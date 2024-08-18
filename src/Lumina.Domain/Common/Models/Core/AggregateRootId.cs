@@ -1,4 +1,4 @@
-namespace Lumina.Domain.Common.Models;
+namespace Lumina.Domain.Common.Models.Core;
 
 /// <summary>
 /// Base identity class for all domain Aggregate Roots.

@@ -1,4 +1,4 @@
-﻿namespace Lumina.Domain.Common.Models;
+﻿namespace Lumina.Domain.Common.Models.Core;
 
 /// <summary>
 /// Base class for all domain Entities.
