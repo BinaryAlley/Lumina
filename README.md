@@ -18,4 +18,4 @@ P.S. This README is just a spark. Watch it grow into a supernova! ✨
 
 ## License
 
-This project is licensed under the GPLv3.0. See the [LICENSE](./documents/LICENSE.md) file for details.
+This project is licensed under the GPLv3.0. See the [LICENSE](./docs/LICENSE.md) file for details.
