@@ -1,44 +1,43 @@
-var builder = WebApplication.CreateBuilder(args);
+#region ========================================================================= USING =====================================================================================
+using Lumina.Presentation.Api.Common.DependencyInjection;
+using Lumina.Application.Common.DependencyInjection;
+#endregion
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+namespace Lumina.Presentation.Api;
 
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+/// <summary>
+/// Application entry point, contains the composition root module, wires up all dependencies of the application.
+/// </summary>
+public class Program
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    #region ===================================================================== METHODS ===================================================================================
+    /// <summary>
+    /// Application entry point.
+    /// </summary>
+    /// <param name="args">Optional command line arguments</param>
+    static void Main(string[] args)
+    {
+        var builder = WebApplication.CreateBuilder(args);
+        
+        builder.Services.AddApplicationLayerServices();
+        builder.Services.AddPresentationApiLayerServices();
 
-app.UseHttpsRedirection();
+        var app = builder.Build();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+        app.UseExceptionHandler("/error"); // uses a middleware which reexecutes the request to the  error path
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast")
-.WithOpenApi();
+        // configure the HTTP request pipeline.
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI();
+        }
 
-app.Run();
+        app.UseHttpsRedirection();
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+        app.MapControllers();
+
+        app.Run();
+    }
+    #endregion
 }
