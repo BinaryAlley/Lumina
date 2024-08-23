@@ -1,27 +1,25 @@
 #region ========================================================================= USING =====================================================================================
+using ErrorOr;
 using Lumina.Domain.Common.Models.Core;
 #endregion
 
-namespace Lumina.Domain.Core.Aggregates.MediaContributor.MediaContributorAggregate.ValueObjects;
+namespace Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate.ValueObjects;
 
 /// <summary>
-/// Value Object for the Id of a media contributor.
+/// Value Object for the Id of a book series.
 /// </summary>
-public sealed class MediaContributorId : AggregateRootId<Guid>
+public sealed class BookSeriesId : ValueObject
 {
     #region ==================================================================== PROPERTIES =================================================================================
-    /// <summary>
-    /// Gets the value of this object.
-    /// </summary>
-    public override Guid Value { get; protected set; }
+    public Guid Value { get; }
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================
     /// <summary>
-    /// Initializes a new instance of the <see cref="MediaContributorId"/> class.
+    /// Initializes a new instance of the <see cref="BookSeriesId"/> class.
     /// </summary>
     /// <param name="value">The value representing this object.</param>
-    private MediaContributorId(Guid value)
+    private BookSeriesId(Guid value)
     {
         Value = value;
     }
@@ -29,24 +27,24 @@ public sealed class MediaContributorId : AggregateRootId<Guid>
 
     #region ===================================================================== METHODS ===================================================================================
     /// <summary>
-    /// Creates a new instance of the <see cref="MediaContributorId"/> class.
+    /// Creates a new instance of the <see cref="BookSeriesId"/> class.
     /// </summary>
-    /// <returns>The created <see cref="MediaContributorId"/> instance.</returns>
-    public static MediaContributorId CreateUnique()
+    /// <returns>The created <see cref="BookSeriesId"/> instance.</returns>
+    public static ErrorOr<BookSeriesId> CreateUnique()
     {
         // TODO: enforce invariants
-        return new MediaContributorId(Guid.NewGuid()); 
+        return new BookSeriesId(Guid.NewGuid());
     }
 
     /// <summary>
-    /// Creates a new instance of the <see cref="MediaContributorId"/> class, from a pre-existing <paramref name="value"/>.
+    /// Creates a new instance of the <see cref="BookSeriesId"/> class, from a pre-existing <paramref name="value"/>.
     /// </summary>
-    /// <param name="value">The value used to create the <see cref="MediaContributorId"/> instance.</param>
-    /// <returns>The created <see cref="MediaContributorId"/> instance.</returns>
-    public static MediaContributorId Create(Guid value)
+    /// <param name="value">The value used to create the <see cref="BookSeriesId"/> instance.</param>
+    /// <returns>The created <see cref="BookSeriesId"/> instance.</returns>
+    public static ErrorOr<BookSeriesId> Create(Guid value)
     {
         // TODO: enforce invariants
-        return new MediaContributorId(value); 
+        return new BookSeriesId(value);
     }
 
     /// <inheritdoc/>

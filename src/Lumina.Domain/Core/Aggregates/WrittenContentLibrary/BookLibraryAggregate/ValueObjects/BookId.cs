@@ -7,10 +7,13 @@ namespace Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggrega
 /// <summary>
 /// Value Object for the Id of a book.
 /// </summary>
-public sealed class BookId : ValueObject
+public sealed class BookId : AggregateRootId<Guid>
 {
     #region ==================================================================== PROPERTIES =================================================================================
-    public Guid Value { get; }
+    /// <summary>
+    /// Gets the value of the <see cref="BookId"/>.
+    /// </summary>
+    public override Guid Value { get; protected set; }
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================

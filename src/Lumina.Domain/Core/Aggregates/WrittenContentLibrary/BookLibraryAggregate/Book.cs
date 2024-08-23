@@ -6,16 +6,17 @@ using Lumina.Domain.Common.Models.Core;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using Lumina.Domain.Core.Aggregates.MediaContributor.MediaContributorAggregate.ValueObjects;
+using Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate.Entities;
 using Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate.ValueObjects;
 #endregion
 
 namespace Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate;
 
 /// <summary>
-/// Entity for a book.
+/// Aggregate root for a book.
 /// </summary>
 [DebuggerDisplay("{Id}: {Title}")]
-public sealed class Book : Entity<BookId>
+public sealed class Book : AggregateRoot<BookId, Guid>
 {
     #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly List<MediaContributorId> _contributors;
@@ -47,7 +48,7 @@ public sealed class Book : Entity<BookId>
     /// <summary>
     /// Gets the series name, if the book is part of a series.
     /// </summary>
-    public Optional<string> Series { get; private set; }
+    public Optional<BookSeries> Series { get; private set; }
 
     /// <summary>
     /// Gets the ASIN (Amazon Standard Identification Number) of the book.
@@ -153,7 +154,7 @@ public sealed class Book : Entity<BookId>
         BookFormat format,
         Optional<string> edition,
         Optional<int> volumeNumber,
-        Optional<string> series,
+        Optional<BookSeries> series,
         Optional<string> asin,
         Optional<string> goodreadsId,
         Optional<string> lccn,
@@ -228,7 +229,7 @@ public sealed class Book : Entity<BookId>
         BookFormat format,
         Optional<string> edition,
         Optional<int> volumeNumber,
-        Optional<string> series,
+        Optional<BookSeries> series,
         Optional<string> asin,
         Optional<string> goodreadsId,
         Optional<string> lccn,
@@ -295,7 +296,7 @@ public sealed class Book : Entity<BookId>
         BookFormat format,
         Optional<string> edition,
         Optional<int> volumeNumber,
-        Optional<string> series,
+        Optional<BookSeries> series,
         Optional<string> asin,
         Optional<string> goodreadsId,
         Optional<string> lccn,

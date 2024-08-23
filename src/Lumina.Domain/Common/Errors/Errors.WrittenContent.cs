@@ -16,6 +16,8 @@ public static partial class Errors
         public static Error InvalidIsbn10Format => Error.Validation(nameof(InvalidIsbn10Format));
         public static Error InvalidIsbn13Format => Error.Validation(nameof(InvalidIsbn13Format));
         public static Error UnknownIsbnFormat => Error.Unexpected(nameof(UnknownIsbnFormat));
+        public static Error TheBookIsAlreadyInTheSeries => Error.Forbidden(nameof(TheBookIsAlreadyInTheSeries));
+        public static Error TheBookIsNotInTheSeries => Error.Forbidden(nameof(TheBookIsNotInTheSeries));
         #endregion
     }
 }
