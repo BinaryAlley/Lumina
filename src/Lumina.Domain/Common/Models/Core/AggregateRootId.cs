@@ -7,6 +7,9 @@ namespace Lumina.Domain.Common.Models.Core;
 public abstract class AggregateRootId<TId> : ValueObject where TId : notnull
 {
     #region ==================================================================== PROPERTIES =================================================================================
+    /// <summary>
+    /// Gets the unique identifier of the Aggregate Root.
+    /// </summary>
     public abstract TId Value { get; protected set; }
     #endregion
 }

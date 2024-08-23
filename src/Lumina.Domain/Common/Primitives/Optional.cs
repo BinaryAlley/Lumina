@@ -12,7 +12,14 @@ public readonly struct Optional<T>
     #endregion
 
     #region ==================================================================== PROPERTIES =================================================================================
+    /// <summary>
+    /// Gets a value indicating whether this structure has a value.
+    /// </summary>
     public bool HasValue { get; }
+    
+    /// <summary>
+    /// Gets the value represented by this structure.
+    /// </summary>
     public T Value
     {
         get
@@ -24,7 +31,7 @@ public readonly struct Optional<T>
 
     #region ====================================================================== CTOR =====================================================================================
     /// <summary>
-    /// Overload C-tor.
+    /// Initializes a new instance of the <see cref="Optional{T}"/> structure.
     /// </summary>
     /// <param name="value">The value represented by this structure.</param>
     public Optional(T value)

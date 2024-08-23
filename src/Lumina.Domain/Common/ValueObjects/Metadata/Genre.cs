@@ -21,7 +21,7 @@ public class Genre : ValueObject
 
     #region ====================================================================== CTOR =====================================================================================
     /// <summary>
-    /// Overload C-tor.
+    /// Initializes a new instance of the <see cref="Genre"/> class.
     /// </summary>
     /// <param name="name">The value representing this object.</param>
     private Genre(string name)
@@ -32,7 +32,7 @@ public class Genre : ValueObject
 
     #region ===================================================================== METHODS ===================================================================================
     /// <summary>
-    /// Creates a new instance of <see cref="Genre"/>.
+    /// Creates a new instance of the <see cref="Genre"/> class.
     /// </summary>
     /// <param name="name">The value of the genre.</param>
     /// <returns>

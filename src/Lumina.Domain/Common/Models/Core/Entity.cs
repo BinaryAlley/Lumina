@@ -7,12 +7,15 @@
 public abstract class Entity<TId> : IEquatable<Entity<TId>> where TId : notnull
 {
     #region ==================================================================== PROPERTIES =================================================================================
+    /// <summary>
+    /// Gets the unique identifier of the entity.
+    /// </summary>
     public TId Id { get; protected set; }
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================
     /// <summary>
-    /// Overload C-tor.
+    /// Initializes a new instance of the <see cref="Entity{TId}"/> class.
     /// </summary>
     /// <param name="id">The id of the entity.</param>
     protected Entity(TId id)
@@ -21,6 +24,9 @@ public abstract class Entity<TId> : IEquatable<Entity<TId>> where TId : notnull
     }
 
 #pragma warning disable CS8618
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Entity{TId}"/> class.
+    /// </summary>
     protected Entity() // only needed during reflection
     {
         

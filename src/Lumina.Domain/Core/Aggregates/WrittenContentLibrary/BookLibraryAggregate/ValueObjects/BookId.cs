@@ -2,12 +2,12 @@
 using Lumina.Domain.Common.Models.Core;
 #endregion
 
-namespace Lumina.Domain.Common.ValueObjects.Media;
+namespace Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate.ValueObjects;
 
 /// <summary>
-/// Value Object for the Id of a person.
+/// Value Object for the Id of a book.
 /// </summary>
-public sealed class PersonId : ValueObject
+public sealed class BookId : ValueObject
 {
     #region ==================================================================== PROPERTIES =================================================================================
     public Guid Value { get; }
@@ -15,10 +15,10 @@ public sealed class PersonId : ValueObject
 
     #region ====================================================================== CTOR =====================================================================================
     /// <summary>
-    /// Overload C-tor.
+    /// Initializes a new instance of the <see cref="BookId"/> class.
     /// </summary>
     /// <param name="value">The value representing this object.</param>
-    private PersonId(Guid value)
+    private BookId(Guid value)
     {
         Value = value;
     }
@@ -26,24 +26,24 @@ public sealed class PersonId : ValueObject
 
     #region ===================================================================== METHODS ===================================================================================
     /// <summary>
-    /// Creates a new instance of <see cref="PersonId"/>.
+    /// Creates a new instance of the <see cref="BookId"/> class.
     /// </summary>
-    /// <returns>The created <see cref="PersonId"/> instance.</returns>
-    public static PersonId CreateUnique()
+    /// <returns>The created <see cref="BookId"/> instance.</returns>
+    public static BookId CreateUnique()
     {
         // TODO: enforce invariants
-        return new PersonId(Guid.NewGuid()); 
+        return new BookId(Guid.NewGuid());
     }
 
     /// <summary>
-    /// Creates a new instance of <see cref="PersonId"/> from <paramref name="value"/>.
+    /// Creates a new instance of the <see cref="BookId"/> class, from a pre-existing <paramref name="value"/>.
     /// </summary>
-    /// <param name="value">The value used to create the <see cref="PersonId"/> instance.</param>
-    /// <returns>The created <see cref="PersonId"/> instance.</returns>
-    public static PersonId Create(Guid value)
+    /// <param name="value">The value used to create the <see cref="BookId"/> instance.</param>
+    /// <returns>The created <see cref="BookId"/> instance.</returns>
+    public static BookId Create(Guid value)
     {
         // TODO: enforce invariants
-        return new PersonId(value); 
+        return new BookId(value);
     }
 
     /// <inheritdoc/>

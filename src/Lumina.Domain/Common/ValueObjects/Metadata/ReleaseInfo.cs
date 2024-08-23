@@ -48,7 +48,7 @@ public class ReleaseInfo : ValueObject
 
     #region ====================================================================== CTOR =====================================================================================
     /// <summary>
-    /// Overload C-tor.
+    /// Initializes a new instance of the <see cref="ReleaseInfo"/> class.
     /// </summary>
     /// <param name="originalReleaseDate">The optional original release date of the media item.</param>
     /// <param name="originalReleaseYear">The optional original release year of the media item.</param>
@@ -56,8 +56,13 @@ public class ReleaseInfo : ValueObject
     /// <param name="reReleaseYear">The optional re-release year of the media item.</param>
     /// <param name="releaseCountry">The optional country or region of release.</param>
     /// <param name="releaseVersion">The optional release version or edition.</param>
-    private ReleaseInfo(Optional<DateOnly> originalReleaseDate, Optional<int> originalReleaseYear,
-        Optional<DateOnly> reReleaseDate, Optional<int> reReleaseYear, Optional<string> releaseCountry, Optional<string> releaseVersion)
+    private ReleaseInfo(
+        Optional<DateOnly> originalReleaseDate, 
+        Optional<int> originalReleaseYear,
+        Optional<DateOnly> reReleaseDate, 
+        Optional<int> reReleaseYear, 
+        Optional<string> releaseCountry, 
+        Optional<string> releaseVersion)
     {
         OriginalReleaseDate = originalReleaseDate;
         OriginalReleaseYear = originalReleaseYear;
@@ -70,7 +75,7 @@ public class ReleaseInfo : ValueObject
 
     #region ===================================================================== METHODS ===================================================================================
     /// <summary>
-    /// Creates a new instance of <see cref="ReleaseInfo"/>.
+    /// Creates a new instance of the <see cref="ReleaseInfo"/> class.
     /// </summary>
     /// <param name="originalReleaseDate">The optional original release date of the media item.</param>
     /// <param name="originalReleaseYear">The optional original release year of the media item.</param>
@@ -81,8 +86,13 @@ public class ReleaseInfo : ValueObject
     /// <returns>
     /// An <see cref="ErrorOr{T}"/> containing either a successfully created <see cref="ReleaseInfo"/> or an error message.
     /// </returns>
-    public static ErrorOr<ReleaseInfo> Create(Optional<DateOnly> originalReleaseDate, Optional<int> originalReleaseYear,
-        Optional<DateOnly> reReleaseDate, Optional<int> reReleaseYear, Optional<string> releaseCountry, Optional<string> releaseVersion)
+    public static ErrorOr<ReleaseInfo> Create(
+        Optional<DateOnly> originalReleaseDate, 
+        Optional<int> originalReleaseYear,
+        Optional<DateOnly> reReleaseDate, 
+        Optional<int> reReleaseYear, 
+        Optional<string> releaseCountry, 
+        Optional<string> releaseVersion)
     {
         if (originalReleaseDate.HasValue && originalReleaseYear.HasValue && originalReleaseDate.Value.Year != originalReleaseYear.Value)
             return Errors.Errors.Metadata.OriginalReleaseDateAndYearMustMatch;

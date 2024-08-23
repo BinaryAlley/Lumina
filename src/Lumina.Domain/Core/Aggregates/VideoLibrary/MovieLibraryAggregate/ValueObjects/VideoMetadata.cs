@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Common.ValueObjects.Media;
+using Lumina.Domain.Common.ValueObjects.Metadata;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Domain.Common.ValueObjects.Metadata;
+namespace Lumina.Domain.Core.Aggregates.VideoLibrary.MovieLibraryAggregate.ValueObjects;
 
 /// <summary>
-/// Value Object for the rating of a media element.
+/// Value Object for the video metadata of a media element.
 /// </summary>
-[DebuggerDisplay("{Value}/{MaxValue}")]
+[DebuggerDisplay("{Title}")]
 public class VideoMetadata : BaseMetadata
 {
     #region ==================================================================== PROPERTIES =================================================================================
@@ -22,7 +22,7 @@ public class VideoMetadata : BaseMetadata
     /// <summary>
     /// Gets the resolution of the video.
     /// </summary>
-    public string Resolution { get; }
+    public string Resolution { get; } // TODO: should be implemented as a value object with width, height, aspet ratio, etc.
 
     /// <summary>
     /// Gets the frame rate of the video.
@@ -38,20 +38,15 @@ public class VideoMetadata : BaseMetadata
     /// Gets the audio codec used.
     /// </summary>
     public Optional<string> AudioCodec { get; }
-
-    /// <summary>
-    /// Gets the list of actors starring in this video.
-    /// </summary>
-    public IReadOnlyList<MediaContributor> Contributors { get; }
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================
     /// <summary>
-    /// Overload C-tor.
+    /// Initializes a new instance of the <see cref="VideoMetadata"/> class.
     /// </summary>
     /// <param name="title">The title of the video.</param>
     /// <param name="originalTitle">The optional original title of the video.</param>
-    /// <param name="durationInSeconds">The duration of the video in seconds.</param>
+    /// <param name="durationInSeconds">The duration of the video, in seconds.</param>
     /// <param name="resolution">The resolution of the video.</param>
     /// <param name="release">The release information of the video.</param>
     /// <param name="description">The optional description of the video.</param>
@@ -62,10 +57,20 @@ public class VideoMetadata : BaseMetadata
     /// <param name="audioCodec">The optional audio codec used.</param>
     /// <param name="genres">The genres of the video.</param>
     /// <param name="tags">The tags associated with the video.</param>
-    /// <param name="contributors">The list of contributors for this video.</param>
-    private VideoMetadata(string title, Optional<string> originalTitle, int durationInSeconds, string resolution, ReleaseInfo release, Optional<string> description,
-        Optional<LanguageInfo> language, Optional<LanguageInfo> originalLanguage, Optional<float> frameRate, Optional<string> videoCodec, Optional<string> audioCodec,
-        IEnumerable<Genre>? genres = null, IEnumerable<Tag>? tags = null, IEnumerable<MediaContributor>? contributors = null)
+    private VideoMetadata(
+        string title, 
+        Optional<string> originalTitle, 
+        int durationInSeconds, 
+        string resolution, 
+        ReleaseInfo release, 
+        Optional<string> description,
+        Optional<LanguageInfo> language, 
+        Optional<LanguageInfo> originalLanguage, 
+        Optional<float> frameRate, 
+        Optional<string> videoCodec, 
+        Optional<string> audioCodec,
+        List<Genre> genres, 
+        List<Tag> tags)
         : base(title, originalTitle, release, description, genres, tags, language, originalLanguage)
     {
         DurationInSeconds = durationInSeconds;
@@ -73,13 +78,12 @@ public class VideoMetadata : BaseMetadata
         FrameRate = frameRate;
         VideoCodec = videoCodec;
         AudioCodec = audioCodec;
-        Contributors = contributors?.ToList().AsReadOnly() ?? new List<MediaContributor>().AsReadOnly();
     }
     #endregion
 
     #region ===================================================================== METHODS ===================================================================================
     /// <summary>
-    /// Creates a new instance of <see cref="VideoMetadata"/>.
+    /// Creates a new instance of the <see cref="VideoMetadata"/> class.
     /// </summary>
     /// <param name="title">The title of the video.</param>
     /// <param name="originalTitle">The optional original title of the video.</param>
@@ -98,12 +102,23 @@ public class VideoMetadata : BaseMetadata
     /// <returns>
     /// An <see cref="ErrorOr{T}"/> containing either a successfully created <see cref="VideoMetadata"/> or an error message.
     /// </returns>
-    public static ErrorOr<VideoMetadata> Create(string title, Optional<string> originalTitle, int durationInSeconds, string resolution, ReleaseInfo release, Optional<string> description,
-        Optional<LanguageInfo> language, Optional<LanguageInfo> originalLanguage, Optional<float> frameRate, Optional<string> videoCodec, Optional<string> audioCodec,
-        IEnumerable<Genre>? genres = null, IEnumerable<Tag>? tags = null, IEnumerable<MediaContributor>? contributors = null)
+    public static ErrorOr<VideoMetadata> Create(
+        string title, 
+        Optional<string> originalTitle, 
+        int durationInSeconds, 
+        string resolution, 
+        ReleaseInfo release, 
+        Optional<string> description,
+        Optional<LanguageInfo> language, 
+        Optional<LanguageInfo> originalLanguage, 
+        Optional<float> frameRate, 
+        Optional<string> videoCodec, 
+        Optional<string> audioCodec,
+        List<Genre> genres, 
+        List<Tag> tags)
     {
         return new VideoMetadata(title, originalTitle, durationInSeconds, resolution, release, description,
-            language, originalLanguage, frameRate, videoCodec, audioCodec, genres, tags, contributors);
+            language, originalLanguage, frameRate, videoCodec, audioCodec, genres, tags);
     }
 
     /// <inheritdoc/>
@@ -116,8 +131,6 @@ public class VideoMetadata : BaseMetadata
         yield return FrameRate;
         yield return VideoCodec;
         yield return AudioCodec;
-        foreach (var contributor in Contributors)
-            yield return contributor;
     }
     #endregion
 }

@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using System.Diagnostics;
 using Lumina.Domain.Common.Models.Core;
 using Lumina.Domain.Common.Primitives;
 #endregion
@@ -8,53 +9,65 @@ namespace Lumina.Domain.Common.ValueObjects.Metadata;
 /// <summary>
 /// Base template for all metadata-related value objects.
 /// </summary>
+[DebuggerDisplay("{Title}")]
 public abstract class BaseMetadata : ValueObject
 {
+    #region ================================================================== FIELD MEMBERS ================================================================================
+    private readonly List<Tag> _tags;
+    private readonly List<Genre> _genres;
+    #endregion
+    
     #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the title of the media item.
     /// </summary>
-    public string Title { get; }
+    public string Title { get; private set;}
 
     /// <summary>
     /// Gets the original title of the media item.
     /// </summary>
-    public Optional<string> OriginalTitle { get; }
+    public Optional<string> OriginalTitle { get; private set; }
 
     /// <summary>
     /// Gets the optional description of the media item.
     /// </summary>
-    public Optional<string> Description { get; }
+    public Optional<string> Description { get; private set; }
 
     /// <summary>
     /// Gets the release information of the media item.
     /// </summary>
-    public ReleaseInfo ReleaseInfo { get; }
+    public ReleaseInfo ReleaseInfo { get; private set; }
 
-    /// <summary>
-    /// Gets the list of tags associated with the media item.
-    /// </summary>
-    public IReadOnlyList<Tag> Tags { get; }
-    
-    /// <summary>
-    /// Gets the list of genres associated with the media item.
-    /// </summary>
-    public IReadOnlyList<Genre> Genres { get; }
-    
     /// <summary>
     /// Gets the optional language of the media item.
     /// </summary>
-    public Optional<LanguageInfo> Language { get; }
+    public Optional<LanguageInfo> Language { get; private set; }
     
     /// <summary>
     /// Gets the optional original language of the media item. 
     /// </summary>
-    public Optional<LanguageInfo> OriginalLanguage { get; }
+    public Optional<LanguageInfo> OriginalLanguage { get; private set; }
+
+    /// <summary>
+    /// Gets the list of tags associated with the media item.
+    /// </summary>
+    public IReadOnlyCollection<Tag> Tags 
+    {
+        get { return _tags.AsReadOnly(); }
+    }
+    
+    /// <summary>
+    /// Gets the list of genres associated with the media item.
+    /// </summary>
+    public IReadOnlyCollection<Genre> Genres 
+    {
+        get { return _genres.AsReadOnly(); }
+    }
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================
     /// <summary>
-    /// Overload C-tor.
+    /// Initializes a new instance of the <see cref="BaseMetadata"/> class.
     /// </summary>
     /// <param name="title">The title of the element to which this metadata object belongs to.</param>
     /// <param name="originalTitle">The optional original title of the element to which this metadata object belongs to.</param>
@@ -65,15 +78,22 @@ public abstract class BaseMetadata : ValueObject
     /// <param name="language">The optional language of the element to which this metadata object belongs to.</param>
     /// <param name="originalLanguage">The optional original language of the element to which this metadata object belongs to.</param>
     /// <exception cref="ArgumentNullException">Thrown when the <see cref="title"/> value is <see langword="null"/></exception>
-    protected BaseMetadata(string title, Optional<string> originalTitle, ReleaseInfo releaseInfo, Optional<string> description, 
-        IEnumerable<Genre>? genres, IEnumerable<Tag>? tags, Optional<LanguageInfo> language, Optional<LanguageInfo> originalLanguage)
+    protected BaseMetadata(
+        string title, 
+        Optional<string> originalTitle, 
+        ReleaseInfo releaseInfo, 
+        Optional<string> description, 
+        List<Genre> genres, 
+        List<Tag> tags, 
+        Optional<LanguageInfo> language, 
+        Optional<LanguageInfo> originalLanguage)
     {
         Title = title ?? throw new ArgumentNullException(nameof(title));
         OriginalTitle = originalTitle;
         ReleaseInfo = releaseInfo;
         Description = description;
-        Genres = genres?.ToList().AsReadOnly() ?? new List<Genre>().AsReadOnly();
-        Tags = tags?.ToList().AsReadOnly() ?? new List<Tag>().AsReadOnly();
+        _genres = genres;
+        _tags = tags;
         Language = language;
         OriginalLanguage = originalLanguage;
     }
@@ -87,9 +107,9 @@ public abstract class BaseMetadata : ValueObject
         yield return OriginalTitle;
         yield return ReleaseInfo;
         yield return Description;
-        foreach (var genre in Genres)
+        foreach (var genre in _genres)
             yield return genre;
-        foreach (var tag in Tags)
+        foreach (var tag in _tags)
             yield return tag;
         yield return Language;
         yield return OriginalLanguage;

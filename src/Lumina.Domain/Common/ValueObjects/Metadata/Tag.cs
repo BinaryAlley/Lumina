@@ -21,7 +21,7 @@ public class Tag : ValueObject
 
     #region ====================================================================== CTOR =====================================================================================
     /// <summary>
-    /// Overload C-tor.
+    /// Initializes a new instance of the <see cref="Tag"/> class.
     /// </summary>
     /// <param name="name">The value representing this object.</param>
     private Tag(string name)
@@ -32,7 +32,7 @@ public class Tag : ValueObject
 
     #region ===================================================================== METHODS ===================================================================================
     /// <summary>
-    /// Creates a new instance of <see cref="Tag"/>.
+    /// Creates a new instance of the <see cref="Tag"/> class.
     /// </summary>
     /// <param name="name">The value of the tag.</param>
     /// <returns>

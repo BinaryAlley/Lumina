@@ -121,6 +121,27 @@
 - SupplementaryContentLibrary (root: SupplementaryContentLibrary, entities: SubtitleFile, Lyrics, LanguageTrack)
 - FileManagement (root: File, entities: Stream)
 
+- WrittenContentLibrary
+  - BookLibrary (root: BookLibrary)
+    - Entities: Book, BookSeries
+    - Value Objects: BookMetadata, SeriesInfo
+  
+  - ComicLibrary (root: ComicLibrary)
+    - Entities: ComicBook, ComicSeries, Manga, GraphicNovel
+    - Value Objects: ComicMetadata, SeriesInfo
+  
+  - PeriodicalLibrary (root: PeriodicalLibrary)
+    - Entities: Magazine, MagazineIssue
+    - Value Objects: PeriodicalMetadata, IssueInfo
+  
+  - AcademicLibrary (root: AcademicLibrary)
+    - Entities: AcademicPaper
+    - Value Objects: AcademicMetadata, CitationInfo
+  
+  - MiscWrittenContentLibrary (root: MiscWrittenContentLibrary)
+    - Entities: SheetMusic, Screenplay
+    - Value Objects: SheetMusicMetadata, ScreenplayMetadata
+
 ## Value Objects
 - BaseMetadata
 - VideoMetadata
@@ -171,6 +192,36 @@
 - FileManagementService
 - LanguageTrackManager
 - CrossMediaRelationshipManager
+- ContentCurationService
+- UserActivityTrackingService
+- ContentSynchronizationService
+
+## Domain Events
+
+- MediaItemAdded
+- MediaItemRemoved
+- PlaylistCreated
+- PlaylistUpdated
+- UserPreferencesChanged
+- MetadataUpdated
+- FileTranscoded
+- StreamStarted
+- StreamEnded
+
+## Bounded Contexts
+
+- MediaManagement
+  - Aggregates: VideoLibrary, AudioLibrary, PodcastLibrary, WrittenContentLibrary, PhotoLibrary
+  - Services: MediaScanner, MetadataFetcher, TranscodingService
+- UserExperience
+  - Aggregates: UserProfile
+  - Services: RecommendationEngine, ContentCurationService, UserActivityTrackingService
+- ContentDelivery
+  - Aggregates: FileManagement
+  - Services: StreamingService, ContentSynchronizationService
+- MetadataManagement
+  - Aggregates: SupplementaryContentLibrary
+  - Services: LyricsMatchingService, ArtworkManagementService
 
 ## Repositories
 - VideoRepository

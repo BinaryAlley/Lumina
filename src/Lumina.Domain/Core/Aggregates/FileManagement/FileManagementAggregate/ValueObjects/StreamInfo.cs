@@ -5,7 +5,7 @@ using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.Errors;
 #endregion
 
-namespace Lumina.Domain.FileManagementAggregate.ValueObjects;
+namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.ValueObjects;
 
 /// <summary>
 /// Value Object for the information about a media stream.
@@ -56,7 +56,7 @@ public class StreamInfo : ValueObject
 
     #region ====================================================================== CTOR =====================================================================================
     /// <summary>
-    /// Overload C-tor.
+    /// Initializes a new instance of the <see cref="StreamInfo"/> class.
     /// </summary>
     /// <param name="streamId">The unique identifier for the stream.</param>
     /// <param name="mimeType">The MIME type of the stream content.</param>
@@ -66,8 +66,15 @@ public class StreamInfo : ValueObject
     /// <param name="frameRate">The frame rate of the stream (for video).</param>
     /// <param name="sampleRate">The sample rate of the stream (for audio).</param>
     /// <param name="channels">The number of channels (for audio).</param>
-    private StreamInfo(string streamId, string mimeType, int bitrate, string codec,
-        Optional<string> resolution = default, Optional<float> frameRate = default, Optional<int> sampleRate = default, Optional<int> channels = default)
+    private StreamInfo(
+        string streamId, 
+        string mimeType, 
+        int bitrate, 
+        string codec,
+        Optional<string> resolution, 
+        Optional<float> frameRate,
+        Optional<int> sampleRate, 
+        Optional<int> channels)
     {
         StreamId = streamId;
         MimeType = mimeType;
@@ -82,7 +89,7 @@ public class StreamInfo : ValueObject
 
     #region ===================================================================== METHODS ===================================================================================
     /// <summary>
-    /// Creates a new instance of <see cref="StreamInfo"/>.
+    /// Creates a new instance of the <see cref="StreamInfo"/> class.
     /// </summary>
     /// <param name="streamId">The unique identifier for the stream.</param>
     /// <param name="mimeType">The MIME type of the stream content.</param>
@@ -95,8 +102,15 @@ public class StreamInfo : ValueObject
     /// <returns>
     /// An <see cref="ErrorOr{T}"/> containing either a successfully created <see cref="StreamInfo"/> or an error message.
     /// </returns>
-    public static ErrorOr<StreamInfo> Create(string streamId, string mimeType, int bitrate, string codec,
-        Optional<string> resolution = default, Optional<float> frameRate = default, Optional<int> sampleRate = default, Optional<int> channels = default)
+    public static ErrorOr<StreamInfo> Create(
+        string streamId, 
+        string mimeType, 
+        int bitrate, 
+        string codec,
+        Optional<string> resolution, 
+        Optional<float> frameRate, 
+        Optional<int> sampleRate, 
+        Optional<int> channels)
     {
         if (streamId is null)
             return Errors.FileManagement.StreamIdCannotBeEmpty;

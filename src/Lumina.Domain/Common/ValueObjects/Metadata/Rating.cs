@@ -28,7 +28,7 @@ public class Rating : ValueObject
     /// <summary>
     /// Gets the optional source of the rating (e.g., "IMDB", "Rotten Tomatoes").
     /// </summary>
-    public Optional<RatingSource> Source { get; }
+    public Optional<VideoRatingSource> Source { get; }
 
     /// <summary>
     /// Gets the optional number of votes or reviews this rating is based on.
@@ -38,13 +38,13 @@ public class Rating : ValueObject
 
     #region ====================================================================== CTOR =====================================================================================
     /// <summary>
-    /// Overload C-tor.
+    /// Initializes a new instance of the <see cref="Rating"/> class.
     /// </summary>
     /// <param name="value">The numeric value of the rating.</param>
     /// <param name="maxValue">The maximum possible rating value.</param>
     /// <param name="source">The optional source of the rating.</param>
     /// <param name="voteCount">The optional number of votes or reviews.</param>
-    private Rating(decimal value, decimal maxValue, Optional<RatingSource> source = default, Optional<int> voteCount = default)
+    private Rating(decimal value, decimal maxValue, Optional<VideoRatingSource> source, Optional<int> voteCount)
     {
         Value = value;
         MaxValue = maxValue;
@@ -55,7 +55,7 @@ public class Rating : ValueObject
 
     #region ===================================================================== METHODS ===================================================================================
     /// <summary>
-    /// Creates a new instance of <see cref="Rating"/>.
+    /// Creates a new instance of the <see cref="Rating"/> class.
     /// </summary>
     /// <param name="value">The numeric value of the rating.</param>
     /// <param name="maxValue">The maximum possible rating value.</param>
@@ -64,7 +64,7 @@ public class Rating : ValueObject
     /// <returns>
     /// An <see cref="ErrorOr{T}"/> containing either a successfully created <see cref="Rating"/> or an error message.
     /// </returns>
-    public static ErrorOr<Rating> Create(decimal value, decimal maxValue, Optional<RatingSource> source = default, Optional<int> voteCount = default)
+    public static ErrorOr<Rating> Create(decimal value, decimal maxValue, Optional<VideoRatingSource> source, Optional<int> voteCount)
     {
         if (maxValue < 0 || value < 0)
             return Errors.Errors.Metadata.RatingMustBePositive;

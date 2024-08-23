@@ -33,7 +33,7 @@ public class LanguageInfo : ValueObject
 
     #region ====================================================================== CTOR =====================================================================================
     /// <summary>
-    /// Overload C-tor.
+    /// Initializes a new instance of the <see cref="LanguageInfo"/> class.
     /// </summary>
     /// <param name="languageCode">The ISO 639-1 two-letter language code.</param>
     /// <param name="languageName">The full name of the language in English.</param>
@@ -50,7 +50,7 @@ public class LanguageInfo : ValueObject
 
     #region ===================================================================== METHODS ===================================================================================
     /// <summary>
-    /// Creates a new instance of <see cref="LanguageInfo"/>.
+    /// Creates a new instance of the <see cref="LanguageInfo"/> class.
     /// </summary>
     /// <param name="languageCode">The ISO 639-1 two-letter language code.</param>
     /// <param name="languageName">The full name of the language in English.</param>

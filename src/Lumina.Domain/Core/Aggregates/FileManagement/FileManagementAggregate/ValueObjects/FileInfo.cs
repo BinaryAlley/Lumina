@@ -5,7 +5,7 @@ using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.Errors;
 #endregion
 
-namespace Lumina.Domain.FileManagementAggregate.ValueObjects;
+namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.ValueObjects;
 
 /// <summary>
 /// Value Object for the information of a file.
@@ -41,7 +41,7 @@ public class FileInfo : ValueObject
 
     #region ====================================================================== CTOR =====================================================================================
     /// <summary>
-    /// Overload C-tor.
+    /// Initializes a new instance of the <see cref="FileInfo"/> class.
     /// </summary>
     /// <param name="path">The full path of the file.</param>
     /// <param name="fileExtension">The file extension.</param>
@@ -60,7 +60,7 @@ public class FileInfo : ValueObject
 
     #region ===================================================================== METHODS ===================================================================================
     /// <summary>
-    /// Creates a new instance of <see cref="FileInfo"/>.
+    /// Creates a new instance of the <see cref="FileInfo"/> class.
     /// </summary>
     /// <param name="path">The full path of the file.</param>
     /// <param name="fileExtension">The file extension.</param>
