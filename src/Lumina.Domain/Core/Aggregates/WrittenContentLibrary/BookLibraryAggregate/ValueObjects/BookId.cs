@@ -34,7 +34,6 @@ public sealed class BookId : AggregateRootId<Guid>
     /// <returns>The created <see cref="BookId"/> instance.</returns>
     public static BookId CreateUnique()
     {
-        // TODO: enforce invariants
         return new BookId(Guid.NewGuid());
     }
 
@@ -45,7 +44,6 @@ public sealed class BookId : AggregateRootId<Guid>
     /// <returns>The created <see cref="BookId"/> instance.</returns>
     public static BookId Create(Guid value)
     {
-        // TODO: enforce invariants
         return new BookId(value);
     }
 

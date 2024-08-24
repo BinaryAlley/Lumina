@@ -223,7 +223,9 @@ public sealed class Book : AggregateRoot<BookId, Guid>
     /// <param name="isbns">The list of ISBNs of the book.</param>
     /// <param name="contributors">The list of media contributors of the book.</param>
     /// <param name="ratings">The list of ratings for the book.</param>
-    /// <returns>The created <see cref="Book"/>.</returns>
+    /// <returns>
+    /// An <see cref="ErrorOr{T}"/> containing either a successfully created <see cref="Book"/>, or an error message.
+    /// </returns>
     public static ErrorOr<Book> Create(
         WrittenContentMetadata metadata,
         BookFormat format,
@@ -289,7 +291,9 @@ public sealed class Book : AggregateRoot<BookId, Guid>
     /// <param name="isbns">The list of ISBNs of the book.</param>
     /// <param name="contributors">The list of media contributors of the book.</param>
     /// <param name="ratings">The list of ratings for the book.</param>
-    /// <returns>The created <see cref="Book"/>.</returns>
+    /// <returns>
+    /// An <see cref="ErrorOr{T}"/> containing either a successfully created <see cref="Book"/>, or an error message.
+    /// </returns>
     public static ErrorOr<Book> Create(
         BookId id,
         WrittenContentMetadata metadata,

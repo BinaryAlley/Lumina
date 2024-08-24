@@ -3,6 +3,8 @@ using Lumina.Application.Common.Behaviors;
 using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 using FluentValidation;
+using MapsterMapper;
+using Mapster;
 #endregion
 
 namespace Lumina.Application.Common.DependencyInjection;
@@ -31,6 +33,12 @@ public static class ApplicationLayerServices
 
         // register fluent validators
         services.AddValidatorsFromAssembly(typeof(ApplicationLayerServices).Assembly);
+
+        // register mapster configs in this assembly
+        var mapsterConfig = TypeAdapterConfig.GlobalSettings;
+        mapsterConfig.Scan(typeof(ApplicationLayerServices).Assembly);
+        services.AddSingleton(mapsterConfig);
+        services.AddScoped<IMapper, ServiceMapper>();
 
         return services;
     }

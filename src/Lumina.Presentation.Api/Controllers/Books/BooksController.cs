@@ -1,6 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Application.Core.WrittenContentLibrary.BooksLibrary.Books.Commands;
+using Lumina.Presentation.Api.Common.Contracts.Books;
 using Lumina.Presentation.Api.Controllers.Common;
+using MapsterMapper;
 using Mediator;
 using Microsoft.AspNetCore.Mvc;
 #endregion
@@ -15,7 +17,8 @@ namespace Lumina.Presentation.Api.Controllers.Books;
 public class BooksController : ApiController 
 {
     #region ================================================================== FIELD MEMBERS ================================================================================
-    private readonly ISender mediator;
+    private readonly ISender _mediator;
+    private readonly IMapper _mapper;
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================
@@ -23,17 +26,18 @@ public class BooksController : ApiController
     /// Initializes a new instance of the <see cref="BooksController"/> class.
     /// </summary>
     /// <param name="mediator">Injecting service for mediating commands and queries.</param>
-    public BooksController(ISender mediator)
+    /// <param name="mapper">Injected service for mapping objects.</param>
+    public BooksController(ISender mediator, IMapper mapper)
     {
-        this.mediator = mediator;
+        _mediator = mediator;
+        _mapper = mapper;
     }
     #endregion
 
     #region ===================================================================== METHODS ===================================================================================
     /// <summary>
-    /// Gets all books.
+    /// Controller action for getting the list of all books.
     /// </summary>
-    /// <returns>An <see cref="ErrorOr{T}"/> containing either a collection of books, or an error.</returns>
     [HttpGet()]
     public async Task<IActionResult> GetBooks()
     {
@@ -42,15 +46,15 @@ public class BooksController : ApiController
         return Ok(new List<string> { "Book 1", "Book 2", "Book 3" });
     }
 
-    // /// <summary>
-    // /// Adds a book.
-    // /// </summary>
-    // /// <param name="command"></param>
-    // /// <returns>The result of the HTTP request.</returns>
-    // public async Task<IActionResult> AddBook(AddBookCommand command)
-    // {
-    //     ErrorOr<Unit> result = await mediator.Send(command);
-    //     return result.Match(result => Ok(result), errors => Problem(errors));
-    // }
+    /// <summary>
+    /// Controller action for adding a book.
+    /// </summary>
+    /// <param name="command">The command to add a book.</param>
+    [HttpPost()]
+    public async Task<IActionResult> AddBook(AddBookRequest request)
+    {
+        var result = await _mediator.Send(_mapper.Map<AddBookCommand>(request));
+        return result.Match(result => Ok(result), errors => Problem(errors));
+    }
     #endregion
 }

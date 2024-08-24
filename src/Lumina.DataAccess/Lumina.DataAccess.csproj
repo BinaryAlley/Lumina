@@ -7,4 +7,8 @@
     <BaseOutputPath>..\..\bin\</BaseOutputPath>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Lumina.Application\Lumina.Application.csproj" />
+  </ItemGroup>
+
 </Project>

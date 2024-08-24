@@ -68,7 +68,7 @@ public class FileInfo : ValueObject
     /// <param name="lastModified">The date and time when the file was last modified.</param>
     /// <param name="mimeType">The MIME type of the file, if available.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{T}"/> containing either a successfully created <see cref="FileInfo"/> or an error message.
+    /// An <see cref="ErrorOr{T}"/> containing either a successfully created <see cref="FileInfo"/>, or an error message.
     /// </returns>
     public static ErrorOr<FileInfo> Create(string path, string fileExtension, long sizeInBytes, DateTime lastModified, Optional<string> mimeType)
     {

@@ -30,26 +30,26 @@ public class WrittenContentMetadata : BaseMetadata
     /// </summary>
     /// <param name="title">The title of the written content.</param>
     /// <param name="originalTitle">The optional original title of the video.</param>
-    /// <param name="release">The release information of the written content.</param>
     /// <param name="description">The description of the written content.</param>
+    /// <param name="releaseInfo">The release information of the written content.</param>
     /// <param name="genres">The genres of the written content.</param>
     /// <param name="tags">The tags associated with the written content.</param>
     /// <param name="language">The language of the written content.</param>
     /// <param name="originalLanguage">The optional original language of the video.</param>
     /// <param name="publisher">The publisher of the written content.</param>
     /// <param name="pageCount">The number of pages in the written content.</param>
-    public WrittenContentMetadata(
+    private WrittenContentMetadata(
         string title,
         Optional<string> originalTitle,
-        ReleaseInfo release,
         Optional<string> description,
+        ReleaseInfo releaseInfo,
         List<Genre> genres,
         List<Tag> tags,
         Optional<LanguageInfo> language, 
         Optional<LanguageInfo> originalLanguage,
         Optional<string> publisher,
         Optional<int> pageCount)
-        : base(title, originalTitle, release, description, genres, tags, language, originalLanguage)
+        : base(title, originalTitle, description, releaseInfo, genres, tags, language, originalLanguage)
     {
         Publisher = publisher;
         PageCount = pageCount;
@@ -57,6 +57,44 @@ public class WrittenContentMetadata : BaseMetadata
     #endregion
 
     #region ===================================================================== METHODS ===================================================================================
+    /// <summary>
+    /// Creates a new instance of the <see cref="WrittenContentMetadata"/> class.
+    /// </summary>
+    /// <param name="title">The title of the written content.</param>
+    /// <param name="originalTitle">The optional original title of the video.</param>
+    /// <param name="description">The description of the written content.</param>
+    /// <param name="releaseInfo">The release information of the written content.</param>
+    /// <param name="genres">The genres of the written content.</param>
+    /// <param name="tags">The tags associated with the written content.</param>
+    /// <param name="language">The language of the written content.</param>
+    /// <param name="originalLanguage">The optional original language of the video.</param>
+    /// <param name="publisher">The publisher of the written content.</param>
+    /// <param name="pageCount">The number of pages in the written content.</param>
+    public static WrittenContentMetadata Create(
+        string title,
+        Optional<string> originalTitle,
+        Optional<string> description,
+        ReleaseInfo releaseInfo,
+        List<Genre> genres,
+        List<Tag> tags,
+        Optional<LanguageInfo> language,
+        Optional<LanguageInfo> originalLanguage,
+        Optional<string> publisher,
+        Optional<int> pageCount)
+    {
+        return new WrittenContentMetadata(
+            title, 
+            originalTitle, 
+            description, 
+            releaseInfo, 
+            genres, tags, 
+            language, 
+            originalLanguage, 
+            publisher, 
+            pageCount
+        );
+    }
+
     /// <inheritdoc/>
     public override IEnumerable<object> GetEqualityComponents()
     {

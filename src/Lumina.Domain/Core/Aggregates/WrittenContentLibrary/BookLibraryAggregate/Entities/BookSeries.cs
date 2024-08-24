@@ -43,8 +43,10 @@ public sealed class BookSeries : Entity<BookSeriesId>
     /// Initializes a new instance of the <see cref="BookSeries"/> class.
     /// </summary>
     /// <param name="id">The identifier of the book series.</param>
-    /// <param name="title">The title of the book series.</param>
-    public BookSeries(BookSeriesId id, WrittenContentMetadata metadata, bool isComplete, List<Book> books)
+    /// <param name="metadata">The metadata of the book series.</param>
+    /// <param name="isComplete">The current status of the book series.</param>
+    /// <param name="books">The books of the book series.</param>
+    private BookSeries(BookSeriesId id, WrittenContentMetadata metadata, bool isComplete, List<Book> books)
         : base(id)
     {
         Id = id;
@@ -55,6 +57,53 @@ public sealed class BookSeries : Entity<BookSeriesId>
     #endregion
 
     #region ===================================================================== METHODS ===================================================================================
+    /// <summary>
+    /// Creates a new instance of the <see cref="BookSeries"/> class.
+    /// </summary>
+    /// <param name="id">The identifier of the book series.</param>
+    /// <param name="metadata">The metadata of the book series.</param>
+    /// <param name="isComplete">The current status of the book series.</param>
+    /// <param name="books">The books of the book series.</param>
+    /// <returns>
+    /// An <see cref="ErrorOr{T}"/> containing either a successfully created <see cref="BookSeries"/>, or an error message.
+    /// </returns>
+    public static ErrorOr<BookSeries> Create(
+        BookSeriesId id, 
+        WrittenContentMetadata metadata, 
+        bool isComplete, 
+        List<Book> books)
+    {
+        // TODO: enforce invariants
+        return new BookSeries(
+            id,
+            metadata,
+            isComplete,
+            books
+        );
+    }
+
+    /// <summary>
+    /// Creates a new instance of the <see cref="BookSeries"/> class.
+    /// </summary>
+    /// <param name="metadata">The metadata of the book series.</param>
+    /// <param name="isComplete">The current status of the book series.</param>
+    /// <param name="books">The books of the book series.</param>
+    /// <returns>
+    /// An <see cref="ErrorOr{T}"/> containing either a successfully created <see cref="BookSeries"/>, or an error message.
+    /// </returns>
+    public static ErrorOr<BookSeries> Create(
+        WrittenContentMetadata metadata,
+        bool isComplete,
+        List<Book> books)
+    {
+        // TODO: enforce invariants
+        return new BookSeries(
+            BookSeriesId.CreateUnique(),
+            metadata,
+            isComplete,
+            books
+        );
+    }
     /// <summary>
     /// Adds a book to the series.
     /// </summary>

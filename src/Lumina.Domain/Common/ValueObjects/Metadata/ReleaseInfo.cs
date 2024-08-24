@@ -84,7 +84,7 @@ public class ReleaseInfo : ValueObject
     /// <param name="releaseCountry">The optional country or region of release.</param>
     /// <param name="releaseVersion">The optional release version or edition.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{T}"/> containing either a successfully created <see cref="ReleaseInfo"/> or an error message.
+    /// An <see cref="ErrorOr{T}"/> containing either a successfully created <see cref="ReleaseInfo"/>, or an error message.
     /// </returns>
     public static ErrorOr<ReleaseInfo> Create(
         Optional<DateOnly> originalReleaseDate, 

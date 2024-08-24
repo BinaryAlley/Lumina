@@ -1,11 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using System;
 using ErrorOr;
-using System.Linq;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
-using System.Collections.Generic;
 using Microsoft.Extensions.Options;
 using Lumina.Presentation.Api.Common.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;

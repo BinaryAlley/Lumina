@@ -71,8 +71,8 @@ public abstract class BaseMetadata : ValueObject
     /// </summary>
     /// <param name="title">The title of the element to which this metadata object belongs to.</param>
     /// <param name="originalTitle">The optional original title of the element to which this metadata object belongs to.</param>
-    /// <param name="releaseInfo">The optional release information of the media item.</param>
     /// <param name="description">The optional description of the element to which this metadata object belongs to.</param>
+    /// <param name="releaseInfo">The optional release information of the media item.</param>
     /// <param name="genres">The list of genres of the element to which this metadata object belongs to.</param>
     /// <param name="tags">The list of tags of the element to which this metadata object belongs to.</param>
     /// <param name="language">The optional language of the element to which this metadata object belongs to.</param>
@@ -81,8 +81,8 @@ public abstract class BaseMetadata : ValueObject
     protected BaseMetadata(
         string title, 
         Optional<string> originalTitle, 
-        ReleaseInfo releaseInfo, 
         Optional<string> description, 
+        ReleaseInfo releaseInfo, 
         List<Genre> genres, 
         List<Tag> tags, 
         Optional<LanguageInfo> language, 
@@ -90,8 +90,8 @@ public abstract class BaseMetadata : ValueObject
     {
         Title = title ?? throw new ArgumentNullException(nameof(title));
         OriginalTitle = originalTitle;
-        ReleaseInfo = releaseInfo;
         Description = description;
+        ReleaseInfo = releaseInfo;
         _genres = genres;
         _tags = tags;
         Language = language;
@@ -105,8 +105,8 @@ public abstract class BaseMetadata : ValueObject
     {
         yield return Title;
         yield return OriginalTitle;
-        yield return ReleaseInfo;
         yield return Description;
+        yield return ReleaseInfo;
         foreach (var genre in _genres)
             yield return genre;
         foreach (var tag in _tags)

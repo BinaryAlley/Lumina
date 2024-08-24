@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using Lumina.Domain.Common.Enums;
 using Lumina.Domain.Common.Models.Core;
 using Lumina.Domain.Common.Primitives;
 using System.Diagnostics;
@@ -38,8 +37,6 @@ public class LanguageInfo : ValueObject
     /// <param name="languageCode">The ISO 639-1 two-letter language code.</param>
     /// <param name="languageName">The full name of the language in English.</param>
     /// <param name="nativeName">The optional native name of the language.</param>
-    /// <exception cref="ArgumentNullException">Thrown if languageCode or languageName is null.</exception>
-    /// <exception cref="ArgumentException">Thrown if languageCode is not a valid ISO 639-1 code.</exception>
     private LanguageInfo(string languageCode, string languageName, Optional<string> nativeName)
     {
         LanguageCode = languageCode.ToLowerInvariant();
@@ -56,7 +53,7 @@ public class LanguageInfo : ValueObject
     /// <param name="languageName">The full name of the language in English.</param>
     /// <param name="nativeName">The optional native name of the language.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{T}"/> containing either a successfully created <see cref="LanguageInfo"/> or an error message.
+    /// An <see cref="ErrorOr{T}"/> containing either a successfully created <see cref="LanguageInfo"/>, or an error message.
     /// </returns>
     public static ErrorOr<LanguageInfo> Create(string languageCode, string languageName, Optional<string> nativeName)
     {

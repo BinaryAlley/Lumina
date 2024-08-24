@@ -54,7 +54,7 @@ public class AudioMetadata : BaseMetadata
     /// <param name="durationInSeconds">The duration of the audio, in seconds.</param>
     /// <param name="sampleRate">The sample rate of the audio, in Hz.</param>
     /// <param name="channels">The number of audio channels.</param>
-    /// <param name="release">The release information of the audio.</param>
+    /// <param name="releaseInfo">The release information of the audio.</param>
     /// <param name="description">The description of the audio.</param>
     /// <param name="language">The language of the audio.</param>
     /// <param name="originalLanguage">The optional original language of the video.</param>
@@ -68,7 +68,7 @@ public class AudioMetadata : BaseMetadata
         int durationInSeconds, 
         int sampleRate, 
         int channels, 
-        ReleaseInfo release, 
+        ReleaseInfo releaseInfo, 
         Optional<string> description,
         List<Genre> genres, 
         List<Tag> tags, 
@@ -77,7 +77,7 @@ public class AudioMetadata : BaseMetadata
         Optional<int> bitDepth, 
         Optional<string> audioCodec, 
         Optional<int> bitrate)
-        : base(title, originalTitle, release, description, genres, tags, language, originalLanguage)
+        : base(title, originalTitle, description, releaseInfo, genres, tags, language, originalLanguage)
     {
         DurationInSeconds = durationInSeconds;
         SampleRate = sampleRate;
@@ -106,7 +106,7 @@ public class AudioMetadata : BaseMetadata
     /// <param name="genres">The genres of the audio.</param>
     /// <param name="tags">The tags associated with the audio.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{T}"/> containing either a successfully created <see cref="AudioMetadata"/> or an error message.
+    /// An <see cref="ErrorOr{T}"/> containing either a successfully created <see cref="AudioMetadata"/>, or an error message.
     /// </returns>
     public static ErrorOr<AudioMetadata> Create(
         string title, 

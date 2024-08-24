@@ -1,6 +1,10 @@
 #region ========================================================================= USING =====================================================================================
+using System.Text.Json.Serialization;
+using Lumina.Application.Common.Converters;
 using Lumina.Presentation.Api.Common.Configuration;
 using Lumina.Presentation.Api.Common.Errors;
+using Mapster;
+using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 #endregion
@@ -21,7 +25,11 @@ public static class PresentationApiLayerServices
     public static IServiceCollection AddPresentationApiLayerServices(this IServiceCollection services)
     {
         // add services to the container
-        services.AddControllers();
+        services.AddControllers().AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            options.JsonSerializerOptions.Converters.Add(new OptionalJsonConverterFactory());
+        });
 
         // add services to the container.
         services.AddEndpointsApiExplorer();
@@ -42,6 +50,12 @@ public static class PresentationApiLayerServices
         });
 
         services.AddSingleton<ProblemDetailsFactory, CustomProblemDetailsFactory>();
+
+        // register mapster configs
+        var mapsterConfig = TypeAdapterConfig.GlobalSettings;
+        mapsterConfig.Scan(typeof(PresentationApiLayerServices).Assembly);
+        services.AddSingleton(mapsterConfig);
+        services.AddScoped<IMapper, ServiceMapper>();
 
         return services;
     }

@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Domain.Common.Models.Core;
 #endregion
 
@@ -30,9 +29,8 @@ public sealed class BookSeriesId : ValueObject
     /// Creates a new instance of the <see cref="BookSeriesId"/> class.
     /// </summary>
     /// <returns>The created <see cref="BookSeriesId"/> instance.</returns>
-    public static ErrorOr<BookSeriesId> CreateUnique()
+    public static BookSeriesId CreateUnique()
     {
-        // TODO: enforce invariants
         return new BookSeriesId(Guid.NewGuid());
     }
 
@@ -41,9 +39,8 @@ public sealed class BookSeriesId : ValueObject
     /// </summary>
     /// <param name="value">The value used to create the <see cref="BookSeriesId"/> instance.</param>
     /// <returns>The created <see cref="BookSeriesId"/> instance.</returns>
-    public static ErrorOr<BookSeriesId> Create(Guid value)
+    public static BookSeriesId Create(Guid value)
     {
-        // TODO: enforce invariants
         return new BookSeriesId(value);
     }
 

@@ -24,7 +24,7 @@ public readonly struct Optional<T>
     {
         get
         {
-            return HasValue ? _value! : throw new InvalidOperationException("Optional has no value.");
+            return HasValue ? _value! : default!;
         }
     }
     #endregion
@@ -34,10 +34,11 @@ public readonly struct Optional<T>
     /// Initializes a new instance of the <see cref="Optional{T}"/> structure.
     /// </summary>
     /// <param name="value">The value represented by this structure.</param>
-    public Optional(T value)
+    /// <param name="hasValue"><see langword="true"/> if <paramref name="value"/> is not <see langword="null"/>, <see langword="false"/>otherwise.</param>
+    private Optional(T? value, bool hasValue)
     {
         _value = value;
-        HasValue = true;
+        HasValue = hasValue;
     }
     #endregion
 
@@ -48,7 +49,47 @@ public readonly struct Optional<T>
     /// <param name="value">The value to be converted.</param>
     public static implicit operator Optional<T>(T value)
     {
-        return new Optional<T>(value);
+        return Some(value);
+    }
+
+    /// <summary>
+    /// Creates an <see cref="Optional{T}"/> with a value.
+    /// </summary>
+    /// <param name="value">The value to wrap in the <see cref="Optional{T}"/>.</param>
+    /// <returns>An <see cref="Optional{T}"/> containing the specified value.</returns>
+    public static Optional<T> Some(T value)
+    {
+        return new Optional<T>(value, true);
+    }
+
+    /// <summary>
+    /// Creates an <see cref="Optional{T}"/> with no value.
+    /// </summary>
+    /// <returns>An empty <see cref="Optional{T}"/>.</returns>
+    public static Optional<T> None()
+    {
+        return new(default, false);
+    }
+
+    /// <summary>
+    /// Creates an <see cref="Optional{T}"/> from a nullable reference type.
+    /// </summary>
+    /// <param name="value">The nullable value to convert.</param>
+    /// <returns>An <see cref="Optional{T}"/> representing the nullable value.</returns>
+    public static Optional<T> FromNullable(T? value)
+    {
+        return value is null ? None() : Some(value);
+    }
+
+    /// <summary>
+    /// Creates an <see cref="Optional{T}"/> from a nullable value type.
+    /// </summary>
+    /// <typeparam name="TValue">The underlying value type.</typeparam>
+    /// <param name="value">The nullable value to convert.</param>
+    /// <returns>An <see cref="Optional{T}"/> representing the nullable value.</returns>
+    public static Optional<T> FromNullable<TValue>(TValue? value) where TValue : struct, T
+    {
+        return value.HasValue ? Some(value.Value) : None();
     }
     #endregion
 }

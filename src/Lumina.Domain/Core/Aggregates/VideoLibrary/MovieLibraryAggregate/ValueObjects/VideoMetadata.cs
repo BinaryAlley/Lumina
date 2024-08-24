@@ -48,7 +48,7 @@ public class VideoMetadata : BaseMetadata
     /// <param name="originalTitle">The optional original title of the video.</param>
     /// <param name="durationInSeconds">The duration of the video, in seconds.</param>
     /// <param name="resolution">The resolution of the video.</param>
-    /// <param name="release">The release information of the video.</param>
+    /// <param name="releaseInfo">The release information of the video.</param>
     /// <param name="description">The optional description of the video.</param>
     /// <param name="language">The language of the video.</param>
     /// <param name="originalLanguage">The optional original language of the video.</param>
@@ -62,8 +62,8 @@ public class VideoMetadata : BaseMetadata
         Optional<string> originalTitle, 
         int durationInSeconds, 
         string resolution, 
-        ReleaseInfo release, 
         Optional<string> description,
+        ReleaseInfo releaseInfo, 
         Optional<LanguageInfo> language, 
         Optional<LanguageInfo> originalLanguage, 
         Optional<float> frameRate, 
@@ -71,7 +71,7 @@ public class VideoMetadata : BaseMetadata
         Optional<string> audioCodec,
         List<Genre> genres, 
         List<Tag> tags)
-        : base(title, originalTitle, release, description, genres, tags, language, originalLanguage)
+        : base(title, originalTitle, description, releaseInfo, genres, tags, language, originalLanguage)
     {
         DurationInSeconds = durationInSeconds;
         Resolution = resolution ?? throw new ArgumentNullException(nameof(resolution));
@@ -89,8 +89,8 @@ public class VideoMetadata : BaseMetadata
     /// <param name="originalTitle">The optional original title of the video.</param>
     /// <param name="durationInSeconds">The duration of the video in seconds.</param>
     /// <param name="resolution">The resolution of the video.</param>
-    /// <param name="release">The release information of the video.</param>
     /// <param name="description">The optional description of the video.</param>
+    /// <param name="releaseInfo">The release information of the video.</param>
     /// <param name="language">The language of the video.</param>
     /// <param name="originalLanguage">The optional original language of the video.</param>
     /// <param name="frameRate">The optional frame rate of the video.</param>
@@ -100,15 +100,15 @@ public class VideoMetadata : BaseMetadata
     /// <param name="tags">The tags associated with the video.</param>
     /// <param name="contributors">The list of contributors for this video.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{T}"/> containing either a successfully created <see cref="VideoMetadata"/> or an error message.
+    /// An <see cref="ErrorOr{T}"/> containing either a successfully created <see cref="VideoMetadata"/>, or an error message.
     /// </returns>
     public static ErrorOr<VideoMetadata> Create(
         string title, 
         Optional<string> originalTitle, 
         int durationInSeconds, 
         string resolution, 
-        ReleaseInfo release, 
         Optional<string> description,
+        ReleaseInfo releaseInfo, 
         Optional<LanguageInfo> language, 
         Optional<LanguageInfo> originalLanguage, 
         Optional<float> frameRate, 
@@ -117,7 +117,7 @@ public class VideoMetadata : BaseMetadata
         List<Genre> genres, 
         List<Tag> tags)
     {
-        return new VideoMetadata(title, originalTitle, durationInSeconds, resolution, release, description,
+        return new VideoMetadata(title, originalTitle, durationInSeconds, resolution, description, releaseInfo,
             language, originalLanguage, frameRate, videoCodec, audioCodec, genres, tags);
     }
 
