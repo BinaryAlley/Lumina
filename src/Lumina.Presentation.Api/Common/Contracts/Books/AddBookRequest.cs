@@ -23,7 +23,6 @@ public record AddBookRequest(
     string? LibraryThingId,
     string? GoogleBooksId,
     string? BarnesAndNobleId,
-    string? KoboId,
     string? AppleBooksId,
     List<IsbnDto> ISBNs,
     List<MediaContributorDto> Contributors,

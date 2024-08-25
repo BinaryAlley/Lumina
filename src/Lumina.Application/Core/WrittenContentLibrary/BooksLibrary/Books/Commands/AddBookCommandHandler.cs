@@ -28,6 +28,7 @@ public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<Boo
     /// </returns>
     public async ValueTask<ErrorOr<Book>> Handle(AddBookCommand request, CancellationToken cancellationToken)
     {
+        // TODO: update Api.Book.md documentation when the functionality is fully implemented
         List<MediaContributorId> contributorIds = new();
         foreach(var mediaContributor in request.Contributors)
         {
@@ -129,7 +130,6 @@ public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<Boo
             Optional<string>.FromNullable(request.LibraryThingId),
             Optional<string>.FromNullable(request.GoogleBooksId),
             Optional<string>.FromNullable(request.BarnesAndNobleId),
-            Optional<string>.FromNullable(request.KoboId),
             Optional<string>.FromNullable(request.AppleBooksId),
             domainIsbns,
             contributorIds,

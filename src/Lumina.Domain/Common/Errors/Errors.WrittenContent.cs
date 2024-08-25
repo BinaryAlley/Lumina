@@ -21,7 +21,6 @@ public static partial class Errors
         public static Error TheBookIsNotInTheSeries => Error.Forbidden(nameof(TheBookIsNotInTheSeries));
         public static Error AsinMustBe10CharactersLong => Error.Validation(nameof(AsinMustBe10CharactersLong));
         public static Error GoodreadsIdMustBeNumeric => Error.Validation(nameof(GoodreadsIdMustBeNumeric));
-        public static Error LccnMustBe12CharactersLong => Error.Validation(nameof(LccnMustBe12CharactersLong));
         public static Error InvalidLccnFormat => Error.Validation(nameof(InvalidLccnFormat));
         public static Error InvalidOclcFormat => Error.Validation(nameof(InvalidOclcFormat));
         public static Error InvalidOpenLibraryId => Error.Validation(nameof(InvalidOpenLibraryId));
@@ -30,8 +29,6 @@ public static partial class Errors
         public static Error InvalidGoogleBooksIdFormat => Error.Validation(nameof(InvalidGoogleBooksIdFormat));
         public static Error BarnesAndNoblesIdMustBe10CharactersLong => Error.Validation(nameof(BarnesAndNoblesIdMustBe10CharactersLong));
         public static Error InvalidBarnesAndNoblesIdFormat => Error.Validation(nameof(InvalidBarnesAndNoblesIdFormat));
-        public static Error KoboIdMustBeNumeric => Error.Validation(nameof(KoboIdMustBeNumeric));
-        public static Error KoboIdMustBeBetween3And5CharactersLong => Error.Validation(nameof(KoboIdMustBeBetween3And5CharactersLong));
         public static Error InvalidAppleBooksIdFormat => Error.Validation(nameof(InvalidAppleBooksIdFormat));
         public static Error PublisherMustBeMaximum100CharactersLong => Error.Validation(nameof(PublisherMustBeMaximum100CharactersLong));
         public static Error PageCountMustBeGreaterThanZero => Error.Validation(nameof(PageCountMustBeGreaterThanZero));

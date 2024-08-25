@@ -91,11 +91,6 @@ public sealed class Book : AggregateRoot<BookId, Guid>
     public Optional<string> BarnesAndNobleId { get; private set; }
 
     /// <summary>
-    /// Gets the Kobo ID of the book.
-    /// </summary>
-    public Optional<string> KoboId { get; private set; }
-
-    /// <summary>
     /// Gets the Apple Books ID of the book.
     /// </summary>
     public Optional<string> AppleBooksId { get; private set; }
@@ -143,7 +138,6 @@ public sealed class Book : AggregateRoot<BookId, Guid>
     /// <param name="libraryThingId">The optional LibraryThing ID of the book.</param>
     /// <param name="googleBooksId">The optional Google Books ID of the book.</param>
     /// <param name="barnesAndNobleId">The optional Barnes & Noble ID of the book.</param>
-    /// <param name="koboId">The optional Kobo ID of the book.</param>
     /// <param name="appleBooksId">The optional Apple Books ID of the book.</param>
     /// <param name="isbns">The list of ISBNs of the book.</param>
     /// <param name="contributors">The list of media contributors of the book.</param>
@@ -163,7 +157,6 @@ public sealed class Book : AggregateRoot<BookId, Guid>
         Optional<string> libraryThingId,
         Optional<string> googleBooksId,
         Optional<string> barnesAndNobleId,
-        Optional<string> koboId,
         Optional<string> appleBooksId,
         List<Isbn> isbns,
         List<MediaContributorId> contributors,
@@ -183,7 +176,6 @@ public sealed class Book : AggregateRoot<BookId, Guid>
         LibraryThingId = libraryThingId;
         GoogleBooksId = googleBooksId;
         BarnesAndNobleId = barnesAndNobleId;
-        KoboId = koboId;
         AppleBooksId = appleBooksId;
         _isbns = isbns;
         _contributors = contributors;
@@ -218,7 +210,6 @@ public sealed class Book : AggregateRoot<BookId, Guid>
     /// <param name="libraryThingId">The optional LibraryThing ID of the book.</param>
     /// <param name="googleBooksId">The optional Google Books ID of the book.</param>
     /// <param name="barnesAndNobleId">The optional Barnes & Noble ID of the book.</param>
-    /// <param name="koboId">The optional Kobo ID of the book.</param>
     /// <param name="appleBooksId">The optional Apple Books ID of the book.</param>
     /// <param name="isbns">The list of ISBNs of the book.</param>
     /// <param name="contributors">The list of media contributors of the book.</param>
@@ -240,7 +231,6 @@ public sealed class Book : AggregateRoot<BookId, Guid>
         Optional<string> libraryThingId,
         Optional<string> googleBooksId,
         Optional<string> barnesAndNobleId,
-        Optional<string> koboId,
         Optional<string> appleBooksId,
         List<Isbn> isbns,
         List<MediaContributorId> contributors,
@@ -262,7 +252,6 @@ public sealed class Book : AggregateRoot<BookId, Guid>
             libraryThingId,
             googleBooksId,
             barnesAndNobleId,
-            koboId,
             appleBooksId,
             isbns,
             contributors,
@@ -286,7 +275,6 @@ public sealed class Book : AggregateRoot<BookId, Guid>
     /// <param name="libraryThingId">The optional LibraryThing ID of the book.</param>
     /// <param name="googleBooksId">The optional Google Books ID of the book.</param>
     /// <param name="barnesAndNobleId">The optional Barnes & Noble ID of the book.</param>
-    /// <param name="koboId">The optional Kobo ID of the book.</param>
     /// <param name="appleBooksId">The optional Apple Books ID of the book.</param>
     /// <param name="isbns">The list of ISBNs of the book.</param>
     /// <param name="contributors">The list of media contributors of the book.</param>
@@ -309,7 +297,6 @@ public sealed class Book : AggregateRoot<BookId, Guid>
         Optional<string> libraryThingId,
         Optional<string> googleBooksId,
         Optional<string> barnesAndNobleId,
-        Optional<string> koboId,
         Optional<string> appleBooksId,
         List<Isbn> isbns,
         List<MediaContributorId> contributors,
@@ -331,7 +318,6 @@ public sealed class Book : AggregateRoot<BookId, Guid>
             libraryThingId,
             googleBooksId,
             barnesAndNobleId,
-            koboId,
             appleBooksId,
             isbns,
             contributors,

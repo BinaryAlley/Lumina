@@ -128,11 +128,10 @@ public class AddBookCommandValidator : AbstractValidator<AddBookCommand>
             .Matches(@"^\d+$").When(x => x.GoodreadsId is not null)
             .WithMessage(Errors.WrittenContent.GoodreadsIdMustBeNumeric.Code); 
         RuleFor(x => x.LCCN)
-            .Length(12).WithMessage(Errors.WrittenContent.LccnMustBe12CharactersLong.Code)
-            .Matches(@"^[a-z]{0,3}\d{8}$").WithMessage(Errors.WrittenContent.InvalidLccnFormat.Code)
+            .Matches(@"^[a-z]{0,3}\d{8,10}$").WithMessage(Errors.WrittenContent.InvalidLccnFormat.Code)
             .When(x => x.LCCN is not null);
         RuleFor(x => x.OCLCNumber)
-            .Matches(@"^(ocm\d{8} |ocn\d{9,}|\(OCoLC\)\d+)$").When(x => x.OCLCNumber is not null)
+            .Matches(@"^(ocm\d{8}|ocn\d{9,}|on\d{10,}|\(OCoLC\)\d{8,}|\d{8,})$").When(x => x.OCLCNumber is not null)
             .WithMessage(Errors.WrittenContent.InvalidOclcFormat.Code);
         RuleFor(x => x.OpenLibraryId)
             .Matches(@"^OL[1-9]\d*[AMW]$").When(x => x.OpenLibraryId is not null)
@@ -148,10 +147,6 @@ public class AddBookCommandValidator : AbstractValidator<AddBookCommand>
             .Length(10).WithMessage(Errors.WrittenContent.BarnesAndNoblesIdMustBe10CharactersLong.Code)
             .Matches(@"^\d{10}$").WithMessage(Errors.WrittenContent.InvalidBarnesAndNoblesIdFormat.Code)
             .When(x => x.BarnesAndNobleId is not null);
-        RuleFor(x => x.KoboId)
-            .Matches(@"^\d+$").WithMessage(Errors.WrittenContent.KoboIdMustBeNumeric.Code)
-            .Length(3, 5).WithMessage(Errors.WrittenContent.KoboIdMustBeBetween3And5CharactersLong.Code)
-            .When(x => x.KoboId is not null);
         RuleFor(x => x.AppleBooksId)
             .Matches(@"^id\d+$").When(x => x.AppleBooksId is not null)
             .WithMessage(Errors.WrittenContent.InvalidAppleBooksIdFormat.Code);

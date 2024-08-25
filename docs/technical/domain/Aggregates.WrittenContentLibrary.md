@@ -25,7 +25,6 @@ class Book
         Optional<string> libraryThingId,
         Optional<string> googleBooksId,
         Optional<string> barnesAndNobleId,
-        Optional<string> koboId,
         Optional<string> appleBooksId,
         List<Isbn> isbns,
         List<MediaContributorId> contributors,
@@ -85,7 +84,6 @@ class Book
   "libraryThingId": "3203347",
   "googleBooksId": "aWZzLPhY4o0C",
   "barnesAndNobleId": "1100307790",
-  "koboId": "the-fellowship-of-the-ring",
   "appleBooksId": "id395211",
   "isbns": [
     {

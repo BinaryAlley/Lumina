@@ -21,7 +21,6 @@ public record BookDto(
     string? LibraryThingId,
     string? GoogleBooksId,
     string? BarnesAndNobleId,
-    string? KoboId,
     string? AppleBooksId,
     List<IsbnDto> ISBNs,
     List<Guid> Contributors,
