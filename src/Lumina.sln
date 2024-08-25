@@ -15,6 +15,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lumina.Presentation.Api", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lumina.Presentation.Web", "Lumina.Presentation.Web\Lumina.Presentation.Web.csproj", "{FABC255B-0D21-4A0A-A0E2-7759D929B4D3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lumina.Application.UnitTests", "..\tests\UnitTests\Lumina.Application.UnitTests\Lumina.Application.UnitTests.csproj", "{4DEA94AF-D592-4187-8850-A569C93256C9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lumina.Infrastructure.UnitTests", "..\tests\UnitTests\Lumina.Infrastructure.UnitTests\Lumina.Infrastructure.UnitTests.csproj", "{8DB5300A-B38A-4F6D-8FF7-A722DA47667E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lumina.DataAccess.UnitTests", "..\tests\UnitTests\Lumina.DataAccess.UnitTests\Lumina.DataAccess.UnitTests.csproj", "{6050F6A9-F136-4B7B-82D2-57E689463ACA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lumina.Domain.UnitTests", "..\tests\UnitTests\Lumina.Domain.UnitTests\Lumina.Domain.UnitTests.csproj", "{3BB42EB9-A0A3-4E3F-9053-785F429714AE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lumina.Presentation.Api.UnitTests", "..\tests\UnitTests\Lumina.Presentation.Api.UnitTests\Lumina.Presentation.Api.UnitTests.csproj", "{4D5E4789-8437-4F3B-883E-28BBF8A4848F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +55,26 @@ Global
 		{FABC255B-0D21-4A0A-A0E2-7759D929B4D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FABC255B-0D21-4A0A-A0E2-7759D929B4D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FABC255B-0D21-4A0A-A0E2-7759D929B4D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4DEA94AF-D592-4187-8850-A569C93256C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DEA94AF-D592-4187-8850-A569C93256C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DEA94AF-D592-4187-8850-A569C93256C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DEA94AF-D592-4187-8850-A569C93256C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8DB5300A-B38A-4F6D-8FF7-A722DA47667E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8DB5300A-B38A-4F6D-8FF7-A722DA47667E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8DB5300A-B38A-4F6D-8FF7-A722DA47667E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8DB5300A-B38A-4F6D-8FF7-A722DA47667E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6050F6A9-F136-4B7B-82D2-57E689463ACA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6050F6A9-F136-4B7B-82D2-57E689463ACA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6050F6A9-F136-4B7B-82D2-57E689463ACA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6050F6A9-F136-4B7B-82D2-57E689463ACA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3BB42EB9-A0A3-4E3F-9053-785F429714AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3BB42EB9-A0A3-4E3F-9053-785F429714AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3BB42EB9-A0A3-4E3F-9053-785F429714AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3BB42EB9-A0A3-4E3F-9053-785F429714AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D5E4789-8437-4F3B-883E-28BBF8A4848F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D5E4789-8437-4F3B-883E-28BBF8A4848F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D5E4789-8437-4F3B-883E-28BBF8A4848F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D5E4789-8437-4F3B-883E-28BBF8A4848F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

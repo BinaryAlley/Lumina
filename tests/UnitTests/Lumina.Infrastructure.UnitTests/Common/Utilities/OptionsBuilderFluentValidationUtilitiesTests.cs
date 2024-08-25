@@ -1,0 +1,91 @@
+#region ========================================================================= USING =====================================================================================
+using System.Diagnostics.CodeAnalysis;
+using AutoFixture;
+using AutoFixture.AutoNSubstitute;
+using FluentAssertions;
+using FluentValidation;
+using Lumina.Infrastructure.Common.Utilities;
+using Lumina.Infrastructure.Common.Validation;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using NSubstitute;
+#endregion
+
+namespace Lumina.Infrastructure.UnitTests.Common.Utilities;
+
+/// <summary>
+/// Contains unit tests for the <see cref="OptionsBuilderFluentValidationUtilities"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class OptionsBuilderFluentValidationUtilitiesTests
+{
+    #region ================================================================== FIELD MEMBERS ================================================================================
+    private readonly IFixture _fixture;
+    #endregion
+
+    #region ====================================================================== CTOR =====================================================================================
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FluentValidationOptionsTests"/> class.
+    /// </summary>
+    public OptionsBuilderFluentValidationUtilitiesTests()
+    {
+        _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
+    }
+    #endregion
+
+    #region ================================================================= METHODS ===================================================================================
+    [Fact]
+    public void ValidateFluently_WhenCalled_ShouldRegisterFluentValidationOptions()
+    {
+        // Arrange
+        var services = Substitute.For<IServiceCollection>();
+        var name = _fixture.Create<string>();
+        var optionsBuilder = new OptionsBuilder<OptionsBuilderFluentValidationUtilitiesFixture>(services, name);
+
+        // Act
+        var result = optionsBuilder.ValidateFluently();
+
+        // Assert
+        result.Should().BeSameAs(optionsBuilder);
+        services.Received(1).Add(Arg.Is<ServiceDescriptor>(sd =>
+            sd.ServiceType == typeof(IValidateOptions<OptionsBuilderFluentValidationUtilitiesFixture>) &&
+            sd.Lifetime == ServiceLifetime.Singleton &&
+            sd.ImplementationFactory != null));
+    }
+
+    [Fact]
+    public void ValidateFluently_WhenCalled_ShouldUseCorrectName()
+    {
+        // Arrange
+        var services = Substitute.For<IServiceCollection>();
+        var name = _fixture.Create<string>();
+        var optionsBuilder = new OptionsBuilder<OptionsBuilderFluentValidationUtilitiesFixture>(services, name);
+
+        // Act
+        optionsBuilder.ValidateFluently();
+
+        // Assert
+        services.Received(1).Add(Arg.Is<ServiceDescriptor>(sd =>
+            sd.ServiceType == typeof(IValidateOptions<OptionsBuilderFluentValidationUtilitiesFixture>) &&
+            sd.Lifetime == ServiceLifetime.Singleton &&
+            sd.ImplementationFactory != null));
+
+        var serviceDescriptor = services.ReceivedCalls()
+            .Select(call => call.GetArguments().First())
+            .OfType<ServiceDescriptor>()
+            .First();
+
+        var implementationFactory = serviceDescriptor.ImplementationFactory;
+        implementationFactory.Should().NotBeNull();
+
+        var serviceProvider = Substitute.For<IServiceProvider>();
+        var mockValidator = Substitute.For<IValidator<OptionsBuilderFluentValidationUtilitiesFixture>>();
+        serviceProvider.GetService(typeof(IValidateOptions<OptionsBuilderFluentValidationUtilitiesFixture>))
+            .Returns(Substitute.For<IValidateOptions<OptionsBuilderFluentValidationUtilitiesFixture>>());
+
+        var fluentValidationOptions = implementationFactory!(serviceProvider) as FluentValidationOptions<OptionsBuilderFluentValidationUtilitiesFixture>;
+        fluentValidationOptions.Should().NotBeNull();
+        fluentValidationOptions!.Name.Should().Be(name);
+    }
+    #endregion
+}
