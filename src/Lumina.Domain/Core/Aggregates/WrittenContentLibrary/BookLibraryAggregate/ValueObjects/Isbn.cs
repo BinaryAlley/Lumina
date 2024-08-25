@@ -49,7 +49,7 @@ public sealed class Isbn : ValueObject
     {
         // enforce invariants
         if (string.IsNullOrWhiteSpace(value))
-            return Errors.WrittenContent.IsbnCannotBeEmpty;
+            return Errors.WrittenContent.IsbnValueCannotBeEmpty;
         // remove hyphens and spaces, for validation
         string cleanedValue = Regex.Replace(value, @"[-\s]", string.Empty);
         switch (format)
