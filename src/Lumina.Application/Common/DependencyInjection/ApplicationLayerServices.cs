@@ -19,7 +19,7 @@ public static class ApplicationLayerServices
     /// Registers the services of the Application layer into the dependency injection container.
     /// </summary>
     /// <param name="services">The service collection to add the services to.</param>
-    /// <returns>The service collection with the added services.</returns>
+    /// <returns>The updated <see cref="IServiceCollection"/>.</returns>
     public static IServiceCollection AddApplicationLayerServices(this IServiceCollection services)
     {
         // register Mediator

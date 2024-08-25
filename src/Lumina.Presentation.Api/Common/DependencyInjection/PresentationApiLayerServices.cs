@@ -21,7 +21,7 @@ public static class PresentationApiLayerServices
     /// Registers the services of the Presentation API layer into the dependency injection container.
     /// </summary>
     /// <param name="services">The service collection to add the services to.</param>
-    /// <returns>The service collection with the added services.</returns>
+    /// <returns>The updated <see cref="IServiceCollection"/>.</returns>
     public static IServiceCollection AddPresentationApiLayerServices(this IServiceCollection services)
     {
         // add services to the container

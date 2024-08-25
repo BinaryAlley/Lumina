@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Api.Common.DependencyInjection;
 using Lumina.Application.Common.DependencyInjection;
+using Lumina.Infrastructure.Common.DependencyInjection;
 #endregion
 
 namespace Lumina.Presentation.Api;
@@ -19,8 +20,12 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
         
+        builder.Services.BindSharedConfiguration(builder.Configuration);
+        builder.Services.BindPresentationApiLayerConfiguration(builder.Configuration);
+
         builder.Services.AddApplicationLayerServices();
         builder.Services.AddPresentationApiLayerServices();
+        builder.Services.AddInfrastructureLayerServices();
 
         var app = builder.Build();
 
