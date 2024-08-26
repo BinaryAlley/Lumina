@@ -2,6 +2,7 @@
 using Lumina.Presentation.Api.Common.DependencyInjection;
 using Lumina.Application.Common.DependencyInjection;
 using Lumina.Infrastructure.Common.DependencyInjection;
+using Lumina.DataAccess.Common.DependencyInjection; 
 #endregion
 
 namespace Lumina.Presentation.Api;
@@ -26,6 +27,7 @@ public class Program
         builder.Services.AddApplicationLayerServices();
         builder.Services.AddPresentationApiLayerServices();
         builder.Services.AddInfrastructureLayerServices();
+        builder.Services.AddDataAccessLayerServices();
 
         var app = builder.Build();
 

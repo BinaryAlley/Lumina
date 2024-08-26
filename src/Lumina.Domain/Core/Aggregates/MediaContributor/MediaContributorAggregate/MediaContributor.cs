@@ -14,7 +14,7 @@ namespace Lumina.Domain.Core.Aggregates.MediaContributor.MediaContributorAggrega
 /// Aggregate Root for a media contributor.
 /// </summary>
 [DebuggerDisplay("{Id}: {Name}")]
-public class MediaContributor : AggregateRoot<MediaContributorId, Guid>
+public class MediaContributor : AggregateRoot<MediaContributorId>
 {
     #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>

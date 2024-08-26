@@ -91,5 +91,14 @@ public readonly struct Optional<T>
     {
         return value.HasValue ? Some(value.Value) : None();
     }
+
+    /// <summary>
+    /// Customized ToString() method.
+    /// </summary>
+    /// <returns>Custom string value showing relevant data for current class.</returns>
+    public override string ToString()
+    {
+        return HasValue ? Value?.ToString()! : string.Empty;
+    }
     #endregion
 }

@@ -7,7 +7,7 @@ using Mapster;
 namespace Lumina.Presentation.Api.Common.Mapping;
 
 /// <summary>
-/// Mapping configuration for books.
+/// Mapping configuration for books between the API request object and the command object.
 /// </summary>
 public class BookMappingConfig : IRegister
 {

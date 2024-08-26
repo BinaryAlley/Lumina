@@ -3,27 +3,65 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lumina.Application", "Lumina.Application\Lumina.Application.csproj", "{7B2671B3-E9C5-41AD-BB0C-692238558197}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lumina.Application", "Lumina.Application\Lumina.Application.csproj", "{7B2671B3-E9C5-41AD-BB0C-692238558197}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lumina.DataAccess", "Lumina.DataAccess\Lumina.DataAccess.csproj", "{7FEA2A01-1660-4D18-B05D-83D356FD7828}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lumina.DataAccess", "Lumina.DataAccess\Lumina.DataAccess.csproj", "{7FEA2A01-1660-4D18-B05D-83D356FD7828}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lumina.Domain", "Lumina.Domain\Lumina.Domain.csproj", "{9FF9D5FA-1D0C-4743-87E3-CC8C08694CAC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lumina.Domain", "Lumina.Domain\Lumina.Domain.csproj", "{9FF9D5FA-1D0C-4743-87E3-CC8C08694CAC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lumina.Infrastructure", "Lumina.Infrastructure\Lumina.Infrastructure.csproj", "{D43E63EA-2210-471E-BFED-D1D33D196554}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lumina.Infrastructure", "Lumina.Infrastructure\Lumina.Infrastructure.csproj", "{D43E63EA-2210-471E-BFED-D1D33D196554}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lumina.Presentation.Api", "Lumina.Presentation.Api\Lumina.Presentation.Api.csproj", "{7A49A922-127C-4786-84B7-53E64D816336}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lumina.Presentation.Api", "Lumina.Presentation.Api\Lumina.Presentation.Api.csproj", "{7A49A922-127C-4786-84B7-53E64D816336}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lumina.Presentation.Web", "Lumina.Presentation.Web\Lumina.Presentation.Web.csproj", "{FABC255B-0D21-4A0A-A0E2-7759D929B4D3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lumina.Presentation.Web", "Lumina.Presentation.Web\Lumina.Presentation.Web.csproj", "{FABC255B-0D21-4A0A-A0E2-7759D929B4D3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lumina.Application.UnitTests", "..\tests\UnitTests\Lumina.Application.UnitTests\Lumina.Application.UnitTests.csproj", "{4DEA94AF-D592-4187-8850-A569C93256C9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lumina.Application.UnitTests", "..\tests\UnitTests\Lumina.Application.UnitTests\Lumina.Application.UnitTests.csproj", "{4DEA94AF-D592-4187-8850-A569C93256C9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lumina.Infrastructure.UnitTests", "..\tests\UnitTests\Lumina.Infrastructure.UnitTests\Lumina.Infrastructure.UnitTests.csproj", "{8DB5300A-B38A-4F6D-8FF7-A722DA47667E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lumina.Infrastructure.UnitTests", "..\tests\UnitTests\Lumina.Infrastructure.UnitTests\Lumina.Infrastructure.UnitTests.csproj", "{8DB5300A-B38A-4F6D-8FF7-A722DA47667E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lumina.DataAccess.UnitTests", "..\tests\UnitTests\Lumina.DataAccess.UnitTests\Lumina.DataAccess.UnitTests.csproj", "{6050F6A9-F136-4B7B-82D2-57E689463ACA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lumina.DataAccess.UnitTests", "..\tests\UnitTests\Lumina.DataAccess.UnitTests\Lumina.DataAccess.UnitTests.csproj", "{6050F6A9-F136-4B7B-82D2-57E689463ACA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lumina.Domain.UnitTests", "..\tests\UnitTests\Lumina.Domain.UnitTests\Lumina.Domain.UnitTests.csproj", "{3BB42EB9-A0A3-4E3F-9053-785F429714AE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lumina.Domain.UnitTests", "..\tests\UnitTests\Lumina.Domain.UnitTests\Lumina.Domain.UnitTests.csproj", "{3BB42EB9-A0A3-4E3F-9053-785F429714AE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lumina.Presentation.Api.UnitTests", "..\tests\UnitTests\Lumina.Presentation.Api.UnitTests\Lumina.Presentation.Api.UnitTests.csproj", "{4D5E4789-8437-4F3B-883E-28BBF8A4848F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lumina.Presentation.Api.UnitTests", "..\tests\UnitTests\Lumina.Presentation.Api.UnitTests\Lumina.Presentation.Api.UnitTests.csproj", "{4D5E4789-8437-4F3B-883E-28BBF8A4848F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3C316ABB-08D5-4450-9A4E-91059DB54254}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{16E590D3-DD9F-4B45-BF19-C6E317A57D11}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{53B1231B-37F5-44BA-80D5-DBA979775F5C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{ACD16983-F1BD-4A92-B282-95BA8C456F6A}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\LICENSE.md = ..\docs\LICENSE.md
+		..\README.md = ..\README.md
+		..\docs\SOURCES.md = ..\docs\SOURCES.md
+		..\docs\USAGE.md = ..\docs\USAGE.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "technical", "technical", "{0C0E5A56-AD29-4D0B-AB87-E865F8B933E2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "api", "api", "{B045C2EC-3ACB-47D3-BE62-7AC334B023D9}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\api\Api.Book.md = ..\docs\technical\api\Api.Book.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "domain", "domain", "{4F8D14A3-A465-4EC2-B175-A188B113AB99}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\domain\Aggregates.FileManagement.md = ..\docs\technical\domain\Aggregates.FileManagement.md
+		..\docs\technical\domain\Aggregates.VideoLibrary.md = ..\docs\technical\domain\Aggregates.VideoLibrary.md
+		..\docs\technical\domain\Aggregates.WrittenContentLibrary.md = ..\docs\technical\domain\Aggregates.WrittenContentLibrary.md
+		..\docs\technical\domain\Common.Metadata.md = ..\docs\technical\domain\Common.Metadata.md
+		..\docs\technical\domain\UbiquitousLanguage.md = ..\docs\technical\domain\UbiquitousLanguage.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "requests", "requests", "{C17A1188-FA69-42BC-92E6-4F91D31B3A58}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "books", "books", "{FAFD9E43-508B-4F20-8AA2-8CADA697ED2D}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\requests\books\Add.http = ..\docs\technical\requests\books\Add.http
+		..\docs\technical\requests\books\GetAll.http = ..\docs\technical\requests\books\GetAll.http
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -78,5 +116,27 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7B2671B3-E9C5-41AD-BB0C-692238558197} = {3C316ABB-08D5-4450-9A4E-91059DB54254}
+		{7FEA2A01-1660-4D18-B05D-83D356FD7828} = {3C316ABB-08D5-4450-9A4E-91059DB54254}
+		{9FF9D5FA-1D0C-4743-87E3-CC8C08694CAC} = {3C316ABB-08D5-4450-9A4E-91059DB54254}
+		{D43E63EA-2210-471E-BFED-D1D33D196554} = {3C316ABB-08D5-4450-9A4E-91059DB54254}
+		{7A49A922-127C-4786-84B7-53E64D816336} = {3C316ABB-08D5-4450-9A4E-91059DB54254}
+		{FABC255B-0D21-4A0A-A0E2-7759D929B4D3} = {3C316ABB-08D5-4450-9A4E-91059DB54254}
+		{4DEA94AF-D592-4187-8850-A569C93256C9} = {53B1231B-37F5-44BA-80D5-DBA979775F5C}
+		{8DB5300A-B38A-4F6D-8FF7-A722DA47667E} = {53B1231B-37F5-44BA-80D5-DBA979775F5C}
+		{6050F6A9-F136-4B7B-82D2-57E689463ACA} = {53B1231B-37F5-44BA-80D5-DBA979775F5C}
+		{3BB42EB9-A0A3-4E3F-9053-785F429714AE} = {53B1231B-37F5-44BA-80D5-DBA979775F5C}
+		{4D5E4789-8437-4F3B-883E-28BBF8A4848F} = {53B1231B-37F5-44BA-80D5-DBA979775F5C}
+		{53B1231B-37F5-44BA-80D5-DBA979775F5C} = {16E590D3-DD9F-4B45-BF19-C6E317A57D11}
+		{0C0E5A56-AD29-4D0B-AB87-E865F8B933E2} = {ACD16983-F1BD-4A92-B282-95BA8C456F6A}
+		{B045C2EC-3ACB-47D3-BE62-7AC334B023D9} = {0C0E5A56-AD29-4D0B-AB87-E865F8B933E2}
+		{4F8D14A3-A465-4EC2-B175-A188B113AB99} = {0C0E5A56-AD29-4D0B-AB87-E865F8B933E2}
+		{C17A1188-FA69-42BC-92E6-4F91D31B3A58} = {0C0E5A56-AD29-4D0B-AB87-E865F8B933E2}
+		{FAFD9E43-508B-4F20-8AA2-8CADA697ED2D} = {C17A1188-FA69-42BC-92E6-4F91D31B3A58}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4A55A28E-C657-4A0B-95EA-2931AE66004E}
 	EndGlobalSection
 EndGlobal

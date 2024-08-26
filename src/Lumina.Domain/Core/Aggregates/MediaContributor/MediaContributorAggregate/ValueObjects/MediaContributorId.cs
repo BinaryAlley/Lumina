@@ -7,23 +7,15 @@ namespace Lumina.Domain.Core.Aggregates.MediaContributor.MediaContributorAggrega
 /// <summary>
 /// Value Object for the Id of a media contributor.
 /// </summary>
-public sealed class MediaContributorId : AggregateRootId<Guid>
+public sealed class MediaContributorId : EntityId<Guid>
 {
-    #region ==================================================================== PROPERTIES =================================================================================
-    /// <summary>
-    /// Gets the value of this object.
-    /// </summary>
-    public override Guid Value { get; protected set; }
-    #endregion
-
     #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="MediaContributorId"/> class.
     /// </summary>
     /// <param name="value">The value representing this object.</param>
-    private MediaContributorId(Guid value)
+    private MediaContributorId(Guid value) : base(value)
     {
-        Value = value;
     }
     #endregion
 

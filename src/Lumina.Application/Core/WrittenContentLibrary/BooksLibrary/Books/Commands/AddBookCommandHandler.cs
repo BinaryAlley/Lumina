@@ -1,5 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
+using Lumina.Application.Common.DataAccess.Repositories.Books;
+using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.Models.Books;
 using Lumina.Domain.Common.Enums;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
@@ -7,6 +10,7 @@ using Lumina.Domain.Core.Aggregates.MediaContributor.MediaContributorAggregate.V
 using Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate;
 using Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate.Entities;
 using Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate.ValueObjects;
+using MapsterMapper;
 using Mediator;
 #endregion
 
@@ -17,6 +21,24 @@ namespace Lumina.Application.Core.WrittenContentLibrary.BooksLibrary.Books.Comma
 /// </summary>
 public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<Book>>
 {
+    #region ================================================================== FIELD MEMBERS ================================================================================
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
+    #endregion
+
+    #region ====================================================================== CTOR =====================================================================================
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AddBookCommandHandler"/> class.
+    /// </summary>
+    /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
+    /// <param name="mapper">Injected service for mapping objects.</param>
+    public AddBookCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
+    {
+        _unitOfWork = unitOfWork;
+        _mapper = mapper;
+    }
+    #endregion
+
     #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Handles the command to add a book.
@@ -29,7 +51,7 @@ public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<Boo
     public async ValueTask<ErrorOr<Book>> Handle(AddBookCommand request, CancellationToken cancellationToken)
     {
         // TODO: update Api.Book.md documentation when the functionality is fully implemented
-        List<MediaContributorId> contributorIds = new();
+        List<MediaContributorId> contributorIds = [];
         foreach(var mediaContributor in request.Contributors)
         {
             // TODO: add logic to search the media contributors repository for existing contributors, based on the provided names
@@ -49,7 +71,7 @@ public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<Boo
         if (errors.Count != 0) // if there are errors, return them            
             return errors;
         
-        List<Rating> domainRatings = domainRatingsResult.Select(rating => rating.Value as Rating).ToList();
+        List<BookRating> domainRatings = domainRatingsResult.Select(rating => rating.Value).ToList();
 
         var domainGenresResult = request.Metadata.Genres.ConvertAll(genre => Genre.Create(genre.Name));
         errors = domainGenresResult.Where(genreResult => genreResult.IsError).SelectMany(genreResult => genreResult.Errors).ToList();
@@ -137,6 +159,14 @@ public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<Boo
         );
         if (createBookResult.IsError)
             return createBookResult.Errors;
+
+        var bookRepository = _unitOfWork.GetRepository<IBookRepository>();
+        var persistenceBook = _mapper.Map<BookDto>(createBookResult.Value);
+        var insertBookResult = await bookRepository.InsertAsync(persistenceBook, cancellationToken);
+        if (insertBookResult.IsError)
+            return insertBookResult.Errors;
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
         return createBookResult.Value;
     }
     #endregion

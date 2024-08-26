@@ -7,23 +7,15 @@ namespace Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggrega
 /// <summary>
 /// Value Object for the Id of a book.
 /// </summary>
-public sealed class BookId : AggregateRootId<Guid>
+public sealed class BookId : EntityId<Guid>
 {
-    #region ==================================================================== PROPERTIES =================================================================================
-    /// <summary>
-    /// Gets the value of the <see cref="BookId"/>.
-    /// </summary>
-    public override Guid Value { get; protected set; }
-    #endregion
-
     #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="BookId"/> class.
     /// </summary>
     /// <param name="value">The value representing this object.</param>
-    private BookId(Guid value)
+    private BookId(Guid value) : base(value)
     {
-        Value = value;
     }
     #endregion
 

@@ -17,17 +17,17 @@ public class LanguageInfo : ValueObject
     /// <summary>
     /// Gets the ISO 639-1 two-letter language code.
     /// </summary>
-    public string LanguageCode { get; }
+    public string LanguageCode { get; private set; }
 
     /// <summary>
     /// Gets the full name of the language in English.
     /// </summary>
-    public string LanguageName { get; }
+    public string LanguageName { get; private set; }
 
     /// <summary>
     /// Gets an optional native name of the language.
     /// </summary>
-    public Optional<string> NativeName { get; }
+    public Optional<string> NativeName { get; private set; }
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================

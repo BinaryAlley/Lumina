@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Enums;
 using Lumina.Application.Common.Models.Common;
+using Lumina.Domain.Common.Enums;
 #endregion
 
 namespace Lumina.Application.Common.Models.Books;

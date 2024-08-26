@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Core.WrittenContentLibrary.BooksLibrary.Books.Commands;
+using Lumina.Application.Core.WrittenContentLibrary.BooksLibrary.Books.Queries;
 using Lumina.Presentation.Api.Common.Contracts.Books;
 using Lumina.Presentation.Api.Controllers.Common;
 using MapsterMapper;
@@ -41,9 +42,8 @@ public class BooksController : ApiController
     [HttpGet()]
     public async Task<IActionResult> GetBooks()
     {
-        // ErrorOr<IEnumerable<BookDto>> result = await mediator.Send(new GetBooksQuery());
-        // return result.Match(result => Ok(result), errors => Problem(errors));
-        return Ok(new List<string> { "Book 1", "Book 2", "Book 3" });
+        var result = await _mediator.Send(new GetBooksQuery());
+        return result.Match(result => Ok(result), errors => Problem(errors));
     }
 
     /// <summary>

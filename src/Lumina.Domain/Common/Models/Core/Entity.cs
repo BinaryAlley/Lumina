@@ -11,6 +11,16 @@ public abstract class Entity<TId> : IEquatable<Entity<TId>> where TId : notnull
     /// Gets the unique identifier of the entity.
     /// </summary>
     public TId Id { get; protected set; }
+
+    /// <summary>
+    /// Gets the date and time when the entity was created.
+    /// </summary>
+    public DateTime Created { get; set; }
+
+    /// <summary>
+    /// Gets the date and time when the entity was last updated.
+    /// </summary>
+    public DateTime? Updated { get; set; }
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================

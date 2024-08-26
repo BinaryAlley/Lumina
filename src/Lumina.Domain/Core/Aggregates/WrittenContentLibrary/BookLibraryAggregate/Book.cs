@@ -16,11 +16,11 @@ namespace Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggrega
 /// Aggregate root for a book.
 /// </summary>
 [DebuggerDisplay("{Id}: {Title}")]
-public sealed class Book : AggregateRoot<BookId, Guid>
+public sealed class Book : AggregateRoot<BookId>
 {
     #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly List<MediaContributorId> _contributors;
-    private readonly List<Rating> _ratings;
+    private readonly List<BookRating> _ratings;
     private readonly List<Isbn> _isbns;
     #endregion
 
@@ -114,7 +114,7 @@ public sealed class Book : AggregateRoot<BookId, Guid>
     /// <summary>
     /// Gets the list of ratings for this book.
     /// </summary>
-    public IReadOnlyCollection<Rating> Ratings
+    public IReadOnlyCollection<BookRating> Ratings
     {
         get { return _ratings.AsReadOnly(); }
     }
@@ -160,7 +160,7 @@ public sealed class Book : AggregateRoot<BookId, Guid>
         Optional<string> appleBooksId,
         List<Isbn> isbns,
         List<MediaContributorId> contributors,
-        List<Rating> ratings) : base(id)
+        List<BookRating> ratings) : base(id)
     {
         Id = id;
         Metadata = metadata;
@@ -234,7 +234,7 @@ public sealed class Book : AggregateRoot<BookId, Guid>
         Optional<string> appleBooksId,
         List<Isbn> isbns,
         List<MediaContributorId> contributors,
-        List<Rating> ratings)
+        List<BookRating> ratings)
     {
         // TODO: enforce invariants
         return new Book(
@@ -300,7 +300,7 @@ public sealed class Book : AggregateRoot<BookId, Guid>
         Optional<string> appleBooksId,
         List<Isbn> isbns,
         List<MediaContributorId> contributors,
-        List<Rating> ratings)
+        List<BookRating> ratings)
     {
         // TODO: enforce invariants
         return new Book(

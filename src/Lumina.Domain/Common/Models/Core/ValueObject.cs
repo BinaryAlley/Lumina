@@ -11,7 +11,7 @@ public abstract class ValueObject : IEquatable<ValueObject>
     /// Gets the list of items that define equality of the object.
     /// </summary>
     /// <returns>A list of items defining the equality.</returns>
-    public abstract IEnumerable<object> GetEqualityComponents();
+    public abstract IEnumerable<object?> GetEqualityComponents();
 
     /// <summary>
     /// Indicates whether the current object is equal to another object of the same type.
@@ -42,7 +42,7 @@ public abstract class ValueObject : IEquatable<ValueObject>
     /// <param name="left">The left operand of equality.</param>
     /// <param name="right">The right operand of equality.</param>
     /// <returns><see langword="true"/> if <paramref name="left"/> is equal to <paramref name="right"/>, <see langword="false"/> otherwise.</returns>
-    public static bool operator ==(ValueObject left, ValueObject right)
+    public static bool operator ==(ValueObject? left, ValueObject? right)
     {
         return Equals(left, right);
     }
@@ -53,7 +53,7 @@ public abstract class ValueObject : IEquatable<ValueObject>
     /// <param name="left">The left operand of equality.</param>
     /// <param name="right">The right operand of equality.</param>
     /// <returns><see langword="true"/> if <paramref name="left"/> is not equal to <paramref name="right"/>, <see langword="false"/> otherwise.</returns>
-    public static bool operator !=(ValueObject left, ValueObject right)
+    public static bool operator !=(ValueObject? left, ValueObject? right)
     {
         return !Equals(left, right);
     }

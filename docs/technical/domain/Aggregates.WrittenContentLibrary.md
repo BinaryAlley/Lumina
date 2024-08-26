@@ -28,7 +28,7 @@ class Book
         Optional<string> appleBooksId,
         List<Isbn> isbns,
         List<MediaContributorId> contributors,
-        List<Rating> ratings);
+        List<BookRating> ratings);
 }
 ```
 

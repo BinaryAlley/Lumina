@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Enums;
 using Lumina.Application.Common.Models.Books;
 using Lumina.Application.Common.Models.Contributors;
+using Lumina.Domain.Common.Enums;
 #endregion
 
 namespace Lumina.Presentation.Api.Common.Contracts.Books;
