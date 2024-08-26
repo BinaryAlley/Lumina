@@ -12,6 +12,7 @@ public static partial class Errors
     public static class WrittenContent
     {
         #region ==================================================================== PROPERTIES =================================================================================
+        public static Error BookAlreadyExists => Error.Conflict(nameof(BookAlreadyExists));
         public static Error IsbnValueCannotBeEmpty => Error.Validation(nameof(IsbnValueCannotBeEmpty));
         public static Error IsbnListCannotBeNull => Error.Validation(nameof(IsbnListCannotBeNull));
         public static Error InvalidIsbn10Format => Error.Validation(nameof(InvalidIsbn10Format));

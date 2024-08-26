@@ -1,0 +1,68 @@
+﻿#region ========================================================================= USING =====================================================================================
+using Lumina.Application.Common.Models.Books;
+using Lumina.Application.Common.Models.Common;
+using Lumina.Domain.Common.Events;
+using Microsoft.EntityFrameworkCore;
+#endregion
+
+namespace Lumina.DataAccess.Core.UoW;
+
+/// <summary>
+/// DbContext for the Lumina application.
+/// </summary>
+/// <remarks>To add a new migration: add-migration InitialMigration -p Lumina.DataAccess -s Lumina.Presentation.Api -o Common\Migrations</remarks>
+/// <remarks>To update the database: update-database -p Lumina.DataAccess -s Lumina.Presentation.Api</remarks>
+public class LuminaDbContext : DbContext
+{
+    #region ==================================================================== PROPERTIES =================================================================================
+    public DbSet<BookDto> Books { get; set; } = null!;
+    #endregion
+
+    #region ====================================================================== CTOR =====================================================================================
+    /// <summary>
+    /// Overload C-tor.
+    /// </summary>
+    /// <param name="options">The options for configuring the database context.</param>
+    public LuminaDbContext(DbContextOptions<LuminaDbContext> options) : base(options)
+    {
+    }
+    #endregion
+
+    #region ===================================================================== METHODS ===================================================================================
+    /// <summary>
+    /// Configures the entity mappings for the database context.
+    /// </summary>
+    /// <param name="modelBuilder">The model builder used to configure the entity mappings.</param>
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        // find all the entity configurations in the assembly and apply them
+        modelBuilder
+            .Ignore<List<IDomainEvent>>()
+            .ApplyConfigurationsFromAssembly(typeof(LuminaDbContext).Assembly);
+
+        base.OnModelCreating(modelBuilder);
+    }
+
+    /// <summary>
+    /// Overrides the SaveChanges method of the DbContext class to automatically set the Created and Updated properties of entities that implement the <see cref="IStorageEntity"/>.
+    /// </summary>
+    /// <returns>The number of objects written to the underlying database.</returns>
+    public override int SaveChanges()
+    {
+        // get all the entity entries that are either added or modified
+        var entries = ChangeTracker.Entries()
+                                   .Where(e => e.Entity is IStorageEntity &&
+                                              (e.State is EntityState.Added or EntityState.Modified));
+        foreach (var entityEntry in entries)
+        {
+            // if the entity is in Added state, set the Created property to the current date and time
+            if (entityEntry.State == EntityState.Added)
+                ((IStorageEntity)entityEntry.Entity).Created = DateTime.UtcNow;
+            // otherwise, if the entity is in Modified state, set the Updated property to the current date and time
+            else if (entityEntry.State == EntityState.Modified)
+                ((IStorageEntity)entityEntry.Entity).Updated = DateTime.UtcNow;
+        }
+        return base.SaveChanges();
+    }
+    #endregion
+}

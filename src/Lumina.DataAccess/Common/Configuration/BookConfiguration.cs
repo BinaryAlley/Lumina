@@ -1,0 +1,181 @@
+#region ========================================================================= USING =====================================================================================
+using Lumina.Application.Common.Models.Books;
+using Lumina.Application.Common.Models.Common;
+using Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+#endregion
+
+namespace Lumina.DataAccess.Common.Configuration;
+
+/// <summary>
+/// Configures the entity mapping for the <see cref="BookDto"/> aggregate root.
+/// </summary>
+public class BookConfiguration : IEntityTypeConfiguration<BookDto>
+{
+    #region ===================================================================== METHODS ===================================================================================
+    /// <summary>
+    /// Configures the <see cref="Book"/> entity.
+    /// </summary>
+    /// <param name="builder">The builder to be used to configure the entity.</param>
+    public void Configure(EntityTypeBuilder<BookDto> builder)
+    {
+        builder.ToTable("Books");
+        builder.HasKey(book => book.Id);
+        builder.Property(book => book.Id)
+            .ValueGeneratedNever() // because EF always tries to generate the value for the Id, and because we generate it as part of the aggregate root, we need to tell EF not to generate it
+            .HasColumnOrder(0);
+
+        builder.Property(book => book.Title).IsRequired().HasMaxLength(255).HasColumnOrder(1);
+        builder.Property(book => book.OriginalTitle).HasMaxLength(255).HasColumnOrder(2);
+        builder.Property(book => book.Description).HasMaxLength(2000).HasColumnOrder(3);
+        builder.Property(book => book.OriginalReleaseDate).HasColumnOrder(4);
+        builder.Property(book => book.OriginalReleaseYear).HasColumnOrder(5);
+        builder.Property(book => book.ReReleaseDate).HasColumnOrder(6);
+        builder.Property(book => book.ReReleaseYear).HasColumnOrder(7);
+        builder.Property(book => book.ReleaseCountry).HasColumnOrder(8);
+        builder.Property(book => book.ReleaseVersion).HasColumnOrder(9);
+        builder.Property(book => book.LanguageCode).HasColumnOrder(10);
+        builder.Property(book => book.LanguageName).HasColumnOrder(11);
+        builder.Property(book => book.LanguageNativeName).HasColumnOrder(12);
+        builder.Property(book => book.OriginalLanguageCode).HasColumnOrder(13);
+        builder.Property(book => book.OriginalLanguageName).HasColumnOrder(14);
+        builder.Property(book => book.OriginalLanguageNativeName).HasColumnOrder(15);
+        // since Tag is a Domain ValueObject (no identity), we need to configure it as a many-to-many relationship
+        builder.HasMany(book => book.Tags)
+        .WithMany()
+        .UsingEntity<Dictionary<string, object>>(
+            "BookTags",
+            j => j.HasOne<TagDto>().WithMany().HasForeignKey("TagId"),
+            j => j.HasOne<BookDto>().WithMany().HasForeignKey("BookId"),
+            j =>
+            {
+                j.HasKey("BookId", "TagId");
+                j.ToTable("BookTags");
+            });
+
+        builder.HasMany(book => book.Genres)
+        .WithMany()
+        .UsingEntity<Dictionary<string, object>>(
+            "BookGenres",
+            j => j.HasOne<GenreDto>().WithMany().HasForeignKey("GenreId"),
+            j => j.HasOne<BookDto>().WithMany().HasForeignKey("BookId"),
+            j =>
+            {
+                j.HasKey("BookId", "GenreId");
+                j.ToTable("BookGenres");
+            });
+
+        builder.Property(book => book.Publisher).HasMaxLength(100).HasColumnOrder(16);
+        builder.Property(book => book.PageCount).HasColumnOrder(17);
+        builder.Property(book => book.Format).HasColumnOrder(18);
+        builder.Property(book => book.Edition).HasMaxLength(50).HasColumnOrder(19);
+        builder.Property(book => book.VolumeNumber).HasColumnOrder(20);
+        builder.Property(book => book.ASIN).HasMaxLength(10).HasColumnOrder(21);
+        builder.Property(book => book.GoodreadsId).HasColumnOrder(22);
+        builder.Property(book => book.LCCN).HasColumnOrder(23);
+        builder.Property(book => book.OCLCNumber).HasColumnOrder(24);
+        builder.Property(book => book.OpenLibraryId).HasMaxLength(50).HasColumnOrder(25);
+        builder.Property(book => book.LibraryThingId).HasMaxLength(50).HasColumnOrder(26);
+        builder.Property(book => book.GoogleBooksId).HasMaxLength(12).HasColumnOrder(27);
+        builder.Property(book => book.BarnesAndNobleId).HasMaxLength(10).HasColumnOrder(28);
+        builder.Property(book => book.AppleBooksId).HasColumnOrder(29);
+        builder.Property(book => book.Created).HasColumnOrder(30);
+        builder.Property(book => book.Updated).HasColumnOrder(31);
+
+        //builder.HasMany<ContributorIdDto>()
+        //.WithMany()
+        //.UsingEntity<Dictionary<string, object>>(
+        //    "BookContributors",
+        //    j => j.HasOne<ContributorIdDto>().WithMany().HasForeignKey("ContributorId"),
+        //    j => j.HasOne<BookDto>().WithMany().HasForeignKey("BookId"),
+        //    j =>
+        //    {
+        //        j.HasKey("BookId", "ContributorId");
+        //        j.ToTable("BookContributors");
+        //    });
+
+        //builder.OwnsMany(book => book.ContributorIds, ownedBuilder =>
+        //{
+        //    ownedBuilder.ToTable("BookContributors");
+        //    ownedBuilder.WithOwner().HasForeignKey("BookId");
+        //    ownedBuilder.Property(c => c.Id)
+        //        .HasColumnName("ContributorId")
+        //        .HasColumnType("uniqueidentifier");
+        //    ownedBuilder.HasKey("BookId", "Id"); // Use the actual property name 'Id' here
+        //});
+
+        builder.OwnsMany(book => book.Ratings, ratingBuilder =>
+        {
+            ratingBuilder.ToTable("BookRatings");
+            ratingBuilder.WithOwner().HasForeignKey("BookId");
+            ratingBuilder.Property<int>("Id").ValueGeneratedOnAdd();
+            ratingBuilder.HasKey("Id");
+
+            ratingBuilder.Property(r => r.Value)
+                .HasColumnType("decimal(3,2)")
+                .IsRequired();
+
+            ratingBuilder.Property(r => r.MaxValue)
+                .HasColumnType("decimal(3,2)")
+                .IsRequired();
+
+            ratingBuilder.Property(r => r.VoteCount)
+                .IsRequired(false);
+
+            ratingBuilder.Property(r => r.Source)
+                .HasConversion<string>()
+                .HasMaxLength(50)  
+                .IsRequired();
+        });
+
+        builder.OwnsMany(book => book.ISBNs, isbnBuilder =>
+        {
+            isbnBuilder.ToTable("BookISBNs");
+            isbnBuilder.WithOwner().HasForeignKey("BookId");
+            isbnBuilder.Property<int>("Id").ValueGeneratedOnAdd();
+            isbnBuilder.HasKey("Id");
+
+            isbnBuilder.Property(isbn => isbn.Value)
+                .HasColumnName("ISBN")
+                .HasMaxLength(13)  
+                .IsRequired();
+
+            isbnBuilder.Property(isbn => isbn.Format)
+                .HasConversion<string>()
+                .HasMaxLength(6)  
+                .IsRequired();
+        });
+    }
+    #endregion
+}
+
+public class TagConfiguration : IEntityTypeConfiguration<TagDto>
+{
+    public void Configure(EntityTypeBuilder<TagDto> builder)
+    {
+        builder.ToTable("Tags");
+        builder.HasKey(t => t.Name);
+        builder.Property(t => t.Name).IsRequired().HasMaxLength(50);
+    }
+}
+
+public class GenreConfiguration : IEntityTypeConfiguration<GenreDto>
+{
+    public void Configure(EntityTypeBuilder<GenreDto> builder)
+    {
+        builder.ToTable("Genres");
+        builder.HasKey(g => g.Name);
+        builder.Property(g => g.Name).IsRequired().HasMaxLength(50);
+    }
+}
+
+//public class ContributorConfiguration : IEntityTypeConfiguration<ContributorIdDto>
+//{
+//    public void Configure(EntityTypeBuilder<ContributorIdDto> builder)
+//    {
+//        builder.ToTable("Contributors");
+//        builder.HasKey(c => c.Id);
+//        builder.Property(c => c.Id).ValueGeneratedNever();
+//    }
+//}
