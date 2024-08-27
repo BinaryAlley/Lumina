@@ -5,7 +5,12 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <BaseOutputPath>..\..\bin\</BaseOutputPath>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="..\AssemblyInfo_Shared.cs" Link="Properties\AssemblyInfo_Shared.cs" />
+    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="ErrorOr" Version="2.0.1" />

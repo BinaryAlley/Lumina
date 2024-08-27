@@ -5,7 +5,13 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <BaseOutputPath>..\..\bin\</BaseOutputPath>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="..\AssemblyInfo_Shared.cs" Link="Properties\AssemblyInfo_Shared.cs" />
+    </ItemGroup>
+
 
     <ItemGroup>
         <PackageReference Include="Mapster" Version="7.4.0" />

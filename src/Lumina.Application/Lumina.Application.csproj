@@ -5,8 +5,13 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <BaseOutputPath>..\..\bin\</BaseOutputPath>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     </PropertyGroup>
 
+    <ItemGroup>
+        <Compile Include="..\AssemblyInfo_Shared.cs" Link="Properties\AssemblyInfo_Shared.cs" />
+    </ItemGroup>
+    
     <ItemGroup>
         <ProjectReference Include="..\Lumina.Domain\Lumina.Domain.csproj" />
     </ItemGroup>
