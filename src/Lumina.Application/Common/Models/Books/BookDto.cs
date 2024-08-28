@@ -25,8 +25,8 @@ public class BookDto : IStorageEntity
     public string? OriginalLanguageCode { get; init; }
     public string? OriginalLanguageName { get; init; }
     public string? OriginalLanguageNativeName { get; init; }
-    public List<TagDto> Tags { get; init; } = [];
-    public List<GenreDto> Genres { get; init; } = [];
+    public HashSet<TagDto> Tags { get; set; } = [];
+    public HashSet<GenreDto> Genres { get; set; } = [];
     public string? Publisher { get; init; }
     public int? PageCount { get; init; }
     public string Format { get; init; } = null!;

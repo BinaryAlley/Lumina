@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Models.Books;
 using Lumina.Application.Common.Models.Common;
-using Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 #endregion
@@ -9,13 +8,13 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace Lumina.DataAccess.Common.Configuration;
 
 /// <summary>
-/// Configures the entity mapping for the <see cref="BookDto"/> aggregate root.
+/// Configures the entity mapping for the <see cref="BookDto"/> entity.
 /// </summary>
 public class BookConfiguration : IEntityTypeConfiguration<BookDto>
 {
     #region ===================================================================== METHODS ===================================================================================
     /// <summary>
-    /// Configures the <see cref="Book"/> entity.
+    /// Configures the <see cref="BookDto"/> entity.
     /// </summary>
     /// <param name="builder">The builder to be used to configure the entity.</param>
     public void Configure(EntityTypeBuilder<BookDto> builder)
@@ -41,7 +40,8 @@ public class BookConfiguration : IEntityTypeConfiguration<BookDto>
         builder.Property(book => book.OriginalLanguageCode).HasColumnOrder(13);
         builder.Property(book => book.OriginalLanguageName).HasColumnOrder(14);
         builder.Property(book => book.OriginalLanguageNativeName).HasColumnOrder(15);
-        // since Tag is a Domain ValueObject (no identity), we need to configure it as a many-to-many relationship
+        // since Tag is a Domain ValueObject (no identity), but we also don't want to have duplicates,
+        // we need to configure it as a many-to-many relationship, where the tag itself is the primary key
         builder.HasMany(book => book.Tags)
         .WithMany()
         .UsingEntity<Dictionary<string, object>>(
@@ -112,18 +112,18 @@ public class BookConfiguration : IEntityTypeConfiguration<BookDto>
             ratingBuilder.Property<int>("Id").ValueGeneratedOnAdd();
             ratingBuilder.HasKey("Id");
 
-            ratingBuilder.Property(r => r.Value)
+            ratingBuilder.Property(rating => rating.Value)
                 .HasColumnType("decimal(3,2)")
                 .IsRequired();
 
-            ratingBuilder.Property(r => r.MaxValue)
+            ratingBuilder.Property(rating => rating.MaxValue)
                 .HasColumnType("decimal(3,2)")
                 .IsRequired();
 
-            ratingBuilder.Property(r => r.VoteCount)
+            ratingBuilder.Property(rating => rating.VoteCount)
                 .IsRequired(false);
 
-            ratingBuilder.Property(r => r.Source)
+            ratingBuilder.Property(rating => rating.Source)
                 .HasConversion<string>()
                 .HasMaxLength(50)  
                 .IsRequired();
@@ -148,26 +148,6 @@ public class BookConfiguration : IEntityTypeConfiguration<BookDto>
         });
     }
     #endregion
-}
-
-public class TagConfiguration : IEntityTypeConfiguration<TagDto>
-{
-    public void Configure(EntityTypeBuilder<TagDto> builder)
-    {
-        builder.ToTable("Tags");
-        builder.HasKey(t => t.Name);
-        builder.Property(t => t.Name).IsRequired().HasMaxLength(50);
-    }
-}
-
-public class GenreConfiguration : IEntityTypeConfiguration<GenreDto>
-{
-    public void Configure(EntityTypeBuilder<GenreDto> builder)
-    {
-        builder.ToTable("Genres");
-        builder.HasKey(g => g.Name);
-        builder.Property(g => g.Name).IsRequired().HasMaxLength(50);
-    }
 }
 
 //public class ContributorConfiguration : IEntityTypeConfiguration<ContributorIdDto>
