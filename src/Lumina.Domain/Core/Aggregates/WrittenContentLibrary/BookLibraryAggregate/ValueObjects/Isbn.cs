@@ -13,6 +13,11 @@ namespace Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggrega
 /// </summary>
 public sealed class Isbn : ValueObject
 {
+    #region ================================================================== FIELD MEMBERS ================================================================================
+    private static readonly Regex Isbn10Regex = new(@"^(?:ISBN(?:-10)?:? )?(?=[0-9X]{10}$|(?=(?:[0-9]+[-\ ]){3})[-\ 0-9X]{13}$)[0-9]{1,5}[-\ ]?[0-9]+[-\ ]?[0-9]+[-\ ]?[0-9X]$", RegexOptions.Compiled);
+    private static readonly Regex Isbn13Regex = new(@"^(?:ISBN(?:-13)?:? )?(?=[0-9]{13}$|(?=(?:[0-9]+[-\ ]){4})[-\ 0-9]{17}$)97[89][-\ ]?[0-9]{1,5}[-\ ]?[0-9]+[-\ ]?[0-9]+[-\ ]?[0-9]$", RegexOptions.Compiled);
+    #endregion
+
     #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the value of the ISBN.
@@ -71,58 +76,40 @@ public sealed class Isbn : ValueObject
     /// <summary>
     /// Validates an ISBN-10 string.
     /// </summary>
-    /// <param name="isbn">The ISBN-10 string to validate, without hyphens or spaces.</param>
+    /// <param name="isbn">The ISBN-10 string to validate, with or without hyphens or spaces.</param>
     /// <returns><see langword="true"/> if the ISBN-10 is valid, <see langword="false"/> otherwise.</returns>
     public static bool IsValidIsbn10(string isbn)
     {
-        // ISBN-10 must be exactly 10 characters long
-        if (isbn.Length != 10)
+        if (!Isbn10Regex.IsMatch(isbn))
             return false;
+        // remove any hyphens or spaces
+        isbn = isbn.Replace("-", "").Replace(" ", "").ToUpper();
         int sum = 0;
         for (int i = 0; i < 9; i++)
-        {
-            // each of the first 9 characters must be a digit
-            if (!char.IsDigit(isbn[i]))
-                return false;
-            // calculate the sum: each digit is multiplied by its position (10 to 2) and added
             sum += (10 - i) * (isbn[i] - '0');
-        }
-        // check the last character, which can be a digit or 'X'
         char lastChar = isbn[9];
-        if (lastChar == 'X' || lastChar == 'x')
+        if (lastChar == 'X')
             sum += 10;
-        else if (char.IsDigit(lastChar))
-            sum += lastChar - '0';
         else
-            return false;
-        // the ISBN-10 is valid if the sum is divisible by 11
+            sum += lastChar - '0';
         return sum % 11 == 0;
     }
 
     /// <summary>
     /// Validates an ISBN-13 string.
     /// </summary>
-    /// <param name="isbn">The ISBN-13 string to validate, without hyphens or spaces.</param>
+    /// <param name="isbn">The ISBN-13 string to validate, with or without hyphens or spaces.</param>
     /// <returns><see langword="true"/> if the ISBN-13 is valid, <see langword="false"/> otherwise.</returns>
     public static bool IsValidIsbn13(string isbn)
     {
-        // ISBN-13 must be exactly 13 characters long
-        if (isbn.Length != 13)
+        if (!Isbn13Regex.IsMatch(isbn))
             return false;
+        // remove any hyphens or spaces
+        isbn = isbn.Replace("-", "").Replace(" ", "");
         int sum = 0;
         for (int i = 0; i < 12; i++)
-        {
-            // each of the first 12 characters must be a digit
-            if (!char.IsDigit(isbn[i]))
-                return false;
-            // calculate the sum: alternate digits are multiplied by 3
             sum += (i % 2 == 0) ? isbn[i] - '0' : 3 * (isbn[i] - '0');
-        }
-        // calculate the check digit
-        int checkDigit = 10 - (sum % 10);
-        if (checkDigit == 10)
-            checkDigit = 0;
-        // the ISBN-13 is valid if the calculated check digit matches the last digit
+        int checkDigit = (10 - (sum % 10)) % 10;
         return checkDigit == (isbn[12] - '0');
     }
 

@@ -1,6 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using FluentValidation;
+using Lumina.Domain.Common.Enums;
 using Lumina.Domain.Common.Errors;
+using System.Text.RegularExpressions;
 #endregion
 
 namespace Lumina.Application.Core.WrittenContentLibrary.BooksLibrary.Books.Commands;
@@ -157,7 +159,12 @@ public class AddBookCommandValidator : AbstractValidator<AddBookCommand>
             {
                 isbn.RuleFor(i => i.Value)
                     .NotEmpty().WithMessage(Errors.WrittenContent.IsbnValueCannotBeEmpty.Code)
-                    .MaximumLength(13).WithMessage(Errors.WrittenContent.InvalidIsbn13Format.Code);
+                    .Matches(i => i.Format == IsbnFormat.Isbn13
+                        ? @"^(?:ISBN(?:-13)?:? )?(?=[0-9]{13}$|(?=(?:[0-9]+[-\ ]){4})[-\ 0-9]{17}$)97[89][-\ ]?[0-9]{1,5}[-\ ]?[0-9]+[-\ ]?[0-9]+[-\ ]?[0-9]$"
+                        : @"^(?:ISBN(?:-10)?:? )?(?=[0-9X]{10}$|(?=(?:[0-9]+[-\ ]){3})[-\ 0-9X]{13}$)[0-9]{1,5}[-\ ]?[0-9]+[-\ ]?[0-9]+[-\ ]?[0-9X]$")
+                    .WithMessage(i => i.Format == IsbnFormat.Isbn13
+                        ? Errors.WrittenContent.InvalidIsbn13Format.Code
+                        : Errors.WrittenContent.InvalidIsbn10Format.Code);
                 isbn.RuleFor(i => i.Format)
                     .IsInEnum().WithMessage(Errors.WrittenContent.UnknownIsbnFormat.Code);
             });
@@ -195,6 +202,36 @@ public class AddBookCommandValidator : AbstractValidator<AddBookCommand>
                     .GreaterThanOrEqualTo(0).When(r => r.VoteCount.HasValue)
                     .WithMessage(Errors.Metadata.RatingVoteCountMustBePositive.Code);
             });
+    }
+
+    public static bool ValidateIsbn10(string isbn)
+    {
+        isbn = isbn.Replace("-", "").Replace(" ", "").ToUpper();
+        if (!Regex.IsMatch(isbn, @"^(?:\d{9}[\dX])$"))
+            return false;
+
+        int sum = 0;
+        for (int i = 0; i < 9; i++)
+            sum += (10 - i) * (isbn[i] - '0');
+
+        char lastChar = isbn[9];
+        sum += lastChar == 'X' ? 10 : (lastChar - '0');
+
+        return sum % 11 == 0;
+    }
+
+    public static bool ValidateIsbn13(string isbn)
+    {
+        if (!Regex.IsMatch(isbn, @"^(978|979)-[0-9]{1,5}-[0-9]+-[0-9]+-[0-9]$"))
+            return false;
+
+        isbn = isbn.Replace("-", "");
+        int sum = 0;
+        for (int i = 0; i < 12; i++)
+            sum += (i % 2 == 0) ? isbn[i] - '0' : (isbn[i] - '0') * 3;
+
+        int checkDigit = (10 - (sum % 10)) % 10;
+        return checkDigit == (isbn[12] - '0');
     }
     #endregion
 }

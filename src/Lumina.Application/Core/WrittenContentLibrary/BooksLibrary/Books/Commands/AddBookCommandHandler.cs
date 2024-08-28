@@ -125,7 +125,7 @@ public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<Boo
                 return originalLanguageInfoResult.Errors;
             originalLanguageInfo = originalLanguageInfoResult.Value;
         }
-        WrittenContentMetadata metadata = WrittenContentMetadata.Create(
+        var metadataResult = WrittenContentMetadata.Create(
             request.Metadata.Title,
             Optional<string>.FromNullable(request.Metadata.OriginalTitle),
             Optional<string>.FromNullable(request.Metadata.Description),
@@ -137,9 +137,10 @@ public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<Boo
             Optional<string>.FromNullable(request.Metadata.Publisher),
             Optional<int>.FromNullable(request.Metadata.PageCount)        
         );
-
+        if (metadataResult.IsError)
+            return metadataResult.Errors;
         var createBookResult = Book.Create(
-            metadata,
+            metadataResult.Value,
             request.Format,
             Optional<string>.FromNullable(request.Edition),
             request.VolumeNumber ?? default,

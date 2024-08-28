@@ -60,7 +60,7 @@ public class BookMappingConfig : IRegister
             .Map(dest => dest.ISBNs, src => src.ISBNs)
             .Map(dest => dest.Ratings, src => src.Ratings)
             .Map(dest => dest.Created, src => src.Created)
-            .Map(dest => dest.Updated, src => src.Updated);
+            .Map(dest => dest.Updated, src => src.Updated.HasValue ? src.Updated : null);
 
         config.NewConfig<BookRating, BookRatingDto>()
             .Map(dest => dest.Value, src => src.Value)
@@ -71,7 +71,7 @@ public class BookMappingConfig : IRegister
         config.NewConfig<Optional<BookRatingSource>, BookRatingSource?>()
             .MapWith(src => src.HasValue ? src.Value : default);
 
-
+        // from BookDto to Book
         config.NewConfig<BookDto, Book>()
         .MapWith(src => Book.Create(
             BookId.Create(src.Id),
@@ -101,11 +101,11 @@ public class BookMappingConfig : IRegister
                 ).Value : Optional<LanguageInfo>.None(),
                 Optional<string>.FromNullable(src.Publisher),
                 Optional<int>.FromNullable(src.PageCount)
-            ),
+            ).Value,
             Enum.Parse<BookFormat>(src.Format),
             Optional<string>.FromNullable(src.Edition),
             Optional<int>.FromNullable(src.VolumeNumber),
-            Optional<BookSeries>.None(), // Assuming BookSeries is not part of BookDto
+            Optional<BookSeries>.None(), 
             Optional<string>.FromNullable(src.ASIN),
             Optional<string>.FromNullable(src.GoodreadsId),
             Optional<string>.FromNullable(src.LCCN),
@@ -115,17 +115,17 @@ public class BookMappingConfig : IRegister
             Optional<string>.FromNullable(src.GoogleBooksId),
             Optional<string>.FromNullable(src.BarnesAndNobleId),
             Optional<string>.FromNullable(src.AppleBooksId),
+            src.Created,
+            Optional<DateTime>.FromNullable(src.Updated),
             src.ISBNs.Select(i => Isbn.Create(i.Value, i.Format).Value).ToList(),
-            new List<MediaContributorId>(), // Assuming MediaContributorId is not part of BookDto
+            new List<MediaContributorId>(), 
             src.Ratings.Select(r => BookRating.Create(
                 r.Value,
                 r.MaxValue,
                 Optional<BookRatingSource>.FromNullable(r.Source),
                 Optional<int>.FromNullable(r.VoteCount)
             ).Value).ToList()
-        ).Value) // Assuming Create returns ErrorOr<Book>, we take the Value
-        .Ignore(dest => dest.Created)
-        .Ignore(dest => dest.Updated);
+        ).Value);
     }
     #endregion
 }

@@ -2,20 +2,20 @@
 using Lumina.Application.Core.WrittenContentLibrary.BooksLibrary.Books.Commands;
 using Lumina.Application.Core.WrittenContentLibrary.BooksLibrary.Books.Queries;
 using Lumina.Presentation.Api.Common.Contracts.Books;
-using Lumina.Presentation.Api.Controllers.Common;
+using Lumina.Presentation.Api.Core.Controllers.Common;
 using MapsterMapper;
 using Mediator;
 using Microsoft.AspNetCore.Mvc;
 #endregion
 
-namespace Lumina.Presentation.Api.Controllers.Books;
+namespace Lumina.Presentation.Api.Core.Controllers.Books;
 
 /// <summary>
 /// Controller for managing books.
 /// </summary>
 [ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}/[controller]")]
-public class BooksController : ApiController 
+public class BooksController : ApiController
 {
     #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly ISender _mediator;
@@ -49,12 +49,12 @@ public class BooksController : ApiController
     /// <summary>
     /// Controller action for adding a book.
     /// </summary>
-    /// <param name="command">The command to add a book.</param>
+    /// <param name="request">The command to add a book.</param>
     [HttpPost()]
     public async Task<IActionResult> AddBook(AddBookRequest request)
     {
         var result = await _mediator.Send(_mapper.Map<AddBookCommand>(request));
-        return result.Match(result => Ok(result), errors => Problem(errors));
+        return result.Match(result => Created($"/api/v1/books/{result.Id}", result), errors => Problem(errors));
     }
     #endregion
 }

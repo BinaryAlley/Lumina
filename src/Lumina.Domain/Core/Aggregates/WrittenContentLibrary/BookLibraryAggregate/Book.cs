@@ -139,10 +139,12 @@ public sealed class Book : AggregateRoot<BookId>
     /// <param name="googleBooksId">The optional Google Books ID of the book.</param>
     /// <param name="barnesAndNobleId">The optional Barnes & Noble ID of the book.</param>
     /// <param name="appleBooksId">The optional Apple Books ID of the book.</param>
+    /// <param name="created">The date and time when the entity was created.</param>
+    /// <param name="updated">The date and time when the entity was last updated.</param>
     /// <param name="isbns">The list of ISBNs of the book.</param>
     /// <param name="contributors">The list of media contributors of the book.</param>
     /// <param name="ratings">The list of ratings for the book.</param>
-    public Book(
+    private Book(
         BookId id,
         WrittenContentMetadata metadata,
         BookFormat format,
@@ -158,6 +160,8 @@ public sealed class Book : AggregateRoot<BookId>
         Optional<string> googleBooksId,
         Optional<string> barnesAndNobleId,
         Optional<string> appleBooksId,
+        DateTime created,
+        Optional<DateTime> updated,
         List<Isbn> isbns,
         List<MediaContributorId> contributors,
         List<BookRating> ratings) : base(id)
@@ -177,6 +181,8 @@ public sealed class Book : AggregateRoot<BookId>
         GoogleBooksId = googleBooksId;
         BarnesAndNobleId = barnesAndNobleId;
         AppleBooksId = appleBooksId;
+        Created = created;
+        Updated = updated.HasValue ? updated.Value : null;
         _isbns = isbns;
         _contributors = contributors;
         _ratings = ratings;
@@ -253,6 +259,8 @@ public sealed class Book : AggregateRoot<BookId>
             googleBooksId,
             barnesAndNobleId,
             appleBooksId,
+            DateTime.UtcNow,
+            default,
             isbns,
             contributors,
             ratings);
@@ -276,6 +284,8 @@ public sealed class Book : AggregateRoot<BookId>
     /// <param name="googleBooksId">The optional Google Books ID of the book.</param>
     /// <param name="barnesAndNobleId">The optional Barnes & Noble ID of the book.</param>
     /// <param name="appleBooksId">The optional Apple Books ID of the book.</param>
+    /// <param name="created">The date and time when the entity was created.</param>
+    /// <param name="updated">The date and time when the entity was last updated.</param>
     /// <param name="isbns">The list of ISBNs of the book.</param>
     /// <param name="contributors">The list of media contributors of the book.</param>
     /// <param name="ratings">The list of ratings for the book.</param>
@@ -298,6 +308,8 @@ public sealed class Book : AggregateRoot<BookId>
         Optional<string> googleBooksId,
         Optional<string> barnesAndNobleId,
         Optional<string> appleBooksId,
+        DateTime created,
+        Optional<DateTime> updated,
         List<Isbn> isbns,
         List<MediaContributorId> contributors,
         List<BookRating> ratings)
@@ -319,6 +331,8 @@ public sealed class Book : AggregateRoot<BookId>
             googleBooksId,
             barnesAndNobleId,
             appleBooksId,
+            created,
+            updated,
             isbns,
             contributors,
             ratings);

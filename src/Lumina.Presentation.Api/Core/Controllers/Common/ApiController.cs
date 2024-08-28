@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 #endregion
 
-namespace Lumina.Presentation.Api.Controllers.Common;
+namespace Lumina.Presentation.Api.Core.Controllers.Common;
 
 /// <summary>
 /// Base class for API controllers.
