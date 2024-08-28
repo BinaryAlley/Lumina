@@ -32,7 +32,7 @@ public class DatabaseSettingsModelValidatorTests
     }
     #endregion
 
-    #region ================================================================= METHODS ===================================================================================
+    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void DatabaseSettingsModelValidator_WhenDefaultConnectionProvided_ShouldNotHaveValidationError()
     {

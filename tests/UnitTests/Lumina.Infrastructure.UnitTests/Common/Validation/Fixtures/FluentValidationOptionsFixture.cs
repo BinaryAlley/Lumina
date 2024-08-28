@@ -2,13 +2,13 @@
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Common.Utilities;
+namespace Lumina.Infrastructure.UnitTests.Common.Validation.Fixtures;
 
 /// <summary>
-/// Contains unit tests for the <see cref="OptionsBuilderFluentValidationUtilitiesTests"/> class.
+/// Contains unit tests for the <see cref="FluentValidationOptionsTests"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class OptionsBuilderFluentValidationUtilitiesFixture
+public class FluentValidationOptionsFixture
 {
 
 }

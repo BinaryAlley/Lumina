@@ -6,6 +6,7 @@ using FluentAssertions;
 using FluentValidation;
 using Lumina.Infrastructure.Common.Utilities;
 using Lumina.Infrastructure.Common.Validation;
+using Lumina.Infrastructure.UnitTests.Common.Utilities.Fixtures;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -25,7 +26,7 @@ public class OptionsBuilderFluentValidationUtilitiesTests
 
     #region ====================================================================== CTOR =====================================================================================
     /// <summary>
-    /// Initializes a new instance of the <see cref="FluentValidationOptionsTests"/> class.
+    /// Initializes a new instance of the <see cref="OptionsBuilderFluentValidationUtilitiesTests"/> class.
     /// </summary>
     public OptionsBuilderFluentValidationUtilitiesTests()
     {
@@ -33,7 +34,7 @@ public class OptionsBuilderFluentValidationUtilitiesTests
     }
     #endregion
 
-    #region ================================================================= METHODS ===================================================================================
+    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void ValidateFluently_WhenCalled_ShouldRegisterFluentValidationOptions()
     {

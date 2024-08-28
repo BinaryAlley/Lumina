@@ -33,7 +33,7 @@ public class CommonSettingsModelValidatorTests
     }
     #endregion
 
-    #region ================================================================= METHODS ===================================================================================
+    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void CommonSettingsModelValidator_WhenThemeProvided_ShouldNotHaveValidationError()
     {

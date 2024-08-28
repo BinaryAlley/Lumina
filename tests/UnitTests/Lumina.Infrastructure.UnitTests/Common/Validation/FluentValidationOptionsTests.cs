@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using NSubstitute;
 using Lumina.Infrastructure.Common.Validation;
 using System.Diagnostics.CodeAnalysis;
+using Lumina.Infrastructure.UnitTests.Common.Validation.Fixtures;
 #endregion
 
 namespace Lumina.Infrastructure.UnitTests.Common.Validation;
@@ -32,7 +33,7 @@ public class FluentValidationOptionsTests
     }
     #endregion
 
-    #region ================================================================= METHODS ===================================================================================
+    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void Validate_WhenMatchingName_ShouldValidateOptions()
     {
