@@ -4,7 +4,7 @@ namespace Lumina.Application.Common.Models.Common;
 /// Represents a rating.
 /// </summary>
 public abstract record RatingDto(
-    decimal Value,
-    decimal MaxValue,
+    decimal? Value,
+    decimal? MaxValue,
     int? VoteCount
 );

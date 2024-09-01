@@ -58,7 +58,7 @@ public class OptionsBuilderFluentValidationUtilitiesTests
     public void ValidateFluently_WhenCalled_ShouldUseCorrectName()
     {
         // Arrange
-        var services = Substitute.For<IServiceCollection>();
+        var services = new ServiceCollection();
         var name = _fixture.Create<string>();
         var optionsBuilder = new OptionsBuilder<OptionsBuilderFluentValidationUtilitiesFixture>(services, name);
 
@@ -66,23 +66,20 @@ public class OptionsBuilderFluentValidationUtilitiesTests
         optionsBuilder.ValidateFluently();
 
         // Assert
-        services.Received(1).Add(Arg.Is<ServiceDescriptor>(sd =>
+        var serviceDescriptor = services.FirstOrDefault(sd =>
             sd.ServiceType == typeof(IValidateOptions<OptionsBuilderFluentValidationUtilitiesFixture>) &&
             sd.Lifetime == ServiceLifetime.Singleton &&
-            sd.ImplementationFactory != null));
+            sd.ImplementationFactory != null);
 
-        var serviceDescriptor = services.ReceivedCalls()
-            .Select(call => call.GetArguments().First())
-            .OfType<ServiceDescriptor>()
-            .First();
+        serviceDescriptor.Should().NotBeNull();
 
-        var implementationFactory = serviceDescriptor.ImplementationFactory;
+        var implementationFactory = serviceDescriptor!.ImplementationFactory;
         implementationFactory.Should().NotBeNull();
 
         var serviceProvider = Substitute.For<IServiceProvider>();
         var mockValidator = Substitute.For<IValidator<OptionsBuilderFluentValidationUtilitiesFixture>>();
-        serviceProvider.GetService(typeof(IValidateOptions<OptionsBuilderFluentValidationUtilitiesFixture>))
-            .Returns(Substitute.For<IValidateOptions<OptionsBuilderFluentValidationUtilitiesFixture>>());
+        serviceProvider.GetService(typeof(IValidator<OptionsBuilderFluentValidationUtilitiesFixture>))
+            .Returns(mockValidator);
 
         var fluentValidationOptions = implementationFactory!(serviceProvider) as FluentValidationOptions<OptionsBuilderFluentValidationUtilitiesFixture>;
         fluentValidationOptions.Should().NotBeNull();

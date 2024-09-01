@@ -182,7 +182,7 @@ public class RequestBookFixture
                     return $"{digits[0]}-{digits[1]}{digits[2]}-{digits[3]}{digits[4]}{digits[5]}{digits[6]}{digits[7]}{digits[8]}-{checkChar}";
                 }
             })
-            .RuleFor(i => i.Format, (f, i) => i.Value.Length > 13 ? IsbnFormat.Isbn13 : IsbnFormat.Isbn10);
+            .RuleFor(i => i.Format, (f, i) => i.Value!.Length > 13 ? IsbnFormat.Isbn13 : IsbnFormat.Isbn10);
 
         return new Faker<AddBookRequest>()
             .CustomInstantiator(f => new AddBookRequest(
@@ -329,15 +329,9 @@ public class RequestBookFixture
         ));
     }
 
-    private string? LimitStringLength(string? input, int maxLength)
+    private static string? LimitStringLength(string? input, int maxLength)
     {
-        return input?.Length > maxLength ? input.Substring(0, maxLength) : input;
-    }
-
-    private int? OptionalYear()
-    {
-        // 50% chance of returning null, 50% chance of returning a value between 1 and 9999
-        return _random.Next(2) == 0 ? null : _random.Next(1, 10000);
+        return input?.Length > maxLength ? input[..maxLength] : input;
     }
     #endregion
 }

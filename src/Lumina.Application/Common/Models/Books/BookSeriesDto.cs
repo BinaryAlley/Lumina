@@ -4,5 +4,5 @@ namespace Lumina.Application.Common.Models.Books;
 /// Represents a request to get book series information.
 /// </summary>
 public record BookSeriesDto(
-    string Title
+    string? Title
 );

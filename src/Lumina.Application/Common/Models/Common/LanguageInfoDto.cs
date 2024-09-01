@@ -4,7 +4,7 @@ namespace Lumina.Application.Common.Models.Common;
 /// Represents a request to get language information.
 /// </summary>
 public record LanguageInfoDto(
-    string LanguageCode,
-    string LanguageName,
+    string? LanguageCode,
+    string? LanguageName,
     string? NativeName
 );

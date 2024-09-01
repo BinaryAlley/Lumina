@@ -31,9 +31,9 @@ public sealed class Book : AggregateRoot<BookId>
     public WrittenContentMetadata Metadata { get; private set; }
 
     /// <summary>
-    /// Gets the format of the book (e.g., Hardcover, Paperback).
+    /// Gets the format of the book (e.g., Hardcover, Paperback), if applicable.
     /// </summary>
-    public BookFormat Format { get; private set; }
+    public Optional<BookFormat> Format { get; private set; }
 
     /// <summary>
     /// Gets the edition of the book, if applicable.
@@ -126,7 +126,7 @@ public sealed class Book : AggregateRoot<BookId>
     /// </summary>
     /// <param name="id">The unique identifier of the book.</param>
     /// <param name="metadata">The metadata of the book.</param>
-    /// <param name="format">The format of the book (e.g., Hardcover, Paperback).</param>
+    /// <param name="format">The optional format of the book (e.g., Hardcover, Paperback).</param>
     /// <param name="edition">The optional edition of the book.</param>
     /// <param name="volumeNumber">The optional volume or book number in the series.</param>
     /// <param name="series">The optional series name, if the book is part of a series.</param>
@@ -147,7 +147,7 @@ public sealed class Book : AggregateRoot<BookId>
     private Book(
         BookId id,
         WrittenContentMetadata metadata,
-        BookFormat format,
+        Optional<BookFormat> format,
         Optional<string> edition,
         Optional<int> volumeNumber,
         Optional<BookSeries> series,
@@ -204,7 +204,7 @@ public sealed class Book : AggregateRoot<BookId>
     /// Creates a new instance of the <see cref="Book"/> class.
     /// </summary>
     /// <param name="metadata">The metadata of the book.</param>
-    /// <param name="format">The format of the book (e.g., Hardcover, Paperback).</param>
+    /// <param name="format">The optional format of the book (e.g., Hardcover, Paperback).</param>
     /// <param name="edition">The optional edition of the book.</param>
     /// <param name="volumeNumber">The optional volume or book number in the series.</param>
     /// <param name="series">The optional series name, if the book is part of a series.</param>
@@ -225,7 +225,7 @@ public sealed class Book : AggregateRoot<BookId>
     /// </returns>
     public static ErrorOr<Book> Create(
         WrittenContentMetadata metadata,
-        BookFormat format,
+        Optional<BookFormat> format,
         Optional<string> edition,
         Optional<int> volumeNumber,
         Optional<BookSeries> series,
@@ -271,7 +271,7 @@ public sealed class Book : AggregateRoot<BookId>
     /// </summary>
     /// <param name="id">The object representing the id of the book.</param>
     /// <param name="metadata">The metadata of the book.</param>
-    /// <param name="format">The format of the book (e.g., Hardcover, Paperback).</param>
+    /// <param name="format">The optional format of the book (e.g., Hardcover, Paperback).</param>
     /// <param name="edition">The optional edition of the book.</param>
     /// <param name="volumeNumber">The optional volume or book number in the series.</param>
     /// <param name="series">The optional series name, if the book is part of a series.</param>
@@ -295,7 +295,7 @@ public sealed class Book : AggregateRoot<BookId>
     public static ErrorOr<Book> Create(
         BookId id,
         WrittenContentMetadata metadata,
-        BookFormat format,
+        Optional<BookFormat> format,
         Optional<string> edition,
         Optional<int> volumeNumber,
         Optional<BookSeries> series,

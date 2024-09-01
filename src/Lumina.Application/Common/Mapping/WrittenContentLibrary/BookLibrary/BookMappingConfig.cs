@@ -87,22 +87,22 @@ public class BookMappingConfig : IRegister
                     Optional<string>.FromNullable(src.ReleaseCountry),
                     Optional<string>.FromNullable(src.ReleaseVersion)
                 ).Value,
-                src.Genres.Select(g => Genre.Create(g.Name).Value).ToList(),
-                src.Tags.Select(t => Tag.Create(t.Name).Value).ToList(),
+                src.Genres.Select(g => Genre.Create(g.Name!).Value).ToList(),
+                src.Tags.Select(t => Tag.Create(t.Name!).Value).ToList(),
                 src.LanguageCode != null ? LanguageInfo.Create(
                     src.LanguageCode,
-                    src.LanguageName,
+                    src.LanguageName!,
                     Optional<string>.FromNullable(src.LanguageNativeName)
                 ).Value : Optional<LanguageInfo>.None(),
                 src.OriginalLanguageCode != null ? LanguageInfo.Create(
                     src.OriginalLanguageCode,
-                    src.OriginalLanguageName,
+                    src.OriginalLanguageName!,
                     Optional<string>.FromNullable(src.OriginalLanguageNativeName)
                 ).Value : Optional<LanguageInfo>.None(),
                 Optional<string>.FromNullable(src.Publisher),
                 Optional<int>.FromNullable(src.PageCount)
             ).Value,
-            Enum.Parse<BookFormat>(src.Format),
+            Optional<BookFormat>.FromNullable(!string.IsNullOrWhiteSpace(src.Format) ? Enum.Parse<BookFormat>(src.Format) : default),
             Optional<string>.FromNullable(src.Edition),
             Optional<int>.FromNullable(src.VolumeNumber),
             Optional<BookSeries>.None(), 
@@ -117,11 +117,11 @@ public class BookMappingConfig : IRegister
             Optional<string>.FromNullable(src.AppleBooksId),
             src.Created,
             Optional<DateTime>.FromNullable(src.Updated),
-            src.ISBNs.Select(i => Isbn.Create(i.Value, i.Format).Value).ToList(),
+            src.ISBNs.Select(i => Isbn.Create(i.Value!, i.Format ?? default).Value).ToList(),
             new List<MediaContributorId>(), 
             src.Ratings.Select(r => BookRating.Create(
-                r.Value,
-                r.MaxValue,
+                r.Value ?? default,
+                r.MaxValue ?? default,
                 Optional<BookRatingSource>.FromNullable(r.Source),
                 Optional<int>.FromNullable(r.VoteCount)
             ).Value).ToList()

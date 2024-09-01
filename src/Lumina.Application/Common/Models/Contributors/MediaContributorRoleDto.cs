@@ -4,6 +4,6 @@ namespace Lumina.Application.Common.Models.Contributors;
 /// Represents a media contributor role.
 /// </summary>
 public record MediaContributorRoleDto(
-    string Name,
-    string Category
+    string? Name,
+    string? Category
 );

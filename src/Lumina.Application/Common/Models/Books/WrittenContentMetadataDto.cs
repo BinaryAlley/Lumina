@@ -8,12 +8,12 @@ namespace Lumina.Application.Common.Models.Books;
 /// Represents written content metadata.
 /// </summary>
 public record WrittenContentMetadataDto(
-    string Title,
+    string? Title,
     string? OriginalTitle,
     string? Description,
-    ReleaseInfoDto ReleaseInfo,
-    List<GenreDto> Genres,
-    List<TagDto> Tags,
+    ReleaseInfoDto? ReleaseInfo,
+    List<GenreDto>? Genres,
+    List<TagDto>? Tags,
     LanguageInfoDto? Language,
     LanguageInfoDto? OriginalLanguage,
     string? Publisher, 

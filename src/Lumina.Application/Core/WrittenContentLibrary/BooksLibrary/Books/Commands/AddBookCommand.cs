@@ -14,7 +14,7 @@ namespace Lumina.Application.Core.WrittenContentLibrary.BooksLibrary.Books.Comma
 /// </summary>
 public record AddBookCommand(
     WrittenContentMetadataDto Metadata,
-    BookFormat Format,
+    BookFormat? Format,
     string? Edition,
     int? VolumeNumber,
     BookSeriesDto? Series,

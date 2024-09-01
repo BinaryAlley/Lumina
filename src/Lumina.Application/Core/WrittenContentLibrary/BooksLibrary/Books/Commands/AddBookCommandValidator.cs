@@ -35,31 +35,31 @@ public class AddBookCommandValidator : AbstractValidator<AddBookCommand>
                     .NotNull().WithMessage(Errors.Metadata.ReleaseInfoCannotBeNull.Code)
                     .ChildRules(ri =>
                     {
-                        ri.RuleFor(r => r.OriginalReleaseYear)
-                            .InclusiveBetween(1, 9999).When(r => r.OriginalReleaseYear.HasValue)
+                        ri.RuleFor(r => r!.OriginalReleaseYear)
+                            .InclusiveBetween(1, 9999).When(r => r!.OriginalReleaseYear.HasValue)
                             .WithMessage(Errors.Metadata.OriginalReleaseYearMustBeBetween1And9999.Code);
-                        ri.RuleFor(r => r.ReReleaseYear)
-                            .InclusiveBetween(1, 9999).When(r => r.ReReleaseYear.HasValue)
+                        ri.RuleFor(r => r!.ReReleaseYear)
+                            .InclusiveBetween(1, 9999).When(r => r!.ReReleaseYear.HasValue)
                             .WithMessage(Errors.Metadata.ReReleaseYearMustBeBetween1And9999.Code);
-                        ri.RuleFor(r => r.ReleaseCountry)
-                            .Matches("^[A-Za-z]{2}$").When(r => r.ReleaseCountry is not null)
+                        ri.RuleFor(r => r!.ReleaseCountry)
+                            .Matches("^[A-Za-z]{2}$").When(r => r!.ReleaseCountry is not null)
                             .WithMessage(Errors.Metadata.CountryCodeMustBe2CharactersLong.Code);
-                        ri.RuleFor(r => r.ReleaseVersion)
-                            .MaximumLength(50).When(r => r.ReleaseVersion is not null)
+                        ri.RuleFor(r => r!.ReleaseVersion)
+                            .MaximumLength(50).When(r => r!.ReleaseVersion is not null)
                             .WithMessage(Errors.Metadata.ReleaseVersionMustBeMaximum50CharactersLong.Code);
-                        ri.RuleFor(r => r.ReReleaseYear)
+                        ri.RuleFor(r => r!.ReReleaseYear)
                             .Must((releaseInfo, reReleaseYear) =>
-                                !releaseInfo.ReReleaseYear.HasValue ||
+                                !releaseInfo!.ReReleaseYear.HasValue ||
                                 !releaseInfo.OriginalReleaseYear.HasValue ||
                                 reReleaseYear >= releaseInfo.OriginalReleaseYear)
-                            .When(r => r.ReReleaseYear.HasValue && r.OriginalReleaseYear.HasValue)
+                            .When(r => r!.ReReleaseYear.HasValue && r.OriginalReleaseYear.HasValue)
                             .WithMessage(Errors.Metadata.ReReleaseYearCannotBeEarlierThanOriginalReleaseYear.Code);
-                        ri.RuleFor(r => r.ReReleaseDate)
+                        ri.RuleFor(r => r!.ReReleaseDate)
                             .Must((releaseInfo, reReleaseDate) =>
-                                !releaseInfo.ReReleaseDate.HasValue ||
+                                !releaseInfo!.ReReleaseDate.HasValue ||
                                 !releaseInfo.OriginalReleaseDate.HasValue ||
                                 reReleaseDate >= releaseInfo.OriginalReleaseDate)
-                            .When(r => r.ReReleaseDate.HasValue && r.OriginalReleaseDate.HasValue)
+                            .When(r => r!.ReReleaseDate.HasValue && r.OriginalReleaseDate.HasValue)
                             .WithMessage(Errors.Metadata.ReReleaseDateCannotBeEarlierThanOriginalReleaseDate.Code);
                     });
                 metadata.RuleFor(m => m.Genres)
@@ -68,7 +68,7 @@ public class AddBookCommandValidator : AbstractValidator<AddBookCommand>
                     .ChildRules(g => 
                         g.RuleFor(genre => genre.Name)
                             .NotEmpty().WithMessage(Errors.Metadata.GenreNameCannotBeEmpty.Code)
-                            .MaximumLength(50)).WithMessage(Errors.Metadata.GenreNameMustBeMaximum50CharactersLong.Code);
+                            .MaximumLength(50).WithMessage(Errors.Metadata.GenreNameMustBeMaximum50CharactersLong.Code));
                 metadata.RuleFor(m => m.Tags)
                     .NotNull().WithMessage(Errors.Metadata.TagsListCannotBeNull.Code);
                 metadata.RuleForEach(m => m.Tags)
@@ -110,7 +110,7 @@ public class AddBookCommandValidator : AbstractValidator<AddBookCommand>
                     .WithMessage(Errors.WrittenContent.PageCountMustBeGreaterThanZero.Code);
             });
         RuleFor(x => x.Format)
-            .IsInEnum().WithMessage(Errors.WrittenContent.UnknownBookFormat.Code);
+            .IsInEnum().When(f => f.Format is not null).WithMessage(Errors.WrittenContent.UnknownBookFormat.Code);
         RuleFor(x => x.Edition)
             .MaximumLength(50).When(x => x.Edition is not null)
             .WithMessage(Errors.WrittenContent.EditionMustBeMaximum50CharactersLong.Code);
@@ -180,10 +180,10 @@ public class AddBookCommandValidator : AbstractValidator<AddBookCommand>
                     .NotNull().WithMessage(Errors.MediaContributor.ContributorRoleCannotBeNull.Code)  
                     .ChildRules(role =>
                     {
-                        role.RuleFor(r => r.Name)
+                        role.RuleFor(r => r!.Name)
                             .NotEmpty().WithMessage(Errors.MediaContributor.RoleNameCannotBeEmpty.Code)
                             .MaximumLength(50).WithMessage(Errors.MediaContributor.RoleNameMustBeMaximum50CharactersLong.Code);
-                        role.RuleFor(r => r.Category)
+                        role.RuleFor(r => r!.Category)
                             .NotEmpty().WithMessage(Errors.MediaContributor.RoleCategoryCannotBeEmpty.Code)
                             .MaximumLength(50).WithMessage(Errors.MediaContributor.RoleCategoryMustBeMaximum50CharactersLong.Code);
                     });
@@ -202,36 +202,6 @@ public class AddBookCommandValidator : AbstractValidator<AddBookCommand>
                     .GreaterThanOrEqualTo(0).When(r => r.VoteCount.HasValue)
                     .WithMessage(Errors.Metadata.RatingVoteCountMustBePositive.Code);
             });
-    }
-
-    public static bool ValidateIsbn10(string isbn)
-    {
-        isbn = isbn.Replace("-", "").Replace(" ", "").ToUpper();
-        if (!Regex.IsMatch(isbn, @"^(?:\d{9}[\dX])$"))
-            return false;
-
-        int sum = 0;
-        for (int i = 0; i < 9; i++)
-            sum += (10 - i) * (isbn[i] - '0');
-
-        char lastChar = isbn[9];
-        sum += lastChar == 'X' ? 10 : (lastChar - '0');
-
-        return sum % 11 == 0;
-    }
-
-    public static bool ValidateIsbn13(string isbn)
-    {
-        if (!Regex.IsMatch(isbn, @"^(978|979)-[0-9]{1,5}-[0-9]+-[0-9]+-[0-9]$"))
-            return false;
-
-        isbn = isbn.Replace("-", "");
-        int sum = 0;
-        for (int i = 0; i < 12; i++)
-            sum += (i % 2 == 0) ? isbn[i] - '0' : (isbn[i] - '0') * 3;
-
-        int checkDigit = (10 - (sum % 10)) % 10;
-        return checkDigit == (isbn[12] - '0');
     }
     #endregion
 }

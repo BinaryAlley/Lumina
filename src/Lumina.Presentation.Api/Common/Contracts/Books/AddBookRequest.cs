@@ -10,8 +10,8 @@ namespace Lumina.Presentation.Api.Common.Contracts.Books;
 /// Represents a request to add a book.
 /// </summary>
 public record AddBookRequest(
-    WrittenContentMetadataDto Metadata,
-    BookFormat Format,
+    WrittenContentMetadataDto? Metadata,
+    BookFormat? Format,
     string? Edition,
     int? VolumeNumber,
     BookSeriesDto? Series,
@@ -24,7 +24,7 @@ public record AddBookRequest(
     string? GoogleBooksId,
     string? BarnesAndNobleId,
     string? AppleBooksId,
-    List<IsbnDto> ISBNs,
-    List<MediaContributorDto> Contributors,
-    List<BookRatingDto> Ratings
+    List<IsbnDto>? ISBNs,
+    List<MediaContributorDto>? Contributors,
+    List<BookRatingDto>? Ratings
 );

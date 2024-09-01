@@ -60,10 +60,11 @@ public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<Boo
         if (request.Series != null)
         {
             // TODO: add logic to search the book series repository for existing book series, based on the provided title
+            // TODO: uncomment integration tests about series
         }
         var domainRatingsResult = request.Ratings.ConvertAll(rating => BookRating.Create(
-                rating.Value,
-                rating.MaxValue,
+                rating.Value ?? default,
+                rating.MaxValue ?? default,
                 Optional<BookRatingSource>.FromNullable(rating.Source.HasValue ? (BookRatingSource)(int)rating.Source : default),
                 Optional<int>.FromNullable(rating.VoteCount)));
         // check if any of the results contain errors
@@ -73,27 +74,27 @@ public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<Boo
         
         List<BookRating> domainRatings = domainRatingsResult.Select(rating => rating.Value).ToList();
 
-        var domainGenresResult = request.Metadata.Genres.ConvertAll(genre => Genre.Create(genre.Name));
+        var domainGenresResult = request.Metadata.Genres!.ConvertAll(genre => Genre.Create(genre.Name!));
         errors = domainGenresResult.Where(genreResult => genreResult.IsError).SelectMany(genreResult => genreResult.Errors).ToList();
         if (errors.Count != 0)        
             return errors;
         List<Genre> domainGenres = domainGenresResult.Select(genre => genre.Value).ToList();
 
-        var domainTagsResult = request.Metadata.Tags.ConvertAll(tag => Tag.Create(tag.Name));
+        var domainTagsResult = request.Metadata.Tags!.ConvertAll(tag => Tag.Create(tag.Name!));
         errors = domainTagsResult.Where(tagResult => tagResult.IsError).SelectMany(tagResult => tagResult.Errors).ToList();
         if (errors.Count != 0)
             return errors;
         List<Tag> domainTags = domainTagsResult.Select(tag => tag.Value).ToList();
 
 
-        var domainIsbnsResult = request.ISBNs.ConvertAll(isbn => Isbn.Create(isbn.Value, (IsbnFormat)(int)isbn.Format));
+        var domainIsbnsResult = request.ISBNs.ConvertAll(isbn => Isbn.Create(isbn.Value!, (IsbnFormat)(int)isbn.Format!));
         errors = domainIsbnsResult.Where(isbnResult => isbnResult.IsError).SelectMany(isbnResult => isbnResult.Errors).ToList();
         if (errors.Count != 0)
             return errors;
         List<Isbn> domainIsbns = domainIsbnsResult.Select(isbn => isbn.Value).ToList();
 
         var releaseInfoResult = ReleaseInfo.Create(
-            Optional<DateOnly>.FromNullable(request.Metadata.ReleaseInfo.OriginalReleaseDate),
+            Optional<DateOnly>.FromNullable(request.Metadata.ReleaseInfo!.OriginalReleaseDate),
             Optional<int>.FromNullable(request.Metadata.ReleaseInfo.OriginalReleaseYear),
             Optional<DateOnly>.FromNullable(request.Metadata.ReleaseInfo.ReReleaseDate),
             Optional<int>.FromNullable(request.Metadata.ReleaseInfo.ReReleaseYear),
@@ -107,8 +108,8 @@ public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<Boo
         if (request.Metadata.Language is not null) 
         {
             var languageInfoResult = LanguageInfo.Create(
-                request.Metadata.Language.LanguageCode, 
-                request.Metadata.Language.LanguageName, 
+                request.Metadata.Language.LanguageCode!, 
+                request.Metadata.Language.LanguageName!, 
                 Optional<string>.FromNullable(request.Metadata.Language.NativeName));
             if (languageInfoResult.IsError)
                 return languageInfoResult.Errors;
@@ -118,15 +119,15 @@ public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<Boo
         if (request.Metadata.OriginalLanguage is not null)
         {
             var originalLanguageInfoResult = LanguageInfo.Create(
-                request.Metadata.OriginalLanguage.LanguageCode, 
-                request.Metadata.OriginalLanguage.LanguageName,
+                request.Metadata.OriginalLanguage.LanguageCode!, 
+                request.Metadata.OriginalLanguage.LanguageName!,
                 Optional<string>.FromNullable(request.Metadata.OriginalLanguage.NativeName));
             if (originalLanguageInfoResult.IsError)
                 return originalLanguageInfoResult.Errors;
             originalLanguageInfo = originalLanguageInfoResult.Value;
         }
         var metadataResult = WrittenContentMetadata.Create(
-            request.Metadata.Title,
+            request.Metadata.Title!,
             Optional<string>.FromNullable(request.Metadata.OriginalTitle),
             Optional<string>.FromNullable(request.Metadata.Description),
             releaseInfo,
@@ -141,7 +142,7 @@ public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<Boo
             return metadataResult.Errors;
         var createBookResult = Book.Create(
             metadataResult.Value,
-            request.Format,
+            Optional<BookFormat>.FromNullable(request.Format),
             Optional<string>.FromNullable(request.Edition),
             request.VolumeNumber ?? default,
             Optional<BookSeries>.FromNullable(bookSeries),

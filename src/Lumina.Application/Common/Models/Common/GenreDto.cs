@@ -4,5 +4,5 @@ namespace Lumina.Application.Common.Models.Common;
 /// Represents a request to get genre information.
 /// </summary>
 public record GenreDto(
-    string Name
+    string? Name
 );

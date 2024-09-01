@@ -8,6 +8,6 @@ namespace Lumina.Application.Common.Models.Books;
 /// Represents a request to get ISBN information.
 /// </summary>
 public record IsbnDto(
-    string Value,
-    IsbnFormat Format
+    string? Value,
+    IsbnFormat? Format
 );

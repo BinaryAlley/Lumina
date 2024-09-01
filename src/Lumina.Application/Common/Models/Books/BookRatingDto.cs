@@ -9,8 +9,8 @@ namespace Lumina.Application.Common.Models.Books;
 /// Represents a book rating.
 /// </summary>
 public record BookRatingDto(
-    decimal Value,
-    decimal MaxValue,
+    decimal? Value,
+    decimal? MaxValue,
     BookRatingSource? Source,
     int? VoteCount
 ) : RatingDto(Value, MaxValue, VoteCount);

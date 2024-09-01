@@ -34,7 +34,16 @@ public class BookJsonConverter : JsonConverter<Book>
             var id = root.GetProperty("id").GetProperty("value").GetGuid();
             var created = root.GetProperty("created").GetDateTime();
             var metadata = DeserializeMetadata(root.GetProperty("metadata"));
-            var format = Enum.Parse<BookFormat>(root.GetProperty("format").GetString()!);
+            BookFormat? format = null;
+            if (root.TryGetProperty("format", out var formatElement))
+            {
+                if (formatElement.ValueKind == JsonValueKind.String)
+                {
+                    var formatString = formatElement.GetString()!;
+                    if (Enum.TryParse(formatString, out BookFormat parsedFormat))
+                        format = parsedFormat;
+                }
+            }
             var edition = root.GetProperty("edition").GetString();
             var volumeNumber = root.GetProperty("volumeNumber").GetInt32();
             var series = DeserializeBookSeries(root.GetProperty("series"));
@@ -54,7 +63,7 @@ public class BookJsonConverter : JsonConverter<Book>
             var createBookResult = Book.Create(
                 BookId.Create(id),
                 metadata,
-                format,
+                Optional<BookFormat>.FromNullable(format),
                 Optional<string>.FromNullable(edition),
                 volumeNumber,
                 Optional<BookSeries>.FromNullable(series),
@@ -106,8 +115,10 @@ public class BookJsonConverter : JsonConverter<Book>
         var language = DeserializeLanguageInfo(element.GetProperty("language"));
         var originalLanguage = DeserializeLanguageInfo(element.GetProperty("originalLanguage"));
         var publisher = element.GetProperty("publisher").GetString();
-        var pageCount = element.GetProperty("pageCount").GetInt32();
-
+        int? pageCount = null;
+        if (element.TryGetProperty("pageCount", out var pageCountElement))
+            if (pageCountElement.ValueKind != JsonValueKind.Null)
+                pageCount = pageCountElement.GetInt32();
         var metadataResult = WrittenContentMetadata.Create(
             title!,
             Optional<string>.FromNullable(originalTitle),
@@ -122,10 +133,8 @@ public class BookJsonConverter : JsonConverter<Book>
         );
 
         if (metadataResult.IsError)
-        {
             throw new JsonException($"Failed to create WrittenContentMetadata: {string.Join(", ", metadataResult.Errors)}");
-        }
-
+        
         return metadataResult.Value;
     }
 
@@ -138,12 +147,12 @@ public class BookJsonConverter : JsonConverter<Book>
     {
         var originalReleaseDate = element.TryGetProperty("originalReleaseDate", out var ordElement) ?
             DateOnly.Parse(ordElement.GetString()!) : (DateOnly?)null;
-        var originalReleaseYear = element.TryGetProperty("originalReleaseYear", out var oryElement) ?
-            oryElement.GetInt32() : (int?)null;
-        var reReleaseDate = element.TryGetProperty("reReleaseDate", out var rrdElement) ?
+        var originalReleaseYear = element.TryGetProperty("originalReleaseYear", out var oryElement) && oryElement.ValueKind == JsonValueKind.Number
+            ? oryElement.GetInt32() : (int?)null;
+        var reReleaseDate = element.TryGetProperty("reReleaseDate", out var rrdElement) && rrdElement.ValueKind == JsonValueKind.String ?
             DateOnly.Parse(rrdElement.GetString()!) : (DateOnly?)null;
-        var reReleaseYear = element.TryGetProperty("reReleaseYear", out var rryElement) ?
-            rryElement.GetInt32() : (int?)null;
+        var reReleaseYear = element.TryGetProperty("reReleaseYear", out var rryElement) && rryElement.ValueKind == JsonValueKind.Number
+           ? rryElement.GetInt32() : (int?)null;
         var releaseCountry = element.TryGetProperty("releaseCountry", out var rcElement) ?
             rcElement.GetString() : null;
         var releaseVersion = element.TryGetProperty("releaseVersion", out var rvElement) ?
@@ -192,24 +201,27 @@ public class BookJsonConverter : JsonConverter<Book>
     /// </summary>
     /// <param name="element">The JSON element containing the language info.</param>
     /// <returns>The deserialized <see cref="LanguageInfo"/>.</returns>
-    private LanguageInfo DeserializeLanguageInfo(JsonElement element)
+    private LanguageInfo? DeserializeLanguageInfo(JsonElement element)
     {
-        var languageCode = element.GetProperty("languageCode").GetString();
-        var languageName = element.GetProperty("languageName").GetString();
-        var nativeName = element.TryGetProperty("nativeName", out var nnElement) ? nnElement.GetString() : null;
-
-        var languageInfoResult = LanguageInfo.Create(
-            languageCode!,
-            languageName!,
-            Optional<string>.FromNullable(nativeName)
-        );
-
-        if (languageInfoResult.IsError)
+        if (element.ValueKind != JsonValueKind.Null)
         {
-            throw new JsonException($"Failed to create LanguageInfo: {string.Join(", ", languageInfoResult.Errors)}");
-        }
+            var languageCode = element.GetProperty("languageCode").GetString();
+            var languageName = element.GetProperty("languageName").GetString();
+            var nativeName = element.TryGetProperty("nativeName", out var nnElement) ? nnElement.GetString() : null;
 
-        return languageInfoResult.Value;
+            var languageInfoResult = LanguageInfo.Create(
+                languageCode!,
+                languageName!,
+                Optional<string>.FromNullable(nativeName)
+            );
+
+            if (languageInfoResult.IsError)
+                throw new JsonException($"Failed to create LanguageInfo: {string.Join(", ", languageInfoResult.Errors)}");
+           
+            return languageInfoResult.Value;
+        }
+        else
+            return null;
     }
 
     /// <summary>
@@ -259,7 +271,10 @@ public class BookJsonConverter : JsonConverter<Book>
                 r.GetProperty("value").GetInt32(),
                 r.GetProperty("maxValue").GetInt32(),
                 Optional<BookRatingSource>.FromNullable(Enum.Parse<BookRatingSource>(r.GetProperty("source").GetString()!)),
-                Optional<int>.FromNullable(r.GetProperty("voteCount").GetInt32())
+                Optional<int>.FromNullable(
+                    r.TryGetProperty("voteCount", out JsonElement voteCountElement) && voteCountElement.ValueKind != JsonValueKind.Null
+                        ? voteCountElement.GetInt32()
+                        : (int?)null)
             ).Value)
             .ToList();
     }
