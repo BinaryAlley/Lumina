@@ -26,7 +26,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly LuminaApiFactory _apiFactory;
     private readonly HttpClient _client;
-    private readonly RequestBookFixture _requestBookFixture;
+    private readonly AddBookRequestFixture _requestBookFixture;
     private readonly JsonSerializerOptions _jsonOptions = new();
     #endregion
 
@@ -39,7 +39,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     {
         _apiFactory = apiFactory;
         _client = _apiFactory.CreateClient();
-        _requestBookFixture = new RequestBookFixture();
+        _requestBookFixture = new AddBookRequestFixture();
         _jsonOptions.Converters.Add(new BookJsonConverter());
     }
     #endregion

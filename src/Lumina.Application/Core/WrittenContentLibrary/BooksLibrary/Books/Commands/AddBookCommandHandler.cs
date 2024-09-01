@@ -60,7 +60,7 @@ public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<Boo
         if (request.Series != null)
         {
             // TODO: add logic to search the book series repository for existing book series, based on the provided title
-            // TODO: uncomment integration tests about series
+            // TODO: uncomment integration and unit tests about series
         }
         var domainRatingsResult = request.Ratings.ConvertAll(rating => BookRating.Create(
                 rating.Value ?? default,
@@ -85,7 +85,6 @@ public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<Boo
         if (errors.Count != 0)
             return errors;
         List<Tag> domainTags = domainTagsResult.Select(tag => tag.Value).ToList();
-
 
         var domainIsbnsResult = request.ISBNs.ConvertAll(isbn => Isbn.Create(isbn.Value!, (IsbnFormat)(int)isbn.Format!));
         errors = domainIsbnsResult.Where(isbnResult => isbnResult.IsError).SelectMany(isbnResult => isbnResult.Errors).ToList();

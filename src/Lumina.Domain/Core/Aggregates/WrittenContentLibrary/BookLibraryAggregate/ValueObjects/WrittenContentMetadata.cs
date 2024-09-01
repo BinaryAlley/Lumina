@@ -3,6 +3,7 @@ using ErrorOr;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using System.Diagnostics;
+using Lumina.Domain.Common.Errors;
 #endregion
 
 namespace Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate.ValueObjects;
@@ -86,6 +87,14 @@ public class WrittenContentMetadata : BaseMetadata
         Optional<string> publisher,
         Optional<int> pageCount)
     {
+        if (string.IsNullOrWhiteSpace(title))
+            return Errors.Metadata.TitleCannotBeEmpty;
+        if (releaseInfo is null)
+            return Errors.Metadata.ReleaseInfoCannotBeNull;
+        if (genres is null)
+            return Errors.Metadata.GenresListCannotBeNull;
+        if (tags is null)
+            return Errors.Metadata.TagsListCannotBeNull;
         return new WrittenContentMetadata(
             title, 
             originalTitle, 

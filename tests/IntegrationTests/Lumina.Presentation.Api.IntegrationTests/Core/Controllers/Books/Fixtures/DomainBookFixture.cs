@@ -14,7 +14,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Lumina.Presentation.Api.IntegrationTests.Core.Controllers.Books.Fixtures;
 
 /// <summary>
-/// Contains unit tests for the <see cref="BooksControllerTests"/> class.
+/// Fixture class for the <see cref="Book"/> domain entity.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class DomainBookFixture

@@ -13,10 +13,10 @@ using System.Diagnostics.CodeAnalysis;
 namespace Lumina.Presentation.Api.IntegrationTests.Core.Controllers.Books.Fixtures;
 
 /// <summary>
-/// Contains unit tests for the <see cref="BooksControllerTests"/> class.
+/// Fixture class for the <see cref="AddBookRequest"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class RequestBookFixture
+public class AddBookRequestFixture
 {
     #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly Fixture _fixture;
@@ -26,9 +26,9 @@ public class RequestBookFixture
 
     #region ====================================================================== CTOR =====================================================================================
     /// <summary>
-    /// Initializes a new instance of the <see cref="RequestBookFixture"/> class.
+    /// Initializes a new instance of the <see cref="AddBookRequestFixture"/> class.
     /// </summary>
-    public RequestBookFixture()
+    public AddBookRequestFixture()
     {
         _fixture = new Fixture();
         _fixture.Customizations.Add(new DateOnlySpecimenBuilder());
@@ -270,10 +270,6 @@ public class RequestBookFixture
     {
         var releaseYear = _random.Next(2000, 2010);
         var reReleaseYear = _random.Next(2010, 2020);
-
-
-        
-
 
         _fixture.Register(() => new ReleaseInfoDto(
             _faker.DateOnlyBetween(new DateOnly(releaseYear, 1, 1), new DateOnly(releaseYear, 12, 31)),
