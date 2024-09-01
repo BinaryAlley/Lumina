@@ -15,7 +15,7 @@ namespace Lumina.DataAccess.Core.UoW;
 public class LuminaDbContext : DbContext
 {
     #region ==================================================================== PROPERTIES =================================================================================
-    public DbSet<BookDto> Books { get; set; } = null!;
+    public virtual DbSet<BookDto> Books { get; set; } = null!;
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================

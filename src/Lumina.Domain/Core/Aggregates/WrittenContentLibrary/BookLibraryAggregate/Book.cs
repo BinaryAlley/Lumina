@@ -1,13 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using System.Diagnostics;
 using ErrorOr;
 using Lumina.Domain.Common.Enums;
 using Lumina.Domain.Common.Models.Core;
 using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Common.ValueObjects.Metadata;
 using Lumina.Domain.Core.Aggregates.MediaContributor.MediaContributorAggregate.ValueObjects;
 using Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate.Entities;
 using Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate.ValueObjects;
+using System.Diagnostics;
 #endregion
 
 namespace Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate;

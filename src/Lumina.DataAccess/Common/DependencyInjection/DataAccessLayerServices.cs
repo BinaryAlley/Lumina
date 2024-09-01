@@ -30,7 +30,6 @@ public static class DataAccessLayerServices
         {
             options.UseSqlite($"Data Source={Path.Combine(basePath, "Lumina.db")}");
         });
-
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         Type[]? dataAccessLayerTypes = Assembly.GetExecutingAssembly().GetTypes();
