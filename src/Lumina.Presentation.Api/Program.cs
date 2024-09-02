@@ -16,7 +16,7 @@ public class Program
     /// <summary>
     /// Application entry point.
     /// </summary>
-    /// <param name="args">Optional command line arguments</param>
+    /// <param name="args">Optional command line arguments.</param>
     static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);

@@ -84,12 +84,20 @@ public class AddBookRequestFixture
             .RuleFor(e => e.Name, f => f.Random.String2(f.Random.Number(1, 50)))
             .RuleFor(e => e.Category, f => f.Random.String2(f.Random.Number(1, 50)));
 
+        var mediaContributorName = new Faker<MediaContributorNameDto>()
+                    .CustomInstantiator(f => new MediaContributorNameDto(
+                        default!,
+                        default!
+                    ))
+                    .RuleFor(e => e.DisplayName, f => f.Random.String2(f.Random.Number(1, 50)))
+                    .RuleFor(e => e.LegalName, f => f.Random.String2(f.Random.Number(1, 50)));
+
         var mediaContributor = new Faker<MediaContributorDto>()
             .CustomInstantiator(f => new MediaContributorDto(
                 default!,
                 default!
             ))
-            .RuleFor(e => e.Name, f => f.Random.String2(f.Random.Number(1, 50)))
+            .RuleFor(e => e.Name, mediaContributorName)
             .RuleFor(e => e.Role, mediaContributorRole);
 
         var rating = new Faker<BookRatingDto>()
@@ -319,8 +327,12 @@ public class AddBookRequestFixture
             _fixture.Create<string>(),
             _fixture.Create<string>()
         ));
-        _fixture.Register(() => new MediaContributorDto(
+        _fixture.Register(() => new MediaContributorNameDto(
             _fixture.Create<string>(),
+            _fixture.Create<string?>()
+        ));
+        _fixture.Register(() => new MediaContributorDto(
+            _fixture.Create<MediaContributorNameDto>(),
             _fixture.Create<MediaContributorRoleDto>()
         ));
     }

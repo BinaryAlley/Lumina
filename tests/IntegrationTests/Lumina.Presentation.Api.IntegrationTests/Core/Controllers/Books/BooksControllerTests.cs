@@ -1314,13 +1314,13 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     }
 
     [Fact]
-    public async Task AddBook_WhenCalledWithEmptyContributorName_ShouldReturnBadRequest()
+    public async Task AddBook_WhenCalledWithNullContributorName_ShouldReturnBadRequest()
     {
         // Arrange
         var bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with
         {
-            Contributors = bookRequest.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Name = null } : contributor).ToList()
+            Contributors = bookRequest.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Name = null! } : contributor).ToList()
         };
 
         // Act
@@ -1331,20 +1331,71 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     }
 
     [Fact]
-    public async Task AddBook_WhenCalledWithInvalidLengthContributorName_ShouldReturnBadRequest()
+    public async Task AddBook_WhenCalledWithEmptyContributorDisplayName_ShouldReturnBadRequest()
     {
         // Arrange
         var bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with
         {
-            Contributors = bookRequest.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Name = new Faker().Random.String2(150) } : contributor).ToList()
+            Contributors = bookRequest.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Name = contributor.Name! with { DisplayName = string.Empty } } : contributor).ToList()
         };
 
         // Act
         var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
-        await AssertBadRequestWithValidationErrors(response, Errors.MediaContributor.ContributorNameMustBeMaximum100CharactersLong.Code);
+        await AssertBadRequestWithValidationErrors(response, Errors.MediaContributor.ContributorDisplayNameCannotBeEmpty.Code);
+    }
+
+    [Fact]
+    public async Task AddBook_WhenCalledWithNullContributorDisplayName_ShouldReturnBadRequest()
+    {
+        // Arrange
+        var bookRequest = _requestBookFixture.CreateRequestBook();
+        bookRequest = bookRequest with
+        {
+            Contributors = bookRequest.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Name = contributor.Name! with { DisplayName = null! } } : contributor).ToList()
+        };
+
+        // Act
+        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+
+        // Assert
+        await AssertBadRequestWithValidationErrors(response, Errors.MediaContributor.ContributorDisplayNameCannotBeEmpty.Code);
+    }
+
+    [Fact]
+    public async Task AddBook_WhenCalledWithInvalidLengthContributorDisplayName_ShouldReturnBadRequest()
+    {
+        // Arrange
+        var bookRequest = _requestBookFixture.CreateRequestBook();
+        bookRequest = bookRequest with
+        {
+            Contributors = bookRequest.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Name = contributor.Name! with { DisplayName = new Faker().Random.String2(150) } } : contributor).ToList()
+        };
+
+        // Act
+        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+
+        // Assert
+        await AssertBadRequestWithValidationErrors(response, Errors.MediaContributor.ContributorDisplayNameMustBeMaximum100CharactersLong.Code);
+    }
+
+    [Fact]
+    public async Task AddBook_WhenCalledWithInvalidLengthContributorLegalName_ShouldReturnBadRequest()
+    {
+        // Arrange
+        var bookRequest = _requestBookFixture.CreateRequestBook();
+        bookRequest = bookRequest with
+        {
+            Contributors = bookRequest.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Name = contributor.Name! with { LegalName = new Faker().Random.String2(150) } } : contributor).ToList()
+        };
+
+        // Act
+        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+
+        // Assert
+        await AssertBadRequestWithValidationErrors(response, Errors.MediaContributor.ContributorLegalNameMustBeMaximum100CharactersLong.Code);
     }
 
     [Fact]

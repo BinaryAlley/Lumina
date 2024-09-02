@@ -1659,7 +1659,7 @@ public class AddBookCommandValidatorTests
     }
 
     [Fact]
-    public void Validate_WhenCalledWithEmptyContributorName_ShouldHaveValidationError()
+    public void Validate_WhenCalledWithNullContributorName_ShouldHaveValidationError()
     {
         // Arrange
         var bookCommand = _commandBookFixture.CreateCommandBook();
@@ -1673,17 +1673,45 @@ public class AddBookCommandValidatorTests
     }
 
     [Fact]
-    public void Validate_WhenCalledWithInvalidLengthContributorName_ShouldHaveValidationError()
+    public void Validate_WhenCalledWithInvalidLengthContributorDisplayName_ShouldHaveValidationError()
     {
         // Arrange
         var bookCommand = _commandBookFixture.CreateCommandBook();
-        bookCommand = bookCommand with { Contributors = bookCommand.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Name = new Faker().Random.String2(101) } : contributor).ToList() };
+        bookCommand = bookCommand with { Contributors = bookCommand.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Name = contributor.Name! with { DisplayName = new Faker().Random.String2(101) } } : contributor).ToList() };
 
         // Act
         var result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor("Contributors[0].Name").WithErrorMessage(Errors.MediaContributor.ContributorNameMustBeMaximum100CharactersLong.Code);
+        result.ShouldHaveValidationErrorFor("Contributors[0].Name.DisplayName").WithErrorMessage(Errors.MediaContributor.ContributorDisplayNameMustBeMaximum100CharactersLong.Code);
+    }
+
+    [Fact]
+    public void Validate_WhenCalledWithEmptyContributorDisplayName_ShouldHaveValidationError()
+    {
+        // Arrange
+        var bookCommand = _commandBookFixture.CreateCommandBook();
+        bookCommand = bookCommand with { Contributors = bookCommand.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Name = contributor.Name! with { DisplayName = null! } } : contributor).ToList() };
+
+        // Act
+        var result = _validator.TestValidate(bookCommand);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor("Contributors[0].Name.DisplayName").WithErrorMessage(Errors.MediaContributor.ContributorDisplayNameCannotBeEmpty.Code);
+    }
+
+    [Fact]
+    public void Validate_WhenCalledWithInvalidLengthContributorLegalName_ShouldHaveValidationError()
+    {
+        // Arrange
+        var bookCommand = _commandBookFixture.CreateCommandBook();
+        bookCommand = bookCommand with { Contributors = bookCommand.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Name = contributor.Name! with { LegalName = new Faker().Random.String2(101) } } : contributor).ToList() };
+
+        // Act
+        var result = _validator.TestValidate(bookCommand);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor("Contributors[0].Name.LegalName").WithErrorMessage(Errors.MediaContributor.ContributorLegalNameMustBeMaximum100CharactersLong.Code);
     }
 
     [Fact]

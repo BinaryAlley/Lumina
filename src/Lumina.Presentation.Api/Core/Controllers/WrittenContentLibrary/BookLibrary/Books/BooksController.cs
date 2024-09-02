@@ -8,7 +8,7 @@ using Mediator;
 using Microsoft.AspNetCore.Mvc;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Controllers.Books;
+namespace Lumina.Presentation.Api.Core.Controllers.WrittenContentLibrary.BookLibrary.Books;
 
 /// <summary>
 /// Controller for managing books.

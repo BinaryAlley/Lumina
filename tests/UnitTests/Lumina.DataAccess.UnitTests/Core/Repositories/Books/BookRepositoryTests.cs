@@ -132,7 +132,7 @@ public class BookRepositoryTests
     }
 
     [Fact]
-    public async Task GetAllAsync_ShouldReturnAllBooks()
+    public async Task GetAllAsync_WhenCalled_ShouldReturnAllBooks()
     {
         // Arrange
         var books = new List<BookDto>
@@ -167,7 +167,7 @@ public class BookRepositoryTests
     }
 
     [Fact]
-    public async Task GetAllAsync_ShouldIncludeRelatedEntities()
+    public async Task GetAllAsync_WhenCalled_ShouldIncludeRelatedEntities()
     {
         // Arrange
         var book = _bookDtoFixture.CreateBookDto();

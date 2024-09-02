@@ -174,8 +174,17 @@ public class AddBookCommandValidator : AbstractValidator<AddBookCommand>
             .ChildRules(contributor =>
             {
                 contributor.RuleFor(c => c.Name)
-                    .NotEmpty().WithMessage(Errors.MediaContributor.ContributorNameCannotBeEmpty.Code)
-                    .MaximumLength(100).WithMessage(Errors.MediaContributor.ContributorNameMustBeMaximum100CharactersLong.Code);
+                    .NotNull().WithMessage(Errors.MediaContributor.ContributorNameCannotBeEmpty.Code)
+                    .ChildRules(name =>
+                    {
+                        name.RuleFor(n => n!.DisplayName)
+                            .NotNull().WithMessage(Errors.MediaContributor.ContributorDisplayNameCannotBeEmpty.Code)
+                            .NotEmpty().WithMessage(Errors.MediaContributor.ContributorDisplayNameCannotBeEmpty.Code)
+                            .MaximumLength(100).WithMessage(Errors.MediaContributor.ContributorDisplayNameMustBeMaximum100CharactersLong.Code);
+                        name.RuleFor(n => n!.LegalName)
+                            .MaximumLength(100).When(n => n!.LegalName is not null)
+                            .WithMessage(Errors.MediaContributor.ContributorLegalNameMustBeMaximum100CharactersLong.Code);
+                    });
                 contributor.RuleFor(c => c.Role)
                     .NotNull().WithMessage(Errors.MediaContributor.ContributorRoleCannotBeNull.Code)  
                     .ChildRules(role =>
