@@ -1,11 +1,29 @@
+#region ========================================================================= USING =====================================================================================
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Lumina.Presentation.Web;
+#endregion
 
-var builder = WebAssemblyHostBuilder.CreateDefault(args);
-builder.RootComponents.Add<App>("#app");
-builder.RootComponents.Add<HeadOutlet>("head::after");
+namespace Lumina.Presentation.Web;
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+/// <summary>
+/// Application entry point, contains the composition root module, wires up all dependencies of the application.
+/// </summary>
+public class Program
+{
+    #region ===================================================================== METHODS ===================================================================================
+    /// <summary>
+    /// Application entry point.
+    /// </summary>
+    /// <param name="args">Optional command line arguments.</param>
+    public static async Task Main(string[] args)
+    {
+        var builder = WebAssemblyHostBuilder.CreateDefault(args);
+        builder.RootComponents.Add<App>("#app");
+        builder.RootComponents.Add<HeadOutlet>("head::after");
 
-await builder.Build().RunAsync();
+        builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+
+        await builder.Build().RunAsync();
+    }
+    #endregion
+}
