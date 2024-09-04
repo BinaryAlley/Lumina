@@ -1,8 +1,0 @@
-﻿<button type="submit" class="abort-button f-16 w-100px @CssClass" @onclick="OnClick" disabled="@IsDisabled">@ChildContent</button>
-
-@code {
-    [Parameter] public RenderFragment? ChildContent { get; set; }
-    [Parameter] public EventCallback OnClick { get; set; }
-    [Parameter] public bool IsDisabled { get; set; }
-    [Parameter] public string? CssClass { get; set; }
-}

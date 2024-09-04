@@ -1,0 +1,33 @@
+﻿<input type="@Type"
+       class="enlightenment-input w-100 @CssClass"
+       name="@Name"
+       autocomplete="@(AutoComplete ? "on" : "off")"
+       value="@Value"
+       @oninput="OnInputHandlerAsync"
+       placeholder="@Placeholder"
+       disabled="@IsDisabled"
+       readonly="@IsReadOnly"
+       data-has-error="@HasError" />
+
+@code {
+    [Parameter] public string Type { get; set; } = "text";
+    [Parameter] public string? CssClass { get; set; }
+    [Parameter] public string? Name { get; set; }
+    [Parameter] public bool AutoComplete { get; set; } = true;
+    [Parameter] public string? Value { get; set; }
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+    [Parameter] public string? Placeholder { get; set; }
+    [Parameter] public bool IsDisabled { get; set; }
+    [Parameter] public bool IsReadOnly { get; set; }
+    [Parameter] public bool HasError { get; set; }
+
+    /// <summary>
+    /// Handles the input event.
+    /// </summary>
+    /// <param name="e">The event arguments.</param>
+    private async Task OnInputHandlerAsync(ChangeEventArgs e)
+    {
+        Value = e.Value?.ToString();
+        await ValueChanged.InvokeAsync(Value);
+    }
+}
