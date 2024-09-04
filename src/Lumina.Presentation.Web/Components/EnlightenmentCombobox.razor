@@ -5,7 +5,7 @@
 
 @implements IDisposable
 
-<div class="enlightenment-combobox inline-block w-100 @(IsOpen ? "open" : string.Empty)">
+<div class="enlightenment-combobox inline-block w-100 @(IsOpen ? "open" : string.Empty) @CssClass">
     <div class="shine-effect"></div>
     <input type="checkbox" class="enlightenment-toggle-checkbox" @bind="IsOpen" id="@Id" @onclick="ToggleDropdown">
     <label class="enlightenment-toggle" for="@Id">
@@ -28,6 +28,7 @@
     [Parameter] public List<ComboboxItem> Items { get; set; } = []; 
     [Parameter] public ComboboxItem? SelectedItem { get; set; }
     [Parameter] public EventCallback<ComboboxItem> SelectedItemChanged { get; set; }
+    [Parameter] public string? CssClass { get; set; }
 
     private bool IsOpen { get; set; }
     private string Id { get; set; } = $"combobox_{Guid.NewGuid()}";
