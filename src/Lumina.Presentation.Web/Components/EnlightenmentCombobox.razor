@@ -1,9 +1,11 @@
 ﻿@using Lumina.Presentation.Web.Common.Models.UI
 @using Lumina.Presentation.Web.Core.Services.UI
 
-@inject ComboboxService _comboboxService
+@typeparam TValue
 
 @implements IDisposable
+
+@inject ComboboxService _comboboxService
 
 <div class="enlightenment-combobox inline-block w-100 @(IsOpen ? "open" : string.Empty) @CssClass">
     <div class="shine-effect"></div>
@@ -25,9 +27,9 @@
 </div>
 
 @code {
-    [Parameter] public List<ComboboxItem> Items { get; set; } = []; 
-    [Parameter] public ComboboxItem? SelectedItem { get; set; }
-    [Parameter] public EventCallback<ComboboxItem> SelectedItemChanged { get; set; }
+    [Parameter] public List<ComboboxItem<TValue>> Items { get; set; } = [];
+    [Parameter] public ComboboxItem<TValue>? SelectedItem { get; set; }
+    [Parameter] public EventCallback<ComboboxItem<TValue>> SelectedItemChanged { get; set; }
     [Parameter] public string? CssClass { get; set; }
 
     private bool IsOpen { get; set; }
@@ -68,7 +70,7 @@
     /// Selects the provided <paramref name="item"/>.
     /// </summary>
     /// <param name="item">The item to select.</param>
-    private async Task SelectItem(ComboboxItem? item)
+    private async Task SelectItem(ComboboxItem<TValue>? item)
     {
         SelectedItem = item;
         IsOpen = false;

@@ -3,7 +3,8 @@
 /// <summary>
 /// Represents an item in a combobox.
 /// </summary>
-public class ComboboxItem
+/// <typeparam name="TValue">The type used for the <see cref="Value"/> property of the item.</typeparam>
+public class ComboboxItem<TValue>
 {
     #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
@@ -14,6 +15,6 @@ public class ComboboxItem
     /// <summary>
     /// Gets or sets the value of the item, that is used by the application.
     /// </summary>
-    public string? Value { get; set; }
+    public TValue? Value { get; set; }
     #endregion
 }
