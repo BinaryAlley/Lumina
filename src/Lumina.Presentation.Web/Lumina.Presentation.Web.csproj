@@ -18,9 +18,4 @@
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.7" PrivateAssets="all" />
     </ItemGroup>
 
-
-    <ItemGroup>
-      <Folder Include="wwwroot\common\images\" />
-    </ItemGroup>
-
 </Project>

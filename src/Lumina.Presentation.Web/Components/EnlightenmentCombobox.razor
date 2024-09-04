@@ -1,0 +1,84 @@
+﻿@using Lumina.Presentation.Web.Common.Models.UI
+@using Lumina.Presentation.Web.Core.Services.UI
+
+@inject ComboboxService _comboboxService
+
+@implements IDisposable
+
+<div class="enlightenment-combobox inline-block w-100 @(IsOpen ? "open" : string.Empty)">
+    <div class="shine-effect"></div>
+    <input type="checkbox" class="enlightenment-toggle-checkbox" @bind="IsOpen" id="@Id" @onclick="ToggleDropdown">
+    <label class="enlightenment-toggle" for="@Id">
+        <span class="enlightenment-selected-text">@(SelectedItem?.Text ?? "No item selected")</span>
+    </label>
+    <div class="enlightenment-dropdown">
+        <div class="shine-effect"></div>
+        <div class="enlightenment-item first-item disabled" @onclick="() => SelectItem(null)">No item selected</div>
+
+        @for (int i = 0; i < Items.Count; i++)
+        {
+            var item = Items[i];
+            var cssClass = $"enlightenment-item {(i == Items.Count - 1 ? "last-item" : string.Empty)}";
+            <div class="@cssClass" @onclick="() => SelectItem(item)">@item.Text</div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public List<ComboboxItem> Items { get; set; } = []; 
+    [Parameter] public ComboboxItem? SelectedItem { get; set; }
+    [Parameter] public EventCallback<ComboboxItem> SelectedItemChanged { get; set; }
+
+    private bool IsOpen { get; set; }
+    private string Id { get; set; } = $"combobox_{Guid.NewGuid()}";
+
+    /// <summary>
+    /// Initializes the component.
+    /// </summary>
+    protected override void OnInitialized()
+    {
+        _comboboxService.ComboboxOpened += CloseIfNotThis;
+    }
+
+    /// <summary>
+    /// Toggles the dropdown state.
+    /// </summary>
+    private void ToggleDropdown()
+    {
+        IsOpen = !IsOpen;
+        if (IsOpen)
+            _comboboxService.NotifyComboboxOpened(Id);
+    }
+
+    /// <summary>
+    /// Closes the dropdown if the provided <paramref name="openedId"/> is not the current <see cref="Id"/>, or if it's <see langword="null"/>.
+    /// </summary>
+    /// <param name="openedId">The optional id of the combobox that initiated the dropdown state change.</param>
+    private void CloseIfNotThis(string? openedId)
+    {
+        if (openedId != Id && IsOpen)
+        {
+            IsOpen = false;
+            StateHasChanged();
+        }
+    }
+
+    /// <summary>
+    /// Selects the provided <paramref name="item"/>.
+    /// </summary>
+    /// <param name="item">The item to select.</param>
+    private async Task SelectItem(ComboboxItem? item)
+    {
+        SelectedItem = item;
+        IsOpen = false;
+        await SelectedItemChanged.InvokeAsync(item);
+    }
+
+    /// <summary>
+    /// Disposes the component.
+    /// </summary>
+    public void Dispose()
+    {
+        _comboboxService.ComboboxOpened -= CloseIfNotThis;
+    }
+}
