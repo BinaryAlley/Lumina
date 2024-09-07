@@ -35,7 +35,7 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
     /// </summary>
     /// <param name="request">Incoming request.</param>
     /// <param name="next">Awaitable delegate for the next action in the pipeline. Eventually this delegate represents the handler.</param>
-    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public async ValueTask<TResponse> Handle(TRequest request, CancellationToken cancellationToken, MessageHandlerDelegate<TRequest, TResponse> next)
     {
         // if there is no validator, just invoke the handler
