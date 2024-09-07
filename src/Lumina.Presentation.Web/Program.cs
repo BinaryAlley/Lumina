@@ -1,7 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Core.Services.UI;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Lumina.Presentation.Web.Common.DependencyInjection;
+using Lumina.Presentation.Web.Common.Api;
+using Lumina.Application.Common.Models.FileSystem;
 #endregion
 
 namespace Lumina.Presentation.Web;
@@ -19,13 +21,18 @@ public class Program
     public static async Task Main(string[] args)
     {
         var builder = WebAssemblyHostBuilder.CreateDefault(args);
+
         builder.RootComponents.Add<App>("#app");
         builder.RootComponents.Add<HeadOutlet>("head::after");
-        builder.Services.AddSingleton<ComboboxService>();
 
-        builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+        builder.AddConfiguration();
+        builder.Services.AddPresentationWebLayerServices();
 
-        await builder.Build().RunAsync();
+        //builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+
+        var webAssemblyHost = builder.Build();
+
+        await webAssemblyHost.RunAsync();
     }
     #endregion
 }

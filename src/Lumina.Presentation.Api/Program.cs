@@ -31,6 +31,8 @@ public class Program
 
         var app = builder.Build();
 
+        app.UseCors("AllowAll");
+
         app.UseExceptionHandler("/error"); // uses a middleware which reexecutes the request to the  error path
 
         // configure the HTTP request pipeline.
