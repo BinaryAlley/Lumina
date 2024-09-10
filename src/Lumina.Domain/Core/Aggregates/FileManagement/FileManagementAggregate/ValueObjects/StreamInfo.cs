@@ -1,8 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Models.Core;
 using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Common.Errors;
+using System.Collections.Generic;
+using System.Diagnostics;
 #endregion
 
 namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.ValueObjects;
@@ -10,6 +12,7 @@ namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.V
 /// <summary>
 /// Value Object for the information about a media stream.
 /// </summary>
+[DebuggerDisplay("{StreamId}")]
 public class StreamInfo : ValueObject
 {
     #region ==================================================================== PROPERTIES =================================================================================
@@ -100,7 +103,7 @@ public class StreamInfo : ValueObject
     /// <param name="sampleRate">The sample rate of the stream (for audio).</param>
     /// <param name="channels">The number of channels (for audio).</param>
     /// <returns>
-    /// An <see cref="ErrorOr{T}"/> containing either a successfully created <see cref="StreamInfo"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="StreamInfo"/>, or an error message.
     /// </returns>
     public static ErrorOr<StreamInfo> Create(
         string streamId, 
