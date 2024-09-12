@@ -1,0 +1,15 @@
+services:
+  lumina.presentation.api:
+    container_name: lumina-server
+    build:
+      context: .
+      dockerfile: Lumina.Presentation.Api/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=5214
+    ports:
+      - "5214:5214"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+    command: "dotnet /app/Lumina.Presentation.Api.dll"

@@ -1,0 +1,7 @@
+services:
+  lumina.presentation.api:
+    container_name: lumina-server
+    image: ${DOCKER_REGISTRY-}lumina-server
+    build:
+      context: .
+      dockerfile: Lumina.Presentation.Api/Dockerfile
