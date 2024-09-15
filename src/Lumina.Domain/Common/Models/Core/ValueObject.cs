@@ -1,9 +1,14 @@
-﻿namespace Lumina.Domain.Common.Models.Core;
+﻿#region ========================================================================= USING =====================================================================================
+using System;
+using System.Collections.Generic;
+using System.Linq;
+#endregion
+
+namespace Lumina.Domain.Common.Models.Core;
 
 /// <summary>
 /// Base class for all domain Value Objects.
 /// </summary>
-/// <typeparam name="TId">The type representing the unique identifier for the Entity. It should be a non-nullable type.</typeparam>
 public abstract class ValueObject : IEquatable<ValueObject>
 {
     #region ===================================================================== METHODS ===================================================================================

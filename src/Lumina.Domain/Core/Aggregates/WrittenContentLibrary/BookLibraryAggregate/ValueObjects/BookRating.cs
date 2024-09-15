@@ -1,10 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using System.Diagnostics;
 using ErrorOr;
-using Lumina.Domain.Common.Enums;
+using Lumina.Contracts.Enums.BookLibrary;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
-using Lumina.Domain.Common.Errors;
+using System.Collections.Generic;
+using System.Diagnostics;
 #endregion
 
 namespace Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate.ValueObjects;
@@ -46,7 +47,7 @@ public class BookRating : Rating
     /// <param name="source">The optional source of the rating.</param>
     /// <param name="voteCount">The optional number of votes or reviews.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{T}"/> containing either a successfully created <see cref="Rating"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="Rating"/>, or an error message.
     /// </returns>
     public static ErrorOr<BookRating> Create(decimal value, decimal maxValue, Optional<BookRatingSource> source, Optional<int> voteCount)
     {

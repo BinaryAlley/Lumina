@@ -2,6 +2,7 @@
 using ErrorOr;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
+using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
@@ -106,7 +107,7 @@ public class AudioMetadata : BaseMetadata
     /// <param name="genres">The genres of the audio.</param>
     /// <param name="tags">The tags associated with the audio.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{T}"/> containing either a successfully created <see cref="AudioMetadata"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="AudioMetadata"/>, or an error message.
     /// </returns>
     public static ErrorOr<AudioMetadata> Create(
         string title, 

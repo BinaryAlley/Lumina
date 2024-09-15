@@ -1,6 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using FluentValidation;
 using Microsoft.Extensions.Options;
+using System;
+using System.Linq;
 #endregion
 
 namespace Lumina.Presentation.Web.Common.Validation;
@@ -8,7 +10,7 @@ namespace Lumina.Presentation.Web.Common.Validation;
 /// <summary>
 /// Provides options for fluent validation of a specific options type.
 /// </summary>
-/// <typeparam name="TOptions">The type of options being validated</typeparam>
+/// <typeparam name="TOptions">The type of options being validated.</typeparam>
 public class FluentValidationOptions<TOptions> : IValidateOptions<TOptions> where TOptions : class
 {
     #region ================================================================== FIELD MEMBERS ================================================================================

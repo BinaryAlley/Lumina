@@ -36,8 +36,10 @@
 - _**Cover Song**_: A rendition of a song performed by an artist other than the original
 - _**Remix**_: A modified version of an original song
 - _**Sound Effect**_: A short audio clip used for specific purposes
+- _**Soundtrack**_: A collection of music used in a film or TV show
 - _**Podcast**_: A series of audio episodes
 - _**Podcast Episode**_: An individual installment of a podcast
+- _**Radio Show**_: An audio program broadcast on the radio
 
 ## Written Content
 - _**Book**_: A standalone written work
@@ -115,7 +117,7 @@
 - VideoLibrary (root: VideoLibrary, entities: TVShow, Season, Episode, Movie, FilmSeries, ConcertVideo, Documentary, TutorialVideo, HomeVideo, Anime, YouTubeVideo, MusicVideo)
 - AudioLibrary (root: AudioLibrary, entities: Song, Album, Artist, Audiobook, LiveRecording, Interview, CoverSong, Remix, SoundEffect)
 - PodcastLibrary (root: PodcastLibrary, entities: Podcast, PodcastEpisode)
-- WrittenContentLibrary (root: WrittenContentLibrary, entities: Book, BookSeries, ComicBook, ComicSeries, Magazine, MagazineIssue, Manga, GraphicNovel, AcademicPaper, SheetMusic, Screenplay)
+- WrittenContentLibrary (root: WrittenContentLibrary, entities: Book, EBook, BookSeries, ComicBook, ComicSeries, Magazine, MagazineIssue, Manga, GraphicNovel, AcademicPaper, SheetMusic, Screenplay)
 - PhotoLibrary (root: PhotoLibrary, entities: Photo, PhotoAlbum, AlbumArtwork, MoviePoster)
 - UserProfile (root: User, entities: Playlist, Collection)
 - SupplementaryContentLibrary (root: SupplementaryContentLibrary, entities: SubtitleFile, Lyrics, LanguageTrack)

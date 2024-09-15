@@ -1,23 +1,24 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Models.Books;
-using Lumina.Application.Common.Models.Common;
+using Lumina.Contracts.Models.Common;
+using Lumina.Contracts.Models.WrittenContentLibrary.BookLibrary;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Collections.Generic;
 #endregion
 
 namespace Lumina.DataAccess.Common.Configuration;
 
 /// <summary>
-/// Configures the entity mapping for the <see cref="BookDto"/> entity.
+/// Configures the entity mapping for the <see cref="BookModel"/> entity.
 /// </summary>
-public class BookConfiguration : IEntityTypeConfiguration<BookDto>
+public class BookConfiguration : IEntityTypeConfiguration<BookModel>
 {
     #region ===================================================================== METHODS ===================================================================================
     /// <summary>
-    /// Configures the <see cref="BookDto"/> entity.
+    /// Configures the <see cref="BookModel"/> entity.
     /// </summary>
     /// <param name="builder">The builder to be used to configure the entity.</param>
-    public void Configure(EntityTypeBuilder<BookDto> builder)
+    public void Configure(EntityTypeBuilder<BookModel> builder)
     {
         builder.ToTable("Books");
         builder.HasKey(book => book.Id);
@@ -46,8 +47,8 @@ public class BookConfiguration : IEntityTypeConfiguration<BookDto>
         .WithMany()
         .UsingEntity<Dictionary<string, object>>(
             "BookTags",
-            j => j.HasOne<TagDto>().WithMany().HasForeignKey("TagId"),
-            j => j.HasOne<BookDto>().WithMany().HasForeignKey("BookId"),
+            j => j.HasOne<TagModel>().WithMany().HasForeignKey("TagId"),
+            j => j.HasOne<BookModel>().WithMany().HasForeignKey("BookId"),
             j =>
             {
                 j.HasKey("BookId", "TagId");
@@ -58,8 +59,8 @@ public class BookConfiguration : IEntityTypeConfiguration<BookDto>
         .WithMany()
         .UsingEntity<Dictionary<string, object>>(
             "BookGenres",
-            j => j.HasOne<GenreDto>().WithMany().HasForeignKey("GenreId"),
-            j => j.HasOne<BookDto>().WithMany().HasForeignKey("BookId"),
+            j => j.HasOne<GenreModel>().WithMany().HasForeignKey("GenreId"),
+            j => j.HasOne<BookModel>().WithMany().HasForeignKey("BookId"),
             j =>
             {
                 j.HasKey("BookId", "GenreId");
@@ -83,12 +84,12 @@ public class BookConfiguration : IEntityTypeConfiguration<BookDto>
         builder.Property(book => book.Created).HasColumnOrder(30);
         builder.Property(book => book.Updated).HasColumnOrder(31);
 
-        //builder.HasMany<ContributorIdDto>()
+        //builder.HasMany<ContributorIdModel>()
         //.WithMany()
         //.UsingEntity<Dictionary<string, object>>(
         //    "BookContributors",
-        //    j => j.HasOne<ContributorIdDto>().WithMany().HasForeignKey("ContributorId"),
-        //    j => j.HasOne<BookDto>().WithMany().HasForeignKey("BookId"),
+        //    j => j.HasOne<ContributorIdModel>().WithMany().HasForeignKey("ContributorId"),
+        //    j => j.HasOne<BookModel>().WithMany().HasForeignKey("BookId"),
         //    j =>
         //    {
         //        j.HasKey("BookId", "ContributorId");
@@ -150,9 +151,9 @@ public class BookConfiguration : IEntityTypeConfiguration<BookDto>
     #endregion
 }
 
-//public class ContributorConfiguration : IEntityTypeConfiguration<ContributorIdDto>
+//public class ContributorConfiguration : IEntityTypeConfiguration<ContributorIdModel>
 //{
-//    public void Configure(EntityTypeBuilder<ContributorIdDto> builder)
+//    public void Configure(EntityTypeBuilder<ContributorIdModel> builder)
 //    {
 //        builder.ToTable("Contributors");
 //        builder.HasKey(c => c.Id);

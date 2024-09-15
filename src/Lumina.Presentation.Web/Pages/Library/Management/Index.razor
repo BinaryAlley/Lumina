@@ -1,0 +1,90 @@
+﻿@page "/library/manage"
+
+<h3 class="text-light-two f-22 mb-10 mt-0 pt-10 text-center">Manage Libraries</h3>
+
+<div class="enlightenment-panel shadow-effect pl-0 pr-0 pb-0 mx-auto panel mt-10" style="width: 350px; min-width: 350px;">
+    <div class="shine-effect"></div>
+    <div class="available-file-system-card">
+        <div class="available-file-system-button text-center close-data-source" style="color: #FF0000; top: 0px; right: 10px;">&times;</div>
+    </div>
+    <table class="w-90 mx-auto" data-unique-id="dataSource.EnvironmentId">
+        <tr>
+            <td colspan="2">
+                    <p class="text-light-one f-18 mt-0 mb-5 text-center">LocalFileSystem</p>
+            </td>
+        </tr>
+        <!-- section Title -->
+        <tr>
+            <td class="w-100">
+                <input type="hidden" name="type" value="local">
+                <label class="text-light-one">Title</label>
+                <input type="text" class="w-100 enlightenment-input" name="title" value="dataSource.Title">
+                <small class="text-disabled" style="margin-left: 25px;">DescriptionTitle</small>
+            </td>
+        </tr>
+        <!-- section URL -->
+        <tr>
+            <td class="w-100">
+                <label class="text-light-one">URL</label>
+                <input type="url" class="w-100 enlightenment-input" name="url" placeholder="example.com" value="dataSource.Url">
+                <small class="text-disabled" style="margin-left: 25px;">DescriptionURL</small>
+            </td>
+        </tr>
+        <!-- section Port -->
+        <tr>
+            <td class="w-100">
+                <label class="text-light-one">Port</label>
+                <input type="number" class="w-100 enlightenment-input" name="port" value="dataSource.Port">
+                <small class="text-disabled" style="margin-left: 25px;">DescriptionPort</small>
+            </td>
+        </tr>
+        <!-- section Username -->
+        <tr>
+            <td class="w-100">
+                <label class="text-light-one">Username</label>
+                <input type="text" class="w-100 enlightenment-input" name="username" autocomplete="on" value="dataSource.Username">
+                <small class="text-disabled" style="margin-left: 25px;">DescriptionUsername</small>
+            </td>
+        </tr>
+        <!-- section Password -->
+        <tr>
+            <td class="w-100">
+                <label class="text-light-one">Password</label>
+                <input type="password" class="w-100 enlightenment-input" name="password" value="dataSource.Password">
+                <small class="text-disabled" style="margin-left: 25px;">DescriptionPassword</small>
+            </td>
+        </tr>
+        <tr>
+            <td class="w-100">
+                <label class="text-light-one">Platform</label>
+                <div class="enlightenment-combobox inline-block w-100">
+                    <div class="shine-effect" style="top: 1px;"></div>
+                    <input type="checkbox" class="enlightenment-toggle-checkbox" />
+                    <label class="enlightenment-toggle">
+                        <span class="enlightenment-selected-text">dataSource.PlatformType</span>
+                    </label>
+                    <div class="enlightenment-dropdown">
+                        <div class="shine-effect" style="top: -4px;"></div>
+                        <div class="enlightenment-option first-option" data-value="Unix">Unix</div>
+                        <div class="enlightenment-option last-option" data-value="Windows">Windows</div>
+                    </div>
+                </div>
+                <small class="text-disabled" style="margin-left: 25px;">DescriptionPlatform</small>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" class="w-100 text-center">
+                <button type="submit" class="confirm-button f-16 w-100px">Save</button>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <span class="invalid-feedback hidden"></span>
+            </td>
+        </tr>
+    </table>
+</div>
+
+@code {
+
+}

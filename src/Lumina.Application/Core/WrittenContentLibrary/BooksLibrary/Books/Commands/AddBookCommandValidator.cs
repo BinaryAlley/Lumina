@@ -1,8 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using FluentValidation;
-using Lumina.Domain.Common.Enums;
+using Lumina.Contracts.Enums.BookLibrary;
 using Lumina.Domain.Common.Errors;
-using System.Text.RegularExpressions;
 #endregion
 
 namespace Lumina.Application.Core.WrittenContentLibrary.BooksLibrary.Books.Commands;

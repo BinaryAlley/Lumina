@@ -1,0 +1,142 @@
+﻿@using System.Collections.Generic
+@using Lumina.Presentation.Web.Common.Api
+@using Lumina.Presentation.Web.Common.Enums
+@using Lumina.Presentation.Web.Common.Enums.FileSystem
+@using Lumina.Presentation.Web.Common.Models.FileManagement
+
+@inject IApiHttpClient _apiHttpClient
+
+<div class="treeview">
+    @foreach (FileSystemTreeNodeModel node in RootNodes)
+    {
+        <FileSystemTreeViewNode Node="node" OnExpand="ExpandNode" OnNodeSelected="HandleNodeSelected" SelectedNodePath="@SelectedNodePath" />
+    }
+</div>
+
+@code {
+    [Parameter] public string? InitialPath { get; set; }
+    [Parameter] public List<FileSystemTreeNodeModel> RootNodes { get; set; } = new List<FileSystemTreeNodeModel>();
+    [Parameter] public EventCallback<string> OnNodeSelected { get; set; }
+
+    private string? SelectedNodePath { get; set; }
+    private string PathSeparator { get; set; } = "/";
+    private FileSystemTypeModel fileSystemType = null!;
+
+    /// <summary>
+    /// Initializes the component.
+    /// </summary>
+    protected override async Task OnInitializedAsync()
+    {
+        fileSystemType = await _apiHttpClient.GetAsync<FileSystemTypeModel>("file-system/get-type").ConfigureAwait(false);
+        // ask the API server for the system path separator
+        PathSeparatorModel pathSeparator = await _apiHttpClient.GetAsync<PathSeparatorModel>("path/get-path-separator").ConfigureAwait(false);
+        PathSeparator = pathSeparator.Separator; // TODO: handle error
+        // on Windows, ask the list of drives
+        if (fileSystemType.PlatformType == PlatformType.Windows)
+        {
+            List<FileSystemTreeNodeModel> drives = await _apiHttpClient.GetAsync<List<FileSystemTreeNodeModel>>("drives/get-drives").ConfigureAwait(false);
+            RootNodes.AddRange(drives);
+        }
+        else
+        {
+            // on UNIX, just add the root "/"
+            RootNodes.Add(new FileSystemTreeNodeModel()
+            {
+                Path = pathSeparator.Separator,
+                IsExpanded = true,
+                ItemType = FileSystemItemType.Root,
+                Name = pathSeparator.Separator
+            });
+        }
+        // if there was an initial path saved from a previous session, load the full tree up to that initial path
+        if (InitialPath is not null)
+        {
+            // ask the whole tree for the saved path
+            List<FileSystemTreeNodeModel> initialTree = await _apiHttpClient.GetAsync<List<FileSystemTreeNodeModel>>($"directories/get-directory-tree?path={Uri.EscapeDataString(InitialPath)}").ConfigureAwait(false);
+            if (initialTree is not null && initialTree.Count > 0)
+            {
+                // take the root of the retrieved tree, and try to match it against a drive in the retrieved list of drives, on Windows; on Unix, add it as the unique root path
+                PathSegmentModel pathRoot = await _apiHttpClient.GetAsync<PathSegmentModel>($"path/get-path-root?path={Uri.EscapeDataString(InitialPath)}").ConfigureAwait(false);
+                if (fileSystemType.PlatformType == PlatformType.Windows)
+                {
+                    FileSystemTreeNodeModel? driveNode = RootNodes.FirstOrDefault(drive => drive.Path.Equals(pathRoot.Path, StringComparison.OrdinalIgnoreCase));
+                    // if a drive was matched, make the retrieved tree a child of it
+                    if (driveNode is not null)
+                    {
+                        int index = RootNodes.IndexOf(driveNode);
+                        RootNodes[index] = initialTree[0];
+                    }
+                }
+                else
+                    RootNodes[0] = initialTree[0];
+            }
+        }
+    }
+
+    /// <summary>
+    /// Expands or collapses a node in the tree view.
+    /// </summary>
+    /// <param name="node">The node to expand or collapse.</param>
+    private async Task ExpandNode(FileSystemTreeNodeModel node)
+    {
+        if (!node.IsExpanded && !node.ChildrenLoaded)
+        {
+            node.Children = new List<FileSystemTreeNodeModel>();
+            node.IsExpanded = true;
+            StateHasChanged();
+            try
+            {
+                await foreach (FileSystemTreeNodeModel? childNode in _apiHttpClient.GetAsyncEnumerable<FileSystemTreeNodeModel>($"directories/get-directories?path={Uri.EscapeDataString(node.Path)}").ConfigureAwait(false))
+                {
+                    if (childNode is not null)
+                    {
+                        node.Children.Add(childNode);
+                        StateHasChanged();
+                    }
+                }
+                await foreach (FileSystemTreeNodeModel? childNode in _apiHttpClient.GetAsyncEnumerable<FileSystemTreeNodeModel>($"files/get-files?path={Uri.EscapeDataString(node.Path)}").ConfigureAwait(false))
+                {
+                    if (childNode is not null)
+                    {
+                        node.Children.Add(childNode);
+                        StateHasChanged();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error expanding node: {ex.Message}"); // TODO: display to the user when notification system is implemented
+            }
+            finally
+            {
+                node.ChildrenLoaded = true;
+            }
+        }
+        else
+            node.IsExpanded = !node.IsExpanded;
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Retrieves the child nodes for a given path.
+    /// </summary>
+    /// <param name="path">The path to get child nodes for.</param>
+    /// <returns>A list of <see cref="FileSystemTreeNodeModel"/> representing the child nodes.</returns>
+    private async Task<List<FileSystemTreeNodeModel>> GetChildNodes(string path)
+    {
+        List<FileSystemTreeNodeModel> directories = await _apiHttpClient.GetAsync<List<FileSystemTreeNodeModel>>($"directories/get-directories?path={Uri.EscapeDataString(path)}").ConfigureAwait(false);
+        List<FileSystemTreeNodeModel> files = await _apiHttpClient.GetAsync<List<FileSystemTreeNodeModel>>($"files/get-files?path={Uri.EscapeDataString(path)}").ConfigureAwait(false);
+        directories.AddRange(files);
+        return directories;
+    }
+
+    /// <summary>
+    /// Handles the selection of a node in the tree view.
+    /// </summary>
+    /// <param name="path">The path of the selected node.</param>
+    private async Task HandleNodeSelected(string path)
+    {
+        SelectedNodePath = path;
+        await OnNodeSelected.InvokeAsync(path).ConfigureAwait(false);
+    }
+}

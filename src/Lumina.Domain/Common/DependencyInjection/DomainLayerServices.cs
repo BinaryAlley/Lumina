@@ -1,4 +1,5 @@
 ﻿#region ========================================================================= USING =====================================================================================
+using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Services;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Strategies.Environment;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Strategies.Path;
@@ -22,6 +23,7 @@ public static class DomainLayerServices
     /// <returns>The updated <see cref="IServiceCollection"/>.</returns>
     public static IServiceCollection AddDomainLayerServices(this IServiceCollection services)
     {
+        services.AddScoped<IDriveService, DriveService>();
         services.AddScoped<IDirectoryService, DirectoryService>();
         services.AddScoped<IFileService, FileService>();
         services.AddScoped<IFileSystemPermissionsService, FileSystemPermissionsService>();

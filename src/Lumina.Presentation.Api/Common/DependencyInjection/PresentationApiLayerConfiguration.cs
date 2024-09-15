@@ -1,4 +1,7 @@
 #region ========================================================================= USING =====================================================================================
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using System.IO;
 using System.Reflection;
 #endregion
 
@@ -25,7 +28,6 @@ internal static class PresentationApiLayerConfiguration
         configuration.SetBasePath(basePath);
         configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
         configuration.AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
-
 
         return services;
     }

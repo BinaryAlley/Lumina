@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using Lumina.Domain.Common.Models.Core;
+using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
@@ -36,7 +37,7 @@ public class Genre : ValueObject
     /// </summary>
     /// <param name="name">The value of the genre.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{T}"/> containing either a successfully created <see cref="Genre"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="Genre"/>, or an error message.
     /// </returns>
     public static ErrorOr<Genre> Create(string name)
     {

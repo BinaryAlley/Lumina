@@ -1,18 +1,23 @@
 ﻿#region ========================================================================= USING =====================================================================================
+using Bogus;
 using FluentAssertions;
+using Lumina.Contracts.Enums.BookLibrary;
+using Lumina.Contracts.Requests.WrittenContentLibrary.BookLibrary;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate;
-using Lumina.Presentation.Api.Common.Contracts.Books;
 using Lumina.Presentation.Api.IntegrationTests.Common.Converters;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 using Lumina.Presentation.Api.IntegrationTests.Core.Controllers.Books.Fixtures;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
-using Lumina.Domain.Common.Errors;
-using Bogus;
-using Lumina.Domain.Common.Enums;
+using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Presentation.Api.IntegrationTests.Core.Controllers.Books;

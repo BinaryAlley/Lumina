@@ -18,6 +18,7 @@ public class ServerConfigurationModelValidator : AbstractValidator<ServerConfigu
     {
         RuleFor(x => x.BaseAddress).NotEmpty().WithMessage("Base address cannot be empty!");
         RuleFor(x => x.Port).InclusiveBetween((ushort)0, (ushort)65535).WithMessage("Port number must be between 0 and 65535!");
+        RuleFor(x => x.ApiVersion).InclusiveBetween((char)0, (char)255).WithMessage("API version must be between 0 and 255!");
     }
     #endregion
 }

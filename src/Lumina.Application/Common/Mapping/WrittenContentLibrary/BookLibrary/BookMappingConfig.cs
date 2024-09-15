@@ -1,6 +1,6 @@
 ﻿#region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Models.Books;
-using Lumina.Domain.Common.Enums;
+using Lumina.Contracts.Enums.BookLibrary;
+using Lumina.Contracts.Models.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using Lumina.Domain.Core.Aggregates.MediaContributor.MediaContributorAggregate.ValueObjects;
@@ -8,6 +8,9 @@ using Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate;
 using Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate.Entities;
 using Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate.ValueObjects;
 using Mapster;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 #endregion
 
 namespace Lumina.Application.Common.Mapping.WrittenContentLibrary.BookLibrary;
@@ -24,7 +27,7 @@ public class BookMappingConfig : IRegister
     /// <param name="config">The type adapter configuration.</param>
     public void Register(TypeAdapterConfig config)
     {
-        config.NewConfig<Book, BookDto>()
+        config.NewConfig<Book, BookModel>()
             .Map(dest => dest.Id, src => src.Id.Value)
             .Map(dest => dest.Title, src => src.Metadata.Title)
             .Map(dest => dest.OriginalTitle, src => src.Metadata.OriginalTitle.HasValue ? src.Metadata.OriginalTitle.Value : default)
@@ -62,7 +65,7 @@ public class BookMappingConfig : IRegister
             .Map(dest => dest.Created, src => src.Created)
             .Map(dest => dest.Updated, src => src.Updated.HasValue ? src.Updated : null);
 
-        config.NewConfig<BookRating, BookRatingDto>()
+        config.NewConfig<BookRating, BookRatingModel>()
             .Map(dest => dest.Value, src => src.Value)
             .Map(dest => dest.MaxValue, src => src.MaxValue)
             .Map(dest => dest.VoteCount, src => src.VoteCount.HasValue ? src.VoteCount.Value : default)
@@ -71,8 +74,8 @@ public class BookMappingConfig : IRegister
         config.NewConfig<Optional<BookRatingSource>, BookRatingSource?>()
             .MapWith(src => src.HasValue ? src.Value : default);
 
-        // from BookDto to Book
-        config.NewConfig<BookDto, Book>()
+        // from BookModel to Book
+        config.NewConfig<BookModel, Book>()
         .MapWith(src => Book.Create(
             BookId.Create(src.Id),
             WrittenContentMetadata.Create(

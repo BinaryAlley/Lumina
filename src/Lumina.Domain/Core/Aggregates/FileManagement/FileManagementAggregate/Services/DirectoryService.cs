@@ -1,14 +1,14 @@
 ﻿#region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using Lumina.Domain.Common.Enums;
+using Lumina.Contracts.Enums.FileSystem;
 using Lumina.Domain.Common.Errors;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Entities;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Strategies.Environment;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Strategies.Platform;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.ValueObjects;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Services;
@@ -25,7 +25,7 @@ public class DirectoryService : IDirectoryService
 
     #region ====================================================================== CTOR =====================================================================================
     /// <summary>
-    /// Initializes a new instance of the <see cref="DirectoryProviderService"/> class.
+    /// Initializes a new instance of the <see cref="DirectoryService"/> class.
     /// </summary>
     /// <param name="environmentContext">Injected facade service for environment contextual services.</param>
     /// <param name="platformContextManager">Injected facade service for platform contextual services.</param>
@@ -42,12 +42,12 @@ public class DirectoryService : IDirectoryService
     /// </summary>
     /// <param name="path">String representation of the file path.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of subdirectories or an error.</returns>
-    public async Task<ErrorOr<IEnumerable<Directory>>> GetSubdirectoriesAsync(string path)
+    public ErrorOr<IEnumerable<Directory>> GetSubdirectories(string path)
     {
-        var fileSystemPathIdResult = FileSystemPathId.Create(path);
+        ErrorOr<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(path);
         if (fileSystemPathIdResult.IsError)
             return fileSystemPathIdResult.Errors;
-        return await GetSubdirectoriesAsync(fileSystemPathIdResult.Value).ConfigureAwait(false);
+        return GetSubdirectories(fileSystemPathIdResult.Value);
     }
 
     /// <summary>
@@ -55,9 +55,9 @@ public class DirectoryService : IDirectoryService
     /// </summary>
     /// <param name="directory">Directory object to retrieve subdirectories for.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of subdirectories or an error.</returns>
-    public async Task<ErrorOr<IEnumerable<Directory>>> GetSubdirectoriesAsync(Directory directory)
+    public ErrorOr<IEnumerable<Directory>> GetSubdirectories(Directory directory)
     {
-        return await GetSubdirectoriesAsync(directory.Id).ConfigureAwait(false);
+        return GetSubdirectories(directory.Id);
     }
 
     /// <summary>
@@ -65,33 +65,40 @@ public class DirectoryService : IDirectoryService
     /// </summary>
     /// <param name="path">Identifier for the file path.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of subdirectories or an error.</returns>
-    public async Task<ErrorOr<IEnumerable<Directory>>> GetSubdirectoriesAsync(FileSystemPathId path)
+    public ErrorOr<IEnumerable<Directory>> GetSubdirectories(FileSystemPathId path)
     {
         // retrieve the list of subdirectories
-        ErrorOr<Task<IEnumerable<FileSystemPathId>>> subdirectoryPathsResult = _environmentContext.DirectoryProviderService.GetSubdirectoryPathsAsync(path);
+        ErrorOr<IEnumerable<FileSystemPathId>> subdirectoryPathsResult = _environmentContext.DirectoryProviderService.GetSubdirectoryPaths(path);
         if (subdirectoryPathsResult.IsError)
             return subdirectoryPathsResult.Errors;
-        List<Directory> result = new();
-        IEnumerable<FileSystemPathId> subdirectoryPaths = await subdirectoryPathsResult.Value.ConfigureAwait(false);
+        List<Directory> result = [];
+        IEnumerable<FileSystemPathId> subdirectoryPaths = subdirectoryPathsResult.Value;
         foreach (FileSystemPathId subPath in subdirectoryPaths)
         {
             // extract directory details
             ErrorOr<string> dirNameResult = _environmentContext.DirectoryProviderService.GetFileName(subPath);
-            ErrorOr<DateTime?> dateModifiedResult = _environmentContext.DirectoryProviderService.GetLastWriteTime(subPath);
-            ErrorOr<DateTime?> dateCreatedResult = _environmentContext.DirectoryProviderService.GetCreationTime(subPath);
+            ErrorOr<Optional<DateTime>> dateModifiedResult = _environmentContext.DirectoryProviderService.GetLastWriteTime(subPath);
+            ErrorOr<Optional<DateTime>> dateCreatedResult = _environmentContext.DirectoryProviderService.GetCreationTime(subPath);
 
             // if any error occurred, mark directory as Inaccessible
             if (dirNameResult.IsError || dateModifiedResult.IsError || dateCreatedResult.IsError)
             {
-                Directory errorDir = new(subPath, !dirNameResult.IsError ? dirNameResult.Value : null!,
-                    !dateCreatedResult.IsError ? dateCreatedResult.Value : null, !dateModifiedResult.IsError ? dateModifiedResult.Value : null);
-                errorDir.SetStatus(FileSystemItemStatus.Inaccessible);
-                result.Add(errorDir);
+                ErrorOr<Directory> errorDirResult = Directory.Create(subPath, !dirNameResult.IsError ? dirNameResult.Value : null!,
+                    !dateCreatedResult.IsError ? dateCreatedResult.Value : Optional<DateTime>.None(), 
+                    !dateModifiedResult.IsError ? dateModifiedResult.Value : Optional<DateTime>.None());
+                if(errorDirResult.IsError)
+                    return errorDirResult.Errors;
+                ErrorOr<Updated> setStatusResult = errorDirResult.Value.SetStatus(FileSystemItemStatus.Inaccessible);
+                if (setStatusResult.IsError)
+                    return setStatusResult.Errors;
+                result.Add(errorDirResult.Value);
             }
             else
             {
-                Directory subDirectory = new(subPath, dirNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value);
-                result.Add(subDirectory);
+                ErrorOr<Directory> subDirectoryResult = Directory.Create(subPath, dirNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value);
+                if (subDirectoryResult.IsError)
+                    return subDirectoryResult.Errors;
+                result.Add(subDirectoryResult.Value);
             }
         }
         return result;
@@ -105,7 +112,7 @@ public class DirectoryService : IDirectoryService
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the result of creating a directory, or an error.</returns>
     public ErrorOr<Directory> CreateDirectory(string path, string name)
     {
-        var fileSystemPathIdResult = FileSystemPathId.Create(path);
+        ErrorOr<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(path);
         if (fileSystemPathIdResult.IsError)
             return fileSystemPathIdResult.Errors;
         return CreateDirectory(fileSystemPathIdResult.Value, name);
@@ -120,14 +127,14 @@ public class DirectoryService : IDirectoryService
     public ErrorOr<Directory> CreateDirectory(FileSystemPathId path, string name)
     {
         // first, check if the directory about to be created does not already exist
-        var combinedPath = _platformContext.PathStrategy.CombinePath(path, name);
+        ErrorOr<FileSystemPathId> combinedPath = _platformContext.PathStrategy.CombinePath(path, name);
         if (combinedPath.IsError)
             return combinedPath.Errors;
-        var directoryExists = _environmentContext.DirectoryProviderService.DirectoryExists(combinedPath.Value);
+        ErrorOr<bool> directoryExists = _environmentContext.DirectoryProviderService.DirectoryExists(combinedPath.Value);
         if (directoryExists.IsError)
             return directoryExists.Errors;
         else if (directoryExists.Value == true)
-            return Errors.FileManagement.DirectoryAlreadyExistsError;
+            return Errors.FileManagement.DirectoryAlreadyExists;
         else
         {
             // create the new directory
@@ -135,18 +142,23 @@ public class DirectoryService : IDirectoryService
             if (newDirectoryPathResult.IsError)
                 return newDirectoryPathResult.Errors;
             ErrorOr<string> dirNameResult = _environmentContext.DirectoryProviderService.GetFileName(path);
-            ErrorOr<DateTime?> dateModifiedResult = _environmentContext.DirectoryProviderService.GetLastWriteTime(path);
-            ErrorOr<DateTime?> dateCreatedResult = _environmentContext.DirectoryProviderService.GetCreationTime(path);
+            ErrorOr<Optional<DateTime>> dateModifiedResult = _environmentContext.DirectoryProviderService.GetLastWriteTime(path);
+            ErrorOr<Optional<DateTime>> dateCreatedResult = _environmentContext.DirectoryProviderService.GetCreationTime(path);
             // if any error occurred, mark directory as Inaccessible
             if (dirNameResult.IsError || dateModifiedResult.IsError || dateCreatedResult.IsError)
             {
-                Directory errorDir = new(newDirectoryPathResult.Value, !dirNameResult.IsError ? dirNameResult.Value : null!,
-                    !dateCreatedResult.IsError ? dateCreatedResult.Value : null, !dateModifiedResult.IsError ? dateModifiedResult.Value : null);
-                errorDir.SetStatus(FileSystemItemStatus.Inaccessible);
-                return errorDir;
+                ErrorOr<Directory> errorDirResult = Directory.Create(newDirectoryPathResult.Value, !dirNameResult.IsError ? dirNameResult.Value : null!,
+                    !dateCreatedResult.IsError ? dateCreatedResult.Value : Optional<DateTime>.None(), 
+                    !dateModifiedResult.IsError ? dateModifiedResult.Value : Optional<DateTime>.None());
+                if (errorDirResult.IsError)
+                    return errorDirResult.Errors;
+                ErrorOr<Updated> setStatusResult = errorDirResult.Value.SetStatus(FileSystemItemStatus.Inaccessible);
+                if (setStatusResult.IsError)
+                    return setStatusResult.Errors;
+                return errorDirResult;
             }
             else
-                return new Directory(newDirectoryPathResult.Value, dirNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value);
+                return Directory.Create(newDirectoryPathResult.Value, dirNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value);
         }
     }
 
@@ -164,10 +176,10 @@ public class DirectoryService : IDirectoryService
             sourcePath += _platformContext.PathStrategy.PathSeparator;
         if (!destinationPath.EndsWith(_platformContext.PathStrategy.PathSeparator))
             destinationPath += _platformContext.PathStrategy.PathSeparator;
-        var fileSystemSourcePathIdResult = FileSystemPathId.Create(sourcePath);
+        ErrorOr<FileSystemPathId> fileSystemSourcePathIdResult = FileSystemPathId.Create(sourcePath);
         if (fileSystemSourcePathIdResult.IsError)
             return fileSystemSourcePathIdResult.Errors;
-        var fileSystemDestinationPathIdResult = FileSystemPathId.Create(destinationPath);
+        ErrorOr<FileSystemPathId> fileSystemDestinationPathIdResult = FileSystemPathId.Create(destinationPath);
         if (fileSystemDestinationPathIdResult.IsError)
             return fileSystemDestinationPathIdResult.Errors;
         return CopyDirectory(fileSystemSourcePathIdResult.Value, fileSystemDestinationPathIdResult.Value, overrideExisting ?? false);
@@ -182,11 +194,11 @@ public class DirectoryService : IDirectoryService
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the copied directory, or an error.</returns>
     public ErrorOr<Directory> CopyDirectory(FileSystemPathId sourcePath, FileSystemPathId destinationPath, bool overrideExisting)
     {
-        var directoryExists = _environmentContext.DirectoryProviderService.DirectoryExists(sourcePath);
+        ErrorOr<bool> directoryExists = _environmentContext.DirectoryProviderService.DirectoryExists(sourcePath);
         if (directoryExists.IsError)
             return directoryExists.Errors;
         else if (directoryExists.Value == false)
-            return Errors.FileManagement.DirectoryNotFoundError;
+            return Errors.FileManagement.DirectoryNotFound;
         else
         {
             // copy the directory
@@ -210,10 +222,10 @@ public class DirectoryService : IDirectoryService
             sourcePath += _platformContext.PathStrategy.PathSeparator;
         if (!destinationPath.EndsWith(_platformContext.PathStrategy.PathSeparator))
             destinationPath += _platformContext.PathStrategy.PathSeparator;
-        var fileSystemSourcePathIdResult = FileSystemPathId.Create(sourcePath);
+        ErrorOr<FileSystemPathId> fileSystemSourcePathIdResult = FileSystemPathId.Create(sourcePath);
         if (fileSystemSourcePathIdResult.IsError)
             return fileSystemSourcePathIdResult.Errors;
-        var fileSystemDestinationPathIdResult = FileSystemPathId.Create(destinationPath);
+        ErrorOr<FileSystemPathId> fileSystemDestinationPathIdResult = FileSystemPathId.Create(destinationPath);
         if (fileSystemDestinationPathIdResult.IsError)
             return fileSystemDestinationPathIdResult.Errors;
         return MoveDirectory(fileSystemSourcePathIdResult.Value, fileSystemDestinationPathIdResult.Value, overrideExisting ?? false);
@@ -228,11 +240,11 @@ public class DirectoryService : IDirectoryService
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the moved directory, or an error.</returns>
     public ErrorOr<Directory> MoveDirectory(FileSystemPathId sourcePath, FileSystemPathId destinationPath, bool overrideExisting)
     {
-        var directoryExists = _environmentContext.DirectoryProviderService.DirectoryExists(sourcePath);
+        ErrorOr<bool> directoryExists = _environmentContext.DirectoryProviderService.DirectoryExists(sourcePath);
         if (directoryExists.IsError)
             return directoryExists.Errors;
         else if (directoryExists.Value == false)
-            return Errors.FileManagement.DirectoryNotFoundError;
+            return Errors.FileManagement.DirectoryNotFound;
         else
         {
             // move the directory
@@ -250,7 +262,7 @@ public class DirectoryService : IDirectoryService
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the renamed directory, or an error.</returns>
     public ErrorOr<Directory> RenameDirectory(string path, string name)
     {
-        var fileSystemPathIdResult = FileSystemPathId.Create(path);
+        ErrorOr<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(path);
         if (fileSystemPathIdResult.IsError)
             return fileSystemPathIdResult.Errors;
         return RenameDirectory(fileSystemPathIdResult.Value, name);
@@ -265,14 +277,14 @@ public class DirectoryService : IDirectoryService
     public ErrorOr<Directory> RenameDirectory(FileSystemPathId path, string name)
     {
         // first, check if the directory about to be created does not already exist
-        var combinedPath = _platformContext.PathStrategy.CombinePath(path, name);
+        ErrorOr<FileSystemPathId> combinedPath = _platformContext.PathStrategy.CombinePath(path, name);
         if (combinedPath.IsError)
             return combinedPath.Errors;
-        var directoryExists = _environmentContext.DirectoryProviderService.DirectoryExists(combinedPath.Value);
+        ErrorOr<bool> directoryExists = _environmentContext.DirectoryProviderService.DirectoryExists(combinedPath.Value);
         if (directoryExists.IsError)
             return directoryExists.Errors;
         else if (directoryExists.Value == true)
-            return Errors.FileManagement.DirectoryAlreadyExistsError;
+            return Errors.FileManagement.DirectoryAlreadyExists;
         else
         {
             // rename the directory
@@ -280,18 +292,23 @@ public class DirectoryService : IDirectoryService
             if (newDirectoryPathResult.IsError)
                 return newDirectoryPathResult.Errors;
             ErrorOr<string> dirNameResult = _environmentContext.DirectoryProviderService.GetFileName(newDirectoryPathResult.Value);
-            ErrorOr<DateTime?> dateModifiedResult = _environmentContext.DirectoryProviderService.GetLastWriteTime(newDirectoryPathResult.Value);
-            ErrorOr<DateTime?> dateCreatedResult = _environmentContext.DirectoryProviderService.GetCreationTime(newDirectoryPathResult.Value);
+            ErrorOr<Optional<DateTime>> dateModifiedResult = _environmentContext.DirectoryProviderService.GetLastWriteTime(newDirectoryPathResult.Value);
+            ErrorOr<Optional<DateTime>> dateCreatedResult = _environmentContext.DirectoryProviderService.GetCreationTime(newDirectoryPathResult.Value);
             // if any error occurred, mark directory as Inaccessible
             if (dirNameResult.IsError || dateModifiedResult.IsError || dateCreatedResult.IsError)
             {
-                Directory errorDir = new(newDirectoryPathResult.Value, !dirNameResult.IsError ? dirNameResult.Value : null!,
-                    !dateCreatedResult.IsError ? dateCreatedResult.Value : null, !dateModifiedResult.IsError ? dateModifiedResult.Value : null);
-                errorDir.SetStatus(FileSystemItemStatus.Inaccessible);
-                return errorDir;
+                ErrorOr<Directory> errorDirResult = Directory.Create(newDirectoryPathResult.Value, !dirNameResult.IsError ? dirNameResult.Value : null!,
+                    !dateCreatedResult.IsError ? dateCreatedResult.Value : Optional<DateTime>.None(), 
+                    !dateModifiedResult.IsError ? dateModifiedResult.Value : Optional<DateTime>.None());
+                if (errorDirResult.IsError)
+                    return errorDirResult.Errors;
+                ErrorOr<Updated> setStatusResult = errorDirResult.Value.SetStatus(FileSystemItemStatus.Inaccessible);
+                if (setStatusResult.IsError)
+                    return setStatusResult.Errors;
+                return errorDirResult;
             }
             else
-                return new Directory(newDirectoryPathResult.Value, dirNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value);
+                return Directory.Create(newDirectoryPathResult.Value, dirNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value);
         }
     }
 
@@ -300,9 +317,9 @@ public class DirectoryService : IDirectoryService
     /// </summary>
     /// <param name="path">String representation of the directory path.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the result of deleting a directory, or an error.</returns>
-    public ErrorOr<bool> DeleteDirectory(string path)
+    public ErrorOr<Deleted> DeleteDirectory(string path)
     {
-        var fileSystemPathIdResult = FileSystemPathId.Create(path);
+        ErrorOr<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(path);
         if (fileSystemPathIdResult.IsError)
             return fileSystemPathIdResult.Errors;
         return DeleteDirectory(fileSystemPathIdResult.Value);
@@ -313,7 +330,7 @@ public class DirectoryService : IDirectoryService
     /// </summary>
     /// <param name="path">Identifier for the directory path.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the result of deleting a directory, or an error.</returns>
-    public ErrorOr<bool> DeleteDirectory(FileSystemPathId path)
+    public ErrorOr<Deleted> DeleteDirectory(FileSystemPathId path)
     {
         return _environmentContext.DirectoryProviderService.DeleteDirectory(path);
     }

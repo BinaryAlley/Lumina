@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using FluentValidation;
 using Lumina.Presentation.Web.Common.Validation;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 #endregion
 

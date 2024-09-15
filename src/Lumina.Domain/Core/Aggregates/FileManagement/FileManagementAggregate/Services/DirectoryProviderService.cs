@@ -1,13 +1,13 @@
 ﻿#region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using Lumina.Domain.Common.Enums;
+using Lumina.Contracts.Enums.FileSystem;
 using Lumina.Domain.Common.Errors;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.ValueObjects;
 using System;
 using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.Linq;
-using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Services;
@@ -37,21 +37,21 @@ internal class DirectoryProviderService : IDirectoryProviderService
 
     #region ===================================================================== METHODS ===================================================================================
     /// <summary>
-    /// Retrieves a list of subdirectory paths from the specified path, asynchronously.
+    /// Retrieves a list of subdirectory paths from the specified path.
     /// </summary>
     /// <param name="path">The path from which to retrieve the subdirectory paths.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a task representing the asynchronous operation for retrieving a collection of directory paths or an error.</returns>
-    public ErrorOr<Task<IEnumerable<FileSystemPathId>>> GetSubdirectoryPathsAsync(FileSystemPathId path)
+    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of directory paths or an error.</returns>
+    public ErrorOr<IEnumerable<FileSystemPathId>> GetSubdirectoryPaths(FileSystemPathId path)
     {
         // check if the user has access permissions to the provided path
         if (!_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ListDirectory, false))
             return Errors.Permission.UnauthorizedAccess;
-        return Task.Run(() => _fileSystem.Directory.GetDirectories(path.Path)
-                                                  .OrderBy(p => p)
-                                                  .Select(p => FileSystemPathId.Create(p))
-                                                  .Where(errorOrPathId => !errorOrPathId.IsError)
-                                                  .Select(errorOrPathId => errorOrPathId.Value)
-                                                  .AsEnumerable());
+        return ErrorOrFactory.From(_fileSystem.Directory.GetDirectories(path.Path)
+                                                        .OrderBy(path => path)
+                                                        .Select(path => FileSystemPathId.Create(path))
+                                                        .Where(errorOrPathId => !errorOrPathId.IsError)
+                                                        .Select(errorOrPathId => errorOrPathId.Value)
+                                                        .AsEnumerable());
     }
 
     /// <summary>
@@ -79,26 +79,26 @@ internal class DirectoryProviderService : IDirectoryProviderService
     /// Gets the last write time of a specific path.
     /// </summary>
     /// <param name="path">The path to retrieve the last write time for.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the last write time of <paramref name="path"/>, or null if not available, or an error.</returns>
-    public ErrorOr<DateTime?> GetLastWriteTime(FileSystemPathId path)
+    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the optional last write time of <paramref name="path"/> if available, or an error.</returns>
+    public ErrorOr<Optional<DateTime>> GetLastWriteTime(FileSystemPathId path)
     {
         // check if the user has access permissions to the provided path
         if (!_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties, false))
             return Errors.Permission.UnauthorizedAccess;
-        return _fileSystem.Directory.GetLastWriteTime(path.Path);
+        return Optional<DateTime>.FromNullable(_fileSystem.Directory.GetLastWriteTime(path.Path));
     }
 
     /// <summary>
     /// Gets the creation time of a specific path.
     /// </summary>
     /// <param name="path">The path to retrieve the creation time for.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the creation time of <paramref name="path"/>, or null if not available, or an error.</returns>
-    public ErrorOr<DateTime?> GetCreationTime(FileSystemPathId path)
+    /// <returns>An <see cref="ErrorOr{TValue}"/> containing the optional creation time of <paramref name="path"/> if available, or an error.</returns>
+    public ErrorOr<Optional<DateTime>> GetCreationTime(FileSystemPathId path)
     {
         // check if the user has access permissions to the provided path
         if (!_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties, false))
             return Errors.Permission.UnauthorizedAccess;
-        return _fileSystem.Directory.GetCreationTime(path.Path);
+        return Optional<DateTime>.FromNullable(_fileSystem.Directory.GetCreationTime(path.Path));
     }
 
     /// <summary>
@@ -128,7 +128,7 @@ internal class DirectoryProviderService : IDirectoryProviderService
     {
         // check if the source directory exists
         if (!_fileSystem.Directory.Exists(sourcePath.Path))
-            return Errors.FileManagement.DirectoryNotFoundError;
+            return Errors.FileManagement.DirectoryNotFound;
         string destPath = CreateUniqueDirectoryPath(destinationPath.Path);
         try
         {
@@ -191,7 +191,7 @@ internal class DirectoryProviderService : IDirectoryProviderService
     {
         // check if the source directory exists
         if (!_fileSystem.Directory.Exists(sourcePath.Path))
-            return Errors.FileManagement.DirectoryNotFoundError;
+            return Errors.FileManagement.DirectoryNotFound;
         try
         {
             // if the destination directory does not exist, perform a simple move
@@ -280,10 +280,10 @@ internal class DirectoryProviderService : IDirectoryProviderService
                 return newDirectoryPathResult.Value;
             }
             else
-                return Errors.FileManagement.InvalidPathError;
+                return Errors.FileManagement.InvalidPath;
         }
         else
-            return Errors.FileManagement.InvalidPathError;
+            return Errors.FileManagement.InvalidPath;
     }
 
     /// <summary>
@@ -291,13 +291,13 @@ internal class DirectoryProviderService : IDirectoryProviderService
     /// </summary>
     /// <param name="path">The path of the directory to be deleted.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the result of deleting a directory, or an error.</returns>
-    public ErrorOr<bool> DeleteDirectory(FileSystemPathId path)
+    public ErrorOr<Deleted> DeleteDirectory(FileSystemPathId path)
     {
         // check if the user has access permissions to the provided path
         if (!_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.Delete, false))
             return Errors.Permission.UnauthorizedAccess;
         _fileSystem.DirectoryInfo.New(path.Path).Delete(true);
-        return true;
+        return Result.Deleted;
     }
     #endregion
 }

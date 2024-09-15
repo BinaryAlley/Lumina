@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using System.Diagnostics;
 using ErrorOr;
-using Lumina.Domain.Common.Enums;
 using Lumina.Domain.Common.Models.Core;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.Aggregates.MediaContributor.MediaContributorAggregate.ValueObjects;
+using System;
+using System.Diagnostics;
 #endregion
 
 
@@ -71,7 +71,6 @@ public class MediaContributor : AggregateRoot<MediaContributorId>
     /// <summary>
     /// Creates a new instance of the <see cref="MediaContributor"/> class.
     /// </summary>
-    /// <param name="id">The unique identifier of the contributor.</param>
     /// <param name="name">The name of the contributor.</param>
     /// <returns>The created <see cref="MediaContributor"/> instance.</returns>
     public static ErrorOr<MediaContributor> Create(MediaContributorName name)

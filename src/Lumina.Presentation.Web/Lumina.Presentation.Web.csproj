@@ -3,11 +3,11 @@
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <BaseOutputPath>..\..\bin\</BaseOutputPath>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <BaseOutputPath>$(SolutionDir)..\bin\client\</BaseOutputPath>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     </PropertyGroup>
-    
+
     <ItemGroup>
         <Compile Include="..\AssemblyInfo_Shared.cs" Link="Properties\AssemblyInfo_Shared.cs" />
     </ItemGroup>

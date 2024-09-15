@@ -1,5 +1,5 @@
 services:
-  lumina.presentation.api:
+  lumina-server:
     container_name: lumina-server
     build:
       context: .

@@ -66,6 +66,8 @@
     border-right: #202020 1px solid;
     padding: 3px;
     z-index: 999;
+    max-height: none; 
+    overflow-y: auto; 
 }
 
     .enlightenment-dropdown > .shine-effect:first-child {

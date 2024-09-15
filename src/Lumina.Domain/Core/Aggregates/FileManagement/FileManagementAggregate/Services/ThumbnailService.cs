@@ -1,8 +1,7 @@
 ﻿#region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using Lumina.Domain.Common.Enums;
+using Lumina.Contracts.Enums.PhotoLibrary;
 using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Services;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Strategies.Environment;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.ValueObjects;
 using SixLabors.ImageSharp;
@@ -69,7 +68,7 @@ public class ThumbnailService : IThumbnailService
             var resultFileContents = _environmentContext.FileProviderService.GetFileAsync(path);
             if (resultFileContents.IsError)
                 return resultFileContents.Errors;
-            byte[] fileContents = await resultFileContents.Value;
+            byte[] fileContents = resultFileContents.Value;
             // finally, resize or adjust quality based on image type
             byte[]? adjustedImage = null;
             if (imageTypeResult.Value == ImageType.JPEG || imageTypeResult.Value == ImageType.JPEG_CANON || imageTypeResult.Value == ImageType.JPEG2000 

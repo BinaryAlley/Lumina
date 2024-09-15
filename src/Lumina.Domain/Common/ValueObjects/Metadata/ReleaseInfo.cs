@@ -2,6 +2,8 @@
 using ErrorOr;
 using Lumina.Domain.Common.Models.Core;
 using Lumina.Domain.Common.Primitives;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
@@ -84,7 +86,7 @@ public class ReleaseInfo : ValueObject
     /// <param name="releaseCountry">The optional country or region of release.</param>
     /// <param name="releaseVersion">The optional release version or edition.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{T}"/> containing either a successfully created <see cref="ReleaseInfo"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="ReleaseInfo"/>, or an error message.
     /// </returns>
     public static ErrorOr<ReleaseInfo> Create(
         Optional<DateOnly> originalReleaseDate, 

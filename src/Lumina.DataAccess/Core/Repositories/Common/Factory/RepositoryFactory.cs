@@ -1,11 +1,12 @@
 ﻿#region ========================================================================= USING =====================================================================================
 using Microsoft.Extensions.DependencyInjection;
+using System;
 #endregion
 
 namespace Lumina.DataAccess.Core.Repositories.Common.Factory;
 
 /// <summary>
-/// Concrete implementation for the repositories abstract factory.
+/// Concrete implementation for the repositories factory.
 /// </summary>
 public class RepositoryFactory : IRepositoryFactory
 {
@@ -15,7 +16,7 @@ public class RepositoryFactory : IRepositoryFactory
 
     #region ====================================================================== CTOR =====================================================================================
     /// <summary>
-    /// Overload C-tor.
+    /// Initializes a new instance of the <see cref="RepositoryFactory"/> class.
     /// </summary>
     /// <param name="serviceProvider">The service provider.</param>
     public RepositoryFactory(IServiceProvider serviceProvider)

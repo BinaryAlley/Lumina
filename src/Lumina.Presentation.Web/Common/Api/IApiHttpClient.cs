@@ -1,5 +1,8 @@
 ﻿#region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Models.FileSystem;
+using Lumina.Presentation.Web.Common.Models.FileManagement;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Presentation.Web.Common.Api;
@@ -19,6 +22,16 @@ public interface IApiHttpClient
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>The deserialized response containing the result of the GET request.</returns>
     Task<TResponse> GetAsync<TResponse>(string endpoint, string? token = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Sends a GET request to the specified <paramref name="endpoint"/> as an asynchronous operation and returns the result as a streamable response.
+    /// </summary>
+    /// <typeparam name="TResponse">The expected type of the response content.</typeparam>
+    /// <param name="endpoint">The API endpoint where the request is being sent.</param>
+    /// <param name="token">The token used for authentication with the API.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="IAsyncEnumerable{T}"/> object, which allows for asynchronous iteration over the deserialized items.</returns>
+    IAsyncEnumerable<TResponse?> GetAsyncEnumerable<TResponse>(string endpoint, string? token = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Sends a GET request to the specified <paramref name="endpoint"/> as an asynchronous operation and returns the result.

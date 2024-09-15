@@ -1,7 +1,13 @@
 ﻿:root {
     --background-color: #222;
-    --border-color-light: #777777;
+    --container-background: #232323;
+    --border-color-light: #363636;
+    --border-color-light-medium: #555555;
+    --border-color-light-high: #777777;
     --border-color-dark: #000000;
+    --border-color-dialog: #1E90FF;
+    --shadow-color: #000000;
+    --text-foreground: #6DCBFE;
 }
 
 html,
@@ -35,7 +41,7 @@ body {
 #page {
     border-style: solid;
     border-width: 1px;
-    border-color: var(--border-color-light) var(--border-color-dark) var(--border-color-dark) var(--border-color-light);
+    border-color: var(--border-color-light-high) var(--border-color-dark) var(--border-color-dark) var(--border-color-light-high);
     background-color: #222;
     min-width: 100%;
     min-height: 100%;
@@ -43,6 +49,21 @@ body {
 
 main {
     padding-top: 20px; 
+}
+
+#modal-background {
+    z-index: 998;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    min-width: 100%;
+    min-height: 100%;
+    background-color: #000000;
+    opacity: 0.6;
+}
+
+.above-modal {
+    z-index: 999;
 }
 
 .shine-effect {
@@ -61,7 +82,7 @@ main {
 
 .enlightenment-panel {
     border-radius: 5px;
-    background: linear-gradient(135deg, #404040, #232323);
+    background: linear-gradient(135deg, #404040, var(--container-background));
     border-top: 1px solid #505050;
     border-left: 1px solid #505050;
     border-right: 1px solid #000;
@@ -69,8 +90,8 @@ main {
     padding: 10px;
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+.container-background {
+    background-color: var(--container-background);
 }
 
 .panel {
@@ -1144,6 +1165,14 @@ main {
 
 .f-24 {
     font-size: 24px !important;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.italic {
+    font-style: italic;
 }
 
 .hidden {

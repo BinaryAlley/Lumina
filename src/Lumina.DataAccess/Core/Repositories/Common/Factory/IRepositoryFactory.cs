@@ -1,7 +1,7 @@
 ﻿namespace Lumina.DataAccess.Core.Repositories.Common.Factory;
 
 /// <summary>
-/// Repositories abstract factory.
+/// Interface for the repositories factory.
 /// </summary>
 public interface IRepositoryFactory
 {

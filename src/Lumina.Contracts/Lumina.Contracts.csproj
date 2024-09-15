@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <BaseOutputPath>$(SolutionDir)..\bin\server\</BaseOutputPath>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="..\AssemblyInfo_Shared.cs" Link="Properties\AssemblyInfo_Shared.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="Responses\WrittenContentLibrary\BookLibrary\" />
+    </ItemGroup>
+
+</Project>

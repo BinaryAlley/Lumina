@@ -2,6 +2,7 @@
 using ErrorOr;
 using Lumina.Domain.Common.Models.Core;
 using Lumina.Domain.Common.Primitives;
+using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
@@ -53,7 +54,7 @@ public class LanguageInfo : ValueObject
     /// <param name="languageName">The full name of the language in English.</param>
     /// <param name="nativeName">The optional native name of the language.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{T}"/> containing either a successfully created <see cref="LanguageInfo"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="LanguageInfo"/>, or an error message.
     /// </returns>
     public static ErrorOr<LanguageInfo> Create(string languageCode, string languageName, Optional<string> nativeName)
     {

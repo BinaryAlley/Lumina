@@ -1,8 +1,13 @@
+#region ========================================================================= USING =====================================================================================
+using System.Diagnostics;
+#endregion
+
 namespace Lumina.Presentation.Web.Common.Models.Configuration;
 
 /// <summary>
 /// Model for deserializing server configuration settings.
 /// </summary>
+[DebuggerDisplay("{SectionName}")]
 public class ServerConfigurationModel
 {
     #region ================================================================== FIELD MEMBERS ================================================================================
@@ -10,6 +15,11 @@ public class ServerConfigurationModel
     #endregion
 
     #region ==================================================================== PROPERTIES =================================================================================
+    /// <summary>
+    /// Gets or sets the remote API server path.
+    /// </summary>
+    public required char ApiVersion { get; init; }
+
     /// <summary>
     /// Gets or sets the remote API server path.
     /// </summary>

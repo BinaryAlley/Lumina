@@ -4,6 +4,7 @@ using Lumina.Application.Common.DataAccess.Repositories.Books;
 using Lumina.DataAccess.Common.DependencyInjection;
 using Lumina.DataAccess.Core.Repositories.Common.Factory;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 

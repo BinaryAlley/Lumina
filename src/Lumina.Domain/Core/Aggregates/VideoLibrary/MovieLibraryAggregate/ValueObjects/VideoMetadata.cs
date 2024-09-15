@@ -2,6 +2,8 @@
 using ErrorOr;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
@@ -98,9 +100,8 @@ public class VideoMetadata : BaseMetadata
     /// <param name="audioCodec">The optional audio codec used.</param>
     /// <param name="genres">The genres of the video.</param>
     /// <param name="tags">The tags associated with the video.</param>
-    /// <param name="contributors">The list of contributors for this video.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{T}"/> containing either a successfully created <see cref="VideoMetadata"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="VideoMetadata"/>, or an error message.
     /// </returns>
     public static ErrorOr<VideoMetadata> Create(
         string title, 

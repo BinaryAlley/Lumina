@@ -50,7 +50,7 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.ToTable("BookTags", (string)null);
                 });
 
-            modelBuilder.Entity("Lumina.Application.Common.Models.Books.BookDto", b =>
+            modelBuilder.Entity("Lumina.Application.Common.Models.Books.BookModel", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("TEXT")
@@ -197,7 +197,7 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.ToTable("Books", (string)null);
                 });
 
-            modelBuilder.Entity("Lumina.Application.Common.Models.Common.GenreDto", b =>
+            modelBuilder.Entity("Lumina.Application.Common.Models.Common.GenreModel", b =>
                 {
                     b.Property<string>("Name")
                         .HasMaxLength(50)
@@ -208,7 +208,7 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.ToTable("Genres", (string)null);
                 });
 
-            modelBuilder.Entity("Lumina.Application.Common.Models.Common.TagDto", b =>
+            modelBuilder.Entity("Lumina.Application.Common.Models.Common.TagModel", b =>
                 {
                     b.Property<string>("Name")
                         .HasMaxLength(50)
@@ -221,13 +221,13 @@ namespace Lumina.DataAccess.Common.Migrations
 
             modelBuilder.Entity("BookGenres", b =>
                 {
-                    b.HasOne("Lumina.Application.Common.Models.Books.BookDto", null)
+                    b.HasOne("Lumina.Application.Common.Models.Books.BookModel", null)
                         .WithMany()
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Lumina.Application.Common.Models.Common.GenreDto", null)
+                    b.HasOne("Lumina.Application.Common.Models.Common.GenreModel", null)
                         .WithMany()
                         .HasForeignKey("GenreId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -236,22 +236,22 @@ namespace Lumina.DataAccess.Common.Migrations
 
             modelBuilder.Entity("BookTags", b =>
                 {
-                    b.HasOne("Lumina.Application.Common.Models.Books.BookDto", null)
+                    b.HasOne("Lumina.Application.Common.Models.Books.BookModel", null)
                         .WithMany()
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Lumina.Application.Common.Models.Common.TagDto", null)
+                    b.HasOne("Lumina.Application.Common.Models.Common.TagModel", null)
                         .WithMany()
                         .HasForeignKey("TagId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Lumina.Application.Common.Models.Books.BookDto", b =>
+            modelBuilder.Entity("Lumina.Application.Common.Models.Books.BookModel", b =>
                 {
-                    b.OwnsMany("Lumina.Application.Common.Models.Books.BookRatingDto", "Ratings", b1 =>
+                    b.OwnsMany("Lumina.Application.Common.Models.Books.BookRatingModel", "Ratings", b1 =>
                         {
                             b1.Property<int>("Id")
                                 .ValueGeneratedOnAdd()
@@ -284,7 +284,7 @@ namespace Lumina.DataAccess.Common.Migrations
                                 .HasForeignKey("BookId");
                         });
 
-                    b.OwnsMany("Lumina.Application.Common.Models.Books.IsbnDto", "ISBNs", b1 =>
+                    b.OwnsMany("Lumina.Application.Common.Models.Books.IsbnModel", "ISBNs", b1 =>
                         {
                             b1.Property<int>("Id")
                                 .ValueGeneratedOnAdd()

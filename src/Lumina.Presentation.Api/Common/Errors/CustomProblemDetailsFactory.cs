@@ -1,39 +1,40 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using Lumina.Presentation.Api.Common.Http;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Extensions.Options;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 #endregion
 
 namespace Lumina.Presentation.Api.Common.Errors;
 
 /// <summary>
-/// Problem details abstract factory which adds custom properties to the default implementation provided by Microsoft
+/// Problem details factory which adds custom properties to the default implementation provided by Microsoft.
 /// </summary>
-/// <remarks>
-/// Creation Date: 14th of July, 2023
-/// </remarks>
 public class CustomProblemDetailsFactory : ProblemDetailsFactory
 {
     #region ================================================================== FIELD MEMBERS ================================================================================
-    private readonly ApiBehaviorOptions options;
-    private readonly Action<ProblemDetailsContext>? configure;
+    private readonly ApiBehaviorOptions _options;
+    private readonly Action<ProblemDetailsContext>? _configure;
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================
     /// <summary>
-    /// Overload C-tor
+    /// Initializes a new instance of the <see cref="CustomProblemDetailsFactory"/> class.
     /// </summary>
-    /// <param name="options">Injected service for retrieving ApiBehaviorOptions</param>
-    /// <param name="problemDetailsOptions">Injected service for retrieving ProblemDetailsOptions</param>
-    /// <exception cref="ArgumentNullException">Thrown when the value of options (if any) is null</exception>
+    /// <param name="options">Injected service for retrieving <see cref="ApiBehaviorOptions"/>.</param>
+    /// <param name="problemDetailsOptions">Injected service for retrieving <see cref="ProblemDetailsOptions"/>.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the value of options (if any) is <see langword="null"/>.</exception>
     public CustomProblemDetailsFactory(IOptions<ApiBehaviorOptions> options, IOptions<ProblemDetailsOptions>? problemDetailsOptions = null)
     {
-        this.options = options?.Value ?? throw new ArgumentNullException(nameof(options));
-        configure = problemDetailsOptions?.Value?.CustomizeProblemDetails;
+        _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
+        _configure = problemDetailsOptions?.Value?.CustomizeProblemDetails;
     }
     #endregion
 
@@ -103,7 +104,7 @@ public class CustomProblemDetailsFactory : ProblemDetailsFactory
     private void ApplyProblemDetailsDefaults(HttpContext httpContext, ProblemDetails problemDetails, int statusCode)
     {
         problemDetails.Status ??= statusCode;
-        if (options.ClientErrorMapping.TryGetValue(statusCode, out var clientErrorData))
+        if (_options.ClientErrorMapping.TryGetValue(statusCode, out var clientErrorData))
         {
             problemDetails.Title ??= clientErrorData.Title;
             problemDetails.Type ??= clientErrorData.Link;
@@ -116,13 +117,13 @@ public class CustomProblemDetailsFactory : ProblemDetailsFactory
         // add any extra custom properties
         if (errors is not null)
         {
-            problemDetails.Extensions.Add("errors", errors.Select(e =>
+            problemDetails.Extensions.Add("errors", errors.Select(error =>
             {
-                return e.Code;
+                return error.Code;
             }));
         }
         //problemDetails.Extensions.Add("errorCodes", errors.Select(e => e.Type.ToString()));
-        configure?.Invoke(new() { HttpContext = httpContext!, ProblemDetails = problemDetails });
+        _configure?.Invoke(new() { HttpContext = httpContext!, ProblemDetails = problemDetails });
     }
     #endregion
 }

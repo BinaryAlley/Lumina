@@ -1,13 +1,17 @@
 ﻿#region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using Bogus;
-using Lumina.Application.Common.Models.Books;
-using Lumina.Application.Common.Models.Common;
-using Lumina.Application.Common.Models.Contributors;
 using Lumina.Application.Core.WrittenContentLibrary.BooksLibrary.Books.Commands;
 using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Domain.Common.Enums;
+using Lumina.Contracts.Enums.BookLibrary;
+using Lumina.Contracts.Models.Common;
+using Lumina.Contracts.Models.MediaContributors;
+using Lumina.Contracts.Models.WrittenContentLibrary;
+using Lumina.Contracts.Models.WrittenContentLibrary.BookLibrary;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 #endregion
 
 namespace Lumina.Application.UnitTests.Core.WrittenContentLibrary.BooksLibrary.Books.Commands.Fixtures;
@@ -47,8 +51,8 @@ public class AddBookCommandFixture
         var releaseYear = _random.Next(2000, 2010);
         var reReleaseYear = _random.Next(2010, 2020);
 
-        var releaseInfo = new Faker<ReleaseInfoDto>()
-            .CustomInstantiator(f => new ReleaseInfoDto(
+        var releaseInfo = new Faker<ReleaseInfoModel>()
+            .CustomInstantiator(f => new ReleaseInfoModel(
                 default,
                 default,
                 default,
@@ -64,42 +68,42 @@ public class AddBookCommandFixture
             .RuleFor(x => x.ReleaseVersion, f => f.Random.String2(f.Random.Number(1, 50)))
             .Generate();
 
-        var genre = new Faker<GenreDto>()
-            .CustomInstantiator(f => new GenreDto(
+        var genre = new Faker<GenreModel>()
+            .CustomInstantiator(f => new GenreModel(
                 default!
             ))
             .RuleFor(e => e.Name, f => f.Random.String2(f.Random.Number(1, 50)));
 
-        var tag = new Faker<TagDto>()
-            .CustomInstantiator(f => new TagDto(
+        var tag = new Faker<TagModel>()
+            .CustomInstantiator(f => new TagModel(
                 default!
             ))
             .RuleFor(e => e.Name, f => f.Random.String2(f.Random.Number(1, 50)));
 
-        var mediaContributorRole = new Faker<MediaContributorRoleDto>()
-            .CustomInstantiator(f => new MediaContributorRoleDto(
+        var mediaContributorRole = new Faker<MediaContributorRoleModel>()
+            .CustomInstantiator(f => new MediaContributorRoleModel(
                 default!,
                 default!
             ))
             .RuleFor(e => e.Name, f => f.Random.String2(f.Random.Number(1, 50)))
             .RuleFor(e => e.Category, f => f.Random.String2(f.Random.Number(1, 50)));
-        var mediaContributorName = new Faker<MediaContributorNameDto>()
-            .CustomInstantiator(f => new MediaContributorNameDto(
+        var mediaContributorName = new Faker<MediaContributorNameModel>()
+            .CustomInstantiator(f => new MediaContributorNameModel(
                 default!,
                 default!
             ))
             .RuleFor(e => e.DisplayName, f => f.Random.String2(f.Random.Number(1, 50)))
             .RuleFor(e => e.LegalName, f => f.Random.String2(f.Random.Number(1, 50)));
-        var mediaContributor = new Faker<MediaContributorDto>()
-            .CustomInstantiator(f => new MediaContributorDto(
+        var mediaContributor = new Faker<MediaContributorModel>()
+            .CustomInstantiator(f => new MediaContributorModel(
                 default!,
                 default!
             ))
             .RuleFor(e => e.Name, mediaContributorName)
             .RuleFor(e => e.Role, mediaContributorRole);
 
-        var rating = new Faker<BookRatingDto>()
-           .CustomInstantiator(f => new BookRatingDto(
+        var rating = new Faker<BookRatingModel>()
+           .CustomInstantiator(f => new BookRatingModel(
                 default,
                 default,
                 default,
@@ -110,8 +114,8 @@ public class AddBookCommandFixture
            .RuleFor(e => e.Source, _fixture.Create<BookRatingSource>())
            .RuleFor(e => e.VoteCount, _random.Next(1, 1000));
 
-        var language = new Faker<LanguageInfoDto>()
-            .CustomInstantiator(f => new LanguageInfoDto(
+        var language = new Faker<LanguageInfoModel>()
+            .CustomInstantiator(f => new LanguageInfoModel(
                 default!,
                 default!,
                 default
@@ -120,8 +124,8 @@ public class AddBookCommandFixture
             .RuleFor(e => e.LanguageCode, f => f.Random.String2(2))
             .RuleFor(e => e.NativeName, f => f.Random.String2(f.Random.Number(1, 50)));
 
-        var originalLanguage = new Faker<LanguageInfoDto>()
-            .CustomInstantiator(f => new LanguageInfoDto(
+        var originalLanguage = new Faker<LanguageInfoModel>()
+            .CustomInstantiator(f => new LanguageInfoModel(
                 default!,
                 default!,
                 default
@@ -130,8 +134,8 @@ public class AddBookCommandFixture
             .RuleFor(e => e.LanguageCode, f => f.Random.String2(2))
             .RuleFor(e => e.NativeName, f => f.Random.String2(f.Random.Number(1, 50)));
 
-        var metadata = new Faker<WrittenContentMetadataDto>()
-            .CustomInstantiator(f => new WrittenContentMetadataDto(
+        var metadata = new Faker<WrittenContentMetadataModel>()
+            .CustomInstantiator(f => new WrittenContentMetadataModel(
                 default!,
                 default,
                 default,
@@ -154,8 +158,8 @@ public class AddBookCommandFixture
             .RuleFor(x => x.Publisher, f => f.Random.String2(f.Random.Number(1, 100)))
             .RuleFor(x => x.PageCount, _random.Next(100, 300));
 
-        var isbn = new Faker<IsbnDto>()
-            .CustomInstantiator(f => new IsbnDto(
+        var isbn = new Faker<IsbnModel>()
+            .CustomInstantiator(f => new IsbnModel(
                 default!,
                 default
             ))
@@ -277,7 +281,7 @@ public class AddBookCommandFixture
         var releaseYear = _random.Next(2000, 2010);
         var reReleaseYear = _random.Next(2010, 2020);
 
-        _fixture.Register(() => new ReleaseInfoDto(
+        _fixture.Register(() => new ReleaseInfoModel(
             _faker.DateOnlyBetween(new DateOnly(releaseYear, 1, 1), new DateOnly(releaseYear, 12, 31)),
             releaseYear,
             _faker.DateOnlyBetween(new DateOnly(reReleaseYear, 1, 1), new DateOnly(reReleaseYear, 12, 31)),
@@ -285,53 +289,53 @@ public class AddBookCommandFixture
             _fixture.Create<string>()[2..],
             _fixture.Create<string?>()));
 
-        _fixture.Register(() => new GenreDto(
+        _fixture.Register(() => new GenreModel(
             _fixture.Create<string>()
         ));
-        _fixture.Register(() => new TagDto(
+        _fixture.Register(() => new TagModel(
             _fixture.Create<string>()
         ));
-        _fixture.Register(() => new LanguageInfoDto(
+        _fixture.Register(() => new LanguageInfoModel(
             _fixture.Create<string>(),
             _fixture.Create<string>(),
             _fixture.Create<string?>()
         ));
-        _fixture.Register(() => new IsbnDto(
+        _fixture.Register(() => new IsbnModel(
             _fixture.Create<string>(),
             _fixture.Create<IsbnFormat>()
         ));
-        _fixture.Register(() => new BookRatingDto(
+        _fixture.Register(() => new BookRatingModel(
             _fixture.Create<decimal>(),
             _fixture.Create<decimal>(),
             _fixture.Create<BookRatingSource?>(),
             _fixture.Create<int?>()
         ));
-        _fixture.Register(() => new WrittenContentMetadataDto(
+        _fixture.Register(() => new WrittenContentMetadataModel(
              _fixture.Create<string>()[255..],
              LimitStringLength(_fixture.Create<string?>(), 255),
              LimitStringLength(_fixture.Create<string?>(), 2000),
-             _fixture.Create<ReleaseInfoDto>(),
-             _fixture.Create<List<GenreDto>>(),
-             _fixture.Create<List<TagDto>>(),
-             _fixture.Create<LanguageInfoDto?>(),
-             _fixture.Create<LanguageInfoDto?>(),
+             _fixture.Create<ReleaseInfoModel>(),
+             _fixture.Create<List<GenreModel>>(),
+             _fixture.Create<List<TagModel>>(),
+             _fixture.Create<LanguageInfoModel?>(),
+             _fixture.Create<LanguageInfoModel?>(),
              _fixture.Create<string?>(),
              _fixture.Create<int?>()
         ));
-        _fixture.Register(() => new BookSeriesDto(
+        _fixture.Register(() => new BookSeriesModel(
             _fixture.Create<string>()
         ));
-        _fixture.Register(() => new MediaContributorRoleDto(
+        _fixture.Register(() => new MediaContributorRoleModel(
             _fixture.Create<string>(),
             _fixture.Create<string>()
         ));
-        _fixture.Register(() => new MediaContributorNameDto(
+        _fixture.Register(() => new MediaContributorNameModel(
             _fixture.Create<string>(),
             _fixture.Create<string?>()
         ));
-        _fixture.Register(() => new MediaContributorDto(
-            _fixture.Create<MediaContributorNameDto>(),
-            _fixture.Create<MediaContributorRoleDto>()
+        _fixture.Register(() => new MediaContributorModel(
+            _fixture.Create<MediaContributorNameModel>(),
+            _fixture.Create<MediaContributorRoleModel>()
         ));
     }
 

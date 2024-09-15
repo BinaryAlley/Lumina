@@ -1,5 +1,8 @@
 ﻿#region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Repositories.Common.Base;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 #endregion
 
 namespace Lumina.DataAccess.Core.Repositories.Common.Factory;
@@ -14,6 +17,9 @@ public class RepositoryDictionary
     #endregion
 
     #region ==================================================================== PROPERTIES =================================================================================
+    /// <summary>
+    /// Gets the number of added repositories.
+    /// </summary>
     public int Count { get { return _container.Count; } }
     #endregion
 

@@ -1,5 +1,5 @@
 services:
-  lumina.presentation.api:
+  lumina-server:
     container_name: lumina-server
     image: ${DOCKER_REGISTRY-}lumina-server
     build:

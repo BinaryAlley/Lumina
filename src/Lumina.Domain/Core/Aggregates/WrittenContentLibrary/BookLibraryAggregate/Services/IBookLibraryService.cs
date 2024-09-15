@@ -1,7 +1,11 @@
+#region ========================================================================= USING =====================================================================================
+using System.Collections.Generic;
+#endregion
+
 namespace Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate.Services;
 
 /// <summary>
-/// Service for managing book libraries.
+/// Interface for the service for managing book libraries.
 /// </summary>
 public interface IBookLibraryService
 {

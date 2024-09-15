@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using System.Diagnostics.CodeAnalysis;
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using FluentAssertions;
@@ -10,6 +9,9 @@ using Lumina.Infrastructure.UnitTests.Common.Utilities.Fixtures;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NSubstitute;
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 #endregion
 
 namespace Lumina.Infrastructure.UnitTests.Common.Utilities;

@@ -48,7 +48,9 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Lumina.Contracts\Lumina.Contracts.csproj" />
         <ProjectReference Include="..\Lumina.Application\Lumina.Application.csproj" />
+        <ProjectReference Include="..\Lumina.Contracts\Lumina.Contracts.csproj" />
         <ProjectReference Include="..\Lumina.Infrastructure\Lumina.Infrastructure.csproj" />
         <ProjectReference Include="..\Lumina.DataAccess\Lumina.DataAccess.csproj" />
     </ItemGroup>

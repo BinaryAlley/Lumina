@@ -1,5 +1,7 @@
 ﻿#region ========================================================================= USING =====================================================================================
 using ErrorOr;
+using System.Threading;
+using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Application.Common.DataAccess.Repositories.Common.Actions;
@@ -16,7 +18,7 @@ public interface IDeleteByIdRepositoryAction<TId> where TId : notnull
     /// </summary>
     /// <param name="id">The id of the element to be deleted.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{T}"/> representing either a successfull operation, or an error.</returns>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successfull operation, or an error.</returns>
     Task<ErrorOr<Deleted>> DeleteByIdAsync(TId id, CancellationToken cancellationToken);
     #endregion
 }

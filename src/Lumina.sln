@@ -71,6 +71,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lumina.Presentation.Api.Int
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{D4C61542-FC91-47FA-B1D2-11CC99617454}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lumina.Contracts", "Lumina.Contracts\Lumina.Contracts.csproj", "{6BD85BA8-B3C4-4D79-8858-F6D7676FF2CC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -133,6 +135,10 @@ Global
 		{D4C61542-FC91-47FA-B1D2-11CC99617454}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D4C61542-FC91-47FA-B1D2-11CC99617454}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4C61542-FC91-47FA-B1D2-11CC99617454}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6BD85BA8-B3C4-4D79-8858-F6D7676FF2CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6BD85BA8-B3C4-4D79-8858-F6D7676FF2CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6BD85BA8-B3C4-4D79-8858-F6D7676FF2CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6BD85BA8-B3C4-4D79-8858-F6D7676FF2CC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -158,6 +164,7 @@ Global
 		{3F057926-562F-4EF4-BFC0-EE62372D4551} = {16E590D3-DD9F-4B45-BF19-C6E317A57D11}
 		{6B3FC07B-6208-4544-ACFB-79243A59EA1A} = {3F057926-562F-4EF4-BFC0-EE62372D4551}
 		{3680DAFB-10BA-4A0F-AE40-620D06DAF617} = {3F057926-562F-4EF4-BFC0-EE62372D4551}
+		{6BD85BA8-B3C4-4D79-8858-F6D7676FF2CC} = {3C316ABB-08D5-4450-9A4E-91059DB54254}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4A55A28E-C657-4A0B-95EA-2931AE66004E}

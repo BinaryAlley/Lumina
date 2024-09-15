@@ -1,6 +1,6 @@
 ﻿#region ========================================================================= USING =====================================================================================
+using Lumina.Contracts.Enums.FileSystem;
 using System;
-using Lumina.Domain.Common.Enums;
 #endregion
 
 namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Strategies.Platform;

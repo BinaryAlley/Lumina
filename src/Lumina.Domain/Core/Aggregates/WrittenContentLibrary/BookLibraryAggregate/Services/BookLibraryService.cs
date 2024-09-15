@@ -1,3 +1,8 @@
+#region ========================================================================= USING =====================================================================================
+using System;
+using System.Collections.Generic;
+#endregion
+
 namespace Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate.Services;
 
 /// <summary>

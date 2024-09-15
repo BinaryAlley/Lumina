@@ -1,5 +1,6 @@
 ﻿#region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Models.Common;
+using Lumina.Contracts.Models.Common;
+
 #endregion
 
 namespace Lumina.Application.Common.DataAccess.Repositories.Common.Base;

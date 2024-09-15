@@ -1,5 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Domain.Common.Models.Core;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 #endregion
 
 namespace Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate.ValueObjects;
@@ -7,6 +10,7 @@ namespace Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggrega
 /// <summary>
 /// Value Object for the Id of a book series.
 /// </summary>
+[DebuggerDisplay("{Value}")]
 public sealed class BookSeriesId : ValueObject
 {
     #region ==================================================================== PROPERTIES =================================================================================

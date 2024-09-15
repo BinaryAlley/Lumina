@@ -2,7 +2,7 @@
     font-size: 14px;
     padding: 5px;
     border: 1px solid;
-    border-color: var(--border-unlit) var(--border-lit) var(--border-lit) var(--border-unlit);
+    border-color: var(--border-color-dark) var(--border-color-light) var(--border-color-light) var(--border-color-dark);
     border-radius: 3px;
     background: linear-gradient(0deg, #90c247, #509c00);
     transition: background 0.3s, color 0.3s;
@@ -26,7 +26,7 @@
         color: #333;
         background: linear-gradient(0deg, #6AAFF8, #82E9F7);
         box-shadow: inset 4px 6px 8px rgba(0,0,0,0.6);
-        border-color: var(--border-unlit) var(--border-lit) var(--border-lit) var(--border-unlit);
+        border-color: var(--border-color-dark) var(--border-color-light) var(--border-color-light) var(--border-color-dark);
         outline: none;
     }
 
@@ -36,12 +36,13 @@
 
     .enlightenment-input:disabled {
         color: #999;
-        background: var(--window-back-color);
+        background: var(--container-background);
     }
 
     .enlightenment-input[readonly] {
         color: #999;
-        background: var(--window-back-color);
+        background: var(--container-background);
+        border-color: var(--border-color-light) var(--border-color-dark) var(--border-color-dark) var(--border-color-light);
     }
 
     .enlightenment-input[data-has-error="true"] {

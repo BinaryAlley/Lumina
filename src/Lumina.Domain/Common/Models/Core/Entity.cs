@@ -1,4 +1,8 @@
-﻿namespace Lumina.Domain.Common.Models.Core;
+﻿#region ========================================================================= USING =====================================================================================
+using System;
+#endregion
+
+namespace Lumina.Domain.Common.Models.Core;
 
 /// <summary>
 /// Base class for all domain Entities.

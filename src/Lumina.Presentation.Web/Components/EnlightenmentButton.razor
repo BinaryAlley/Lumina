@@ -1,9 +1,18 @@
-﻿<button type="submit" class="@(IsConfirmButton ? "confirm" : "abort")-button f-16 w-100px @CssClass" @onclick="OnClick" disabled="@IsDisabled">@ChildContent</button>
+﻿<button type="submit"
+        style="width: @($"{Width}{(UsesPercentForWidth ? "%" : "px")}"); height: @($"{Height}{(UsesPercentForHeight ? "%" : "px")}");"
+        class="@(IsConfirmButton ? "confirm" : "abort")-button f-16 @CssClass" @onclick="OnClick"
+        disabled="@IsDisabled">
+    @ChildContent
+</button>
 
 @code {
     [Parameter] public RenderFragment? ChildContent { get; set; }
     [Parameter] public EventCallback OnClick { get; set; }
     [Parameter] public bool IsDisabled { get; set; }
     [Parameter] public bool IsConfirmButton { get; set; } = true;
+    [Parameter] public bool UsesPercentForHeight { get; set; }
+    [Parameter] public bool UsesPercentForWidth { get; set; }
+    [Parameter] public int Width { get; set; } = 100;
+    [Parameter] public int Height { get; set; } = 22;
     [Parameter] public string? CssClass { get; set; }
 }

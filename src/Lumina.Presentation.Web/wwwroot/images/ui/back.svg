@@ -1,0 +1,34 @@
+<!-- <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300"> -->
+  <!-- <defs> -->
+    <!-- <radialGradient id="circleGradient" cx="25%" cy="25%" r="75%" fx="30%" fy="15%"> -->
+      <!-- <stop offset="0%" stop-color="#C1D0E5"/> -->
+      <!-- <stop offset="100%" stop-color="#006CBE"/> -->
+    <!-- </radialGradient> -->
+  <!-- </defs> -->
+  <!-- <circle cx="150" cy="150" r="150" fill="url(#circleGradient)" /> -->
+  <!-- <path d="M180 75 L100 150 L180 225" fill="none" stroke="#FFFFFF" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/> -->
+<!-- </svg> -->
+
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">
+  <defs>
+    <radialGradient id="baseGradient" cx="10%" cy="10%" r="100%" fx="20%" fy="5%">
+      <stop offset="0%" stop-color="#76AD7D" stop-opacity="0.1"/>
+      <stop offset="50%" stop-color="#006B0E" stop-opacity="1"/>
+    </radialGradient>
+    <radialGradient id="highlightGradient" cx="75%" cy="95%" r="100%" fx="80%" fy="80%">
+      <stop offset="0%" stop-color="#91EF86" stop-opacity="0.9"/>
+      <stop offset="64%" stop-color="#54AC5F" stop-opacity="0.1"/>
+      <stop offset="65%" stop-color="#FFFFFF" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#54AC5F" stop-opacity="0.3"/>
+    </radialGradient>
+    <radialGradient id="refractionGradient" cx="75%" cy="75%" r="50%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="transparent" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="150" cy="150" r="150" fill="url(#baseGradient)" />
+  <circle cx="150" cy="150" r="150" fill="url(#highlightGradient)" />
+  <circle cx="150" cy="150" r="150" fill="url(#refractionGradient)" />
+  <path d="M180 75 L100 150 L180 225" fill="none" stroke="#FFFFFF" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

@@ -1,13 +1,13 @@
 ﻿#region ========================================================================= USING =====================================================================================
+using Bogus;
 using FluentValidation.TestHelper;
 using Lumina.Application.Core.WrittenContentLibrary.BooksLibrary.Books.Commands;
 using Lumina.Application.UnitTests.Core.WrittenContentLibrary.BooksLibrary.Books.Commands.Fixtures;
-using System.Diagnostics.CodeAnalysis;
+using Lumina.Contracts.Enums.BookLibrary;
 using Lumina.Domain.Common.Errors;
-using Bogus;
-using Lumina.Domain.Common.Enums;
-using Lumina.Application.Common.Models.Books;
-using Lumina.Application.Common.Models.Common;
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 #endregion
 
 namespace Lumina.Application.UnitTests.Core.WrittenContentLibrary.BooksLibrary.Books.Commands;

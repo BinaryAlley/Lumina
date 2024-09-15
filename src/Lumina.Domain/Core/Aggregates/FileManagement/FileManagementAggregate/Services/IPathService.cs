@@ -1,6 +1,7 @@
 ﻿#region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.ValueObjects;
+using System;
 using System.Collections.Generic;
 #endregion
 
@@ -53,5 +54,12 @@ public interface IPathService
     /// </summary>
     /// <returns>A collection of characters that are invalid in the context of paths.</returns>
     char[] GetInvalidPathCharsForPlatform();
+
+    /// <summary>
+    /// Returns the root portion of the given path.
+    /// </summary>
+    /// <param name="path">The path for which to get the root.</param>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> containing the root of <paramref name="path"/>, or an error.</returns>
+    ErrorOr<PathSegment> GetPathRoot(string path);
     #endregion
 }

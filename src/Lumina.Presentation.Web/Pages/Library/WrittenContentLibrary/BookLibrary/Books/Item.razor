@@ -1,0 +1,146 @@
+﻿@page "/library/written-content-library/books-library/books/item/{id:guid}"
+
+@using Lumina.Presentation.Web.Common.Enums.BookLibrary
+@using Lumina.Presentation.Web.Common.Models.Common
+@using Lumina.Presentation.Web.Common.Models.MediaContributors
+@using Lumina.Presentation.Web.Common.Models.WrittenContentLibrary
+@using Lumina.Presentation.Web.Common.Models.WrittenContentLibrary.BookLibrary
+@using Lumina.Presentation.Web.Common.Requests.WrittenContentLibrary.BookLibrary
+
+@inject HttpClient _httpClient
+
+<h1>@(Id.HasValue ? "Edit" : "Add") Book</h1>
+
+<EditForm Model="@bookRequest" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="title">Title<span class="mandatory-field">*</span>:</label>
+        <InputText id="title" @bind-Value="bookRequest.Metadata.Title" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="originalTitle">Original Title:</label>
+        <InputText id="originalTitle" @bind-Value="bookRequest.Metadata.OriginalTitle" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="description">Description:</label>
+        <InputTextArea id="description" @bind-Value="bookRequest.Metadata.Description" class="form-control" />
+    </div>
+
+    <h3>Release Information</h3>
+    <div class="form-group">
+        <label for="originalReleaseDate">Original Release Date:</label>
+        <InputDate id="originalReleaseDate" @bind-Value="bookRequest.Metadata.ReleaseInfo.OriginalReleaseDate" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="releaseCountry">Release Country:</label>
+        <InputText id="releaseCountry" @bind-Value="bookRequest.Metadata.ReleaseInfo.ReleaseCountry" class="form-control" />
+    </div>
+
+    <h3>Genres</h3>
+    @foreach (var genre in bookRequest.Metadata.Genres)
+    {
+        <div class="form-group">
+            <InputText @bind-Value="genre.Name" class="form-control" />
+        </div>
+    }
+    <button type="button" class="btn btn-secondary" @onclick="AddGenre">Add Genre</button>
+
+    <h3>Language</h3>
+    <div class="form-group">
+        <label for="languageCode">Language Code:</label>
+        <InputText id="languageCode" @bind-Value="bookRequest.Metadata.Language.LanguageCode" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="languageName">Language Name:</label>
+        <InputText id="languageName" @bind-Value="bookRequest.Metadata.Language.LanguageName" class="form-control" />
+    </div>
+
+    <h3>Book Details</h3>
+    <div class="form-group">
+        <label for="format">Format:</label>
+        <InputSelect id="format" @bind-Value="bookRequest.Format" class="form-control">
+            @foreach (var format in Enum.GetValues(typeof(BookFormat)))
+            {
+                <option value="@format">@format</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="form-group">
+        <label for="edition">Edition:</label>
+        <InputText id="edition" @bind-Value="bookRequest.Edition" class="form-control" />
+    </div>
+
+    <h3>Identifiers</h3>
+    <div class="form-group">
+        <label for="isbn">ISBN:</label>
+        <InputText id="isbn" @bind-Value="bookRequest.ISBNs[0].Value" class="form-control" />
+        <InputSelect @bind-Value="bookRequest.ISBNs[0].Format" class="form-control">
+            @foreach (var format in Enum.GetValues(typeof(IsbnFormat)))
+            {
+                <option value="@format">@format</option>
+            }
+        </InputSelect>
+    </div>
+
+    <h3>Contributors</h3>
+    @foreach (var contributor in bookRequest.Contributors)
+    {
+        <div class="form-group">
+            @* <InputText @bind-Value="contributor.Name" placeholder="Name" class="form-control" /> *@
+            <InputText @bind-Value="contributor.Role.Name" placeholder="Role" class="form-control" />
+        </div>
+    }
+    <button type="button" class="btn btn-secondary" @onclick="AddContributor">Add Contributor</button>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+</EditForm>
+
+@code {
+    private AddBookRequest bookRequest = new AddBookRequest
+        {
+            Metadata = new WrittenContentMetadataModel
+            {
+                ReleaseInfo = new ReleaseInfoModel(),
+                Genres = new List<GenreModel>(),
+                Language = new LanguageInfoModel()
+            },
+            ISBNs = new List<IsbnModel> { new IsbnModel() },
+            Contributors = new List<MediaContributorModel>()
+        };
+
+    private void AddGenre()
+    {
+        bookRequest.Metadata.Genres.Add(new GenreModel());
+    }
+
+    private void AddContributor()
+    {
+        bookRequest.Contributors.Add(new MediaContributorModel { Role = new MediaContributorRoleModel() });
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        // Send the bookRequest to your API
+        var response = await _httpClient.PostAsJsonAsync("api/books", bookRequest).ConfigureAwait(false);
+        if (response.IsSuccessStatusCode)
+        {
+            // Handle successful submission
+        }
+        else
+        {
+            // Handle error
+        }
+    }
+}
+
+@code {
+    [Parameter]
+    public Guid? Id { get; set; }
+}

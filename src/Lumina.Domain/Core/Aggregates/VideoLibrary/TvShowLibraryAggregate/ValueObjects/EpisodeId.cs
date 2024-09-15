@@ -1,5 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Domain.Common.Models.Core;
+using System;
+using System.Collections.Generic;
 #endregion
 
 namespace Lumina.Domain.Core.Aggregates.VideoLibrary.TvShowLibraryAggregate.ValueObjects;
@@ -7,20 +9,15 @@ namespace Lumina.Domain.Core.Aggregates.VideoLibrary.TvShowLibraryAggregate.Valu
 /// <summary>
 /// Value Object for the Id of an episode.
 /// </summary>
-public sealed class EpisodeId : ValueObject
+public sealed class EpisodeId : EntityId<Guid>
 {
-    #region ==================================================================== PROPERTIES =================================================================================
-    public Guid Value { get; }
-    #endregion
-
     #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="EpisodeId"/> class.
     /// </summary>
     /// <param name="value">The value representing this object.</param>
-    private EpisodeId(Guid value)
+    private EpisodeId(Guid value) : base(value)
     {
-        Value = value;
     }
     #endregion
 

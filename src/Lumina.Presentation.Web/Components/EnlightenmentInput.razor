@@ -1,5 +1,6 @@
 ﻿<input type="@Type"
-       class="enlightenment-input w-100 @CssClass"
+       style="width: @($"{Width}{(UsesPercentForWidth ? "%" : "px")}"); height: @($"{Height}{(UsesPercentForHeight ? "%" : "px")}");"
+       class="enlightenment-input @CssClass"
        name="@Name"
        autocomplete="@(AutoComplete ? "on" : "off")"
        value="@Value"
@@ -11,6 +12,10 @@
 
 @code {
     [Parameter] public string Type { get; set; } = "text";
+    [Parameter] public bool UsesPercentForHeight { get; set; }
+    [Parameter] public bool UsesPercentForWidth { get; set; } = true;
+    [Parameter] public int Width { get; set; } = 100;
+    [Parameter] public int Height { get; set; } = 28;
     [Parameter] public string? CssClass { get; set; }
     [Parameter] public string? Name { get; set; }
     [Parameter] public bool AutoComplete { get; set; } = true;
@@ -28,6 +33,6 @@
     private async Task OnInputHandlerAsync(ChangeEventArgs e)
     {
         Value = e.Value?.ToString();
-        await ValueChanged.InvokeAsync(Value);
+        await ValueChanged.InvokeAsync(Value).ConfigureAwait(false);
     }
 }

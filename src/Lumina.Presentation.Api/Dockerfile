@@ -15,6 +15,7 @@ WORKDIR /src
 COPY ["AssemblyInfo_Shared.cs", "."]
 COPY ["Lumina.Presentation.Api/Lumina.Presentation.Api.csproj", "Lumina.Presentation.Api/"]
 COPY ["Lumina.Application/Lumina.Application.csproj", "Lumina.Application/"]
+COPY ["Lumina.Contracts/Lumina.Contracts.csproj", "Lumina.Contracts/"]
 COPY ["Lumina.Domain/Lumina.Domain.csproj", "Lumina.Domain/"]
 COPY ["Lumina.Infrastructure/Lumina.Infrastructure.csproj", "Lumina.Infrastructure/"]
 COPY ["Lumina.DataAccess/Lumina.DataAccess.csproj", "Lumina.DataAccess/"]
@@ -24,6 +25,7 @@ RUN dotnet restore "./Lumina.Presentation.Api/Lumina.Presentation.Api.csproj" /p
 # build the project
 COPY ["Lumina.Presentation.Api/", "Lumina.Presentation.Api/"]
 COPY ["Lumina.Application/", "Lumina.Application/"]
+COPY ["Lumina.Contracts/", "Lumina.Contracts/"]
 COPY ["Lumina.Domain/", "Lumina.Domain/"]
 COPY ["Lumina.Infrastructure/", "Lumina.Infrastructure/"]
 COPY ["Lumina.DataAccess/", "Lumina.DataAccess/"]

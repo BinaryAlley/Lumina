@@ -2,8 +2,8 @@
 using ErrorOr;
 using Lumina.Application.Common.DataAccess.Repositories.Books;
 using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.Models.Books;
-using Lumina.Domain.Common.Enums;
+using Lumina.Contracts.Enums.BookLibrary;
+using Lumina.Contracts.Models.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using Lumina.Domain.Core.Aggregates.MediaContributor.MediaContributorAggregate.ValueObjects;
@@ -12,6 +12,11 @@ using Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate.E
 using Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate.ValueObjects;
 using MapsterMapper;
 using Mediator;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Application.Core.WrittenContentLibrary.BooksLibrary.Books.Commands;
@@ -46,7 +51,7 @@ public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<Boo
     /// <param name="request">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{T}"/> containing either a successfully created <see cref="Book"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="Book"/>, or an error message.
     /// </returns>
     public async ValueTask<ErrorOr<Book>> Handle(AddBookCommand request, CancellationToken cancellationToken)
     {
@@ -162,11 +167,11 @@ public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<Boo
             return createBookResult.Errors;
 
         var bookRepository = _unitOfWork.GetRepository<IBookRepository>();
-        var persistenceBook = _mapper.Map<BookDto>(createBookResult.Value);
-        var insertBookResult = await bookRepository.InsertAsync(persistenceBook, cancellationToken);
+        var persistenceBook = _mapper.Map<BookModel>(createBookResult.Value);
+        var insertBookResult = await bookRepository.InsertAsync(persistenceBook, cancellationToken).ConfigureAwait(false);
         if (insertBookResult.IsError)
             return insertBookResult.Errors;
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         return createBookResult.Value;
     }

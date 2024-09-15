@@ -1,11 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Core.WrittenContentLibrary.BooksLibrary.Books.Commands;
 using Lumina.Application.Core.WrittenContentLibrary.BooksLibrary.Books.Queries;
-using Lumina.Presentation.Api.Common.Contracts.Books;
+using Lumina.Contracts.Requests.WrittenContentLibrary.BookLibrary;
 using Lumina.Presentation.Api.Core.Controllers.Common;
 using MapsterMapper;
 using Mediator;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Presentation.Api.Core.Controllers.WrittenContentLibrary.BookLibrary.Books;
@@ -26,7 +27,7 @@ public class BooksController : ApiController
     /// <summary>
     /// Initializes a new instance of the <see cref="BooksController"/> class.
     /// </summary>
-    /// <param name="mediator">Injecting service for mediating commands and queries.</param>
+    /// <param name="mediator">Injected service for mediating commands and queries.</param>
     /// <param name="mapper">Injected service for mapping objects.</param>
     public BooksController(ISender mediator, IMapper mapper)
     {
@@ -42,7 +43,7 @@ public class BooksController : ApiController
     [HttpGet()]
     public async Task<IActionResult> GetBooks()
     {
-        var result = await _mediator.Send(new GetBooksQuery());
+        var result = await _mediator.Send(new GetBooksQuery()).ConfigureAwait(false);
         return result.Match(result => Ok(result), errors => Problem(errors));
     }
 
@@ -53,7 +54,7 @@ public class BooksController : ApiController
     [HttpPost()]
     public async Task<IActionResult> AddBook(AddBookRequest request)
     {
-        var result = await _mediator.Send(_mapper.Map<AddBookCommand>(request));
+        var result = await _mediator.Send(_mapper.Map<AddBookCommand>(request)).ConfigureAwait(false);
         return result.Match(result => Created($"/api/v1/books/{result.Id}", result), errors => Problem(errors));
     }
     #endregion

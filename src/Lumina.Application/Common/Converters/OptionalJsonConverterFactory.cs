@@ -1,7 +1,8 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Domain.Common.Primitives;
+using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Lumina.Domain.Common.Primitives;
 #endregion
 
 namespace Lumina.Application.Common.Converters;
@@ -16,7 +17,7 @@ public class OptionalJsonConverterFactory : JsonConverterFactory
     /// Determines whether the converter can convert the specified type.
     /// </summary>
     /// <param name="typeToConvert">The type to check for convertibility.</param>
-    /// <returns><see langword="true"/> if the type is <see cref="Optional{T}"/>, <see langword="false"/> otherwise.</returns>
+    /// <returns><see langword="true"/> if the type is <see cref="Optional{TValue}"/>, <see langword="false"/> otherwise.</returns>
     public override bool CanConvert(Type typeToConvert)
     {
         if (!typeToConvert.IsGenericType)
@@ -29,7 +30,7 @@ public class OptionalJsonConverterFactory : JsonConverterFactory
     /// </summary>
     /// <param name="typeToConvert">The type for which to create a converter.</param>
     /// <param name="options">The serializer options to use.</param>
-    /// <returns>A converter for <see cref="Optional{T}"/>.</returns>
+    /// <returns>A converter for <see cref="Optional{TValue}"/>.</returns>
     public override JsonConverter CreateConverter(Type typeToConvert, JsonSerializerOptions options)
     {
         Type valueType = typeToConvert.GetGenericArguments()[0];

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Lumina.Domain.Common.Errors;
 using System.Text.RegularExpressions;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.ValueObjects;
+using System.Linq;
 #endregion
 
 namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Strategies.Path;
@@ -48,7 +49,7 @@ public class WindowsPathStrategy : IWindowsPathStrategy
     public ErrorOr<FileSystemPathId> CombinePath(FileSystemPathId path, string name)
     {
         if (name == null)
-            return Errors.FileManagement.NameCannotBeEmptyError;
+            return Errors.FileManagement.NameCannotBeEmpty;
         // trim any directory separator characters from the end of the path
         string subpath = path.Path.TrimEnd(PathSeparator);
         // if the name begins with a directory separator, remove it
@@ -66,7 +67,7 @@ public class WindowsPathStrategy : IWindowsPathStrategy
     {
         // Windows paths usually start with a drive letter and colon, e.g., "C:"
         if (!path.Path.Contains(':') || !path.Path.Contains(PathSeparator) || !char.IsLetter(path.Path[0]) || path.Path[1] != ':' || path.Path[2] != PathSeparator)
-            return Errors.FileManagement.InvalidPathError;
+            return Errors.FileManagement.InvalidPath;
         return ErrorOrFactory.From(GetPathSegments());
         IEnumerable<PathSegment> GetPathSegments()
         {
@@ -96,19 +97,19 @@ public class WindowsPathStrategy : IWindowsPathStrategy
     {
         // validation: ensure the path is not null or empty
         if (!IsValidPath(path))
-            return Errors.FileManagement.InvalidPathError;
+            return Errors.FileManagement.InvalidPath;
         // if path is just a drive letter followed by ":\", return null
         if (Regex.IsMatch(path.Path, @"^[a-zA-Z]:\\?$"))
-            return Errors.FileManagement.CannotNavigateUpError;
+            return Errors.FileManagement.CannotNavigateUp;
         // trim trailing slash for consistent processing
         string tempPath = path.Path;
-        if (tempPath.EndsWith("\\"))
+        if (tempPath.EndsWith('\\'))
             tempPath = tempPath.TrimEnd(PathSeparator);
         // find the last occurrence of a slash
         var lastIndex = tempPath.LastIndexOf(PathSeparator);
         // if there's no slash found (shouldn't happen due to previous steps), or if we are at the root level after trimming, return error
         if (lastIndex < 0)
-            return Errors.FileManagement.CannotNavigateUpError;
+            return Errors.FileManagement.CannotNavigateUp;
         // if we are at the drive root level after trimming, return drive root, otherwise, return the path up to the last slash
         ErrorOr<FileSystemPathId> newPathResult = FileSystemPathId.Create(lastIndex == 2 && tempPath[1] == ':' ? tempPath[..3] : tempPath[..lastIndex]);
         if (newPathResult.IsError)
@@ -123,6 +124,40 @@ public class WindowsPathStrategy : IWindowsPathStrategy
     public char[] GetInvalidPathCharsForPlatform()
     {
         return ['<', '>', '"', '/', '|', '?', '*'];
+    }
+
+    /// <summary>
+    /// Returns the root portion of the given path.
+    /// </summary>
+    /// <param name="path">The path for which to get the root.</param>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> containing the root of <paramref name="path"/>, or an error.</returns>
+    public ErrorOr<PathSegment> GetPathRoot(FileSystemPathId path)
+    {
+        if (!IsValidPath(path))
+            return Errors.FileManagement.InvalidPath;
+        // check if the path starts with a drive letter (e.g., "C:")
+        if (path.Path.Length >= 2 && char.IsLetter(path.Path[0]) && path.Path[1] == ':')
+        {
+            string root = path.Path[..2];
+            if (path.Path.Length > 2 && path.Path[2] == PathSeparator)
+                root += PathSeparator;
+            return new PathSegment(root, isDirectory: true, isDrive: true);
+        }
+        // check for UNC paths (e.g., "\\server\share")
+        if (path.Path.StartsWith('\\'))
+        {
+            var parseResult = ParsePath(path);
+            if (parseResult.IsError)
+                return parseResult.Errors;
+
+            var segments = parseResult.Value.ToList();
+            if (segments.Count >= 2)
+            {
+                string root = $@"\\{segments[0].Name}\{segments[1].Name}\";
+                return new PathSegment(root, isDirectory: true, isDrive: false);
+            }
+        }
+        return Errors.FileManagement.InvalidPath;
     }
     #endregion
 }

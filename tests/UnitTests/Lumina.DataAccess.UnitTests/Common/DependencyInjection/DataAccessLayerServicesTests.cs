@@ -11,6 +11,8 @@ using Lumina.DataAccess.Core.UoW;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Linq;
 #endregion
 
 namespace Lumina.DataAccess.UnitTests.Common.DependencyInjection;
@@ -41,7 +43,7 @@ public class DataAccessLayerServicesTests
     {
         // Arrange
         var services = new ServiceCollection();
-        var basePath = Path.GetTempPath(); // Use a real existing path
+        var basePath = Path.GetTempPath(); // use a real existing path
 
         // Act
         DataAccessLayerServices.AddDataAccessLayerServices(services);

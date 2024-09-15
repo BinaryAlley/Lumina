@@ -2,7 +2,12 @@
 using Lumina.Application.Common.DataAccess.Repositories.Common.Base;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.DataAccess.Core.Repositories.Common.Factory;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.DataAccess.Core.UoW;
@@ -18,14 +23,17 @@ public class UnitOfWork : IUnitOfWork
     #endregion
 
     #region ==================================================================== PROPERTIES =================================================================================
+    /// <summary>
+    /// Gets or sets the collection of available repositories.
+    /// </summary>
     internal RepositoryDictionary Repositories { get; private set; } = new RepositoryDictionary();
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================
     /// <summary>
-    /// Overload C-tor.
+    /// Initializes a new instance of the <see cref="UnitOfWork"/> class.
     /// </summary>
-    /// <param name="repositoryFactory">The abstract factory used to generate repositories.</param>
+    /// <param name="repositoryFactory">The factory used to generate repositories.</param>
     /// <param name="luminaDbContext">Injected Entity Framework DbContext.</param>
     public UnitOfWork(IRepositoryFactory repositoryFactory, LuminaDbContext luminaDbContext)
     {
@@ -95,7 +103,7 @@ public class UnitOfWork : IUnitOfWork
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public async Task SaveChangesAsync(CancellationToken cancellationToken)
     {
-        await _luminaDbContext.SaveChangesAsync(cancellationToken);
+        await _luminaDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>

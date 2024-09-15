@@ -4,7 +4,7 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>disable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <BaseOutputPath>..\..\bin\</BaseOutputPath>
+        <BaseOutputPath>$(SolutionDir)..\bin\server\</BaseOutputPath>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     </PropertyGroup>
 
@@ -22,7 +22,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Core\Aggregates\FileManagement\FileManagementAggregate\Entities\" />
+      <ProjectReference Include="..\Lumina.Contracts\Lumina.Contracts.csproj" />
     </ItemGroup>
 
 </Project>

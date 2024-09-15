@@ -1,13 +1,15 @@
 #region ========================================================================= USING =====================================================================================
-using Mediator;
 using ErrorOr;
 using FluentValidation;
+using Mediator;
+using System.Threading;
+using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Application.Common.Behaviors;
 
 /// <summary>
-/// Behavior pipeline for the register command
+/// Represents a validation behavior in the MediatR pipeline for handling requests and responses.
 /// </summary>
 /// <typeparam name="TRequest">The type representing a request. It should implement <see cref="IRequest{TResponse}"/>.</typeparam>
 /// <typeparam name="TResponse">The type representing a response. It should implement <see cref="IErrorOr"/> interface.</typeparam>
@@ -15,7 +17,7 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
                                                                                               where TResponse : IErrorOr
 {
     #region ================================================================== FIELD MEMBERS ================================================================================
-    private readonly IValidator<TRequest>? validator;
+    private readonly IValidator<TRequest>? _validator;
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================
@@ -25,7 +27,7 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
     /// <param name="validator">The validator used in this behavior pipeline for the Mediator commands and queries.</param>
     public ValidationBehavior(IValidator<TRequest>? validator = null)
     {
-        this.validator = validator;
+        _validator = validator;
     }
     #endregion
 
@@ -39,13 +41,13 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
     public async ValueTask<TResponse> Handle(TRequest request, CancellationToken cancellationToken, MessageHandlerDelegate<TRequest, TResponse> next)
     {
         // if there is no validator, just invoke the handler
-        if (validator is null)
-            return await next(request, cancellationToken);
+        if (_validator is null)
+            return await next(request, cancellationToken).ConfigureAwait(false);
         // before the handler of the command is executed
-        var validationResult = await validator.ValidateAsync(request, cancellationToken);
+        var validationResult = await _validator.ValidateAsync(request, cancellationToken).ConfigureAwait(false);
         // if there are no validation errors, invoke the command handler
         if (validationResult.IsValid)
-            return await next(request, cancellationToken);
+            return await next(request, cancellationToken).ConfigureAwait(false);
         // after the command handler is executed
         var errors = validationResult.Errors.ConvertAll(validationFailure => Error.Validation(description: validationFailure.ErrorMessage));
         // the compiler doesn't know there is an implicit converter from a list of errors to the ErrorOr object, and unfortunately, there is no way around this but to use some magic

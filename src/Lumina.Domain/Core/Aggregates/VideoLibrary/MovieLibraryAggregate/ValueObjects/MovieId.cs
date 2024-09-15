@@ -1,5 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Domain.Common.Models.Core;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 #endregion
 
 namespace Lumina.Domain.Core.Aggregates.VideoLibrary.MovieLibraryAggregate.ValueObjects;
@@ -7,20 +10,16 @@ namespace Lumina.Domain.Core.Aggregates.VideoLibrary.MovieLibraryAggregate.Value
 /// <summary>
 /// Value Object for the Id of a movie.
 /// </summary>
-public sealed class MovieId : ValueObject
-{
-    #region ==================================================================== PROPERTIES =================================================================================
-    public Guid Value { get; }
-    #endregion
-
+[DebuggerDisplay("{Value}")]
+public sealed class MovieId : EntityId<Guid>
+{    
     #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="MovieId"/> class.
     /// </summary>
     /// <param name="value">The value representing this object.</param>
-    private MovieId(Guid value)
+    private MovieId(Guid value) : base(value)
     {
-        Value = value;
     }
     #endregion
 

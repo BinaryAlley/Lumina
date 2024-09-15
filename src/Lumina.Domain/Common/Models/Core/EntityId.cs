@@ -1,4 +1,5 @@
 ﻿#region ========================================================================= USING =====================================================================================
+using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
@@ -12,12 +13,15 @@ namespace Lumina.Domain.Common.Models.Core;
 public abstract class EntityId<TId> : ValueObject
 {
     #region ==================================================================== PROPERTIES =================================================================================
+    /// <summary>
+    /// Gets the value representing the entity identifier.
+    /// </summary>
     public TId Value { get; }
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================
     /// <summary>
-    /// Overload C-tor.
+    /// Initializes a new instance of the <see cref="EntityId{TId}"/> class.
     /// </summary>
     /// <param name="value">The value representing this object.</param>
     protected EntityId(TId value)
@@ -27,7 +31,7 @@ public abstract class EntityId<TId> : ValueObject
 
 #pragma warning disable CS8618
     /// <summary>
-    /// Default C-tor.
+    /// Initializes a new instance of the <see cref="EntityId{TId}"/> class.
     /// </summary>
     protected EntityId()
     {

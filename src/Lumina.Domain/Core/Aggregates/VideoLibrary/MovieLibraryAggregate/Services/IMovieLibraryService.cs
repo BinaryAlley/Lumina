@@ -1,7 +1,11 @@
+#region ========================================================================= USING =====================================================================================
+using System.Collections.Generic;
+#endregion
+
 namespace Lumina.Domain.Core.Aggregates.VideoLibrary.MovieLibraryAggregate.Services;
 
 /// <summary>
-/// Service for managing movie libraries.
+/// Interface for the service for managing movie libraries.
 /// </summary>
 public interface IMovieLibraryService
 {

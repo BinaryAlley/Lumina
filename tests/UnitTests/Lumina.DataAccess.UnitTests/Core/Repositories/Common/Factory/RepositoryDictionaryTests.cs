@@ -5,6 +5,7 @@ using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Repositories.Books;
 using Lumina.DataAccess.Core.Repositories.Books;
 using Lumina.DataAccess.Core.Repositories.Common.Factory;
+using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 

@@ -1,8 +1,10 @@
 ﻿#region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Enums;
+using ErrorOr;
+using Lumina.Contracts.Enums.FileSystem;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Models.Core;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.ValueObjects;
-using System;
 using System.Diagnostics;
 #endregion
 
@@ -21,22 +23,19 @@ public abstract class FileSystemItem : AggregateRoot<FileSystemPathId>
     public string Name { get; protected set; }
 
     /// <summary>
-    /// Gets or sets the creation date of the file system item.
-    /// Can be <see langword="null"/> if the information is not available.
+    /// Gets or sets the optional parent of the file system item.
     /// </summary>
-    public DateTime? DateCreated { get; protected set; }
+    public Optional<FileSystemItem> Parent { get; protected set; }
 
     /// <summary>
-    /// Gets or sets the last modification date of the file system item.
-    /// Can be <see langword="null"/> if the information is not available.
-    /// </summary>
-    public DateTime? DateModified { get; protected set; }
-
-    /// <summary>
-    /// Gets or sets the current status of the file system item.
-    /// Defaults to Accessible.
+    /// Gets or sets the current status of the file system item. Defaults to Accessible.
     /// </summary>
     public FileSystemItemStatus Status { get; protected set; } = FileSystemItemStatus.Accessible;
+
+    /// <summary>
+    /// Gets or sets the tpe of the file system item.
+    /// </summary>
+    public FileSystemItemType Type { get; protected set; }
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================
@@ -45,45 +44,38 @@ public abstract class FileSystemItem : AggregateRoot<FileSystemPathId>
     /// </summary>
     /// <param name="id">The unique identifier for the file system path.</param>
     /// <param name="name">The name of the file system item.</param>
-    /// <param name="dateModified">The date and time the file system item was last modified. Can be <see langword="null"/> if unknown.</param>
-    /// <param name="dateCreated">The date and time the file system item was created. Can be <see langword="null"/> if unknown.</param>
-    protected FileSystemItem(FileSystemPathId id, string name, DateTime? dateModified, DateTime? dateCreated) : base(id)
+    /// <param name="fileSystemItemType">The type of the file system item.</param>
+    protected FileSystemItem(FileSystemPathId id, string name, FileSystemItemType fileSystemItemType) : base(id)
     {
         Name = name;
-        DateCreated = dateCreated;
-        DateModified = dateModified;
+        Type = fileSystemItemType;
     }
     #endregion
 
     #region ===================================================================== METHODS ===================================================================================
     /// <summary>
-    /// Renames the file system item to the specified new name.
-    /// </summary>
-    /// <param name="newName">The new name for the file system item.</param>
-    /// <exception cref="ArgumentException">Thrown if the new name is null or whitespace.</exception>
-    public void Rename(string newName)
-    {
-        if (string.IsNullOrWhiteSpace(newName))
-            throw new ArgumentException("New name cannot be empty", nameof(newName));
-        Name = newName;
-    }
-
-    /// <summary>
-    /// Updates the last modified date of the file system item.
-    /// </summary>
-    /// <param name="date">The new date and time of last modification.</param>
-    public void UpdateLastModified(DateTime date)
-    {
-        DateModified = date;
-    }
-
-    /// <summary>
     /// Sets the status of the filesystem item.
     /// </summary>
     /// <param name="status">The status to be set.</param>
-    public void SetStatus(FileSystemItemStatus status)
+    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successfull operation, or an error.</returns>
+    public ErrorOr<Updated> SetStatus(FileSystemItemStatus status)
     {
         Status = status;
+        return Result.Updated;
+    }
+
+    /// <summary>
+    /// Sets the parent of the filesystem item.
+    /// </summary>
+    /// <param name="parent">The file system item to be set as parent.</param>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successfull operation, or an error.</returns>
+    public ErrorOr<Updated> SetParent(FileSystemItem parent)
+    {
+        if (parent is not null)
+            Parent = parent;
+        else
+            return Errors.FileManagement.ParentNodeCannotBeNull;
+        return Result.Updated;
     }
     #endregion
 }

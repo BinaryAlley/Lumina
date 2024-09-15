@@ -1,7 +1,7 @@
 # this file is required because the default base output path for the projects has been changed, and we need to tell docker compose where to take the files from, in debug mode
 # this file is the last in the chain of files when docker-compose commands are called, so it always takes precedence
 services:
-  lumina.presentation.api:
+  lumina-server:
     labels:
       com.microsoft.visualstudio.debuggee.program: "/app/Lumina.Presentation.Api.dll"
       com.microsoft.visualstudio.debuggee.workingdirectory: "/app"

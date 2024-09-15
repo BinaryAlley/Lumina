@@ -1,6 +1,9 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using Lumina.Domain.Common.Models.Core;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 #endregion
 
 namespace Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate.ValueObjects;
@@ -8,20 +11,16 @@ namespace Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggrega
 /// <summary>
 /// Value Object for the Id of a book library.
 /// </summary>
-public sealed class BookLibraryId : ValueObject
+[DebuggerDisplay("{Value}")]
+public sealed class BookLibraryId : EntityId<Guid>
 {
-    #region ==================================================================== PROPERTIES =================================================================================
-    public Guid Value { get; }
-    #endregion
-
     #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="BookLibraryId"/> class.
     /// </summary>
     /// <param name="value">The value representing this object.</param>
-    private BookLibraryId(Guid value)
+    private BookLibraryId(Guid value) : base(value)
     {
-        Value = value;
     }
     #endregion
 

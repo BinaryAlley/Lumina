@@ -1,6 +1,8 @@
 ﻿#region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using Lumina.Application.Common.Models.Common;
+using Lumina.Contracts.Models.Common;
+using System.Threading;
+using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Application.Common.DataAccess.Repositories.Common.Actions;
@@ -17,7 +19,7 @@ public interface IInsertRepositoryAction<TModel> where TModel : IStorageEntity
     /// </summary>
     /// <param name="data">The element to be saved.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{T}"/> representing either a successfull operation, or an error.</returns>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successfull operation, or an error.</returns>
     Task<ErrorOr<Created>> InsertAsync(TModel data, CancellationToken cancellationToken);
     #endregion
 }

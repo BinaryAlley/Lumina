@@ -1,11 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using Lumina.Domain.Common.Enums;
+using Lumina.Contracts.Enums.BookLibrary;
 using Lumina.Domain.Common.Models.Core;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.Aggregates.MediaContributor.MediaContributorAggregate.ValueObjects;
 using Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate.Entities;
 using Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate.ValueObjects;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
@@ -50,47 +52,47 @@ public sealed class Book : AggregateRoot<BookId>
     public Optional<BookSeries> Series { get; private set; }
 
     /// <summary>
-    /// Gets the ASIN (Amazon Standard Identification Number) of the book.
+    /// Gets the ASIN (Amazon Standard Identification Number) of the book, if applicable.
     /// </summary>
     public Optional<string> ASIN { get; private set; }
 
     /// <summary>
-    /// Gets the Goodreads ID of the book.
+    /// Gets the Goodreads ID of the book, if applicable.
     /// </summary>
     public Optional<string> GoodreadsId { get; private set; }
 
     /// <summary>
-    /// Gets the Library of Congress Control Number (LCCN) of the book.
+    /// Gets the Library of Congress Control Number (LCCN) of the book, if applicable.
     /// </summary>
     public Optional<string> LCCN { get; private set; }
 
     /// <summary>
-    /// Gets the OCLC Number (WorldCat identifier) of the book.
+    /// Gets the OCLC Number (WorldCat identifier) of the book, if applicable.
     /// </summary>
     public Optional<string> OCLCNumber { get; private set; }
 
     /// <summary>
-    /// Gets the Open Library ID of the book.
+    /// Gets the Open Library ID of the book, if applicable.
     /// </summary>
     public Optional<string> OpenLibraryId { get; private set; }
 
     /// <summary>
-    /// Gets the LibraryThing ID of the book.
+    /// Gets the LibraryThing ID of the book, if applicable.
     /// </summary>
     public Optional<string> LibraryThingId { get; private set; }
 
     /// <summary>
-    /// Gets the Google Books ID of the book.
+    /// Gets the Google Books ID of the book, if applicable.
     /// </summary>
     public Optional<string> GoogleBooksId { get; private set; }
 
     /// <summary>
-    /// Gets the Barnes & Noble ID of the book.
+    /// Gets the Barnes & Noble ID of the book, if applicable.
     /// </summary>
     public Optional<string> BarnesAndNobleId { get; private set; }
 
     /// <summary>
-    /// Gets the Apple Books ID of the book.
+    /// Gets the Apple Books ID of the book, if applicable.
     /// </summary>
     public Optional<string> AppleBooksId { get; private set; }
 
@@ -220,7 +222,7 @@ public sealed class Book : AggregateRoot<BookId>
     /// <param name="contributors">The list of media contributors of the book.</param>
     /// <param name="ratings">The list of ratings for the book.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{T}"/> containing either a successfully created <see cref="Book"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="Book"/>, or an error message.
     /// </returns>
     public static ErrorOr<Book> Create(
         WrittenContentMetadata metadata,
@@ -289,7 +291,7 @@ public sealed class Book : AggregateRoot<BookId>
     /// <param name="contributors">The list of media contributors of the book.</param>
     /// <param name="ratings">The list of ratings for the book.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{T}"/> containing either a successfully created <see cref="Book"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="Book"/>, or an error message.
     /// </returns>
     public static ErrorOr<Book> Create(
         BookId id,

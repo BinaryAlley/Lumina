@@ -1,9 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using System.Text.RegularExpressions;
 using ErrorOr;
-using Lumina.Domain.Common.Enums;
-using Lumina.Domain.Common.Models.Core;
+using Lumina.Contracts.Enums.BookLibrary;
 using Lumina.Domain.Common.Errors;
+using Lumina.Domain.Common.Models.Core;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Text.RegularExpressions;
 #endregion
 
 namespace Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate.ValueObjects;
@@ -11,6 +13,7 @@ namespace Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggrega
 /// <summary>
 /// Value Object for the ISBN of a book.
 /// </summary>
+[DebuggerDisplay("{Value} ({Format})")]
 public sealed class Isbn : ValueObject
 {
     #region ================================================================== FIELD MEMBERS ================================================================================

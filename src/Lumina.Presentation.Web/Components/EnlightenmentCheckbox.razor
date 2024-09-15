@@ -22,6 +22,6 @@
     private async Task OnChangeHandler(ChangeEventArgs e)
     {
         Checked = e?.Value != null ? (bool)e.Value : false;
-        await CheckedChanged.InvokeAsync(Checked);
+        await CheckedChanged.InvokeAsync(Checked).ConfigureAwait(false);
     }
 }

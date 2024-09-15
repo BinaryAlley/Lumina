@@ -102,5 +102,18 @@ public class PathService : IPathService
     {
         return _platformContext.PathStrategy.GetInvalidPathCharsForPlatform();
     }
+
+    /// <summary>
+    /// Returns the root portion of the given path.
+    /// </summary>
+    /// <param name="path">The path for which to get the root.</param>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> containing the root of <paramref name="path"/>, or an error.</returns>
+    public ErrorOr<PathSegment> GetPathRoot(string path)
+    {
+        ErrorOr<FileSystemPathId> newPathResult = FileSystemPathId.Create(path);
+        if (newPathResult.IsError)
+            return newPathResult.Errors;
+        return _platformContext.PathStrategy.GetPathRoot(newPathResult.Value);
+    }
     #endregion
 }

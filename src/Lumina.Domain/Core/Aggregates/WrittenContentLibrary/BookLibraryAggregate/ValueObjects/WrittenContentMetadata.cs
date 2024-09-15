@@ -1,9 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
+using System.Collections.Generic;
 using System.Diagnostics;
-using Lumina.Domain.Common.Errors;
 #endregion
 
 namespace Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate.ValueObjects;
@@ -73,7 +74,7 @@ public class WrittenContentMetadata : BaseMetadata
     /// <param name="publisher">The publisher of the written content.</param>
     /// <param name="pageCount">The number of pages in the written content.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{T}"/> containing either a successfully created <see cref="WrittenContentMetadata"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="WrittenContentMetadata"/>, or an error message.
     /// </returns>
     public static ErrorOr<WrittenContentMetadata> Create(
         string title,

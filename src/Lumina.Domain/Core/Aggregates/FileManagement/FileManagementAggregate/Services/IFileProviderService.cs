@@ -1,9 +1,9 @@
 ﻿#region ========================================================================= USING =====================================================================================
 using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.ValueObjects;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Services;
@@ -18,15 +18,15 @@ public interface IFileProviderService
     /// Retrieves a list of files at the specified path.
     /// </summary>
     /// <param name="path">The path for which to retrieve the list of files.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a task representing the asynchronous operation for retrieving a collection of file paths, or an error.</returns>
-    ErrorOr<Task<IEnumerable<FileSystemPathId>>> GetFilePathsAsync(FileSystemPathId path);
+    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of file paths, or an error.</returns>
+    ErrorOr<IEnumerable<FileSystemPathId>> GetFilePaths(FileSystemPathId path);
 
     /// <summary>
     /// Retrieves the contents of a file at the specified path.
     /// </summary>
     /// <param name="path">The path for which to retrieve the file contents.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a task representing the asynchronous operation for retrieving the contents of a file at the specified path, or an error.</returns>
-    ErrorOr<Task<byte[]>> GetFileAsync(FileSystemPathId path);
+    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the contents of a file at the specified path, or an error.</returns>
+    ErrorOr<byte[]> GetFileAsync(FileSystemPathId path);
 
     /// <summary>
     /// Checks if a file with the specified path exists.
@@ -46,15 +46,15 @@ public interface IFileProviderService
     /// Gets the last write time of a file at the specified path.
     /// </summary>
     /// <param name="path">The path of the file to retrieve the last write time for.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the last write time of <paramref name="path"/>, or null if not available, or an error.</returns>
-    ErrorOr<DateTime?> GetLastWriteTime(FileSystemPathId path);
+    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the optional last write time of <paramref name="path"/> if available, or an error.</returns>
+    ErrorOr<Optional<DateTime>> GetLastWriteTime(FileSystemPathId path);
 
     /// <summary>
     /// Gets the creation time of a file at the specified path.
     /// </summary>
     /// <param name="path">The path of the file to retrieve the creation time for.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the creation time of <paramref name="path"/>, or null if not available, or an error.</returns>
-    ErrorOr<DateTime?> GetCreationTime(FileSystemPathId path);
+    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the otional creation time of <paramref name="path"/> if available, or an error.</returns>
+    ErrorOr<Optional<DateTime>> GetCreationTime(FileSystemPathId path);
 
     /// <summary>
     /// Gets the size of a file at the specified path.
@@ -94,6 +94,6 @@ public interface IFileProviderService
     /// </summary>
     /// <param name="path">The path of the file to be deleted.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the result of deleting a file, or an error.</returns>
-    ErrorOr<bool> DeleteFile(FileSystemPathId path);
+    ErrorOr<Deleted> DeleteFile(FileSystemPathId path);
     #endregion
 }

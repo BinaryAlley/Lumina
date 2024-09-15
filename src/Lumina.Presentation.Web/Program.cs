@@ -1,9 +1,8 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Presentation.Web.Common.DependencyInjection;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Lumina.Presentation.Web.Common.DependencyInjection;
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Application.Common.Models.FileSystem;
+using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Presentation.Web;
@@ -32,7 +31,7 @@ public class Program
 
         var webAssemblyHost = builder.Build();
 
-        await webAssemblyHost.RunAsync();
+        await webAssemblyHost.RunAsync().ConfigureAwait(false);
     }
     #endregion
 }

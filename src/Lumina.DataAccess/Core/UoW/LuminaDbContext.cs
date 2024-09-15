@@ -1,8 +1,11 @@
 ﻿#region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Models.Books;
-using Lumina.Application.Common.Models.Common;
+using Lumina.Contracts.Models.Common;
+using Lumina.Contracts.Models.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.Common.Events;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 #endregion
 
 namespace Lumina.DataAccess.Core.UoW;
@@ -15,12 +18,12 @@ namespace Lumina.DataAccess.Core.UoW;
 public class LuminaDbContext : DbContext
 {
     #region ==================================================================== PROPERTIES =================================================================================
-    public virtual DbSet<BookDto> Books { get; set; } = null!;
+    public virtual DbSet<BookModel> Books { get; set; } = null!;
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================
     /// <summary>
-    /// Overload C-tor.
+    /// Initializes a new instance of the <see cref="LuminaDbContext"/> class.
     /// </summary>
     /// <param name="options">The options for configuring the database context.</param>
     public LuminaDbContext(DbContextOptions<LuminaDbContext> options) : base(options)

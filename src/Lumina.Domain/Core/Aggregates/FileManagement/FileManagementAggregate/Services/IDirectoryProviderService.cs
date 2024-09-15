@@ -1,9 +1,9 @@
 ﻿#region ========================================================================= USING =====================================================================================
 using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.ValueObjects;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Services;
@@ -15,11 +15,11 @@ public interface IDirectoryProviderService
 {
     #region ===================================================================== METHODS ===================================================================================
     /// <summary>
-    /// Retrieves a list of subdirectory paths from the specified path, asynchronously.
+    /// Retrieves a list of subdirectory paths from the specified path.
     /// </summary>
     /// <param name="path">The path from which to retrieve the subdirectory paths.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a task representing the asynchronous operation for retrieving a collection of directory paths or an error.</returns>
-    ErrorOr<Task<IEnumerable<FileSystemPathId>>> GetSubdirectoryPathsAsync(FileSystemPathId path);
+    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of directory paths or an error.</returns>
+    ErrorOr<IEnumerable<FileSystemPathId>> GetSubdirectoryPaths(FileSystemPathId path);
 
     /// <summary>
     /// Checks if a directory with the specified path exists.
@@ -40,15 +40,15 @@ public interface IDirectoryProviderService
     /// </summary>
     /// <param name="path">The path to retrieve the last write time for.</param>
     /// <returns>The last write time for the specified path, or null if unavailable.</returns>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the last write time of <paramref name="path"/>, or null if not available, or an error.</returns>
-    ErrorOr<DateTime?> GetLastWriteTime(FileSystemPathId path);
+    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the optional last write time of <paramref name="path"/> if available, or an error.</returns>
+    ErrorOr<Optional<DateTime>> GetLastWriteTime(FileSystemPathId path);
 
     /// <summary>
     /// Gets the creation time of a specific path.
     /// </summary>
     /// <param name="path">The path to retrieve the creation time for.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the creation time of <paramref name="path"/>, or null if not available, or an error.</returns>
-    ErrorOr<DateTime?> GetCreationTime(FileSystemPathId path);
+    /// <returns>An <see cref="ErrorOr{TValue}"/> containing the optional creation time of <paramref name="path"/> if available, or an error.</returns>
+    ErrorOr<Optional<DateTime>> GetCreationTime(FileSystemPathId path);
 
     /// <summary>
     /// Creates a new directory with the specified name, at the specified path.
@@ -89,6 +89,6 @@ public interface IDirectoryProviderService
     /// </summary>
     /// <param name="path">The path of the directory to be deleted.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the result of deleting a directory, or an error.</returns>
-    ErrorOr<bool> DeleteDirectory(FileSystemPathId path);
+    ErrorOr<Deleted> DeleteDirectory(FileSystemPathId path);
     #endregion
 }

@@ -1,0 +1,62 @@
+﻿@using Lumina.Presentation.Web.Common.Models.UI
+
+<div id="directory-browser-dialog" class="container-background above-modal">
+    <div id="directory-browser-content">
+        <div id="directory-browser-header">
+            <div id="directory-browser-shine-spark"></div>
+            <div id="directory-browser-shine-effect"></div>
+            <div id="directory-browser-header-navigation-container">
+                <div class="directory-browser-header-navigation">
+                    <img src="images/ui/back.svg" class="navigation-icon" alt="Back" title="Back"/>
+                    <img src="images/ui/forward.svg" class="navigation-icon" alt="Forward" title="Forward" />
+                    <img src="images/ui/up.svg" class="navigation-icon" alt="Up one level" title="Up one level" />
+                </div>
+                <div id="directory-browser-header-address-bar-container">
+                    <EnlightenmentInput CssClass="directory-browser-header-address-bar-url" Type="text" Name="addressBar" Height="22" AutoComplete="true" />
+                    <div class="directory-browser-header-address-bar-actions">
+                        <img src="images/ui/favorite-star.svg" class="navigation-icon favorite-unselected" alt="Favorite directory" title="Favorite directory" />
+                        <EnlightenmentButton CssClass="directory-browser-content-new-directory" Width="120">New Directory</EnlightenmentButton>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="directory-browser-file-system-container">
+            <div id="directory-browser-file-system-treeview-container">
+                <div id="directory-browser-file-system-treeview">
+                    <FileSystemTreeView InitialPath="@savedPath" OnNodeSelected="HandleNodeSelected" />
+                </div>
+                <EnlightenmentCombobox CssClass="directory-browser-file-system-sources" Items="null" @bind-SelectedItem="selectedValue" />
+            </div>
+            <div id="directory-browser-file-system-directories-container">
+                <div id="directory-browser-file-system-directories"></div>
+            </div>
+        </div>
+        <div id="directory-browser-actions-container">
+            <div id="directory-browser-actions-path-container">
+                <label class="text-light-one">Directory</label>
+                <EnlightenmentInput Type="text" Name="selectedDirectory" IsReadOnly="true" AutoComplete="true" />
+            </div>
+            <div id="directory-browser-actions">
+                <EnlightenmentButton IsConfirmButton="false">Cancel</EnlightenmentButton>
+                <EnlightenmentButton>Open</EnlightenmentButton>
+            </div>
+        </div>
+    </div>
+
+
+    @* <div id="divModal"></div>
+    <label class="text-light-one">Enter new directory name:</label>
+    <EnlightenmentInput Type="text" Name="newDirectoryName" AutoComplete="true" />
+    <EnlightenmentButton IsConfirmButton="false">Cancel</EnlightenmentButton>
+    <EnlightenmentButton>Confirm</EnlightenmentButton> *@
+</div>
+
+@code {
+    private ComboboxItem<string>? selectedValue;
+    private string savedPath = string.Empty;
+
+    private void HandleNodeSelected(string path)
+    {
+        Console.WriteLine($"Selected node: {path}");
+    }
+}

@@ -1,14 +1,14 @@
 ﻿#region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using Lumina.Domain.Common.Enums;
+using Lumina.Contracts.Enums.FileSystem;
 using Lumina.Domain.Common.Errors;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Entities;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Strategies.Environment;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Strategies.Platform;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.ValueObjects;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Services;
@@ -42,12 +42,12 @@ public class FileService : IFileService
     /// </summary>
     /// <param name="path">String representation of the file path.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of files or an error.</returns>
-    public async Task<ErrorOr<IEnumerable<File>>> GetFilesAsync(string path)
+    public ErrorOr<IEnumerable<File>> GetFiles(string path)
     {
         var fileSystemPathIdResult = FileSystemPathId.Create(path);
         if (fileSystemPathIdResult.IsError)
             return fileSystemPathIdResult.Errors;
-        return await GetFilesAsync(fileSystemPathIdResult.Value).ConfigureAwait(false);
+        return GetFiles(fileSystemPathIdResult.Value);
     }
 
     /// <summary>
@@ -55,9 +55,9 @@ public class FileService : IFileService
     /// </summary>
     /// <param name="file">The file object.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of files or an error.</returns>
-    public async Task<ErrorOr<IEnumerable<File>>> GetFilesAsync(File file)
+    public ErrorOr<IEnumerable<File>> GetFiles(File file)
     {
-        return await GetFilesAsync(file.Id).ConfigureAwait(false);
+        return GetFiles(file.Id);
     }
 
     /// <summary>
@@ -65,34 +65,41 @@ public class FileService : IFileService
     /// </summary>
     /// <param name="path">Identifier for the file path.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of files or an error.</returns>
-    public async Task<ErrorOr<IEnumerable<File>>> GetFilesAsync(FileSystemPathId path)
+    public ErrorOr<IEnumerable<File>> GetFiles(FileSystemPathId path)
     {
         // retrieve the list of files
-        ErrorOr<Task<IEnumerable<FileSystemPathId>>> filePathsResult = _environmentContext.FileProviderService.GetFilePathsAsync(path);
+        ErrorOr<IEnumerable<FileSystemPathId>> filePathsResult = _environmentContext.FileProviderService.GetFilePaths(path);
         if (filePathsResult.IsError)
             return filePathsResult.Errors;
         List<File> result = new();
-        IEnumerable<FileSystemPathId> filePaths = await filePathsResult.Value.ConfigureAwait(false);
+        IEnumerable<FileSystemPathId> filePaths = filePathsResult.Value;
         foreach (FileSystemPathId filePath in filePaths)
         {
             // extract file details and add to the result list
             ErrorOr<string> fileNameResult = _environmentContext.FileProviderService.GetFileName(filePath);
-            ErrorOr<DateTime?> dateModifiedResult = _environmentContext.FileProviderService.GetLastWriteTime(filePath);
-            ErrorOr<DateTime?> dateCreatedResult = _environmentContext.FileProviderService.GetCreationTime(filePath);
+            ErrorOr<Optional<DateTime>> dateModifiedResult = _environmentContext.FileProviderService.GetLastWriteTime(filePath);
+            ErrorOr<Optional<DateTime>> dateCreatedResult = _environmentContext.FileProviderService.GetCreationTime(filePath);
             ErrorOr<long?> sizeResult = _environmentContext.FileProviderService.GetSize(filePath);
             long size = sizeResult.Value ?? 0;
             // if any of the details returned an error, set inaccessible status
             if (fileNameResult.IsError || dateModifiedResult.IsError || dateCreatedResult.IsError)
             {
-                File errorFile = new(filePath, !fileNameResult.IsError ? fileNameResult.Value : null!,
-                    !dateCreatedResult.IsError ? dateCreatedResult.Value : null, !dateModifiedResult.IsError ? dateModifiedResult.Value : null, size);
-                errorFile.SetStatus(FileSystemItemStatus.Inaccessible);
-                result.Add(errorFile);
+                ErrorOr<File> errorFileResult = File.Create(filePath, !fileNameResult.IsError ? fileNameResult.Value : null!,
+                    !dateCreatedResult.IsError ? dateCreatedResult.Value : Optional<DateTime>.None(), 
+                    !dateModifiedResult.IsError ? dateModifiedResult.Value : Optional<DateTime>.None(), size);
+                if (errorFileResult.IsError)
+                    return errorFileResult.Errors;
+                ErrorOr<Updated> setStatusResult = errorFileResult.Value.SetStatus(FileSystemItemStatus.Inaccessible);
+                if (setStatusResult.IsError)
+                    return setStatusResult.Errors;
+                result.Add(errorFileResult.Value);
             }
             else
             {
-                File file = new(filePath, fileNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value, size);
-                result.Add(file);
+                var fileResult = File.Create(filePath, fileNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value, size);
+                if (fileResult.IsError)
+                    return fileResult.Errors;
+                result.Add(fileResult.Value);
             }
         }
         return result;
@@ -132,7 +139,7 @@ public class FileService : IFileService
         if (fileExists.IsError)
             return fileExists.Errors;
         else if (fileExists.Value == false)
-            return Errors.FileManagement.FileNotFoundError;
+            return Errors.FileManagement.FileNotFound;
         else
         {
             // copy the file
@@ -140,20 +147,25 @@ public class FileService : IFileService
             if (copyFileResult.IsError)
                 return copyFileResult.Errors;
             ErrorOr<string> fileNameResult = _environmentContext.FileProviderService.GetFileName(copyFileResult.Value);
-            ErrorOr<DateTime?> dateModifiedResult = _environmentContext.FileProviderService.GetLastWriteTime(copyFileResult.Value);
-            ErrorOr<DateTime?> dateCreatedResult = _environmentContext.FileProviderService.GetCreationTime(copyFileResult.Value);
+            ErrorOr<Optional<DateTime>> dateModifiedResult = _environmentContext.FileProviderService.GetLastWriteTime(copyFileResult.Value);
+            ErrorOr<Optional<DateTime>> dateCreatedResult = _environmentContext.FileProviderService.GetCreationTime(copyFileResult.Value);
             ErrorOr<long?> sizeResult = _environmentContext.FileProviderService.GetSize(copyFileResult.Value);
             long size = sizeResult.Value ?? 0;
             // if any of the details returned an error, set inaccessible status
             if (fileNameResult.IsError || dateModifiedResult.IsError || dateCreatedResult.IsError)
             {
-                File errorFile = new(copyFileResult.Value, !fileNameResult.IsError ? fileNameResult.Value : null!,
-                    !dateCreatedResult.IsError ? dateCreatedResult.Value : null, !dateModifiedResult.IsError ? dateModifiedResult.Value : null, size);
-                errorFile.SetStatus(FileSystemItemStatus.Inaccessible);
-                return errorFile;
+                ErrorOr<File> errorFileResult = File.Create(copyFileResult.Value, !fileNameResult.IsError ? fileNameResult.Value : null!,
+                    !dateCreatedResult.IsError ? dateCreatedResult.Value : Optional<DateTime>.None(), 
+                    !dateModifiedResult.IsError ? dateModifiedResult.Value : Optional<DateTime>.None(), size);
+                if (errorFileResult.IsError)
+                    return errorFileResult.Errors;
+                ErrorOr<Updated> setStatusResult = errorFileResult.Value.SetStatus(FileSystemItemStatus.Inaccessible);
+                if (setStatusResult.IsError)
+                    return setStatusResult.Errors;
+                return errorFileResult;
             }
             else
-                return new File(copyFileResult.Value, fileNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value, size);
+                return File.Create(copyFileResult.Value, fileNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value, size);
         }
     }
 
@@ -191,7 +203,7 @@ public class FileService : IFileService
         if (fileExists.IsError)
             return fileExists.Errors;
         else if (fileExists.Value == false)
-            return Errors.FileManagement.FileNotFoundError;
+            return Errors.FileManagement.FileNotFound;
         else
         {
             // move the file
@@ -199,20 +211,25 @@ public class FileService : IFileService
             if (moveFileResult.IsError)
                 return moveFileResult.Errors;
             ErrorOr<string> fileNameResult = _environmentContext.FileProviderService.GetFileName(moveFileResult.Value);
-            ErrorOr<DateTime?> dateModifiedResult = _environmentContext.FileProviderService.GetLastWriteTime(moveFileResult.Value);
-            ErrorOr<DateTime?> dateCreatedResult = _environmentContext.FileProviderService.GetCreationTime(moveFileResult.Value);
+            ErrorOr<Optional<DateTime>> dateModifiedResult = _environmentContext.FileProviderService.GetLastWriteTime(moveFileResult.Value);
+            ErrorOr<Optional<DateTime>> dateCreatedResult = _environmentContext.FileProviderService.GetCreationTime(moveFileResult.Value);
             ErrorOr<long?> sizeResult = _environmentContext.FileProviderService.GetSize(moveFileResult.Value);
             long size = sizeResult.Value ?? 0;
             // if any of the details returned an error, set inaccessible status
             if (fileNameResult.IsError || dateModifiedResult.IsError || dateCreatedResult.IsError)
             {
-                File errorFile = new(moveFileResult.Value, !fileNameResult.IsError ? fileNameResult.Value : null!,
-                    !dateCreatedResult.IsError ? dateCreatedResult.Value : null, !dateModifiedResult.IsError ? dateModifiedResult.Value : null, size);
-                errorFile.SetStatus(FileSystemItemStatus.Inaccessible);
-                return errorFile;
+                ErrorOr<File> errorFileResult = File.Create(moveFileResult.Value, !fileNameResult.IsError ? fileNameResult.Value : null!,
+                    !dateCreatedResult.IsError ? dateCreatedResult.Value : Optional<DateTime>.None(), 
+                    !dateModifiedResult.IsError ? dateModifiedResult.Value : Optional<DateTime>.None(), size);
+                if (errorFileResult.IsError)
+                    return errorFileResult.Errors;
+                ErrorOr<Updated> setStatusResult = errorFileResult.Value.SetStatus(FileSystemItemStatus.Inaccessible);
+                if (setStatusResult.IsError)
+                    return setStatusResult.Errors;
+                return errorFileResult;
             }
             else
-                return new File(moveFileResult.Value, fileNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value, size);
+                return File.Create(moveFileResult.Value, fileNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value, size);
         }
     }
 
@@ -246,7 +263,7 @@ public class FileService : IFileService
         if (fileExists.IsError)
             return fileExists.Errors;
         else if (fileExists.Value == true)
-            return Errors.FileManagement.FileAlreadyExistsError;
+            return Errors.FileManagement.FileAlreadyExists;
         else
         {
             // rename the file
@@ -254,20 +271,25 @@ public class FileService : IFileService
             if (newFilePathResult.IsError)
                 return newFilePathResult.Errors;
             ErrorOr<string> fileNameResult = _environmentContext.FileProviderService.GetFileName(newFilePathResult.Value);
-            ErrorOr<DateTime?> dateModifiedResult = _environmentContext.FileProviderService.GetLastWriteTime(newFilePathResult.Value);
-            ErrorOr<DateTime?> dateCreatedResult = _environmentContext.FileProviderService.GetCreationTime(newFilePathResult.Value);
+            ErrorOr<Optional<DateTime>> dateModifiedResult = _environmentContext.FileProviderService.GetLastWriteTime(newFilePathResult.Value);
+            ErrorOr<Optional<DateTime>> dateCreatedResult = _environmentContext.FileProviderService.GetCreationTime(newFilePathResult.Value);
             ErrorOr<long?> sizeResult = _environmentContext.FileProviderService.GetSize(newFilePathResult.Value);
             long size = sizeResult.Value ?? 0;
             // if any of the details returned an error, set inaccessible status
             if (fileNameResult.IsError || dateModifiedResult.IsError || dateCreatedResult.IsError)
             {
-                File errorFile = new(newFilePathResult.Value, !fileNameResult.IsError ? fileNameResult.Value : null!,
-                    !dateCreatedResult.IsError ? dateCreatedResult.Value : null, !dateModifiedResult.IsError ? dateModifiedResult.Value : null, size);
-                errorFile.SetStatus(FileSystemItemStatus.Inaccessible);
-                return errorFile;
+                ErrorOr<File> errorFileResult = File.Create(newFilePathResult.Value, !fileNameResult.IsError ? fileNameResult.Value : null!,
+                    !dateCreatedResult.IsError ? dateCreatedResult.Value : Optional<DateTime>.None(), 
+                    !dateModifiedResult.IsError ? dateModifiedResult.Value : Optional<DateTime>.None(), size);
+                if (errorFileResult.IsError)
+                    return errorFileResult.Errors;
+                ErrorOr<Updated> setStatusResult = errorFileResult.Value.SetStatus(FileSystemItemStatus.Inaccessible);
+                if (setStatusResult.IsError)
+                    return setStatusResult.Errors;
+                return errorFileResult;
             }
             else
-                return new File(newFilePathResult.Value, fileNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value, size);
+                return File.Create(newFilePathResult.Value, fileNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value, size);
         }
     }
 
@@ -276,7 +298,7 @@ public class FileService : IFileService
     /// </summary>
     /// <param name="path">String representation of the file path.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the result of deleting a file, or an error.</returns>
-    public ErrorOr<bool> DeleteFile(string path)
+    public ErrorOr<Deleted> DeleteFile(string path)
     {
         var fileSystemPathIdResult = FileSystemPathId.Create(path);
         if (fileSystemPathIdResult.IsError)
@@ -289,7 +311,7 @@ public class FileService : IFileService
     /// </summary>
     /// <param name="path">Identifier for the file path.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the result of deleting a file, or an error.</returns>
-    public ErrorOr<bool> DeleteFile(FileSystemPathId path)
+    public ErrorOr<Deleted> DeleteFile(FileSystemPathId path)
     {
         return _environmentContext.FileProviderService.DeleteFile(path);
     }

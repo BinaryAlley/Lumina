@@ -6,21 +6,22 @@
 @implements IDisposable
 
 @inject ComboboxService _comboboxService
+@inject IJSRuntime JSRuntime
 
-<div class="enlightenment-combobox inline-block w-100 @(IsOpen ? "open" : string.Empty) @CssClass">
+<div id="combobox_@Id" class="enlightenment-combobox inline-block w-100 @(IsOpen ? "open" : string.Empty) @CssClass">
     <div class="shine-effect"></div>
-    <input type="checkbox" class="enlightenment-toggle-checkbox" @bind="IsOpen" id="@Id" @onclick="ToggleDropdown">
-    <label class="enlightenment-toggle" for="@Id">
+    <input type="checkbox" class="enlightenment-toggle-checkbox" @bind="IsOpen" id="combobox_checkbox_@Id" @onclick="ToggleDropdownAsync">
+    <label class="enlightenment-toggle" for="combobox_checkbox_@Id">
         <span class="enlightenment-selected-text">@(SelectedItem?.Text ?? "No item selected")</span>
     </label>
     <div class="enlightenment-dropdown">
         <div class="shine-effect"></div>
-        <div class="enlightenment-item first-item disabled" @onclick="() => SelectItem(null)">No item selected</div>
+        <div class="enlightenment-item first-item disabled italic" @onclick="() => SelectItem(null)">No item selected</div>
 
-        @for (int i = 0; i < Items.Count; i++)
+        @for (int i = 0; i < Items?.Count; i++)
         {
             var item = Items[i];
-            var cssClass = $"enlightenment-item {(i == Items.Count - 1 ? "last-item" : string.Empty)}";
+            var cssClass = $"enlightenment-item {(i == Items.Count - 1 ? "last-item" : string.Empty)} {(item.IsEnabled ? string.Empty : "disabled")}";
             <div class="@cssClass" @onclick="() => SelectItem(item)">@item.Text</div>
         }
     </div>
@@ -33,7 +34,7 @@
     [Parameter] public string? CssClass { get; set; }
 
     private bool IsOpen { get; set; }
-    private string Id { get; set; } = $"combobox_{Guid.NewGuid()}";
+    private Guid Id { get; set; } = Guid.NewGuid();
 
     /// <summary>
     /// Initializes the component.
@@ -46,11 +47,14 @@
     /// <summary>
     /// Toggles the dropdown state.
     /// </summary>
-    private void ToggleDropdown()
+    private async Task ToggleDropdownAsync()
     {
         IsOpen = !IsOpen;
         if (IsOpen)
-            _comboboxService.NotifyComboboxOpened(Id);
+        {
+            _comboboxService.NotifyComboboxOpened("combobox_checkbox_" + Id);
+            await JSRuntime.InvokeVoidAsync("adjustDropdownHeight", "combobox_" + Id).ConfigureAwait(false);
+        }
     }
 
     /// <summary>
@@ -59,7 +63,7 @@
     /// <param name="openedId">The optional id of the combobox that initiated the dropdown state change.</param>
     private void CloseIfNotThis(string? openedId)
     {
-        if (openedId != Id && IsOpen)
+        if (openedId != "combobox_checkbox_" + Id && IsOpen)
         {
             IsOpen = false;
             StateHasChanged();
@@ -74,7 +78,7 @@
     {
         SelectedItem = item;
         IsOpen = false;
-        await SelectedItemChanged.InvokeAsync(item);
+        await SelectedItemChanged.InvokeAsync(item).ConfigureAwait(false);
     }
 
     /// <summary>

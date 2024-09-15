@@ -181,6 +181,11 @@
 .menubar {
     background: linear-gradient( to bottom, #505050 0%, #464646 35%, #404040 55%, #363636 100% );
     padding: 0;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    z-index: 900;
 }
 
     .menubar ul {

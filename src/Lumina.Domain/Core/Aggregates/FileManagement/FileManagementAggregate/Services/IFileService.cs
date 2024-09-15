@@ -3,7 +3,6 @@ using ErrorOr;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Entities;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.ValueObjects;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Services;
@@ -19,21 +18,21 @@ public interface IFileService
     /// </summary>
     /// <param name="path">String representation of the file path.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of files or an error.</returns>
-    Task<ErrorOr<IEnumerable<File>>> GetFilesAsync(string path);
+    ErrorOr<IEnumerable<File>> GetFiles(string path);
 
     /// <summary>
     /// Retrieves files associated with a given file.
     /// </summary>
     /// <param name="file">The file object.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of files or an error.</returns>
-    Task<ErrorOr<IEnumerable<File>>> GetFilesAsync(File file);
+    ErrorOr<IEnumerable<File>> GetFiles(File file);
 
     /// <summary>
     /// Retrieves files for a specified file path ID.
     /// </summary>
     /// <param name="path">Identifier for the file path.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of files or an error.</returns>
-    Task<ErrorOr<IEnumerable<File>>> GetFilesAsync(FileSystemPathId path);
+    ErrorOr<IEnumerable<File>> GetFiles(FileSystemPathId path);
 
     /// <summary>
     /// Copies a file located at <paramref name="sourcePath"/> to <paramref name="destinationPath"/>.
@@ -66,6 +65,6 @@ public interface IFileService
     /// </summary>
     /// <param name="path">String representation of the file path.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the result of deleting a file, or an error.</returns>
-    ErrorOr<bool> DeleteFile(string path);
+    ErrorOr<Deleted> DeleteFile(string path);
     #endregion
 }
