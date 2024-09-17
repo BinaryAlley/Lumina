@@ -51,6 +51,29 @@ public class PathController : ApiController
     }
 
     /// <summary>
+    /// Gets the path separator character of the file system.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    [HttpGet("get-path-separator")]
+    public async Task<IActionResult> GetPathSeparator(CancellationToken cancellationToken)
+    {
+        PathSeparatorResponse result = await _mediator.Send(new GetPathSeparatorQuery(), cancellationToken).ConfigureAwait(false);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Gets the path separator character of the file system.
+    /// </summary>
+    /// <param name="path">The path for which to get the parent path.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    [HttpGet("get-path-parent")]
+    public async Task<IActionResult> GetPathParent([FromQuery, ModelBinder(typeof(UrlStringBinder))] string path, CancellationToken cancellationToken)
+    {
+        ErrorOr<IEnumerable<PathSegmentResponse>> result = await _mediator.Send(new GetPathParentQuery(path), cancellationToken).ConfigureAwait(false);
+        return result.Match(result => Ok(result), errors => Problem(errors));
+    }
+
+    /// <summary>
     /// Combines <paramref name="originalPath"/> with <paramref name="newPath"/>.
     /// </summary>
     /// <param name="originalPath">The path to combine to.</param>
@@ -64,17 +87,6 @@ public class PathController : ApiController
     }
 
     /// <summary>
-    /// Gets the path separator character of the file system.
-    /// </summary>
-    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    [HttpGet("get-path-separator")]
-    public async Task<IActionResult> GetPathSeparator(CancellationToken cancellationToken)
-    {
-        PathSeparatorResponse result = await _mediator.Send(new GetPathSeparatorQuery(), cancellationToken).ConfigureAwait(false);
-        return Ok(result);
-    }
-
-    /// <summary>
     /// Gets the path components of <paramref name="path"/>.
     /// </summary>
     /// <param name="path">The path for which to get the path segments.</param>
@@ -84,6 +96,18 @@ public class PathController : ApiController
     {
         ErrorOr<IEnumerable<PathSegmentResponse>> result = await _mediator.Send(new SplitPathCommand(path), cancellationToken).ConfigureAwait(false);
         return result.Match(result => Ok(result), errors => Problem(errors));
+    }
+
+    /// <summary>
+    /// Validates the validity of <paramref name="path"/>.
+    /// </summary>
+    /// <param name="path">The path to be validated.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    [HttpGet("validate")]
+    public async Task<IActionResult> ValidatePath([FromQuery, ModelBinder(typeof(UrlStringBinder))] string path, CancellationToken cancellationToken)
+    {
+        PathValidResponse result = await _mediator.Send(new ValidatePathQuery(path), cancellationToken).ConfigureAwait(false);
+        return Ok(result);
     }
     #endregion
 }

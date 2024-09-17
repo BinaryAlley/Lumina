@@ -7,7 +7,7 @@ namespace Lumina.Presentation.Web.Common.Models.FileManagement;
 
 /// <summary>
 /// Model containing the file system platform type.
-/// </summary>
+/// </summary>`
 [DebuggerDisplay("{PlatformType}")]
 public class FileSystemTypeModel
 {

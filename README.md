@@ -30,6 +30,15 @@ Any modifications or adaptations made to the original graphics and styles are my
 
 To explore more about Enlightenment and their contributions to the open-source community, please visit the [official Enlightenment website](https://www.enlightenment.org/).
 
+### Icons
+
+Most icons were taken from [Lyra Icon Theme](https://github.com/yeyushengfan258/Lyra-icon-theme/tree/master/src), a beautiful icon theme for Linux desktops.
+
+Several icons used in this project were adapted from icons sourced from [svgrepo](https://www.svgrepo.com/).
+
+- [`toggle-thumbnails.svg`](https://www.svgrepo.com/svg/370469/page-image) (Public Domain license)
+- [`toggle-hidden.svg`](https://www.svgrepo.com/svg/470389/hidden) (MIT License)
+
 ## License
 
 This project is licensed under the GPLv3.0. See the [LICENSE](./docs/LICENSE.md) file for details.

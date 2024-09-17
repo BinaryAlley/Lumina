@@ -5,10 +5,10 @@ using System.Diagnostics;
 namespace Lumina.Contracts.Responses.FileManagement;
 
 /// <summary>
-/// Represents a response containing a file system path.
+/// Represents a response to the inquiry about the validity of a file system path.
 /// </summary>
-/// <param name="Path">The returned path.</param>
-[DebuggerDisplay("{Path}")]
-public record PathSegmentResponse(
-    string Path
+/// <param name="IsValid">Whether a file system path is valid or not.</param>
+[DebuggerDisplay("{IsValid}")]
+public record PathValidResponse(
+    bool IsValid
 );

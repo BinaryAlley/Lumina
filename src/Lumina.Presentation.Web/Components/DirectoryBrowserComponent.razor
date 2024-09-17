@@ -1,40 +1,104 @@
-﻿@using Lumina.Presentation.Web.Common.Models.UI
+﻿@using Lumina.Presentation.Web.Common.Api
+@using Lumina.Presentation.Web.Common.Enums.FileSystem
+@using Lumina.Presentation.Web.Common.Exceptions
+@using Lumina.Presentation.Web.Common.Models.Common
+@using Lumina.Presentation.Web.Common.Models.FileManagement
+@using Lumina.Presentation.Web.Common.Models.UI
+@using Microsoft.AspNetCore.Components
+
+@inject IJSRuntime JSRuntime
+@inject IApiHttpClient _apiHttpClient
 
 <div id="directory-browser-dialog" class="container-background above-modal">
     <div id="directory-browser-content">
         <div id="directory-browser-header">
             <div id="directory-browser-shine-spark"></div>
             <div id="directory-browser-shine-effect"></div>
-            <div id="directory-browser-header-navigation-container">
-                <div class="directory-browser-header-navigation">
-                    <img src="images/ui/back.svg" class="navigation-icon" alt="Back" title="Back"/>
-                    <img src="images/ui/forward.svg" class="navigation-icon" alt="Forward" title="Forward" />
-                    <img src="images/ui/up.svg" class="navigation-icon" alt="Up one level" title="Up one level" />
+            <div id="directory-browser-header-navigation-container">                            
+                <!--File System Navigator-->
+                <div id="navigator-view-mode-container">
+                    <img src="images/ui/list.png" id="navigator-list-view" alt="List View" title="List View" />
+                    <img src="images/ui/details.png" id="navigator-details-view" alt="Details View" title="Details View" />
+                    <img src="images/ui/small-icons.png" id="navigator-small-icons-view" alt="Small Icons View" title="Small Icons View" />
+                    <img src="images/ui/medium-icons.png" id="navigator-medium-icons-view" alt="Medium Icons View" title="Medium Icons View" />
+                    <img src="images/ui/large-icons.png" id="navigator-large-icons-view" alt="Large Icons View" title="Large Icons View" />
+                    <img src="images/ui/extra-large-icons.png" id="navigator-extra-large-icons-view" alt="Extra Large Icons View" title="Extra Large Icons View" />
                 </div>
-                <div id="directory-browser-header-address-bar-container">
-                    <EnlightenmentInput CssClass="directory-browser-header-address-bar-url" Type="text" Name="addressBar" Height="22" AutoComplete="true" />
-                    <div class="directory-browser-header-address-bar-actions">
-                        <img src="images/ui/favorite-star.svg" class="navigation-icon favorite-unselected" alt="Favorite directory" title="Favorite directory" />
-                        <EnlightenmentButton CssClass="directory-browser-content-new-directory" Width="120">New Directory</EnlightenmentButton>
+                <div id="navigator-navigation-controls-container">
+                    <div id="navigator-history">
+                        <img src="images/ui/back.svg" class="navigation-icon" alt="Back" title="Back" />
+                        <img src="images/ui/forward.svg" class="navigation-icon" alt="Forward" title="Forward" />
+                        <img src="images/ui/up.svg" class="navigation-icon" alt="Up One Level" title="Up One Level" />
                     </div>
+                    <img src="images/ui/toggle-tree-view.svg" id="navigator-toggle-tree-view-button" alt="Toggle Tree View" title="Toggle Tree View" class="navigator-icon" />
+                    <img src="images/ui/toggle-thumbnails.svg" id="navigator-toggle-thumbnails-button" alt="Toggle Thumbnails" title="Toggle Thumbanils" class="navigator-icon" />
+                    <img src="images/ui/toggle-hidden.svg" id="navigator-toggle-hidden-button" alt="Toggle Hidden Files" title="Toggle Hidden Files" class="navigator-icon" />
                 </div>
+                <div id="navigator-address-bar-container">
+                    <div id="navigator-address-bar-group">
+                        <EnlightenmentInput CssClass="navigator-address-bar-input" Type="text" Value="@Path" Name="navigator-address-bar-input" AutoComplete="true" />
+                        <div id="navigator-address-bar">
+                            <ul id="navigator-path-segments">
+                                @if (pathSegments?.Length > 0)
+                                {
+                                    for (int i = 0; i < pathSegments.Length; i++)
+                                    {
+                                        var localIndex = i;  // capture the current index in a local variable, otherwise it would be evaluated when the loop ends
+                                        var pathSegment = pathSegments[i];
+                                        <li id="path-segment-@i">
+                                            <div class="navigator-combobox inline-block">
+                                                <div class="shine-effect" style="top: 1px;"></div>
+                                                <input type="checkbox" class="navigator-toggle-checkbox" id="segment-toggle-@i"
+                                                       @onchange="@(e => OnNavigatorPathSegmentCheckChangeHandler(e, localIndex))" />
+                                                <label class="navigator-toggle" for="segment-toggle-@i">
+                                                    <span class="navigator-selected-text">@pathSegment.Path</span>
+                                                    <span class="navigator-arrow"></span>
+                                                </label>
+                                            </div>
+                                        </li>
+                                    }
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                    <EnlightenmentButton CssClass="navigator-edit-path-button" IsConfirmButton="false" Height="28" Width="35">
+                        <img src="images/ui/edit.svg" id="navigator-edit-icon" alt="Edit Path" title="Edit Path" />
+                    </EnlightenmentButton>
+                    <EnlightenmentButton CssClass="navigator-navigate-button" Height="28" Width="35">
+                        <img src="images/ui/check.svg" id="navigator-navigate-icon" alt="Navigate" title="Navigate" />
+                    </EnlightenmentButton>
+                    <EnlightenmentButton CssClass="directory-browser-content-new-directory" IsConfirmButton="false" Width="35" Height="28">
+                        <img src="images/ui/new-directory.svg" id="navigator-new-directory-icon" alt="New Directory" title="New Directory" />
+                    </EnlightenmentButton>
+                    <EnlightenmentButton CssClass="directory-browser-content-favorite-directory" IsConfirmButton="false" Width="35" Height="28">
+                        <img src="images/ui/favorite-star.svg" class="navigation-icon favorite-unselected" alt="Favorite directory" title="Favorite directory" />
+                    </EnlightenmentButton>
+                </div>
+                <!--End File System Navigator-->
             </div>
         </div>
         <div id="directory-browser-file-system-container">
+            <!--File System Tree View-->
             <div id="directory-browser-file-system-treeview-container">
                 <div id="directory-browser-file-system-treeview">
-                    <FileSystemTreeView InitialPath="@savedPath" OnNodeSelected="HandleNodeSelected" />
+                    <div class="treeview">
+                        @foreach (FileSystemTreeNodeModel node in treeViewRootNodes)
+                        {
+                            <FileSystemTreeViewNode Node="node" OnExpand="ExpandNode" OnNodeSelected="HandleNodeSelected" selectedNodePath="@selectedNodePath" />
+                        }
+                    </div>
                 </div>
                 <EnlightenmentCombobox CssClass="directory-browser-file-system-sources" Items="null" @bind-SelectedItem="selectedValue" />
             </div>
             <div id="directory-browser-file-system-directories-container">
                 <div id="directory-browser-file-system-directories"></div>
             </div>
+            <!--End File System Tree View-->
         </div>
         <div id="directory-browser-actions-container">
             <div id="directory-browser-actions-path-container">
                 <label class="text-light-one">Directory</label>
-                <EnlightenmentInput Type="text" Name="selectedDirectory" IsReadOnly="true" AutoComplete="true" />
+                <EnlightenmentInput Type="text" Name="selected-directory" IsReadOnly="true" AutoComplete="true" />
             </div>
             <div id="directory-browser-actions">
                 <EnlightenmentButton IsConfirmButton="false">Cancel</EnlightenmentButton>
@@ -51,12 +115,205 @@
     <EnlightenmentButton>Confirm</EnlightenmentButton> *@
 </div>
 
+<!--The drop down for the navigator path segments needs to be absolute, such that it is not affected by the parent clipping-->
+@if (showPathSegmentDowpDown && expandedPathSegmentIndex.HasValue && pathSegmentsSubdirectoriesCache.ContainsKey(expandedPathSegmentIndex.Value))
+{
+    <div class="navigator-dropdown opened" id="navigatorDropdown" data-path-segment-id="path-segment-@expandedPathSegmentIndex">        
+        @foreach (var directory in pathSegmentsSubdirectoriesCache[expandedPathSegmentIndex.Value])
+        {
+            <div class="navigator-option" data-path="@directory.Path" @onclick="@(() => HandleNodeSelected(directory.Path))">@directory.Name</div>
+        }
+    </div>
+}
 @code {
-    private ComboboxItem<string>? selectedValue;
-    private string savedPath = string.Empty;
+    [Parameter]
+    public string? Path { get; set; }
 
-    private void HandleNodeSelected(string path)
+    public EventCallback<string> OnNodeSelected { get; set; }
+
+    private List<FileSystemTreeNodeModel> treeViewRootNodes = [];
+    private FileSystemTypeModel fileSystemType = null!;
+    private ComboboxItem<string>? selectedValue;
+    private PathSegmentModel[]? pathSegments;
+    private string pathSeparator = "/";
+    private string? selectedNodePath;
+    private string? _path;
+    private bool showPathSegmentDowpDown;
+    private int? expandedPathSegmentIndex;
+    private Dictionary<int, List<FileSystemTreeNodeModel>> pathSegmentsSubdirectoriesCache = [];
+
+
+    /// <summary>
+    /// Initializes the component.
+    /// </summary>
+    protected override async Task OnInitializedAsync()
     {
+        fileSystemType = await _apiHttpClient.GetAsync<FileSystemTypeModel>("file-system/get-type").ConfigureAwait(false);
+        // ask the API server for the system path separator
+        PathSeparatorModel apiPathSeparator = await _apiHttpClient.GetAsync<PathSeparatorModel>("path/get-path-separator").ConfigureAwait(false);
+        pathSeparator = apiPathSeparator.Separator; // TODO: handle error
+
+        // treeview 
+        // on Windows, ask the list of drives
+        if (fileSystemType?.PlatformType == PlatformType.Windows)
+        {
+            List<FileSystemTreeNodeModel> drives = await _apiHttpClient.GetAsync<List<FileSystemTreeNodeModel>>("drives/get-drives").ConfigureAwait(false);
+            treeViewRootNodes.AddRange(drives);
+        }
+        else
+        {
+            // on UNIX, just add the root "/"
+            treeViewRootNodes.Add(new FileSystemTreeNodeModel()
+            {
+                Path = pathSeparator!,
+                IsExpanded = true,
+                ItemType = FileSystemItemType.Root,
+                Name = pathSeparator!
+            });
+        }
+        if (Path is not null)
+        {
+            var isPathValidResponse = await _apiHttpClient.GetAsync<PathValidModel>($"path/validate?path={Uri.EscapeDataString(Path)}").ConfigureAwait(false);
+            if (!isPathValidResponse.IsValid)
+            {
+                // TODO: display error message to user
+                Console.WriteLine("specified path is not valid!");
+            }
+            else
+            {
+                // if there was an initial path saved from a previous session, load the full tree up to that initial path
+                // ask the whole tree for the saved path
+                List<FileSystemTreeNodeModel> initialTree = await _apiHttpClient.GetAsync<List<FileSystemTreeNodeModel>>($"directories/get-directory-tree?path={Uri.EscapeDataString(Path!)}").ConfigureAwait(false);
+                if (initialTree is not null && initialTree.Count > 0)
+                {
+                    pathSegments = await _apiHttpClient.GetAsync<PathSegmentModel[]>($"path/split?path={Uri.EscapeDataString(Path!)}").ConfigureAwait(false);
+                    StateHasChanged();
+                    // take the root of the retrieved tree, and try to match it against a drive in the retrieved list of drives, on Windows; on Unix, add it as the unique root path
+                    PathSegmentModel pathRoot = await _apiHttpClient.GetAsync<PathSegmentModel>($"path/get-path-root?path={Uri.EscapeDataString(Path!)}").ConfigureAwait(false);
+                    if (fileSystemType?.PlatformType == PlatformType.Windows)
+                    {
+                        FileSystemTreeNodeModel? driveNode = treeViewRootNodes.FirstOrDefault(drive => drive.Path.Equals(pathRoot.Path, StringComparison.OrdinalIgnoreCase));
+                        // if a drive was matched, make the retrieved tree a child of it
+                        if (driveNode is not null)
+                        {
+                            int index = treeViewRootNodes.IndexOf(driveNode);
+                            treeViewRootNodes[index] = initialTree[0];
+                        }
+                    }
+                    else
+                        treeViewRootNodes[0] = initialTree[0];
+                }
+            }
+        }
+        await JSRuntime.InvokeVoidAsync("makeAddressBarHorizontallyScrollable").ConfigureAwait(false);        
+    }
+
+    /// <summary>
+    /// Expands or collapses a node in the tree view.
+    /// </summary>
+    /// <param name="node">The node to expand or collapse.</param>
+    private async Task ExpandNode(FileSystemTreeNodeModel node)
+    {
+        if (!node.IsExpanded && !node.ChildrenLoaded)
+        {
+            node.Children = new List<FileSystemTreeNodeModel>();
+            node.IsExpanded = true;
+            StateHasChanged();
+            try
+            {
+                await foreach (FileSystemTreeNodeModel? childNode in _apiHttpClient.GetAsyncEnumerable<FileSystemTreeNodeModel>($"directories/get-directories?path={Uri.EscapeDataString(node.Path)}").ConfigureAwait(false))
+                {
+                    if (childNode is not null)
+                    {
+                        node.Children.Add(childNode);
+                        StateHasChanged();
+                    }
+                }
+                await foreach (FileSystemTreeNodeModel? childNode in _apiHttpClient.GetAsyncEnumerable<FileSystemTreeNodeModel>($"files/get-files?path={Uri.EscapeDataString(node.Path)}").ConfigureAwait(false))
+                {
+                    if (childNode is not null)
+                    {
+                        node.Children.Add(childNode);
+                        StateHasChanged();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error expanding node: {ex.Message}"); // TODO: display to the user when notification system is implemented
+            }
+            finally
+            {
+                node.ChildrenLoaded = true;
+            }
+        }
+        else
+            node.IsExpanded = !node.IsExpanded;
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Handles the selection of a node in the tree view.
+    /// </summary>
+    /// <param name="path">The path of the selected node.</param>
+    private async Task HandleNodeSelected(string path)
+    {
+        selectedNodePath = path;
         Console.WriteLine($"Selected node: {path}");
+        await OnNodeSelected.InvokeAsync(path).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Handles the change event.
+    /// </summary>
+    /// <param name="e">The event arguments.</param>
+    private async Task OnNavigatorPathSegmentCheckChangeHandler(ChangeEventArgs e, int toggledIndex)
+    {
+        await JSRuntime.InvokeVoidAsync("uncheckAllExcept", $"segment-toggle-{toggledIndex}").ConfigureAwait(false);
+        // check if the checkbox is checked
+        bool isChecked = (bool)e.Value!;
+        showPathSegmentDowpDown = isChecked;
+        expandedPathSegmentIndex = null;
+        // if it's checked, get the subdirectories for the toggled path segment
+        if (isChecked && pathSegments?.Length > 0)
+        {
+            // initialize the path with the first segment
+            string concatenatedPath = pathSegments[0].Path;
+            // concatenate only up to the toggled index
+            for (int i = 1; i <= toggledIndex; i++)
+                concatenatedPath = $"{(concatenatedPath != pathSeparator ? concatenatedPath : string.Empty)}{pathSeparator}{pathSegments[i].Path}";
+            string parentConcatenatedPath = concatenatedPath;
+            try
+            {
+                if (concatenatedPath != pathSeparator) // on UNIX, dont get the parent, if we are at root path
+                {
+                    List<PathSegmentModel> parentLocation = await _apiHttpClient.GetAsync<List<PathSegmentModel>>($"path/get-path-parent?path={Uri.EscapeDataString(concatenatedPath)}").ConfigureAwait(false);
+                    parentConcatenatedPath = parentLocation[0].Path;
+                    for (int i = 1; i < parentLocation.Count; i++)
+                        parentConcatenatedPath = $"{(parentConcatenatedPath != pathSeparator ? parentConcatenatedPath : string.Empty)}{pathSeparator}{pathSegments[i].Path}";
+                }
+            }
+            catch (ApiException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            // fetch directories for the expanded path segment
+            List<FileSystemTreeNodeModel> directories = [
+                new() { Path = concatenatedPath, Name = ".", }, // current directory
+                new() { Path = parentConcatenatedPath, Name = ".." } // parent directory
+            ];
+            // add the rest of the subdirectories of the expanded path node
+            await foreach (FileSystemTreeNodeModel? directory in _apiHttpClient.GetAsyncEnumerable<FileSystemTreeNodeModel>($"directories/get-directories?path={Uri.EscapeDataString(concatenatedPath)}").ConfigureAwait(false))
+                if (directory is not null)
+                    directories.Add(directory);
+            // store the directories for this segment
+            pathSegmentsSubdirectoriesCache[toggledIndex] = directories;
+            expandedPathSegmentIndex = toggledIndex;
+            StateHasChanged();
+            // invoke the javascript function that positions the dropdown underneath the toggled path segment
+            await JSRuntime.InvokeVoidAsync("updateDropdownPosition", $"path-segment-{toggledIndex}").ConfigureAwait(false);
+        }
+        else
+            StateHasChanged();
     }
 }
