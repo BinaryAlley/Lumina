@@ -1,4 +1,6 @@
-﻿/**
+﻿let windowWasClicked = false;
+
+/**
  * Adjusts the height of a dropdown identified by `comboboxId` to fit in the available space.
  * @param {string} comboboxId The Id of the combobox whose dropdown should be adjusted.
  */
@@ -25,8 +27,7 @@ function adjustDropdownHeight(comboboxId = null) {
 
 /**
  * Gets the position and size of an element relative to the viewport.
- * 
- * @param {string} id - The ID of the element to get the offset for.
+ * @param {string} id - The Id of the element to get the offset for.
  * @returns {Object} An object with the top, left, width, and height of the element.
  */
 function getElementOffset(id) {
@@ -50,7 +51,6 @@ function getElementOffset(id) {
 
 /**
  * Updates the position and height of the dropdown relative to the specified path segment.
- * 
  * @param {string} pathSegmentId - The ID of the path segment element to position the dropdown relative to.
  */
 function updateDropdownPosition(pathSegmentId) {
@@ -69,30 +69,53 @@ function updateDropdownPosition(pathSegmentId) {
 }
 
 /**
- * Unchecks all checkboxes except the one with the specified ID.
- * 
+ * Enables horizontal scrolling to the file system browser explorer tab.
+ */
+function addHorizontalScrolling(id) {
+    document.getElementById(id).addEventListener('wheel', function (event) {
+        event.preventDefault();
+        this.scrollLeft += (event.deltaY > 0 ? 1 : -1) * 80;
+    }, { passive: false });
+}
+
+/**
+ * Disables horizontal scrolling to the file system browser explorer tab.
+ */
+function removeHorizontalScrolling(id) {
+    document.getElementById(id).removeEventListener('wheel', function (event) {
+        event.preventDefault();
+        this.scrollLeft += (event.deltaY > 0 ? 1 : -1) * 80;
+    }, { passive: false });
+}
+
+/**
+ * Focuses the navigator address bar input.
+ */
+function focusNavigatorInputElement() {
+    const elements = document.getElementsByClassName('navigator-address-bar-input');
+    if (elements.length > 0)
+        elements[0].focus();
+}
+
+/**
+ * Unchecks all checkboxes except the one with the specified Id.
  * @param {string} id - The Id of the checkbox to leave checked.
  */
 function uncheckAllExcept(id) {
     const checkboxes = document.querySelectorAll('.navigator-toggle-checkbox');
     checkboxes.forEach((checkbox) => {
-        if (checkbox.id !== id) {
+        if (checkbox.id !== id)
             checkbox.checked = false;
-        }
     });
 }
 
 /**
- * Enables horizontal scrolling for the address bar using the mouse wheel.
+ * Closes all navigator path segments.
  */
-function makeAddressBarHorizontallyScrollable() {
-    const addressBar = document.getElementById('navigator-address-bar');
-    if (addressBar) {
-        addressBar.addEventListener('wheel', function (event) {
-            event.preventDefault();
-            this.scrollLeft += (event.deltaY > 0 ? 1 : -1) * 80;
-        }, { passive: false });
-    }
+function closeNavigatorPathSegments() {
+    const checkboxes = document.getElementsByClassName('navigator-toggle-checkbox');
+    for (let i = 0; i < checkboxes.length; i++)
+        checkboxes[i].checked = false;
 }
 
 /**
@@ -106,5 +129,20 @@ window.addEventListener('resize', function () {
         const pathSegmentId = dropdown.getAttribute('data-path-segment-id');
         if (pathSegmentId)
             updateDropdownPosition(pathSegmentId);
+    }
+});
+
+/**
+ * Handles window click events.
+ * @param {MouseEvent} event - The click event triggered on the window.
+ */
+window.addEventListener('click', function (event) {
+    // check if the clicked element is not a checkbox or its label
+    if (!event.target.closest('.navigator-toggle-checkbox, .navigator-toggle')) {
+        windowWasClicked = true;
+        closeNavigatorPathSegments();
+        const dropdown = document.getElementById('navigatorDropdown');
+        if (dropdown)
+            dropdown.style.display = 'none';
     }
 });

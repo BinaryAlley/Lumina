@@ -11,4 +11,4 @@ namespace Lumina.Application.Core.FileManagement.Directories.Queries;
 /// Query for retrieving the list of directories at a path.
 /// </summary>
 /// <param name="Path">The path for which to retrieve the list of directories.</param>
-public record GetDirectoriesQuery(string Path) : IRequest<ErrorOr<IEnumerable<DirectoryResponse>>>;
+public record GetTreeDirectoriesQuery(string Path) : IRequest<ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>>;

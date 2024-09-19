@@ -42,9 +42,9 @@ public class DirectoriesController : ApiController
     /// <param name="path">The path for which to get the directory tree.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     [HttpGet("get-directory-tree")]
-    public async IAsyncEnumerable<FileSystemTreeNodeResponse> GetDirectoryTree([FromQuery, ModelBinder(typeof(UrlStringBinder))] string path, [EnumeratorCancellation] CancellationToken cancellationToken)
+    public async IAsyncEnumerable<FileSystemTreeNodeResponse> GetDirectoryTree([FromQuery, ModelBinder(typeof(UrlStringBinder))] string path, [FromQuery] bool includeFiles, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _mediator.Send(new GetDirectoryTreeQuery(path), cancellationToken).ConfigureAwait(false);
+        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _mediator.Send(new GetDirectoryTreeQuery(path, includeFiles), cancellationToken).ConfigureAwait(false);
         if (!result.IsError && result.Value is not null)
         {
             foreach (var treeNode in result.Value)
@@ -61,10 +61,30 @@ public class DirectoriesController : ApiController
     /// </summary>
     /// <param name="path">The path for which to get the directories.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    [HttpGet("get-directories")]
-    public async IAsyncEnumerable<FileSystemTreeNodeResponse> GetDirectories([FromQuery, ModelBinder(typeof(UrlStringBinder))] string path, [EnumeratorCancellation] CancellationToken cancellationToken)
+    [HttpGet("get-tree-directories")]
+    public async IAsyncEnumerable<FileSystemTreeNodeResponse> GetTreeDirectories([FromQuery, ModelBinder(typeof(UrlStringBinder))] string path, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _mediator.Send(new GetDirectoriesQuery(path), cancellationToken).ConfigureAwait(false);
+        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _mediator.Send(new GetTreeDirectoriesQuery(path), cancellationToken).ConfigureAwait(false);
+        if (!result.IsError && result.Value is not null)
+        {
+            foreach (var directory in result.Value)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                    yield break;
+                yield return directory;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets the directories of <paramref name="path"/>.
+    /// </summary>
+    /// <param name="path">The path for which to get the directories.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    [HttpGet("get-directories")]
+    public async IAsyncEnumerable<DirectoryResponse> GetDirectories([FromQuery, ModelBinder(typeof(UrlStringBinder))] string path, [EnumeratorCancellation] CancellationToken cancellationToken)
+    {
+        ErrorOr<IEnumerable<DirectoryResponse>> result = await _mediator.Send(new GetDirectoriesQuery(path), cancellationToken).ConfigureAwait(false);
         if (!result.IsError && result.Value is not null)
         {
             foreach (var directory in result.Value)

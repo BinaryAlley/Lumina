@@ -1,4 +1,5 @@
 ﻿#region ========================================================================= USING =====================================================================================
+using ErrorOr;
 using Lumina.Application.Core.FileManagement.Files.Queries;
 using Lumina.Contracts.Responses.FileManagement;
 using Lumina.Presentation.Api.Common.ModelBinders;
@@ -41,15 +42,35 @@ public class FilesController : ApiController
     /// </summary>
     /// <param name="path">The path for which to get the files.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    [HttpGet("get-files")]
-    public async IAsyncEnumerable<FileSystemTreeNodeResponse> GetFiles([FromQuery, ModelBinder(typeof(UrlStringBinder))] string path, [EnumeratorCancellation] CancellationToken cancellationToken)
+    [HttpGet("get-tree-files")]
+    public async IAsyncEnumerable<FileSystemTreeNodeResponse> GetTreeFiles([FromQuery, ModelBinder(typeof(UrlStringBinder))] string path, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var result = await _mediator.Send(new GetFilesQuery(path), cancellationToken).ConfigureAwait(false);
+        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _mediator.Send(new GetTreeFilesQuery(path), cancellationToken).ConfigureAwait(false);
         foreach (var file in result.Value)
         {
             if (cancellationToken.IsCancellationRequested)
                 yield break;
             yield return file;
+        }
+    }
+
+    /// <summary>
+    /// Gets the files of <paramref name="path"/>.
+    /// </summary>
+    /// <param name="path">The path for which to get the files.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    [HttpGet("get-files")]
+    public async IAsyncEnumerable<FileResponse> GetFiles([FromQuery, ModelBinder(typeof(UrlStringBinder))] string path, [EnumeratorCancellation] CancellationToken cancellationToken)
+    {
+        ErrorOr<IEnumerable<FileResponse>> result = await _mediator.Send(new GetFilesQuery(path), cancellationToken).ConfigureAwait(false);
+        if (!result.IsError)
+        {
+            foreach (var file in result.Value)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                    yield break;
+                yield return file;
+            }
         }
     }
     #endregion

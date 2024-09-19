@@ -1,15 +1,16 @@
 ﻿#region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Common.Enums.FileSystem;
+using System;
 using System.Diagnostics;
 #endregion
 
 namespace Lumina.Presentation.Web.Common.Models.FileManagement;
 
 /// <summary>
-/// Model for files and directories displayed in custom directory/file browser dialogs.
+/// Base model for files and directories displayed in custom directory/file browser dialogs.
 /// </summary>
 [DebuggerDisplay("{Path}")]
-public class FileSystemItemModel
+public abstract class FileSystemItemModel
 {
     #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
@@ -18,23 +19,18 @@ public class FileSystemItemModel
     public string? Path { get; set; }
 
     /// <summary>
-    /// Gets the type of the file system element.
+    /// Gets or sets the name of the file system item.
     /// </summary>
-    public FileSystemItemType ItemType { get; set; }
+    public string? Name { get; set; }
 
     /// <summary>
-    /// Gets or sets the file extension of the item, if applicable (e.g., ".txt", ".jpg").
+    /// Gets or sets the creation date of the file system item.
     /// </summary>
-    public string? Extension { get; set; }
+    public DateTime DateCreated { get; set; }
 
     /// <summary>
-    /// Gets or sets the source path or identifier for the icon representing the file system item.
+    /// Gets or sets the modification date of the file system item.
     /// </summary>
-    public string? IconSource { get; set; }
-
-    /// <summary>
-    /// Gets or sets a friendly name for the file system item, which may be a user-friendly display name.
-    /// </summary>
-    public string? FriendlyName { get; set; }
+    public DateTime DateModified { get; set; }
     #endregion
 }

@@ -73,7 +73,7 @@ public class GetDirectoryTreeQueryHandler : IRequestHandler<GetDirectoryTreeQuer
             return buildDirectoryTreeResult.Errors;
 
         // add subdirectories of the last directory node
-        ErrorOr<Success> loadChildrenResult = LoadChildren(currentNode);
+        ErrorOr<Success> loadChildrenResult = LoadChildren(currentNode, request.IncludeFiles);
         if (loadChildrenResult.IsError)
             return loadChildrenResult.Errors;
         return await ValueTask.FromResult(result);
@@ -135,8 +135,9 @@ public class GetDirectoryTreeQueryHandler : IRequestHandler<GetDirectoryTreeQuer
     /// Loads the child directories and files of the specified directory node.
     /// </summary>
     /// <param name="node">The directory node to load children for.</param>
+    /// <param name="includeFiles">Whether to include files in the directories or not.</param>
     /// <returns>A result indicating a successful operation, or an error message.</returns>
-    private ErrorOr<Success> LoadChildren(FileSystemTreeNodeResponse node)
+    private ErrorOr<Success> LoadChildren(FileSystemTreeNodeResponse node, bool includeFiles)
     {
         // get subdirectories under the current node's path
         ErrorOr<IEnumerable<Directory>> subDirectoriesResult = _directoryService.GetSubdirectories(node.Path);
@@ -155,22 +156,25 @@ public class GetDirectoryTreeQueryHandler : IRequestHandler<GetDirectoryTreeQuer
             };
             node.Children.Add(subDirNode);
         }
-        // get files under the current node's path
-        ErrorOr<IEnumerable<File>> filesResult = _fileService.GetFiles(node.Path);
-        if (filesResult.IsError)
-            return filesResult.Errors;
-        // add each file as a child node of the current directory
-        foreach (File file in filesResult.Value)
+        if (includeFiles)
         {
-            FileSystemTreeNodeResponse fileNode = new FileSystemTreeNodeResponse
+            // get files under the current node's path
+            ErrorOr<IEnumerable<File>> filesResult = _fileService.GetFiles(node.Path);
+            if (filesResult.IsError)
+                return filesResult.Errors;
+            // add each file as a child node of the current directory
+            foreach (File file in filesResult.Value)
             {
-                Name = file.Name,
-                Path = file.Id.Path,
-                ItemType = FileSystemItemType.File,
-                IsExpanded = false,
-                ChildrenLoaded = true
-            };
-            node.Children.Add(fileNode);
+                FileSystemTreeNodeResponse fileNode = new FileSystemTreeNodeResponse
+                {
+                    Name = file.Name,
+                    Path = file.Id.Path,
+                    ItemType = FileSystemItemType.File,
+                    IsExpanded = false,
+                    ChildrenLoaded = true
+                };
+                node.Children.Add(fileNode);
+            }
         }
         node.ChildrenLoaded = true;
         return Result.Success;

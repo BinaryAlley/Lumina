@@ -16,7 +16,7 @@ namespace Lumina.Application.Core.FileManagement.Directories.Queries;
 /// <summary>
 /// Handler for the query to get all directories.
 /// </summary>
-public class GetDirectoriesQueryHandler : IRequestHandler<GetDirectoriesQuery, ErrorOr<IEnumerable<DirectoryResponse>>>
+public class GetTreeDirectoriesQueryHandler : IRequestHandler<GetTreeDirectoriesQuery, ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>>
 {
     #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IDirectoryService _directoryService;
@@ -24,10 +24,10 @@ public class GetDirectoriesQueryHandler : IRequestHandler<GetDirectoriesQuery, E
 
     #region ====================================================================== CTOR =====================================================================================
     /// <summary>
-    /// Initializes a new instance of the <see cref="GetDirectoriesQueryHandler"/> class.
+    /// Initializes a new instance of the <see cref="GetTreeDirectoriesQueryHandler"/> class.
     /// </summary>
     /// <param name="directoryService">Injected service for handling directories.</param>
-    public GetDirectoriesQueryHandler(IDirectoryService directoryService)
+    public GetTreeDirectoriesQueryHandler(IDirectoryService directoryService)
     {
         _directoryService = directoryService;
     }
@@ -40,12 +40,12 @@ public class GetDirectoriesQueryHandler : IRequestHandler<GetDirectoriesQuery, E
     /// <param name="request">The query containing the requested path.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a collection of <see cref="DirectoryResponse"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a collection of <see cref="FileSystemTreeNodeResponse"/>, or an error message.
     /// </returns>
-    public ValueTask<ErrorOr<IEnumerable<DirectoryResponse>>> Handle(GetDirectoriesQuery request, CancellationToken cancellationToken)
+    public ValueTask<ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>> Handle(GetTreeDirectoriesQuery request, CancellationToken cancellationToken)
     {
         ErrorOr<IEnumerable<Directory>> result = _directoryService.GetSubdirectories(request.Path);
-        return ValueTask.FromResult(result.Match(values => ErrorOrFactory.From(result.Value.Adapt<IEnumerable<DirectoryResponse>>()), errors => errors));
+        return ValueTask.FromResult(result.Match(values => ErrorOrFactory.From(result.Value.Adapt<IEnumerable<FileSystemTreeNodeResponse>>()), errors => errors));
     }
     #endregion
 }

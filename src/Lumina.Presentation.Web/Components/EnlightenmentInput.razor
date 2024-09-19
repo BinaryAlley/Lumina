@@ -1,10 +1,14 @@
-﻿<input type="@Type"
+﻿@inject IJSRuntime JSRuntime
+
+<input type="@Type"
        style="width: @($"{Width}{(UsesPercentForWidth ? "%" : "px")}"); height: @($"{Height}{(UsesPercentForHeight ? "%" : "px")}");"
        class="enlightenment-input @CssClass"
        name="@Name"
        autocomplete="@(AutoComplete ? "on" : "off")"
        value="@Value"
        @oninput="OnInputHandlerAsync"
+       @onkeypress="OnKeyPressAsync"
+       @onkeydown="OnKeyDownAsync"
        placeholder="@Placeholder"
        disabled="@IsDisabled"
        readonly="@IsReadOnly"
@@ -21,18 +25,40 @@
     [Parameter] public bool AutoComplete { get; set; } = true;
     [Parameter] public string? Value { get; set; }
     [Parameter] public EventCallback<string> ValueChanged { get; set; }
+    [Parameter] public EventCallback OnEnterPressed { get; set; }
+    [Parameter] public EventCallback OnEscapePressed { get; set; }
     [Parameter] public string? Placeholder { get; set; }
     [Parameter] public bool IsDisabled { get; set; }
     [Parameter] public bool IsReadOnly { get; set; }
     [Parameter] public bool HasError { get; set; }
 
     /// <summary>
-    /// Handles the input event.
+    /// Handles the input change event.
     /// </summary>
     /// <param name="e">The event arguments.</param>
     private async Task OnInputHandlerAsync(ChangeEventArgs e)
     {
         Value = e.Value?.ToString();
         await ValueChanged.InvokeAsync(Value).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Handles the key press event.
+    /// </summary>
+    /// <param name="e">The event arguments.</param>
+    private async Task OnKeyPressAsync(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+            await OnEnterPressed.InvokeAsync();
+    }
+
+    /// <summary>
+    /// Handles the key down event.
+    /// </summary>
+    /// <param name="e">The event arguments.</param>
+    private async Task OnKeyDownAsync(KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape")
+            await OnEscapePressed.InvokeAsync(Value);
     }
 }

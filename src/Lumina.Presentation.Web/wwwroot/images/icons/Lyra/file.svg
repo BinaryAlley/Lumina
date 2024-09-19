@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="64" height="64" version="1.1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+
+    <defs>
+        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feComponentTransfer in="SourceAlpha" result="adjustedAlpha">
+                <feFuncA type="table" tableValues="0 1"/>
+            </feComponentTransfer>
+            <feGaussianBlur in="adjustedAlpha" stdDeviation="1.5" result="blur"/>
+            <feFlood flood-color="#039bfc" result="color"/>
+            <feComposite in="color" in2="blur" operator="in" result="softGlowColored"/>
+            <feMerge>
+                <feMergeNode in="softGlowColored"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+    </defs>
+
+    <g transform="translate(.0027)" fill="none" stroke="#039bfc">
+        <g transform="translate(-118.5 -1.0001)">
+            <path d="m151.91 7.5012-19.463 0.00384c-1.0839 0-1.9566 0.87713-1.9566 1.9666v48.062c0 1.0895 0.87263 1.9666 1.9566 1.9666h36.094c1.0839 0 1.9566-0.87713 1.9566-1.9666v-31.35c0-0.52622-0.17737-1.2239-0.54454-1.9686h-14.129c-1.084 0-1.9566-0.87711-1.9566-1.9666v-14.329c-0.73795-0.32677-1.4386-0.41867-1.9565-0.41867z" stroke-width=".99964" filter="url(#glow)"/>
+            <path d="m153.89 7.9297v14.288c0 1.108 0.89202 2.0001 2.0001 2.0001h14.071c-0.32607-0.65878-0.79761-1.3523-1.4453-2.0001l-12.606-12.713c-0.62957-0.79666-1.3298-1.2789-2.0001-1.5742z" stroke-width=".99964" filter="url(#glow)"/>
+        </g>  
+    </g>
+</svg>

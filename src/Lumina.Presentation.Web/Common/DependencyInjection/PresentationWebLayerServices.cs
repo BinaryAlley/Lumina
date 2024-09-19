@@ -26,11 +26,14 @@ public static class PresentationWebLayerServices
     {
         // scan the current assembly for validators and register them to the DI container
         services.AddValidatorsFromAssemblyContaining<Program>(ServiceLifetime.Singleton);
-        
+
         // handle transient errors like network timeouts or intermittent failures
         var retryPolicy = Policy
             .Handle<HttpRequestException>()
-            .OrResult<HttpResponseMessage>(r => !r.IsSuccessStatusCode)
+            .OrResult<HttpResponseMessage>(r =>
+                !r.IsSuccessStatusCode &&
+                r.StatusCode != HttpStatusCode.Forbidden &&
+                r.StatusCode != HttpStatusCode.BadRequest)
             .WaitAndRetryAsync(3, retryAttempt =>
                 TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
 

@@ -25,6 +25,15 @@ public class FileMappingConfig : IRegister
             .Map(dest => dest.IsExpanded, () => false)
             .Map(dest => dest.ChildrenLoaded, () => false)
             .MapToConstructor(true);
+
+        config.NewConfig<File, FileResponse>()
+            .MapWith(src => new FileResponse(
+                src.Id.Path,
+                src.Name,
+                src.DateCreated.HasValue ? src.DateCreated.Value : default,
+                src.DateModified.HasValue ? src.DateModified.Value : default,
+                src.Size
+            ));
     }
     #endregion
 }

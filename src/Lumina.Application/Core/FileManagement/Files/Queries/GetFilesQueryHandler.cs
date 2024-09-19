@@ -15,7 +15,7 @@ namespace Lumina.Application.Core.FileManagement.Files.Queries;
 /// <summary>
 /// Handler for the query to get all files.
 /// </summary>
-public class GetFilesQueryHandler : IRequestHandler<GetFilesQuery, ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>>
+public class GetFilesQueryHandler : IRequestHandler<GetFilesQuery, ErrorOr<IEnumerable<FileResponse>>>
 {
     #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IFileService _fileService;
@@ -39,12 +39,12 @@ public class GetFilesQueryHandler : IRequestHandler<GetFilesQuery, ErrorOr<IEnum
     /// <param name="request">The query containing the requested path.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a collection of <see cref="FileSystemTreeNodeResponse"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a collection of <see cref="FileResponse"/>, or an error message.
     /// </returns>
-    public ValueTask<ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>> Handle(GetFilesQuery request, CancellationToken cancellationToken)
+    public ValueTask<ErrorOr<IEnumerable<FileResponse>>> Handle(GetFilesQuery request, CancellationToken cancellationToken)
     {
         ErrorOr<IEnumerable<File>> result = _fileService.GetFiles(request.Path);
-        return ValueTask.FromResult(result.Match(values => ErrorOrFactory.From(result.Value.Adapt<IEnumerable<FileSystemTreeNodeResponse>>()), errors => errors));
+        return ValueTask.FromResult(result.Match(values => ErrorOrFactory.From(result.Value.Adapt<IEnumerable<FileResponse>>()), errors => errors));
     }
     #endregion
 }
