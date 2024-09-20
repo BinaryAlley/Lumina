@@ -109,5 +109,17 @@ public class PathController : ApiController
         PathValidResponse result = await _mediator.Send(new ValidatePathQuery(path), cancellationToken).ConfigureAwait(false);
         return Ok(result);
     }
+
+    /// <summary>
+    /// Checks whether <paramref name="path"/> exists or not.
+    /// </summary>
+    /// <param name="path">The path to be checked.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    [HttpGet("check-path-exists")]
+    public async Task<IActionResult> CheckPathExists([FromQuery, ModelBinder(typeof(UrlStringBinder))] string path, CancellationToken cancellationToken)
+    {
+        PathExistsResponse result = await _mediator.Send(new CheckPathExistsQuery(path), cancellationToken).ConfigureAwait(false);
+        return Ok(result);
+    }
     #endregion
 }

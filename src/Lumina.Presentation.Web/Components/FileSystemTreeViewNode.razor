@@ -19,7 +19,7 @@
         <div class="child-nodes">
             @foreach (var childNode in Node.Children)
             {
-                <FileSystemTreeViewNode Node="childNode" OnExpand="OnExpand" OnNodeSelected="OnNodeSelected" SelectedNodePath="@SelectedNodePath" />
+                <FileSystemTreeViewNode Node="childNode" OnExpandToggle="OnExpandToggle" OnNodeSelected="OnNodeSelected" SelectedNodePath="@SelectedNodePath" />
             }
         </div>
     }
@@ -27,7 +27,7 @@
 
 @code {
     [Parameter] public FileSystemTreeNodeModel Node { get; set; } = null!;
-    [Parameter] public EventCallback<FileSystemTreeNodeModel> OnExpand { get; set; }
+    [Parameter] public EventCallback<FileSystemTreeNodeModel> OnExpandToggle { get; set; }
     [Parameter] public EventCallback<string> OnNodeSelected { get; set; }
     [Parameter] public string? SelectedNodePath { get; set; }
 
@@ -38,7 +38,7 @@
     /// </summary>
     private async Task ToggleExpand()
     {
-        await OnExpand.InvokeAsync(Node).ConfigureAwait(false);
+        await OnExpandToggle.InvokeAsync(Node).ConfigureAwait(false);
     }
 
     /// <summary>

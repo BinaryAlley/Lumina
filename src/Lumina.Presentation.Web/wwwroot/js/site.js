@@ -132,17 +132,21 @@ window.addEventListener('resize', function () {
     }
 });
 
-/**
- * Handles window click events.
- * @param {MouseEvent} event - The click event triggered on the window.
- */
-window.addEventListener('click', function (event) {
-    // check if the clicked element is not a checkbox or its label
-    if (!event.target.closest('.navigator-toggle-checkbox, .navigator-toggle')) {
-        windowWasClicked = true;
-        closeNavigatorPathSegments();
-        const dropdown = document.getElementById('navigatorDropdown');
-        if (dropdown)
-            dropdown.style.display = 'none';
-    }
-});
+window.windowClickHandler = (dotnetHelper) => {
+    window.addEventListener('click', (event) => {
+        dotnetHelper.invokeMethodAsync('OnWindowClick', {
+            x: event.clientX,
+            y: event.clientY,
+            sender: event.target.getAttribute('id')
+        });
+    });
+};
+
+window.windowKeyDownHandler = (element, dotnetHelper) => {
+    element.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            dotnetHelper.invokeMethodAsync('EscapePressed');
+        }
+    });
+};

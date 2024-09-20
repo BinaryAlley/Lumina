@@ -1,13 +1,20 @@
 ﻿@using Lumina.Presentation.Web.Common.Api
 @using Lumina.Presentation.Web.Common.Enums.FileSystem
+@using Lumina.Presentation.Web.Common.Enums.Notifications
 @using Lumina.Presentation.Web.Common.Exceptions
 @using Lumina.Presentation.Web.Common.Models.Common
 @using Lumina.Presentation.Web.Common.Models.FileManagement
 @using Lumina.Presentation.Web.Common.Models.UI
+@using Lumina.Presentation.Web.Common.Services
 @using Microsoft.AspNetCore.Components
+@using System.Text.Json
+@using System.Text
+
+@implements IDisposable
 
 @inject IJSRuntime JSRuntime
 @inject IApiHttpClient _apiHttpClient
+@inject INotificationService _notificationService
 
 <div id="file-system-browser-dialog" class="container-background above-modal">
     <div id="file-system-browser-content">
@@ -39,12 +46,12 @@
                         @if (isNavigationPathEditMode)
                         {
                             <EnlightenmentInput CssClass="navigator-address-bar-input" Type="text" @bind-Value="@Path" Name="navigator-address-bar-input"
-                                                AutoComplete="true" OnEnterPressed="ExitNavigationPathEditModeAsync" OnEscapePressed="HandleNavigatorInputEscapePressed" />
+                                AutoComplete="true" OnEnterPressed="ExitNavigationPathEditModeAsync" OnEscapePressed="HandleNavigatorInputEscapePressed" Id="navigator-address-bar-input" />
                         }
                         else
                         {
                             <div id="navigator-address-bar">
-                                <ul id="navigator-path-segments">
+                                <ul id="navigator-path-segments" @onclick="EnterNavigationPathEditModeAsync">
                                     @if (pathSegments?.Length > 0)
                                     {
                                         for (int i = 0; i < pathSegments.Length; i++)
@@ -54,11 +61,11 @@
                                             <li id="path-segment-@i">
                                                 <div class="navigator-combobox inline-block">
                                                     <div class="shine-effect" style="top: 1px;"></div>
-                                                    <input type="checkbox" class="navigator-toggle-checkbox" id="segment-toggle-@i"
-                                                           @onchange="@(e => OnNavigatorPathSegmentCheckChangeHandler(e, localIndex))" />
-                                                    <label class="navigator-toggle" for="segment-toggle-@i">
-                                                        <span class="navigator-selected-text">@pathSegment.Path</span>
-                                                        <span class="navigator-arrow"></span>
+                                                    <input type="checkbox" class="navigator-toggle-checkbox" id="segment-toggle-@i" checked="@(expandedPathSegmentIndex == localIndex)"
+                                                           @onchange="@(e => ToggleNavigatorPathSegment(e, localIndex))" @onclick:stopPropagation />
+                                                    <label class="navigator-toggle" for="segment-toggle-@i" @onclick:stopPropagation>
+                                                        <span class="navigator-selected-text" @onclick:stopPropagation>@pathSegment.Path</span>
+                                                        <span class="navigator-arrow" @onclick:stopPropagation></span>
                                                     </label>
                                                 </div>
                                             </li>
@@ -91,7 +98,7 @@
                     <div class="treeview">
                         @foreach (FileSystemTreeNodeModel node in treeViewRootNodes)
                         {
-                            <FileSystemTreeViewNode Node="node" OnExpand="ExpandNode" OnNodeSelected="NavigateToPathAsync" selectedNodePath="@selectedNodePath" />
+                            <FileSystemTreeViewNode Node="node" OnExpandToggle="ToggleTreeViewNode" OnNodeSelected="NavigateToPathAsync" selectedNodePath="@selectedNodePath" />
                         }
                     </div>
                 </div>
@@ -182,6 +189,7 @@
     private FileSystemViewMode viewMode = FileSystemViewMode.List; // TODO: take from config
     private FileSystemIconSize iconSize;
     private Dictionary<int, List<FileSystemTreeNodeModel>> pathSegmentsSubdirectoriesCache = [];
+    private DotNetObjectReference<FileSystemBrowser>? reference;
 
     /// <summary>
     /// Initializes the component.
@@ -197,29 +205,59 @@
     }
 
     /// <summary>
+    /// Handles the event risen after the component was rendered.
+    /// </summary>
+    /// <param name="firstRender">Indicates whether this is the first render or not.</param>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // on first render, subscribe this component to the javascript function that handles window clicks
+        if (firstRender)
+        {
+            reference = DotNetObjectReference.Create(this);
+            await JSRuntime.InvokeVoidAsync("windowClickHandler", reference);
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    /// <summary>
+    /// Handles the window click event.
+    /// </summary>
+    /// <param name="e">The event arguments.</param>
+    [JSInvokable]
+    public void OnWindowClick(dynamic e)
+    {
+        // parse the event args and get the initiator of the event
+        var jsonElement = (JsonElement)e;
+        string? sender = jsonElement.GetProperty("sender").GetString();
+        // ignore the event if it was initiated by a path segment (don't collapse an element that was just expanded)
+        if (showPathSegmentDowpDown && sender is not null && !sender.Contains("segment-toggle-"))
+        {
+            // otherwise, collapse all path segments
+            showPathSegmentDowpDown = false;
+            expandedPathSegmentIndex = null;
+        }
+        // exit navigator path edit mode when clicking anywhere outside of it, or on elements that should not exit it
+        if (sender is null || (sender is not null && !sender.Contains("navigator-path-segments") && !sender.Contains("navigator-edit-icon") && !sender.Contains("navigator-address-bar-input")))
+            isNavigationPathEditMode = false;
+        StateHasChanged();
+    }
+
+    /// <summary>
     /// Expands or collapses a node in the tree view.
     /// </summary>
     /// <param name="node">The node to expand or collapse.</param>
-    private async Task ExpandNode(FileSystemTreeNodeModel node)
+    private async Task ToggleTreeViewNode(FileSystemTreeNodeModel node)
     {
         if (!node.IsExpanded && !node.ChildrenLoaded)
         {
             node.Children = new List<FileSystemTreeNodeModel>();
             node.IsExpanded = true;
             StateHasChanged();
-            try
+            if (await CheckPathAsync(node.Path).ConfigureAwait(false))
             {
-                await foreach (FileSystemTreeNodeModel? childNode in _apiHttpClient.GetAsyncEnumerable<FileSystemTreeNodeModel>($"directories/get-tree-directories?path={Uri.EscapeDataString(node.Path)}").ConfigureAwait(false))
+                try
                 {
-                    if (childNode is not null)
-                    {
-                        node.Children.Add(childNode);
-                        StateHasChanged();
-                    }
-                }
-                if (IncludeFiles)
-                {
-                    await foreach (FileSystemTreeNodeModel? childNode in _apiHttpClient.GetAsyncEnumerable<FileSystemTreeNodeModel>($"files/get-tree-files?path={Uri.EscapeDataString(node.Path)}").ConfigureAwait(false))
+                    await foreach (FileSystemTreeNodeModel? childNode in _apiHttpClient.GetAsyncEnumerable<FileSystemTreeNodeModel>($"directories/get-tree-directories?path={Uri.EscapeDataString(node.Path)}").ConfigureAwait(false))
                     {
                         if (childNode is not null)
                         {
@@ -227,20 +265,91 @@
                             StateHasChanged();
                         }
                     }
+                    if (IncludeFiles)
+                    {
+                        await foreach (FileSystemTreeNodeModel? childNode in _apiHttpClient.GetAsyncEnumerable<FileSystemTreeNodeModel>($"files/get-tree-files?path={Uri.EscapeDataString(node.Path)}").ConfigureAwait(false))
+                        {
+                            if (childNode is not null)
+                            {
+                                node.Children.Add(childNode);
+                                StateHasChanged();
+                            }
+                        }
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error expanding node: {ex.Message}"); // TODO: display to the user when notification system is implemented
-            }
-            finally
-            {
-                node.ChildrenLoaded = true;
+                catch (ApiException ex)
+                {
+                    HandleApiException(ex);
+                }
+                finally
+                {
+                    node.ChildrenLoaded = true;
+                }
             }
         }
         else
             node.IsExpanded = !node.IsExpanded;
         StateHasChanged();
+    }
+
+    /// <summary>
+    /// Handles the change event.
+    /// </summary>
+    /// <param name="e">The event arguments.</param>
+    private async Task ToggleNavigatorPathSegment(ChangeEventArgs e, int toggledIndex)
+    {
+        // uncheck all other path segment checkboxes
+        await JSRuntime.InvokeVoidAsync("uncheckAllExcept", $"segment-toggle-{toggledIndex}").ConfigureAwait(false);
+        // check if the checkbox is checked
+        bool isChecked = (bool)e.Value!;
+        // if it's checked, get the subdirectories for the toggled path segment
+        if (isChecked && pathSegments?.Length > 0)
+        {
+            // initialize the path with the first segment
+            string concatenatedPath = pathSegments[0].Path;
+            // concatenate only up to the toggled index
+            for (int i = 1; i <= toggledIndex; i++)
+                concatenatedPath = $"{(concatenatedPath != pathSeparator ? concatenatedPath : string.Empty)}{pathSeparator}{pathSegments[i].Path}";
+            string parentConcatenatedPath = concatenatedPath;
+            try
+            {
+                if (concatenatedPath != pathSeparator) // on UNIX, dont get the parent, if we are at root path
+                {
+                    List<PathSegmentModel> parentLocation = await _apiHttpClient.GetAsync<List<PathSegmentModel>>($"path/get-path-parent?path={Uri.EscapeDataString(concatenatedPath)}").ConfigureAwait(false);
+                    parentConcatenatedPath = parentLocation[0].Path;
+                    for (int i = 1; i < parentLocation.Count; i++)
+                        parentConcatenatedPath = $"{(parentConcatenatedPath != pathSeparator ? parentConcatenatedPath : string.Empty)}{pathSeparator}{pathSegments[i].Path}";
+                }
+            }
+            catch (ApiException ex)
+            {
+                HandleApiException(ex);
+            }
+            if (!concatenatedPath.EndsWith(pathSeparator))
+                concatenatedPath += pathSeparator;
+            // fetch directories for the expanded path segment
+            List<FileSystemTreeNodeModel> directories = [
+                new() { Path = concatenatedPath, Name = ".", }, // current directory
+    new() { Path = parentConcatenatedPath, Name = ".." } // parent directory
+            ];
+            // add the rest of the subdirectories of the expanded path node
+            await foreach (FileSystemTreeNodeModel? directory in _apiHttpClient.GetAsyncEnumerable<FileSystemTreeNodeModel>($"directories/get-tree-directories?path={Uri.EscapeDataString(concatenatedPath)}").ConfigureAwait(false))
+                if (directory is not null)
+                    directories.Add(directory);
+            // store the directories for this segment
+            pathSegmentsSubdirectoriesCache[toggledIndex] = directories;
+            expandedPathSegmentIndex = toggledIndex;
+            showPathSegmentDowpDown = true;
+            StateHasChanged();
+            // invoke the javascript function that positions the dropdown underneath the toggled path segment
+            await JSRuntime.InvokeVoidAsync("updateDropdownPosition", $"path-segment-{toggledIndex}").ConfigureAwait(false);
+        }
+        else
+        {
+            expandedPathSegmentIndex = null;
+            showPathSegmentDowpDown = false;
+            StateHasChanged();
+        }
     }
 
     /// <summary>
@@ -254,10 +363,11 @@
         {
             _path = path;
             await GetNavigatorPathAsync(path).ConfigureAwait(false);
-            await GetFileSystemTreeViewAsync(path).ConfigureAwait(false);
+            await GetFileSystemTreeAsync(path).ConfigureAwait(false);
             await GetFileSystemItemsAsync(path).ConfigureAwait(false);
-            Console.WriteLine($"Selected node: {path}");
         }
+        else
+            Path = _path;
         await OnNodeSelected.InvokeAsync(path).ConfigureAwait(false);
     }
 
@@ -279,13 +389,27 @@
     /// <returns><see langword="true"/> if the specified path is valid, <see langword="false"/> otherwise.</returns>
     private async Task<bool> CheckPathAsync(string path)
     {
-        var isPathValidResponse = await _apiHttpClient.GetAsync<PathValidModel>($"path/validate?path={Uri.EscapeDataString(path)}").ConfigureAwait(false);
-        if (!isPathValidResponse.IsValid)
+        try
         {
-            // TODO: display error message to user
-            Console.WriteLine("specified path is not valid!");
+            var isPathValidResponse = await _apiHttpClient.GetAsync<PathValidModel>($"path/validate?path={Uri.EscapeDataString(path)}").ConfigureAwait(false);
+            if (!isPathValidResponse.IsValid)
+            {
+                _notificationService.Show("Specified path is not valid!", NotificationType.Error); // TODO: should ask error message from server when translation is implemented
+                Path = _path;
+            }
+            PathExistsModel pathExistsResponse = await _apiHttpClient.GetAsync<PathExistsModel>($"path/check-path-exists?path={Uri.EscapeDataString(path)}").ConfigureAwait(false);
+            if (!pathExistsResponse.Exists)
+            {
+                _notificationService.Show("Specified path does not exist!", NotificationType.Error); // TODO: should ask error message from server when translation is implemented
+                return false;
+            }
+            return isPathValidResponse.IsValid;
         }
-        return isPathValidResponse.IsValid;
+        catch (ApiException ex)
+        {
+            HandleApiException(ex);
+            return false;
+        }
     }
 
     /// <summary>
@@ -302,7 +426,7 @@
     /// Gets the file system items that are displayed in the file system tree view pane.
     /// </summary>
     /// <param name="path">The path for which to get the file system items.</param>
-    private async Task GetFileSystemTreeViewAsync(string path)
+    private async Task GetFileSystemTreeAsync(string path)
     {
         treeViewRootNodes = [];
         // on Windows, ask the list of drives
@@ -375,65 +499,8 @@
         }
         catch (ApiException ex)
         {
-            Console.Error.WriteLine($"Error expanding node: {ex.Message}"); // TODO: display to the user when notification system is implemented
+            HandleApiException(ex);
         }
-    }
-
-    /// <summary>
-    /// Handles the change event.
-    /// </summary>
-    /// <param name="e">The event arguments.</param>
-    private async Task OnNavigatorPathSegmentCheckChangeHandler(ChangeEventArgs e, int toggledIndex)
-    {
-        // uncheck all other path segment checkboxes
-        await JSRuntime.InvokeVoidAsync("uncheckAllExcept", $"segment-toggle-{toggledIndex}").ConfigureAwait(false);
-        // check if the checkbox is checked
-        bool isChecked = (bool)e.Value!;
-        showPathSegmentDowpDown = isChecked;
-        expandedPathSegmentIndex = null;
-        // if it's checked, get the subdirectories for the toggled path segment
-        if (isChecked && pathSegments?.Length > 0)
-        {
-            // initialize the path with the first segment
-            string concatenatedPath = pathSegments[0].Path;
-            // concatenate only up to the toggled index
-            for (int i = 1; i <= toggledIndex; i++)
-                concatenatedPath = $"{(concatenatedPath != pathSeparator ? concatenatedPath : string.Empty)}{pathSeparator}{pathSegments[i].Path}";
-            string parentConcatenatedPath = concatenatedPath;
-            try
-            {
-                if (concatenatedPath != pathSeparator) // on UNIX, dont get the parent, if we are at root path
-                {
-                    List<PathSegmentModel> parentLocation = await _apiHttpClient.GetAsync<List<PathSegmentModel>>($"path/get-path-parent?path={Uri.EscapeDataString(concatenatedPath)}").ConfigureAwait(false);
-                    parentConcatenatedPath = parentLocation[0].Path;
-                    for (int i = 1; i < parentLocation.Count; i++)
-                        parentConcatenatedPath = $"{(parentConcatenatedPath != pathSeparator ? parentConcatenatedPath : string.Empty)}{pathSeparator}{pathSegments[i].Path}";
-                }
-            }
-            catch (ApiException ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            if (!concatenatedPath.EndsWith(pathSeparator))
-                concatenatedPath += pathSeparator;
-            // fetch directories for the expanded path segment
-            List<FileSystemTreeNodeModel> directories = [
-                new() { Path = concatenatedPath, Name = ".", }, // current directory
-        new() { Path = parentConcatenatedPath, Name = ".." } // parent directory
-            ];
-            // add the rest of the subdirectories of the expanded path node
-            await foreach (FileSystemTreeNodeModel? directory in _apiHttpClient.GetAsyncEnumerable<FileSystemTreeNodeModel>($"directories/get-tree-directories?path={Uri.EscapeDataString(concatenatedPath)}").ConfigureAwait(false))
-                if (directory is not null)
-                    directories.Add(directory);
-            // store the directories for this segment
-            pathSegmentsSubdirectoriesCache[toggledIndex] = directories;
-            expandedPathSegmentIndex = toggledIndex;
-            StateHasChanged();
-            // invoke the javascript function that positions the dropdown underneath the toggled path segment
-            await JSRuntime.InvokeVoidAsync("updateDropdownPosition", $"path-segment-{toggledIndex}").ConfigureAwait(false);
-        }
-        else
-            StateHasChanged();
     }
 
     /// <summary>
@@ -502,5 +569,52 @@
     public async Task SetFocusOnNavigatorAddressInputAsync()
     {
         await JSRuntime.InvokeVoidAsync("focusNavigatorInputElement");
+    }
+
+    /// <summary>
+    /// Handles API exceptions, presenting standard problem details in a user friendly way.
+    /// </summary>
+    /// <param name="ex">The exception to handle</param>
+    private void HandleApiException(ApiException ex)
+    {
+        StringBuilder errorMessage = new StringBuilder();
+        if (ex.ProblemDetails is not null)
+        {
+            errorMessage.AppendLine($"HTTP {ex.ProblemDetails.Status} {ex.HttpStatusCode}<br>");
+            if (!string.IsNullOrEmpty(ex.ProblemDetails.Detail))
+                errorMessage.AppendLine($"<b>{ex.ProblemDetails.Detail}<b>");
+            if (ex.ProblemDetails.Extensions is not null && ex.ProblemDetails.Extensions.TryGetValue("errors", out var errorsObj))
+            {
+                if (errorsObj is JsonElement jsonElement && jsonElement.ValueKind == JsonValueKind.Object)
+                {
+                    errorMessage.AppendLine("Validation Errors:");
+                    foreach (var error in jsonElement.EnumerateObject())
+                    {
+                        string fieldName = error.Name;
+                        if (error.Value.ValueKind == JsonValueKind.Array)
+                            foreach (var errorValue in error.Value.EnumerateArray())
+                                errorMessage.AppendLine($"- {fieldName}: {errorValue}<br>");
+                    }
+                }
+            }
+            if (ex.ProblemDetails.Extensions is not null)
+                foreach (var extension in ex.ProblemDetails.Extensions)
+                    if (extension.Key != "errors")
+                        errorMessage.AppendLine($"{extension.Key}: {extension.Value}<br>");
+        }
+        else
+        {
+            errorMessage.AppendLine($"HTTP {ex.HttpStatusCode}<br>");
+            errorMessage.AppendLine($"{ex.Message}<br>");
+        }
+        _notificationService.Show(errorMessage.ToString(), NotificationType.Error);
+    }
+
+    /// <summary>
+    /// Disposes this component.
+    /// </summary>
+    public void Dispose()
+    {
+        reference?.Dispose();
     }
 }

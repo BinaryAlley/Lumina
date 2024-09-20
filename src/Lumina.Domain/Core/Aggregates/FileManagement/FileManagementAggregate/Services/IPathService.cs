@@ -28,6 +28,13 @@ public interface IPathService
     bool IsValidPath(string path);
 
     /// <summary>
+    /// Checks if <paramref name="path"/> exists.
+    /// </summary>
+    /// <param name="path">The path to be checked.</param>
+    /// <returns><see langword="true"/> if <paramref name="path"/> exists, <see langword="false"/> otherwise.</returns>
+    bool Exists(string path);
+
+    /// <summary>
     /// Tries to combine <paramref name="path"/> with <paramref name="name"/>.
     /// </summary>
     /// <param name="path">The path to be combined.</param>

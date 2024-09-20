@@ -52,6 +52,19 @@ public class PathService : IPathService
     }
 
     /// <summary>
+    /// Checks if <paramref name="path"/> exists.
+    /// </summary>
+    /// <param name="path">The path to be checked.</param>
+    /// <returns><see langword="true"/> if <paramref name="path"/> exists, <see langword="false"/> otherwise.</returns>
+    public bool Exists(string path)
+    {
+        ErrorOr<FileSystemPathId> newPathResult = FileSystemPathId.Create(path);
+        if (newPathResult.IsError)
+            return false;
+        return _platformContext.PathStrategy.Exists(newPathResult.Value);
+    }
+
+    /// <summary>
     /// Tries to combine <paramref name="path"/> with <paramref name="name"/>.
     /// </summary>
     /// <param name="path">The path to be combined.</param>

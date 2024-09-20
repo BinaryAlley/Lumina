@@ -1,20 +1,22 @@
 ﻿@inject IJSRuntime JSRuntime
 
 <input type="@Type"
+       @ref="inputElement"
        style="width: @($"{Width}{(UsesPercentForWidth ? "%" : "px")}"); height: @($"{Height}{(UsesPercentForHeight ? "%" : "px")}");"
        class="enlightenment-input @CssClass"
        name="@Name"
        autocomplete="@(AutoComplete ? "on" : "off")"
        value="@Value"
        @oninput="OnInputHandlerAsync"
-       @onkeypress="OnKeyPressAsync"
        @onkeydown="OnKeyDownAsync"
        placeholder="@Placeholder"
        disabled="@IsDisabled"
        readonly="@IsReadOnly"
-       data-has-error="@HasError" />
+       data-has-error="@HasError" 
+       id="@Id" />
 
 @code {
+    [Parameter] public string? Id { get; set; }
     [Parameter] public string Type { get; set; } = "text";
     [Parameter] public bool UsesPercentForHeight { get; set; }
     [Parameter] public bool UsesPercentForWidth { get; set; } = true;
@@ -32,6 +34,18 @@
     [Parameter] public bool IsReadOnly { get; set; }
     [Parameter] public bool HasError { get; set; }
 
+    private ElementReference inputElement;
+
+    /// <summary>
+    /// Handles the event risen after the component was rendered.
+    /// </summary>
+    /// <param name="firstRender">Indicates whether this is the first render or not.</param>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+            await JSRuntime.InvokeVoidAsync("windowKeyDownHandler", inputElement, DotNetObjectReference.Create(this));
+    }
+
     /// <summary>
     /// Handles the input change event.
     /// </summary>
@@ -43,22 +57,21 @@
     }
 
     /// <summary>
-    /// Handles the key press event.
-    /// </summary>
-    /// <param name="e">The event arguments.</param>
-    private async Task OnKeyPressAsync(KeyboardEventArgs e)
-    {
-        if (e.Key == "Enter")
-            await OnEnterPressed.InvokeAsync();
-    }
-
-    /// <summary>
     /// Handles the key down event.
     /// </summary>
     /// <param name="e">The event arguments.</param>
     private async Task OnKeyDownAsync(KeyboardEventArgs e)
     {
-        if (e.Key == "Escape")
-            await OnEscapePressed.InvokeAsync(Value);
+        if (e.Key == "Enter" || e.Code == "NumpadEnter")
+            await OnEnterPressed.InvokeAsync();
+    }
+
+    /// <summary>
+    /// Handles the Escape key pressed.
+    /// </summary>
+    [JSInvokable]
+    public void EscapePressed()
+    {
+        OnEscapePressed.InvokeAsync(Value);
     }
 }

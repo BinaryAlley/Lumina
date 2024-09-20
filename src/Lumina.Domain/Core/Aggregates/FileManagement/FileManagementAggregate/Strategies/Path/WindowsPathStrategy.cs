@@ -6,6 +6,7 @@ using Lumina.Domain.Common.Errors;
 using System.Text.RegularExpressions;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.ValueObjects;
 using System.Linq;
+using System.IO.Abstractions;
 #endregion
 
 namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Strategies.Path;
@@ -15,10 +16,25 @@ namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.S
 /// </summary>
 public class WindowsPathStrategy : IWindowsPathStrategy
 {
+    #region ================================================================== FIELD MEMBERS ================================================================================
+    private readonly IFileSystem _fileSystem;
+    #endregion
+
     #region ==================================================================== PROPERTIES =================================================================================
     public char PathSeparator
     {
         get { return '\\'; }
+    }
+    #endregion
+
+    #region ====================================================================== CTOR =====================================================================================
+    /// <summary>
+    /// Initializes a new instance of the <see cref="WindowsPathStrategy"/> class.
+    /// </summary>
+    /// <param name="fileSystem">Injected service used to interact with the local filesystem.</param>
+    public WindowsPathStrategy(IFileSystem fileSystem)
+    {
+        _fileSystem = fileSystem;
     }
     #endregion
 
@@ -38,6 +54,16 @@ public class WindowsPathStrategy : IWindowsPathStrategy
         // this allows drive letters (e.g., C:\) and UNC paths (e.g., \\server\share)
         var pathPattern = @"^[a-zA-Z]:\\(?:[a-zA-Z0-9\s().-]+\\)*[a-zA-Z0-9\s().-]*\\?$";
         return Regex.IsMatch(path.Path, pathPattern);
+    }
+
+    /// <summary>
+    /// Checks if <paramref name="path"/> exists.
+    /// </summary>
+    /// <param name="path">The path to be checked.</param>
+    /// <returns><see langword="true"/> if <paramref name="path"/> exists, <see langword="false"/> otherwise.</returns>
+    public bool Exists(FileSystemPathId path)
+    {
+        return _fileSystem.Path.Exists(path.Path);
     }
 
     /// <summary>

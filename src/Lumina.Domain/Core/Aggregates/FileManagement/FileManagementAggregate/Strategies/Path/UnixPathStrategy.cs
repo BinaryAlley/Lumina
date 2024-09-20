@@ -4,6 +4,7 @@ using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.ValueObjects;
 using System;
 using System.Collections.Generic;
+using System.IO.Abstractions;
 using System.Linq;
 using System.Text.RegularExpressions;
 #endregion
@@ -15,10 +16,25 @@ namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.S
 /// </summary>
 public class UnixPathStrategy : IUnixPathStrategy
 {
+    #region ================================================================== FIELD MEMBERS ================================================================================
+    private readonly IFileSystem _fileSystem;
+    #endregion
+
     #region ==================================================================== PROPERTIES =================================================================================
     public char PathSeparator
     {
         get { return '/'; }
+    }
+    #endregion
+
+    #region ====================================================================== CTOR =====================================================================================
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UnixPathStrategy"/> class.
+    /// </summary>
+    /// <param name="fileSystem">Injected service used to interact with the local filesystem.</param>
+    public UnixPathStrategy(IFileSystem fileSystem)
+    {
+        _fileSystem = fileSystem;
     }
     #endregion
 
@@ -39,6 +55,16 @@ public class UnixPathStrategy : IUnixPathStrategy
             return false;
         var pathPattern = @"^\/([\w\-\.\~!$&'()*+,;=:@ ]+(\/[\w\-\.\~!$&'()*+,;=:@ ]+)*)?\/?$";
         return Regex.IsMatch(path.Path, pathPattern);
+    }
+
+    /// <summary>
+    /// Checks if <paramref name="path"/> exists.
+    /// </summary>
+    /// <param name="path">The path to be checked.</param>
+    /// <returns><see langword="true"/> if <paramref name="path"/> exists, <see langword="false"/> otherwise.</returns>
+    public bool Exists(FileSystemPathId path)
+    {
+        return _fileSystem.Path.Exists(path.Path);
     }
 
     /// <summary>
