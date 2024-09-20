@@ -1,0 +1,95 @@
+﻿@using Lumina.Presentation.Web.Common.Enums.Notifications
+@using Lumina.Presentation.Web.Common.Models.Common
+@using Lumina.Presentation.Web.Common.Services
+
+@inject INotificationService NotificationService
+
+@implements IDisposable
+
+<div class="notification-container">
+    @foreach (var notification in _notifications)
+    {
+        <div class="notification @GetNotificationClass(notification.Type)" @key="notification.Id">
+            <div class="shine-effect"></div>
+            <div class="notification-body">
+                <span class="notification-message">@((MarkupString)notification.Message)</span>
+                <button class="close-button" @onclick="() => RemoveNotification(notification.Id)">×</button>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private List<NotificationModel> _notifications = [];
+
+    /// <summary>
+    /// Initializes the component.
+    /// </summary>
+    protected override void OnInitialized()
+    {
+        NotificationService.OnNotification += AddNotification;
+    }
+
+    /// <summary>
+    /// Adds a notification to the list of notifications and updates the UI.
+    /// </summary>
+    /// <param name="notification">The notification to be added.</param>
+    private void AddNotification(NotificationModel notification)
+    {
+        string logMessage = $"{notification.Type}: {notification.Message}";
+
+        if (notification.Type == NotificationType.Error)
+            Console.WriteLine($"Error: {notification.Message}");
+        else if (notification.Type == NotificationType.Warning)
+            Console.WriteLine($"Warning: {notification.Message}");
+        else if (notification.Type == NotificationType.Info)
+            Console.WriteLine($"Info: {notification.Message}");
+        else if (notification.Type == NotificationType.Success)
+            Console.WriteLine($"Success: {notification.Message}");
+        _notifications.Add(notification);
+        InvokeAsync(StateHasChanged);
+        _ = RemoveNotificationAfterDelay(notification.Id);
+    }
+
+    /// <summary>
+    /// Removes a notification from the list of notifications after a delay of 5 seconds.
+    /// </summary>
+    /// <param name="id">The Id of the notification to be removed.</param>
+    private async Task RemoveNotificationAfterDelay(Guid id)
+    {
+        await Task.Delay(5000); // 5 seconds delay
+        RemoveNotification(id);
+    }
+
+    /// <summary>
+    /// Removes a notification from the list of notifications and updates the UI.
+    /// </summary>
+    /// <param name="id">The Id of the notification to be removed.</param>
+    private void RemoveNotification(Guid id)
+    {
+        _notifications.RemoveAll(notification => notification.Id == id);
+        InvokeAsync(StateHasChanged);
+    }
+
+    /// <summary>
+    /// Gets the CSS class for a notification based on its type.
+    /// </summary>
+    /// <param name="type">The type of the notification.</param>
+    /// <returns>The CSS class for the notification.</returns>
+    private string GetNotificationClass(NotificationType type) => type switch
+    {
+        NotificationType.Info => "info",
+        NotificationType.Success => "success",
+        NotificationType.Warning => "warning",
+        NotificationType.Error => "error",
+        _ => string.Empty
+    };
+
+    /// <summary>
+    /// Disposes the component.
+    /// </summary>
+    public void Dispose()
+    {
+        NotificationService.OnNotification -= AddNotification;
+    }
+}

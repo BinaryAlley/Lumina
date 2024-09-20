@@ -1,0 +1,107 @@
+﻿.notification-container {
+    position: fixed;
+    bottom: 10px;
+    left: 20px;
+    z-index: 1000;
+    width: 300px;
+    max-height: calc(100vh - 40px); /* full viewport height minus 40px */
+    overflow-y: auto; /* add vertical scrollbar if content exceeds max-height */
+}
+
+.notification {
+    border-radius: 4px;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    display: flex;
+    flex-direction: row; /* stack content horizontally */
+    align-items: flex-start; /* align items to the top */
+    background: linear-gradient(135deg, #404040, #232323) !important;
+    border-top: 1px solid #505050 !important;
+    border-left: 1px solid #505050 !important;
+    border-right: 1px solid #000 !important;
+    border-bottom: 1px solid #000 !important;
+    box-shadow: 5px 5px 5px var(--shadow-color);
+    animation: fadeIn 0.3s, fadeOut 0.3s 4.7s;
+
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    justify-content: flex-start;
+    position: relative;
+}
+
+.notification-body {
+    padding: 15px;
+    display: flex;
+    flex-direction: row; /* stack content horizontally */
+    align-items: flex-start; /* align items to the top */
+    word-wrap: break-word; /* allow long words to break and wrap */
+    overflow-wrap: break-word; /* modern browsers */
+    word-break: break-word; /* for very long words or URLs */
+}
+
+.notification-message {
+    flex-grow: 1; /* allow message to take up available space */
+    margin-right: 3px; /* add some space between message and close button */
+    overflow-wrap: break-word; /* modern browsers */
+    word-break: break-word; /* for very long words or URLs */
+    hyphens: auto; /* enable automatic hyphenation */
+    white-space: pre-wrap; /* preserve line breaks */
+    font-family: monospace;
+}
+
+.close-button {
+    background: none;
+    color: var(--text-foreground);
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    flex-shrink: 0; /* prevent button from shrinking */
+}
+
+.shine-effect {
+    background: linear-gradient(to right, transparent, #fff, transparent);
+    width: 100%;
+    top: -1px;
+    height: 1px;
+    flex-shrink: 0;
+    pointer-events: none; /* ensure it doesn't interfere with interactions */
+}
+
+.info {
+    color: #2196F3;
+}
+
+.success {
+    color: #4CAF50;
+}
+
+.warning {
+    color: #FFC107;
+}
+
+.error {
+    color: #F44336;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}

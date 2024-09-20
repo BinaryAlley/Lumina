@@ -1,6 +1,7 @@
 ﻿#region ========================================================================= USING =====================================================================================
 using FluentValidation;
 using Lumina.Presentation.Web.Common.Api;
+using Lumina.Presentation.Web.Common.Services;
 using Lumina.Presentation.Web.Core.Services.UI;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
@@ -51,6 +52,7 @@ public static class PresentationWebLayerServices
             .AddPolicyHandler(circuitBreakerPolicy); 
 
         services.AddSingleton<ComboboxService>();
+        services.AddScoped<INotificationService, NotificationService>();
 
         return services;
     }
