@@ -48,6 +48,7 @@ internal class DirectoryProviderService : IDirectoryProviderService
             return Errors.Permission.UnauthorizedAccess;
         return ErrorOrFactory.From(_fileSystem.Directory.GetDirectories(path.Path)
                                                         .OrderBy(path => path)
+                                                        .Select(path => path.EndsWith(_fileSystem.Path.DirectorySeparatorChar) ? path : path + _fileSystem.Path.DirectorySeparatorChar)
                                                         .Select(path => FileSystemPathId.Create(path))
                                                         .Where(errorOrPathId => !errorOrPathId.IsError)
                                                         .Select(errorOrPathId => errorOrPathId.Value)
@@ -72,7 +73,8 @@ internal class DirectoryProviderService : IDirectoryProviderService
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a file name or an error.</returns>
     public ErrorOr<string> GetFileName(FileSystemPathId path)
     {
-        return _fileSystem.Path.GetFileName(path.Path);
+        string inputPath = path.Path.EndsWith(_fileSystem.Path.DirectorySeparatorChar) ? path.Path[..^1] : path.Path;
+        return _fileSystem.Path.GetFileName(inputPath);
     }
 
     /// <summary>

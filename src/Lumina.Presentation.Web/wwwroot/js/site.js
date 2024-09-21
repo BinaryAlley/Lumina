@@ -132,6 +132,10 @@ window.addEventListener('resize', function () {
     }
 });
 
+/**
+ * Attaches a click event listener to the window, invoking a .NET method when the window is clicked.
+ * @param {any} dotnetHelper - .NET object to invoke methods asynchronously.
+ */
 window.windowClickHandler = (dotnetHelper) => {
     window.addEventListener('click', (event) => {
         dotnetHelper.invokeMethodAsync('OnWindowClick', {
@@ -142,6 +146,11 @@ window.windowClickHandler = (dotnetHelper) => {
     });
 };
 
+/**
+ * Attaches a keydown event listener to the given element, invoking a .NET method when 'Escape' is pressed.
+ * @param {HTMLElement} element - The HTML element to attach the keydown listener to.
+ * @param {any} dotnetHelper - .NET object to invoke methods asynchronously.
+ */
 window.windowKeyDownHandler = (element, dotnetHelper) => {
     element.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {

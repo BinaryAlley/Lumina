@@ -46,7 +46,9 @@
     /// </summary>
     private async Task HandleNodeClick()
     {
+        Console.WriteLine("===node selected: " + Node.Path + "; selected node path: " + SelectedNodePath + "; is selected: " + IsSelected);
         await OnNodeSelected.InvokeAsync(Node.Path).ConfigureAwait(false);
+        StateHasChanged();
     }
 
     /// <summary>

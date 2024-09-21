@@ -33,9 +33,9 @@
                 </div>
                 <div id="navigator-navigation-controls-container">
                     <div id="navigator-history">
-                        <img src="images/ui/back.svg" class="navigation-icon" alt="Back" title="Back" />
-                        <img src="images/ui/forward.svg" class="navigation-icon" alt="Forward" title="Forward" />
-                        <img src="images/ui/up.svg" class="navigation-icon" alt="Up One Level" title="Up One Level" />
+                        <img src="images/ui/back.svg" class="navigation-icon" alt="Back" title="Back" @onclick="NavigateBackAsync" />
+                        <img src="images/ui/forward.svg" class="navigation-icon" alt="Forward" title="Forward" @onclick="NavigateForwardAsync" />
+                        <img src="images/ui/up.svg" class="navigation-icon" alt="Up One Level" title="Up One Level" @onclick="NavigateUpAsync" />
                     </div>
                     <img src="images/ui/toggle-tree-view.svg" id="navigator-toggle-tree-view-button" alt="Toggle Tree View" title="Toggle Tree View" class="navigator-icon" />
                     <img src="images/ui/toggle-thumbnails.svg" id="navigator-toggle-thumbnails-button" alt="Toggle Thumbnails" title="Toggle Thumbanils" class="navigator-icon" />
@@ -98,7 +98,7 @@
                     <div class="treeview">
                         @foreach (FileSystemTreeNodeModel node in treeViewRootNodes)
                         {
-                            <FileSystemTreeViewNode Node="node" OnExpandToggle="ToggleTreeViewNode" OnNodeSelected="NavigateToPathAsync" selectedNodePath="@selectedNodePath" />
+                            <FileSystemTreeViewNode Node="node" OnExpandToggle="ToggleTreeViewNode" OnNodeSelected="HandleFileSystemTreeViewNodeSelectedAsync" SelectedNodePath="@selectedNodePath" />
                         }
                     </div>
                 </div>
@@ -165,7 +165,7 @@
     <div class="navigator-dropdown opened" id="navigatorDropdown" data-path-segment-id="path-segment-@expandedPathSegmentIndex">        
         @foreach (var directory in pathSegmentsSubdirectoriesCache[expandedPathSegmentIndex.Value])
         {
-            <div class="navigator-option" data-path="@directory.Path" @onclick="@(() => NavigateToPathAsync(directory.Path))">@directory.Name</div>
+            <div class="navigator-option" data-path="@directory.Path" @onclick="@(() => NavigateToPathAsync(directory.Path, isForwardNavigation: false, isBackwardNavigation: false))">@directory.Name</div>
         }
     </div>
 }
@@ -190,6 +190,8 @@
     private FileSystemIconSize iconSize;
     private Dictionary<int, List<FileSystemTreeNodeModel>> pathSegmentsSubdirectoriesCache = [];
     private DotNetObjectReference<FileSystemBrowser>? reference;
+    private readonly Stack<string> undoStack = new();
+    private readonly Stack<string> redoStack = new();
 
     /// <summary>
     /// Initializes the component.
@@ -198,7 +200,11 @@
     {
         await GetFileSystemPropertiesAsync().ConfigureAwait(false);
         if (Path is not null)
-            await NavigateToPathAsync(Path).ConfigureAwait(false);
+        {
+            if (!Path.EndsWith(pathSeparator))
+                Path += pathSeparator;
+            await NavigateToPathAsync(Path, isForwardNavigation: false, isBackwardNavigation: false).ConfigureAwait(false);
+        }
         await ChangeViewModeAsync(viewMode).ConfigureAwait(false);
         // make the navigator path segments horizontally scrollable
         await JSRuntime.InvokeVoidAsync("addHorizontalScrolling", "navigator-address-bar").ConfigureAwait(false);
@@ -311,13 +317,14 @@
             for (int i = 1; i <= toggledIndex; i++)
                 concatenatedPath = $"{(concatenatedPath != pathSeparator ? concatenatedPath : string.Empty)}{pathSeparator}{pathSegments[i].Path}";
             string parentConcatenatedPath = concatenatedPath;
+            // fetch directories for the expanded path segment
             try
             {
                 if (concatenatedPath != pathSeparator) // on UNIX, dont get the parent, if we are at root path
                 {
-                    List<PathSegmentModel> parentLocation = await _apiHttpClient.GetAsync<List<PathSegmentModel>>($"path/get-path-parent?path={Uri.EscapeDataString(concatenatedPath)}").ConfigureAwait(false);
-                    parentConcatenatedPath = parentLocation[0].Path;
-                    for (int i = 1; i < parentLocation.Count; i++)
+                    PathSegmentModel[] parentLocationResponse = await _apiHttpClient.GetAsync<PathSegmentModel[]>($"path/get-path-parent?path={Uri.EscapeDataString(concatenatedPath)}").ConfigureAwait(false);
+                    parentConcatenatedPath = parentLocationResponse[0].Path;
+                    for (int i = 1; i < parentLocationResponse.Length; i++)
                         parentConcatenatedPath = $"{(parentConcatenatedPath != pathSeparator ? parentConcatenatedPath : string.Empty)}{pathSeparator}{pathSegments[i].Path}";
                 }
             }
@@ -327,11 +334,8 @@
             }
             if (!concatenatedPath.EndsWith(pathSeparator))
                 concatenatedPath += pathSeparator;
-            // fetch directories for the expanded path segment
-            List<FileSystemTreeNodeModel> directories = [
-                new() { Path = concatenatedPath, Name = ".", }, // current directory
-    new() { Path = parentConcatenatedPath, Name = ".." } // parent directory
-            ];
+            // add current and parent directories too
+            List<FileSystemTreeNodeModel> directories = [ new() { Path = concatenatedPath, Name = ".", }, new() { Path = parentConcatenatedPath, Name = ".." } ];
             // add the rest of the subdirectories of the expanded path node
             await foreach (FileSystemTreeNodeModel? directory in _apiHttpClient.GetAsyncEnumerable<FileSystemTreeNodeModel>($"directories/get-tree-directories?path={Uri.EscapeDataString(concatenatedPath)}").ConfigureAwait(false))
                 if (directory is not null)
@@ -356,19 +360,122 @@
     /// Handles the selection of a node in the tree view.
     /// </summary>
     /// <param name="path">The path of the selected node.</param>
-    private async Task NavigateToPathAsync(string path)
+    /// <param name="isForwardNavigation">Indicates whether the navigation is towards a location in the redo stack or not.</param>
+    /// <param name="isBackwardNavigation">Indicates whether the navigation is towards a location in the undo stack or not.</param>
+    private async Task NavigateToPathAsync(string path, bool isForwardNavigation, bool isBackwardNavigation)
     {
-        selectedNodePath = path;
         if (await CheckPathAsync(path).ConfigureAwait(false))
         {
-            _path = path;
+            // check if backward navigation is possible
+            if (isBackwardNavigation)
+            {
+                if (undoStack.Count > 0)
+                {
+                    // get the first path in the backward navigation list
+                    string backwardPath = undoStack.Pop();
+                    // put the current path in the forward navigationlist, before navigating to the backward path
+                    if (Path is not null)
+                    {
+                        if (!Path.EndsWith(pathSeparator))
+                            Path += pathSeparator;
+                        redoStack.Push(Path);
+                    }
+                    path = backwardPath;
+                }
+                else
+                    return;
+            }
+            else if (isForwardNavigation) // check if forward navigation is possible
+            {
+                if (redoStack.Count > 0)
+                {
+                    // get the first path in the forward navigation list
+                    string forwardPath = redoStack.Pop();
+                    // put the current path in the backward navigation list, before navigating to the forward path
+                    if (Path is not null)
+                    {
+                        if (!Path.EndsWith(pathSeparator))
+                            Path += pathSeparator;
+                        if (undoStack.Count == 0 || (undoStack.Count > 0 && undoStack.Peek() != Path))
+                            undoStack.Push(Path);
+                    }
+                    path = forwardPath;
+                }
+                else
+                    return;
+            }
+            else // navigation to a brand new location (up, directory browse, manual path edit, etc)
+            {
+                redoStack.Clear();
+                if (Path is not null && Path != path) // when navigating up, Path will be set after navigation
+                {
+                    if (undoStack.Count == 0 || (undoStack.Count > 0 && undoStack.Peek() != Path))
+                        undoStack.Push(Path);
+                }
+                else if (_path is not null && _path != path) // when editing the address, Path already comes set, check against control value
+                {
+                    if (undoStack.Count == 0 || (undoStack.Count > 0 && undoStack.Peek() != _path))
+                        undoStack.Push(_path);
+                }
+            }
+            _path = path; // we are about to navigate to the new path, store its value in the control variable
             await GetNavigatorPathAsync(path).ConfigureAwait(false);
             await GetFileSystemTreeAsync(path).ConfigureAwait(false);
             await GetFileSystemItemsAsync(path).ConfigureAwait(false);
         }
-        else
-            Path = _path;
+        selectedNodePath = _path;
+        Path = _path; // also update the navigation input address
+        if (Path is not null && !Path.EndsWith(pathSeparator))
+            Path += pathSeparator;
         await OnNodeSelected.InvokeAsync(path).ConfigureAwait(false);
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Provides backwards navigation.
+    /// </summary>
+    private async Task NavigateBackAsync()
+    {
+        if (Path is not null)
+            await NavigateToPathAsync(Path, isForwardNavigation: false, isBackwardNavigation: true).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Provides forwards navigation.
+    /// </summary>
+    private async Task NavigateForwardAsync()
+    {
+        if (Path is not null)
+            await NavigateToPathAsync(Path, isForwardNavigation: true, isBackwardNavigation: false).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Provides upwards navigation.
+    /// </summary>
+    private async Task NavigateUpAsync()
+    {
+        try
+        {
+            if (Path is not null)
+            {
+                // ask the API for the parent path
+                PathSegmentModel[] parentLocationResponse = await _apiHttpClient.GetAsync<PathSegmentModel[]>($"path/get-path-parent?path={Uri.EscapeDataString(Path)}").ConfigureAwait(false);
+                // if the answer was valid, and we can navigate up, reconstruct the provided path from its segments, and navigate to it
+                if (parentLocationResponse is not null)
+                {
+                    string parentConcatenatedPath = parentLocationResponse[0].Path;
+                    for (int i = 1; i < parentLocationResponse.Length; i++)
+                        parentConcatenatedPath = $"{(parentConcatenatedPath != pathSeparator ? parentConcatenatedPath : string.Empty)}{pathSeparator}{parentLocationResponse[i].Path}";
+                    if (!parentConcatenatedPath.EndsWith(pathSeparator))
+                        parentConcatenatedPath += pathSeparator;
+                    await NavigateToPathAsync(parentConcatenatedPath, isForwardNavigation: false, isBackwardNavigation: false).ConfigureAwait(false);
+                }
+            }
+        }
+        catch (ApiException ex)
+        {
+            HandleApiException(ex);
+        }
     }
 
     /// <summary>
@@ -396,6 +503,8 @@
             {
                 _notificationService.Show("Specified path is not valid!", NotificationType.Error); // TODO: should ask error message from server when translation is implemented
                 Path = _path;
+                if (Path is not null && !Path.EndsWith(pathSeparator))
+                    Path += pathSeparator;
             }
             PathExistsModel pathExistsResponse = await _apiHttpClient.GetAsync<PathExistsModel>($"path/check-path-exists?path={Uri.EscapeDataString(path)}").ConfigureAwait(false);
             if (!pathExistsResponse.Exists)
@@ -447,7 +556,6 @@
             });
         }
         // if there was an initial path saved from a previous session, load the full tree up to that initial path
-        // ask the whole tree for the saved path
         List<FileSystemTreeNodeModel> initialTree = await _apiHttpClient.GetAsync<List<FileSystemTreeNodeModel>>($"directories/get-directory-tree?path={Uri.EscapeDataString(path!)}&includeFiles={IncludeFiles}").ConfigureAwait(false);
         if (initialTree is not null && initialTree.Count > 0)
         {
@@ -550,7 +658,27 @@
         isNavigationPathEditMode = false;
         StateHasChanged();
         if (Path is not null)
-            await NavigateToPathAsync(Path).ConfigureAwait(false);
+        {
+            if (!Path.EndsWith(pathSeparator))
+                Path += pathSeparator;
+            await NavigateToPathAsync(Path, isForwardNavigation: false, isBackwardNavigation: false).ConfigureAwait(false);
+        }
+    }
+
+    /// <summary>
+    /// Handles the selection of a node in the file system tree view.
+    /// </summary>
+    /// <param name="path">The path of the newly selected node.</param>
+    private async Task HandleFileSystemTreeViewNodeSelectedAsync(string path)
+    {
+        StateHasChanged();
+        if (selectedNodePath is not null)
+        {
+            Path = path;
+            if (!Path.EndsWith(pathSeparator))
+                Path += pathSeparator;
+            await NavigateToPathAsync(Path, isForwardNavigation: false, isBackwardNavigation: false).ConfigureAwait(false);
+        }
     }
 
     /// <summary>

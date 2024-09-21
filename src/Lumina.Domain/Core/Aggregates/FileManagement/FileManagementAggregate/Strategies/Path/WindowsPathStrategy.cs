@@ -81,7 +81,7 @@ public class WindowsPathStrategy : IWindowsPathStrategy
         // if the name begins with a directory separator, remove it
         name = name.TrimStart(PathSeparator);
         // combine the two parts with the Windows directory separator character
-        return FileSystemPathId.Create(subpath + PathSeparator + name);
+        return FileSystemPathId.Create(subpath + PathSeparator + name + PathSeparator);
     }
 
     /// <summary>

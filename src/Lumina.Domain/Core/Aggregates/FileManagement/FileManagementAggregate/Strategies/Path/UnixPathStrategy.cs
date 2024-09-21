@@ -82,7 +82,7 @@ public class UnixPathStrategy : IUnixPathStrategy
         // if the name begins with a directory separator, remove it
         name = name.TrimStart(PathSeparator);
         // combine the two parts with the Unix directory separator character
-        return FileSystemPathId.Create(subpath + PathSeparator + name);
+        return FileSystemPathId.Create(subpath + PathSeparator + name + PathSeparator);
     }
 
     /// <summary>
@@ -121,7 +121,7 @@ public class UnixPathStrategy : IUnixPathStrategy
             return Errors.FileManagement.InvalidPath;
         // trim trailing slash for consistent processing
         string tempPath = path.Path;
-        if (tempPath.EndsWith("/"))
+        if (tempPath.EndsWith('/'))
             tempPath = tempPath.TrimEnd(PathSeparator);
         // find the last occurrence of a slash
         var lastIndex = tempPath.LastIndexOf(PathSeparator);

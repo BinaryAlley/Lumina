@@ -1,4 +1,5 @@
 ﻿@using Lumina.Presentation.Web.Common.Models.FileManagement
+
 <div id="navigator-view-mode-container">
     <img src="images/ui/list.png" id="navigator-list-view" alt="List View" title="List View" />
     <img src="images/ui/details.png" id="navigator-details-view" alt="Details View" title="Details View" />
@@ -48,13 +49,8 @@
     protected override async Task OnParametersSetAsync()
     {
         if (Path is not null && PathSeparator is not null && FileSystemType is not null)
-        {
             if (!Path.EndsWith(PathSeparator))
                 Path += PathSeparator;
-            Console.WriteLine("param path:" + Path);
-            Console.WriteLine("param PathSeparator:" + PathSeparator);
-            Console.WriteLine("param FileSystemType:" + FileSystemType?.PlatformType);            
-        }
         await base.OnParametersSetAsync().ConfigureAwait(false);
     }
 }
