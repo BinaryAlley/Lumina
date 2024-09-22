@@ -1,5 +1,6 @@
 ﻿#region ========================================================================= USING =====================================================================================
 using System;
+using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Presentation.Web.Core.Services.UI;
@@ -10,7 +11,7 @@ namespace Lumina.Presentation.Web.Core.Services.UI;
 public class ComboboxService
 {
     #region ================================================================== FIELD MEMBERS ================================================================================
-    public event Action<string>? ComboboxOpened;
+    public event Func<string, Task>? ComboboxOpened;
     #endregion
 
     #region ===================================================================== METHODS ===================================================================================

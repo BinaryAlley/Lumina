@@ -1,8 +1,8 @@
-﻿@using Lumina.Presentation.Web.Common.Api
+﻿@using Lumina.Presentation.Web.Common.Models.Common
+@using Lumina.Presentation.Web.Common.Api
 @using Lumina.Presentation.Web.Common.Enums.FileSystem
 @using Lumina.Presentation.Web.Common.Enums.Notifications
 @using Lumina.Presentation.Web.Common.Exceptions
-@using Lumina.Presentation.Web.Common.Models.Common
 @using Lumina.Presentation.Web.Common.Models.FileManagement
 @using Lumina.Presentation.Web.Common.Models.UI
 @using Lumina.Presentation.Web.Common.Services
@@ -21,15 +21,15 @@
         <div id="file-system-browser-header">
             <div id="file-system-browser-shine-spark"></div>
             <div id="file-system-browser-shine-effect"></div>
-            <div id="file-system-browser-header-navigation-container">                            
+            <div id="file-system-browser-header-navigation-container">
                 <!--File System Navigator-->
                 <div id="navigator-view-mode-container">
                     <img src="images/ui/list.png" id="navigator-list-view" alt="List View" title="List View" @onclick="@(() => ChangeViewModeAsync(FileSystemViewMode.List))" />
                     <img src="images/ui/details.png" id="navigator-details-view" alt="Details View" title="Details View" @onclick="@(() => ChangeViewModeAsync(FileSystemViewMode.Details))" />
-                    <img src="images/ui/small-icons.png" id="navigator-small-icons-view" alt="Small Icons View" title="Small Icons View" @onclick="@(() => ChangeIconSize(FileSystemIconSize.Small))" />
-                    <img src="images/ui/medium-icons.png" id="navigator-medium-icons-view" alt="Medium Icons View" title="Medium Icons View" @onclick="@(() => ChangeIconSize(FileSystemIconSize.Medium))" />
-                    <img src="images/ui/large-icons.png" id="navigator-large-icons-view" alt="Large Icons View" title="Large Icons View" @onclick="@(() => ChangeIconSize(FileSystemIconSize.Large))" />
-                    <img src="images/ui/extra-large-icons.png" id="navigator-extra-large-icons-view" alt="Extra Large Icons View" title="Extra Large Icons View" @onclick="@(() => ChangeIconSize(FileSystemIconSize.ExtraLarge))" />
+                    <img src="images/ui/small-icons.png" id="navigator-small-icons-view" alt="Small Icons View" title="Small Icons View" @onclick="@(() => ChangeIconSizeAsync(FileSystemIconSize.Small))" />
+                    <img src="images/ui/medium-icons.png" id="navigator-medium-icons-view" alt="Medium Icons View" title="Medium Icons View" @onclick="@(() => ChangeIconSizeAsync(FileSystemIconSize.Medium))" />
+                    <img src="images/ui/large-icons.png" id="navigator-large-icons-view" alt="Large Icons View" title="Large Icons View" @onclick="@(() => ChangeIconSizeAsync(FileSystemIconSize.Large))" />
+                    <img src="images/ui/extra-large-icons.png" id="navigator-extra-large-icons-view" alt="Extra Large Icons View" title="Extra Large Icons View" @onclick="@(() => ChangeIconSizeAsync(FileSystemIconSize.ExtraLarge))" />
                 </div>
                 <div id="navigator-navigation-controls-container">
                     <div id="navigator-history">
@@ -40,13 +40,56 @@
                     <img src="images/ui/toggle-tree-view.svg" id="navigator-toggle-tree-view-button" alt="Toggle Tree View" title="Toggle Tree View" class="navigator-icon" />
                     <img src="images/ui/toggle-thumbnails.svg" id="navigator-toggle-thumbnails-button" alt="Toggle Thumbnails" title="Toggle Thumbanils" class="navigator-icon" />
                     <img src="images/ui/toggle-hidden.svg" id="navigator-toggle-hidden-button" alt="Toggle Hidden Files" title="Toggle Hidden Files" class="navigator-icon" />
+                    @* <img src="images/ui/toggle-selection.svg" id="navigator-toggle-selection-button" alt="Toggle Selection Mode" title="Toggle Selection Mode" class="navigator-icon" /> *@
+
+
+
+
+
+                    <svg @onclick="ToggleSelectionModeAsync" id="navigator-toggle-selection-button" alt="Toggle Selection Mode" title="Toggle Selection Mode" class="navigator-icon" width="30" height="30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <defs>
+                            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                                <feComponentTransfer in="SourceAlpha" result="adjustedAlpha">
+                                    <feFuncA type="table" tableValues="0 0.5 1" />
+                                </feComponentTransfer>
+                                <feGaussianBlur in="adjustedAlpha" stdDeviation="2" result="blur" />
+                                <feFlood flood-color="#039bfc" result="color" />
+                                <feComposite in="color" in2="blur" operator="in" result="softGlowColored" />
+                                <feMerge>
+                                    <feMergeNode in="softGlowColored" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                            <linearGradient id="linearGradient1299" x1="5" x2="195" y1="174.76" y2="174.76" gradientTransform="matrix(.32632 0 0 .095367 -.63187 42.834)" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#039bfc" stop-opacity="0" offset="0" />
+                                <stop stop-color="#039bfc" offset=".225" />
+                                <stop stop-color="#039bfc" offset=".5" />
+                                <stop stop-color="#039bfc" offset=".775" />
+                                <stop stop-color="#039bfc" stop-opacity="0" offset="1" />
+                            </linearGradient>
+                        </defs>
+
+                        <g transform="translate(0,-0.5) scale(0.475)">
+                            <rect x=".99971" y="59" width="62.001" height="1" ry="0" fill="url(#linearGradient1299)" stroke-width="3.7796" style="mix-blend-mode:normal;paint-order:stroke fill markers" filter="url(#glow)" />
+                        </g>
+                        <g stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5">
+                            <rect x="4.5" y="4.5" width="21" height="21" ry="2.5" fill="none" stroke="#039bfc" style="paint-order:stroke fill markers" filter="url(#glow)" />
+                        </g>
+                        <g transform="translate(8,8) scale(0.030)">
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill @(isSelectionMode ? " enabled" : string.Empty)" filter="url(#glow)" d="M161.9,21.9v21.9h131.2V0H161.9v43.7V21.9v21.9h131.2V0H161.9v43.7V21.9z M406.6,425.9L393,408.7l-52.4,41.6l-79.4-102.1   l-53,61.8l-38.9-217.9l198.1,99.1l-78.6,26.2l100.9,122.4L406.6,425.9L393,408.7L406.6,425.9l16.9-13.9l-60.4-73.2l118.3-39.4   L110.8,114l70.4,394.5l78.2-91.2l73.7,94.7l104.5-82.9l-14.2-17.2L406.6,425.9z M424.3,87.5V0h-87.5v43.7l43.7,0l0,43.7H424.3   L424.3,87.5z M118.1,0H30.7v87.5h43.7l0-43.7l43.7,0V0L118.1,0z M30.7,306.2v87.5h87.5v-43.7l-43.7,0l0-43.7H30.7z M402.5,131.2   h-21.9v87.5h43.7v-87.5h-43.7H402.5h-21.9v87.5h43.7v-87.5h-43.7H402.5z M52.5,262.4h21.9V131.2H30.7v131.2h43.7H52.5h21.9V131.2 H30.7v131.2h43.7H52.5z" />
+                        </g>
+                    </svg>
+
+                    @* <img src="images/ui/toggle-selection.svg" @onclick="ToggleColor"
+                    style="@($"--text-color: {_currentTextColor}; --stroke-color: {_currentStrokeColor};")" id="navigator-toggle-selection-button" alt="Toggle Selection Mode" title="Toggle Selection Mode" class="navigator-icon" /> *@
+                    @* <object data="images/ui/toggle-selection.svg" type="image/svg+xml" id="navigator-toggle-selection-button" alt="Toggle Selection Mode" title="Toggle Selection Mode" class="navigator-icon ColorScheme-Text" /> *@
                 </div>
                 <div id="navigator-address-bar-container">
                     <div id="navigator-address-bar-group">
                         @if (isNavigationPathEditMode)
                         {
                             <EnlightenmentInput CssClass="navigator-address-bar-input" Type="text" @bind-Value="@Path" Name="navigator-address-bar-input"
-                                AutoComplete="true" OnEnterPressed="ExitNavigationPathEditModeAsync" OnEscapePressed="HandleNavigatorInputEscapePressed" Id="navigator-address-bar-input" />
+                                                AutoComplete="true" OnEnterPressed="ExitNavigationPathEditModeAsync" OnEscapePressed="HandleNavigatorInputEscapePressedAsync" Id="navigator-address-bar-input" />
                         }
                         else
                         {
@@ -129,7 +172,7 @@
                                         iconSizeClass = "extra-large-icons";
                                 }
                                 string itemType = fileSystemItem is FileModel ? "file" : "directory";
-                                <div class="e @iconSizeClass" data-path="@fileSystemItem.Path" data-type="@itemType">
+                                <div class="e @iconSizeClass" data-path="@fileSystemItem.Path" data-type="@itemType" onmouseup="handleFileSystemEntityMouseUp(event)" onmousedown="handleFileSystemEntityMouseDown(event)">
                                     <div class="icon"><img src="/images/icons/Lyra/@(itemType).svg"></div>
                                     <div class="text"><span class="@(itemType == "directory" ? "d" : "f") t">@fileSystemItem.Name</span></div>
                                     <div class="date-modified @(itemType == "directory" ? "d" : "f")" style="display: none;">@fileSystemItem.DateModified</div>
@@ -158,11 +201,13 @@
     <EnlightenmentButton IsConfirmButton="false">Cancel</EnlightenmentButton>
     <EnlightenmentButton>Confirm</EnlightenmentButton> *@
 </div>
+<div id="visible-selection-rectangle"></div>
+<div id="selection-rectangle"></div>
 
 <!--The drop down for the navigator path segments needs to be absolute, such that it is not affected by the parent clipping-->
 @if (showPathSegmentDowpDown && expandedPathSegmentIndex.HasValue && pathSegmentsSubdirectoriesCache.ContainsKey(expandedPathSegmentIndex.Value))
 {
-    <div class="navigator-dropdown opened" id="navigatorDropdown" data-path-segment-id="path-segment-@expandedPathSegmentIndex">        
+    <div class="navigator-dropdown opened" id="navigatorDropdown" data-path-segment-id="path-segment-@expandedPathSegmentIndex">
         @foreach (var directory in pathSegmentsSubdirectoriesCache[expandedPathSegmentIndex.Value])
         {
             <div class="navigator-option" data-path="@directory.Path" @onclick="@(() => NavigateToPathAsync(directory.Path, isForwardNavigation: false, isBackwardNavigation: false))">@directory.Name</div>
@@ -171,7 +216,7 @@
 }
 @code {
     [Parameter] public string? Path { get; set; }
-    [Parameter] public bool IncludeFiles { get; set; } 
+    [Parameter] public bool IncludeFiles { get; set; }
 
     public EventCallback<string> OnNodeSelected { get; set; }
 
@@ -183,6 +228,7 @@
     private string pathSeparator = "/";
     private string? selectedNodePath;
     private string? _path;
+    private bool isSelectionMode;
     private bool showPathSegmentDowpDown;
     private bool isNavigationPathEditMode;
     private int? expandedPathSegmentIndex;
@@ -190,8 +236,8 @@
     private FileSystemIconSize iconSize;
     private Dictionary<int, List<FileSystemTreeNodeModel>> pathSegmentsSubdirectoriesCache = [];
     private DotNetObjectReference<FileSystemBrowser>? reference;
-    private readonly Stack<string> undoStack = new();
-    private readonly Stack<string> redoStack = new();
+    private readonly Stack<string> undoStack = [];
+    private readonly Stack<string> redoStack = [];
 
     /// <summary>
     /// Initializes the component.
@@ -206,8 +252,6 @@
             await NavigateToPathAsync(Path, isForwardNavigation: false, isBackwardNavigation: false).ConfigureAwait(false);
         }
         await ChangeViewModeAsync(viewMode).ConfigureAwait(false);
-        // make the navigator path segments horizontally scrollable
-        await JSRuntime.InvokeVoidAsync("addHorizontalScrolling", "navigator-address-bar").ConfigureAwait(false);
     }
 
     /// <summary>
@@ -220,7 +264,12 @@
         if (firstRender)
         {
             reference = DotNetObjectReference.Create(this);
-            await JSRuntime.InvokeVoidAsync("windowClickHandler", reference);
+            // assign the elements of this component instance to javascript variables, for memoization
+            await JSRuntime.InvokeVoidAsync("initializeFileSystemBrowser", reference).ConfigureAwait(false);
+            // make the navigator path segments horizontally scrollable
+            await JSRuntime.InvokeVoidAsync("addHorizontalScrolling", "navigator-address-bar").ConfigureAwait(false);
+            // subscribe to window clicks
+            await JSRuntime.InvokeVoidAsync("windowClickHandler", reference).ConfigureAwait(false);
         }
         await base.OnAfterRenderAsync(firstRender);
     }
@@ -230,7 +279,7 @@
     /// </summary>
     /// <param name="e">The event arguments.</param>
     [JSInvokable]
-    public void OnWindowClick(dynamic e)
+    public async Task OnWindowClickAsync(dynamic e)
     {
         // parse the event args and get the initiator of the event
         var jsonElement = (JsonElement)e;
@@ -245,7 +294,7 @@
         // exit navigator path edit mode when clicking anywhere outside of it, or on elements that should not exit it
         if (sender is null || (sender is not null && !sender.Contains("navigator-path-segments") && !sender.Contains("navigator-edit-icon") && !sender.Contains("navigator-address-bar-input")))
             isNavigationPathEditMode = false;
-        StateHasChanged();
+        await InvokeAsync(StateHasChanged);
     }
 
     /// <summary>
@@ -258,7 +307,7 @@
         {
             node.Children = new List<FileSystemTreeNodeModel>();
             node.IsExpanded = true;
-            StateHasChanged();
+            await InvokeAsync(StateHasChanged);
             if (await CheckPathAsync(node.Path).ConfigureAwait(false))
             {
                 try
@@ -268,7 +317,7 @@
                         if (childNode is not null)
                         {
                             node.Children.Add(childNode);
-                            StateHasChanged();
+                            await InvokeAsync(StateHasChanged);
                         }
                     }
                     if (IncludeFiles)
@@ -278,7 +327,7 @@
                             if (childNode is not null)
                             {
                                 node.Children.Add(childNode);
-                                StateHasChanged();
+                                await InvokeAsync(StateHasChanged);
                             }
                         }
                     }
@@ -295,7 +344,7 @@
         }
         else
             node.IsExpanded = !node.IsExpanded;
-        StateHasChanged();
+        await InvokeAsync(StateHasChanged);
     }
 
     /// <summary>
@@ -335,7 +384,7 @@
             if (!concatenatedPath.EndsWith(pathSeparator))
                 concatenatedPath += pathSeparator;
             // add current and parent directories too
-            List<FileSystemTreeNodeModel> directories = [ new() { Path = concatenatedPath, Name = ".", }, new() { Path = parentConcatenatedPath, Name = ".." } ];
+            List<FileSystemTreeNodeModel> directories = [new() { Path = concatenatedPath, Name = ".", }, new() { Path = parentConcatenatedPath, Name = ".." }];
             // add the rest of the subdirectories of the expanded path node
             await foreach (FileSystemTreeNodeModel? directory in _apiHttpClient.GetAsyncEnumerable<FileSystemTreeNodeModel>($"directories/get-tree-directories?path={Uri.EscapeDataString(concatenatedPath)}").ConfigureAwait(false))
                 if (directory is not null)
@@ -344,7 +393,7 @@
             pathSegmentsSubdirectoriesCache[toggledIndex] = directories;
             expandedPathSegmentIndex = toggledIndex;
             showPathSegmentDowpDown = true;
-            StateHasChanged();
+            await InvokeAsync(StateHasChanged);
             // invoke the javascript function that positions the dropdown underneath the toggled path segment
             await JSRuntime.InvokeVoidAsync("updateDropdownPosition", $"path-segment-{toggledIndex}").ConfigureAwait(false);
         }
@@ -352,7 +401,7 @@
         {
             expandedPathSegmentIndex = null;
             showPathSegmentDowpDown = false;
-            StateHasChanged();
+            await InvokeAsync(StateHasChanged);
         }
     }
 
@@ -419,16 +468,23 @@
                 }
             }
             _path = path; // we are about to navigate to the new path, store its value in the control variable
-            await GetNavigatorPathAsync(path).ConfigureAwait(false);
-            await GetFileSystemTreeAsync(path).ConfigureAwait(false);
-            await GetFileSystemItemsAsync(path).ConfigureAwait(false);
+            try
+            {
+                await GetNavigatorPathAsync(path).ConfigureAwait(false);
+                await GetFileSystemTreeAsync(path).ConfigureAwait(false);
+                await GetFileSystemItemsAsync(path).ConfigureAwait(false);
+            }
+            catch (ApiException ex)
+            {
+                HandleApiException(ex);
+            }
         }
         selectedNodePath = _path;
         Path = _path; // also update the navigation input address
         if (Path is not null && !Path.EndsWith(pathSeparator))
             Path += pathSeparator;
         await OnNodeSelected.InvokeAsync(path).ConfigureAwait(false);
-        StateHasChanged();
+        await InvokeAsync(StateHasChanged);
     }
 
     /// <summary>
@@ -476,6 +532,16 @@
         {
             HandleApiException(ex);
         }
+    }
+
+    /// <summary>
+    /// Handles the file system directories double click event.
+    /// </summary>
+    /// <param name="path">The path of the double clicked directory.</param>
+    [JSInvokable()]
+    public async Task OnDirectoryDoubleClickAsync(string path)
+    {
+        await NavigateToPathAsync(path, isForwardNavigation: false, isBackwardNavigation: false).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -528,7 +594,7 @@
     private async Task GetNavigatorPathAsync(string path)
     {
         pathSegments = await _apiHttpClient.GetAsync<PathSegmentModel[]>($"path/split?path={Uri.EscapeDataString(path!)}").ConfigureAwait(false);
-        StateHasChanged();
+        await InvokeAsync(StateHasChanged);
     }
 
     /// <summary>
@@ -548,12 +614,12 @@
         {
             // on UNIX, just add the root "/"
             treeViewRootNodes.Add(new FileSystemTreeNodeModel()
-            {
-                Path = pathSeparator!,
-                IsExpanded = true,
-                ItemType = FileSystemItemType.Root,
-                Name = pathSeparator!
-            });
+                {
+                    Path = pathSeparator!,
+                    IsExpanded = true,
+                    ItemType = FileSystemItemType.Root,
+                    Name = pathSeparator!
+                });
         }
         // if there was an initial path saved from a previous session, load the full tree up to that initial path
         List<FileSystemTreeNodeModel> initialTree = await _apiHttpClient.GetAsync<List<FileSystemTreeNodeModel>>($"directories/get-directory-tree?path={Uri.EscapeDataString(path!)}&includeFiles={IncludeFiles}").ConfigureAwait(false);
@@ -590,7 +656,7 @@
                 if (directory is not null)
                 {
                     fileSystemItems.Add(directory);
-                    StateHasChanged();
+                    await InvokeAsync(StateHasChanged);
                 }
             }
             if (IncludeFiles)
@@ -600,7 +666,7 @@
                     if (file is not null)
                     {
                         fileSystemItems.Add(file);
-                        StateHasChanged();
+                        await InvokeAsync(StateHasChanged);
                     }
                 }
             }
@@ -622,18 +688,18 @@
             await JSRuntime.InvokeVoidAsync("addHorizontalScrolling", "file-system-browser-file-system-explorer").ConfigureAwait(false);
         else
             await JSRuntime.InvokeVoidAsync("removeHorizontalScrolling", "file-system-browser-file-system-explorer").ConfigureAwait(false);
-        StateHasChanged();
+        await InvokeAsync(StateHasChanged);
     }
 
     /// <summary>
     /// Changes the icon size for the file system items.
     /// </summary>
     /// <param name="newIconSize">Thew new icon size to change to.</param>
-    private void ChangeIconSize(FileSystemIconSize newIconSize)
+    private async Task ChangeIconSizeAsync(FileSystemIconSize newIconSize)
     {
         viewMode = FileSystemViewMode.Icons;
         iconSize = newIconSize;
-        StateHasChanged();
+        await InvokeAsync(StateHasChanged);
     }
 
     /// <summary>
@@ -642,9 +708,9 @@
     private async Task EnterNavigationPathEditModeAsync()
     {
         isNavigationPathEditMode = true;
-        StateHasChanged();
+        await InvokeAsync(StateHasChanged);
         await InvokeAsync(async () =>
-        {           
+        {
             await Task.Delay(50); // a small delay is necessary to ensure the DOM has updated
             await SetFocusOnNavigatorAddressInputAsync().ConfigureAwait(false);
         });
@@ -656,7 +722,7 @@
     private async Task ExitNavigationPathEditModeAsync()
     {
         isNavigationPathEditMode = false;
-        StateHasChanged();
+        await InvokeAsync(StateHasChanged);
         if (Path is not null)
         {
             if (!Path.EndsWith(pathSeparator))
@@ -671,7 +737,7 @@
     /// <param name="path">The path of the newly selected node.</param>
     private async Task HandleFileSystemTreeViewNodeSelectedAsync(string path)
     {
-        StateHasChanged();
+        await InvokeAsync(StateHasChanged);
         if (selectedNodePath is not null)
         {
             Path = path;
@@ -684,11 +750,11 @@
     /// <summary>
     /// Handles the Escape key being pressed in the navigator address input.
     /// </summary>
-    private void HandleNavigatorInputEscapePressed()
+    private async Task HandleNavigatorInputEscapePressedAsync()
     {
         Path = _path;
         isNavigationPathEditMode = false;
-        StateHasChanged();
+        await InvokeAsync(StateHasChanged);
     }
 
     /// <summary>
@@ -696,7 +762,16 @@
     /// </summary>
     public async Task SetFocusOnNavigatorAddressInputAsync()
     {
-        await JSRuntime.InvokeVoidAsync("focusNavigatorInputElement");
+        await JSRuntime.InvokeVoidAsync("focusNavigatorInputElement").ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Enables or disables selection mode.
+    /// </summary>
+    private async Task ToggleSelectionModeAsync()
+    {
+        isSelectionMode = !isSelectionMode;
+        await JSRuntime.InvokeVoidAsync("toggleSelectionMode").ConfigureAwait(false);
     }
 
     /// <summary>

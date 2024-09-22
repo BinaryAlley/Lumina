@@ -43,7 +43,7 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
-            await JSRuntime.InvokeVoidAsync("windowKeyDownHandler", inputElement, DotNetObjectReference.Create(this));
+            await JSRuntime.InvokeVoidAsync("windowKeyDownHandler", inputElement, DotNetObjectReference.Create(this)).ConfigureAwait(false);
     }
 
     /// <summary>

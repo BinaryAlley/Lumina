@@ -41,7 +41,7 @@
     /// </summary>
     protected override void OnInitialized()
     {
-        _comboboxService.ComboboxOpened += CloseIfNotThis;
+        _comboboxService.ComboboxOpened += CloseIfNotThisAsync;
     }
 
     /// <summary>
@@ -61,12 +61,12 @@
     /// Closes the dropdown if the provided <paramref name="openedId"/> is not the current <see cref="Id"/>, or if it's <see langword="null"/>.
     /// </summary>
     /// <param name="openedId">The optional id of the combobox that initiated the dropdown state change.</param>
-    private void CloseIfNotThis(string? openedId)
+    private async Task CloseIfNotThisAsync(string? openedId)
     {
         if (openedId != "combobox_checkbox_" + Id && IsOpen)
         {
             IsOpen = false;
-            StateHasChanged();
+            await InvokeAsync(StateHasChanged);
         }
     }
 
@@ -86,6 +86,6 @@
     /// </summary>
     public void Dispose()
     {
-        _comboboxService.ComboboxOpened -= CloseIfNotThis;
+        _comboboxService.ComboboxOpened -= CloseIfNotThisAsync;
     }
 }
