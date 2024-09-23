@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.WrittenContentLibrary.BooksLibrary.Books.Commands;
-using Lumina.Application.Core.WrittenContentLibrary.BooksLibrary.Books.Queries;
+using Lumina.Application.Core.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook;
+using Lumina.Application.Core.WrittenContentLibrary.BooksLibrary.Books.Queries.GetBooks;
 using Lumina.Contracts.Requests.WrittenContentLibrary.BookLibrary;
 using Lumina.Presentation.Api.Core.Controllers.Common;
 using MapsterMapper;

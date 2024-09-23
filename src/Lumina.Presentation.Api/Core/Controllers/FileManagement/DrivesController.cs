@@ -1,6 +1,6 @@
 ﻿#region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using Lumina.Application.Core.FileManagement.Drives.Queries;
+using Lumina.Application.Core.FileManagement.Drives.Queries.GetDrives;
 using Lumina.Contracts.Responses.FileManagement;
 using Lumina.Presentation.Api.Core.Controllers.Common;
 using Mediator;

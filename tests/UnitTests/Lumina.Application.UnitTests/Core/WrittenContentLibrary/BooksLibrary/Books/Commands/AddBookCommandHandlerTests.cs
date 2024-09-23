@@ -5,7 +5,7 @@ using ErrorOr;
 using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Repositories.Books;
 using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Core.WrittenContentLibrary.BooksLibrary.Books.Commands;
+using Lumina.Application.Core.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook;
 using Lumina.Application.UnitTests.Common.Setup;
 using Lumina.Application.UnitTests.Core.WrittenContentLibrary.BooksLibrary.Books.Commands.Fixtures;
 using Lumina.Contracts.Enums.BookLibrary;

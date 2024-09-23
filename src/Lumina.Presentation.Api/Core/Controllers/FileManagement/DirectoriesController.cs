@@ -1,6 +1,8 @@
 ﻿#region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using Lumina.Application.Core.FileManagement.Directories.Queries;
+using Lumina.Application.Core.FileManagement.Directories.Queries.GetDirectories;
+using Lumina.Application.Core.FileManagement.Directories.Queries.GetDirectoryTree;
+using Lumina.Application.Core.FileManagement.Directories.Queries.GetTreeDirectories;
 using Lumina.Contracts.Responses.FileManagement;
 using Lumina.Presentation.Api.Common.ModelBinders;
 using Lumina.Presentation.Api.Core.Controllers.Common;

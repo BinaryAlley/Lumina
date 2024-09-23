@@ -1,7 +1,7 @@
 ﻿#region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using Bogus;
-using Lumina.Application.Core.WrittenContentLibrary.BooksLibrary.Books.Commands;
+using Lumina.Application.Core.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook;
 using Lumina.Application.UnitTests.Common.Setup;
 using Lumina.Contracts.Enums.BookLibrary;
 using Lumina.Contracts.Models.Common;
