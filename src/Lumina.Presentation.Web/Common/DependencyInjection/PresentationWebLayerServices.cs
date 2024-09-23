@@ -29,7 +29,7 @@ public static class PresentationWebLayerServices
         services.AddValidatorsFromAssemblyContaining<Program>(ServiceLifetime.Singleton);
 
         // handle transient errors like network timeouts or intermittent failures
-        var retryPolicy = Policy
+        Polly.Retry.AsyncRetryPolicy<HttpResponseMessage> retryPolicy = Policy
             .Handle<HttpRequestException>()
             .OrResult<HttpResponseMessage>(r =>
                 !r.IsSuccessStatusCode &&
@@ -39,17 +39,17 @@ public static class PresentationWebLayerServices
                 TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
 
         // use a circuit breaker to prevent repeatedly calling a failing service
-        var circuitBreakerPolicy = Policy
+        Polly.CircuitBreaker.AsyncCircuitBreakerPolicy<HttpResponseMessage> circuitBreakerPolicy = Policy
             .Handle<HttpRequestException>()
             .OrResult<HttpResponseMessage>(r => r.StatusCode == HttpStatusCode.InternalServerError)
             .CircuitBreakerAsync(3, TimeSpan.FromSeconds(30));
 
-        var policy = Policy.WrapAsync(retryPolicy, circuitBreakerPolicy);
+        Polly.Wrap.AsyncPolicyWrap<HttpResponseMessage> policy = Policy.WrapAsync(retryPolicy, circuitBreakerPolicy);
 
         // register the typed client used for the API interaction
         services.AddHttpClient<IApiHttpClient, ApiHttpClient>()
             .AddPolicyHandler(retryPolicy)
-            .AddPolicyHandler(circuitBreakerPolicy); 
+            .AddPolicyHandler(circuitBreakerPolicy);
 
         services.AddSingleton<ComboboxService>();
         services.AddScoped<INotificationService, NotificationService>();

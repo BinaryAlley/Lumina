@@ -21,13 +21,13 @@ public class RepositoryFactoryTests
     public void CreateRepository_WhenCalled_ShouldReturnCorrectRepository()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
         DataAccessLayerServices.AddDataAccessLayerServices(services);
-        var serviceProvider = services.BuildServiceProvider();
-        var repositoryFactory = new RepositoryFactory(serviceProvider);
+        ServiceProvider serviceProvider = services.BuildServiceProvider();
+        RepositoryFactory repositoryFactory = new(serviceProvider);
 
         // Act
-        var result = repositoryFactory.CreateRepository<IBookRepository>();
+        IBookRepository result = repositoryFactory.CreateRepository<IBookRepository>();
 
         // Assert
         result.Should().NotBeNull();
@@ -38,10 +38,10 @@ public class RepositoryFactoryTests
     public void CreateRepository_WhenUnregisteredTypeRequested_ShouldThrowException()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
         DataAccessLayerServices.AddDataAccessLayerServices(services);
-        var serviceProvider = services.BuildServiceProvider();
-        var repositoryFactory = new RepositoryFactory(serviceProvider);
+        ServiceProvider serviceProvider = services.BuildServiceProvider();
+        RepositoryFactory repositoryFactory = new(serviceProvider);
 
         // Act & Assert
         Action act = () => repositoryFactory.CreateRepository<IUnregisteredRepository>();

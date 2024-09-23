@@ -40,14 +40,14 @@ public class FluentValidationOptionsTests
     public void Validate_WhenMatchingName_ShouldValidateOptions()
     {
         // Arrange
-        var name = _fixture.Create<string>();
-        var options = _fixture.Create<FluentValidationOptionsFixture>();
-        var validator = Substitute.For<IValidator<FluentValidationOptionsFixture>>();
+        string name = _fixture.Create<string>();
+        FluentValidationOptionsFixture options = _fixture.Create<FluentValidationOptionsFixture>();
+        IValidator<FluentValidationOptionsFixture> validator = Substitute.For<IValidator<FluentValidationOptionsFixture>>();
         validator.Validate(options).Returns(new ValidationResult());
-        var sut = new FluentValidationOptions<FluentValidationOptionsFixture>(name, validator);
+        FluentValidationOptions<FluentValidationOptionsFixture> sut = new(name, validator);
 
         // Act
-        var result = sut.Validate(name, options);
+        ValidateOptionsResult result = sut.Validate(name, options);
 
         // Assert
         result.Should().BeOfType<ValidateOptionsResult>();
@@ -59,14 +59,14 @@ public class FluentValidationOptionsTests
     public void Validate_WhenNonMatchingName_ShouldSkipValidation()
     {
         // Arrange
-        var name = _fixture.Create<string>();
-        var differentName = _fixture.Create<string>();
-        var options = _fixture.Create<FluentValidationOptionsFixture>();
-        var validator = Substitute.For<IValidator<FluentValidationOptionsFixture>>();
-        var sut = new FluentValidationOptions<FluentValidationOptionsFixture>(name, validator);
+        string name = _fixture.Create<string>();
+        string differentName = _fixture.Create<string>();
+        FluentValidationOptionsFixture options = _fixture.Create<FluentValidationOptionsFixture>();
+        IValidator<FluentValidationOptionsFixture> validator = Substitute.For<IValidator<FluentValidationOptionsFixture>>();
+        FluentValidationOptions<FluentValidationOptionsFixture> sut = new(name, validator);
 
         // Act
-        var result = sut.Validate(differentName, options);
+        ValidateOptionsResult result = sut.Validate(differentName, options);
 
         // Assert
         result.Should().Be(ValidateOptionsResult.Skip);
@@ -77,13 +77,13 @@ public class FluentValidationOptionsTests
     public void Validate_WhenNullName_ShouldValidateOptions()
     {
         // Arrange
-        var options = _fixture.Create<FluentValidationOptionsFixture>();
-        var validator = Substitute.For<IValidator<FluentValidationOptionsFixture>>();
+        FluentValidationOptionsFixture options = _fixture.Create<FluentValidationOptionsFixture>();
+        IValidator<FluentValidationOptionsFixture> validator = Substitute.For<IValidator<FluentValidationOptionsFixture>>();
         validator.Validate(options).Returns(new ValidationResult());
-        var sut = new FluentValidationOptions<FluentValidationOptionsFixture>(null, validator);
+        FluentValidationOptions<FluentValidationOptionsFixture> sut = new(null, validator);
 
         // Act
-        var result = sut.Validate(_fixture.Create<string>(), options);
+        ValidateOptionsResult result = sut.Validate(_fixture.Create<string>(), options);
 
         // Assert
         result.Should().BeOfType<ValidateOptionsResult>();
@@ -95,9 +95,9 @@ public class FluentValidationOptionsTests
     public void Validate_WhenNullOptions_ShouldThrowArgumentNullException()
     {
         // Arrange
-        var name = _fixture.Create<string>();
-        var validator = Substitute.For<IValidator<FluentValidationOptionsFixture>>();
-        var sut = new FluentValidationOptions<FluentValidationOptionsFixture>(name, validator);
+        string name = _fixture.Create<string>();
+        IValidator<FluentValidationOptionsFixture> validator = Substitute.For<IValidator<FluentValidationOptionsFixture>>();
+        FluentValidationOptions<FluentValidationOptionsFixture> sut = new(name, validator);
 
         // Act
         Action act = () => sut.Validate(name, null!);
@@ -110,18 +110,18 @@ public class FluentValidationOptionsTests
     public void Validate_WhenInvalidOptions_ShouldReturnFailureResult()
     {
         // Arrange
-        var name = _fixture.Create<string>();
-        var options = _fixture.Create<FluentValidationOptionsFixture>();
-        var validator = Substitute.For<IValidator<FluentValidationOptionsFixture>>();
-        var validationFailures = new List<ValidationFailure>
-        {
+        string name = _fixture.Create<string>();
+        FluentValidationOptionsFixture options = _fixture.Create<FluentValidationOptionsFixture>();
+        IValidator<FluentValidationOptionsFixture> validator = Substitute.For<IValidator<FluentValidationOptionsFixture>>();
+        List<ValidationFailure> validationFailures =
+        [
             new("PropertyName", "Error Message")
-        };
+        ];
         validator.Validate(options).Returns(new ValidationResult(validationFailures));
-        var sut = new FluentValidationOptions<FluentValidationOptionsFixture>(name, validator);
+        FluentValidationOptions<FluentValidationOptionsFixture> sut = new(name, validator);
 
         // Act
-        var result = sut.Validate(name, options);
+        ValidateOptionsResult result = sut.Validate(name, options);
 
         // Assert
         result.Should().BeOfType<ValidateOptionsResult>();

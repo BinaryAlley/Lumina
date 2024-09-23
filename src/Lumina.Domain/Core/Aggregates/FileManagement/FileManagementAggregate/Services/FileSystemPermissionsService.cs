@@ -29,7 +29,7 @@ internal class FileSystemPermissionsService : IFileSystemPermissionsService
     /// <param name="platformContextManager">Injected facade service for platform contextual services.</param>
     public FileSystemPermissionsService(IPlatformContextManager platformContextManager)
     {
-         _platformContextManager = platformContextManager;
+        _platformContextManager = platformContextManager;
     }
     #endregion
 
@@ -85,7 +85,7 @@ internal class FileSystemPermissionsService : IFileSystemPermissionsService
                 modes = AccessModes.F_OK;  // check existence, not an exact match but the closest
                 break;
             case FileAccessMode.Delete:
-                if (fileInfo.FileType == FileTypes.Directory)                   
+                if (fileInfo.FileType == FileTypes.Directory)
                     return fileInfo.CanAccess(AccessModes.W_OK | AccessModes.X_OK); // to delete a directory, we need write and execute permissions on the directory itself
                 else
                 {
@@ -147,7 +147,7 @@ internal class FileSystemPermissionsService : IFileSystemPermissionsService
                             _ = fileSystemInfo.CreationTime;  // trigger potential access denial
                             break;
                         case FileAccessMode.ReadContents:
-                            using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                            using (FileStream stream = new(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                                 stream.Close();
                             break;
                     }
@@ -203,7 +203,7 @@ internal class FileSystemPermissionsService : IFileSystemPermissionsService
             }
 
         }
-        catch 
+        catch
         {
             return false;
         }

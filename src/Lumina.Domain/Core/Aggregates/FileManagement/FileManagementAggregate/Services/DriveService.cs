@@ -41,10 +41,8 @@ public class DriveService : IDriveService
     {
         if (_platformContext.Platform == PlatformType.Unix)
         {
-            var unixRootResult = UnixRootItem.Create(FileSystemItemStatus.Accessible);
-            if (unixRootResult.IsError)
-                return unixRootResult.Errors;
-            return new List<FileSystemItem>() { unixRootResult.Value };
+            ErrorOr<UnixRootItem> unixRootResult = UnixRootItem.Create(FileSystemItemStatus.Accessible);
+            return unixRootResult.IsError ? (ErrorOr<IEnumerable<FileSystemItem>>)unixRootResult.Errors : (ErrorOr<IEnumerable<FileSystemItem>>)new List<FileSystemItem>() { unixRootResult.Value };
         }
         else
             return ErrorOrFactory.From(_fileSystem.DriveInfo.GetDrives()
@@ -53,7 +51,7 @@ public class DriveService : IDriveService
                                                             .Select(driveInfo =>
                                                             {
                                                                 ErrorOr<FileSystemItem> root;
-                                                                var windowsRootResult = WindowsRootItem.Create(driveInfo.Name, driveInfo.Name);
+                                                                ErrorOr<WindowsRootItem> windowsRootResult = WindowsRootItem.Create(driveInfo.Name, driveInfo.Name);
                                                                 if (windowsRootResult.IsError)
                                                                     return windowsRootResult.Errors;
                                                                 else

@@ -44,12 +44,12 @@ internal class DirectoryProviderService : IDirectoryProviderService
     public ErrorOr<IEnumerable<FileSystemPathId>> GetSubdirectoryPaths(FileSystemPathId path)
     {
         // check if the user has access permissions to the provided path
-        if (!_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ListDirectory, false))
-            return Errors.Permission.UnauthorizedAccess;
-        return ErrorOrFactory.From(_fileSystem.Directory.GetDirectories(path.Path)
+        return !_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ListDirectory, false)
+            ? (ErrorOr<IEnumerable<FileSystemPathId>>)Errors.Permission.UnauthorizedAccess
+            : ErrorOrFactory.From(_fileSystem.Directory.GetDirectories(path.Path)
                                                         .OrderBy(path => path)
                                                         .Select(path => path.EndsWith(_fileSystem.Path.DirectorySeparatorChar) ? path : path + _fileSystem.Path.DirectorySeparatorChar)
-                                                        .Select(path => FileSystemPathId.Create(path))
+                                                        .Select(FileSystemPathId.Create)
                                                         .Where(errorOrPathId => !errorOrPathId.IsError)
                                                         .Select(errorOrPathId => errorOrPathId.Value)
                                                         .AsEnumerable());
@@ -85,9 +85,9 @@ internal class DirectoryProviderService : IDirectoryProviderService
     public ErrorOr<Optional<DateTime>> GetLastWriteTime(FileSystemPathId path)
     {
         // check if the user has access permissions to the provided path
-        if (!_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties, false))
-            return Errors.Permission.UnauthorizedAccess;
-        return Optional<DateTime>.FromNullable(_fileSystem.Directory.GetLastWriteTime(path.Path));
+        return !_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties, false)
+            ? (ErrorOr<Optional<DateTime>>)Errors.Permission.UnauthorizedAccess
+            : (ErrorOr<Optional<DateTime>>)Optional<DateTime>.FromNullable(_fileSystem.Directory.GetLastWriteTime(path.Path));
     }
 
     /// <summary>
@@ -98,9 +98,9 @@ internal class DirectoryProviderService : IDirectoryProviderService
     public ErrorOr<Optional<DateTime>> GetCreationTime(FileSystemPathId path)
     {
         // check if the user has access permissions to the provided path
-        if (!_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties, false))
-            return Errors.Permission.UnauthorizedAccess;
-        return Optional<DateTime>.FromNullable(_fileSystem.Directory.GetCreationTime(path.Path));
+        return !_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties, false)
+            ? (ErrorOr<Optional<DateTime>>)Errors.Permission.UnauthorizedAccess
+            : (ErrorOr<Optional<DateTime>>)Optional<DateTime>.FromNullable(_fileSystem.Directory.GetCreationTime(path.Path));
     }
 
     /// <summary>
@@ -270,7 +270,7 @@ internal class DirectoryProviderService : IDirectoryProviderService
             string? newDirectory = _fileSystem.Path.Combine(parentDirectory, name);
             if (!string.IsNullOrEmpty(newDirectory))
             {
-                var newDirectoryPathResult = FileSystemPathId.Create(newDirectory);
+                ErrorOr<FileSystemPathId> newDirectoryPathResult = FileSystemPathId.Create(newDirectory);
                 if (newDirectoryPathResult.IsError)
                     return newDirectoryPathResult.Errors;
                 if (!_fileSystemPermissionsService.CanAccessPath(parendDirectoryResult.Value, FileAccessMode.Write, false))

@@ -20,10 +20,10 @@ public class UnitOfWorkTests
     public void UnitOfWorkImplementsUnitOfWorkInterface_InterfaceIsImplemented_ReturnsTrue()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
         DataAccessLayerServices.AddDataAccessLayerServices(services);
-        var serviceProvider = services.BuildServiceProvider();
-        var unitOfWork = (UnitOfWork)serviceProvider.GetRequiredService<IUnitOfWork>();
+        ServiceProvider serviceProvider = services.BuildServiceProvider();
+        UnitOfWork unitOfWork = (UnitOfWork)serviceProvider.GetRequiredService<IUnitOfWork>();
 
         // Assert
         Assert.True(unitOfWork is IUnitOfWork);

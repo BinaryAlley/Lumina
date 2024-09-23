@@ -44,12 +44,12 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
         if (_validator is null)
             return await next(request, cancellationToken).ConfigureAwait(false);
         // before the handler of the command is executed
-        var validationResult = await _validator.ValidateAsync(request, cancellationToken).ConfigureAwait(false);
+        FluentValidation.Results.ValidationResult validationResult = await _validator.ValidateAsync(request, cancellationToken).ConfigureAwait(false);
         // if there are no validation errors, invoke the command handler
         if (validationResult.IsValid)
             return await next(request, cancellationToken).ConfigureAwait(false);
         // after the command handler is executed
-        var errors = validationResult.Errors.ConvertAll(validationFailure => Error.Validation(description: validationFailure.ErrorMessage));
+        System.Collections.Generic.List<Error> errors = validationResult.Errors.ConvertAll(validationFailure => Error.Validation(description: validationFailure.ErrorMessage));
         // the compiler doesn't know there is an implicit converter from a list of errors to the ErrorOr object, and unfortunately, there is no way around this but to use some magic
         // this is acceptable because we DO know that we will always have a list of errors of type ErrorOr (check the generic constraint at the top of the class!)
         return (dynamic)errors;

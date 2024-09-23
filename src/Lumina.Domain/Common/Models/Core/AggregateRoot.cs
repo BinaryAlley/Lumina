@@ -22,7 +22,7 @@ public abstract class AggregateRoot<TId> : Entity<TId> where TId : notnull
     /// </summary>
     protected AggregateRoot() // only needed during reflection
     {
-        
+
     }
 #pragma warning restore CS8618
     #endregion

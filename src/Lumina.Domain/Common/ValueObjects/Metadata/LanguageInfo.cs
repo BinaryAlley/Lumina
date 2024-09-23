@@ -58,13 +58,11 @@ public class LanguageInfo : ValueObject
     /// </returns>
     public static ErrorOr<LanguageInfo> Create(string languageCode, string languageName, Optional<string> nativeName)
     {
-        if (string.IsNullOrWhiteSpace(languageCode))
-            return Errors.Errors.Metadata.LanguageCodeCannotBeEmpty;
-        if (string.IsNullOrWhiteSpace(languageName))
-            return Errors.Errors.Metadata.LanguageNameCannotBeEmpty;
-        if (languageCode.Length != 2)
-            return Errors.Errors.Metadata.InvalidIsoCode;
-        return new LanguageInfo(languageCode, languageName, nativeName);
+        return string.IsNullOrWhiteSpace(languageCode)
+            ? (ErrorOr<LanguageInfo>)Errors.Errors.Metadata.LanguageCodeCannotBeEmpty
+            : string.IsNullOrWhiteSpace(languageName)
+            ? (ErrorOr<LanguageInfo>)Errors.Errors.Metadata.LanguageNameCannotBeEmpty
+            : languageCode.Length != 2 ? (ErrorOr<LanguageInfo>)Errors.Errors.Metadata.InvalidIsoCode : (ErrorOr<LanguageInfo>)new LanguageInfo(languageCode, languageName, nativeName);
     }
 
     /// <inheritdoc/>

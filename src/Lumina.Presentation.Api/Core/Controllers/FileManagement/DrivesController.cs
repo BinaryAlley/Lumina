@@ -43,7 +43,7 @@ public class DrivesController : ApiController
     public async Task<IActionResult> GetDrives(CancellationToken cancellationToken)
     {
         ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _mediator.Send(new GetDrivesQuery(), cancellationToken).ConfigureAwait(false);
-        return result.Match(result => Ok(result), errors => Problem(errors));
+        return result.Match(Ok, Problem);
     }
     #endregion
 }

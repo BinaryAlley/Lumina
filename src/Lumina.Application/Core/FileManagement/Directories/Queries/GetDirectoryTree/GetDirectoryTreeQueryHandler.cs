@@ -56,27 +56,25 @@ public class GetDirectoryTreeQueryHandler : IRequestHandler<GetDirectoryTreeQuer
     {
         List<FileSystemTreeNodeResponse> result = [];
         // retrieve the list of drives
-        var getDrivesResult = GetDrives();
+        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> getDrivesResult = GetDrives();
         if (getDrivesResult.IsError)
             return getDrivesResult.Errors;
         result.AddRange(getDrivesResult.Value);
 
-        var pathPartsResults = _pathService.ParsePath(request.Path);
+        ErrorOr<IEnumerable<PathSegment>> pathPartsResults = _pathService.ParsePath(request.Path);
         if (pathPartsResults.IsError)
             return pathPartsResults.Errors;
 
-        var pathParts = pathPartsResults.Value.ToList();
-        var currentPath = pathParts[0].Name;
+        List<PathSegment> pathParts = pathPartsResults.Value.ToList();
+        string currentPath = pathParts[0].Name;
 
-        var buildDirectoryTreeResult = BuildDirectoryTree(result, pathParts, out var currentNode);
+        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> buildDirectoryTreeResult = BuildDirectoryTree(result, pathParts, out FileSystemTreeNodeResponse? currentNode);
         if (buildDirectoryTreeResult.IsError)
             return buildDirectoryTreeResult.Errors;
 
         // add subdirectories of the last directory node
-        var loadChildrenResult = LoadChildren(currentNode, request.IncludeFiles);
-        if (loadChildrenResult.IsError)
-            return loadChildrenResult.Errors;
-        return await ValueTask.FromResult(result);
+        ErrorOr<Success> loadChildrenResult = LoadChildren(currentNode, request.IncludeFiles);
+        return loadChildrenResult.IsError ? (ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>)loadChildrenResult.Errors : (ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>)await ValueTask.FromResult(result);
     }
 
     /// <summary>
@@ -87,10 +85,10 @@ public class GetDirectoryTreeQueryHandler : IRequestHandler<GetDirectoryTreeQuer
     /// </returns>
     private ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> GetDrives()
     {
-        var driveResult = _driveService.GetDrives();
-        if (driveResult.IsError)
-            return driveResult.Errors;
-        return ErrorOrFactory.From(driveResult.Value.Adapt<IEnumerable<FileSystemTreeNodeResponse>>());
+        ErrorOr<IEnumerable<FileSystemItem>> driveResult = _driveService.GetDrives();
+        return driveResult.IsError
+            ? (ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>)driveResult.Errors
+            : ErrorOrFactory.From(driveResult.Value.Adapt<IEnumerable<FileSystemTreeNodeResponse>>());
     }
 
     /// <summary>
@@ -104,21 +102,21 @@ public class GetDirectoryTreeQueryHandler : IRequestHandler<GetDirectoryTreeQuer
     private ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> BuildDirectoryTree(List<FileSystemTreeNodeResponse> drives, List<PathSegment> pathParts, out FileSystemTreeNodeResponse currentNode)
     {
         // find the root drive that matches the first part of the path
-        var drive = drives.First(d => d.Name.Contains(pathParts[0].Name));
+        FileSystemTreeNodeResponse drive = drives.First(d => d.Name.Contains(pathParts[0].Name));
         drive.IsExpanded = true;
         currentNode = drive;
-        var currentPath = pathParts[0].Name;
+        string currentPath = pathParts[0].Name;
 
         // traverse the remaining path parts to build the tree structure
-        for (var i = 1; i < pathParts.Count; i++)
+        for (int i = 1; i < pathParts.Count; i++)
         {
-            var combinedPathResult = _pathService.CombinePath(currentPath, pathParts[i].Name);
+            ErrorOr<string> combinedPathResult = _pathService.CombinePath(currentPath, pathParts[i].Name);
             if (combinedPathResult.IsError)
                 return combinedPathResult.Errors;
 
             currentPath = combinedPathResult.Value;
             // create a new node for the directory and add it as a child of the current node
-            var newNode = new FileSystemTreeNodeResponse
+            FileSystemTreeNodeResponse newNode = new()
             {
                 Path = currentPath,
                 Name = pathParts[i].Name,
@@ -140,13 +138,13 @@ public class GetDirectoryTreeQueryHandler : IRequestHandler<GetDirectoryTreeQuer
     private ErrorOr<Success> LoadChildren(FileSystemTreeNodeResponse node, bool includeFiles)
     {
         // get subdirectories under the current node's path
-        var subDirectoriesResult = _directoryService.GetSubdirectories(node.Path);
+        ErrorOr<IEnumerable<Directory>> subDirectoriesResult = _directoryService.GetSubdirectories(node.Path);
         if (subDirectoriesResult.IsError)
             return subDirectoriesResult.Errors;
         // add each subdirectory as a child node of the current directory
-        foreach (var subDirectory in subDirectoriesResult.Value)
+        foreach (Directory subDirectory in subDirectoriesResult.Value)
         {
-            var subDirNode = new FileSystemTreeNodeResponse
+            FileSystemTreeNodeResponse subDirNode = new()
             {
                 Name = subDirectory.Name,
                 Path = subDirectory.Id.Path,
@@ -159,13 +157,13 @@ public class GetDirectoryTreeQueryHandler : IRequestHandler<GetDirectoryTreeQuer
         if (includeFiles)
         {
             // get files under the current node's path
-            var filesResult = _fileService.GetFiles(node.Path);
+            ErrorOr<IEnumerable<File>> filesResult = _fileService.GetFiles(node.Path);
             if (filesResult.IsError)
                 return filesResult.Errors;
             // add each file as a child node of the current directory
-            foreach (var file in filesResult.Value)
+            foreach (File file in filesResult.Value)
             {
-                var fileNode = new FileSystemTreeNodeResponse
+                FileSystemTreeNodeResponse fileNode = new()
                 {
                     Name = file.Name,
                     Path = file.Id.Path,

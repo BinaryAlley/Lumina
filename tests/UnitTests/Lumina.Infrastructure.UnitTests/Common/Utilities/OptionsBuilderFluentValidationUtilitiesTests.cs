@@ -41,12 +41,12 @@ public class OptionsBuilderFluentValidationUtilitiesTests
     public void ValidateFluently_WhenCalled_ShouldRegisterFluentValidationOptions()
     {
         // Arrange
-        var services = Substitute.For<IServiceCollection>();
-        var name = _fixture.Create<string>();
-        var optionsBuilder = new OptionsBuilder<OptionsBuilderFluentValidationUtilitiesFixture>(services, name);
+        IServiceCollection services = Substitute.For<IServiceCollection>();
+        string name = _fixture.Create<string>();
+        OptionsBuilder<OptionsBuilderFluentValidationUtilitiesFixture> optionsBuilder = new(services, name);
 
         // Act
-        var result = optionsBuilder.ValidateFluently();
+        OptionsBuilder<OptionsBuilderFluentValidationUtilitiesFixture> result = optionsBuilder.ValidateFluently();
 
         // Assert
         result.Should().BeSameAs(optionsBuilder);
@@ -60,30 +60,30 @@ public class OptionsBuilderFluentValidationUtilitiesTests
     public void ValidateFluently_WhenCalled_ShouldUseCorrectName()
     {
         // Arrange
-        var services = new ServiceCollection();
-        var name = _fixture.Create<string>();
-        var optionsBuilder = new OptionsBuilder<OptionsBuilderFluentValidationUtilitiesFixture>(services, name);
+        ServiceCollection services = new();
+        string name = _fixture.Create<string>();
+        OptionsBuilder<OptionsBuilderFluentValidationUtilitiesFixture> optionsBuilder = new(services, name);
 
         // Act
         optionsBuilder.ValidateFluently();
 
         // Assert
-        var serviceDescriptor = services.FirstOrDefault(sd =>
+        ServiceDescriptor? serviceDescriptor = services.FirstOrDefault(sd =>
             sd.ServiceType == typeof(IValidateOptions<OptionsBuilderFluentValidationUtilitiesFixture>) &&
             sd.Lifetime == ServiceLifetime.Singleton &&
             sd.ImplementationFactory != null);
 
         serviceDescriptor.Should().NotBeNull();
 
-        var implementationFactory = serviceDescriptor!.ImplementationFactory;
+        Func<IServiceProvider, object>? implementationFactory = serviceDescriptor!.ImplementationFactory;
         implementationFactory.Should().NotBeNull();
 
-        var serviceProvider = Substitute.For<IServiceProvider>();
-        var mockValidator = Substitute.For<IValidator<OptionsBuilderFluentValidationUtilitiesFixture>>();
+        IServiceProvider serviceProvider = Substitute.For<IServiceProvider>();
+        IValidator<OptionsBuilderFluentValidationUtilitiesFixture> mockValidator = Substitute.For<IValidator<OptionsBuilderFluentValidationUtilitiesFixture>>();
         serviceProvider.GetService(typeof(IValidator<OptionsBuilderFluentValidationUtilitiesFixture>))
             .Returns(mockValidator);
 
-        var fluentValidationOptions = implementationFactory!(serviceProvider) as FluentValidationOptions<OptionsBuilderFluentValidationUtilitiesFixture>;
+        FluentValidationOptions<OptionsBuilderFluentValidationUtilitiesFixture>? fluentValidationOptions = implementationFactory!(serviceProvider) as FluentValidationOptions<OptionsBuilderFluentValidationUtilitiesFixture>;
         fluentValidationOptions.Should().NotBeNull();
         fluentValidationOptions!.Name.Should().Be(name);
     }

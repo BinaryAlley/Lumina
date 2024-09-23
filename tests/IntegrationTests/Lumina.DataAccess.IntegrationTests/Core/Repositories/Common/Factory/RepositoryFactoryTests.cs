@@ -16,8 +16,8 @@ public class RepositoryFactoryTests
     public void RepositoryFactoryImplementsRepositoryFactoryInterface_InterfaceIsImplemented_ReturnsTrue()
     {
         // Arrange
-        var repositoryFactory = new RepositoryFactory(null!);
-        
+        RepositoryFactory repositoryFactory = new(null!);
+
         // Assert
         Assert.True(repositoryFactory is IRepositoryFactory);
     }

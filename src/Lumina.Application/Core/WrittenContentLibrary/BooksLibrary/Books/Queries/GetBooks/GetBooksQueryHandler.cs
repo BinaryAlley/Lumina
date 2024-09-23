@@ -43,8 +43,8 @@ public class GetBooksQueryHandler : IRequestHandler<GetBooksQuery, ErrorOr<IEnum
     /// </returns>
     public async ValueTask<ErrorOr<IEnumerable<Book>>> Handle(GetBooksQuery request, CancellationToken cancellationToken)
     {
-        var bookRepository = _unitOfWork.GetRepository<IBookRepository>();
-        var getBooksResult = await bookRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+        IBookRepository bookRepository = _unitOfWork.GetRepository<IBookRepository>();
+        ErrorOr<IEnumerable<Contracts.Models.WrittenContentLibrary.BookLibrary.BookModel>> getBooksResult = await bookRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
         return getBooksResult.Match(values => ErrorOrFactory.From(values.Adapt<IEnumerable<Book>>()), errors => errors);
     }
     #endregion

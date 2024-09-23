@@ -53,7 +53,7 @@ public class CustomProblemDetailsFactory : ProblemDetailsFactory
         string? detail = null, string? instance = null)
     {
         statusCode ??= 500;
-        var problemDetails = new ProblemDetails
+        ProblemDetails problemDetails = new()
         {
             Status = statusCode,
             Title = title,
@@ -81,7 +81,7 @@ public class CustomProblemDetailsFactory : ProblemDetailsFactory
     {
         ArgumentNullException.ThrowIfNull(modelStateDictionary);
         statusCode ??= 400;
-        var problemDetails = new ValidationProblemDetails(modelStateDictionary)
+        ValidationProblemDetails problemDetails = new(modelStateDictionary)
         {
             Status = statusCode,
             Type = type,
@@ -104,23 +104,20 @@ public class CustomProblemDetailsFactory : ProblemDetailsFactory
     private void ApplyProblemDetailsDefaults(HttpContext httpContext, ProblemDetails problemDetails, int statusCode)
     {
         problemDetails.Status ??= statusCode;
-        if (_options.ClientErrorMapping.TryGetValue(statusCode, out var clientErrorData))
+        if (_options.ClientErrorMapping.TryGetValue(statusCode, out ClientErrorData? clientErrorData))
         {
             problemDetails.Title ??= clientErrorData.Title;
             problemDetails.Type ??= clientErrorData.Link;
         }
-        var traceId = Activity.Current?.Id ?? httpContext?.TraceIdentifier;
+        string? traceId = Activity.Current?.Id ?? httpContext?.TraceIdentifier;
         if (traceId != null)
             problemDetails.Extensions["traceId"] = traceId;
         // get any errors that might be sent by ApiController base class' Problem() method
-        var errors = httpContext?.Items[HttpContextItemKeys.ERRORS] as List<Error>;
+        List<Error>? errors = httpContext?.Items[HttpContextItemKeys.ERRORS] as List<Error>;
         // add any extra custom properties
         if (errors is not null)
         {
-            problemDetails.Extensions.Add("errors", errors.Select(error =>
-            {
-                return error.Code;
-            }));
+            problemDetails.Extensions.Add("errors", errors.Select(error => error.Code));
         }
         //problemDetails.Extensions.Add("errorCodes", errors.Select(e => e.Type.ToString()));
         _configure?.Invoke(new() { HttpContext = httpContext!, ProblemDetails = problemDetails });

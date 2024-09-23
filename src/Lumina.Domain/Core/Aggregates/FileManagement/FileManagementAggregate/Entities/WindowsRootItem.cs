@@ -22,10 +22,7 @@ public sealed class WindowsRootItem : FileSystemItem
     /// <summary>
     /// Gets the collection of file system items that are children to the current file system root entity.
     /// </summary>
-    public IReadOnlyCollection<FileSystemItem> Items
-    {
-        get { return _items.AsReadOnly(); }
-    }
+    public IReadOnlyCollection<FileSystemItem> Items => _items.AsReadOnly();
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================
@@ -35,7 +32,7 @@ public sealed class WindowsRootItem : FileSystemItem
     /// <param name="id">The unique identifier of the root item in the file system path.</param>
     /// <param name="name">The name of the root item.</param>
     private WindowsRootItem(FileSystemPathId id, string name) : base(id, name, FileSystemItemType.Root)
-    {        
+    {
     }
     #endregion
 
@@ -58,13 +55,11 @@ public sealed class WindowsRootItem : FileSystemItem
         ErrorOr<FileSystemPathId> createPathResult = FileSystemPathId.Create(path);
         if (createPathResult.IsError)
             return createPathResult.Errors;
-        WindowsRootItem newRoot = new WindowsRootItem(
+        WindowsRootItem newRoot = new(
             createPathResult.Value,
             name);
         ErrorOr<Updated> setStatusResult = newRoot.SetStatus(status);
-        if (setStatusResult.IsError)
-            return setStatusResult.Errors;
-        return newRoot;
+        return setStatusResult.IsError ? (ErrorOr<WindowsRootItem>)setStatusResult.Errors : (ErrorOr<WindowsRootItem>)newRoot;
     }
 
     /// <summary>
@@ -82,13 +77,11 @@ public sealed class WindowsRootItem : FileSystemItem
         FileSystemItemStatus status = FileSystemItemStatus.Accessible)
     {
         // TODO: enforce invariants        
-        WindowsRootItem newFile = new WindowsRootItem(
+        WindowsRootItem newFile = new(
             id,
             name);
         ErrorOr<Updated> setStatusResult = newFile.SetStatus(status);
-        if (setStatusResult.IsError)
-            return setStatusResult.Errors;
-        return newFile;
+        return setStatusResult.IsError ? (ErrorOr<WindowsRootItem>)setStatusResult.Errors : (ErrorOr<WindowsRootItem>)newFile;
     }
     #endregion
 }

@@ -48,10 +48,10 @@ public class AddBookCommandFixture
     /// <returns>The created command to add a book.</returns>
     public AddBookCommand CreateCommandBook()
     {
-        var releaseYear = _random.Next(2000, 2010);
-        var reReleaseYear = _random.Next(2010, 2020);
+        int releaseYear = _random.Next(2000, 2010);
+        int reReleaseYear = _random.Next(2010, 2020);
 
-        var releaseInfo = new Faker<ReleaseInfoModel>()
+        ReleaseInfoModel releaseInfo = new Faker<ReleaseInfoModel>()
             .CustomInstantiator(f => new ReleaseInfoModel(
                 default,
                 default,
@@ -68,33 +68,33 @@ public class AddBookCommandFixture
             .RuleFor(x => x.ReleaseVersion, f => f.Random.String2(f.Random.Number(1, 50)))
             .Generate();
 
-        var genre = new Faker<GenreModel>()
+        Faker<GenreModel> genre = new Faker<GenreModel>()
             .CustomInstantiator(f => new GenreModel(
                 default!
             ))
             .RuleFor(e => e.Name, f => f.Random.String2(f.Random.Number(1, 50)));
 
-        var tag = new Faker<TagModel>()
+        Faker<TagModel> tag = new Faker<TagModel>()
             .CustomInstantiator(f => new TagModel(
                 default!
             ))
             .RuleFor(e => e.Name, f => f.Random.String2(f.Random.Number(1, 50)));
 
-        var mediaContributorRole = new Faker<MediaContributorRoleModel>()
+        Faker<MediaContributorRoleModel> mediaContributorRole = new Faker<MediaContributorRoleModel>()
             .CustomInstantiator(f => new MediaContributorRoleModel(
                 default!,
                 default!
             ))
             .RuleFor(e => e.Name, f => f.Random.String2(f.Random.Number(1, 50)))
             .RuleFor(e => e.Category, f => f.Random.String2(f.Random.Number(1, 50)));
-        var mediaContributorName = new Faker<MediaContributorNameModel>()
+        Faker<MediaContributorNameModel> mediaContributorName = new Faker<MediaContributorNameModel>()
             .CustomInstantiator(f => new MediaContributorNameModel(
                 default!,
                 default!
             ))
             .RuleFor(e => e.DisplayName, f => f.Random.String2(f.Random.Number(1, 50)))
             .RuleFor(e => e.LegalName, f => f.Random.String2(f.Random.Number(1, 50)));
-        var mediaContributor = new Faker<MediaContributorModel>()
+        Faker<MediaContributorModel> mediaContributor = new Faker<MediaContributorModel>()
             .CustomInstantiator(f => new MediaContributorModel(
                 default!,
                 default!
@@ -102,7 +102,7 @@ public class AddBookCommandFixture
             .RuleFor(e => e.Name, mediaContributorName)
             .RuleFor(e => e.Role, mediaContributorRole);
 
-        var rating = new Faker<BookRatingModel>()
+        Faker<BookRatingModel> rating = new Faker<BookRatingModel>()
            .CustomInstantiator(f => new BookRatingModel(
                 default,
                 default,
@@ -114,7 +114,7 @@ public class AddBookCommandFixture
            .RuleFor(e => e.Source, _fixture.Create<BookRatingSource>())
            .RuleFor(e => e.VoteCount, _random.Next(1, 1000));
 
-        var language = new Faker<LanguageInfoModel>()
+        Faker<LanguageInfoModel> language = new Faker<LanguageInfoModel>()
             .CustomInstantiator(f => new LanguageInfoModel(
                 default!,
                 default!,
@@ -124,7 +124,7 @@ public class AddBookCommandFixture
             .RuleFor(e => e.LanguageCode, f => f.Random.String2(2))
             .RuleFor(e => e.NativeName, f => f.Random.String2(f.Random.Number(1, 50)));
 
-        var originalLanguage = new Faker<LanguageInfoModel>()
+        Faker<LanguageInfoModel> originalLanguage = new Faker<LanguageInfoModel>()
             .CustomInstantiator(f => new LanguageInfoModel(
                 default!,
                 default!,
@@ -134,7 +134,7 @@ public class AddBookCommandFixture
             .RuleFor(e => e.LanguageCode, f => f.Random.String2(2))
             .RuleFor(e => e.NativeName, f => f.Random.String2(f.Random.Number(1, 50)));
 
-        var metadata = new Faker<WrittenContentMetadataModel>()
+        Faker<WrittenContentMetadataModel> metadata = new Faker<WrittenContentMetadataModel>()
             .CustomInstantiator(f => new WrittenContentMetadataModel(
                 default!,
                 default,
@@ -158,30 +158,30 @@ public class AddBookCommandFixture
             .RuleFor(x => x.Publisher, f => f.Random.String2(f.Random.Number(1, 100)))
             .RuleFor(x => x.PageCount, _random.Next(100, 300));
 
-        var isbn = new Faker<IsbnModel>()
+        Faker<IsbnModel> isbn = new Faker<IsbnModel>()
             .CustomInstantiator(f => new IsbnModel(
                 default!,
                 default
             ))
             .RuleFor(i => i.Value, f =>
             {
-                var isIsbn13 = f.Random.Bool();
+                bool isIsbn13 = f.Random.Bool();
                 if (isIsbn13)
                 {
-                    var prefix = f.Random.Bool() ? "978" : "979";
-                    var group = f.Random.Number(0, 99999).ToString().PadLeft(5, '0');
-                    var publisher = f.Random.Number(0, 999999).ToString().PadLeft(6, '0');
-                    var title = f.Random.Number(0, 99).ToString().PadLeft(2, '0');
-                    string isbn = $"{prefix}{group.Substring(0, 1)}{publisher}{title}";
+                    string prefix = f.Random.Bool() ? "978" : "979";
+                    string group = f.Random.Number(0, 99999).ToString().PadLeft(5, '0');
+                    string publisher = f.Random.Number(0, 999999).ToString().PadLeft(6, '0');
+                    string title = f.Random.Number(0, 99).ToString().PadLeft(2, '0');
+                    string isbn = $"{prefix}{group[..1]}{publisher}{title}";
                     int sum = 0;
                     for (int i = 0; i < 12; i++)
                         sum += (i % 2 == 0 ? 1 : 3) * int.Parse(isbn[i].ToString());
                     int checkDigit = (10 - (sum % 10)) % 10;
-                    return $"{prefix}-{group.Substring(0, 1)}-{publisher}-{title}-{checkDigit}";
+                    return $"{prefix}-{group[..1]}-{publisher}-{title}-{checkDigit}";
                 }
                 else
                 {
-                    var digits = new int[9];
+                    int[] digits = new int[9];
                     for (int i = 0; i < 9; i++)
                         digits[i] = f.Random.Number(0, 9);
                     int sum = 0;
@@ -222,16 +222,16 @@ public class AddBookCommandFixture
             .RuleFor(x => x.GoodreadsId, _random.Next(100000, 500000).ToString())
             .RuleFor(x => x.LCCN, f =>
             {
-                var letters = new string(Enumerable.Range(0, f.Random.Number(0, 3))
+                string letters = new(Enumerable.Range(0, f.Random.Number(0, 3))
                     .Select(_ => f.Random.Char('a', 'z'))
                     .ToArray());
-                var digits = f.Random.String2(f.Random.Number(8, 10), "0123456789");
+                string digits = f.Random.String2(f.Random.Number(8, 10), "0123456789");
                 return letters + digits;
             })
             .RuleFor(x => x.OCLCNumber, f =>
             {
                 string[] prefixes = ["ocm", "ocn", "on", "(OCoLC)"];
-                var prefix = f.Random.ArrayElement(prefixes);
+                string prefix = f.Random.ArrayElement(prefixes);
                 string number;
                 switch (prefix)
                 {
@@ -255,9 +255,9 @@ public class AddBookCommandFixture
             })
             .RuleFor(x => x.OpenLibraryId, f =>
             {
-                var firstDigit = f.Random.Number(1, 9);
-                var remainingDigits = f.Random.String2(f.Random.Number(0, 6), "0123456789");
-                var suffix = f.Random.ArrayElement(new[] { 'A', 'M', 'W' });
+                int firstDigit = f.Random.Number(1, 9);
+                string remainingDigits = f.Random.String2(f.Random.Number(0, 6), "0123456789");
+                char suffix = f.Random.ArrayElement(new[] { 'A', 'M', 'W' });
                 return $"OL{firstDigit}{remainingDigits}{suffix}";
             })
             .RuleFor(x => x.LibraryThingId, f => f.Random.String2(f.Random.Number(1, 50)))
@@ -278,8 +278,8 @@ public class AddBookCommandFixture
 
     private void ConfigureCustomRequestTypes()
     {
-        var releaseYear = _random.Next(2000, 2010);
-        var reReleaseYear = _random.Next(2010, 2020);
+        int releaseYear = _random.Next(2000, 2010);
+        int reReleaseYear = _random.Next(2010, 2020);
 
         _fixture.Register(() => new ReleaseInfoModel(
             _faker.DateOnlyBetween(new DateOnly(releaseYear, 1, 1), new DateOnly(releaseYear, 12, 31)),

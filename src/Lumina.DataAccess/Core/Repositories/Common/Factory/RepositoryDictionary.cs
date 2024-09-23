@@ -20,7 +20,7 @@ public class RepositoryDictionary
     /// <summary>
     /// Gets the number of added repositories.
     /// </summary>
-    public int Count { get { return _container.Count; } }
+    public int Count => _container.Count;
     #endregion
 
     #region ===================================================================== METHODS ===================================================================================

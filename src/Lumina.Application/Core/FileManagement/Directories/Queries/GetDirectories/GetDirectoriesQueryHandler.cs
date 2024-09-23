@@ -4,7 +4,6 @@ using Lumina.Contracts.Responses.FileManagement;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Entities;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Services;
 using Mapster;
-using MapsterMapper;
 using Mediator;
 using System.Collections.Generic;
 using System.Threading;
@@ -44,7 +43,7 @@ public class GetDirectoriesQueryHandler : IRequestHandler<GetDirectoriesQuery, E
     /// </returns>
     public ValueTask<ErrorOr<IEnumerable<DirectoryResponse>>> Handle(GetDirectoriesQuery request, CancellationToken cancellationToken)
     {
-        var result = _directoryService.GetSubdirectories(request.Path);
+        ErrorOr<IEnumerable<Directory>> result = _directoryService.GetSubdirectories(request.Path);
         return ValueTask.FromResult(result.Match(values => ErrorOrFactory.From(result.Value.Adapt<IEnumerable<DirectoryResponse>>()), errors => errors));
     }
     #endregion

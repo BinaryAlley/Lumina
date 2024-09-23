@@ -37,7 +37,7 @@ public abstract class ValueObject : IEquatable<ValueObject>
     {
         if (obj is null || obj.GetType() != GetType())
             return false;
-        var valueObject = (ValueObject)obj;
+        ValueObject valueObject = (ValueObject)obj;
         return GetEqualityComponents().SequenceEqual(valueObject.GetEqualityComponents());
     }
 

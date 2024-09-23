@@ -35,8 +35,9 @@ public class UnitOfWorkTests
     public UnitOfWorkTests()
     {
         _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
-        _fixture.Customize<LuminaDbContext>(composer => composer.FromFactory(() => {
-            var options = new DbContextOptionsBuilder<LuminaDbContext>()
+        _fixture.Customize<LuminaDbContext>(composer => composer.FromFactory(() =>
+        {
+            DbContextOptions<LuminaDbContext> options = new DbContextOptionsBuilder<LuminaDbContext>()
                 .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
                 .Options;
             return Substitute.ForPartsOf<LuminaDbContext>(options);
@@ -49,10 +50,10 @@ public class UnitOfWorkTests
     public void ResetRepositories_WhenCalled_ShouldClearAllRepositories()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
         DataAccessLayerServices.AddDataAccessLayerServices(services);
-        var serviceProvider = services.BuildServiceProvider();
-        var unitOfWork = (UnitOfWork)serviceProvider.GetRequiredService<IUnitOfWork>();
+        ServiceProvider serviceProvider = services.BuildServiceProvider();
+        UnitOfWork unitOfWork = (UnitOfWork)serviceProvider.GetRequiredService<IUnitOfWork>();
 
         // Act
         unitOfWork.ResetRepositories();
@@ -65,10 +66,10 @@ public class UnitOfWorkTests
     public void AddRepositories_WhenCalled_ShouldAddRepositories()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
         DataAccessLayerServices.AddDataAccessLayerServices(services);
-        var serviceProvider = services.BuildServiceProvider();
-        var unitOfWork = (UnitOfWork)serviceProvider.GetRequiredService<IUnitOfWork>();
+        ServiceProvider serviceProvider = services.BuildServiceProvider();
+        UnitOfWork unitOfWork = (UnitOfWork)serviceProvider.GetRequiredService<IUnitOfWork>();
         int initialCount = unitOfWork.Repositories.Count;
 
         // Act
@@ -84,11 +85,11 @@ public class UnitOfWorkTests
     public void Constructor_WhenCalled_ShouldAddRepositories()
     {
         // Arrange
-        var repositoryFactory = _fixture.Create<IRepositoryFactory>();
-        var dbContext = _fixture.Create<LuminaDbContext>();
+        IRepositoryFactory repositoryFactory = _fixture.Create<IRepositoryFactory>();
+        LuminaDbContext dbContext = _fixture.Create<LuminaDbContext>();
 
         // Act
-        var unitOfWork = new UnitOfWork(repositoryFactory, dbContext);
+        UnitOfWork unitOfWork = new(repositoryFactory, dbContext);
 
         // Assert
         unitOfWork.Repositories.Count.Should().BeGreaterThan(0);
@@ -98,14 +99,14 @@ public class UnitOfWorkTests
     public void GetRepository_WhenRepositoryNotAdded_ShouldReturnNull()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
         DataAccessLayerServices.AddDataAccessLayerServices(services);
-        var serviceProvider = services.BuildServiceProvider();
-        var unitOfWork = (UnitOfWork)serviceProvider.GetRequiredService<IUnitOfWork>();
+        ServiceProvider serviceProvider = services.BuildServiceProvider();
+        UnitOfWork unitOfWork = (UnitOfWork)serviceProvider.GetRequiredService<IUnitOfWork>();
         unitOfWork.ResetRepositories();
 
         // Act
-        var result = unitOfWork.GetRepository<IBookRepository>();
+        IBookRepository result = unitOfWork.GetRepository<IBookRepository>();
 
         // Assert
         result.Should().BeNull();
@@ -115,10 +116,10 @@ public class UnitOfWorkTests
     public void GetRepository_WhenRepositoriesAdded_ShouldReturnRepositories()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
         DataAccessLayerServices.AddDataAccessLayerServices(services);
-        var serviceProvider = services.BuildServiceProvider();
-        var unitOfWork = (UnitOfWork)serviceProvider.GetRequiredService<IUnitOfWork>();
+        ServiceProvider serviceProvider = services.BuildServiceProvider();
+        UnitOfWork unitOfWork = (UnitOfWork)serviceProvider.GetRequiredService<IUnitOfWork>();
 
         // Act & Assert
         unitOfWork.GetRepository<IBookRepository>().Should().NotBeNull();
@@ -128,10 +129,10 @@ public class UnitOfWorkTests
     public async Task SaveChangesAsync_WhenCalled_ShouldCallDbContextSaveChangesAsync()
     {
         // Arrange
-        var repositoryFactory = _fixture.Create<IRepositoryFactory>();
-        var dbContext = _fixture.Create<LuminaDbContext>();
-        var unitOfWork = new UnitOfWork(repositoryFactory, dbContext);
-        var cancellationToken = new CancellationToken();
+        IRepositoryFactory repositoryFactory = _fixture.Create<IRepositoryFactory>();
+        LuminaDbContext dbContext = _fixture.Create<LuminaDbContext>();
+        UnitOfWork unitOfWork = new(repositoryFactory, dbContext);
+        CancellationToken cancellationToken = new();
 
         // Act
         await unitOfWork.SaveChangesAsync(cancellationToken);

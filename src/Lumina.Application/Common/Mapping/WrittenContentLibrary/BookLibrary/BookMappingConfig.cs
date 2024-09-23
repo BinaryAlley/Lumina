@@ -108,7 +108,7 @@ public class BookMappingConfig : IRegister
             Optional<BookFormat>.FromNullable(!string.IsNullOrWhiteSpace(src.Format) ? Enum.Parse<BookFormat>(src.Format) : default),
             Optional<string>.FromNullable(src.Edition),
             Optional<int>.FromNullable(src.VolumeNumber),
-            Optional<BookSeries>.None(), 
+            Optional<BookSeries>.None(),
             Optional<string>.FromNullable(src.ASIN),
             Optional<string>.FromNullable(src.GoodreadsId),
             Optional<string>.FromNullable(src.LCCN),
@@ -121,7 +121,7 @@ public class BookMappingConfig : IRegister
             src.Created,
             Optional<DateTime>.FromNullable(src.Updated),
             src.ISBNs.Select(i => Isbn.Create(i.Value!, i.Format ?? default).Value).ToList(),
-            new List<MediaContributorId>(), 
+            new List<MediaContributorId>(),
             src.Ratings.Select(r => BookRating.Create(
                 r.Value ?? default,
                 r.MaxValue ?? default,

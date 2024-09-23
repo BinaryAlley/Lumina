@@ -3,7 +3,6 @@ using ErrorOr;
 using Lumina.Application.Core.FileManagement.Paths.Commands.SplitPath;
 using Lumina.Contracts.Responses.FileManagement;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Services;
-using Mapster;
 using Mediator;
 using System.Threading;
 using System.Threading.Tasks;
@@ -42,7 +41,7 @@ public class CombinePathCommandHandler : IRequestHandler<CombinePathCommand, Err
     /// </returns>
     public ValueTask<ErrorOr<PathSegmentResponse>> Handle(CombinePathCommand request, CancellationToken cancellationToken)
     {
-        var result = _pathService.CombinePath(request.OriginalPath, request.NewPath);
+        ErrorOr<string> result = _pathService.CombinePath(request.OriginalPath, request.NewPath);
         return ValueTask.FromResult(result.Match(values => ErrorOrFactory.From(new PathSegmentResponse(result.Value)), errors => errors));
     }
     #endregion

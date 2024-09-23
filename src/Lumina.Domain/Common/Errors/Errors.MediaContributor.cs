@@ -13,7 +13,7 @@ public static partial class Errors
     {
         #region ==================================================================== PROPERTIES =================================================================================
 
-        public static Error ContributorsListCannotBeNull => Error.Validation(nameof(ContributorsListCannotBeNull)); 
+        public static Error ContributorsListCannotBeNull => Error.Validation(nameof(ContributorsListCannotBeNull));
         public static Error ContributorNameCannotBeEmpty => Error.Validation(nameof(ContributorNameCannotBeEmpty));
         public static Error ContributorDisplayNameCannotBeEmpty => Error.Validation(nameof(ContributorDisplayNameCannotBeEmpty));
         public static Error ContributorDisplayNameMustBeMaximum100CharactersLong => Error.Validation(nameof(ContributorDisplayNameMustBeMaximum100CharactersLong));

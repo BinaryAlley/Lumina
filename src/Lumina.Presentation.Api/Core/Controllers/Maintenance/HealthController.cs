@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Api.Core.Controllers.Common;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -20,7 +20,7 @@ public class HealthController : ApiController
     public async Task<IActionResult> CheckHealth()
     {
         // TODO: to be implemented
-        return Ok();
+        return await Task.FromResult(Ok());
     }
     #endregion
 }

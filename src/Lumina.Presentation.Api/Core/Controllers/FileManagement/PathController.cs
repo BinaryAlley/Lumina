@@ -40,7 +40,7 @@ public class PathController : ApiController
         _mediator = mediator;
     }
     #endregion
-    
+
     #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Gets the root of <paramref name="path"/>.
@@ -51,7 +51,7 @@ public class PathController : ApiController
     public async Task<IActionResult> GetPathRoot([FromQuery, ModelBinder(typeof(UrlStringBinder))] string path, CancellationToken cancellationToken)
     {
         ErrorOr<PathSegmentResponse> result = await _mediator.Send(new GetPathRootQuery(path), cancellationToken).ConfigureAwait(false);
-        return result.Match(result => Ok(result), errors => Problem(errors));
+        return result.Match(Ok, Problem);
     }
 
     /// <summary>
@@ -74,7 +74,7 @@ public class PathController : ApiController
     public async Task<IActionResult> GetPathParent([FromQuery, ModelBinder(typeof(UrlStringBinder))] string path, CancellationToken cancellationToken)
     {
         ErrorOr<IEnumerable<PathSegmentResponse>> result = await _mediator.Send(new GetPathParentQuery(path), cancellationToken).ConfigureAwait(false);
-        return result.Match(result => Ok(result), errors => Problem(errors));
+        return result.Match(Ok, Problem);
     }
 
     /// <summary>
@@ -87,7 +87,7 @@ public class PathController : ApiController
     public async Task<IActionResult> CombinePath([FromQuery, ModelBinder(typeof(UrlStringBinder))] string originalPath, [FromQuery, ModelBinder(typeof(UrlStringBinder))] string newPath, CancellationToken cancellationToken)
     {
         ErrorOr<PathSegmentResponse> result = await _mediator.Send(new CombinePathCommand(originalPath, newPath), cancellationToken).ConfigureAwait(false);
-        return result.Match(result => Ok(result), errors => Problem(errors));
+        return result.Match(Ok, Problem);
     }
 
     /// <summary>
@@ -99,7 +99,7 @@ public class PathController : ApiController
     public async Task<IActionResult> SplitPath([FromQuery, ModelBinder(typeof(UrlStringBinder))] string path, CancellationToken cancellationToken)
     {
         ErrorOr<IEnumerable<PathSegmentResponse>> result = await _mediator.Send(new SplitPathCommand(path), cancellationToken).ConfigureAwait(false);
-        return result.Match(result => Ok(result), errors => Problem(errors));
+        return result.Match(Ok, Problem);
     }
 
     /// <summary>

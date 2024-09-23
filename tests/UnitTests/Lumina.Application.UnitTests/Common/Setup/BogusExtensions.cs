@@ -32,8 +32,8 @@ public static class BogusExtensions
     /// <returns>A random<see cref="DateOnly"/> instance.</returns>
     public static DateOnly DateOnlyBetween(this Faker faker, DateOnly start, DateOnly end)
     {
-        var startDateTime = start.ToDateTime(TimeOnly.MinValue);
-        var endDateTime = end.ToDateTime(TimeOnly.MinValue);
+        DateTime startDateTime = start.ToDateTime(TimeOnly.MinValue);
+        DateTime endDateTime = end.ToDateTime(TimeOnly.MinValue);
         return System.DateOnly.FromDateTime(faker.Date.Between(startDateTime, endDateTime));
     }
     #endregion

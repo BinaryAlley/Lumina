@@ -1,4 +1,4 @@
-﻿namespace Lumina.Contracts.Enums.FileSystem.VideoLibrary;
+﻿namespace Lumina.Contracts.Enums.VideoLibrary;
 
 /// <summary>
 /// Enumeration for the types of video content libraries.

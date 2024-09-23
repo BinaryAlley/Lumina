@@ -46,8 +46,8 @@ public class BookModelFixture
     /// <returns>The created BookModel.</returns>
     public BookModel CreateBookModel()
     {
-        var releaseYear = _random.Next(2000, 2010);
-        var reReleaseYear = _random.Next(2010, 2020);
+        int releaseYear = _random.Next(2000, 2010);
+        int reReleaseYear = _random.Next(2010, 2020);
 
         return new Faker<BookModel>()
             .RuleFor(x => x.Id, f => f.Random.Guid())
@@ -105,17 +105,17 @@ public class BookModelFixture
 
     private string CreateLCCN(Faker f)
     {
-        var letters = new string(Enumerable.Range(0, f.Random.Number(0, 3))
+        string letters = new(Enumerable.Range(0, f.Random.Number(0, 3))
             .Select(_ => f.Random.Char('a', 'z'))
             .ToArray());
-        var digits = f.Random.String2(f.Random.Number(8, 10), "0123456789");
+        string digits = f.Random.String2(f.Random.Number(8, 10), "0123456789");
         return letters + digits;
     }
 
     private string CreateOCLCNumber(Faker f)
     {
         string[] prefixes = ["ocm", "ocn", "on", "(OCoLC)"];
-        var prefix = f.Random.ArrayElement(prefixes);
+        string prefix = f.Random.ArrayElement(prefixes);
         string number = prefix switch
         {
             "ocm" => f.Random.String2(8, "0123456789"),
@@ -129,9 +129,9 @@ public class BookModelFixture
 
     private string CreateOpenLibraryId(Faker f)
     {
-        var firstDigit = f.Random.Number(1, 9);
-        var remainingDigits = f.Random.String2(f.Random.Number(0, 6), "0123456789");
-        var suffix = f.Random.ArrayElement(new[] { 'A', 'M', 'W' });
+        int firstDigit = f.Random.Number(1, 9);
+        string remainingDigits = f.Random.String2(f.Random.Number(0, 6), "0123456789");
+        char suffix = f.Random.ArrayElement(new[] { 'A', 'M', 'W' });
         return $"OL{firstDigit}{remainingDigits}{suffix}";
     }
 
@@ -152,23 +152,23 @@ public class BookModelFixture
 
     private string CreateIsbn(Faker f)
     {
-        var isIsbn13 = f.Random.Bool();
+        bool isIsbn13 = f.Random.Bool();
         if (isIsbn13)
         {
-            var prefix = f.Random.Bool() ? "978" : "979";
-            var group = f.Random.Number(0, 99999).ToString().PadLeft(5, '0');
-            var publisher = f.Random.Number(0, 999999).ToString().PadLeft(6, '0');
-            var title = f.Random.Number(0, 99).ToString().PadLeft(2, '0');
-            string isbn = $"{prefix}{group.Substring(0, 1)}{publisher}{title}";
+            string prefix = f.Random.Bool() ? "978" : "979";
+            string group = f.Random.Number(0, 99999).ToString().PadLeft(5, '0');
+            string publisher = f.Random.Number(0, 999999).ToString().PadLeft(6, '0');
+            string title = f.Random.Number(0, 99).ToString().PadLeft(2, '0');
+            string isbn = $"{prefix}{group[..1]}{publisher}{title}";
             int sum = 0;
             for (int i = 0; i < 12; i++)
                 sum += (i % 2 == 0 ? 1 : 3) * int.Parse(isbn[i].ToString());
             int checkDigit = (10 - (sum % 10)) % 10;
-            return $"{prefix}-{group.Substring(0, 1)}-{publisher}-{title}-{checkDigit}";
+            return $"{prefix}-{group[..1]}-{publisher}-{title}-{checkDigit}";
         }
         else
         {
-            var digits = new int[9];
+            int[] digits = new int[9];
             for (int i = 0; i < 9; i++)
                 digits[i] = f.Random.Number(0, 9);
             int sum = 0;

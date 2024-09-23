@@ -52,15 +52,15 @@ public class FluentValidationOptions<TOptions> : IValidateOptions<TOptions> wher
 
         ArgumentNullException.ThrowIfNull(options, nameof(options)); // don't go further if the options are null
 
-        var validationResult = _validator.Validate(options); // validate the options using the validator
+        FluentValidation.Results.ValidationResult validationResult = _validator.Validate(options); // validate the options using the validator
 
         // return a response based on the validation result
         if (validationResult.IsValid)
             return ValidateOptionsResult.Success;
-        
+
         // if the validation fails, collect the error messages
         // TODO: add translation support for the error messages
-        var errors = validationResult.Errors.Select(x => $"Options validation failed for '{x.PropertyName}' with error: '{x.ErrorMessage}'")
+        string[] errors = validationResult.Errors.Select(x => $"Options validation failed for '{x.PropertyName}' with error: '{x.ErrorMessage}'")
                                             .ToArray();
 
         // and return them with a failure result

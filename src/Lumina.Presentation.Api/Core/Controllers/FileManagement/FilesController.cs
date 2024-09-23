@@ -47,7 +47,7 @@ public class FilesController : ApiController
     public async IAsyncEnumerable<FileSystemTreeNodeResponse> GetTreeFiles([FromQuery, ModelBinder(typeof(UrlStringBinder))] string path, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _mediator.Send(new GetTreeFilesQuery(path), cancellationToken).ConfigureAwait(false);
-        foreach (var file in result.Value)
+        foreach (FileSystemTreeNodeResponse file in result.Value)
         {
             if (cancellationToken.IsCancellationRequested)
                 yield break;
@@ -66,7 +66,7 @@ public class FilesController : ApiController
         ErrorOr<IEnumerable<FileResponse>> result = await _mediator.Send(new GetFilesQuery(path), cancellationToken).ConfigureAwait(false);
         if (!result.IsError)
         {
-            foreach (var file in result.Value)
+            foreach (FileResponse file in result.Value)
             {
                 if (cancellationToken.IsCancellationRequested)
                     yield break;

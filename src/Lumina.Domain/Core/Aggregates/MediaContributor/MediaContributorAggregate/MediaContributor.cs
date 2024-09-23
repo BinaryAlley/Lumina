@@ -53,10 +53,10 @@ public class MediaContributor : AggregateRoot<MediaContributorId>
     /// <param name="dateOfBirth">The optional date of birth of the contributor.</param>
     /// <param name="dateOfBirth">The optional date of death of the contributor.</param>
     private MediaContributor(
-        MediaContributorId id, 
-        MediaContributorName name, 
-        MediaContributorRole role, 
-        Optional<DateOnly> dateOfBirth, 
+        MediaContributorId id,
+        MediaContributorName name,
+        MediaContributorRole role,
+        Optional<DateOnly> dateOfBirth,
         Optional<DateOnly> dateOfDeath)
     {
         Id = id;
@@ -87,10 +87,10 @@ public class MediaContributor : AggregateRoot<MediaContributorId>
     /// <param name="name">The name of the contributor.</param>
     /// <returns>The created <see cref="MediaContributor"/> instance.</returns>
     public static ErrorOr<MediaContributor> Create(
-        MediaContributorId id, 
-        MediaContributorName name, 
-        MediaContributorRole role, 
-        Optional<DateOnly> dateOfBirth, 
+        MediaContributorId id,
+        MediaContributorName name,
+        MediaContributorRole role,
+        Optional<DateOnly> dateOfBirth,
         Optional<DateOnly> dateOfDeath)
     {
         return new MediaContributor(id, name, role, dateOfBirth, dateOfDeath);

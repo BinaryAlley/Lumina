@@ -43,7 +43,7 @@ public class GetDrivesQueryHandler : IRequestHandler<GetDrivesQuery, ErrorOr<IEn
     /// </returns>
     public ValueTask<ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>> Handle(GetDrivesQuery request, CancellationToken cancellationToken)
     {
-        var result = _driveService.GetDrives();
+        ErrorOr<IEnumerable<FileSystemItem>> result = _driveService.GetDrives();
         return ValueTask.FromResult(result.Match(values => ErrorOrFactory.From(values.Adapt<IEnumerable<FileSystemTreeNodeResponse>>()), errors => errors));
     }
     #endregion

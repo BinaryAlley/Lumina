@@ -45,9 +45,7 @@ public class DirectoryService : IDirectoryService
     public ErrorOr<IEnumerable<Directory>> GetSubdirectories(string path)
     {
         ErrorOr<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(path);
-        if (fileSystemPathIdResult.IsError)
-            return fileSystemPathIdResult.Errors;
-        return GetSubdirectories(fileSystemPathIdResult.Value);
+        return fileSystemPathIdResult.IsError ? (ErrorOr<IEnumerable<Directory>>)fileSystemPathIdResult.Errors : GetSubdirectories(fileSystemPathIdResult.Value);
     }
 
     /// <summary>
@@ -84,9 +82,9 @@ public class DirectoryService : IDirectoryService
             if (dirNameResult.IsError || dateModifiedResult.IsError || dateCreatedResult.IsError)
             {
                 ErrorOr<Directory> errorDirResult = Directory.Create(subPath, !dirNameResult.IsError ? dirNameResult.Value : null!,
-                    !dateCreatedResult.IsError ? dateCreatedResult.Value : Optional<DateTime>.None(), 
+                    !dateCreatedResult.IsError ? dateCreatedResult.Value : Optional<DateTime>.None(),
                     !dateModifiedResult.IsError ? dateModifiedResult.Value : Optional<DateTime>.None());
-                if(errorDirResult.IsError)
+                if (errorDirResult.IsError)
                     return errorDirResult.Errors;
                 ErrorOr<Updated> setStatusResult = errorDirResult.Value.SetStatus(FileSystemItemStatus.Inaccessible);
                 if (setStatusResult.IsError)
@@ -113,9 +111,7 @@ public class DirectoryService : IDirectoryService
     public ErrorOr<Directory> CreateDirectory(string path, string name)
     {
         ErrorOr<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(path);
-        if (fileSystemPathIdResult.IsError)
-            return fileSystemPathIdResult.Errors;
-        return CreateDirectory(fileSystemPathIdResult.Value, name);
+        return fileSystemPathIdResult.IsError ? (ErrorOr<Directory>)fileSystemPathIdResult.Errors : CreateDirectory(fileSystemPathIdResult.Value, name);
     }
 
     /// <summary>
@@ -148,14 +144,12 @@ public class DirectoryService : IDirectoryService
             if (dirNameResult.IsError || dateModifiedResult.IsError || dateCreatedResult.IsError)
             {
                 ErrorOr<Directory> errorDirResult = Directory.Create(newDirectoryPathResult.Value, !dirNameResult.IsError ? dirNameResult.Value : null!,
-                    !dateCreatedResult.IsError ? dateCreatedResult.Value : Optional<DateTime>.None(), 
+                    !dateCreatedResult.IsError ? dateCreatedResult.Value : Optional<DateTime>.None(),
                     !dateModifiedResult.IsError ? dateModifiedResult.Value : Optional<DateTime>.None());
                 if (errorDirResult.IsError)
                     return errorDirResult.Errors;
                 ErrorOr<Updated> setStatusResult = errorDirResult.Value.SetStatus(FileSystemItemStatus.Inaccessible);
-                if (setStatusResult.IsError)
-                    return setStatusResult.Errors;
-                return errorDirResult;
+                return setStatusResult.IsError ? (ErrorOr<Directory>)setStatusResult.Errors : errorDirResult;
             }
             else
                 return Directory.Create(newDirectoryPathResult.Value, dirNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value);
@@ -180,9 +174,9 @@ public class DirectoryService : IDirectoryService
         if (fileSystemSourcePathIdResult.IsError)
             return fileSystemSourcePathIdResult.Errors;
         ErrorOr<FileSystemPathId> fileSystemDestinationPathIdResult = FileSystemPathId.Create(destinationPath);
-        if (fileSystemDestinationPathIdResult.IsError)
-            return fileSystemDestinationPathIdResult.Errors;
-        return CopyDirectory(fileSystemSourcePathIdResult.Value, fileSystemDestinationPathIdResult.Value, overrideExisting ?? false);
+        return fileSystemDestinationPathIdResult.IsError
+            ? (ErrorOr<Directory>)fileSystemDestinationPathIdResult.Errors
+            : CopyDirectory(fileSystemSourcePathIdResult.Value, fileSystemDestinationPathIdResult.Value, overrideExisting ?? false);
     }
 
     /// <summary>
@@ -226,9 +220,9 @@ public class DirectoryService : IDirectoryService
         if (fileSystemSourcePathIdResult.IsError)
             return fileSystemSourcePathIdResult.Errors;
         ErrorOr<FileSystemPathId> fileSystemDestinationPathIdResult = FileSystemPathId.Create(destinationPath);
-        if (fileSystemDestinationPathIdResult.IsError)
-            return fileSystemDestinationPathIdResult.Errors;
-        return MoveDirectory(fileSystemSourcePathIdResult.Value, fileSystemDestinationPathIdResult.Value, overrideExisting ?? false);
+        return fileSystemDestinationPathIdResult.IsError
+            ? (ErrorOr<Directory>)fileSystemDestinationPathIdResult.Errors
+            : MoveDirectory(fileSystemSourcePathIdResult.Value, fileSystemDestinationPathIdResult.Value, overrideExisting ?? false);
     }
 
     /// <summary>
@@ -263,9 +257,7 @@ public class DirectoryService : IDirectoryService
     public ErrorOr<Directory> RenameDirectory(string path, string name)
     {
         ErrorOr<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(path);
-        if (fileSystemPathIdResult.IsError)
-            return fileSystemPathIdResult.Errors;
-        return RenameDirectory(fileSystemPathIdResult.Value, name);
+        return fileSystemPathIdResult.IsError ? (ErrorOr<Directory>)fileSystemPathIdResult.Errors : RenameDirectory(fileSystemPathIdResult.Value, name);
     }
 
     /// <summary>
@@ -298,14 +290,12 @@ public class DirectoryService : IDirectoryService
             if (dirNameResult.IsError || dateModifiedResult.IsError || dateCreatedResult.IsError)
             {
                 ErrorOr<Directory> errorDirResult = Directory.Create(newDirectoryPathResult.Value, !dirNameResult.IsError ? dirNameResult.Value : null!,
-                    !dateCreatedResult.IsError ? dateCreatedResult.Value : Optional<DateTime>.None(), 
+                    !dateCreatedResult.IsError ? dateCreatedResult.Value : Optional<DateTime>.None(),
                     !dateModifiedResult.IsError ? dateModifiedResult.Value : Optional<DateTime>.None());
                 if (errorDirResult.IsError)
                     return errorDirResult.Errors;
                 ErrorOr<Updated> setStatusResult = errorDirResult.Value.SetStatus(FileSystemItemStatus.Inaccessible);
-                if (setStatusResult.IsError)
-                    return setStatusResult.Errors;
-                return errorDirResult;
+                return setStatusResult.IsError ? (ErrorOr<Directory>)setStatusResult.Errors : errorDirResult;
             }
             else
                 return Directory.Create(newDirectoryPathResult.Value, dirNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value);
@@ -320,9 +310,7 @@ public class DirectoryService : IDirectoryService
     public ErrorOr<Deleted> DeleteDirectory(string path)
     {
         ErrorOr<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(path);
-        if (fileSystemPathIdResult.IsError)
-            return fileSystemPathIdResult.Errors;
-        return DeleteDirectory(fileSystemPathIdResult.Value);
+        return fileSystemPathIdResult.IsError ? (ErrorOr<Deleted>)fileSystemPathIdResult.Errors : DeleteDirectory(fileSystemPathIdResult.Value);
     }
 
     /// <summary>

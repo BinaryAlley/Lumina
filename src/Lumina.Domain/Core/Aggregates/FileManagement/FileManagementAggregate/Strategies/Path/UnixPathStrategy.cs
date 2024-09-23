@@ -21,10 +21,7 @@ public class UnixPathStrategy : IUnixPathStrategy
     #endregion
 
     #region ==================================================================== PROPERTIES =================================================================================
-    public char PathSeparator
-    {
-        get { return '/'; }
-    }
+    public char PathSeparator => '/';
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================
@@ -47,13 +44,13 @@ public class UnixPathStrategy : IUnixPathStrategy
     public bool IsValidPath(FileSystemPathId path)
     {
         // check for invalid path characters
-        var invalidChars = GetInvalidPathCharsForPlatform();
+        char[] invalidChars = GetInvalidPathCharsForPlatform();
         if (path.Path.IndexOfAny(invalidChars) >= 0)
             return false;
         // check for relative paths
         if (path.Path.StartsWith("./") || path.Path.StartsWith("../"))
             return false;
-        var pathPattern = @"^\/([\w\-\.\~!$&'()*+,;=:@ ]+(\/[\w\-\.\~!$&'()*+,;=:@ ]+)*)?\/?$";
+        string pathPattern = @"^\/([\w\-\.\~!$&'()*+,;=:@ ]+(\/[\w\-\.\~!$&'()*+,;=:@ ]+)*)?\/?$";
         return Regex.IsMatch(path.Path, pathPattern);
     }
 
@@ -124,15 +121,13 @@ public class UnixPathStrategy : IUnixPathStrategy
         if (tempPath.EndsWith('/'))
             tempPath = tempPath.TrimEnd(PathSeparator);
         // find the last occurrence of a slash
-        var lastIndex = tempPath.LastIndexOf(PathSeparator);
+        int lastIndex = tempPath.LastIndexOf(PathSeparator);
         // if there's no slash found (shouldn't happen due to previous steps), or if we are at the root level after trimming, return error
         if (lastIndex < 0)
             return Errors.FileManagement.CannotNavigateUp;
         // return the path up to the last slash, or, if there's only the root slash, return that one instead
         ErrorOr<FileSystemPathId> newPathResult = FileSystemPathId.Create(lastIndex > 0 ? tempPath[..lastIndex] : tempPath[..1]);
-        if (newPathResult.IsError)
-            return newPathResult.Errors;
-        return ParsePath(newPathResult.Value);
+        return newPathResult.IsError ? (ErrorOr<IEnumerable<PathSegment>>)newPathResult.Errors : ParsePath(newPathResult.Value);
     }
 
     /// <summary>
@@ -155,9 +150,9 @@ public class UnixPathStrategy : IUnixPathStrategy
             return Errors.FileManagement.InvalidPath;
 
         // On Unix-like systems, the root is always "/"
-        if (path.Path.StartsWith(PathSeparator))
-            return new PathSegment(PathSeparator.ToString(), isDirectory: false, isDrive: true);
-        return Errors.FileManagement.InvalidPath;
+        return path.Path.StartsWith(PathSeparator)
+            ? (ErrorOr<PathSegment>)new PathSegment(PathSeparator.ToString(), isDirectory: false, isDrive: true)
+            : (ErrorOr<PathSegment>)Errors.FileManagement.InvalidPath;
     }
     #endregion
 }

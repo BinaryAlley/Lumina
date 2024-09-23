@@ -41,9 +41,7 @@ public class Genre : ValueObject
     /// </returns>
     public static ErrorOr<Genre> Create(string name)
     {
-        if (string.IsNullOrWhiteSpace(name))
-            return Errors.Errors.Metadata.GenreNameCannotBeEmpty;
-        return new Genre(name);
+        return string.IsNullOrWhiteSpace(name) ? (ErrorOr<Genre>)Errors.Errors.Metadata.GenreNameCannotBeEmpty : (ErrorOr<Genre>)new Genre(name);
     }
 
     /// <inheritdoc/>

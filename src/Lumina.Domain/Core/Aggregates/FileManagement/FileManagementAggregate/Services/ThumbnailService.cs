@@ -44,10 +44,10 @@ public class ThumbnailService : IThumbnailService
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of bytes representing the thumbnail of the file at the specified path or an error.</returns>
     public async Task<ErrorOr<Thumbnail>> GetThumbnailAsync(string path, int quality)
     {
-        var fileSystemPathIdResult = FileSystemPathId.Create(path);
-        if (fileSystemPathIdResult.IsError)
-            return fileSystemPathIdResult.Errors;
-        return await GetThumbnailAsync(fileSystemPathIdResult.Value, quality);
+        ErrorOr<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(path);
+        return fileSystemPathIdResult.IsError
+            ? (ErrorOr<Thumbnail>)fileSystemPathIdResult.Errors
+            : await GetThumbnailAsync(fileSystemPathIdResult.Value, quality);
     }
 
     /// <summary>
@@ -59,21 +59,21 @@ public class ThumbnailService : IThumbnailService
     public async Task<ErrorOr<Thumbnail>> GetThumbnailAsync(FileSystemPathId path, int quality)
     {
         // first, get the type of the image file
-        var imageTypeResult = await _environmentContext.FileTypeService.GetImageTypeAsync(path);
+        ErrorOr<ImageType> imageTypeResult = await _environmentContext.FileTypeService.GetImageTypeAsync(path);
         if (imageTypeResult.IsError)
             return imageTypeResult.Errors;
         if (imageTypeResult.Value != ImageType.None)
         {
             // then, get its bytes
-            var resultFileContents = _environmentContext.FileProviderService.GetFileAsync(path);
+            ErrorOr<byte[]> resultFileContents = _environmentContext.FileProviderService.GetFileAsync(path);
             if (resultFileContents.IsError)
                 return resultFileContents.Errors;
             byte[] fileContents = resultFileContents.Value;
             // finally, resize or adjust quality based on image type
             byte[]? adjustedImage = null;
-            if (imageTypeResult.Value == ImageType.JPEG || imageTypeResult.Value == ImageType.JPEG_CANON || imageTypeResult.Value == ImageType.JPEG2000 
-                || imageTypeResult.Value == ImageType.JPEG_UNKNOWN || imageTypeResult.Value == ImageType.PNG || imageTypeResult.Value == ImageType.BMP
-                || imageTypeResult.Value == ImageType.WEBP || imageTypeResult.Value == ImageType.GIF || imageTypeResult.Value == ImageType.TIFF || imageTypeResult.Value == ImageType.TGA)
+            if (imageTypeResult.Value is ImageType.JPEG or ImageType.JPEG_CANON or ImageType.JPEG2000
+                or ImageType.JPEG_UNKNOWN or ImageType.PNG or ImageType.BMP
+                or ImageType.WEBP or ImageType.GIF or ImageType.TIFF or ImageType.TGA)
                 adjustedImage = await AdjustImageResolutionAsync(fileContents, imageTypeResult.Value, quality);
             return new Thumbnail(imageTypeResult.Value, adjustedImage ?? fileContents);
         }
@@ -90,8 +90,8 @@ public class ThumbnailService : IThumbnailService
     /// <returns>A byte array representing the processed image.</returns>
     private static async Task<byte[]> AdjustImageQualityAsync(byte[] imageBytes, ImageType imageType, int quality)
     {
-        using var inputMemoryStream = new MemoryStream(imageBytes);
-        using var outputMemoryStream = new MemoryStream();       
+        using MemoryStream inputMemoryStream = new(imageBytes);
+        using MemoryStream outputMemoryStream = new();
         switch (imageType)
         {
             case ImageType.JPEG:
@@ -99,22 +99,23 @@ public class ThumbnailService : IThumbnailService
             case ImageType.JPEG_CANON:
             case ImageType.JPEG_UNKNOWN:
                 {
-                    using var image = await Image.LoadAsync(inputMemoryStream);
+                    using Image image = await Image.LoadAsync(inputMemoryStream);
                     await image.SaveAsync(outputMemoryStream, new JpegEncoder() { Quality = quality });
                     break;
                 }
             case ImageType.PNG:
                 {
-                    using var image = await Image.LoadAsync(inputMemoryStream);
+                    using Image image = await Image.LoadAsync(inputMemoryStream);
                     // PNG is lossless; quality adjustments don't apply in the same way - we can adjust compression
                     int compressionLevel = MapRange(quality, 1, 100, 1, 9);
-                    var encoder = new PngEncoder { CompressionLevel = (PngCompressionLevel)compressionLevel };
+                    PngEncoder encoder = new()
+                    { CompressionLevel = (PngCompressionLevel)compressionLevel };
                     await image.SaveAsync(outputMemoryStream, encoder);
                     break;
                 }
             case ImageType.BMP:
                 {
-                    using var image = await Image.LoadAsync(inputMemoryStream);
+                    using Image image = await Image.LoadAsync(inputMemoryStream);
                     await image.SaveAsync(outputMemoryStream, new PngEncoder()); // convert BMP to PNG for compression
                     break;
                 }
@@ -133,8 +134,8 @@ public class ThumbnailService : IThumbnailService
     /// <returns>The bytes of the adjusted image.</returns>
     private static async Task<byte[]> AdjustImageResolutionAsync(byte[] imageBytes, ImageType imageType, int quality)
     {
-        using var inputMemoryStream = new MemoryStream(imageBytes);
-        using var outputMemoryStream = new MemoryStream();
+        using MemoryStream inputMemoryStream = new(imageBytes);
+        using MemoryStream outputMemoryStream = new();
         Image image = await Image.LoadAsync(inputMemoryStream);
         double ratio = quality / 100.0;
         int newWidth = (int)(image.Width * ratio);
@@ -142,7 +143,7 @@ public class ThumbnailService : IThumbnailService
         // ensure new dimensions are not zero
         newWidth = Math.Max(1, newWidth);
         newHeight = Math.Max(1, newHeight);
-        var options = new ResizeOptions
+        ResizeOptions options = new()
         {
             Size = new Size(newWidth, newHeight),
             Mode = ResizeMode.Max
@@ -166,7 +167,7 @@ public class ThumbnailService : IThumbnailService
                 break;
             default:
                 return imageBytes; // for unsupported formats, just return the original bytes
-        }       
+        }
         return outputMemoryStream.ToArray();
     }
 
@@ -183,7 +184,7 @@ public class ThumbnailService : IThumbnailService
     /// </returns>
     private static int MapRange(int value, int fromSource, int toSource, int fromTarget, int toTarget)
     {
-        return (value - fromSource) * (toTarget - fromTarget) / (toSource - fromSource) + fromTarget;
+        return ((value - fromSource) * (toTarget - fromTarget) / (toSource - fromSource)) + fromTarget;
     }
     #endregion
 }

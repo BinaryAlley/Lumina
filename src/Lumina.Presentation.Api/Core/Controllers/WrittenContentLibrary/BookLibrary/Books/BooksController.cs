@@ -43,8 +43,8 @@ public class BooksController : ApiController
     [HttpGet()]
     public async Task<IActionResult> GetBooks()
     {
-        var result = await _mediator.Send(new GetBooksQuery()).ConfigureAwait(false);
-        return result.Match(result => Ok(result), errors => Problem(errors));
+        ErrorOr.ErrorOr<System.Collections.Generic.IEnumerable<Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate.Book>> result = await _mediator.Send(new GetBooksQuery()).ConfigureAwait(false);
+        return result.Match(Ok, Problem);
     }
 
     /// <summary>
@@ -54,8 +54,8 @@ public class BooksController : ApiController
     [HttpPost()]
     public async Task<IActionResult> AddBook(AddBookRequest request)
     {
-        var result = await _mediator.Send(_mapper.Map<AddBookCommand>(request)).ConfigureAwait(false);
-        return result.Match(result => Created($"/api/v1/books/{result.Id}", result), errors => Problem(errors));
+        ErrorOr.ErrorOr<Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate.Book> result = await _mediator.Send(_mapper.Map<AddBookCommand>(request)).ConfigureAwait(false);
+        return result.Match(result => Created($"/api/v1/books/{result.Id}", result), Problem);
     }
     #endregion
 }

@@ -23,10 +23,7 @@ public sealed class UnixRootItem : FileSystemItem
     /// <summary>
     /// Gets the collection of file system items that are children to the current file system root entity.
     /// </summary>
-    public IReadOnlyCollection<FileSystemItem> Items
-    {
-        get { return _items.AsReadOnly(); }
-    }
+    public IReadOnlyCollection<FileSystemItem> Items => _items.AsReadOnly();
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================
@@ -54,13 +51,11 @@ public sealed class UnixRootItem : FileSystemItem
         ErrorOr<FileSystemPathId> createPathResult = FileSystemPathId.Create(PATH);
         if (createPathResult.IsError)
             return createPathResult.Errors;
-        UnixRootItem newRoot = new UnixRootItem(
+        UnixRootItem newRoot = new(
             createPathResult.Value,
             PATH);
         ErrorOr<Updated> setStatusResult = newRoot.SetStatus(status);
-        if (setStatusResult.IsError)
-            return setStatusResult.Errors;
-        return newRoot;
+        return setStatusResult.IsError ? (ErrorOr<UnixRootItem>)setStatusResult.Errors : (ErrorOr<UnixRootItem>)newRoot;
     }
     #endregion
 }

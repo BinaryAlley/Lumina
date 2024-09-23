@@ -48,17 +48,17 @@ public class BookRepositoryTests
     public async Task InsertAsync_WhenBookDoesNotExist_ShouldAddBookToContextAndReturnCreated()
     {
         // Arrange
-        var bookModel = _bookModelFixture.CreateBookModel();
+        BookModel bookModel = _bookModelFixture.CreateBookModel();
 
         // Act
-        var result = await _sut.InsertAsync(bookModel, CancellationToken.None);
+        ErrorOr<Created> result = await _sut.InsertAsync(bookModel, CancellationToken.None);
 
         // Assert
         result.IsError.Should().BeFalse();
         result.Value.Should().Be(Result.Created);
 
         // Check if the book was added to the context's ChangeTracker
-        var addedBook = _mockContext.ChangeTracker.Entries<BookModel>()
+        Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<BookModel>? addedBook = _mockContext.ChangeTracker.Entries<BookModel>()
             .FirstOrDefault(e => e.State == EntityState.Added && e.Entity.Id == bookModel.Id);
         addedBook.Should().NotBeNull();
     }
@@ -67,13 +67,13 @@ public class BookRepositoryTests
     public async Task InsertAsync_WhenBookAlreadyExists_ShouldReturnError()
     {
         // Arrange
-        var bookModel = _bookModelFixture.CreateBookModel();
+        BookModel bookModel = _bookModelFixture.CreateBookModel();
 
         _mockContext.Books.Add(bookModel);
         await _mockContext.SaveChangesAsync();
 
         // Act
-        var result = await _sut.InsertAsync(bookModel, CancellationToken.None);
+        ErrorOr<Created> result = await _sut.InsertAsync(bookModel, CancellationToken.None);
 
         // Assert
         result.IsError.Should().BeTrue();
@@ -85,24 +85,24 @@ public class BookRepositoryTests
     public async Task InsertAsync_WhenExistingTagsFound_ShouldReplaceTagsWithExistingOnes()
     {
         // Arrange
-        var existingTag = new TagModel("Existing");
+        TagModel existingTag = new("Existing");
         _mockContext.Set<TagModel>().Add(existingTag);
         await _mockContext.SaveChangesAsync();
 
-        var bookModel = _bookModelFixture.CreateBookModel();
+        BookModel bookModel = _bookModelFixture.CreateBookModel();
         bookModel.Tags = [new("Existing"), new("New")];
 
         // Act
-        var result = await _sut.InsertAsync(bookModel, CancellationToken.None);
+        ErrorOr<Created> result = await _sut.InsertAsync(bookModel, CancellationToken.None);
 
         // Assert
         result.IsError.Should().BeFalse();
         result.Value.Should().Be(Result.Created);
 
-        var addedBook = _mockContext.ChangeTracker.Entries<BookModel>()
+        Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<BookModel>? addedBook = _mockContext.ChangeTracker.Entries<BookModel>()
             .FirstOrDefault(e => e.State == EntityState.Added && e.Entity.Id == bookModel.Id);
         addedBook.Should().NotBeNull();
-        var addedBookEntity = addedBook!.Entity;
+        BookModel addedBookEntity = addedBook!.Entity;
         addedBookEntity.Tags.Should().HaveCount(2);
         addedBookEntity.Tags.Should().Contain(t => t.Name == "Existing" && t == existingTag);
         addedBookEntity.Tags.Should().Contain(t => t.Name == "New" && t != existingTag);
@@ -112,24 +112,24 @@ public class BookRepositoryTests
     public async Task InsertAsync_WhenExistingGenresFound_ShouldReplaceGenresWithExistingOnes()
     {
         // Arrange
-        var existingGenre = new GenreModel("Existing");
+        GenreModel existingGenre = new("Existing");
         _mockContext.Set<GenreModel>().Add(existingGenre);
         await _mockContext.SaveChangesAsync();
 
-        var bookModel = _bookModelFixture.CreateBookModel();
+        BookModel bookModel = _bookModelFixture.CreateBookModel();
         bookModel.Genres = [new("Existing"), new("New")];
 
         // Act
-        var result = await _sut.InsertAsync(bookModel, CancellationToken.None);
+        ErrorOr<Created> result = await _sut.InsertAsync(bookModel, CancellationToken.None);
 
         // Assert
         result.IsError.Should().BeFalse();
         result.Value.Should().Be(Result.Created);
 
-        var addedBook = _mockContext.ChangeTracker.Entries<BookModel>()
+        Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<BookModel>? addedBook = _mockContext.ChangeTracker.Entries<BookModel>()
             .FirstOrDefault(e => e.State == EntityState.Added && e.Entity.Id == bookModel.Id);
         addedBook.Should().NotBeNull();
-        var addedBookEntity = addedBook!.Entity;
+        BookModel addedBookEntity = addedBook!.Entity;
         addedBookEntity.Genres.Should().HaveCount(2);
         addedBookEntity.Genres.Should().Contain(g => g.Name == "Existing" && g == existingGenre);
         addedBookEntity.Genres.Should().Contain(g => g.Name == "New" && g != existingGenre);
@@ -139,17 +139,17 @@ public class BookRepositoryTests
     public async Task GetAllAsync_WhenCalled_ShouldReturnAllBooks()
     {
         // Arrange
-        var books = new List<BookModel>
-        {
+        List<BookModel> books =
+        [
             _bookModelFixture.CreateBookModel(),
             _bookModelFixture.CreateBookModel(),
             _bookModelFixture.CreateBookModel()
-        };
+        ];
         _mockContext.Books.AddRange(books);
         await _mockContext.SaveChangesAsync();
 
         // Act
-        var result = await _sut.GetAllAsync(CancellationToken.None);
+        ErrorOr<IEnumerable<BookModel>> result = await _sut.GetAllAsync(CancellationToken.None);
 
         // Assert
         result.IsError.Should().BeFalse();
@@ -162,7 +162,7 @@ public class BookRepositoryTests
     public async Task GetAllAsync_WhenNoBooksExist_ShouldReturnEmptyList()
     {
         // Act
-        var result = await _sut.GetAllAsync(CancellationToken.None);
+        ErrorOr<IEnumerable<BookModel>> result = await _sut.GetAllAsync(CancellationToken.None);
 
         // Assert
         result.IsError.Should().BeFalse();
@@ -174,7 +174,7 @@ public class BookRepositoryTests
     public async Task GetAllAsync_WhenCalled_ShouldIncludeRelatedEntities()
     {
         // Arrange
-        var book = _bookModelFixture.CreateBookModel();
+        BookModel book = _bookModelFixture.CreateBookModel();
         book.Tags = [new TagModel("Tag1"), new TagModel("Tag2")];
         book.Genres = [new GenreModel("Genre1"), new GenreModel("Genre2")];
         book.ISBNs = [new IsbnModel("1234567890", IsbnFormat.Isbn10), new IsbnModel("1234567890123", IsbnFormat.Isbn13)];
@@ -182,13 +182,13 @@ public class BookRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        var result = await _sut.GetAllAsync(CancellationToken.None);
+        ErrorOr<IEnumerable<BookModel>> result = await _sut.GetAllAsync(CancellationToken.None);
 
         // Assert
         result.IsError.Should().BeFalse();
         result.Value.Should().NotBeNull();
         result.Value.Should().HaveCount(1);
-        var retrievedBook = result.Value.First();
+        BookModel retrievedBook = result.Value.First();
         retrievedBook.Tags.Should().HaveCount(2);
         retrievedBook.Genres.Should().HaveCount(2);
         retrievedBook.ISBNs.Should().HaveCount(2);

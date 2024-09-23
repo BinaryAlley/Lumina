@@ -23,7 +23,7 @@ public class UrlStringBinder : IModelBinder
             throw new ArgumentNullException(nameof(bindingContext));
         string modelName = bindingContext.ModelName;
         // try to fetch the value of the argument by name
-        var valueProviderResult = bindingContext.ValueProvider.GetValue(modelName);
+        ValueProviderResult valueProviderResult = bindingContext.ValueProvider.GetValue(modelName);
         if (valueProviderResult == ValueProviderResult.None)
             return Task.CompletedTask;
         string? value = valueProviderResult.FirstValue;

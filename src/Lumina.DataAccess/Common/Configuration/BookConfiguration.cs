@@ -126,7 +126,7 @@ public class BookConfiguration : IEntityTypeConfiguration<BookModel>
 
             ratingBuilder.Property(rating => rating.Source)
                 .HasConversion<string>()
-                .HasMaxLength(50)  
+                .HasMaxLength(50)
                 .IsRequired();
         });
 
@@ -139,12 +139,12 @@ public class BookConfiguration : IEntityTypeConfiguration<BookModel>
 
             isbnBuilder.Property(isbn => isbn.Value)
                 .HasColumnName("ISBN")
-                .HasMaxLength(13)  
+                .HasMaxLength(13)
                 .IsRequired();
 
             isbnBuilder.Property(isbn => isbn.Format)
                 .HasConversion<string>()
-                .HasMaxLength(6)  
+                .HasMaxLength(6)
                 .IsRequired();
         });
     }

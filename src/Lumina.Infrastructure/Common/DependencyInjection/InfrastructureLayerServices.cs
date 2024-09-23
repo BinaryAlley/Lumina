@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using System.Reflection;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 #endregion
 
 namespace Lumina.Infrastructure.Common.DependencyInjection;

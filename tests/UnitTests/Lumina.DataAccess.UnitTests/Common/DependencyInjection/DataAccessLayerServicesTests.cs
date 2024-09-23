@@ -42,8 +42,8 @@ public class DataAccessLayerServicesTests
     public void AddDataAccessLayerServices_WhenBasePathExists_ShouldAddServices()
     {
         // Arrange
-        var services = new ServiceCollection();
-        var basePath = Path.GetTempPath(); // use a real existing path
+        ServiceCollection services = new();
+        string basePath = Path.GetTempPath(); // use a real existing path
 
         // Act
         DataAccessLayerServices.AddDataAccessLayerServices(services);
@@ -59,16 +59,16 @@ public class DataAccessLayerServicesTests
     public void AddDataAccessLayerServices_ShouldRegisterDbContextWithCorrectConnectionString()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
 
         // Act
         DataAccessLayerServices.AddDataAccessLayerServices(services);
 
         // Assert
-        var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<LuminaDbContext>));
+        ServiceDescriptor? descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<LuminaDbContext>));
         descriptor.Should().NotBeNull();
-        var serviceProvider = services.BuildServiceProvider();
-        var context = serviceProvider.GetService<LuminaDbContext>();
+        ServiceProvider serviceProvider = services.BuildServiceProvider();
+        LuminaDbContext? context = serviceProvider.GetService<LuminaDbContext>();
 
         context.Should().NotBeNull();
         context!.Database.GetDbConnection().ConnectionString.Should().Contain("Lumina.db");
@@ -78,14 +78,14 @@ public class DataAccessLayerServicesTests
     public void AddDataAccessLayerServices_WhenCalled_ShouldRegisterRepositories()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = new();
 
         // Act
         DataAccessLayerServices.AddDataAccessLayerServices(services);
-        var serviceProvider = services.BuildServiceProvider();
+        ServiceProvider serviceProvider = services.BuildServiceProvider();
 
         // Assert
-        var repository = serviceProvider.GetService<IBookRepository>();
+        IBookRepository? repository = serviceProvider.GetService<IBookRepository>();
         repository.Should().NotBeNull();
     }
     #endregion

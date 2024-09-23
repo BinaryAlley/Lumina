@@ -53,10 +53,10 @@ public class LuminaDbContext : DbContext
     public override int SaveChanges()
     {
         // get all the entity entries that are either added or modified
-        var entries = ChangeTracker.Entries()
+        IEnumerable<Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry> entries = ChangeTracker.Entries()
                                    .Where(e => e.Entity is IStorageEntity &&
                                               (e.State is EntityState.Added or EntityState.Modified));
-        foreach (var entityEntry in entries)
+        foreach (Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry? entityEntry in entries)
         {
             // if the entity is in Added state, set the Created property to the current date and time
             if (entityEntry.State == EntityState.Added)

@@ -99,26 +99,17 @@ public sealed class Book : AggregateRoot<BookId>
     /// <summary>
     /// Gets the list of ISBN (International Standard Book Number) of the book.
     /// </summary>
-    public IReadOnlyCollection<Isbn> ISBNs
-    {
-        get { return _isbns.AsReadOnly(); }
-    }
+    public IReadOnlyCollection<Isbn> ISBNs => _isbns.AsReadOnly();
 
     /// <summary>
     /// Gets the list of media contributors (actors, directors, etc) starring in this book.
     /// </summary>
-    public IReadOnlyCollection<MediaContributorId> Contributors
-    {
-        get { return _contributors.AsReadOnly(); }
-    }
+    public IReadOnlyCollection<MediaContributorId> Contributors => _contributors.AsReadOnly();
 
     /// <summary>
     /// Gets the list of ratings for this book.
     /// </summary>
-    public IReadOnlyCollection<BookRating> Ratings
-    {
-        get { return _ratings.AsReadOnly(); }
-    }
+    public IReadOnlyCollection<BookRating> Ratings => _ratings.AsReadOnly();
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================

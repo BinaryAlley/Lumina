@@ -44,11 +44,11 @@ internal class FileProviderService : IFileProviderService
     public ErrorOr<IEnumerable<FileSystemPathId>> GetFilePaths(FileSystemPathId path)
     {
         // check if the user has access permissions to the provided path
-        if (!_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ListDirectory))
-            return Errors.Permission.UnauthorizedAccess;
-        return ErrorOrFactory.From(_fileSystem.Directory.GetFiles(path.Path)
+        return !_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ListDirectory)
+            ? (ErrorOr<IEnumerable<FileSystemPathId>>)Errors.Permission.UnauthorizedAccess
+            : ErrorOrFactory.From(_fileSystem.Directory.GetFiles(path.Path)
                                                         .OrderBy(p => p)
-                                                        .Select(p => FileSystemPathId.Create(p))
+                                                        .Select(FileSystemPathId.Create)
                                                         .Where(errorOrPathId => !errorOrPathId.IsError)
                                                         .Select(errorOrPathId => errorOrPathId.Value)
                                                         .AsEnumerable());
@@ -82,9 +82,9 @@ internal class FileProviderService : IFileProviderService
     public ErrorOr<byte[]> GetFileAsync(FileSystemPathId path)
     {
         // check if the user has access permissions to the provided path
-        if (!_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadContents))
-            return Errors.Permission.UnauthorizedAccess;
-        return System.IO.File.ReadAllBytes(path.Path);
+        return !_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadContents)
+            ? (ErrorOr<byte[]>)Errors.Permission.UnauthorizedAccess
+            : (ErrorOr<byte[]>)System.IO.File.ReadAllBytes(path.Path);
     }
 
     /// <summary>
@@ -95,9 +95,9 @@ internal class FileProviderService : IFileProviderService
     public ErrorOr<Optional<DateTime>> GetLastWriteTime(FileSystemPathId path)
     {
         // check if the user has access permissions to the provided path
-        if (!_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties))
-            return Errors.Permission.UnauthorizedAccess;
-        return Optional<DateTime>.FromNullable(_fileSystem.File.GetLastWriteTime(path.Path));
+        return !_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties)
+            ? (ErrorOr<Optional<DateTime>>)Errors.Permission.UnauthorizedAccess
+            : (ErrorOr<Optional<DateTime>>)Optional<DateTime>.FromNullable(_fileSystem.File.GetLastWriteTime(path.Path));
     }
 
     /// <summary>
@@ -108,9 +108,9 @@ internal class FileProviderService : IFileProviderService
     public ErrorOr<Optional<DateTime>> GetCreationTime(FileSystemPathId path)
     {
         // check if the user has access permissions to the provided path
-        if (!_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties))
-            return Errors.Permission.UnauthorizedAccess;
-        return Optional<DateTime>.FromNullable(_fileSystem.File.GetCreationTime(path.Path));
+        return !_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties)
+            ? (ErrorOr<Optional<DateTime>>)Errors.Permission.UnauthorizedAccess
+            : (ErrorOr<Optional<DateTime>>)Optional<DateTime>.FromNullable(_fileSystem.File.GetCreationTime(path.Path));
     }
 
     /// <summary>
@@ -121,9 +121,9 @@ internal class FileProviderService : IFileProviderService
     public ErrorOr<long?> GetSize(FileSystemPathId path)
     {
         // check if the user has access permissions to the provided path
-        if (!_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties))
-            return Errors.Permission.UnauthorizedAccess;
-        return _fileSystem.FileInfo.New(path.Path)?.Length ?? 0;
+        return !_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties)
+            ? (ErrorOr<long?>)Errors.Permission.UnauthorizedAccess
+            : (ErrorOr<long?>)(_fileSystem.FileInfo.New(path.Path)?.Length ?? 0);
     }
 
     /// <summary>
@@ -233,7 +233,7 @@ internal class FileProviderService : IFileProviderService
             string? newFile = _fileSystem.Path.Combine(parendDirectoryResult.Value.Path, name);
             if (!string.IsNullOrEmpty(newFile))
             {
-                var newFilePathResult = FileSystemPathId.Create(newFile);
+                ErrorOr<FileSystemPathId> newFilePathResult = FileSystemPathId.Create(newFile);
                 if (newFilePathResult.IsError)
                     return newFilePathResult.Errors;
                 // check if the user has access permissions to the provided path

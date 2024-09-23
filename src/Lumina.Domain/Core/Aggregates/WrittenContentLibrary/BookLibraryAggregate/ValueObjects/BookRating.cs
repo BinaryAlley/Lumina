@@ -51,11 +51,9 @@ public class BookRating : Rating
     /// </returns>
     public static ErrorOr<BookRating> Create(decimal value, decimal maxValue, Optional<BookRatingSource> source, Optional<int> voteCount)
     {
-        if (maxValue < 0 || value < 0)
-            return Errors.Metadata.RatingValueMustBePositive;
-        if (value > maxValue)
-            return Errors.Metadata.RatingValueCannotBeGreaterThanMaxValue;
-        return new BookRating(value, maxValue, source, voteCount);
+        return maxValue < 0 || value < 0
+            ? (ErrorOr<BookRating>)Errors.Metadata.RatingValueMustBePositive
+            : value > maxValue ? (ErrorOr<BookRating>)Errors.Metadata.RatingValueCannotBeGreaterThanMaxValue : (ErrorOr<BookRating>)new BookRating(value, maxValue, source, voteCount);
     }
 
     /// <inheritdoc/>

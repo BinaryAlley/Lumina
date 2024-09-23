@@ -40,7 +40,7 @@ public class GetPathRootQueryHandler : IRequestHandler<GetPathRootQuery, ErrorOr
     /// <returns>The root of the specified path.</returns>
     public ValueTask<ErrorOr<PathSegmentResponse>> Handle(GetPathRootQuery request, CancellationToken cancellationToken)
     {
-        var result = _pathService.GetPathRoot(request.Path);
+        ErrorOr<PathSegment> result = _pathService.GetPathRoot(request.Path);
         return ValueTask.FromResult(result.Match(values => ErrorOrFactory.From(result.Value.Adapt<PathSegmentResponse>()), errors => errors));
     }
     #endregion

@@ -64,19 +64,19 @@ public class AudioMetadata : BaseMetadata
     /// <param name="genres">The genres of the audio.</param>
     /// <param name="tags">The tags associated with the audio.</param>
     public AudioMetadata(
-        string title, 
-        Optional<string> originalTitle, 
-        int durationInSeconds, 
-        int sampleRate, 
-        int channels, 
-        ReleaseInfo releaseInfo, 
+        string title,
+        Optional<string> originalTitle,
+        int durationInSeconds,
+        int sampleRate,
+        int channels,
+        ReleaseInfo releaseInfo,
         Optional<string> description,
-        List<Genre> genres, 
-        List<Tag> tags, 
-        Optional<LanguageInfo> language, 
-        Optional<LanguageInfo> originalLanguage, 
-        Optional<int> bitDepth, 
-        Optional<string> audioCodec, 
+        List<Genre> genres,
+        List<Tag> tags,
+        Optional<LanguageInfo> language,
+        Optional<LanguageInfo> originalLanguage,
+        Optional<int> bitDepth,
+        Optional<string> audioCodec,
         Optional<int> bitrate)
         : base(title, originalTitle, description, releaseInfo, genres, tags, language, originalLanguage)
     {
@@ -110,43 +110,43 @@ public class AudioMetadata : BaseMetadata
     /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="AudioMetadata"/>, or an error message.
     /// </returns>
     public static ErrorOr<AudioMetadata> Create(
-        string title, 
-        Optional<string> originalTitle, 
-        int durationInSeconds, 
-        int sampleRate, 
-        int channels, 
-        ReleaseInfo release, 
-        Optional<string> 
+        string title,
+        Optional<string> originalTitle,
+        int durationInSeconds,
+        int sampleRate,
+        int channels,
+        ReleaseInfo release,
+        Optional<string>
         description,
-        List<Genre> genres, 
-        List<Tag> tags, 
-        Optional<LanguageInfo> language, 
-        Optional<LanguageInfo> originalLanguage, 
-        Optional<int> bitDepth, 
-        Optional<string> audioCodec, 
+        List<Genre> genres,
+        List<Tag> tags,
+        Optional<LanguageInfo> language,
+        Optional<LanguageInfo> originalLanguage,
+        Optional<int> bitDepth,
+        Optional<string> audioCodec,
         Optional<int> bitrate)
     {
         return new AudioMetadata(
-            title, 
-            originalTitle, 
-            durationInSeconds, 
-            sampleRate, 
-            channels, 
-            release, 
-            description, 
-            genres, 
+            title,
+            originalTitle,
+            durationInSeconds,
+            sampleRate,
+            channels,
+            release,
+            description,
+            genres,
             tags,
-            language, 
-            originalLanguage, 
-            bitDepth, 
-            audioCodec, 
+            language,
+            originalLanguage,
+            bitDepth,
+            audioCodec,
             bitrate);
     }
 
     /// <inheritdoc/>
     public override IEnumerable<object> GetEqualityComponents()
     {
-        foreach (var component in base.GetEqualityComponents())
+        foreach (object component in base.GetEqualityComponents())
             yield return component;
         yield return DurationInSeconds;
         yield return SampleRate;

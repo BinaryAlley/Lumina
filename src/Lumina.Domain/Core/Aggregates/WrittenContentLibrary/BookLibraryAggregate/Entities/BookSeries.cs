@@ -33,10 +33,7 @@ public sealed class BookSeries : Entity<BookSeriesId>
     /// <summary>
     /// Gets the collection of books in the series.
     /// </summary>
-    public IReadOnlyCollection<Book> Books
-    {
-        get { return _books.AsReadOnly(); }
-    }
+    public IReadOnlyCollection<Book> Books => _books.AsReadOnly();
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================
@@ -69,9 +66,9 @@ public sealed class BookSeries : Entity<BookSeriesId>
     /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="BookSeries"/>, or an error message.
     /// </returns>
     public static ErrorOr<BookSeries> Create(
-        BookSeriesId id, 
-        WrittenContentMetadata metadata, 
-        bool isComplete, 
+        BookSeriesId id,
+        WrittenContentMetadata metadata,
+        bool isComplete,
         List<Book> books)
     {
         // TODO: enforce invariants

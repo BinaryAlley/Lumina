@@ -54,7 +54,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task GetBooks_WhenCalled_ShouldReturnBooks()
     {
         // Arrange
-        var response = await _client.GetAsync("/api/v1/books");
+        HttpResponseMessage response = await _client.GetAsync("/api/v1/books");
 
         // Act
         response.EnsureSuccessStatusCode();
@@ -62,7 +62,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
         // Assert
         response.EnsureSuccessStatusCode();
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var bookResponse = await response.Content.ReadFromJsonAsync<Book[]>(_jsonOptions);
+        Book[]? bookResponse = await response.Content.ReadFromJsonAsync<Book[]>(_jsonOptions);
         bookResponse.Should().NotBeNull();
     }
 
@@ -73,11 +73,11 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
         AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         response.EnsureSuccessStatusCode();
-        var bookResponse = await response.Content.ReadFromJsonAsync<Book>(_jsonOptions);
+        Book? bookResponse = await response.Content.ReadFromJsonAsync<Book>(_jsonOptions);
         response.StatusCode.Should().Be(HttpStatusCode.Created);
         bookResponse.Should().NotBeNull();
 
@@ -155,11 +155,11 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
 
         // check Location header
         response.Headers.Location.Should().NotBeNull();
-        var locationUri = response.Headers.Location!.ToString();
+        string locationUri = response.Headers.Location!.ToString();
         locationUri.Should().StartWith("/api/v1/books/");
 
         // extract ID from Location header
-        var idFromHeader = locationUri.Split('/').Last();
+        string idFromHeader = locationUri.Split('/').Last();
 
         // compare with bookResponse id
         bookResponse!.Id.ToString().Should().Be(idFromHeader);
@@ -169,11 +169,11 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyTitle_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { Metadata = bookRequest.Metadata! with { Title = null! } };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.Metadata.TitleCannotBeEmpty.Code);
@@ -183,11 +183,11 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLengthTitle_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { Metadata = bookRequest.Metadata! with { Title = new Faker().Random.String2(300) } };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.Metadata.TitleMustBeMaximum255CharactersLong.Code);
@@ -197,7 +197,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyOriginalTitle_ShouldAddBook()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { Metadata = bookRequest.Metadata! with { OriginalTitle = null! } };
 
         // Act & Assert
@@ -208,11 +208,11 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLengthOriginalTitle_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { Metadata = bookRequest.Metadata! with { OriginalTitle = new Faker().Random.String2(300) } };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.Metadata.OriginalTitleMustBeMaximum255CharactersLong.Code);
@@ -222,7 +222,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyDescription_ShouldAddBook()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { Metadata = bookRequest.Metadata! with { Description = null! } };
 
         // Act & Assert
@@ -233,11 +233,11 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLengthDescription_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { Metadata = bookRequest.Metadata! with { Description = new Faker().Random.String2(2001) } };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.Metadata.DescriptionMustBeMaximum2000CharactersLong.Code);
@@ -247,11 +247,11 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithNullReleaseInfo_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { Metadata = bookRequest.Metadata! with { ReleaseInfo = null! } };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.Metadata.ReleaseInfoCannotBeNull.Code);
@@ -261,7 +261,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyOriginalReleaseYear_ShouldAddBook()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { Metadata = bookRequest.Metadata! with { ReleaseInfo = bookRequest.Metadata.ReleaseInfo! with { OriginalReleaseYear = null! } } };
 
         // Act & Assert
@@ -272,11 +272,11 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidValueOriginalReleaseYear_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { Metadata = bookRequest.Metadata! with { ReleaseInfo = bookRequest.Metadata.ReleaseInfo! with { OriginalReleaseYear = 10000 } } };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.Metadata.OriginalReleaseYearMustBeBetween1And9999.Code);
@@ -286,7 +286,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyReReleaseYear_ShouldAddBook()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { Metadata = bookRequest.Metadata! with { ReleaseInfo = bookRequest.Metadata.ReleaseInfo! with { ReReleaseYear = null!, ReReleaseDate = null } } };
 
         // Act & Assert
@@ -297,7 +297,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidValueReReleaseYear_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with
         {
             Metadata = bookRequest.Metadata! with
@@ -309,7 +309,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
         };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.Metadata.ReReleaseYearMustBeBetween1And9999.Code);
@@ -319,7 +319,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyReleaseCountry_ShouldAddBook()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { Metadata = bookRequest.Metadata! with { ReleaseInfo = bookRequest.Metadata.ReleaseInfo! with { ReleaseCountry = null! } } };
 
         // Act & Assert
@@ -330,7 +330,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidValueReleaseCountry_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with
         {
             Metadata = bookRequest.Metadata! with
@@ -340,7 +340,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
         };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.Metadata.CountryCodeMustBe2CharactersLong.Code);
@@ -350,7 +350,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyReleaseVersion_ShouldAddBook()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { Metadata = bookRequest.Metadata! with { ReleaseInfo = bookRequest.Metadata.ReleaseInfo! with { ReleaseVersion = null! } } };
 
         // Act & Assert
@@ -361,7 +361,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidValueReleasVersion_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with
         {
             Metadata = bookRequest.Metadata! with
@@ -371,7 +371,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
         };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.Metadata.ReleaseVersionMustBeMaximum50CharactersLong.Code);
@@ -381,7 +381,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenReReleaseYearIsAfterOriginalReleaseYear_ShouldAddBook()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with
         {
             Metadata = bookRequest.Metadata! with
@@ -400,7 +400,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenReReleaseYearIsBeforeReleaseYear_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with
         {
             Metadata = bookRequest.Metadata! with
@@ -412,7 +412,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
         };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.Metadata.ReReleaseYearCannotBeEarlierThanOriginalReleaseYear.Code);
@@ -422,7 +422,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenReReleaseDateIsAfterOriginalReleaseDate_ShouldAddBook()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with
         {
             Metadata = bookRequest.Metadata! with
@@ -441,7 +441,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenReReleaseDateIsBeforeReleaseDate_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with
         {
             Metadata = bookRequest.Metadata! with
@@ -453,7 +453,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
         };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.Metadata.ReReleaseDateCannotBeEarlierThanOriginalReleaseDate.Code);
@@ -463,11 +463,11 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithNullGenres_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { Metadata = bookRequest.Metadata! with { Genres = null! } };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.Metadata.GenresListCannotBeNull.Code);
@@ -477,7 +477,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyGenreName_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with
         {
             Metadata = bookRequest.Metadata! with
@@ -487,7 +487,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
         };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.Metadata.GenreNameCannotBeEmpty.Code);
@@ -497,7 +497,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLengthGenreName_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with
         {
             Metadata = bookRequest.Metadata! with
@@ -506,7 +506,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
             }
         };
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.Metadata.GenreNameMustBeMaximum50CharactersLong.Code);
@@ -516,11 +516,11 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithNullTags_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { Metadata = bookRequest.Metadata! with { Tags = null! } };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.Metadata.TagsListCannotBeNull.Code);
@@ -530,7 +530,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyTagName_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with
         {
             Metadata = bookRequest.Metadata! with
@@ -540,7 +540,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
         };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.Metadata.TagNameCannotBeEmpty.Code);
@@ -550,7 +550,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLengthTagName_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with
         {
             Metadata = bookRequest.Metadata! with
@@ -559,7 +559,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
             }
         };
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.Metadata.TagNameMustBeMaximum50CharactersLong.Code);
@@ -569,7 +569,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyLanguage_ShouldAddBook()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { Metadata = bookRequest.Metadata! with { Language = null! } };
 
         // Act & Assert
@@ -580,11 +580,11 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyLanguageCode_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { Metadata = bookRequest.Metadata! with { Language = bookRequest.Metadata.Language! with { LanguageCode = null } } };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.Metadata.LanguageCodeCannotBeEmpty.Code);
@@ -594,20 +594,20 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLengthLanguageCode_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
-        bookRequest = bookRequest with 
-        { 
-            Metadata = bookRequest.Metadata! with 
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
+        bookRequest = bookRequest with
+        {
+            Metadata = bookRequest.Metadata! with
             {
-                Language = bookRequest.Metadata.Language! with 
+                Language = bookRequest.Metadata.Language! with
                 {
-                    LanguageCode = new Faker().Random.String2(10) 
+                    LanguageCode = new Faker().Random.String2(10)
                 }
             }
         };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.Metadata.LanguageCodeMustBe2CharactersLong.Code);
@@ -617,11 +617,11 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyLanguageName_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { Metadata = bookRequest.Metadata! with { Language = bookRequest.Metadata.Language! with { LanguageName = null } } };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.Metadata.LanguageNameCannotBeEmpty.Code);
@@ -631,7 +631,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLengthLanguageName_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with
         {
             Metadata = bookRequest.Metadata! with
@@ -644,7 +644,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
         };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.Metadata.LanguageNameMustBeMaximum50CharactersLong.Code);
@@ -654,7 +654,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyLanguageNativeName_ShouldAddBook()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { Metadata = bookRequest.Metadata! with { Language = bookRequest.Metadata.Language! with { NativeName = null } } };
 
         // Act & Assert
@@ -665,7 +665,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLengthNativeLanguageName_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with
         {
             Metadata = bookRequest.Metadata! with
@@ -678,7 +678,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
         };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.Metadata.LanguageNativeNameMustBeMaximum50CharactersLong.Code);
@@ -688,7 +688,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyOriginalLanguage_ShouldAddBook()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { Metadata = bookRequest.Metadata! with { OriginalLanguage = null! } };
 
         // Act & Assert
@@ -699,11 +699,11 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyOriginalLanguageCode_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { Metadata = bookRequest.Metadata! with { OriginalLanguage = bookRequest.Metadata.Language! with { LanguageCode = null } } };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.Metadata.LanguageCodeCannotBeEmpty.Code);
@@ -713,7 +713,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLengthOriginalLanguageCode_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with
         {
             Metadata = bookRequest.Metadata! with
@@ -726,7 +726,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
         };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.Metadata.LanguageCodeMustBe2CharactersLong.Code);
@@ -736,11 +736,11 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyOriginalLanguageName_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { Metadata = bookRequest.Metadata! with { OriginalLanguage = bookRequest.Metadata.Language! with { LanguageName = null } } };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.Metadata.LanguageNameCannotBeEmpty.Code);
@@ -750,7 +750,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLengthOriginalLanguageName_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with
         {
             Metadata = bookRequest.Metadata! with
@@ -763,7 +763,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
         };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.Metadata.LanguageNameMustBeMaximum50CharactersLong.Code);
@@ -773,7 +773,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLengthOriginalNativeLanguageName_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with
         {
             Metadata = bookRequest.Metadata! with
@@ -786,7 +786,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
         };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.Metadata.LanguageNativeNameMustBeMaximum50CharactersLong.Code);
@@ -796,7 +796,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyOriginalLanguageNativeName_ShouldAddBook()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { Metadata = bookRequest.Metadata! with { OriginalLanguage = bookRequest.Metadata.Language! with { NativeName = null } } };
 
         // Act & Assert
@@ -807,7 +807,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyPublisher_ShouldAddBook()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { Metadata = bookRequest.Metadata! with { Publisher = null } };
 
         // Act & Assert
@@ -818,11 +818,11 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLengthPublisher_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { Metadata = bookRequest.Metadata! with { Publisher = new Faker().Random.String2(150) } };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.WrittenContent.PublisherMustBeMaximum100CharactersLong.Code);
@@ -832,7 +832,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyPageCount_ShouldAddBook()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { Metadata = bookRequest.Metadata! with { PageCount = null } };
 
         // Act & Assert
@@ -843,11 +843,11 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithNegativePageCount_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { Metadata = bookRequest.Metadata! with { PageCount = -1 } };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.WrittenContent.PageCountMustBeGreaterThanZero.Code);
@@ -857,7 +857,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyFormat_ShouldAddBook()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { Format = null };
 
         // Act & Assert
@@ -868,11 +868,11 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidFormat_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { Format = (BookFormat)99 };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.WrittenContent.UnknownBookFormat.Code);
@@ -882,7 +882,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyEdition_ShouldAddBook()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { Edition = null };
 
         // Act & Assert
@@ -893,11 +893,11 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLengthEdition_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { Edition = new Faker().Random.String2(100) };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.WrittenContent.EditionMustBeMaximum50CharactersLong.Code);
@@ -907,7 +907,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyVolumeNumber_ShouldAddBook()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { VolumeNumber = null };
 
         // Act & Assert
@@ -918,11 +918,11 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithNegativeVolumeNumber_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { VolumeNumber = -1 };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.WrittenContent.VolumeNumberMustBeGreaterThanZero.Code);
@@ -932,7 +932,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptySeries_ShouldAddBook()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { Series = null };
 
         // Act & Assert
@@ -974,7 +974,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyAsin_ShouldAddBook()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { ASIN = null };
 
         // Act & Assert
@@ -985,11 +985,11 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLengthAsin_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { ASIN = new Faker().Random.String2(15) };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.WrittenContent.AsinMustBe10CharactersLong.Code);
@@ -999,7 +999,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyGoodreadsId_ShouldAddBook()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { GoodreadsId = null };
 
         // Act & Assert
@@ -1010,11 +1010,11 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidGoodreadsId_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { GoodreadsId = new Faker().Random.String2(2) };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.WrittenContent.GoodreadsIdMustBeNumeric.Code);
@@ -1024,7 +1024,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyLccn_ShouldAddBook()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { LCCN = null };
 
         // Act & Assert
@@ -1035,11 +1035,11 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLccn_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { LCCN = new Faker().Random.String2(200) };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.WrittenContent.InvalidLccnFormat.Code);
@@ -1049,7 +1049,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyOclcNumber_ShouldAddBook()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { OCLCNumber = null };
 
         // Act & Assert
@@ -1060,11 +1060,11 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidOclcNumber_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { OCLCNumber = new Faker().Random.String2(200) };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.WrittenContent.InvalidOclcFormat.Code);
@@ -1074,7 +1074,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyOpenLibraryId_ShouldAddBook()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { OpenLibraryId = null };
 
         // Act & Assert
@@ -1085,11 +1085,11 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidOpenLibraryId_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { OpenLibraryId = new Faker().Random.String2(200) };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.WrittenContent.InvalidOpenLibraryId.Code);
@@ -1099,7 +1099,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyLibraryThingId_ShouldAddBook()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { LibraryThingId = null };
 
         // Act & Assert
@@ -1110,11 +1110,11 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLengthLibraryThingId_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { LibraryThingId = new Faker().Random.String2(200) };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.WrittenContent.LibraryThingIdMustBeMaximum50CharactersLong.Code);
@@ -1124,7 +1124,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyGoogleBooksId_ShouldAddBook()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { GoogleBooksId = null };
 
         // Act & Assert
@@ -1135,11 +1135,11 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLengthGoogleBooksId_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { GoogleBooksId = new Faker().Random.String2(20) };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.WrittenContent.GoogleBooksIdMustBe12CharactersLong.Code);
@@ -1149,11 +1149,11 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidGoogleBooksId_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { GoogleBooksId = new Faker().Random.String2(11) + " " };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.WrittenContent.InvalidGoogleBooksIdFormat.Code);
@@ -1163,7 +1163,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyBarnesAndNobleId_ShouldAddBook()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { BarnesAndNobleId = null };
 
         // Act & Assert
@@ -1174,11 +1174,11 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLengthBarnesAndNobleId_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { BarnesAndNobleId = new Faker().Random.String2(20) };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.WrittenContent.BarnesAndNoblesIdMustBe10CharactersLong.Code);
@@ -1188,11 +1188,11 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidBarnesAndNobleId_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { BarnesAndNobleId = new Faker().Random.String2(10) };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.WrittenContent.InvalidBarnesAndNoblesIdFormat.Code);
@@ -1202,7 +1202,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyAppleBooksId_ShouldAddBook()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { AppleBooksId = null };
 
         // Act & Assert
@@ -1213,11 +1213,11 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidAppleBooksId_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { AppleBooksId = new Faker().Random.String2(10) };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.WrittenContent.InvalidAppleBooksIdFormat.Code);
@@ -1227,11 +1227,11 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithNullIsbns_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { ISBNs = null! };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.WrittenContent.IsbnListCannotBeNull.Code);
@@ -1241,14 +1241,14 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyIsbnValue_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with
         {
             ISBNs = bookRequest.ISBNs!.Select((isbn, index) => index == 0 ? isbn with { Value = null } : isbn).ToList()
         };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.WrittenContent.IsbnValueCannotBeEmpty.Code);
@@ -1258,14 +1258,14 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidIsbn10Value_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with
         {
             ISBNs = bookRequest.ISBNs!.Select((isbn, index) => index == 0 ? isbn with { Value = new Faker().Random.String2(5), Format = IsbnFormat.Isbn10 } : isbn).ToList()
         };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.WrittenContent.InvalidIsbn10Format.Code);
@@ -1275,14 +1275,14 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidIsbn13Value_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with
         {
             ISBNs = bookRequest.ISBNs!.Select((isbn, index) => index == 0 ? isbn with { Value = new Faker().Random.String2(5), Format = IsbnFormat.Isbn13 } : isbn).ToList()
         };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.WrittenContent.InvalidIsbn13Format.Code);
@@ -1292,13 +1292,13 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidIsbnFormat_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with
         {
             ISBNs = bookRequest.ISBNs!.Select((isbn, index) => index == 0 ? isbn with { Format = (IsbnFormat)99 } : isbn).ToList()
         };
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.WrittenContent.UnknownIsbnFormat.Code);
@@ -1308,11 +1308,11 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithNullContributors_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { Contributors = null! };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.MediaContributor.ContributorsListCannotBeNull.Code);
@@ -1322,14 +1322,14 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithNullContributorName_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with
         {
             Contributors = bookRequest.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Name = null! } : contributor).ToList()
         };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.MediaContributor.ContributorNameCannotBeEmpty.Code);
@@ -1339,14 +1339,14 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyContributorDisplayName_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with
         {
             Contributors = bookRequest.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Name = contributor.Name! with { DisplayName = string.Empty } } : contributor).ToList()
         };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.MediaContributor.ContributorDisplayNameCannotBeEmpty.Code);
@@ -1356,14 +1356,14 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithNullContributorDisplayName_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with
         {
             Contributors = bookRequest.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Name = contributor.Name! with { DisplayName = null! } } : contributor).ToList()
         };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.MediaContributor.ContributorDisplayNameCannotBeEmpty.Code);
@@ -1373,14 +1373,14 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLengthContributorDisplayName_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with
         {
             Contributors = bookRequest.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Name = contributor.Name! with { DisplayName = new Faker().Random.String2(150) } } : contributor).ToList()
         };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.MediaContributor.ContributorDisplayNameMustBeMaximum100CharactersLong.Code);
@@ -1390,14 +1390,14 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLengthContributorLegalName_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with
         {
             Contributors = bookRequest.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Name = contributor.Name! with { LegalName = new Faker().Random.String2(150) } } : contributor).ToList()
         };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.MediaContributor.ContributorLegalNameMustBeMaximum100CharactersLong.Code);
@@ -1407,14 +1407,14 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyContributorRole_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with
         {
             Contributors = bookRequest.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Role = null } : contributor).ToList()
         };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.MediaContributor.ContributorRoleCannotBeNull.Code);
@@ -1424,15 +1424,15 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyContributorRoleName_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with
         {
-            Contributors = bookRequest.Contributors!.Select((contributor, index) => index == 0 ? contributor with 
-                { Role = contributor.Role! with { Name = null } } : contributor).ToList()
+            Contributors = bookRequest.Contributors!.Select((contributor, index) => index == 0 ? contributor with
+            { Role = contributor.Role! with { Name = null } } : contributor).ToList()
         };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.MediaContributor.RoleNameCannotBeEmpty.Code);
@@ -1442,7 +1442,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLengthContributorRoleName_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with
         {
             Contributors = bookRequest.Contributors!.Select((contributor, index) => index == 0 ? contributor with
@@ -1450,7 +1450,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
         };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.MediaContributor.RoleNameMustBeMaximum50CharactersLong.Code);
@@ -1460,7 +1460,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyContributorRoleCategory_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with
         {
             Contributors = bookRequest.Contributors!.Select((contributor, index) => index == 0 ? contributor with
@@ -1468,7 +1468,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
         };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.MediaContributor.RoleCategoryCannotBeEmpty.Code);
@@ -1478,7 +1478,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithInvalidLengthContributorRoleCategory_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with
         {
             Contributors = bookRequest.Contributors!.Select((contributor, index) => index == 0 ? contributor with
@@ -1486,7 +1486,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
         };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.MediaContributor.RoleCategoryMustBeMaximum50CharactersLong.Code);
@@ -1496,11 +1496,11 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithNullRatings_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with { Ratings = null! };
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.Metadata.RatingsListCannotBeNull.Code);
@@ -1510,13 +1510,13 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithNegativeRatingValue_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with
         {
             Ratings = bookRequest.Ratings!.Select((rating, index) => index == 0 ? rating with { Value = -3 } : rating).ToList()
         };
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.Metadata.RatingValueMustBePositive.Code);
@@ -1526,13 +1526,13 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithRatingValueGreaterThanMaxValue_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with
         {
             Ratings = bookRequest.Ratings!.Select((rating, index) => index == 0 ? rating with { Value = 3, MaxValue = 2 } : rating).ToList()
         };
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.Metadata.RatingValueCannotBeGreaterThanMaxValue.Code);
@@ -1542,13 +1542,13 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithNegativeMaxRatingValue_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with
         {
             Ratings = bookRequest.Ratings!.Select((rating, index) => index == 0 ? rating with { MaxValue = -3 } : rating).ToList()
         };
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.Metadata.RatingMaxValueMustBePositive.Code);
@@ -1558,7 +1558,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithEmptyRatingVoteCount_ShouldAddBook()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with
         {
             Ratings = bookRequest.Ratings!.Select((rating, index) => index == 0 ? rating with { VoteCount = null } : rating).ToList()
@@ -1571,13 +1571,13 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
     public async Task AddBook_WhenCalledWithNegativeVoteCount_ShouldReturnBadRequest()
     {
         // Arrange
-        var bookRequest = _requestBookFixture.CreateRequestBook();
+        AddBookRequest bookRequest = _requestBookFixture.CreateRequestBook();
         bookRequest = bookRequest with
         {
             Ratings = bookRequest.Ratings!.Select((rating, index) => index == 0 ? rating with { VoteCount = -3 } : rating).ToList()
         };
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
 
         // Assert
         await AssertBadRequestWithValidationErrors(response, Errors.Metadata.RatingVoteCountMustBePositive.Code);
@@ -1588,17 +1588,17 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         response.Content.Headers.ContentType?.MediaType.Should().Be("application/problem+json");
 
-        var problemDetails = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+        ProblemDetails? problemDetails = await response.Content.ReadFromJsonAsync<ProblemDetails>();
         problemDetails.Should().NotBeNull();
         problemDetails!.Type.Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.1");
         problemDetails.Title.Should().Be("One or more validation errors occurred."); // TODO: update when localization is implemented
         problemDetails.Status.Should().Be(400);
 
-        var errors = problemDetails.Extensions["errors"] as JsonElement?;
+        JsonElement? errors = problemDetails.Extensions["errors"] as JsonElement?;
         errors.Should().NotBeNull();
 
-        var actualErrorCodes = new List<string>();
-        foreach (var property in errors!.Value.EnumerateObject())
+        List<string> actualErrorCodes = [];
+        foreach (JsonProperty property in errors!.Value.EnumerateObject())
             actualErrorCodes.AddRange(property.Value.EnumerateArray().Select(e => e.GetString()!));
         actualErrorCodes.Should().Contain(expectedErrorCodes, because: "all expected error codes should be present");
         Console.WriteLine($"All error codes: {string.Join(", ", actualErrorCodes)}");
@@ -1606,12 +1606,12 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
         problemDetails.Extensions.Should().ContainKey("traceId");
         problemDetails.Extensions["traceId"]!.ToString().Should().MatchRegex(@"^[\da-f]{2}-[\da-f]{32}-[\da-f]{16}-[\da-f]{2}$");
     }
-    
+
     private async Task AssertCreated(AddBookRequest bookRequest)
     {
-        var response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("api/v1/books", bookRequest);
         response.EnsureSuccessStatusCode();
-        var bookResponse = await response.Content.ReadFromJsonAsync<Book>(_jsonOptions);
+        Book? bookResponse = await response.Content.ReadFromJsonAsync<Book>(_jsonOptions);
         response.StatusCode.Should().Be(HttpStatusCode.Created);
         bookResponse.Should().NotBeNull();
     }

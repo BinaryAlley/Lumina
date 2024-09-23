@@ -29,7 +29,7 @@ public sealed class MediaContributorId : EntityId<Guid>
     public static MediaContributorId CreateUnique()
     {
         // TODO: enforce invariants
-        return new MediaContributorId(Guid.NewGuid()); 
+        return new MediaContributorId(Guid.NewGuid());
     }
 
     /// <summary>
@@ -40,7 +40,7 @@ public sealed class MediaContributorId : EntityId<Guid>
     public static MediaContributorId Create(Guid value)
     {
         // TODO: enforce invariants
-        return new MediaContributorId(value); 
+        return new MediaContributorId(value);
     }
 
     /// <inheritdoc/>

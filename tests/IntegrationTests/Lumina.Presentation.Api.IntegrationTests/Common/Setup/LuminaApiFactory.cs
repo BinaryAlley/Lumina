@@ -42,18 +42,15 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
     {
         builder.ConfigureServices(services =>
         {
-            var descriptor = services.SingleOrDefault(serviceDescriptor => serviceDescriptor.ServiceType == typeof(DbContextOptions<LuminaDbContext>));
+            ServiceDescriptor? descriptor = services.SingleOrDefault(serviceDescriptor => serviceDescriptor.ServiceType == typeof(DbContextOptions<LuminaDbContext>));
             if (descriptor is not null)
                 services.Remove(descriptor);
-            services.AddDbContext<LuminaDbContext>(options =>
+            services.AddDbContext<LuminaDbContext>(options => options.UseSqlite(_connection));
+            ServiceProvider servicePreovider = services.BuildServiceProvider();
+            using (IServiceScope scope = servicePreovider.CreateScope())
             {
-                options.UseSqlite(_connection);
-            });
-            var servicePreovider = services.BuildServiceProvider();
-            using (var scope = servicePreovider.CreateScope())
-            {
-                var scopedServices = scope.ServiceProvider;
-                var dbContext = scopedServices.GetRequiredService<LuminaDbContext>();
+                IServiceProvider scopedServices = scope.ServiceProvider;
+                LuminaDbContext dbContext = scopedServices.GetRequiredService<LuminaDbContext>();
                 dbContext.Database.EnsureCreated();
             }
         });

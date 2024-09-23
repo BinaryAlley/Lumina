@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DependencyInjection;
 using Lumina.DataAccess.Common.DependencyInjection;
+using Lumina.Domain.Common.DependencyInjection;
 using Lumina.Infrastructure.Common.DependencyInjection;
 using Lumina.Presentation.Api.Common.DependencyInjection;
-using Lumina.Domain.Common.DependencyInjection; 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
 using System.Threading.Tasks;
@@ -23,8 +23,8 @@ public class Program
     /// <param name="args">Optional command line arguments.</param>
     public static async Task Main(string[] args)
     {
-        var builder = WebApplication.CreateBuilder(args);
-        
+        WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
         builder.Services.BindSharedConfiguration(builder.Configuration);
         builder.Services.BindPresentationApiLayerConfiguration(builder.Configuration);
 
@@ -34,7 +34,7 @@ public class Program
         builder.Services.AddDataAccessLayerServices();
         builder.Services.AddDomainLayerServices();
 
-        var app = builder.Build();
+        WebApplication app = builder.Build();
 
         app.UseCors("AllowAll");
 

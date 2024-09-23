@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using System.Diagnostics.CodeAnalysis;
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using FluentAssertions;
+using Lumina.Infrastructure.Common.Errors;
 using Lumina.Infrastructure.Common.Models.Configuration;
 using Lumina.Infrastructure.Common.Validators;
-using Lumina.Infrastructure.Common.Errors;
+using System.Diagnostics.CodeAnalysis;
 #endregion
 
 namespace Lumina.Infrastructure.UnitTests.Common.Validators;
@@ -38,12 +38,12 @@ public class CommonSettingsModelValidatorTests
     public void CommonSettingsModelValidator_WhenThemeProvided_ShouldNotHaveValidationError()
     {
         // Arrange
-        var model = _fixture.Build<CommonSettingsModel>()
+        CommonSettingsModel model = _fixture.Build<CommonSettingsModel>()
             .With(x => x.Theme, "Dark")
             .Create();
 
         // Act
-        var result = _validator.Validate(model);
+        FluentValidation.Results.ValidationResult result = _validator.Validate(model);
 
         // Assert
         result.IsValid.Should().BeTrue();
@@ -54,12 +54,12 @@ public class CommonSettingsModelValidatorTests
     public void CommonSettingsModelValidator_WhenThemeNotProvided_ShouldNotHaveValidationError()
     {
         // Arrange
-        var model = _fixture.Build<CommonSettingsModel>()
+        CommonSettingsModel model = _fixture.Build<CommonSettingsModel>()
             .With(x => x.Theme, string.Empty)
             .Create();
 
         // Act
-        var result = _validator.Validate(model);
+        FluentValidation.Results.ValidationResult result = _validator.Validate(model);
 
         // Assert
         result.IsValid.Should().BeFalse();

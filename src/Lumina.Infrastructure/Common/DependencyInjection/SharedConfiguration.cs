@@ -24,14 +24,14 @@ public static class SharedConfiguration
     /// <exception cref="DirectoryNotFoundException">Thrown when the base path where the configuration files should be located, does not exist.</exception>
     public static IServiceCollection BindSharedConfiguration(this IServiceCollection services, IConfigurationManager configuration)
     {
-        var basePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        string? basePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         if (!Directory.Exists(basePath))
             throw new DirectoryNotFoundException($"The base path '{basePath}' does not exist.");
         configuration.SetBasePath(basePath);
         configuration.AddJsonFile("appsettings.shared.json", optional: false, reloadOnChange: true);
         configuration.AddJsonFile("appsettings.shared.Development.json", optional: true, reloadOnChange: true);
         configuration.AddEnvironmentVariables(); // environment variables should override the configuration files
-        
+
         // bind the common settings section
         services.AddOptions<CommonSettingsModel>()
                 .Bind(configuration.GetRequiredSection(CommonSettingsModel.SectionName))
@@ -42,7 +42,7 @@ public static class SharedConfiguration
         services.AddOptions<DatabaseSettingsModel>()
                 .Bind(configuration.GetRequiredSection(DatabaseSettingsModel.SectionName))
                 .ValidateFluently()
-                .ValidateOnStart(); 
+                .ValidateOnStart();
         return services;
     }
     #endregion

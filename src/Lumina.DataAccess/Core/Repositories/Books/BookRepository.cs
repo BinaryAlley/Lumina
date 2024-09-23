@@ -43,16 +43,16 @@ internal sealed class BookRepository : IBookRepository
     /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successfull operation, or an error.</returns>
     public async Task<ErrorOr<Created>> InsertAsync(BookModel book, CancellationToken cancellationToken)
     {
-        var jobExists = await _luminaDbContext.Books.AnyAsync(_book => _book.Id == book.Id, cancellationToken: cancellationToken).ConfigureAwait(false);
+        bool jobExists = await _luminaDbContext.Books.AnyAsync(_book => _book.Id == book.Id, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (jobExists)
             return Errors.WrittenContent.BookAlreadyExists;
 
         // fetch existing tags and genres
-        var existingTags = await _luminaDbContext.Set<TagModel>()
+        List<TagModel> existingTags = await _luminaDbContext.Set<TagModel>()
             .Where(t => book.Tags.Select(bt => bt.Name).Contains(t.Name))
             .ToListAsync(cancellationToken).ConfigureAwait(false);
 
-        var existingGenres = await _luminaDbContext.Set<GenreModel>()
+        List<GenreModel> existingGenres = await _luminaDbContext.Set<GenreModel>()
             .Where(g => book.Genres.Select(bg => bg.Name).Contains(g.Name))
             .ToListAsync(cancellationToken).ConfigureAwait(false);
 

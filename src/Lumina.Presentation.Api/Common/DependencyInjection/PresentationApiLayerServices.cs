@@ -25,14 +25,11 @@ public static class PresentationApiLayerServices
     /// <returns>The updated <see cref="IServiceCollection"/>.</returns>
     public static IServiceCollection AddPresentationApiLayerServices(this IServiceCollection services)
     {
-        services.AddCors(options =>
-        {
-            options.AddPolicy("AllowAll",
+        services.AddCors(options => options.AddPolicy("AllowAll",
                  builder => builder
                      .AllowAnyOrigin()
                      .AllowAnyMethod()
-                     .AllowAnyHeader());
-        });
+                     .AllowAnyHeader()));
 
         // add services to the container
         services.AddControllers().AddJsonOptions(options =>
@@ -45,7 +42,7 @@ public static class PresentationApiLayerServices
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
         services.ConfigureOptions<ConfigureSwaggerOptions>();
-        
+
         services.AddApiVersioning(options =>
         {
             options.DefaultApiVersion = new ApiVersion(1, 0);
@@ -62,7 +59,7 @@ public static class PresentationApiLayerServices
         services.AddSingleton<ProblemDetailsFactory, CustomProblemDetailsFactory>();
 
         // register mapster configs
-        var mapsterConfig = TypeAdapterConfig.GlobalSettings;
+        TypeAdapterConfig mapsterConfig = TypeAdapterConfig.GlobalSettings;
         mapsterConfig.Scan(typeof(PresentationApiLayerServices).Assembly);
         services.AddSingleton(mapsterConfig);
         services.AddScoped<IMapper, ServiceMapper>();

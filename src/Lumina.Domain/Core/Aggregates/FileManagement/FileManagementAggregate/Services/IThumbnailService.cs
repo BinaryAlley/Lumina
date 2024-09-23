@@ -9,7 +9,7 @@ namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.S
 /// <summary>
 /// Interface for the service for handling thumbnails.
 /// </summary>
-public interface IThumbnailService 
+public interface IThumbnailService
 {
     #region ===================================================================== METHODS ===================================================================================
     /// <summary>

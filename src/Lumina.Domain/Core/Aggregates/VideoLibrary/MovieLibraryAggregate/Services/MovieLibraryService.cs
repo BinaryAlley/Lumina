@@ -14,9 +14,6 @@ public sealed class MovieLibraryService : IMovieLibraryService
     /// <summary>
     /// Gets the collection of movies in the library.
     /// </summary>
-    public ICollection<Movie> Movies
-    {
-        get { throw new NotImplementedException(); }
-    }
+    public ICollection<Movie> Movies => throw new NotImplementedException();
     #endregion
 }

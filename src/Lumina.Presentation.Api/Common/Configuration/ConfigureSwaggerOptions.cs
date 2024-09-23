@@ -36,8 +36,8 @@ public class ConfigureSwaggerOptions : IConfigureNamedOptions<SwaggerGenOptions>
     public void Configure(SwaggerGenOptions options)
     {
         // add swagger document for every API version discovered
-        foreach (var description in _provider.ApiVersionDescriptions)
-            options.SwaggerDoc(description.GroupName,CreateVersionInfo(description));
+        foreach (ApiVersionDescription description in _provider.ApiVersionDescriptions)
+            options.SwaggerDoc(description.GroupName, CreateVersionInfo(description));
     }
 
     /// <summary>
@@ -57,7 +57,7 @@ public class ConfigureSwaggerOptions : IConfigureNamedOptions<SwaggerGenOptions>
     /// <returns>The created <see cref="OpenApiInfo"/> instance.</returns>
     private OpenApiInfo CreateVersionInfo(ApiVersionDescription description)
     {
-        var info = new OpenApiInfo()
+        OpenApiInfo info = new()
         {
             Title = "Lumina API",
             Version = description.ApiVersion.ToString()

@@ -64,15 +64,15 @@ public class AddBookCommandHandlerTests
     public async Task Handle_WhenCalledWithValidCommand_ShouldReturnSuccessResult()
     {
         // Arrange
-        var bookCommand = _commandBookFixture.CreateCommandBook();
-        var bookModel = _fixture.Create<BookModel>();
+        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        BookModel bookModel = _fixture.Create<BookModel>();
 
         _mockMapper.Map<BookModel>(Arg.Any<Book>()).Returns(bookModel);
         _mockBookRepository.InsertAsync(Arg.Any<BookModel>(), Arg.Any<CancellationToken>())
             .Returns(Result.Created);
 
         // Act
-        var result = await _sut.Handle(bookCommand, CancellationToken.None);
+        ErrorOr<Book> result = await _sut.Handle(bookCommand, CancellationToken.None);
 
         // Assert
         result.IsError.Should().BeFalse();
@@ -85,11 +85,11 @@ public class AddBookCommandHandlerTests
     public async Task Handle_WhenBookCreationFails_ShouldReturnFailureResult()
     {
         // Arrange
-        var bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata with { Title = null } };
 
         // Act
-        var result = await _sut.Handle(bookCommand, CancellationToken.None);
+        ErrorOr<Book> result = await _sut.Handle(bookCommand, CancellationToken.None);
 
         // Assert
         result.IsError.Should().BeTrue();
@@ -102,15 +102,15 @@ public class AddBookCommandHandlerTests
     public async Task Handle_WhenRepositoryInsertFails_ShouldReturnFailureResult()
     {
         // Arrange
-        var bookCommand = _commandBookFixture.CreateCommandBook();
-        var bookModel = _fixture.Create<BookModel>();
-       
+        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        BookModel bookModel = _fixture.Create<BookModel>();
+
         _mockMapper.Map<BookModel>(Arg.Any<Book>()).Returns(bookModel);
         _mockBookRepository.InsertAsync(Arg.Any<BookModel>(), Arg.Any<CancellationToken>())
             .Returns(Errors.WrittenContent.BookAlreadyExists);
 
         // Act
-        var result = await _sut.Handle(bookCommand, CancellationToken.None);
+        ErrorOr<Book> result = await _sut.Handle(bookCommand, CancellationToken.None);
 
         // Assert
         result.IsError.Should().BeTrue();
@@ -123,11 +123,11 @@ public class AddBookCommandHandlerTests
     public async Task Handle_WhenCalledWithInvalidISBN_ShouldReturnFailureResult()
     {
         // Arrange
-        var bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
         bookCommand = bookCommand with { ISBNs = [new IsbnModel("invalid", IsbnFormat.Isbn13)] };
 
         // Act
-        var result = await _sut.Handle(bookCommand, CancellationToken.None);
+        ErrorOr<Book> result = await _sut.Handle(bookCommand, CancellationToken.None);
 
         // Assert
         result.IsError.Should().BeTrue();
@@ -140,11 +140,11 @@ public class AddBookCommandHandlerTests
     public async Task Handle_WhenCalledWithInvalidRating_ShouldReturnFailureResult()
     {
         // Arrange
-        var bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
         bookCommand = bookCommand with { Ratings = [new BookRatingModel(-1, 5, null, null)] };
 
         // Act
-        var result = await _sut.Handle(bookCommand, CancellationToken.None);
+        ErrorOr<Book> result = await _sut.Handle(bookCommand, CancellationToken.None);
 
         // Assert
         result.IsError.Should().BeTrue();
@@ -157,7 +157,7 @@ public class AddBookCommandHandlerTests
     public async Task Handle_WhenGenreCreationFails_ShouldReturnFailureResult()
     {
         // Arrange
-        var bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
         bookCommand = bookCommand with
         {
             Metadata = bookCommand.Metadata with
@@ -167,7 +167,7 @@ public class AddBookCommandHandlerTests
         };
 
         // Act
-        var result = await _sut.Handle(bookCommand, CancellationToken.None);
+        ErrorOr<Book> result = await _sut.Handle(bookCommand, CancellationToken.None);
 
         // Assert
         result.IsError.Should().BeTrue();
@@ -180,7 +180,7 @@ public class AddBookCommandHandlerTests
     public async Task Handle_WhenTagCreationFails_ShouldReturnFailureResult()
     {
         // Arrange
-        var bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
         bookCommand = bookCommand with
         {
             Metadata = bookCommand.Metadata with
@@ -190,7 +190,7 @@ public class AddBookCommandHandlerTests
         };
 
         // Act
-        var result = await _sut.Handle(bookCommand, CancellationToken.None);
+        ErrorOr<Book> result = await _sut.Handle(bookCommand, CancellationToken.None);
 
         // Assert
         result.IsError.Should().BeTrue();
@@ -203,7 +203,7 @@ public class AddBookCommandHandlerTests
     public async Task Handle_WhenReleaseInfoCreationFails_ShouldReturnFailureResult()
     {
         // Arrange
-        var bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
         bookCommand = bookCommand with
         {
             Metadata = bookCommand.Metadata with
@@ -220,7 +220,7 @@ public class AddBookCommandHandlerTests
         };
 
         // Act
-        var result = await _sut.Handle(bookCommand, CancellationToken.None);
+        ErrorOr<Book> result = await _sut.Handle(bookCommand, CancellationToken.None);
 
         // Assert
         result.IsError.Should().BeTrue();
@@ -233,7 +233,7 @@ public class AddBookCommandHandlerTests
     public async Task Handle_WhenLanguageInfoCreationFails_ShouldReturnFailureResult()
     {
         // Arrange
-        var bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
         bookCommand = bookCommand with
         {
             Metadata = bookCommand.Metadata with
@@ -243,7 +243,7 @@ public class AddBookCommandHandlerTests
         };
 
         // Act
-        var result = await _sut.Handle(bookCommand, CancellationToken.None);
+        ErrorOr<Book> result = await _sut.Handle(bookCommand, CancellationToken.None);
 
         // Assert
         result.IsError.Should().BeTrue();
@@ -256,7 +256,7 @@ public class AddBookCommandHandlerTests
     public async Task Handle_WhenOriginalLanguageInfoCreationFails_ShouldReturnFailureResult()
     {
         // Arrange
-        var bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
         bookCommand = bookCommand with
         {
             Metadata = bookCommand.Metadata with
@@ -266,7 +266,7 @@ public class AddBookCommandHandlerTests
         };
 
         // Act
-        var result = await _sut.Handle(bookCommand, CancellationToken.None);
+        ErrorOr<Book> result = await _sut.Handle(bookCommand, CancellationToken.None);
 
         // Assert
         result.IsError.Should().BeTrue();

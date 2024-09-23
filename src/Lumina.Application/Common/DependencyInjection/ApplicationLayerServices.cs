@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
+using FluentValidation;
 using Lumina.Application.Common.Behaviors;
+using Mapster;
+using MapsterMapper;
 using Mediator;
 using Microsoft.Extensions.DependencyInjection;
-using FluentValidation;
-using MapsterMapper;
-using Mapster;
 #endregion
 
 namespace Lumina.Application.Common.DependencyInjection;
@@ -23,10 +23,7 @@ public static class ApplicationLayerServices
     public static IServiceCollection AddApplicationLayerServices(this IServiceCollection services)
     {
         // register Mediator
-        services.AddMediator(options =>
-        {
-            options.ServiceLifetime = ServiceLifetime.Scoped;
-        });
+        services.AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped);
 
         // register the validation behavior
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
@@ -35,7 +32,7 @@ public static class ApplicationLayerServices
         services.AddValidatorsFromAssembly(typeof(ApplicationLayerServices).Assembly);
 
         // register mapster configs in this assembly
-        var mapsterConfig = TypeAdapterConfig.GlobalSettings;
+        TypeAdapterConfig mapsterConfig = TypeAdapterConfig.GlobalSettings;
         mapsterConfig.Scan(typeof(ApplicationLayerServices).Assembly);
         services.AddSingleton(mapsterConfig);
         services.AddScoped<IMapper, ServiceMapper>();

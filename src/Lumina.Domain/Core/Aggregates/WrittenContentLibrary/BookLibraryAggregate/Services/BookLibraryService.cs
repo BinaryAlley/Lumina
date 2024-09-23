@@ -14,9 +14,6 @@ public sealed class BookLibraryService : IBookLibraryService
     /// <summary>
     /// Gets the collection of books in the library.
     /// </summary>
-    public ICollection<Book> Books
-    {
-        get { throw new NotImplementedException(); }
-    }
+    public ICollection<Book> Books => throw new NotImplementedException();
     #endregion
 }

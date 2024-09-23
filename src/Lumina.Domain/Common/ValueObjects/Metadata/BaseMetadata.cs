@@ -18,12 +18,12 @@ public abstract class BaseMetadata : ValueObject
     private readonly List<Tag> _tags;
     private readonly List<Genre> _genres;
     #endregion
-    
+
     #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the title of the media item.
     /// </summary>
-    public string Title { get; private set;}
+    public string Title { get; private set; }
 
     /// <summary>
     /// Gets the original title of the media item.
@@ -44,7 +44,7 @@ public abstract class BaseMetadata : ValueObject
     /// Gets the optional language of the media item.
     /// </summary>
     public Optional<LanguageInfo> Language { get; private set; }
-    
+
     /// <summary>
     /// Gets the optional original language of the media item. 
     /// </summary>
@@ -53,18 +53,12 @@ public abstract class BaseMetadata : ValueObject
     /// <summary>
     /// Gets the list of tags associated with the media item.
     /// </summary>
-    public IReadOnlyCollection<Tag> Tags 
-    {
-        get { return _tags.AsReadOnly(); }
-    }
-    
+    public IReadOnlyCollection<Tag> Tags => _tags.AsReadOnly();
+
     /// <summary>
     /// Gets the list of genres associated with the media item.
     /// </summary>
-    public IReadOnlyCollection<Genre> Genres 
-    {
-        get { return _genres.AsReadOnly(); }
-    }
+    public IReadOnlyCollection<Genre> Genres => _genres.AsReadOnly();
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================
@@ -81,13 +75,13 @@ public abstract class BaseMetadata : ValueObject
     /// <param name="originalLanguage">The optional original language of the element to which this metadata object belongs to.</param>
     /// <exception cref="ArgumentNullException">Thrown when the <see cref="title"/> value is <see langword="null"/></exception>
     protected BaseMetadata(
-        string title, 
-        Optional<string> originalTitle, 
-        Optional<string> description, 
-        ReleaseInfo releaseInfo, 
-        List<Genre> genres, 
-        List<Tag> tags, 
-        Optional<LanguageInfo> language, 
+        string title,
+        Optional<string> originalTitle,
+        Optional<string> description,
+        ReleaseInfo releaseInfo,
+        List<Genre> genres,
+        List<Tag> tags,
+        Optional<LanguageInfo> language,
         Optional<LanguageInfo> originalLanguage)
     {
         Title = title ?? throw new ArgumentNullException(nameof(title));
@@ -109,9 +103,9 @@ public abstract class BaseMetadata : ValueObject
         yield return OriginalTitle;
         yield return Description;
         yield return ReleaseInfo;
-        foreach (var genre in _genres)
+        foreach (Genre genre in _genres)
             yield return genre;
-        foreach (var tag in _tags)
+        foreach (Tag tag in _tags)
             yield return tag;
         yield return Language;
         yield return OriginalLanguage;

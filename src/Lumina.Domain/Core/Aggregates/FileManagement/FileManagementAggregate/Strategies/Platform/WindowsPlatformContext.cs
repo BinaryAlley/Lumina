@@ -15,7 +15,7 @@ public class WindowsPlatformContext : IWindowsPlatformContext
     /// Gets the platform type, which is Windows for this context.
     /// </summary>
     public PlatformType Platform { get; } = PlatformType.Windows;
- 
+
     /// <summary>
     /// Gets the path strategy for Windows platforms.
     /// </summary>

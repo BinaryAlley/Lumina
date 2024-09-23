@@ -30,18 +30,12 @@ public sealed class Movie : Entity<MovieId>
     /// <summary>
     /// Gets the list of ratings for this movie.
     /// </summary>
-    public IReadOnlyCollection<Rating> Ratings 
-    {
-        get { return _ratings.AsReadOnly(); }
-    }
+    public IReadOnlyCollection<Rating> Ratings => _ratings.AsReadOnly();
 
     /// <summary>
     /// Gets the list of media contributors (actors, directors, etc) starring in this movie.
     /// </summary>
-    public IReadOnlyCollection<MediaContributorId> Contributors 
-    {
-        get { return _contributors.AsReadOnly(); }
-    }
+    public IReadOnlyCollection<MediaContributorId> Contributors => _contributors.AsReadOnly();
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================
@@ -66,7 +60,7 @@ public sealed class Movie : Entity<MovieId>
     /// </summary>
     private Movie() // only needed during reflection
     {
-        
+
     }
 #pragma warning restore CS8618
     #endregion

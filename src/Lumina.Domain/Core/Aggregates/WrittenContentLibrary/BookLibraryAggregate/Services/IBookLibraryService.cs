@@ -14,7 +14,7 @@ public interface IBookLibraryService
     /// Gets the collection of books in the library.
     /// </summary>
     ICollection<Book> Books { get; }
-    
+
     // ICollection<BookSeries> Series { get; }
     #endregion
 

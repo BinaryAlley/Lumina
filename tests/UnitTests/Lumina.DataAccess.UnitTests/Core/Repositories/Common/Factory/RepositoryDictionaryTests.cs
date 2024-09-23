@@ -36,8 +36,8 @@ public class RepositoryDictionaryTests
     public void Add_WhenValidRepositoryItemIsAdded_ShouldIncreaseCount()
     {
         // Arrange
-        var bookRepository = _fixture.Create<BookRepository>();
-        var repositoryDictionary = new RepositoryDictionary();
+        BookRepository bookRepository = _fixture.Create<BookRepository>();
+        RepositoryDictionary repositoryDictionary = new();
 
         // Act
         repositoryDictionary.Add<IBookRepository>(bookRepository);
@@ -50,8 +50,8 @@ public class RepositoryDictionaryTests
     public void Clear_WhenCalled_ShouldRemoveAllItems()
     {
         // Arrange
-        var bookRepository = _fixture.Create<BookRepository>();
-        var repositoryDictionary = new RepositoryDictionary();
+        BookRepository bookRepository = _fixture.Create<BookRepository>();
+        RepositoryDictionary repositoryDictionary = new();
         repositoryDictionary.Add<IBookRepository>(bookRepository);
 
         // Act
@@ -65,12 +65,12 @@ public class RepositoryDictionaryTests
     public void Get_WhenRepositoryExists_ShouldReturnCorrectRepository()
     {
         // Arrange
-        var expected = _fixture.Create<BookRepository>();
-        var repositoryDictionary = new RepositoryDictionary();
+        BookRepository expected = _fixture.Create<BookRepository>();
+        RepositoryDictionary repositoryDictionary = new();
         repositoryDictionary.Add<IBookRepository>(expected);
 
         // Act
-        var actual = repositoryDictionary.Get<IBookRepository>(typeof(BookRepository));
+        IBookRepository actual = repositoryDictionary.Get<IBookRepository>(typeof(BookRepository));
 
         // Assert
         actual.Should().BeSameAs(expected);
@@ -80,7 +80,7 @@ public class RepositoryDictionaryTests
     public void Add_WhenNullValueIsProvided_ShouldThrowArgumentException()
     {
         // Arrange
-        var repositoryDictionary = new RepositoryDictionary();
+        RepositoryDictionary repositoryDictionary = new();
 
         // Act & Assert
         Action act = () => repositoryDictionary.Add<IBookRepository>(null!);
@@ -91,8 +91,8 @@ public class RepositoryDictionaryTests
     public void Add_WhenDuplicateValueIsAdded_ShouldThrowArgumentException()
     {
         // Arrange
-        var bookRepository = _fixture.Create<BookRepository>();
-        var repositoryDictionary = new RepositoryDictionary();
+        BookRepository bookRepository = _fixture.Create<BookRepository>();
+        RepositoryDictionary repositoryDictionary = new();
         repositoryDictionary.Add<IBookRepository>(bookRepository);
 
         // Act & Assert
@@ -104,8 +104,8 @@ public class RepositoryDictionaryTests
     public void Add_WhenNonRepositoryValueIsAdded_ShouldThrowArgumentException()
     {
         // Arrange
-        var nonRepository = new object();
-        var repositoryDictionary = new RepositoryDictionary();
+        object nonRepository = new();
+        RepositoryDictionary repositoryDictionary = new();
 
         // Act & Assert
         Action act = () => repositoryDictionary.Add(nonRepository);

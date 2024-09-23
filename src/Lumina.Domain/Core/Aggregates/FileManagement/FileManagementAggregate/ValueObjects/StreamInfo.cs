@@ -20,37 +20,37 @@ public class StreamInfo : ValueObject
     /// Gets the id of the stream.
     /// </summary>
     public string StreamId { get; }
-    
+
     /// <summary>
     /// Gets the MimeType of the stream.
     /// </summary>
     public string MimeType { get; }
-    
+
     /// <summary>
     /// Gets the bitrate of the stream.
     /// </summary>
     public int Bitrate { get; }
-    
+
     /// <summary>
     /// Gets the codec of the stream.
     /// </summary>
     public string Codec { get; }
-    
+
     /// <summary>
     /// Gets the optional resolution of the stream.
     /// </summary>
     public Optional<string> Resolution { get; }
-    
+
     /// <summary>
     /// Gets the optional frame rate of the stream.
     /// </summary>
     public Optional<float> FrameRate { get; }
-    
+
     /// <summary>
     /// Gets the optional sample rate of the stream.
     /// </summary>
     public Optional<int> SampleRate { get; }
-    
+
     /// <summary>
     /// Gets the optional channels of the stream.
     /// </summary>
@@ -70,13 +70,13 @@ public class StreamInfo : ValueObject
     /// <param name="sampleRate">The sample rate of the stream (for audio).</param>
     /// <param name="channels">The number of channels (for audio).</param>
     private StreamInfo(
-        string streamId, 
-        string mimeType, 
-        int bitrate, 
+        string streamId,
+        string mimeType,
+        int bitrate,
         string codec,
-        Optional<string> resolution, 
+        Optional<string> resolution,
         Optional<float> frameRate,
-        Optional<int> sampleRate, 
+        Optional<int> sampleRate,
         Optional<int> channels)
     {
         StreamId = streamId;
@@ -106,24 +106,24 @@ public class StreamInfo : ValueObject
     /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="StreamInfo"/>, or an error message.
     /// </returns>
     public static ErrorOr<StreamInfo> Create(
-        string streamId, 
-        string mimeType, 
-        int bitrate, 
+        string streamId,
+        string mimeType,
+        int bitrate,
         string codec,
-        Optional<string> resolution, 
-        Optional<float> frameRate, 
-        Optional<int> sampleRate, 
+        Optional<string> resolution,
+        Optional<float> frameRate,
+        Optional<int> sampleRate,
         Optional<int> channels)
     {
-        if (streamId is null)
-            return Errors.FileManagement.StreamIdCannotBeEmpty;
-        if (codec is null)
-            return Errors.FileManagement.CodecCannotBeEmpty;
-        if (bitrate <= 0)
-            return Errors.FileManagement.BitrateMustBeAPositiveNumber;
-        return new StreamInfo(streamId, mimeType, bitrate, codec, resolution, frameRate, sampleRate, channels);
+        return streamId is null
+            ? (ErrorOr<StreamInfo>)Errors.FileManagement.StreamIdCannotBeEmpty
+            : codec is null
+            ? (ErrorOr<StreamInfo>)Errors.FileManagement.CodecCannotBeEmpty
+            : bitrate <= 0
+            ? (ErrorOr<StreamInfo>)Errors.FileManagement.BitrateMustBeAPositiveNumber
+            : (ErrorOr<StreamInfo>)new StreamInfo(streamId, mimeType, bitrate, codec, resolution, frameRate, sampleRate, channels);
     }
-    
+
     /// <inheritdoc/>
     public override IEnumerable<object> GetEqualityComponents()
     {

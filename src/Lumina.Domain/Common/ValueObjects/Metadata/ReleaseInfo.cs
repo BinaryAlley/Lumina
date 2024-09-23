@@ -59,11 +59,11 @@ public class ReleaseInfo : ValueObject
     /// <param name="releaseCountry">The optional country or region of release.</param>
     /// <param name="releaseVersion">The optional release version or edition.</param>
     private ReleaseInfo(
-        Optional<DateOnly> originalReleaseDate, 
+        Optional<DateOnly> originalReleaseDate,
         Optional<int> originalReleaseYear,
-        Optional<DateOnly> reReleaseDate, 
-        Optional<int> reReleaseYear, 
-        Optional<string> releaseCountry, 
+        Optional<DateOnly> reReleaseDate,
+        Optional<int> reReleaseYear,
+        Optional<string> releaseCountry,
         Optional<string> releaseVersion)
     {
         OriginalReleaseDate = originalReleaseDate;
@@ -89,22 +89,22 @@ public class ReleaseInfo : ValueObject
     /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="ReleaseInfo"/>, or an error message.
     /// </returns>
     public static ErrorOr<ReleaseInfo> Create(
-        Optional<DateOnly> originalReleaseDate, 
+        Optional<DateOnly> originalReleaseDate,
         Optional<int> originalReleaseYear,
-        Optional<DateOnly> reReleaseDate, 
-        Optional<int> reReleaseYear, 
-        Optional<string> releaseCountry, 
+        Optional<DateOnly> reReleaseDate,
+        Optional<int> reReleaseYear,
+        Optional<string> releaseCountry,
         Optional<string> releaseVersion)
     {
-        if (originalReleaseDate.HasValue && originalReleaseYear.HasValue && originalReleaseDate.Value.Year != originalReleaseYear.Value)
-            return Errors.Errors.Metadata.OriginalReleaseDateAndYearMustMatch;
-        if (reReleaseDate.HasValue && reReleaseYear.HasValue && reReleaseDate.Value.Year != reReleaseYear.Value)
-            return Errors.Errors.Metadata.ReReleaseDateAndYearMustMatch;
-        if (originalReleaseDate.HasValue && reReleaseDate.HasValue && originalReleaseDate.Value > reReleaseDate.Value)
-            return Errors.Errors.Metadata.ReReleaseDateCannotBeEarlierThanOriginalReleaseDate;
-        if (originalReleaseYear.HasValue && reReleaseYear.HasValue && originalReleaseYear.Value > reReleaseYear.Value)
-            return Errors.Errors.Metadata.ReReleaseYearCannotBeEarlierThanOriginalReleaseYear;
-        return new ReleaseInfo(originalReleaseDate, originalReleaseYear, reReleaseDate, reReleaseYear, releaseCountry, releaseVersion);
+        return originalReleaseDate.HasValue && originalReleaseYear.HasValue && originalReleaseDate.Value.Year != originalReleaseYear.Value
+            ? (ErrorOr<ReleaseInfo>)Errors.Errors.Metadata.OriginalReleaseDateAndYearMustMatch
+            : reReleaseDate.HasValue && reReleaseYear.HasValue && reReleaseDate.Value.Year != reReleaseYear.Value
+            ? (ErrorOr<ReleaseInfo>)Errors.Errors.Metadata.ReReleaseDateAndYearMustMatch
+            : originalReleaseDate.HasValue && reReleaseDate.HasValue && originalReleaseDate.Value > reReleaseDate.Value
+            ? (ErrorOr<ReleaseInfo>)Errors.Errors.Metadata.ReReleaseDateCannotBeEarlierThanOriginalReleaseDate
+            : originalReleaseYear.HasValue && reReleaseYear.HasValue && originalReleaseYear.Value > reReleaseYear.Value
+            ? (ErrorOr<ReleaseInfo>)Errors.Errors.Metadata.ReReleaseYearCannotBeEarlierThanOriginalReleaseYear
+            : (ErrorOr<ReleaseInfo>)new ReleaseInfo(originalReleaseDate, originalReleaseYear, reReleaseDate, reReleaseYear, releaseCountry, releaseVersion);
     }
 
     /// <inheritdoc/>

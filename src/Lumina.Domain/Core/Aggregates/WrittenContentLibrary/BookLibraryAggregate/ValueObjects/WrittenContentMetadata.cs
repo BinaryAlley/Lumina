@@ -48,7 +48,7 @@ public class WrittenContentMetadata : BaseMetadata
         ReleaseInfo releaseInfo,
         List<Genre> genres,
         List<Tag> tags,
-        Optional<LanguageInfo> language, 
+        Optional<LanguageInfo> language,
         Optional<LanguageInfo> originalLanguage,
         Optional<string> publisher,
         Optional<int> pageCount)
@@ -88,23 +88,23 @@ public class WrittenContentMetadata : BaseMetadata
         Optional<string> publisher,
         Optional<int> pageCount)
     {
-        if (string.IsNullOrWhiteSpace(title))
-            return Errors.Metadata.TitleCannotBeEmpty;
-        if (releaseInfo is null)
-            return Errors.Metadata.ReleaseInfoCannotBeNull;
-        if (genres is null)
-            return Errors.Metadata.GenresListCannotBeNull;
-        if (tags is null)
-            return Errors.Metadata.TagsListCannotBeNull;
-        return new WrittenContentMetadata(
-            title, 
-            originalTitle, 
-            description, 
-            releaseInfo, 
-            genres, tags, 
-            language, 
-            originalLanguage, 
-            publisher, 
+        return string.IsNullOrWhiteSpace(title)
+            ? (ErrorOr<WrittenContentMetadata>)Errors.Metadata.TitleCannotBeEmpty
+            : releaseInfo is null
+            ? (ErrorOr<WrittenContentMetadata>)Errors.Metadata.ReleaseInfoCannotBeNull
+            : genres is null
+            ? (ErrorOr<WrittenContentMetadata>)Errors.Metadata.GenresListCannotBeNull
+            : tags is null
+            ? (ErrorOr<WrittenContentMetadata>)Errors.Metadata.TagsListCannotBeNull
+            : (ErrorOr<WrittenContentMetadata>)new WrittenContentMetadata(
+            title,
+            originalTitle,
+            description,
+            releaseInfo,
+            genres, tags,
+            language,
+            originalLanguage,
+            publisher,
             pageCount
         );
     }
@@ -112,7 +112,7 @@ public class WrittenContentMetadata : BaseMetadata
     /// <inheritdoc/>
     public override IEnumerable<object> GetEqualityComponents()
     {
-        foreach (var component in base.GetEqualityComponents())
+        foreach (object component in base.GetEqualityComponents())
             yield return component;
         yield return Publisher;
         yield return PageCount;

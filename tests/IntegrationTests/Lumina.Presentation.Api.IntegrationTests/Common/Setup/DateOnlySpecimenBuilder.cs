@@ -21,9 +21,7 @@ public class DateOnlySpecimenBuilder : ISpecimenBuilder
     /// <returns>A specimen based on the request.</returns>
     public object Create(object request, ISpecimenContext context)
     {
-        if (request is Type type && type == typeof(DateOnly))
-            return DateOnly.FromDateTime(DateTime.Now);
-        return new NoSpecimen();
+        return request is Type type && type == typeof(DateOnly) ? DateOnly.FromDateTime(DateTime.Now) : (object)new NoSpecimen();
     }
     #endregion
 }

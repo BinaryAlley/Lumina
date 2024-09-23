@@ -16,17 +16,11 @@ public readonly struct Optional<TValue>
     /// Gets a value indicating whether this structure has a value.
     /// </summary>
     public bool HasValue { get; }
-    
+
     /// <summary>
     /// Gets the value represented by this structure.
     /// </summary>
-    public TValue Value
-    {
-        get
-        {
-            return HasValue ? _value! : default!;
-        }
-    }
+    public TValue Value => HasValue ? _value! : default!;
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================

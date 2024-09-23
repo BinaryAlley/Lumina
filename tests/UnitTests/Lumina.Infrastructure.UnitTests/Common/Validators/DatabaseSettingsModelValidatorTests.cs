@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using System.Diagnostics.CodeAnalysis;
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using FluentAssertions;
+using Lumina.Infrastructure.Common.Errors;
 using Lumina.Infrastructure.Common.Models.Configuration;
 using Lumina.Infrastructure.Common.Validators;
-using Lumina.Infrastructure.Common.Errors;
+using System.Diagnostics.CodeAnalysis;
 #endregion
 
 namespace Lumina.Infrastructure.UnitTests.Common.Validators;
@@ -37,12 +37,12 @@ public class DatabaseSettingsModelValidatorTests
     public void DatabaseSettingsModelValidator_WhenDefaultConnectionProvided_ShouldNotHaveValidationError()
     {
         // Arrange
-        var model = _fixture.Build<DatabaseSettingsModel>()
+        DatabaseSettingsModel model = _fixture.Build<DatabaseSettingsModel>()
             .With(x => x.DefaultConnection, "dummy-connection-string")
             .Create();
 
         // Act
-        var result = _validator.Validate(model);
+        FluentValidation.Results.ValidationResult result = _validator.Validate(model);
 
         // Assert
         result.IsValid.Should().BeTrue();
@@ -53,12 +53,12 @@ public class DatabaseSettingsModelValidatorTests
     public void DatabaseSettingsModelValidator_WhenDefaultConnectionNotProvided_ShouldHaveValidationError()
     {
         // Arrange
-        var model = _fixture.Build<DatabaseSettingsModel>()
+        DatabaseSettingsModel model = _fixture.Build<DatabaseSettingsModel>()
             .With(x => x.DefaultConnection, string.Empty)
             .Create();
 
         // Act
-        var result = _validator.Validate(model);
+        FluentValidation.Results.ValidationResult result = _validator.Validate(model);
 
         // Assert
         result.IsValid.Should().BeFalse();

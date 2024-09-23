@@ -1,8 +1,8 @@
 ﻿#region ========================================================================= USING =====================================================================================
+using Lumina.Contracts.Models.FileManagement;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Lumina.Contracts.Models.FileManagement;
 #endregion
 
 namespace Lumina.Contracts.Responses.FileManagement;

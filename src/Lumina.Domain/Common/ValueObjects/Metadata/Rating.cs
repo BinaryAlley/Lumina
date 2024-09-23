@@ -51,7 +51,7 @@ public abstract class Rating : ValueObject
     /// <returns>The rating value as a percentage of the maximum value.</returns>
     public decimal AsPercentage()
     {
-        return (Value / MaxValue) * 100;
+        return Value / MaxValue * 100;
     }
     #endregion
 }

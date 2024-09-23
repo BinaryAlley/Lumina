@@ -1,4 +1,4 @@
-﻿@page "/library/manage/item"
+@page "/library/manage/item"
 @page "/library/manage/item/{id:guid}"
 
 @using Lumina.Presentation.Web.Common.Enums.AudioLibrary
@@ -51,7 +51,7 @@
                                 <td>@item.Column1</td>
                                 <td>@item.Column2</td>
                                 <td>
-                                    <MultiDirectorySelector  />
+                                    @* <MultiDirectorySelector  /> *@
                                 </td>
                             </tr>
                         }
@@ -165,14 +165,19 @@
         // Perform save operation
         isSaving = false;
         Console.WriteLine("saved");
+        await Task.CompletedTask;
     }
 
     private async Task CancelOperation()
     {
         isCancelling = true;
         // Perform cancel operation
-        isCancelling = false;
-        Console.WriteLine("cancelled");
+        if (!isCancelling)
+            isCancelling = false;
+        selectedValue2 = new ComboboxItem<string>();
+        if (selectedValue2 is not null)
+            Console.WriteLine("cancelled");
+        await Task.CompletedTask;
     }
 
     private List<TableItem> tableData = new List<TableItem>
@@ -183,8 +188,8 @@
 
     public class TableItem
     {
-        public string Column1 { get; set; }
-        public string Column2 { get; set; }
-        public List<string> Directories { get; set; }
+        public string? Column1 { get; set; }
+        public string? Column2 { get; set; }
+        public List<string>? Directories { get; set; }
     }
 }

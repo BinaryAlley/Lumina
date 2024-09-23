@@ -25,7 +25,7 @@ public class OptionalJsonConverter<TValue> : JsonConverter<Optional<TValue>>
     {
         if (reader.TokenType == JsonTokenType.Null)
             return Optional<TValue>.None();
-        var value = JsonSerializer.Deserialize<TValue>(ref reader, options);
+        TValue? value = JsonSerializer.Deserialize<TValue>(ref reader, options);
         return Optional<TValue>.Some(value!);
     }
 

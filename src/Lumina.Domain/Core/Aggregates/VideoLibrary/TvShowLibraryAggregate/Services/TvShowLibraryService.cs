@@ -14,9 +14,6 @@ public class TvShowLibraryService : ITvShowLibraryService
     /// <summary>
     /// Gets the collection of TV shows in the library.
     /// </summary>
-    public ICollection<TvShow> TvShows
-    {
-        get { throw new NotImplementedException(); }
-    }
+    public ICollection<TvShow> TvShows => throw new NotImplementedException();
     #endregion
 }

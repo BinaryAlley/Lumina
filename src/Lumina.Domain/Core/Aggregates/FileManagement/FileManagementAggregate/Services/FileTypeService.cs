@@ -60,7 +60,7 @@ public class FileTypeService : IFileTypeService
         if (!_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadContents))
             return Errors.Permission.UnauthorizedAccess;
         Memory<byte> buffer = new byte[BUFFER_SIZE];
-        using var stream = _fileSystem.FileStream.New(path.Path, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.ReadWrite);
+        using FileSystemStream stream = _fileSystem.FileStream.New(path.Path, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.ReadWrite);
         // check if the file's length is less than the buffer size
         if (stream.Length < BUFFER_SIZE)
             return ImageType.None;
@@ -73,12 +73,9 @@ public class FileTypeService : IFileTypeService
             return type;
         // no known image header types were found, check other methods
         string content = Encoding.UTF8.GetString(buffer.ToArray());
-        if (IsSvg(content, path.Path))
-            return ImageType.SVG;
-        else if (IsTga(buffer.ToArray()))
-            return ImageType.TGA;
-        else
-            return ImageType.None;
+        return IsSvg(content, path.Path)
+            ? (ErrorOr<ImageType>)ImageType.SVG
+            : IsTga(buffer.ToArray()) ? (ErrorOr<ImageType>)ImageType.TGA : (ErrorOr<ImageType>)ImageType.None;
     }
 
     /// <summary>
@@ -96,7 +93,7 @@ public class FileTypeService : IFileTypeService
         if (initialContent.StartsWith("<?xml", StringComparison.OrdinalIgnoreCase))
         {
             // Read more content from the file
-            using var stream = _fileSystem.FileStream.New(path, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.ReadWrite);
+            using FileSystemStream stream = _fileSystem.FileStream.New(path, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.ReadWrite);
             byte[] svgBuffer = new byte[1000];
             stream.Read(svgBuffer, 0, 1000);
             string extendedContent = Encoding.UTF8.GetString(svgBuffer);
@@ -116,7 +113,7 @@ public class FileTypeService : IFileTypeService
         if (buffer.Length < 18)
             return false;
         byte imageType = buffer[2];
-        return imageType == 1 || imageType == 2 || imageType == 10;
+        return imageType is 1 or 2 or 10;
     }
 
     /// <summary>

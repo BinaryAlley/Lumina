@@ -1,12 +1,12 @@
 ﻿#region ========================================================================= USING =====================================================================================
-using System;
 using ErrorOr;
-using System.Collections.Generic;
 using Lumina.Domain.Common.Errors;
-using System.Text.RegularExpressions;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.ValueObjects;
-using System.Linq;
+using System;
+using System.Collections.Generic;
 using System.IO.Abstractions;
+using System.Linq;
+using System.Text.RegularExpressions;
 #endregion
 
 namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Strategies.Path;
@@ -21,10 +21,7 @@ public class WindowsPathStrategy : IWindowsPathStrategy
     #endregion
 
     #region ==================================================================== PROPERTIES =================================================================================
-    public char PathSeparator
-    {
-        get { return '\\'; }
-    }
+    public char PathSeparator => '\\';
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================
@@ -47,12 +44,12 @@ public class WindowsPathStrategy : IWindowsPathStrategy
     public bool IsValidPath(FileSystemPathId path)
     {
         // check for invalid path characters
-        var invalidChars = GetInvalidPathCharsForPlatform();
+        char[] invalidChars = GetInvalidPathCharsForPlatform();
         if (path.Path.IndexOfAny(invalidChars) >= 0)
             return false;
         // regular expression to match valid absolute paths
         // this allows drive letters (e.g., C:\) and UNC paths (e.g., \\server\share)
-        var pathPattern = @"^[a-zA-Z]:\\(?:[a-zA-Z0-9\s()._-]+\\)*[a-zA-Z0-9\s()._-]*\\?$"; 
+        string pathPattern = @"^[a-zA-Z]:\\(?:[a-zA-Z0-9\s()._-]+\\)*[a-zA-Z0-9\s()._-]*\\?$";
         return Regex.IsMatch(path.Path, pathPattern);
     }
 
@@ -92,18 +89,18 @@ public class WindowsPathStrategy : IWindowsPathStrategy
     public ErrorOr<IEnumerable<PathSegment>> ParsePath(FileSystemPathId path)
     {
         // Windows paths usually start with a drive letter and colon, e.g., "C:"
-        if (!path.Path.Contains(':') || !path.Path.Contains(PathSeparator) || !char.IsLetter(path.Path[0]) || path.Path[1] != ':' || path.Path[2] != PathSeparator)
-            return Errors.FileManagement.InvalidPath;
-        return ErrorOrFactory.From(GetPathSegments());
+        return !path.Path.Contains(':') || !path.Path.Contains(PathSeparator) || !char.IsLetter(path.Path[0]) || path.Path[1] != ':' || path.Path[2] != PathSeparator
+            ? (ErrorOr<IEnumerable<PathSegment>>)Errors.FileManagement.InvalidPath
+            : ErrorOrFactory.From(GetPathSegments());
         IEnumerable<PathSegment> GetPathSegments()
         {
             // the drive segment
             yield return new PathSegment(path.Path[..2], isDirectory: false, isDrive: true);
             // extract the other segments
-            var segments = path.Path[3..].Split(new[] { PathSeparator }, StringSplitOptions.RemoveEmptyEntries);
-            for (var i = 0; i < segments.Length; i++)
+            string[] segments = path.Path[3..].Split(new[] { PathSeparator }, StringSplitOptions.RemoveEmptyEntries);
+            for (int i = 0; i < segments.Length; i++)
             {
-                var segment = segments[i];
+                string segment = segments[i];
                 bool isDirectory;
                 if (segment.Contains('.'))
                     isDirectory = i != segments.Length - 1 || path.Path.EndsWith(PathSeparator); // check if it's the last segment or if the next segment also contains a path delimiter
@@ -132,15 +129,13 @@ public class WindowsPathStrategy : IWindowsPathStrategy
         if (tempPath.EndsWith('\\'))
             tempPath = tempPath.TrimEnd(PathSeparator);
         // find the last occurrence of a slash
-        var lastIndex = tempPath.LastIndexOf(PathSeparator);
+        int lastIndex = tempPath.LastIndexOf(PathSeparator);
         // if there's no slash found (shouldn't happen due to previous steps), or if we are at the root level after trimming, return error
         if (lastIndex < 0)
             return Errors.FileManagement.CannotNavigateUp;
         // if we are at the drive root level after trimming, return drive root, otherwise, return the path up to the last slash
         ErrorOr<FileSystemPathId> newPathResult = FileSystemPathId.Create(lastIndex == 2 && tempPath[1] == ':' ? tempPath[..3] : tempPath[..lastIndex]);
-        if (newPathResult.IsError)
-            return newPathResult.Errors;
-        return ParsePath(newPathResult.Value);
+        return newPathResult.IsError ? (ErrorOr<IEnumerable<PathSegment>>)newPathResult.Errors : ParsePath(newPathResult.Value);
     }
 
     /// <summary>
@@ -172,11 +167,11 @@ public class WindowsPathStrategy : IWindowsPathStrategy
         // check for UNC paths (e.g., "\\server\share")
         if (path.Path.StartsWith('\\'))
         {
-            var parseResult = ParsePath(path);
+            ErrorOr<IEnumerable<PathSegment>> parseResult = ParsePath(path);
             if (parseResult.IsError)
                 return parseResult.Errors;
 
-            var segments = parseResult.Value.ToList();
+            List<PathSegment> segments = parseResult.Value.ToList();
             if (segments.Count >= 2)
             {
                 string root = $@"\\{segments[0].Name}\{segments[1].Name}\";

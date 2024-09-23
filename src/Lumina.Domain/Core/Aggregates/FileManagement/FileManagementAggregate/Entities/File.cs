@@ -74,16 +74,14 @@ public sealed class File : FileSystemItem
         ErrorOr<FileSystemPathId> createPathResult = FileSystemPathId.Create(path);
         if (createPathResult.IsError)
             return createPathResult.Errors;
-        File newFile = new File(
+        File newFile = new(
             createPathResult.Value,
             name,
             dateCreated,
             dateModified,
             size);
         ErrorOr<Updated> setStatusResult = newFile.SetStatus(status);
-        if (setStatusResult.IsError)
-            return setStatusResult.Errors;
-        return newFile;
+        return setStatusResult.IsError ? (ErrorOr<File>)setStatusResult.Errors : (ErrorOr<File>)newFile;
     }
 
     /// <summary>
@@ -107,16 +105,14 @@ public sealed class File : FileSystemItem
         FileSystemItemStatus status = FileSystemItemStatus.Accessible)
     {
         // TODO: enforce invariants        
-        File newFile = new File(
+        File newFile = new(
             id,
             name,
             dateCreated,
             dateModified,
             size);
         ErrorOr<Updated> setStatusResult = newFile.SetStatus(status);
-        if (setStatusResult.IsError)
-            return setStatusResult.Errors;
-        return newFile;
+        return setStatusResult.IsError ? (ErrorOr<File>)setStatusResult.Errors : (ErrorOr<File>)newFile;
     }
 
     /// <summary>

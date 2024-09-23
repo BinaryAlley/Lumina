@@ -22,7 +22,7 @@ internal static class PresentationApiLayerConfiguration
     /// <exception cref="DirectoryNotFoundException">Thrown when the base path where the configuration files should be located, does not exist.</exception>
     public static IServiceCollection BindPresentationApiLayerConfiguration(this IServiceCollection services, IConfigurationManager configuration)
     {
-        var basePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        string? basePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         if (!Directory.Exists(basePath))
             throw new DirectoryNotFoundException($"The base path '{basePath}' does not exist.");
         configuration.SetBasePath(basePath);

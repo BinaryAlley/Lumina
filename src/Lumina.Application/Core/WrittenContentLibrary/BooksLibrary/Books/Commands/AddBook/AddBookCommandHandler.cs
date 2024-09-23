@@ -57,7 +57,7 @@ public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<Boo
     {
         // TODO: update Api.Book.md documentation when the functionality is fully implemented
         List<MediaContributorId> contributorIds = [];
-        foreach (var mediaContributor in request.Contributors)
+        foreach (Contracts.Models.MediaContributors.MediaContributorModel mediaContributor in request.Contributors)
         {
             // TODO: add logic to search the media contributors repository for existing contributors, based on the provided names
         }
@@ -67,37 +67,37 @@ public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<Boo
             // TODO: add logic to search the book series repository for existing book series, based on the provided title
             // TODO: uncomment integration and unit tests about series
         }
-        var domainRatingsResult = request.Ratings.ConvertAll(rating => BookRating.Create(
+        List<ErrorOr<BookRating>> domainRatingsResult = request.Ratings.ConvertAll(rating => BookRating.Create(
                 rating.Value ?? default,
                 rating.MaxValue ?? default,
                 Optional<BookRatingSource>.FromNullable(rating.Source.HasValue ? (BookRatingSource)(int)rating.Source : default),
                 Optional<int>.FromNullable(rating.VoteCount)));
         // check if any of the results contain errors
-        var errors = domainRatingsResult.Where(ratingResult => ratingResult.IsError).SelectMany(ratingResult => ratingResult.Errors).ToList();
+        List<Error> errors = domainRatingsResult.Where(ratingResult => ratingResult.IsError).SelectMany(ratingResult => ratingResult.Errors).ToList();
         if (errors.Count != 0) // if there are errors, return them            
             return errors;
 
-        var domainRatings = domainRatingsResult.Select(rating => rating.Value).ToList();
+        List<BookRating> domainRatings = domainRatingsResult.Select(rating => rating.Value).ToList();
 
-        var domainGenresResult = request.Metadata.Genres!.ConvertAll(genre => Genre.Create(genre.Name!));
+        List<ErrorOr<Genre>> domainGenresResult = request.Metadata.Genres!.ConvertAll(genre => Genre.Create(genre.Name!));
         errors = domainGenresResult.Where(genreResult => genreResult.IsError).SelectMany(genreResult => genreResult.Errors).ToList();
         if (errors.Count != 0)
             return errors;
-        var domainGenres = domainGenresResult.Select(genre => genre.Value).ToList();
+        List<Genre> domainGenres = domainGenresResult.Select(genre => genre.Value).ToList();
 
-        var domainTagsResult = request.Metadata.Tags!.ConvertAll(tag => Tag.Create(tag.Name!));
+        List<ErrorOr<Tag>> domainTagsResult = request.Metadata.Tags!.ConvertAll(tag => Tag.Create(tag.Name!));
         errors = domainTagsResult.Where(tagResult => tagResult.IsError).SelectMany(tagResult => tagResult.Errors).ToList();
         if (errors.Count != 0)
             return errors;
-        var domainTags = domainTagsResult.Select(tag => tag.Value).ToList();
+        List<Tag> domainTags = domainTagsResult.Select(tag => tag.Value).ToList();
 
-        var domainIsbnsResult = request.ISBNs.ConvertAll(isbn => Isbn.Create(isbn.Value!, (IsbnFormat)(int)isbn.Format!));
+        List<ErrorOr<Isbn>> domainIsbnsResult = request.ISBNs.ConvertAll(isbn => Isbn.Create(isbn.Value!, (IsbnFormat)(int)isbn.Format!));
         errors = domainIsbnsResult.Where(isbnResult => isbnResult.IsError).SelectMany(isbnResult => isbnResult.Errors).ToList();
         if (errors.Count != 0)
             return errors;
-        var domainIsbns = domainIsbnsResult.Select(isbn => isbn.Value).ToList();
+        List<Isbn> domainIsbns = domainIsbnsResult.Select(isbn => isbn.Value).ToList();
 
-        var releaseInfoResult = ReleaseInfo.Create(
+        ErrorOr<ReleaseInfo> releaseInfoResult = ReleaseInfo.Create(
             Optional<DateOnly>.FromNullable(request.Metadata.ReleaseInfo!.OriginalReleaseDate),
             Optional<int>.FromNullable(request.Metadata.ReleaseInfo.OriginalReleaseYear),
             Optional<DateOnly>.FromNullable(request.Metadata.ReleaseInfo.ReReleaseDate),
@@ -107,11 +107,11 @@ public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<Boo
         );
         if (releaseInfoResult.IsError)
             return releaseInfoResult.Errors;
-        var releaseInfo = releaseInfoResult.Value;
+        ReleaseInfo releaseInfo = releaseInfoResult.Value;
         LanguageInfo? languageInfo = null;
         if (request.Metadata.Language is not null)
         {
-            var languageInfoResult = LanguageInfo.Create(
+            ErrorOr<LanguageInfo> languageInfoResult = LanguageInfo.Create(
                 request.Metadata.Language.LanguageCode!,
                 request.Metadata.Language.LanguageName!,
                 Optional<string>.FromNullable(request.Metadata.Language.NativeName));
@@ -122,7 +122,7 @@ public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<Boo
         LanguageInfo? originalLanguageInfo = null;
         if (request.Metadata.OriginalLanguage is not null)
         {
-            var originalLanguageInfoResult = LanguageInfo.Create(
+            ErrorOr<LanguageInfo> originalLanguageInfoResult = LanguageInfo.Create(
                 request.Metadata.OriginalLanguage.LanguageCode!,
                 request.Metadata.OriginalLanguage.LanguageName!,
                 Optional<string>.FromNullable(request.Metadata.OriginalLanguage.NativeName));
@@ -130,7 +130,7 @@ public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<Boo
                 return originalLanguageInfoResult.Errors;
             originalLanguageInfo = originalLanguageInfoResult.Value;
         }
-        var metadataResult = WrittenContentMetadata.Create(
+        ErrorOr<WrittenContentMetadata> metadataResult = WrittenContentMetadata.Create(
             request.Metadata.Title!,
             Optional<string>.FromNullable(request.Metadata.OriginalTitle),
             Optional<string>.FromNullable(request.Metadata.Description),
@@ -144,7 +144,7 @@ public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<Boo
         );
         if (metadataResult.IsError)
             return metadataResult.Errors;
-        var createBookResult = Book.Create(
+        ErrorOr<Book> createBookResult = Book.Create(
             metadataResult.Value,
             Optional<BookFormat>.FromNullable(request.Format),
             Optional<string>.FromNullable(request.Edition),
@@ -166,9 +166,9 @@ public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<Boo
         if (createBookResult.IsError)
             return createBookResult.Errors;
 
-        var bookRepository = _unitOfWork.GetRepository<IBookRepository>();
-        var persistenceBook = _mapper.Map<BookModel>(createBookResult.Value);
-        var insertBookResult = await bookRepository.InsertAsync(persistenceBook, cancellationToken).ConfigureAwait(false);
+        IBookRepository bookRepository = _unitOfWork.GetRepository<IBookRepository>();
+        BookModel persistenceBook = _mapper.Map<BookModel>(createBookResult.Value);
+        ErrorOr<Created> insertBookResult = await bookRepository.InsertAsync(persistenceBook, cancellationToken).ConfigureAwait(false);
         if (insertBookResult.IsError)
             return insertBookResult.Errors;
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

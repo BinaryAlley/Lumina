@@ -60,18 +60,18 @@ public class VideoMetadata : BaseMetadata
     /// <param name="genres">The genres of the video.</param>
     /// <param name="tags">The tags associated with the video.</param>
     private VideoMetadata(
-        string title, 
-        Optional<string> originalTitle, 
-        int durationInSeconds, 
-        string resolution, 
+        string title,
+        Optional<string> originalTitle,
+        int durationInSeconds,
+        string resolution,
         Optional<string> description,
-        ReleaseInfo releaseInfo, 
-        Optional<LanguageInfo> language, 
-        Optional<LanguageInfo> originalLanguage, 
-        Optional<float> frameRate, 
-        Optional<string> videoCodec, 
+        ReleaseInfo releaseInfo,
+        Optional<LanguageInfo> language,
+        Optional<LanguageInfo> originalLanguage,
+        Optional<float> frameRate,
+        Optional<string> videoCodec,
         Optional<string> audioCodec,
-        List<Genre> genres, 
+        List<Genre> genres,
         List<Tag> tags)
         : base(title, originalTitle, description, releaseInfo, genres, tags, language, originalLanguage)
     {
@@ -104,18 +104,18 @@ public class VideoMetadata : BaseMetadata
     /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="VideoMetadata"/>, or an error message.
     /// </returns>
     public static ErrorOr<VideoMetadata> Create(
-        string title, 
-        Optional<string> originalTitle, 
-        int durationInSeconds, 
-        string resolution, 
+        string title,
+        Optional<string> originalTitle,
+        int durationInSeconds,
+        string resolution,
         Optional<string> description,
-        ReleaseInfo releaseInfo, 
-        Optional<LanguageInfo> language, 
-        Optional<LanguageInfo> originalLanguage, 
-        Optional<float> frameRate, 
-        Optional<string> videoCodec, 
+        ReleaseInfo releaseInfo,
+        Optional<LanguageInfo> language,
+        Optional<LanguageInfo> originalLanguage,
+        Optional<float> frameRate,
+        Optional<string> videoCodec,
         Optional<string> audioCodec,
-        List<Genre> genres, 
+        List<Genre> genres,
         List<Tag> tags)
     {
         return new VideoMetadata(title, originalTitle, durationInSeconds, resolution, description, releaseInfo,
@@ -125,7 +125,7 @@ public class VideoMetadata : BaseMetadata
     /// <inheritdoc/>
     public override IEnumerable<object> GetEqualityComponents()
     {
-        foreach (var component in base.GetEqualityComponents())
+        foreach (object component in base.GetEqualityComponents())
             yield return component;
         yield return DurationInSeconds;
         yield return Resolution;

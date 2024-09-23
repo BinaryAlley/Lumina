@@ -43,7 +43,7 @@ public class SplitPathCommandHandler : IRequestHandler<SplitPathCommand, ErrorOr
     /// </returns>
     public ValueTask<ErrorOr<IEnumerable<PathSegmentResponse>>> Handle(SplitPathCommand request, CancellationToken cancellationToken)
     {
-        var result = _pathService.ParsePath(request.Path);
+        ErrorOr<IEnumerable<PathSegment>> result = _pathService.ParsePath(request.Path);
         return ValueTask.FromResult(result.Match(values => ErrorOrFactory.From(result.Value.Adapt<IEnumerable<PathSegmentResponse>>()), errors => errors));
     }
     #endregion

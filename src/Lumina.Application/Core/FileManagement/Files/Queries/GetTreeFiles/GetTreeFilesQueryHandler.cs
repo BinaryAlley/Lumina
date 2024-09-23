@@ -43,7 +43,7 @@ public class GetTreeFilesQueryHandler : IRequestHandler<GetTreeFilesQuery, Error
     /// </returns>
     public ValueTask<ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>> Handle(GetTreeFilesQuery request, CancellationToken cancellationToken)
     {
-        var result = _fileService.GetFiles(request.Path);
+        ErrorOr<IEnumerable<File>> result = _fileService.GetFiles(request.Path);
         return ValueTask.FromResult(result.Match(values => ErrorOrFactory.From(result.Value.Adapt<IEnumerable<FileSystemTreeNodeResponse>>()), errors => errors));
     }
     #endregion

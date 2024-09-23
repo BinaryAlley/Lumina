@@ -1,4 +1,4 @@
-﻿@page "/library/written-content-library/books-library/books/item/{id:guid}"
+@page "/library/written-content-library/books-library/books/item/{id:guid}"
 
 @using Lumina.Presentation.Web.Common.Enums.BookLibrary
 @using Lumina.Presentation.Web.Common.Models.Common
@@ -17,7 +17,7 @@
 
     <div class="form-group">
         <label for="title">Title<span class="mandatory-field">*</span>:</label>
-        <InputText id="title" @bind-Value="bookRequest.Metadata.Title" class="form-control" />
+        <InputText id="title" @bind-Value="bookRequest.Metadata!.Title" class="form-control" />
     </div>
 
     <div class="form-group">
@@ -33,7 +33,7 @@
     <h3>Release Information</h3>
     <div class="form-group">
         <label for="originalReleaseDate">Original Release Date:</label>
-        <InputDate id="originalReleaseDate" @bind-Value="bookRequest.Metadata.ReleaseInfo.OriginalReleaseDate" class="form-control" />
+        <InputDate id="originalReleaseDate" @bind-Value="bookRequest.Metadata.ReleaseInfo!.OriginalReleaseDate" class="form-control" />
     </div>
 
     <div class="form-group">
@@ -42,7 +42,7 @@
     </div>
 
     <h3>Genres</h3>
-    @foreach (var genre in bookRequest.Metadata.Genres)
+    @foreach (var genre in bookRequest.Metadata.Genres!)
     {
         <div class="form-group">
             <InputText @bind-Value="genre.Name" class="form-control" />
@@ -53,7 +53,7 @@
     <h3>Language</h3>
     <div class="form-group">
         <label for="languageCode">Language Code:</label>
-        <InputText id="languageCode" @bind-Value="bookRequest.Metadata.Language.LanguageCode" class="form-control" />
+        <InputText id="languageCode" @bind-Value="bookRequest.Metadata.Language!.LanguageCode" class="form-control" />
     </div>
 
     <div class="form-group">
@@ -80,7 +80,7 @@
     <h3>Identifiers</h3>
     <div class="form-group">
         <label for="isbn">ISBN:</label>
-        <InputText id="isbn" @bind-Value="bookRequest.ISBNs[0].Value" class="form-control" />
+        <InputText id="isbn" @bind-Value="bookRequest.ISBNs![0].Value" class="form-control" />
         <InputSelect @bind-Value="bookRequest.ISBNs[0].Format" class="form-control">
             @foreach (var format in Enum.GetValues(typeof(IsbnFormat)))
             {
@@ -90,11 +90,11 @@
     </div>
 
     <h3>Contributors</h3>
-    @foreach (var contributor in bookRequest.Contributors)
+    @foreach (var contributor in bookRequest.Contributors!)
     {
         <div class="form-group">
             @* <InputText @bind-Value="contributor.Name" placeholder="Name" class="form-control" /> *@
-            <InputText @bind-Value="contributor.Role.Name" placeholder="Role" class="form-control" />
+            <InputText @bind-Value="contributor.Role!.Name" placeholder="Role" class="form-control" />
         </div>
     }
     <button type="button" class="btn btn-secondary" @onclick="AddContributor">Add Contributor</button>
@@ -117,12 +117,12 @@
 
     private void AddGenre()
     {
-        bookRequest.Metadata.Genres.Add(new GenreModel());
+        bookRequest.Metadata!.Genres!.Add(new GenreModel());
     }
 
     private void AddContributor()
     {
-        bookRequest.Contributors.Add(new MediaContributorModel { Role = new MediaContributorRoleModel() });
+        bookRequest.Contributors!.Add(new MediaContributorModel { Role = new MediaContributorRoleModel() });
     }
 
     private async Task HandleValidSubmit()

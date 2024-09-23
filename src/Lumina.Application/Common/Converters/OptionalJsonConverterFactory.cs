@@ -20,9 +20,7 @@ public class OptionalJsonConverterFactory : JsonConverterFactory
     /// <returns><see langword="true"/> if the type is <see cref="Optional{TValue}"/>, <see langword="false"/> otherwise.</returns>
     public override bool CanConvert(Type typeToConvert)
     {
-        if (!typeToConvert.IsGenericType)
-            return false;
-        return typeToConvert.GetGenericTypeDefinition() == typeof(Optional<>);
+        return typeToConvert.IsGenericType && typeToConvert.GetGenericTypeDefinition() == typeof(Optional<>);
     }
 
     /// <summary>

@@ -49,7 +49,7 @@ public sealed class MediaContributorName : ValueObject
     public static ErrorOr<MediaContributorName> Create(string displayName, Optional<string> legalName)
     {
         // TODO: enforce invariants
-        return new MediaContributorName(displayName, legalName); 
+        return new MediaContributorName(displayName, legalName);
     }
 
     /// <inheritdoc/>

@@ -27,13 +27,10 @@ public static class DataAccessLayerServices
     /// <returns>The updated <see cref="IServiceCollection"/>.</returns>
     public static void AddDataAccessLayerServices(this IServiceCollection services)
     {
-        var basePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        string? basePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         if (!Directory.Exists(basePath))
             throw new DirectoryNotFoundException($"The base path '{basePath}' does not exist.");
-        services.AddDbContext<LuminaDbContext>(options =>
-        {
-            options.UseSqlite($"Data Source={Path.Combine(basePath, "Lumina.db")}");
-        });
+        services.AddDbContext<LuminaDbContext>(options => options.UseSqlite($"Data Source={Path.Combine(basePath, "Lumina.db")}"));
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         Type[]? dataAccessLayerTypes = Assembly.GetExecutingAssembly().GetTypes();

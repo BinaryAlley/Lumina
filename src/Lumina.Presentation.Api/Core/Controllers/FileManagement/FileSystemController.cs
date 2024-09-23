@@ -1,5 +1,6 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using Lumina.Application.Core.FileManagement.FileSystem.Queries.GetFileSysem;
+using Lumina.Contracts.Responses.FileManagement;
 using Lumina.Presentation.Api.Core.Controllers.Common;
 using Mediator;
 using Microsoft.AspNetCore.Mvc;
@@ -39,7 +40,7 @@ public class FileSystemController : ApiController
     [HttpGet("get-type")]
     public async Task<IActionResult> GetType(CancellationToken cancellationToken)
     {
-        var platformType = await _mediator.Send(new GetFileSystemQuery(), cancellationToken).ConfigureAwait(false);
+        FileSystemTypeResponse platformType = await _mediator.Send(new GetFileSystemQuery(), cancellationToken).ConfigureAwait(false);
         return Ok(platformType);
     }
     #endregion

@@ -44,10 +44,8 @@ public class FileService : IFileService
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of files or an error.</returns>
     public ErrorOr<IEnumerable<File>> GetFiles(string path)
     {
-        var fileSystemPathIdResult = FileSystemPathId.Create(path);
-        if (fileSystemPathIdResult.IsError)
-            return fileSystemPathIdResult.Errors;
-        return GetFiles(fileSystemPathIdResult.Value);
+        ErrorOr<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(path);
+        return fileSystemPathIdResult.IsError ? (ErrorOr<IEnumerable<File>>)fileSystemPathIdResult.Errors : GetFiles(fileSystemPathIdResult.Value);
     }
 
     /// <summary>
@@ -71,7 +69,7 @@ public class FileService : IFileService
         ErrorOr<IEnumerable<FileSystemPathId>> filePathsResult = _environmentContext.FileProviderService.GetFilePaths(path);
         if (filePathsResult.IsError)
             return filePathsResult.Errors;
-        List<File> result = new();
+        List<File> result = [];
         IEnumerable<FileSystemPathId> filePaths = filePathsResult.Value;
         foreach (FileSystemPathId filePath in filePaths)
         {
@@ -85,7 +83,7 @@ public class FileService : IFileService
             if (fileNameResult.IsError || dateModifiedResult.IsError || dateCreatedResult.IsError)
             {
                 ErrorOr<File> errorFileResult = File.Create(filePath, !fileNameResult.IsError ? fileNameResult.Value : null!,
-                    !dateCreatedResult.IsError ? dateCreatedResult.Value : Optional<DateTime>.None(), 
+                    !dateCreatedResult.IsError ? dateCreatedResult.Value : Optional<DateTime>.None(),
                     !dateModifiedResult.IsError ? dateModifiedResult.Value : Optional<DateTime>.None(), size);
                 if (errorFileResult.IsError)
                     return errorFileResult.Errors;
@@ -96,7 +94,7 @@ public class FileService : IFileService
             }
             else
             {
-                var fileResult = File.Create(filePath, fileNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value, size);
+                ErrorOr<File> fileResult = File.Create(filePath, fileNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value, size);
                 if (fileResult.IsError)
                     return fileResult.Errors;
                 result.Add(fileResult.Value);
@@ -117,13 +115,13 @@ public class FileService : IFileService
         // make sure the paths are in the expected format
         if (!destinationDirectoryPath.EndsWith(_platformContext.PathStrategy.PathSeparator))
             destinationDirectoryPath += _platformContext.PathStrategy.PathSeparator;
-        var fileSystemSourcePathIdResult = FileSystemPathId.Create(sourceFilePath);
+        ErrorOr<FileSystemPathId> fileSystemSourcePathIdResult = FileSystemPathId.Create(sourceFilePath);
         if (fileSystemSourcePathIdResult.IsError)
             return fileSystemSourcePathIdResult.Errors;
-        var fileSystemDestinationPathIdResult = FileSystemPathId.Create(destinationDirectoryPath);
-        if (fileSystemDestinationPathIdResult.IsError)
-            return fileSystemDestinationPathIdResult.Errors;
-        return CopyFile(fileSystemSourcePathIdResult.Value, fileSystemDestinationPathIdResult.Value, overrideExisting ?? false);
+        ErrorOr<FileSystemPathId> fileSystemDestinationPathIdResult = FileSystemPathId.Create(destinationDirectoryPath);
+        return fileSystemDestinationPathIdResult.IsError
+            ? (ErrorOr<File>)fileSystemDestinationPathIdResult.Errors
+            : CopyFile(fileSystemSourcePathIdResult.Value, fileSystemDestinationPathIdResult.Value, overrideExisting ?? false);
     }
 
     /// <summary>
@@ -135,7 +133,7 @@ public class FileService : IFileService
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the copied file, or an error.</returns>
     public ErrorOr<File> CopyFile(FileSystemPathId sourceFilePath, FileSystemPathId destinationDirectoryPath, bool overrideExisting)
     {
-        var fileExists = _environmentContext.FileProviderService.FileExists(sourceFilePath);
+        ErrorOr<bool> fileExists = _environmentContext.FileProviderService.FileExists(sourceFilePath);
         if (fileExists.IsError)
             return fileExists.Errors;
         else if (fileExists.Value == false)
@@ -155,14 +153,12 @@ public class FileService : IFileService
             if (fileNameResult.IsError || dateModifiedResult.IsError || dateCreatedResult.IsError)
             {
                 ErrorOr<File> errorFileResult = File.Create(copyFileResult.Value, !fileNameResult.IsError ? fileNameResult.Value : null!,
-                    !dateCreatedResult.IsError ? dateCreatedResult.Value : Optional<DateTime>.None(), 
+                    !dateCreatedResult.IsError ? dateCreatedResult.Value : Optional<DateTime>.None(),
                     !dateModifiedResult.IsError ? dateModifiedResult.Value : Optional<DateTime>.None(), size);
                 if (errorFileResult.IsError)
                     return errorFileResult.Errors;
                 ErrorOr<Updated> setStatusResult = errorFileResult.Value.SetStatus(FileSystemItemStatus.Inaccessible);
-                if (setStatusResult.IsError)
-                    return setStatusResult.Errors;
-                return errorFileResult;
+                return setStatusResult.IsError ? (ErrorOr<File>)setStatusResult.Errors : errorFileResult;
             }
             else
                 return File.Create(copyFileResult.Value, fileNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value, size);
@@ -181,13 +177,13 @@ public class FileService : IFileService
         // make sure the paths are in the expected format
         if (!destinationDirectoryPath.EndsWith(_platformContext.PathStrategy.PathSeparator))
             destinationDirectoryPath += _platformContext.PathStrategy.PathSeparator;
-        var fileSystemSourcePathIdResult = FileSystemPathId.Create(sourceFilePath);
+        ErrorOr<FileSystemPathId> fileSystemSourcePathIdResult = FileSystemPathId.Create(sourceFilePath);
         if (fileSystemSourcePathIdResult.IsError)
             return fileSystemSourcePathIdResult.Errors;
-        var fileSystemDestinationPathIdResult = FileSystemPathId.Create(destinationDirectoryPath);
-        if (fileSystemDestinationPathIdResult.IsError)
-            return fileSystemDestinationPathIdResult.Errors;
-        return MoveFile(fileSystemSourcePathIdResult.Value, fileSystemDestinationPathIdResult.Value, overrideExisting ?? false);
+        ErrorOr<FileSystemPathId> fileSystemDestinationPathIdResult = FileSystemPathId.Create(destinationDirectoryPath);
+        return fileSystemDestinationPathIdResult.IsError
+            ? (ErrorOr<File>)fileSystemDestinationPathIdResult.Errors
+            : MoveFile(fileSystemSourcePathIdResult.Value, fileSystemDestinationPathIdResult.Value, overrideExisting ?? false);
     }
 
     /// <summary>
@@ -199,7 +195,7 @@ public class FileService : IFileService
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the moved file, or an error.</returns>
     public ErrorOr<File> MoveFile(FileSystemPathId sourceFilePath, FileSystemPathId destinationDirectoryPath, bool overrideExisting)
     {
-        var fileExists = _environmentContext.FileProviderService.FileExists(sourceFilePath);
+        ErrorOr<bool> fileExists = _environmentContext.FileProviderService.FileExists(sourceFilePath);
         if (fileExists.IsError)
             return fileExists.Errors;
         else if (fileExists.Value == false)
@@ -219,14 +215,12 @@ public class FileService : IFileService
             if (fileNameResult.IsError || dateModifiedResult.IsError || dateCreatedResult.IsError)
             {
                 ErrorOr<File> errorFileResult = File.Create(moveFileResult.Value, !fileNameResult.IsError ? fileNameResult.Value : null!,
-                    !dateCreatedResult.IsError ? dateCreatedResult.Value : Optional<DateTime>.None(), 
+                    !dateCreatedResult.IsError ? dateCreatedResult.Value : Optional<DateTime>.None(),
                     !dateModifiedResult.IsError ? dateModifiedResult.Value : Optional<DateTime>.None(), size);
                 if (errorFileResult.IsError)
                     return errorFileResult.Errors;
                 ErrorOr<Updated> setStatusResult = errorFileResult.Value.SetStatus(FileSystemItemStatus.Inaccessible);
-                if (setStatusResult.IsError)
-                    return setStatusResult.Errors;
-                return errorFileResult;
+                return setStatusResult.IsError ? (ErrorOr<File>)setStatusResult.Errors : errorFileResult;
             }
             else
                 return File.Create(moveFileResult.Value, fileNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value, size);
@@ -241,10 +235,8 @@ public class FileService : IFileService
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the renamed file, or an error.</returns>
     public ErrorOr<File> RenameFile(string path, string name)
     {
-        var fileSystemPathIdResult = FileSystemPathId.Create(path);
-        if (fileSystemPathIdResult.IsError)
-            return fileSystemPathIdResult.Errors;
-        return RenameFile(fileSystemPathIdResult.Value, name);
+        ErrorOr<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(path);
+        return fileSystemPathIdResult.IsError ? (ErrorOr<File>)fileSystemPathIdResult.Errors : RenameFile(fileSystemPathIdResult.Value, name);
     }
 
     /// <summary>
@@ -256,10 +248,10 @@ public class FileService : IFileService
     public ErrorOr<File> RenameFile(FileSystemPathId path, string name)
     {
         // first, check if the directory about to be created does not already exist
-        var combinedPath = _platformContext.PathStrategy.CombinePath(path, name);
+        ErrorOr<FileSystemPathId> combinedPath = _platformContext.PathStrategy.CombinePath(path, name);
         if (combinedPath.IsError)
             return combinedPath.Errors;
-        var fileExists = _environmentContext.FileProviderService.FileExists(combinedPath.Value);
+        ErrorOr<bool> fileExists = _environmentContext.FileProviderService.FileExists(combinedPath.Value);
         if (fileExists.IsError)
             return fileExists.Errors;
         else if (fileExists.Value == true)
@@ -279,14 +271,12 @@ public class FileService : IFileService
             if (fileNameResult.IsError || dateModifiedResult.IsError || dateCreatedResult.IsError)
             {
                 ErrorOr<File> errorFileResult = File.Create(newFilePathResult.Value, !fileNameResult.IsError ? fileNameResult.Value : null!,
-                    !dateCreatedResult.IsError ? dateCreatedResult.Value : Optional<DateTime>.None(), 
+                    !dateCreatedResult.IsError ? dateCreatedResult.Value : Optional<DateTime>.None(),
                     !dateModifiedResult.IsError ? dateModifiedResult.Value : Optional<DateTime>.None(), size);
                 if (errorFileResult.IsError)
                     return errorFileResult.Errors;
                 ErrorOr<Updated> setStatusResult = errorFileResult.Value.SetStatus(FileSystemItemStatus.Inaccessible);
-                if (setStatusResult.IsError)
-                    return setStatusResult.Errors;
-                return errorFileResult;
+                return setStatusResult.IsError ? (ErrorOr<File>)setStatusResult.Errors : errorFileResult;
             }
             else
                 return File.Create(newFilePathResult.Value, fileNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value, size);
@@ -300,10 +290,8 @@ public class FileService : IFileService
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the result of deleting a file, or an error.</returns>
     public ErrorOr<Deleted> DeleteFile(string path)
     {
-        var fileSystemPathIdResult = FileSystemPathId.Create(path);
-        if (fileSystemPathIdResult.IsError)
-            return fileSystemPathIdResult.Errors;
-        return DeleteFile(fileSystemPathIdResult.Value);
+        ErrorOr<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(path);
+        return fileSystemPathIdResult.IsError ? (ErrorOr<Deleted>)fileSystemPathIdResult.Errors : DeleteFile(fileSystemPathIdResult.Value);
     }
 
     /// <summary>

@@ -39,7 +39,7 @@ public class ApiHttpClient : IApiHttpClient
     {
         _httpClient = httpClient;
         // read the API server configuration values from the configuration, and assign them to the injected client
-        var serverConfigurationModel = serverConfigurationOptions.Value;
+        ServerConfigurationModel serverConfigurationModel = serverConfigurationOptions.Value;
         httpClient.BaseAddress = new Uri($"{serverConfigurationModel.BaseAddress}:{serverConfigurationModel.Port}/api/v{serverConfigurationModel.ApiVersion}/");
 
         _jsonOptions = new JsonSerializerOptions
@@ -62,7 +62,7 @@ public class ApiHttpClient : IApiHttpClient
     /// <returns>The deserialized response containing the result of the GET request.</returns>
     public async Task<TResponse> GetAsync<TResponse>(string endpoint, string? token = null, CancellationToken cancellationToken = default)
     {
-        using var request = new HttpRequestMessage(HttpMethod.Get, endpoint);
+        using HttpRequestMessage request = new(HttpMethod.Get, endpoint);
         if (!string.IsNullOrEmpty(token))
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
         return await SendRequestAsync<TResponse>(request, cancellationToken).ConfigureAwait(false);
@@ -78,7 +78,7 @@ public class ApiHttpClient : IApiHttpClient
     /// <returns>An <see cref="IAsyncEnumerable{T}"/> object, which allows for asynchronous iteration over the deserialized items.</returns>
     public async IAsyncEnumerable<TResponse?> GetAsyncEnumerable<TResponse>(string endpoint, string? token = null, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        using var request = new HttpRequestMessage(HttpMethod.Get, endpoint);
+        using HttpRequestMessage request = new(HttpMethod.Get, endpoint);
         // HttpClient is implemented differently in Blazor WASM, because there are no sockets in the browser, so its BrowserHttpHandler is implemented on top of Fetch API,
         // which can provide response content in one of two forms: BrowserHttpContent, which is based on arrayBuffer method (this means that it will always read the response stream to its completion,
         // before making the content available), and StreamContent that is wrapping WasmHttpReadStream, which is based on readable streams (this one allows for reading response as it comes).
@@ -88,11 +88,11 @@ public class ApiHttpClient : IApiHttpClient
         if (!string.IsNullOrEmpty(token))
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
         // send the request and expect only headers initially - this prevents the client from buffering the entire response
-        using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+        using HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
-        await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+        await using System.IO.Stream stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
         // Deserialize the JSON content asynchronously as an enumerable of TResponse items
-        await foreach (var item in JsonSerializer.DeserializeAsyncEnumerable<TResponse>(stream, _jsonOptions, cancellationToken).ConfigureAwait(false))
+        await foreach (TResponse? item in JsonSerializer.DeserializeAsyncEnumerable<TResponse>(stream, _jsonOptions, cancellationToken).ConfigureAwait(false))
         {
             if (cancellationToken.IsCancellationRequested)
                 yield break;
@@ -109,14 +109,14 @@ public class ApiHttpClient : IApiHttpClient
     /// <returns>A model containing the deserialized blob.</returns>
     public async Task<BlobDataModel> GetBlobAsync(string endpoint, string? token = null, CancellationToken cancellationToken = default)
     {
-        using var request = new HttpRequestMessage(HttpMethod.Get, endpoint);
+        using HttpRequestMessage request = new(HttpMethod.Get, endpoint);
         if (!string.IsNullOrEmpty(token))
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        using var response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
+        using HttpResponseMessage response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode)
         {
             // read the content as a string, for error messages
-            var content = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            string content = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
             ProblemDetailsModel? problemDetails = null;
             try
             {
@@ -141,7 +141,7 @@ public class ApiHttpClient : IApiHttpClient
     /// <returns>The deserialized response containing the result of the DELETE request.</returns>
     public async Task<TResponse> DeleteAsync<TResponse>(string endpoint, string? token = null, CancellationToken cancellationToken = default)
     {
-        using var request = new HttpRequestMessage(HttpMethod.Delete, endpoint);
+        using HttpRequestMessage request = new(HttpMethod.Delete, endpoint);
         if (!string.IsNullOrEmpty(token))
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         return await SendRequestAsync<TResponse>(request, cancellationToken).ConfigureAwait(false);
@@ -159,7 +159,7 @@ public class ApiHttpClient : IApiHttpClient
     /// <returns>The deserialized response containing the result of the PUT request.</returns>
     public async Task<TResponse> PutAsync<TResponse, TModel>(string endpoint, TModel data, string? token = null, CancellationToken cancellationToken = default)
     {
-        using var request = new HttpRequestMessage(HttpMethod.Put, endpoint);
+        using HttpRequestMessage request = new(HttpMethod.Put, endpoint);
         if (!string.IsNullOrEmpty(token))
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         request.Content = new StringContent(JsonSerializer.Serialize(data, _jsonOptions), Encoding.UTF8, "application/json");
@@ -178,7 +178,7 @@ public class ApiHttpClient : IApiHttpClient
     /// <returns>The deserialized response containing the result of the POST request.</returns>
     public async Task<TResponse> PostAsync<TResponse, TModel>(string endpoint, TModel data, string? token = null, CancellationToken cancellationToken = default)
     {
-        using var request = new HttpRequestMessage(HttpMethod.Post, endpoint);
+        using HttpRequestMessage request = new(HttpMethod.Post, endpoint);
         if (!string.IsNullOrEmpty(token))
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         request.Content = new StringContent(JsonSerializer.Serialize(data, _jsonOptions), Encoding.UTF8, "application/json");
@@ -197,8 +197,8 @@ public class ApiHttpClient : IApiHttpClient
     private async Task<TResponse> SendRequestAsync<TResponse>(HttpRequestMessage request, CancellationToken cancellationToken)
     {
         // send the HTTP request and read the response
-        var response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
-        var content = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+        HttpResponseMessage response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
+        string content = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
         // if the response is successful, deserialize the content to TResponse and return it
         if (response.IsSuccessStatusCode)
             return JsonSerializer.Deserialize<TResponse>(content, _jsonOptions)!;

@@ -41,9 +41,7 @@ public class Tag : ValueObject
     /// </returns>
     public static ErrorOr<Tag> Create(string name)
     {
-        if (string.IsNullOrWhiteSpace(name))
-            return Errors.Errors.Metadata.TagNameCannotBeEmpty;
-        return new Tag(name);
+        return string.IsNullOrWhiteSpace(name) ? (ErrorOr<Tag>)Errors.Errors.Metadata.TagNameCannotBeEmpty : (ErrorOr<Tag>)new Tag(name);
     }
 
     /// <inheritdoc/>

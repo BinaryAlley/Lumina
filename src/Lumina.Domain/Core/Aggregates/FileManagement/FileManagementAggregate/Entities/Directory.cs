@@ -19,7 +19,7 @@ public sealed class Directory : FileSystemItem
     #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly List<FileSystemItem> _items = [];
     #endregion
-    
+
     #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets or sets the creation date of the file system item. Can be optional if the information is not available.
@@ -34,10 +34,7 @@ public sealed class Directory : FileSystemItem
     /// <summary>
     /// Gets the collection of file system items that are children to the current directory entity.
     /// </summary>
-    public IReadOnlyCollection<FileSystemItem> Items
-    {
-        get { return _items.AsReadOnly(); }
-    }
+    public IReadOnlyCollection<FileSystemItem> Items => _items.AsReadOnly();
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================
@@ -77,15 +74,13 @@ public sealed class Directory : FileSystemItem
         ErrorOr<FileSystemPathId> createPathResult = FileSystemPathId.Create(path);
         if (createPathResult.IsError)
             return createPathResult.Errors;
-        Directory newDirectory = new Directory(
+        Directory newDirectory = new(
             createPathResult.Value,
             name,
             dateCreated,
             dateModified);
         ErrorOr<Updated> setStatusResult = newDirectory.SetStatus(status);
-        if (setStatusResult.IsError)
-            return setStatusResult.Errors;
-        return newDirectory;
+        return setStatusResult.IsError ? (ErrorOr<Directory>)setStatusResult.Errors : (ErrorOr<Directory>)newDirectory;
     }
 
     /// <summary>
@@ -106,15 +101,13 @@ public sealed class Directory : FileSystemItem
         FileSystemItemStatus status = FileSystemItemStatus.Accessible)
     {
         // TODO: enforce invariants        
-        Directory newDirectory = new Directory(
+        Directory newDirectory = new(
             id,
             name,
             dateCreated,
             dateModified);
         ErrorOr<Updated> setStatusResult = newDirectory.SetStatus(status);
-        if (setStatusResult.IsError)
-            return setStatusResult.Errors;
-        return newDirectory;
+        return setStatusResult.IsError ? (ErrorOr<Directory>)setStatusResult.Errors : (ErrorOr<Directory>)newDirectory;
     }
 
     /// <summary>

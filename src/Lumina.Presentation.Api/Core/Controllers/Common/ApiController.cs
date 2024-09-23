@@ -43,7 +43,7 @@ public abstract class ApiController : ControllerBase
     /// <param name="error">The error to convert.</param>
     protected internal IActionResult Problem(Error error)
     {
-        var statusCode = error.Type switch
+        int statusCode = error.Type switch
         {
             ErrorType.Conflict => StatusCodes.Status409Conflict,
             ErrorType.NotFound => StatusCodes.Status404NotFound,
@@ -62,8 +62,8 @@ public abstract class ApiController : ControllerBase
     /// <param name="errors">The list of errors to convert.</param>
     protected internal IActionResult ValidationProblem(List<Error> errors)
     {
-        var modelStateDictionary = new ModelStateDictionary();
-        foreach (var error in errors)
+        ModelStateDictionary modelStateDictionary = new();
+        foreach (Error error in errors)
             modelStateDictionary.AddModelError(error.Code, error.Description);
         return ValidationProblem(modelStateDictionary: modelStateDictionary, title: "One or more validation errors occurred.");
     }
