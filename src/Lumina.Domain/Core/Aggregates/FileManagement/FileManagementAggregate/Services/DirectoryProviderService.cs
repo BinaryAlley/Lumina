@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using Lumina.Contracts.Enums.FileSystem;
 using Lumina.Domain.Common.Errors;
@@ -6,6 +6,7 @@ using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.ValueObjects;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 #endregion
@@ -40,19 +41,39 @@ internal class DirectoryProviderService : IDirectoryProviderService
     /// Retrieves a list of subdirectory paths from the specified path.
     /// </summary>
     /// <param name="path">The path from which to retrieve the subdirectory paths.</param>
+    /// <param name="includeHiddenElements">Whether to include hidden subdirectories or not.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of directory paths or an error.</returns>
-    public ErrorOr<IEnumerable<FileSystemPathId>> GetSubdirectoryPaths(FileSystemPathId path)
+    public ErrorOr<IEnumerable<FileSystemPathId>> GetSubdirectoryPaths(FileSystemPathId path, bool includeHiddenElements)
     {
         // check if the user has access permissions to the provided path
-        return !_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ListDirectory, false)
-            ? (ErrorOr<IEnumerable<FileSystemPathId>>)Errors.Permission.UnauthorizedAccess
-            : ErrorOrFactory.From(_fileSystem.Directory.GetDirectories(path.Path)
+        if (!_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ListDirectory, false))
+            return Errors.Permission.UnauthorizedAccess;
+        return ErrorOrFactory.From(_fileSystem.Directory.GetDirectories(path.Path)
+                                                        .Where(path => includeHiddenElements || (GetAttributes(path) & FileAttributes.Hidden) != FileAttributes.Hidden)
                                                         .OrderBy(path => path)
                                                         .Select(path => path.EndsWith(_fileSystem.Path.DirectorySeparatorChar) ? path : path + _fileSystem.Path.DirectorySeparatorChar)
-                                                        .Select(FileSystemPathId.Create)
+                                                        .Select(path => FileSystemPathId.Create(path))
                                                         .Where(errorOrPathId => !errorOrPathId.IsError)
                                                         .Select(errorOrPathId => errorOrPathId.Value)
                                                         .AsEnumerable());
+    }
+
+    /// <summary>
+    /// Gets the attributes of a file system item identified by <paramref name="path"/>.
+    /// </summary>
+    /// <param name="path">The path for which to retrieve the file system attributes.</param>
+    /// <returns>The retrieved file system attributes.</returns>
+    private FileAttributes GetAttributes(string path)
+    {
+        try
+        {
+            // File.GetAttributes is used for both directories and files
+            return _fileSystem.File.GetAttributes(path);
+        }
+        catch
+        {
+            return default;
+        }
     }
 
     /// <summary>
@@ -85,9 +106,9 @@ internal class DirectoryProviderService : IDirectoryProviderService
     public ErrorOr<Optional<DateTime>> GetLastWriteTime(FileSystemPathId path)
     {
         // check if the user has access permissions to the provided path
-        return !_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties, false)
-            ? (ErrorOr<Optional<DateTime>>)Errors.Permission.UnauthorizedAccess
-            : (ErrorOr<Optional<DateTime>>)Optional<DateTime>.FromNullable(_fileSystem.Directory.GetLastWriteTime(path.Path));
+        if (!_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties, false))
+            return Errors.Permission.UnauthorizedAccess;
+        return Optional<DateTime>.FromNullable(_fileSystem.Directory.GetLastWriteTime(path.Path));
     }
 
     /// <summary>
@@ -98,9 +119,9 @@ internal class DirectoryProviderService : IDirectoryProviderService
     public ErrorOr<Optional<DateTime>> GetCreationTime(FileSystemPathId path)
     {
         // check if the user has access permissions to the provided path
-        return !_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties, false)
-            ? (ErrorOr<Optional<DateTime>>)Errors.Permission.UnauthorizedAccess
-            : (ErrorOr<Optional<DateTime>>)Optional<DateTime>.FromNullable(_fileSystem.Directory.GetCreationTime(path.Path));
+        if (!_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties, false))
+            return Errors.Permission.UnauthorizedAccess;
+        return Optional<DateTime>.FromNullable(_fileSystem.Directory.GetCreationTime(path.Path));
     }
 
     /// <summary>

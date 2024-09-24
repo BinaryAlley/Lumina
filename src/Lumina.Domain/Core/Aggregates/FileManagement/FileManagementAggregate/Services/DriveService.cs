@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using Lumina.Contracts.Enums.FileSystem;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Entities;
@@ -42,7 +42,9 @@ public class DriveService : IDriveService
         if (_platformContext.Platform == PlatformType.Unix)
         {
             ErrorOr<UnixRootItem> unixRootResult = UnixRootItem.Create(FileSystemItemStatus.Accessible);
-            return unixRootResult.IsError ? (ErrorOr<IEnumerable<FileSystemItem>>)unixRootResult.Errors : (ErrorOr<IEnumerable<FileSystemItem>>)new List<FileSystemItem>() { unixRootResult.Value };
+            if (unixRootResult.IsError)
+                return unixRootResult.Errors;
+            return new List<FileSystemItem>() { unixRootResult.Value };
         }
         else
             return ErrorOrFactory.From(_fileSystem.DriveInfo.GetDrives()

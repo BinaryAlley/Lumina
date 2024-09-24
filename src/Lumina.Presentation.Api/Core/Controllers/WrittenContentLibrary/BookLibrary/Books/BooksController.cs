@@ -44,7 +44,7 @@ public class BooksController : ApiController
     public async Task<IActionResult> GetBooks()
     {
         ErrorOr.ErrorOr<System.Collections.Generic.IEnumerable<Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate.Book>> result = await _mediator.Send(new GetBooksQuery()).ConfigureAwait(false);
-        return result.Match(Ok, Problem);
+        return result.Match(result => Ok(result), errors => Problem(errors));
     }
 
     /// <summary>

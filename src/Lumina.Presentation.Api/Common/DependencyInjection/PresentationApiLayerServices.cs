@@ -25,11 +25,14 @@ public static class PresentationApiLayerServices
     /// <returns>The updated <see cref="IServiceCollection"/>.</returns>
     public static IServiceCollection AddPresentationApiLayerServices(this IServiceCollection services)
     {
-        services.AddCors(options => options.AddPolicy("AllowAll",
+        services.AddCors(options =>
+        {
+            options.AddPolicy("AllowAll",
                  builder => builder
                      .AllowAnyOrigin()
                      .AllowAnyMethod()
-                     .AllowAnyHeader()));
+                     .AllowAnyHeader());
+        });
 
         // add services to the container
         services.AddControllers().AddJsonOptions(options =>

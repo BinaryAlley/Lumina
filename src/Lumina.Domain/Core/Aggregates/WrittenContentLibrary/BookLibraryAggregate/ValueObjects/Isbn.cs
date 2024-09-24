@@ -17,8 +17,8 @@ namespace Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggrega
 public sealed class Isbn : ValueObject
 {
     #region ================================================================== FIELD MEMBERS ================================================================================
-    private static readonly Regex Isbn10Regex = new(@"^(?:ISBN(?:-10)?:? )?(?=[0-9X]{10}$|(?=(?:[0-9]+[-\ ]){3})[-\ 0-9X]{13}$)[0-9]{1,5}[-\ ]?[0-9]+[-\ ]?[0-9]+[-\ ]?[0-9X]$", RegexOptions.Compiled);
-    private static readonly Regex Isbn13Regex = new(@"^(?:ISBN(?:-13)?:? )?(?=[0-9]{13}$|(?=(?:[0-9]+[-\ ]){4})[-\ 0-9]{17}$)97[89][-\ ]?[0-9]{1,5}[-\ ]?[0-9]+[-\ ]?[0-9]+[-\ ]?[0-9]$", RegexOptions.Compiled);
+    private static readonly Regex _isbn10Regex = new(@"^(?:ISBN(?:-10)?:? )?(?=[0-9X]{10}$|(?=(?:[0-9]+[-\ ]){3})[-\ 0-9X]{13}$)[0-9]{1,5}[-\ ]?[0-9]+[-\ ]?[0-9]+[-\ ]?[0-9X]$", RegexOptions.Compiled);
+    private static readonly Regex _isbn13Regex = new(@"^(?:ISBN(?:-13)?:? )?(?=[0-9]{13}$|(?=(?:[0-9]+[-\ ]){4})[-\ 0-9]{17}$)97[89][-\ ]?[0-9]{1,5}[-\ ]?[0-9]+[-\ ]?[0-9]+[-\ ]?[0-9]$", RegexOptions.Compiled);
     #endregion
 
     #region ==================================================================== PROPERTIES =================================================================================
@@ -83,7 +83,7 @@ public sealed class Isbn : ValueObject
     /// <returns><see langword="true"/> if the ISBN-10 is valid, <see langword="false"/> otherwise.</returns>
     public static bool IsValidIsbn10(string isbn)
     {
-        if (!Isbn10Regex.IsMatch(isbn))
+        if (!_isbn10Regex.IsMatch(isbn))
             return false;
         // remove any hyphens or spaces
         isbn = isbn.Replace("-", "").Replace(" ", "").ToUpper();
@@ -105,7 +105,7 @@ public sealed class Isbn : ValueObject
     /// <returns><see langword="true"/> if the ISBN-13 is valid, <see langword="false"/> otherwise.</returns>
     public static bool IsValidIsbn13(string isbn)
     {
-        if (!Isbn13Regex.IsMatch(isbn))
+        if (!_isbn13Regex.IsMatch(isbn))
             return false;
         // remove any hyphens or spaces
         isbn = isbn.Replace("-", "").Replace(" ", "");

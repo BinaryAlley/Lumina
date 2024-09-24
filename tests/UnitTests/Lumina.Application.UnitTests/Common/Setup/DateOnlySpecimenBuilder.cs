@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using AutoFixture.Kernel;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -21,7 +21,9 @@ public class DateOnlySpecimenBuilder : ISpecimenBuilder
     /// <returns>A specimen based on the request.</returns>
     public object Create(object request, ISpecimenContext context)
     {
-        return request is Type type && type == typeof(DateOnly) ? DateOnly.FromDateTime(DateTime.Now) : (object)new NoSpecimen();
+        if (request is Type type && type == typeof(DateOnly))
+            return DateOnly.FromDateTime(DateTime.Now);
+        return new NoSpecimen();
     }
     #endregion
 }

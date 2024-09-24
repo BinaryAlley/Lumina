@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using Lumina.Contracts.Enums.FileSystem;
 using Lumina.Domain.Common.Errors;
@@ -81,7 +81,9 @@ public sealed class File : FileSystemItem
             dateModified,
             size);
         ErrorOr<Updated> setStatusResult = newFile.SetStatus(status);
-        return setStatusResult.IsError ? (ErrorOr<File>)setStatusResult.Errors : (ErrorOr<File>)newFile;
+        if (setStatusResult.IsError)
+            return setStatusResult.Errors;
+        return newFile;
     }
 
     /// <summary>
@@ -112,7 +114,9 @@ public sealed class File : FileSystemItem
             dateModified,
             size);
         ErrorOr<Updated> setStatusResult = newFile.SetStatus(status);
-        return setStatusResult.IsError ? (ErrorOr<File>)setStatusResult.Errors : (ErrorOr<File>)newFile;
+        if (setStatusResult.IsError)
+            return setStatusResult.Errors;
+        return newFile;
     }
 
     /// <summary>

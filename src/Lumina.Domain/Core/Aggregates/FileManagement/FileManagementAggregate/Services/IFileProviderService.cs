@@ -18,8 +18,9 @@ public interface IFileProviderService
     /// Retrieves a list of files at the specified path.
     /// </summary>
     /// <param name="path">The path for which to retrieve the list of files.</param>
+    /// <param name="includeHiddenElements">Whether to include hidden files or not.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of file paths, or an error.</returns>
-    ErrorOr<IEnumerable<FileSystemPathId>> GetFilePaths(FileSystemPathId path);
+    ErrorOr<IEnumerable<FileSystemPathId>> GetFilePaths(FileSystemPathId path, bool includeHiddenElements);
 
     /// <summary>
     /// Retrieves the contents of a file at the specified path.

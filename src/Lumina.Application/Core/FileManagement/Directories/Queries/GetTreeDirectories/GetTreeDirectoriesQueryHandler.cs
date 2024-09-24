@@ -43,7 +43,7 @@ public class GetTreeDirectoriesQueryHandler : IRequestHandler<GetTreeDirectories
     /// </returns>
     public ValueTask<ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>> Handle(GetTreeDirectoriesQuery request, CancellationToken cancellationToken)
     {
-        ErrorOr<IEnumerable<Directory>> result = _directoryService.GetSubdirectories(request.Path);
+        ErrorOr<IEnumerable<Directory>> result = _directoryService.GetSubdirectories(request.Path, request.IncludeHiddenElements);
         return ValueTask.FromResult(result.Match(values => ErrorOrFactory.From(result.Value.Adapt<IEnumerable<FileSystemTreeNodeResponse>>()), errors => errors));
     }
     #endregion

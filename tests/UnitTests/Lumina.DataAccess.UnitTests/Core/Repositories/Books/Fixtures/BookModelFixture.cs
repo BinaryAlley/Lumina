@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using Bogus;
 using Lumina.Contracts.Enums.BookLibrary;
@@ -137,9 +137,9 @@ public class BookModelFixture
 
     private string CreateGoogleBooksId(Faker f)
     {
-        const string validChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
-        return new string(Enumerable.Repeat(validChars, 12)
-            .Select(s => s[f.Random.Number(validChars.Length - 1)])
+        const string VALID_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+        return new string(Enumerable.Repeat(VALID_CHARS, 12)
+            .Select(s => s[f.Random.Number(VALID_CHARS.Length - 1)])
             .ToArray());
     }
 

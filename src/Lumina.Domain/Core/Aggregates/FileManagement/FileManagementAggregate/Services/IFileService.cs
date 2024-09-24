@@ -17,22 +17,25 @@ public interface IFileService
     /// Retrieves files for the specified string path.
     /// </summary>
     /// <param name="path">String representation of the file path.</param>
+    /// <param name="includeHiddenElements">Whether to include hidden files or not.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of files or an error.</returns>
-    ErrorOr<IEnumerable<File>> GetFiles(string path);
+    ErrorOr<IEnumerable<File>> GetFiles(string path, bool includeHiddenElements);
 
     /// <summary>
     /// Retrieves files associated with a given file.
     /// </summary>
     /// <param name="file">The file object.</param>
+    /// <param name="includeHiddenElements">Whether to include hidden files or not.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of files or an error.</returns>
-    ErrorOr<IEnumerable<File>> GetFiles(File file);
+    ErrorOr<IEnumerable<File>> GetFiles(File file, bool includeHiddenElements);
 
     /// <summary>
     /// Retrieves files for a specified file path ID.
     /// </summary>
     /// <param name="path">Identifier for the file path.</param>
+    /// <param name="includeHiddenElements">Whether to include hidden files or not.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of files or an error.</returns>
-    ErrorOr<IEnumerable<File>> GetFiles(FileSystemPathId path);
+    ErrorOr<IEnumerable<File>> GetFiles(FileSystemPathId path, bool includeHiddenElements);
 
     /// <summary>
     /// Copies a file located at <paramref name="sourcePath"/> to <paramref name="destinationPath"/>.

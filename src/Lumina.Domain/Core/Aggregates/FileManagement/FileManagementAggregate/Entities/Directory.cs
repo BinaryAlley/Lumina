@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using Lumina.Contracts.Enums.FileSystem;
 using Lumina.Domain.Common.Primitives;
@@ -80,7 +80,9 @@ public sealed class Directory : FileSystemItem
             dateCreated,
             dateModified);
         ErrorOr<Updated> setStatusResult = newDirectory.SetStatus(status);
-        return setStatusResult.IsError ? (ErrorOr<Directory>)setStatusResult.Errors : (ErrorOr<Directory>)newDirectory;
+        if (setStatusResult.IsError)
+            return setStatusResult.Errors;
+        return newDirectory;
     }
 
     /// <summary>
@@ -107,7 +109,9 @@ public sealed class Directory : FileSystemItem
             dateCreated,
             dateModified);
         ErrorOr<Updated> setStatusResult = newDirectory.SetStatus(status);
-        return setStatusResult.IsError ? (ErrorOr<Directory>)setStatusResult.Errors : (ErrorOr<Directory>)newDirectory;
+        if (setStatusResult.IsError)
+            return setStatusResult.Errors;
+        return newDirectory;
     }
 
     /// <summary>

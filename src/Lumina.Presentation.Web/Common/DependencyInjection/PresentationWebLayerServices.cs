@@ -1,10 +1,13 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using FluentValidation;
 using Lumina.Presentation.Web.Common.Api;
 using Lumina.Presentation.Web.Common.Services;
 using Lumina.Presentation.Web.Core.Services.UI;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
+using Polly.CircuitBreaker;
+using Polly.Retry;
+using Polly.Wrap;
 using System;
 using System.Net;
 using System.Net.Http;
@@ -29,7 +32,7 @@ public static class PresentationWebLayerServices
         services.AddValidatorsFromAssemblyContaining<Program>(ServiceLifetime.Singleton);
 
         // handle transient errors like network timeouts or intermittent failures
-        Polly.Retry.AsyncRetryPolicy<HttpResponseMessage> retryPolicy = Policy
+        AsyncRetryPolicy<HttpResponseMessage> retryPolicy = Policy
             .Handle<HttpRequestException>()
             .OrResult<HttpResponseMessage>(r =>
                 !r.IsSuccessStatusCode &&
@@ -39,12 +42,12 @@ public static class PresentationWebLayerServices
                 TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
 
         // use a circuit breaker to prevent repeatedly calling a failing service
-        Polly.CircuitBreaker.AsyncCircuitBreakerPolicy<HttpResponseMessage> circuitBreakerPolicy = Policy
+        AsyncCircuitBreakerPolicy<HttpResponseMessage> circuitBreakerPolicy = Policy
             .Handle<HttpRequestException>()
             .OrResult<HttpResponseMessage>(r => r.StatusCode == HttpStatusCode.InternalServerError)
             .CircuitBreakerAsync(3, TimeSpan.FromSeconds(30));
 
-        Polly.Wrap.AsyncPolicyWrap<HttpResponseMessage> policy = Policy.WrapAsync(retryPolicy, circuitBreakerPolicy);
+        AsyncPolicyWrap<HttpResponseMessage> policy = Policy.WrapAsync(retryPolicy, circuitBreakerPolicy);
 
         // register the typed client used for the API interaction
         services.AddHttpClient<IApiHttpClient, ApiHttpClient>()

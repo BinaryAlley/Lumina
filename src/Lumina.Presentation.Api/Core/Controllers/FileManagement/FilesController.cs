@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using Lumina.Application.Core.FileManagement.Files.Queries.GetFiles;
 using Lumina.Application.Core.FileManagement.Files.Queries.GetTreeFiles;
@@ -31,7 +31,7 @@ public class FilesController : ApiController
     /// Initializes a new instance of the <see cref="FilesController"/> class.
     /// </summary>
     /// <param name="mediator">Injected service for mediating commands and queries.</param>
-    public FilesController(ISender mediator, IMapper mapper)
+    public FilesController(ISender mediator)
     {
         _mediator = mediator;
     }
@@ -42,11 +42,13 @@ public class FilesController : ApiController
     /// Gets the files of <paramref name="path"/>.
     /// </summary>
     /// <param name="path">The path for which to get the files.</param>
+    /// <param name="includeHiddenElements">Whether to include hidden file system elements or not.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     [HttpGet("get-tree-files")]
-    public async IAsyncEnumerable<FileSystemTreeNodeResponse> GetTreeFiles([FromQuery, ModelBinder(typeof(UrlStringBinder))] string path, [EnumeratorCancellation] CancellationToken cancellationToken)
+    public async IAsyncEnumerable<FileSystemTreeNodeResponse> GetTreeFiles([FromQuery, ModelBinder(typeof(UrlStringBinder))] string path, 
+        [FromQuery] bool includeHiddenElements, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _mediator.Send(new GetTreeFilesQuery(path), cancellationToken).ConfigureAwait(false);
+        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _mediator.Send(new GetTreeFilesQuery(path, includeHiddenElements), cancellationToken).ConfigureAwait(false);
         foreach (FileSystemTreeNodeResponse file in result.Value)
         {
             if (cancellationToken.IsCancellationRequested)
@@ -59,11 +61,13 @@ public class FilesController : ApiController
     /// Gets the files of <paramref name="path"/>.
     /// </summary>
     /// <param name="path">The path for which to get the files.</param>
+    /// <param name="includeHiddenElements">Whether to include hidden file system elements or not.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     [HttpGet("get-files")]
-    public async IAsyncEnumerable<FileResponse> GetFiles([FromQuery, ModelBinder(typeof(UrlStringBinder))] string path, [EnumeratorCancellation] CancellationToken cancellationToken)
+    public async IAsyncEnumerable<FileResponse> GetFiles([FromQuery, ModelBinder(typeof(UrlStringBinder))] string path, 
+        [FromQuery] bool includeHiddenElements, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        ErrorOr<IEnumerable<FileResponse>> result = await _mediator.Send(new GetFilesQuery(path), cancellationToken).ConfigureAwait(false);
+        ErrorOr<IEnumerable<FileResponse>> result = await _mediator.Send(new GetFilesQuery(path, includeHiddenElements), cancellationToken).ConfigureAwait(false);
         if (!result.IsError)
         {
             foreach (FileResponse file in result.Value)

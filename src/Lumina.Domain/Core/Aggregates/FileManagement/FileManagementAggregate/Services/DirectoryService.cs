@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using Lumina.Contracts.Enums.FileSystem;
 using Lumina.Domain.Common.Errors;
@@ -41,37 +41,41 @@ public class DirectoryService : IDirectoryService
     /// Retrieves subdirectories for the specified string path.
     /// </summary>
     /// <param name="path">String representation of the file path.</param>
+    /// <param name="includeHiddenElements">Whether to include hidden subdirectories or not.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of subdirectories or an error.</returns>
-    public ErrorOr<IEnumerable<Directory>> GetSubdirectories(string path)
+    public ErrorOr<IEnumerable<Directory>> GetSubdirectories(string path, bool includeHiddenElements)
     {
         ErrorOr<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(path);
-        return fileSystemPathIdResult.IsError ? (ErrorOr<IEnumerable<Directory>>)fileSystemPathIdResult.Errors : GetSubdirectories(fileSystemPathIdResult.Value);
+        if (fileSystemPathIdResult.IsError)
+            return fileSystemPathIdResult.Errors;
+        return GetSubdirectories(fileSystemPathIdResult.Value, includeHiddenElements);
     }
 
     /// <summary>
     /// Retrieves subdirectories for the given directory.
     /// </summary>
     /// <param name="directory">Directory object to retrieve subdirectories for.</param>
+    /// <param name="includeHiddenElements">Whether to include hidden subdirectories or not.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of subdirectories or an error.</returns>
-    public ErrorOr<IEnumerable<Directory>> GetSubdirectories(Directory directory)
+    public ErrorOr<IEnumerable<Directory>> GetSubdirectories(Directory directory, bool includeHiddenElements)
     {
-        return GetSubdirectories(directory.Id);
+        return GetSubdirectories(directory.Id, includeHiddenElements);
     }
 
     /// <summary>
     /// Retrieves subdirectories for the specified file system path.
     /// </summary>
     /// <param name="path">Identifier for the file path.</param>
+    /// <param name="includeHiddenElements">Whether to include hidden subdirectories or not.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of subdirectories or an error.</returns>
-    public ErrorOr<IEnumerable<Directory>> GetSubdirectories(FileSystemPathId path)
+    public ErrorOr<IEnumerable<Directory>> GetSubdirectories(FileSystemPathId path, bool includeHiddenElements)
     {
         // retrieve the list of subdirectories
-        ErrorOr<IEnumerable<FileSystemPathId>> subdirectoryPathsResult = _environmentContext.DirectoryProviderService.GetSubdirectoryPaths(path);
+        ErrorOr<IEnumerable<FileSystemPathId>> subdirectoryPathsResult = _environmentContext.DirectoryProviderService.GetSubdirectoryPaths(path, includeHiddenElements);
         if (subdirectoryPathsResult.IsError)
             return subdirectoryPathsResult.Errors;
         List<Directory> result = [];
-        IEnumerable<FileSystemPathId> subdirectoryPaths = subdirectoryPathsResult.Value;
-        foreach (FileSystemPathId subPath in subdirectoryPaths)
+        foreach (FileSystemPathId subPath in subdirectoryPathsResult.Value)
         {
             // extract directory details
             ErrorOr<string> dirNameResult = _environmentContext.DirectoryProviderService.GetFileName(subPath);
@@ -111,7 +115,9 @@ public class DirectoryService : IDirectoryService
     public ErrorOr<Directory> CreateDirectory(string path, string name)
     {
         ErrorOr<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(path);
-        return fileSystemPathIdResult.IsError ? (ErrorOr<Directory>)fileSystemPathIdResult.Errors : CreateDirectory(fileSystemPathIdResult.Value, name);
+        if (fileSystemPathIdResult.IsError)
+            return fileSystemPathIdResult.Errors;
+        return CreateDirectory(fileSystemPathIdResult.Value, name);
     }
 
     /// <summary>
@@ -149,7 +155,9 @@ public class DirectoryService : IDirectoryService
                 if (errorDirResult.IsError)
                     return errorDirResult.Errors;
                 ErrorOr<Updated> setStatusResult = errorDirResult.Value.SetStatus(FileSystemItemStatus.Inaccessible);
-                return setStatusResult.IsError ? (ErrorOr<Directory>)setStatusResult.Errors : errorDirResult;
+                if (setStatusResult.IsError)
+                    return setStatusResult.Errors;
+                return errorDirResult;
             }
             else
                 return Directory.Create(newDirectoryPathResult.Value, dirNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value);
@@ -174,9 +182,9 @@ public class DirectoryService : IDirectoryService
         if (fileSystemSourcePathIdResult.IsError)
             return fileSystemSourcePathIdResult.Errors;
         ErrorOr<FileSystemPathId> fileSystemDestinationPathIdResult = FileSystemPathId.Create(destinationPath);
-        return fileSystemDestinationPathIdResult.IsError
-            ? (ErrorOr<Directory>)fileSystemDestinationPathIdResult.Errors
-            : CopyDirectory(fileSystemSourcePathIdResult.Value, fileSystemDestinationPathIdResult.Value, overrideExisting ?? false);
+        if (fileSystemDestinationPathIdResult.IsError)
+            return fileSystemDestinationPathIdResult.Errors;
+        return CopyDirectory(fileSystemSourcePathIdResult.Value, fileSystemDestinationPathIdResult.Value, overrideExisting ?? false);
     }
 
     /// <summary>
@@ -220,9 +228,9 @@ public class DirectoryService : IDirectoryService
         if (fileSystemSourcePathIdResult.IsError)
             return fileSystemSourcePathIdResult.Errors;
         ErrorOr<FileSystemPathId> fileSystemDestinationPathIdResult = FileSystemPathId.Create(destinationPath);
-        return fileSystemDestinationPathIdResult.IsError
-            ? (ErrorOr<Directory>)fileSystemDestinationPathIdResult.Errors
-            : MoveDirectory(fileSystemSourcePathIdResult.Value, fileSystemDestinationPathIdResult.Value, overrideExisting ?? false);
+        if (fileSystemDestinationPathIdResult.IsError)
+            return fileSystemDestinationPathIdResult.Errors;
+        return MoveDirectory(fileSystemSourcePathIdResult.Value, fileSystemDestinationPathIdResult.Value, overrideExisting ?? false);
     }
 
     /// <summary>
@@ -257,7 +265,9 @@ public class DirectoryService : IDirectoryService
     public ErrorOr<Directory> RenameDirectory(string path, string name)
     {
         ErrorOr<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(path);
-        return fileSystemPathIdResult.IsError ? (ErrorOr<Directory>)fileSystemPathIdResult.Errors : RenameDirectory(fileSystemPathIdResult.Value, name);
+        if (fileSystemPathIdResult.IsError)
+            return fileSystemPathIdResult.Errors;
+        return RenameDirectory(fileSystemPathIdResult.Value, name);
     }
 
     /// <summary>
@@ -295,7 +305,9 @@ public class DirectoryService : IDirectoryService
                 if (errorDirResult.IsError)
                     return errorDirResult.Errors;
                 ErrorOr<Updated> setStatusResult = errorDirResult.Value.SetStatus(FileSystemItemStatus.Inaccessible);
-                return setStatusResult.IsError ? (ErrorOr<Directory>)setStatusResult.Errors : errorDirResult;
+                if (setStatusResult.IsError)
+                    return setStatusResult.Errors;
+                return errorDirResult;
             }
             else
                 return Directory.Create(newDirectoryPathResult.Value, dirNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value);
@@ -310,7 +322,9 @@ public class DirectoryService : IDirectoryService
     public ErrorOr<Deleted> DeleteDirectory(string path)
     {
         ErrorOr<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(path);
-        return fileSystemPathIdResult.IsError ? (ErrorOr<Deleted>)fileSystemPathIdResult.Errors : DeleteDirectory(fileSystemPathIdResult.Value);
+        if (fileSystemPathIdResult.IsError)
+            return fileSystemPathIdResult.Errors;
+        return DeleteDirectory(fileSystemPathIdResult.Value);
     }
 
     /// <summary>

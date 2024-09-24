@@ -1,12 +1,17 @@
+#region ========================================================================= USING =====================================================================================
+using System.Diagnostics;
+#endregion
+
 namespace Lumina.Infrastructure.Common.Models.Configuration;
 
 /// <summary>
 /// Model for deserializing database configuration settings.
 /// </summary>
+[DebuggerDisplay("{SECTION_NAME}")]
 public class DatabaseSettingsModel
 {
     #region ================================================================== FIELD MEMBERS ================================================================================
-    public const string SectionName = "ConnectionStrings";
+    public const string SECTION_NAME = "ConnectionStrings";
     #endregion
 
     #region ==================================================================== PROPERTIES =================================================================================

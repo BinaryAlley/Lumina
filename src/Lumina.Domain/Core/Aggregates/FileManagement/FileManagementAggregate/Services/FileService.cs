@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using Lumina.Contracts.Enums.FileSystem;
 using Lumina.Domain.Common.Errors;
@@ -41,32 +41,37 @@ public class FileService : IFileService
     /// Retrieves files for the specified string path.
     /// </summary>
     /// <param name="path">String representation of the file path.</param>
+    /// <param name="includeHiddenElements">Whether to include hidden files or not.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of files or an error.</returns>
-    public ErrorOr<IEnumerable<File>> GetFiles(string path)
+    public ErrorOr<IEnumerable<File>> GetFiles(string path, bool includeHiddenElements)
     {
         ErrorOr<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(path);
-        return fileSystemPathIdResult.IsError ? (ErrorOr<IEnumerable<File>>)fileSystemPathIdResult.Errors : GetFiles(fileSystemPathIdResult.Value);
+        if (fileSystemPathIdResult.IsError)
+            return fileSystemPathIdResult.Errors;
+        return GetFiles(fileSystemPathIdResult.Value, includeHiddenElements);
     }
 
     /// <summary>
     /// Retrieves files associated with a given file.
     /// </summary>
     /// <param name="file">The file object.</param>
+    /// <param name="includeHiddenElements">Whether to include hidden files or not.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of files or an error.</returns>
-    public ErrorOr<IEnumerable<File>> GetFiles(File file)
+    public ErrorOr<IEnumerable<File>> GetFiles(File file, bool includeHiddenElements)
     {
-        return GetFiles(file.Id);
+        return GetFiles(file.Id, includeHiddenElements);
     }
 
     /// <summary>
     /// Retrieves files for a specified file path Id.
     /// </summary>
     /// <param name="path">Identifier for the file path.</param>
+    /// <param name="includeHiddenElements">Whether to include hidden files or not.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of files or an error.</returns>
-    public ErrorOr<IEnumerable<File>> GetFiles(FileSystemPathId path)
+    public ErrorOr<IEnumerable<File>> GetFiles(FileSystemPathId path, bool includeHiddenElements)
     {
         // retrieve the list of files
-        ErrorOr<IEnumerable<FileSystemPathId>> filePathsResult = _environmentContext.FileProviderService.GetFilePaths(path);
+        ErrorOr<IEnumerable<FileSystemPathId>> filePathsResult = _environmentContext.FileProviderService.GetFilePaths(path, includeHiddenElements);
         if (filePathsResult.IsError)
             return filePathsResult.Errors;
         List<File> result = [];
@@ -119,9 +124,9 @@ public class FileService : IFileService
         if (fileSystemSourcePathIdResult.IsError)
             return fileSystemSourcePathIdResult.Errors;
         ErrorOr<FileSystemPathId> fileSystemDestinationPathIdResult = FileSystemPathId.Create(destinationDirectoryPath);
-        return fileSystemDestinationPathIdResult.IsError
-            ? (ErrorOr<File>)fileSystemDestinationPathIdResult.Errors
-            : CopyFile(fileSystemSourcePathIdResult.Value, fileSystemDestinationPathIdResult.Value, overrideExisting ?? false);
+        if (fileSystemDestinationPathIdResult.IsError)
+            return fileSystemDestinationPathIdResult.Errors;
+        return CopyFile(fileSystemSourcePathIdResult.Value, fileSystemDestinationPathIdResult.Value, overrideExisting ?? false);
     }
 
     /// <summary>
@@ -158,7 +163,9 @@ public class FileService : IFileService
                 if (errorFileResult.IsError)
                     return errorFileResult.Errors;
                 ErrorOr<Updated> setStatusResult = errorFileResult.Value.SetStatus(FileSystemItemStatus.Inaccessible);
-                return setStatusResult.IsError ? (ErrorOr<File>)setStatusResult.Errors : errorFileResult;
+                if (setStatusResult.IsError)
+                    return setStatusResult.Errors;
+                return errorFileResult;
             }
             else
                 return File.Create(copyFileResult.Value, fileNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value, size);
@@ -181,9 +188,9 @@ public class FileService : IFileService
         if (fileSystemSourcePathIdResult.IsError)
             return fileSystemSourcePathIdResult.Errors;
         ErrorOr<FileSystemPathId> fileSystemDestinationPathIdResult = FileSystemPathId.Create(destinationDirectoryPath);
-        return fileSystemDestinationPathIdResult.IsError
-            ? (ErrorOr<File>)fileSystemDestinationPathIdResult.Errors
-            : MoveFile(fileSystemSourcePathIdResult.Value, fileSystemDestinationPathIdResult.Value, overrideExisting ?? false);
+        if (fileSystemDestinationPathIdResult.IsError)
+            return fileSystemDestinationPathIdResult.Errors;
+        return MoveFile(fileSystemSourcePathIdResult.Value, fileSystemDestinationPathIdResult.Value, overrideExisting ?? false);
     }
 
     /// <summary>
@@ -220,7 +227,9 @@ public class FileService : IFileService
                 if (errorFileResult.IsError)
                     return errorFileResult.Errors;
                 ErrorOr<Updated> setStatusResult = errorFileResult.Value.SetStatus(FileSystemItemStatus.Inaccessible);
-                return setStatusResult.IsError ? (ErrorOr<File>)setStatusResult.Errors : errorFileResult;
+                if (setStatusResult.IsError)
+                    return setStatusResult.Errors;
+                return errorFileResult;
             }
             else
                 return File.Create(moveFileResult.Value, fileNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value, size);
@@ -236,7 +245,9 @@ public class FileService : IFileService
     public ErrorOr<File> RenameFile(string path, string name)
     {
         ErrorOr<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(path);
-        return fileSystemPathIdResult.IsError ? (ErrorOr<File>)fileSystemPathIdResult.Errors : RenameFile(fileSystemPathIdResult.Value, name);
+        if (fileSystemPathIdResult.IsError)
+            return fileSystemPathIdResult.Errors;
+        return RenameFile(fileSystemPathIdResult.Value, name);
     }
 
     /// <summary>
@@ -276,7 +287,9 @@ public class FileService : IFileService
                 if (errorFileResult.IsError)
                     return errorFileResult.Errors;
                 ErrorOr<Updated> setStatusResult = errorFileResult.Value.SetStatus(FileSystemItemStatus.Inaccessible);
-                return setStatusResult.IsError ? (ErrorOr<File>)setStatusResult.Errors : errorFileResult;
+                if (setStatusResult.IsError)
+                    return setStatusResult.Errors;
+                return errorFileResult;
             }
             else
                 return File.Create(newFilePathResult.Value, fileNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value, size);
@@ -291,7 +304,9 @@ public class FileService : IFileService
     public ErrorOr<Deleted> DeleteFile(string path)
     {
         ErrorOr<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(path);
-        return fileSystemPathIdResult.IsError ? (ErrorOr<Deleted>)fileSystemPathIdResult.Errors : DeleteFile(fileSystemPathIdResult.Value);
+        if (fileSystemPathIdResult.IsError)
+            return fileSystemPathIdResult.Errors;
+        return DeleteFile(fileSystemPathIdResult.Value);
     }
 
     /// <summary>

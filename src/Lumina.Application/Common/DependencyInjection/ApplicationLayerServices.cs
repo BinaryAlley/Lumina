@@ -23,7 +23,10 @@ public static class ApplicationLayerServices
     public static IServiceCollection AddApplicationLayerServices(this IServiceCollection services)
     {
         // register Mediator
-        services.AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped);
+        services.AddMediator(options =>
+        {
+            options.ServiceLifetime = ServiceLifetime.Scoped;
+        });
 
         // register the validation behavior
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));

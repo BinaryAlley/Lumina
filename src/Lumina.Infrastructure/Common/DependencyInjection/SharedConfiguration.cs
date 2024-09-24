@@ -34,13 +34,13 @@ public static class SharedConfiguration
 
         // bind the common settings section
         services.AddOptions<CommonSettingsModel>()
-                .Bind(configuration.GetRequiredSection(CommonSettingsModel.SectionName))
+                .Bind(configuration.GetRequiredSection(CommonSettingsModel.SECTION_NAME))
                 .ValidateFluently()
                 .ValidateOnStart();
 
         // bind the database connection string section
         services.AddOptions<DatabaseSettingsModel>()
-                .Bind(configuration.GetRequiredSection(DatabaseSettingsModel.SectionName))
+                .Bind(configuration.GetRequiredSection(DatabaseSettingsModel.SECTION_NAME))
                 .ValidateFluently()
                 .ValidateOnStart();
         return services;

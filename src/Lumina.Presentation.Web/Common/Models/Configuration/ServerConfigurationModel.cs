@@ -7,11 +7,11 @@ namespace Lumina.Presentation.Web.Common.Models.Configuration;
 /// <summary>
 /// Model for deserializing server configuration settings.
 /// </summary>
-[DebuggerDisplay("{SectionName}")]
+[DebuggerDisplay("{SECTION_NAME}")]
 public class ServerConfigurationModel
 {
     #region ================================================================== FIELD MEMBERS ================================================================================
-    public const string SectionName = "ServerConfiguration";
+    public const string SECTION_NAME = "ServerConfiguration";
     #endregion
 
     #region ==================================================================== PROPERTIES =================================================================================

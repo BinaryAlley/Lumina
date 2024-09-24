@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Models.Core;
@@ -48,7 +48,9 @@ public sealed class FileSystemPathId : ValueObject
     /// </returns>
     public static ErrorOr<FileSystemPathId> Create(string path)
     {
-        return string.IsNullOrWhiteSpace(path) ? (ErrorOr<FileSystemPathId>)Errors.FileManagement.InvalidPath : (ErrorOr<FileSystemPathId>)new FileSystemPathId(path);
+        if (string.IsNullOrWhiteSpace(path))
+            return Errors.FileManagement.InvalidPath;
+        return new FileSystemPathId(path);
     }
     #endregion
 }

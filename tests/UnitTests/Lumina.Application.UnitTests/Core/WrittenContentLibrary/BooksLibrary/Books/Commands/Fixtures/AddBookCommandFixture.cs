@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using Bogus;
 using Lumina.Application.Core.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook;
@@ -263,9 +263,9 @@ public class AddBookCommandFixture
             .RuleFor(x => x.LibraryThingId, f => f.Random.String2(f.Random.Number(1, 50)))
             .RuleFor(x => x.GoogleBooksId, f =>
             {
-                const string validChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
-                return new string(Enumerable.Repeat(validChars, 12)
-                    .Select(s => s[f.Random.Number(validChars.Length - 1)])
+                const string VALID_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+                return new string(Enumerable.Repeat(VALID_CHARS, 12)
+                    .Select(s => s[f.Random.Number(VALID_CHARS.Length - 1)])
                     .ToArray());
             })
             .RuleFor(x => x.BarnesAndNobleId, f => f.Random.String2(10, "0123456789"))

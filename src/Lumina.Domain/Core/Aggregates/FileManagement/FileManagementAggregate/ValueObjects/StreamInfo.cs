@@ -115,13 +115,13 @@ public class StreamInfo : ValueObject
         Optional<int> sampleRate,
         Optional<int> channels)
     {
-        return streamId is null
-            ? (ErrorOr<StreamInfo>)Errors.FileManagement.StreamIdCannotBeEmpty
-            : codec is null
-            ? (ErrorOr<StreamInfo>)Errors.FileManagement.CodecCannotBeEmpty
-            : bitrate <= 0
-            ? (ErrorOr<StreamInfo>)Errors.FileManagement.BitrateMustBeAPositiveNumber
-            : (ErrorOr<StreamInfo>)new StreamInfo(streamId, mimeType, bitrate, codec, resolution, frameRate, sampleRate, channels);
+        if (streamId is null)
+            return Errors.FileManagement.StreamIdCannotBeEmpty;
+        if (codec is null)
+            return Errors.FileManagement.CodecCannotBeEmpty;
+        if (bitrate <= 0)
+            return Errors.FileManagement.BitrateMustBeAPositiveNumber;
+        return new StreamInfo(streamId, mimeType, bitrate, codec, resolution, frameRate, sampleRate, channels);
     }
 
     /// <inheritdoc/>

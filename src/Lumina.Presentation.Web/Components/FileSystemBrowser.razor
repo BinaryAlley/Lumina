@@ -1,4 +1,4 @@
-﻿@using Lumina.Presentation.Web.Common.Models.Common
+@using Lumina.Presentation.Web.Common.Models.Common
 @using Lumina.Presentation.Web.Common.Api
 @using Lumina.Presentation.Web.Common.Enums.FileSystem
 @using Lumina.Presentation.Web.Common.Enums.Notifications
@@ -39,14 +39,10 @@
                     </div>
                     <img src="images/ui/toggle-tree-view.svg" id="navigator-toggle-tree-view-button" alt="Toggle Tree View" title="Toggle Tree View" class="navigator-icon" />
                     <img src="images/ui/toggle-thumbnails.svg" id="navigator-toggle-thumbnails-button" alt="Toggle Thumbnails" title="Toggle Thumbanils" class="navigator-icon" />
-                    <img src="images/ui/toggle-hidden.svg" id="navigator-toggle-hidden-button" alt="Toggle Hidden Files" title="Toggle Hidden Files" class="navigator-icon" />
-                    @* <img src="images/ui/toggle-selection.svg" id="navigator-toggle-selection-button" alt="Toggle Selection Mode" title="Toggle Selection Mode" class="navigator-icon" /> *@
+                    @* <img src="images/ui/toggle-hidden.svg" id="navigator-toggle-hidden-button" alt="Toggle Hidden Files" title="Toggle Hidden Files" class="navigator-icon" /> *@
 
-
-
-
-
-                    <svg @onclick="ToggleSelectionModeAsync" id="navigator-toggle-selection-button" alt="Toggle Selection Mode" title="Toggle Selection Mode" class="navigator-icon" width="30" height="30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
+                    <svg @onclick="ToggleHiddenElementsModeAsync" id="navigator-toggle-hidden-button" class="navigator-icon" width="30" height="30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <title>Toggle Hidden Files</title>
                         <defs>
                             <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
                                 <feComponentTransfer in="SourceAlpha" result="adjustedAlpha">
@@ -60,7 +56,8 @@
                                     <feMergeNode in="SourceGraphic" />
                                 </feMerge>
                             </filter>
-                            <linearGradient id="linearGradient1299" x1="5" x2="195" y1="174.76" y2="174.76" gradientTransform="matrix(.32632 0 0 .095367 -.63187 42.834)" gradientUnits="userSpaceOnUse">
+
+                            <linearGradient id="linearGradient" x1="5" x2="195" y1="174.76" y2="174.76" gradientTransform="matrix(.32632 0 0 .095367 -.63187 42.834)" gradientUnits="userSpaceOnUse">
                                 <stop stop-color="#039bfc" stop-opacity="0" offset="0" />
                                 <stop stop-color="#039bfc" offset=".225" />
                                 <stop stop-color="#039bfc" offset=".5" />
@@ -70,7 +67,44 @@
                         </defs>
 
                         <g transform="translate(0,-0.5) scale(0.475)">
-                            <rect x=".99971" y="59" width="62.001" height="1" ry="0" fill="url(#linearGradient1299)" stroke-width="3.7796" style="mix-blend-mode:normal;paint-order:stroke fill markers" filter="url(#glow)" />
+                            <rect x=".99971" y="59" width="62.001" height="1" ry="0" fill="url(#linearGradient)" stroke-width="3.7796" style="mix-blend-mode:normal;paint-order:stroke fill markers" filter="url(#glow)" />
+                        </g>
+                        <g stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5">
+                            <rect x="4.5" y="4.5" width="21" height="21" ry="2.5" fill="none" stroke="#039bfc" style="paint-order:stroke fill markers" filter="url(#glow)" />
+                        </g>
+                        <g transform="translate(5,5) scale(0.85)">
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill @(showHiddenElements ? " enabled" : string.Empty)" filter="url(#glow)" d="M14.3307 7.16929C13.5873 7.05887 12.806 7 12 7C7.02944 7 3 9.23858 3 12C3 13.4401 4.09589 14.738 5.84963 15.6504L8.21192 13.2881C8.07452 12.8839 8 12.4506 8 12C8 9.79086 9.79086 8 12 8C12.4506 8 12.8839 8.07452 13.2881 8.21192L14.3307 7.16929Z" />
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill @(showHiddenElements ? " enabled" : string.Empty)" filter="url(#glow)" d="M11.2308 15.9261C11.4797 15.9746 11.7369 16 12 16C14.2091 16 16 14.2091 16 12C16 11.7369 15.9746 11.4797 15.9261 11.2308L18.5726 8.58427C20.0782 9.47809 21 10.6792 21 12C21 14.7614 16.9706 17 12 17C11.4016 17 10.8169 16.9676 10.2512 16.9057L11.2308 15.9261Z" />
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill @(showHiddenElements ? " enabled" : string.Empty)" filter="url(#glow)" d="M17.7929 5.20711C18.1834 4.81658 18.8166 4.81658 19.2071 5.20711C19.5976 5.59763 19.5976 6.2308 19.2071 6.62132L6.47919 19.3492C6.08866 19.7398 5.4555 19.7398 5.06497 19.3492C4.67445 18.9587 4.67445 18.3256 5.06497 17.935L17.7929 5.20711Z" />
+                        </g>
+                    </svg>
+
+                    <svg @onclick="ToggleSelectionModeAsync" id="navigator-toggle-selection-button" class="navigator-icon" width="30" height="30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <title>Toggle Selection Mode</title>
+                        <defs>
+                            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                                <feComponentTransfer in="SourceAlpha" result="adjustedAlpha">
+                                    <feFuncA type="table" tableValues="0 0.5 1" />
+                                </feComponentTransfer>
+                                <feGaussianBlur in="adjustedAlpha" stdDeviation="2" result="blur" />
+                                <feFlood flood-color="#039bfc" result="color" />
+                                <feComposite in="color" in2="blur" operator="in" result="softGlowColored" />
+                                <feMerge>
+                                    <feMergeNode in="softGlowColored" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                            <linearGradient id="linearGradient1" x1="5" x2="195" y1="174.76" y2="174.76" gradientTransform="matrix(.32632 0 0 .095367 -.63187 42.834)" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#039bfc" stop-opacity="0" offset="0" />
+                                <stop stop-color="#039bfc" offset=".225" />
+                                <stop stop-color="#039bfc" offset=".5" />
+                                <stop stop-color="#039bfc" offset=".775" />
+                                <stop stop-color="#039bfc" stop-opacity="0" offset="1" />
+                            </linearGradient>
+                        </defs>
+
+                        <g transform="translate(0,-0.5) scale(0.475)">
+                            <rect x=".99971" y="59" width="62.001" height="1" ry="0" fill="url(#linearGradient)" stroke-width="3.7796" style="mix-blend-mode:normal;paint-order:stroke fill markers" filter="url(#glow)" />
                         </g>
                         <g stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5">
                             <rect x="4.5" y="4.5" width="21" height="21" ry="2.5" fill="none" stroke="#039bfc" style="paint-order:stroke fill markers" filter="url(#glow)" />
@@ -229,6 +263,7 @@
     private string? selectedNodePath;
     private string? _path;
     private bool isSelectionMode;
+    private bool showHiddenElements;
     private bool showPathSegmentDowpDown;
     private bool isNavigationPathEditMode;
     private int? expandedPathSegmentIndex;
@@ -312,7 +347,7 @@
             {
                 try
                 {
-                    await foreach (FileSystemTreeNodeModel? childNode in _apiHttpClient.GetAsyncEnumerable<FileSystemTreeNodeModel>($"directories/get-tree-directories?path={Uri.EscapeDataString(node.Path)}").ConfigureAwait(false))
+                    await foreach (FileSystemTreeNodeModel? childNode in _apiHttpClient.GetAsyncEnumerable<FileSystemTreeNodeModel>($"directories/get-tree-directories?path={Uri.EscapeDataString(node.Path)}&includeHiddenElements={showHiddenElements}").ConfigureAwait(false))
                     {
                         if (childNode is not null)
                         {
@@ -322,7 +357,7 @@
                     }
                     if (IncludeFiles)
                     {
-                        await foreach (FileSystemTreeNodeModel? childNode in _apiHttpClient.GetAsyncEnumerable<FileSystemTreeNodeModel>($"files/get-tree-files?path={Uri.EscapeDataString(node.Path)}").ConfigureAwait(false))
+                        await foreach (FileSystemTreeNodeModel? childNode in _apiHttpClient.GetAsyncEnumerable<FileSystemTreeNodeModel>($"files/get-tree-files?path={Uri.EscapeDataString(node.Path)}&includeHiddenElements={showHiddenElements}").ConfigureAwait(false))
                         {
                             if (childNode is not null)
                             {
@@ -386,7 +421,7 @@
             // add current and parent directories too
             List<FileSystemTreeNodeModel> directories = [new() { Path = concatenatedPath, Name = ".", }, new() { Path = parentConcatenatedPath, Name = ".." }];
             // add the rest of the subdirectories of the expanded path node
-            await foreach (FileSystemTreeNodeModel? directory in _apiHttpClient.GetAsyncEnumerable<FileSystemTreeNodeModel>($"directories/get-tree-directories?path={Uri.EscapeDataString(concatenatedPath)}").ConfigureAwait(false))
+            await foreach (FileSystemTreeNodeModel? directory in _apiHttpClient.GetAsyncEnumerable<FileSystemTreeNodeModel>($"directories/get-tree-directories?path={Uri.EscapeDataString(concatenatedPath)}&includeHiddenElements={showHiddenElements}").ConfigureAwait(false))
                 if (directory is not null)
                     directories.Add(directory);
             // store the directories for this segment
@@ -622,7 +657,7 @@
                 });
         }
         // if there was an initial path saved from a previous session, load the full tree up to that initial path
-        List<FileSystemTreeNodeModel> initialTree = await _apiHttpClient.GetAsync<List<FileSystemTreeNodeModel>>($"directories/get-directory-tree?path={Uri.EscapeDataString(path!)}&includeFiles={IncludeFiles}").ConfigureAwait(false);
+        List<FileSystemTreeNodeModel> initialTree = await _apiHttpClient.GetAsync<List<FileSystemTreeNodeModel>>($"directories/get-directory-tree?path={Uri.EscapeDataString(path!)}&includeFiles={IncludeFiles}&includeHiddenElements={showHiddenElements}").ConfigureAwait(false);
         if (initialTree is not null && initialTree.Count > 0)
         {
             // take the root of the retrieved tree, and try to match it against a drive in the retrieved list of drives, on Windows; on Unix, add it as the unique root path
@@ -651,7 +686,7 @@
         fileSystemItems.Clear();
         try
         {
-            await foreach (DirectoryModel? directory in _apiHttpClient.GetAsyncEnumerable<DirectoryModel>($"directories/get-directories?path={Uri.EscapeDataString(path)}").ConfigureAwait(false))
+            await foreach (DirectoryModel? directory in _apiHttpClient.GetAsyncEnumerable<DirectoryModel>($"directories/get-directories?path={Uri.EscapeDataString(path)}&includeHiddenElements={showHiddenElements}").ConfigureAwait(false))
             {
                 if (directory is not null)
                 {
@@ -661,7 +696,7 @@
             }
             if (IncludeFiles)
             {
-                await foreach (FileModel? file in _apiHttpClient.GetAsyncEnumerable<FileModel>($"files/get-files?path={Uri.EscapeDataString(path)}").ConfigureAwait(false))
+                await foreach (FileModel? file in _apiHttpClient.GetAsyncEnumerable<FileModel>($"files/get-files?path={Uri.EscapeDataString(path)}&includeHiddenElements={showHiddenElements}").ConfigureAwait(false))
                 {
                     if (file is not null)
                     {
@@ -772,6 +807,20 @@
     {
         isSelectionMode = !isSelectionMode;
         await JSRuntime.InvokeVoidAsync("toggleSelectionMode").ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Enables or disables the display of hidden file system files and directories.
+    /// </summary>
+    private async Task ToggleHiddenElementsModeAsync()
+    {
+        showHiddenElements = !showHiddenElements;
+        if (Path is not null)
+        {
+            if (!Path.EndsWith(pathSeparator))
+                Path += pathSeparator;
+            await NavigateToPathAsync(Path, isForwardNavigation: false, isBackwardNavigation: false).ConfigureAwait(false);
+        }
     }
 
     /// <summary>

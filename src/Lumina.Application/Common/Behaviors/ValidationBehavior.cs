@@ -2,6 +2,8 @@
 using ErrorOr;
 using FluentValidation;
 using Mediator;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -49,7 +51,7 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
         if (validationResult.IsValid)
             return await next(request, cancellationToken).ConfigureAwait(false);
         // after the command handler is executed
-        System.Collections.Generic.List<Error> errors = validationResult.Errors.ConvertAll(validationFailure => Error.Validation(description: validationFailure.ErrorMessage));
+        List<Error> errors = validationResult.Errors.ConvertAll(validationFailure => Error.Validation(description: validationFailure.ErrorMessage));
         // the compiler doesn't know there is an implicit converter from a list of errors to the ErrorOr object, and unfortunately, there is no way around this but to use some magic
         // this is acceptable because we DO know that we will always have a list of errors of type ErrorOr (check the generic constraint at the top of the class!)
         return (dynamic)errors;

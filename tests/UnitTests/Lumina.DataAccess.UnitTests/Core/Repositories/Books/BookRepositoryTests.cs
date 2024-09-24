@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using EntityFrameworkCore.Testing.NSubstitute;
 using ErrorOr;
 using FluentAssertions;
@@ -10,6 +10,7 @@ using Lumina.DataAccess.Core.UoW;
 using Lumina.DataAccess.UnitTests.Core.Repositories.Books.Fixtures;
 using Lumina.Domain.Common.Errors;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -58,7 +59,7 @@ public class BookRepositoryTests
         result.Value.Should().Be(Result.Created);
 
         // Check if the book was added to the context's ChangeTracker
-        Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<BookModel>? addedBook = _mockContext.ChangeTracker.Entries<BookModel>()
+        EntityEntry<BookModel>? addedBook = _mockContext.ChangeTracker.Entries<BookModel>()
             .FirstOrDefault(e => e.State == EntityState.Added && e.Entity.Id == bookModel.Id);
         addedBook.Should().NotBeNull();
     }
@@ -99,7 +100,7 @@ public class BookRepositoryTests
         result.IsError.Should().BeFalse();
         result.Value.Should().Be(Result.Created);
 
-        Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<BookModel>? addedBook = _mockContext.ChangeTracker.Entries<BookModel>()
+        EntityEntry<BookModel>? addedBook = _mockContext.ChangeTracker.Entries<BookModel>()
             .FirstOrDefault(e => e.State == EntityState.Added && e.Entity.Id == bookModel.Id);
         addedBook.Should().NotBeNull();
         BookModel addedBookEntity = addedBook!.Entity;
@@ -126,7 +127,7 @@ public class BookRepositoryTests
         result.IsError.Should().BeFalse();
         result.Value.Should().Be(Result.Created);
 
-        Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<BookModel>? addedBook = _mockContext.ChangeTracker.Entries<BookModel>()
+        EntityEntry<BookModel>? addedBook = _mockContext.ChangeTracker.Entries<BookModel>()
             .FirstOrDefault(e => e.State == EntityState.Added && e.Entity.Id == bookModel.Id);
         addedBook.Should().NotBeNull();
         BookModel addedBookEntity = addedBook!.Entity;

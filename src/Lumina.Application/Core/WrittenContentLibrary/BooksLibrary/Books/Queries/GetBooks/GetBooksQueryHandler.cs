@@ -1,7 +1,8 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using Lumina.Application.Common.DataAccess.Repositories.Books;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Contracts.Models.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate;
 using Mapster;
 using Mediator;
@@ -44,7 +45,7 @@ public class GetBooksQueryHandler : IRequestHandler<GetBooksQuery, ErrorOr<IEnum
     public async ValueTask<ErrorOr<IEnumerable<Book>>> Handle(GetBooksQuery request, CancellationToken cancellationToken)
     {
         IBookRepository bookRepository = _unitOfWork.GetRepository<IBookRepository>();
-        ErrorOr<IEnumerable<Contracts.Models.WrittenContentLibrary.BookLibrary.BookModel>> getBooksResult = await bookRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+        ErrorOr<IEnumerable<BookModel>> getBooksResult = await bookRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
         return getBooksResult.Match(values => ErrorOrFactory.From(values.Adapt<IEnumerable<Book>>()), errors => errors);
     }
     #endregion

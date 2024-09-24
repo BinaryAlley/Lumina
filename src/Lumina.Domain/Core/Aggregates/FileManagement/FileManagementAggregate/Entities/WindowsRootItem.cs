@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using Lumina.Contracts.Enums.FileSystem;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.ValueObjects;
@@ -59,7 +59,9 @@ public sealed class WindowsRootItem : FileSystemItem
             createPathResult.Value,
             name);
         ErrorOr<Updated> setStatusResult = newRoot.SetStatus(status);
-        return setStatusResult.IsError ? (ErrorOr<WindowsRootItem>)setStatusResult.Errors : (ErrorOr<WindowsRootItem>)newRoot;
+        if (setStatusResult.IsError)
+            return setStatusResult.Errors;
+        return newRoot;
     }
 
     /// <summary>
@@ -81,7 +83,9 @@ public sealed class WindowsRootItem : FileSystemItem
             id,
             name);
         ErrorOr<Updated> setStatusResult = newFile.SetStatus(status);
-        return setStatusResult.IsError ? (ErrorOr<WindowsRootItem>)setStatusResult.Errors : (ErrorOr<WindowsRootItem>)newFile;
+        if (setStatusResult.IsError)
+            return setStatusResult.Errors;
+        return newFile;
     }
     #endregion
 }

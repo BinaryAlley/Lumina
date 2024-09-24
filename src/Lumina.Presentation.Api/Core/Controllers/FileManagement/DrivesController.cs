@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using Lumina.Application.Core.FileManagement.Drives.Queries.GetDrives;
 using Lumina.Contracts.Responses.FileManagement;
@@ -43,7 +43,7 @@ public class DrivesController : ApiController
     public async Task<IActionResult> GetDrives(CancellationToken cancellationToken)
     {
         ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _mediator.Send(new GetDrivesQuery(), cancellationToken).ConfigureAwait(false);
-        return result.Match(Ok, Problem);
+        return result.Match(result => Ok(result), errors => Problem(errors));
     }
     #endregion
 }

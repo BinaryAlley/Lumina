@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using Lumina.Application.Core.FileManagement.Directories.Queries.GetDirectories;
 using Lumina.Application.Core.FileManagement.Directories.Queries.GetDirectoryTree;
@@ -42,11 +42,13 @@ public class DirectoriesController : ApiController
     /// Gets the tree of expanded directories leading up to <paramref name="path"/>, with the additional list of drives, and children of the last child directory.
     /// </summary>
     /// <param name="path">The path for which to get the directory tree.</param>
+    /// <param name="includeHiddenElements">Whether to include hidden file system elements or not.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     [HttpGet("get-directory-tree")]
-    public async IAsyncEnumerable<FileSystemTreeNodeResponse> GetDirectoryTree([FromQuery, ModelBinder(typeof(UrlStringBinder))] string path, [FromQuery] bool includeFiles, [EnumeratorCancellation] CancellationToken cancellationToken)
+    public async IAsyncEnumerable<FileSystemTreeNodeResponse> GetDirectoryTree([FromQuery, ModelBinder(typeof(UrlStringBinder))] string path, 
+        [FromQuery] bool includeFiles, [FromQuery] bool includeHiddenElements, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _mediator.Send(new GetDirectoryTreeQuery(path, includeFiles), cancellationToken).ConfigureAwait(false);
+        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _mediator.Send(new GetDirectoryTreeQuery(path, includeFiles, includeHiddenElements), cancellationToken).ConfigureAwait(false);
         if (!result.IsError && result.Value is not null)
         {
             foreach (FileSystemTreeNodeResponse treeNode in result.Value)
@@ -62,11 +64,13 @@ public class DirectoriesController : ApiController
     /// Gets the directories of <paramref name="path"/>.
     /// </summary>
     /// <param name="path">The path for which to get the directories.</param>
+    /// <param name="includeHiddenElements">Whether to include hidden file system elements or not.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     [HttpGet("get-tree-directories")]
-    public async IAsyncEnumerable<FileSystemTreeNodeResponse> GetTreeDirectories([FromQuery, ModelBinder(typeof(UrlStringBinder))] string path, [EnumeratorCancellation] CancellationToken cancellationToken)
+    public async IAsyncEnumerable<FileSystemTreeNodeResponse> GetTreeDirectories([FromQuery, ModelBinder(typeof(UrlStringBinder))] string path, 
+        [FromQuery] bool includeHiddenElements, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _mediator.Send(new GetTreeDirectoriesQuery(path), cancellationToken).ConfigureAwait(false);
+        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _mediator.Send(new GetTreeDirectoriesQuery(path,includeHiddenElements), cancellationToken).ConfigureAwait(false);
         if (!result.IsError && result.Value is not null)
         {
             foreach (FileSystemTreeNodeResponse directory in result.Value)
@@ -82,11 +86,13 @@ public class DirectoriesController : ApiController
     /// Gets the directories of <paramref name="path"/>.
     /// </summary>
     /// <param name="path">The path for which to get the directories.</param>
+    /// <param name="includeHiddenElements">Whether to include hidden file system elements or not.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     [HttpGet("get-directories")]
-    public async IAsyncEnumerable<DirectoryResponse> GetDirectories([FromQuery, ModelBinder(typeof(UrlStringBinder))] string path, [EnumeratorCancellation] CancellationToken cancellationToken)
+    public async IAsyncEnumerable<DirectoryResponse> GetDirectories([FromQuery, ModelBinder(typeof(UrlStringBinder))] string path,
+        [FromQuery] bool includeHiddenElements, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        ErrorOr<IEnumerable<DirectoryResponse>> result = await _mediator.Send(new GetDirectoriesQuery(path), cancellationToken).ConfigureAwait(false);
+        ErrorOr<IEnumerable<DirectoryResponse>> result = await _mediator.Send(new GetDirectoriesQuery(path, includeHiddenElements), cancellationToken).ConfigureAwait(false);
         if (!result.IsError && result.Value is not null)
         {
             foreach (DirectoryResponse directory in result.Value)

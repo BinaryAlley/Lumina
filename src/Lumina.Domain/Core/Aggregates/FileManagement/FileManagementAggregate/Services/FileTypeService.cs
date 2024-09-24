@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using Lumina.Contracts.Enums.FileSystem;
 using Lumina.Contracts.Enums.PhotoLibrary;
@@ -73,9 +73,12 @@ public class FileTypeService : IFileTypeService
             return type;
         // no known image header types were found, check other methods
         string content = Encoding.UTF8.GetString(buffer.ToArray());
-        return IsSvg(content, path.Path)
-            ? (ErrorOr<ImageType>)ImageType.SVG
-            : IsTga(buffer.ToArray()) ? (ErrorOr<ImageType>)ImageType.TGA : (ErrorOr<ImageType>)ImageType.None;
+        if (IsSvg(content, path.Path))
+            return ImageType.SVG;
+        else if (IsTga(buffer.ToArray()))
+            return ImageType.TGA;
+        else
+            return ImageType.None;
     }
 
     /// <summary>

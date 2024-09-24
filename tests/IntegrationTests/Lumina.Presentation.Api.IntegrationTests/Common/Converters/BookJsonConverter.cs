@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.Enums.BookLibrary;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
@@ -85,9 +85,9 @@ public class BookJsonConverter : JsonConverter<Book>
                 contributorIds,
                 ratings: ratings
             );
-            return createBookResult.IsError
-                ? throw new JsonException($"Failed to create Book: {string.Join(", ", createBookResult.Errors)}")
-                : createBookResult.Value;
+            if (createBookResult.IsError)
+                throw new JsonException($"Failed to create Book: {string.Join(", ", createBookResult.Errors)}");
+            return createBookResult.Value;
         }
     }
 
@@ -135,9 +135,9 @@ public class BookJsonConverter : JsonConverter<Book>
             Optional<int>.FromNullable(pageCount)
         );
 
-        return metadataResult.IsError
-            ? throw new JsonException($"Failed to create WrittenContentMetadata: {string.Join(", ", metadataResult.Errors)}")
-            : metadataResult.Value;
+        if (metadataResult.IsError)
+            throw new JsonException($"Failed to create WrittenContentMetadata: {string.Join(", ", metadataResult.Errors)}");
+        return metadataResult.Value;
     }
 
     /// <summary>
@@ -169,9 +169,9 @@ public class BookJsonConverter : JsonConverter<Book>
             Optional<string>.FromNullable(releaseVersion)
         );
 
-        return releaseInfoResult.IsError
-            ? throw new JsonException($"Failed to create ReleaseInfo: {string.Join(", ", releaseInfoResult.Errors)}")
-            : releaseInfoResult.Value;
+        if (releaseInfoResult.IsError)
+            throw new JsonException($"Failed to create ReleaseInfo: {string.Join(", ", releaseInfoResult.Errors)}");
+        return releaseInfoResult.Value;
     }
 
     /// <summary>
@@ -217,9 +217,9 @@ public class BookJsonConverter : JsonConverter<Book>
                 Optional<string>.FromNullable(nativeName)
             );
 
-            return languageInfoResult.IsError
-                ? throw new JsonException($"Failed to create LanguageInfo: {string.Join(", ", languageInfoResult.Errors)}")
-                : languageInfoResult.Value;
+            if (languageInfoResult.IsError)
+                throw new JsonException($"Failed to create LanguageInfo: {string.Join(", ", languageInfoResult.Errors)}");
+            return languageInfoResult.Value;
         }
         else
             return null;

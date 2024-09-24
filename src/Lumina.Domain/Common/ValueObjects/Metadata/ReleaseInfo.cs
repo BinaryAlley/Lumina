@@ -96,15 +96,15 @@ public class ReleaseInfo : ValueObject
         Optional<string> releaseCountry,
         Optional<string> releaseVersion)
     {
-        return originalReleaseDate.HasValue && originalReleaseYear.HasValue && originalReleaseDate.Value.Year != originalReleaseYear.Value
-            ? (ErrorOr<ReleaseInfo>)Errors.Errors.Metadata.OriginalReleaseDateAndYearMustMatch
-            : reReleaseDate.HasValue && reReleaseYear.HasValue && reReleaseDate.Value.Year != reReleaseYear.Value
-            ? (ErrorOr<ReleaseInfo>)Errors.Errors.Metadata.ReReleaseDateAndYearMustMatch
-            : originalReleaseDate.HasValue && reReleaseDate.HasValue && originalReleaseDate.Value > reReleaseDate.Value
-            ? (ErrorOr<ReleaseInfo>)Errors.Errors.Metadata.ReReleaseDateCannotBeEarlierThanOriginalReleaseDate
-            : originalReleaseYear.HasValue && reReleaseYear.HasValue && originalReleaseYear.Value > reReleaseYear.Value
-            ? (ErrorOr<ReleaseInfo>)Errors.Errors.Metadata.ReReleaseYearCannotBeEarlierThanOriginalReleaseYear
-            : (ErrorOr<ReleaseInfo>)new ReleaseInfo(originalReleaseDate, originalReleaseYear, reReleaseDate, reReleaseYear, releaseCountry, releaseVersion);
+        if (originalReleaseDate.HasValue && originalReleaseYear.HasValue && originalReleaseDate.Value.Year != originalReleaseYear.Value)
+            return Errors.Errors.Metadata.OriginalReleaseDateAndYearMustMatch;
+        if (reReleaseDate.HasValue && reReleaseYear.HasValue && reReleaseDate.Value.Year != reReleaseYear.Value)
+            return Errors.Errors.Metadata.ReReleaseDateAndYearMustMatch;
+        if (originalReleaseDate.HasValue && reReleaseDate.HasValue && originalReleaseDate.Value > reReleaseDate.Value)
+            return Errors.Errors.Metadata.ReReleaseDateCannotBeEarlierThanOriginalReleaseDate;
+        if (originalReleaseYear.HasValue && reReleaseYear.HasValue && originalReleaseYear.Value > reReleaseYear.Value)
+            return Errors.Errors.Metadata.ReReleaseYearCannotBeEarlierThanOriginalReleaseYear;
+        return new ReleaseInfo(originalReleaseDate, originalReleaseYear, reReleaseDate, reReleaseYear, releaseCountry, releaseVersion);
     }
 
     /// <inheritdoc/>

@@ -17,22 +17,25 @@ public interface IDirectoryService
     /// Retrieves subdirectories for the specified string path.
     /// </summary>
     /// <param name="path">String representation of the file path.</param>
+    /// <param name="includeHiddenElements">Whether to include hidden subdirectories or not.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of subdirectories or an error.</returns>
-    ErrorOr<IEnumerable<Directory>> GetSubdirectories(string path);
+    ErrorOr<IEnumerable<Directory>> GetSubdirectories(string path, bool includeHiddenElements);
 
     /// <summary>
     /// Retrieves subdirectories for the given directory.
     /// </summary>
     /// <param name="directory">Directory object to retrieve subdirectories for.</param>
+    /// <param name="includeHiddenElements">Whether to include hidden subdirectories or not.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of subdirectories or an error.</returns>
-    ErrorOr<IEnumerable<Directory>> GetSubdirectories(Directory directory);
+    ErrorOr<IEnumerable<Directory>> GetSubdirectories(Directory directory, bool includeHiddenElements);
 
     /// <summary>
     /// Retrieves subdirectories for the specified file system path.
     /// </summary>
     /// <param name="path">Identifier for the file path.</param>
+    /// <param name="includeHiddenElements">Whether to include hidden subdirectories or not.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of subdirectories or an error.</returns>
-    ErrorOr<IEnumerable<Directory>> GetSubdirectories(FileSystemPathId path);
+    ErrorOr<IEnumerable<Directory>> GetSubdirectories(FileSystemPathId path, bool includeHiddenElements);
 
     /// <summary>
     /// Creates a directory with the specified <paramref name="name"/>, at the specified <paramref name="path"/>.

@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using Lumina.Application.Common.DataAccess.Repositories.Books;
 using Lumina.Contracts.Models.Common;
@@ -43,7 +43,7 @@ internal sealed class BookRepository : IBookRepository
     /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successfull operation, or an error.</returns>
     public async Task<ErrorOr<Created>> InsertAsync(BookModel book, CancellationToken cancellationToken)
     {
-        bool jobExists = await _luminaDbContext.Books.AnyAsync(_book => _book.Id == book.Id, cancellationToken: cancellationToken).ConfigureAwait(false);
+        bool jobExists = await _luminaDbContext.Books.AnyAsync(repositoryBook => repositoryBook.Id == book.Id, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (jobExists)
             return Errors.WrittenContent.BookAlreadyExists;
 

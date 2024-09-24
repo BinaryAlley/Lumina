@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using Lumina.Contracts.Enums.FileSystem;
 using Lumina.Contracts.Responses.FileManagement;
@@ -66,15 +66,16 @@ public class GetDirectoryTreeQueryHandler : IRequestHandler<GetDirectoryTreeQuer
             return pathPartsResults.Errors;
 
         List<PathSegment> pathParts = pathPartsResults.Value.ToList();
-        string currentPath = pathParts[0].Name;
 
         ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> buildDirectoryTreeResult = BuildDirectoryTree(result, pathParts, out FileSystemTreeNodeResponse? currentNode);
         if (buildDirectoryTreeResult.IsError)
             return buildDirectoryTreeResult.Errors;
 
         // add subdirectories of the last directory node
-        ErrorOr<Success> loadChildrenResult = LoadChildren(currentNode, request.IncludeFiles);
-        return loadChildrenResult.IsError ? (ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>)loadChildrenResult.Errors : (ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>)await ValueTask.FromResult(result);
+        ErrorOr<Success> loadChildrenResult = LoadChildren(currentNode, request.IncludeFiles, request.IncludeHiddenElements);
+        if (loadChildrenResult.IsError)
+            return loadChildrenResult.Errors;
+        return await ValueTask.FromResult(result);
     }
 
     /// <summary>
@@ -86,9 +87,9 @@ public class GetDirectoryTreeQueryHandler : IRequestHandler<GetDirectoryTreeQuer
     private ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> GetDrives()
     {
         ErrorOr<IEnumerable<FileSystemItem>> driveResult = _driveService.GetDrives();
-        return driveResult.IsError
-            ? (ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>)driveResult.Errors
-            : ErrorOrFactory.From(driveResult.Value.Adapt<IEnumerable<FileSystemTreeNodeResponse>>());
+        if (driveResult.IsError)
+            return driveResult.Errors;
+        return ErrorOrFactory.From(driveResult.Value.Adapt<IEnumerable<FileSystemTreeNodeResponse>>());
     }
 
     /// <summary>
@@ -102,7 +103,7 @@ public class GetDirectoryTreeQueryHandler : IRequestHandler<GetDirectoryTreeQuer
     private ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> BuildDirectoryTree(List<FileSystemTreeNodeResponse> drives, List<PathSegment> pathParts, out FileSystemTreeNodeResponse currentNode)
     {
         // find the root drive that matches the first part of the path
-        FileSystemTreeNodeResponse drive = drives.First(d => d.Name.Contains(pathParts[0].Name));
+        FileSystemTreeNodeResponse drive = drives.First(drive => drive.Name.Contains(pathParts[0].Name));
         drive.IsExpanded = true;
         currentNode = drive;
         string currentPath = pathParts[0].Name;
@@ -135,10 +136,10 @@ public class GetDirectoryTreeQueryHandler : IRequestHandler<GetDirectoryTreeQuer
     /// <param name="node">The directory node to load children for.</param>
     /// <param name="includeFiles">Whether to include files in the directories or not.</param>
     /// <returns>A result indicating a successful operation, or an error message.</returns>
-    private ErrorOr<Success> LoadChildren(FileSystemTreeNodeResponse node, bool includeFiles)
+    private ErrorOr<Success> LoadChildren(FileSystemTreeNodeResponse node, bool includeFiles, bool includeHiddenElements)
     {
         // get subdirectories under the current node's path
-        ErrorOr<IEnumerable<Directory>> subDirectoriesResult = _directoryService.GetSubdirectories(node.Path);
+        ErrorOr<IEnumerable<Directory>> subDirectoriesResult = _directoryService.GetSubdirectories(node.Path, includeHiddenElements);
         if (subDirectoriesResult.IsError)
             return subDirectoriesResult.Errors;
         // add each subdirectory as a child node of the current directory
@@ -157,7 +158,7 @@ public class GetDirectoryTreeQueryHandler : IRequestHandler<GetDirectoryTreeQuer
         if (includeFiles)
         {
             // get files under the current node's path
-            ErrorOr<IEnumerable<File>> filesResult = _fileService.GetFiles(node.Path);
+            ErrorOr<IEnumerable<File>> filesResult = _fileService.GetFiles(node.Path, includeHiddenElements);
             if (filesResult.IsError)
                 return filesResult.Errors;
             // add each file as a child node of the current directory

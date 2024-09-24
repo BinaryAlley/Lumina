@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.ValueObjects;
@@ -127,7 +127,9 @@ public class UnixPathStrategy : IUnixPathStrategy
             return Errors.FileManagement.CannotNavigateUp;
         // return the path up to the last slash, or, if there's only the root slash, return that one instead
         ErrorOr<FileSystemPathId> newPathResult = FileSystemPathId.Create(lastIndex > 0 ? tempPath[..lastIndex] : tempPath[..1]);
-        return newPathResult.IsError ? (ErrorOr<IEnumerable<PathSegment>>)newPathResult.Errors : ParsePath(newPathResult.Value);
+        if (newPathResult.IsError)
+            return newPathResult.Errors;
+        return ParsePath(newPathResult.Value);
     }
 
     /// <summary>
@@ -150,9 +152,9 @@ public class UnixPathStrategy : IUnixPathStrategy
             return Errors.FileManagement.InvalidPath;
 
         // On Unix-like systems, the root is always "/"
-        return path.Path.StartsWith(PathSeparator)
-            ? (ErrorOr<PathSegment>)new PathSegment(PathSeparator.ToString(), isDirectory: false, isDrive: true)
-            : (ErrorOr<PathSegment>)Errors.FileManagement.InvalidPath;
+        if (path.Path.StartsWith(PathSeparator))
+            return new PathSegment(PathSeparator.ToString(), isDirectory: false, isDrive: true);
+        return Errors.FileManagement.InvalidPath;
     }
     #endregion
 }

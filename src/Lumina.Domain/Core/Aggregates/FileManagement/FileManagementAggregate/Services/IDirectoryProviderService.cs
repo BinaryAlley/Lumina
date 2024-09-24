@@ -18,8 +18,9 @@ public interface IDirectoryProviderService
     /// Retrieves a list of subdirectory paths from the specified path.
     /// </summary>
     /// <param name="path">The path from which to retrieve the subdirectory paths.</param>
+    /// <param name="includeHiddenElements">Whether to include hidden subdirectories or not.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of directory paths or an error.</returns>
-    ErrorOr<IEnumerable<FileSystemPathId>> GetSubdirectoryPaths(FileSystemPathId path);
+    ErrorOr<IEnumerable<FileSystemPathId>> GetSubdirectoryPaths(FileSystemPathId path, bool includeHiddenElements);
 
     /// <summary>
     /// Checks if a directory with the specified path exists.

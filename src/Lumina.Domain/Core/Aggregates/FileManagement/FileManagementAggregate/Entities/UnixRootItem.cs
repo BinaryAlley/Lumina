@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using Lumina.Contracts.Enums.FileSystem;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.ValueObjects;
@@ -55,7 +55,9 @@ public sealed class UnixRootItem : FileSystemItem
             createPathResult.Value,
             PATH);
         ErrorOr<Updated> setStatusResult = newRoot.SetStatus(status);
-        return setStatusResult.IsError ? (ErrorOr<UnixRootItem>)setStatusResult.Errors : (ErrorOr<UnixRootItem>)newRoot;
+        if (setStatusResult.IsError)
+            return setStatusResult.Errors;
+        return newRoot;
     }
     #endregion
 }

@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Repositories.Common.Base;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.DataAccess.Core.Repositories.Common.Factory;
@@ -30,7 +30,10 @@ public static class DataAccessLayerServices
         string? basePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         if (!Directory.Exists(basePath))
             throw new DirectoryNotFoundException($"The base path '{basePath}' does not exist.");
-        services.AddDbContext<LuminaDbContext>(options => options.UseSqlite($"Data Source={Path.Combine(basePath, "Lumina.db")}"));
+        services.AddDbContext<LuminaDbContext>(options =>
+        {
+            options.UseSqlite($"Data Source={Path.Combine(basePath, "Lumina.db")}");
+        });
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         Type[]? dataAccessLayerTypes = Assembly.GetExecutingAssembly().GetTypes();

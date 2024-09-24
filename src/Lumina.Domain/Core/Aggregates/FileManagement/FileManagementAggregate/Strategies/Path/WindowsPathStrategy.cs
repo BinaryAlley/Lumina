@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.ValueObjects;
@@ -89,9 +89,9 @@ public class WindowsPathStrategy : IWindowsPathStrategy
     public ErrorOr<IEnumerable<PathSegment>> ParsePath(FileSystemPathId path)
     {
         // Windows paths usually start with a drive letter and colon, e.g., "C:"
-        return !path.Path.Contains(':') || !path.Path.Contains(PathSeparator) || !char.IsLetter(path.Path[0]) || path.Path[1] != ':' || path.Path[2] != PathSeparator
-            ? (ErrorOr<IEnumerable<PathSegment>>)Errors.FileManagement.InvalidPath
-            : ErrorOrFactory.From(GetPathSegments());
+        if (!path.Path.Contains(':') || !path.Path.Contains(PathSeparator) || !char.IsLetter(path.Path[0]) || path.Path[1] != ':' || path.Path[2] != PathSeparator)
+            return Errors.FileManagement.InvalidPath;
+        return ErrorOrFactory.From(GetPathSegments());
         IEnumerable<PathSegment> GetPathSegments()
         {
             // the drive segment
@@ -135,7 +135,9 @@ public class WindowsPathStrategy : IWindowsPathStrategy
             return Errors.FileManagement.CannotNavigateUp;
         // if we are at the drive root level after trimming, return drive root, otherwise, return the path up to the last slash
         ErrorOr<FileSystemPathId> newPathResult = FileSystemPathId.Create(lastIndex == 2 && tempPath[1] == ':' ? tempPath[..3] : tempPath[..lastIndex]);
-        return newPathResult.IsError ? (ErrorOr<IEnumerable<PathSegment>>)newPathResult.Errors : ParsePath(newPathResult.Value);
+        if (newPathResult.IsError)
+            return newPathResult.Errors;
+        return ParsePath(newPathResult.Value);
     }
 
     /// <summary>

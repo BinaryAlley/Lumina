@@ -11,4 +11,5 @@ namespace Lumina.Application.Core.FileManagement.Directories.Queries.GetTreeDire
 /// Query for retrieving the list of directories at a path.
 /// </summary>
 /// <param name="Path">The path for which to retrieve the list of directories.</param>
-public record GetTreeDirectoriesQuery(string Path) : IRequest<ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>>;
+/// <param name="IncludeHiddenElements">Whether to include hidden directories or not.</param>
+public record GetTreeDirectoriesQuery(string Path, bool IncludeHiddenElements) : IRequest<ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>>;

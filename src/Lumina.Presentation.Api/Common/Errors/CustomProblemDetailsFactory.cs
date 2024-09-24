@@ -116,9 +116,7 @@ public class CustomProblemDetailsFactory : ProblemDetailsFactory
         List<Error>? errors = httpContext?.Items[HttpContextItemKeys.ERRORS] as List<Error>;
         // add any extra custom properties
         if (errors is not null)
-        {
             problemDetails.Extensions.Add("errors", errors.Select(error => error.Code));
-        }
         //problemDetails.Extensions.Add("errorCodes", errors.Select(e => e.Type.ToString()));
         _configure?.Invoke(new() { HttpContext = httpContext!, ProblemDetails = problemDetails });
     }

@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using Lumina.Contracts.Enums.PhotoLibrary;
 using Lumina.Domain.Common.Errors;
@@ -45,9 +45,9 @@ public class ThumbnailService : IThumbnailService
     public async Task<ErrorOr<Thumbnail>> GetThumbnailAsync(string path, int quality)
     {
         ErrorOr<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(path);
-        return fileSystemPathIdResult.IsError
-            ? (ErrorOr<Thumbnail>)fileSystemPathIdResult.Errors
-            : await GetThumbnailAsync(fileSystemPathIdResult.Value, quality);
+        if (fileSystemPathIdResult.IsError)
+            return fileSystemPathIdResult.Errors;
+        return await GetThumbnailAsync(fileSystemPathIdResult.Value, quality);
     }
 
     /// <summary>

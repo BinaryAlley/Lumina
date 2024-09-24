@@ -37,7 +37,7 @@ internal static class PresentationWebLayerConfiguration
     internal static IServiceCollection BindConfiguration(this IServiceCollection serviceCollection, IConfiguration configuration)
     {
         serviceCollection.AddOptions<ServerConfigurationModel>()
-                         .Bind(configuration.GetRequiredSection(ServerConfigurationModel.SectionName))
+                         .Bind(configuration.GetRequiredSection(ServerConfigurationModel.SECTION_NAME))
                          .ValidateFluently()
                          .ValidateOnStart();
         return serviceCollection;

@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Common.Exceptions;
 using Lumina.Presentation.Web.Common.Models.Common;
 using Lumina.Presentation.Web.Common.Models.Configuration;
@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Http;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
@@ -90,7 +91,7 @@ public class ApiHttpClient : IApiHttpClient
         // send the request and expect only headers initially - this prevents the client from buffering the entire response
         using HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
-        await using System.IO.Stream stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+        await using Stream stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
         // Deserialize the JSON content asynchronously as an enumerable of TResponse items
         await foreach (TResponse? item in JsonSerializer.DeserializeAsyncEnumerable<TResponse>(stream, _jsonOptions, cancellationToken).ConfigureAwait(false))
         {

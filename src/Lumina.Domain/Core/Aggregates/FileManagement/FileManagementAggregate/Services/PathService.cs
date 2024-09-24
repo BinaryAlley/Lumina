@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Strategies.Platform;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.ValueObjects;
@@ -43,7 +43,9 @@ public class PathService : IPathService
     public bool IsValidPath(string path)
     {
         ErrorOr<FileSystemPathId> newPathResult = FileSystemPathId.Create(path);
-        return !newPathResult.IsError && _platformContext.PathStrategy.IsValidPath(newPathResult.Value);
+        if (newPathResult.IsError)
+            return false;
+        return _platformContext.PathStrategy.IsValidPath(newPathResult.Value);
     }
 
     /// <summary>
@@ -54,7 +56,9 @@ public class PathService : IPathService
     public bool Exists(string path)
     {
         ErrorOr<FileSystemPathId> newPathResult = FileSystemPathId.Create(path);
-        return !newPathResult.IsError && _platformContext.PathStrategy.Exists(newPathResult.Value);
+        if (newPathResult.IsError)
+            return false;
+        return _platformContext.PathStrategy.Exists(newPathResult.Value);
     }
 
     /// <summary>
@@ -69,7 +73,9 @@ public class PathService : IPathService
         if (newPathResult.IsError)
             return newPathResult.Errors;
         ErrorOr<FileSystemPathId> combinedPathResult = _platformContext.PathStrategy.CombinePath(newPathResult.Value, name);
-        return combinedPathResult.IsError ? (ErrorOr<string>)combinedPathResult.Errors : (ErrorOr<string>)combinedPathResult.Value.Path;
+        if (combinedPathResult.IsError)
+            return combinedPathResult.Errors;
+        return combinedPathResult.Value.Path;
     }
 
     /// <summary>
@@ -80,7 +86,9 @@ public class PathService : IPathService
     public ErrorOr<IEnumerable<PathSegment>> ParsePath(string path)
     {
         ErrorOr<FileSystemPathId> newPathResult = FileSystemPathId.Create(path);
-        return newPathResult.IsError ? (ErrorOr<IEnumerable<PathSegment>>)newPathResult.Errors : _platformContext.PathStrategy.ParsePath(newPathResult.Value);
+        if (newPathResult.IsError)
+            return newPathResult.Errors;
+        return _platformContext.PathStrategy.ParsePath(newPathResult.Value);
     }
 
     /// <summary>
@@ -91,7 +99,9 @@ public class PathService : IPathService
     public ErrorOr<IEnumerable<PathSegment>> GoUpOneLevel(string path)
     {
         ErrorOr<FileSystemPathId> newPathResult = FileSystemPathId.Create(path);
-        return newPathResult.IsError ? (ErrorOr<IEnumerable<PathSegment>>)newPathResult.Errors : _platformContext.PathStrategy.GoUpOneLevel(newPathResult.Value);
+        if (newPathResult.IsError)
+            return newPathResult.Errors;
+        return _platformContext.PathStrategy.GoUpOneLevel(newPathResult.Value);
     }
 
     /// <summary>
@@ -111,7 +121,9 @@ public class PathService : IPathService
     public ErrorOr<PathSegment> GetPathRoot(string path)
     {
         ErrorOr<FileSystemPathId> newPathResult = FileSystemPathId.Create(path);
-        return newPathResult.IsError ? (ErrorOr<PathSegment>)newPathResult.Errors : _platformContext.PathStrategy.GetPathRoot(newPathResult.Value);
+        if (newPathResult.IsError)
+            return newPathResult.Errors;
+        return _platformContext.PathStrategy.GetPathRoot(newPathResult.Value);
     }
     #endregion
 }

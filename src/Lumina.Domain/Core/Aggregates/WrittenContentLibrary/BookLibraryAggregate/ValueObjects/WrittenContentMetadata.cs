@@ -88,15 +88,15 @@ public class WrittenContentMetadata : BaseMetadata
         Optional<string> publisher,
         Optional<int> pageCount)
     {
-        return string.IsNullOrWhiteSpace(title)
-            ? (ErrorOr<WrittenContentMetadata>)Errors.Metadata.TitleCannotBeEmpty
-            : releaseInfo is null
-            ? (ErrorOr<WrittenContentMetadata>)Errors.Metadata.ReleaseInfoCannotBeNull
-            : genres is null
-            ? (ErrorOr<WrittenContentMetadata>)Errors.Metadata.GenresListCannotBeNull
-            : tags is null
-            ? (ErrorOr<WrittenContentMetadata>)Errors.Metadata.TagsListCannotBeNull
-            : (ErrorOr<WrittenContentMetadata>)new WrittenContentMetadata(
+        if (string.IsNullOrWhiteSpace(title))
+            return Errors.Metadata.TitleCannotBeEmpty;
+        if (releaseInfo is null)
+            return Errors.Metadata.ReleaseInfoCannotBeNull;
+        if (genres is null)
+            return Errors.Metadata.GenresListCannotBeNull;
+        if (tags is null)
+            return Errors.Metadata.TagsListCannotBeNull;
+        return new WrittenContentMetadata(
             title,
             originalTitle,
             description,
