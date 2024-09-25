@@ -137,6 +137,13 @@
     min-height: 0;
 }
 
+#file-system-browser-file-system-treeview-container.collapsed {
+    max-width: 0px;
+    min-width: 0px;
+    border: 0px;
+    padding: 0px;
+}
+
 #file-system-browser-file-system-treeview {
     background-color: #131313;
     border: 1px solid var(--border-color-light);
@@ -172,12 +179,9 @@
     width: 100%;
     height: 100%;
     box-shadow: inset 2px 2px 5px var(--shadow-color);
-
-
     margin: auto;
     width: 100%;
     height: 100%;
-
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -197,7 +201,6 @@
 }
 
 #file-system-browser-file-system-explorer {
-
 }
 
 div[id^="file-system-browser-file-system-explorer"]:not([id*="container"]) {
@@ -844,7 +847,7 @@ div[id^="file-system-browser-file-system-explorer"]:not([id*="container"]) {
     box-sizing: border-box;
 }
 
-.navigator-arrow { 
+.navigator-arrow {
     display: inline-block;
     width: 12px;
     height: 9px;
@@ -886,6 +889,7 @@ div[id^="file-system-browser-file-system-explorer"]:not([id*="container"]) {
     max-height: calc(100vh - 100px); /* Subtracting a small value ensures a little space is left on top and bottom */
     overflow-y: auto;
 }
+
     .navigator-dropdown.opened {
         display: block;
     }
@@ -1039,11 +1043,11 @@ div[id^="file-system-browser-file-system-explorer"]:not([id*="container"]) {
         order: 3;
     }
 
-        #file-system-browser-header-address-bar-container {
-            flex-direction: column;
-            align-items: stretch;
-            width: 100%;
-        }
+    #file-system-browser-header-address-bar-container {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+    }
 
     .file-system-browser-header-address-bar-url {
         width: 100%;
@@ -1077,7 +1081,7 @@ div[id^="file-system-browser-file-system-explorer"]:not([id*="container"]) {
     }
 
     #navigator-address-bar-container {
-        width: 100%; 
+        width: 100%;
         flex-basis: 100%;
     }
 
