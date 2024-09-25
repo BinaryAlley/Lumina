@@ -1,0 +1,24 @@
+name: Branch Naming Convention Check
+
+on:
+  push:
+    branches-ignore:
+      - master
+
+jobs:
+  check-branch-name:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check branch name
+        run: |
+          branch_name=${{ github.ref_name }}
+          if [[ $branch_name == "master" ]]; then
+            echo "Branch is master, skipping check."
+            exit 0
+          fi
+          if ! [[ $branch_name =~ ^(feature|bugfix|hotfix|documentation|refactor|other)/ ]]; then
+            echo "Branch name '$branch_name' does not follow the naming convention."
+            echo "It should start with one of: feature/, bugfix/, hotfix/, documentation/, refactor/, or other/"
+            echo "Example: feature/my-feature-name or bugfix/fix-issue-123"
+            exit 1
+          fi
