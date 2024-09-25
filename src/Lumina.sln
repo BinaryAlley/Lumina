@@ -33,6 +33,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{ACD16983-F1BD-4A92-B282-95BA8C456F6A}"
 	ProjectSection(SolutionItems) = preProject
+		..\docs\CONTRIBUTING.md = ..\docs\CONTRIBUTING.md
 		..\docs\LICENSE.md = ..\docs\LICENSE.md
 		..\README.md = ..\README.md
 		..\docs\SOURCES.md = ..\docs\SOURCES.md
@@ -76,6 +77,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5DD47F82-699B-4E71-A10A-238E80EA5814}"
 	ProjectSection(SolutionItems) = preProject
 		..\.editorconfig = ..\.editorconfig
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "templates", "templates", "{A0D07244-9CB2-4E30-85A5-97D520E4B9CC}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\templates\PULL_REQUEST_TEMPLATE.md = ..\docs\technical\templates\PULL_REQUEST_TEMPLATE.md
 	EndProjectSection
 EndProject
 Global
@@ -170,6 +176,7 @@ Global
 		{6B3FC07B-6208-4544-ACFB-79243A59EA1A} = {3F057926-562F-4EF4-BFC0-EE62372D4551}
 		{3680DAFB-10BA-4A0F-AE40-620D06DAF617} = {3F057926-562F-4EF4-BFC0-EE62372D4551}
 		{6BD85BA8-B3C4-4D79-8858-F6D7676FF2CC} = {3C316ABB-08D5-4450-9A4E-91059DB54254}
+		{A0D07244-9CB2-4E30-85A5-97D520E4B9CC} = {0C0E5A56-AD29-4D0B-AB87-E865F8B933E2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4A55A28E-C657-4A0B-95EA-2931AE66004E}

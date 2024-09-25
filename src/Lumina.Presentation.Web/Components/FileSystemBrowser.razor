@@ -37,10 +37,42 @@
                         <img src="images/ui/forward.svg" class="navigation-icon" alt="Forward" title="Forward" @onclick="NavigateForwardAsync" />
                         <img src="images/ui/up.svg" class="navigation-icon" alt="Up One Level" title="Up One Level" @onclick="NavigateUpAsync" />
                     </div>
-                    <img src="images/ui/toggle-tree-view.svg" id="navigator-toggle-tree-view-button" alt="Toggle Tree View" title="Toggle Tree View" class="navigator-icon" />
-                    <img src="images/ui/toggle-thumbnails.svg" id="navigator-toggle-thumbnails-button" alt="Toggle Thumbnails" title="Toggle Thumbanils" class="navigator-icon" />
-                    @* <img src="images/ui/toggle-hidden.svg" id="navigator-toggle-hidden-button" alt="Toggle Hidden Files" title="Toggle Hidden Files" class="navigator-icon" /> *@
+                    <svg @onclick="ToggleFileSystemTreeViewAsync" id="navigator-toggle-tree-view-button" class="navigator-icon" width="30" height="30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <title>Toggle Tree View</title>
+                        <defs>
+                            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                                <feComponentTransfer in="SourceAlpha" result="adjustedAlpha">
+                                    <feFuncA type="table" tableValues="0 0.5 1" />
+                                </feComponentTransfer>
+                                <feGaussianBlur in="adjustedAlpha" stdDeviation="2" result="blur" />
+                                <feFlood flood-color="#039bfc" result="color" />
+                                <feComposite in="color" in2="blur" operator="in" result="softGlowColored" />
+                                <feMerge>
+                                    <feMergeNode in="softGlowColored" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
 
+                            <linearGradient id="linearGradient" x1="5" x2="195" y1="174.76" y2="174.76" gradientTransform="matrix(.32632 0 0 .095367 -.63187 42.834)" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#039bfc" stop-opacity="0" offset="0" />
+                                <stop stop-color="#039bfc" offset=".225" />
+                                <stop stop-color="#039bfc" offset=".5" />
+                                <stop stop-color="#039bfc" offset=".775" />
+                                <stop stop-color="#039bfc" stop-opacity="0" offset="1" />
+                            </linearGradient>
+                        </defs>
+
+                        <g transform="translate(0,-0.5) scale(0.475)">
+                            <rect x=".99971" y="59" width="62.001" height="1" ry="0" fill="url(#linearGradient)" stroke-width="3.7796" style="mix-blend-mode:normal;paint-order:stroke fill markers" filter="url(#glow)" />
+                        </g>
+                        <g stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5">
+                            <rect x="4.5" y="4.5" width="21" height="21" ry="2.5" fill="none" stroke="#039bfc" style="paint-order:stroke fill markers" filter="url(#glow)" />
+                        </g>
+                        <g transform="translate(6,6) scale(0.55)">
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill @(showFileSystemTreeView ? " enabled" : string.Empty)" filter="url(#glow)" d="M 4 4 L 4 14 L 9 14 L 9 23 L 18 23 L 18 28 L 28 28 L 28 18 L 18 18 L 18 22 L 10 22 L 10 14 L 14 14 L 14 9 L 18 9 L 18 14 L 28 14 L 28 4 L 18 4 L 18 8 L 14 8 L 14 4 L 4 4 z M 5 5 L 13 5 L 13 13 L 5 13 L 5 5 z M 19 5 L 27 5 L 27 13 L 19 13 L 19 5 z" />
+                        </g>
+                    </svg>
+                    <img src="images/ui/toggle-thumbnails.svg" id="navigator-toggle-thumbnails-button" alt="Toggle Thumbnails" title="Toggle Thumbanils" class="navigator-icon" />
                     <svg @onclick="ToggleHiddenElementsModeAsync" id="navigator-toggle-hidden-button" class="navigator-icon" width="30" height="30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
                         <title>Toggle Hidden Files</title>
                         <defs>
@@ -170,7 +202,7 @@
         </div>
         <div id="file-system-browser-file-system-container">
             <!--File System Tree View-->
-            <div id="file-system-browser-file-system-treeview-container">
+            <div id="file-system-browser-file-system-treeview-container" class="@(showFileSystemTreeView ? string.Empty: "collapsed")">
                 <div id="file-system-browser-file-system-treeview">
                     <div class="treeview">
                         @foreach (FileSystemTreeNodeModel node in treeViewRootNodes)
@@ -263,7 +295,8 @@
     private string? selectedNodePath;
     private string? _path;
     private bool isSelectionMode;
-    private bool showHiddenElements;
+    private bool showHiddenElements; // TODO: take from config
+    private bool showFileSystemTreeView = true; // TODO: take from config
     private bool showPathSegmentDowpDown;
     private bool isNavigationPathEditMode;
     private int? expandedPathSegmentIndex;
@@ -506,7 +539,8 @@
             try
             {
                 await GetNavigatorPathAsync(path).ConfigureAwait(false);
-                await GetFileSystemTreeAsync(path).ConfigureAwait(false);
+                if (showFileSystemTreeView)
+                    await GetFileSystemTreeAsync(path).ConfigureAwait(false);
                 await GetFileSystemItemsAsync(path).ConfigureAwait(false);
             }
             catch (ApiException ex)
@@ -807,6 +841,21 @@
     {
         isSelectionMode = !isSelectionMode;
         await JSRuntime.InvokeVoidAsync("toggleSelectionMode").ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Enables or disables the display of the file system tree view.
+    /// </summary>
+    private async Task ToggleFileSystemTreeViewAsync()
+    {
+        showFileSystemTreeView = !showFileSystemTreeView;
+        // if file system treeview needs to be displayed, get its file system tree structure from the API
+        if (showFileSystemTreeView && Path is not null)
+        {
+            if (!Path.EndsWith(pathSeparator))
+                Path += pathSeparator;
+            await NavigateToPathAsync(Path, isForwardNavigation: false, isBackwardNavigation: false).ConfigureAwait(false);
+        }
     }
 
     /// <summary>
