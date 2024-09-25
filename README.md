@@ -18,7 +18,7 @@ P.S. This README is just a spark. Watch it grow into a supernova! ✨
 
 ## Contributing
 
-Lumina welcomes community contributions. All forms of input, be it code, bug reports, or feature suggestions, are appreciated.
+Lumina welcomes community contributions. All forms of input, be it code, bug reports, or feature suggestions, are appreciated. Be sure to read the [guidelines](./docs/CONTRIBUTING.md) for contributing first!
 
 ## Acknowledgments and Credits
 
