@@ -105,7 +105,7 @@ internal class FileProviderService : IFileProviderService
         // check if the user has access permissions to the provided path
         if (!_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadContents))
             return Errors.Permission.UnauthorizedAccess;
-        return System.IO.File.ReadAllBytes(path.Path);
+        return File.ReadAllBytes(path.Path);
     }
 
     /// <summary>

@@ -1,8 +1,9 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using Lumina.Contracts.Enums.PhotoLibrary;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Entities;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.ValueObjects;
+using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
@@ -18,14 +19,16 @@ public interface IFileTypeService
     /// Determines if <paramref name="file"/> is of type image or not, and returns its type.
     /// </summary>
     /// <param name="file">The file to determine if it is an image or not.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing the type of image or an error.</returns>
-    Task<ErrorOr<ImageType>> GetImageTypeAsync(File file);
+    Task<ErrorOr<ImageType>> GetImageTypeAsync(File file, CancellationToken cancellationToken);
 
     /// <summary>
     /// Determines if a file identified by <paramref name="path"/> is of type image or not, and returns its type.
     /// </summary>
     /// <param name="path">The path of the file to determine if it is an image or not.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing the type of image or an error.</returns>
-    Task<ErrorOr<ImageType>> GetImageTypeAsync(FileSystemPathId path);
+    Task<ErrorOr<ImageType>> GetImageTypeAsync(FileSystemPathId path, CancellationToken cancellationToken);
     #endregion
 }

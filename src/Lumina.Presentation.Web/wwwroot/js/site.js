@@ -11,7 +11,42 @@ let fileSystemExplorerContainer = null;
 let visibleSelectionRectangle = null;
 let selectionRectangle = null;
 
+let scrollTimeout; // timeout to delay thumbnail loading after scrolling
+let resizeTimeout; // timeout to delay thumbnail loading after resizing
+let abortController; // allows the cancellation of thumbnail retrieval jobs
+let hasScrolledAfterModeChange = false; // flag to track if scrolling occurred after a mode change
+let showThumbnails = true; // whether to show thumbnails or not
+let scrollThumbnailRetrievalTimeout = 1000; // the time span to wait after the last scroll, before getting thumbnails
+let inspectFileForThumbnails = false; // whether to check the actual header bytes in order to determine if a file is an image, rather than its extension
+let thumbnailsRetrievalBatchSize = 20; // the number of thumbnails to ask from the server, concurrently
+let imagePreviewsQuality = 70; // the quality used for image thumbnails
+let fullImageQuality = 90; // the quality used for full images
+
 // =================== common helper function ===================
+
+/**
+ * Convert Blob to Base64.
+ * @param {any} blob The blob to convert.
+ * @returns The converted Base64 string.
+ */
+async function blobToBase64(blob) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+    });
+}
+
+/**
+ * Determines if the given file path corresponds to an image file.
+ * @param {string} filePath - The path to the file to be checked.
+ * @returns {boolean} True if the file path ends with an image file extension, false otherwise.
+ */
+function isImageFile(filePath) {
+    // Adjust the regex pattern to match the image file extensions you support
+    return /\.(jpe?g|png|gif|bmp|svg|ico|webp)$/i.test(filePath);
+}
 
 /**
  * Gets the current time
@@ -217,6 +252,59 @@ function closeNavigatorPathSegments() {
         checkboxes[i].checked = false;
 }
 
+/**
+ * Handles the scroll event for the explorer or explorerContainer.
+ * Clears any previous timeout and creates a new one to fetch visible items.
+ */
+function handleFileSystemBrowserScrollEvent() {
+    // clear any previously set timeouts to debounce the getVisibleItems call
+    if (scrollTimeout) clearTimeout(scrollTimeout);
+    // if there's an ongoing operation, abort it
+    if (abortController) {
+        abortController.abort();
+        abortController = null;
+    }
+    // set a timeout to call getVisibleItems once the user stops scrolling
+    scrollTimeout = setTimeout(() => {
+        if (showThumbnails)
+            getVisibleItems();
+    }, scrollThumbnailRetrievalTimeout);
+    hasScrolledAfterModeChange = true;
+}
+
+/**
+ * Handles the window's resize event.
+ * Clears any previous timeout and creates a new one to fetch file system browser visible items.
+ */
+function handleFileSystemBrowserResizeEvent() {
+    // clear any previously set timeouts to debounce the getVisibleItems call during resize
+    if (resizeTimeout) clearTimeout(resizeTimeout);
+    // if there's an ongoing operation, abort it
+    if (abortController) {
+        abortController.abort();
+        abortController = null;
+    }
+    // set a timeout to call getVisibleItems once the user stops resizing
+    resizeTimeout = setTimeout(() => {
+        if (showThumbnails)
+            getVisibleItems();
+    }, scrollThumbnailRetrievalTimeout);
+}
+
+/**
+ * Switches to a different view mode.
+ */
+function switchViewMode() {
+    hasScrolledAfterModeChange = false; // reset the flag indicating a mode change
+    // check if content has been scrolled after the mode change; since scroll is the one triggering thumbnails retrieval,
+    // and there is no initial scroll when mode is changed, we need to trigger the retrieval manually
+    setTimeout(() => {
+        if (!hasScrolledAfterModeChange && showThumbnails)
+            getVisibleItems();
+    }, 50); // wait 50ms to ensure all other events have processed
+}
+
+
 // =================== file system browser dialog selection ===================
 
 /**
@@ -231,8 +319,10 @@ function initializeFileSystemBrowser(dotnetHelper) {
         visibleSelectionRectangle = document.getElementById('visible-selection-rectangle');
     if (!fileSystemExplorer) {
         fileSystemExplorer = document.getElementById('file-system-browser-file-system-explorer');
-        if (fileSystemExplorer) 
-            fileSystemExplorer.addEventListener('mouseup', fileSystemExplorerMouseUp);
+        if (fileSystemExplorer) {
+            fileSystemExplorer.addEventListener('mouseup', handleFileSystemExplorerMouseUp);
+            fileSystemExplorer.addEventListener('scroll', handleFileSystemBrowserScrollEvent);
+        }
     }
     // event handlers needed for selection
     if (!fileSystemExplorerContainer) {
@@ -242,6 +332,7 @@ function initializeFileSystemBrowser(dotnetHelper) {
             fileSystemExplorerContainer.addEventListener('mousemove', updateSelection);
             fileSystemExplorerContainer.addEventListener('mouseup', endSelection);
             fileSystemExplorerContainer.addEventListener('wheel', handleSelection);
+            fileSystemExplorerContainer.addEventListener('scroll', handleFileSystemBrowserScrollEvent);
             fileSystemExplorerContainer.addEventListener('scroll', handleSelection);
         }
     }
@@ -273,8 +364,7 @@ function initializeFileSystemBrowser(dotnetHelper) {
                 dotnetHelper.invokeMethodAsync('OnDirectoryDoubleClickAsync', e.currentTarget.dataset.path);
                 return;
             }
-            else
-            { // files
+            else { // files
 
             }
             // reset the timestamp used to track double clicks
@@ -302,8 +392,7 @@ function initializeFileSystemBrowser(dotnetHelper) {
             for (let i = from; i <= to; i++)
                 allEClassElements[i].classList.add('selected');
         }
-        else
-        { // when neither CTRL nor SHIFT keys are pressed
+        else { // when neither CTRL nor SHIFT keys are pressed
             if (!isSelectionMode) {
                 // get all elements that are selected
                 const selectedElements = allEClassElements.filter(element => element.classList.contains('selected'));
@@ -335,10 +424,10 @@ function initializeFileSystemBrowser(dotnetHelper) {
  * Handler for the mouse up event of the file system browser dialog explorer
  * @param {MouseEvent} e - The mouseup event object.
  */
-function fileSystemExplorerMouseUp(e) {
+function handleFileSystemExplorerMouseUp(e) {
     const explorerScrollbars = hasScrollbars(fileSystemExplorer);
     // check if clicked on the horizontal scrollbar
-    if (explorerScrollbars.horizontal && e.clientY > fileSystemExplorer.getBoundingClientRect().top + fileSystemExplorer.offsetHeight - scrollbarHeight) 
+    if (explorerScrollbars.horizontal && e.clientY > fileSystemExplorer.getBoundingClientRect().top + fileSystemExplorer.offsetHeight - scrollbarHeight)
         return;
     if (!e.ctrlKey && !e.shiftKey && !isSelectionMode) {
         // deselect all file system elements when their explorer is clicked
@@ -504,6 +593,115 @@ function toggleSelectionMode(e) {
     isSelectionMode = !isSelectionMode;
 }
 
+// =================== file system browser dialog thumbnails preview ===================
+
+/**
+ * Identifies items within the explorerContainer that are either fully or partially visible.
+ * Items with thumbnails already retrieved are excluded.
+ * Populates a list of such visible items and passes them for further processing.
+ */
+function getVisibleItems() {
+    const containerRect = fileSystemExplorerContainer.getBoundingClientRect();
+    const visibleItems = [];
+    // go through each .e item which has not had its thumbnail retrieved yet
+    const fileElements = Array.from(fileSystemExplorer.querySelectorAll('.e:not([data-thumbnail-retrieved])[data-type="file"]'));
+    // if the option for checking file header bytes is disabled, filter images by extension
+    const itemsToProcess = inspectFileForThumbnails ? fileElements : fileElements.filter(item => isImageFile(item.getAttribute('data-path')));
+    itemsToProcess.forEach(item => {
+        const itemPath = item.getAttribute('data-path');
+        const itemRect = item.getBoundingClientRect();
+        // check if the item is fully or partially visible horizontally and vertically
+        const isFullyVisibleHorizontally = itemRect.left >= containerRect.left && itemRect.right <= containerRect.right;
+        const isFullyVisibleVertically = itemRect.top >= containerRect.top && itemRect.bottom <= containerRect.bottom;
+        const isPartiallyVisibleHorizontally = itemRect.left < containerRect.right && itemRect.right > containerRect.left;
+        const isPartiallyVisibleVertically = itemRect.top < containerRect.bottom && itemRect.bottom > containerRect.top;
+        // if the item is fully or partially visible in both directions, add it to our list
+        if ((isFullyVisibleHorizontally || isPartiallyVisibleHorizontally) &&
+            (isFullyVisibleVertically || isPartiallyVisibleVertically)) {
+            const imgElement = item.querySelector('img');
+            visibleItems.push({
+                path: itemPath,
+                img: imgElement
+            });
+        }
+    });
+    // process the list of visible items
+    processVisibleItems(visibleItems);
+}
+
+/**
+ * Processes a given item by retrieving its thumbnail from an API and updating the item's thumbnail image.
+ * If there are more items in the visibleItems list, it continues to process the next item.
+ * If an error occurs during the retrieval process (including an aborted fetch operation), it is handled gracefully.
+ * @param {Object} item - The item containing its path and corresponding image element.
+ * @param {Array} visibleItems - List of remaining visible items to process.
+ * @throws {AbortError} - Indicates the fetch operation was aborted.
+ * @throws {Error} - Catches and logs other errors that might occur during the thumbnail retrieval.
+ */
+async function processItem(item, visibleItems) {
+    try {
+        const result = await getThumbnailApiCall(item.path, imagePreviewsQuality);
+        // update the item's thumbnail using the retrieved data
+        if (typeof result.base64Data !== "undefined")
+            item.img.src = `data:${result.mimeType};base64,${result.base64Data}`;
+        item.img.closest('.e').setAttribute('data-thumbnail-retrieved', 'true');
+        // continue with next item if there are more in the queue
+        if (visibleItems.length > 0) {
+            const nextItem = visibleItems.shift();
+            processItem(nextItem, visibleItems);
+        }
+    } catch (error) {
+        if (error.name === 'AbortError') {
+            // console.log('Fetch operation was aborted.');
+        } else {
+            // on error, revert the icons to the default ones
+            let itemType = item.img.closest('.e').getAttribute('data-type');
+            if (itemType === 'directory')
+                item.img.src = "http://localhost:5012/images/icons/Lyra/directory.svg";
+            else if (itemType === 'file')
+                item.img.src = "http://localhost:5012/images/icons/Lyra/file.svg";
+            console.error('Error processing item:', error);
+        }
+    }
+}
+
+/**
+ * Makes an API call to retrieve a thumbnail for the given item.
+ * @param {string} path - The path of the item for which the thumbnail needs to be fetched.
+ * @returns {Promise<object>} - Returns a Promise resolving to an object containing base64Data and mimeType.
+ * @throws {Error} - Throws an error if the API call fails.
+ */
+async function getThumbnailApiCall(path, quality) {
+    // fetch the thumbnail for the given item from the server
+    const response = await fetch('http://localhost:5214/api/v1/thumbnails/get-thumbnail?path=' + encodeURIComponent(path) + '&quality=' + quality, {
+        signal: abortController.signal // use the abort signal 
+    });
+    if (!response.ok)
+        throw new Error('Failed to fetch the thumbnail');
+    // convert the response to a JSON object
+    const blob = await response.blob();
+    const base64Data = await blobToBase64(blob);
+    const mimeType = response.headers.get('Content-Type'); 
+    return {
+        base64Data: base64Data,
+        mimeType: mimeType
+    };
+}
+
+/**
+ * Initiates the processing of visible items. Processing is batched based on thumbnailsRetrievalBatchSize. * 
+ * @param {Array} visibleItemsList - List of visible items to be processed.
+ */
+async function processVisibleItems(visibleItemsList) {
+    const visibleItems = [...visibleItemsList];
+    abortController = new AbortController(); // create a new AbortController
+    // process items in batches determined by thumbnailsRetrievalBatchSize
+    for (let i = 0; i < Math.min(thumbnailsRetrievalBatchSize, visibleItems.length); i++) {
+        const item = visibleItems.shift();
+        processItem(item, visibleItems);
+    }
+}
+
 // =================== window functions ===================
 
 /**
@@ -539,6 +737,7 @@ function windowKeyDownHandler(element, dotnetHelper) {
  */
 window.addEventListener('resize', function () {
     adjustDropdownHeight();
+    handleFileSystemBrowserResizeEvent();
     // update all dropdowns' positions on resize
     const dropdown = document.getElementById('navigatorDropdown');
     if (dropdown) {
