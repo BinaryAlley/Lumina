@@ -28,6 +28,8 @@ public static class PresentationWebLayerServices
     /// <returns>The updated <see cref="IServiceCollection"/>.</returns>
     public static IServiceCollection AddPresentationWebLayerServices(this IServiceCollection services)
     {
+        services.AddControllersWithViews();
+
         // scan the current assembly for validators and register them to the DI container
         services.AddValidatorsFromAssemblyContaining<Program>(ServiceLifetime.Singleton);
 
