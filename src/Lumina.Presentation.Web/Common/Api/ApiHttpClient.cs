@@ -3,7 +3,6 @@ using Lumina.Presentation.Web.Common.Exceptions;
 using Lumina.Presentation.Web.Common.Models.Common;
 using Lumina.Presentation.Web.Common.Models.Configuration;
 using Lumina.Presentation.Web.Common.Models.FileManagement;
-using Microsoft.AspNetCore.Components.WebAssembly.Http;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -79,13 +78,7 @@ public class ApiHttpClient : IApiHttpClient
     /// <returns>An <see cref="IAsyncEnumerable{T}"/> object, which allows for asynchronous iteration over the deserialized items.</returns>
     public async IAsyncEnumerable<TResponse?> GetAsyncEnumerable<TResponse>(string endpoint, string? token = null, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        using HttpRequestMessage request = new(HttpMethod.Get, endpoint);
-        // HttpClient is implemented differently in Blazor WASM, because there are no sockets in the browser, so its BrowserHttpHandler is implemented on top of Fetch API,
-        // which can provide response content in one of two forms: BrowserHttpContent, which is based on arrayBuffer method (this means that it will always read the response stream to its completion,
-        // before making the content available), and StreamContent that is wrapping WasmHttpReadStream, which is based on readable streams (this one allows for reading response as it comes).
-        // WasmHttpReadStream can only work when WebAssemblyEnableStreamingResponse is enabled on request, and only on browsers that support it
-        request.SetBrowserResponseStreamingEnabled(true);
-
+        using HttpRequestMessage request = new(HttpMethod.Get, endpoint);        
         if (!string.IsNullOrEmpty(token))
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
         // send the request and expect only headers initially - this prevents the client from buffering the entire response

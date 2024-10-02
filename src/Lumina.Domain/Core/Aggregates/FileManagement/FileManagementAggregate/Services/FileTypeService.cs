@@ -9,6 +9,7 @@ using System;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
@@ -43,18 +44,20 @@ public class FileTypeService : IFileTypeService
     /// Determines if <paramref name="file"/> is of type image or not, and returns its type.
     /// </summary>
     /// <param name="file">The file to determine if it is an image or not.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing the type of image or an error.</returns>
-    public async Task<ErrorOr<ImageType>> GetImageTypeAsync(File file)
+    public async Task<ErrorOr<ImageType>> GetImageTypeAsync(File file, CancellationToken cancellationToken)
     {
-        return await GetImageTypeAsync(file.Id).ConfigureAwait(false);
+        return await GetImageTypeAsync(file.Id, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
     /// Determines if a file identified by <paramref name="path"/> is of type image or not, and returns its type.
     /// </summary>
     /// <param name="path">The path of the file to determine if it is an image or not.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing the type of image or an error.</returns>
-    public async Task<ErrorOr<ImageType>> GetImageTypeAsync(FileSystemPathId path)
+    public async Task<ErrorOr<ImageType>> GetImageTypeAsync(FileSystemPathId path, CancellationToken cancellationToken)
     {
         // check if the user has access permissions to the provided path
         if (!_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadContents))
@@ -65,7 +68,7 @@ public class FileTypeService : IFileTypeService
         if (stream.Length < BUFFER_SIZE)
             return ImageType.None;
         // read only the first bytes of the file, equal to the buffer size
-        await stream.ReadAsync(buffer).ConfigureAwait(false);
+        await stream.ReadAsync(buffer, cancellationToken).ConfigureAwait(false);
         byte[] firstBytes = buffer[..BUFFER_SIZE].ToArray();
         // check if its a known image type, based on header bytes
         ImageType type = IdentifyHeader(firstBytes);

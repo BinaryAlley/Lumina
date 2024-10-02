@@ -5,7 +5,6 @@ using Lumina.Application.Core.FileManagement.Files.Queries.GetTreeFiles;
 using Lumina.Contracts.Responses.FileManagement;
 using Lumina.Presentation.Api.Common.ModelBinders;
 using Lumina.Presentation.Api.Core.Controllers.Common;
-using MapsterMapper;
 using Mediator;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -49,7 +48,7 @@ public class FilesController : ApiController
         [FromQuery] bool includeHiddenElements, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _mediator.Send(new GetTreeFilesQuery(path, includeHiddenElements), cancellationToken).ConfigureAwait(false);
-        foreach (FileSystemTreeNodeResponse file in result.Value)
+        foreach (FileSystemTreeNodeResponse file in result.Value ?? [])
         {
             if (cancellationToken.IsCancellationRequested)
                 yield break;
@@ -70,7 +69,7 @@ public class FilesController : ApiController
         ErrorOr<IEnumerable<FileResponse>> result = await _mediator.Send(new GetFilesQuery(path, includeHiddenElements), cancellationToken).ConfigureAwait(false);
         if (!result.IsError)
         {
-            foreach (FileResponse file in result.Value)
+            foreach (FileResponse file in result.Value ?? [])
             {
                 if (cancellationToken.IsCancellationRequested)
                     yield break;

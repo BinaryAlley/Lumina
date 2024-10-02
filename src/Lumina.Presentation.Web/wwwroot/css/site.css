@@ -52,6 +52,7 @@ main {
 }
 
 #modal-background {
+    display: none;
     z-index: 998;
     position: absolute;
     top: 0px;

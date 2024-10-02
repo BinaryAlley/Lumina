@@ -1,6 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using FluentValidation;
 using Lumina.Presentation.Web.Common.Api;
+using Lumina.Presentation.Web.Common.Exceptions;
+using Lumina.Presentation.Web.Common.Filters;
 using Lumina.Presentation.Web.Common.Services;
 using Lumina.Presentation.Web.Core.Services.UI;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +13,7 @@ using Polly.Wrap;
 using System;
 using System.Net;
 using System.Net.Http;
+using System.Text.Json.Serialization;
 #endregion
 
 namespace Lumina.Presentation.Web.Common.DependencyInjection;
@@ -28,23 +31,25 @@ public static class PresentationWebLayerServices
     /// <returns>The updated <see cref="IServiceCollection"/>.</returns>
     public static IServiceCollection AddPresentationWebLayerServices(this IServiceCollection services)
     {
+        services.AddControllersWithViews(options => options.Filters.Add(typeof(ApiExceptionFilter)))
+            .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
         // scan the current assembly for validators and register them to the DI container
         services.AddValidatorsFromAssemblyContaining<Program>(ServiceLifetime.Singleton);
 
         // handle transient errors like network timeouts or intermittent failures
-        AsyncRetryPolicy<HttpResponseMessage> retryPolicy = Policy
+        AsyncRetryPolicy<HttpResponseMessage> retryPolicy = Policy<HttpResponseMessage>
             .Handle<HttpRequestException>()
-            .OrResult<HttpResponseMessage>(r =>
-                !r.IsSuccessStatusCode &&
-                r.StatusCode != HttpStatusCode.Forbidden &&
-                r.StatusCode != HttpStatusCode.BadRequest)
+            .OrInner<ApiException>(ex =>
+                ex.HttpStatusCode != HttpStatusCode.BadRequest &&
+                ex.HttpStatusCode != HttpStatusCode.Forbidden)
             .WaitAndRetryAsync(3, retryAttempt =>
                 TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
 
         // use a circuit breaker to prevent repeatedly calling a failing service
-        AsyncCircuitBreakerPolicy<HttpResponseMessage> circuitBreakerPolicy = Policy
+        AsyncCircuitBreakerPolicy<HttpResponseMessage> circuitBreakerPolicy = Policy<HttpResponseMessage>
             .Handle<HttpRequestException>()
-            .OrResult<HttpResponseMessage>(r => r.StatusCode == HttpStatusCode.InternalServerError)
+            .OrInner<ApiException>(ex => ex.HttpStatusCode == HttpStatusCode.InternalServerError)
             .CircuitBreakerAsync(3, TimeSpan.FromSeconds(30));
 
         AsyncPolicyWrap<HttpResponseMessage> policy = Policy.WrapAsync(retryPolicy, circuitBreakerPolicy);
@@ -56,6 +61,7 @@ public static class PresentationWebLayerServices
 
         services.AddSingleton<ComboboxService>();
         services.AddScoped<INotificationService, NotificationService>();
+        services.AddScoped<ApiExceptionFilter>();
 
         return services;
     }

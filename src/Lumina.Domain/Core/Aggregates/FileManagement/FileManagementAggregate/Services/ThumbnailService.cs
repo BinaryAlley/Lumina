@@ -10,6 +10,7 @@ using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.Processing;
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
@@ -41,13 +42,14 @@ public class ThumbnailService : IThumbnailService
     /// </summary>
     /// <param name="path">String representation of the file path.</param>
     /// <param name="quality">The quality of the thumbnail to get.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of bytes representing the thumbnail of the file at the specified path or an error.</returns>
-    public async Task<ErrorOr<Thumbnail>> GetThumbnailAsync(string path, int quality)
+    public async Task<ErrorOr<Thumbnail>> GetThumbnailAsync(string path, int quality, CancellationToken cancellationToken)
     {
         ErrorOr<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(path);
         if (fileSystemPathIdResult.IsError)
             return fileSystemPathIdResult.Errors;
-        return await GetThumbnailAsync(fileSystemPathIdResult.Value, quality);
+        return await GetThumbnailAsync(fileSystemPathIdResult.Value, quality, cancellationToken);
     }
 
     /// <summary>
@@ -55,11 +57,12 @@ public class ThumbnailService : IThumbnailService
     /// </summary>
     /// <param name="path">The path of the file for which to get the thumbnail.</param>
     /// <param name="quality">The quality of the thumbnail to get.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of bytes representing the thumbnail of the file at the specified path or an error.</returns>
-    public async Task<ErrorOr<Thumbnail>> GetThumbnailAsync(FileSystemPathId path, int quality)
+    public async Task<ErrorOr<Thumbnail>> GetThumbnailAsync(FileSystemPathId path, int quality, CancellationToken cancellationToken)
     {
         // first, get the type of the image file
-        ErrorOr<ImageType> imageTypeResult = await _environmentContext.FileTypeService.GetImageTypeAsync(path);
+        ErrorOr<ImageType> imageTypeResult = await _environmentContext.FileTypeService.GetImageTypeAsync(path, cancellationToken);
         if (imageTypeResult.IsError)
             return imageTypeResult.Errors;
         if (imageTypeResult.Value != ImageType.None)
@@ -74,7 +77,7 @@ public class ThumbnailService : IThumbnailService
             if (imageTypeResult.Value is ImageType.JPEG or ImageType.JPEG_CANON or ImageType.JPEG2000
                 or ImageType.JPEG_UNKNOWN or ImageType.PNG or ImageType.BMP
                 or ImageType.WEBP or ImageType.GIF or ImageType.TIFF or ImageType.TGA)
-                adjustedImage = await AdjustImageResolutionAsync(fileContents, imageTypeResult.Value, quality);
+                adjustedImage = await AdjustImageResolutionAsync(fileContents, imageTypeResult.Value, quality, cancellationToken);
             return new Thumbnail(imageTypeResult.Value, adjustedImage ?? fileContents);
         }
         else
@@ -87,8 +90,9 @@ public class ThumbnailService : IThumbnailService
     /// <param name="imageBytes">The byte array of the source image.</param>
     /// <param name="imageType">The format of the image whose quality is adjusted.</param>
     /// <param name="quality">A value between 1 (lowest quality) to 100 (highest quality).</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>A byte array representing the processed image.</returns>
-    private static async Task<byte[]> AdjustImageQualityAsync(byte[] imageBytes, ImageType imageType, int quality)
+    private static async Task<byte[]> AdjustImageQualityAsync(byte[] imageBytes, ImageType imageType, int quality, CancellationToken cancellationToken)
     {
         using MemoryStream inputMemoryStream = new(imageBytes);
         using MemoryStream outputMemoryStream = new();
@@ -99,24 +103,24 @@ public class ThumbnailService : IThumbnailService
             case ImageType.JPEG_CANON:
             case ImageType.JPEG_UNKNOWN:
                 {
-                    using Image image = await Image.LoadAsync(inputMemoryStream);
-                    await image.SaveAsync(outputMemoryStream, new JpegEncoder() { Quality = quality });
+                    using Image image = await Image.LoadAsync(inputMemoryStream, cancellationToken);
+                    await image.SaveAsync(outputMemoryStream, new JpegEncoder() { Quality = quality }, cancellationToken);
                     break;
                 }
             case ImageType.PNG:
                 {
-                    using Image image = await Image.LoadAsync(inputMemoryStream);
+                    using Image image = await Image.LoadAsync(inputMemoryStream, cancellationToken);
                     // PNG is lossless; quality adjustments don't apply in the same way - we can adjust compression
                     int compressionLevel = MapRange(quality, 1, 100, 1, 9);
                     PngEncoder encoder = new()
                     { CompressionLevel = (PngCompressionLevel)compressionLevel };
-                    await image.SaveAsync(outputMemoryStream, encoder);
+                    await image.SaveAsync(outputMemoryStream, encoder, cancellationToken);
                     break;
                 }
             case ImageType.BMP:
                 {
-                    using Image image = await Image.LoadAsync(inputMemoryStream);
-                    await image.SaveAsync(outputMemoryStream, new PngEncoder()); // convert BMP to PNG for compression
+                    using Image image = await Image.LoadAsync(inputMemoryStream, cancellationToken);
+                    await image.SaveAsync(outputMemoryStream, new PngEncoder(), cancellationToken); // convert BMP to PNG for compression
                     break;
                 }
             default:
@@ -131,12 +135,13 @@ public class ThumbnailService : IThumbnailService
     /// <param name="imageBytes">The byte array of the source image.</param>
     /// <param name="imageType">The format of the image whose quality is adjusted.</param>
     /// <param name="quality">A value between 1 (lowest quality) to 100 (highest quality).</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>The bytes of the adjusted image.</returns>
-    private static async Task<byte[]> AdjustImageResolutionAsync(byte[] imageBytes, ImageType imageType, int quality)
+    private static async Task<byte[]> AdjustImageResolutionAsync(byte[] imageBytes, ImageType imageType, int quality, CancellationToken cancellationToken)
     {
         using MemoryStream inputMemoryStream = new(imageBytes);
         using MemoryStream outputMemoryStream = new();
-        Image image = await Image.LoadAsync(inputMemoryStream);
+        Image image = await Image.LoadAsync(inputMemoryStream, cancellationToken);
         double ratio = quality / 100.0;
         int newWidth = (int)(image.Width * ratio);
         int newHeight = (int)(image.Height * ratio);
@@ -163,7 +168,7 @@ public class ThumbnailService : IThumbnailService
             case ImageType.JPEG2000:
             case ImageType.JPEG_CANON:
             case ImageType.JPEG_UNKNOWN:
-                await image.SaveAsync(outputMemoryStream, image.Metadata.DecodedImageFormat!);
+                await image.SaveAsync(outputMemoryStream, image.Metadata.DecodedImageFormat!, cancellationToken);
                 break;
             default:
                 return imageBytes; // for unsupported formats, just return the original bytes

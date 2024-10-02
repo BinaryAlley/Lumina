@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>@ViewData["Title"] - Lumina</title>
+        <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/button.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/checkbox.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/combobox.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/file-system-browser.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/file-system-tree-view-node.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/navigation-menu.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/notification.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/textbox.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/Lumina.Presentation.Web.styles.css" asp-append-version="true" />
+    </head>
+    <body>
+        <div id="page">
+            <header>
+                @await Html.PartialAsync("_NavMenu")
+            </header>
+            <main role="main">
+                <article>
+                    @RenderBody()
+                </article>
+            </main>
+        </div>
+        <!--Modal grid background-->
+        <div id="modal-background"></div>
+
+        <script defer src="~/js/notifications.js" asp-append-version="true"></script>
+        <script defer src="~/js/site.js" asp-append-version="true"></script>
+        @await RenderSectionAsync("Scripts", required: false)
+    </body>
+</html>

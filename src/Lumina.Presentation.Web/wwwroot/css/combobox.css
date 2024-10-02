@@ -1,0 +1,154 @@
+﻿.enlightenment-combobox {
+    position: relative;
+    font-family: Arial, sans-serif;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.enlightenment-toggle-checkbox {
+    display: none;
+}
+
+.enlightenment-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    border-radius: 3px;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+    color: #6DCBFE;
+    padding: 3px 24px 3px 18px;
+    width: 100%;
+    border: none;
+    outline: none;
+    appearance: none;
+    border-top: #989898 1px solid;
+    border-bottom: #151515 1px solid;
+    border-left: #878787 1px solid;
+    border-right: #202020 1px solid;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%225%22%3E%3Cpath%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222%22%20d%3D%22M2%2C0L6%2C4L10%2C0%22%2F%3E%3C%2Fsvg%3E'), url('../images/ui/scrollbar_dots_v.png'), linear-gradient(180deg, #606060, #555555, #4C4C4C, #414141);
+    background-repeat: no-repeat, no-repeat, repeat;
+    background-position: right 10px top 50%, left 7px top 50%, 0 0;
+    background-size: 12px 6px, 3px auto, 100%;
+    user-select: none;
+    box-sizing: border-box;
+}
+
+    .enlightenment-toggle:hover {
+        background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%225%22%3E%3Cpath%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222%22%20d%3D%22M2%2C0L6%2C4L10%2C0%22%2F%3E%3C%2Fsvg%3E'), url('../images/ui/scrollbar_dots_lit_v.png'), linear-gradient(180deg, #606060, #555555, #4C4C4C, #414141);
+        background-repeat: no-repeat, no-repeat, repeat;
+        background-position: right 10px top 50%, left 7px top 50%, 0 0;
+        background-size: 12px 6px, 3px auto, 100%;
+    }
+
+.enlightenment-selected-text {
+    flex: 1;
+    text-align: right;
+}
+
+.enlightenment-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    box-sizing: border-box;
+    background-image: url('../images/ui/metal-plate.png'), linear-gradient(180deg, #505050, #464646, #404040, #363636);
+    background-repeat: repeat, no-repeat;
+    background-position: 3px 3px, 0 0; /* offset the metal-plate image by 3 pixels from the top and left */
+    background-clip: content-box, border-box; /* clip the metal-plate image to the content box */
+    border-top: #989898 1px solid;
+    border-bottom: #151515 1px solid;
+    border-left: #878787 1px solid;
+    border-right: #202020 1px solid;
+    padding: 3px;
+    z-index: 999;
+    max-height: none;
+    overflow-y: auto;
+}
+
+    .enlightenment-dropdown > .shine-effect:first-child {
+        top: -4px;
+    }
+
+.enlightenment-item {
+    display: block;
+    border-left: 1px solid #232323;
+    border-right: 1px solid #777777;
+    border-top: 1px solid #232323;
+    border-bottom: 1px solid #777777;
+    color: #FFFFFF;
+    padding: 5px 10px;
+    width: 100%;
+    box-sizing: border-box;
+    user-select: none;
+    cursor: pointer;
+}
+
+    .enlightenment-item.first-item {
+        border-top: 1px solid #232323;
+        margin-top: -1px;
+    }
+
+    .enlightenment-item.last-item {
+        border-bottom: 1px solid #777777;
+    }
+
+    .enlightenment-item.disabled {
+        color: #AAAAAA;
+    }
+
+    .enlightenment-item:hover {
+        background-image: none;
+        background: linear-gradient(to bottom, #505050, #464646, #404040, #363636);
+        color: #1D8AF9;
+        box-shadow: inset 1px 0 0 0 #777777, inset -1px 0 0 0 #232323, inset 0 1px 0 0 #989898, inset 0 -1px 0 0 #151515;
+    }
+
+.enlightenment-combobox.open .enlightenment-dropdown {
+    display: block;
+}
+
+.enlightenment-combobox > .shine-effect:first-child {
+    top: 1px;
+    opacity: 0;
+    transition: opacity 0.5s;
+}
+
+.enlightenment-combobox:hover > .shine-effect:first-child {
+    opacity: 1;
+}
+
+.enlightenment-combobox > .shine-effect::before,
+.enlightenment-combobox > .shine-effect::after {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.5s;
+}
+
+.enlightenment-combobox > .shine-effect::before {
+    width: 3px;
+    height: 2px;
+    border-radius: 5px 5px 0 0;
+    background-color: #FFFFFF;
+}
+
+.enlightenment-combobox > .shine-effect::after {
+    width: 10px;
+    height: 3px;
+    border-radius: 5px 5px 0 0;
+    background-color: #FFFFFF;
+    filter: blur(3px);
+}
+
+.enlightenment-combobox:hover > .shine-effect::before,
+.enlightenment-combobox:hover > .shine-effect::after {
+    opacity: 1;
+}

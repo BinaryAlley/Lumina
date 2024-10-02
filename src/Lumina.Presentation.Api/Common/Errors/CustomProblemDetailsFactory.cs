@@ -28,12 +28,12 @@ public class CustomProblemDetailsFactory : ProblemDetailsFactory
     /// <summary>
     /// Initializes a new instance of the <see cref="CustomProblemDetailsFactory"/> class.
     /// </summary>
-    /// <param name="options">Injected service for retrieving <see cref="ApiBehaviorOptions"/>.</param>
+    /// <param name="apiBehaviorOptions">Injected service for retrieving <see cref="ApiBehaviorOptions"/>.</param>
     /// <param name="problemDetailsOptions">Injected service for retrieving <see cref="ProblemDetailsOptions"/>.</param>
     /// <exception cref="ArgumentNullException">Thrown when the value of options (if any) is <see langword="null"/>.</exception>
-    public CustomProblemDetailsFactory(IOptions<ApiBehaviorOptions> options, IOptions<ProblemDetailsOptions>? problemDetailsOptions = null)
+    public CustomProblemDetailsFactory(IOptions<ApiBehaviorOptions> apiBehaviorOptions, IOptions<ProblemDetailsOptions>? problemDetailsOptions = null)
     {
-        _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
+        _options = apiBehaviorOptions?.Value ?? throw new ArgumentNullException(nameof(apiBehaviorOptions));
         _configure = problemDetailsOptions?.Value?.CustomizeProblemDetails;
     }
     #endregion
