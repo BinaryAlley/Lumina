@@ -1,0 +1,537 @@
+@using Lumina.Presentation.Web.Common.Models.Common
+@using Lumina.Presentation.Web.Common.Api
+@using Lumina.Presentation.Web.Common.Enums.FileSystem
+@using Lumina.Presentation.Web.Common.Enums.Notifications
+@using Lumina.Presentation.Web.Common.Exceptions
+@using Lumina.Presentation.Web.Common.Models.FileManagement
+@using Lumina.Presentation.Web.Common.Models.UI
+@using Lumina.Presentation.Web.Common.Services
+@using Microsoft.AspNetCore.Components
+@using System.Text.Json
+@using System.Text
+
+@inject IApiHttpClient _apiHttpClient
+@inject INotificationService _notificationService
+
+<div id="file-system-browser-dialog" class="container-background above-modal">
+    <div id="file-system-browser-content">
+        <div id="file-system-browser-header">
+            <div id="file-system-browser-shine-spark"></div>
+            <div id="file-system-browser-shine-effect"></div>
+            <div id="file-system-browser-header-navigation-container">
+                <!--File System Navigator-->
+                <div id="navigator-view-mode-container">
+                    <!--List View Mode-->
+                    <svg id="navigator-list-view" class="navigator-icon" width="30" height="30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <title>List View</title>
+                        <defs>
+                            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                                <feComponentTransfer in="SourceAlpha" result="adjustedAlpha">
+                                    <feFuncA type="table" tableValues="0 0.5 1" />
+                                </feComponentTransfer>
+                                <feGaussianBlur in="adjustedAlpha" stdDeviation="2" result="blur" />
+                                <feFlood flood-color="#039bfc" result="color" />
+                                <feComposite in="color" in2="blur" operator="in" result="softGlowColored" />
+                                <feMerge>
+                                    <feMergeNode in="softGlowColored" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+
+                            <linearGradient id="linearGradient" x1="5" x2="195" y1="174.76" y2="174.76" gradientTransform="matrix(.32632 0 0 .095367 -.63187 42.834)" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#039bfc" stop-opacity="0" offset="0" />
+                                <stop stop-color="#039bfc" offset=".225" />
+                                <stop stop-color="#039bfc" offset=".5" />
+                                <stop stop-color="#039bfc" offset=".775" />
+                                <stop stop-color="#039bfc" stop-opacity="0" offset="1" />
+                            </linearGradient>
+                        </defs>
+
+                        <g transform="translate(0,-0.5) scale(0.475)">
+                            <rect x=".99971" y="59" width="62.001" height="1" ry="0" fill="url(#linearGradient)" stroke-width="3.7796" style="mix-blend-mode:normal;paint-order:stroke fill markers" filter="url(#glow)" />
+                        </g>
+                        <g stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5">
+                            <rect x="4.5" y="4.5" width="21" height="21" ry="2.5" fill="none" stroke="#039bfc" style="paint-order:stroke fill markers" filter="url(#glow)" />
+                        </g>
+                        <g transform="translate(6,6) scale(0.55)">
+                            <path xmlns="http://www.w3.org/2000/svg" style="stroke:currentColor;" class="navigator-icon-fill list" filter="url(#glow)" d="M3,5 h8 v8 h-8 z M11,9 h4" fill="none" stroke-width="1" />
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill list" filter="url(#glow)" d="M5,7 h4 v4 h-4 z" />
+
+                            <path xmlns="http://www.w3.org/2000/svg" style="stroke:currentColor;" class="navigator-icon-fill list" filter="url(#glow)" d="M3,13 h8 v8 h-8 z M11,17 h4" fill="none" stroke-width="1" />
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill list" filter="url(#glow)" d="M5,15 h4 v4 h-4 z" />
+
+                            <path xmlns="http://www.w3.org/2000/svg" style="stroke:currentColor;" class="navigator-icon-fill list" filter="url(#glow)" d="M3,21 h8 v8 h-8 z M11,25 h4" fill="none" stroke-width="1" />
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill list" filter="url(#glow)" d="M5,23 h4 v4 h-4 z" />
+
+                            <path xmlns="http://www.w3.org/2000/svg" style="stroke:currentColor;" class="navigator-icon-fill list" filter="url(#glow)" d="M20,5 h8 v8 h-8 z M28,9 h4" fill="none" stroke-width="1" />
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill list" filter="url(#glow)" d="M22,7 h4 v4 h-4 z" />
+
+                            <path xmlns="http://www.w3.org/2000/svg" style="stroke:currentColor;" class="navigator-icon-fill list" filter="url(#glow)" d="M20,13 h8 v8 h-8 z M28,17 h4" fill="none" stroke-width="1" />
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill list" filter="url(#glow)" d="M22,15 h4 v4 h-4 z" />
+
+                            <path xmlns="http://www.w3.org/2000/svg" style="stroke:currentColor;" class="navigator-icon-fill list" filter="url(#glow)" d="M20,21 h8 v8 h-8 z M28,25 h4" fill="none" stroke-width="1" />
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill list" filter="url(#glow)" d="M22,23 h4 v4 h-4 z" />
+                        </g>
+                    </svg>
+                    <!--Details View Mode-->
+                    <svg id="navigator-details-view" class="navigator-icon" width="30" height="30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <title>Details View</title>
+                        <defs>
+                            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                                <feComponentTransfer in="SourceAlpha" result="adjustedAlpha">
+                                    <feFuncA type="table" tableValues="0 0.5 1" />
+                                </feComponentTransfer>
+                                <feGaussianBlur in="adjustedAlpha" stdDeviation="2" result="blur" />
+                                <feFlood flood-color="#039bfc" result="color" />
+                                <feComposite in="color" in2="blur" operator="in" result="softGlowColored" />
+                                <feMerge>
+                                    <feMergeNode in="softGlowColored" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+
+                            <linearGradient id="linearGradient" x1="5" x2="195" y1="174.76" y2="174.76" gradientTransform="matrix(.32632 0 0 .095367 -.63187 42.834)" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#039bfc" stop-opacity="0" offset="0" />
+                                <stop stop-color="#039bfc" offset=".225" />
+                                <stop stop-color="#039bfc" offset=".5" />
+                                <stop stop-color="#039bfc" offset=".775" />
+                                <stop stop-color="#039bfc" stop-opacity="0" offset="1" />
+                            </linearGradient>
+                        </defs>
+
+                        <g transform="translate(0,-0.5) scale(0.475)">
+                            <rect x=".99971" y="59" width="62.001" height="1" ry="0" fill="url(#linearGradient)" stroke-width="3.7796" style="mix-blend-mode:normal;paint-order:stroke fill markers" filter="url(#glow)" />
+                        </g>
+                        <g stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5">
+                            <rect x="4.5" y="4.5" width="21" height="21" ry="2.5" fill="none" stroke="#039bfc" style="paint-order:stroke fill markers" filter="url(#glow)" />
+                        </g>
+                        <g transform="translate(6,6) scale(0.55)">
+                            <path xmlns="http://www.w3.org/2000/svg" style="stroke:currentColor;" class="navigator-icon-fill details" filter="url(#glow)" d="M3,5 h8 v8 h-8 z M11,9 h4" fill="none" stroke-width="1" />
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill details" filter="url(#glow)" d="M5,7 h4 v4 h-4 z" />
+
+                            <path xmlns="http://www.w3.org/2000/svg" style="stroke:currentColor;" class="navigator-icon-fill details" filter="url(#glow)" d="M3,13 h8 v8 h-8 z M11,17 h4" fill="none" stroke-width="1" />
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill details" filter="url(#glow)" d="M5,15 h4 v4 h-4 z" />
+
+                            <path xmlns="http://www.w3.org/2000/svg" style="stroke:currentColor;" class="navigator-icon-fill details" filter="url(#glow)" d="M3,21 h8 v8 h-8 z M11,25 h4" fill="none" stroke-width="1" />
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill details" filter="url(#glow)" d="M5,23 h4 v4 h-4 z" />
+
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill details" filter="url(#glow)" d="M17.5,8.5 h5 v1 h-5 z" />
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill details" filter="url(#glow)" d="M17.5,16.5 h5 v1 h-5 z" />
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill details" filter="url(#glow)" d="M17.5,24.5 h5 v1 h-5 z" />
+
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill details" filter="url(#glow)" d="M25,8.5 h5 v1 h-5 z" />
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill details" filter="url(#glow)" d="M25,16.5 h5 v1 h-5 z" />
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill details" filter="url(#glow)" d="M25,24.5 h5 v1 h-5 z" />
+                        </g>
+                    </svg>
+                    <!--Small Icons View Mode-->
+                    <svg id="navigator-small-icons-view" class="navigator-icon" width="30" height="30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <title>Small Icons View</title>
+                        <defs>
+                            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                                <feComponentTransfer in="SourceAlpha" result="adjustedAlpha">
+                                    <feFuncA type="table" tableValues="0 0.5 1" />
+                                </feComponentTransfer>
+                                <feGaussianBlur in="adjustedAlpha" stdDeviation="2" result="blur" />
+                                <feFlood flood-color="#039bfc" result="color" />
+                                <feComposite in="color" in2="blur" operator="in" result="softGlowColored" />
+                                <feMerge>
+                                    <feMergeNode in="softGlowColored" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+
+                            <linearGradient id="linearGradient" x1="5" x2="195" y1="174.76" y2="174.76" gradientTransform="matrix(.32632 0 0 .095367 -.63187 42.834)" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#039bfc" stop-opacity="0" offset="0" />
+                                <stop stop-color="#039bfc" offset=".225" />
+                                <stop stop-color="#039bfc" offset=".5" />
+                                <stop stop-color="#039bfc" offset=".775" />
+                                <stop stop-color="#039bfc" stop-opacity="0" offset="1" />
+                            </linearGradient>
+                        </defs>
+
+                        <g transform="translate(0,-0.5) scale(0.475)">
+                            <rect x=".99971" y="59" width="62.001" height="1" ry="0" fill="url(#linearGradient)" stroke-width="3.7796" style="mix-blend-mode:normal;paint-order:stroke fill markers" filter="url(#glow)" />
+                        </g>
+                        <g stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5">
+                            <rect x="4.5" y="4.5" width="21" height="21" ry="2.5" fill="none" stroke="#039bfc" style="paint-order:stroke fill markers" filter="url(#glow)" />
+                        </g>
+                        <g transform="translate(6,6) scale(0.55)">
+                            <path xmlns="http://www.w3.org/2000/svg" style="stroke:currentColor;" class="navigator-icon-fill small-icons" filter="url(#glow)" d="M4,5 h8 v8 h-8 z" fill="none" stroke-width="1" />
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill small-icons" filter="url(#glow)" d="M6,7 h4 v4 h-4 z" />
+
+                            <path xmlns="http://www.w3.org/2000/svg" style="stroke:currentColor;" class="navigator-icon-fill small-icons" filter="url(#glow)" d="M4,13 h8 v8 h-8 z" fill="none" stroke-width="1" />
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill small-icons" filter="url(#glow)" d="M6,15 h4 v4 h-4 z" />
+
+                            <path xmlns="http://www.w3.org/2000/svg" style="stroke:currentColor;" class="navigator-icon-fill small-icons" filter="url(#glow)" d="M4,21 h8 v8 h-8 z" fill="none" stroke-width="1" />
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill small-icons" filter="url(#glow)" d="M6,23 h4 v4 h-4 z" />
+
+                            <path xmlns="http://www.w3.org/2000/svg" style="stroke:currentColor;" class="navigator-icon-fill small-icons" filter="url(#glow)" d="M12,5 h8 v8 h-8 z" fill="none" stroke-width="1" />
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill small-icons" filter="url(#glow)" d="M14,7 h4 v4 h-4 z" />
+
+                            <path xmlns="http://www.w3.org/2000/svg" style="stroke:currentColor;" class="navigator-icon-fill small-icons" filter="url(#glow)" d="M12,13 h8 v8 h-8 z" fill="none" stroke-width="1" />
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill small-icons" filter="url(#glow)" d="M14,15 h4 v4 h-4 z" />
+
+                            <path xmlns="http://www.w3.org/2000/svg" style="stroke:currentColor;" class="navigator-icon-fill small-icons" filter="url(#glow)" d="M12,21 h8 v8 h-8 z" fill="none" stroke-width="1" />
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill small-icons" filter="url(#glow)" d="M14,23 h4 v4 h-4 z" />
+
+                            <path xmlns="http://www.w3.org/2000/svg" style="stroke:currentColor;" class="navigator-icon-fill small-icons" filter="url(#glow)" d="M20,5 h8 v8 h-8 z" fill="none" stroke-width="1" />
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill small-icons" filter="url(#glow)" d="M22,7 h4 v4 h-4 z" />
+
+                            <path xmlns="http://www.w3.org/2000/svg" style="stroke:currentColor;" class="navigator-icon-fill small-icons" filter="url(#glow)" d="M20,13 h8 v8 h-8 z" fill="none" stroke-width="1" />
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill small-icons" filter="url(#glow)" d="M22,15 h4 v4 h-4 z" />
+
+                            <path xmlns="http://www.w3.org/2000/svg" style="stroke:currentColor;" class="navigator-icon-fill small-icons" filter="url(#glow)" d="M20,21 h8 v8 h-8 z" fill="none" stroke-width="1" />
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill small-icons" filter="url(#glow)" d="M22,23 h4 v4 h-4 z" />
+                        </g>
+                    </svg>
+                    <!--Medium Icons View Mode-->
+                    <svg id="navigator-medium-icons-view" class="navigator-icon" width="30" height="30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <title>Medium Icons View</title>
+                        <defs>
+                            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                                <feComponentTransfer in="SourceAlpha" result="adjustedAlpha">
+                                    <feFuncA type="table" tableValues="0 0.5 1" />
+                                </feComponentTransfer>
+                                <feGaussianBlur in="adjustedAlpha" stdDeviation="2" result="blur" />
+                                <feFlood flood-color="#039bfc" result="color" />
+                                <feComposite in="color" in2="blur" operator="in" result="softGlowColored" />
+                                <feMerge>
+                                    <feMergeNode in="softGlowColored" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+
+                            <linearGradient id="linearGradient" x1="5" x2="195" y1="174.76" y2="174.76" gradientTransform="matrix(.32632 0 0 .095367 -.63187 42.834)" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#039bfc" stop-opacity="0" offset="0" />
+                                <stop stop-color="#039bfc" offset=".225" />
+                                <stop stop-color="#039bfc" offset=".5" />
+                                <stop stop-color="#039bfc" offset=".775" />
+                                <stop stop-color="#039bfc" stop-opacity="0" offset="1" />
+                            </linearGradient>
+                        </defs>
+
+                        <g transform="translate(0,-0.5) scale(0.475)">
+                            <rect x=".99971" y="59" width="62.001" height="1" ry="0" fill="url(#linearGradient)" stroke-width="3.7796" style="mix-blend-mode:normal;paint-order:stroke fill markers" filter="url(#glow)" />
+                        </g>
+                        <g stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5">
+                            <rect x="4.5" y="4.5" width="21" height="21" ry="2.5" fill="none" stroke="#039bfc" style="paint-order:stroke fill markers" filter="url(#glow)" />
+                        </g>
+                        <g transform="translate(6,6) scale(0.55)">
+                            <path xmlns="http://www.w3.org/2000/svg" style="stroke:currentColor;" class="navigator-icon-fill medium-icons" filter="url(#glow)" d="M4,5 h12 v12 h-12 z" fill="none" stroke-width="1" />
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill medium-icons" filter="url(#glow)" d="M6,7 h8 v8 h-8 z" />
+
+                            <path xmlns="http://www.w3.org/2000/svg" style="stroke:currentColor;" class="navigator-icon-fill medium-icons" filter="url(#glow)" d="M4,17 h12 v12 h-12 z" fill="none" stroke-width="1" />
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill medium-icons" filter="url(#glow)" d="M6,19 h8 v8 h-8 z" />
+
+                            <path xmlns="http://www.w3.org/2000/svg" style="stroke:currentColor;" class="navigator-icon-fill medium-icons" filter="url(#glow)" d="M16,5 h12 v12 h-12 z" fill="none" stroke-width="1" />
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill medium-icons" filter="url(#glow)" d="M18,7 h8 v8 h-8 z" />
+
+                            <path xmlns="http://www.w3.org/2000/svg" style="stroke:currentColor;" class="navigator-icon-fill medium-icons" filter="url(#glow)" d="M16,17 h12 v12 h-12 z" fill="none" stroke-width="1" />
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill medium-icons" filter="url(#glow)" d="M18,19 h8 v8 h-8 z" />
+                        </g>
+                    </svg>
+                    <!--Large Icons View Mode-->
+                    <svg id="navigator-large-icons-view" class="navigator-icon" width="30" height="30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <title>Large Icons View</title>
+                        <defs>
+                            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                                <feComponentTransfer in="SourceAlpha" result="adjustedAlpha">
+                                    <feFuncA type="table" tableValues="0 0.5 1" />
+                                </feComponentTransfer>
+                                <feGaussianBlur in="adjustedAlpha" stdDeviation="2" result="blur" />
+                                <feFlood flood-color="#039bfc" result="color" />
+                                <feComposite in="color" in2="blur" operator="in" result="softGlowColored" />
+                                <feMerge>
+                                    <feMergeNode in="softGlowColored" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+
+                            <linearGradient id="linearGradient" x1="5" x2="195" y1="174.76" y2="174.76" gradientTransform="matrix(.32632 0 0 .095367 -.63187 42.834)" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#039bfc" stop-opacity="0" offset="0" />
+                                <stop stop-color="#039bfc" offset=".225" />
+                                <stop stop-color="#039bfc" offset=".5" />
+                                <stop stop-color="#039bfc" offset=".775" />
+                                <stop stop-color="#039bfc" stop-opacity="0" offset="1" />
+                            </linearGradient>
+                        </defs>
+
+                        <g transform="translate(0,-0.5) scale(0.475)">
+                            <rect x=".99971" y="59" width="62.001" height="1" ry="0" fill="url(#linearGradient)" stroke-width="3.7796" style="mix-blend-mode:normal;paint-order:stroke fill markers" filter="url(#glow)" />
+                        </g>
+                        <g stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5">
+                            <rect x="4.5" y="4.5" width="21" height="21" ry="2.5" fill="none" stroke="#039bfc" style="paint-order:stroke fill markers" filter="url(#glow)" />
+                        </g>
+                        <g transform="translate(6,6) scale(0.55)">
+                            <path xmlns="http://www.w3.org/2000/svg" style="stroke:currentColor;" class="navigator-icon-fill large-icons" filter="url(#glow)" d="M4,5 h24 v24 h-24 z" fill="none" stroke-width="1" />
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill large-icons" filter="url(#glow)" d="M6,7 h20 v20 h-20 z" />
+                        </g>
+                    </svg>
+                    <!--Extra Large Icons View Mode-->
+                    <svg id="navigator-extra-large-icons-view" class="navigator-icon" width="30" height="30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <title>Extra Large Icons View</title>
+                        <defs>
+                            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                                <feComponentTransfer in="SourceAlpha" result="adjustedAlpha">
+                                    <feFuncA type="table" tableValues="0 0.5 1" />
+                                </feComponentTransfer>
+                                <feGaussianBlur in="adjustedAlpha" stdDeviation="2" result="blur" />
+                                <feFlood flood-color="#039bfc" result="color" />
+                                <feComposite in="color" in2="blur" operator="in" result="softGlowColored" />
+                                <feMerge>
+                                    <feMergeNode in="softGlowColored" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+
+                            <linearGradient id="linearGradient" x1="5" x2="195" y1="174.76" y2="174.76" gradientTransform="matrix(.32632 0 0 .095367 -.63187 42.834)" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#039bfc" stop-opacity="0" offset="0" />
+                                <stop stop-color="#039bfc" offset=".225" />
+                                <stop stop-color="#039bfc" offset=".5" />
+                                <stop stop-color="#039bfc" offset=".775" />
+                                <stop stop-color="#039bfc" stop-opacity="0" offset="1" />
+                            </linearGradient>
+                        </defs>
+
+                        <g transform="translate(0,-0.5) scale(0.475)">
+                            <rect x=".99971" y="59" width="62.001" height="1" ry="0" fill="url(#linearGradient)" stroke-width="3.7796" style="mix-blend-mode:normal;paint-order:stroke fill markers" filter="url(#glow)" />
+                        </g>
+                        <g stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5">
+                            <rect x="4.5" y="4.5" width="21" height="21" ry="2.5" fill="none" stroke="#039bfc" style="paint-order:stroke fill markers" filter="url(#glow)" />
+                        </g>
+                        <g transform="translate(6,6) scale(0.55)">
+                            <path xmlns="http://www.w3.org/2000/svg" style="stroke:currentColor;" class="navigator-icon-fill extra-large-icons" filter="url(#glow)" d="M4,5 h24 v24 h-24 z" fill="none" stroke-width="1" />
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill extra-large-icons" filter="url(#glow)" d="M11,12 L16,17 L21,12 L26,17 V7 H6 V17 Z" fill="none" stroke-width="1" />
+                        </g>
+                    </svg>
+                </div>
+                <div id="navigator-navigation-controls-container">
+                    <!--Navigation-->
+                    <div id="navigator-history">
+                        <img src="images/ui/back.svg" id="navigator-navigate-back" class="navigation-icon" alt="Back" title="Back" />
+                        <img src="images/ui/forward.svg" id="navigator-navigate-forward" class="navigation-icon" alt="Forward" title="Forward" />
+                        <img src="images/ui/up.svg" id="navigator-navigate-up" class="navigation-icon" alt="Up One Level" title="Up One Level" />
+                    </div>
+                    <!--Toggle Tree View-->
+                    <svg id="navigator-toggle-tree-view-button" class="navigator-icon" width="30" height="30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <title>Toggle Tree View</title>
+                        <defs>
+                            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                                <feComponentTransfer in="SourceAlpha" result="adjustedAlpha">
+                                    <feFuncA type="table" tableValues="0 0.5 1" />
+                                </feComponentTransfer>
+                                <feGaussianBlur in="adjustedAlpha" stdDeviation="2" result="blur" />
+                                <feFlood flood-color="#039bfc" result="color" />
+                                <feComposite in="color" in2="blur" operator="in" result="softGlowColored" />
+                                <feMerge>
+                                    <feMergeNode in="softGlowColored" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+
+                            <linearGradient id="linearGradient" x1="5" x2="195" y1="174.76" y2="174.76" gradientTransform="matrix(.32632 0 0 .095367 -.63187 42.834)" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#039bfc" stop-opacity="0" offset="0" />
+                                <stop stop-color="#039bfc" offset=".225" />
+                                <stop stop-color="#039bfc" offset=".5" />
+                                <stop stop-color="#039bfc" offset=".775" />
+                                <stop stop-color="#039bfc" stop-opacity="0" offset="1" />
+                            </linearGradient>
+                        </defs>
+
+                        <g transform="translate(0,-0.5) scale(0.475)">
+                            <rect x=".99971" y="59" width="62.001" height="1" ry="0" fill="url(#linearGradient)" stroke-width="3.7796" style="mix-blend-mode:normal;paint-order:stroke fill markers" filter="url(#glow)" />
+                        </g>
+                        <g stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5">
+                            <rect x="4.5" y="4.5" width="21" height="21" ry="2.5" fill="none" stroke="#039bfc" style="paint-order:stroke fill markers" filter="url(#glow)" />
+                        </g>
+                        <g transform="translate(6,6) scale(0.55)">
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill tree-view" filter="url(#glow)" d="M 4 4 L 4 14 L 9 14 L 9 23 L 18 23 L 18 28 L 28 28 L 28 18 L 18 18 L 18 22 L 10 22 L 10 14 L 14 14 L 14 9 L 18 9 L 18 14 L 28 14 L 28 4 L 18 4 L 18 8 L 14 8 L 14 4 L 4 4 z M 5 5 L 13 5 L 13 13 L 5 13 L 5 5 z M 19 5 L 27 5 L 27 13 L 19 13 L 19 5 z" />
+                        </g>
+                    </svg>
+                    <!--Toggle Thumbnails-->
+                    <svg id="navigator-toggle-thumbnails-button" class="navigator-icon" width="30" height="30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <title>Toggle Thumbanils</title>
+                        <defs>
+                            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                                <feComponentTransfer in="SourceAlpha" result="adjustedAlpha">
+                                    <feFuncA type="table" tableValues="0 0.5 1" />
+                                </feComponentTransfer>
+                                <feGaussianBlur in="adjustedAlpha" stdDeviation="2" result="blur" />
+                                <feFlood flood-color="#039bfc" result="color" />
+                                <feComposite in="color" in2="blur" operator="in" result="softGlowColored" />
+                                <feMerge>
+                                    <feMergeNode in="softGlowColored" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+
+                            <linearGradient id="linearGradient" x1="5" x2="195" y1="174.76" y2="174.76" gradientTransform="matrix(.32632 0 0 .095367 -.63187 42.834)" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#039bfc" stop-opacity="0" offset="0" />
+                                <stop stop-color="#039bfc" offset=".225" />
+                                <stop stop-color="#039bfc" offset=".5" />
+                                <stop stop-color="#039bfc" offset=".775" />
+                                <stop stop-color="#039bfc" stop-opacity="0" offset="1" />
+                            </linearGradient>
+                        </defs>
+
+                        <g transform="translate(0,-0.5) scale(0.475)">
+                            <rect x=".99971" y="59" width="62.001" height="1" ry="0" fill="url(#linearGradient)" stroke-width="3.7796" style="mix-blend-mode:normal;paint-order:stroke fill markers" filter="url(#glow)" />
+                        </g>
+                        <g stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5">
+                            <rect x="4.5" y="4.5" width="21" height="21" ry="2.5" fill="none" stroke="#039bfc" style="paint-order:stroke fill markers" filter="url(#glow)" />
+                        </g>
+                        <g transform="translate(3,2.5) scale(0.32)">
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill" filter="url(#glow)" d="M 20,17L 44.25,17L 56,28.75L 56,59L 20,59L 20,17 Z M 24,21L 24,55L 52,55L 52,34L 39,34L 39,21L 24,21 Z M 43,22.25L 43,30L 50.75,30L 43,22.25 Z M 27,47.5L 30,50.5L 42.5,38L 47.5,43L 51,39L 51,54L 25,54L 25,50L 27,47.5 Z M 33,22C 33,26.3723 29.3723,30 25,30L 25,22L 33,22 Z " />
+                        </g>
+                    </svg>
+                    <!--Toggle Hidden Elements-->
+                    <svg id="navigator-toggle-hidden-button" class="navigator-icon" width="30" height="30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <title>Toggle Hidden Items</title>
+                        <defs>
+                            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                                <feComponentTransfer in="SourceAlpha" result="adjustedAlpha">
+                                    <feFuncA type="table" tableValues="0 0.5 1" />
+                                </feComponentTransfer>
+                                <feGaussianBlur in="adjustedAlpha" stdDeviation="2" result="blur" />
+                                <feFlood flood-color="#039bfc" result="color" />
+                                <feComposite in="color" in2="blur" operator="in" result="softGlowColored" />
+                                <feMerge>
+                                    <feMergeNode in="softGlowColored" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+
+                            <linearGradient id="linearGradient" x1="5" x2="195" y1="174.76" y2="174.76" gradientTransform="matrix(.32632 0 0 .095367 -.63187 42.834)" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#039bfc" stop-opacity="0" offset="0" />
+                                <stop stop-color="#039bfc" offset=".225" />
+                                <stop stop-color="#039bfc" offset=".5" />
+                                <stop stop-color="#039bfc" offset=".775" />
+                                <stop stop-color="#039bfc" stop-opacity="0" offset="1" />
+                            </linearGradient>
+                        </defs>
+
+                        <g transform="translate(0,-0.5) scale(0.475)">
+                            <rect x=".99971" y="59" width="62.001" height="1" ry="0" fill="url(#linearGradient)" stroke-width="3.7796" style="mix-blend-mode:normal;paint-order:stroke fill markers" filter="url(#glow)" />
+                        </g>
+                        <g stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5">
+                            <rect x="4.5" y="4.5" width="21" height="21" ry="2.5" fill="none" stroke="#039bfc" style="paint-order:stroke fill markers" filter="url(#glow)" />
+                        </g>
+                        <g transform="translate(5,5) scale(0.85)">
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill hidden-elements" filter="url(#glow)" d="M14.3307 7.16929C13.5873 7.05887 12.806 7 12 7C7.02944 7 3 9.23858 3 12C3 13.4401 4.09589 14.738 5.84963 15.6504L8.21192 13.2881C8.07452 12.8839 8 12.4506 8 12C8 9.79086 9.79086 8 12 8C12.4506 8 12.8839 8.07452 13.2881 8.21192L14.3307 7.16929Z" />
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill hidden-elements" filter="url(#glow)" d="M11.2308 15.9261C11.4797 15.9746 11.7369 16 12 16C14.2091 16 16 14.2091 16 12C16 11.7369 15.9746 11.4797 15.9261 11.2308L18.5726 8.58427C20.0782 9.47809 21 10.6792 21 12C21 14.7614 16.9706 17 12 17C11.4016 17 10.8169 16.9676 10.2512 16.9057L11.2308 15.9261Z" />
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill hidden-elements" filter="url(#glow)" d="M17.7929 5.20711C18.1834 4.81658 18.8166 4.81658 19.2071 5.20711C19.5976 5.59763 19.5976 6.2308 19.2071 6.62132L6.47919 19.3492C6.08866 19.7398 5.4555 19.7398 5.06497 19.3492C4.67445 18.9587 4.67445 18.3256 5.06497 17.935L17.7929 5.20711Z" />
+                        </g>
+                    </svg>
+                    <!--Toggle Selection Mode-->
+                    <svg id="navigator-toggle-selection-button" class="navigator-icon" width="30" height="30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <title>Toggle Selection Mode</title>
+                        <defs>
+                            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                                <feComponentTransfer in="SourceAlpha" result="adjustedAlpha">
+                                    <feFuncA type="table" tableValues="0 0.5 1" />
+                                </feComponentTransfer>
+                                <feGaussianBlur in="adjustedAlpha" stdDeviation="2" result="blur" />
+                                <feFlood flood-color="#039bfc" result="color" />
+                                <feComposite in="color" in2="blur" operator="in" result="softGlowColored" />
+                                <feMerge>
+                                    <feMergeNode in="softGlowColored" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                            <linearGradient id="linearGradient1" x1="5" x2="195" y1="174.76" y2="174.76" gradientTransform="matrix(.32632 0 0 .095367 -.63187 42.834)" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#039bfc" stop-opacity="0" offset="0" />
+                                <stop stop-color="#039bfc" offset=".225" />
+                                <stop stop-color="#039bfc" offset=".5" />
+                                <stop stop-color="#039bfc" offset=".775" />
+                                <stop stop-color="#039bfc" stop-opacity="0" offset="1" />
+                            </linearGradient>
+                        </defs>
+
+                        <g transform="translate(0,-0.5) scale(0.475)">
+                            <rect x=".99971" y="59" width="62.001" height="1" ry="0" fill="url(#linearGradient)" stroke-width="3.7796" style="mix-blend-mode:normal;paint-order:stroke fill markers" filter="url(#glow)" />
+                        </g>
+                        <g stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5">
+                            <rect x="4.5" y="4.5" width="21" height="21" ry="2.5" fill="none" stroke="#039bfc" style="paint-order:stroke fill markers" filter="url(#glow)" />
+                        </g>
+                        <g transform="translate(8,8) scale(0.030)">
+                            <path xmlns="http://www.w3.org/2000/svg" style="fill:currentColor;" class="navigator-icon-fill selection-mode" filter="url(#glow)" d="M161.9,21.9v21.9h131.2V0H161.9v43.7V21.9v21.9h131.2V0H161.9v43.7V21.9z M406.6,425.9L393,408.7l-52.4,41.6l-79.4-102.1   l-53,61.8l-38.9-217.9l198.1,99.1l-78.6,26.2l100.9,122.4L406.6,425.9L393,408.7L406.6,425.9l16.9-13.9l-60.4-73.2l118.3-39.4   L110.8,114l70.4,394.5l78.2-91.2l73.7,94.7l104.5-82.9l-14.2-17.2L406.6,425.9z M424.3,87.5V0h-87.5v43.7l43.7,0l0,43.7H424.3   L424.3,87.5z M118.1,0H30.7v87.5h43.7l0-43.7l43.7,0V0L118.1,0z M30.7,306.2v87.5h87.5v-43.7l-43.7,0l0-43.7H30.7z M402.5,131.2   h-21.9v87.5h43.7v-87.5h-43.7H402.5h-21.9v87.5h43.7v-87.5h-43.7H402.5z M52.5,262.4h21.9V131.2H30.7v131.2h43.7H52.5h21.9V131.2 H30.7v131.2h43.7H52.5z" />
+                        </g>
+                    </svg>
+                </div>
+                <!--Navigator-->
+                <div id="navigator-address-bar-container">
+                    <div id="navigator-address-bar-group">
+                        <input type="text" class="enlightenment-input navigator-address-bar-input" Name="navigator-address-bar-input" autocomplete="on" id="navigator-address-bar-input" />
+                        <div id="navigator-address-bar">
+                            <ul id="navigator-path-segments">
+                            </ul>
+                        </div>
+                    </div>
+                    <button id="navigator-edit-path-button" class="navigator-edit-path-button abort-button f-16" style="height:28px; width:35px;">
+                        <img src="images/ui/edit.svg" id="navigator-edit-icon" alt="Edit Path" title="Edit Path" />
+                    </button>
+                    <button id="navigator-navigate-button" class="navigator-navigate-button confirm-button f-16" style="height:28px; width:35px;">
+                        <img src="images/ui/check.svg" id="navigator-navigate-icon" alt="Navigate" title="Navigate" />
+                    </button>
+                    <button class="file-system-browser-content-new-directory abort-button f-16" style="height:28px; width:35px;">
+                        <img src="images/ui/new-directory.svg" id="navigator-new-directory-icon" alt="New Directory" title="New Directory" />
+                    </button>
+                    <button class="file-system-browser-content-favorite-directory abort-button f-16" style="height:28px; width:35px;">
+                        <img src="images/ui/favorite-star.svg" class="navigation-icon favorite-unselected" alt="Favorite directory" title="Favorite directory" />
+                    </button>
+                </div>
+                <!--End File System Navigator-->
+            </div>
+        </div>
+        <div id="file-system-browser-file-system-container">
+            <!--File System Tree View-->
+            <div id="file-system-browser-file-system-treeview-container">
+                <div id="file-system-browser-file-system-treeview">
+                    <div id="file-system-browser-treeview" class="treeview">
+                    </div>
+                </div>
+            </div>
+            <!--End File System Tree View-->
+            <div id="file-system-browser-file-system-directories-container">
+                <div id="file-system-browser-file-system-directories">
+                    <div id="file-system-browser-file-system-explorer-container" class="scroll-horizontal">
+                        <div id="file-system-browser-file-system-explorer-details-header" style="height: 0px;">
+                            <span>Name</span>
+                        </div>
+                        <div id="file-system-browser-file-system-explorer">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="file-system-browser-actions-container">
+            <div id="file-system-browser-actions-path-container">
+                <label class="text-light-one">Directory</label>
+                <input type="text" id="file-system-browser-selected-element" Name="file-system-browser-selected-element" class="enlightenment-input w-100" readonly autocomplete="on" />
+            </div>
+            <div id="file-system-browser-actions">
+                <button id="file-system-browser-cancel-button" class="abort-button w-100px">Cancel</button>
+                <button id="file-system-browser-confirm-button" class="confirm-button w-100px" disabled>Open</button>
+            </div>
+        </div>
+    </div>
+    @* <div id="divModal"></div>
+    <label class="text-light-one">Enter new directory name:</label>
+    <EnlightenmentInput Type="text" Name="newDirectoryName" AutoComplete="true" />
+    <EnlightenmentButton IsConfirmButton="false">Cancel</EnlightenmentButton>
+    <EnlightenmentButton>Confirm</EnlightenmentButton> *@
+</div>
+<div id="visible-selection-rectangle"></div>
+<div id="selection-rectangle"></div>
+<script defer src="~/js/file-system-browser-dialog.js" asp-append-version="true"></script>
+<script defer>
+    document.addEventListener('DOMContentLoaded', async function () {
+        await initFileSystemBrowser(
+            '@Model.ServerBasePath', 
+            '@Model.ClientBasePath', 
+            '@Model.Path.Replace(@"\", @"\\")', 
+            '@Model.ViewMode.ToString().ToLower()', 
+            '@Model.IconSize.ToString().ToLower()');
+    });
+</script>

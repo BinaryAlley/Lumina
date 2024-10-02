@@ -1,9 +1,10 @@
 ﻿#file-system-browser-dialog {
+    display: none;
     position: absolute;
     top: 12.5%;
     bottom: 12.5%;
-    left: 10%;
-    right: 10%;
+    left: 8%;
+    right: 8%;
     padding: 10px;
     border: 1px solid var(--border-color-dialog);
     box-shadow: 30px 30px 25px var(--shadow-color);
@@ -65,7 +66,7 @@
     min-width: 0;
 }
 
-::deep .file-system-browser-content-new-directory {
+.file-system-browser-content-new-directory {
     min-width: 35px;
     flex-basis: 35px;
     flex-shrink: 0;
@@ -137,12 +138,12 @@
     min-height: 0;
 }
 
-#file-system-browser-file-system-treeview-container.collapsed {
-    max-width: 0px;
-    min-width: 0px;
-    border: 0px;
-    padding: 0px;
-}
+    #file-system-browser-file-system-treeview-container.collapsed {
+        max-width: 0px;
+        min-width: 0px;
+        border: 0px;
+        padding: 0px;
+    }
 
 #file-system-browser-file-system-treeview {
     background-color: #131313;
@@ -158,7 +159,7 @@
     min-height: 0;
 }
 
-::deep .file-system-browser-file-system-sources {
+.file-system-browser-file-system-sources {
     flex-grow: 0;
 }
 
@@ -198,6 +199,7 @@
 
 #file-system-browser-file-system-explorer-details-header {
     color: deepskyblue;
+    background-color: #232323;
 }
 
 #file-system-browser-file-system-explorer {
@@ -247,6 +249,7 @@ div[id^="file-system-browser-file-system-explorer"]:not([id*="container"]) {
     display: flex;
     align-items: center;
     user-select: none;
+    box-sizing: content-box;
 }
 
     .e.details-icons {
@@ -629,6 +632,7 @@ div[id^="file-system-browser-file-system-explorer"]:not([id*="container"]) {
 
 /*File System Navigator*/
 #navigator-navigation-controls-container {
+    width: 225px;
     display: flex;
     align-items: center;
 }
@@ -639,7 +643,7 @@ div[id^="file-system-browser-file-system-explorer"]:not([id*="container"]) {
     margin-right: 10px;
 }
 
-#navigator-history, ::deep .navigator-navigate-button, ::deep .navigator-edit-path-button {
+#navigator-history, .navigator-navigate-button, .navigator-edit-path-button {
     flex-shrink: 0; /* don't let them shrink */
 }
 
@@ -674,23 +678,23 @@ div[id^="file-system-browser-file-system-explorer"]:not([id*="container"]) {
     height: 24px;
 }
 
-::deep .navigator-navigate-button, ::deep .navigator-edit-path-button {
+.navigator-navigate-button, .navigator-edit-path-button {
     text-align: end !important;
     flex-shrink: 0;
 }
 
-::deep .navigator-navigate-button,
-::deep .file-system-browser-content-new-directory {
+.navigator-navigate-button,
+.file-system-browser-content-new-directory {
     margin: 0px 10px 2px 0px;
     flex-shrink: 0;
 }
 
-::deep .file-system-browser-content-favorite-directory {
+.file-system-browser-content-favorite-directory {
     margin: 0px 2px 2px 0px;
     flex-shrink: 0;
 }
 
-::deep .navigator-edit-path-button {
+.navigator-edit-path-button {
     margin: 0px 10px 2px 12px;
     flex-shrink: 0;
 }
@@ -753,7 +757,7 @@ div[id^="file-system-browser-file-system-explorer"]:not([id*="container"]) {
     display: flex;
     margin-right: 0px;
     align-items: center;
-    width: 125px;
+    width: 175px;
     margin-left: 5px;
 }
 
@@ -765,7 +769,7 @@ div[id^="file-system-browser-file-system-explorer"]:not([id*="container"]) {
     }
 
 
-::deep .navigator-address-bar-input {
+.navigator-address-bar-input {
     width: 100%;
 }
 
@@ -885,7 +889,7 @@ div[id^="file-system-browser-file-system-explorer"]:not([id*="container"]) {
     border-right: #202020 1px solid;
     padding: 3px;
     z-index: 999;
-    max-height: calc(100vh - 100px); /* Subtracting a small value ensures a little space is left on top and bottom */
+    max-height: calc(100vh - 12.5vh - 60px); /* subtracting a small value ensures a little space is left on top and bottom; -12.5% because parent has "top: 12.5%;" */
     overflow-y: auto;
 }
 
@@ -1066,7 +1070,7 @@ div[id^="file-system-browser-file-system-explorer"]:not([id*="container"]) {
         width: 100%;
     }
 
-    ::deep .file-system-browser-content-new-directory {
+    .file-system-browser-content-new-directory {
         min-width: 0;
         flex-basis: auto;
         margin-right: 10px;
@@ -1102,9 +1106,9 @@ div[id^="file-system-browser-file-system-explorer"]:not([id*="container"]) {
 }
 
 
-@media screen and (max-width: 399px) {
+@media screen and (max-width: 449px) {
     #file-system-browser-dialog {
-        min-width: 400px
+        min-width: 450px
     }
 
     .e.extra-large-icons {
@@ -1116,7 +1120,7 @@ div[id^="file-system-browser-file-system-explorer"]:not([id*="container"]) {
         }
 
             .e.extra-large-icons .text span {
-                max-width: 400px;
+                max-width: 450px;
             }
 
     .e.large-icons {

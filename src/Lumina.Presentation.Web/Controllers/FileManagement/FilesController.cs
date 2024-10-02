@@ -1,38 +1,33 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Application.Core.FileManagement.Files.Queries.GetFiles;
-using Lumina.Application.Core.FileManagement.Files.Queries.GetTreeFiles;
-using Lumina.Contracts.Responses.FileManagement;
-using Lumina.Presentation.Api.Common.ModelBinders;
-using Lumina.Presentation.Api.Core.Controllers.Common;
-using Mediator;
+using Lumina.Presentation.Web.Common.Api;
+using Lumina.Presentation.Web.Common.Models.FileManagement;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Controllers.FileManagement;
+namespace Lumina.Presentation.Web.Controllers.FileManagement;
 
 /// <summary>
 /// Controller for managing file system files.
 /// </summary>
-[ApiVersion("1.0")]
-[Route("api/v{version:apiVersion}/[controller]")]
-public class FilesController : ApiController
+[Route("[controller]")]
+public class FilesController : Controller
 {
     #region ================================================================== FIELD MEMBERS ================================================================================
-    private readonly ISender _mediator;
+    private readonly IApiHttpClient _apiHttpClient;
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="FilesController"/> class.
     /// </summary>
-    /// <param name="mediator">Injected service for mediating commands and queries.</param>
-    public FilesController(ISender mediator)
+    /// <param name="apiHttpClient">Injected service for interactions with the API.</param>
+    public FilesController(IApiHttpClient apiHttpClient)
     {
-        _mediator = mediator;
+        _apiHttpClient = apiHttpClient;
     }
     #endregion
 
@@ -44,11 +39,11 @@ public class FilesController : ApiController
     /// <param name="includeHiddenElements">Whether to include hidden file system elements or not.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     [HttpGet("get-tree-files")]
-    public async IAsyncEnumerable<FileSystemTreeNodeResponse> GetTreeFiles([FromQuery, ModelBinder(typeof(UrlStringBinder))] string path, 
-        [FromQuery] bool includeHiddenElements, [EnumeratorCancellation] CancellationToken cancellationToken)
+    public async IAsyncEnumerable<FileSystemTreeNodeModel?> GetTreeFiles([FromQuery] string path, [FromQuery] bool includeHiddenElements, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _mediator.Send(new GetTreeFilesQuery(path, includeHiddenElements), cancellationToken).ConfigureAwait(false);
-        foreach (FileSystemTreeNodeResponse file in result.Value ?? [])
+        IAsyncEnumerable<FileSystemTreeNodeModel?> response = _apiHttpClient.GetAsyncEnumerable<FileSystemTreeNodeModel>(
+            $"files/get-tree-files?path={Uri.EscapeDataString(path)}&includeHiddenElements={includeHiddenElements}", cancellationToken: cancellationToken);
+        await foreach (FileSystemTreeNodeModel? file in response)
         {
             if (cancellationToken.IsCancellationRequested)
                 yield break;
@@ -63,18 +58,15 @@ public class FilesController : ApiController
     /// <param name="includeHiddenElements">Whether to include hidden file system elements or not.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     [HttpGet("get-files")]
-    public async IAsyncEnumerable<FileResponse> GetFiles([FromQuery, ModelBinder(typeof(UrlStringBinder))] string path, 
-        [FromQuery] bool includeHiddenElements, [EnumeratorCancellation] CancellationToken cancellationToken)
+    public async IAsyncEnumerable<FileModel?> GetFiles([FromQuery] string path, [FromQuery] bool includeHiddenElements, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        ErrorOr<IEnumerable<FileResponse>> result = await _mediator.Send(new GetFilesQuery(path, includeHiddenElements), cancellationToken).ConfigureAwait(false);
-        if (!result.IsError)
+        IAsyncEnumerable<FileModel?> response = _apiHttpClient.GetAsyncEnumerable<FileModel>(
+           $"files/get-files?path={Uri.EscapeDataString(path)}&includeHiddenElements={includeHiddenElements}", cancellationToken: cancellationToken);
+        await foreach (FileModel? file in response)
         {
-            foreach (FileResponse file in result.Value ?? [])
-            {
-                if (cancellationToken.IsCancellationRequested)
-                    yield break;
-                yield return file;
-            }
+            if (cancellationToken.IsCancellationRequested)
+                yield break;
+            yield return file;
         }
     }
     #endregion

@@ -1,8 +1,13 @@
-﻿namespace Lumina.Presentation.Web.Common.Models.FileManagement;
+#region ========================================================================= USING =====================================================================================
+using System.Diagnostics;
+#endregion
+
+namespace Lumina.Presentation.Web.Common.Models.FileManagement;
 
 /// <summary>
 /// Represents a response containing a file system path.
 /// </summary>
+[DebuggerDisplay("{Path}")]
 public class PathSegmentModel
 {
     #region ==================================================================== PROPERTIES =================================================================================

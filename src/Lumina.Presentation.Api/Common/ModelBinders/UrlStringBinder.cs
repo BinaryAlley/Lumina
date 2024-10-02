@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
 using System.Threading.Tasks;
@@ -19,8 +19,7 @@ public class UrlStringBinder : IModelBinder
     /// <returns>A task representing the bind operation.</returns>
     public Task BindModelAsync(ModelBindingContext bindingContext)
     {
-        if (bindingContext is null)
-            throw new ArgumentNullException(nameof(bindingContext));
+        ArgumentNullException.ThrowIfNull(bindingContext);
         string modelName = bindingContext.ModelName;
         // try to fetch the value of the argument by name
         ValueProviderResult valueProviderResult = bindingContext.ValueProvider.GetValue(modelName);

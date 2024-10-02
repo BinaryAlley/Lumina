@@ -82,7 +82,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "templates", "templates", "{
 		..\docs\technical\templates\PULL_REQUEST_TEMPLATE.md = ..\docs\technical\templates\PULL_REQUEST_TEMPLATE.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lumina.Presentation.Web", "Lumina.Presentation.Web\Lumina.Presentation.Web.csproj", "{613C74E8-720C-4205-8BA7-85B23D2E7881}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lumina.Presentation.Web", "Lumina.Presentation.Web\Lumina.Presentation.Web.csproj", "{613C74E8-720C-4205-8BA7-85B23D2E7881}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
