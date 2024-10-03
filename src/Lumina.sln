@@ -32,7 +32,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{ACD16983-F1BD-4A92-B282-95BA8C456F6A}"
 	ProjectSection(SolutionItems) = preProject
 		..\docs\CONTRIBUTING.md = ..\docs\CONTRIBUTING.md
-		..\docs\LICENSE.md = ..\docs\LICENSE.md
+		..\LICENSE.md = ..\LICENSE.md
 		..\README.md = ..\README.md
 		..\docs\SOURCES.md = ..\docs\SOURCES.md
 		..\docs\USAGE.md = ..\docs\USAGE.md
