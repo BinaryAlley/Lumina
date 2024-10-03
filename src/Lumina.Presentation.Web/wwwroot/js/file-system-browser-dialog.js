@@ -20,11 +20,13 @@ const btnNavigatorNavigateForward = document.getElementById('navigator-navigate-
 const btnNavigatorNavigateUp = document.getElementById('navigator-navigate-up');
 
 const btnNavigatorToggleTreeView = document.getElementById('navigator-toggle-tree-view-button');
+const btnNavigatorToggleThumbnails = document.getElementById('navigator-toggle-thumbnails-button');
 const btnNavigatorToggleSelectionMode = document.getElementById('navigator-toggle-selection-button');
 const btnNavigatorHiddenElements = document.getElementById('navigator-toggle-hidden-button');
 const btnEditPath = document.getElementById('navigator-edit-path-button');
 
 const svgTreeView = document.querySelectorAll('.navigator-icon-fill.tree-view');
+const svgThumbnails = document.querySelectorAll('.navigator-icon-fill.thumbnails');
 const svgSelectionMode = document.querySelectorAll('.navigator-icon-fill.selection-mode');
 const svgHiddenElements = document.querySelectorAll('.navigator-icon-fill.hidden-elements');
 const svgListView = document.querySelectorAll('.navigator-icon-fill.list');
@@ -193,6 +195,7 @@ async function showFileSystemBrowserDialogAsync(path, showHiddenElementsValue) {
         addressBarInput.value = path;
         await toggleShowFileSystemHiddenElementsAsync(false);
         await toggleFileSystemTreeViewAsync(false);
+        await toggleShowFileSystemElementsThumbnailsAsync(false);
         await navigateToPathAsync(path, false, false);
     } else
         notificationService.Show("Path cannot be null!", NotificationType.ERROR); // TODO: should ask error message from server when translation is implemented
@@ -303,7 +306,8 @@ async function navigateToPathAsync(path, isForwardNavigation, isBackwardNavigati
         await getFileSystemItemsAsync(path);
         if (showFileSystemTreeView)
             await getFileSystemTreeViewAsync(path);
-        getFileSystemVisibleItems();
+        if (showThumbnails)
+            getFileSystemVisibleItems();
     }
     addressBarInput.value = _path;
     if (addressBarInput.value !== null && !addressBarInput.value.endsWith(pathSeparator))
@@ -1488,6 +1492,24 @@ async function toggleShowFileSystemHiddenElementsAsync(isManualSet) {
 }
 
 /**
+ * Enables or disables the display of file system elements thumbnails.
+ * @param {boolean} isManualSet - Indicates whether the toggle is triggered manually (by clicking on the icon) or automatically.
+ */
+async function toggleShowFileSystemElementsThumbnailsAsync(isManualSet) {
+    if (isManualSet)
+        showThumbnails = !showThumbnails;
+
+    svgThumbnails.forEach(element => {
+        showThumbnails ? element.classList.add('enabled') : element.classList.remove('enabled');
+    });
+    if (isManualSet && addressBarInput.value !== null) {
+        if (!addressBarInput.value.endsWith(pathSeparator))
+            addressBarInput.value += pathSeparator;
+        await navigateToPathAsync(addressBarInput.value, false, false);
+    }
+}
+
+/**
  * Closes all comboboxes except for the one passed as an argument.
  * @param {HTMLElement} exceptionCheckbox - The checkbox of the combobox that should remain open.
  */
@@ -1530,6 +1552,7 @@ btnLargeIconsView.addEventListener('click', () => switchViewMode('icons', 'large
 btnExtraLargeIconsView.addEventListener('click', () => switchViewMode('icons', 'extra-large', true));
 
 btnNavigatorToggleTreeView.addEventListener('click', async () => await toggleFileSystemTreeViewAsync(true));
+btnNavigatorToggleThumbnails.addEventListener('click', async () => await toggleShowFileSystemElementsThumbnailsAsync(true));
 btnNavigatorToggleSelectionMode.addEventListener('click', toggleFileSystemSelectionMode);
 btnNavigatorHiddenElements.addEventListener('click', async () => await toggleShowFileSystemHiddenElementsAsync(true));
 btnNavigatorNavigateUp.addEventListener('click', navigateUpAsync);
