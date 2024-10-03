@@ -1559,6 +1559,7 @@ btnNavigatorNavigateUp.addEventListener('click', navigateUpAsync);
 
 fileSystemExplorer.addEventListener('mouseup', handleFileSystemExplorerMouseUp);
 fileSystemExplorer.addEventListener('scroll', handleFileSystemBrowserScrollEvent);
+fileSystemExplorerContainer.addEventListener('scroll', handleFileSystemBrowserScrollEvent);
 
 fileSystemExplorerContainer.addEventListener('mousedown', startSelection);
 fileSystemExplorerContainer.addEventListener('mousemove', updateSelection);
@@ -1566,7 +1567,6 @@ fileSystemExplorerContainer.addEventListener('mouseup', endSelection);
 fileSystemExplorerContainer.addEventListener('wheel', handleSelection, { passive: true });
 fileSystemExplorerContainer.addEventListener('scroll', handleSelection);
 
-fileSystemExplorerContainer.addEventListener('scroll', handleSelection);
 
 /**
  * Event handler for the address bar input navigate button Click event.
