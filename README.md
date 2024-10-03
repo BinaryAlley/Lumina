@@ -41,4 +41,4 @@ Several icons used in this project were adapted from icons sourced from [svgrepo
 
 ## License
 
-This project is licensed under the GPLv3.0. See the [LICENSE](./docs/LICENSE.md) file for details.
+This project is licensed under the GPLv3.0. See the [LICENSE](./LICENSE.md) file for details.
