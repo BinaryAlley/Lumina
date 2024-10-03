@@ -7,7 +7,7 @@ using Lumina.Application.Common.DataAccess.Repositories.Books;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Core.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook;
 using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Application.UnitTests.Core.WrittenContentLibrary.BooksLibrary.Books.Commands.Fixtures;
+using Lumina.Application.UnitTests.Core.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook.Fixtures;
 using Lumina.Contracts.Enums.BookLibrary;
 using Lumina.Contracts.Models.Common;
 using Lumina.Contracts.Models.WrittenContentLibrary.BookLibrary;
@@ -21,7 +21,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.WrittenContentLibrary.BooksLibrary.Books.Commands;
+namespace Lumina.Application.UnitTests.Core.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook;
 
 /// <summary>
 /// Contains unit tests for the <see cref="AddBookCommandHandler"/> class.
