@@ -15,8 +15,8 @@ jobs:
         with:
           dotnet-version: '8.0.x'
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore src/Lumina.sln
       - name: Build
-        run: dotnet build --no-restore
+        run: dotnet build src/Lumina.sln --no-restore
       - name: Run tests
-        run: dotnet test --no-build --verbosity normal
+        run: dotnet test src/Lumina.sln --no-build --verbosity normal
