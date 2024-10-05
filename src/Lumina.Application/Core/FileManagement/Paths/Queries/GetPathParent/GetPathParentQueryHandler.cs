@@ -1,9 +1,9 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using Lumina.Contracts.Responses.FileManagement;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Services;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.ValueObjects;
-using Mapster;
+using MapsterMapper;
 using Mediator;
 using System.Collections.Generic;
 using System.Threading;
@@ -19,6 +19,7 @@ public class GetPathParentQueryHandler : IRequestHandler<GetPathParentQuery, Err
 {
     #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IPathService _pathService;
+    private readonly IMapper _mapper;
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================
@@ -26,9 +27,11 @@ public class GetPathParentQueryHandler : IRequestHandler<GetPathParentQuery, Err
     /// Initializes a new instance of the <see cref="GetPathParentQueryHandler"/> class.
     /// </summary>
     /// <param name="pathService">Injected service for managing file system paths.</param>
-    public GetPathParentQueryHandler(IPathService pathService)
+    /// <param name="mapper">Injected service for mapping objects.</param>
+    public GetPathParentQueryHandler(IPathService pathService, IMapper mapper)
     {
         _pathService = pathService;
+        _mapper = mapper;
     }
     #endregion
 
@@ -44,7 +47,7 @@ public class GetPathParentQueryHandler : IRequestHandler<GetPathParentQuery, Err
     public ValueTask<ErrorOr<IEnumerable<PathSegmentResponse>>> Handle(GetPathParentQuery request, CancellationToken cancellationToken)
     {
         ErrorOr<IEnumerable<PathSegment>> result = _pathService.GoUpOneLevel(request.Path);
-        return ValueTask.FromResult(result.Match(values => ErrorOrFactory.From(result.Value.Adapt<IEnumerable<PathSegmentResponse>>()), errors => errors));
+        return ValueTask.FromResult(result.Match(values => ErrorOrFactory.From(_mapper.Map<IEnumerable<PathSegmentResponse>>(values)), errors => errors));
     }
     #endregion
 }

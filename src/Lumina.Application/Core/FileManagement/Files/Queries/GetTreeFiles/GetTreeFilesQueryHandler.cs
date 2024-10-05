@@ -1,9 +1,10 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using Lumina.Contracts.Responses.FileManagement;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Entities;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Services;
 using Mapster;
+using MapsterMapper;
 using Mediator;
 using System.Collections.Generic;
 using System.Threading;
@@ -19,6 +20,7 @@ public class GetTreeFilesQueryHandler : IRequestHandler<GetTreeFilesQuery, Error
 {
     #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IFileService _fileService;
+    private readonly IMapper _mapper;
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================
@@ -26,9 +28,11 @@ public class GetTreeFilesQueryHandler : IRequestHandler<GetTreeFilesQuery, Error
     /// Initializes a new instance of the <see cref="GetTreeFilesQueryHandler"/> class.
     /// </summary>
     /// <param name="fileService">Injected service for handling files.</param>
-    public GetTreeFilesQueryHandler(IFileService fileService)
+    /// <param name="mapper">Injected service for mapping objects.</param>
+    public GetTreeFilesQueryHandler(IFileService fileService, IMapper mapper)
     {
         _fileService = fileService;
+        _mapper = mapper;
     }
     #endregion
 
@@ -44,7 +48,7 @@ public class GetTreeFilesQueryHandler : IRequestHandler<GetTreeFilesQuery, Error
     public ValueTask<ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>> Handle(GetTreeFilesQuery request, CancellationToken cancellationToken)
     {
         ErrorOr<IEnumerable<File>> result = _fileService.GetFiles(request.Path, request.IncludeHiddenElements);
-        return ValueTask.FromResult(result.Match(values => ErrorOrFactory.From(result.Value.Adapt<IEnumerable<FileSystemTreeNodeResponse>>()), errors => errors));
+        return ValueTask.FromResult(result.Match(values => ErrorOrFactory.From(_mapper.Map<IEnumerable<FileSystemTreeNodeResponse>>(values)), errors => errors));
     }
     #endregion
 }

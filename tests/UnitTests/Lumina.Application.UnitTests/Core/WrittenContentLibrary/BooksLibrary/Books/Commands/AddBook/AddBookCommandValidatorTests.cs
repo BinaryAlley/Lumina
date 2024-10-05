@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using Bogus;
 using FluentValidation.TestHelper;
 using Lumina.Application.Core.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook;
@@ -13,7 +13,7 @@ using System.Linq;
 namespace Lumina.Application.UnitTests.Core.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook;
 
 /// <summary>
-/// Contains unit tests for the <see cref="UnitOfWork"/> class.
+/// Contains unit tests for the <see cref="AddBookCommandValidator"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class AddBookCommandValidatorTests

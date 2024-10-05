@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.Models.FileManagement;
 using Lumina.Contracts.Responses.FileManagement;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate;
@@ -28,7 +28,7 @@ public class DirectoryMappingConfig : IRegister
              .Map(dest => dest.ItemType, src => src.Type)
              .Map(dest => dest.IsExpanded, () => false)
              .Map(dest => dest.ChildrenLoaded, () => false)
-             .Map(dest => dest.Children, src => src.Items)
+             .Map(dest => dest.Children, src => src.Items.Adapt<List<FileSystemTreeNodeResponse>>())
              .MapToConstructor(true);
 
         config.NewConfig<Directory, DirectoryResponse>()

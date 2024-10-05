@@ -4,6 +4,7 @@ using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.ValueObjects;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -91,11 +92,15 @@ public class WindowsPathStrategy : IWindowsPathStrategy
         // Windows paths usually start with a drive letter and colon, e.g., "C:"
         if (!path.Path.Contains(':') || !path.Path.Contains(PathSeparator) || !char.IsLetter(path.Path[0]) || path.Path[1] != ':' || path.Path[2] != PathSeparator)
             return Errors.FileManagement.InvalidPath;
-        return ErrorOrFactory.From(GetPathSegments());
-        IEnumerable<PathSegment> GetPathSegments()
+        IEnumerable<ErrorOr<PathSegment>> getPathSegmentsResults = GetPathSegments();
+        foreach (ErrorOr<PathSegment> getPathSegmentsResult in getPathSegmentsResults)
+            if (getPathSegmentsResult.IsError)
+                return getPathSegmentsResult.Errors;
+        return ErrorOrFactory.From(getPathSegmentsResults.Select(getPathSegmentsResult => getPathSegmentsResult.Value));
+        IEnumerable<ErrorOr<PathSegment>> GetPathSegments()
         {
             // the drive segment
-            yield return new PathSegment(path.Path[..2], isDirectory: false, isDrive: true);
+            yield return PathSegment.Create(path.Path[..2], isDirectory: false, isDrive: true);
             // extract the other segments
             string[] segments = path.Path[3..].Split(new[] { PathSeparator }, StringSplitOptions.RemoveEmptyEntries);
             for (int i = 0; i < segments.Length; i++)
@@ -106,7 +111,7 @@ public class WindowsPathStrategy : IWindowsPathStrategy
                     isDirectory = i != segments.Length - 1 || path.Path.EndsWith(PathSeparator); // check if it's the last segment or if the next segment also contains a path delimiter
                 else
                     isDirectory = true;
-                yield return new PathSegment(segment, isDirectory, isDrive: false);
+                yield return PathSegment.Create(segment, isDirectory, isDrive: false);
             }
         }
     }
@@ -164,7 +169,7 @@ public class WindowsPathStrategy : IWindowsPathStrategy
             string root = path.Path[..2];
             if (path.Path.Length > 2 && path.Path[2] == PathSeparator)
                 root += PathSeparator;
-            return new PathSegment(root, isDirectory: true, isDrive: true);
+            return PathSegment.Create(root, isDirectory: true, isDrive: true);
         }
         // check for UNC paths (e.g., "\\server\share")
         if (path.Path.StartsWith('\\'))
@@ -177,7 +182,7 @@ public class WindowsPathStrategy : IWindowsPathStrategy
             if (segments.Count >= 2)
             {
                 string root = $@"\\{segments[0].Name}\{segments[1].Name}\";
-                return new PathSegment(root, isDirectory: true, isDrive: false);
+                return PathSegment.Create(root, isDirectory: true, isDrive: false);
             }
         }
         return Errors.FileManagement.InvalidPath;

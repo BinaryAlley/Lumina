@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.FileManagement.FileSystem.Queries.GetFileSysem;
+using Lumina.Application.Core.FileManagement.FileSystem.Queries.GetFileSystem;
 using Lumina.Contracts.Responses.FileManagement;
 using Lumina.Presentation.Api.Core.Controllers.Common;
 using Mediator;

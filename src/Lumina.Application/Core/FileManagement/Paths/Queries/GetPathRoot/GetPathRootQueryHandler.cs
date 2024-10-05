@@ -1,9 +1,9 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using Lumina.Contracts.Responses.FileManagement;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Services;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.ValueObjects;
-using Mapster;
+using MapsterMapper;
 using Mediator;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,6 +18,7 @@ public class GetPathRootQueryHandler : IRequestHandler<GetPathRootQuery, ErrorOr
 {
     #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IPathService _pathService;
+    private readonly IMapper _mapper;
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================
@@ -25,9 +26,11 @@ public class GetPathRootQueryHandler : IRequestHandler<GetPathRootQuery, ErrorOr
     /// Initializes a new instance of the <see cref="GetPathRootQueryHandler"/> class.
     /// </summary>
     /// <param name="pathService">Injected service for managing file system paths.</param>
-    public GetPathRootQueryHandler(IPathService pathService)
+    /// <param name="mapper">Injected service for mapping objects.</param>
+    public GetPathRootQueryHandler(IPathService pathService, IMapper mapper)
     {
         _pathService = pathService;
+        _mapper = mapper;
     }
     #endregion
 
@@ -41,7 +44,7 @@ public class GetPathRootQueryHandler : IRequestHandler<GetPathRootQuery, ErrorOr
     public ValueTask<ErrorOr<PathSegmentResponse>> Handle(GetPathRootQuery request, CancellationToken cancellationToken)
     {
         ErrorOr<PathSegment> result = _pathService.GetPathRoot(request.Path);
-        return ValueTask.FromResult(result.Match(values => ErrorOrFactory.From(result.Value.Adapt<PathSegmentResponse>()), errors => errors));
+        return ValueTask.FromResult(result.Match(values => ErrorOrFactory.From(_mapper.Map<PathSegmentResponse>(values)), errors => errors));
     }
     #endregion
 }
