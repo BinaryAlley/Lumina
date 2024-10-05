@@ -1,9 +1,10 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using Lumina.Contracts.Responses.FileManagement;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Entities;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Services;
 using Mapster;
+using MapsterMapper;
 using Mediator;
 using System.Collections.Generic;
 using System.Threading;
@@ -19,6 +20,7 @@ public class GetTreeDirectoriesQueryHandler : IRequestHandler<GetTreeDirectories
 {
     #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IDirectoryService _directoryService;
+    private readonly IMapper _mapper;
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================
@@ -26,9 +28,11 @@ public class GetTreeDirectoriesQueryHandler : IRequestHandler<GetTreeDirectories
     /// Initializes a new instance of the <see cref="GetTreeDirectoriesQueryHandler"/> class.
     /// </summary>
     /// <param name="directoryService">Injected service for handling directories.</param>
-    public GetTreeDirectoriesQueryHandler(IDirectoryService directoryService)
+    /// <param name="mapper">Injected service for mapping objects.</param>
+    public GetTreeDirectoriesQueryHandler(IDirectoryService directoryService, IMapper mapper)
     {
         _directoryService = directoryService;
+        _mapper = mapper;
     }
     #endregion
 
@@ -44,7 +48,7 @@ public class GetTreeDirectoriesQueryHandler : IRequestHandler<GetTreeDirectories
     public ValueTask<ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>> Handle(GetTreeDirectoriesQuery request, CancellationToken cancellationToken)
     {
         ErrorOr<IEnumerable<Directory>> result = _directoryService.GetSubdirectories(request.Path, request.IncludeHiddenElements);
-        return ValueTask.FromResult(result.Match(values => ErrorOrFactory.From(result.Value.Adapt<IEnumerable<FileSystemTreeNodeResponse>>()), errors => errors));
+        return ValueTask.FromResult(result.Match(values => ErrorOrFactory.From(_mapper.Map<IEnumerable<FileSystemTreeNodeResponse>>(values)), errors => errors));
     }
     #endregion
 }

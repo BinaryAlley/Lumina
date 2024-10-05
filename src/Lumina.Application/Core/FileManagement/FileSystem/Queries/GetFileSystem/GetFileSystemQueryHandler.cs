@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.Responses.FileManagement;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Strategies.Platform;
 using Mediator;
@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Core.FileManagement.FileSystem.Queries.GetFileSysem;
+namespace Lumina.Application.Core.FileManagement.FileSystem.Queries.GetFileSystem;
 
 /// <summary>
 /// Handler for the query to get the file system type.

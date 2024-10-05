@@ -1,4 +1,6 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
+using ErrorOr;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Models.Core;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -36,7 +38,7 @@ public class PathSegment : ValueObject
     /// <param name="name">The name of the path segment.</param>
     /// <param name="isDirectory">Value indicating if the current path segment is a file system directory or not.</param>
     /// <param name="isDrive">Value indicating if the current path segment is a file system drive or not.</param>
-    public PathSegment(string name, bool isDirectory, bool isDrive)
+    private PathSegment(string name, bool isDirectory, bool isDrive)
     {
         Name = name;
         IsDirectory = isDirectory;
@@ -45,6 +47,22 @@ public class PathSegment : ValueObject
     #endregion
 
     #region ===================================================================== METHODS ===================================================================================
+    /// <summary>
+    /// Creates a new instance of the <see cref="PathSegment"/> class.
+    /// </summary>
+    /// <param name="name">The name of the path segment.</param>
+    /// <param name="isDirectory">Value indicating if the current path segment is a file system directory or not.</param>
+    /// <param name="isDrive">Value indicating if the current path segment is a file system drive or not.</param>
+    /// <returns>
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="PathSegment"/> or an error message.
+    /// </returns>
+    public static ErrorOr<PathSegment> Create(string name, bool isDirectory, bool isDrive)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            return Errors.FileManagement.NameCannotBeEmpty;
+        return new PathSegment(name, isDirectory, isDrive);
+    }
+
     /// <inheritdoc/>
     public override IEnumerable<object> GetEqualityComponents()
     {

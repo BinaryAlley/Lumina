@@ -1,9 +1,10 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using Lumina.Contracts.Responses.FileManagement;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Services;
 using Mapster;
+using MapsterMapper;
 using Mediator;
 using System.Collections.Generic;
 using System.Threading;
@@ -19,6 +20,7 @@ public class GetDrivesQueryHandler : IRequestHandler<GetDrivesQuery, ErrorOr<IEn
 {
     #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IDriveService _driveService;
+    private readonly IMapper _mapper;
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================
@@ -26,9 +28,11 @@ public class GetDrivesQueryHandler : IRequestHandler<GetDrivesQuery, ErrorOr<IEn
     /// Initializes a new instance of the <see cref="GetDrivesQueryHandler"/> class.
     /// </summary>
     /// <param name="driveService">Injected service for handling file system drives.</param>
-    public GetDrivesQueryHandler(IDriveService driveService)
+    /// <param name="mapper">Injected service for mapping objects.</param>
+    public GetDrivesQueryHandler(IDriveService driveService, IMapper mapper)
     {
         _driveService = driveService;
+        _mapper = mapper;
     }
     #endregion
 
@@ -44,7 +48,7 @@ public class GetDrivesQueryHandler : IRequestHandler<GetDrivesQuery, ErrorOr<IEn
     public ValueTask<ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>> Handle(GetDrivesQuery request, CancellationToken cancellationToken)
     {
         ErrorOr<IEnumerable<FileSystemItem>> result = _driveService.GetDrives();
-        return ValueTask.FromResult(result.Match(values => ErrorOrFactory.From(values.Adapt<IEnumerable<FileSystemTreeNodeResponse>>()), errors => errors));
+        return ValueTask.FromResult(result.Match(values => ErrorOrFactory.From(_mapper.Map<IEnumerable<FileSystemTreeNodeResponse>>(values)), errors => errors));
     }
     #endregion
 }

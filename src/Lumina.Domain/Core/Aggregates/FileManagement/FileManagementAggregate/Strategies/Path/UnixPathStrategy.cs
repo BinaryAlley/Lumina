@@ -94,16 +94,19 @@ public class UnixPathStrategy : IUnixPathStrategy
             return Errors.FileManagement.InvalidPath;
         // get the path segments
         List<string> splitSegments = [.. path.Path.Split(new[] { PathSeparator }, StringSplitOptions.RemoveEmptyEntries)];
-        IEnumerable<PathSegment> segments = splitSegments.Select((segment, index) =>
+        IEnumerable<ErrorOr<PathSegment>> segmentsResults = splitSegments.Select((segment, index) =>
         {
             bool isDirectory;
             if (segment.Contains('.'))
                 isDirectory = index != splitSegments.Count - 1 || path.Path.EndsWith(PathSeparator); // check if it's the last segment or if the path ends with a '/'
             else
                 isDirectory = true;
-            return new PathSegment(segment, isDirectory, isDrive: false);
-        }).Prepend(new PathSegment(PathSeparator.ToString(), isDirectory: false, isDrive: true)); // UNIX paths have '/' as "root drive"
-        return ErrorOrFactory.From(segments);
+            return PathSegment.Create(segment, isDirectory, isDrive: false);
+        }).Prepend(PathSegment.Create(PathSeparator.ToString(), isDirectory: false, isDrive: true)); // UNIX paths have '/' as "root drive"
+        foreach (ErrorOr<PathSegment> segment in segmentsResults)
+            if (segment.IsError)
+                return segment.Errors;
+        return ErrorOrFactory.From(segmentsResults.Select(segmentResult => segmentResult.Value));
     }
 
     /// <summary>
@@ -153,7 +156,7 @@ public class UnixPathStrategy : IUnixPathStrategy
 
         // On Unix-like systems, the root is always "/"
         if (path.Path.StartsWith(PathSeparator))
-            return new PathSegment(PathSeparator.ToString(), isDirectory: false, isDrive: true);
+            return PathSegment.Create(PathSeparator.ToString(), isDirectory: false, isDrive: true);
         return Errors.FileManagement.InvalidPath;
     }
     #endregion

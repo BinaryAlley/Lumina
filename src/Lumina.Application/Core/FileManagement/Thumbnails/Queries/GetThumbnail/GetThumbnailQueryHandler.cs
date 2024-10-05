@@ -3,7 +3,7 @@ using ErrorOr;
 using Lumina.Contracts.Responses.FileManagement;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Services;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.ValueObjects;
-using Mapster;
+using MapsterMapper;
 using Mediator;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,6 +18,7 @@ public class GetThumbnailQueryHandler : IRequestHandler<GetThumbnailQuery, Error
 {
     #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IThumbnailService _thumbnailsService;
+    private readonly IMapper _mapper;
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================
@@ -25,9 +26,11 @@ public class GetThumbnailQueryHandler : IRequestHandler<GetThumbnailQuery, Error
     /// Initializes a new instance of the <see cref="GetThumbnailQueryHandler"/> class.
     /// </summary>
     /// <param name="thumbnailsService">Injected service for handling thumbnails.</param>
-    public GetThumbnailQueryHandler(IThumbnailService thumbnailsService)
+    /// <param name="mapper">Injected service for mapping objects.</param>
+    public GetThumbnailQueryHandler(IThumbnailService thumbnailsService, IMapper mapper)
     {
         _thumbnailsService = thumbnailsService;
+        _mapper = mapper;
     }
     #endregion
 
@@ -41,7 +44,7 @@ public class GetThumbnailQueryHandler : IRequestHandler<GetThumbnailQuery, Error
     public async ValueTask<ErrorOr<ThumbnailResponse>> Handle(GetThumbnailQuery request, CancellationToken cancellationToken)
     {
         ErrorOr<Thumbnail> result = await _thumbnailsService.GetThumbnailAsync(request.Path, request.Quality, cancellationToken);
-        return await ValueTask.FromResult(result.Match(values => ErrorOrFactory.From(result.Value.Adapt<ThumbnailResponse>()), errors => errors));
+        return await ValueTask.FromResult(result.Match(values => ErrorOrFactory.From(_mapper.Map<ThumbnailResponse>(values)), errors => errors));
     }
     #endregion
 }
