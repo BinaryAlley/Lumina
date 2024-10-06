@@ -3,6 +3,8 @@ using Lumina.Presentation.Web.Common.Enums.FileSystem;
 using Lumina.Presentation.Web.Common.Models.Configuration;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using System.Runtime.InteropServices;
+
 #endregion
 
 namespace Lumina.Presentation.Web.ViewComponents;
@@ -38,7 +40,7 @@ public class FileSystemBrowserViewComponent : ViewComponent
     {
         return View(new
         { 
-            Path = @"C:\",
+            Path = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? @"/" : @"C:\",
             ServerBasePath = $"{_serverConfigurationModel.BaseAddress}:{_serverConfigurationModel.Port}/api/v{_serverConfigurationModel.ApiVersion}/",
             ClientBasePath = "http://localhost:5012/", // TODO: take from appsettings or environment
             ViewMode = FileSystemViewMode.List,

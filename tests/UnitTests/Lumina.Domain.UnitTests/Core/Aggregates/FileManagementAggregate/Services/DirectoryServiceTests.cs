@@ -16,6 +16,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Runtime.InteropServices;
+
 #endregion
 
 namespace Lumina.Domain.UnitTests.Core.Aggregates.FileManagementAggregate.Services;
@@ -33,6 +35,11 @@ public class DirectoryServiceTests
     private readonly DirectoryService _sut;
     private readonly FileSystemPathIdFixture _fileSystemPathIdFixture;
     private readonly DirectoryFixture _directoryFixture;
+    private static readonly bool s_isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+    private readonly string _pathDirTest = s_isLinux ? "/TestDir" : @"C:\TestDir";
+    private readonly string _pathDirTestSubDir1 = s_isLinux ? "/TestDir/Sub1" : @"C:\TestDir\Sub1";
+    private readonly string _pathDirTestSubDir2 = s_isLinux ? "/TestDir/Sub2" : @"C:\TestDir\Sub2";
+    private readonly char _dirSeparator = s_isLinux ? '/' : '\\';
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================
@@ -56,13 +63,13 @@ public class DirectoryServiceTests
     public void GetSubdirectories_WithValidPath_ShouldReturnListOfDirectories()
     {
         // Arrange
-        string path = @"C:\TestDir";
+        string path = _pathDirTest;
         bool includeHiddenElements = false;
         FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(path);
         FileSystemPathId[] subPaths =
         [
-            _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestDir\Sub1"),
-            _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestDir\Sub2")
+            _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDirTestSubDir1),
+            _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDirTestSubDir2)
         ];
 
         _mockEnvironmentContext.DirectoryProviderService.GetSubdirectoryPaths(pathId, includeHiddenElements)
@@ -106,7 +113,7 @@ public class DirectoryServiceTests
     public void GetSubdirectories_WhenDirectoryProviderServiceReturnsError_ShouldPropagateError()
     {
         // Arrange
-        string path = @"C:\TestDir";
+        string path = _pathDirTest;
         bool includeHiddenElements = false;
         FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(path);
 
@@ -125,10 +132,12 @@ public class DirectoryServiceTests
     public void GetSubdirectories_WhenSubdirectoryDetailsAreInaccessible_ShouldReturnInaccessibleDirectory()
     {
         // Arrange
-        string path = @"C:\TestDir";
+        string path = _pathDirTest;
         bool includeHiddenElements = false;
         FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(path);
-        FileSystemPathId subPath = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestDir\InaccessibleSub");
+        FileSystemPathId subPath = _fileSystemPathIdFixture.CreateFileSystemPathId(
+            s_isLinux ? "/TestDir/InaccessibleSub" : @"C:\TestDir\InaccessibleSub"
+        );
 
         _mockEnvironmentContext.DirectoryProviderService.GetSubdirectoryPaths(pathId, includeHiddenElements)
             .Returns(ErrorOrFactory.From(new[] { subPath }.AsEnumerable()));
@@ -157,8 +166,8 @@ public class DirectoryServiceTests
         bool includeHiddenElements = false;
         FileSystemPathId[] subPaths =
         [
-            _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestDir\Sub1"),
-        _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestDir\Sub2")
+            _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDirTestSubDir1),
+        _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDirTestSubDir2)
         ];
 
         _mockEnvironmentContext.DirectoryProviderService.GetSubdirectoryPaths(parentDirectory.Id, includeHiddenElements)
@@ -207,7 +216,9 @@ public class DirectoryServiceTests
         // Arrange
         Directory parentDirectory = _directoryFixture.CreateDirectory();
         bool includeHiddenElements = false;
-        FileSystemPathId subPath = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestDir\InaccessibleSub");
+        FileSystemPathId subPath = _fileSystemPathIdFixture.CreateFileSystemPathId(
+            s_isLinux ? "/TestDir/InaccessibleSub" : @"C:\TestDir\InaccessibleSub"
+        );
 
         _mockEnvironmentContext.DirectoryProviderService.GetSubdirectoryPaths(parentDirectory.Id, includeHiddenElements)
             .Returns(ErrorOrFactory.From(new[] { subPath }.AsEnumerable()));
@@ -232,12 +243,12 @@ public class DirectoryServiceTests
     public void GetSubdirectories_WithValidFileSystemPathId_ShouldReturnListOfDirectories()
     {
         // Arrange
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestDir");
+        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDirTest);
         bool includeHiddenElements = false;
         FileSystemPathId[] subPaths =
         [
-            _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestDir\Sub1"),
-        _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestDir\Sub2")
+            _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDirTestSubDir1),
+        _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDirTestSubDir2)
         ];
 
         _mockEnvironmentContext.DirectoryProviderService.GetSubdirectoryPaths(pathId, includeHiddenElements)
@@ -266,7 +277,7 @@ public class DirectoryServiceTests
     public void GetSubdirectoriesWithFileSystemPathId_WhenDirectoryProviderServiceReturnsError_ShouldPropagateError()
     {
         // Arrange
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestDir");
+        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDirTest);
         bool includeHiddenElements = false;
 
         _mockEnvironmentContext.DirectoryProviderService.GetSubdirectoryPaths(pathId, includeHiddenElements)
@@ -284,9 +295,11 @@ public class DirectoryServiceTests
     public void GetSubdirectoriesWithFileSystemPathId_WhenSubdirectoryDetailsAreInaccessible_ShouldReturnInaccessibleDirectory()
     {
         // Arrange
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestDir");
+        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDirTest);
         bool includeHiddenElements = false;
-        FileSystemPathId subPath = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestDir\InaccessibleSub");
+        FileSystemPathId subPath = _fileSystemPathIdFixture.CreateFileSystemPathId(
+            s_isLinux ? "/TestDir/InaccessibleSub" : @"C:\TestDir\InaccessibleSub"
+        );
 
         _mockEnvironmentContext.DirectoryProviderService.GetSubdirectoryPaths(pathId, includeHiddenElements)
             .Returns(ErrorOrFactory.From(new[] { subPath }.AsEnumerable()));
@@ -311,7 +324,7 @@ public class DirectoryServiceTests
     public void CreateDirectory_WithValidStringPath_ShouldReturnNewDirectory()
     {
         // Arrange
-        string parentPath = @"C:\TestDir";
+        string parentPath = _pathDirTest;
         string newDirName = "NewDirectory";
         FileSystemPathId parentPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(parentPath);
         FileSystemPathId newDirPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(System.IO.Path.Combine(parentPath, newDirName));
@@ -352,7 +365,7 @@ public class DirectoryServiceTests
     public void CreateDirectory_WithFileSystemPathId_ShouldReturnNewDirectory()
     {
         // Arrange
-        FileSystemPathId parentPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestDir");
+        FileSystemPathId parentPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDirTest);
         string newDirName = "NewDirectory";
         FileSystemPathId newDirPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(System.IO.Path.Combine(parentPathId.Path, newDirName));
 
@@ -377,7 +390,7 @@ public class DirectoryServiceTests
     public void CreateDirectory_WhenDirectoryProviderServiceReturnsError_ShouldPropagateError()
     {
         // Arrange
-        FileSystemPathId parentPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestDir");
+        FileSystemPathId parentPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDirTest);
         string newDirName = "NewDirectory";
 
         _mockEnvironmentContext.DirectoryProviderService.CreateDirectory(parentPathId, newDirName)
@@ -395,7 +408,7 @@ public class DirectoryServiceTests
     public void CreateDirectory_WhenDirectoryDetailsAreInaccessible_ShouldReturnInaccessibleDirectory()
     {
         // Arrange
-        FileSystemPathId parentPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestDir");
+        FileSystemPathId parentPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDirTest);
         string newDirName = "NewDirectory";
         FileSystemPathId newDirPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(System.IO.Path.Combine(parentPathId.Path, newDirName));
 
@@ -424,7 +437,7 @@ public class DirectoryServiceTests
     public void CreateDirectory_WhenDirectoryExistsReturnsError_ShouldPropagateError()
     {
         // Arrange
-        FileSystemPathId parentPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestDir");
+        FileSystemPathId parentPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDirTest);
         string newDirName = "NewDirectory";
         FileSystemPathId newDirPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(System.IO.Path.Combine(parentPathId.Path, newDirName));
 
@@ -444,7 +457,7 @@ public class DirectoryServiceTests
     public void CreateDirectory_WhenDirectoryAlreadyExists_ShouldReturnDirectoryAlreadyExistsError()
     {
         // Arrange
-        FileSystemPathId parentPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestDir");
+        FileSystemPathId parentPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDirTest);
         string newDirName = "ExistingDirectory";
         FileSystemPathId newDirPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(System.IO.Path.Combine(parentPathId.Path, newDirName));
         _mockPlatformContext.PathStrategy.CombinePath(parentPathId, newDirName).Returns(ErrorOrFactory.From(newDirPathId));
@@ -463,7 +476,7 @@ public class DirectoryServiceTests
     public void CreateDirectory_WhenCombinePathReturnsError_ShouldReturnError()
     {
         // Arrange
-        FileSystemPathId parentPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestDir");
+        FileSystemPathId parentPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDirTest);
         string newDirName = "NewDirectory";
 
         _mockPlatformContext.PathStrategy.CombinePath(parentPathId, newDirName)
@@ -485,10 +498,12 @@ public class DirectoryServiceTests
     public void RenameDirectory_WithValidStringPath_ShouldReturnRenamedDirectory()
     {
         // Arrange
-        string oldPath = @"C:\TestDir\OldName";
+        string oldPath = s_isLinux ? "/TestDir/OldName" : @"C:\TestDir\OldName";
         string newName = "NewName";
         FileSystemPathId oldPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(oldPath);
-        FileSystemPathId newPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestDir\NewName");
+        FileSystemPathId newPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(
+            s_isLinux ? "/TestDir/NewName" : @"C:\TestDir\NewName"
+        );
 
         _mockEnvironmentContext.DirectoryProviderService.RenameDirectory(oldPathId, newName)
             .Returns(ErrorOrFactory.From(newPathId));
@@ -527,9 +542,13 @@ public class DirectoryServiceTests
     public void RenameDirectory_WithFileSystemPathId_ShouldReturnRenamedDirectory()
     {
         // Arrange
-        FileSystemPathId oldPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestDir\OldName");
+        FileSystemPathId oldPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(
+            s_isLinux ? "/TestDir/OldName" : @"C:\TestDir\OldName"
+        );
         string newName = "NewName";
-        FileSystemPathId newPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestDir\NewName");
+        FileSystemPathId newPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(
+            s_isLinux ? "/TestDir/NewName" : @"C:\TestDir\NewName"
+        );
 
         _mockEnvironmentContext.DirectoryProviderService.RenameDirectory(oldPathId, newName)
             .Returns(ErrorOrFactory.From(newPathId));
@@ -553,7 +572,9 @@ public class DirectoryServiceTests
     public void RenameDirectory_WhenDirectoryProviderServiceReturnsError_ShouldPropagateError()
     {
         // Arrange
-        FileSystemPathId oldPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestDir\OldName");
+        FileSystemPathId oldPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(
+            s_isLinux ? "/TestDir/OldName" : @"C:\TestDir\OldName"
+        );
         string newName = "NewName";
 
         _mockEnvironmentContext.DirectoryProviderService.RenameDirectory(oldPathId, newName)
@@ -571,9 +592,13 @@ public class DirectoryServiceTests
     public void RenameDirectory_WhenDirectoryDetailsAreInaccessible_ShouldReturnInaccessibleDirectory()
     {
         // Arrange
-        FileSystemPathId oldPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestDir\OldName");
+        FileSystemPathId oldPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(
+            s_isLinux ? "/TestDir/OldName" : @"C:\TestDir\OldName"
+        );
         string newName = "NewName";
-        FileSystemPathId newPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestDir\NewName");
+        FileSystemPathId newPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(
+            s_isLinux ? "/TestDir/NewName" : @"C:\TestDir\NewName"
+        );
 
         _mockEnvironmentContext.DirectoryProviderService.RenameDirectory(oldPathId, newName)
             .Returns(ErrorOrFactory.From(newPathId));
@@ -600,9 +625,13 @@ public class DirectoryServiceTests
     public void RenameDirectory_WhenDirectoryAlreadyExists_ShouldReturnDirectoryAlreadyExistsError()
     {
         // Arrange
-        FileSystemPathId oldPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestDir\OldName");
+        FileSystemPathId oldPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(
+            s_isLinux ? "/TestDir/OldName" : @"C:\TestDir\OldName"
+        );
         string newName = "ExistingDirectory";
-        FileSystemPathId newPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestDir\ExistingDirectory");
+        FileSystemPathId newPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(
+            s_isLinux ? "/TestDir/ExistingDirectory" : @"C:\TestDir\ExistingDirectory"
+        );
 
         _mockPlatformContext.PathStrategy.CombinePath(Arg.Any<FileSystemPathId>(), newName)
             .Returns(ErrorOrFactory.From(newPathId));
@@ -621,7 +650,9 @@ public class DirectoryServiceTests
     public void RenameDirectory_WhenCombinePathReturnsError_ShouldReturnError()
     {
         // Arrange
-        FileSystemPathId oldPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestDir\OldName");
+        FileSystemPathId oldPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(
+            s_isLinux ? "/TestDir/OldName" : @"C:\TestDir\OldName"
+        );
         string newName = "NewName";
 
         _mockPlatformContext.PathStrategy.CombinePath(Arg.Any<FileSystemPathId>(), newName)
@@ -643,10 +674,13 @@ public class DirectoryServiceTests
     public void RenameDirectory_WhenDirectoryExistsReturnsError_ShouldPropagateError()
     {
         // Arrange
-        FileSystemPathId oldPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestDir\OldName");
+        FileSystemPathId oldPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(
+            s_isLinux ? "/TestDir/OldName" : @"C:\TestDir\OldName"
+        );
         string newName = "NewName";
-        FileSystemPathId newPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestDir\NewName");
-
+        FileSystemPathId newPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(
+            s_isLinux ? "/TestDir/NewName" : @"C:\TestDir\NewName"
+        );
         _mockPlatformContext.PathStrategy.CombinePath(Arg.Any<FileSystemPathId>(), newName)
             .Returns(ErrorOrFactory.From(newPathId));
 
@@ -668,7 +702,7 @@ public class DirectoryServiceTests
     public void DeleteDirectory_WithValidStringPath_ShouldReturnDeleted()
     {
         // Arrange
-        string path = @"C:\TestDir\ToDelete";
+        string path = s_isLinux ? "/TestDir/ToDelete" : @"C:\TestDir\ToDelete";
         FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(path);
 
         _mockEnvironmentContext.DirectoryProviderService.DeleteDirectory(pathId)
@@ -700,7 +734,9 @@ public class DirectoryServiceTests
     public void DeleteDirectory_WithFileSystemPathId_ShouldReturnDeleted()
     {
         // Arrange
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestDir\ToDelete");
+        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(
+            s_isLinux ? "/TestDir/ToDelete" : @"C:\TestDir\ToDelete"
+        );
 
         _mockEnvironmentContext.DirectoryProviderService.DeleteDirectory(pathId)
             .Returns(Result.Deleted);
@@ -717,7 +753,9 @@ public class DirectoryServiceTests
     public void DeleteDirectory_WhenDirectoryProviderServiceReturnsError_ShouldPropagateError()
     {
         // Arrange
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestDir\ToDelete");
+        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(
+            s_isLinux ? "/TestDir/ToDelete" : @"C:\TestDir\ToDelete"
+        );
 
         _mockEnvironmentContext.DirectoryProviderService.DeleteDirectory(pathId)
             .Returns(Errors.Permission.UnauthorizedAccess);
@@ -734,7 +772,9 @@ public class DirectoryServiceTests
     public void DeleteDirectory_WhenDirectoryDoesNotExist_ShouldReturnDirectoryNotFoundError()
     {
         // Arrange
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestDir\NonExistent");
+        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(
+            s_isLinux ? "/TestDir/NonExistent" : @"C:\TestDir\NonExistent"
+        );
 
         _mockEnvironmentContext.DirectoryProviderService.DeleteDirectory(pathId)
             .Returns(Errors.FileManagement.DirectoryNotFound);
