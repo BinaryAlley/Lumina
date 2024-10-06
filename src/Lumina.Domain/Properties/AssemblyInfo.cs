@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -17,3 +17,4 @@ using System.Runtime.InteropServices;
 [assembly: Guid("E4C6366D-8187-459B-BB7F-1BE077DCFB25")]
 
 [assembly: InternalsVisibleTo("Lumina.Domain.UnitTests")]
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

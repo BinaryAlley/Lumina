@@ -17,3 +17,4 @@ using System.Runtime.InteropServices;
 [assembly: Guid("4E3EEA67-7C92-4588-9183-03140627D564")]
 
 [assembly: InternalsVisibleTo("Lumina.Presentation.Web.UnitTests")]
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

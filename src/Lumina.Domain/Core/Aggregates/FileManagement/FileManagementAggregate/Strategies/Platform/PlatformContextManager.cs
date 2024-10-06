@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.Enums.FileSystem;
 using System;
 using System.Runtime.InteropServices;
@@ -14,6 +14,7 @@ public class PlatformContextManager : IPlatformContextManager
     #region ================================================================== FIELD MEMBERS ================================================================================
     private IPlatformContext? _currentPlatformContext;
     private readonly IPlatformContextFactory _platformContextFactory;
+    private readonly IOperatingSystemInfo _operatingSystemInfo;
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================
@@ -21,9 +22,11 @@ public class PlatformContextManager : IPlatformContextManager
     /// Initializes a new instance of the <see cref="PlatformContextManager"/> class.
     /// </summary>
     /// <param name="platformContextFactory">Injected factory for creating platform contexts.</param>
-    public PlatformContextManager(IPlatformContextFactory platformContextFactory)
+    /// <param name="operatingSystemInfo">Injected class for checking the platform type of the current Operating System.</param>
+    public PlatformContextManager(IPlatformContextFactory platformContextFactory, IOperatingSystemInfo operatingSystemInfo)
     {
         _platformContextFactory = platformContextFactory;
+        _operatingSystemInfo = operatingSystemInfo;
     }
     #endregion
 
@@ -37,7 +40,7 @@ public class PlatformContextManager : IPlatformContextManager
         // set a default context if none is set
         if (_currentPlatformContext is null)
         {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            if (_operatingSystemInfo.IsOSPlatform(OSPlatform.Linux))
                 SetCurrentPlatform(PlatformType.Unix);
             else
                 SetCurrentPlatform(PlatformType.Windows);

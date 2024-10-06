@@ -159,18 +159,17 @@ internal class FileProviderService : IFileProviderService
         // check if the source file exists
         if (!_fileSystem.File.Exists(sourceFilePath.Path))
             return Errors.FileManagement.FileNotFound;
-        string destinationFilePath;
         string fileName = _fileSystem.Path.GetFileName(sourceFilePath.Path);
+        string destinationFilePath = _fileSystem.Path.Combine(destinationDirectoryPath.Path, fileName);
         // when copying a file to the same location, just copy it with a new name
         if (_fileSystem.Path.GetDirectoryName(sourceFilePath.Path) == destinationDirectoryPath.Path)
-            destinationFilePath = CreateUniqueFilePath(destinationDirectoryPath.Path);
+            destinationFilePath = CreateUniqueFilePath(destinationFilePath);
         else
         {
             // check if there is already a file with the same name as the copied file, in the destination directory
-            if (_fileSystem.File.Exists(destinationDirectoryPath.Path + fileName))
+            if (_fileSystem.File.Exists(destinationFilePath))
                 if (!overrideExisting)
                     return Errors.FileManagement.FileAlreadyExists;
-            destinationFilePath = destinationDirectoryPath.Path + fileName;
         }
         try
         {
@@ -218,7 +217,7 @@ internal class FileProviderService : IFileProviderService
         try
         {
             string fileName = _fileSystem.Path.GetFileName(sourceFilePath.Path);
-            string destinationFilePath = destinationDirectoryPath.Path + fileName;
+            string destinationFilePath = _fileSystem.Path.Combine(destinationDirectoryPath.Path, fileName);
             // if the destination file does not exist, perform a simple move
             if (!_fileSystem.File.Exists(destinationFilePath))
                 _fileSystem.File.Move(sourceFilePath.Path, destinationFilePath);

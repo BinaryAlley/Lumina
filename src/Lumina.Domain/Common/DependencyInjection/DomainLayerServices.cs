@@ -1,10 +1,12 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Services;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Strategies.Environment;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Strategies.Path;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Strategies.Platform;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.IO.Abstractions;
+using System.Runtime.InteropServices;
 #endregion
 
 namespace Lumina.Domain.Common.DependencyInjection;
@@ -38,6 +40,7 @@ public static class DomainLayerServices
         services.AddScoped<IPlatformContextManager, PlatformContextManager>();
         services.AddScoped<IUnixPathStrategy, UnixPathStrategy>();
         services.AddScoped<IWindowsPathStrategy, WindowsPathStrategy>();
+        services.AddScoped<IOperatingSystemInfo, OperatingSystemInfo>();
         services.AddSingleton<IFileSystem, FileSystem>();
         return services;
     }

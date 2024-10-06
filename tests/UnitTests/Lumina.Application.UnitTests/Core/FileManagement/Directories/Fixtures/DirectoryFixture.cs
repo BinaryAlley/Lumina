@@ -37,7 +37,14 @@ public class DirectoryFixture
     /// <summary>
     /// Creates a random valid <see cref="Directory"/>.
     /// </summary>
-    /// <returns>The created <see cref="Directory"/>.</returns>
+    /// <param name="path">Optional. The directory path. If not provided, a random path is generated.</param>
+    /// <param name="name">Optional. The directory name. If not provided, a random name is generated.</param>
+    /// <param name="dateCreated">Optional. The directory's creation date. If not provided, a random past date is generated.</param>
+    /// <param name="dateModified">Optional. The directory's modification date. If not provided, a recent date is generated.</param>
+    /// <param name="status">Optional. The directory's status. If not provided, a random status is assigned.</param>
+    /// <param name="childItems">Optional. A list of child items to be added to the directory.</param>
+    /// <returns>A newly created Directory instance.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if the Directory creation fails.</exception>
     public Directory CreateDirectory(
         string? path = null,
         string? name = null,

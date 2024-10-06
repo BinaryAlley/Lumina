@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.Enums.FileSystem;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Strategies.Platform;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.ValueObjects;
@@ -16,7 +16,7 @@ namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.S
 /// <summary>
 /// Service for file system permissions.
 /// </summary>
-internal class FileSystemPermissionsService : IFileSystemPermissionsService
+internal class FileSystemPermissionsService : IFileSystemPermissionsService // TODO: refactor towards abstractions that could allow testing
 {
     #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IPlatformContextManager _platformContextManager;
