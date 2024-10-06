@@ -49,8 +49,8 @@ public class WindowsPathStrategy : IWindowsPathStrategy
             return false;
         // regular expression to match valid absolute paths
         // this allows drive letters (e.g., C:\) and UNC paths (e.g., \\server\share)
-        string pathPattern = @"^(?:[a-zA-Z]:\\|\\\\[a-zA-Z0-9\s()._-]+\\[a-zA-Z0-9\s()._-]+)(?:[a-zA-Z0-9\s()._-]+\\)*[a-zA-Z0-9\s()._-]*\\?$";
-        return Regex.IsMatch(path.Path, pathPattern);
+        const string PATH_PATTERN = @"^(?:[a-zA-Z]:\\|\\\\[a-zA-Z0-9\s()._\[\]-]+\\[a-zA-Z0-9\s()._\[\]-]+)(?:[a-zA-Z0-9\s()._\[\]-]+\\)*[a-zA-Z0-9\s()._\[\]-]*\\?$";
+        return Regex.IsMatch(path.Path, PATH_PATTERN);
     }
 
     /// <summary>

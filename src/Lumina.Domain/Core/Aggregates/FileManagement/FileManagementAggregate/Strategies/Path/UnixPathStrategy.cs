@@ -50,8 +50,8 @@ public class UnixPathStrategy : IUnixPathStrategy
         // check for relative paths
         if (path.Path.StartsWith("./") || path.Path.StartsWith("../"))
             return false;
-        string pathPattern = @"^\/([\w\-\.\~!$&'()*+,;=:@ ]+(\/[\w\-\.\~!$&'()*+,;=:@ ]+)*)?\/?$";
-        return Regex.IsMatch(path.Path, pathPattern);
+        const string PATH_PATTERN = @"^\/([\w\-\.\~!$&'()*+,;=:@\[\] ]+(\/[\w\-\.\~!$&'()*+,;=:@\[\] ]+)*)?\/?$";
+        return Regex.IsMatch(path.Path, PATH_PATTERN);
     }
 
     /// <summary>
