@@ -117,6 +117,8 @@ public class FileService : IFileService
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a copied file, or an error.</returns>
     public ErrorOr<File> CopyFile(string sourceFilePath, string destinationDirectoryPath, bool? overrideExisting)
     {
+        if (string.IsNullOrWhiteSpace(destinationDirectoryPath))
+            return Errors.FileManagement.InvalidPath;
         // make sure the paths are in the expected format
         if (!destinationDirectoryPath.EndsWith(_platformContext.PathStrategy.PathSeparator))
             destinationDirectoryPath += _platformContext.PathStrategy.PathSeparator;
@@ -181,6 +183,8 @@ public class FileService : IFileService
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a moved file, or an error.</returns>
     public ErrorOr<File> MoveFile(string sourceFilePath, string destinationDirectoryPath, bool? overrideExisting)
     {
+        if (string.IsNullOrWhiteSpace(destinationDirectoryPath))
+            return Errors.FileManagement.InvalidPath;
         // make sure the paths are in the expected format
         if (!destinationDirectoryPath.EndsWith(_platformContext.PathStrategy.PathSeparator))
             destinationDirectoryPath += _platformContext.PathStrategy.PathSeparator;

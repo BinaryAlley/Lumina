@@ -143,9 +143,9 @@ public class DirectoryService : IDirectoryService
             ErrorOr<FileSystemPathId> newDirectoryPathResult = _environmentContext.DirectoryProviderService.CreateDirectory(path, name);
             if (newDirectoryPathResult.IsError)
                 return newDirectoryPathResult.Errors;
-            ErrorOr<string> dirNameResult = _environmentContext.DirectoryProviderService.GetFileName(path);
-            ErrorOr<Optional<DateTime>> dateModifiedResult = _environmentContext.DirectoryProviderService.GetLastWriteTime(path);
-            ErrorOr<Optional<DateTime>> dateCreatedResult = _environmentContext.DirectoryProviderService.GetCreationTime(path);
+            ErrorOr<string> dirNameResult = _environmentContext.DirectoryProviderService.GetFileName(newDirectoryPathResult.Value);
+            ErrorOr<Optional<DateTime>> dateModifiedResult = _environmentContext.DirectoryProviderService.GetLastWriteTime(newDirectoryPathResult.Value);
+            ErrorOr<Optional<DateTime>> dateCreatedResult = _environmentContext.DirectoryProviderService.GetCreationTime(newDirectoryPathResult.Value);
             // if any error occurred, mark directory as Inaccessible
             if (dirNameResult.IsError || dateModifiedResult.IsError || dateCreatedResult.IsError)
             {

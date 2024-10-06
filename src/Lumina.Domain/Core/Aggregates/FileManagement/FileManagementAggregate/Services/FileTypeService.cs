@@ -23,7 +23,7 @@ public class FileTypeService : IFileTypeService
     #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IFileSystem _fileSystem;
     private readonly IFileSystemPermissionsService _fileSystemPermissionsService;
-    private const int BUFFER_SIZE = 16; // 16 bytes should be more than enough for common images header types
+    private const int BUFFER_SIZE = 18; // 18 bytes should be more than enough for common images header types
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================
@@ -119,7 +119,7 @@ public class FileTypeService : IFileTypeService
         if (buffer.Length < 18)
             return false;
         byte imageType = buffer[2];
-        return imageType is 1 or 2 or 10;
+        return imageType is 1 or 2 or 3 or 9 or 10 or 11;
     }
 
     /// <summary>

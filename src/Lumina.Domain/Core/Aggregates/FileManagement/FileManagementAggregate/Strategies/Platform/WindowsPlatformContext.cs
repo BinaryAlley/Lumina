@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.Enums.FileSystem;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Strategies.Path;
 #endregion
@@ -19,7 +19,7 @@ public class WindowsPlatformContext : IWindowsPlatformContext
     /// <summary>
     /// Gets the path strategy for Windows platforms.
     /// </summary>
-    public IPathStrategy PathStrategy { get; private set; }
+    public IPathStrategy PathStrategy { get; }
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================

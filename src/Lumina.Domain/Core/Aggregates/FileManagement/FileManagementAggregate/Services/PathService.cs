@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Strategies.Platform;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.ValueObjects;
 using System.Collections.Generic;
@@ -69,6 +70,8 @@ public class PathService : IPathService
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing the combined path, or an error.</returns>
     public ErrorOr<string> CombinePath(string path, string name)
     {
+        if (string.IsNullOrWhiteSpace(path) || string.IsNullOrWhiteSpace(name))
+            return Errors.FileManagement.InvalidPath;
         ErrorOr<FileSystemPathId> newPathResult = FileSystemPathId.Create(path);
         if (newPathResult.IsError)
             return newPathResult.Errors;
