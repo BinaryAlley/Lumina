@@ -157,13 +157,16 @@ public class FileProviderServiceTests
     }
 
     [Fact]
-    public void GetFilePaths_ShouldOrderFilesAlphabetically()
+    public void GetFilePaths_WhenCalled_ShouldOrderFilesAlphabetically()
     {
         // Arrange
         FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId();
         string[] files = s_isLinux 
-            ? new[] { "/C.txt", "/A.txt", "/B.txt" } 
-            : new[] { @"C:\C.txt", @"C:\A.txt", @"C:\B.txt" };
+            ? ["/C.txt", "/A.txt", "/B.txt"]
+            : [@"C:\C.txt", @"C:\A.txt", @"C:\B.txt"];
+        string[] expectedFiles = s_isLinux 
+            ? ["/A.txt", "/B.txt", "/C.txt"]
+            : [@"C:\A.txt", @"C:\B.txt", @"C:\C.txt"];
         _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ListDirectory).Returns(true);
         _mockFileSystem.Directory.GetFiles(path.Path).Returns(files);
         _mockFileSystem.File.GetAttributes(Arg.Any<string>()).Returns(FileAttributes.Normal);
@@ -173,7 +176,7 @@ public class FileProviderServiceTests
 
         // Assert
         result.IsError.Should().BeFalse();
-        result.Value.Select(x => x.Path).Should().BeEquivalentTo([@"C:\A.txt", @"C:\B.txt", @"C:\C.txt"], options => options.WithStrictOrdering());
+        result.Value.Select(x => x.Path).Should().BeEquivalentTo(expectedFiles, options => options.WithStrictOrdering());
     }
 
     [Fact]
