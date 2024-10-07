@@ -51,7 +51,7 @@ public class DirectoriesController : ApiController
         ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _mediator.Send(new GetDirectoryTreeQuery(path, includeFiles, includeHiddenElements), cancellationToken).ConfigureAwait(false);
         if (!result.IsError && result.Value is not null)
         {
-            foreach (FileSystemTreeNodeResponse treeNode in result.Value ?? [])
+            foreach (FileSystemTreeNodeResponse treeNode in result.Value)
             {
                 if (cancellationToken.IsCancellationRequested)
                     yield break;
@@ -73,7 +73,7 @@ public class DirectoriesController : ApiController
         ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _mediator.Send(new GetTreeDirectoriesQuery(path,includeHiddenElements), cancellationToken).ConfigureAwait(false);
         if (!result.IsError && result.Value is not null)
         {
-            foreach (FileSystemTreeNodeResponse directory in result.Value ?? [])
+            foreach (FileSystemTreeNodeResponse directory in result.Value)
             {
                 if (cancellationToken.IsCancellationRequested)
                     yield break;
@@ -95,7 +95,7 @@ public class DirectoriesController : ApiController
         ErrorOr<IEnumerable<DirectoryResponse>> result = await _mediator.Send(new GetDirectoriesQuery(path, includeHiddenElements), cancellationToken).ConfigureAwait(false);
         if (!result.IsError && result.Value is not null)
         {
-            foreach (DirectoryResponse directory in result.Value ?? [])
+            foreach (DirectoryResponse directory in result.Value)
             {
                 if (cancellationToken.IsCancellationRequested)
                     yield break;
