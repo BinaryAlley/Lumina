@@ -48,11 +48,14 @@ public class FilesController : ApiController
         [FromQuery] bool includeHiddenElements, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _mediator.Send(new GetTreeFilesQuery(path, includeHiddenElements), cancellationToken).ConfigureAwait(false);
-        foreach (FileSystemTreeNodeResponse file in result.Value ?? [])
+        if (!result.IsError && result.Value is not null)
         {
-            if (cancellationToken.IsCancellationRequested)
-                yield break;
-            yield return file;
+            foreach (FileSystemTreeNodeResponse file in result.Value)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                    yield break;
+                yield return file;
+            }
         }
     }
 
@@ -67,9 +70,9 @@ public class FilesController : ApiController
         [FromQuery] bool includeHiddenElements, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         ErrorOr<IEnumerable<FileResponse>> result = await _mediator.Send(new GetFilesQuery(path, includeHiddenElements), cancellationToken).ConfigureAwait(false);
-        if (!result.IsError)
+        if (!result.IsError && result.Value is not null)
         {
-            foreach (FileResponse file in result.Value ?? [])
+            foreach (FileResponse file in result.Value)
             {
                 if (cancellationToken.IsCancellationRequested)
                     yield break;
