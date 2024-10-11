@@ -57,7 +57,7 @@ public class FileSystemStructureFixture
             }
             // make the second nested directory hidden
             if (i == 2)
-                SetHidden(currentPath);
+                currentPath = SetHidden(currentPath);
         }
         return currentPath;
     }
@@ -66,7 +66,7 @@ public class FileSystemStructureFixture
     /// Sets the hidden attribute for a file or directory.
     /// </summary>
     /// <param name="path">The path to the file or directory.</param>
-    private static void SetHidden(string path)
+    private static string SetHidden(string path)
     {
         if (OperatingSystem.IsWindows())
             File.SetAttributes(path, File.GetAttributes(path) | FileAttributes.Hidden);
@@ -80,7 +80,9 @@ public class FileSystemStructureFixture
                 Directory.Move(path, newPath);
             else if (File.Exists(path))
                 File.Move(path, newPath);
+            path = newPath;
         }
+        return path;
     }
 
     /// <summary>

@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
@@ -33,6 +34,7 @@ public class DirectoriesControllerTests : IClassFixture<LuminaApiFactory>
         PropertyNameCaseInsensitive = true,
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
+    private static readonly bool s_isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================
@@ -83,7 +85,8 @@ public class DirectoriesControllerTests : IClassFixture<LuminaApiFactory>
             treeNodes!.Should().NotBeEmpty();
 
             string[] pathSegments = testPath.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
-
+            if (s_isLinux) // on UNIX, the leading slash is considered "the drive", the root location - add it!
+                pathSegments = new string[] { "/" }.Concat(pathSegments).ToArray();
             // recursively validate the tree structure
             void ValidateNode(FileSystemTreeNodeResponse node, int depth)
             {
@@ -97,6 +100,8 @@ public class DirectoriesControllerTests : IClassFixture<LuminaApiFactory>
                 node.Name.Should().Be(expectedSegment);
 
                 string expectedPath = string.Join(Path.DirectorySeparatorChar.ToString(), pathSegments.Take(depth + 1));
+                if (expectedPath.StartsWith("//"))
+                    expectedPath = expectedPath.Substring(1);
                 if (!expectedPath.EndsWith(Path.DirectorySeparatorChar))
                     expectedPath += Path.DirectorySeparatorChar;
                 node.Path.Should().EndWith(expectedPath);
@@ -162,6 +167,8 @@ public class DirectoriesControllerTests : IClassFixture<LuminaApiFactory>
             treeNodes!.Should().NotBeEmpty();
 
             string[] pathSegments = testPath.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
+            if (s_isLinux) // on UNIX, the leading slash is considered "the drive", the root location - add it!
+                pathSegments = new string[] { "/" }.Concat(pathSegments).ToArray();
 
             // recursively validate the tree structure
             void ValidateNode(FileSystemTreeNodeResponse node, int depth)
@@ -178,6 +185,8 @@ public class DirectoriesControllerTests : IClassFixture<LuminaApiFactory>
                 string expectedPath = string.Join(Path.DirectorySeparatorChar.ToString(), pathSegments.Take(depth + 1));
                 if (!expectedPath.EndsWith(Path.DirectorySeparatorChar))
                     expectedPath += Path.DirectorySeparatorChar;
+                if (expectedPath.StartsWith("//"))
+                    expectedPath = expectedPath.Substring(1);
                 node.Path.Should().EndWith(expectedPath);
 
                 // if the node is a drive or directory, check its children recursively
@@ -191,7 +200,7 @@ public class DirectoriesControllerTests : IClassFixture<LuminaApiFactory>
                         else if (childNode.ItemType is FileSystemItemType.File)
                         {
                             childNode.Children.Should().BeEmpty(); // files should not have children
-                            childNode.Name.Should().BeOneOf("TestFile_1.txt", "TestFile_2.txt");
+                            childNode.Name.Should().BeOneOf((s_isLinux ? "." : string.Empty) + "TestFile_1.txt", "TestFile_2.txt");
                         }
                     }
                 }
@@ -244,6 +253,8 @@ public class DirectoriesControllerTests : IClassFixture<LuminaApiFactory>
             treeNodes.Should().AllSatisfy(node => node.ItemType.Should().BeOneOf(FileSystemItemType.Directory, FileSystemItemType.Root));
 
             string[] pathSegments = testPath.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
+            if (s_isLinux) // on UNIX, the leading slash is considered "the drive", the root location - add it!
+                pathSegments = new string[] { "/" }.Concat(pathSegments).ToArray();
 
             // recursively validate the tree structure
             void ValidateNode(FileSystemTreeNodeResponse node, int depth)
@@ -260,6 +271,8 @@ public class DirectoriesControllerTests : IClassFixture<LuminaApiFactory>
                 string expectedPath = string.Join(Path.DirectorySeparatorChar.ToString(), pathSegments.Take(depth + 1));
                 if (!expectedPath.EndsWith(Path.DirectorySeparatorChar))
                     expectedPath += Path.DirectorySeparatorChar;
+                if (expectedPath.StartsWith("//"))
+                    expectedPath = expectedPath.Substring(1);
                 node.Path.Should().EndWith(expectedPath);
 
                 node.Children.Should().NotBeNull();
@@ -314,6 +327,8 @@ public class DirectoriesControllerTests : IClassFixture<LuminaApiFactory>
             treeNodes.Should().AllSatisfy(node => node.ItemType.Should().BeOneOf(FileSystemItemType.Directory, FileSystemItemType.Root));
 
             string[] pathSegments = testPath.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
+            if (s_isLinux) // on UNIX, the leading slash is considered "the drive", the root location - add it!
+                pathSegments = new string[] { "/" }.Concat(pathSegments).ToArray();
 
             // recursively validate the tree structure
             void ValidateNode(FileSystemTreeNodeResponse node, int depth)
@@ -330,6 +345,8 @@ public class DirectoriesControllerTests : IClassFixture<LuminaApiFactory>
                 string expectedPath = string.Join(Path.DirectorySeparatorChar.ToString(), pathSegments.Take(depth + 1));
                 if (!expectedPath.EndsWith(Path.DirectorySeparatorChar))
                     expectedPath += Path.DirectorySeparatorChar;
+                if (expectedPath.StartsWith("//"))
+                    expectedPath = expectedPath.Substring(1);
                 node.Path.Should().EndWith(expectedPath);
 
                 node.Children.Should().NotBeNull();
@@ -521,8 +538,8 @@ public class DirectoriesControllerTests : IClassFixture<LuminaApiFactory>
 
 
             FileSystemTreeNodeResponse firstNode = treeNodes.First();
-            firstNode.Name.Should().Be("NestedDirectory_2");
-            firstNode.Path.Should().Be(Path.Combine(testPath, "NestedDirectory_2" + Path.DirectorySeparatorChar));
+            firstNode.Name.Should().Be((s_isLinux ? "." : string.Empty) + "NestedDirectory_2");
+            firstNode.Path.Should().Be(Path.Combine(testPath, (s_isLinux ? "." : string.Empty) + "NestedDirectory_2" + Path.DirectorySeparatorChar));
             firstNode.ItemType.Should().Be(FileSystemItemType.Directory);
             treeNodes.Should().AllSatisfy(n => n.ItemType.Should().Be(FileSystemItemType.Directory));
             treeNodes.Count.Should().Be(1); // only directories
@@ -706,8 +723,8 @@ public class DirectoriesControllerTests : IClassFixture<LuminaApiFactory>
 
 
             DirectoryResponse firstDirectory = directories.First();
-            firstDirectory.Name.Should().Be("NestedDirectory_2");
-            firstDirectory.Path.Should().Be(Path.Combine(testPath, "NestedDirectory_2" + Path.DirectorySeparatorChar));
+            firstDirectory.Name.Should().Be((s_isLinux ? "." : string.Empty) + "NestedDirectory_2");
+            firstDirectory.Path.Should().Be(Path.Combine(testPath, (s_isLinux ? "." : string.Empty) + "NestedDirectory_2" + Path.DirectorySeparatorChar));
             directories.Count.Should().Be(1); // only directories
         }
         finally

@@ -1,14 +1,17 @@
 #region ========================================================================= USING =====================================================================================
 using FluentAssertions;
 using Lumina.Contracts.Responses.FileManagement;
+using Lumina.Presentation.Api.Core.Controllers.FileManagement;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
@@ -31,6 +34,7 @@ public class PathControllerTests : IClassFixture<LuminaApiFactory>
         PropertyNameCaseInsensitive = true,
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
+    private static readonly bool s_isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================
@@ -220,7 +224,7 @@ public class PathControllerTests : IClassFixture<LuminaApiFactory>
         string path = System.IO.Path.GetDirectoryName(testPath)!;
         while (!string.IsNullOrEmpty(path))
         {
-            string segment = System.IO.Path.GetFileName(path);
+            string segment = s_isLinux && path == Path.DirectorySeparatorChar.ToString() ? path : System.IO.Path.GetFileName(path);
             if (string.IsNullOrEmpty(segment))
             {
                 hierarchy.Add(System.IO.Path.GetPathRoot(path)!.TrimEnd(System.IO.Path.DirectorySeparatorChar));

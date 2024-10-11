@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
@@ -32,6 +33,7 @@ public class FilesControllerTests : IClassFixture<LuminaApiFactory>
         PropertyNameCaseInsensitive = true,
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
+    private static readonly bool s_isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
     #endregion
 
     #region ====================================================================== CTOR =====================================================================================
@@ -175,8 +177,8 @@ public class FilesControllerTests : IClassFixture<LuminaApiFactory>
             string[] pathSegments = testPath.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
 
             FileSystemTreeNodeResponse firstDirectory = files.First();
-            firstDirectory.Name.Should().Be("TestFile_1.txt");
-            firstDirectory.Path.Should().Be(Path.Combine(testPath, "TestFile_1.txt"));
+            firstDirectory.Name.Should().Be((s_isLinux ? "." : string.Empty) + "TestFile_1.txt");
+            firstDirectory.Path.Should().Be(Path.Combine(testPath, (s_isLinux ? "." : string.Empty) + "TestFile_1.txt"));
             FileSystemTreeNodeResponse secondDirectory = files.Last();
             secondDirectory.Name.Should().Be("TestFile_2.txt");
             secondDirectory.Path.Should().Be(Path.Combine(testPath, "TestFile_2.txt"));
@@ -362,8 +364,8 @@ public class FilesControllerTests : IClassFixture<LuminaApiFactory>
             string[] pathSegments = testPath.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
 
             FileResponse firstDirectory = files.First();
-            firstDirectory.Name.Should().Be("TestFile_1.txt");
-            firstDirectory.Path.Should().Be(Path.Combine(testPath, "TestFile_1.txt"));
+            firstDirectory.Name.Should().Be( (s_isLinux ? "." : string.Empty) + "TestFile_1.txt");
+            firstDirectory.Path.Should().Be(Path.Combine(testPath, (s_isLinux ? "." : string.Empty) + "TestFile_1.txt"));
             FileResponse secondDirectory = files.Last();
             secondDirectory.Name.Should().Be("TestFile_2.txt");
             secondDirectory.Path.Should().Be(Path.Combine(testPath, "TestFile_2.txt"));
