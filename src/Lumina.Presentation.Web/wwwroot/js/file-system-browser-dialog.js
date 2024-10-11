@@ -238,7 +238,7 @@ async function checkPathAsync(path) {
             if (addressBarInput.value !== null && !addressBarInput.value.endsWith(pathSeparator))
                 addressBarInput.value += pathSeparator;
         } else {
-            const pathExistsResponse = await callApiGetAsync(`${clientBasePath}path/check-path-exists?path=${encodeURIComponent(path)}`);
+            const pathExistsResponse = await callApiGetAsync(`${clientBasePath}path/check-path-exists?path=${encodeURIComponent(path)}&includeHiddenElements=${showHiddenElements}`);
             if (pathExistsResponse !== undefined && !pathExistsResponse.exists) {
                 notificationService.show("Specified path does not exist!", NotificationType.ERROR); // TODO: should ask error message from server when translation is implemented
                 return false;

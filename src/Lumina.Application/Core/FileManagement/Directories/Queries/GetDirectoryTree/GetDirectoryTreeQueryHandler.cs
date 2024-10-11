@@ -67,7 +67,7 @@ public class GetDirectoryTreeQueryHandler : IRequestHandler<GetDirectoryTreeQuer
 
         List<PathSegment> pathParts = pathPartsResults.Value.ToList();
 
-        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> buildDirectoryTreeResult = BuildDirectoryTree(result, pathParts, out FileSystemTreeNodeResponse? currentNode);
+        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> buildDirectoryTreeResult = BuildDirectoryTree(result, pathParts, out FileSystemTreeNodeResponse? currentNode, request.IncludeHiddenElements);
         if (buildDirectoryTreeResult.IsError)
             return buildDirectoryTreeResult.Errors;
 
@@ -97,10 +97,11 @@ public class GetDirectoryTreeQueryHandler : IRequestHandler<GetDirectoryTreeQuer
     /// </summary>
     /// <param name="drives">The list of available drives.</param>
     /// <param name="pathParts">The list of parsed path segments (directories).</param>
+    /// <param name="includeHiddenElements">Whether to include hidden file system elements or not.</param>
     /// <returns>
     /// An <see cref="ErrorOr{TValue}"/> containing a list of <see cref="FileSystemTreeNodeResponse"/> representing the directory tree, or an error message.
     /// </returns>
-    private ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> BuildDirectoryTree(List<FileSystemTreeNodeResponse> drives, List<PathSegment> pathParts, out FileSystemTreeNodeResponse currentNode)
+    private ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> BuildDirectoryTree(List<FileSystemTreeNodeResponse> drives, List<PathSegment> pathParts, out FileSystemTreeNodeResponse currentNode, bool includeHiddenElements = true)
     {
         // find the root drive that matches the first part of the path
         FileSystemTreeNodeResponse drive = drives.First(drive => drive.Name.Contains(pathParts[0].Name));
@@ -114,18 +115,21 @@ public class GetDirectoryTreeQueryHandler : IRequestHandler<GetDirectoryTreeQuer
             ErrorOr<string> combinedPathResult = _pathService.CombinePath(currentPath, pathParts[i].Name);
             if (combinedPathResult.IsError)
                 return combinedPathResult.Errors;
-
-            currentPath = combinedPathResult.Value;
-            // create a new node for the directory and add it as a child of the current node
-            FileSystemTreeNodeResponse newNode = new()
+            if (_pathService.Exists(combinedPathResult.Value, includeHiddenElements))
             {
-                Path = currentPath,
-                Name = pathParts[i].Name,
-                ItemType = FileSystemItemType.Directory,
-                IsExpanded = true
-            };
-            currentNode.Children.Add(newNode);
-            currentNode = newNode; // move to the new node
+
+                currentPath = combinedPathResult.Value;
+                // create a new node for the directory and add it as a child of the current node
+                FileSystemTreeNodeResponse newNode = new()
+                {
+                    Path = currentPath,
+                    Name = pathParts[i].Name,
+                    ItemType = FileSystemItemType.Directory,
+                    IsExpanded = true
+                };
+                currentNode.Children.Add(newNode);
+                currentNode = newNode; // move to the new node
+            }
         }
         return new List<FileSystemTreeNodeResponse> { drive };
     }
@@ -143,7 +147,7 @@ public class GetDirectoryTreeQueryHandler : IRequestHandler<GetDirectoryTreeQuer
         if (subDirectoriesResult.IsError)
             return subDirectoriesResult.Errors;
         // add each subdirectory as a child node of the current directory
-        foreach (Directory subDirectory in subDirectoriesResult.Value)
+        foreach (Directory subDirectory in subDirectoriesResult.Value ?? [])
         {
             FileSystemTreeNodeResponse subDirNode = new()
             {

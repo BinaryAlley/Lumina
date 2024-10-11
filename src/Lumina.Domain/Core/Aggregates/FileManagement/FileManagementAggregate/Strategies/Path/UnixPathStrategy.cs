@@ -4,6 +4,7 @@ using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.ValueObjects;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -58,10 +59,26 @@ public class UnixPathStrategy : IUnixPathStrategy
     /// Checks if <paramref name="path"/> exists.
     /// </summary>
     /// <param name="path">The path to be checked.</param>
+    /// <param name="includeHiddenElements">Whether to include hidden file system elements or not.</param>
     /// <returns><see langword="true"/> if <paramref name="path"/> exists, <see langword="false"/> otherwise.</returns>
-    public bool Exists(FileSystemPathId path)
+    public bool Exists(FileSystemPathId path, bool includeHiddenElements = true)
     {
-        return _fileSystem.Path.Exists(path.Path);
+        if (!_fileSystem.Path.Exists(path.Path))
+            return false;
+        bool isHidden;
+        if (_fileSystem.Directory.Exists(path.Path))
+        {
+            IDirectoryInfo dirInfo = _fileSystem.DirectoryInfo.New(path.Path);
+            isHidden = (dirInfo.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden;
+        }
+        else if (_fileSystem.File.Exists(path.Path))
+        {
+            IFileInfo fileInfo = _fileSystem.FileInfo.New(path.Path);
+            isHidden = (fileInfo.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden;
+        }
+        else // path exists but is neither a file nor a directory (drive, etc)
+            return true;
+        return includeHiddenElements || !isHidden;
     }
 
     /// <summary>

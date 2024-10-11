@@ -196,10 +196,10 @@ public class GetDirectoryTreeQueryHandlerTests
         IEnumerable<PathSegment> pathSegments = new[] { firstPathSegment }.Concat(_pathSegmentFixture.CreateMany(2));
         Error error = Error.Failure("PathService.Error", "An error occurred");
 
-         _mockDriveService.GetDrives().Returns(ErrorOrFactory.From(drives));
+        _mockDriveService.GetDrives().Returns(ErrorOrFactory.From(drives));
         _mockPathService.ParsePath(query.Path).Returns(ErrorOrFactory.From(pathSegments));
         _mockPathService.CombinePath(Arg.Any<string>(), Arg.Any<string>()).Returns(error);
-       
+
         // Act
         ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.Handle(query, CancellationToken.None);
 
@@ -313,6 +313,7 @@ public class GetDirectoryTreeQueryHandlerTests
 
         _mockDriveService.GetDrives().Returns(ErrorOrFactory.From(drives));
         _mockPathService.ParsePath(query.Path).Returns(ErrorOrFactory.From((IEnumerable<PathSegment>)pathSegments));
+        _mockPathService.Exists(Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
         _mockPathService.CombinePath(Arg.Any<string>(), Arg.Any<string>())
             .Returns(callInfo => $"{callInfo.ArgAt<string>(0)}\\{callInfo.ArgAt<string>(1)}");
 
@@ -350,6 +351,7 @@ public class GetDirectoryTreeQueryHandlerTests
         ];
 
         _mockDriveService.GetDrives().Returns(ErrorOrFactory.From(drives));
+        _mockPathService.Exists(Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
         _mockPathService.ParsePath(query.Path).Returns(ErrorOrFactory.From((IEnumerable<PathSegment>)pathSegments));
         _mockPathService.CombinePath(Arg.Any<string>(), Arg.Any<string>())
             .Returns(callInfo => $"{callInfo.ArgAt<string>(0)}\\{callInfo.ArgAt<string>(1)}");

@@ -36,7 +36,7 @@ public class CheckPathExistsQueryHandlerTests
 
     #region ===================================================================== METHODS ===================================================================================
     [Fact]
-    public async Task Handle_WhenPathExists_ShouldReturnTrueResponse()
+    public async Task Handle_WhenPathExistsAndIsNotHidden_ShouldReturnTrueResponse()
     {
         // Arrange
         CheckPathExistsQuery query = CheckPathExistsQueryFixture.CreateCheckPathExistsQuery();
@@ -48,6 +48,36 @@ public class CheckPathExistsQueryHandlerTests
         // Assert
         result.Exists.Should().BeTrue();
         _mockPathService.Received(1).Exists(query.Path);
+    }
+
+    [Fact]
+    public async Task Handle_WhenPathExistsAndIsHiddenAndIncludeHiddenElementsIsTrue_ShouldReturnTrueResponse()
+    {
+        // Arrange
+        CheckPathExistsQuery query = CheckPathExistsQueryFixture.CreateCheckPathExistsQuery(true);
+        _mockPathService.Exists(query.Path).Returns(true);
+
+        // Act
+        PathExistsResponse result = await _sut.Handle(query, CancellationToken.None);
+
+        // Assert
+        result.Exists.Should().BeTrue();
+        _mockPathService.Received(1).Exists(query.Path);
+    }
+
+    [Fact]
+    public async Task Handle_WhenPathExistsAndIsHiddenAndIncludeHiddenElementsIsFalse_ShouldReturnFalseResponse()
+    {
+        // Arrange
+        CheckPathExistsQuery query = CheckPathExistsQueryFixture.CreateCheckPathExistsQuery(false);
+        _mockPathService.Exists(query.Path, false).Returns(false);
+
+        // Act
+        PathExistsResponse result = await _sut.Handle(query, CancellationToken.None);
+
+        // Assert
+        result.Exists.Should().BeFalse();
+        _mockPathService.Received(1).Exists(query.Path, false);
     }
 
     [Fact]
@@ -69,15 +99,15 @@ public class CheckPathExistsQueryHandlerTests
     public async Task Handle_WhenCalledWithNullPath_ShouldStillCallPathService()
     {
         // Arrange
-        CheckPathExistsQuery query = new(null!);
-        _mockPathService.Exists(Arg.Any<string>()).Returns(false);
+        CheckPathExistsQuery query = new(null!, false);
+        _mockPathService.Exists(Arg.Any<string>(), Arg.Any<bool>()).Returns(false);
 
         // Act
         PathExistsResponse result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
         result.Exists.Should().BeFalse();
-        _mockPathService.Received(1).Exists(Arg.Any<string>());
+        _mockPathService.Received(1).Exists(Arg.Any<string>(), Arg.Any<bool>());
     }
 
     [Fact]
