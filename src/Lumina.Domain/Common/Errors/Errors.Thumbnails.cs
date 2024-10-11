@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using ErrorOr;
 #endregion
 
@@ -13,6 +13,7 @@ public static partial class Errors
     {
         #region ==================================================================== PROPERTIES =================================================================================
         public static Error NoThumbnail => Error.Failure(nameof(NoThumbnail));
+        public static Error ImageQaulityMustBeBetweenZeroAndOneHundred => Error.Validation(nameof(ImageQaulityMustBeBetweenZeroAndOneHundred));
         #endregion
     }
 }
