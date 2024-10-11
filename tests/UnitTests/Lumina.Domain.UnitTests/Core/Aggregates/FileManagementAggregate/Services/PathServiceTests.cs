@@ -125,6 +125,38 @@ public class PathServiceTests
     }
 
     [Fact]
+    public void Exists_WhenPathIsHiddenAndIncludeHiddenElementsIsTrue_ShouldReturnTrue()
+    {
+        // Arrange
+        string existingPath = @"C:\ExistingPath";
+        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(existingPath);
+        _mockPathStrategy.Exists(pathId, true).Returns(true);
+
+        // Act
+        bool result = _sut.Exists(existingPath, true);
+
+        // Assert
+        result.Should().BeTrue();
+        _mockPathStrategy.Received(1).Exists(Arg.Is<FileSystemPathId>(id => id.Path == existingPath));
+    }
+
+    [Fact]
+    public void Exists_WhenPathIsHiddenAndIncludeHiddenElementsIsFalse_ShouldReturnFalse()
+    {
+        // Arrange
+        string existingPath = @"C:\ExistingPath";
+        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(existingPath);
+        _mockPathStrategy.Exists(pathId, false).Returns(false);
+
+        // Act
+        bool result = _sut.Exists(existingPath, false);
+
+        // Assert
+        result.Should().BeFalse();
+        _mockPathStrategy.Received(1).Exists(Arg.Is<FileSystemPathId>(id => id.Path == existingPath), false);
+    }
+
+    [Fact]
     public void Exists_WithValidNonExistingPath_ShouldReturnFalse()
     {
         // Arrange

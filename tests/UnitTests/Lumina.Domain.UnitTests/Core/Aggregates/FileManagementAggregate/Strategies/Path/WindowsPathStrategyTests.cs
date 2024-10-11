@@ -156,18 +156,39 @@ public class WindowsPathStrategyTests
     }
 
     [Fact]
-    public void Exists_WhenPathExists_ShouldReturnTrue()
+    public void Exists_WhenPathExistsAndIsHiddenAndIncludeHiddenElementsIsTrue_ShouldReturnTrue()
     {
         // Arrange
         string existingPath = @"C:\Users\User\existing_file.txt";
         FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(existingPath);
         _mockFileSystem.Path.Exists(existingPath).Returns(true);
+        _mockFileSystem.File.Exists(existingPath).Returns(true);
 
         // Act
-        bool result = _sut.Exists(pathId);
+        bool result = _sut.Exists(pathId, true);
 
         // Assert
         result.Should().BeTrue();
+        _mockFileSystem.Path.Received(1).Exists(existingPath);
+    }
+
+    [Fact]
+    public void Exists_WhenPathExistsAndIsHiddenAndIncludeHiddenElementsIsFalse_ShouldReturnFalse()
+    {
+        // Arrange
+        string existingPath = @"C:\Users\User\existing_file.txt";
+        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(existingPath);
+        _mockFileSystem.Path.Exists(existingPath).Returns(true);
+        _mockFileSystem.File.Exists(existingPath).Returns(true);
+        IFileInfo mockFileInfo = Substitute.For<IFileInfo>();
+        mockFileInfo.Attributes.Returns(System.IO.FileAttributes.Hidden);
+        _mockFileSystem.FileInfo.New(Arg.Any<string>()).Returns(mockFileInfo);
+
+        // Act
+        bool result = _sut.Exists(pathId, false);
+
+        // Assert
+        result.Should().BeFalse();
         _mockFileSystem.Path.Received(1).Exists(existingPath);
     }
 
@@ -210,9 +231,10 @@ public class WindowsPathStrategyTests
         string directoryPath = @"C:\Users\User\Documents\";
         FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(directoryPath);
         _mockFileSystem.Path.Exists(directoryPath).Returns(true);
+        _mockFileSystem.Directory.Exists(directoryPath).Returns(true);
 
         // Act
-        bool result = _sut.Exists(pathId);
+        bool result = _sut.Exists(pathId, true);
 
         // Assert
         result.Should().BeTrue();
@@ -226,9 +248,10 @@ public class WindowsPathStrategyTests
         string filePath = @"C:\Users\User\Documents\file.txt";
         FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(filePath);
         _mockFileSystem.Path.Exists(filePath).Returns(true);
+        _mockFileSystem.File.Exists(filePath).Returns(true);
 
         // Act
-        bool result = _sut.Exists(pathId);
+        bool result = _sut.Exists(pathId, true);
 
         // Assert
         result.Should().BeTrue();
@@ -244,7 +267,7 @@ public class WindowsPathStrategyTests
         _mockFileSystem.Path.Exists(uncPath).Returns(true);
 
         // Act
-        bool result = _sut.Exists(pathId);
+        bool result = _sut.Exists(pathId, true);
 
         // Assert
         result.Should().BeTrue();

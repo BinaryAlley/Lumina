@@ -53,13 +53,14 @@ public class PathService : IPathService
     /// Checks if <paramref name="path"/> exists.
     /// </summary>
     /// <param name="path">The path to be checked.</param>
+    /// <param name="includeHiddenElements">Whether to include hidden file system elements or not.</param>
     /// <returns><see langword="true"/> if <paramref name="path"/> exists, <see langword="false"/> otherwise.</returns>
-    public bool Exists(string path)
+    public bool Exists(string path, bool includeHiddenElements = true)
     {
         ErrorOr<FileSystemPathId> newPathResult = FileSystemPathId.Create(path);
         if (newPathResult.IsError)
             return false;
-        return _platformContext.PathStrategy.Exists(newPathResult.Value);
+        return _platformContext.PathStrategy.Exists(newPathResult.Value, includeHiddenElements);
     }
 
     /// <summary>

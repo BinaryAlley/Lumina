@@ -634,7 +634,7 @@ public class PathControllerTests
             .Returns(expectedResponse);
 
         // Act
-        IActionResult result = await _sut.CheckPathExists(path, cancellationToken);
+        IActionResult result = await _sut.CheckPathExists(path, true, cancellationToken);
 
         // Assert
         OkObjectResult okResult = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -652,7 +652,7 @@ public class PathControllerTests
             .Returns(new PathExistsResponse(true));
 
         // Act
-        await _sut.CheckPathExists(path, cancellationToken);
+        await _sut.CheckPathExists(path, true, cancellationToken);
 
         // Assert
         await _mockMediator.Received(1).Send(Arg.Is<CheckPathExistsQuery>(q => q.Path == path), Arg.Is(cancellationToken));
@@ -674,7 +674,7 @@ public class PathControllerTests
 
         // Act & Assert
         cts.CancelAfter(50);
-        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => _sut.CheckPathExists(path, cts.Token));
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => _sut.CheckPathExists(path, true, cts.Token));
     }
     #endregion
 }

@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.ValueObjects;
 using System.Collections.Generic;
@@ -30,8 +30,9 @@ public interface IPathService
     /// Checks if <paramref name="path"/> exists.
     /// </summary>
     /// <param name="path">The path to be checked.</param>
+    /// <param name="includeHiddenElements">Whether to include hidden file system elements or not.</param>
     /// <returns><see langword="true"/> if <paramref name="path"/> exists, <see langword="false"/> otherwise.</returns>
-    bool Exists(string path);
+    bool Exists(string path, bool includeHiddenElements = true);
 
     /// <summary>
     /// Tries to combine <paramref name="path"/> with <paramref name="name"/>.

@@ -94,11 +94,12 @@ public class PathController : Controller
     /// Checks whether <paramref name="path"/> exists or not.
     /// </summary>
     /// <param name="path">The path to be checked.</param>
+    /// <param name="includeHiddenElements">Whether to include hidden file system elements or not.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     [HttpGet("check-path-exists")]
-    public async Task<IActionResult> CheckPathExists([FromQuery] string path, CancellationToken cancellationToken)
+    public async Task<IActionResult> CheckPathExists([FromQuery] string path, [FromQuery] bool includeHiddenElements, CancellationToken cancellationToken)
     {
-        PathExistsModel response = await _apiHttpClient.GetAsync<PathExistsModel>($"path/check-path-exists?path={Uri.EscapeDataString(path)}", cancellationToken: cancellationToken);
+        PathExistsModel response = await _apiHttpClient.GetAsync<PathExistsModel>($"path/check-path-exists?path={Uri.EscapeDataString(path)}&includeHiddenElements={includeHiddenElements}", cancellationToken: cancellationToken);
         return Json(new { success = true, data = new { exists = response.Exists } });
     }
     #endregion

@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.Responses.FileManagement;
 using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Services;
 using Mediator;
@@ -39,7 +39,7 @@ public class CheckPathExistsQueryHandler : IRequestHandler<CheckPathExistsQuery,
     /// </returns>
     public ValueTask<PathExistsResponse> Handle(CheckPathExistsQuery request, CancellationToken cancellationToken)
     {
-        return ValueTask.FromResult(new PathExistsResponse(_pathService.Exists(request.Path)));
+        return ValueTask.FromResult(new PathExistsResponse(_pathService.Exists(request.Path, request.IncludeHiddenElements)));
     }
     #endregion
 }

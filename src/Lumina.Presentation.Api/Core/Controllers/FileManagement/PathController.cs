@@ -118,11 +118,12 @@ public class PathController : ApiController
     /// Checks whether <paramref name="path"/> exists or not.
     /// </summary>
     /// <param name="path">The path to be checked.</param>
+    /// <param name="includeHiddenElements">Whether to include hidden file system elements or not.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     [HttpGet("check-path-exists")]
-    public async Task<IActionResult> CheckPathExists([FromQuery, ModelBinder(typeof(UrlStringBinder))] string path, CancellationToken cancellationToken)
+    public async Task<IActionResult> CheckPathExists([FromQuery, ModelBinder(typeof(UrlStringBinder))] string path, [FromQuery] bool includeHiddenElements, CancellationToken cancellationToken)
     {
-        PathExistsResponse result = await _mediator.Send(new CheckPathExistsQuery(path), cancellationToken).ConfigureAwait(false);
+        PathExistsResponse result = await _mediator.Send(new CheckPathExistsQuery(path, includeHiddenElements), cancellationToken).ConfigureAwait(false);
         return Ok(result);
     }
     #endregion
