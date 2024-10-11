@@ -8,6 +8,7 @@ using Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate.E
 using Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate.ValueObjects;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -18,6 +19,7 @@ namespace Lumina.Presentation.Api.IntegrationTests.Common.Converters;
 /// <summary>
 /// Custom JSON converter for the <see cref="Book"/> class.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class BookJsonConverter : JsonConverter<Book>
 {
     #region ===================================================================== METHODS ===================================================================================

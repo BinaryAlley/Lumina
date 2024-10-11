@@ -1,24 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using AutoFixture;
-using AutoFixture.AutoNSubstitute;
-using ErrorOr;
 using FluentAssertions;
-using Lumina.Application.Core.FileManagement.Directories.Queries.GetDirectories;
-using Lumina.Application.Core.FileManagement.Directories.Queries.GetDirectoryTree;
-using Lumina.Application.Core.FileManagement.Directories.Queries.GetTreeDirectories;
 using Lumina.Application.Core.FileManagement.FileSystem.Queries.GetFileSystem;
 using Lumina.Contracts.Enums.FileSystem;
 using Lumina.Contracts.Responses.FileManagement;
-using Lumina.Domain.Common.Errors;
 using Lumina.Presentation.Api.Core.Controllers.FileManagement;
-using Lumina.Presentation.Api.UnitTests.Core.Controllers.FileManagement.Fixtures;
 using Mediator;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -53,7 +43,7 @@ public class FileSystemControllerTests
     {
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;
-        FileSystemTypeResponse expectedResponse = new FileSystemTypeResponse(PlatformType.Windows);
+        FileSystemTypeResponse expectedResponse = new(PlatformType.Windows);
         _mockMediator.Send(Arg.Any<GetFileSystemQuery>(), Arg.Any<CancellationToken>())
             .Returns(expectedResponse);
 
@@ -73,7 +63,7 @@ public class FileSystemControllerTests
     {
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;
-        FileSystemTypeResponse expectedResponse = new FileSystemTypeResponse(platformType);
+        FileSystemTypeResponse expectedResponse = new(platformType);
         _mockMediator.Send(Arg.Any<GetFileSystemQuery>(), Arg.Any<CancellationToken>())
             .Returns(expectedResponse);
 

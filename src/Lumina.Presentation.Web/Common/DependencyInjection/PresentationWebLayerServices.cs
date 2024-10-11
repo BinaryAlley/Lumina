@@ -32,7 +32,12 @@ public static class PresentationWebLayerServices
     public static IServiceCollection AddPresentationWebLayerServices(this IServiceCollection services)
     {
         services.AddControllersWithViews(options => options.Filters.Add(typeof(ApiExceptionFilter)))
-            .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+            .AddJsonOptions(options => 
+            {
+                options.JsonSerializerOptions.MaxDepth = 256;
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; // needed because file system API responses can have very nested structures
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
 
         // scan the current assembly for validators and register them to the DI container
         services.AddValidatorsFromAssemblyContaining<Program>(ServiceLifetime.Singleton);
