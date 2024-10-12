@@ -10,7 +10,6 @@ namespace Lumina.Infrastructure.Common.Validators;
 /// </summary>
 public class DatabaseSettingsModelValidator : AbstractValidator<DatabaseSettingsModel>
 {
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="DatabaseSettingsModelValidator"/> class.
     /// </summary>
@@ -18,5 +17,4 @@ public class DatabaseSettingsModelValidator : AbstractValidator<DatabaseSettings
     {
         RuleFor(x => x.DefaultConnection).NotEmpty().WithMessage(Errors.Errors.Configuration.DatabaseConnectionStringCannotBeEmpty.Code);
     }
-    #endregion
 }

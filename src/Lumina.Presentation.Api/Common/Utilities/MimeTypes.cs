@@ -11,7 +11,6 @@ namespace Lumina.Presentation.Api.Common.Utilities;
 /// </summary>
 public static class MimeTypes
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private static readonly FrozenDictionary<ImageType, string> s_imageTypeToMimeType = new Dictionary<ImageType, string>
     {
         { ImageType.BMP, "image/bmp" },
@@ -30,9 +29,7 @@ public static class MimeTypes
         { ImageType.TGA, "image/x-tga" },
         { ImageType.SVG, "image/svg+xml" }
     }.ToFrozenDictionary();
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Gets the mime type of <paramref name="type"/>.
     /// </summary>
@@ -42,5 +39,4 @@ public static class MimeTypes
     {
         return s_imageTypeToMimeType.TryGetValue(type, out string? mimeType) ? mimeType : "application/octet-stream";
     }
-    #endregion
 }

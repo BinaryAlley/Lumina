@@ -11,7 +11,6 @@ namespace Lumina.Application.Common.Mapping.FileManagement;
 /// </summary>
 public class FileMappingConfig : IRegister
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Registers the mapping configuration.
     /// </summary>
@@ -35,5 +34,4 @@ public class FileMappingConfig : IRegister
                 src.Size
             ));
     }
-    #endregion
 }

@@ -9,7 +9,6 @@ namespace Lumina.Contracts.Models.Common;
 /// </summary>
 public interface IStorageEntity
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets or sets the identifier of the entity.
     /// </summary>
@@ -24,5 +23,4 @@ public interface IStorageEntity
     /// The time and date when the entity was updated.
     /// </summary>
     DateTime? Updated { get; set; }
-    #endregion
 }

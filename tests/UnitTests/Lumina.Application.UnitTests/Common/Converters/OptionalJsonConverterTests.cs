@@ -14,11 +14,8 @@ namespace Lumina.Application.UnitTests.Common.Converters;
 [ExcludeFromCodeCoverage]
 public class OptionalJsonConverterTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly JsonSerializerOptions _options;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="OptionalJsonConverterTests"/> class.
     /// </summary>
@@ -28,9 +25,7 @@ public class OptionalJsonConverterTests
         _options.Converters.Add(new OptionalJsonConverter<string>());
         _options.Converters.Add(new OptionalJsonConverter<int>());
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void Read_WhenJsonIsNull_ShouldReturnNone()
     {
@@ -138,5 +133,4 @@ public class OptionalJsonConverterTests
         // Assert
         deserialized.Should().Be(original);
     }
-    #endregion
 }

@@ -14,11 +14,8 @@ namespace Lumina.Application.UnitTests.Core.FileManagement.Pahs.Queries.CheckPat
 [ExcludeFromCodeCoverage]
 public class CheckPathExistsQueryValidatorTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly CheckPathExistsQueryValidator _validator;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="CheckPathExistsQueryValidatorTests"/> class.
     /// </summary>
@@ -26,9 +23,7 @@ public class CheckPathExistsQueryValidatorTests
     {
         _validator = new CheckPathExistsQueryValidator();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void Validate_WhenPathIsNull_ShouldHaveValidationError()
     {
@@ -87,5 +82,4 @@ public class CheckPathExistsQueryValidatorTests
         // Assert
         result.ShouldNotHaveValidationErrorFor(x => x.Path);
     }
-    #endregion
 }

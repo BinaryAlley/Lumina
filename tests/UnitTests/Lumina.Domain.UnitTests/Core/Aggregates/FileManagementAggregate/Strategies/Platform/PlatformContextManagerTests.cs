@@ -16,12 +16,9 @@ namespace Lumina.Domain.UnitTests.Core.Aggregates.FileManagementAggregate.Strate
 [ExcludeFromCodeCoverage]
 public class PlatformContextManagerTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IPlatformContextFactory _mockPlatformContextFactory;
     private PlatformContextManager? sut;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="PlatformContextManagerTests"/> class.
     /// </summary>
@@ -29,9 +26,7 @@ public class PlatformContextManagerTests
     {
         _mockPlatformContextFactory = Substitute.For<IPlatformContextFactory>();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void GetCurrentContext_WhenNoContextSet_ShouldSetDefaultContext()
     {
@@ -155,5 +150,4 @@ public class PlatformContextManagerTests
         result.Should().Be(mockWindowsContext);
         _mockPlatformContextFactory.Received(1).CreateStrategy<IWindowsPlatformContext>();
     }
-    #endregion
 }

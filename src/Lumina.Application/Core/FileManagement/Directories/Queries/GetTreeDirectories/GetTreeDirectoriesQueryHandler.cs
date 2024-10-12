@@ -18,12 +18,9 @@ namespace Lumina.Application.Core.FileManagement.Directories.Queries.GetTreeDire
 /// </summary>
 public class GetTreeDirectoriesQueryHandler : IRequestHandler<GetTreeDirectoriesQuery, ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>>
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IDirectoryService _directoryService;
     private readonly IMapper _mapper;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="GetTreeDirectoriesQueryHandler"/> class.
     /// </summary>
@@ -34,9 +31,7 @@ public class GetTreeDirectoriesQueryHandler : IRequestHandler<GetTreeDirectories
         _directoryService = directoryService;
         _mapper = mapper;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Gets the list of directories at the specified path.
     /// </summary>
@@ -50,5 +45,4 @@ public class GetTreeDirectoriesQueryHandler : IRequestHandler<GetTreeDirectories
         ErrorOr<IEnumerable<Directory>> result = _directoryService.GetSubdirectories(request.Path, request.IncludeHiddenElements);
         return ValueTask.FromResult(result.Match(values => ErrorOrFactory.From(_mapper.Map<IEnumerable<FileSystemTreeNodeResponse>>(values)), errors => errors));
     }
-    #endregion
 }

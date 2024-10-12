@@ -19,11 +19,8 @@ namespace Lumina.Application.UnitTests.Core.FileManagement.Directories.Fixtures;
 [ExcludeFromCodeCoverage]
 public class DirectoryFixture
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly Faker _faker;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="DirectoryFixture"/> class.
     /// </summary>
@@ -31,9 +28,7 @@ public class DirectoryFixture
     {
         _faker = new Faker();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a random valid <see cref="Directory"/>.
     /// </summary>
@@ -112,5 +107,4 @@ public class DirectoryFixture
         }
         return CreateDirectory(childItems: childItems);
     }
-    #endregion
 }

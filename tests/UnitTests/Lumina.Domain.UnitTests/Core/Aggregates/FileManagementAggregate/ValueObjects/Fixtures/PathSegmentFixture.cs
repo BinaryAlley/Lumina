@@ -16,11 +16,8 @@ namespace Lumina.Domain.UnitTests.Core.Aggregates.FileManagementAggregate.ValueO
 [ExcludeFromCodeCoverage]
 public class PathSegmentFixture
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly Faker _faker;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="PathSegmentFixture"/> class.
     /// </summary>
@@ -28,9 +25,7 @@ public class PathSegmentFixture
     {
         _faker = new Faker();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a random valid <see cref="PathSegment"/>.
     /// </summary>
@@ -60,5 +55,4 @@ public class PathSegmentFixture
     {
         return Enumerable.Range(0, count).Select(_ => CreatePathSegment()).ToList();
     }
-    #endregion
 }

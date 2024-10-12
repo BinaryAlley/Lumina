@@ -20,7 +20,6 @@ namespace Lumina.Domain.UnitTests.Core.Aggregates.FileManagementAggregate.Servic
 public class ImageTypeFixture : TheoryData<ImageType, byte[]>
 {
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="ImageTypeFixture"/> class.
     /// </summary>
@@ -31,9 +30,7 @@ public class ImageTypeFixture : TheoryData<ImageType, byte[]>
         Add(ImageType.BMP, CreateImage(new BmpEncoder()));
         Add(ImageType.GIF, CreateImage(new GifEncoder()));
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a byte array representing a thumbnail fixture.
     /// </summary>
@@ -46,5 +43,4 @@ public class ImageTypeFixture : TheoryData<ImageType, byte[]>
         image.Save(ms, encoder);
         return ms.ToArray();
     }
-    #endregion
 }

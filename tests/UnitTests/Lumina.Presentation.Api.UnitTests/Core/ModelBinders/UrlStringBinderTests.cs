@@ -17,11 +17,8 @@ namespace Lumina.Presentation.Api.UnitTests.Core.ModelBinders;
 [ExcludeFromCodeCoverage]
 public class UrlStringBinderTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly UrlStringBinder _sut;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="UrlStringBinderTests"/> class.
     /// </summary>
@@ -29,9 +26,7 @@ public class UrlStringBinderTests
     {
         _sut = new UrlStringBinder();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public async Task BindModelAsync_WhenBindingContextIsNull_ShouldThrowArgumentNullException()
     {
@@ -116,5 +111,4 @@ public class UrlStringBinderTests
         // Assert
         mockBindingContext.ValueProvider.Received(1).GetValue(MODEL_NAME);
     }
-    #endregion
 }

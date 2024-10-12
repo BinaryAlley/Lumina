@@ -13,11 +13,8 @@ namespace Lumina.Application.UnitTests.Core.FileManagement.Thumbnails.Queries.Ge
 [ExcludeFromCodeCoverage]
 public class GetThumbnailQueryValidatorTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly GetThumbnailQueryValidator _validator;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="GetThumbnailQueryValidatorTests"/> class.
     /// </summary>
@@ -25,9 +22,7 @@ public class GetThumbnailQueryValidatorTests
     {
         _validator = new GetThumbnailQueryValidator();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void Validate_WhenPathIsNull_ShouldHaveValidationError()
     {
@@ -106,5 +101,4 @@ public class GetThumbnailQueryValidatorTests
         result.ShouldNotHaveValidationErrorFor(x => x.Quality);
     }
 
-    #endregion
 }

@@ -29,7 +29,6 @@ namespace Lumina.Application.UnitTests.Core.FileManagement.Pahs.Commands.SplitPa
 [ExcludeFromCodeCoverage]
 public class SplitPathCommandHandlerTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IFixture _fixture;
     private readonly IMapper _mockMapper;
     private readonly IPathService _mockPathService;
@@ -38,9 +37,7 @@ public class SplitPathCommandHandlerTests
     private readonly PathSegmentResponseFixture _pathSegmentResponseFixture;
     private readonly PathSegmentMappingConfig _pathSegmentMappingConfig;
     private readonly TypeAdapterConfig _config;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="SplitPathCommandHandlerTests"/> class.
     /// </summary>
@@ -57,9 +54,7 @@ public class SplitPathCommandHandlerTests
         _pathSegmentMappingConfig = new PathSegmentMappingConfig();
         _pathSegmentMappingConfig.Register(_config);
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public async Task Handle_WhenCalledWithValidCommand_ShouldReturnSuccessResult()
     {
@@ -126,5 +121,4 @@ public class SplitPathCommandHandlerTests
         _mockPathService.Received(1).ParsePath(command.Path);
         _mockMapper.Received(1).Map<IEnumerable<PathSegmentResponse>>(Arg.Any<IEnumerable<PathSegment>>());
     }
-    #endregion
 }

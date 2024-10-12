@@ -27,13 +27,10 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Controllers.FileManagement;
 [ExcludeFromCodeCoverage]
 public class DrivesControllerTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly ISender _mockMediator;
     private readonly DrivesController _sut;
     private readonly FileSystemTreeNodeResponseFixture _fileSystemTreeNodeResponseFixture;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="DrivesControllerTests"/> class.
     /// </summary>
@@ -43,9 +40,7 @@ public class DrivesControllerTests
         _sut = new DrivesController(_mockMediator);
         _fileSystemTreeNodeResponseFixture = new FileSystemTreeNodeResponseFixture();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public async Task GetDrives_WhenCalled_ShouldReturnOkResultWithFileSystemTreeNodeResponses()
     {
@@ -142,5 +137,4 @@ public class DrivesControllerTests
         cts.CancelAfter(50);
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() => _sut.GetDrives(cts.Token));
     }
-    #endregion
 }

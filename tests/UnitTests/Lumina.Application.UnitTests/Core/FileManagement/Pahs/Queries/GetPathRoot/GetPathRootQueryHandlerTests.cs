@@ -24,16 +24,13 @@ namespace Lumina.Application.UnitTests.Core.FileManagement.Pahs.Queries.GetPathR
 [ExcludeFromCodeCoverage]
 public class GetPathRootQueryHandlerTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IFixture _fixture;
     private readonly IMapper _mockMapper;
     private readonly IPathService _mockPathService;
     private readonly GetPathRootQueryHandler _sut;
     private readonly PathSegmentFixture _pathSegmentFixture;
     private readonly PathSegmentResponseFixture _pathSegmentResponseFixture;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="GetPathRootQueryHandlerTests"/> class.
     /// </summary>
@@ -46,9 +43,7 @@ public class GetPathRootQueryHandlerTests
         _pathSegmentFixture = new PathSegmentFixture();
         _pathSegmentResponseFixture = new PathSegmentResponseFixture();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public async Task Handle_WhenCalledWithValidQuery_ShouldReturnSuccessResult()
     {
@@ -115,5 +110,4 @@ public class GetPathRootQueryHandlerTests
         _mockPathService.Received(1).GetPathRoot(query.Path);
         _mockMapper.Received(1).Map<PathSegmentResponse>(Arg.Is<PathSegment>(p => p == rootPathSegment));
     }
-    #endregion
 }

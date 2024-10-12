@@ -16,12 +16,9 @@ namespace Lumina.Domain.Core.Aggregates.VideoLibrary.MovieLibraryAggregate;
 [DebuggerDisplay("{Id}: {Title}")]
 public sealed class Movie : Entity<MovieId>
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly List<MediaContributorId> _contributors;
     private readonly List<Rating> _ratings;
-    #endregion
 
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the video metadata of the movie.
     /// </summary>
@@ -36,9 +33,7 @@ public sealed class Movie : Entity<MovieId>
     /// Gets the list of media contributors (actors, directors, etc) starring in this movie.
     /// </summary>
     public IReadOnlyCollection<MediaContributorId> Contributors => _contributors.AsReadOnly();
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="Movie"/> class.
     /// </summary>
@@ -63,9 +58,7 @@ public sealed class Movie : Entity<MovieId>
 
     }
 #pragma warning restore CS8618
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a new instance of the <see cref="Movie"/> class.
     /// </summary>
@@ -92,5 +85,4 @@ public sealed class Movie : Entity<MovieId>
         // TODO: enforce invariants
         return new Movie(id, metadata, contributors, ratings);
     }
-    #endregion
 }

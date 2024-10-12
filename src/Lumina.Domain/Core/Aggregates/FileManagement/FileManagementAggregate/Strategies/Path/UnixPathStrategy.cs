@@ -17,15 +17,10 @@ namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.S
 /// </summary>
 public class UnixPathStrategy : IUnixPathStrategy
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IFileSystem _fileSystem;
-    #endregion
 
-    #region ==================================================================== PROPERTIES =================================================================================
     public char PathSeparator => '/';
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="UnixPathStrategy"/> class.
     /// </summary>
@@ -34,9 +29,7 @@ public class UnixPathStrategy : IUnixPathStrategy
     {
         _fileSystem = fileSystem;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Checks if <paramref name="path"/> is a valid path.
     /// </summary>
@@ -176,5 +169,4 @@ public class UnixPathStrategy : IUnixPathStrategy
             return PathSegment.Create(PathSeparator.ToString(), isDirectory: false, isDrive: true);
         return Errors.FileManagement.InvalidPath;
     }
-    #endregion
 }

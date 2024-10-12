@@ -30,7 +30,6 @@ namespace Lumina.Domain.UnitTests.Core.Aggregates.FileManagementAggregate.Servic
 [ExcludeFromCodeCoverage]
 public class DirectoryProviderServiceTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IFixture _fixture;
     private readonly IFileSystem _mockFileSystem;
     private readonly IFileSystemPermissionsService _mockFileSystemPermissionsService;
@@ -59,9 +58,7 @@ public class DirectoryProviderServiceTests
     private readonly string _pathValid2 = s_isLinux ? "/Valid/" : @"C:\Valid\";
     private readonly string _pathInvalid2 = s_isLinux ? "/Invalid/" : @"C:\Invalid\";
     private readonly char _dirSeparator = s_isLinux ? '/' : '\\';
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="DirectoryProviderServiceTests"/> class.
     /// </summary>
@@ -73,9 +70,7 @@ public class DirectoryProviderServiceTests
         _sut = new DirectoryProviderService(_mockFileSystem, _mockFileSystemPermissionsService);
         _fileSystemPathIdFixture = new();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void GetSubdirectoryPaths_WhenUserHasNoAccess_ShouldReturnUnauthorizedAccessError()
     {
@@ -1008,5 +1003,4 @@ public class DirectoryProviderServiceTests
         result.FirstError.Should().Be(Errors.Permission.UnauthorizedAccess);
         _mockFileSystem.DirectoryInfo.DidNotReceive().New(Arg.Any<string>());
     }
-    #endregion
 }

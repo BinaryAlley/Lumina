@@ -26,13 +26,10 @@ namespace Lumina.Domain.UnitTests.Core.Aggregates.FileManagementAggregate.Servic
 [ExcludeFromCodeCoverage]
 public class ThumbnailServiceTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IEnvironmentContext _mockEnvironmentContext;
     private readonly ThumbnailService _sut;
     private readonly FileSystemPathIdFixture _fileSystemPathIdFixture;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="ThumbnailServiceTests"/> class.
     /// </summary>
@@ -42,9 +39,7 @@ public class ThumbnailServiceTests
         _sut = new ThumbnailService(_mockEnvironmentContext);
         _fileSystemPathIdFixture = new FileSystemPathIdFixture();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public async Task GetThumbnailAsync_WithValidPath_ShouldReturnThumbnail()
     {
@@ -191,5 +186,4 @@ public class ThumbnailServiceTests
         await Assert.ThrowsAsync<TaskCanceledException>(() =>
             _sut.GetThumbnailAsync(pathId, quality, cts.Token));
     }
-    #endregion
 }

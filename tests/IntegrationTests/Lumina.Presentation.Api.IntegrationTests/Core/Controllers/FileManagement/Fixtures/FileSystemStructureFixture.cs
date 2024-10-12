@@ -13,12 +13,9 @@ namespace Lumina.Presentation.Api.IntegrationTests.Core.Controllers.FileManageme
 [ExcludeFromCodeCoverage]
 public class FileSystemStructureFixture
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly string _rootPath;
     private readonly Faker _faker = new();
-    #endregion
 
-    #region ===================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="FileSystemStructureFixture"/> class.
     /// </summary>
@@ -26,9 +23,7 @@ public class FileSystemStructureFixture
     {
         _rootPath = Path.Combine(AppContext.BaseDirectory, "TestFileSystemStructure_" + Guid.NewGuid());
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
 
     /// <summary>
     /// Creates a file system structure with three nested directories, each containing two text files.
@@ -93,5 +88,4 @@ public class FileSystemStructureFixture
         if (Directory.Exists(_rootPath))
             Directory.Delete(_rootPath, recursive: true);
     }
-    #endregion
 }

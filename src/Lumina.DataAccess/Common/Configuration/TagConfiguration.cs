@@ -11,7 +11,6 @@ namespace Lumina.DataAccess.Common.Configuration;
 /// </summary>
 public class TagConfiguration : IEntityTypeConfiguration<TagModel>
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Configures the <see cref="TagModel"/> entity.
     /// </summary>
@@ -22,5 +21,4 @@ public class TagConfiguration : IEntityTypeConfiguration<TagModel>
         builder.HasKey(tag => tag.Name);
         builder.Property(tag => tag.Name).IsRequired().HasMaxLength(50);
     }
-    #endregion
 }

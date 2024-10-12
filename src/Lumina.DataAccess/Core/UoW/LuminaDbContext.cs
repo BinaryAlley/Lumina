@@ -18,11 +18,8 @@ namespace Lumina.DataAccess.Core.UoW;
 /// <remarks>To update the database: update-database -p Lumina.DataAccess -s Lumina.Presentation.Api</remarks>
 public class LuminaDbContext : DbContext
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     public virtual DbSet<BookModel> Books { get; set; } = null!;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="LuminaDbContext"/> class.
     /// </summary>
@@ -30,9 +27,7 @@ public class LuminaDbContext : DbContext
     public LuminaDbContext(DbContextOptions<LuminaDbContext> options) : base(options)
     {
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Configures the entity mappings for the database context.
     /// </summary>
@@ -67,5 +62,4 @@ public class LuminaDbContext : DbContext
         }
         return base.SaveChanges();
     }
-    #endregion
 }

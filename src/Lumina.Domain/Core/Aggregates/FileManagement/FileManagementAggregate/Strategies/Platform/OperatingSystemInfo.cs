@@ -11,7 +11,6 @@ namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.S
 [ExcludeFromCodeCoverage]
 internal class OperatingSystemInfo : IOperatingSystemInfo
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Determines if the current Operating System plaform is <paramref name="platform"/>.
     /// </summary>
@@ -21,5 +20,4 @@ internal class OperatingSystemInfo : IOperatingSystemInfo
     {
         return RuntimeInformation.IsOSPlatform(platform);
     }
-    #endregion
 }

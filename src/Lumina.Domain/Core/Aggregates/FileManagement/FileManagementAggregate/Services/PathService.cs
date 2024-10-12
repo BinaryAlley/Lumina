@@ -13,18 +13,13 @@ namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.S
 /// </summary>
 public class PathService : IPathService
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IPlatformContext _platformContext;
-    #endregion
 
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the character used to separate path segments.
     /// </summary>
     public char PathSeparator => _platformContext.PathStrategy.PathSeparator;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="PathService"/> class.
     /// </summary>
@@ -33,9 +28,7 @@ public class PathService : IPathService
     {
         _platformContext = platformContextManager.GetCurrentContext();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Checks if <paramref name="path"/> is a valid path.
     /// </summary>
@@ -129,5 +122,4 @@ public class PathService : IPathService
             return newPathResult.Errors;
         return _platformContext.PathStrategy.GetPathRoot(newPathResult.Value);
     }
-    #endregion
 }

@@ -12,7 +12,6 @@ namespace Lumina.Domain.Common.ValueObjects.Metadata;
 [DebuggerDisplay("{Value}/{MaxValue}")]
 public abstract class Rating : ValueObject
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the numeric value of the rating.
     /// </summary>
@@ -27,9 +26,7 @@ public abstract class Rating : ValueObject
     /// Gets the optional number of votes or reviews this rating is based on.
     /// </summary>
     public Optional<int> VoteCount { get; private set; }
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="Rating"/> class.
     /// </summary>
@@ -42,9 +39,7 @@ public abstract class Rating : ValueObject
         MaxValue = maxValue;
         VoteCount = voteCount;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Returns the rating as a percentage.
     /// </summary>
@@ -53,5 +48,4 @@ public abstract class Rating : ValueObject
     {
         return Value / MaxValue * 100;
     }
-    #endregion
 }

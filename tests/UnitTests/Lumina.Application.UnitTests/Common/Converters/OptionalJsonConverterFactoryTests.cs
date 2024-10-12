@@ -18,11 +18,8 @@ namespace Lumina.Application.UnitTests.Common.Converters;
 [ExcludeFromCodeCoverage]
 public class OptionalJsonConverterFactoryTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly OptionalJsonConverterFactory _factory;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="OptionalJsonConverterFactoryTests"/> class.
     /// </summary>
@@ -30,9 +27,7 @@ public class OptionalJsonConverterFactoryTests
     {
         _factory = new OptionalJsonConverterFactory();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void CanConvert_WhenTypeIsOptional_ShouldReturnTrue()
     {
@@ -113,5 +108,4 @@ public class OptionalJsonConverterFactoryTests
         // Assert
         converter.Should().BeOfType<OptionalJsonConverter<OptionalJsonConverterFactoryFixture>>();
     }
-    #endregion
 }

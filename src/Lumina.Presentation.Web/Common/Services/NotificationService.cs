@@ -11,11 +11,8 @@ namespace Lumina.Presentation.Web.Common.Services;
 /// </summary>
 public class NotificationService : INotificationService
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     public event Action<NotificationModel>? OnNotification;
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Shows a notification.
     /// </summary>
@@ -25,5 +22,4 @@ public class NotificationService : INotificationService
     {
         OnNotification?.Invoke(new NotificationModel { Message = message, Type = type, Id = Guid.NewGuid() });
     }
-    #endregion
 }

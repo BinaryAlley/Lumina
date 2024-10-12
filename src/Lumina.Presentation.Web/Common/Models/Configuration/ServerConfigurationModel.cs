@@ -10,11 +10,8 @@ namespace Lumina.Presentation.Web.Common.Models.Configuration;
 [DebuggerDisplay("{SECTION_NAME}")]
 public class ServerConfigurationModel
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     public const string SECTION_NAME = "ServerConfiguration";
-    #endregion
 
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets or sets the remote API server path.
     /// </summary>
@@ -29,5 +26,4 @@ public class ServerConfigurationModel
     /// Gets or sets the remote API server port.
     /// </summary>
     public required ushort Port { get; init; }
-    #endregion
 }

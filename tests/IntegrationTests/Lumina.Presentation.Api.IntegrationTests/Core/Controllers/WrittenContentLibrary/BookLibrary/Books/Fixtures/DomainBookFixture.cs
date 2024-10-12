@@ -21,11 +21,8 @@ namespace Lumina.Presentation.Api.IntegrationTests.Core.Controllers.Books.Fixtur
 [ExcludeFromCodeCoverage]
 public class DomainBookFixture
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly Fixture _fixture;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="DomainBookFixture"/> class.
     /// </summary>
@@ -36,9 +33,7 @@ public class DomainBookFixture
         _fixture.Customizations.Add(new NullableDateOnlySpecimenBuilder());
         ConfigureCustomDomainTypes();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     public Book CreateDomainBook()
     {
         return Book.Create(
@@ -109,5 +104,4 @@ public class DomainBookFixture
             _fixture.Create<Optional<int>>()
         ).Value);
     }
-    #endregion
 }

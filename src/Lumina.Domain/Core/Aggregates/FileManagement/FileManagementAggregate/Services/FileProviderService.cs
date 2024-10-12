@@ -18,12 +18,9 @@ namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.S
 /// </summary>
 internal class FileProviderService : IFileProviderService
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IFileSystem _fileSystem;
     private readonly IFileSystemPermissionsService _fileSystemPermissionsService;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="FileProviderService"/> class.
     /// </summary>
@@ -34,9 +31,7 @@ internal class FileProviderService : IFileProviderService
         _fileSystem = fileSystem;
         _fileSystemPermissionsService = fileSystemPermissionsService;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Retrieves a list of file paths at the specified path.
     /// </summary>
@@ -284,5 +279,4 @@ internal class FileProviderService : IFileProviderService
         _fileSystem.File.Delete(path.Path);
         return Result.Deleted;
     }
-    #endregion
 }

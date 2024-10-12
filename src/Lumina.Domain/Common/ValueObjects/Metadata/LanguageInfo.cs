@@ -14,7 +14,6 @@ namespace Lumina.Domain.Common.ValueObjects.Metadata;
 [DebuggerDisplay("{LanguageCode}")]
 public class LanguageInfo : ValueObject
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the ISO 639-1 two-letter language code.
     /// </summary>
@@ -29,9 +28,7 @@ public class LanguageInfo : ValueObject
     /// Gets an optional native name of the language.
     /// </summary>
     public Optional<string> NativeName { get; private set; }
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="LanguageInfo"/> class.
     /// </summary>
@@ -44,9 +41,7 @@ public class LanguageInfo : ValueObject
         LanguageName = languageName;
         NativeName = nativeName;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a new instance of the <see cref="LanguageInfo"/> class.
     /// </summary>
@@ -83,5 +78,4 @@ public class LanguageInfo : ValueObject
     {
         return $"{LanguageCode} - {LanguageName}";
     }
-    #endregion
 }

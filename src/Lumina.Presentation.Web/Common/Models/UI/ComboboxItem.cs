@@ -11,7 +11,6 @@ namespace Lumina.Presentation.Web.Common.Models.UI;
 [DebuggerDisplay("{Text}")]
 public class ComboboxItem<TValue>
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets or sets the text of the item, that is visible to the user.
     /// </summary>
@@ -26,5 +25,4 @@ public class ComboboxItem<TValue>
     /// Gets or sets the property indicating whether this element can be selected or not.
     /// </summary>
     public bool IsEnabled { get; set; } = true;
-    #endregion
 }

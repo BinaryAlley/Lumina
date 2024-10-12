@@ -21,13 +21,10 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Controllers.Common;
 [ExcludeFromCodeCoverage]
 public class ApiControllerTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly ApiControllerFixture _sut;
     private readonly HttpContext _mockHttpContext;
     private readonly ProblemDetailsFactory _mockProblemDetailsFactory;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="ApiControllerTests"/> class.
     /// </summary>
@@ -42,9 +39,7 @@ public class ApiControllerTests
         };
         _sut.ProblemDetailsFactory = _mockProblemDetailsFactory;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void Problem_WhenCalledWithNoErrors_ShouldReturnGenericProblem()
     {
@@ -280,5 +275,4 @@ public class ApiControllerTests
         validationProblem.Errors["Code1"].Should().Contain("Description1");
         validationProblem.Errors["Code2"].Should().Contain("Description2");
     }
-    #endregion
 }

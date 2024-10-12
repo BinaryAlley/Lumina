@@ -11,7 +11,6 @@ public static partial class Errors
 {
     public static class Metadata
     {
-        #region ==================================================================== PROPERTIES =================================================================================
         public static Error MetadataCannotBeNull => Error.Validation(nameof(MetadataCannotBeNull));
         public static Error TitleCannotBeEmpty => Error.Validation(nameof(TitleCannotBeEmpty));
         public static Error TitleMustBeMaximum255CharactersLong => Error.Validation(nameof(TitleMustBeMaximum255CharactersLong));
@@ -43,6 +42,5 @@ public static partial class Errors
         public static Error RatingVoteCountMustBePositive => Error.Validation(nameof(RatingVoteCountMustBePositive));
         public static Error RatingsListCannotBeNull => Error.Validation(nameof(RatingsListCannotBeNull));
         public static Error InvalidIsoCode => Error.Validation(nameof(InvalidIsoCode));
-        #endregion
     }
 }

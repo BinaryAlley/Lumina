@@ -10,7 +10,6 @@ namespace Lumina.Application.Core.FileManagement.Files.Queries.GetTreeFiles;
 /// </summary>
 public class GetTreeFilesQueryValidator : AbstractValidator<GetTreeFilesQuery>
 {
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="GetTreeFilesQueryValidator"/> class.
     /// </summary>
@@ -18,5 +17,4 @@ public class GetTreeFilesQueryValidator : AbstractValidator<GetTreeFilesQuery>
     {
         RuleFor(x => x.Path).NotEmpty().WithMessage(Errors.FileManagement.PathCannotBeEmpty.Code);
     }
-    #endregion
 }

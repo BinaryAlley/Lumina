@@ -12,7 +12,6 @@ namespace Lumina.Application.UnitTests.Core.FileManagement.Pahs.Commands.SplitPa
 [ExcludeFromCodeCoverage]
 public class SplitPathCommandFixture
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a random valid command for splitting paths.
     /// </summary>
@@ -25,5 +24,4 @@ public class SplitPathCommandFixture
             ))
             .RuleFor(x => x.Path, f => f.System.FilePath());
     }
-    #endregion
 }

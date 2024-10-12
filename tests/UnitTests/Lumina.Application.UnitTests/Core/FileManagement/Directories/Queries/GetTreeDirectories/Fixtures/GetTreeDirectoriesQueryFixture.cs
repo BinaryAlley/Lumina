@@ -12,7 +12,6 @@ namespace Lumina.Application.UnitTests.Core.FileManagement.Directories.Queries.G
 [ExcludeFromCodeCoverage]
 public class GetTreeDirectoriesQueryFixture
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a random valid query to get tree directories.
     /// </summary>
@@ -28,5 +27,4 @@ public class GetTreeDirectoriesQueryFixture
             .RuleFor(x => x.Path, f => f.System.DirectoryPath())
             .RuleFor(x => x.IncludeHiddenElements, f => includeHiddenElements);
     }
-    #endregion
 }

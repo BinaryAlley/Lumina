@@ -10,7 +10,6 @@ namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.S
 /// </summary>
 public interface IPlatformContext
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the platform for the current platform context.
     /// </summary>
@@ -20,5 +19,4 @@ public interface IPlatformContext
     /// Gets the path strategy for the current platform context.
     /// </summary>
     IPathStrategy PathStrategy { get; }
-    #endregion
 }

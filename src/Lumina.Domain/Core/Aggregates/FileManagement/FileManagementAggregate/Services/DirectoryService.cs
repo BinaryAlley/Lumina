@@ -18,12 +18,9 @@ namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.S
 /// </summary>
 public class DirectoryService : IDirectoryService
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IPlatformContext _platformContext;
     private readonly IEnvironmentContext _environmentContext;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="DirectoryService"/> class.
     /// </summary>
@@ -34,9 +31,7 @@ public class DirectoryService : IDirectoryService
         _platformContext = platformContextManager.GetCurrentContext();
         _environmentContext = environmentContext;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Retrieves subdirectories for the specified string path.
     /// </summary>
@@ -336,5 +331,4 @@ public class DirectoryService : IDirectoryService
     {
         return _environmentContext.DirectoryProviderService.DeleteDirectory(path);
     }
-    #endregion
 }

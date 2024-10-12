@@ -12,7 +12,6 @@ namespace Lumina.Application.Common.Converters;
 /// </summary>
 public class OptionalJsonConverterFactory : JsonConverterFactory
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Determines whether the converter can convert the specified type.
     /// </summary>
@@ -36,5 +35,4 @@ public class OptionalJsonConverterFactory : JsonConverterFactory
             typeof(OptionalJsonConverter<>).MakeGenericType(valueType))!;
         return converter;
     }
-    #endregion
 }

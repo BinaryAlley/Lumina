@@ -10,7 +10,6 @@ namespace Lumina.Presentation.Web.Common.DependencyInjection;
 /// </summary>
 internal static class PresentationWebLayerConfiguration
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Extension method for registering the configuration options of the Lumina.Presentation.Web project into the Dependency Injection container.
     /// </summary>
@@ -29,6 +28,5 @@ internal static class PresentationWebLayerConfiguration
                          .ValidateOnStart();
         return serviceCollection;
     }
-    #endregion
 }
 

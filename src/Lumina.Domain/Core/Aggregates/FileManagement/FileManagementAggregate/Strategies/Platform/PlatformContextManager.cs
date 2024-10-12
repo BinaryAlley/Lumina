@@ -11,13 +11,10 @@ namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.S
 /// </summary>
 public class PlatformContextManager : IPlatformContextManager
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private IPlatformContext? _currentPlatformContext;
     private readonly IPlatformContextFactory _platformContextFactory;
     private readonly IOperatingSystemInfo _operatingSystemInfo;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="PlatformContextManager"/> class.
     /// </summary>
@@ -28,9 +25,7 @@ public class PlatformContextManager : IPlatformContextManager
         _platformContextFactory = platformContextFactory;
         _operatingSystemInfo = operatingSystemInfo;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Gets the current platform context.
     /// </summary>
@@ -63,5 +58,4 @@ public class PlatformContextManager : IPlatformContextManager
             _ => throw new ArgumentException($"Unsupported platform type: {platformType}"),
         };
     }
-    #endregion
 }

@@ -18,12 +18,9 @@ namespace Lumina.Application.UnitTests.Core.FileManagement.Pahs.Queries.GetPathS
 [ExcludeFromCodeCoverage]
 public class GetPathSeparatorQueryHandlerTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IPathService _mockPathService;
     private readonly GetPathSeparatorQueryHandler _sut;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="GetPathSeparatorQueryHandlerTests"/> class.
     /// </summary>
@@ -32,9 +29,7 @@ public class GetPathSeparatorQueryHandlerTests
         _mockPathService = Substitute.For<IPathService>();
         _sut = new GetPathSeparatorQueryHandler(_mockPathService);
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public async Task Handle_WhenCalled_ShouldReturnPathSeparatorResponse()
     {
@@ -101,5 +96,4 @@ public class GetPathSeparatorQueryHandlerTests
         // Assert
         await act.Should().NotThrowAsync();
     }
-    #endregion
 }

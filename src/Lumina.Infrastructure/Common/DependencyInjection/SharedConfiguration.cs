@@ -14,7 +14,6 @@ namespace Lumina.Infrastructure.Common.DependencyInjection;
 /// </summary>
 public static class SharedConfiguration
 {
-    #region ================================================================== METHODS ===================================================================================
     /// <summary>
     /// Extension method for registering the shared configuration to the DI container.
     /// </summary>
@@ -45,5 +44,4 @@ public static class SharedConfiguration
                 .ValidateOnStart();
         return services;
     }
-    #endregion
 }

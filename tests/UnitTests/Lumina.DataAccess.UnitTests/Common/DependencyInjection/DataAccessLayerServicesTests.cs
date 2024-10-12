@@ -23,11 +23,8 @@ namespace Lumina.DataAccess.UnitTests.Common.DependencyInjection;
 [ExcludeFromCodeCoverage]
 public class DataAccessLayerServicesTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IFixture _fixture;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="DataAccessLayerServicesTests"/> class.
     /// </summary>
@@ -35,9 +32,7 @@ public class DataAccessLayerServicesTests
     {
         _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void AddDataAccessLayerServices_WhenBasePathExists_ShouldAddServices()
     {
@@ -88,5 +83,4 @@ public class DataAccessLayerServicesTests
         IBookRepository? repository = serviceProvider.GetService<IBookRepository>();
         repository.Should().NotBeNull();
     }
-    #endregion
 }

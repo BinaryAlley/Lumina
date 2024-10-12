@@ -12,7 +12,6 @@ namespace Lumina.Domain.UnitTests.Common.Primitives;
 [ExcludeFromCodeCoverage]
 public class OptionalTests
 {
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void Some_WhenCreatingOptionalWithValue_ShouldHaveValueAndCorrectValue()
     {
@@ -133,5 +132,4 @@ public class OptionalTests
         // Assert
         result.Should().BeEmpty();
     }
-    #endregion
 }

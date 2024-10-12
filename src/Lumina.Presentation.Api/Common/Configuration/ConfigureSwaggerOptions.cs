@@ -13,11 +13,8 @@ namespace Lumina.Presentation.Api.Common.Configuration;
 /// </summary>
 public class ConfigureSwaggerOptions : IConfigureNamedOptions<SwaggerGenOptions>
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IApiVersionDescriptionProvider _provider;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="ConfigureSwaggerOptions"/> class.
     /// </summary>
@@ -26,9 +23,7 @@ public class ConfigureSwaggerOptions : IConfigureNamedOptions<SwaggerGenOptions>
     {
         _provider = provider;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Configures the Swagger options.
     /// </summary>
@@ -66,5 +61,4 @@ public class ConfigureSwaggerOptions : IConfigureNamedOptions<SwaggerGenOptions>
             info.Description += " This API version has been deprecated.";
         return info;
     }
-    #endregion
 }

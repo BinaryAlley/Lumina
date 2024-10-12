@@ -10,11 +10,8 @@ namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.S
 /// </summary>
 public class PlatformContextFactory : IPlatformContextFactory
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IServiceProvider _serviceProvider;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="PlatformContextFactory"/> class.
     /// </summary>
@@ -23,9 +20,7 @@ public class PlatformContextFactory : IPlatformContextFactory
     {
         _serviceProvider = serviceProvider;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates and returns the appropriate platform context.
     /// </summary>
@@ -35,5 +30,4 @@ public class PlatformContextFactory : IPlatformContextFactory
     {
         return _serviceProvider.GetRequiredService<TPlatformContext>() ?? throw new ArgumentException();
     }
-    #endregion
 }

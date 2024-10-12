@@ -14,7 +14,6 @@ namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.V
 [DebuggerDisplay("{Name}")]
 public class PathSegment : ValueObject
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the name of the path segment.
     /// </summary>
@@ -29,9 +28,7 @@ public class PathSegment : ValueObject
     /// Gets the value indicating if the current path segment is a file system drive or not.
     /// </summary>
     public bool IsDrive { get; }
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="PathSegment"/> class.
     /// </summary>
@@ -44,9 +41,7 @@ public class PathSegment : ValueObject
         IsDirectory = isDirectory;
         IsDrive = isDrive;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a new instance of the <see cref="PathSegment"/> class.
     /// </summary>
@@ -70,5 +65,4 @@ public class PathSegment : ValueObject
         yield return IsDirectory;
         yield return IsDrive;
     }
-    #endregion
 }

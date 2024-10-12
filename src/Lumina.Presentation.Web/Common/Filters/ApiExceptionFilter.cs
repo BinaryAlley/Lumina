@@ -21,7 +21,6 @@ namespace Lumina.Presentation.Web.Common.Filters;
 /// </summary>
 public class ApiExceptionFilter : IExceptionFilter
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Called after an action has thrown an Exception.
     /// </summary>
@@ -103,5 +102,4 @@ public class ApiExceptionFilter : IExceptionFilter
         task.Wait();  // run the task synchronously
         httpContext.Response.Cookies.Delete("Token");
     }
-    #endregion
 }

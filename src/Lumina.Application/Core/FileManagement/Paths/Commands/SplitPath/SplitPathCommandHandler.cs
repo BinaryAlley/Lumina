@@ -17,12 +17,9 @@ namespace Lumina.Application.Core.FileManagement.Paths.Commands.SplitPath;
 /// </summary>
 public class SplitPathCommandHandler : IRequestHandler<SplitPathCommand, ErrorOr<IEnumerable<PathSegmentResponse>>>
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IPathService _pathService;
     private readonly IMapper _mapper;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="SplitPathCommandHandler"/> class.
     /// </summary>
@@ -33,9 +30,7 @@ public class SplitPathCommandHandler : IRequestHandler<SplitPathCommand, ErrorOr
         _pathService = pathService;
         _mapper = mapper;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Gets the path components of the specified path.
     /// </summary>
@@ -49,5 +44,4 @@ public class SplitPathCommandHandler : IRequestHandler<SplitPathCommand, ErrorOr
         ErrorOr<IEnumerable<PathSegment>> result = _pathService.ParsePath(request.Path);
         return ValueTask.FromResult(result.Match(values => ErrorOrFactory.From(_mapper.Map<IEnumerable<PathSegmentResponse>>(values)), errors => errors));
     }
-    #endregion
 }

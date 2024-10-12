@@ -14,7 +14,6 @@ namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.S
 /// </summary>
 public interface IFileTypeService
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Determines if <paramref name="file"/> is of type image or not, and returns its type.
     /// </summary>
@@ -30,5 +29,4 @@ public interface IFileTypeService
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing the type of image or an error.</returns>
     Task<ErrorOr<ImageType>> GetImageTypeAsync(FileSystemPathId path, CancellationToken cancellationToken);
-    #endregion
 }

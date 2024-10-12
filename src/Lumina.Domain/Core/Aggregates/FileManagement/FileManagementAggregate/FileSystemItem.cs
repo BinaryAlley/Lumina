@@ -16,7 +16,6 @@ namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate;
 [DebuggerDisplay("{Name}")]
 public abstract class FileSystemItem : AggregateRoot<FileSystemPathId>
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets or sets the name of the file system item.
     /// </summary>
@@ -36,9 +35,7 @@ public abstract class FileSystemItem : AggregateRoot<FileSystemPathId>
     /// Gets or sets the tpe of the file system item.
     /// </summary>
     public FileSystemItemType Type { get; protected set; }
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="FileSystemItem"/> class.
     /// </summary>
@@ -50,9 +47,7 @@ public abstract class FileSystemItem : AggregateRoot<FileSystemPathId>
         Name = name;
         Type = fileSystemItemType;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Sets the status of the filesystem item.
     /// </summary>
@@ -77,5 +72,4 @@ public abstract class FileSystemItem : AggregateRoot<FileSystemPathId>
             return Errors.FileManagement.ParentNodeCannotBeNull;
         return Result.Updated;
     }
-    #endregion
 }

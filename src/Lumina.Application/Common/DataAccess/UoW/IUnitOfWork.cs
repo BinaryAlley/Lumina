@@ -10,7 +10,6 @@ namespace Lumina.Application.Common.DataAccess.UoW;
 /// </summary>
 public interface IUnitOfWork
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Exposes a repository of type <typeparamref name="TRepository"/> to the Business Layer.
     /// </summary>
@@ -33,5 +32,4 @@ public interface IUnitOfWork
     /// Commits a transaction.
     /// </summary>
     void CommitTransaction();
-    #endregion
 }

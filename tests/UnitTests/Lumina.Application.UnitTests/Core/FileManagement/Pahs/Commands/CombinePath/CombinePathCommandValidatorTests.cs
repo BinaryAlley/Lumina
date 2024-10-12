@@ -14,11 +14,8 @@ namespace Lumina.Application.UnitTests.Core.FileManagement.Pahs.Commands.Combine
 [ExcludeFromCodeCoverage]
 public class CombinePathCommandValidatorTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly CombinePathCommandValidator _validator;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="CombinePathCommandValidatorTests"/> class.
     /// </summary>
@@ -26,9 +23,7 @@ public class CombinePathCommandValidatorTests
     {
         _validator = new CombinePathCommandValidator();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void Validate_WhenOriginalPathIsNull_ShouldHaveValidationError()
     {
@@ -133,5 +128,4 @@ public class CombinePathCommandValidatorTests
         result.ShouldNotHaveValidationErrorFor(x => x.OriginalPath);
         result.ShouldNotHaveValidationErrorFor(x => x.NewPath);
     }
-    #endregion
 }

@@ -15,7 +15,6 @@ namespace Lumina.Domain.Core.Aggregates.VideoLibrary.MovieLibraryAggregate.Value
 [DebuggerDisplay("{Title}")]
 public class VideoMetadata : BaseMetadata
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the duration of the video in seconds.
     /// </summary>
@@ -40,9 +39,7 @@ public class VideoMetadata : BaseMetadata
     /// Gets the audio codec used.
     /// </summary>
     public Optional<string> AudioCodec { get; }
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="VideoMetadata"/> class.
     /// </summary>
@@ -81,9 +78,7 @@ public class VideoMetadata : BaseMetadata
         VideoCodec = videoCodec;
         AudioCodec = audioCodec;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a new instance of the <see cref="VideoMetadata"/> class.
     /// </summary>
@@ -133,5 +128,4 @@ public class VideoMetadata : BaseMetadata
         yield return VideoCodec;
         yield return AudioCodec;
     }
-    #endregion
 }

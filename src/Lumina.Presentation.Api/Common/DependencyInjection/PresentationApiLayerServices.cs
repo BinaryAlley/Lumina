@@ -17,7 +17,6 @@ namespace Lumina.Presentation.Api.Common.DependencyInjection;
 /// </summary>
 public static class PresentationApiLayerServices
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Registers the services of the Presentation API layer into the dependency injection container.
     /// </summary>
@@ -71,5 +70,4 @@ public static class PresentationApiLayerServices
 
         return services;
     }
-    #endregion
 }

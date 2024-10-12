@@ -10,7 +10,6 @@ namespace Lumina.Application.Core.FileManagement.Paths.Commands.CombinePath;
 /// </summary>
 public class CombinePathCommandValidator : AbstractValidator<CombinePathCommand>
 {
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="CombinePathCommandValidator"/> class.
     /// </summary>
@@ -19,5 +18,4 @@ public class CombinePathCommandValidator : AbstractValidator<CombinePathCommand>
         RuleFor(x => x.OriginalPath).NotEmpty().WithMessage(Errors.FileManagement.PathCannotBeEmpty.Code);
         RuleFor(x => x.NewPath).NotEmpty().WithMessage(Errors.FileManagement.PathCannotBeEmpty.Code);
     }
-    #endregion
 }

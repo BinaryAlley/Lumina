@@ -10,7 +10,6 @@ namespace Lumina.Presentation.Web.Common.Models.Common;
 [DebuggerDisplay("{Value}/{MaxValue}")]
 public abstract class RatingModel
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the numeric value of the rating.
     /// </summary>
@@ -25,5 +24,4 @@ public abstract class RatingModel
     /// Gets the optional number of votes or reviews this rating is based on.
     /// </summary>
     public int? VoteCount { get; set; }
-    #endregion
 }

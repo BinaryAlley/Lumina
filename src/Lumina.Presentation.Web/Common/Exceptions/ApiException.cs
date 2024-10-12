@@ -11,7 +11,6 @@ namespace Lumina.Presentation.Web.Common.Exceptions;
 /// </summary>
 public class ApiException : Exception
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets or sets the values of status codes defined for HTTP defined in RFC 2616 for HTTP 1.1.
     /// </summary>
@@ -21,9 +20,7 @@ public class ApiException : Exception
     /// Gets or sets the problem details represented by this exception.
     /// </summary>
     public ProblemDetailsModel? ProblemDetails { get; }
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="ApiException"/> class.
     /// </summary>
@@ -34,5 +31,4 @@ public class ApiException : Exception
         ProblemDetails = problemDetails;
         HttpStatusCode = httpStatusCode;
     }
-    #endregion
 }

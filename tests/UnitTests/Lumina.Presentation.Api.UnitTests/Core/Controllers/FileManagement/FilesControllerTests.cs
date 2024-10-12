@@ -27,14 +27,11 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Controllers.FileManagement;
 [ExcludeFromCodeCoverage]
 public class FilesControllerTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IFixture _fixture;
     private readonly ISender _mockMediator;
     private readonly FilesController _sut;
     private readonly FileSystemTreeNodeResponseFixture _fileSystemTreeNodeResponseFixture;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="FilesControllerTests"/> class.
     /// </summary>
@@ -45,9 +42,7 @@ public class FilesControllerTests
         _sut = new FilesController(_mockMediator);
         _fileSystemTreeNodeResponseFixture = new FileSystemTreeNodeResponseFixture();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public async Task GetTreeFiles_WhenCalled_ShouldReturnFileSystemTreeNodeResponses()
     {
@@ -167,5 +162,4 @@ public class FilesControllerTests
         List<FileResponse> actualResponses = await result.ToListAsync();
         actualResponses.Should().BeEmpty();
     }
-    #endregion
 }

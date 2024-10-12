@@ -26,7 +26,6 @@ namespace Lumina.Presentation.Api.IntegrationTests.Core.Controllers.FileManageme
 [ExcludeFromCodeCoverage]
 public class PathControllerTests : IClassFixture<LuminaApiFactory>
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly HttpClient _client;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -35,9 +34,7 @@ public class PathControllerTests : IClassFixture<LuminaApiFactory>
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
     private static readonly bool s_isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="PathControllerTests"/> class.
     /// </summary>
@@ -46,9 +43,7 @@ public class PathControllerTests : IClassFixture<LuminaApiFactory>
     {
         _client = apiFactory.CreateClient();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public async Task GetPathRoot_WhenCalledWithValidPath_ShouldReturnOkResultWithPathSegmentResponse()
     {
@@ -636,5 +631,4 @@ public class PathControllerTests : IClassFixture<LuminaApiFactory>
         // Assert
         await act.Should().ThrowAsync<TaskCanceledException>();
     }
-    #endregion
 }

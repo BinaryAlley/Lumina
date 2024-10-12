@@ -12,14 +12,11 @@ namespace Lumina.Domain.Common.Models.Core;
 [DebuggerDisplay("{Value}")]
 public abstract class EntityId<TId> : ValueObject
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the value representing the entity identifier.
     /// </summary>
     public TId Value { get; }
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="EntityId{TId}"/> class.
     /// </summary>
@@ -37,9 +34,7 @@ public abstract class EntityId<TId> : ValueObject
     {
     }
 #pragma warning restore CS8618
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Gets the list of items that define equality of the object.
     /// </summary>
@@ -57,5 +52,4 @@ public abstract class EntityId<TId> : ValueObject
     {
         return Value?.ToString() ?? base.ToString();
     }
-    #endregion
 }

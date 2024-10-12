@@ -11,7 +11,6 @@ namespace Lumina.Presentation.Web.Common.Models.FileManagement;
 [DebuggerDisplay("{Path}")]
 public abstract class FileSystemItemModel
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets or sets the full path to the file system item.
     /// </summary>
@@ -31,5 +30,4 @@ public abstract class FileSystemItemModel
     /// Gets or sets the modification date of the file system item.
     /// </summary>
     public DateTime DateModified { get; set; }
-    #endregion
 }

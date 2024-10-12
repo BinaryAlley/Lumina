@@ -10,7 +10,6 @@ namespace Lumina.Presentation.Web.Common.Models.Common;
 [DebuggerDisplay("{LanguageName}")]
 public class LanguageInfoModel
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the ISO 639-1 two-letter language code.
     /// </summary>
@@ -25,5 +24,4 @@ public class LanguageInfoModel
     /// Gets an optional native name of the language.
     /// </summary>
     public string? NativeName { get; set; }
-    #endregion
 }

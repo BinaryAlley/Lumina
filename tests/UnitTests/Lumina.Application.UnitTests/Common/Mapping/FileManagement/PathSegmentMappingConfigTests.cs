@@ -17,21 +17,16 @@ namespace Lumina.Application.UnitTests.Common.Mapping.FileManagement;
 [ExcludeFromCodeCoverage]
 public class PathSegmentMappingConfigTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly TypeAdapterConfig _config;
     private readonly PathSegmentMappingConfig _pathSegmentMappingConfig;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     public PathSegmentMappingConfigTests()
     {
         _config = new TypeAdapterConfig();
         _pathSegmentMappingConfig = new PathSegmentMappingConfig();
         _pathSegmentMappingConfig.Register(_config);
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void Register_WhenMappingPathSegmentToPathSegmentResponse_ShouldMapCorrectly()
     {
@@ -90,5 +85,4 @@ public class PathSegmentMappingConfigTests
             results[i].Path.Should().Be(pathSegments[i].Name);
         }
     }
-    #endregion
 }

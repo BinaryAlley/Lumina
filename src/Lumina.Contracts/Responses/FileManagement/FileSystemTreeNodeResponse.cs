@@ -12,7 +12,6 @@ namespace Lumina.Contracts.Responses.FileManagement;
 [DebuggerDisplay("{Path}")]
 public class FileSystemTreeNodeResponse
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets or sets the full path of the file or directory.
     /// </summary>
@@ -42,5 +41,4 @@ public class FileSystemTreeNodeResponse
     /// Gets or sets the list of child nodes.
     /// </summary>
     public List<FileSystemTreeNodeResponse> Children { get; set; } = [];
-    #endregion
 }

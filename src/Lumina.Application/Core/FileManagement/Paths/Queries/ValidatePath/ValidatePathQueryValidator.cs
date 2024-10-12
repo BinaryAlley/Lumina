@@ -10,7 +10,6 @@ namespace Lumina.Application.Core.FileManagement.Paths.Queries.ValidatePath;
 /// </summary>
 public class ValidatePathQueryValidator : AbstractValidator<ValidatePathQuery>
 {
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="ValidatePathQueryValidator"/> class.
     /// </summary>
@@ -18,5 +17,4 @@ public class ValidatePathQueryValidator : AbstractValidator<ValidatePathQuery>
     {
         RuleFor(x => x.Path).NotEmpty().WithMessage(Errors.FileManagement.PathCannotBeEmpty.Code);
     }
-    #endregion
 }

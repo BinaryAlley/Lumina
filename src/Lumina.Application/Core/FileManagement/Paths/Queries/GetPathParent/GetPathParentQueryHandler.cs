@@ -17,12 +17,9 @@ namespace Lumina.Application.Core.FileManagement.Paths.Queries.GetPathParent;
 /// </summary>
 public class GetPathParentQueryHandler : IRequestHandler<GetPathParentQuery, ErrorOr<IEnumerable<PathSegmentResponse>>>
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IPathService _pathService;
     private readonly IMapper _mapper;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="GetPathParentQueryHandler"/> class.
     /// </summary>
@@ -33,9 +30,7 @@ public class GetPathParentQueryHandler : IRequestHandler<GetPathParentQuery, Err
         _pathService = pathService;
         _mapper = mapper;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Gets the parent of the specified file system path.
     /// </summary>
@@ -49,5 +44,4 @@ public class GetPathParentQueryHandler : IRequestHandler<GetPathParentQuery, Err
         ErrorOr<IEnumerable<PathSegment>> result = _pathService.GoUpOneLevel(request.Path);
         return ValueTask.FromResult(result.Match(values => ErrorOrFactory.From(_mapper.Map<IEnumerable<PathSegmentResponse>>(values)), errors => errors));
     }
-    #endregion
 }

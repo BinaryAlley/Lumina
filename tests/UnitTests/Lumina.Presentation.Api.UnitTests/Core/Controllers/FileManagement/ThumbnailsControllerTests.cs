@@ -29,12 +29,9 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Controllers.FileManagement;
 [ExcludeFromCodeCoverage]
 public class ThumbnailsControllerTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly ISender _mockMediator;
     private readonly ThumbnailsController _sut;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="ThumbnailsControllerTests"/> class.
     /// </summary>
@@ -43,9 +40,7 @@ public class ThumbnailsControllerTests
         _mockMediator = Substitute.For<ISender>();
         _sut = new ThumbnailsController(_mockMediator);
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public async Task GetThumbnail_WhenCalled_ShouldReturnFileResultWithThumbnailResponse()
     {
@@ -150,5 +145,4 @@ public class ThumbnailsControllerTests
         cts.CancelAfter(50);
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() => _sut.GetThumbnail(path, quality, cts.Token));
     }
-    #endregion
 }

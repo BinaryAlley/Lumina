@@ -10,10 +10,8 @@ namespace Lumina.Domain.Core.Aggregates.VideoLibrary.TvShowLibraryAggregate.Serv
 /// </summary>
 public class TvShowLibraryService : ITvShowLibraryService
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the collection of TV shows in the library.
     /// </summary>
     public ICollection<TvShow> TvShows => throw new NotImplementedException();
-    #endregion
 }

@@ -10,7 +10,6 @@ namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.S
 /// </summary>
 public interface IPlatformContextManager
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Gets the current platform context.
     /// </summary>
@@ -23,5 +22,4 @@ public interface IPlatformContextManager
     /// <param name="platformType">The platform to be set.</param>
     /// <exception cref="ArgumentException">Thrown when an unsupported platform type is provided.</exception>
     void SetCurrentPlatform(PlatformType platformType);
-    #endregion
 }

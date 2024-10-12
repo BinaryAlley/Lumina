@@ -10,10 +10,8 @@ namespace Lumina.Presentation.Web.Common.Models.FileManagement;
 [DebuggerDisplay("{Path}")]
 public class FileModel : FileSystemItemModel
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets or sets the size of the file, in bytes
     /// </summary>
     public long Size { get; set; }
-    #endregion
 }

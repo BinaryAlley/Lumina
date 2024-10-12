@@ -20,11 +20,8 @@ namespace Lumina.Presentation.Api.Core.Controllers.FileManagement;
 [Route("api/v{version:apiVersion}/[controller]")]
 public class ThumbnailsController : ApiController
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly ISender _mediator;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="ThumbnailsController"/> class.
     /// </summary>
@@ -33,9 +30,7 @@ public class ThumbnailsController : ApiController
     {
         _mediator = mediator;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Gets the thumbnail of a file identified by of <paramref name="path"/>.
     /// </summary>
@@ -48,5 +43,4 @@ public class ThumbnailsController : ApiController
         ErrorOr<ThumbnailResponse> getResult = await _mediator.Send(new GetThumbnailQuery(path, quality), cancellationToken);
         return getResult.Match(result => File(result.Bytes, MimeTypes.GetMimeType(result.Type)), errors => Problem(errors));
     }
-    #endregion
 }

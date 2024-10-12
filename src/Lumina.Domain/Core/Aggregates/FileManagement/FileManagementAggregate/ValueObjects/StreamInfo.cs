@@ -15,7 +15,6 @@ namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.V
 [DebuggerDisplay("{StreamId}")]
 public class StreamInfo : ValueObject
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the id of the stream.
     /// </summary>
@@ -55,9 +54,7 @@ public class StreamInfo : ValueObject
     /// Gets the optional channels of the stream.
     /// </summary>
     public Optional<int> Channels { get; }
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="StreamInfo"/> class.
     /// </summary>
@@ -88,9 +85,7 @@ public class StreamInfo : ValueObject
         SampleRate = sampleRate;
         Channels = channels;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a new instance of the <see cref="StreamInfo"/> class.
     /// </summary>
@@ -136,5 +131,4 @@ public class StreamInfo : ValueObject
         yield return SampleRate;
         yield return Channels;
     }
-    #endregion
 }

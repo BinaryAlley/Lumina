@@ -10,7 +10,6 @@ namespace Lumina.Domain.Core.Aggregates.VideoLibrary.Services;
 /// </summary>
 public interface IVideoLibraryService
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the service for managing a movie library.
     /// </summary>
@@ -20,5 +19,4 @@ public interface IVideoLibraryService
     /// Gets the service for managing a TV shows library.
     /// </summary>
     public ITvShowLibraryService TvShowLibraryService { get; }
-    #endregion
 }

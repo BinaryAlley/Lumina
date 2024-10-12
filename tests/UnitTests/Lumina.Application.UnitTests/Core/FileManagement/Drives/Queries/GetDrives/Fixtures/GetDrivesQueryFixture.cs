@@ -15,11 +15,8 @@ namespace Lumina.Application.UnitTests.Core.FileManagement.Drives.Queries.GetDri
 [ExcludeFromCodeCoverage]
 public class GetDrivesQueryFixture
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly Faker _faker = new();
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a single <see cref="FileSystemTreeNodeResponse"/> with a nested structure.
     /// </summary>
@@ -58,5 +55,4 @@ public class GetDrivesQueryFixture
     {
         return Enumerable.Range(0, count).Select(_ => Create(0, maxDepth, maxChildren)).ToList();
     }
-    #endregion
 }

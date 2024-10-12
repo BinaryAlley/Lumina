@@ -10,7 +10,6 @@ namespace Lumina.Presentation.Web.Common.Models.FileManagement;
 [DebuggerDisplay("{ContentType} (Data.Length)")]
 public class BlobDataModel
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets or sets the binary data as a byte array.
     /// </summary>
@@ -20,5 +19,4 @@ public class BlobDataModel
     /// Gets or sets the content type (MIME type) of the blob data, such as "image/png" for an image or "application/pdf" for a PDF document.
     /// </summary>
     public string ContentType { get; set; } = null!;
-    #endregion
 }

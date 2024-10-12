@@ -29,16 +29,13 @@ namespace Lumina.Application.UnitTests.Core.WrittenContentLibrary.BooksLibrary.B
 [ExcludeFromCodeCoverage]
 public class AddBookCommandHandlerTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IFixture _fixture;
     private readonly IUnitOfWork _mockUnitOfWork;
     private readonly IMapper _mockMapper;
     private readonly IBookRepository _mockBookRepository;
     private readonly AddBookCommandHandler _sut;
     private readonly AddBookCommandFixture _commandBookFixture;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="AddBookCommandHandlerTests"/> class.
     /// </summary>
@@ -57,9 +54,7 @@ public class AddBookCommandHandlerTests
         _sut = new AddBookCommandHandler(_mockUnitOfWork, _mockMapper);
         _commandBookFixture = new AddBookCommandFixture();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public async Task Handle_WhenCalledWithValidCommand_ShouldReturnSuccessResult()
     {
@@ -274,5 +269,4 @@ public class AddBookCommandHandlerTests
         await _mockBookRepository.DidNotReceive().InsertAsync(Arg.Any<BookModel>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
-    #endregion
 }

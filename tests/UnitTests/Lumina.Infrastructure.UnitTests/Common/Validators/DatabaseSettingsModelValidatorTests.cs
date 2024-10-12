@@ -16,12 +16,9 @@ namespace Lumina.Infrastructure.UnitTests.Common.Validators;
 [ExcludeFromCodeCoverage]
 public class DatabaseSettingsModelValidatorTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly DatabaseSettingsModelValidator _validator;
     private readonly IFixture _fixture;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="CommonSettingsModelValidatorTests"/> class.
     /// </summary>
@@ -30,9 +27,7 @@ public class DatabaseSettingsModelValidatorTests
         _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
         _validator = new();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void DatabaseSettingsModelValidator_WhenDefaultConnectionProvided_ShouldNotHaveValidationError()
     {
@@ -65,5 +60,4 @@ public class DatabaseSettingsModelValidatorTests
         result.Errors.Should().ContainSingle()
             .Which.ErrorMessage.Should().Be(Errors.Configuration.DatabaseConnectionStringCannotBeEmpty.Code);
     }
-    #endregion
 }

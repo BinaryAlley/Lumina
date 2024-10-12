@@ -18,12 +18,9 @@ namespace Lumina.Application.UnitTests.Core.FileManagement.Pahs.Queries.Validate
 [ExcludeFromCodeCoverage]
 public class ValidatePathQueryHandlerTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IPathService _mockPathService;
     private readonly ValidatePathQueryHandler _sut;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="ValidatePathQueryHandlerTests"/> class.
     /// </summary>
@@ -32,9 +29,7 @@ public class ValidatePathQueryHandlerTests
         _mockPathService = Substitute.For<IPathService>();
         _sut = new ValidatePathQueryHandler(_mockPathService);
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public async Task Handle_WhenCalledWithValidPath_ShouldReturnTrueResponse()
     {
@@ -94,5 +89,4 @@ public class ValidatePathQueryHandlerTests
         result.IsValid.Should().BeFalse();
         _mockPathService.Received(1).IsValidPath(Arg.Any<string>());
     }
-    #endregion
 }

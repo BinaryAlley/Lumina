@@ -21,12 +21,9 @@ namespace Lumina.Application.UnitTests.Common.Behaviors;
 [ExcludeFromCodeCoverage]
 public class ValidationBehaviorTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IValidator<ValidationBehaviorFixture> _mockValidator;
     private readonly MessageHandlerDelegate<ValidationBehaviorFixture, ErrorOr<ValidationBehaviorTestResponse>> _nextDelegate;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="ValidationBehaviorTests"/> class.
     /// </summary>
@@ -35,9 +32,7 @@ public class ValidationBehaviorTests
         _mockValidator = Substitute.For<IValidator<ValidationBehaviorFixture>>();
         _nextDelegate = Substitute.For<MessageHandlerDelegate<ValidationBehaviorFixture, ErrorOr<ValidationBehaviorTestResponse>>>();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public async Task Handle_WhenValidatorIsNull_ShouldInvokeNextDelegate()
     {
@@ -102,5 +97,4 @@ public class ValidationBehaviorTests
         await _mockValidator.Received(1).ValidateAsync(request, Arg.Any<CancellationToken>());
         await _nextDelegate.DidNotReceive().Invoke(request, Arg.Any<CancellationToken>());
     }
-    #endregion
 }

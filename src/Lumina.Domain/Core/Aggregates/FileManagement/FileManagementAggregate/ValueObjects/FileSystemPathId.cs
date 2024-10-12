@@ -14,14 +14,11 @@ namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.V
 [DebuggerDisplay("{Path}")]
 public sealed class FileSystemPathId : ValueObject
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the value of this object.
     /// </summary>
     public string Path { get; }
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="FileSystemPathId"/> class.
     /// </summary>
@@ -30,9 +27,7 @@ public sealed class FileSystemPathId : ValueObject
     {
         Path = path;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <inheritdoc />
     public override IEnumerable<object> GetEqualityComponents()
     {
@@ -52,5 +47,4 @@ public sealed class FileSystemPathId : ValueObject
             return Errors.FileManagement.InvalidPath;
         return new FileSystemPathId(path);
     }
-    #endregion
 }

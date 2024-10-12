@@ -21,12 +21,9 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Controllers.FileManagement;
 [ExcludeFromCodeCoverage]
 public class FileSystemControllerTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly ISender _mockMediator;
     private readonly FileSystemController _sut;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="FileSystemControllerTests"/> class.
     /// </summary>
@@ -35,9 +32,7 @@ public class FileSystemControllerTests
         _mockMediator = Substitute.For<ISender>();
         _sut = new FileSystemController(_mockMediator);
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public async Task GetType_WhenCalled_ShouldReturnOkResultWithFileSystemTypeResponse()
     {
@@ -108,5 +103,4 @@ public class FileSystemControllerTests
         cts.CancelAfter(50);
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() => _sut.GetType(cts.Token));
     }
-    #endregion
 }

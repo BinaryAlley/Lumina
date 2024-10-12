@@ -12,7 +12,6 @@ namespace Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 [ExcludeFromCodeCoverage]
 public static class BogusExtensions
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Adds <see cref="DateOnly"/> random data generation support to the <see cref="Faker"/> class.
     /// </summary>
@@ -36,5 +35,4 @@ public static class BogusExtensions
         DateTime endDateTime = end.ToDateTime(TimeOnly.MinValue);
         return System.DateOnly.FromDateTime(faker.Date.Between(startDateTime, endDateTime));
     }
-    #endregion
 }

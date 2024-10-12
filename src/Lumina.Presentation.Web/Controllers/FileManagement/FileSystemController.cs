@@ -14,11 +14,8 @@ namespace Lumina.Presentation.Web.Controllers.FileManagement;
 [Route("/file-system")]
 public class FileSystemController : Controller
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IApiHttpClient _apiHttpClient;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="FileSystemController"/> class.
     /// </summary>
@@ -27,9 +24,7 @@ public class FileSystemController : Controller
     {
         _apiHttpClient = apiHttpClient;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Gets the type of the file system.
     /// </summary>
@@ -40,5 +35,4 @@ public class FileSystemController : Controller
         FileSystemTypeModel response = await _apiHttpClient.GetAsync<FileSystemTypeModel>($"file-system/get-type", cancellationToken: cancellationToken);
         return Json(new { success = true, data = new { platformType = response.PlatformType.ToString() } });
     }
-    #endregion
 }

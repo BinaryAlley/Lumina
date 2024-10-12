@@ -21,13 +21,10 @@ namespace Lumina.Application.UnitTests.Core.FileManagement.Pahs.Commands.Combine
 [ExcludeFromCodeCoverage]
 public class CombinePathCommandHandlerTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IFixture _fixture;
     private readonly IPathService _mockPathService;
     private readonly CombinePathCommandHandler _sut;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="CombinePathCommandHandlerTests"/> class.
     /// </summary>
@@ -37,9 +34,7 @@ public class CombinePathCommandHandlerTests
         _mockPathService = Substitute.For<IPathService>();
         _sut = new CombinePathCommandHandler(_mockPathService);
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public async Task Handle_WhenCalledWithValidCommand_ShouldReturnSuccessResult()
     {
@@ -95,5 +90,4 @@ public class CombinePathCommandHandlerTests
         result.Value.Path.Should().BeEmpty();
         _mockPathService.Received(1).CombinePath(command.OriginalPath, command.NewPath);
     }
-    #endregion
 }

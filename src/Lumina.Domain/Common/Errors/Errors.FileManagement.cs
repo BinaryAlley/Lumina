@@ -11,7 +11,6 @@ public static partial class Errors
 {
     public static class FileManagement
     {
-        #region ==================================================================== PROPERTIES =================================================================================
         public static Error ParentNodeCannotBeNull => Error.Failure(nameof(ParentNodeCannotBeNull));
         public static Error FileCopyError => Error.Failure(nameof(FileCopyError));
         public static Error FileMoveError => Error.Failure(nameof(FileMoveError));
@@ -29,6 +28,5 @@ public static partial class Errors
         public static Error FileAlreadyExists => Error.Conflict(nameof(FileAlreadyExists));
         public static Error DirectoryNotFound => Error.NotFound(nameof(DirectoryNotFound));
         public static Error DirectoryAlreadyExists => Error.Conflict(nameof(DirectoryAlreadyExists));
-        #endregion
     }
 }

@@ -28,7 +28,6 @@ namespace Lumina.Domain.UnitTests.Core.Aggregates.FileManagementAggregate.Servic
 [ExcludeFromCodeCoverage]
 public class FileServiceTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IEnvironmentContext _mockEnvironmentContext;
     private readonly IPlatformContextManager _mockPlatformContextManager;
     private readonly IPlatformContext _mockPlatformContext;
@@ -49,9 +48,7 @@ public class FileServiceTests
     private readonly string _pathSourceExistingFile = s_isLinux ? "/Source/existingfile.txt" : @"C:\Source\existingfile.txt";
     private readonly string _pathSourceNonExistingFile = s_isLinux ? "/Source/nonexistent.txt" : @"C:\Source\nonexistent.txt";
     private readonly char _dirSeparator = s_isLinux ? '/' : '\\';
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="FileServiceTests"/> class.
     /// </summary>
@@ -65,9 +62,7 @@ public class FileServiceTests
         _fileSystemPathIdFixture = new FileSystemPathIdFixture();
         _fileFixture = new FileFixture();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void GetFiles_WithValidPath_ShouldReturnListOfFiles()
     {
@@ -1217,5 +1212,4 @@ public class FileServiceTests
         result.IsError.Should().BeTrue();
         result.FirstError.Should().Be(Errors.Permission.UnauthorizedAccess);
     }
-    #endregion
 }

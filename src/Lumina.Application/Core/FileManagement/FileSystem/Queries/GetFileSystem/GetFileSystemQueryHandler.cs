@@ -13,11 +13,8 @@ namespace Lumina.Application.Core.FileManagement.FileSystem.Queries.GetFileSyste
 /// </summary>
 public class GetFileSystemQueryHandler : IRequestHandler<GetFileSystemQuery, FileSystemTypeResponse>
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IPlatformContext _platformContext;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="GetFileSystemQueryHandler"/> class.
     /// </summary>
@@ -26,9 +23,7 @@ public class GetFileSystemQueryHandler : IRequestHandler<GetFileSystemQuery, Fil
     {
         _platformContext = platformContextManager.GetCurrentContext();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Gets the type of the file system.
     /// </summary>
@@ -39,5 +34,4 @@ public class GetFileSystemQueryHandler : IRequestHandler<GetFileSystemQuery, Fil
     {
         return ValueTask.FromResult(new FileSystemTypeResponse(_platformContext.Platform));
     }
-    #endregion
 }

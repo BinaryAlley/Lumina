@@ -17,7 +17,6 @@ namespace Lumina.Presentation.Api.Core.Controllers.Common;
 [ApiVersion("1.0")]
 public abstract class ApiController : ControllerBase
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Handles controllers errors.
     /// </summary>
@@ -67,5 +66,4 @@ public abstract class ApiController : ControllerBase
             modelStateDictionary.AddModelError(error.Code, error.Description);
         return ValidationProblem(modelStateDictionary: modelStateDictionary, title: "One or more validation errors occurred.");
     }
-    #endregion
 }

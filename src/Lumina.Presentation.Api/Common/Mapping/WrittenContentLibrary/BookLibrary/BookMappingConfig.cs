@@ -11,7 +11,6 @@ namespace Lumina.Presentation.Api.Common.Mapping.WrittenContentLibrary.BookLibra
 /// </summary>
 public class BookMappingConfig : IRegister
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Registers the mapping configuration.
     /// </summary>
@@ -25,5 +24,4 @@ public class BookMappingConfig : IRegister
             .Map(dest => dest.OCLCNumber, src => src.OCLCNumber)
             .MapToConstructor(true);
     }
-    #endregion
 }

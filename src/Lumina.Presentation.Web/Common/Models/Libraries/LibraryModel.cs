@@ -13,7 +13,6 @@ namespace Lumina.Presentation.Web.Common.Models.Libraries;
 [DebuggerDisplay("{Title}")]
 public class LibraryModel
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets or sets the unique identifier of the library.
     /// </summary>
@@ -33,5 +32,4 @@ public class LibraryModel
     /// Gets or sets the collection of directories that contain the library files.
     /// </summary>
     public List<string> Paths { get; set; } = [];
-    #endregion
 }

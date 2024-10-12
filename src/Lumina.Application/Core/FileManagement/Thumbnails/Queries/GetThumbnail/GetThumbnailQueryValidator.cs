@@ -10,7 +10,6 @@ namespace Lumina.Application.Core.FileManagement.Thumbnails.Queries.GetThumbnail
 /// </summary>
 public class GetThumbnailQueryValidator : AbstractValidator<GetThumbnailQuery>
 {
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="GetThumbnailQueryValidator"/> class.
     /// </summary>
@@ -19,5 +18,4 @@ public class GetThumbnailQueryValidator : AbstractValidator<GetThumbnailQuery>
         RuleFor(x => x.Path).NotEmpty().WithMessage(Errors.FileManagement.PathCannotBeEmpty.Code);
         RuleFor(x => x.Quality).InclusiveBetween(0, 100).WithMessage(Errors.Thumbnails.ImageQaulityMustBeBetweenZeroAndOneHundred.Code);
     }
-    #endregion
 }

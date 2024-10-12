@@ -12,7 +12,6 @@ namespace Lumina.Presentation.Web.Common.Models.WrittenContentLibrary;
 [DebuggerDisplay("{Title}")]
 public class WrittenContentMetadataModel
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets or sets the title of the written content.
     /// </summary>
@@ -62,5 +61,4 @@ public class WrittenContentMetadataModel
     /// Gets or sets the number of pages in the written content.
     /// </summary>
     public int? PageCount { get; set; }
-    #endregion
 }

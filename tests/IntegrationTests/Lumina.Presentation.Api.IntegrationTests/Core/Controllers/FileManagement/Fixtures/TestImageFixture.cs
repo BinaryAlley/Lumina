@@ -15,14 +15,11 @@ namespace Lumina.Presentation.Api.IntegrationTests.Core.Controllers.FileManageme
 [ExcludeFromCodeCoverage]
 public class TestImageFixture : IDisposable
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the path of the created test image.
     /// </summary>
     public string ImagePath { get; }
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="TestImageFixture"/> class.
     /// </summary>
@@ -31,9 +28,7 @@ public class TestImageFixture : IDisposable
         ImagePath = Path.Combine(Path.GetTempPath(), $"TestImage_{Guid.NewGuid()}.jpg");
         CreateTestImage();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a test image file.
     /// </summary>
@@ -51,5 +46,4 @@ public class TestImageFixture : IDisposable
         if (File.Exists(ImagePath))
             File.Delete(ImagePath);
     }
-    #endregion
 }

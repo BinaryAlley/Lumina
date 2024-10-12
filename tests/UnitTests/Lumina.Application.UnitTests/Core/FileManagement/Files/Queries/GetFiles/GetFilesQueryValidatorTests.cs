@@ -14,11 +14,8 @@ namespace Lumina.Application.UnitTests.Core.FileManagement.Files.Queries.GetFile
 [ExcludeFromCodeCoverage]
 public class GetFilesQueryValidatorTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly GetFilesQueryValidator _validator;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="GetFilesQueryValidatorTests"/> class.
     /// </summary>
@@ -26,9 +23,7 @@ public class GetFilesQueryValidatorTests
     {
         _validator = new GetFilesQueryValidator();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void Validate_WhenPathIsNull_ShouldHaveValidationError()
     {
@@ -115,5 +110,4 @@ public class GetFilesQueryValidatorTests
         // Assert
         result.ShouldNotHaveValidationErrorFor(x => x.IncludeHiddenElements);
     }
-    #endregion
 }

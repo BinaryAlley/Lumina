@@ -14,12 +14,9 @@ namespace Lumina.Domain.Common.ValueObjects.Metadata;
 [DebuggerDisplay("{Title}")]
 public abstract class BaseMetadata : ValueObject
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly List<Tag> _tags;
     private readonly List<Genre> _genres;
-    #endregion
 
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the title of the media item.
     /// </summary>
@@ -59,9 +56,7 @@ public abstract class BaseMetadata : ValueObject
     /// Gets the list of genres associated with the media item.
     /// </summary>
     public IReadOnlyCollection<Genre> Genres => _genres.AsReadOnly();
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="BaseMetadata"/> class.
     /// </summary>
@@ -93,9 +88,7 @@ public abstract class BaseMetadata : ValueObject
         Language = language;
         OriginalLanguage = originalLanguage;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <inheritdoc/>
     public override IEnumerable<object> GetEqualityComponents()
     {
@@ -110,5 +103,4 @@ public abstract class BaseMetadata : ValueObject
         yield return Language;
         yield return OriginalLanguage;
     }
-    #endregion
 }

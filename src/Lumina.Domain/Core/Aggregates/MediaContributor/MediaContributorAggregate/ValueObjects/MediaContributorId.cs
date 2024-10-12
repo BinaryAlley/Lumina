@@ -11,7 +11,6 @@ namespace Lumina.Domain.Core.Aggregates.MediaContributor.MediaContributorAggrega
 /// </summary>
 public sealed class MediaContributorId : EntityId<Guid>
 {
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="MediaContributorId"/> class.
     /// </summary>
@@ -19,9 +18,7 @@ public sealed class MediaContributorId : EntityId<Guid>
     private MediaContributorId(Guid value) : base(value)
     {
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a new instance of the <see cref="MediaContributorId"/> class.
     /// </summary>
@@ -48,5 +45,4 @@ public sealed class MediaContributorId : EntityId<Guid>
     {
         yield return Value;
     }
-    #endregion
 }

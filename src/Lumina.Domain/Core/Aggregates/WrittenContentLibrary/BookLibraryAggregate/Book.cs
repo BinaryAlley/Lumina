@@ -19,13 +19,10 @@ namespace Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggrega
 [DebuggerDisplay("{Id}: {Title}")]
 public sealed class Book : AggregateRoot<BookId>
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly List<MediaContributorId> _contributors;
     private readonly List<BookRating> _ratings;
     private readonly List<Isbn> _isbns;
-    #endregion
 
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the written content metadata of the book.
     /// </summary>
@@ -110,9 +107,7 @@ public sealed class Book : AggregateRoot<BookId>
     /// Gets the list of ratings for this book.
     /// </summary>
     public IReadOnlyCollection<BookRating> Ratings => _ratings.AsReadOnly();
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="Book"/> class.
     /// </summary>
@@ -189,9 +184,7 @@ public sealed class Book : AggregateRoot<BookId>
 
     }
 #pragma warning restore CS8618
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a new instance of the <see cref="Book"/> class.
     /// </summary>
@@ -329,5 +322,4 @@ public sealed class Book : AggregateRoot<BookId>
             contributors,
             ratings);
     }
-    #endregion
 }

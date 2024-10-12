@@ -14,11 +14,8 @@ namespace Lumina.Presentation.Web.Controllers.FileManagement;
 [Route("[controller]")]
 public class DrivesController : Controller
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IApiHttpClient _apiHttpClient;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="DrivesController"/> class.
     /// </summary>
@@ -27,9 +24,7 @@ public class DrivesController : Controller
     {
         _apiHttpClient = apiHttpClient;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Controller action for getting the list of all file system drives.
     /// </summary>
@@ -40,5 +35,4 @@ public class DrivesController : Controller
         FileSystemTreeNodeModel[] response = await _apiHttpClient.GetAsync<FileSystemTreeNodeModel[]>($"drives/get-drives", cancellationToken: cancellationToken);
         return Json(new { success = true, data = new { drives = response } });
     }
-    #endregion
 }

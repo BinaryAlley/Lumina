@@ -25,7 +25,6 @@ namespace Lumina.Presentation.Api.IntegrationTests.Core.Controllers.FileManageme
 [ExcludeFromCodeCoverage]
 public class FilesControllerTests : IClassFixture<LuminaApiFactory>
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly HttpClient _client;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -34,9 +33,7 @@ public class FilesControllerTests : IClassFixture<LuminaApiFactory>
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
     private static readonly bool s_isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="FilesControllerTests"/> class.
     /// </summary>
@@ -45,9 +42,7 @@ public class FilesControllerTests : IClassFixture<LuminaApiFactory>
     {
         _client = apiFactory.CreateClient();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public async Task GetTreeFiles_WhenCalledWithValidPathAndNotIncludeHiddenElements_ShouldReturnTreeFilesWithoutHiddenElements()
     {
@@ -331,5 +326,4 @@ public class FilesControllerTests : IClassFixture<LuminaApiFactory>
             fileSystemFixture.CleanupFileSystemStructure();
         }
     }
-    #endregion
 }

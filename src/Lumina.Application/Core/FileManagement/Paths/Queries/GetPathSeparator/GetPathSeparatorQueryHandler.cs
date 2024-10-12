@@ -13,11 +13,8 @@ namespace Lumina.Application.Core.FileManagement.Paths.Queries.GetPathSeparator;
 /// </summary>
 public class GetPathSeparatorQueryHandler : IRequestHandler<GetPathSeparatorQuery, PathSeparatorResponse>
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IPathService _pathService;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="GetPathSeparatorQueryHandler"/> class.
     /// </summary>
@@ -26,9 +23,7 @@ public class GetPathSeparatorQueryHandler : IRequestHandler<GetPathSeparatorQuer
     {
         _pathService = pathService;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Gets the path separator character of a file system path.
     /// </summary>
@@ -39,5 +34,4 @@ public class GetPathSeparatorQueryHandler : IRequestHandler<GetPathSeparatorQuer
     {
         return ValueTask.FromResult(new PathSeparatorResponse(_pathService.PathSeparator.ToString()));
     }
-    #endregion
 }

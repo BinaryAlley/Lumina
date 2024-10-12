@@ -10,7 +10,6 @@ namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.S
 /// </summary>
 public class WindowsPlatformContext : IWindowsPlatformContext
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the platform type, which is Windows for this context.
     /// </summary>
@@ -20,9 +19,7 @@ public class WindowsPlatformContext : IWindowsPlatformContext
     /// Gets the path strategy for Windows platforms.
     /// </summary>
     public IPathStrategy PathStrategy { get; }
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="WindowsPlatformContext"/> class.
     /// </summary>
@@ -31,5 +28,4 @@ public class WindowsPlatformContext : IWindowsPlatformContext
     {
         PathStrategy = windowsPathStrategy;
     }
-    #endregion
 }

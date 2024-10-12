@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.Models.FileManagement;
 using System;
 using System.Collections.Generic;
@@ -16,4 +16,10 @@ namespace Lumina.Contracts.Responses.FileManagement;
 /// <param name="DateModified">The modification date of the directory.</param>
 /// <param name="Items">The children items of the directory.</param>
 [DebuggerDisplay("{Name} (Directory)")]
-public record DirectoryResponse(string Path, string Name, DateTime DateCreated, DateTime DateModified, List<FileSystemItemModel> Items) : FileSystemItemModel(Path, Name, DateCreated, DateModified);
+public record DirectoryResponse(
+    string Path, 
+    string Name, 
+    DateTime DateCreated, 
+    DateTime DateModified, 
+    List<FileSystemItemModel> Items
+) : FileSystemItemModel(Path, Name, DateCreated, DateModified);

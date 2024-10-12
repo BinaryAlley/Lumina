@@ -16,7 +16,6 @@ namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.E
 [DebuggerDisplay("{Id.Path}")]
 public sealed class File : FileSystemItem
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets or sets the creation date of the file system item. Can be optional if the information is not available.
     /// </summary>
@@ -31,9 +30,7 @@ public sealed class File : FileSystemItem
     /// Gets or sets the size in bytes of the current file entity.
     /// </summary>
     public long Size { get; private set; }
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="File"/> class.
     /// </summary>
@@ -48,9 +45,7 @@ public sealed class File : FileSystemItem
         DateModified = dateModified;
         Size = size;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a new instance of the <see cref="File"/> class.
     /// </summary>
@@ -153,5 +148,4 @@ public sealed class File : FileSystemItem
         Name = newName;
         return Result.Updated;
     }
-    #endregion
 }

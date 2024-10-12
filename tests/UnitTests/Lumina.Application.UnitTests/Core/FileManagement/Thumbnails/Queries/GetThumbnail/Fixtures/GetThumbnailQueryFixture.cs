@@ -12,7 +12,6 @@ namespace Lumina.Application.UnitTests.Core.FileManagement.Thumbnails.Queries.Ge
 [ExcludeFromCodeCoverage]
 public class GetThumbnailQueryFixture
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a random valid query to get a thumbnail.
     /// </summary>
@@ -27,5 +26,4 @@ public class GetThumbnailQueryFixture
             .RuleFor(x => x.Path, f => f.System.FilePath())
             .RuleFor(x => x.Quality, f => f.Random.Int());
     }
-    #endregion
 }

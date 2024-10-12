@@ -22,11 +22,8 @@ namespace Lumina.Infrastructure.UnitTests.Common.Utilities;
 [ExcludeFromCodeCoverage]
 public class OptionsBuilderFluentValidationUtilitiesTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IFixture _fixture;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="OptionsBuilderFluentValidationUtilitiesTests"/> class.
     /// </summary>
@@ -34,9 +31,7 @@ public class OptionsBuilderFluentValidationUtilitiesTests
     {
         _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void ValidateFluently_WhenCalled_ShouldRegisterFluentValidationOptions()
     {
@@ -87,5 +82,4 @@ public class OptionsBuilderFluentValidationUtilitiesTests
         fluentValidationOptions.Should().NotBeNull();
         fluentValidationOptions!.Name.Should().Be(name);
     }
-    #endregion
 }

@@ -15,7 +15,6 @@ namespace Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggrega
 [DebuggerDisplay("{Title}")]
 public class WrittenContentMetadata : BaseMetadata
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the publisher of the written content.
     /// </summary>
@@ -25,9 +24,7 @@ public class WrittenContentMetadata : BaseMetadata
     /// Gets the number of pages in the written content.
     /// </summary>
     public Optional<int> PageCount { get; }
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="WrittenContentMetadata"/> class.
     /// </summary>
@@ -57,9 +54,7 @@ public class WrittenContentMetadata : BaseMetadata
         Publisher = publisher;
         PageCount = pageCount;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a new instance of the <see cref="WrittenContentMetadata"/> class.
     /// </summary>
@@ -117,5 +112,4 @@ public class WrittenContentMetadata : BaseMetadata
         yield return Publisher;
         yield return PageCount;
     }
-    #endregion
 }

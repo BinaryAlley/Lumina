@@ -11,7 +11,6 @@ namespace Lumina.Application.Common.Mapping.FileManagement;
 /// </summary>
 public class PathSegmentMappingConfig : IRegister
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Registers the mapping configuration.
     /// </summary>
@@ -22,5 +21,4 @@ public class PathSegmentMappingConfig : IRegister
             .Map(dest => dest.Path, src => src.Name)
             .MapToConstructor(true);
     }
-    #endregion
 }

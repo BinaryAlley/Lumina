@@ -13,7 +13,6 @@ namespace Lumina.Application.UnitTests.Core.FileManagement.Thumbnails.Fixtures;
 [ExcludeFromCodeCoverage]
 public class ThumbnailResponseFixture
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a random valid query to get a thumbnail.
     /// </summary>
@@ -28,5 +27,4 @@ public class ThumbnailResponseFixture
             .RuleFor(x => x.Type, f => f.PickRandom<ImageType>())
             .RuleFor(x => x.Bytes, f => f.Random.Bytes(20));
     }
-    #endregion
 }

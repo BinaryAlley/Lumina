@@ -14,11 +14,8 @@ namespace Lumina.Application.UnitTests.Core.FileManagement.Directories.Queries.G
 [ExcludeFromCodeCoverage]
 public class GetDirectoryTreeQueryValidatorTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly GetDirectoryTreeQueryValidator _validator;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="GetDirectoryTreeQueryValidatorTests"/> class.
     /// </summary>
@@ -26,9 +23,7 @@ public class GetDirectoryTreeQueryValidatorTests
     {
         _validator = new GetDirectoryTreeQueryValidator();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void Validate_WhenPathIsNull_ShouldHaveValidationError()
     {
@@ -143,5 +138,4 @@ public class GetDirectoryTreeQueryValidatorTests
         // Assert
         result.ShouldNotHaveValidationErrorFor(x => x.IncludeFiles);
     }
-    #endregion
 }

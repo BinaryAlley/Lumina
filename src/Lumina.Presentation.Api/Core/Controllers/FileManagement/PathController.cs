@@ -26,11 +26,8 @@ namespace Lumina.Presentation.Api.Core.Controllers.FileManagement;
 [Route("api/v{version:apiVersion}/[controller]")]
 public class PathController : ApiController
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly ISender _mediator;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="PathController"/> class.
     /// </summary>
@@ -39,9 +36,7 @@ public class PathController : ApiController
     {
         _mediator = mediator;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Gets the root of <paramref name="path"/>.
     /// </summary>
@@ -126,5 +121,4 @@ public class PathController : ApiController
         PathExistsResponse result = await _mediator.Send(new CheckPathExistsQuery(path, includeHiddenElements), cancellationToken).ConfigureAwait(false);
         return Ok(result);
     }
-    #endregion
 }

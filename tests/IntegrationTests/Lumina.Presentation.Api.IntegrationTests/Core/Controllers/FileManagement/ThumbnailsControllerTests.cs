@@ -21,7 +21,6 @@ namespace Lumina.Presentation.Api.IntegrationTests.Core.Controllers.FileManageme
 [ExcludeFromCodeCoverage]
 public class ThumbnailsControllerTests : IClassFixture<LuminaApiFactory>, IClassFixture<TestImageFixture>
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly HttpClient _client;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -30,9 +29,7 @@ public class ThumbnailsControllerTests : IClassFixture<LuminaApiFactory>, IClass
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
     private readonly string _testImagePath;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="ThumbnailsControllerTests"/> class.
     /// </summary>
@@ -43,9 +40,7 @@ public class ThumbnailsControllerTests : IClassFixture<LuminaApiFactory>, IClass
         _client = apiFactory.CreateClient();
         _testImagePath = imageFixture.ImagePath;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public async Task GetThumbnail_WhenCalledWithValidPathAndQuality_ShouldReturnOkResultWithThumbnail()
     {
@@ -132,5 +127,4 @@ public class ThumbnailsControllerTests : IClassFixture<LuminaApiFactory>, IClass
         // Assert
         await act.Should().ThrowAsync<TaskCanceledException>();
     }
-    #endregion
 }

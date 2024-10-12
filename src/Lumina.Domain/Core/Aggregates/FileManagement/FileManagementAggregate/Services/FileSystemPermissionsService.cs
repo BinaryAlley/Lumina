@@ -18,11 +18,8 @@ namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.S
 /// </summary>
 internal class FileSystemPermissionsService : IFileSystemPermissionsService // TODO: refactor towards abstractions that could allow testing
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IPlatformContextManager _platformContextManager;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="FileSystemPermissionsService"/> class.
     /// </summary>
@@ -31,9 +28,7 @@ internal class FileSystemPermissionsService : IFileSystemPermissionsService // T
     {
         _platformContextManager = platformContextManager;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Checks if <paramref name="path"/> can be accessed.
     /// </summary>
@@ -209,5 +204,4 @@ internal class FileSystemPermissionsService : IFileSystemPermissionsService // T
         }
         return allowAccess;
     }
-    #endregion
 }

@@ -11,7 +11,6 @@ namespace Lumina.Application.Common.Mapping.FileManagement;
 /// </summary>
 public class ThumbnailMappingConfig : IRegister
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Registers the mapping configuration.
     /// </summary>
@@ -23,5 +22,4 @@ public class ThumbnailMappingConfig : IRegister
              .Map(dest => dest.Bytes, src => src.Bytes)
              .MapToConstructor(true);
     }
-    #endregion
 }

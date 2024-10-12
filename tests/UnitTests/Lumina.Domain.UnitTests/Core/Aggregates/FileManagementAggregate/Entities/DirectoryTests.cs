@@ -20,7 +20,6 @@ namespace Lumina.Domain.UnitTests.Core.Aggregates.FileManagementAggregate.Entiti
 [ExcludeFromCodeCoverage]
 public class DirectoryTests
 {
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void Create_WhenCalledWithValidParameters_ShouldReturnSuccessfulResult()
     {
@@ -134,5 +133,4 @@ public class DirectoryTests
         result.IsError.Should().BeFalse();
         directory.Items.Should().NotContain(item);
     }
-    #endregion
 }

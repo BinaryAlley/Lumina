@@ -24,11 +24,8 @@ namespace Lumina.DataAccess.UnitTests.Core.UoW;
 [ExcludeFromCodeCoverage]
 public class UnitOfWorkTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IFixture _fixture;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="UnitOfWorkTests"/> class.
     /// </summary>
@@ -43,9 +40,7 @@ public class UnitOfWorkTests
             return Substitute.ForPartsOf<LuminaDbContext>(options);
         }));
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void ResetRepositories_WhenCalled_ShouldClearAllRepositories()
     {
@@ -140,5 +135,4 @@ public class UnitOfWorkTests
         // Assert
         await dbContext.Received(1).SaveChangesAsync(cancellationToken);
     }
-    #endregion
 }

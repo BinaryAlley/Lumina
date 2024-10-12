@@ -17,19 +17,14 @@ namespace Lumina.DataAccess.Core.UoW;
 /// </summary>
 public class UnitOfWork : IUnitOfWork
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly LuminaDbContext _luminaDbContext;
     private readonly IRepositoryFactory _repositoryFactory;
-    #endregion
 
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets or sets the collection of available repositories.
     /// </summary>
     internal RepositoryDictionary Repositories { get; private set; } = new RepositoryDictionary();
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="UnitOfWork"/> class.
     /// </summary>
@@ -41,9 +36,7 @@ public class UnitOfWork : IUnitOfWork
         _luminaDbContext = luminaDbContext;
         AddRepositories();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Adds all the repositories from the Data Access Layer so that they can be exposed to the Business Layer.
     /// </summary>
@@ -121,5 +114,4 @@ public class UnitOfWork : IUnitOfWork
     {
         throw new NotImplementedException();
     }
-    #endregion
 }

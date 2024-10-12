@@ -17,12 +17,9 @@ namespace Lumina.Domain.UnitTests.Core.Aggregates.FileManagementAggregate.Strate
 [ExcludeFromCodeCoverage]
 public class PlatformContextFactoryTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IServiceProvider _serviceProvider;
     private readonly PlatformContextFactory _sut;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="PlatformContextFactoryTests"/> class.
     /// </summary>
@@ -37,9 +34,7 @@ public class PlatformContextFactoryTests
         _serviceProvider = services.BuildServiceProvider();
         _sut = new PlatformContextFactory(_serviceProvider);
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void CreateStrategy_WhenWindowsServiceExists_ShouldReturnWindowsService()
     {
@@ -68,5 +63,4 @@ public class PlatformContextFactoryTests
         // Act & Assert
         Assert.Throws<InvalidOperationException>(() => _sut.CreateStrategy<INonExistentPlatformContextFixture>());
     }
-    #endregion
 }

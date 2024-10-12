@@ -14,11 +14,8 @@ namespace Lumina.Application.UnitTests.Core.FileManagement.Pahs.Commands.SplitPa
 [ExcludeFromCodeCoverage]
 public class SplitPathCommandValidatorTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly SplitPathCommandValidator _validator;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="SplitPathCommandValidatorTests"/> class.
     /// </summary>
@@ -26,9 +23,7 @@ public class SplitPathCommandValidatorTests
     {
         _validator = new SplitPathCommandValidator();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void Validate_WhenPathIsNull_ShouldHaveValidationError()
     {
@@ -87,5 +82,4 @@ public class SplitPathCommandValidatorTests
         // Assert
         result.ShouldNotHaveValidationErrorFor(x => x.Path);
     }
-    #endregion
 }

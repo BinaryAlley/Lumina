@@ -18,13 +18,10 @@ namespace Lumina.Application.UnitTests.Common.Mapping.FileManagement;
 [ExcludeFromCodeCoverage]
 public class ThumbnailMappingConfigTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly TypeAdapterConfig _config;
     private readonly ThumbnailMappingConfig _thumbnailMappingConfig;
     private readonly Faker _faker;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     public ThumbnailMappingConfigTests()
     {
         _config = new TypeAdapterConfig();
@@ -32,9 +29,7 @@ public class ThumbnailMappingConfigTests
         _thumbnailMappingConfig.Register(_config);
         _faker = new Faker();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void Register_WhenMappingThumbnailToThumbnailResponse_ShouldMapCorrectly()
     {
@@ -111,5 +106,4 @@ public class ThumbnailMappingConfigTests
             results[i].Bytes.Should().BeEquivalentTo(thumbnails[i].Bytes);
         }
     }
-    #endregion
 }

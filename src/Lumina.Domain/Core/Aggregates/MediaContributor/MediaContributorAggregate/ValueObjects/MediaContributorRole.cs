@@ -12,7 +12,6 @@ namespace Lumina.Domain.Core.Aggregates.MediaContributor.MediaContributorAggrega
 [DebuggerDisplay("{DisplayName}")]
 public sealed class MediaContributorRole : ValueObject
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the value representing this object.
     /// </summary>
@@ -22,9 +21,7 @@ public sealed class MediaContributorRole : ValueObject
     /// Gets the category of this object.
     /// </summary>
     public string Category { get; }
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="MediaContributorRole"/> class.
     /// </summary>
@@ -35,9 +32,7 @@ public sealed class MediaContributorRole : ValueObject
         Name = name;
         Category = category;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a new instance of the <see cref="MediaContributorRole"/> class, from a pre-existing <paramref name="value"/>.
     /// </summary>
@@ -56,5 +51,4 @@ public sealed class MediaContributorRole : ValueObject
         yield return Name;
         yield return Category;
     }
-    #endregion
 }

@@ -15,11 +15,8 @@ namespace Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggrega
 [DebuggerDisplay("{Id}: {Title}")]
 public sealed class BookSeries : Entity<BookSeriesId>
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly List<Book> _books;
-    #endregion
 
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the written content metadata of the book series.
     /// </summary>
@@ -34,9 +31,7 @@ public sealed class BookSeries : Entity<BookSeriesId>
     /// Gets the collection of books in the series.
     /// </summary>
     public IReadOnlyCollection<Book> Books => _books.AsReadOnly();
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="BookSeries"/> class.
     /// </summary>
@@ -52,9 +47,7 @@ public sealed class BookSeries : Entity<BookSeriesId>
         IsComplete = isComplete;
         _books = books;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a new instance of the <see cref="BookSeries"/> class.
     /// </summary>
@@ -127,5 +120,4 @@ public sealed class BookSeries : Entity<BookSeriesId>
         _books.Remove(book);
         return Result.Deleted;
     }
-    #endregion
 }

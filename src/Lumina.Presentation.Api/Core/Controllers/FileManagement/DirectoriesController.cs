@@ -22,11 +22,8 @@ namespace Lumina.Presentation.Api.Core.Controllers.FileManagement;
 [Route("api/v{version:apiVersion}/[controller]")]
 public class DirectoriesController : ApiController
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly ISender _mediator;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="DirectoriesController"/> class.
     /// </summary>
@@ -35,9 +32,7 @@ public class DirectoriesController : ApiController
     {
         _mediator = mediator;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Gets the tree of expanded directories leading up to <paramref name="path"/>, with the additional list of drives, and children of the last child directory.
     /// </summary>
@@ -103,5 +98,4 @@ public class DirectoriesController : ApiController
             }
         }
     }
-    #endregion
 }

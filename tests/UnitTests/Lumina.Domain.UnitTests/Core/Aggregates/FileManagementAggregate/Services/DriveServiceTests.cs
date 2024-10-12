@@ -22,14 +22,11 @@ namespace Lumina.Domain.UnitTests.Core.Aggregates.FileManagementAggregate.Servic
 [ExcludeFromCodeCoverage]
 public class DriveServiceTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IFileSystem _mockFileSystem;
     private readonly IPlatformContextManager _mockPlatformContextManager;
     private readonly IPlatformContext _mockPlatformContext;
     private readonly DriveService _sut;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="DriveServiceTests"/> class.
     /// </summary>
@@ -41,9 +38,7 @@ public class DriveServiceTests
         _mockPlatformContextManager.GetCurrentContext().Returns(_mockPlatformContext);
         _sut = new DriveService(_mockFileSystem, _mockPlatformContextManager);
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void GetDrives_OnUnixPlatform_ShouldReturnSingleUnixRootItem()
     {
@@ -90,5 +85,4 @@ public class DriveServiceTests
         mockDriveInfo.IsReady.Returns(isReady);
         return mockDriveInfo;
     }
-    #endregion
 }

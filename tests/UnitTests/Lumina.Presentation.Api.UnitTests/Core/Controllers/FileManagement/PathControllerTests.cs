@@ -33,14 +33,11 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Controllers.FileManagement;
 [ExcludeFromCodeCoverage]
 public class PathControllerTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly ISender _mockMediator;
     private readonly PathController _sut;
     private readonly PathSegmentResponseFixture _pathSegmentResponseFixture;
     private readonly PathSeparatorResponseFixture _pathSeparatorResponseFixture;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="PathControllerTests"/> class.
     /// </summary>
@@ -51,9 +48,7 @@ public class PathControllerTests
         _pathSegmentResponseFixture = new PathSegmentResponseFixture();
         _pathSeparatorResponseFixture = new PathSeparatorResponseFixture();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public async Task GetPathRoot_WhenCalled_ShouldReturnOkResultWithPathSegmentResponse()
     {
@@ -676,5 +671,4 @@ public class PathControllerTests
         cts.CancelAfter(50);
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() => _sut.CheckPathExists(path, true, cts.Token));
     }
-    #endregion
 }

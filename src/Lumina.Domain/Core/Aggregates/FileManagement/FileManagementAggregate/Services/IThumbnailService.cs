@@ -12,7 +12,6 @@ namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.S
 /// </summary>
 public interface IThumbnailService
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Gets the thumbnail of a file at the specified path.
     /// </summary>
@@ -30,5 +29,4 @@ public interface IThumbnailService
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of bytes representing the thumbnail of the file at the specified path or an error.</returns>
     Task<ErrorOr<Thumbnail>> GetThumbnailAsync(FileSystemPathId path, int quality, CancellationToken cancellationToken);
-    #endregion
 }

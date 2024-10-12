@@ -13,14 +13,11 @@ namespace Lumina.Domain.Common.ValueObjects.Metadata;
 [DebuggerDisplay("{Name}")]
 public class Tag : ValueObject
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the name of the tag element of the media item.
     /// </summary>
     public string Name { get; }
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="Tag"/> class.
     /// </summary>
@@ -29,9 +26,7 @@ public class Tag : ValueObject
     {
         Name = name.Trim();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a new instance of the <see cref="Tag"/> class.
     /// </summary>
@@ -60,5 +55,4 @@ public class Tag : ValueObject
     {
         return Name;
     }
-    #endregion
 }

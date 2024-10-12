@@ -20,7 +20,6 @@ namespace Lumina.Application.Common.Mapping.WrittenContentLibrary.BookLibrary;
 /// </summary>
 public class BookMappingConfig : IRegister
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Registers the mapping configuration.
     /// </summary>
@@ -130,5 +129,4 @@ public class BookMappingConfig : IRegister
             ).Value).ToList()
         ).Value);
     }
-    #endregion
 }

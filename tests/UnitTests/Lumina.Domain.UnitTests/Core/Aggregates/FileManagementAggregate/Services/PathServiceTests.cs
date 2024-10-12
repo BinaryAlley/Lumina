@@ -21,16 +21,13 @@ namespace Lumina.Domain.UnitTests.Core.Aggregates.FileManagementAggregate.Servic
 [ExcludeFromCodeCoverage]
 public class PathServiceTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IPlatformContextManager _mockPlatformContextManager;
     private readonly IPlatformContext _mockPlatformContext;
     private readonly IPathStrategy _mockPathStrategy;
     private readonly PathService _sut;
     private readonly FileSystemPathIdFixture _fileSystemPathIdFixture;
     private readonly PathSegmentFixture _pathSegmentFixture;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="PathServiceTests"/> class.
     /// </summary>
@@ -45,9 +42,7 @@ public class PathServiceTests
         _fileSystemPathIdFixture = new FileSystemPathIdFixture();
         _pathSegmentFixture = new PathSegmentFixture();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void IsValidPath_WithValidPath_ShouldReturnTrue()
     {
@@ -528,5 +523,4 @@ public class PathServiceTests
         result.FirstError.Should().Be(Errors.FileManagement.InvalidPath);
         _mockPathStrategy.DidNotReceive().GetPathRoot(Arg.Any<FileSystemPathId>());
     }
-    #endregion
 }

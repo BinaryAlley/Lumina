@@ -9,7 +9,6 @@ namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.S
 /// </summary>
 internal class EnvironmentContext : IEnvironmentContext
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the service for identifying and handling different file types.
     /// </summary>
@@ -24,9 +23,7 @@ internal class EnvironmentContext : IEnvironmentContext
     /// Gets the service for performing directory-related operations.
     /// </summary>
     public IDirectoryProviderService DirectoryProviderService { get; private set; }
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="EnvironmentContext"/> class.
     /// </summary>
@@ -39,5 +36,4 @@ internal class EnvironmentContext : IEnvironmentContext
         FileProviderService = fileProviderService;
         DirectoryProviderService = directoryProviderService;
     }
-    #endregion
 }

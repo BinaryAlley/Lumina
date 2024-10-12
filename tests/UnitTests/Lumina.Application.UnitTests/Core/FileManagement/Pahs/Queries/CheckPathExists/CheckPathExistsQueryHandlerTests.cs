@@ -18,12 +18,9 @@ namespace Lumina.Application.UnitTests.Core.FileManagement.Pahs.Queries.CheckPat
 [ExcludeFromCodeCoverage]
 public class CheckPathExistsQueryHandlerTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IPathService _mockPathService;
     private readonly CheckPathExistsQueryHandler _sut;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="CheckPathExistsQueryHandlerTests"/> class.
     /// </summary>
@@ -32,9 +29,7 @@ public class CheckPathExistsQueryHandlerTests
         _mockPathService = Substitute.For<IPathService>();
         _sut = new CheckPathExistsQueryHandler(_mockPathService);
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public async Task Handle_WhenPathExistsAndIsNotHidden_ShouldReturnTrueResponse()
     {
@@ -125,5 +120,4 @@ public class CheckPathExistsQueryHandlerTests
         result.Exists.Should().BeTrue();
         _mockPathService.Received(1).Exists(query.Path);
     }
-    #endregion
 }

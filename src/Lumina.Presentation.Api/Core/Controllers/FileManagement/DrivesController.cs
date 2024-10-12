@@ -19,11 +19,8 @@ namespace Lumina.Presentation.Api.Core.Controllers.FileManagement;
 [Route("api/v{version:apiVersion}/[controller]")]
 public class DrivesController : ApiController
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly ISender _mediator;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="DrivesController"/> class.
     /// </summary>
@@ -32,9 +29,7 @@ public class DrivesController : ApiController
     {
         _mediator = mediator;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Controller action for getting the list of all file system drives.
     /// </summary>
@@ -45,5 +40,4 @@ public class DrivesController : ApiController
         ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _mediator.Send(new GetDrivesQuery(), cancellationToken).ConfigureAwait(false);
         return result.Match(result => Ok(result), errors => Problem(errors));
     }
-    #endregion
 }

@@ -25,7 +25,6 @@ namespace Lumina.Presentation.Api.IntegrationTests.Core.Controllers.FileManageme
 [ExcludeFromCodeCoverage]
 public class FileSystemControllerTests : IClassFixture<LuminaApiFactory>
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly HttpClient _client;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -33,9 +32,7 @@ public class FileSystemControllerTests : IClassFixture<LuminaApiFactory>
         PropertyNameCaseInsensitive = true,
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="FileSystemControllerTests"/> class.
     /// </summary>
@@ -44,9 +41,7 @@ public class FileSystemControllerTests : IClassFixture<LuminaApiFactory>
     {
         _client = apiFactory.CreateClient();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public async Task GetType_WhenCalled_ShouldReturnOkResultWithFileSystemTypeResponse()
     {
@@ -95,5 +90,4 @@ public class FileSystemControllerTests : IClassFixture<LuminaApiFactory>
         // Assert
         await act.Should().NotThrowAsync();
     }
-    #endregion
 }

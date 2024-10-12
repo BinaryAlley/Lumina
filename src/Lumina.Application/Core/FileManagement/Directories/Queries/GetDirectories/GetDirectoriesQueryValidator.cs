@@ -10,7 +10,6 @@ namespace Lumina.Application.Core.FileManagement.Directories.Queries.GetDirector
 /// </summary>
 public class GetDirectoriesQueryValidator : AbstractValidator<GetDirectoriesQuery>
 {
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="GetDirectoriesQueryValidator"/> class.
     /// </summary>
@@ -18,5 +17,4 @@ public class GetDirectoriesQueryValidator : AbstractValidator<GetDirectoriesQuer
     {
         RuleFor(x => x.Path).NotEmpty().WithMessage(Errors.FileManagement.PathCannotBeEmpty.Code);
     }
-    #endregion
 }

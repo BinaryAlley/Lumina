@@ -20,13 +20,10 @@ namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.S
 /// </summary>
 public class FileTypeService : IFileTypeService
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IFileSystem _fileSystem;
     private readonly IFileSystemPermissionsService _fileSystemPermissionsService;
     private const int BUFFER_SIZE = 18; // 18 bytes should be more than enough for common images header types
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="FileTypeService"/> class.
     /// </summary>
@@ -37,9 +34,7 @@ public class FileTypeService : IFileTypeService
         _fileSystem = fileSystem;
         _fileSystemPermissionsService = fileSystemPermissionsService;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Determines if <paramref name="file"/> is of type image or not, and returns its type.
     /// </summary>
@@ -159,5 +154,4 @@ public class FileTypeService : IFileTypeService
             return ImageType.WEBP; // WEBP
         return ImageType.None;
     }
-    #endregion
 }

@@ -14,7 +14,6 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Controllers.Common.Fixtures;
 [ExcludeFromCodeCoverage]
 public class ApiControllerFixture : ApiController
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Returns a standardized error response using the <see cref="ProblemDetails"/> format.
     /// </summary>
@@ -34,5 +33,4 @@ public class ApiControllerFixture : ApiController
     {
         return ValidationProblem(errors);
     }
-    #endregion
 }

@@ -4,7 +4,6 @@ using Lumina.Presentation.Web.Common.Api;
 using Lumina.Presentation.Web.Common.Exceptions;
 using Lumina.Presentation.Web.Common.Filters;
 using Lumina.Presentation.Web.Common.Services;
-using Lumina.Presentation.Web.Core.Services.UI;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
 using Polly.CircuitBreaker;
@@ -23,7 +22,6 @@ namespace Lumina.Presentation.Web.Common.DependencyInjection;
 /// </summary>
 public static class PresentationWebLayerServices
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Registers the services of the Presentation Web layer into the dependency injection container.
     /// </summary>
@@ -64,11 +62,9 @@ public static class PresentationWebLayerServices
             .AddPolicyHandler(retryPolicy)
             .AddPolicyHandler(circuitBreakerPolicy);
 
-        services.AddSingleton<ComboboxService>();
         services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<ApiExceptionFilter>();
 
         return services;
     }
-    #endregion
 }

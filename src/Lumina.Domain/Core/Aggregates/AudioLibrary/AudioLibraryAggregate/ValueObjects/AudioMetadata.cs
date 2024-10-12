@@ -14,7 +14,6 @@ namespace Lumina.Domain.Core.Aggregates.AudioLibrary.AudioLibraryAggregate.Value
 [DebuggerDisplay("{Title}")]
 public class AudioMetadata : BaseMetadata
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the duration of the video in seconds.
     /// </summary>
@@ -44,9 +43,7 @@ public class AudioMetadata : BaseMetadata
     /// Gets the bitrate of the audio in kbps.
     /// </summary>
     public Optional<int> Bitrate { get; }
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="AudioMetadata"/> class.
     /// </summary>
@@ -87,9 +84,7 @@ public class AudioMetadata : BaseMetadata
         AudioCodec = audioCodec;
         Bitrate = bitrate;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a new instance of the <see cref="AudioMetadata"/> class.
     /// </summary>
@@ -155,5 +150,4 @@ public class AudioMetadata : BaseMetadata
         yield return AudioCodec;
         yield return Bitrate;
     }
-    #endregion
 }

@@ -14,7 +14,6 @@ namespace Lumina.Domain.Core.Aggregates.MediaContributor.MediaContributorAggrega
 [DebuggerDisplay("{DisplayName}")]
 public sealed class MediaContributorName : ValueObject
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the name by which the contributor is popularly known.
     /// </summary>
@@ -24,9 +23,7 @@ public sealed class MediaContributorName : ValueObject
     /// Gets the legal name of the contributor.
     /// </summary>
     public Optional<string> LegalName { get; private set; }
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="MediaContributorName"/> class.
     /// </summary>
@@ -37,9 +34,7 @@ public sealed class MediaContributorName : ValueObject
         DisplayName = displayName;
         LegalName = legalName;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a new instance of the <see cref="MediaContributorName"/> class.
     /// </summary>
@@ -58,5 +53,4 @@ public sealed class MediaContributorName : ValueObject
         yield return DisplayName;
         yield return LegalName;
     }
-    #endregion
 }

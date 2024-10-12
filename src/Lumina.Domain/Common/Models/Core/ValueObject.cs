@@ -11,7 +11,6 @@ namespace Lumina.Domain.Common.Models.Core;
 /// </summary>
 public abstract class ValueObject : IEquatable<ValueObject>
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Gets the list of items that define equality of the object.
     /// </summary>
@@ -72,5 +71,4 @@ public abstract class ValueObject : IEquatable<ValueObject>
         return GetEqualityComponents().Select(x => x?.GetHashCode() ?? 0)
                                       .Aggregate((x, y) => x ^ y);
     }
-    #endregion
 }

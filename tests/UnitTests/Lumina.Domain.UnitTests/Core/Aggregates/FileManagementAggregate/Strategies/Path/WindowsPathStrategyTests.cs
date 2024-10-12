@@ -20,14 +20,11 @@ namespace Lumina.Domain.UnitTests.Core.Aggregates.FileManagementAggregate.Strate
 [ExcludeFromCodeCoverage]
 public class WindowsPathStrategyTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IFileSystem _mockFileSystem;
     private readonly WindowsPathStrategy _sut;
     private readonly FileSystemPathIdFixture _fileSystemPathIdFixture;
     private readonly PathSegmentFixture _pathSegmentFixture;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="WindowsPathStrategyTests"/> class.
     /// </summary>
@@ -38,9 +35,7 @@ public class WindowsPathStrategyTests
         _fileSystemPathIdFixture = new FileSystemPathIdFixture();
         _pathSegmentFixture = new PathSegmentFixture();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Theory]
     [InlineData(@"C:\Users\User")]
     [InlineData(@"D:\Program Files\")]
@@ -772,5 +767,4 @@ public class WindowsPathStrategyTests
         result.IsError.Should().BeTrue();
         result.FirstError.Should().Be(Errors.FileManagement.InvalidPath);
     }
-    #endregion
 }

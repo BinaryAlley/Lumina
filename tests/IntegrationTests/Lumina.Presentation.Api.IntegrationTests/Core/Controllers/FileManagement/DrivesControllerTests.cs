@@ -24,7 +24,6 @@ namespace Lumina.Presentation.Api.IntegrationTests.Core.Controllers.FileManageme
 [ExcludeFromCodeCoverage]
 public class DrivesControllerTests : IClassFixture<LuminaApiFactory>
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly HttpClient _client;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -33,9 +32,7 @@ public class DrivesControllerTests : IClassFixture<LuminaApiFactory>
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
     private static readonly bool s_isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="DrivesControllerTests"/> class.
     /// </summary>
@@ -44,9 +41,7 @@ public class DrivesControllerTests : IClassFixture<LuminaApiFactory>
     {
         _client = apiFactory.CreateClient();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
 
     [Fact]
     public async Task GetDrives_WhenCalled_ShouldReturnDrives()
@@ -81,5 +76,4 @@ public class DrivesControllerTests : IClassFixture<LuminaApiFactory>
         firstDrive.ItemType.Should().Be(FileSystemItemType.Root);
         drives.Count.Should().BeGreaterThanOrEqualTo(1);
     }
-    #endregion
 }

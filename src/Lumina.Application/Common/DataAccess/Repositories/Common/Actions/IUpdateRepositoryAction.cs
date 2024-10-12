@@ -13,7 +13,6 @@ namespace Lumina.Application.Common.DataAccess.Repositories.Common.Actions;
 /// <typeparam name="TModel">The type used for the update action. It should implement <see cref="IStorageEntity"/>.</typeparam>
 public interface IUpdateRepositoryAction<TModel> where TModel : IStorageEntity
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Updates <paramref name="data"/> in the storage medium.
     /// </summary>
@@ -21,5 +20,4 @@ public interface IUpdateRepositoryAction<TModel> where TModel : IStorageEntity
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successfull operation, or an error.</returns>
     Task<ErrorOr<Updated>> UpdateAsync(TModel data, CancellationToken cancellationToken);
-    #endregion
 }

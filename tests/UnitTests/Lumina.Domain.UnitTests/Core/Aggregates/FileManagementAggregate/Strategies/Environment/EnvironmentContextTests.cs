@@ -14,13 +14,10 @@ namespace Lumina.Domain.UnitTests.Core.Aggregates.FileManagementAggregate.Strate
 [ExcludeFromCodeCoverage]
 public class EnvironmentContextTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IDirectoryProviderService _mockDirectoryProviderService;
     private readonly IFileProviderService _mockFileProviderService;
     private readonly IFileTypeService _mockFileTypeService;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="EnvironmentContextTests"/> class.
     /// </summary>
@@ -30,9 +27,7 @@ public class EnvironmentContextTests
         _mockFileProviderService = Substitute.For<IFileProviderService>();
         _mockFileTypeService = Substitute.For<IFileTypeService>();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void Constructor_WhenCalledWithValidParameters_ShouldInitializeAllProperties()
     {
@@ -95,5 +90,4 @@ public class EnvironmentContextTests
         // Assert
         result.Should().Be(_mockDirectoryProviderService);
     }
-    #endregion
 }

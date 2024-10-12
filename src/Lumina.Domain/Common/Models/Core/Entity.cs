@@ -10,7 +10,6 @@ namespace Lumina.Domain.Common.Models.Core;
 /// <typeparam name="TId">The type representing the unique identifier for the Entity. It should be a non-nullable type.</typeparam>
 public abstract class Entity<TId> : IEquatable<Entity<TId>> where TId : notnull
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the unique identifier of the entity.
     /// </summary>
@@ -25,9 +24,7 @@ public abstract class Entity<TId> : IEquatable<Entity<TId>> where TId : notnull
     /// Gets the date and time when the entity was last updated.
     /// </summary>
     public DateTime? Updated { get; set; }
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="Entity{TId}"/> class.
     /// </summary>
@@ -46,9 +43,7 @@ public abstract class Entity<TId> : IEquatable<Entity<TId>> where TId : notnull
 
     }
 #pragma warning restore CS8618
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Indicates whether the current object is equal to another object of the same type.
     /// </summary>
@@ -99,5 +94,4 @@ public abstract class Entity<TId> : IEquatable<Entity<TId>> where TId : notnull
     {
         return Id.GetHashCode();
     }
-    #endregion
 }

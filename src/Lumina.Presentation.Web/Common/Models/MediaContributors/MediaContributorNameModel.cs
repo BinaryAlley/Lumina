@@ -10,7 +10,6 @@ namespace Lumina.Presentation.Web.Common.Models.MediaContributors;
 [DebuggerDisplay("{DisplayName}")]
 public class MediaContributorNameModel
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the name by which the contributor is popularly known.
     /// </summary>
@@ -20,5 +19,4 @@ public class MediaContributorNameModel
     /// Gets the legal name of the contributor.
     /// </summary>
     public string? LegalName { get; set; }
-    #endregion
 }

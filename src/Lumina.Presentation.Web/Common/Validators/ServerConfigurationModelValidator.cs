@@ -10,7 +10,6 @@ namespace Lumina.Presentation.Web.Common.Validators;
 /// </summary>
 public class ServerConfigurationModelValidator : AbstractValidator<ServerConfigurationModel>
 {
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="ServerConfigurationModelValidator"/> class.
     /// </summary>
@@ -20,5 +19,4 @@ public class ServerConfigurationModelValidator : AbstractValidator<ServerConfigu
         RuleFor(x => x.Port).InclusiveBetween((ushort)0, (ushort)65535).WithMessage("Port number must be between 0 and 65535!");
         RuleFor(x => x.ApiVersion).InclusiveBetween((char)0, (char)255).WithMessage("API version must be between 0 and 255!");
     }
-    #endregion
 }

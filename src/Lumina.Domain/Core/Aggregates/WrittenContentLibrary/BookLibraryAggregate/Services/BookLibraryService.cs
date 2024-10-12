@@ -10,10 +10,8 @@ namespace Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggrega
 /// </summary>
 public sealed class BookLibraryService : IBookLibraryService
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the collection of books in the library.
     /// </summary>
     public ICollection<Book> Books => throw new NotImplementedException();
-    #endregion
 }

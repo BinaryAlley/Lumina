@@ -12,7 +12,6 @@ namespace Lumina.Application.UnitTests.Core.FileManagement.Pahs.Commands.Combine
 [ExcludeFromCodeCoverage]
 public class CombinePathCommandFixture
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a random valid command to combine paths.
     /// </summary>
@@ -27,5 +26,4 @@ public class CombinePathCommandFixture
             .RuleFor(x => x.OriginalPath, f => f.System.FilePath())
             .RuleFor(x => x.NewPath, f => f.System.FilePath());
     }
-    #endregion
 }

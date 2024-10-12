@@ -13,7 +13,6 @@ namespace Lumina.DataAccess.Common.Configuration;
 /// </summary>
 public class BookConfiguration : IEntityTypeConfiguration<BookModel>
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Configures the <see cref="BookModel"/> entity.
     /// </summary>
@@ -148,7 +147,6 @@ public class BookConfiguration : IEntityTypeConfiguration<BookModel>
                 .IsRequired();
         });
     }
-    #endregion
 }
 
 //public class ContributorConfiguration : IEntityTypeConfiguration<ContributorIdModel>
