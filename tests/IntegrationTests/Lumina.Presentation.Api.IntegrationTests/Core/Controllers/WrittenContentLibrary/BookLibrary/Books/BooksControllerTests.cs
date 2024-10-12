@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using Bogus;
 using FluentAssertions;
 using Lumina.Contracts.Enums.BookLibrary;
@@ -20,7 +20,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Controllers.Books;
+namespace Lumina.Presentation.Api.IntegrationTests.Core.Controllers.WrittenContentLibrary.BookLibrary.Books;
 
 /// <summary>
 /// Contains integration tests for the <see cref="BooksController"/> class.

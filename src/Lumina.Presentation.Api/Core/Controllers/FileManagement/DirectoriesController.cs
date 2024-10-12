@@ -49,7 +49,7 @@ public class DirectoriesController : ApiController
         [FromQuery] bool includeFiles, [FromQuery] bool includeHiddenElements, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _mediator.Send(new GetDirectoryTreeQuery(path, includeFiles, includeHiddenElements), cancellationToken).ConfigureAwait(false);
-        if (!result.IsError && result.Value is not null)
+        if (!result.IsError)
         {
             foreach (FileSystemTreeNodeResponse treeNode in result.Value)
             {
@@ -71,7 +71,7 @@ public class DirectoriesController : ApiController
         [FromQuery] bool includeHiddenElements, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _mediator.Send(new GetTreeDirectoriesQuery(path,includeHiddenElements), cancellationToken).ConfigureAwait(false);
-        if (!result.IsError && result.Value is not null)
+        if (!result.IsError)
         {
             foreach (FileSystemTreeNodeResponse directory in result.Value)
             {
@@ -93,7 +93,7 @@ public class DirectoriesController : ApiController
         [FromQuery] bool includeHiddenElements, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         ErrorOr<IEnumerable<DirectoryResponse>> result = await _mediator.Send(new GetDirectoriesQuery(path, includeHiddenElements), cancellationToken).ConfigureAwait(false);
-        if (!result.IsError && result.Value is not null)
+        if (!result.IsError)
         {
             foreach (DirectoryResponse directory in result.Value)
             {

@@ -37,6 +37,8 @@ public static class PresentationApiLayerServices
         // add services to the container
         services.AddControllers().AddJsonOptions(options =>
         {
+            options.JsonSerializerOptions.MaxDepth = 256;
+            options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; // needed because file system API responses can have very nested structures
             options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             options.JsonSerializerOptions.Converters.Add(new OptionalJsonConverterFactory());
         });

@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using Lumina.DataAccess.Core.UoW;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -8,6 +8,8 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 #endregion
 
 namespace Lumina.Presentation.Api.IntegrationTests.Common.Setup;
@@ -42,10 +44,13 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
     {
         builder.ConfigureServices(services =>
         {
+            // remove existing DbContext configuration
             ServiceDescriptor? descriptor = services.SingleOrDefault(serviceDescriptor => serviceDescriptor.ServiceType == typeof(DbContextOptions<LuminaDbContext>));
             if (descriptor is not null)
                 services.Remove(descriptor);
+            // add SQLite DbContext configuration
             services.AddDbContext<LuminaDbContext>(options => options.UseSqlite(_connection));
+            // build service provider and ensure database is created
             ServiceProvider servicePreovider = services.BuildServiceProvider();
             using (IServiceScope scope = servicePreovider.CreateScope())
             {
