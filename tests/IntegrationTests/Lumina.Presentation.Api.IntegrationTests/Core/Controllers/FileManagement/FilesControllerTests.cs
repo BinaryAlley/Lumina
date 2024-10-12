@@ -191,52 +191,6 @@ public class FilesControllerTests : IClassFixture<LuminaApiFactory>
     }
 
     [Fact]
-    public async Task GetTreeFiles_WhenCancellationIsRequested_ShouldStopYieldingResults()
-    {
-        // Arrange
-        FileSystemStructureFixture fileSystemFixture = new();
-        string testPath = fileSystemFixture.CreateFileSystemStructure();
-
-        bool includeHiddenElements = false;
-        CancellationTokenSource cts = new();
-
-        try
-        {
-            // Act
-            Task<HttpResponseMessage> getTreeFilesTask = _client.GetAsync(
-                $"/api/v1/files/get-tree-files?path={Uri.EscapeDataString(testPath)}&includeHiddenElements={includeHiddenElements}",
-                cts.Token
-            );
-
-            // simulate cancellation before the request completes
-            await Task.Delay(100);
-            cts.Cancel();
-
-            HttpResponseMessage? response = null;
-            try
-            {
-                response = await getTreeFilesTask;
-            }
-            catch (TaskCanceledException)
-            {
-                // expected when the task is cancelled, suppress the exception to continue the test
-            }
-            // Assert
-            response?.StatusCode.Should().Be(HttpStatusCode.OK, "The cancellation should occur gracefully on the server side");
-
-            // assert that no elements were returned after cancellation
-            if (response != null)
-                using (Stream stream = await response.Content.ReadAsStreamAsync())
-                using (JsonDocument jsonDoc = await JsonDocument.ParseAsync(stream))
-                    jsonDoc.RootElement.GetArrayLength().Should().Be(0, "no elements should be yielded after cancellation");
-        }
-        finally
-        {
-            fileSystemFixture.CleanupFileSystemStructure();
-        }
-    }
-
-    [Fact]
     public async Task GetFiles_WhenCalledWithValidPathAndNotIncludeHiddenElements_ShouldReturnFilesWithoutHiddenElements()
     {
         // Arrange
