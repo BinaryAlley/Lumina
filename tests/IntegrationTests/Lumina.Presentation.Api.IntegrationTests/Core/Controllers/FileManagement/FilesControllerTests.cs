@@ -209,6 +209,7 @@ public class FilesControllerTests : IClassFixture<LuminaApiFactory>
             );
 
             // simulate cancellation before the request completes
+            await Task.Delay(100);
             cts.Cancel();
 
             HttpResponseMessage? response = null;
