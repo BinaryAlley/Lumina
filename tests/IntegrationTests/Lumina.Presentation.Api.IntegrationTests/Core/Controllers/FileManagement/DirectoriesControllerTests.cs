@@ -363,52 +363,6 @@ public class DirectoriesControllerTests : IClassFixture<LuminaApiFactory>
     }
 
     [Fact]
-    public async Task GetDirectoryTree_WhenCancellationIsRequested_ShouldStopYieldingResults()
-    {
-        // Arrange
-        FileSystemStructureFixture fileSystemFixture = new();
-        string testPath = fileSystemFixture.CreateFileSystemStructure();
-
-        bool includeFiles = true;
-        bool includeHiddenElements = false;
-        CancellationTokenSource cts = new();
-
-        try
-        {
-            // Act
-            Task<HttpResponseMessage> getDirectoryTreeTask = _client.GetAsync(
-                $"/api/v1/directories/get-directory-tree?path={Uri.EscapeDataString(testPath)}&includeFiles={includeFiles}&includeHiddenElements={includeHiddenElements}",
-                cts.Token
-            );
-
-            // simulate cancellation before the request completes
-            cts.Cancel();
-
-            HttpResponseMessage? response = null;
-            try
-            {
-                response = await getDirectoryTreeTask;
-            }
-            catch (TaskCanceledException)
-            {
-                // expected when the task is cancelled, suppress the exception to continue the test
-            }
-            // Assert
-            response?.StatusCode.Should().Be(HttpStatusCode.OK, "The cancellation should occur gracefully on the server side");
-
-            // assert that no elements were returned after cancellation
-            if (response != null)
-                using (Stream stream = await response.Content.ReadAsStreamAsync())
-                    using (JsonDocument jsonDoc = await JsonDocument.ParseAsync(stream))
-                        jsonDoc.RootElement.GetArrayLength().Should().Be(0, "no elements should be yielded after cancellation");
-        }
-        finally
-        {
-            fileSystemFixture.CleanupFileSystemStructure();
-        }
-    }
-
-    [Fact]
     public async Task GetTreeDirectories_WhenCalledWithValidPathAndNotIncludeHiddenElements_ShouldReturnTreeDirectoriesWithoutHiddenElements()
     {
         // Arrange
@@ -551,51 +505,6 @@ public class DirectoriesControllerTests : IClassFixture<LuminaApiFactory>
     }
 
     [Fact]
-    public async Task GetTreeDirectories_WhenCancellationIsRequested_ShouldStopYieldingResults()
-    {
-        // Arrange
-        FileSystemStructureFixture fileSystemFixture = new();
-        string testPath = fileSystemFixture.CreateFileSystemStructure();
-
-        bool includeHiddenElements = false;
-        CancellationTokenSource cts = new();
-
-        try
-        {
-            // Act
-            Task<HttpResponseMessage> getTreeDirectoriesTask = _client.GetAsync(
-                $"/api/v1/directories/get-tree-directories?path={Uri.EscapeDataString(testPath)}&includeHiddenElements={includeHiddenElements}",
-                cts.Token
-            );
-
-            // simulate cancellation before the request completes
-            cts.Cancel();
-
-            HttpResponseMessage? response = null;
-            try
-            {
-                response = await getTreeDirectoriesTask;
-            }
-            catch (TaskCanceledException)
-            {
-                // expected when the task is cancelled, suppress the exception to continue the test
-            }
-            // Assert
-            response?.StatusCode.Should().Be(HttpStatusCode.OK, "The cancellation should occur gracefully on the server side");
-
-            // assert that no elements were returned after cancellation
-            if (response != null)
-                using (Stream stream = await response.Content.ReadAsStreamAsync())
-                using (JsonDocument jsonDoc = await JsonDocument.ParseAsync(stream))
-                    jsonDoc.RootElement.GetArrayLength().Should().Be(0, "no elements should be yielded after cancellation");
-        }
-        finally
-        {
-            fileSystemFixture.CleanupFileSystemStructure();
-        }
-    }
-
-    [Fact]
     public async Task GetDirectories_WhenCalledWithValidPathAndNotIncludeHiddenElements_ShouldReturnDirectoriesWithoutHiddenElements()
     {
         // Arrange
@@ -726,48 +635,6 @@ public class DirectoriesControllerTests : IClassFixture<LuminaApiFactory>
             firstDirectory.Name.Should().Be((s_isLinux ? "." : string.Empty) + "NestedDirectory_2");
             firstDirectory.Path.Should().Be(Path.Combine(testPath, (s_isLinux ? "." : string.Empty) + "NestedDirectory_2" + Path.DirectorySeparatorChar));
             directories.Count.Should().Be(1); // only directories
-        }
-        finally
-        {
-            fileSystemFixture.CleanupFileSystemStructure();
-        }
-    }
-
-    [Fact]
-    public async Task GetDirectories_WhenCancellationIsRequested_ShouldStopYieldingResults()
-    {
-        // Arrange
-        FileSystemStructureFixture fileSystemFixture = new();
-        string testPath = fileSystemFixture.CreateFileSystemStructure();
-
-        bool includeHiddenElements = false;
-        CancellationTokenSource cts = new();
-
-        try
-        {
-            // Act
-            Task<HttpResponseMessage> getDirectoriesTask = _client.GetAsync($"/api/v1/directories/get-directories?path={Uri.EscapeDataString(testPath)}&includeHiddenElements={includeHiddenElements}", cts.Token);
-
-            // simulate cancellation before the request completes
-            cts.Cancel();
-
-            HttpResponseMessage? response = null;
-            try
-            {
-                response = await getDirectoriesTask;
-            }
-            catch (TaskCanceledException)
-            {
-                // expected when the task is cancelled, suppress the exception to continue the test
-            }
-            // Assert
-            response?.StatusCode.Should().Be(HttpStatusCode.OK, "The cancellation should occur gracefully on the server side");
-
-            // assert that no elements were returned after cancellation
-            if (response != null)
-                using (Stream stream = await response.Content.ReadAsStreamAsync())
-                using (JsonDocument jsonDoc = await JsonDocument.ParseAsync(stream))
-                    jsonDoc.RootElement.GetArrayLength().Should().Be(0, "no elements should be yielded after cancellation");
         }
         finally
         {

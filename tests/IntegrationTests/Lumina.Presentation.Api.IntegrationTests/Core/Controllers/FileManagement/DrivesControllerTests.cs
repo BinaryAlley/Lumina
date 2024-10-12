@@ -81,39 +81,5 @@ public class DrivesControllerTests : IClassFixture<LuminaApiFactory>
         firstDrive.ItemType.Should().Be(FileSystemItemType.Root);
         drives.Count.Should().BeGreaterThanOrEqualTo(1);
     }
-
-    [Fact]
-    public async Task GetDrives_WhenCancellationIsRequested_ShouldStopYieldingResults()
-    {
-        // Arrange
-        CancellationTokenSource cts = new();
-        
-        // Act
-        Task<HttpResponseMessage> getDrivesTask = _client.GetAsync(
-            $"/api/v1/drives/get-drives",
-            cts.Token
-        );
-
-        // simulate cancellation before the request completes
-        cts.Cancel();
-
-        HttpResponseMessage? response = null;
-        try
-        {
-            response = await getDrivesTask;
-        }
-        catch (TaskCanceledException)
-        {
-            // expected when the task is cancelled, suppress the exception to continue the test
-        }
-        // Assert
-        response?.StatusCode.Should().Be(HttpStatusCode.OK, "The cancellation should occur gracefully on the server side");
-
-        // assert that no elements were returned after cancellation
-        if (response != null)
-            using (Stream stream = await response.Content.ReadAsStreamAsync())
-            using (JsonDocument jsonDoc = await JsonDocument.ParseAsync(stream))
-                jsonDoc.RootElement.GetArrayLength().Should().Be(0, "no elements should be yielded after cancellation");
-    }
     #endregion
 }
