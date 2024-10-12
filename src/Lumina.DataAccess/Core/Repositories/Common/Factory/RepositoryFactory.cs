@@ -10,11 +10,8 @@ namespace Lumina.DataAccess.Core.Repositories.Common.Factory;
 /// </summary>
 public class RepositoryFactory : IRepositoryFactory
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IServiceProvider _serviceProvider;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="RepositoryFactory"/> class.
     /// </summary>
@@ -23,9 +20,7 @@ public class RepositoryFactory : IRepositoryFactory
     {
         _serviceProvider = serviceProvider;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a new repository of type <typeparamref name="TResult"/>.
     /// </summary>
@@ -36,5 +31,4 @@ public class RepositoryFactory : IRepositoryFactory
     {
         return _serviceProvider.GetRequiredService<TResult>() ?? throw new ArgumentException();
     }
-    #endregion
 }

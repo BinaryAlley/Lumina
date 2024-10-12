@@ -19,11 +19,8 @@ namespace Lumina.DataAccess.Core.Repositories.Books;
 /// </summary>
 internal sealed class BookRepository : IBookRepository
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly LuminaDbContext _luminaDbContext;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="BookRepository"/> class.
     /// </summary>
@@ -32,9 +29,7 @@ internal sealed class BookRepository : IBookRepository
     {
         _luminaDbContext = luminaDbContext;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Adds a new book.
     /// </summary>
@@ -77,5 +72,4 @@ internal sealed class BookRepository : IBookRepository
             .Include(book => book.ISBNs)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
     }
-    #endregion
 }

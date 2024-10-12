@@ -11,4 +11,7 @@ namespace Lumina.Contracts.Responses.FileManagement;
 /// <param name="Type">The type of the thumbnail image.</param>
 /// <param name="Bytes">The bytes representing the thumbail.</param>
 [DebuggerDisplay("{Type}")]
-public record ThumbnailResponse(ImageType Type, byte[] Bytes);
+public record ThumbnailResponse(
+    ImageType Type, 
+    byte[] Bytes
+);

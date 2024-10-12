@@ -18,12 +18,9 @@ namespace Lumina.Application.Core.FileManagement.Directories.Queries.GetDirector
 /// </summary>
 public class GetDirectoriesQueryHandler : IRequestHandler<GetDirectoriesQuery, ErrorOr<IEnumerable<DirectoryResponse>>>
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IDirectoryService _directoryService;
     private readonly IMapper _mapper;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="GetDirectoriesQueryHandler"/> class.
     /// </summary>
@@ -34,9 +31,7 @@ public class GetDirectoriesQueryHandler : IRequestHandler<GetDirectoriesQuery, E
         _directoryService = directoryService;
         _mapper = mapper;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Gets the list of directories at the specified path.
     /// </summary>
@@ -50,5 +45,4 @@ public class GetDirectoriesQueryHandler : IRequestHandler<GetDirectoriesQuery, E
         ErrorOr<IEnumerable<Directory>> result = _directoryService.GetSubdirectories(request.Path, request.IncludeHiddenElements);
         return ValueTask.FromResult(result.Match(values => ErrorOrFactory.From(_mapper.Map<IEnumerable<DirectoryResponse>>(values)), errors => errors));
     }
-    #endregion
 }

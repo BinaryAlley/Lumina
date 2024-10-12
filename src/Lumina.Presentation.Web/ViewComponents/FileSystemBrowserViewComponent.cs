@@ -14,11 +14,8 @@ namespace Lumina.Presentation.Web.ViewComponents;
 /// </summary>
 public class FileSystemBrowserViewComponent : ViewComponent
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly ServerConfigurationModel _serverConfigurationModel;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="FileSystemBrowserViewComponent"/> class.
     /// </summary>
@@ -27,9 +24,7 @@ public class FileSystemBrowserViewComponent : ViewComponent
     {
         _serverConfigurationModel = serverConfigurationModelOptions.Value;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Invokes the <see cref="FileSystemBrowser"/> view component.
     /// </summary>
@@ -47,5 +42,4 @@ public class FileSystemBrowserViewComponent : ViewComponent
             IconSize = FileSystemIconSize.Large
         });
     }
-    #endregion
 }

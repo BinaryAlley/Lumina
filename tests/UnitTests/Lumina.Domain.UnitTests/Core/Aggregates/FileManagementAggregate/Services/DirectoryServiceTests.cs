@@ -28,7 +28,6 @@ namespace Lumina.Domain.UnitTests.Core.Aggregates.FileManagementAggregate.Servic
 [ExcludeFromCodeCoverage]
 public class DirectoryServiceTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IEnvironmentContext _mockEnvironmentContext;
     private readonly IPlatformContextManager _mockPlatformContextManager;
     private readonly IPlatformContext _mockPlatformContext;
@@ -40,9 +39,7 @@ public class DirectoryServiceTests
     private readonly string _pathDirTestSubDir1 = s_isLinux ? "/TestDir/Sub1" : @"C:\TestDir\Sub1";
     private readonly string _pathDirTestSubDir2 = s_isLinux ? "/TestDir/Sub2" : @"C:\TestDir\Sub2";
     private readonly char _dirSeparator = s_isLinux ? '/' : '\\';
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="DirectoryServiceTests"/> class.
     /// </summary>
@@ -56,9 +53,7 @@ public class DirectoryServiceTests
         _fileSystemPathIdFixture = new FileSystemPathIdFixture();
         _directoryFixture = new DirectoryFixture();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void GetSubdirectories_WithValidPath_ShouldReturnListOfDirectories()
     {
@@ -786,5 +781,4 @@ public class DirectoryServiceTests
         result.IsError.Should().BeTrue();
         result.FirstError.Should().Be(Errors.FileManagement.DirectoryNotFound);
     }
-    #endregion
 }

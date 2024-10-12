@@ -11,7 +11,6 @@ namespace Lumina.DataAccess.IntegrationTests.Core.Repositories.Common.Factory;
 [ExcludeFromCodeCoverage]
 public class RepositoryFactoryTests
 {
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void RepositoryFactoryImplementsRepositoryFactoryInterface_InterfaceIsImplemented_ReturnsTrue()
     {
@@ -21,5 +20,4 @@ public class RepositoryFactoryTests
         // Assert
         Assert.True(repositoryFactory is IRepositoryFactory);
     }
-    #endregion
 }

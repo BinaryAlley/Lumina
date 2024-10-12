@@ -12,7 +12,6 @@ namespace Lumina.Presentation.Api.Common.DependencyInjection;
 /// </summary>
 internal static class PresentationApiLayerConfiguration
 {
-    #region ================================================================== METHODS ===================================================================================
     /// <summary>
     /// Extension method for adding the Presentation API layer configuration to the DI container.
     /// </summary>
@@ -31,5 +30,4 @@ internal static class PresentationApiLayerConfiguration
 
         return services;
     }
-    #endregion
 }

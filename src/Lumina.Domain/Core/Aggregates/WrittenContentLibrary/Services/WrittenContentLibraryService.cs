@@ -9,14 +9,11 @@ namespace Lumina.Domain.Core.Aggregates.WrittenContentLibrary.Services;
 /// </summary>
 public class WrittenContentLibraryService : IWrittenContentLibraryService
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the service for managing book libraries.
     /// </summary>
     public IBookLibraryService BookLibraryService { get; private set; }
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="WrittenContentLibraryService"/> class.
     /// </summary>
@@ -25,8 +22,4 @@ public class WrittenContentLibraryService : IWrittenContentLibraryService
     {
         BookLibraryService = bookLibraryService;
     }
-    #endregion
-
-    #region ===================================================================== METHODS ===================================================================================
-    #endregion
 }

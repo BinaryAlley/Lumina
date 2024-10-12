@@ -11,14 +11,11 @@ namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.S
 /// </summary>
 public interface IPathService
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the character used to separate path segments.
     /// </summary>
     char PathSeparator { get; }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Checks if <paramref name="path"/> is a valid path.
     /// </summary>
@@ -68,5 +65,4 @@ public interface IPathService
     /// <param name="path">The path for which to get the root.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing the root of <paramref name="path"/>, or an error.</returns>
     ErrorOr<PathSegment> GetPathRoot(string path);
-    #endregion
 }

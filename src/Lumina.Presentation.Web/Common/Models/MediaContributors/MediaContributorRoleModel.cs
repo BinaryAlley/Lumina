@@ -10,7 +10,6 @@ namespace Lumina.Presentation.Web.Common.Models.MediaContributors;
 [DebuggerDisplay("{Name}")]
 public class MediaContributorRoleModel
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the value representing this object.
     /// </summary>
@@ -20,5 +19,4 @@ public class MediaContributorRoleModel
     /// Gets the category of this object.
     /// </summary>
     public string? Category { get; set; }
-    #endregion
 }

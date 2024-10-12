@@ -18,7 +18,6 @@ namespace Lumina.Domain.UnitTests.Core.Aggregates.FileManagementAggregate.Entiti
 [ExcludeFromCodeCoverage]
 public class WindowsRootItemTests
 {
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void Create_WhenCalledWithValidParameters_ShouldReturnSuccessfulResult()
     {
@@ -144,5 +143,4 @@ public class WindowsRootItemTests
         result.FirstError.Should().Be(Errors.FileManagement.ParentNodeCannotBeNull);
         windowsRootItem.Parent.HasValue.Should().BeFalse();
     }
-    #endregion
 }

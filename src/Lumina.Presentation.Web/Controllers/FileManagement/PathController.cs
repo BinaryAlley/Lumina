@@ -15,11 +15,8 @@ namespace Lumina.Presentation.Web.Controllers.FileManagement;
 [Route("[controller]")]
 public class PathController : Controller
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IApiHttpClient _apiHttpClient;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="PathController"/> class.
     /// </summary>
@@ -28,9 +25,7 @@ public class PathController : Controller
     {
         _apiHttpClient = apiHttpClient;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Gets the root of <paramref name="path"/>.
     /// </summary>
@@ -102,5 +97,4 @@ public class PathController : Controller
         PathExistsModel response = await _apiHttpClient.GetAsync<PathExistsModel>($"path/check-path-exists?path={Uri.EscapeDataString(path)}&includeHiddenElements={includeHiddenElements}", cancellationToken: cancellationToken);
         return Json(new { success = true, data = new { exists = response.Exists } });
     }
-    #endregion
 }

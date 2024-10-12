@@ -14,11 +14,8 @@ namespace Lumina.Application.UnitTests.Core.FileManagement.Directories.Fixtures;
 [ExcludeFromCodeCoverage]
 public class FileSystemItemModelFixture
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly Faker _faker = new();
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a random valid <see cref="FileSystemItemModel"/>.
     /// </summary>
@@ -42,5 +39,4 @@ public class FileSystemItemModelFixture
     {
         return Enumerable.Range(0, count).Select(_ => Create()).ToList();
     }
-    #endregion
 }

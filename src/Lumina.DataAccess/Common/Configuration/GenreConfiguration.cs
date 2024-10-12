@@ -11,7 +11,6 @@ namespace Lumina.DataAccess.Common.Configuration;
 /// </summary>
 public class GenreConfiguration : IEntityTypeConfiguration<GenreModel>
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Configures the <see cref="GenreModel"/> entity.
     /// </summary>
@@ -22,5 +21,4 @@ public class GenreConfiguration : IEntityTypeConfiguration<GenreModel>
         builder.HasKey(genre => genre.Name);
         builder.Property(genre => genre.Name).IsRequired().HasMaxLength(50);
     }
-    #endregion
 }

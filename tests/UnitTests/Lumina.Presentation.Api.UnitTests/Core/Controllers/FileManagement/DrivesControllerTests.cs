@@ -27,13 +27,10 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Controllers.FileManagement;
 [ExcludeFromCodeCoverage]
 public class DrivesControllerTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly ISender _mockMediator;
     private readonly DrivesController _sut;
     private readonly FileSystemTreeNodeResponseFixture _fileSystemTreeNodeResponseFixture;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="DrivesControllerTests"/> class.
     /// </summary>
@@ -43,9 +40,7 @@ public class DrivesControllerTests
         _sut = new DrivesController(_mockMediator);
         _fileSystemTreeNodeResponseFixture = new FileSystemTreeNodeResponseFixture();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public async Task GetDrives_WhenCalled_ShouldReturnOkResultWithFileSystemTreeNodeResponses()
     {
@@ -130,17 +125,25 @@ public class DrivesControllerTests
     {
         // Arrange
         CancellationTokenSource cts = new();
+        TaskCompletionSource<bool> operationStarted = new();
+        TaskCompletionSource<bool> cancellationRequested = new();
 
         _mockMediator.Send(Arg.Any<GetDrivesQuery>(), Arg.Any<CancellationToken>())
             .Returns(callInfo => new ValueTask<ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>>(Task.Run(async () =>
             {
-                await Task.Delay(100, callInfo.Arg<CancellationToken>());
+                operationStarted.SetResult(true);
+                await cancellationRequested.Task;
+                callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
                 return ErrorOrFactory.From(_fileSystemTreeNodeResponseFixture.CreateMany(3, 1, 1).AsEnumerable());
             }, callInfo.Arg<CancellationToken>())));
 
-        // Act & Assert
-        cts.CancelAfter(50);
-        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => _sut.GetDrives(cts.Token));
+        // Act
+        Task<IActionResult> operationTask = _sut.GetDrives(cts.Token);
+        await operationStarted.Task;
+        cts.Cancel();
+        cancellationRequested.SetResult(true);
+
+        // Assert
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => operationTask);
     }
-    #endregion
 }

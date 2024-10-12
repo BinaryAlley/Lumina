@@ -17,11 +17,8 @@ namespace Lumina.Domain.UnitTests.Core.Aggregates.FileManagementAggregate.ValueO
 [ExcludeFromCodeCoverage]
 public class StreamInfoFixture
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly Faker _faker;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="StreamInfoFixture"/> class.
     /// </summary>
@@ -29,9 +26,7 @@ public class StreamInfoFixture
     {
         _faker = new Faker();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a random valid <see cref="StreamInfo"/>.
     /// </summary>
@@ -80,5 +75,4 @@ public class StreamInfoFixture
     {
         return Enumerable.Range(0, count).Select(_ => CreateStreamInfo()).ToList();
     }
-    #endregion
 }

@@ -28,14 +28,11 @@ namespace Lumina.Presentation.Api.IntegrationTests.Core.Controllers.WrittenConte
 [ExcludeFromCodeCoverage]
 public class BooksControllerTests : IClassFixture<LuminaApiFactory>
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly LuminaApiFactory _apiFactory;
     private readonly HttpClient _client;
     private readonly AddBookRequestFixture _requestBookFixture;
     private readonly JsonSerializerOptions _jsonOptions = new();
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="BooksControllerTests"/> class.
     /// </summary>
@@ -47,9 +44,7 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
         _requestBookFixture = new AddBookRequestFixture();
         _jsonOptions.Converters.Add(new BookJsonConverter());
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public async Task GetBooks_WhenCalled_ShouldReturnBooks()
     {
@@ -1615,5 +1610,4 @@ public class BooksControllerTests : IClassFixture<LuminaApiFactory>
         response.StatusCode.Should().Be(HttpStatusCode.Created);
         bookResponse.Should().NotBeNull();
     }
-    #endregion
 }

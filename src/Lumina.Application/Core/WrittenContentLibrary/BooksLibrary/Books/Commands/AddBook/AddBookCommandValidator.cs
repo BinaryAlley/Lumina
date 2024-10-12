@@ -11,7 +11,6 @@ namespace Lumina.Application.Core.WrittenContentLibrary.BooksLibrary.Books.Comma
 /// </summary>
 public class AddBookCommandValidator : AbstractValidator<AddBookCommand>
 {
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="AddBookCommandValidator"/> class.
     /// </summary>
@@ -211,5 +210,4 @@ public class AddBookCommandValidator : AbstractValidator<AddBookCommand>
                     .WithMessage(Errors.Metadata.RatingVoteCountMustBePositive.Code);
             });
     }
-    #endregion
 }

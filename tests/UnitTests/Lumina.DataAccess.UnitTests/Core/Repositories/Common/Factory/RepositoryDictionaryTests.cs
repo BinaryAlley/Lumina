@@ -17,11 +17,8 @@ namespace Lumina.DataAccess.UnitTests.Core.Repositories.Common.Factory;
 [ExcludeFromCodeCoverage]
 public class RepositoryDictionaryTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IFixture _fixture;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="RepositoryDictionaryTests"/> class.
     /// </summary>
@@ -29,9 +26,7 @@ public class RepositoryDictionaryTests
     {
         _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void Add_WhenValidRepositoryItemIsAdded_ShouldIncreaseCount()
     {
@@ -111,5 +106,4 @@ public class RepositoryDictionaryTests
         Action act = () => repositoryDictionary.Add(nonRepository);
         act.Should().Throw<ArgumentException>().WithMessage("Value must implement IRepository interface!");
     }
-    #endregion
 }

@@ -15,7 +15,6 @@ namespace Lumina.Domain.Common.ValueObjects.Metadata;
 [DebuggerDisplay("{ReleaseYear}")]
 public class ReleaseInfo : ValueObject
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the optional original release date of the media item.
     /// </summary>
@@ -46,9 +45,7 @@ public class ReleaseInfo : ValueObject
     /// Gets the optional release version or edition. (e.g. "Original", "Director's Cut", "2.0")
     /// </summary>
     public Optional<string> ReleaseVersion { get; }
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="ReleaseInfo"/> class.
     /// </summary>
@@ -73,9 +70,7 @@ public class ReleaseInfo : ValueObject
         ReleaseCountry = releaseCountry;
         ReleaseVersion = releaseVersion;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a new instance of the <see cref="ReleaseInfo"/> class.
     /// </summary>
@@ -117,5 +112,4 @@ public class ReleaseInfo : ValueObject
         yield return ReleaseCountry;
         yield return ReleaseVersion;
     }
-    #endregion
 }

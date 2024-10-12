@@ -12,18 +12,13 @@ namespace Lumina.DataAccess.Core.Repositories.Common.Factory;
 /// </summary>
 public class RepositoryDictionary
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly List<KeyValuePair<Type, object>> _container = [];
-    #endregion
 
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the number of added repositories.
     /// </summary>
     public int Count => _container.Count;
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Resets the collection of repositories.
     /// </summary>
@@ -66,5 +61,4 @@ public class RepositoryDictionary
     {
         return (TResult)_container.FirstOrDefault(e => e.Key == key).Value;
     }
-    #endregion
 }

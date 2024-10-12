@@ -15,7 +15,6 @@ namespace Lumina.Domain.UnitTests.Core.Aggregates.FileManagementAggregate.Strate
 [ExcludeFromCodeCoverage]
 public class PlatformContextTests
 {
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void WindowsPlatformContext_Constructor_ShouldSetPropertiesCorrectly()
     {
@@ -117,5 +116,4 @@ public class PlatformContextTests
         unixPlatformContext.GetType().GetProperty(nameof(UnixPlatformContext.Platform))!
             .SetMethod.Should().BeNull();
     }
-    #endregion
 }

@@ -18,12 +18,9 @@ namespace Lumina.Application.Core.FileManagement.Files.Queries.GetTreeFiles;
 /// </summary>
 public class GetTreeFilesQueryHandler : IRequestHandler<GetTreeFilesQuery, ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>>
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IFileService _fileService;
     private readonly IMapper _mapper;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="GetTreeFilesQueryHandler"/> class.
     /// </summary>
@@ -34,9 +31,7 @@ public class GetTreeFilesQueryHandler : IRequestHandler<GetTreeFilesQuery, Error
         _fileService = fileService;
         _mapper = mapper;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Gets the list of files at the specified path.
     /// </summary>
@@ -50,5 +45,4 @@ public class GetTreeFilesQueryHandler : IRequestHandler<GetTreeFilesQuery, Error
         ErrorOr<IEnumerable<File>> result = _fileService.GetFiles(request.Path, request.IncludeHiddenElements);
         return ValueTask.FromResult(result.Match(values => ErrorOrFactory.From(_mapper.Map<IEnumerable<FileSystemTreeNodeResponse>>(values)), errors => errors));
     }
-    #endregion
 }

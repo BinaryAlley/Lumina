@@ -10,10 +10,8 @@ namespace Lumina.Presentation.Web.Common.Models.Common;
 [DebuggerDisplay("{Name}")]
 public class GenreModel
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the name of the genre element of the media item.
     /// </summary>
     public string? Name { get; set; }
-    #endregion
 }

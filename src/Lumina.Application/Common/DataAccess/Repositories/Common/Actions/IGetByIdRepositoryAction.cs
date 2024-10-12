@@ -15,7 +15,6 @@ namespace Lumina.Application.Common.DataAccess.Repositories.Common.Actions;
 public interface IGetByIdRepositoryAction<TModel, TId> where TModel : IStorageEntity
                                                        where TId : notnull
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Gets an element of type <typeparamref name="TModel"/> identified by <paramref name="id"/> from the storage medium.
     /// </summary>
@@ -23,5 +22,4 @@ public interface IGetByIdRepositoryAction<TModel, TId> where TModel : IStorageEn
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a <typeparamref name="TModel"/> identified by <paramref name="id"/>, or an error.</returns>
     Task<ErrorOr<TModel?>> GetByIdAsync(TId id, CancellationToken cancellationToken);
-    #endregion
 }

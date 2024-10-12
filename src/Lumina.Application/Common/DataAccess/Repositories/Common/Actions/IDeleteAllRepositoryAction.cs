@@ -10,11 +10,9 @@ namespace Lumina.Application.Common.DataAccess.Repositories.Common.Actions;
 /// </summary>
 public interface IDeleteAllRepositoryAction
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Deletes all entities from the storage medium.
     /// </summary>
     /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successfull operation, or an error.</returns>
     Task<ErrorOr<Deleted>> DeleteAllAsync();
-    #endregion
 }

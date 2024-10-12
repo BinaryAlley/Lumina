@@ -15,7 +15,6 @@ namespace Lumina.Application.Common.Mapping.FileManagement;
 /// </summary>
 public class DirectoryMappingConfig : IRegister
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Registers the mapping configuration.
     /// </summary>
@@ -48,5 +47,4 @@ public class DirectoryMappingConfig : IRegister
                DateTime.Now
            ));
     }
-    #endregion
 }

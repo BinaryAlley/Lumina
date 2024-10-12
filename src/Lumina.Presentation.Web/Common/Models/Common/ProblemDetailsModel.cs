@@ -13,7 +13,6 @@ namespace Lumina.Presentation.Web.Common.Models.Common;
 [DebuggerDisplay("{Title} ({Status})")]
 public class ProblemDetailsModel
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets or sets the URI reference that identifies the problem type.
     /// </summary>
@@ -50,5 +49,4 @@ public class ProblemDetailsModel
     /// </summary>
     [JsonExtensionData]
     public IDictionary<string, JsonElement>? Extensions { get; set; }
-    #endregion
 }

@@ -17,11 +17,8 @@ namespace Lumina.Presentation.Web.Controllers.FileManagement;
 [Route("[controller]")]
 public class DirectoriesController : Controller
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IApiHttpClient _apiHttpClient;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="DirectoriesController"/> class.
     /// </summary>
@@ -30,9 +27,7 @@ public class DirectoriesController : Controller
     {
         _apiHttpClient = apiHttpClient;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Gets the directories of <paramref name="path"/>.
     /// </summary>
@@ -83,5 +78,4 @@ public class DirectoriesController : Controller
         FileSystemTreeNodeModel[] response = await _apiHttpClient.GetAsync<FileSystemTreeNodeModel[]>($"directories/get-directory-tree?path={Uri.EscapeDataString(path)}&includeFiles={includeFiles}&includeHiddenElements={includeHiddenElements}", cancellationToken: cancellationToken);
         return Json(new { success = true, data = new { tree = response } });
     }
-    #endregion
 }

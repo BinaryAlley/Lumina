@@ -27,16 +27,13 @@ namespace Lumina.Application.UnitTests.Core.FileManagement.Files.Queries.GetTree
 [ExcludeFromCodeCoverage]
 public class GetTreeFilesQueryHandlerTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IFixture _fixture;
     private readonly IMapper _mockMapper;
     private readonly IFileService _mockFileService;
     private readonly GetTreeFilesQueryHandler _sut;
     private readonly FileFixture _fileFixture;
     private readonly FileSystemTreeNodeResponseFixture _fileSystemTreeNodeResponseFixture;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="GetTreeFilesQueryHandler"/> class.
     /// </summary>
@@ -49,9 +46,7 @@ public class GetTreeFilesQueryHandlerTests
         _fileFixture = new FileFixture();
         _fileSystemTreeNodeResponseFixture = new FileSystemTreeNodeResponseFixture();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public async Task Handle_WhenCalledWithValidQueryWithoutHiddenFiles_ShouldReturnSuccessResult()
     {
@@ -139,5 +134,4 @@ public class GetTreeFilesQueryHandlerTests
         result.Value.Should().BeEmpty();
         _mockFileService.Received(1).GetFiles(query.Path, query.IncludeHiddenElements);
     }
-    #endregion
 }

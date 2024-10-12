@@ -15,7 +15,6 @@ namespace Lumina.Application.Common.Mapping.FileManagement;
 /// </summary>
 public class FileSystemTreeMappingConfig : IRegister
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Registers the mapping configuration.
     /// </summary>
@@ -63,5 +62,4 @@ public class FileSystemTreeMappingConfig : IRegister
                      dest.Children = [];
              });
     }
-    #endregion
 }

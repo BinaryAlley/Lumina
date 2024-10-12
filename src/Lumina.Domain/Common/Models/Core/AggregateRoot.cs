@@ -6,7 +6,6 @@
 /// <typeparam name="TId">The type representing the unique identifier for the Aggregate Root. It should be a non-nullable type.</typeparam>
 public abstract class AggregateRoot<TId> : Entity<TId> where TId : notnull
 {
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="AggregateRoot{TId}"/> class.
     /// </summary>
@@ -25,5 +24,4 @@ public abstract class AggregateRoot<TId> : Entity<TId> where TId : notnull
 
     }
 #pragma warning restore CS8618
-    #endregion
 }

@@ -11,7 +11,6 @@ namespace Lumina.Presentation.Web.Common.Models.Common;
 [DebuggerDisplay("{OriginalReleaseDate}")]
 public class ReleaseInfoModel
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the optional original release date of the media item.
     /// </summary>
@@ -42,5 +41,4 @@ public class ReleaseInfoModel
     /// Gets the optional release version or edition. (e.g. "Original", "Director's Cut", "2.0")
     /// </summary>
     public string? ReleaseVersion { get; set; }
-    #endregion
 }

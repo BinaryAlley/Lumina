@@ -16,7 +16,6 @@ namespace Lumina.Domain.Common.DependencyInjection;
 /// </summary>
 public static class DomainLayerServices
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Registers the services of the Domain layer into the dependency injection container.
     /// </summary>
@@ -44,5 +43,4 @@ public static class DomainLayerServices
         services.AddSingleton<IFileSystem, FileSystem>();
         return services;
     }
-    #endregion
 }

@@ -22,13 +22,10 @@ namespace Lumina.Presentation.Api.IntegrationTests.Core.Controllers.Books.Fixtur
 [ExcludeFromCodeCoverage]
 public class AddBookRequestFixture
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly Fixture _fixture;
     private readonly Random _random = new();
     private readonly Faker _faker;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="AddBookRequestFixture"/> class.
     /// </summary>
@@ -39,9 +36,7 @@ public class AddBookRequestFixture
         _fixture.Customizations.Add(new NullableDateOnlySpecimenBuilder());
         _faker = new Faker();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a random valid request to add a book.
     /// </summary>
@@ -345,5 +340,4 @@ public class AddBookRequestFixture
     {
         return input?.Length > maxLength ? input[..maxLength] : input;
     }
-    #endregion
 }

@@ -19,13 +19,10 @@ namespace Lumina.DataAccess.UnitTests.Core.Repositories.Books.Fixtures;
 [ExcludeFromCodeCoverage]
 public class BookModelFixture
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly Fixture _fixture;
     private readonly Random _random = new();
     private readonly Faker _faker;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="BookModelFixture"/> class.
     /// </summary>
@@ -37,9 +34,7 @@ public class BookModelFixture
         _faker = new Faker();
         ConfigureCustomTypes();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a random valid BookModel.
     /// </summary>
@@ -204,5 +199,4 @@ public class BookModelFixture
             _fixture.Create<int>()
         ));
     }
-    #endregion
 }

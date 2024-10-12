@@ -13,11 +13,8 @@ namespace Lumina.Application.Core.FileManagement.Paths.Queries.CheckPathExists;
 /// </summary>
 public class CheckPathExistsQueryHandler : IRequestHandler<CheckPathExistsQuery, PathExistsResponse>
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IPathService _pathService;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="CheckPathExistsQueryHandler"/> class.
     /// </summary>
@@ -26,9 +23,7 @@ public class CheckPathExistsQueryHandler : IRequestHandler<CheckPathExistsQuery,
     {
         _pathService = pathService;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Checks the existence of the specified file system path.
     /// </summary>
@@ -41,5 +36,4 @@ public class CheckPathExistsQueryHandler : IRequestHandler<CheckPathExistsQuery,
     {
         return ValueTask.FromResult(new PathExistsResponse(_pathService.Exists(request.Path, request.IncludeHiddenElements)));
     }
-    #endregion
 }

@@ -11,7 +11,6 @@ namespace Lumina.Infrastructure.Common.DependencyInjection;
 /// </summary>
 public static class InfrastructureLayerServices
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Extension method for adding the Infrastructure layer services to the DI container.
     /// </summary>
@@ -24,5 +23,4 @@ public static class InfrastructureLayerServices
 
         return services;
     }
-    #endregion
 }

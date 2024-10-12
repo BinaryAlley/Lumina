@@ -13,7 +13,6 @@ namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.S
 /// </summary>
 public interface IFileProviderService
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Retrieves a list of files at the specified path.
     /// </summary>
@@ -96,5 +95,4 @@ public interface IFileProviderService
     /// <param name="path">The path of the file to be deleted.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the result of deleting a file, or an error.</returns>
     ErrorOr<Deleted> DeleteFile(FileSystemPathId path);
-    #endregion
 }

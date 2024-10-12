@@ -11,7 +11,6 @@ namespace Lumina.Domain.Core.Aggregates.VideoLibrary.TvShowLibraryAggregate.Valu
 /// </summary>
 public sealed class TvShowId : EntityId<Guid>
 {
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="TvShowId"/> class.
     /// </summary>
@@ -19,9 +18,7 @@ public sealed class TvShowId : EntityId<Guid>
     private TvShowId(Guid value) : base(value)
     {
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a new instance of the <see cref="TvShowId"/> class.
     /// </summary>
@@ -48,5 +45,4 @@ public sealed class TvShowId : EntityId<Guid>
     {
         yield return Value;
     }
-    #endregion
 }

@@ -26,15 +26,12 @@ namespace Lumina.Application.UnitTests.Core.FileManagement.Drives.Queries.GetDri
 [ExcludeFromCodeCoverage]
 public class GetDrivesQueryHandlerTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IFixture _fixture;
     private readonly IMapper _mockMapper;
     private readonly IDriveService _mockDriveService;
     private readonly GetDrivesQueryHandler _sut;
     private readonly GetDrivesQueryFixture _getDrivesQueryFixture;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="GetDrivesQueryHandlerTests"/> class.
     /// </summary>
@@ -46,9 +43,7 @@ public class GetDrivesQueryHandlerTests
         _sut = new GetDrivesQueryHandler(_mockDriveService, _mockMapper);
         _getDrivesQueryFixture = new GetDrivesQueryFixture();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public async Task Handle_WhenCalled_ShouldReturnSuccessResult()
     {
@@ -119,5 +114,4 @@ public class GetDrivesQueryHandlerTests
         _mockDriveService.Received(1).GetDrives();
         _mockMapper.Received(1).Map<IEnumerable<FileSystemTreeNodeResponse>>(Arg.Any<IEnumerable<FileSystemItem>>());
     }
-    #endregion
 }

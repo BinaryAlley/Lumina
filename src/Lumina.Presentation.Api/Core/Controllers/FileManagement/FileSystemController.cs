@@ -17,11 +17,8 @@ namespace Lumina.Presentation.Api.Core.Controllers.FileManagement;
 [Route("api/v{version:apiVersion}/file-system")]
 public class FileSystemController : ApiController
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly ISender _mediator;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="FileSystemController"/> class.
     /// </summary>
@@ -30,9 +27,7 @@ public class FileSystemController : ApiController
     {
         _mediator = mediator;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Gets the type of the file system.
     /// </summary>
@@ -43,5 +38,4 @@ public class FileSystemController : ApiController
         FileSystemTypeResponse platformType = await _mediator.Send(new GetFileSystemQuery(), cancellationToken).ConfigureAwait(false);
         return Ok(platformType);
     }
-    #endregion
 }

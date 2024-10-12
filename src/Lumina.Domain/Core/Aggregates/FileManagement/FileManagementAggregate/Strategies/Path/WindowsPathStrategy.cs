@@ -17,15 +17,10 @@ namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.S
 /// </summary>
 public class WindowsPathStrategy : IWindowsPathStrategy
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IFileSystem _fileSystem;
-    #endregion
 
-    #region ==================================================================== PROPERTIES =================================================================================
     public char PathSeparator => '\\';
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="WindowsPathStrategy"/> class.
     /// </summary>
@@ -34,9 +29,7 @@ public class WindowsPathStrategy : IWindowsPathStrategy
     {
         _fileSystem = fileSystem;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Checks if <paramref name="path"/> is a valid path.
     /// </summary>
@@ -232,5 +225,4 @@ public class WindowsPathStrategy : IWindowsPathStrategy
         // if we reach here, the path is neither a valid UNC path nor a valid drive path
         return Errors.FileManagement.InvalidPath;
     }
-    #endregion
 }

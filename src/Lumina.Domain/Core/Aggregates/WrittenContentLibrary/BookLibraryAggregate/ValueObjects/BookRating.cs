@@ -16,14 +16,11 @@ namespace Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggrega
 [DebuggerDisplay("{Value}/{MaxValue}")]
 public class BookRating : Rating
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the optional source of the rating (e.g., "Goodreads", "Amazon").
     /// </summary>
     public Optional<BookRatingSource> Source { get; }
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="Rating"/> class.
     /// </summary>
@@ -36,9 +33,7 @@ public class BookRating : Rating
     {
         Source = source;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a new instance of the <see cref="Rating"/> class.
     /// </summary>
@@ -80,5 +75,4 @@ public class BookRating : Rating
             baseString += $" [{VoteCount.Value} votes]";
         return baseString;
     }
-    #endregion
 }

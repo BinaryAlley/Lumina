@@ -13,7 +13,6 @@ namespace Lumina.Presentation.Web.Common.Requests.WrittenContentLibrary.BookLibr
 /// </summary>
 public class AddBookRequest
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets or sets the written content metadata of the book.
     /// </summary>
@@ -98,5 +97,4 @@ public class AddBookRequest
     /// Gets or sets the list of ratings for this book.
     /// </summary>
     public List<BookRatingModel>? Ratings { get; set; }
-    #endregion
 }

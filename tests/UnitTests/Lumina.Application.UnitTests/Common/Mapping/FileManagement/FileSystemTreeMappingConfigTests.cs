@@ -18,21 +18,16 @@ namespace Lumina.Application.UnitTests.Common.Mapping.FileManagement;
 [ExcludeFromCodeCoverage]
 public class FileSystemTreeMappingConfigTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly TypeAdapterConfig _config;
     private readonly FileSystemTreeMappingConfig _fileSystemTreeMappingConfig;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     public FileSystemTreeMappingConfigTests()
     {
         _config = new TypeAdapterConfig();
         _fileSystemTreeMappingConfig = new FileSystemTreeMappingConfig();
         _fileSystemTreeMappingConfig.Register(_config);
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void Register_WhenMappingWindowsRootItemToFileSystemTreeNodeResponse_ShouldMapCorrectly()
     {
@@ -160,5 +155,4 @@ public class FileSystemTreeMappingConfigTests
         result.ChildrenLoaded.Should().BeFalse();
         result.Children.Should().BeEmpty();
     }
-    #endregion
 }

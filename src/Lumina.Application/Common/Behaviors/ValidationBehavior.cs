@@ -18,11 +18,8 @@ namespace Lumina.Application.Common.Behaviors;
 public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>
                                                                                               where TResponse : IErrorOr
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IValidator<TRequest>? _validator;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="ValidationBehavior{TRequest, TResponse}"/> class.
     /// </summary>
@@ -31,9 +28,7 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
     {
         _validator = validator;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Pipeline handler. Perform any additional behavior and await the <paramref name="next"/> delegate as necessary.
     /// </summary>
@@ -56,5 +51,4 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
         // this is acceptable because we DO know that we will always have a list of errors of type ErrorOr (check the generic constraint at the top of the class!)
         return (dynamic)errors;
     }
-    #endregion
 }

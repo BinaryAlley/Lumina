@@ -10,7 +10,6 @@ namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.S
 /// </summary>
 internal class UnixPlatformContext : IUnixPlatformContext
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the platform type, which is Unix for this context.
     /// </summary>
@@ -20,9 +19,7 @@ internal class UnixPlatformContext : IUnixPlatformContext
     /// Gets the path strategy for Unix platforms.
     /// </summary>
     public IPathStrategy PathStrategy { get; }
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="UnixPlatformContext"/> class.
     /// </summary>
@@ -31,5 +28,4 @@ internal class UnixPlatformContext : IUnixPlatformContext
     {
         PathStrategy = unixPathStrategy;
     }
-    #endregion
 }

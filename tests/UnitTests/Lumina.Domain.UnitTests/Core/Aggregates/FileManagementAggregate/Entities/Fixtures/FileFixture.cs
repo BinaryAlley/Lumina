@@ -18,11 +18,8 @@ namespace Lumina.Domain.UnitTests.Core.Aggregates.FileManagementAggregate.Entiti
 [ExcludeFromCodeCoverage]
 public class FileFixture
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly Faker _faker;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="FileFixture"/> class.
     /// </summary>
@@ -30,9 +27,7 @@ public class FileFixture
     {
         _faker = new Faker();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a random valid <see cref="File"/>.
     /// </summary>
@@ -84,5 +79,4 @@ public class FileFixture
             FileSystemItemStatus.Accessible
         ).Value;
     }
-    #endregion
 }

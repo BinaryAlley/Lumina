@@ -15,7 +15,6 @@ namespace Lumina.DataAccess.IntegrationTests.Core.UoW;
 [ExcludeFromCodeCoverage]
 public class UnitOfWorkTests
 {
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void UnitOfWorkImplementsUnitOfWorkInterface_InterfaceIsImplemented_ReturnsTrue()
     {
@@ -28,5 +27,4 @@ public class UnitOfWorkTests
         // Assert
         Assert.True(unitOfWork is IUnitOfWork);
     }
-    #endregion
 }

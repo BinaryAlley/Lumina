@@ -7,11 +7,8 @@ namespace Lumina.Domain.Common.Primitives;
 /// <typeparam name="TValue">The type of the value represented by this structure.</typeparam>
 public readonly struct Optional<TValue>
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly TValue? _value;
-    #endregion
 
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets a value indicating whether this structure has a value.
     /// </summary>
@@ -21,9 +18,7 @@ public readonly struct Optional<TValue>
     /// Gets the value represented by this structure.
     /// </summary>
     public TValue Value => HasValue ? _value! : default!;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="Optional{TValue}"/> structure.
     /// </summary>
@@ -34,9 +29,7 @@ public readonly struct Optional<TValue>
         _value = value;
         HasValue = hasValue;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Custom implementation operator for converting <paramref name="value"/> to an <see cref="Optional{TValue}"/>.
     /// </summary>
@@ -94,5 +87,4 @@ public readonly struct Optional<TValue>
     {
         return HasValue ? Value?.ToString()! : string.Empty;
     }
-    #endregion
 }

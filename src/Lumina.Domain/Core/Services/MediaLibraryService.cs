@@ -10,7 +10,6 @@ namespace Lumina.Domain.Core.Services;
 /// </summary>
 public class MediaLibraryService : IMediaLibraryService
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the service for managing a video library.
     /// </summary>
@@ -20,9 +19,7 @@ public class MediaLibraryService : IMediaLibraryService
     /// Gets the service for managing a written content library.
     /// </summary>
     public IWrittenContentLibraryService WrittenContentLibraryService { get; private set; }
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="MediaLibraryService"/> class.
     /// </summary>
@@ -33,5 +30,4 @@ public class MediaLibraryService : IMediaLibraryService
         VideoLibraryService = videoLibraryService;
         WrittenContentLibraryService = writtenContentLibraryService;
     }
-    #endregion
 }

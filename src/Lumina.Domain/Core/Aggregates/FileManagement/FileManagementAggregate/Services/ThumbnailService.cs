@@ -21,11 +21,8 @@ namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.S
 /// </summary>
 public class ThumbnailService : IThumbnailService
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IEnvironmentContext _environmentContext;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="ThumbnailService"/> class.
     /// </summary>
@@ -34,9 +31,7 @@ public class ThumbnailService : IThumbnailService
     {
         _environmentContext = environmentContext;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Gets the thumbnail of a file at the specified path.
     /// </summary>
@@ -191,5 +186,4 @@ public class ThumbnailService : IThumbnailService
     {
         return ((value - fromSource) * (toTarget - fromTarget) / (toSource - fromSource)) + fromTarget;
     }
-    #endregion
 }

@@ -14,11 +14,8 @@ namespace Lumina.Application.UnitTests.Core.FileManagement.Pahs.Fixtures;
 [ExcludeFromCodeCoverage]
 public class PathSeparatorResponseFixture
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly Faker _faker = new();
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a random valid <see cref="PathSeparatorResponse"/>.
     /// </summary>
@@ -37,5 +34,4 @@ public class PathSeparatorResponseFixture
     {
         return Enumerable.Range(0, count).Select(_ => Create()).ToList();
     }
-    #endregion
 }

@@ -9,7 +9,6 @@ namespace Lumina.Domain.Common.Events;
 /// </summary>
 public interface IDomainEvent
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the id of the domain event.
     /// </summary>
@@ -19,5 +18,4 @@ public interface IDomainEvent
     /// Gets the date and time when the domain event occurred.
     /// </summary>
     DateTime OccurredOn { get; }
-    #endregion
 }

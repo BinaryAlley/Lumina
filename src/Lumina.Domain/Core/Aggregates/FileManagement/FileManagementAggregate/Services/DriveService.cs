@@ -15,12 +15,9 @@ namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.S
 /// </summary>
 public class DriveService : IDriveService
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IFileSystem _fileSystem;
     private readonly IPlatformContext _platformContext;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="DriveService"/> class.
     /// </summary>
@@ -30,9 +27,7 @@ public class DriveService : IDriveService
         _fileSystem = fileSystem;
         _platformContext = platformContextManager.GetCurrentContext();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Retrieves the list of drives.
     /// </summary>
@@ -64,5 +59,4 @@ public class DriveService : IDriveService
                                                             .Select(errorOrDrive => errorOrDrive.Value)
                                                             .AsEnumerable());
     }
-    #endregion
 }

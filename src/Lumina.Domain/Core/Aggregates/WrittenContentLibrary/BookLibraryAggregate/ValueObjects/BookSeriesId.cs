@@ -13,11 +13,8 @@ namespace Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggrega
 [DebuggerDisplay("{Value}")]
 public sealed class BookSeriesId : ValueObject
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     public Guid Value { get; }
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="BookSeriesId"/> class.
     /// </summary>
@@ -26,9 +23,7 @@ public sealed class BookSeriesId : ValueObject
     {
         Value = value;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a new instance of the <see cref="BookSeriesId"/> class.
     /// </summary>
@@ -53,5 +48,4 @@ public sealed class BookSeriesId : ValueObject
     {
         yield return Value;
     }
-    #endregion
 }

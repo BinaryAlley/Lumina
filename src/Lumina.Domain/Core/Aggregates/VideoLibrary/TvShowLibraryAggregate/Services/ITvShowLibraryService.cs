@@ -9,10 +9,8 @@ namespace Lumina.Domain.Core.Aggregates.VideoLibrary.TvShowLibraryAggregate.Serv
 /// </summary>
 public interface ITvShowLibraryService
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the collection of TV shows in the library.
     /// </summary>
     public ICollection<TvShow> TvShows { get; }
-    #endregion
 }

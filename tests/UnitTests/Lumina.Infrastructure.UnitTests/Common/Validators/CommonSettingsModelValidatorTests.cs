@@ -17,12 +17,9 @@ namespace Lumina.Infrastructure.UnitTests.Common.Validators;
 [ExcludeFromCodeCoverage]
 public class CommonSettingsModelValidatorTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly CommonSettingsModelValidator _validator;
     private readonly IFixture _fixture;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="CommonSettingsModelValidatorTests"/> class.
     /// </summary>
@@ -31,9 +28,7 @@ public class CommonSettingsModelValidatorTests
         _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
         _validator = new();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void CommonSettingsModelValidator_WhenThemeProvided_ShouldNotHaveValidationError()
     {
@@ -66,5 +61,4 @@ public class CommonSettingsModelValidatorTests
         result.Errors.Should().ContainSingle()
             .Which.ErrorMessage.Should().Be(Errors.Configuration.ApplicationThemeCannotBeEmpty.Code);
     }
-    #endregion
 }

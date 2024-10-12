@@ -18,12 +18,9 @@ namespace Lumina.Application.Core.FileManagement.Drives.Queries.GetDrives;
 /// </summary>
 public class GetDrivesQueryHandler : IRequestHandler<GetDrivesQuery, ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>>
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IDriveService _driveService;
     private readonly IMapper _mapper;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="GetDrivesQueryHandler"/> class.
     /// </summary>
@@ -34,9 +31,7 @@ public class GetDrivesQueryHandler : IRequestHandler<GetDrivesQuery, ErrorOr<IEn
         _driveService = driveService;
         _mapper = mapper;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Gets the list of file system drives.
     /// </summary>
@@ -50,5 +45,4 @@ public class GetDrivesQueryHandler : IRequestHandler<GetDrivesQuery, ErrorOr<IEn
         ErrorOr<IEnumerable<FileSystemItem>> result = _driveService.GetDrives();
         return ValueTask.FromResult(result.Match(values => ErrorOrFactory.From(_mapper.Map<IEnumerable<FileSystemTreeNodeResponse>>(values)), errors => errors));
     }
-    #endregion
 }

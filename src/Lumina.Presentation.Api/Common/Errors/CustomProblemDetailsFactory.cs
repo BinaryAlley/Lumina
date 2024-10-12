@@ -19,12 +19,9 @@ namespace Lumina.Presentation.Api.Common.Errors;
 /// </summary>
 public class CustomProblemDetailsFactory : ProblemDetailsFactory
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly ApiBehaviorOptions _options;
     private readonly Action<ProblemDetailsContext>? _configure;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="CustomProblemDetailsFactory"/> class.
     /// </summary>
@@ -36,9 +33,7 @@ public class CustomProblemDetailsFactory : ProblemDetailsFactory
         _options = apiBehaviorOptions?.Value ?? throw new ArgumentNullException(nameof(apiBehaviorOptions));
         _configure = problemDetailsOptions?.Value?.CustomizeProblemDetails;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a <see cref="ProblemDetails"/> instance that configures defaults based on values specified in <see cref="ApiBehaviorOptions"/>.
     /// </summary>
@@ -120,5 +115,4 @@ public class CustomProblemDetailsFactory : ProblemDetailsFactory
         //problemDetails.Extensions.Add("errorCodes", errors.Select(e => e.Type.ToString()));
         _configure?.Invoke(new() { HttpContext = httpContext!, ProblemDetails = problemDetails });
     }
-    #endregion
 }

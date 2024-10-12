@@ -15,11 +15,8 @@ namespace Lumina.Domain.UnitTests.Core.Aggregates.FileManagementAggregate.ValueO
 [ExcludeFromCodeCoverage]
 public class ThumbnailFixture
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly Faker _faker;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="ThumbnailFixture"/> class.
     /// </summary>
@@ -27,9 +24,7 @@ public class ThumbnailFixture
     {
         _faker = new Faker();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a random valid <see cref="Thumbnail"/>.
     /// </summary>
@@ -53,5 +48,4 @@ public class ThumbnailFixture
     {
         return Enumerable.Range(0, count).Select(_ => CreateThumbnail()).ToList();
     }
-    #endregion
 }

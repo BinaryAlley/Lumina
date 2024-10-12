@@ -10,7 +10,6 @@ namespace Lumina.Infrastructure.Common.Validators;
 /// </summary>
 public class CommonSettingsModelValidator : AbstractValidator<CommonSettingsModel>
 {
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="CommonSettingsModelValidator"/> class.
     /// </summary>
@@ -18,5 +17,4 @@ public class CommonSettingsModelValidator : AbstractValidator<CommonSettingsMode
     {
         RuleFor(x => x.Theme).NotEmpty().WithMessage(Errors.Errors.Configuration.ApplicationThemeCannotBeEmpty.Code);
     }
-    #endregion
 }

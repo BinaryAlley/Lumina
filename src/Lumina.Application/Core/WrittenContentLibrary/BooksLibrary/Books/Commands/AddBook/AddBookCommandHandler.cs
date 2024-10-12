@@ -27,12 +27,9 @@ namespace Lumina.Application.Core.WrittenContentLibrary.BooksLibrary.Books.Comma
 /// </summary>
 public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<Book>>
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="AddBookCommandHandler"/> class.
     /// </summary>
@@ -43,9 +40,7 @@ public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<Boo
         _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Handles the command to add a book.
     /// </summary>
@@ -176,5 +171,4 @@ public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<Boo
 
         return createBookResult.Value;
     }
-    #endregion
 }

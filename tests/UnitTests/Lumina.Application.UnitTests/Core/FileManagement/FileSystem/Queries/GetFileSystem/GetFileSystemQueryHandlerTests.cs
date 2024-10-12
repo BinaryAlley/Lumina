@@ -21,14 +21,11 @@ namespace Lumina.Application.UnitTests.Core.FileManagement.FileSystem.Queries.Ge
 [ExcludeFromCodeCoverage]
 public class GetFileSystemQueryHandlerTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IFixture _fixture;
     private readonly IPlatformContextManager _mockPlatformContextManager;
     private readonly IPlatformContext _mockPlatformContext;
     private readonly GetFileSystemQueryHandler _sut;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="GetFileSystemQueryHandlerTests"/> class.
     /// </summary>
@@ -40,9 +37,7 @@ public class GetFileSystemQueryHandlerTests
         _mockPlatformContextManager.GetCurrentContext().Returns(_mockPlatformContext);
         _sut = new GetFileSystemQueryHandler(_mockPlatformContextManager);
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Theory]
     [InlineData(PlatformType.Unix)]
     [InlineData(PlatformType.Windows)]
@@ -110,5 +105,4 @@ public class GetFileSystemQueryHandlerTests
         await act.Should().NotThrowAsync();
         _mockPlatformContextManager.Received(1).GetCurrentContext();
     }
-    #endregion
 }

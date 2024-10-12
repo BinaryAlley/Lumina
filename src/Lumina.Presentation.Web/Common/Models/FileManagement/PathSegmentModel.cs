@@ -10,10 +10,8 @@ namespace Lumina.Presentation.Web.Common.Models.FileManagement;
 [DebuggerDisplay("{Path}")]
 public class PathSegmentModel
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets or sets the returned path.
     /// </summary>
     public string Path { get; set; } = null!;
-    #endregion
 }

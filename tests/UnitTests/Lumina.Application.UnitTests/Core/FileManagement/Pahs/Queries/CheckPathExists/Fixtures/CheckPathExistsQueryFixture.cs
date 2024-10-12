@@ -12,7 +12,6 @@ namespace Lumina.Application.UnitTests.Core.FileManagement.Pahs.Queries.CheckPat
 [ExcludeFromCodeCoverage]
 public class CheckPathExistsQueryFixture
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a random valid query to check if paths exist.
     /// </summary>
@@ -28,5 +27,4 @@ public class CheckPathExistsQueryFixture
             .RuleFor(x => x.Path, f => f.System.FilePath())
             .RuleFor(x => x.IncludeHiddenElements, includeHiddenElements);
     }
-    #endregion
 }

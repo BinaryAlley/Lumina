@@ -18,12 +18,9 @@ namespace Lumina.Application.UnitTests.Core.WrittenContentLibrary.BooksLibrary.B
 [ExcludeFromCodeCoverage]
 public class AddBookCommandValidatorTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly AddBookCommandFixture _commandBookFixture;
     private readonly AddBookCommandValidator _validator;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="AddBookCommandValidatorTests"/> class.
     /// </summary>
@@ -32,9 +29,7 @@ public class AddBookCommandValidatorTests
         _validator = new AddBookCommandValidator();
         _commandBookFixture = new AddBookCommandFixture();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void Validate_WhenTitleIsNull_ShouldHaveValidationError()
     {
@@ -1893,5 +1888,4 @@ public class AddBookCommandValidatorTests
         // Assert
         result.ShouldNotHaveValidationErrorFor(x => x.Ratings[0].VoteCount);
     }
-    #endregion
 }

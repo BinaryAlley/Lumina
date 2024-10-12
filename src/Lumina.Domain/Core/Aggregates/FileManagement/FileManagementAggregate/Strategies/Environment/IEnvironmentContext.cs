@@ -9,7 +9,6 @@ namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.S
 /// </summary>
 public interface IEnvironmentContext
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the service for identifying and handling different file types.
     /// </summary>
@@ -24,5 +23,4 @@ public interface IEnvironmentContext
     /// Gets the service for providing file system directories.
     /// </summary>
     IDirectoryProviderService DirectoryProviderService { get; }
-    #endregion
 }

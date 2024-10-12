@@ -29,7 +29,6 @@ namespace Lumina.Application.UnitTests.Core.FileManagement.Directories.Queries.G
 [ExcludeFromCodeCoverage]
 public class GetDirectoryTreeQueryHandlerTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IFixture _fixture;
     private readonly IDriveService _mockDriveService;
     private readonly IDirectoryService _mockDirectoryService;
@@ -40,9 +39,7 @@ public class GetDirectoryTreeQueryHandlerTests
     private readonly DirectoryFixture _directoryFixture;
     private readonly PathSegmentFixture _pathSegmentFixture;
     private readonly FileFixture _fileFixture;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="GetDirectoryTreeQueryHandlerTests"/> class.
     /// </summary>
@@ -59,9 +56,7 @@ public class GetDirectoryTreeQueryHandlerTests
         _pathSegmentFixture = new PathSegmentFixture();
         _fileFixture = new FileFixture();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public async Task Handle_WhenCalledWithValidQueryAndNoIncludeFiles_ShouldReturnSuccessResult()
     {
@@ -391,5 +386,4 @@ public class GetDirectoryTreeQueryHandlerTests
         result.Value.First().Children.Should().HaveCount(2);
         _mockDirectoryService.Received(1).GetSubdirectories(Arg.Any<string>(), false);
     }
-    #endregion
 }

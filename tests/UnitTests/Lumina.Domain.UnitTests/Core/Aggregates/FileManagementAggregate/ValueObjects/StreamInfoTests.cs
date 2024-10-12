@@ -27,11 +27,8 @@ namespace Lumina.Domain.UnitTests.Core.Aggregates.FileManagementAggregate.ValueO
 [ExcludeFromCodeCoverage]
 public class StreamInfoTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly StreamInfoFixture _streamInfoFixture;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="StreamInfoTests"/> class.
     /// </summary>
@@ -39,9 +36,7 @@ public class StreamInfoTests
     {
         _streamInfoFixture = new StreamInfoFixture();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void Create_WithValidInput_ShouldReturnStreamInfo()
     {
@@ -182,5 +177,4 @@ public class StreamInfoTests
         // Assert
         hashCode1.Should().NotBe(hashCode2);
     }
-    #endregion
 }

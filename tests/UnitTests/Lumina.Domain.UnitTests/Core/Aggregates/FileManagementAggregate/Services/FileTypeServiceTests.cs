@@ -27,15 +27,12 @@ namespace Lumina.Domain.UnitTests.Core.Aggregates.FileManagementAggregate.Servic
 [ExcludeFromCodeCoverage]
 public class FileTypeServiceTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private MockFileSystem _mockFileSystem = null!;
     private readonly IFileSystemPermissionsService _mockFileSystemPermissionsService;
     private FileTypeService? sut;
     private readonly FileSystemPathIdFixture _fileSystemPathIdFixture;
     private readonly FileFixture _fileFixture;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="FileTypeServiceTests"/> class.
     /// </summary>
@@ -45,9 +42,7 @@ public class FileTypeServiceTests
         _fileSystemPathIdFixture = new FileSystemPathIdFixture();
         _fileFixture = new FileFixture();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public async Task GetImageTypeAsync_WithValidFile_ShouldReturnCorrectImageType()
     {
@@ -233,5 +228,4 @@ public class FileTypeServiceTests
         result.IsError.Should().BeFalse();
         result.Value.Should().Be(expectedType, because: $"the file header matches {testName}");
     }
-    #endregion
 }

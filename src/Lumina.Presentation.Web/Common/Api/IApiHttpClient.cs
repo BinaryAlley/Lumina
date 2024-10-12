@@ -12,7 +12,6 @@ namespace Lumina.Presentation.Web.Common.Api;
 /// </summary>
 public interface IApiHttpClient
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Sends a GET request to the specified <paramref name="endpoint"/> as an asynchronous operation and returns the result.
     /// </summary>
@@ -75,5 +74,4 @@ public interface IApiHttpClient
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>The deserialized response containing the result of the POST request.</returns>
     Task<TResponse> PostAsync<TResponse, TModel>(string endpoint, TModel data, string? token = null, CancellationToken cancellationToken = default);
-    #endregion
 }

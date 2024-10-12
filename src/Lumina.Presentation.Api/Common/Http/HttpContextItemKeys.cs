@@ -7,7 +7,5 @@ namespace Lumina.Presentation.Api.Common.Http;
 /// </summary>
 public static class HttpContextItemKeys
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     public const string ERRORS = "errors";
-    #endregion
 }

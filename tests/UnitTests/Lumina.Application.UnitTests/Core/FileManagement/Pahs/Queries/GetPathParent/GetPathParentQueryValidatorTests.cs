@@ -14,11 +14,8 @@ namespace Lumina.Application.UnitTests.Core.FileManagement.Pahs.Queries.GetPathP
 [ExcludeFromCodeCoverage]
 public class GetPathParentQueryValidatorTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly GetPathParentQueryValidator _validator;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="GetPathParentQueryValidatorTests"/> class.
     /// </summary>
@@ -26,9 +23,7 @@ public class GetPathParentQueryValidatorTests
     {
         _validator = new GetPathParentQueryValidator();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void Validate_WhenPathIsNull_ShouldHaveValidationError()
     {
@@ -87,5 +82,4 @@ public class GetPathParentQueryValidatorTests
         // Assert
         result.ShouldNotHaveValidationErrorFor(x => x.Path);
     }
-    #endregion
 }

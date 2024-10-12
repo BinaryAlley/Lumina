@@ -16,7 +16,6 @@ namespace Lumina.Domain.Core.Aggregates.MediaContributor.MediaContributorAggrega
 [DebuggerDisplay("{Id}: {Name}")]
 public class MediaContributor : AggregateRoot<MediaContributorId>
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the name of the contributor.
     /// </summary>
@@ -41,9 +40,7 @@ public class MediaContributor : AggregateRoot<MediaContributorId>
     /// Gets the date of death of the contributor.
     /// </summary>
     public Optional<DateOnly> DateOfDeath { get; private set; }
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="MediaContributor"/> class.
     /// </summary>
@@ -65,9 +62,7 @@ public class MediaContributor : AggregateRoot<MediaContributorId>
         DateOfBirth = dateOfBirth;
         DateOfDeath = dateOfDeath;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a new instance of the <see cref="MediaContributor"/> class.
     /// </summary>
@@ -95,5 +90,4 @@ public class MediaContributor : AggregateRoot<MediaContributorId>
     {
         return new MediaContributor(id, name, role, dateOfBirth, dateOfDeath);
     }
-    #endregion
 }

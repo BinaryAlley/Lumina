@@ -12,7 +12,6 @@ namespace Lumina.DataAccess.UnitTests.Common.Setup;
 [ExcludeFromCodeCoverage]
 public class DateOnlySpecimenBuilder : ISpecimenBuilder
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Adds <see cref="DateOnly"/> support to the AutoFixture library.
     /// </summary>
@@ -25,5 +24,4 @@ public class DateOnlySpecimenBuilder : ISpecimenBuilder
             return DateOnly.FromDateTime(DateTime.Now);
         return new NoSpecimen();
     }
-    #endregion
 }

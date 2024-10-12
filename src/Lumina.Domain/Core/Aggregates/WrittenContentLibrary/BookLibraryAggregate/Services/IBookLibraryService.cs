@@ -9,14 +9,12 @@ namespace Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggrega
 /// </summary>
 public interface IBookLibraryService
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the collection of books in the library.
     /// </summary>
     ICollection<Book> Books { get; }
 
     // ICollection<BookSeries> Series { get; }
-    #endregion
 
     // void AddBook(Book book);
     // void RemoveBook(Guid bookId);

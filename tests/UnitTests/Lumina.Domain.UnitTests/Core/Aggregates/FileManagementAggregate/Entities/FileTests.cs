@@ -18,7 +18,6 @@ namespace Lumina.Domain.UnitTests.Core.Aggregates.FileManagementAggregate.Entiti
 [ExcludeFromCodeCoverage]
 public class FileTests
 {
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void Create_WhenCalledWithValidParameters_ShouldReturnSuccessfulResult()
     {
@@ -154,5 +153,4 @@ public class FileTests
         result.FirstError.Should().Be(Errors.FileManagement.NameCannotBeEmpty);
         file.Name.Should().Be("file.txt");
     }
-    #endregion
 }

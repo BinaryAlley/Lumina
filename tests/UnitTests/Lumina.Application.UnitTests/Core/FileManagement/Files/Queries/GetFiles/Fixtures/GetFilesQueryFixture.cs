@@ -12,7 +12,6 @@ namespace Lumina.Application.UnitTests.Core.FileManagement.Files.Queries.GetFile
 [ExcludeFromCodeCoverage]
 public class GetFilesQueryFixture
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a random valid query to get files.
     /// </summary>
@@ -28,5 +27,4 @@ public class GetFilesQueryFixture
             .RuleFor(x => x.Path, f => f.System.FilePath())
             .RuleFor(x => x.IncludeHiddenElements, f => includeHiddenElements);
     }
-    #endregion
 }

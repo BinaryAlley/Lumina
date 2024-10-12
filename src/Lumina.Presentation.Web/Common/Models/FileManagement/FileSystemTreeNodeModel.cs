@@ -12,7 +12,6 @@ namespace Lumina.Presentation.Web.Common.Models.FileManagement;
 [DebuggerDisplay("{Path}")]
 public class FileSystemTreeNodeModel
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets or sets the full path of the file or directory.
     /// </summary>
@@ -42,5 +41,4 @@ public class FileSystemTreeNodeModel
     /// Gets or sets the list of child nodes.
     /// </summary>
     public List<FileSystemTreeNodeModel> Children { get; set; } = [];
-    #endregion
 }

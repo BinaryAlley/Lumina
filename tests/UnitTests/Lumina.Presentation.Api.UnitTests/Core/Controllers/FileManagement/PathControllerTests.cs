@@ -33,14 +33,11 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Controllers.FileManagement;
 [ExcludeFromCodeCoverage]
 public class PathControllerTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly ISender _mockMediator;
     private readonly PathController _sut;
     private readonly PathSegmentResponseFixture _pathSegmentResponseFixture;
     private readonly PathSeparatorResponseFixture _pathSeparatorResponseFixture;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="PathControllerTests"/> class.
     /// </summary>
@@ -51,9 +48,7 @@ public class PathControllerTests
         _pathSegmentResponseFixture = new PathSegmentResponseFixture();
         _pathSeparatorResponseFixture = new PathSeparatorResponseFixture();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public async Task GetPathRoot_WhenCalled_ShouldReturnOkResultWithPathSegmentResponse()
     {
@@ -153,17 +148,26 @@ public class PathControllerTests
         // Arrange
         string path = @"C:\Users\TestUser";
         CancellationTokenSource cts = new();
+        TaskCompletionSource<bool> operationStarted = new();
+        TaskCompletionSource<bool> cancellationRequested = new();
 
         _mockMediator.Send(Arg.Any<GetPathRootQuery>(), Arg.Any<CancellationToken>())
             .Returns(callInfo => new ValueTask<ErrorOr<PathSegmentResponse>>(Task.Run(async () =>
             {
-                await Task.Delay(100, callInfo.Arg<CancellationToken>());
+                operationStarted.SetResult(true);
+                await cancellationRequested.Task;
+                callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
                 return ErrorOrFactory.From(_pathSegmentResponseFixture.Create());
             }, callInfo.Arg<CancellationToken>())));
 
-        // Act & Assert
-        cts.CancelAfter(50);
-        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => _sut.GetPathRoot(path, cts.Token));
+        // Act
+        Task<IActionResult> operationTask = _sut.GetPathRoot(path, cts.Token);
+        await operationStarted.Task;
+        cts.Cancel();
+        cancellationRequested.SetResult(true);
+
+        // Assert
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => operationTask);
     }
 
     [Fact]
@@ -204,17 +208,26 @@ public class PathControllerTests
     {
         // Arrange
         CancellationTokenSource cts = new();
+        TaskCompletionSource<bool> operationStarted = new();
+        TaskCompletionSource<bool> cancellationRequested = new();
 
         _mockMediator.Send(Arg.Any<GetPathSeparatorQuery>(), Arg.Any<CancellationToken>())
             .Returns(callInfo => new ValueTask<PathSeparatorResponse>(Task.Run(async () =>
             {
-                await Task.Delay(100, callInfo.Arg<CancellationToken>());
+                operationStarted.SetResult(true);
+                await cancellationRequested.Task;
+                callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
                 return _pathSeparatorResponseFixture.Create();
             }, callInfo.Arg<CancellationToken>())));
 
-        // Act & Assert
-        cts.CancelAfter(50);
-        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => _sut.GetPathSeparator(cts.Token));
+        // Act
+        Task<IActionResult> operationTask = _sut.GetPathSeparator(cts.Token);
+        await operationStarted.Task;
+        cts.Cancel();
+        cancellationRequested.SetResult(true);
+
+        // Assert
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => operationTask);
     }
 
     [Fact]
@@ -319,20 +332,29 @@ public class PathControllerTests
         // Arrange
         string path = @"C:\Users\TestUser\Documents";
         CancellationTokenSource cts = new();
+        TaskCompletionSource<bool> operationStarted = new();
+        TaskCompletionSource<bool> cancellationRequested = new();
 
         _mockMediator.Send(Arg.Any<GetPathParentQuery>(), Arg.Any<CancellationToken>())
             .Returns(callInfo => new ValueTask<ErrorOr<IEnumerable<PathSegmentResponse>>>(Task.Run(async () =>
             {
-                await Task.Delay(100, callInfo.Arg<CancellationToken>());
+                operationStarted.SetResult(true);
+                await cancellationRequested.Task;
+                callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
                 return ErrorOrFactory.From(new List<PathSegmentResponse>
                 {
                 _pathSegmentResponseFixture.Create()
                 }.AsEnumerable());
             }, callInfo.Arg<CancellationToken>())));
 
-        // Act & Assert
-        cts.CancelAfter(50);
-        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => _sut.GetPathParent(path, cts.Token));
+        // Act
+        Task<IActionResult> operationTask = _sut.GetPathParent(path, cts.Token);
+        await operationStarted.Task;
+        cts.Cancel();
+        cancellationRequested.SetResult(true);
+
+        // Assert
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => operationTask);
     }
 
     [Fact]
@@ -437,17 +459,26 @@ public class PathControllerTests
         string originalPath = @"C:\Users";
         string newPath = "TestUser";
         CancellationTokenSource cts = new();
+        TaskCompletionSource<bool> operationStarted = new();
+        TaskCompletionSource<bool> cancellationRequested = new();
 
         _mockMediator.Send(Arg.Any<CombinePathCommand>(), Arg.Any<CancellationToken>())
             .Returns(callInfo => new ValueTask<ErrorOr<PathSegmentResponse>>(Task.Run(async () =>
             {
-                await Task.Delay(100, callInfo.Arg<CancellationToken>());
+                operationStarted.SetResult(true);
+                await cancellationRequested.Task;
+                callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
                 return ErrorOrFactory.From(_pathSegmentResponseFixture.Create());
             }, callInfo.Arg<CancellationToken>())));
 
-        // Act & Assert
-        cts.CancelAfter(50);
-        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => _sut.CombinePath(originalPath, newPath, cts.Token));
+        // Act
+        Task<IActionResult> operationTask = _sut.CombinePath(originalPath, newPath, cts.Token);
+        await operationStarted.Task;
+        cts.Cancel();
+        cancellationRequested.SetResult(true);
+
+        // Assert
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => operationTask);
     }
 
     [Fact]
@@ -553,20 +584,29 @@ public class PathControllerTests
         // Arrange
         string path = @"C:\Users\TestUser\Documents";
         CancellationTokenSource cts = new();
+        TaskCompletionSource<bool> operationStarted = new();
+        TaskCompletionSource<bool> cancellationRequested = new();
 
         _mockMediator.Send(Arg.Any<SplitPathCommand>(), Arg.Any<CancellationToken>())
             .Returns(callInfo => new ValueTask<ErrorOr<IEnumerable<PathSegmentResponse>>>(Task.Run(async () =>
             {
-                await Task.Delay(100, callInfo.Arg<CancellationToken>());
+                operationStarted.SetResult(true);
+                await cancellationRequested.Task;
+                callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
                 return ErrorOrFactory.From(new List<PathSegmentResponse>
                 {
                 _pathSegmentResponseFixture.Create()
                 }.AsEnumerable());
             }, callInfo.Arg<CancellationToken>())));
 
-        // Act & Assert
-        cts.CancelAfter(50);
-        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => _sut.SplitPath(path, cts.Token));
+        // Act
+        Task<IActionResult> operationTask = _sut.SplitPath(path, cts.Token);
+        await operationStarted.Task;
+        cts.Cancel();
+        cancellationRequested.SetResult(true);
+
+        // Assert
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => operationTask);
     }
 
     [Fact]
@@ -610,17 +650,26 @@ public class PathControllerTests
         // Arrange
         string path = @"C:\Users\TestUser\Documents";
         CancellationTokenSource cts = new();
+        TaskCompletionSource<bool> operationStarted = new();
+        TaskCompletionSource<bool> cancellationRequested = new();
 
         _mockMediator.Send(Arg.Any<ValidatePathQuery>(), Arg.Any<CancellationToken>())
             .Returns(callInfo => new ValueTask<PathValidResponse>(Task.Run(async () =>
             {
-                await Task.Delay(100, callInfo.Arg<CancellationToken>());
+                operationStarted.SetResult(true);
+                await cancellationRequested.Task;
+                callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
                 return new PathValidResponse(true);
             }, callInfo.Arg<CancellationToken>())));
 
-        // Act & Assert
-        cts.CancelAfter(50);
-        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => _sut.ValidatePath(path, cts.Token));
+        // Act
+        Task<IActionResult> operationTask = _sut.ValidatePath(path, cts.Token);
+        await operationStarted.Task;
+        cts.Cancel();
+        cancellationRequested.SetResult(true);
+
+        // Assert
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => operationTask);
     }
 
     [Fact]
@@ -664,17 +713,25 @@ public class PathControllerTests
         // Arrange
         string path = @"C:\Users\TestUser\Documents";
         CancellationTokenSource cts = new();
+        TaskCompletionSource<bool> operationStarted = new();
+        TaskCompletionSource<bool> cancellationRequested = new();
 
         _mockMediator.Send(Arg.Any<CheckPathExistsQuery>(), Arg.Any<CancellationToken>())
             .Returns(callInfo => new ValueTask<PathExistsResponse>(Task.Run(async () =>
             {
-                await Task.Delay(100, callInfo.Arg<CancellationToken>());
+                operationStarted.SetResult(true);
+                await cancellationRequested.Task;
+                callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
                 return new PathExistsResponse(true);
             }, callInfo.Arg<CancellationToken>())));
 
-        // Act & Assert
-        cts.CancelAfter(50);
-        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => _sut.CheckPathExists(path, true, cts.Token));
+        // Act
+        Task<IActionResult> operationTask = _sut.CheckPathExists(path, true, cts.Token);
+        await operationStarted.Task;
+        cts.Cancel();
+        cancellationRequested.SetResult(true);
+
+        // Assert
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => operationTask);
     }
-    #endregion
 }

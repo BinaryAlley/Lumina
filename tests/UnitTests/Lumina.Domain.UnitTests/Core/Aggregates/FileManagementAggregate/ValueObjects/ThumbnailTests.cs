@@ -17,11 +17,8 @@ namespace Lumina.Domain.UnitTests.Core.Aggregates.FileManagementAggregate.ValueO
 [ExcludeFromCodeCoverage]
 public class ThumbnailTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly ThumbnailFixture _thumbnailFixture;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="ThumbnailTests"/> class.
     /// </summary>
@@ -29,9 +26,7 @@ public class ThumbnailTests
     {
         _thumbnailFixture = new ThumbnailFixture();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void Constructor_ShouldSetPropertiesCorrectly()
     {
@@ -133,5 +128,4 @@ public class ThumbnailTests
         components[0].Should().Be(thumbnail.Type);
         components[1].Should().BeEquivalentTo(thumbnail.Bytes);
     }
-    #endregion
 }

@@ -15,11 +15,8 @@ namespace Lumina.Domain.UnitTests.Core.Aggregates.FileManagementAggregate.ValueO
 [ExcludeFromCodeCoverage]
 public class PathSegmentTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly PathSegmentFixture _pathSegmentFixture;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="PathSegmentTests"/> class.
     /// </summary>
@@ -27,9 +24,7 @@ public class PathSegmentTests
     {
         _pathSegmentFixture = new PathSegmentFixture();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void Create_WithValidInput_ShouldReturnPathSegment()
     {
@@ -147,5 +142,4 @@ public class PathSegmentTests
         // Assert
         result.Should().BeTrue();
     }
-    #endregion
 }

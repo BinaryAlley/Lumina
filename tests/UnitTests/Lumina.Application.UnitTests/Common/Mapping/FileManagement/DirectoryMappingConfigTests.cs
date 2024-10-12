@@ -20,13 +20,10 @@ namespace Lumina.Application.UnitTests.Common.Mapping.FileManagement;
 [ExcludeFromCodeCoverage]
 public class DirectoryMappingConfigTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly TypeAdapterConfig _config;
     private readonly DirectoryMappingConfig _directoryMappingConfig;
     private readonly FileSystemTreeMappingConfig _fileSystemTreeMappingConfig;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     public DirectoryMappingConfigTests()
     {
         _config = new TypeAdapterConfig();
@@ -35,9 +32,7 @@ public class DirectoryMappingConfigTests
         _directoryMappingConfig.Register(_config);
         _fileSystemTreeMappingConfig.Register(_config);
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void Register_WhenMappingDirectoryToFileSystemTreeNodeResponse_ShouldMapCorrectly()
     {
@@ -115,5 +110,4 @@ public class DirectoryMappingConfigTests
         result.DateCreated.Should().BeOnOrAfter(beforeMapping).And.BeOnOrBefore(afterMapping);
         result.DateModified.Should().BeOnOrAfter(beforeMapping).And.BeOnOrBefore(afterMapping);
     }
-    #endregion
 }

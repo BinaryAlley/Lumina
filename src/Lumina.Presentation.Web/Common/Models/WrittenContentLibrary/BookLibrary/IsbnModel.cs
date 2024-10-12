@@ -11,7 +11,6 @@ namespace Lumina.Presentation.Web.Common.Models.WrittenContentLibrary.BookLibrar
 [DebuggerDisplay("{Value} ({Format})")]
 public class IsbnModel
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets or sets the ISBN value.
     /// </summary>
@@ -21,5 +20,4 @@ public class IsbnModel
     /// Gets or sets the format of the ISBN (e.g., ISBN-10 or ISBN-13).
     /// </summary>
     public IsbnFormat? Format { get; set; }
-    #endregion
 }

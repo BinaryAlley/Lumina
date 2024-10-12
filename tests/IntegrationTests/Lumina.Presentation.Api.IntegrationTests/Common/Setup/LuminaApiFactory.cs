@@ -20,11 +20,8 @@ namespace Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 [ExcludeFromCodeCoverage]
 public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly SqliteConnection _connection;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="LuminaApiFactory"/> class.
     /// </summary>
@@ -33,9 +30,7 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
         _connection = new SqliteConnection("DataSource=:memory:");
         _connection.Open();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Configures the web host for the integration tests.
     /// </summary>
@@ -69,5 +64,4 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
         _connection.Close();
         base.Dispose();
     }
-    #endregion
 }

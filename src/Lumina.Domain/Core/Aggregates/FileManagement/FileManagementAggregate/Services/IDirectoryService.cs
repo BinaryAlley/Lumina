@@ -12,7 +12,6 @@ namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.S
 /// </summary>
 public interface IDirectoryService
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Retrieves subdirectories for the specified string path.
     /// </summary>
@@ -77,5 +76,4 @@ public interface IDirectoryService
     /// <param name="path">String representation of the directory path.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the result of deleting a directory, or an error.</returns>
     ErrorOr<Deleted> DeleteDirectory(string path);
-    #endregion
 }

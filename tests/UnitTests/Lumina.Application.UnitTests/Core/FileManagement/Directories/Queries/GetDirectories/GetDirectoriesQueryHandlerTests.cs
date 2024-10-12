@@ -27,16 +27,13 @@ namespace Lumina.Application.UnitTests.Core.FileManagement.Directories.Queries.G
 [ExcludeFromCodeCoverage]
 public class GetDirectoriesQueryHandlerTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IFixture _fixture;
     private readonly IMapper _mockMapper;
     private readonly IDirectoryService _mockDirectoryService;
     private readonly GetDirectoriesQueryHandler _sut;
     private readonly DirectoryFixture _directoryFixture;
     private readonly DirectoryResponseFixture _directoryResponseFixture;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="GetDirectoriesQueryHandlerTests"/> class.
     /// </summary>
@@ -49,9 +46,7 @@ public class GetDirectoriesQueryHandlerTests
         _directoryFixture = new DirectoryFixture();
         _directoryResponseFixture = new DirectoryResponseFixture();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public async Task Handle_WhenCalledWithValidQueryWithoutFilesIncluded_ShouldReturnSuccessResult()
     {
@@ -139,5 +134,4 @@ public class GetDirectoriesQueryHandlerTests
         result.Value.Should().BeEmpty();
         _mockDirectoryService.Received(1).GetSubdirectories(query.Path, query.IncludeHiddenElements);
     }
-    #endregion
 }

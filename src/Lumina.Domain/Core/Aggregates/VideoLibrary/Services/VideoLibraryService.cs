@@ -10,7 +10,6 @@ namespace Lumina.Domain.Core.Aggregates.VideoLibrary.Services;
 /// </summary>
 public class VideoLibraryService : IVideoLibraryService
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the service for managing a movie library.
     /// </summary>
@@ -20,9 +19,7 @@ public class VideoLibraryService : IVideoLibraryService
     /// Gets the service for managing a TV shows library.
     /// </summary>
     public ITvShowLibraryService TvShowLibraryService { get; private set; }
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="VideoLibraryService"/> class.
     /// </summary>
@@ -33,8 +30,4 @@ public class VideoLibraryService : IVideoLibraryService
         MovieLibraryService = movieLibraryService;
         TvShowLibraryService = tvShowLibraryService;
     }
-    #endregion
-
-    #region ===================================================================== METHODS ===================================================================================
-    #endregion
 }

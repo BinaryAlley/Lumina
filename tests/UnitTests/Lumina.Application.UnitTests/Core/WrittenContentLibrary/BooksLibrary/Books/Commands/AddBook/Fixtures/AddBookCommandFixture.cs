@@ -22,13 +22,10 @@ namespace Lumina.Application.UnitTests.Core.WrittenContentLibrary.BooksLibrary.B
 [ExcludeFromCodeCoverage]
 public class AddBookCommandFixture
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly Fixture _fixture;
     private readonly Random _random = new();
     private readonly Faker _faker;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="AddBookCommandFixture"/> class.
     /// </summary>
@@ -39,9 +36,7 @@ public class AddBookCommandFixture
         _fixture.Customizations.Add(new NullableDateOnlySpecimenBuilder());
         _faker = new Faker();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a random valid command to add a book.
     /// </summary>
@@ -343,5 +338,4 @@ public class AddBookCommandFixture
     {
         return input?.Length > maxLength ? input[..maxLength] : input;
     }
-    #endregion
 }

@@ -14,19 +14,14 @@ namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.E
 [DebuggerDisplay("{Id.Path}")]
 public sealed class UnixRootItem : FileSystemItem
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly List<FileSystemItem> _items = [];
     private const string PATH = "/";
-    #endregion
 
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the collection of file system items that are children to the current file system root entity.
     /// </summary>
     public IReadOnlyCollection<FileSystemItem> Items => _items.AsReadOnly();
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="UnixRootItem"/> class.
     /// </summary>
@@ -35,9 +30,7 @@ public sealed class UnixRootItem : FileSystemItem
     private UnixRootItem(FileSystemPathId id, string name) : base(id, name, FileSystemItemType.Root)
     {
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a new instance of the <see cref="UnixRootItem"/> class.
     /// </summary>
@@ -59,5 +52,4 @@ public sealed class UnixRootItem : FileSystemItem
             return setStatusResult.Errors;
         return newRoot;
     }
-    #endregion
 }

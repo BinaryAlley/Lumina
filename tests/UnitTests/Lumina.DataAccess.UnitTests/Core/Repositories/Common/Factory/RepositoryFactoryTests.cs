@@ -16,7 +16,6 @@ namespace Lumina.DataAccess.UnitTests.Core.Repositories.Common.Factory;
 [ExcludeFromCodeCoverage]
 public class RepositoryFactoryTests
 {
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void CreateRepository_WhenCalled_ShouldReturnCorrectRepository()
     {
@@ -47,7 +46,6 @@ public class RepositoryFactoryTests
         Action act = () => repositoryFactory.CreateRepository<IUnregisteredRepository>();
         act.Should().Throw<InvalidOperationException>().WithMessage("No service for type 'Lumina.DataAccess.UnitTests.Core.Repositories.Common.Factory.IUnregisteredRepository' has been registered.");
     }
-    #endregion
 }
 
 public interface IUnregisteredRepository { }

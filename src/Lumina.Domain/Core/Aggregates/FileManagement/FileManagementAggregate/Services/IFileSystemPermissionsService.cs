@@ -10,7 +10,6 @@ namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.S
 /// </summary>
 public interface IFileSystemPermissionsService
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Checks if <paramref name="path"/> can be accessed.
     /// </summary>
@@ -19,5 +18,4 @@ public interface IFileSystemPermissionsService
     /// <param name="isFile">Indicates whether the path represents a file or directory.</param>
     /// <returns><see langword="true"/>, if <paramref name="path"/> can be accessed, <see langword="false"/> otherwise.</returns>
     bool CanAccessPath(FileSystemPathId path, FileAccessMode accessMode, bool isFile = true);
-    #endregion
 }

@@ -21,11 +21,8 @@ namespace Lumina.Presentation.Api.Core.Controllers.FileManagement;
 [Route("api/v{version:apiVersion}/[controller]")]
 public class FilesController : ApiController
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly ISender _mediator;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="FilesController"/> class.
     /// </summary>
@@ -34,9 +31,7 @@ public class FilesController : ApiController
     {
         _mediator = mediator;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Gets the files of <paramref name="path"/>.
     /// </summary>
@@ -80,5 +75,4 @@ public class FilesController : ApiController
             }
         }
     }
-    #endregion
 }

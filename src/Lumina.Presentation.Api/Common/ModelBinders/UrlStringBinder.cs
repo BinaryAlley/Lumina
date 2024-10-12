@@ -11,7 +11,6 @@ namespace Lumina.Presentation.Api.Common.ModelBinders;
 /// </summary>
 public class UrlStringBinder : IModelBinder
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Binds a model to a value by using the specified controller context and binding context.
     /// </summary>
@@ -36,5 +35,4 @@ public class UrlStringBinder : IModelBinder
         bindingContext.Result = ModelBindingResult.Success(value);
         return Task.CompletedTask;
     }
-    #endregion
 }

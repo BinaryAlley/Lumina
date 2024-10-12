@@ -32,7 +32,6 @@ namespace Lumina.Application.UnitTests.Core.FileManagement.Directories.Queries.G
 [ExcludeFromCodeCoverage]
 public class GetTreeDirectoriesQueryHandlerTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IFixture _fixture;
     private readonly IMapper _mockMapper;
     private readonly IDirectoryService _mockDirectoryService;
@@ -40,9 +39,7 @@ public class GetTreeDirectoriesQueryHandlerTests
     private readonly GetTreeDirectoriesQueryFixture _getTreeDirectoriesQueryFixture;
     private readonly DirectoryFixture _directoryFixture;
     private readonly FileSystemTreeNodeResponseFixture _fileSystemTreeNodeResponseFixture;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="GetTreeDirectoriesQueryHandlerTests"/> class.
     /// </summary>
@@ -56,9 +53,7 @@ public class GetTreeDirectoriesQueryHandlerTests
         _directoryFixture = new DirectoryFixture();
         _fileSystemTreeNodeResponseFixture = new FileSystemTreeNodeResponseFixture();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public async Task Handle_WhenCalledWithValidQueryWithoutFilesIncluded_ShouldReturnSuccessResult()
     {
@@ -170,5 +165,4 @@ public class GetTreeDirectoriesQueryHandlerTests
         result.Value.Should().BeEquivalentTo(nestedResponses, options => options.IncludingNestedObjects());
         result.Value.Any(r => r.Children.Count != 0).Should().BeTrue();
     }
-    #endregion
 }

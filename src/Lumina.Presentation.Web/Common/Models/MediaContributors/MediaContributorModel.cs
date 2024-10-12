@@ -11,7 +11,6 @@ namespace Lumina.Presentation.Web.Common.Models.MediaContributors;
 [DebuggerDisplay("{Name}")]
 public class MediaContributorModel
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the name of the contributor.
     /// </summary>
@@ -21,5 +20,4 @@ public class MediaContributorModel
     /// Gets the role of the contributor.
     /// </summary>
     public MediaContributorRoleModel? Role { get; set; }
-    #endregion
 }

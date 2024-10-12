@@ -16,11 +16,8 @@ namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.E
 [DebuggerDisplay("{Id.Path}")]
 public sealed class Directory : FileSystemItem
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly List<FileSystemItem> _items = [];
-    #endregion
 
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets or sets the creation date of the file system item. Can be optional if the information is not available.
     /// </summary>
@@ -35,9 +32,7 @@ public sealed class Directory : FileSystemItem
     /// Gets the collection of file system items that are children to the current directory entity.
     /// </summary>
     public IReadOnlyCollection<FileSystemItem> Items => _items.AsReadOnly();
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="Directory"/> class.
     /// </summary>
@@ -50,9 +45,7 @@ public sealed class Directory : FileSystemItem
         DateCreated = dateCreated;
         DateModified = dateModified;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a new instance of the <see cref="Directory"/> class.
     /// </summary>
@@ -146,5 +139,4 @@ public sealed class Directory : FileSystemItem
         _items.Remove(item);
         return Result.Updated;
     }
-    #endregion
 }

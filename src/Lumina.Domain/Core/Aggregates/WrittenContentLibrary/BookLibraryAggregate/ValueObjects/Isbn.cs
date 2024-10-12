@@ -16,12 +16,9 @@ namespace Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggrega
 [DebuggerDisplay("{Value} ({Format})")]
 public sealed class Isbn : ValueObject
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private static readonly Regex s_isbn10Regex = new(@"^(?:ISBN(?:-10)?:? )?(?=[0-9X]{10}$|(?=(?:[0-9]+[-\ ]){3})[-\ 0-9X]{13}$)[0-9]{1,5}[-\ ]?[0-9]+[-\ ]?[0-9]+[-\ ]?[0-9X]$", RegexOptions.Compiled);
     private static readonly Regex s_isbn13Regex = new(@"^(?:ISBN(?:-13)?:? )?(?=[0-9]{13}$|(?=(?:[0-9]+[-\ ]){4})[-\ 0-9]{17}$)97[89][-\ ]?[0-9]{1,5}[-\ ]?[0-9]+[-\ ]?[0-9]+[-\ ]?[0-9]$", RegexOptions.Compiled);
-    #endregion
 
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the value of the ISBN.
     /// </summary>
@@ -31,9 +28,7 @@ public sealed class Isbn : ValueObject
     /// Gets the format of the ISBN.
     /// </summary>
     public IsbnFormat Format { get; private set; }
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="Isbn"/> class.
     /// </summary>
@@ -44,9 +39,7 @@ public sealed class Isbn : ValueObject
         Value = value;
         Format = format;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a new instance of the <see cref="Isbn"/> class.
     /// </summary>
@@ -122,5 +115,4 @@ public sealed class Isbn : ValueObject
         yield return Value;
         yield return Format;
     }
-    #endregion
 }

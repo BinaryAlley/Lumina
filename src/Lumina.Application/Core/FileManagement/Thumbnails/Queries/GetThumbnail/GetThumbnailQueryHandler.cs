@@ -16,12 +16,9 @@ namespace Lumina.Application.Core.FileManagement.Thumbnails.Queries.GetThumbnail
 /// </summary>
 public class GetThumbnailQueryHandler : IRequestHandler<GetThumbnailQuery, ErrorOr<ThumbnailResponse>>
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IThumbnailService _thumbnailsService;
     private readonly IMapper _mapper;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="GetThumbnailQueryHandler"/> class.
     /// </summary>
@@ -32,9 +29,7 @@ public class GetThumbnailQueryHandler : IRequestHandler<GetThumbnailQuery, Error
         _thumbnailsService = thumbnailsService;
         _mapper = mapper;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Gets the thumbnail for a file located at the specified path, with the specified quality.
     /// </summary>
@@ -46,5 +41,4 @@ public class GetThumbnailQueryHandler : IRequestHandler<GetThumbnailQuery, Error
         ErrorOr<Thumbnail> result = await _thumbnailsService.GetThumbnailAsync(request.Path, request.Quality, cancellationToken);
         return await ValueTask.FromResult(result.Match(values => ErrorOrFactory.From(_mapper.Map<ThumbnailResponse>(values)), errors => errors));
     }
-    #endregion
 }

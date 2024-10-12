@@ -29,7 +29,6 @@ namespace Lumina.Domain.UnitTests.Core.Aggregates.FileManagementAggregate.Servic
 [ExcludeFromCodeCoverage]
 public class FileProviderServiceTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IFixture _fixture;
     private readonly IFileSystem _mockFileSystem;
     private readonly IFileSystemPermissionsService _mockFileSystemPermissionsService;
@@ -46,9 +45,7 @@ public class FileProviderServiceTests
     private readonly string _pathSource = s_isLinux ? "/Source" : @"C:\Source";
     private readonly string _pathDestination = s_isLinux ? "/Destination" : @"C:\Destination";
     private readonly char _dirSeparator = s_isLinux ? '/' : '\\';
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="FileProviderServiceTests"/> class.
     /// </summary>
@@ -60,9 +57,7 @@ public class FileProviderServiceTests
         _sut = new FileProviderService(_mockFileSystem, _mockFileSystemPermissionsService);
         _fileSystemPathIdFixture = new();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void GetFilePaths_WhenUserHasNoAccess_ShouldReturnUnauthorizedAccessError()
     {
@@ -931,5 +926,4 @@ public class FileProviderServiceTests
         result.FirstError.Should().Be(Errors.Permission.UnauthorizedAccess);
         _mockFileSystem.File.DidNotReceive().Delete(Arg.Any<string>());
     }
-    #endregion
 }

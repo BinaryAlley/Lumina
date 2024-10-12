@@ -14,7 +14,6 @@ namespace Lumina.Application.Common.DependencyInjection;
 /// </summary>
 public static class ApplicationLayerServices
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Registers the services of the Application layer into the dependency injection container.
     /// </summary>
@@ -42,5 +41,4 @@ public static class ApplicationLayerServices
 
         return services;
     }
-    #endregion
 }

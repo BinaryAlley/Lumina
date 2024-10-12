@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.Models.FileManagement;
 using System;
 using System.Diagnostics;
@@ -15,4 +15,10 @@ namespace Lumina.Contracts.Responses.FileManagement;
 /// <param name="DateModified">The modification date of the file.</param>
 /// <param name="Size">The size of the file, in bytes.</param>
 [DebuggerDisplay("{Name} (File, Size: {Size} bytes)")]
-public record FileResponse(string Path, string Name, DateTime DateCreated, DateTime DateModified, long Size) : FileSystemItemModel(Path, Name, DateCreated, DateModified);
+public record FileResponse(
+    string Path, 
+    string Name, 
+    DateTime DateCreated, 
+    DateTime DateModified, 
+    long Size
+) : FileSystemItemModel(Path, Name, DateCreated, DateModified);

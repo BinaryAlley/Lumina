@@ -13,7 +13,6 @@ namespace Lumina.Domain.Core.Aggregates.VideoLibrary.MovieLibraryAggregate.Value
 [DebuggerDisplay("{Value}")]
 public sealed class MovieId : EntityId<Guid>
 {
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="MovieId"/> class.
     /// </summary>
@@ -21,9 +20,7 @@ public sealed class MovieId : EntityId<Guid>
     private MovieId(Guid value) : base(value)
     {
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a new instance of the <see cref="MovieId"/> class.
     /// </summary>
@@ -50,5 +47,4 @@ public sealed class MovieId : EntityId<Guid>
     {
         yield return Value;
     }
-    #endregion
 }

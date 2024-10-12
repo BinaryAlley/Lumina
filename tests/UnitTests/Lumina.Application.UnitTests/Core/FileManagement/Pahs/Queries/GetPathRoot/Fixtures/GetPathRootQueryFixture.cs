@@ -12,7 +12,6 @@ namespace Lumina.Application.UnitTests.Core.FileManagement.Pahs.Queries.GetPathR
 [ExcludeFromCodeCoverage]
 public class GetPathRootQueryFixture
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a random valid query to check if paths exist.
     /// </summary>
@@ -25,5 +24,4 @@ public class GetPathRootQueryFixture
             ))
             .RuleFor(x => x.Path, f => f.System.FilePath());
     }
-    #endregion
 }

@@ -12,7 +12,6 @@ namespace Lumina.Presentation.Web.Common.Utilities;
 /// </summary>
 public static class OptionsBuilderFluentValidationUtilities
 {
-    #region ================================================================== METHODS ===================================================================================
     /// <summary>
     /// Extension method to add fluent validation to the options validation pipeline.
     /// </summary>
@@ -29,5 +28,4 @@ public static class OptionsBuilderFluentValidationUtilities
             serviceProvider => new FluentValidationOptions<TOptions>(optionsBuilder.Name, serviceProvider.GetRequiredService<IValidator<TOptions>>()));
         return optionsBuilder;
     }
-    #endregion
 }

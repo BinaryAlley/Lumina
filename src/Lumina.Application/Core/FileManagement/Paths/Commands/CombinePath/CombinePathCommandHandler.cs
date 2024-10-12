@@ -15,11 +15,8 @@ namespace Lumina.Application.Core.FileManagement.Paths.Commands.CombinePath;
 /// </summary>
 public class CombinePathCommandHandler : IRequestHandler<CombinePathCommand, ErrorOr<PathSegmentResponse>>
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IPathService _pathService;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="SplitPathCommandHandler"/> class.
     /// </summary>
@@ -28,9 +25,7 @@ public class CombinePathCommandHandler : IRequestHandler<CombinePathCommand, Err
     {
         _pathService = pathService;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Combines two file system paths.
     /// </summary>
@@ -44,5 +39,4 @@ public class CombinePathCommandHandler : IRequestHandler<CombinePathCommand, Err
         ErrorOr<string> result = _pathService.CombinePath(request.OriginalPath, request.NewPath);
         return ValueTask.FromResult(result.Match(values => ErrorOrFactory.From(new PathSegmentResponse(result.Value)), errors => errors));
     }
-    #endregion
 }

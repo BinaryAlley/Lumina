@@ -13,11 +13,8 @@ namespace Lumina.Application.Core.FileManagement.Paths.Queries.ValidatePath;
 /// </summary>
 public class ValidatePathQueryHandler : IRequestHandler<ValidatePathQuery, PathValidResponse>
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IPathService _pathService;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="ValidatePathQueryHandler"/> class.
     /// </summary>
@@ -26,9 +23,7 @@ public class ValidatePathQueryHandler : IRequestHandler<ValidatePathQuery, PathV
     {
         _pathService = pathService;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Validates the specified file system path.
     /// </summary>
@@ -41,5 +36,4 @@ public class ValidatePathQueryHandler : IRequestHandler<ValidatePathQuery, PathV
     {
         return ValueTask.FromResult(new PathValidResponse(_pathService.IsValidPath(request.Path)));
     }
-    #endregion
 }

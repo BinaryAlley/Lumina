@@ -24,12 +24,9 @@ namespace Lumina.Presentation.Web.Common.Api;
 /// </summary>
 public class ApiHttpClient : IApiHttpClient
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _jsonOptions;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="ApiHttpClient"/> class.
     /// </summary>
@@ -49,9 +46,7 @@ public class ApiHttpClient : IApiHttpClient
             Converters = { new JsonStringEnumConverter() }
         };
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Sends a GET request to the specified <paramref name="endpoint"/> as an asynchronous operation and returns the result.
     /// </summary>
@@ -208,5 +203,4 @@ public class ApiHttpClient : IApiHttpClient
             throw new ApiException(problemDetails, response.StatusCode);
         }
     }
-    #endregion
 }

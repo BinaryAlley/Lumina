@@ -13,18 +13,13 @@ namespace Lumina.Presentation.Web.Common.Validation;
 /// <typeparam name="TOptions">The type of options being validated.</typeparam>
 public class FluentValidationOptions<TOptions> : IValidateOptions<TOptions> where TOptions : class
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IValidator<TOptions> _validator;
-    #endregion
 
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the name of the options being validated.
     /// </summary>
     public string? Name { get; }
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="FluentValidationOptions{TOptions}"/> class.
     /// </summary>
@@ -35,9 +30,7 @@ public class FluentValidationOptions<TOptions> : IValidateOptions<TOptions> wher
         Name = name;
         _validator = validator;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Validates the specified <paramref name="options"/>.
     /// </summary>
@@ -61,10 +54,9 @@ public class FluentValidationOptions<TOptions> : IValidateOptions<TOptions> wher
         // if the validation fails, collect the error messages
         // TODO: add translation support for the error messages
         string[] errors = validationResult.Errors.Select(x => $"Options validation failed for '{x.PropertyName}' with error: '{x.ErrorMessage}'")
-                                            .ToArray();
+                                                 .ToArray();
 
         // and return them with a failure result
         return ValidateOptionsResult.Fail(errors);
     }
-    #endregion
 }

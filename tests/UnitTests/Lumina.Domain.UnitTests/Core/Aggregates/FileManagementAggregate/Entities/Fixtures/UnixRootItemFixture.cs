@@ -15,7 +15,6 @@ namespace Lumina.Domain.UnitTests.Core.Aggregates.FileManagementAggregate.Entiti
 [ExcludeFromCodeCoverage]
 public class UnixRootItemFixture
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a random valid <see cref="UnixRootItem"/>.
     /// </summary>
@@ -29,5 +28,4 @@ public class UnixRootItemFixture
             throw new InvalidOperationException("Failed to create UnixRootItem: " + string.Join(", ", unixRootItemResult.Errors));
         return unixRootItemResult.Value;
     }
-    #endregion
 }

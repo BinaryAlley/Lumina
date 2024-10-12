@@ -14,11 +14,8 @@ namespace Lumina.Application.UnitTests.Core.FileManagement.Files.Fixtures;
 [ExcludeFromCodeCoverage]
 public class FileResponseFixture
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly Faker _faker = new();
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a random valid <see cref="FileResponse"/>.
     /// </summary>
@@ -43,5 +40,4 @@ public class FileResponseFixture
     {
         return Enumerable.Range(0, count).Select(_ => Create()).ToList();
     }
-    #endregion
 }

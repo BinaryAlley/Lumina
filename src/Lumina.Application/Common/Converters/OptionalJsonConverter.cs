@@ -13,7 +13,6 @@ namespace Lumina.Application.Common.Converters;
 /// <typeparam name="TValue">The type of the value represented by the <see cref="Optional{TValue}"/> structure.</typeparam>
 public class OptionalJsonConverter<TValue> : JsonConverter<Optional<TValue>>
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Reads and converts the JSON to an instance of <see cref="Optional{TValue}"/>.
     /// </summary>
@@ -42,5 +41,4 @@ public class OptionalJsonConverter<TValue> : JsonConverter<Optional<TValue>>
         else
             writer.WriteNullValue();
     }
-    #endregion
 }

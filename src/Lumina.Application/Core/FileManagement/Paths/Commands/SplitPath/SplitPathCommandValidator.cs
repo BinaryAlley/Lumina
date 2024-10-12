@@ -10,7 +10,6 @@ namespace Lumina.Application.Core.FileManagement.Paths.Commands.SplitPath;
 /// </summary>
 public class SplitPathCommandValidator : AbstractValidator<SplitPathCommand>
 {
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="SplitPathCommandValidator"/> class.
     /// </summary>
@@ -18,5 +17,4 @@ public class SplitPathCommandValidator : AbstractValidator<SplitPathCommand>
     {
         RuleFor(x => x.Path).NotEmpty().WithMessage(Errors.FileManagement.PathCannotBeEmpty.Code);
     }
-    #endregion
 }

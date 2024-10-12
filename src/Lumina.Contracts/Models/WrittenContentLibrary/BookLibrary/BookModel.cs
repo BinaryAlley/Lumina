@@ -13,7 +13,6 @@ namespace Lumina.Contracts.Models.WrittenContentLibrary.BookLibrary;
 [DebuggerDisplay("{Title}")]
 public class BookModel : IStorageEntity
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the Id of the media item.
     /// </summary>
@@ -204,5 +203,4 @@ public class BookModel : IStorageEntity
     /// Gets the optional time and date when the entity was updated.
     /// </summary>
     public DateTime? Updated { get; set; }
-    #endregion
 }

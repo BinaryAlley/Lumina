@@ -16,7 +16,6 @@ namespace Lumina.Presentation.Api;
 /// </summary>
 public class Program
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Application entry point.
     /// </summary>
@@ -53,5 +52,4 @@ public class Program
 
         await app.RunAsync().ConfigureAwait(false);
     }
-    #endregion
 }

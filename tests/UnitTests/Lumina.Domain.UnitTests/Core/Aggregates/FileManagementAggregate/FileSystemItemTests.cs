@@ -22,12 +22,9 @@ namespace Lumina.Domain.UnitTests.Core.Aggregates.FileManagementAggregate;
 [ExcludeFromCodeCoverage]
 public class FileSystemItemTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IFixture _fixture;
     private readonly FileSystemPathIdFixture _fileSystemPathIdFixture;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="FileSystemItemTests"/> class.
     /// </summary>
@@ -36,9 +33,7 @@ public class FileSystemItemTests
         _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
         _fileSystemPathIdFixture = new FileSystemPathIdFixture();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void Constructor_WhenCalled_ShouldSetPropertiesCorrectly()
     {
@@ -172,5 +167,4 @@ public class FileSystemItemTests
         FileSystemItemType type = _fixture.Create<FileSystemItemType>();
         return new FileSystemItemFixture(id, name, type);
     }
-    #endregion
 }

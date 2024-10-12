@@ -13,7 +13,6 @@ namespace Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.V
 [DebuggerDisplay("{Type}")]
 public class Thumbnail : ValueObject
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the type of the image represented by this thumbnail.
     /// </summary>
@@ -23,9 +22,7 @@ public class Thumbnail : ValueObject
     /// Gets the bytes of the image represented by this thumbnail.
     /// </summary>
     public byte[] Bytes { get; }
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="Thumbnail"/> class.
     /// </summary>
@@ -36,14 +33,11 @@ public class Thumbnail : ValueObject
         Type = type;
         Bytes = bytes;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <inheritdoc/>
     public override IEnumerable<object> GetEqualityComponents()
     {
         yield return Type;
         yield return Bytes;
     }
-    #endregion
 }

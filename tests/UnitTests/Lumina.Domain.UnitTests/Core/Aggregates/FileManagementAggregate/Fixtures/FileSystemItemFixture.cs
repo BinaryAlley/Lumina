@@ -13,7 +13,6 @@ namespace Lumina.Domain.UnitTests.Core.Aggregates.FileManagementAggregate.Fixtur
 [ExcludeFromCodeCoverage]
 public class FileSystemItemFixture : FileSystemItem
 {
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="FileSystemItemFixture"/> class.
     /// </summary>
@@ -24,5 +23,4 @@ public class FileSystemItemFixture : FileSystemItem
         : base(id, name, fileSystemItemType)
     {
     }
-    #endregion
 }

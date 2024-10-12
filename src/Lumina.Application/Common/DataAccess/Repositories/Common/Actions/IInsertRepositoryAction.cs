@@ -13,7 +13,6 @@ namespace Lumina.Application.Common.DataAccess.Repositories.Common.Actions;
 /// <typeparam name="TModel">The type used for the insert action. It should implement <see cref="IStorageEntity"/>.</typeparam>
 public interface IInsertRepositoryAction<TModel> where TModel : IStorageEntity
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Saves an element of type <typeparamref name="TModel"/> in the storage medium.
     /// </summary>
@@ -21,5 +20,4 @@ public interface IInsertRepositoryAction<TModel> where TModel : IStorageEntity
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successfull operation, or an error.</returns>
     Task<ErrorOr<Created>> InsertAsync(TModel data, CancellationToken cancellationToken);
-    #endregion
 }

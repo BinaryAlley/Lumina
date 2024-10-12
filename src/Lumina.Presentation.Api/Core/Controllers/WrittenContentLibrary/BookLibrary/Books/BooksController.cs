@@ -18,12 +18,9 @@ namespace Lumina.Presentation.Api.Core.Controllers.WrittenContentLibrary.BookLib
 [Route("api/v{version:apiVersion}/[controller]")]
 public class BooksController : ApiController
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly ISender _mediator;
     private readonly IMapper _mapper;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="BooksController"/> class.
     /// </summary>
@@ -34,9 +31,7 @@ public class BooksController : ApiController
         _mediator = mediator;
         _mapper = mapper;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Controller action for getting the list of all books.
     /// </summary>
@@ -57,5 +52,4 @@ public class BooksController : ApiController
         ErrorOr.ErrorOr<Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate.Book> result = await _mediator.Send(_mapper.Map<AddBookCommand>(request)).ConfigureAwait(false);
         return result.Match(result => Created($"/api/v1/books/{result.Id}", result), Problem);
     }
-    #endregion
 }

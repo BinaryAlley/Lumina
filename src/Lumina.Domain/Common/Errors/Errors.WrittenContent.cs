@@ -11,7 +11,6 @@ public static partial class Errors
 {
     public static class WrittenContent
     {
-        #region ==================================================================== PROPERTIES =================================================================================
         public static Error BookAlreadyExists => Error.Conflict(nameof(BookAlreadyExists));
         public static Error IsbnValueCannotBeEmpty => Error.Validation(nameof(IsbnValueCannotBeEmpty));
         public static Error IsbnListCannotBeNull => Error.Validation(nameof(IsbnListCannotBeNull));
@@ -36,6 +35,5 @@ public static partial class Errors
         public static Error UnknownBookFormat => Error.Validation(nameof(UnknownBookFormat));
         public static Error EditionMustBeMaximum50CharactersLong => Error.Validation(nameof(EditionMustBeMaximum50CharactersLong));
         public static Error VolumeNumberMustBeGreaterThanZero => Error.Validation(nameof(VolumeNumberMustBeGreaterThanZero));
-        #endregion
     }
 }

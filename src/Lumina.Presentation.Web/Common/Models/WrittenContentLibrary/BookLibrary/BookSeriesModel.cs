@@ -10,10 +10,8 @@ namespace Lumina.Presentation.Web.Common.Models.WrittenContentLibrary.BookLibrar
 [DebuggerDisplay("{Title}")]
 public class BookSeriesModel
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets or sets the title of the book series.
     /// </summary>
     public string? Title { get; set; }
-    #endregion
 }

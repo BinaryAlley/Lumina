@@ -26,16 +26,13 @@ namespace Lumina.Application.UnitTests.Core.FileManagement.Pahs.Queries.GetPathP
 [ExcludeFromCodeCoverage]
 public class GetPathParentQueryHandlerTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IFixture _fixture;
     private readonly IMapper _mockMapper;
     private readonly IPathService _mockPathService;
     private readonly GetPathParentQueryHandler _sut;
     private readonly PathSegmentFixture _pathSegmentFixture;
     private readonly PathSegmentResponseFixture _pathSegmentResponseFixture;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     public GetPathParentQueryHandlerTests()
     {
         _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
@@ -45,9 +42,7 @@ public class GetPathParentQueryHandlerTests
         _pathSegmentFixture = new PathSegmentFixture();
         _pathSegmentResponseFixture = new PathSegmentResponseFixture();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public async Task Handle_WhenCalledWithValidQuery_ShouldReturnSuccessResult()
     {
@@ -114,5 +109,4 @@ public class GetPathParentQueryHandlerTests
         _mockPathService.Received(1).GoUpOneLevel(query.Path);
         _mockMapper.Received(1).Map<IEnumerable<PathSegmentResponse>>(Arg.Is<IEnumerable<PathSegment>>(p => !p.Any()));
     }
-    #endregion
 }

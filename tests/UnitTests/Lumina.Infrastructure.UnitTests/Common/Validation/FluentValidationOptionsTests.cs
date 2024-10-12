@@ -21,11 +21,8 @@ namespace Lumina.Infrastructure.UnitTests.Common.Validation;
 [ExcludeFromCodeCoverage]
 public class FluentValidationOptionsTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IFixture _fixture;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="FluentValidationOptionsTests"/> class.
     /// </summary>
@@ -33,9 +30,7 @@ public class FluentValidationOptionsTests
     {
         _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void Validate_WhenMatchingName_ShouldValidateOptions()
     {
@@ -131,5 +126,4 @@ public class FluentValidationOptionsTests
             .Which.Should().Contain("Options validation failed for 'PropertyName' with error: 'Error Message'");
 
     }
-    #endregion
 }

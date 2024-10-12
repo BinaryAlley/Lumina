@@ -21,14 +21,11 @@ namespace Lumina.Application.Core.FileManagement.Directories.Queries.GetDirector
 /// </summary>
 public class GetDirectoryTreeQueryHandler : IRequestHandler<GetDirectoryTreeQuery, ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>>
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IDirectoryService _directoryService;
     private readonly IFileService _fileService;
     private readonly IPathService _pathService;
     private readonly IDriveService _driveService;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="GetDirectoryTreeQueryHandler"/> class.
     /// </summary>
@@ -43,9 +40,7 @@ public class GetDirectoryTreeQueryHandler : IRequestHandler<GetDirectoryTreeQuer
         _pathService = pathService;
         _driveService = driveService;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Gets the tree of expanded directories leading up to the requested path, with the additional list of drives, and children of the last child directory.
     /// </summary>
@@ -182,5 +177,4 @@ public class GetDirectoryTreeQueryHandler : IRequestHandler<GetDirectoryTreeQuer
         node.ChildrenLoaded = true;
         return Result.Success;
     }
-    #endregion
 }

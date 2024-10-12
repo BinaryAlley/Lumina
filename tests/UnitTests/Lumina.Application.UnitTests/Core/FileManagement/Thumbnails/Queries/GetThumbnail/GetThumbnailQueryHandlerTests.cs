@@ -23,14 +23,11 @@ namespace Lumina.Application.UnitTests.Core.FileManagement.Thumbnails.Queries.Ge
 [ExcludeFromCodeCoverage]
 public class GetThumbnailQueryHandlerTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IFixture _fixture;
     private readonly IThumbnailService _mockThumbnailService;
     private readonly IMapper _mockMapper;
     private readonly GetThumbnailQueryHandler _sut;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     public GetThumbnailQueryHandlerTests()
     {
         _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
@@ -38,9 +35,7 @@ public class GetThumbnailQueryHandlerTests
         _mockMapper = Substitute.For<IMapper>();
         _sut = new GetThumbnailQueryHandler(_mockThumbnailService, _mockMapper);
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public async Task Handle_WhenCalledWithValidQuery_ShouldReturnSuccessResult()
     {
@@ -100,5 +95,4 @@ public class GetThumbnailQueryHandlerTests
         await _mockThumbnailService.Received(1).GetThumbnailAsync(query.Path, query.Quality, cts.Token);
         _mockMapper.DidNotReceive().Map<ThumbnailResponse>(Arg.Any<Thumbnail>());
     }
-    #endregion
 }

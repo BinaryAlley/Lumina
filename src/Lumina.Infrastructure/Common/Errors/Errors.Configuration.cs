@@ -11,9 +11,7 @@ public static partial class Errors
 {
     public static class Configuration
     {
-        #region ==================================================================== PROPERTIES =================================================================================
         public static Error ApplicationThemeCannotBeEmpty => Error.Validation(nameof(ApplicationThemeCannotBeEmpty));
         public static Error DatabaseConnectionStringCannotBeEmpty => Error.Validation(nameof(DatabaseConnectionStringCannotBeEmpty));
-        #endregion
     }
 }

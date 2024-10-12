@@ -10,7 +10,6 @@ namespace Lumina.Domain.Core.Services;
 /// </summary>
 public interface IMediaLibraryService
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets the service for managing a audio library.
     /// </summary>
@@ -25,5 +24,4 @@ public interface IMediaLibraryService
     /// Gets the service for managing a written content library.
     /// </summary>
     public IWrittenContentLibraryService WrittenContentLibraryService { get; }
-    #endregion
 }

@@ -16,12 +16,9 @@ namespace Lumina.Application.Core.FileManagement.Paths.Queries.GetPathRoot;
 /// </summary>
 public class GetPathRootQueryHandler : IRequestHandler<GetPathRootQuery, ErrorOr<PathSegmentResponse>>
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IPathService _pathService;
     private readonly IMapper _mapper;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="GetPathRootQueryHandler"/> class.
     /// </summary>
@@ -32,9 +29,7 @@ public class GetPathRootQueryHandler : IRequestHandler<GetPathRootQuery, ErrorOr
         _pathService = pathService;
         _mapper = mapper;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Gets the root of the specified file system path.
     /// </summary>
@@ -46,5 +41,4 @@ public class GetPathRootQueryHandler : IRequestHandler<GetPathRootQuery, ErrorOr
         ErrorOr<PathSegment> result = _pathService.GetPathRoot(request.Path);
         return ValueTask.FromResult(result.Match(values => ErrorOrFactory.From(_mapper.Map<PathSegmentResponse>(values)), errors => errors));
     }
-    #endregion
 }

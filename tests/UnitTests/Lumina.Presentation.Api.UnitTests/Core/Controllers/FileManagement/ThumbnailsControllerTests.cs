@@ -29,12 +29,9 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Controllers.FileManagement;
 [ExcludeFromCodeCoverage]
 public class ThumbnailsControllerTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly ISender _mockMediator;
     private readonly ThumbnailsController _sut;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="ThumbnailsControllerTests"/> class.
     /// </summary>
@@ -43,9 +40,7 @@ public class ThumbnailsControllerTests
         _mockMediator = Substitute.For<ISender>();
         _sut = new ThumbnailsController(_mockMediator);
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public async Task GetThumbnail_WhenCalled_ShouldReturnFileResultWithThumbnailResponse()
     {
@@ -138,17 +133,25 @@ public class ThumbnailsControllerTests
         string path = "/path/to/file.jpg";
         int quality = 80;
         CancellationTokenSource cts = new();
+        TaskCompletionSource<bool> operationStarted = new();
+        TaskCompletionSource<bool> cancellationRequested = new();
 
         _mockMediator.Send(Arg.Any<GetThumbnailQuery>(), Arg.Any<CancellationToken>())
             .Returns(callInfo => new ValueTask<ErrorOr<ThumbnailResponse>>(Task.Run(async () =>
             {
-                await Task.Delay(100, callInfo.Arg<CancellationToken>());
+                operationStarted.SetResult(true);
+                await cancellationRequested.Task;
+                callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
                 return ErrorOrFactory.From(ThumbnailResponseFixture.CreateThumbnailResponse());
             }, callInfo.Arg<CancellationToken>())));
 
-        // Act & Assert
-        cts.CancelAfter(50);
-        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => _sut.GetThumbnail(path, quality, cts.Token));
+        // Act
+        Task<IActionResult> operationTask = _sut.GetThumbnail(path, quality, cts.Token);
+        await operationStarted.Task;
+        cts.Cancel();
+        cancellationRequested.SetResult(true);
+
+        // Assert
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => operationTask);
     }
-    #endregion
 }

@@ -16,11 +16,8 @@ namespace Lumina.Presentation.Web.Controllers.FileManagement;
 [Route("[controller]")]
 public class FilesController : Controller
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IApiHttpClient _apiHttpClient;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="FilesController"/> class.
     /// </summary>
@@ -29,9 +26,7 @@ public class FilesController : Controller
     {
         _apiHttpClient = apiHttpClient;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Gets the files of <paramref name="path"/>.
     /// </summary>
@@ -69,5 +64,4 @@ public class FilesController : Controller
             yield return file;
         }
     }
-    #endregion
 }

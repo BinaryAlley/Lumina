@@ -12,7 +12,6 @@ namespace Lumina.Presentation.Api.Core.Controllers.Maintenance;
 [Route("[controller]")]
 public class HealthController : ApiController
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Checks if the application is healthy.
     /// </summary>
@@ -22,5 +21,4 @@ public class HealthController : ApiController
         // TODO: to be implemented
         return await Task.FromResult(Ok());
     }
-    #endregion
 }

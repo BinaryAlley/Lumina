@@ -28,16 +28,13 @@ namespace Lumina.Application.UnitTests.Core.FileManagement.Files.Queries.GetFile
 [ExcludeFromCodeCoverage]
 public class GetFilesQueryHandlerTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IFixture _fixture;
     private readonly IMapper _mockMapper;
     private readonly IFileService _mockFileService;
     private readonly GetFilesQueryHandler _sut;
     private readonly FileFixture _fileFixture;
     private readonly FileResponseFixture _fileResponseFixture;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="GetFilesQueryHandlerTests"/> class.
     /// </summary>
@@ -50,9 +47,7 @@ public class GetFilesQueryHandlerTests
         _fileFixture = new FileFixture();
         _fileResponseFixture = new FileResponseFixture();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public async Task Handle_WhenCalledWithValidQueryWithoutHiddenFiles_ShouldReturnSuccessResult()
     {
@@ -145,5 +140,4 @@ public class GetFilesQueryHandlerTests
         _mockFileService.Received(1).GetFiles(query.Path, query.IncludeHiddenElements);
         _mockMapper.Received(1).Map<IEnumerable<FileResponse>>(Arg.Is<IEnumerable<File>>(f => !f.Any()));
     }
-    #endregion
 }

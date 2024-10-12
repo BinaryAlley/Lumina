@@ -26,13 +26,10 @@ namespace Lumina.DataAccess.UnitTests.Core.Repositories.Books;
 [ExcludeFromCodeCoverage]
 public class BookRepositoryTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly LuminaDbContext _mockContext;
     private readonly BookRepository _sut;
     private readonly BookModelFixture _bookModelFixture;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="BookRepositoryTests"/> class.
     /// </summary>
@@ -42,9 +39,7 @@ public class BookRepositoryTests
         _sut = new BookRepository(_mockContext);
         _bookModelFixture = new BookModelFixture();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public async Task InsertAsync_WhenBookDoesNotExist_ShouldAddBookToContextAndReturnCreated()
     {
@@ -194,5 +189,4 @@ public class BookRepositoryTests
         retrievedBook.Genres.Should().HaveCount(2);
         retrievedBook.ISBNs.Should().HaveCount(2);
     }
-    #endregion
 }

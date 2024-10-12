@@ -12,10 +12,8 @@ namespace Lumina.Presentation.Web.Common.Models.WrittenContentLibrary.BookLibrar
 [DebuggerDisplay("{Value}/{MaxValue}")]
 public class BookRatingModel : RatingModel
 {
-    #region ==================================================================== PROPERTIES =================================================================================
     /// <summary>
     /// Gets or sets the source of the book rating (e.g., a specific website or platform).
     /// </summary>
     public BookRatingSource? Source { get; set; }
-    #endregion
 }

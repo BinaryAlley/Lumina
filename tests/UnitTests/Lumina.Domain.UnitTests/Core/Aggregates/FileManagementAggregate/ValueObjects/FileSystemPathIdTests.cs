@@ -15,11 +15,8 @@ namespace Lumina.Domain.UnitTests.Core.Aggregates.FileManagementAggregate.ValueO
 [ExcludeFromCodeCoverage]
 public class FileSystemPathIdTests
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly FileSystemPathIdFixture _fileSystemPathIdFixture;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="FileSystemPathIdTests"/> class.
     /// </summary>
@@ -27,9 +24,7 @@ public class FileSystemPathIdTests
     {
         _fileSystemPathIdFixture = new FileSystemPathIdFixture();
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     [Fact]
     public void Create_WithValidPath_ShouldReturnFileSystemPathId()
     {
@@ -146,5 +141,4 @@ public class FileSystemPathIdTests
         // Assert
         result.Should().BeTrue();
     }
-    #endregion
 }

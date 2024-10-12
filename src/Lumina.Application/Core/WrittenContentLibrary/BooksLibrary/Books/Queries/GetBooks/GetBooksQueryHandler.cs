@@ -18,11 +18,8 @@ namespace Lumina.Application.Core.WrittenContentLibrary.BooksLibrary.Books.Queri
 /// </summary>
 public class GetBooksQueryHandler : IRequestHandler<GetBooksQuery, ErrorOr<IEnumerable<Book>>>
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly IUnitOfWork _unitOfWork;
-    #endregion
 
-    #region ====================================================================== CTOR =====================================================================================
     /// <summary>
     /// Initializes a new instance of the <see cref="GetBooksQueryHandler"/> class.
     /// </summary>
@@ -31,9 +28,7 @@ public class GetBooksQueryHandler : IRequestHandler<GetBooksQuery, ErrorOr<IEnum
     {
         _unitOfWork = unitOfWork;
     }
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Handles the query to get all books.
     /// </summary>
@@ -48,5 +43,4 @@ public class GetBooksQueryHandler : IRequestHandler<GetBooksQuery, ErrorOr<IEnum
         ErrorOr<IEnumerable<BookModel>> getBooksResult = await bookRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
         return getBooksResult.Match(values => ErrorOrFactory.From(values.Adapt<IEnumerable<Book>>()), errors => errors);
     }
-    #endregion
 }

@@ -19,7 +19,6 @@ namespace Lumina.DataAccess.Common.DependencyInjection;
 /// </summary>
 public static class DataAccessLayerServices
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Extension method for adding the DataAccess layer services to the DI container.
     /// </summary>
@@ -57,5 +56,4 @@ public static class DataAccessLayerServices
                                    .First(), type);
         }
     }
-    #endregion
 }

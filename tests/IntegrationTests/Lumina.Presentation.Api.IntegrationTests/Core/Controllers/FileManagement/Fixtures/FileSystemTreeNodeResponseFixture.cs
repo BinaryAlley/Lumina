@@ -15,11 +15,8 @@ namespace Lumina.Presentation.Api.IntegrationTests.Core.Controllers.FileManageme
 [ExcludeFromCodeCoverage]
 public class FileSystemTreeNodeResponseFixture
 {
-    #region ================================================================== FIELD MEMBERS ================================================================================
     private readonly Faker _faker = new();
-    #endregion
 
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Creates a single <see cref="FileSystemTreeNodeResponse"/> with a nested structure.
     /// </summary>
@@ -58,5 +55,4 @@ public class FileSystemTreeNodeResponseFixture
     {
         return Enumerable.Range(0, count).Select(_ => Create(0, maxDepth, maxChildren)).ToList();
     }
-    #endregion
 }

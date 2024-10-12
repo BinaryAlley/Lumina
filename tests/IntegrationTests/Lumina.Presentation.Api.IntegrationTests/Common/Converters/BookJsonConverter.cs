@@ -22,7 +22,6 @@ namespace Lumina.Presentation.Api.IntegrationTests.Common.Converters;
 [ExcludeFromCodeCoverage]
 public class BookJsonConverter : JsonConverter<Book>
 {
-    #region ===================================================================== METHODS ===================================================================================
     /// <summary>
     /// Reads and converts JSON to a <see cref="Book"/> object.
     /// </summary>
@@ -281,5 +280,4 @@ public class BookJsonConverter : JsonConverter<Book>
             ).Value)
             .ToList();
     }
-    #endregion
 }
