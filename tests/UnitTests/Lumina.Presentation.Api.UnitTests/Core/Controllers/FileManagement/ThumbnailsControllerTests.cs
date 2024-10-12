@@ -133,16 +133,25 @@ public class ThumbnailsControllerTests
         string path = "/path/to/file.jpg";
         int quality = 80;
         CancellationTokenSource cts = new();
+        TaskCompletionSource<bool> operationStarted = new();
+        TaskCompletionSource<bool> cancellationRequested = new();
 
         _mockMediator.Send(Arg.Any<GetThumbnailQuery>(), Arg.Any<CancellationToken>())
             .Returns(callInfo => new ValueTask<ErrorOr<ThumbnailResponse>>(Task.Run(async () =>
             {
-                await Task.Delay(100, callInfo.Arg<CancellationToken>());
+                operationStarted.SetResult(true);
+                await cancellationRequested.Task;
+                callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
                 return ErrorOrFactory.From(ThumbnailResponseFixture.CreateThumbnailResponse());
             }, callInfo.Arg<CancellationToken>())));
 
-        // Act & Assert
-        cts.CancelAfter(50);
-        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => _sut.GetThumbnail(path, quality, cts.Token));
+        // Act
+        Task<IActionResult> operationTask = _sut.GetThumbnail(path, quality, cts.Token);
+        await operationStarted.Task;
+        cts.Cancel();
+        cancellationRequested.SetResult(true);
+
+        // Assert
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => operationTask);
     }
 }

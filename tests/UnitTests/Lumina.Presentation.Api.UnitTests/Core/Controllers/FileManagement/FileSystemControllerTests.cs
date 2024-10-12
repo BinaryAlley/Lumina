@@ -91,16 +91,25 @@ public class FileSystemControllerTests
     {
         // Arrange
         CancellationTokenSource cts = new();
+        TaskCompletionSource<bool> operationStarted = new();
+        TaskCompletionSource<bool> cancellationRequested = new();
 
         _mockMediator.Send(Arg.Any<GetFileSystemQuery>(), Arg.Any<CancellationToken>())
             .Returns(callInfo => new ValueTask<FileSystemTypeResponse>(Task.Run(async () =>
             {
-                await Task.Delay(100, callInfo.Arg<CancellationToken>());
+                operationStarted.SetResult(true);
+                await cancellationRequested.Task;
+                callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
                 return new FileSystemTypeResponse(PlatformType.Windows);
             }, callInfo.Arg<CancellationToken>())));
 
-        // Act & Assert
-        cts.CancelAfter(50);
-        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => _sut.GetType(cts.Token));
+        // Act
+        Task<IActionResult> operationTask = _sut.GetType(cts.Token);
+        await operationStarted.Task;
+        cts.Cancel();
+        cancellationRequested.SetResult(true);
+
+        // Assert
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => operationTask);
     }
 }
