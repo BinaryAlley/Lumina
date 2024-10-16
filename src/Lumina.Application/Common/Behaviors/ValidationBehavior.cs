@@ -3,7 +3,6 @@ using ErrorOr;
 using FluentValidation;
 using Mediator;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -11,7 +10,7 @@ using System.Threading.Tasks;
 namespace Lumina.Application.Common.Behaviors;
 
 /// <summary>
-/// Represents a validation behavior in the MediatR pipeline for handling requests and responses.
+/// Represents a validation behavior in the Mediator pipeline for handling requests and responses.
 /// </summary>
 /// <typeparam name="TRequest">The type representing a request. It should implement <see cref="IRequest{TResponse}"/>.</typeparam>
 /// <typeparam name="TResponse">The type representing a response. It should implement <see cref="IErrorOr"/> interface.</typeparam>
@@ -35,7 +34,7 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
     /// <param name="request">Incoming request.</param>
     /// <param name="next">Awaitable delegate for the next action in the pipeline. Eventually this delegate represents the handler.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    public async ValueTask<TResponse> Handle(TRequest request, CancellationToken cancellationToken, MessageHandlerDelegate<TRequest, TResponse> next)
+    public async ValueTask<TResponse> Handle(TRequest request, MessageHandlerDelegate<TRequest, TResponse> next, CancellationToken cancellationToken)
     {
         // if there is no validator, just invoke the handler
         if (_validator is null)

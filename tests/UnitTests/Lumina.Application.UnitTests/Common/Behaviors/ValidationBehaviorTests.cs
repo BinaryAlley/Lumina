@@ -43,7 +43,7 @@ public class ValidationBehaviorTests
         _nextDelegate.Invoke(request, Arg.Any<CancellationToken>()).Returns(new ValueTask<ErrorOr<ValidationBehaviorTestResponse>>(ErrorOrFactory.From(expectedResponse)));
 
         // Act
-        ErrorOr<ValidationBehaviorTestResponse> result = await behavior.Handle(request, CancellationToken.None, _nextDelegate);
+        ErrorOr<ValidationBehaviorTestResponse> result = await behavior.Handle(request, _nextDelegate, CancellationToken.None);
 
         // Assert
         result.IsError.Should().BeFalse();
@@ -62,7 +62,7 @@ public class ValidationBehaviorTests
         _nextDelegate.Invoke(request, Arg.Any<CancellationToken>()).Returns(new ValueTask<ErrorOr<ValidationBehaviorTestResponse>>(ErrorOrFactory.From(expectedResponse)));
 
         // Act
-        ErrorOr<ValidationBehaviorTestResponse> result = await behavior.Handle(request, CancellationToken.None, _nextDelegate);
+        ErrorOr<ValidationBehaviorTestResponse> result = await behavior.Handle(request, _nextDelegate, CancellationToken.None);
 
         // Assert
         result.IsError.Should().BeFalse();
@@ -85,7 +85,7 @@ public class ValidationBehaviorTests
         _mockValidator.ValidateAsync(request, Arg.Any<CancellationToken>()).Returns(new ValidationResult(validationFailures));
 
         // Act
-        ErrorOr<ValidationBehaviorTestResponse> result = await behavior.Handle(request, CancellationToken.None, _nextDelegate);
+        ErrorOr<ValidationBehaviorTestResponse> result = await behavior.Handle(request, _nextDelegate, CancellationToken.None);
 
         // Assert
         result.IsError.Should().BeTrue();
