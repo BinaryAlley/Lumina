@@ -96,7 +96,9 @@ public class FileTypeService : IFileTypeService
             // Read more content from the file
             using FileSystemStream stream = _fileSystem.FileStream.New(path, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.ReadWrite);
             byte[] svgBuffer = new byte[1000];
+#pragma warning disable CA2022 // Avoid inexact read with 'Stream.Read'
             stream.Read(svgBuffer, 0, 1000);
+#pragma warning restore CA2022 // Avoid inexact read with 'Stream.Read'
             string extendedContent = Encoding.UTF8.GetString(svgBuffer);
             // check if the extended content contains <svg
             return extendedContent.Contains("<svg", StringComparison.OrdinalIgnoreCase);
