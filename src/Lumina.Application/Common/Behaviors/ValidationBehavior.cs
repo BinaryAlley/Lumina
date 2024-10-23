@@ -3,7 +3,6 @@ using ErrorOr;
 using FluentValidation;
 using Mediator;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion

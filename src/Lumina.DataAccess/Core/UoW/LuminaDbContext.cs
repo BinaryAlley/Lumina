@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Models.Common;
-using Lumina.Contracts.Models.WrittenContentLibrary.BookLibrary;
+using Lumina.Contracts.Entities.Common;
+using Lumina.Contracts.Entities.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.Common.Events;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -18,7 +18,7 @@ namespace Lumina.DataAccess.Core.UoW;
 /// <remarks>To update the database: update-database -p Lumina.DataAccess -s Lumina.Presentation.Api</remarks>
 public class LuminaDbContext : DbContext
 {
-    public virtual DbSet<BookModel> Books { get; set; } = null!;
+    public virtual DbSet<BookEntity> Books { get; set; } = null!;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LuminaDbContext"/> class.

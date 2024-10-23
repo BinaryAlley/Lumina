@@ -11,8 +11,4 @@
     <ItemGroup>
         <Compile Include="..\AssemblyInfo_Shared.cs" Link="Properties\AssemblyInfo_Shared.cs" />
     </ItemGroup>
-
-    <ItemGroup>
-        <Folder Include="Responses\WrittenContentLibrary\BookLibrary\" />
-    </ItemGroup>
 </Project>

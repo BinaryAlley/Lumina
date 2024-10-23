@@ -14,15 +14,12 @@
     
     <ItemGroup>
         <ProjectReference Include="..\Lumina.Contracts\Lumina.Contracts.csproj" />
-        <ProjectReference Include="..\Lumina.Contracts\Lumina.Contracts.csproj" />
         <ProjectReference Include="..\Lumina.Domain\Lumina.Domain.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Mapster" Version="7.4.0" />
         <PackageReference Include="FluentValidation" Version="11.9.2" />
         <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.9.2" />
-        <PackageReference Include="Mapster.DependencyInjection" Version="1.0.1" />
         <PackageReference Include="Mediator.Abstractions" Version="2.1.7" />
         <PackageReference Include="Mediator.SourceGenerator" Version="2.1.7">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

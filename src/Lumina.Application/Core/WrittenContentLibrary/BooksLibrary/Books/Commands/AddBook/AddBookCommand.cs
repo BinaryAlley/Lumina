@@ -1,12 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
+using Lumina.Contracts.Entities.MediaContributors;
+using Lumina.Contracts.Entities.WrittenContentLibrary;
+using Lumina.Contracts.Entities.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.Enums.BookLibrary;
-using Lumina.Contracts.Models.MediaContributors;
-using Lumina.Contracts.Models.WrittenContentLibrary;
-using Lumina.Contracts.Models.WrittenContentLibrary.BookLibrary;
-using Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate;
+using Lumina.Contracts.Responses.WrittenContentLibrary.BookLibrary.Books;
 using Mediator;
 using System.Collections.Generic;
+using System.Diagnostics;
 #endregion
 
 namespace Lumina.Application.Core.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook;
@@ -31,12 +32,13 @@ namespace Lumina.Application.Core.WrittenContentLibrary.BooksLibrary.Books.Comma
 /// <param name="ISBNs">The list of ISBN (International Standard Book Number) of the book.</param>
 /// <param name="Contributors">The list of media contributors (actors, directors, etc) starring in this book.</param>
 /// <param name="Ratings">The list of ratings for this book.</param>
+[DebuggerDisplay("Title: {Title}")]
 public record AddBookCommand(
-    WrittenContentMetadataModel Metadata,
+    WrittenContentMetadataEntity? Metadata,
     BookFormat? Format,
     string? Edition,
     int? VolumeNumber,
-    BookSeriesModel? Series,
+    BookSeriesEntity? Series,
     string? ASIN,
     string? GoodreadsId,
     string? LCCN,
@@ -46,7 +48,7 @@ public record AddBookCommand(
     string? GoogleBooksId,
     string? BarnesAndNobleId,
     string? AppleBooksId,
-    List<IsbnModel> ISBNs,
-    List<MediaContributorModel> Contributors,
-    List<BookRatingModel> Ratings
-) : IRequest<ErrorOr<Book>>;
+    List<IsbnEntity>? ISBNs,
+    List<MediaContributorEntity>? Contributors,
+    List<BookRatingEntity>? Ratings
+) : IRequest<ErrorOr<BookResponse>>;

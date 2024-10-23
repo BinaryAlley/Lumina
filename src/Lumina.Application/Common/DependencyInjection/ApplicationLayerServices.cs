@@ -1,8 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using FluentValidation;
 using Lumina.Application.Common.Behaviors;
-using Mapster;
-using MapsterMapper;
 using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 #endregion
@@ -32,12 +30,6 @@ public static class ApplicationLayerServices
 
         // register fluent validators
         services.AddValidatorsFromAssembly(typeof(ApplicationLayerServices).Assembly);
-
-        // register mapster configs in this assembly
-        TypeAdapterConfig mapsterConfig = TypeAdapterConfig.GlobalSettings;
-        mapsterConfig.Scan(typeof(ApplicationLayerServices).Assembly);
-        services.AddSingleton(mapsterConfig);
-        services.AddScoped<IMapper, ServiceMapper>();
 
         return services;
     }

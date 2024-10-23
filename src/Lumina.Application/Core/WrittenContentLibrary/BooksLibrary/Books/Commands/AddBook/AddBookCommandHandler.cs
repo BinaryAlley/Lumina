@@ -2,16 +2,17 @@
 using ErrorOr;
 using Lumina.Application.Common.DataAccess.Repositories.Books;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.Mapping.WrittenContentLibrary.BookLibrary.Books;
+using Lumina.Contracts.Entities.MediaContributors;
+using Lumina.Contracts.Entities.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.Enums.BookLibrary;
-using Lumina.Contracts.Models.MediaContributors;
-using Lumina.Contracts.Models.WrittenContentLibrary.BookLibrary;
+using Lumina.Contracts.Responses.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using Lumina.Domain.Core.Aggregates.MediaContributor.MediaContributorAggregate.ValueObjects;
 using Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate;
 using Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate.Entities;
 using Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate.ValueObjects;
-using MapsterMapper;
 using Mediator;
 using System;
 using System.Collections.Generic;
@@ -25,20 +26,17 @@ namespace Lumina.Application.Core.WrittenContentLibrary.BooksLibrary.Books.Comma
 /// <summary>
 /// Handler for the command to add a book.
 /// </summary>
-public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<Book>>
+public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<BookResponse>>
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IMapper _mapper;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AddBookCommandHandler"/> class.
     /// </summary>
     /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
-    /// <param name="mapper">Injected service for mapping objects.</param>
-    public AddBookCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
+    public AddBookCommandHandler(IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
-        _mapper = mapper;
     }
 
     /// <summary>
@@ -49,11 +47,11 @@ public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<Boo
     /// <returns>
     /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="Book"/>, or an error message.
     /// </returns>
-    public async ValueTask<ErrorOr<Book>> Handle(AddBookCommand request, CancellationToken cancellationToken)
+    public async ValueTask<ErrorOr<BookResponse>> Handle(AddBookCommand request, CancellationToken cancellationToken)
     {
         // TODO: update Api.Book.md documentation when the functionality is fully implemented
         List<MediaContributorId> contributorIds = [];
-        foreach (MediaContributorModel mediaContributor in request.Contributors)
+        foreach (MediaContributorEntity mediaContributor in request.Contributors!)
         {
             // TODO: add logic to search the media contributors repository for existing contributors, based on the provided names
         }
@@ -63,10 +61,10 @@ public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<Boo
             // TODO: add logic to search the book series repository for existing book series, based on the provided title
             // TODO: uncomment integration and unit tests about series
         }
-        List<ErrorOr<BookRating>> domainRatingsResult = request.Ratings.ConvertAll(rating => BookRating.Create(
+        List<ErrorOr<BookRating>> domainRatingsResult = request.Ratings!.ConvertAll(rating => BookRating.Create(
                 rating.Value ?? default,
                 rating.MaxValue ?? default,
-                Optional<BookRatingSource>.FromNullable(rating.Source.HasValue ? (BookRatingSource)(int)rating.Source : default),
+                Optional<BookRatingSource>.FromNullable(rating.Source.HasValue ? (BookRatingSource)(int)rating.Source : (BookRatingSource?)null),
                 Optional<int>.FromNullable(rating.VoteCount)));
         // check if any of the results contain errors
         List<Error> errors = domainRatingsResult.Where(ratingResult => ratingResult.IsError).SelectMany(ratingResult => ratingResult.Errors).ToList();
@@ -75,7 +73,7 @@ public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<Boo
 
         List<BookRating> domainRatings = domainRatingsResult.Select(rating => rating.Value).ToList();
 
-        List<ErrorOr<Genre>> domainGenresResult = request.Metadata.Genres!.ConvertAll(genre => Genre.Create(genre.Name!));
+        List<ErrorOr<Genre>> domainGenresResult = request.Metadata!.Genres!.ConvertAll(genre => Genre.Create(genre.Name!));
         errors = domainGenresResult.Where(genreResult => genreResult.IsError).SelectMany(genreResult => genreResult.Errors).ToList();
         if (errors.Count != 0)
             return errors;
@@ -87,7 +85,7 @@ public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<Boo
             return errors;
         List<Tag> domainTags = domainTagsResult.Select(tag => tag.Value).ToList();
 
-        List<ErrorOr<Isbn>> domainIsbnsResult = request.ISBNs.ConvertAll(isbn => Isbn.Create(isbn.Value!, (IsbnFormat)(int)isbn.Format!));
+        List<ErrorOr<Isbn>> domainIsbnsResult = request.ISBNs!.ConvertAll(isbn => Isbn.Create(isbn.Value!, (IsbnFormat)(int)isbn.Format!));
         errors = domainIsbnsResult.Where(isbnResult => isbnResult.IsError).SelectMany(isbnResult => isbnResult.Errors).ToList();
         if (errors.Count != 0)
             return errors;
@@ -163,12 +161,12 @@ public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<Boo
             return createBookResult.Errors;
 
         IBookRepository bookRepository = _unitOfWork.GetRepository<IBookRepository>();
-        BookModel persistenceBook = _mapper.Map<BookModel>(createBookResult.Value);
+        BookEntity persistenceBook = createBookResult.Value.ToRepositoryEntity();
         ErrorOr<Created> insertBookResult = await bookRepository.InsertAsync(persistenceBook, cancellationToken).ConfigureAwait(false);
         if (insertBookResult.IsError)
             return insertBookResult.Errors;
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
-        return createBookResult.Value;
+        return persistenceBook.ToResponse();
     }
 }

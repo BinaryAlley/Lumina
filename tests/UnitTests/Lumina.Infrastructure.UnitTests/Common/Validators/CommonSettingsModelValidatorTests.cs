@@ -10,7 +10,6 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Lumina.Infrastructure.UnitTests.Common.Validators;
 
-
 /// <summary>
 /// Contains unit tests for the <see cref="CommonSettingsModelValidator"/> class.
 /// </summary>
@@ -59,6 +58,6 @@ public class CommonSettingsModelValidatorTests
         // Assert
         result.IsValid.Should().BeFalse();
         result.Errors.Should().ContainSingle()
-            .Which.ErrorMessage.Should().Be(Errors.Configuration.ApplicationThemeCannotBeEmpty.Code);
+            .Which.ErrorMessage.Should().Be(Errors.Configuration.ApplicationThemeCannotBeEmpty.Description);
     }
 }

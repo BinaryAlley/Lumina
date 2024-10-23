@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using Bogus;
+using Lumina.Contracts.Entities.Common;
+using Lumina.Contracts.Entities.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.Enums.BookLibrary;
-using Lumina.Contracts.Models.Common;
-using Lumina.Contracts.Models.WrittenContentLibrary.BookLibrary;
 using Lumina.DataAccess.UnitTests.Common.Setup;
 using System;
 using System.Collections.Generic;
@@ -14,7 +14,7 @@ using System.Linq;
 namespace Lumina.DataAccess.UnitTests.Core.Repositories.Books.Fixtures;
 
 /// <summary>
-/// Fixture class for the <see cref="BookModel"/> class.
+/// Fixture class for the <see cref="BookEntity"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class BookModelFixture
@@ -39,12 +39,12 @@ public class BookModelFixture
     /// Creates a random valid BookModel.
     /// </summary>
     /// <returns>The created BookModel.</returns>
-    public BookModel CreateBookModel()
+    public BookEntity CreateBookModel()
     {
         int releaseYear = _random.Next(2000, 2010);
         int reReleaseYear = _random.Next(2010, 2020);
 
-        return new Faker<BookModel>()
+        return new Faker<BookEntity>()
             .RuleFor(x => x.Id, f => f.Random.Guid())
             .RuleFor(x => x.Title, f => f.Random.String2(f.Random.Number(1, 255)))
             .RuleFor(x => x.OriginalTitle, f => f.Random.String2(f.Random.Number(1, 255)))
@@ -61,8 +61,8 @@ public class BookModelFixture
             .RuleFor(x => x.OriginalLanguageCode, f => f.Random.String2(2))
             .RuleFor(x => x.OriginalLanguageName, f => f.Random.String2(f.Random.Number(1, 50)))
             .RuleFor(x => x.OriginalLanguageNativeName, f => f.Random.String2(f.Random.Number(1, 50)))
-            .RuleFor(x => x.Tags, f => new HashSet<TagModel>(CreateTags(f.Random.Number(1, 5))))
-            .RuleFor(x => x.Genres, f => new HashSet<GenreModel>(CreateGenres(f.Random.Number(1, 5))))
+            .RuleFor(x => x.Tags, f => new HashSet<TagEntity>(CreateTags(f.Random.Number(1, 5))))
+            .RuleFor(x => x.Genres, f => new HashSet<GenreEntity>(CreateGenres(f.Random.Number(1, 5))))
             .RuleFor(x => x.Publisher, f => f.Random.String2(f.Random.Number(1, 100)))
             .RuleFor(x => x.PageCount, _random.Next(100, 300))
             .RuleFor(x => x.Format, f => f.PickRandom<BookFormat>().ToString())
@@ -84,17 +84,17 @@ public class BookModelFixture
             .Generate();
     }
 
-    private List<TagModel> CreateTags(int count)
+    private static List<TagEntity> CreateTags(int count)
     {
-        return new Faker<TagModel>()
-            .CustomInstantiator(f => new TagModel(f.Random.String2(f.Random.Number(1, 50))))
+        return new Faker<TagEntity>()
+            .CustomInstantiator(f => new TagEntity(f.Random.String2(f.Random.Number(1, 50))))
             .Generate(count);
     }
 
-    private List<GenreModel> CreateGenres(int count)
+    private static List<GenreEntity> CreateGenres(int count)
     {
-        return new Faker<GenreModel>()
-            .CustomInstantiator(f => new GenreModel(f.Random.String2(f.Random.Number(1, 50))))
+        return new Faker<GenreEntity>()
+            .CustomInstantiator(f => new GenreEntity(f.Random.String2(f.Random.Number(1, 50))))
             .Generate(count);
     }
 
@@ -138,14 +138,14 @@ public class BookModelFixture
             .ToArray());
     }
 
-    private List<IsbnModel> CreateIsbns(int count)
+    private static List<IsbnEntity> CreateIsbns(int count)
     {
-        return new Faker<IsbnModel>()
-            .CustomInstantiator(f => new IsbnModel(CreateIsbn(f), f.PickRandom<IsbnFormat>()))
+        return new Faker<IsbnEntity>()
+            .CustomInstantiator(f => new IsbnEntity(CreateIsbn(f), f.PickRandom<IsbnFormat>()))
             .Generate(count);
     }
 
-    private string CreateIsbn(Faker f)
+    private static string CreateIsbn(Faker f)
     {
         bool isIsbn13 = f.Random.Bool();
         if (isIsbn13)
@@ -175,10 +175,10 @@ public class BookModelFixture
         }
     }
 
-    private List<BookRatingModel> CreateBookRatings(int count)
+    private static List<BookRatingEntity> CreateBookRatings(int count)
     {
-        return new Faker<BookRatingModel>()
-            .CustomInstantiator(f => new BookRatingModel(
+        return new Faker<BookRatingEntity>()
+            .CustomInstantiator(f => new BookRatingEntity(
                 f.Random.Decimal(1, 5),
                 5,
                 f.PickRandom<BookRatingSource>(),
@@ -189,10 +189,10 @@ public class BookModelFixture
 
     private void ConfigureCustomTypes()
     {
-        _fixture.Register(() => new TagModel(_fixture.Create<string>()));
-        _fixture.Register(() => new GenreModel(_fixture.Create<string>()));
-        _fixture.Register(() => new IsbnModel(_fixture.Create<string>(), _fixture.Create<IsbnFormat>()));
-        _fixture.Register(() => new BookRatingModel(
+        _fixture.Register(() => new TagEntity(_fixture.Create<string>()));
+        _fixture.Register(() => new GenreEntity(_fixture.Create<string>()));
+        _fixture.Register(() => new IsbnEntity(_fixture.Create<string>(), _fixture.Create<IsbnFormat>()));
+        _fixture.Register(() => new BookRatingEntity(
             _fixture.Create<decimal>(),
             _fixture.Create<decimal>(),
             _fixture.Create<BookRatingSource>(),

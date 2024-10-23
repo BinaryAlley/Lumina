@@ -1,6 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
-using AutoFixture;
-using AutoFixture.AutoNSubstitute;
+#region ========================================================================= USING =====================================================================================
 using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Repositories.Books;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -23,16 +21,6 @@ namespace Lumina.DataAccess.UnitTests.Common.DependencyInjection;
 [ExcludeFromCodeCoverage]
 public class DataAccessLayerServicesTests
 {
-    private readonly IFixture _fixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DataAccessLayerServicesTests"/> class.
-    /// </summary>
-    public DataAccessLayerServicesTests()
-    {
-        _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
-    }
-
     [Fact]
     public void AddDataAccessLayerServices_WhenBasePathExists_ShouldAddServices()
     {

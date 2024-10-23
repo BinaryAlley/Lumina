@@ -2,7 +2,7 @@
 using Lumina.Presentation.Web.Common.Exceptions;
 using Lumina.Presentation.Web.Common.Models.Common;
 using Lumina.Presentation.Web.Common.Models.Configuration;
-using Lumina.Presentation.Web.Common.Models.FileManagement;
+using Lumina.Presentation.Web.Common.Models.FileSystemManagement;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;

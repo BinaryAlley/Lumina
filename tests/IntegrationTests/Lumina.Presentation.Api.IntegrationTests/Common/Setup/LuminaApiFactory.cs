@@ -8,8 +8,6 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 #endregion
 
 namespace Lumina.Presentation.Api.IntegrationTests.Common.Setup;

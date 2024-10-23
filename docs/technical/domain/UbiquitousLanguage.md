@@ -121,7 +121,7 @@
 - PhotoLibrary (root: PhotoLibrary, entities: Photo, PhotoAlbum, AlbumArtwork, MoviePoster)
 - UserProfile (root: User, entities: Playlist, Collection)
 - SupplementaryContentLibrary (root: SupplementaryContentLibrary, entities: SubtitleFile, Lyrics, LanguageTrack)
-- FileManagement (root: File, entities: Stream)
+- FileSystemManagement (root: File, entities: Stream)
 
 - WrittenContentLibrary
   - BookLibrary (root: BookLibrary)
@@ -219,7 +219,7 @@
   - Aggregates: UserProfile
   - Services: RecommendationEngine, ContentCurationService, UserActivityTrackingService
 - ContentDelivery
-  - Aggregates: FileManagement
+  - Aggregates: FileSystemManagement
   - Services: StreamingService, ContentSynchronizationService
 - MetadataManagement
   - Aggregates: SupplementaryContentLibrary
