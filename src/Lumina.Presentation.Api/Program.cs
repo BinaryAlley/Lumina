@@ -1,11 +1,12 @@
 #region ========================================================================= USING =====================================================================================
+using FastEndpoints;
+using FastEndpoints.Swagger;
 using Lumina.Application.Common.DependencyInjection;
 using Lumina.DataAccess.Common.DependencyInjection;
 using Lumina.Domain.Common.DependencyInjection;
 using Lumina.Infrastructure.Common.DependencyInjection;
 using Lumina.Presentation.Api.Common.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Hosting;
 using System.Threading.Tasks;
 #endregion
 
@@ -37,18 +38,21 @@ public class Program
 
         app.UseCors("AllowAll");
 
-        app.UseExceptionHandler("/error"); // uses a middleware which reexecutes the request to the  error path
-
-        // configure the HTTP request pipeline.
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseSwagger();
-            app.UseSwaggerUI();
-        }
+        //app.UseExceptionHandler("/error"); // uses a middleware which re-executes the request to the  error path
 
         //app.UseHttpsRedirection();
 
-        app.MapControllers();
+        app.UseAuthorization();
+
+        app.UseFastEndpoints(config =>
+        {
+            config.Endpoints.RoutePrefix = "api";
+            config.Versioning.Prefix = "v";
+            config.Versioning.DefaultVersion = 1;
+            config.Versioning.PrependToRoute = true;
+            config.Endpoints.ShortNames = true;
+        });
+        app.UseSwaggerGen();
 
         await app.RunAsync().ConfigureAwait(false);
     }

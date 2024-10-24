@@ -1,4 +1,4 @@
-﻿namespace Lumina.Domain.Common.Models.Core;
+namespace Lumina.Domain.Common.Models.Core;
 
 /// <summary>
 /// Base class for all domain Aggregate Roots.
@@ -15,7 +15,6 @@ public abstract class AggregateRoot<TId> : Entity<TId> where TId : notnull
         Id = id;
     }
 
-#pragma warning disable CS8618
     /// <summary>
     /// Initializes a new instance of the <see cref="AggregateRoot{TId}"/> class.
     /// </summary>
@@ -23,5 +22,4 @@ public abstract class AggregateRoot<TId> : Entity<TId> where TId : notnull
     {
 
     }
-#pragma warning restore CS8618
 }

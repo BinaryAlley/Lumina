@@ -34,7 +34,7 @@ public class Genre : ValueObject
     /// <returns>
     /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="Genre"/>, or an error message.
     /// </returns>
-    public static ErrorOr<Genre> Create(string name)
+    public static ErrorOr<Genre> Create(string? name)
     {
         if (string.IsNullOrWhiteSpace(name))
             return Errors.Errors.Metadata.GenreNameCannotBeEmpty;

@@ -51,7 +51,7 @@ public class LanguageInfo : ValueObject
     /// <returns>
     /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="LanguageInfo"/>, or an error message.
     /// </returns>
-    public static ErrorOr<LanguageInfo> Create(string languageCode, string languageName, Optional<string> nativeName)
+    public static ErrorOr<LanguageInfo> Create(string? languageCode, string? languageName, Optional<string> nativeName)
     {
         if (string.IsNullOrWhiteSpace(languageCode))
             return Errors.Errors.Metadata.LanguageCodeCannotBeEmpty;

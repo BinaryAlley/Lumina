@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Models.Common;
-using Lumina.Contracts.Models.WrittenContentLibrary.BookLibrary;
+using Lumina.Contracts.Entities.Common;
+using Lumina.Contracts.Entities.WrittenContentLibrary.BookLibrary;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.Collections.Generic;
@@ -9,15 +9,15 @@ using System.Collections.Generic;
 namespace Lumina.DataAccess.Common.Configuration;
 
 /// <summary>
-/// Configures the entity mapping for the <see cref="BookModel"/> entity.
+/// Configures the entity mapping for the <see cref="BookEntity"/> entity.
 /// </summary>
-public class BookConfiguration : IEntityTypeConfiguration<BookModel>
+public class BookConfiguration : IEntityTypeConfiguration<BookEntity>
 {
     /// <summary>
-    /// Configures the <see cref="BookModel"/> entity.
+    /// Configures the <see cref="BookEntity"/> entity.
     /// </summary>
     /// <param name="builder">The builder to be used to configure the entity.</param>
-    public void Configure(EntityTypeBuilder<BookModel> builder)
+    public void Configure(EntityTypeBuilder<BookEntity> builder)
     {
         builder.ToTable("Books");
         builder.HasKey(book => book.Id);
@@ -46,8 +46,8 @@ public class BookConfiguration : IEntityTypeConfiguration<BookModel>
         .WithMany()
         .UsingEntity<Dictionary<string, object>>(
             "BookTags",
-            j => j.HasOne<TagModel>().WithMany().HasForeignKey("TagId"),
-            j => j.HasOne<BookModel>().WithMany().HasForeignKey("BookId"),
+            j => j.HasOne<TagEntity>().WithMany().HasForeignKey("TagId"),
+            j => j.HasOne<BookEntity>().WithMany().HasForeignKey("BookId"),
             j =>
             {
                 j.HasKey("BookId", "TagId");
@@ -58,8 +58,8 @@ public class BookConfiguration : IEntityTypeConfiguration<BookModel>
         .WithMany()
         .UsingEntity<Dictionary<string, object>>(
             "BookGenres",
-            j => j.HasOne<GenreModel>().WithMany().HasForeignKey("GenreId"),
-            j => j.HasOne<BookModel>().WithMany().HasForeignKey("BookId"),
+            j => j.HasOne<GenreEntity>().WithMany().HasForeignKey("GenreId"),
+            j => j.HasOne<BookEntity>().WithMany().HasForeignKey("BookId"),
             j =>
             {
                 j.HasKey("BookId", "GenreId");

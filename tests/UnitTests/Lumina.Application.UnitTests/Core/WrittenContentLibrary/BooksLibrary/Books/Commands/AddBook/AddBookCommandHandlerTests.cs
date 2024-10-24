@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using ErrorOr;
@@ -8,12 +8,11 @@ using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Core.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook;
 using Lumina.Application.UnitTests.Common.Setup;
 using Lumina.Application.UnitTests.Core.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook.Fixtures;
+using Lumina.Contracts.Entities.Common;
+using Lumina.Contracts.Entities.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.Enums.BookLibrary;
-using Lumina.Contracts.Models.Common;
-using Lumina.Contracts.Models.WrittenContentLibrary.BookLibrary;
+using Lumina.Contracts.Responses.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate;
-using MapsterMapper;
 using NSubstitute;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -31,7 +30,6 @@ public class AddBookCommandHandlerTests
 {
     private readonly IFixture _fixture;
     private readonly IUnitOfWork _mockUnitOfWork;
-    private readonly IMapper _mockMapper;
     private readonly IBookRepository _mockBookRepository;
     private readonly AddBookCommandHandler _sut;
     private readonly AddBookCommandFixture _commandBookFixture;
@@ -46,12 +44,11 @@ public class AddBookCommandHandlerTests
         _fixture.Customizations.Add(new NullableDateOnlySpecimenBuilder());
 
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
-        _mockMapper = Substitute.For<IMapper>();
         _mockBookRepository = Substitute.For<IBookRepository>();
 
         _mockUnitOfWork.GetRepository<IBookRepository>().Returns(_mockBookRepository);
 
-        _sut = new AddBookCommandHandler(_mockUnitOfWork, _mockMapper);
+        _sut = new AddBookCommandHandler(_mockUnitOfWork);
         _commandBookFixture = new AddBookCommandFixture();
     }
 
@@ -60,19 +57,17 @@ public class AddBookCommandHandlerTests
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
-        BookModel bookModel = _fixture.Create<BookModel>();
 
-        _mockMapper.Map<BookModel>(Arg.Any<Book>()).Returns(bookModel);
-        _mockBookRepository.InsertAsync(Arg.Any<BookModel>(), Arg.Any<CancellationToken>())
+        _mockBookRepository.InsertAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Created);
 
         // Act
-        ErrorOr<Book> result = await _sut.Handle(bookCommand, CancellationToken.None);
+        ErrorOr<BookResponse> result = await _sut.Handle(bookCommand, CancellationToken.None);
 
         // Assert
         result.IsError.Should().BeFalse();
-        result.Value.Should().BeOfType<Book>();
-        await _mockBookRepository.Received(1).InsertAsync(Arg.Any<BookModel>(), Arg.Any<CancellationToken>());
+        result.Value.Should().BeOfType<BookResponse>();
+        await _mockBookRepository.Received(1).InsertAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -81,15 +76,15 @@ public class AddBookCommandHandlerTests
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
-        bookCommand = bookCommand with { Metadata = bookCommand.Metadata with { Title = null } };
+        bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { Title = null } };
 
         // Act
-        ErrorOr<Book> result = await _sut.Handle(bookCommand, CancellationToken.None);
+        ErrorOr<BookResponse> result = await _sut.Handle(bookCommand, CancellationToken.None);
 
         // Assert
         result.IsError.Should().BeTrue();
-        result.Errors.Should().Contain(e => e.Code == Errors.Metadata.TitleCannotBeEmpty.Code);
-        await _mockBookRepository.DidNotReceive().InsertAsync(Arg.Any<BookModel>(), Arg.Any<CancellationToken>());
+        result.Errors.Should().Contain(e => e.Description == Errors.Metadata.TitleCannotBeEmpty.Description);
+        await _mockBookRepository.DidNotReceive().InsertAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -98,19 +93,17 @@ public class AddBookCommandHandlerTests
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
-        BookModel bookModel = _fixture.Create<BookModel>();
 
-        _mockMapper.Map<BookModel>(Arg.Any<Book>()).Returns(bookModel);
-        _mockBookRepository.InsertAsync(Arg.Any<BookModel>(), Arg.Any<CancellationToken>())
+        _mockBookRepository.InsertAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>())
             .Returns(Errors.WrittenContent.BookAlreadyExists);
 
         // Act
-        ErrorOr<Book> result = await _sut.Handle(bookCommand, CancellationToken.None);
+        ErrorOr<BookResponse> result = await _sut.Handle(bookCommand, CancellationToken.None);
 
         // Assert
         result.IsError.Should().BeTrue();
         result.Errors.Should().Contain(Errors.WrittenContent.BookAlreadyExists);
-        await _mockBookRepository.Received(1).InsertAsync(Arg.Any<BookModel>(), Arg.Any<CancellationToken>());
+        await _mockBookRepository.Received(1).InsertAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -119,15 +112,15 @@ public class AddBookCommandHandlerTests
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
-        bookCommand = bookCommand with { ISBNs = [new IsbnModel("invalid", IsbnFormat.Isbn13)] };
+        bookCommand = bookCommand with { ISBNs = [new IsbnEntity("invalid", IsbnFormat.Isbn13)] };
 
         // Act
-        ErrorOr<Book> result = await _sut.Handle(bookCommand, CancellationToken.None);
+        ErrorOr<BookResponse> result = await _sut.Handle(bookCommand, CancellationToken.None);
 
         // Assert
         result.IsError.Should().BeTrue();
-        result.Errors.Should().Contain(e => e.Code == Errors.WrittenContent.InvalidIsbn13Format.Code);
-        await _mockBookRepository.DidNotReceive().InsertAsync(Arg.Any<BookModel>(), Arg.Any<CancellationToken>());
+        result.Errors.Should().Contain(e => e.Description == Errors.WrittenContent.InvalidIsbn13Format.Description);
+        await _mockBookRepository.DidNotReceive().InsertAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -136,15 +129,15 @@ public class AddBookCommandHandlerTests
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
-        bookCommand = bookCommand with { Ratings = [new BookRatingModel(-1, 5, null, null)] };
+        bookCommand = bookCommand with { Ratings = [new BookRatingEntity(-1, 5, null, null)] };
 
         // Act
-        ErrorOr<Book> result = await _sut.Handle(bookCommand, CancellationToken.None);
+        ErrorOr<BookResponse> result = await _sut.Handle(bookCommand, CancellationToken.None);
 
         // Assert
         result.IsError.Should().BeTrue();
-        result.Errors.Should().Contain(e => e.Code == Errors.Metadata.RatingValueMustBePositive.Code);
-        await _mockBookRepository.DidNotReceive().InsertAsync(Arg.Any<BookModel>(), Arg.Any<CancellationToken>());
+        result.Errors.Should().Contain(e => e.Description == Errors.Metadata.RatingValueMustBePositive.Description);
+        await _mockBookRepository.DidNotReceive().InsertAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -155,19 +148,19 @@ public class AddBookCommandHandlerTests
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
         bookCommand = bookCommand with
         {
-            Metadata = bookCommand.Metadata with
+            Metadata = bookCommand.Metadata! with
             {
-                Genres = [new GenreModel("")]
+                Genres = [new GenreEntity("")]
             }
         };
 
         // Act
-        ErrorOr<Book> result = await _sut.Handle(bookCommand, CancellationToken.None);
+        ErrorOr<BookResponse> result = await _sut.Handle(bookCommand, CancellationToken.None);
 
         // Assert
         result.IsError.Should().BeTrue();
-        result.Errors.Should().Contain(e => e.Code == Errors.Metadata.GenreNameCannotBeEmpty.Code);
-        await _mockBookRepository.DidNotReceive().InsertAsync(Arg.Any<BookModel>(), Arg.Any<CancellationToken>());
+        result.Errors.Should().Contain(e => e.Description == Errors.Metadata.GenreNameCannotBeEmpty.Description);
+        await _mockBookRepository.DidNotReceive().InsertAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -178,19 +171,19 @@ public class AddBookCommandHandlerTests
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
         bookCommand = bookCommand with
         {
-            Metadata = bookCommand.Metadata with
+            Metadata = bookCommand.Metadata! with
             {
-                Tags = [new TagModel("")]
+                Tags = [new TagEntity("")]
             }
         };
 
         // Act
-        ErrorOr<Book> result = await _sut.Handle(bookCommand, CancellationToken.None);
+        ErrorOr<BookResponse> result = await _sut.Handle(bookCommand, CancellationToken.None);
 
         // Assert
         result.IsError.Should().BeTrue();
-        result.Errors.Should().Contain(e => e.Code == Errors.Metadata.TagNameCannotBeEmpty.Code);
-        await _mockBookRepository.DidNotReceive().InsertAsync(Arg.Any<BookModel>(), Arg.Any<CancellationToken>());
+        result.Errors.Should().Contain(e => e.Description == Errors.Metadata.TagNameCannotBeEmpty.Description);
+        await _mockBookRepository.DidNotReceive().InsertAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -201,9 +194,9 @@ public class AddBookCommandHandlerTests
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
         bookCommand = bookCommand with
         {
-            Metadata = bookCommand.Metadata with
+            Metadata = bookCommand.Metadata! with
             {
-                ReleaseInfo = new ReleaseInfoModel(
+                ReleaseInfo = new ReleaseInfoEntity(
                     OriginalReleaseDate: new DateOnly(2025, 1, 1),
                     ReReleaseDate: new DateOnly(2024, 1, 1),
                     OriginalReleaseYear: null,
@@ -215,12 +208,12 @@ public class AddBookCommandHandlerTests
         };
 
         // Act
-        ErrorOr<Book> result = await _sut.Handle(bookCommand, CancellationToken.None);
+        ErrorOr<BookResponse> result = await _sut.Handle(bookCommand, CancellationToken.None);
 
         // Assert
         result.IsError.Should().BeTrue();
-        result.Errors.Should().Contain(e => e.Code == Errors.Metadata.ReReleaseDateCannotBeEarlierThanOriginalReleaseDate.Code);
-        await _mockBookRepository.DidNotReceive().InsertAsync(Arg.Any<BookModel>(), Arg.Any<CancellationToken>());
+        result.Errors.Should().Contain(e => e.Description == Errors.Metadata.ReReleaseDateCannotBeEarlierThanOriginalReleaseDate.Description);
+        await _mockBookRepository.DidNotReceive().InsertAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -231,19 +224,19 @@ public class AddBookCommandHandlerTests
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
         bookCommand = bookCommand with
         {
-            Metadata = bookCommand.Metadata with
+            Metadata = bookCommand.Metadata! with
             {
-                Language = new LanguageInfoModel("", "English", null)
+                Language = new LanguageInfoEntity("", "English", null)
             }
         };
 
         // Act
-        ErrorOr<Book> result = await _sut.Handle(bookCommand, CancellationToken.None);
+        ErrorOr<BookResponse> result = await _sut.Handle(bookCommand, CancellationToken.None);
 
         // Assert
         result.IsError.Should().BeTrue();
-        result.Errors.Should().Contain(e => e.Code == Errors.Metadata.LanguageCodeCannotBeEmpty.Code);
-        await _mockBookRepository.DidNotReceive().InsertAsync(Arg.Any<BookModel>(), Arg.Any<CancellationToken>());
+        result.Errors.Should().Contain(e => e.Description == Errors.Metadata.LanguageCodeCannotBeEmpty.Description);
+        await _mockBookRepository.DidNotReceive().InsertAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -254,19 +247,19 @@ public class AddBookCommandHandlerTests
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
         bookCommand = bookCommand with
         {
-            Metadata = bookCommand.Metadata with
+            Metadata = bookCommand.Metadata! with
             {
-                OriginalLanguage = new LanguageInfoModel("", "English", null)
+                OriginalLanguage = new LanguageInfoEntity("", "English", null)
             }
         };
 
         // Act
-        ErrorOr<Book> result = await _sut.Handle(bookCommand, CancellationToken.None);
+        ErrorOr<BookResponse> result = await _sut.Handle(bookCommand, CancellationToken.None);
 
         // Assert
         result.IsError.Should().BeTrue();
-        result.Errors.Should().Contain(e => e.Code == Errors.Metadata.LanguageCodeCannotBeEmpty.Code);
-        await _mockBookRepository.DidNotReceive().InsertAsync(Arg.Any<BookModel>(), Arg.Any<CancellationToken>());
+        result.Errors.Should().Contain(e => e.Description == Errors.Metadata.LanguageCodeCannotBeEmpty.Description);
+        await _mockBookRepository.DidNotReceive().InsertAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 }

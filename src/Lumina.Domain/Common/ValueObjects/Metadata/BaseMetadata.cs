@@ -23,12 +23,12 @@ public abstract class BaseMetadata : ValueObject
     public string Title { get; private set; }
 
     /// <summary>
-    /// Gets the original title of the media item.
+    /// Gets the original title of the media item, if applicable.
     /// </summary>
     public Optional<string> OriginalTitle { get; private set; }
 
     /// <summary>
-    /// Gets the optional description of the media item.
+    /// Gets the optional description of the media item, if applicable.
     /// </summary>
     public Optional<string> Description { get; private set; }
 
@@ -38,12 +38,12 @@ public abstract class BaseMetadata : ValueObject
     public ReleaseInfo ReleaseInfo { get; private set; }
 
     /// <summary>
-    /// Gets the optional language of the media item.
+    /// Gets the optional language of the media item, if applicable.
     /// </summary>
     public Optional<LanguageInfo> Language { get; private set; }
 
     /// <summary>
-    /// Gets the optional original language of the media item. 
+    /// Gets the optional original language of the media item, if applicable. 
     /// </summary>
     public Optional<LanguageInfo> OriginalLanguage { get; private set; }
 
@@ -61,13 +61,13 @@ public abstract class BaseMetadata : ValueObject
     /// Initializes a new instance of the <see cref="BaseMetadata"/> class.
     /// </summary>
     /// <param name="title">The title of the element to which this metadata object belongs to.</param>
-    /// <param name="originalTitle">The optional original title of the element to which this metadata object belongs to.</param>
-    /// <param name="description">The optional description of the element to which this metadata object belongs to.</param>
+    /// <param name="originalTitle">The optional original title of the element to which this metadata object belongs to, if applicable.</param>
+    /// <param name="description">The optional description of the element to which this metadata object belongs to, if applicable.</param>
     /// <param name="releaseInfo">The optional release information of the media item.</param>
     /// <param name="genres">The list of genres of the element to which this metadata object belongs to.</param>
     /// <param name="tags">The list of tags of the element to which this metadata object belongs to.</param>
-    /// <param name="language">The optional language of the element to which this metadata object belongs to.</param>
-    /// <param name="originalLanguage">The optional original language of the element to which this metadata object belongs to.</param>
+    /// <param name="language">The optional language of the element to which this metadata object belongs to, if applicable.</param>
+    /// <param name="originalLanguage">The optional original language of the element to which this metadata object belongs to, if applicable.</param>
     /// <exception cref="ArgumentNullException">Thrown when the <see cref="title"/> value is <see langword="null"/></exception>
     protected BaseMetadata(
         string title,

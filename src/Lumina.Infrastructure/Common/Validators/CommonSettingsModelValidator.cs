@@ -15,6 +15,6 @@ public class CommonSettingsModelValidator : AbstractValidator<CommonSettingsMode
     /// </summary>
     public CommonSettingsModelValidator()
     {
-        RuleFor(x => x.Theme).NotEmpty().WithMessage(Errors.Errors.Configuration.ApplicationThemeCannotBeEmpty.Code);
+        RuleFor(x => x.Theme).NotEmpty().WithMessage(Errors.Errors.Configuration.ApplicationThemeCannotBeEmpty.Description);
     }
 }

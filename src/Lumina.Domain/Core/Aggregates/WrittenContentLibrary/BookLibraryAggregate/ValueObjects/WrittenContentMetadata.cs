@@ -16,12 +16,12 @@ namespace Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggrega
 public class WrittenContentMetadata : BaseMetadata
 {
     /// <summary>
-    /// Gets the publisher of the written content.
+    /// Gets the publisher of the written content, if applicable.
     /// </summary>
     public Optional<string> Publisher { get; }
 
     /// <summary>
-    /// Gets the number of pages in the written content.
+    /// Gets the number of pages in the written content, if applicable.
     /// </summary>
     public Optional<int> PageCount { get; }
 
@@ -29,15 +29,15 @@ public class WrittenContentMetadata : BaseMetadata
     /// Initializes a new instance of the <see cref="WrittenContentMetadata"/> class.
     /// </summary>
     /// <param name="title">The title of the written content.</param>
-    /// <param name="originalTitle">The optional original title of the video.</param>
-    /// <param name="description">The description of the written content.</param>
+    /// <param name="originalTitle">The optional original title of the written content, if applicable.</param>
+    /// <param name="description">The description of the written content, if applicable.</param>
     /// <param name="releaseInfo">The release information of the written content.</param>
     /// <param name="genres">The genres of the written content.</param>
     /// <param name="tags">The tags associated with the written content.</param>
-    /// <param name="language">The language of the written content.</param>
-    /// <param name="originalLanguage">The optional original language of the video.</param>
-    /// <param name="publisher">The publisher of the written content.</param>
-    /// <param name="pageCount">The number of pages in the written content.</param>
+    /// <param name="language">The language of the written content, if applicable.</param>
+    /// <param name="originalLanguage">The optional original language of the written content, if applicable.</param>
+    /// <param name="publisher">The publisher of the written content, if applicable.</param>
+    /// <param name="pageCount">The number of pages in the written content, if applicable.</param>
     private WrittenContentMetadata(
         string title,
         Optional<string> originalTitle,
@@ -59,15 +59,15 @@ public class WrittenContentMetadata : BaseMetadata
     /// Creates a new instance of the <see cref="WrittenContentMetadata"/> class.
     /// </summary>
     /// <param name="title">The title of the written content.</param>
-    /// <param name="originalTitle">The optional original title of the video.</param>
-    /// <param name="description">The description of the written content.</param>
+    /// <param name="originalTitle">The optional original title of the written content, if applicable.</param>
+    /// <param name="description">The description of the written content, if applicable.</param>
     /// <param name="releaseInfo">The release information of the written content.</param>
     /// <param name="genres">The genres of the written content.</param>
     /// <param name="tags">The tags associated with the written content.</param>
     /// <param name="language">The language of the written content.</param>
-    /// <param name="originalLanguage">The optional original language of the video.</param>
-    /// <param name="publisher">The publisher of the written content.</param>
-    /// <param name="pageCount">The number of pages in the written content.</param>
+    /// <param name="originalLanguage">The optional original language of the written content, if applicable.</param>
+    /// <param name="publisher">The publisher of the written content, if applicable.</param>
+    /// <param name="pageCount">The number of pages in the written content, if applicable.</param>
     /// <returns>
     /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="WrittenContentMetadata"/>, or an error message.
     /// </returns>

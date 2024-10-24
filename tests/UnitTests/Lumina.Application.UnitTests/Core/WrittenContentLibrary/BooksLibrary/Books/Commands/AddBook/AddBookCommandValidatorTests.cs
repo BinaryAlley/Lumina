@@ -41,7 +41,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Metadata.Title).WithErrorMessage(Errors.Metadata.TitleCannotBeEmpty.Code);
+        result.ShouldHaveValidationErrorFor(x => x.Metadata!.Title).WithErrorMessage(Errors.Metadata.TitleCannotBeEmpty.Description);
     }
 
     [Fact]
@@ -55,7 +55,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Metadata.Title).WithErrorMessage(Errors.Metadata.TitleMustBeMaximum255CharactersLong.Code);
+        result.ShouldHaveValidationErrorFor(x => x.Metadata!.Title).WithErrorMessage(Errors.Metadata.TitleMustBeMaximum255CharactersLong.Description);
     }
 
     [Fact]
@@ -69,7 +69,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Metadata.Title);
+        result.ShouldNotHaveValidationErrorFor(x => x.Metadata!.Title);
     }
 
     [Fact]
@@ -83,7 +83,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Metadata.OriginalTitle).WithErrorMessage(Errors.Metadata.OriginalTitleMustBeMaximum255CharactersLong.Code);
+        result.ShouldHaveValidationErrorFor(x => x.Metadata!.OriginalTitle).WithErrorMessage(Errors.Metadata.OriginalTitleMustBeMaximum255CharactersLong.Description);
     }
 
     [Fact]
@@ -97,7 +97,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Metadata.OriginalTitle);
+        result.ShouldNotHaveValidationErrorFor(x => x.Metadata!.OriginalTitle);
     }
 
     [Fact]
@@ -111,7 +111,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Metadata.OriginalTitle);
+        result.ShouldNotHaveValidationErrorFor(x => x.Metadata!.OriginalTitle);
     }
 
     [Fact]
@@ -125,7 +125,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Metadata.Description).WithErrorMessage(Errors.Metadata.DescriptionMustBeMaximum2000CharactersLong.Code);
+        result.ShouldHaveValidationErrorFor(x => x.Metadata!.Description).WithErrorMessage(Errors.Metadata.DescriptionMustBeMaximum2000CharactersLong.Description);
     }
 
     [Fact]
@@ -139,7 +139,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Metadata.Description);
+        result.ShouldNotHaveValidationErrorFor(x => x.Metadata!.Description);
     }
 
     [Fact]
@@ -153,7 +153,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Metadata.Description);
+        result.ShouldNotHaveValidationErrorFor(x => x.Metadata!.Description);
     }
 
     [Fact]
@@ -167,7 +167,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Metadata.Description);
+        result.ShouldNotHaveValidationErrorFor(x => x.Metadata!.Description);
     }
 
     [Fact]
@@ -181,7 +181,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Metadata.ReleaseInfo).WithErrorMessage(Errors.Metadata.ReleaseInfoCannotBeNull.Code);
+        result.ShouldHaveValidationErrorFor(x => x.Metadata!.ReleaseInfo).WithErrorMessage(Errors.Metadata.ReleaseInfoCannotBeNull.Description);
     }
 
     [Fact]
@@ -189,13 +189,13 @@ public class AddBookCommandValidatorTests
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
-        bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { ReleaseInfo = bookCommand.Metadata.ReleaseInfo! with { OriginalReleaseYear = new Faker().Random.Int(2000, 2005), ReReleaseYear = new Faker().Random.Int(2005, 2010) } } };
+        bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { ReleaseInfo = bookCommand.Metadata.ReleaseInfo! with { OriginalReleaseDate = null!, OriginalReleaseYear = new Faker().Random.Int(2000, 2005), ReReleaseYear = new Faker().Random.Int(2005, 2010), ReReleaseDate = null! } } };
 
         // Act
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Metadata.ReleaseInfo!.OriginalReleaseYear);
+        result.ShouldNotHaveValidationErrorFor(x => x.Metadata!.ReleaseInfo!.OriginalReleaseYear);
     }
 
     [Fact]
@@ -209,7 +209,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Metadata.ReleaseInfo!.OriginalReleaseYear).WithErrorMessage(Errors.Metadata.OriginalReleaseYearMustBeBetween1And9999.Code);
+        result.ShouldHaveValidationErrorFor(x => x.Metadata!.ReleaseInfo!.OriginalReleaseYear).WithErrorMessage(Errors.Metadata.OriginalReleaseYearMustBeBetween1And9999.Description);
     }
 
     [Fact]
@@ -223,7 +223,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Metadata.ReleaseInfo!.OriginalReleaseYear).WithErrorMessage(Errors.Metadata.OriginalReleaseYearMustBeBetween1And9999.Code);
+        result.ShouldHaveValidationErrorFor(x => x.Metadata!.ReleaseInfo!.OriginalReleaseYear).WithErrorMessage(Errors.Metadata.OriginalReleaseYearMustBeBetween1And9999.Description);
     }
 
     [Fact]
@@ -237,7 +237,7 @@ public class AddBookCommandValidatorTests
             {
                 ReleaseInfo = bookCommand.Metadata.ReleaseInfo!
             with
-                { OriginalReleaseYear = new Faker().Random.Int(2000, 2005), ReReleaseYear = new Faker().Random.Int(2005, 2010) }
+                { OriginalReleaseYear = new Faker().Random.Int(2000, 2005), ReReleaseYear = new Faker().Random.Int(2005, 2010), ReReleaseDate = null! }
             }
         };
 
@@ -245,7 +245,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Metadata.ReleaseInfo!.ReReleaseYear);
+        result.ShouldNotHaveValidationErrorFor(x => x.Metadata!.ReleaseInfo!.ReReleaseYear);
     }
 
     [Fact]
@@ -259,7 +259,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Metadata.ReleaseInfo!.ReReleaseYear).WithErrorMessage(Errors.Metadata.ReReleaseYearMustBeBetween1And9999.Code);
+        result.ShouldHaveValidationErrorFor(x => x.Metadata!.ReleaseInfo!.ReReleaseYear).WithErrorMessage(Errors.Metadata.ReReleaseYearMustBeBetween1And9999.Description);
     }
 
     [Fact]
@@ -273,7 +273,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Metadata.ReleaseInfo!.ReReleaseYear).WithErrorMessage(Errors.Metadata.ReReleaseYearMustBeBetween1And9999.Code);
+        result.ShouldHaveValidationErrorFor(x => x.Metadata!.ReleaseInfo!.ReReleaseYear).WithErrorMessage(Errors.Metadata.ReReleaseYearMustBeBetween1And9999.Description);
     }
 
     [Fact]
@@ -287,7 +287,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Metadata.ReleaseInfo!.ReleaseCountry);
+        result.ShouldNotHaveValidationErrorFor(x => x.Metadata!.ReleaseInfo!.ReleaseCountry);
     }
 
     [Fact]
@@ -301,7 +301,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Metadata.ReleaseInfo!.ReleaseCountry).WithErrorMessage(Errors.Metadata.CountryCodeMustBe2CharactersLong.Code);
+        result.ShouldHaveValidationErrorFor(x => x.Metadata!.ReleaseInfo!.ReleaseCountry).WithErrorMessage(Errors.Metadata.CountryCodeMustBe2CharactersLong.Description);
     }
 
     [Fact]
@@ -315,7 +315,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Metadata.ReleaseInfo!.ReleaseVersion);
+        result.ShouldNotHaveValidationErrorFor(x => x.Metadata!.ReleaseInfo!.ReleaseVersion);
     }
 
     [Fact]
@@ -329,7 +329,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Metadata.ReleaseInfo!.ReleaseVersion).WithErrorMessage(Errors.Metadata.ReleaseVersionMustBeMaximum50CharactersLong.Code);
+        result.ShouldHaveValidationErrorFor(x => x.Metadata!.ReleaseInfo!.ReleaseVersion).WithErrorMessage(Errors.Metadata.ReleaseVersionMustBeMaximum50CharactersLong.Description);
     }
 
     [Fact]
@@ -337,13 +337,13 @@ public class AddBookCommandValidatorTests
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
-        bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { ReleaseInfo = bookCommand.Metadata.ReleaseInfo! with { OriginalReleaseYear = 2000, ReReleaseYear = 2001 } } };
+        bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { ReleaseInfo = bookCommand.Metadata.ReleaseInfo! with { OriginalReleaseYear = 2000, ReReleaseYear = 2001, ReReleaseDate = null! } } };
 
         // Act
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Metadata.ReleaseInfo!.ReReleaseYear);
+        result.ShouldNotHaveValidationErrorFor(x => x.Metadata!.ReleaseInfo!.ReReleaseYear);
     }
 
     [Fact]
@@ -351,13 +351,13 @@ public class AddBookCommandValidatorTests
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
-        bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { ReleaseInfo = bookCommand.Metadata.ReleaseInfo! with { OriginalReleaseYear = 2001, ReReleaseYear = 2000 } } };
+        bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { ReleaseInfo = bookCommand.Metadata.ReleaseInfo! with { OriginalReleaseYear = 2001, ReReleaseYear = 2000, ReReleaseDate = null! } } };
 
         // Act
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Metadata.ReleaseInfo!.ReReleaseYear).WithErrorMessage(Errors.Metadata.ReReleaseYearCannotBeEarlierThanOriginalReleaseYear.Code);
+        result.ShouldHaveValidationErrorFor(x => x.Metadata!.ReleaseInfo!.ReReleaseYear).WithErrorMessage(Errors.Metadata.ReReleaseYearCannotBeEarlierThanOriginalReleaseYear.Description);
     }
 
     [Fact]
@@ -371,7 +371,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Metadata.ReleaseInfo!.ReReleaseDate);
+        result.ShouldNotHaveValidationErrorFor(x => x.Metadata!.ReleaseInfo!.ReReleaseDate);
     }
 
     [Fact]
@@ -385,7 +385,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Metadata.ReleaseInfo!.ReReleaseDate).WithErrorMessage(Errors.Metadata.ReReleaseDateCannotBeEarlierThanOriginalReleaseDate.Code);
+        result.ShouldHaveValidationErrorFor(x => x.Metadata!.ReleaseInfo!.ReReleaseDate).WithErrorMessage(Errors.Metadata.ReReleaseDateCannotBeEarlierThanOriginalReleaseDate.Description);
     }
 
     [Fact]
@@ -399,7 +399,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Metadata.Genres).WithErrorMessage(Errors.Metadata.GenresListCannotBeNull.Code);
+        result.ShouldHaveValidationErrorFor(x => x.Metadata!.Genres).WithErrorMessage(Errors.Metadata.GenresListCannotBeNull.Description);
     }
 
     [Fact]
@@ -413,7 +413,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor("Metadata.Genres[0].Name").WithErrorMessage(Errors.Metadata.GenreNameCannotBeEmpty.Code);
+        result.ShouldHaveValidationErrorFor("Metadata.Genres[0].Name").WithErrorMessage(Errors.Metadata.GenreNameCannotBeEmpty.Description);
     }
 
     [Fact]
@@ -427,7 +427,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor("Metadata.Genres[0].Name").WithErrorMessage(Errors.Metadata.GenreNameMustBeMaximum50CharactersLong.Code);
+        result.ShouldHaveValidationErrorFor("Metadata.Genres[0].Name").WithErrorMessage(Errors.Metadata.GenreNameMustBeMaximum50CharactersLong.Description);
     }
 
     [Fact]
@@ -447,7 +447,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Metadata.Genres);
+        result.ShouldNotHaveValidationErrorFor(x => x.Metadata!.Genres);
     }
 
     [Fact]
@@ -461,7 +461,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Metadata.Tags).WithErrorMessage(Errors.Metadata.TagsListCannotBeNull.Code);
+        result.ShouldHaveValidationErrorFor(x => x.Metadata!.Tags).WithErrorMessage(Errors.Metadata.TagsListCannotBeNull.Description);
     }
 
     [Fact]
@@ -475,7 +475,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor("Metadata.Tags[0].Name").WithErrorMessage(Errors.Metadata.TagNameCannotBeEmpty.Code);
+        result.ShouldHaveValidationErrorFor("Metadata.Tags[0].Name").WithErrorMessage(Errors.Metadata.TagNameCannotBeEmpty.Description);
     }
 
     [Fact]
@@ -489,7 +489,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor("Metadata.Tags[0].Name").WithErrorMessage(Errors.Metadata.TagNameMustBeMaximum50CharactersLong.Code);
+        result.ShouldHaveValidationErrorFor("Metadata.Tags[0].Name").WithErrorMessage(Errors.Metadata.TagNameMustBeMaximum50CharactersLong.Description);
     }
 
     [Fact]
@@ -509,7 +509,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Metadata.Tags);
+        result.ShouldNotHaveValidationErrorFor(x => x.Metadata!.Tags);
     }
 
     [Fact]
@@ -523,7 +523,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Metadata.Language);
+        result.ShouldNotHaveValidationErrorFor(x => x.Metadata!.Language);
     }
 
     [Fact]
@@ -537,7 +537,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Metadata.Language!.LanguageCode).WithErrorMessage(Errors.Metadata.LanguageCodeCannotBeEmpty.Code);
+        result.ShouldHaveValidationErrorFor(x => x.Metadata!.Language!.LanguageCode).WithErrorMessage(Errors.Metadata.LanguageCodeCannotBeEmpty.Description);
     }
 
     [Fact]
@@ -551,7 +551,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Metadata.Language!.LanguageCode).WithErrorMessage(Errors.Metadata.LanguageCodeMustBe2CharactersLong.Code);
+        result.ShouldHaveValidationErrorFor(x => x.Metadata!.Language!.LanguageCode).WithErrorMessage(Errors.Metadata.LanguageCodeMustBe2CharactersLong.Description);
     }
 
     [Fact]
@@ -565,7 +565,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Metadata.Language!.LanguageName).WithErrorMessage(Errors.Metadata.LanguageNameCannotBeEmpty.Code);
+        result.ShouldHaveValidationErrorFor(x => x.Metadata!.Language!.LanguageName).WithErrorMessage(Errors.Metadata.LanguageNameCannotBeEmpty.Description);
     }
 
     [Fact]
@@ -579,7 +579,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Metadata.Language!.LanguageName).WithErrorMessage(Errors.Metadata.LanguageNameMustBeMaximum50CharactersLong.Code);
+        result.ShouldHaveValidationErrorFor(x => x.Metadata!.Language!.LanguageName).WithErrorMessage(Errors.Metadata.LanguageNameMustBeMaximum50CharactersLong.Description);
     }
 
     [Fact]
@@ -593,7 +593,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Metadata.Language!.NativeName);
+        result.ShouldNotHaveValidationErrorFor(x => x.Metadata!.Language!.NativeName);
     }
 
     [Fact]
@@ -607,7 +607,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Metadata.Language!.NativeName).WithErrorMessage(Errors.Metadata.LanguageNativeNameMustBeMaximum50CharactersLong.Code);
+        result.ShouldHaveValidationErrorFor(x => x.Metadata!.Language!.NativeName).WithErrorMessage(Errors.Metadata.LanguageNativeNameMustBeMaximum50CharactersLong.Description);
     }
 
     [Fact]
@@ -621,7 +621,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Metadata.OriginalLanguage);
+        result.ShouldNotHaveValidationErrorFor(x => x.Metadata!.OriginalLanguage);
     }
 
     [Fact]
@@ -635,7 +635,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Metadata.OriginalLanguage!.LanguageCode).WithErrorMessage(Errors.Metadata.LanguageCodeCannotBeEmpty.Code);
+        result.ShouldHaveValidationErrorFor(x => x.Metadata!.OriginalLanguage!.LanguageCode).WithErrorMessage(Errors.Metadata.LanguageCodeCannotBeEmpty.Description);
     }
 
     [Fact]
@@ -649,7 +649,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Metadata.OriginalLanguage!.LanguageCode).WithErrorMessage(Errors.Metadata.LanguageCodeMustBe2CharactersLong.Code);
+        result.ShouldHaveValidationErrorFor(x => x.Metadata!.OriginalLanguage!.LanguageCode).WithErrorMessage(Errors.Metadata.LanguageCodeMustBe2CharactersLong.Description);
     }
 
     [Fact]
@@ -663,7 +663,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Metadata.OriginalLanguage!.LanguageName).WithErrorMessage(Errors.Metadata.LanguageNameCannotBeEmpty.Code);
+        result.ShouldHaveValidationErrorFor(x => x.Metadata!.OriginalLanguage!.LanguageName).WithErrorMessage(Errors.Metadata.LanguageNameCannotBeEmpty.Description);
     }
 
     [Fact]
@@ -677,7 +677,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Metadata.OriginalLanguage!.LanguageName).WithErrorMessage(Errors.Metadata.LanguageNameMustBeMaximum50CharactersLong.Code);
+        result.ShouldHaveValidationErrorFor(x => x.Metadata!.OriginalLanguage!.LanguageName).WithErrorMessage(Errors.Metadata.LanguageNameMustBeMaximum50CharactersLong.Description);
     }
 
     [Fact]
@@ -691,7 +691,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Metadata.OriginalLanguage!.NativeName);
+        result.ShouldNotHaveValidationErrorFor(x => x.Metadata!.OriginalLanguage!.NativeName);
     }
 
     [Fact]
@@ -705,7 +705,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Metadata.OriginalLanguage!.NativeName).WithErrorMessage(Errors.Metadata.LanguageNativeNameMustBeMaximum50CharactersLong.Code);
+        result.ShouldHaveValidationErrorFor(x => x.Metadata!.OriginalLanguage!.NativeName).WithErrorMessage(Errors.Metadata.LanguageNativeNameMustBeMaximum50CharactersLong.Description);
     }
 
     [Fact]
@@ -719,7 +719,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Metadata.Publisher);
+        result.ShouldNotHaveValidationErrorFor(x => x.Metadata!.Publisher);
     }
 
     [Fact]
@@ -733,7 +733,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Metadata.Publisher);
+        result.ShouldNotHaveValidationErrorFor(x => x.Metadata!.Publisher);
     }
 
     [Fact]
@@ -747,7 +747,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Metadata.Publisher).WithErrorMessage(Errors.WrittenContent.PublisherMustBeMaximum100CharactersLong.Code);
+        result.ShouldHaveValidationErrorFor(x => x.Metadata!.Publisher).WithErrorMessage(Errors.WrittenContent.PublisherMustBeMaximum100CharactersLong.Description);
     }
 
     [Fact]
@@ -761,7 +761,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Metadata.PageCount);
+        result.ShouldNotHaveValidationErrorFor(x => x.Metadata!.PageCount);
     }
 
     [Fact]
@@ -775,7 +775,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Metadata.PageCount).WithErrorMessage(Errors.WrittenContent.PageCountMustBeGreaterThanZero.Code);
+        result.ShouldHaveValidationErrorFor(x => x.Metadata!.PageCount).WithErrorMessage(Errors.WrittenContent.PageCountMustBeGreaterThanZero.Description);
     }
 
     [Fact]
@@ -789,7 +789,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Metadata.PageCount).WithErrorMessage(Errors.WrittenContent.PageCountMustBeGreaterThanZero.Code);
+        result.ShouldHaveValidationErrorFor(x => x.Metadata!.PageCount).WithErrorMessage(Errors.WrittenContent.PageCountMustBeGreaterThanZero.Description);
     }
 
     [Fact]
@@ -803,7 +803,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Metadata.PageCount);
+        result.ShouldNotHaveValidationErrorFor(x => x.Metadata!.PageCount);
     }
 
     [Fact]
@@ -845,7 +845,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Format).WithErrorMessage(Errors.WrittenContent.UnknownBookFormat.Code);
+        result.ShouldHaveValidationErrorFor(x => x.Format).WithErrorMessage(Errors.WrittenContent.UnknownBookFormat.Description);
     }
 
     [Fact]
@@ -887,7 +887,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Edition).WithErrorMessage(Errors.WrittenContent.EditionMustBeMaximum50CharactersLong.Code);
+        result.ShouldHaveValidationErrorFor(x => x.Edition).WithErrorMessage(Errors.WrittenContent.EditionMustBeMaximum50CharactersLong.Description);
     }
 
     [Fact]
@@ -915,7 +915,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.VolumeNumber).WithErrorMessage(Errors.WrittenContent.VolumeNumberMustBeGreaterThanZero.Code);
+        result.ShouldHaveValidationErrorFor(x => x.VolumeNumber).WithErrorMessage(Errors.WrittenContent.VolumeNumberMustBeGreaterThanZero.Description);
     }
 
     [Fact]
@@ -929,7 +929,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.VolumeNumber).WithErrorMessage(Errors.WrittenContent.VolumeNumberMustBeGreaterThanZero.Code);
+        result.ShouldHaveValidationErrorFor(x => x.VolumeNumber).WithErrorMessage(Errors.WrittenContent.VolumeNumberMustBeGreaterThanZero.Description);
     }
 
     [Fact]
@@ -971,7 +971,7 @@ public class AddBookCommandValidatorTests
     //    var result = _validator.TestValidate(bookCommand);
 
     //    // Assert
-    //    result.ShouldHaveValidationErrorFor(x => x.Series.Title).WithErrorMessage(Errors.Metadata.TitleCannotBeEmpty.Code);
+    //    result.ShouldHaveValidationErrorFor(x => x.Series.Title).WithErrorMessage(Errors.Metadata.TitleCannotBeEmpty.Description);
     //}
 
     //[Fact]
@@ -985,7 +985,7 @@ public class AddBookCommandValidatorTests
     //    var result = _validator.TestValidate(bookCommand);
 
     //    // Assert
-    //    result.ShouldHaveValidationErrorFor(x => x.Series.Title).WithErrorMessage(Errors.Metadata.TitleMustBeMaximum255CharactersLong.Code);
+    //    result.ShouldHaveValidationErrorFor(x => x.Series.Title).WithErrorMessage(Errors.Metadata.TitleMustBeMaximum255CharactersLong.Description);
     //}
 
     //[Fact]
@@ -1041,7 +1041,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.ASIN).WithErrorMessage(Errors.WrittenContent.AsinMustBe10CharactersLong.Code);
+        result.ShouldHaveValidationErrorFor(x => x.ASIN).WithErrorMessage(Errors.WrittenContent.AsinMustBe10CharactersLong.Description);
     }
 
     [Fact]
@@ -1083,7 +1083,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.GoodreadsId).WithErrorMessage(Errors.WrittenContent.GoodreadsIdMustBeNumeric.Code);
+        result.ShouldHaveValidationErrorFor(x => x.GoodreadsId).WithErrorMessage(Errors.WrittenContent.GoodreadsIdMustBeNumeric.Description);
     }
 
     [Fact]
@@ -1097,7 +1097,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.GoodreadsId).WithErrorMessage(Errors.WrittenContent.GoodreadsIdMustBeNumeric.Code);
+        result.ShouldHaveValidationErrorFor(x => x.GoodreadsId).WithErrorMessage(Errors.WrittenContent.GoodreadsIdMustBeNumeric.Description);
     }
 
     [Fact]
@@ -1111,7 +1111,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.GoodreadsId).WithErrorMessage(Errors.WrittenContent.GoodreadsIdMustBeNumeric.Code);
+        result.ShouldHaveValidationErrorFor(x => x.GoodreadsId).WithErrorMessage(Errors.WrittenContent.GoodreadsIdMustBeNumeric.Description);
     }
 
     [Fact]
@@ -1153,7 +1153,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.LCCN).WithErrorMessage(Errors.WrittenContent.InvalidLccnFormat.Code);
+        result.ShouldHaveValidationErrorFor(x => x.LCCN).WithErrorMessage(Errors.WrittenContent.InvalidLccnFormat.Description);
     }
 
     [Fact]
@@ -1167,7 +1167,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.LCCN).WithErrorMessage(Errors.WrittenContent.InvalidLccnFormat.Code);
+        result.ShouldHaveValidationErrorFor(x => x.LCCN).WithErrorMessage(Errors.WrittenContent.InvalidLccnFormat.Description);
     }
 
     [Fact]
@@ -1181,7 +1181,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.LCCN).WithErrorMessage(Errors.WrittenContent.InvalidLccnFormat.Code);
+        result.ShouldHaveValidationErrorFor(x => x.LCCN).WithErrorMessage(Errors.WrittenContent.InvalidLccnFormat.Description);
     }
 
     [Fact]
@@ -1279,7 +1279,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.OCLCNumber).WithErrorMessage(Errors.WrittenContent.InvalidOclcFormat.Code);
+        result.ShouldHaveValidationErrorFor(x => x.OCLCNumber).WithErrorMessage(Errors.WrittenContent.InvalidOclcFormat.Description);
     }
 
     [Fact]
@@ -1321,7 +1321,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.OpenLibraryId).WithErrorMessage(Errors.WrittenContent.InvalidOpenLibraryId.Code);
+        result.ShouldHaveValidationErrorFor(x => x.OpenLibraryId).WithErrorMessage(Errors.WrittenContent.InvalidOpenLibraryId.Description);
     }
 
     [Fact]
@@ -1335,7 +1335,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.OpenLibraryId).WithErrorMessage(Errors.WrittenContent.InvalidOpenLibraryId.Code);
+        result.ShouldHaveValidationErrorFor(x => x.OpenLibraryId).WithErrorMessage(Errors.WrittenContent.InvalidOpenLibraryId.Description);
     }
 
     [Fact]
@@ -1349,7 +1349,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.OpenLibraryId).WithErrorMessage(Errors.WrittenContent.InvalidOpenLibraryId.Code);
+        result.ShouldHaveValidationErrorFor(x => x.OpenLibraryId).WithErrorMessage(Errors.WrittenContent.InvalidOpenLibraryId.Description);
     }
 
     [Fact]
@@ -1391,7 +1391,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.LibraryThingId).WithErrorMessage(Errors.WrittenContent.LibraryThingIdMustBeMaximum50CharactersLong.Code);
+        result.ShouldHaveValidationErrorFor(x => x.LibraryThingId).WithErrorMessage(Errors.WrittenContent.LibraryThingIdMustBeMaximum50CharactersLong.Description);
     }
 
     [Fact]
@@ -1419,7 +1419,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.GoogleBooksId).WithErrorMessage(Errors.WrittenContent.GoogleBooksIdMustBe12CharactersLong.Code);
+        result.ShouldHaveValidationErrorFor(x => x.GoogleBooksId).WithErrorMessage(Errors.WrittenContent.GoogleBooksIdMustBe12CharactersLong.Description);
     }
 
     [Fact]
@@ -1433,7 +1433,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.GoogleBooksId).WithErrorMessage(Errors.WrittenContent.InvalidGoogleBooksIdFormat.Code);
+        result.ShouldHaveValidationErrorFor(x => x.GoogleBooksId).WithErrorMessage(Errors.WrittenContent.InvalidGoogleBooksIdFormat.Description);
     }
 
     [Fact]
@@ -1475,7 +1475,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.BarnesAndNobleId).WithErrorMessage(Errors.WrittenContent.BarnesAndNoblesIdMustBe10CharactersLong.Code);
+        result.ShouldHaveValidationErrorFor(x => x.BarnesAndNobleId).WithErrorMessage(Errors.WrittenContent.BarnesAndNoblesIdMustBe10CharactersLong.Description);
     }
 
     [Fact]
@@ -1489,7 +1489,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.BarnesAndNobleId).WithErrorMessage(Errors.WrittenContent.InvalidBarnesAndNoblesIdFormat.Code);
+        result.ShouldHaveValidationErrorFor(x => x.BarnesAndNobleId).WithErrorMessage(Errors.WrittenContent.InvalidBarnesAndNoblesIdFormat.Description);
     }
 
     [Fact]
@@ -1545,7 +1545,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.AppleBooksId).WithErrorMessage(Errors.WrittenContent.InvalidAppleBooksIdFormat.Code);
+        result.ShouldHaveValidationErrorFor(x => x.AppleBooksId).WithErrorMessage(Errors.WrittenContent.InvalidAppleBooksIdFormat.Description);
     }
 
     [Fact]
@@ -1559,7 +1559,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.ISBNs).WithErrorMessage(Errors.WrittenContent.IsbnListCannotBeNull.Code);
+        result.ShouldHaveValidationErrorFor(x => x.ISBNs).WithErrorMessage(Errors.WrittenContent.IsbnListCannotBeNull.Description);
     }
 
     [Fact]
@@ -1573,7 +1573,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor("ISBNs[0].Value").WithErrorMessage(Errors.WrittenContent.IsbnValueCannotBeEmpty.Code);
+        result.ShouldHaveValidationErrorFor("ISBNs[0].Value").WithErrorMessage(Errors.WrittenContent.IsbnValueCannotBeEmpty.Description);
     }
 
     [Fact]
@@ -1587,7 +1587,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor("ISBNs[0].Value").WithErrorMessage(Errors.WrittenContent.InvalidIsbn10Format.Code);
+        result.ShouldHaveValidationErrorFor("ISBNs[0].Value").WithErrorMessage(Errors.WrittenContent.InvalidIsbn10Format.Description);
     }
 
     [Fact]
@@ -1601,7 +1601,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor("ISBNs[0].Value").WithErrorMessage(Errors.WrittenContent.InvalidIsbn13Format.Code);
+        result.ShouldHaveValidationErrorFor("ISBNs[0].Value").WithErrorMessage(Errors.WrittenContent.InvalidIsbn13Format.Description);
     }
 
     [Fact]
@@ -1615,7 +1615,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor("ISBNs[0].Format").WithErrorMessage(Errors.WrittenContent.UnknownIsbnFormat.Code);
+        result.ShouldHaveValidationErrorFor("ISBNs[0].Format").WithErrorMessage(Errors.WrittenContent.UnknownIsbnFormat.Description);
     }
 
     [Fact]
@@ -1629,7 +1629,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.ISBNs[0].Value);
+        result.ShouldNotHaveValidationErrorFor(x => x.ISBNs![0].Value);
     }
 
     [Fact]
@@ -1643,7 +1643,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.ISBNs[0].Value);
+        result.ShouldNotHaveValidationErrorFor(x => x.ISBNs![0].Value);
     }
 
     [Fact]
@@ -1657,7 +1657,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Contributors).WithErrorMessage(Errors.MediaContributor.ContributorsListCannotBeNull.Code);
+        result.ShouldHaveValidationErrorFor(x => x.Contributors).WithErrorMessage(Errors.MediaContributor.ContributorsListCannotBeNull.Description);
     }
 
     [Fact]
@@ -1671,7 +1671,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor("Contributors[0].Name").WithErrorMessage(Errors.MediaContributor.ContributorNameCannotBeEmpty.Code);
+        result.ShouldHaveValidationErrorFor("Contributors[0].Name").WithErrorMessage(Errors.MediaContributor.ContributorNameCannotBeEmpty.Description);
     }
 
     [Fact]
@@ -1685,7 +1685,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor("Contributors[0].Name.DisplayName").WithErrorMessage(Errors.MediaContributor.ContributorDisplayNameMustBeMaximum100CharactersLong.Code);
+        result.ShouldHaveValidationErrorFor("Contributors[0].Name.DisplayName").WithErrorMessage(Errors.MediaContributor.ContributorDisplayNameMustBeMaximum100CharactersLong.Description);
     }
 
     [Fact]
@@ -1699,7 +1699,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor("Contributors[0].Name.DisplayName").WithErrorMessage(Errors.MediaContributor.ContributorDisplayNameCannotBeEmpty.Code);
+        result.ShouldHaveValidationErrorFor("Contributors[0].Name.DisplayName").WithErrorMessage(Errors.MediaContributor.ContributorDisplayNameCannotBeEmpty.Description);
     }
 
     [Fact]
@@ -1713,7 +1713,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor("Contributors[0].Name.LegalName").WithErrorMessage(Errors.MediaContributor.ContributorLegalNameMustBeMaximum100CharactersLong.Code);
+        result.ShouldHaveValidationErrorFor("Contributors[0].Name.LegalName").WithErrorMessage(Errors.MediaContributor.ContributorLegalNameMustBeMaximum100CharactersLong.Description);
     }
 
     [Fact]
@@ -1727,7 +1727,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor("Contributors[0].Role").WithErrorMessage(Errors.MediaContributor.ContributorRoleCannotBeNull.Code);
+        result.ShouldHaveValidationErrorFor("Contributors[0].Role").WithErrorMessage(Errors.MediaContributor.ContributorRoleCannotBeNull.Description);
     }
 
     [Fact]
@@ -1741,7 +1741,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor("Contributors[0].Role.Name").WithErrorMessage(Errors.MediaContributor.RoleNameCannotBeEmpty.Code);
+        result.ShouldHaveValidationErrorFor("Contributors[0].Role.Name").WithErrorMessage(Errors.MediaContributor.RoleNameCannotBeEmpty.Description);
     }
 
     [Fact]
@@ -1755,7 +1755,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor("Contributors[0].Role.Name").WithErrorMessage(Errors.MediaContributor.RoleNameMustBeMaximum50CharactersLong.Code);
+        result.ShouldHaveValidationErrorFor("Contributors[0].Role.Name").WithErrorMessage(Errors.MediaContributor.RoleNameMustBeMaximum50CharactersLong.Description);
     }
 
     [Fact]
@@ -1769,7 +1769,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor("Contributors[0].Role.Category").WithErrorMessage(Errors.MediaContributor.RoleCategoryCannotBeEmpty.Code);
+        result.ShouldHaveValidationErrorFor("Contributors[0].Role.Category").WithErrorMessage(Errors.MediaContributor.RoleCategoryCannotBeEmpty.Description);
     }
 
     [Fact]
@@ -1783,7 +1783,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor("Contributors[0].Role.Category").WithErrorMessage(Errors.MediaContributor.RoleCategoryMustBeMaximum50CharactersLong.Code);
+        result.ShouldHaveValidationErrorFor("Contributors[0].Role.Category").WithErrorMessage(Errors.MediaContributor.RoleCategoryMustBeMaximum50CharactersLong.Description);
     }
 
     [Fact]
@@ -1797,7 +1797,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Ratings).WithErrorMessage(Errors.Metadata.RatingsListCannotBeNull.Code);
+        result.ShouldHaveValidationErrorFor(x => x.Ratings).WithErrorMessage(Errors.Metadata.RatingsListCannotBeNull.Description);
     }
 
     [Fact]
@@ -1811,7 +1811,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor("Ratings[0].Value").WithErrorMessage(Errors.Metadata.RatingValueMustBePositive.Code);
+        result.ShouldHaveValidationErrorFor("Ratings[0].Value").WithErrorMessage(Errors.Metadata.RatingValueMustBePositive.Description);
     }
 
     [Fact]
@@ -1825,7 +1825,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor("Ratings[0].Value").WithErrorMessage(Errors.Metadata.RatingValueCannotBeGreaterThanMaxValue.Code);
+        result.ShouldHaveValidationErrorFor("Ratings[0].Value").WithErrorMessage(Errors.Metadata.RatingValueCannotBeGreaterThanMaxValue.Description);
     }
 
     [Fact]
@@ -1839,7 +1839,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor("Ratings[0].MaxValue").WithErrorMessage(Errors.Metadata.RatingMaxValueMustBePositive.Code);
+        result.ShouldHaveValidationErrorFor("Ratings[0].MaxValue").WithErrorMessage(Errors.Metadata.RatingMaxValueMustBePositive.Description);
     }
 
     [Fact]
@@ -1853,7 +1853,7 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldHaveValidationErrorFor("Ratings[0].VoteCount").WithErrorMessage(Errors.Metadata.RatingVoteCountMustBePositive.Code);
+        result.ShouldHaveValidationErrorFor("Ratings[0].VoteCount").WithErrorMessage(Errors.Metadata.RatingVoteCountMustBePositive.Description);
     }
 
     [Fact]
@@ -1886,6 +1886,6 @@ public class AddBookCommandValidatorTests
         TestValidationResult<AddBookCommand> result = _validator.TestValidate(bookCommand);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Ratings[0].VoteCount);
+        result.ShouldNotHaveValidationErrorFor(x => x.Ratings![0].VoteCount);
     }
 }

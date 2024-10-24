@@ -1,11 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Converters;
-using Lumina.Presentation.Api.Common.Configuration;
-using Lumina.Presentation.Api.Common.Errors;
-using Mapster;
-using MapsterMapper;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
+using FastEndpoints;
+using FastEndpoints.Swagger;
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json.Serialization;
 #endregion
@@ -24,6 +20,40 @@ public static class PresentationApiLayerServices
     /// <returns>The updated <see cref="IServiceCollection"/>.</returns>
     public static IServiceCollection AddPresentationApiLayerServices(this IServiceCollection services)
     {
+        
+        services.Configure<JsonOptions>(jsonOptions =>
+        {
+            jsonOptions.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            jsonOptions.SerializerOptions.MaxDepth = 256;
+            jsonOptions.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; // needed because file system API responses can have very nested structures
+        });
+
+        services.AddAuthorization();
+
+        services.AddFastEndpoints(
+        o => o.Assemblies =
+        [
+            typeof(Program).Assembly
+        ]);
+        services.SwaggerDocument(documentOptions =>
+        {
+            documentOptions.SerializerSettings = s =>
+            {
+                s.PropertyNamingPolicy = null;
+                s.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+            };
+            documentOptions.MaxEndpointVersion = 1;
+            documentOptions.MinEndpointVersion = 1;
+            documentOptions.DocumentSettings = s =>
+            {
+                s.DocumentName = "Release 1.0";
+                s.Title = "Lumina API";
+                s.Version = "v1.0";
+            };
+            documentOptions.RemoveEmptyRequestSchema = true;
+            documentOptions.ShortSchemaNames = true;            
+        });
+
         services.AddCors(options =>
         {
             options.AddPolicy("AllowAll",
@@ -32,41 +62,6 @@ public static class PresentationApiLayerServices
                      .AllowAnyMethod()
                      .AllowAnyHeader());
         });
-
-        // add services to the container
-        services.AddControllers().AddJsonOptions(options =>
-        {
-            options.JsonSerializerOptions.MaxDepth = 256;
-            options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; // needed because file system API responses can have very nested structures
-            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-            options.JsonSerializerOptions.Converters.Add(new OptionalJsonConverterFactory());
-        });
-
-        // add services to the container.
-        services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
-        services.ConfigureOptions<ConfigureSwaggerOptions>();
-
-        services.AddApiVersioning(options =>
-        {
-            options.DefaultApiVersion = new ApiVersion(1, 0);
-            options.AssumeDefaultVersionWhenUnspecified = true;
-            options.ReportApiVersions = true;
-        });
-
-        services.AddVersionedApiExplorer(options =>
-        {
-            options.GroupNameFormat = "'v'VVV";
-            options.SubstituteApiVersionInUrl = true;
-        });
-
-        services.AddSingleton<ProblemDetailsFactory, CustomProblemDetailsFactory>();
-
-        // register mapster configs
-        TypeAdapterConfig mapsterConfig = TypeAdapterConfig.GlobalSettings;
-        mapsterConfig.Scan(typeof(PresentationApiLayerServices).Assembly);
-        services.AddSingleton(mapsterConfig);
-        services.AddScoped<IMapper, ServiceMapper>();
 
         return services;
     }

@@ -34,7 +34,7 @@ public class Tag : ValueObject
     /// <returns>
     /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="Tag"/>, or an error message.
     /// </returns>
-    public static ErrorOr<Tag> Create(string name)
+    public static ErrorOr<Tag> Create(string? name)
     {
         if (string.IsNullOrWhiteSpace(name))
             return Errors.Errors.Metadata.TagNameCannotBeEmpty;

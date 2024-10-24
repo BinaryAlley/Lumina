@@ -35,7 +35,7 @@ public class BookJsonConverter : JsonConverter<Book>
         {
             JsonElement root = doc.RootElement;
 
-            Guid id = root.GetProperty("id").GetProperty("value").GetGuid();
+            Guid id = root.GetProperty("id").GetGuid();
             DateTime created = root.GetProperty("created").GetDateTime();
             WrittenContentMetadata metadata = DeserializeMetadata(root.GetProperty("metadata"));
             BookFormat? format = null;
@@ -108,7 +108,7 @@ public class BookJsonConverter : JsonConverter<Book>
     /// </summary>
     /// <param name="element">The JSON element containing the metadata.</param>
     /// <returns>The deserialized <see cref="WrittenContentMetadata"/>.</returns>
-    private WrittenContentMetadata DeserializeMetadata(JsonElement element)
+    private static WrittenContentMetadata DeserializeMetadata(JsonElement element)
     {
         string? title = element.GetProperty("title").GetString();
         string? originalTitle = element.GetProperty("originalTitle").GetString();
@@ -146,9 +146,9 @@ public class BookJsonConverter : JsonConverter<Book>
     /// </summary>
     /// <param name="element">The JSON element containing the release info.</param>
     /// <returns>The deserialized <see cref="ReleaseInfo"/>.</returns>
-    private ReleaseInfo DeserializeReleaseInfo(JsonElement element)
+    private static ReleaseInfo DeserializeReleaseInfo(JsonElement element)
     {
-        DateOnly? originalReleaseDate = element.TryGetProperty("originalReleaseDate", out JsonElement ordElement) ?
+        DateOnly? originalReleaseDate = element.TryGetProperty("originalReleaseDate", out JsonElement ordElement) && ordElement.ValueKind != JsonValueKind.Null ?
             DateOnly.Parse(ordElement.GetString()!) : (DateOnly?)null;
         int? originalReleaseYear = element.TryGetProperty("originalReleaseYear", out JsonElement oryElement) && oryElement.ValueKind == JsonValueKind.Number
             ? oryElement.GetInt32() : (int?)null;
@@ -180,7 +180,7 @@ public class BookJsonConverter : JsonConverter<Book>
     /// </summary>
     /// <param name="element">The JSON element containing the genres.</param>
     /// <returns>The deserialized list of <see cref="Genre"/>.</returns>
-    private List<Genre> DeserializeGenres(JsonElement element)
+    private static List<Genre> DeserializeGenres(JsonElement element)
     {
         return element.EnumerateArray()
             .Select(g => Genre.Create(g.GetProperty("name").GetString()!).Value)
@@ -192,7 +192,7 @@ public class BookJsonConverter : JsonConverter<Book>
     /// </summary>
     /// <param name="element">The JSON element containing the tags.</param>
     /// <returns>The deserialized list of <see cref="Tag"/>.</returns>
-    private List<Tag> DeserializeTags(JsonElement element)
+    private static List<Tag> DeserializeTags(JsonElement element)
     {
         return element.EnumerateArray()
             .Select(t => Tag.Create(t.GetProperty("name").GetString()!).Value)
@@ -204,7 +204,7 @@ public class BookJsonConverter : JsonConverter<Book>
     /// </summary>
     /// <param name="element">The JSON element containing the language info.</param>
     /// <returns>The deserialized <see cref="LanguageInfo"/>.</returns>
-    private LanguageInfo? DeserializeLanguageInfo(JsonElement element)
+    private static LanguageInfo? DeserializeLanguageInfo(JsonElement element)
     {
         if (element.ValueKind != JsonValueKind.Null)
         {
@@ -231,7 +231,7 @@ public class BookJsonConverter : JsonConverter<Book>
     /// </summary>
     /// <param name="element">The JSON element containing the book series.</param>
     /// <returns>The deserialized <see cref="BookSeries"/>.</returns>
-    private BookSeries DeserializeBookSeries(JsonElement element)
+    private static BookSeries DeserializeBookSeries(JsonElement element)
     {
         // TODO: implement when book series are implemented
         return null!;
@@ -242,7 +242,7 @@ public class BookJsonConverter : JsonConverter<Book>
     /// </summary>
     /// <param name="element">The JSON element containing the ISBNs.</param>
     /// <returns>The deserialized list of <see cref="Isbn"/>.</returns>
-    private List<Isbn> DeserializeIsbns(JsonElement element)
+    private static List<Isbn> DeserializeIsbns(JsonElement element)
     {
         return element.EnumerateArray()
             .Select(i => Isbn.Create(i.GetProperty("value").GetString()!,
@@ -255,7 +255,7 @@ public class BookJsonConverter : JsonConverter<Book>
     /// </summary>
     /// <param name="element">The JSON element containing the contributor IDs.</param>
     /// <returns>The deserialized list of <see cref="MediaContributorId"/>.</returns>
-    private List<MediaContributorId> DeserializeContributorIds(JsonElement element)
+    private static List<MediaContributorId> DeserializeContributorIds(JsonElement element)
     {
         // TODO: implement when contributors are implemented
         return [];
@@ -266,7 +266,7 @@ public class BookJsonConverter : JsonConverter<Book>
     /// </summary>
     /// <param name="element">The JSON element containing the ratings.</param>
     /// <returns>The deserialized list of <see cref="BookRating"/>.</returns>
-    private List<BookRating> DeserializeRatings(JsonElement element)
+    private static List<BookRating> DeserializeRatings(JsonElement element)
     {
         return element.EnumerateArray()
             .Select(r => BookRating.Create(

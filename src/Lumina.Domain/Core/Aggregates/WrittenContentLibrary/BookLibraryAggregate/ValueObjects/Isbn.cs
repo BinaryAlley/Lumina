@@ -46,7 +46,7 @@ public sealed class Isbn : ValueObject
     /// <param name="value">The value representing this object.</param>
     /// <param name="format">The format of the ISBN representing this object.</param>
     /// <returns>The created <see cref="Isbn"/> instance.</returns>
-    public static ErrorOr<Isbn> Create(string value, IsbnFormat format)
+    public static ErrorOr<Isbn> Create(string? value, IsbnFormat format)
     {
         // enforce invariants
         if (string.IsNullOrWhiteSpace(value))

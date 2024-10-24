@@ -58,6 +58,6 @@ public class DatabaseSettingsModelValidatorTests
         // Assert
         result.IsValid.Should().BeFalse();
         result.Errors.Should().ContainSingle()
-            .Which.ErrorMessage.Should().Be(Errors.Configuration.DatabaseConnectionStringCannotBeEmpty.Code);
+            .Which.ErrorMessage.Should().Be(Errors.Configuration.DatabaseConnectionStringCannotBeEmpty.Description);
     }
 }
