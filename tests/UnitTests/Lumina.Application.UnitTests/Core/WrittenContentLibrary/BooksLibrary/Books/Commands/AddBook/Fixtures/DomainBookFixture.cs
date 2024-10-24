@@ -11,6 +11,7 @@ using Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate.V
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 #endregion
 
 namespace Lumina.Application.UnitTests.Core.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook.Fixtures;
@@ -62,14 +63,20 @@ public class DomainBookFixture
         _fixture.Register(() => Optional<string>.Some(_fixture.Create<string>()));
         _fixture.Register(() => Optional<int>.Some(_fixture.Create<int>()));
 
-        _fixture.Register(() => ReleaseInfo.Create(
-                _fixture.Create<Optional<DateOnly>>(),
-                _fixture.Create<Optional<int>>(),
-                _fixture.Create<Optional<DateOnly>>(),
-                _fixture.Create<Optional<int>>(),
+        _fixture.Register(() =>
+        {
+            int originalYear = _fixture.Create<Generator<int>>().First(y => y >= 1900 && y <= 2025);
+            int reReleaseYear = _fixture.Create<Generator<int>>().First(y => y >= originalYear && y <= 2025);
+
+            return ReleaseInfo.Create(
+                Optional<DateOnly>.Some(DateOnly.FromDateTime(new DateTime(originalYear, 1, 1))), 
+                Optional<int>.Some(originalYear),
+                Optional<DateOnly>.Some(DateOnly.FromDateTime(new DateTime(reReleaseYear, 1, 1))),
+                Optional<int>.Some(reReleaseYear),
                 _fixture.Create<Optional<string>>(),
                 _fixture.Create<Optional<string>>()
-            ).Value);
+            ).Value;
+        });
 
         _fixture.Register(() => Genre.Create(
             _fixture.Create<string>()
