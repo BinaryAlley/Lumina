@@ -98,12 +98,18 @@ public class DirectoryFixture
     private Directory CreateNestedDirectory(int currentDepth, int maxDepth, int maxChildrenPerDirectory)
     {
         List<FileSystemItem> childItems = [];
-
+        // ensure we create at least one child if we haven't reached max depth
         if (currentDepth < maxDepth)
         {
-            int childCount = _faker.Random.Int(0, maxChildrenPerDirectory);
+            // force at least 1 child, up to maxChildrenPerDirectory
+            int childCount = _faker.Random.Int(1, maxChildrenPerDirectory);
             for (int i = 0; i < childCount; i++)
-               childItems.Add(CreateNestedDirectory(currentDepth + 1, maxDepth, maxChildrenPerDirectory));
+            {
+                Directory childDirectory = CreateNestedDirectory(currentDepth + 1, maxDepth, maxChildrenPerDirectory);
+                ErrorOr<Updated> addResult = childDirectory.SetParent(childDirectory);
+                if (!addResult.IsError)
+                    childItems.Add(childDirectory);
+            }
         }
         return CreateDirectory(childItems: childItems);
     }
