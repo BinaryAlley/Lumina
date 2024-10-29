@@ -36,9 +36,9 @@
         <None Update="appsettings.json">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
-        <None Update="appsettings.Development.json">
+        <None Update="appsettings.development.json">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <DependentUpon>appsettings.shared.json</DependentUpon>
+            <DependentUpon>appsettings.json</DependentUpon>
         </None>
     </ItemGroup>
 

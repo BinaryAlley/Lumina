@@ -25,7 +25,7 @@
         <None Update="appsettings.shared.json">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
-        <None Update="appsettings.shared.Development.json">
+        <None Update="appsettings.shared.development.json">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <DependentUpon>appsettings.shared.json</DependentUpon>
         </None>
