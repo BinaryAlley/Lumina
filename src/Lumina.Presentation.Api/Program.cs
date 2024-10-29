@@ -7,6 +7,10 @@ using Lumina.Domain.Common.DependencyInjection;
 using Lumina.Infrastructure.Common.DependencyInjection;
 using Lumina.Presentation.Api.Common.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.FileProviders;
+using System;
+using System.IO;
 using System.Threading.Tasks;
 #endregion
 
@@ -53,6 +57,18 @@ public class Program
             config.Endpoints.ShortNames = true;
         });
         app.UseSwaggerGen();
+
+        string mediaRootDirectoryPathSetting = app.Configuration.GetValue<string>("MediaSettings:RootDirectory") ?? string.Empty;
+        string mediaRootPath = Path.Combine(AppContext.BaseDirectory, mediaRootDirectoryPathSetting);
+
+        if (!Directory.Exists(mediaRootPath))
+            Directory.CreateDirectory(mediaRootPath);
+
+        app.UseStaticFiles(new StaticFileOptions
+        {
+            FileProvider = new PhysicalFileProvider(mediaRootPath),
+            RequestPath = "/media"
+        });
 
         await app.RunAsync().ConfigureAwait(false);
     }

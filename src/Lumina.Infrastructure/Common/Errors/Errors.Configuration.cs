@@ -13,5 +13,6 @@ public static partial class Errors
     {
         public static Error ApplicationThemeCannotBeEmpty => Error.Validation(description: nameof(ApplicationThemeCannotBeEmpty));
         public static Error DatabaseConnectionStringCannotBeEmpty => Error.Validation(description: nameof(DatabaseConnectionStringCannotBeEmpty));
+        public static Error MediaRootDirectoryCannotBeEmpty => Error.Validation(description: nameof(MediaRootDirectoryCannotBeEmpty));
     }
 }

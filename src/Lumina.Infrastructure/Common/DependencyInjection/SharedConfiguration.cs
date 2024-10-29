@@ -42,6 +42,13 @@ public static class SharedConfiguration
                 .Bind(configuration.GetRequiredSection(DatabaseSettingsModel.SECTION_NAME))
                 .ValidateFluently()
                 .ValidateOnStart();
+
+
+        services.AddOptions<MediaSettingsModel>()
+                .Bind(configuration.GetRequiredSection(MediaSettingsModel.SECTION_NAME))
+                .ValidateFluently()
+                .ValidateOnStart();
+
         return services;
     }
 }

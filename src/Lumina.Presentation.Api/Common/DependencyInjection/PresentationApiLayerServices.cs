@@ -20,7 +20,7 @@ public static class PresentationApiLayerServices
     /// <returns>The updated <see cref="IServiceCollection"/>.</returns>
     public static IServiceCollection AddPresentationApiLayerServices(this IServiceCollection services)
     {
-        
+
         services.Configure<JsonOptions>(jsonOptions =>
         {
             jsonOptions.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
