@@ -4,8 +4,8 @@ const progressIndicator = document.getElementById('progress-indicator');
 const progressIndicatorValue = document.getElementById('progress-indicator-value');
 const progressIndicatorValueShadow = document.getElementById('progress-indicator-value-shadow');
 const progressIndicatorValueText = document.getElementById('progress-indicator-value-text');
-
-
+const audioPlayerFullHeightToggle = document.getElementById('audio-player-full-height-toggle');
+const audioPlayerClose = document.getElementById('audio-player-close');
 
 let enableConsoleDebugMessages = false; // whether to display debug messages at the developer console, or not
 
@@ -35,6 +35,106 @@ async function callApiGetAsync(url) {
     } catch (error) {
         console.error('Error:', error);
         notificationService.show(error, NotificationType.ERROR);
+    }
+}
+
+//+======================================================================================+
+//|                                Website navigation                                    |
+//+======================================================================================+
+
+/**
+ * Initializes navigation by setting the initial history state, intercepting link clicks,
+ * and managing back/forward browser actions.
+ */
+function initializeNavigation() {
+    // store initial state
+    const initialState = {
+        url: window.location.href,
+        content: document.querySelector('main').innerHTML,
+        title: document.title
+    };
+    history.replaceState(initialState, document.title, window.location.href);
+    // initial nav-link binding
+    bindNavigationLinks();
+
+    // handle browser back/forward
+    window.addEventListener('popstate', handlePopState);
+}
+
+
+/**
+ * Binds AJAX navigation behavior to links marked with .nav-link class.
+ */
+function bindNavigationLinks() {
+    document.querySelectorAll('.nav-link').forEach(link => {
+        // only bind if not already bound
+        if (!link.dataset.boundNavigation) {
+            link.addEventListener('click', handleNavigation);
+            link.dataset.boundNavigation = 'true';
+        }
+    });
+}
+
+/**
+ * Handles link clicks to navigate dynamically without reloading the page.
+ * @param {Event} e - The click event for a navigation link.
+ */
+async function handleNavigation(e) {
+    e.preventDefault();
+    const url = e.target.href;
+    await updateContent(url, true);
+}
+
+/**
+ * Restores page content and title when navigating with browser back/forward buttons.
+ * @param {PopStateEvent} e - The popstate event with previous state data.
+ */
+async function handlePopState(e) {
+    if (e.state) {
+        // if we have cached content in state, use it immediately
+        if (e.state.content) {
+            document.querySelector('main').innerHTML = e.state.content;
+            document.title = e.state.title;
+        }
+        // still fetch fresh content to ensure it's up to date
+        await updateContent(e.state.url, false);
+    }
+}
+
+/**
+ * Loads new page content and updates the URL and history if required.
+ * @param {string} url - URL to fetch new content from.
+ * @param {boolean} addToHistory - Whether to add the new state to history.
+ */
+async function updateContent(url, addToHistory) {
+    try {
+        const response = await fetch(url);
+        const html = await response.text();
+
+        // parse the new content
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const content = doc.querySelector('main').innerHTML;
+        const title = doc.querySelector('title')?.textContent || document.title;
+
+        // update the page
+        document.querySelector('main').innerHTML = content;
+        document.title = title;
+
+        // bind navigation links in the new content
+        bindNavigationLinks();
+
+        // save to history if needed
+        if (addToHistory) {
+            const state = {
+                url: url,
+                content: content,
+                title: title
+            };
+            history.pushState(state, title, url);
+        }
+    } catch (error) {
+        console.error('Navigation failed:', error);
     }
 }
 
@@ -237,3 +337,28 @@ function getElementOffset(id) {
         height: 0
     };
 }
+
+/**
+ * Toggles the visibility of the audio player.
+ */
+function toggleAudioPlayerVisibility() {
+    const playerContainer = document.querySelector('.audio-player-container');
+    const contentContainer = document.querySelector('main');
+    playerContainer.classList.toggle('not-shown');
+    contentContainer.classList.toggle('audio-player-not-shown');
+}
+
+/**
+ * Toggles the display of the audio player as collapsed player, or full height player.
+ */
+function toggleAudioPlayerFullHeight() {
+    const playerContainer = document.querySelector('.audio-player-container');
+    const contentContainer = document.querySelector('main');
+    playerContainer.classList.toggle('full-height');
+    contentContainer.classList.toggle('audio-player-full-height');
+}
+
+audioPlayerFullHeightToggle.addEventListener('click', toggleAudioPlayerFullHeight);
+audioPlayerClose.addEventListener('click', toggleAudioPlayerVisibility);
+
+document.addEventListener('DOMContentLoaded', initializeNavigation);
