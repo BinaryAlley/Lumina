@@ -35,16 +35,11 @@ public class DirectoriesController : Controller
     /// <param name="includeHiddenElements">Whether to include hidden file system elements or not.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     [HttpGet("get-directories")]
-    public async IAsyncEnumerable<DirectoryModel?> GetDirectories([FromQuery] string path, [FromQuery] bool includeHiddenElements, [EnumeratorCancellation] CancellationToken cancellationToken)
+    public async Task<IActionResult> GetDirectories([FromQuery] string path, [FromQuery] bool includeHiddenElements, CancellationToken cancellationToken)
     {
-        IAsyncEnumerable<DirectoryModel?> response = _apiHttpClient.GetAsyncEnumerable<DirectoryModel>(
+        IEnumerable<DirectoryModel> response = await _apiHttpClient.GetAsync<DirectoryModel[]>(
             $"directories/get-directories?path={Uri.EscapeDataString(path)}&includeHiddenElements={includeHiddenElements}", cancellationToken: cancellationToken);
-        await foreach (DirectoryModel? directory in response)
-        {
-            if (cancellationToken.IsCancellationRequested)
-                yield break;
-            yield return directory;
-        }
+        return Json(new { success = true, data = response });
     }
 
     /// <summary>
@@ -54,16 +49,11 @@ public class DirectoriesController : Controller
     /// <param name="includeHiddenElements">Whether to include hidden file system elements or not.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     [HttpGet("get-tree-directories")]
-    public async IAsyncEnumerable<FileSystemTreeNodeModel?> GetTreeDirectories([FromQuery] string path, [FromQuery] bool includeHiddenElements, [EnumeratorCancellation] CancellationToken cancellationToken)
+    public async Task<IActionResult> GetTreeDirectories([FromQuery] string path, [FromQuery] bool includeHiddenElements, CancellationToken cancellationToken)
     {
-        IAsyncEnumerable<FileSystemTreeNodeModel?> response = _apiHttpClient.GetAsyncEnumerable<FileSystemTreeNodeModel>(
+        IEnumerable<FileSystemTreeNodeModel> response = await _apiHttpClient.GetAsync<FileSystemTreeNodeModel[]>(
             $"directories/get-tree-directories?path={Uri.EscapeDataString(path)}&includeHiddenElements={includeHiddenElements}", cancellationToken: cancellationToken);
-        await foreach (FileSystemTreeNodeModel? directory in response)
-        {
-            if (cancellationToken.IsCancellationRequested)
-                yield break;
-            yield return directory;
-        }
+        return Json(new { success = true, data = response });
     }
 
     /// <summary>
@@ -76,6 +66,6 @@ public class DirectoriesController : Controller
     public async Task<IActionResult> GetDirectoryTree([FromQuery] string path, [FromQuery] bool includeFiles, [FromQuery] bool includeHiddenElements, CancellationToken cancellationToken)
     {
         FileSystemTreeNodeModel[] response = await _apiHttpClient.GetAsync<FileSystemTreeNodeModel[]>($"directories/get-directory-tree?path={Uri.EscapeDataString(path)}&includeFiles={includeFiles}&includeHiddenElements={includeHiddenElements}", cancellationToken: cancellationToken);
-        return Json(new { success = true, data = new { tree = response } });
+        return Json(new { success = true, data = response });
     }
 }
