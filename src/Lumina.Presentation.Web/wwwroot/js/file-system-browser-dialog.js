@@ -2,7 +2,8 @@
 //|                                  DOM Elements                                        |
 //+======================================================================================+ 
 
-const modalBackground = document.getElementById('modal-background');
+const modalBackgroundMenu = document.getElementById('modal-background-menu');
+const modalBackgroundArticle = document.getElementById('modal-background-article');
 const fileSystemBrowserDialog = document.getElementById('file-system-browser-dialog');
 const fileSystemBrowserTreeview = document.getElementById('file-system-browser-treeview');
 const pathSegmentsContainer = document.getElementById('navigator-path-segments');
@@ -179,16 +180,18 @@ async function initFileSystemBrowser(serverBasePathValue, clientBasePathValue, i
     switchViewMode(viewModeValue, viewModeValue === 'list' ? null : iconSizeValue, true);
     
     // TODO: to be removed:
-    showFileSystemBrowserDialogAsync(initialPath, true);
+    //showFileSystemBrowserDialogAsync(initialPath, true);
 }
 
 /**
  * Shows the file system browser dialog.
  */
-async function showFileSystemBrowserDialogAsync(path, showHiddenElementsValue) {
+async function showFileSystemBrowserDialogAsync(path, showHiddenElementsValue, includeFilesValue) {
     if (path !== undefined && path !== null) {
         showHiddenElements = showHiddenElementsValue;
-        modalBackground.style.display = 'block';
+        includeFiles = includeFilesValue;
+        modalBackgroundMenu.style.display = 'block';
+        modalBackgroundArticle.style.display = 'block';
         fileSystemBrowserDialog.style.display = 'block';
         if (!path.endsWith(pathSeparator))
             path += pathSeparator;
@@ -205,7 +208,8 @@ async function showFileSystemBrowserDialogAsync(path, showHiddenElementsValue) {
  * Hides the file system browser dialog.
  */
 function hideFileSystemBrowserDialog() {
-    modalBackground.style.display = 'block';
+    modalBackgroundMenu.style.display = 'block';
+    modalBackgroundArticle.style.display = 'block';
     fileSystemBrowserDialog.style.display = 'block';
 }
 
@@ -436,7 +440,7 @@ async function handlePathSegmentComboboxChangeAsync(e) {
 
         // fetch directory data for the path
         try {
-            await streamFileSystemDirectoriesAsync(pathValue, (parsedItem) => {
+            await fetchFileSystemDirectoriesAsync(pathValue, (parsedItem) => {
                 addDirectoryOption(dropdown, pathValue, parsedItem.name, async () => {
                     const newPath = pathValue + (!pathValue.endsWith(pathSeparator) ? pathSeparator : '') + parsedItem.name + pathSeparator;
                     addressBarInput.value = newPath;
@@ -678,8 +682,8 @@ async function loadFileSystemTreeViewChildNodesAsync(parentNode, path) {
     childNodes.innerHTML = '';
     try {
         showBusyIndicator();
-        // stream directory information and create nodes for each
-        await streamFileSystemDirectoriesAsync(path, (dir) => {
+        // fetch directory information and create nodes for each
+        await fetchFileSystemDirectoriesAsync(path, (dir) => {
             dir.itemType = 'Directory';
             const dirNode = createFileSystemTreeViewTreeNode(dir);
             childNodes.appendChild(dirNode);
@@ -693,86 +697,48 @@ async function loadFileSystemTreeViewChildNodesAsync(parentNode, path) {
 }
 
 /**
- * Streams directory information from the server for a given path.
+ * Fetches directory information from the server for a given path.
  * @param {string} path - The path to get directories from.
  * @param {Function} callback - Function to call for each directory received.
  */
-async function streamFileSystemDirectoriesAsync(path, callback) {
-    await streamJsonDataAsync(`${clientBasePath}directories/get-directories?path=${encodeURIComponent(path)}&includeHiddenElements=${showHiddenElements}`, callback, 'Directory');
+async function fetchFileSystemDirectoriesAsync(path, callback) {
+    await fetchJsonDataAsync(`${clientBasePath}directories/get-directories?path=${encodeURIComponent(path)}&includeHiddenElements=${showHiddenElements}`, callback, 'Directory');
 }
 
 /**
- * Streams file information from the server for a given path.
+ * Fetches file information from the server for a given path.
  * @param {string} path - The path to get files from.
  * @param {Function} callback - Function to call for each file received.
  */
-async function streamFileSystemFilesAsync(path, callback) {
-    await streamJsonDataAsync(`${clientBasePath}files/get-tree-files?path=${encodeURIComponent(path)}&includeHiddenElements=${showHiddenElements}`, callback, 'File');
+async function fetchFileSystemFilesAsync(path, callback) {
+    await fetchJsonDataAsync(`${clientBasePath}files/get-tree-files?path=${encodeURIComponent(path)}&includeHiddenElements=${showHiddenElements}`, callback, 'File');
 }
 
 /**
- * Streams JSON data from a given URL and processes it item by item.
- * This function handles potentially large datasets by processing the data as it arrives,
- * rather than waiting for the entire response to load.
+ * Fetches and processes JSON data from a given URL.
+ * This function handles the data by processing all items in the response.data array
+ * and passing them through the callback function.
  * 
  * @param {string} url - The URL to fetch JSON data from.
  * @param {Function} callback - Function to call for each processed item.
  * @param {string} itemType - Type of item being processed ('File' or 'Directory').
  */
-async function streamJsonDataAsync(url, callback, itemType) {
+async function fetchJsonDataAsync(url, callback, itemType) {
     // initiate the fetch request from the API
     const response = await fetch(url);
-    // get a reader for the response body stream
-    const reader = response.body.getReader();
-    // create a decoder to convert the incoming byte stream to text
-    const decoder = new TextDecoder();   
-    let buffer = ''; // buffer to hold incoming data that hasn't been fully processed yet
-    // function to process the buffer and extract complete JSON objects
-    function processBuffer() {
-        let startIndex = 0;
-        let endIndex;
-        // look for complete JSON objects (ending with '},')
-        while ((endIndex = buffer.indexOf('},', startIndex)) !== -1) {
-            // extract a single JSON object
-            let itemJson = buffer.substring(startIndex, endIndex + 1);
-            // remove leading comma if present (from array structure)
-            if (itemJson.startsWith(',')) itemJson = itemJson.substring(1);
-            // remove surrounding square brackets (array indicators)
-            itemJson = itemJson.replace(/^\[|\]$/g, '');
-            // parse the JSON string into an object
-            var item = JSON.parse(itemJson);
-            // manually specify he type of to the parsed object
-            item.itemType = itemType;
-            // call the provided callback function with the processed item
-            callback(item);
-            // move the start index to the beginning of the next item
-            startIndex = endIndex + 2;
-        }
-        // keep any incomplete JSON data in the buffer for the next processing cycle
-        buffer = buffer.slice(startIndex);
-    }
-    // main loop to read the stream
-    while (true) {
-        // read a chunk from the stream
-        const { done, value } = await reader.read();
-        // if the stream is finished, break the loop
-        if (done)
-            break;
-        // decode the chunk and add it to the buffer
-        buffer += decoder.decode(value, { stream: true });
-        // process the updated buffer
-        processBuffer();
-    }
-    // process any remaining data in the buffer after the stream is complete
-    if (buffer.trim()) {
-        let finalJson = buffer.trim();
-        if (finalJson.startsWith(',')) finalJson = finalJson.substring(1);
-        finalJson = finalJson.replace(/^\[|\]$/g, '');
-        if (finalJson !== '') {
-            var item = JSON.parse(finalJson);
-            item.itemType = itemType;
-            callback(item);
-        }
+    // parse the JSON response
+    const result = await response.json();
+
+    // verify the response was successful
+    if (!result.success)
+        throw new Error('Failed to fetch data from server');
+
+    // process each item in the response.data array
+    for (let item of result.data) {
+        // manually specify the type to the parsed object
+        item.itemType = itemType;
+        // call the provided callback function with the processed item
+        callback(item);
     }
 }
 
@@ -844,8 +810,8 @@ async function getFileSystemItemsAsync(path) {
 
     try {
         showBusyIndicator();
-        // stream file system items and create explorer items for each
-        await streamFileSystemItemsAsync(path, (item) => {
+        // fetch file system items and create explorer items for each
+        await fetchFileSystemItemsAsync(path, (item) => {
             const newItem = createFileSystemExplorerItem(item);
             fileSystemExplorer.appendChild(newItem);
         });
@@ -858,13 +824,14 @@ async function getFileSystemItemsAsync(path) {
 }
 
 /**
- * Streams both directories and files from a specified path.
- * @param {string} path - The file system path to stream items from.
+ * Fetches both directories and files from a specified path.
+ * @param {string} path - The file system path to fetch items from.
  * @param {Function} callback - Function to call for each item (directory or file) received.
  */
-async function streamFileSystemItemsAsync(path, callback) {
-    await streamFileSystemDirectoriesAsync(path, callback);
-    await streamFileSystemFilesAsync(path, callback);
+async function fetchFileSystemItemsAsync(path, callback) {
+    await fetchFileSystemDirectoriesAsync(path, callback);
+    if (includeFiles)
+        await fetchFileSystemFilesAsync(path, callback);
 }
 
 /**
@@ -1510,18 +1477,6 @@ async function toggleShowFileSystemElementsThumbnailsAsync(isManualSet) {
 }
 
 /**
- * Closes all comboboxes except for the one passed as an argument.
- * @param {HTMLElement} exceptionCheckbox - The checkbox of the combobox that should remain open.
- */
-function closeAllComboboxesExcept(exceptionCheckbox) {
-    const checkedCheckboxes = document.querySelectorAll('.enlightenment-toggle-checkbox:checked, .navigator-toggle-checkbox:checked');
-    checkedCheckboxes.forEach(function (checkbox) {
-        if (!exceptionCheckbox || checkbox.id !== exceptionCheckbox.id)
-            checkbox.checked = false;
-    });
-}
-
-/**
  * Gets the icon of the node, based on it type.
  * @param {any} node The node for which to get the icon.
  * @returns The icon on the node.
@@ -1616,79 +1571,6 @@ addressBar.addEventListener('click', function (e) {
         addressBarInput.style.display = 'block'; // show #addressBarInput
         addressBarInput.focus(); // focus on the input
     }
-});
-
-/**
- * Detects changes on any combobox checkbox. If a combobox is opened, this will ensure all other comboboxes are closed.
- */
-document.addEventListener('change', function (e) {
-    if (e.target.matches('.enlightenment-toggle-checkbox, .navigator-toggle-checkbox')) 
-        if (e.target.checked) 
-            closeAllComboboxesExcept(e.target);
-});
-
-/**
- * Event handler for when an option in the combobox is clicked.
- * This updates the displayed value of the combobox to the clicked option and closes the dropdown.
- */
-document.addEventListener('click', function (e) {
-    if (e.target.matches('.enlightenment-option')) {
-        var text = e.target.textContent;
-        var combobox = e.target.closest('.enlightenment-combobox');
-
-        var selectedText = combobox.querySelector('.enlightenment-selected-text');
-        if (selectedText) 
-            selectedText.textContent = text;
-
-        var toggleCheckbox = combobox.querySelector('.enlightenment-toggle-checkbox');
-        if (toggleCheckbox) 
-            toggleCheckbox.checked = false;
-    }
-});
-
-/**
- * Global click event for the entire document. Closes all combobox dropdowns if the clicked target is outside any combobox.
- */
-document.addEventListener('click', function (e) {
-    // enlightenment combobox logic
-    if (!e.target.closest('.enlightenment-combobox')) {
-        const checkbox = document.querySelector('.enlightenment-toggle-checkbox:checked');
-        if (checkbox) 
-            checkbox.checked = false;
-    }
-    // navigator combobox logic
-    if (!e.target.closest('.navigator-combobox') && addressBar) {
-        const checkbox = document.querySelector('.navigator-toggle-checkbox:checked');
-        if (checkbox) 
-            checkbox.checked = false;
-        // when drop down closes, hide address bar overflow
-        addressBar.style.overflowX = 'auto';
-        addressBar.style.overflowY = 'hidden';
-        reattachDropdown();
-    }
-});
-
-/**
- * Event handler for navigation combobox drop down item clicks.
- */
-document.addEventListener("click", function (e) {
-    if (e.target.matches('.navigator-option')) {
-        // the address bar drop downs may be destroyed when an option is clicked - they are regenerated each time anyway
-        addressBar.removeEventListener('scroll', adjustDropdownPosition);
-
-        var parentElement = e.target.parentElement;
-        if (parentElement) 
-            parentElement.remove();
-    }
-});
-
-/**
- * Prevents the global document click event from propagating when clicking on a combobox. 
- * This ensures the dropdown doesn't close unintentionally.
- */
-document.addEventListener('click', function (e) {
-    if (e.target.closest('.enlightenment-combobox, .navigator-combobox')) 
-        e.stopPropagation();
 });
 
 /**

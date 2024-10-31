@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Presentation.Web.Controllers.FileSystemManagement;
@@ -34,16 +35,11 @@ public class FilesController : Controller
     /// <param name="includeHiddenElements">Whether to include hidden file system elements or not.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     [HttpGet("get-tree-files")]
-    public async IAsyncEnumerable<FileSystemTreeNodeModel?> GetTreeFiles([FromQuery] string path, [FromQuery] bool includeHiddenElements, [EnumeratorCancellation] CancellationToken cancellationToken)
+    public async Task<IActionResult> GetTreeFiles([FromQuery] string path, [FromQuery] bool includeHiddenElements, CancellationToken cancellationToken)
     {
-        IAsyncEnumerable<FileSystemTreeNodeModel?> response = _apiHttpClient.GetAsyncEnumerable<FileSystemTreeNodeModel>(
+        IEnumerable<FileSystemTreeNodeModel> response = await _apiHttpClient.GetAsync<FileSystemTreeNodeModel[]>(
             $"files/get-tree-files?path={Uri.EscapeDataString(path)}&includeHiddenElements={includeHiddenElements}", cancellationToken: cancellationToken);
-        await foreach (FileSystemTreeNodeModel? file in response)
-        {
-            if (cancellationToken.IsCancellationRequested)
-                yield break;
-            yield return file;
-        }
+        return Json(new { success = true, data = response });
     }
 
     /// <summary>
@@ -53,15 +49,10 @@ public class FilesController : Controller
     /// <param name="includeHiddenElements">Whether to include hidden file system elements or not.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     [HttpGet("get-files")]
-    public async IAsyncEnumerable<FileModel?> GetFiles([FromQuery] string path, [FromQuery] bool includeHiddenElements, [EnumeratorCancellation] CancellationToken cancellationToken)
+    public async Task<IActionResult> GetFiles([FromQuery] string path, [FromQuery] bool includeHiddenElements, CancellationToken cancellationToken)
     {
-        IAsyncEnumerable<FileModel?> response = _apiHttpClient.GetAsyncEnumerable<FileModel>(
+        IEnumerable<FileModel> response = await _apiHttpClient.GetAsync<FileModel[]>(
            $"files/get-files?path={Uri.EscapeDataString(path)}&includeHiddenElements={includeHiddenElements}", cancellationToken: cancellationToken);
-        await foreach (FileModel? file in response)
-        {
-            if (cancellationToken.IsCancellationRequested)
-                yield break;
-            yield return file;
-        }
+        return Json(new { success = true, data = response });
     }
 }
