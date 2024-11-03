@@ -95,6 +95,7 @@
 - ComicSeries
 - Magazine
 - MagazineIssue
+- Newspaper
 - Manga
 - GraphicNovel
 - AcademicPaper
@@ -117,7 +118,7 @@
 - VideoLibrary (root: VideoLibrary, entities: TVShow, Season, Episode, Movie, FilmSeries, ConcertVideo, Documentary, TutorialVideo, HomeVideo, Anime, YouTubeVideo, MusicVideo)
 - AudioLibrary (root: AudioLibrary, entities: Song, Album, Artist, Audiobook, LiveRecording, Interview, CoverSong, Remix, SoundEffect)
 - PodcastLibrary (root: PodcastLibrary, entities: Podcast, PodcastEpisode)
-- WrittenContentLibrary (root: WrittenContentLibrary, entities: Book, EBook, BookSeries, ComicBook, ComicSeries, Magazine, MagazineIssue, Manga, GraphicNovel, AcademicPaper, SheetMusic, Screenplay)
+- WrittenContentLibrary (root: WrittenContentLibrary, entities: Book, EBook, BookSeries, ComicBook, ComicSeries, Magazine, MagazineIssue, Newspaper, Manga, GraphicNovel, AcademicPaper, SheetMusic, Screenplay)
 - PhotoLibrary (root: PhotoLibrary, entities: Photo, PhotoAlbum, AlbumArtwork, MoviePoster)
 - UserProfile (root: User, entities: Playlist, Collection)
 - SupplementaryContentLibrary (root: SupplementaryContentLibrary, entities: SubtitleFile, Lyrics, LanguageTrack)
@@ -133,7 +134,7 @@
     - Value Objects: ComicMetadata, SeriesInfo
   
   - PeriodicalLibrary (root: PeriodicalLibrary)
-    - Entities: Magazine, MagazineIssue
+    - Entities: Magazine, MagazineIssue, Newspaper
     - Value Objects: PeriodicalMetadata, IssueInfo
   
   - AcademicLibrary (root: AcademicLibrary)

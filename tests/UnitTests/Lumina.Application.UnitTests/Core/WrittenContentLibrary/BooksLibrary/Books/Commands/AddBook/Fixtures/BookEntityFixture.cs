@@ -3,7 +3,7 @@ using AutoFixture;
 using Bogus;
 using Lumina.Application.UnitTests.Common.Setup;
 using Lumina.Contracts.Entities.Common;
-using Lumina.Contracts.Entities.WrittenContentLibrary.BookLibrary;
+using Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.Enums.BookLibrary;
 using System;
 using System.Collections.Generic;
@@ -124,7 +124,7 @@ public class BookEntityFixture
             Genres = new HashSet<GenreEntity>(genre.Generate(_faker.Random.Number(1, 5))),
             Publisher = _faker.Random.Bool() ? _faker.Random.String2(_faker.Random.Number(1, 100)) : null,
             PageCount = _random.Next(100, 1000),
-            Format = _faker.PickRandom(new[] { "Hardcover", "Paperback", "eBook", "Audiobook" }),
+            Format = _faker.PickRandom<BookFormat>(),
             Edition = _faker.Random.Bool() ? _faker.Random.String2(_faker.Random.Number(1, 50)) : null,
             VolumeNumber = _faker.Random.Bool() ? _random.Next(1, 20) : null,
             ASIN = _faker.Random.String2(10),

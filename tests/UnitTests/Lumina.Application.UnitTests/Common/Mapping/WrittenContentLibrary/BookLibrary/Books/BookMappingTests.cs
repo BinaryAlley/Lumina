@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using FluentAssertions;
 using Lumina.Application.Common.Mapping.Common.Metadata;
-using Lumina.Application.Common.Mapping.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Application.Common.Mapping.WrittenContentLibrary.BookLibrary.Common;
+using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
 using Lumina.Application.UnitTests.Core.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook.Fixtures;
-using Lumina.Contracts.Entities.WrittenContentLibrary.BookLibrary;
-using Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate;
+using Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -58,7 +58,7 @@ public class BookMappingTests
         result.Genres.Should().BeEquivalentTo(book.Metadata.Genres.ToRepositoryEntities());
         result.Publisher.Should().Be(book.Metadata.Publisher.HasValue ? book.Metadata.Publisher.Value : null);
         result.PageCount.Should().Be(book.Metadata.PageCount.HasValue ? book.Metadata.PageCount.Value : null);
-        result.Format.Should().Be(book.Format.ToString());
+        result.Format.Should().Be(book.Format.HasValue ? book.Format.Value : null);
         result.Edition.Should().Be(book.Edition.HasValue ? book.Edition.Value : null);
         result.VolumeNumber.Should().Be(book.VolumeNumber.HasValue ? book.VolumeNumber.Value : null);
         result.ASIN.Should().Be(book.ASIN.HasValue ? book.ASIN.Value : null);

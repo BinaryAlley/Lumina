@@ -1,7 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.Entities.Common;
+using Lumina.Contracts.Entities.MediaLibrary.Management;
+using Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.Entities.UsersManagement;
-using Lumina.Contracts.Entities.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.Common.Events;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -21,6 +22,7 @@ public class LuminaDbContext : DbContext
 {
     public virtual DbSet<BookEntity> Books { get; set; } = null!;
     public virtual DbSet<UserEntity> Users { get; set; } = null!;
+    public virtual DbSet<LibraryEntity> Libraries { get; set; } = null!;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LuminaDbContext"/> class.
@@ -43,6 +45,8 @@ public class LuminaDbContext : DbContext
         base.OnModelCreating(modelBuilder);
     }
 
+    // TODO: implement async versions of SaveChanges
+
     /// <summary>
     /// Overrides the SaveChanges method of the DbContext class to automatically set the Created and Updated properties of entities that implement the <see cref="IStorageEntity"/>.
     /// </summary>
@@ -51,8 +55,8 @@ public class LuminaDbContext : DbContext
     {
         // get all the entity entries that are either added or modified
         IEnumerable<EntityEntry> entries = ChangeTracker.Entries()
-                                                        .Where(e => e.Entity is IStorageEntity &&
-                                                                   (e.State is EntityState.Added or EntityState.Modified));
+                                                        .Where(entity => entity.Entity is IStorageEntity &&
+                                                                        (entity.State is EntityState.Added or EntityState.Modified));
         foreach (EntityEntry? entityEntry in entries)
         {
             // if the entity is in Added state, set the Created property to the current date and time

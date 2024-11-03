@@ -7,6 +7,8 @@ const modalBackgroundArticle = document.getElementById('modal-background-article
 const fileSystemBrowserDialog = document.getElementById('file-system-browser-dialog');
 const fileSystemBrowserTreeview = document.getElementById('file-system-browser-treeview');
 const pathSegmentsContainer = document.getElementById('navigator-path-segments');
+const article = document.querySelector('article');
+const menubar = document.getElementsByClassName('menubar')[0];
 
 const fileSystemTreeViewContainer = document.getElementById('file-system-browser-file-system-treeview-container');
 const fileSystemExplorerContainer = document.getElementById('file-system-browser-file-system-explorer-container');
@@ -47,6 +49,7 @@ const btnExtraLargeIconsView = document.getElementById('navigator-extra-large-ic
 const btnFileSystemBrowserEditPath = document.getElementById('navigator-edit-path-button');
 const btnFileSystemBrowserSubmitPath = document.getElementById('navigator-navigate-button');
 const btnFileSystemBrowserConfirm = document.getElementById('file-system-browser-confirm-button');
+const btnFileSystemBrowserCancel = document.getElementById('file-system-browser-cancel-button');
 
 const selectedFileSystemElementsInput = document.getElementById('file-system-browser-selected-element');
 
@@ -178,15 +181,12 @@ async function initFileSystemBrowser(serverBasePathValue, clientBasePathValue, i
     addHorizontalScrolling(addressBar);
     //switchViewMode('list', null, true);
     switchViewMode(viewModeValue, viewModeValue === 'list' ? null : iconSizeValue, true);
-    
-    // TODO: to be removed:
-    //showFileSystemBrowserDialogAsync(initialPath, true);
 }
 
 /**
  * Shows the file system browser dialog.
  */
-async function showFileSystemBrowserDialogAsync(path, showHiddenElementsValue, includeFilesValue) {
+async function showFileSystemBrowserDialogAsync(path, showHiddenElementsValue, includeFilesValue, onConfirmCallback) {
     if (path !== undefined && path !== null) {
         showHiddenElements = showHiddenElementsValue;
         includeFiles = includeFilesValue;
@@ -200,6 +200,15 @@ async function showFileSystemBrowserDialogAsync(path, showHiddenElementsValue, i
         await toggleFileSystemTreeViewAsync(false);
         await toggleShowFileSystemElementsThumbnailsAsync(false);
         await navigateToPathAsync(path, false, false);
+        // add click handler for confirm button
+        btnFileSystemBrowserConfirm.onclick = function () {
+            const selectedPaths = selectedFileSystemElementsInput.value;
+            if (onConfirmCallback && typeof onConfirmCallback === 'function') 
+                onConfirmCallback(selectedPaths);
+            // hide dialog
+            hideFileSystemBrowserDialog();
+        };
+        btnFileSystemBrowserCancel.onclick = hideFileSystemBrowserDialog;
     } else
         notificationService.Show("Path cannot be null!", NotificationType.ERROR); // TODO: should ask error message from server when translation is implemented
 }
@@ -208,9 +217,9 @@ async function showFileSystemBrowserDialogAsync(path, showHiddenElementsValue, i
  * Hides the file system browser dialog.
  */
 function hideFileSystemBrowserDialog() {
-    modalBackgroundMenu.style.display = 'block';
-    modalBackgroundArticle.style.display = 'block';
-    fileSystemBrowserDialog.style.display = 'block';
+    modalBackgroundMenu.style.display = 'none';
+    modalBackgroundArticle.style.display = 'none';
+    fileSystemBrowserDialog.style.display = 'none';
 }
 
 /**
@@ -724,21 +733,15 @@ async function fetchFileSystemFilesAsync(path, callback) {
  * @param {string} itemType - Type of item being processed ('File' or 'Directory').
  */
 async function fetchJsonDataAsync(url, callback, itemType) {
-    // initiate the fetch request from the API
-    const response = await fetch(url);
-    // parse the JSON response
-    const result = await response.json();
-
-    // verify the response was successful
-    if (!result.success)
-        throw new Error('Failed to fetch data from server');
-
-    // process each item in the response.data array
-    for (let item of result.data) {
-        // manually specify the type to the parsed object
-        item.itemType = itemType;
-        // call the provided callback function with the processed item
-        callback(item);
+    const response = await callApiGetAsync(url);
+    if (response !== undefined) {       
+        // process each item in the response.data array
+        for (let item of response) {
+            // manually specify the type to the parsed object
+            item.itemType = itemType;
+            // call the provided callback function with the processed item
+            callback(item);
+        }
     }
 }
 
@@ -1079,16 +1082,16 @@ function startSelection(e) {
     document.body.style.overflowY = 'hidden'; // needed in order to not put a vertical scrollbar on the document, while in vertical layout selection
     document.documentElement.style.overflowY = 'hidden';
     selectionStartPosition.x = e.pageX + fileSystemExplorer.scrollLeft;
-    selectionStartPosition.y = e.pageY + fileSystemExplorerContainer.scrollTop; // not a mistake - in vertical mode, this is the overflow container!
+    selectionStartPosition.y = (e.pageY - parseInt(window.getComputedStyle(menubar).height)) + fileSystemExplorerContainer.scrollTop; // not a mistake - in vertical mode, this is the overflow container!
     // place the selection rectangle at the clicked location (relative to the whole page, and taking into account scroll offset), with 0 size
     visibleSelectionRectangle.style.left = e.pageX + 'px';
-    visibleSelectionRectangle.style.top = e.pageY + 'px';
+    visibleSelectionRectangle.style.top = (e.pageY - parseInt(window.getComputedStyle(menubar).height)) + 'px';
     visibleSelectionRectangle.style.width = '0px';
     visibleSelectionRectangle.style.height = '0px';
     visibleSelectionRectangle.style.visibility = 'visible';
 
     selectionRectangle.style.left = e.pageX + 'px';
-    selectionRectangle.style.top = e.pageY + 'px';
+    selectionRectangle.style.top = (e.pageY - parseInt(window.getComputedStyle(menubar).height)) + 'px';
     selectionRectangle.style.width = '0px';
     selectionRectangle.style.height = '0px';
 }
@@ -1101,7 +1104,7 @@ function updateSelection(e) {
     if (!isSelecting)
         return;
     currentMousePosition.x = e.pageX;
-    currentMousePosition.y = e.pageY;
+    currentMousePosition.y = e.pageY - parseInt(window.getComputedStyle(menubar).height);
     handleSelection();
 }
 
@@ -1192,10 +1195,10 @@ function handleSelection() {
     if (right > containerRect.right)
         visibleSelectionRectangle.style.width = (containerRect.right - left) + 'px';
 
-    if (top < containerRect.top) {
-        const difference = containerRect.top - top;
+    if (top < containerRect.top - parseInt(window.getComputedStyle(menubar).height)) {
+        const difference = containerRect.top - top - parseInt(window.getComputedStyle(menubar).height);
         visibleSelectionRectangle.style.height = (parseFloat(visibleSelectionRectangle.style.height) - difference) + 'px';
-        visibleSelectionRectangle.style.top = containerRect.top + 'px';
+        visibleSelectionRectangle.style.top = (containerRect.top - parseInt(window.getComputedStyle(menubar).height)) + 'px';
     }
     if (bottom > containerRect.bottom)
         visibleSelectionRectangle.style.height = (containerRect.bottom - top) + 'px';

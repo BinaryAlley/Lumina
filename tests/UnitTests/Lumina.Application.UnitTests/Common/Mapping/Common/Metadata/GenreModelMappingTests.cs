@@ -12,7 +12,7 @@ using System.Linq;
 namespace Lumina.Application.UnitTests.Common.Mapping.Common.Metadata;
 
 /// <summary>
-/// Contains unit tests for the <see cref="GenreModelMapping"/> class.
+/// Contains unit tests for the <see cref="GenreEntityMapping"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GenreModelMappingTests
@@ -24,7 +24,7 @@ public class GenreModelMappingTests
         GenreEntity genreEntity = new("Rock");
 
         // Act
-        ErrorOr<Genre> result = genreEntity.ToDomainModel();
+        ErrorOr<Genre> result = genreEntity.ToDomainEntity();
 
         // Assert
         result.IsError.Should().BeFalse();
@@ -43,7 +43,7 @@ public class GenreModelMappingTests
         GenreEntity genreEntity = new(name);
 
         // Act
-        ErrorOr<Genre> result = genreEntity.ToDomainModel();
+        ErrorOr<Genre> result = genreEntity.ToDomainEntity();
 
         // Assert
         result.IsError.Should().BeFalse();
@@ -61,7 +61,7 @@ public class GenreModelMappingTests
         GenreEntity genreEntity = new(invalidName);
 
         // Act
-        ErrorOr<Genre> result = genreEntity.ToDomainModel();
+        ErrorOr<Genre> result = genreEntity.ToDomainEntity();
 
         // Assert
         result.IsError.Should().BeTrue();
@@ -80,7 +80,7 @@ public class GenreModelMappingTests
         ];
 
         // Act
-        IEnumerable<ErrorOr<Genre>> results = genreEntities.ToDomainModels();
+        IEnumerable<ErrorOr<Genre>> results = genreEntities.ToDomainEntities();
 
         // Assert
         results.Should().NotBeNull();
@@ -107,7 +107,7 @@ public class GenreModelMappingTests
         ];
 
         // Act
-        IEnumerable<ErrorOr<Genre>> results = genreEntities.ToDomainModels();
+        IEnumerable<ErrorOr<Genre>> results = genreEntities.ToDomainEntities();
 
         // Assert
         results.Should().NotBeNull();

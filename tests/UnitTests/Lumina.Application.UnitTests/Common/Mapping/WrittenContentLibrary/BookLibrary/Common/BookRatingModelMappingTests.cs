@@ -2,11 +2,10 @@
 using ErrorOr;
 using FluentAssertions;
 using Lumina.Application.Common.Mapping.Common.Metadata;
-using Lumina.Application.Common.Mapping.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Application.Common.Mapping.WrittenContentLibrary.BookLibrary.Common;
+using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
 using Lumina.Application.UnitTests.Core.WrittenContentLibrary.BooksLibrary.Common.Fixtures;
-using Lumina.Contracts.Entities.WrittenContentLibrary.BookLibrary;
-using Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate.ValueObjects;
+using Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -15,7 +14,7 @@ using System.Linq;
 namespace Lumina.Application.UnitTests.Common.Mapping.WrittenContentLibrary.BookLibrary.Common;
 
 /// <summary>
-/// Contains unit tests for the <see cref="BookRatingModelMapping"/> class.
+/// Contains unit tests for the <see cref="BookRatingEntityMapping"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class BookRatingModelMappingTests
@@ -37,7 +36,7 @@ public class BookRatingModelMappingTests
         BookRatingEntity entity = _bookRatingEntityFixture.CreateComplete();
 
         // Act
-        ErrorOr<BookRating> result = entity.ToDomainModel();
+        ErrorOr<BookRating> result = entity.ToDomainEntity();
 
         // Assert
         result.IsError.Should().BeFalse();
@@ -69,7 +68,7 @@ public class BookRatingModelMappingTests
         BookRatingEntity entity = _bookRatingEntityFixture.CreateMinimal();
 
         // Act
-        ErrorOr<BookRating> result = entity.ToDomainModel();
+        ErrorOr<BookRating> result = entity.ToDomainEntity();
 
         // Assert
         result.IsError.Should().BeFalse();
@@ -87,7 +86,7 @@ public class BookRatingModelMappingTests
         BookRatingEntity entity = _bookRatingEntityFixture.CreateInvalid();
 
         // Act
-        ErrorOr<BookRating> result = entity.ToDomainModel();
+        ErrorOr<BookRating> result = entity.ToDomainEntity();
 
         // Assert
         result.IsError.Should().BeTrue();
@@ -104,7 +103,7 @@ public class BookRatingModelMappingTests
         ];
 
         // Act
-        IEnumerable<ErrorOr<BookRating>> results = entities.ToDomainModels();
+        IEnumerable<ErrorOr<BookRating>> results = entities.ToDomainEntities();
 
         // Assert
         results.Should().NotBeNull();
@@ -138,7 +137,7 @@ public class BookRatingModelMappingTests
         ];
 
         // Act
-        IEnumerable<ErrorOr<BookRating>> results = entities.ToDomainModels();
+        IEnumerable<ErrorOr<BookRating>> results = entities.ToDomainEntities();
 
         // Assert
         results.Should().NotBeNull();

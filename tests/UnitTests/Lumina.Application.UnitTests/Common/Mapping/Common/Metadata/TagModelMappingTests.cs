@@ -12,7 +12,7 @@ using System.Linq;
 namespace Lumina.Application.UnitTests.Common.Mapping.Common.Metadata;
 
 /// <summary>
-/// Contains unit tests for the <see cref="TagModelMapping"/> class.
+/// Contains unit tests for the <see cref="TagEntityMapping"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class TagModelMappingTests
@@ -24,7 +24,7 @@ public class TagModelMappingTests
         TagEntity tagEntity = new("indie");
 
         // Act
-        ErrorOr<Tag> result = tagEntity.ToDomainModel();
+        ErrorOr<Tag> result = tagEntity.ToDomainEntity();
 
         // Assert
         result.IsError.Should().BeFalse();
@@ -44,7 +44,7 @@ public class TagModelMappingTests
         TagEntity tagEntity = new(name);
 
         // Act
-        ErrorOr<Tag> result = tagEntity.ToDomainModel();
+        ErrorOr<Tag> result = tagEntity.ToDomainEntity();
 
         // Assert
         result.IsError.Should().BeFalse();
@@ -62,7 +62,7 @@ public class TagModelMappingTests
         TagEntity tagEntity = new(invalidName);
 
         // Act
-        ErrorOr<Tag> result = tagEntity.ToDomainModel();
+        ErrorOr<Tag> result = tagEntity.ToDomainEntity();
 
         // Assert
         result.IsError.Should().BeTrue();
@@ -81,7 +81,7 @@ public class TagModelMappingTests
         ];
 
         // Act
-        IEnumerable<ErrorOr<Tag>> results = tagEntities.ToDomainModels();
+        IEnumerable<ErrorOr<Tag>> results = tagEntities.ToDomainEntities();
 
         // Assert
         results.Should().NotBeNull();
@@ -108,7 +108,7 @@ public class TagModelMappingTests
         ];
 
         // Act
-        IEnumerable<ErrorOr<Tag>> results = tagEntities.ToDomainModels();
+        IEnumerable<ErrorOr<Tag>> results = tagEntities.ToDomainEntities();
 
         // Assert
         results.Should().NotBeNull();

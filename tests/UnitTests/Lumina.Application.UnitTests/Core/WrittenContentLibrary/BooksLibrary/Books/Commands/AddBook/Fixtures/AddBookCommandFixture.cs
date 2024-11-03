@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using Bogus;
-using Lumina.Application.Core.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook;
+using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook;
 using Lumina.Application.UnitTests.Common.Setup;
 using Lumina.Contracts.Entities.Common;
 using Lumina.Contracts.Entities.MediaContributors;
-using Lumina.Contracts.Entities.WrittenContentLibrary;
-using Lumina.Contracts.Entities.WrittenContentLibrary.BookLibrary;
+using Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary;
+using Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.Enums.BookLibrary;
 using System;
 using System.Collections.Generic;

@@ -47,10 +47,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "api", "api", "{B045C2EC-3AC
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "domain", "domain", "{4F8D14A3-A465-4EC2-B175-A188B113AB99}"
 	ProjectSection(SolutionItems) = preProject
-		..\docs\technical\domain\Aggregates.VideoLibrary.md = ..\docs\technical\domain\Aggregates.VideoLibrary.md
 		..\docs\technical\domain\Aggregates.FileSystemManagement.md = ..\docs\technical\domain\Aggregates.FileSystemManagement.md
+		..\docs\technical\domain\Aggregates.VideoLibrary.md = ..\docs\technical\domain\Aggregates.VideoLibrary.md
 		..\docs\technical\domain\Aggregates.WrittenContentLibrary.md = ..\docs\technical\domain\Aggregates.WrittenContentLibrary.md
 		..\docs\technical\domain\Common.Metadata.md = ..\docs\technical\domain\Common.Metadata.md
+		..\docs\technical\domain\Domain.md = ..\docs\technical\domain\Domain.md
 		..\docs\technical\domain\UbiquitousLanguage.md = ..\docs\technical\domain\UbiquitousLanguage.md
 	EndProjectSection
 EndProject

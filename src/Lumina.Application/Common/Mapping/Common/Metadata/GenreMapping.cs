@@ -13,24 +13,24 @@ namespace Lumina.Application.Common.Mapping.Common.Metadata;
 public static class GenreMapping
 {
     /// <summary>
-    /// Converts <paramref name="domainModel"/> to <see cref="GenreEntity"/>.
+    /// Converts <paramref name="domainEntity"/> to <see cref="GenreEntity"/>.
     /// </summary>
-    /// <param name="domainModel">The domain model to be converted.</param>
+    /// <param name="domainEntity">The domain entity to be converted.</param>
     /// <returns>The converted repository entity.</returns>
-    public static GenreEntity ToRepositoryEntity(this Genre domainModel)
+    public static GenreEntity ToRepositoryEntity(this Genre domainEntity)
     {
         return new GenreEntity(
-            domainModel.Name
+            domainEntity.Name
         );
     }
 
     /// <summary>
-    /// Converts <paramref name="domainModels"/> to a collection of <see cref="GenreEntity"/>.
+    /// Converts <paramref name="domainEntities"/> to a collection of <see cref="GenreEntity"/>.
     /// </summary>
-    /// <param name="domainModels">The domain models to be converted.</param>
+    /// <param name="domainEntities">The domain entities to be converted.</param>
     /// <returns>The converted repository entities.</returns>
-    public static IEnumerable<GenreEntity> ToRepositoryEntities(this IEnumerable<Genre> domainModels)
+    public static IEnumerable<GenreEntity> ToRepositoryEntities(this IEnumerable<Genre> domainEntities)
     {
-        return domainModels.Select(domainModel => domainModel.ToRepositoryEntity());
+        return domainEntities.Select(domainEntity => domainEntity.ToRepositoryEntity());
     }
 }

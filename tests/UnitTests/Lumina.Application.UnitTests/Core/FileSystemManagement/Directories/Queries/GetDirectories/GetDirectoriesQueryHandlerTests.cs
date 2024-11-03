@@ -7,8 +7,8 @@ using Lumina.Application.Core.FileSystemManagement.Directories.Queries.GetDirect
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Directories.Fixtures;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Directories.Queries.GetDirectories.Fixtures;
 using Lumina.Contracts.Responses.FileSystemManagement.Directories;
-using Lumina.Domain.Core.Aggregates.FileSystemManagement.FileSystemManagementAggregate.Entities;
-using Lumina.Domain.Core.Aggregates.FileSystemManagement.FileSystemManagementAggregate.Services;
+using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using NSubstitute;
 using System;
 using System.Collections.Generic;

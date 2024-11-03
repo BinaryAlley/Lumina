@@ -2,12 +2,11 @@
 using ErrorOr;
 using FluentAssertions;
 using Lumina.Application.Common.Mapping.Common.Metadata;
-using Lumina.Application.Common.Mapping.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Application.Common.Mapping.WrittenContentLibrary.BookLibrary.Common;
+using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
 using Lumina.Application.UnitTests.Core.WrittenContentLibrary.BooksLibrary.Common.Fixtures;
-using Lumina.Contracts.Entities.WrittenContentLibrary.BookLibrary;
+using Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.Enums.BookLibrary;
-using Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate.ValueObjects;
+using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -16,7 +15,7 @@ using System.Linq;
 namespace Lumina.Application.UnitTests.Common.Mapping.WrittenContentLibrary.BookLibrary.Common;
 
 /// <summary>
-/// Contains unit tests for the <see cref="IsbnModelMapping"/> class.
+/// Contains unit tests for the <see cref="IsbnEntityMapping"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class IsbnModelMappingTests
@@ -38,7 +37,7 @@ public class IsbnModelMappingTests
         IsbnEntity entity = _isbnEntityFixture.CreateIsbn10();
 
         // Act
-        ErrorOr<Isbn> result = entity.ToDomainModel();
+        ErrorOr<Isbn> result = entity.ToDomainEntity();
 
         // Assert
         result.IsError.Should().BeFalse();
@@ -54,7 +53,7 @@ public class IsbnModelMappingTests
         IsbnEntity entity = _isbnEntityFixture.CreateIsbn13();
 
         // Act
-        ErrorOr<Isbn> result = entity.ToDomainModel();
+        ErrorOr<Isbn> result = entity.ToDomainEntity();
 
         // Assert
         result.IsError.Should().BeFalse();
@@ -70,7 +69,7 @@ public class IsbnModelMappingTests
         IsbnEntity entity = _isbnEntityFixture.CreateWithoutFormat();
 
         // Act
-        ErrorOr<Isbn> result = entity.ToDomainModel();
+        ErrorOr<Isbn> result = entity.ToDomainEntity();
 
         // Assert
         result.IsError.Should().BeFalse();
@@ -86,7 +85,7 @@ public class IsbnModelMappingTests
         IsbnEntity entity = _isbnEntityFixture.CreateInvalid();
 
         // Act
-        ErrorOr<Isbn> result = entity.ToDomainModel();
+        ErrorOr<Isbn> result = entity.ToDomainEntity();
 
         // Assert
         result.IsError.Should().BeTrue();
@@ -104,7 +103,7 @@ public class IsbnModelMappingTests
         ];
 
         // Act
-        IEnumerable<ErrorOr<Isbn>> results = entities.ToDomainModels();
+        IEnumerable<ErrorOr<Isbn>> results = entities.ToDomainEntities();
 
         // Assert
         results.Should().NotBeNull();
@@ -135,7 +134,7 @@ public class IsbnModelMappingTests
         ];
 
         // Act
-        IEnumerable<ErrorOr<Isbn>> results = entities.ToDomainModels();
+        IEnumerable<ErrorOr<Isbn>> results = entities.ToDomainEntities();
 
         // Assert
         results.Should().NotBeNull();

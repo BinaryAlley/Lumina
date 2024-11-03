@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
 using Lumina.Contracts.Responses.FileSystemManagement.Files;
-using Lumina.Domain.Core.Aggregates.FileSystemManagement.FileSystemManagementAggregate.Entities;
+using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using System.Collections.Generic;
 using System.Linq;
 #endregion
@@ -14,55 +14,55 @@ namespace Lumina.Application.Common.Mapping.FileSystemManagement.Files;
 public static class FileMapping
 {
     /// <summary>
-    /// Converts <paramref name="domainModel"/> to <see cref="FileSystemTreeNodeResponse"/>.
+    /// Converts <paramref name="domainEntity"/> to <see cref="FileSystemTreeNodeResponse"/>.
     /// </summary>
-    /// <param name="domainModel">The domain model to be converted.</param>
+    /// <param name="domainEntity">The domain entity to be converted.</param>
     /// <returns>The converted response.</returns>
-    public static FileSystemTreeNodeResponse ToFileSystemTreeNodeResponse(this File domainModel)
+    public static FileSystemTreeNodeResponse ToFileSystemTreeNodeResponse(this File domainEntity)
     {
         return new FileSystemTreeNodeResponse()
         {
-            Name = domainModel.Name,
-            Path = domainModel.Id.Path,
-            ItemType = domainModel.Type,
+            Name = domainEntity.Name,
+            Path = domainEntity.Id.Path,
+            ItemType = domainEntity.Type,
             IsExpanded = false,
             ChildrenLoaded = false
         };
     }
 
     /// <summary>
-    /// Converts <paramref name="domainModels"/> to a collection of <see cref="FileSystemTreeNodeResponse"/>.
+    /// Converts <paramref name="domainEntities"/> to a collection of <see cref="FileSystemTreeNodeResponse"/>.
     /// </summary>
-    /// <param name="domainModels">The domain models to be converted.</param>
+    /// <param name="domainEntities">The domain entities to be converted.</param>
     /// <returns>The converted responses.</returns>
-    public static IEnumerable<FileSystemTreeNodeResponse> ToFileSystemTreeNodeResponses(this IEnumerable<File> domainModels)
+    public static IEnumerable<FileSystemTreeNodeResponse> ToFileSystemTreeNodeResponses(this IEnumerable<File> domainEntities)
     {
-        return domainModels.Select(domainModel => domainModel.ToFileSystemTreeNodeResponse());
+        return domainEntities.Select(domainEntity => domainEntity.ToFileSystemTreeNodeResponse());
     }
 
     /// <summary>
-    /// Converts <paramref name="domainModel"/> to <see cref="FileResponse"/>.
+    /// Converts <paramref name="domainEntity"/> to <see cref="FileResponse"/>.
     /// </summary>
-    /// <param name="domainModel">The domain model to be converted.</param>
+    /// <param name="domainEntity">The domain entity to be converted.</param>
     /// <returns>The converted response.</returns>
-    public static FileResponse ToResponse(this File domainModel)
+    public static FileResponse ToResponse(this File domainEntity)
     {
         return new FileResponse(
-            domainModel.Id.Path,
-            domainModel.Name,
-            domainModel.DateCreated.HasValue ? domainModel.DateCreated.Value : default,
-            domainModel.DateModified.HasValue ? domainModel.DateModified.Value : default,
-            domainModel.Size
+            domainEntity.Id.Path,
+            domainEntity.Name,
+            domainEntity.DateCreated.HasValue ? domainEntity.DateCreated.Value : default,
+            domainEntity.DateModified.HasValue ? domainEntity.DateModified.Value : default,
+            domainEntity.Size
         );
     }
 
     /// <summary>
-    /// Converts <paramref name="domainModels"/> to a collection of <see cref="FileResponse"/>.
+    /// Converts <paramref name="domainEntities"/> to a collection of <see cref="FileResponse"/>.
     /// </summary>
-    /// <param name="domainModels">The domain models to be converted.</param>
+    /// <param name="domainEntities">The domain entities to be converted.</param>
     /// <returns>The converted responses.</returns>
-    public static IEnumerable<FileResponse> ToResponses(this IEnumerable<File> domainModels)
+    public static IEnumerable<FileResponse> ToResponses(this IEnumerable<File> domainEntities)
     {
-        return domainModels.Select(domainModel => domainModel.ToResponse());
+        return domainEntities.Select(domainEntity => domainEntity.ToResponse());
     }
 }

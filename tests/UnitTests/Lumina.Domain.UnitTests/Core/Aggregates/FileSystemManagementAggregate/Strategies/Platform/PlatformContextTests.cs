@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using FluentAssertions;
 using Lumina.Contracts.Enums.FileSystem;
-using Lumina.Domain.Core.Aggregates.FileSystemManagement.FileSystemManagementAggregate.Strategies.Path;
-using Lumina.Domain.Core.Aggregates.FileSystemManagement.FileSystemManagementAggregate.Strategies.Platform;
+using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Path;
+using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Platform;
 using NSubstitute;
 using System.Diagnostics.CodeAnalysis;
 #endregion

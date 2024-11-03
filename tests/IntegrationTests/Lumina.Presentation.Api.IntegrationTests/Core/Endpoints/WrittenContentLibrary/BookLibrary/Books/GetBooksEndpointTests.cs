@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using FluentAssertions;
-using Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate;
+using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using System;

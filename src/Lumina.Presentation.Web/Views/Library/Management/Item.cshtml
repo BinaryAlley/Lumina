@@ -1,0 +1,130 @@
+@*
+/library/manage/item/{id:guid}
+*@
+
+@using Lumina.Presentation.Web.Common.Models.Libraries
+
+@{
+    var id = Context.Request.RouteValues["id"] as string;
+}
+
+@model LibraryModel
+
+@await Component.InvokeAsync("FileSystemBrowser")
+
+<div class="enlightenment-panel shadow-effect p-2 mx-auto panel w-50 mb-10" style="min-width: 320px; margin-top: 1rem;">
+    <div class="shine-effect"></div>
+    <form asp-controller="LibraryManagement" asp-action="EditLibrary" method="post" id="add-media-library-form">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" value="@id" />
+        <div class="form-row">
+            <h1 class="text-light-two w-100 text-center pt-0 pb-0 engraved-title">@(id is not null ? "Edit" : "Add New") Library</h1>
+        </div>
+        <div class="form-container">
+            <h3 class="text-light-two">General Information</h3>
+            <!-- Title -->
+            <div class="form-row">
+                <div class="form-label">
+                    <label asp-for="Title">Title</label>
+                    <span class="mandatory-field">*</span>:
+                </div>
+                <div class="form-field">
+                    <input asp-for="Title" class="enlightenment-input" />
+                </div>
+                <small class="form-label text-disabled form-description">DescriptionTitle</small>
+            </div>
+            <!-- Library Type -->
+            <div class="form-row">
+                <div class="form-label">
+                    <label asp-for="LibraryType">Library Type</label>
+                    <span class="mandatory-field">*</span>:
+                </div>
+                <div class="form-field">
+                    <div class="enlightenment-combobox inline-block w-100">
+                        <div class="shine-effect" style="top: 1px;"></div>
+                        <input type="checkbox" class="enlightenment-toggle-checkbox" id="library-type" />
+                        <label class="enlightenment-toggle" for="library-type">
+                            <span class="enlightenment-selected-text">@Model.LibraryType</span>
+                        </label>
+                        <div class="enlightenment-dropdown">
+                            <div class="shine-effect" style="top: -4px;"></div>
+                            <!-- Dropdown options remain the same -->
+                            <div class="enlightenment-option first-option disabled">Book</div>
+                            <div class="enlightenment-option" data-value="Book">Book</div>
+                            <!-- ... rest of the options ... -->
+                        </div>
+                    </div>
+                </div>
+                <small class="form-label text-disabled form-description">DescriptionLibraryType</small>
+            </div>
+            <!-- Directories -->
+            <div class="form-row mt-10">
+                <div class="form-label">
+                    <label asp-for="Paths">Directories</label>
+                    <span class="mandatory-field">*</span>:
+                    <img src="~/images/ui/add-directory.svg" alt="Add directory" id="add-media-directory" title="Add directory" class="add-form-table-row-icon ml-5" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-table w-100">
+                    @for (int i = 0; i < Model.Paths.Count; i++)
+                    {
+                        <div class="form-table-row">
+                            <span title="@Model.Paths[i]">@Model.Paths[i]</span>
+                            <img src="~/images/ui/delete.svg" alt="Remove" title="Remove" class="remove-form-table-row-icon" />
+                        </div>
+                    }
+                </div>
+                <small class="form-label text-disabled form-description">DescriptionDirectories</small>
+            </div>
+            <div class="form-row">
+                <button type="submit" class="confirm-button w-100px">Save</button>
+            </div>
+        </div>
+    </form>
+</div>
+@section Scripts {
+    <script type="text/javascript" defer>
+        document.getElementById('add-media-directory').addEventListener('click', function () {
+            showFileSystemBrowserDialogAsync('C:\\Users\\', true, false, addNewPaths); // TODO: take path and include hidden elements from settings
+        });
+
+        function addNewPaths(selectedPaths) {
+            // get the form table where the new paths will be added
+            const formTable = document.querySelector('.form-table');
+            // process the selected paths
+            const paths = selectedPaths.slice(1, -1).split('","');
+            // add each path as a new row
+            paths.forEach(path => {
+                // check if path already exists
+                const existingPath = formTable.querySelector(`span[title="${path}"]`);
+                if (!existingPath) {
+                    formTable.insertAdjacentHTML('beforeend', `
+                        <div class="form-table-row">
+                            <span title="${path}">${path}</span>
+                            <img src="/images/ui/delete.svg" alt="Remove" title="Remove" class="remove-form-table-row-icon" onclick="this.closest('.form-table-row').remove();" />
+                        </div>
+                    `);
+                }
+            });
+        }
+
+        document.getElementById('add-media-library-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const form = event.target;
+            const formData = {
+                Id: form.querySelector('[name="Id"]').value || null,
+                Title: form.querySelector('[name="Title"]').value,
+                LibraryType: form.querySelector('.enlightenment-selected-text').textContent,
+                Paths: Array.from(form.querySelectorAll('.form-table-row span'))
+                    .map(span => span.textContent)
+            };
+            const result = await callApiPostAsync('/library/manage/item', formData);
+            if (result) {
+                // Optional: Handle successful response
+                // For example, redirect after success
+                // window.location.href = '/library/manage';
+            }
+        });
+    </script>
+}

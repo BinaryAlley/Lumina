@@ -1,12 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using FluentAssertions;
 using Lumina.Application.Common.Mapping.Common.Metadata;
-using Lumina.Application.Common.Mapping.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Application.Common.Mapping.WrittenContentLibrary.BookLibrary.Common;
+using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
 using Lumina.Application.UnitTests.Core.WrittenContentLibrary.BooksLibrary.Common.Fixtures;
-using Lumina.Contracts.Entities.WrittenContentLibrary.BookLibrary;
+using Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.Enums.BookLibrary;
-using Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate.ValueObjects;
+using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;

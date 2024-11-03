@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.Responses.FileSystemManagement.Thumbnails;
-using Lumina.Domain.Core.Aggregates.FileSystemManagement.FileSystemManagementAggregate.ValueObjects;
+using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 #endregion
 
 namespace Lumina.Application.Common.Mapping.FileSystemManagement.Thumbnails;
@@ -11,15 +11,15 @@ namespace Lumina.Application.Common.Mapping.FileSystemManagement.Thumbnails;
 public static class ThumbnailMapping
 {
     /// <summary>
-    /// Converts <paramref name="domainModel"/> to <see cref="ThumbnailResponse"/>.
+    /// Converts <paramref name="domainEntity"/> to <see cref="ThumbnailResponse"/>.
     /// </summary>
-    /// <param name="domainModel">The domain model to be converted.</param>
+    /// <param name="domainEntity">The domain entity to be converted.</param>
     /// <returns>The converted response.</returns>
-    public static ThumbnailResponse ToResponse(this Thumbnail domainModel)
+    public static ThumbnailResponse ToResponse(this Thumbnail domainEntity)
     {
         return new ThumbnailResponse(
-            domainModel.Type,
-            domainModel.Bytes
+            domainEntity.Type,
+            domainEntity.Bytes
         );
     }
 }

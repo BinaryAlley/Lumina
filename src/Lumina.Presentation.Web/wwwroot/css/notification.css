@@ -21,7 +21,7 @@
     border-right: 1px solid #000 !important;
     border-bottom: 1px solid #000 !important;
     box-shadow: 5px 5px 5px var(--shadow-color);
-    animation: fadeIn 0.3s, fadeOut 0.3s 4.7s;
+    animation: fadeIn 0.3s, fadeOut 0.3s 9.7s; /* animation for notifications fade out effect */
     flex-direction: column;
     flex-wrap: nowrap;
     align-items: stretch;
@@ -60,7 +60,7 @@
     flex-shrink: 0; /* prevent button from shrinking */
 }
 
-.shine-effect {
+.notification-shine-effect {
     background: linear-gradient(to right, transparent, #fff, transparent);
     width: 100%;
     top: -1px;

@@ -2,7 +2,7 @@
 using AutoFixture;
 using Lumina.Contracts.Enums.BookLibrary;
 using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate.ValueObjects;
+using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion

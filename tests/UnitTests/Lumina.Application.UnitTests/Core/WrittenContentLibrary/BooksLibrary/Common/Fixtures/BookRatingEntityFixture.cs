@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using Bogus;
-using Lumina.Contracts.Entities.WrittenContentLibrary.BookLibrary;
+using Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.Enums.BookLibrary;
 using System;
 using System.Diagnostics.CodeAnalysis;

@@ -2,7 +2,7 @@
 using ErrorOr;
 using Lumina.Application.Common.DataAccess.Repositories.Books;
 using Lumina.Contracts.Entities.Common;
-using Lumina.Contracts.Entities.WrittenContentLibrary.BookLibrary;
+using Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Errors;
 using Microsoft.EntityFrameworkCore;

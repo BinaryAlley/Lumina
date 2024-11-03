@@ -3,7 +3,7 @@ using EntityFrameworkCore.Testing.NSubstitute;
 using ErrorOr;
 using FluentAssertions;
 using Lumina.Contracts.Entities.Common;
-using Lumina.Contracts.Entities.WrittenContentLibrary.BookLibrary;
+using Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.Enums.BookLibrary;
 using Lumina.DataAccess.Core.Repositories.Books;
 using Lumina.DataAccess.Core.UoW;

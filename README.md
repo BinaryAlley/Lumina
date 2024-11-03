@@ -38,6 +38,8 @@ Several icons used in this project were adapted from icons sourced from [svgrepo
 
 - [`toggle-thumbnails.svg`](https://www.svgrepo.com/svg/370469/page-image) (Public Domain license)
 - [`toggle-hidden.svg`](https://www.svgrepo.com/svg/470389/hidden) (MIT License)
+- [`delete.svg`](https://www.svgrepo.com/svg/488148/delete) (MIT License)
+- [`add-directory.svg`](https://www.svgrepo.com/svg/488040/add-folder) (MIT License)
 
 ## License
 

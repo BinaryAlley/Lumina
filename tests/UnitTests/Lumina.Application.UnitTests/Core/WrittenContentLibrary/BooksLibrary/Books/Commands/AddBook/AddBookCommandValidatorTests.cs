@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
 using FluentValidation.TestHelper;
-using Lumina.Application.Core.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook;
+using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook;
 using Lumina.Application.UnitTests.Core.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook.Fixtures;
 using Lumina.Contracts.Enums.BookLibrary;
 using Lumina.Domain.Common.Errors;

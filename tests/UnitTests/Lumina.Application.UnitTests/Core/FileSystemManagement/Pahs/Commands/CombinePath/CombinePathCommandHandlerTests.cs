@@ -6,7 +6,7 @@ using FluentAssertions;
 using Lumina.Application.Core.FileSystemManagement.Paths.Commands.CombinePath;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Pahs.Commands.CombinePath.Fixtures;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
-using Lumina.Domain.Core.Aggregates.FileSystemManagement.FileSystemManagementAggregate.Services;
+using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using NSubstitute;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;

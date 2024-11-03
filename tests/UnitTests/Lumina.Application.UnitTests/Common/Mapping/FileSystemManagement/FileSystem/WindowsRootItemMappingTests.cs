@@ -4,7 +4,7 @@ using FluentAssertions;
 using Lumina.Application.Common.Mapping.FileSystemManagement.FileSystem;
 using Lumina.Contracts.Enums.FileSystem;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
-using Lumina.Domain.Core.Aggregates.FileSystemManagement.FileSystemManagementAggregate.Entities;
+using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 

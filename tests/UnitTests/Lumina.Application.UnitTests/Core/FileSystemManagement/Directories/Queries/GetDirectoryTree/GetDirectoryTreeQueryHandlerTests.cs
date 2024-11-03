@@ -7,10 +7,11 @@ using Lumina.Application.UnitTests.Core.FileSystemManagement.Directories.Queries
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Files.Fixtures;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Pahs.Fixtures;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
-using Lumina.Domain.Core.Aggregates.FileSystemManagement.FileSystemManagementAggregate;
-using Lumina.Domain.Core.Aggregates.FileSystemManagement.FileSystemManagementAggregate.Entities;
-using Lumina.Domain.Core.Aggregates.FileSystemManagement.FileSystemManagementAggregate.Services;
-using Lumina.Domain.Core.Aggregates.FileSystemManagement.FileSystemManagementAggregate.ValueObjects;
+using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
+using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using NSubstitute;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;

@@ -2,14 +2,11 @@
 using ErrorOr;
 using FluentAssertions;
 using Lumina.Application.Common.Mapping.Common.Metadata;
-using Lumina.Application.Common.Mapping.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Application.Common.Mapping.WrittenContentLibrary.BookLibrary.Common;
+using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Application.UnitTests.Core.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook.Fixtures;
-using Lumina.Contracts.Entities.WrittenContentLibrary.BookLibrary;
-using Lumina.Contracts.Enums.BookLibrary;
-using Lumina.Contracts.Responses.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate;
-using System;
+using Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
@@ -17,7 +14,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Lumina.Application.UnitTests.Common.Mapping.WrittenContentLibrary.BookLibrary.Books;
 
 /// <summary>
-/// Contains unit tests for the <see cref="BookModelMapping"/> class.
+/// Contains unit tests for the <see cref="BookEntityMapping"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class BookModelMappingTests
@@ -39,7 +36,7 @@ public class BookModelMappingTests
         BookEntity bookEntity = _bookEntityFixture.CreateBook();
 
         // Act
-        ErrorOr<Book> result = bookEntity.ToDomainModel();
+        ErrorOr<Book> result = bookEntity.ToDomainEntity();
 
         // Assert
         // Assert
@@ -161,7 +158,7 @@ public class BookModelMappingTests
         else
             result.Value.Metadata.PageCount.HasValue.Should().BeFalse();
 
-        result.Value.Format.Value.Should().Be(Enum.Parse<BookFormat>(bookEntity.Format));
+        result.Value.Format.Value.Should().Be(bookEntity.Format);
 
         if (bookEntity.Edition is not null)
         {
@@ -293,7 +290,7 @@ public class BookModelMappingTests
         result.Metadata.OriginalLanguage.NativeName.Should().Be(bookEntity.OriginalLanguageNativeName);
         result.Metadata.Publisher.Should().Be(bookEntity.Publisher);
         result.Metadata.PageCount.Should().Be(bookEntity.PageCount);
-        result.Format.Should().Be(Enum.Parse<BookFormat>(bookEntity.Format));
+        result.Format.Should().Be(bookEntity.Format);
         result.Edition.Should().Be(bookEntity.Edition);
         result.VolumeNumber.Should().Be(bookEntity.VolumeNumber);
         result.ASIN.Should().Be(bookEntity.ASIN);
@@ -322,7 +319,7 @@ public class BookModelMappingTests
         ];
 
         // Act
-        IEnumerable<ErrorOr<Book>> results = bookEntities.ToDomainModels();
+        IEnumerable<ErrorOr<Book>> results = bookEntities.ToDomainEntities();
 
         // Assert
         results.Should().NotBeNull();

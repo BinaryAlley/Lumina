@@ -1,10 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Mapping.FileSystemManagement.Common;
 using Lumina.Contracts.Enums.FileSystem;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
-using Lumina.Contracts.Responses.FileSystemManagement.Directories;
-using Lumina.Domain.Core.Aggregates.FileSystemManagement.FileSystemManagementAggregate.Entities;
-using System.Linq;
+using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 #endregion
 
 namespace Lumina.Application.Common.Mapping.FileSystemManagement.FileSystem;
@@ -15,16 +12,16 @@ namespace Lumina.Application.Common.Mapping.FileSystemManagement.FileSystem;
 public static class WindowsRootItemMapping
 {
     /// <summary>
-    /// Converts <paramref name="domainModel"/> to <see cref="FileSystemTreeNodeResponse"/>.
+    /// Converts <paramref name="domainEntity"/> to <see cref="FileSystemTreeNodeResponse"/>.
     /// </summary>
-    /// <param name="domainModel">The domain model to be converted.</param>
+    /// <param name="domainEntity">The domain entity to be converted.</param>
     /// <returns>The converted response.</returns>
-    public static FileSystemTreeNodeResponse ToTreeNodeResponse(this WindowsRootItem domainModel)
+    public static FileSystemTreeNodeResponse ToTreeNodeResponse(this WindowsRootItem domainEntity)
     {
         return new FileSystemTreeNodeResponse()
         {
-            Path = domainModel.Id.Path,
-            Name = domainModel.Name,
+            Path = domainEntity.Id.Path,
+            Name = domainEntity.Name,
             ItemType = FileSystemItemType.Root,
             IsExpanded = false
         };

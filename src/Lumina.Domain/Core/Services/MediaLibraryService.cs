@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Core.Aggregates.VideoLibrary.Services;
-using Lumina.Domain.Core.Aggregates.WrittenContentLibrary.Services;
+using Lumina.Domain.Core.BoundedContexts.VideoLibraryBoundedContext.Services;
+using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.Services;
 #endregion
 
 namespace Lumina.Domain.Core.Services;
@@ -8,7 +8,7 @@ namespace Lumina.Domain.Core.Services;
 /// <summary>
 /// Service for managing media libraries.
 /// </summary>
-public class MediaLibraryService : IMediaLibraryService
+public class MediaLibraryService : IMediaLibraryService // TODO: perhaps a better naming would be IMediaLibraryFacade (same for injected facades here)
 {
     /// <summary>
     /// Gets the service for managing a video library.
