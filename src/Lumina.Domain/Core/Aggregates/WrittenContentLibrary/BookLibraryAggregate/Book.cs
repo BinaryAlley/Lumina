@@ -14,7 +14,7 @@ using System.Diagnostics;
 namespace Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate;
 
 /// <summary>
-/// Aggregate root for a book.
+/// Aggregate root for a book library aggregate.
 /// </summary>
 [DebuggerDisplay("{Id}: {Title}")]
 public sealed class Book : AggregateRoot<BookId>
