@@ -16,7 +16,7 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Lumina.Domain.Common.Errors;
 using Bogus;
-using Lumina.Contracts.Enums.BookLibrary;
+using Lumina.Domain.Common.Enums.BookLibrary;
 using Lumina.Presentation.Api.IntegrationTests.Common.Converters;
 using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 #endregion

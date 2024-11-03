@@ -6,7 +6,7 @@ using FluentAssertions;
 using Lumina.Application.Core.FileSystemManagement.Files.Queries.GetTreeFiles;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Files.Fixtures;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Files.Queries.GetTreeFiles.Fixtures;
-using Lumina.Contracts.Enums.FileSystem;
+using Lumina.Domain.Common.Enums.FileSystem;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;

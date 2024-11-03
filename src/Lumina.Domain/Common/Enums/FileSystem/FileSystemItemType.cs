@@ -1,4 +1,4 @@
-﻿namespace Lumina.Contracts.Enums.FileSystem;
+﻿namespace Lumina.Domain.Common.Enums.FileSystem;
 
 /// <summary>
 /// Enumeration for the types of file system elements.

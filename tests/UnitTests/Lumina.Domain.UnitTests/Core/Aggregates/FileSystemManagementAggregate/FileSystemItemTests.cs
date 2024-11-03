@@ -3,7 +3,7 @@ using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using ErrorOr;
 using FluentAssertions;
-using Lumina.Contracts.Enums.FileSystem;
+using Lumina.Domain.Common.Enums.FileSystem;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;

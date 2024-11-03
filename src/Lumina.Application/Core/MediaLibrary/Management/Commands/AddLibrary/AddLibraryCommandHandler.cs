@@ -4,7 +4,7 @@ using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Contracts.Entities.MediaLibrary.Management;
-using Lumina.Contracts.Enums.MediaLibrary;
+using Lumina.Domain.Common.Enums.MediaLibrary;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
 using Mediator;

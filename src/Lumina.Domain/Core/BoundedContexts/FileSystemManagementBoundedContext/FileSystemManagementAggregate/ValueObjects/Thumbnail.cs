@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Enums.PhotoLibrary;
+using Lumina.Domain.Common.Enums.PhotoLibrary;
 using Lumina.Domain.Common.Models.Core;
 using System.Collections.Generic;
 using System.Diagnostics;

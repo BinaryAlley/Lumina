@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using FluentAssertions;
-using Lumina.Contracts.Enums.PhotoLibrary;
+using Lumina.Domain.Common.Enums.PhotoLibrary;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.ValueObjects.Fixtures;
 using System.Collections.Generic;

@@ -1,4 +1,4 @@
-namespace Lumina.Contracts.Enums.PhotoLibrary;
+namespace Lumina.Domain.Common.Enums.PhotoLibrary;
 
 /// <summary>
 /// Enumeration for known image types.

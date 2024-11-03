@@ -1,4 +1,4 @@
-namespace Lumina.Contracts.Enums.VideoLibrary;
+namespace Lumina.Domain.Common.Enums.VideoLibrary;
 
 /// <summary>
 /// Enumeration for the various sources of video ratings.

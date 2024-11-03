@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using FluentAssertions;
-using Lumina.Contracts.Enums.FileSystem;
+using Lumina.Domain.Common.Enums.FileSystem;
 using Lumina.Contracts.Responses.FileSystemManagement.FileSystem;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 using System;

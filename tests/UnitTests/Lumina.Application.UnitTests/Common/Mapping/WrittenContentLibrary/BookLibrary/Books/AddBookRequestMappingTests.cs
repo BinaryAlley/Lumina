@@ -5,7 +5,7 @@ using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Bo
 using Lumina.Application.UnitTests.Core.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook.Fixtures;
 using Lumina.Contracts.Entities.MediaContributors;
 using Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary;
-using Lumina.Contracts.Enums.BookLibrary;
+using Lumina.Domain.Common.Enums.BookLibrary;
 using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using System.Diagnostics.CodeAnalysis;
 #endregion

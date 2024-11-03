@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.Entities.Common;
 using Lumina.Contracts.Entities.UsersManagement;
-using Lumina.Contracts.Enums.MediaLibrary;
+using Lumina.Domain.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

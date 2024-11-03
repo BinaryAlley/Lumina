@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using FluentValidation;
-using Lumina.Contracts.Enums.BookLibrary;
+using Lumina.Domain.Common.Enums.BookLibrary;
 using Lumina.Domain.Common.Errors;
 #endregion
 

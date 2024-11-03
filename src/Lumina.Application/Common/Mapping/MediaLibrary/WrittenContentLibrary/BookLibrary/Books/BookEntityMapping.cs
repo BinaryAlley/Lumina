@@ -6,7 +6,7 @@ using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookL
 using Lumina.Contracts.Entities.Common;
 using Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary;
 using Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Contracts.Enums.BookLibrary;
+using Lumina.Domain.Common.Enums.BookLibrary;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;

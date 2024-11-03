@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Contracts.Enums.PhotoLibrary;
+using Lumina.Domain.Common.Enums.PhotoLibrary;
 using Lumina.Contracts.Responses.FileSystemManagement.Thumbnails;
 using System.Diagnostics.CodeAnalysis;
 #endregion
