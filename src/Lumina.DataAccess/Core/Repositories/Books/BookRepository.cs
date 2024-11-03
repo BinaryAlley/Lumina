@@ -38,8 +38,8 @@ internal sealed class BookRepository : IBookRepository
     /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successfull operation, or an error.</returns>
     public async Task<ErrorOr<Created>> InsertAsync(BookEntity book, CancellationToken cancellationToken)
     {
-        bool jobExists = await _luminaDbContext.Books.AnyAsync(repositoryBook => repositoryBook.Id == book.Id, cancellationToken: cancellationToken).ConfigureAwait(false);
-        if (jobExists)
+        bool bookExists = await _luminaDbContext.Books.AnyAsync(repositoryBook => repositoryBook.Id == book.Id, cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (bookExists)
             return Errors.WrittenContent.BookAlreadyExists;
 
         // fetch existing tags and genres

@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.Entities.Common;
+using Lumina.Contracts.Entities.UsersManagement;
 using Lumina.Contracts.Entities.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.Common.Events;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +20,7 @@ namespace Lumina.DataAccess.Core.UoW;
 public class LuminaDbContext : DbContext
 {
     public virtual DbSet<BookEntity> Books { get; set; } = null!;
+    public virtual DbSet<UserEntity> Users { get; set; } = null!;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LuminaDbContext"/> class.
