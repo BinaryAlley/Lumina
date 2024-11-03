@@ -241,12 +241,14 @@ internal class DirectoryProviderService : IDirectoryProviderService
             string destFilePath = _fileSystem.Path.Combine(destDir, fileName);
             // if a file with the same name exists in the destination
             if (_fileSystem.File.Exists(destFilePath))
+            {
                 if (overwrite)
                 {
                     // overwrite the file in the destination directory
                     _fileSystem.File.Delete(destFilePath);
                     _fileSystem.File.Move(sourceFilePath, destFilePath);
                 }
+            }
             else
                 _fileSystem.File.Move(sourceFilePath, destFilePath); // move the file if it does not exist in the destination directory
         }
