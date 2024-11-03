@@ -38,6 +38,55 @@ async function callApiGetAsync(url) {
     }
 }
 
+/**
+ * Performs a POST request to the specified API endpoint.
+ * @param {string} url - The API endpoint URL.
+ * @param {Object} data - The data to send in the request body.
+ * @param {Object} [options] - Additional options for the request.
+ * @param {boolean} [options.useAntiForgery=true] - Whether to include anti-forgery token.
+ * @param {Object} [options.headers] - Additional headers to include.
+ * @returns {Promise<any>} The response data if successful, undefined otherwise.
+ */
+async function callApiPostAsync(url, data, options = {}) {
+    const defaultOptions = {
+        useAntiForgery: true,
+        headers: {}
+    };
+    const finalOptions = { ...defaultOptions, ...options };
+    try {
+        // prepare headers
+        const headers = {
+            'Content-Type': 'application/json',
+            ...finalOptions.headers
+        };
+        // add anti-forgery token if enabled
+        if (finalOptions.useAntiForgery) {
+            const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+            if (token) 
+                headers['X-CSRF-TOKEN'] = token;
+        }
+        // make the request
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) 
+            throw new Error(`HTTP error! status: ${response.status}`);
+        const jsonResponse = await response.json();
+        if (jsonResponse.success) {
+            if (jsonResponse.message)
+                notificationService.show(jsonResponse.message, NotificationType.SUCCESS);
+            return jsonResponse.data;
+        }
+        else
+            notificationService.show(jsonResponse.errorMessage, NotificationType.ERROR);
+    } catch (error) {
+        console.error('Error:', error);
+        notificationService.show(error, NotificationType.ERROR);
+    }
+}
+
 //+======================================================================================+
 //|                                Website navigation                                    |
 //+======================================================================================+
@@ -338,6 +387,12 @@ function getElementOffset(id) {
     };
 }
 
+document.querySelectorAll('.remove-form-table-row-icon').forEach(icon => {
+    icon.addEventListener('click', function () {
+        this.parentElement.remove();
+    });
+});
+
 /**
  * Toggles the visibility of the audio player.
  */
@@ -360,5 +415,91 @@ function toggleAudioPlayerFullHeight() {
 
 audioPlayerFullHeightToggle.addEventListener('click', toggleAudioPlayerFullHeight);
 audioPlayerClose.addEventListener('click', toggleAudioPlayerVisibility);
+
+
+/**
+ * Closes all comboboxes except for the one passed as an argument.
+ * @param {HTMLElement} exceptionCheckbox - The checkbox of the combobox that should remain open.
+ */
+function closeAllComboboxesExcept(exceptionCheckbox) {
+    const checkedCheckboxes = document.querySelectorAll('.enlightenment-toggle-checkbox:checked, .navigator-toggle-checkbox:checked');
+    checkedCheckboxes.forEach(function (checkbox) {
+        if (!exceptionCheckbox || checkbox.id !== exceptionCheckbox.id)
+            checkbox.checked = false;
+    });
+}
+
+/**
+ * Detects changes on any combobox checkbox. If a combobox is opened, this will ensure all other comboboxes are closed.
+ */
+document.addEventListener('change', function (e) {
+    if (e.target.matches('.enlightenment-toggle-checkbox, .navigator-toggle-checkbox'))
+        if (e.target.checked)
+            closeAllComboboxesExcept(e.target);
+});
+
+/**
+ * Event handler for when an option in the combobox is clicked.
+ * This updates the displayed value of the combobox to the clicked option and closes the dropdown.
+ */
+document.addEventListener('click', function (e) {
+    if (e.target.matches('.enlightenment-option')) {
+        var text = e.target.textContent;
+        var combobox = e.target.closest('.enlightenment-combobox');
+
+        var selectedText = combobox.querySelector('.enlightenment-selected-text');
+        if (selectedText)
+            selectedText.textContent = text;
+
+        var toggleCheckbox = combobox.querySelector('.enlightenment-toggle-checkbox');
+        if (toggleCheckbox)
+            toggleCheckbox.checked = false;
+    }
+});
+
+/**
+ * Global click event for the entire document. Closes all combobox dropdowns if the clicked target is outside any combobox.
+ */
+document.addEventListener('click', function (e) {
+    // enlightenment combobox logic
+    if (!e.target.closest('.enlightenment-combobox')) {
+        const checkbox = document.querySelector('.enlightenment-toggle-checkbox:checked');
+        if (checkbox)
+            checkbox.checked = false;
+    }
+    // navigator combobox logic
+    if (!e.target.closest('.navigator-combobox') && typeof addressBar !== 'undefined' && addressBar !== null) {
+        const checkbox = document.querySelector('.navigator-toggle-checkbox:checked');
+        if (checkbox)
+            checkbox.checked = false;
+        // when drop down closes, hide address bar overflow
+        addressBar.style.overflowX = 'auto';
+        addressBar.style.overflowY = 'hidden';
+        reattachDropdown();
+    }
+});
+
+/**
+ * Event handler for navigation combobox drop down item clicks.
+ */
+document.addEventListener("click", function (e) {
+    if (e.target.matches('.navigator-option')) {
+        // the address bar drop downs may be destroyed when an option is clicked - they are regenerated each time anyway
+        addressBar.removeEventListener('scroll', adjustDropdownPosition);
+
+        var parentElement = e.target.parentElement;
+        if (parentElement)
+            parentElement.remove();
+    }
+});
+
+/**
+ * Prevents the global document click event from propagating when clicking on a combobox. 
+ * This ensures the dropdown doesn't close unintentionally.
+ */
+document.addEventListener('click', function (e) {
+    if (e.target.closest('.enlightenment-combobox, .navigator-combobox'))
+        e.stopPropagation();
+});
 
 document.addEventListener('DOMContentLoaded', initializeNavigation);

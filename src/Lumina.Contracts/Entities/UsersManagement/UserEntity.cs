@@ -1,6 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.Entities.Common;
+using Lumina.Contracts.Entities.MediaLibrary.Management;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
@@ -41,6 +43,11 @@ public class UserEntity : IStorageEntity
     /// Gets or sets the optional date and time when the verification token was created.
     /// </summary>
     public DateTime? VerificationTokenCreated { get; set; }
+
+    /// <summary>
+    /// Gets the collection of libraries owned by this user.
+    /// </summary>
+    public required ICollection<LibraryEntity> Libraries { get; init; } = [];
 
     /// <summary>
     /// Gets the time and date when the entity was added.

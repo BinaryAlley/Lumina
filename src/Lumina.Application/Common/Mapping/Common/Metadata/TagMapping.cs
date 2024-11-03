@@ -13,24 +13,24 @@ namespace Lumina.Application.Common.Mapping.Common.Metadata;
 public static class TagMapping
 {
     /// <summary>
-    /// Converts <paramref name="domainModel"/> to <see cref="TagEntity"/>.
+    /// Converts <paramref name="domainEntity"/> to <see cref="TagEntity"/>.
     /// </summary>
-    /// <param name="domainModel">The domain model to be converted.</param>
+    /// <param name="domainEntity">The domain entity to be converted.</param>
     /// <returns>The converted repository entity.</returns>
-    public static TagEntity ToRepositoryEntity(this Tag domainModel)
+    public static TagEntity ToRepositoryEntity(this Tag domainEntity)
     {
         return new TagEntity(
-            domainModel.Name
+            domainEntity.Name
         );
     }
 
     /// <summary>
-    /// Converts <paramref name="domainModels"/> to a collection of <see cref="TagEntity"/>.
+    /// Converts <paramref name="domainEntities"/> to a collection of <see cref="TagEntity"/>.
     /// </summary>
-    /// <param name="domainModels">The domain model to be converted.</param>
+    /// <param name="domainEntities">The domain entity to be converted.</param>
     /// <returns>The converted repository entities.</returns>
-    public static IEnumerable<TagEntity> ToRepositoryEntities(this IEnumerable<Tag> domainModels)
+    public static IEnumerable<TagEntity> ToRepositoryEntities(this IEnumerable<Tag> domainEntities)
     {
-        return domainModels.Select(domainModel => domainModel.ToRepositoryEntity());
+        return domainEntities.Select(domainEntity => domainEntity.ToRepositoryEntity());
     }
 }

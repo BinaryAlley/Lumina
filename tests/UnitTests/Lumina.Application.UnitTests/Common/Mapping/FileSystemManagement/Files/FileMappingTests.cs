@@ -5,7 +5,7 @@ using Lumina.Application.UnitTests.Core.FileSystemManagement.Files.Fixtures;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
 using Lumina.Contracts.Responses.FileSystemManagement.Files;
 using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.Aggregates.FileSystemManagement.FileSystemManagementAggregate.Entities;
+using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;

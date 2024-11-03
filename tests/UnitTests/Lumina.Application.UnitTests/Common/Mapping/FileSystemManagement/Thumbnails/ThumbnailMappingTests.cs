@@ -5,7 +5,7 @@ using FluentAssertions;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Thumbnails;
 using Lumina.Contracts.Enums.PhotoLibrary;
 using Lumina.Contracts.Responses.FileSystemManagement.Thumbnails;
-using Lumina.Domain.Core.Aggregates.FileSystemManagement.FileSystemManagementAggregate.ValueObjects;
+using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;

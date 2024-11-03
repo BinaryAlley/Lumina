@@ -40,5 +40,11 @@ public class UserConfiguration : IEntityTypeConfiguration<UserEntity>
 
         builder.Property(user => user.VerificationTokenCreated)
             .HasColumnOrder(5);
+
+        builder.HasMany(user => user.Libraries)
+            .WithOne(library => library.User)
+            .HasForeignKey(library => library.UserId)
+            .IsRequired() // a library must have a user
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

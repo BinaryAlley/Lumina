@@ -12,6 +12,7 @@ public static partial class Errors
     public static class FileSystemManagement
     {
         public static Error ParentNodeCannotBeNull => Error.Failure(description: nameof(ParentNodeCannotBeNull));
+        public static Error PathMustBeMaximum260CharactersLong => Error.Failure(description: nameof(PathMustBeMaximum260CharactersLong));
         public static Error FileCopyError => Error.Failure(description: nameof(FileCopyError));
         public static Error FileMoveError => Error.Failure(description: nameof(FileMoveError));
         public static Error DirectoryCopyError => Error.Failure(description: nameof(DirectoryCopyError));

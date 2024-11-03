@@ -3,7 +3,6 @@ using FluentValidation;
 using Lumina.Presentation.Web.Common.Api;
 using Lumina.Presentation.Web.Common.Exceptions;
 using Lumina.Presentation.Web.Common.Filters;
-using Lumina.Presentation.Web.Common.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
 using Polly.CircuitBreaker;
@@ -62,7 +61,6 @@ public static class PresentationWebLayerServices
             .AddPolicyHandler(retryPolicy)
             .AddPolicyHandler(circuitBreakerPolicy);
 
-        services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<ApiExceptionFilter>();
 
         return services;

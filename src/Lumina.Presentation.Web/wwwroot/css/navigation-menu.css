@@ -29,7 +29,7 @@
     width: 46px;
     height: 46px;
     display: none;
-    z-index: 2;
+    z-index: 999;
     padding: 5px 0;
     margin: 0px;
     font-family: 'Cabin', Sans-serif;
@@ -185,6 +185,7 @@
     position: fixed;
     top: 0px;
     left: 0px;
+    max-height: 22px;
     width: 100%;
     z-index: 900;
 }

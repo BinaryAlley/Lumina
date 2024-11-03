@@ -2,7 +2,7 @@
 using AutoFixture;
 using Bogus;
 using Lumina.Contracts.Entities.Common;
-using Lumina.Contracts.Entities.WrittenContentLibrary.BookLibrary;
+using Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.Enums.BookLibrary;
 using Lumina.DataAccess.UnitTests.Common.Setup;
 using System;
@@ -65,7 +65,7 @@ public class BookModelFixture
             .RuleFor(x => x.Genres, f => new HashSet<GenreEntity>(CreateGenres(f.Random.Number(1, 5))))
             .RuleFor(x => x.Publisher, f => f.Random.String2(f.Random.Number(1, 100)))
             .RuleFor(x => x.PageCount, _random.Next(100, 300))
-            .RuleFor(x => x.Format, f => f.PickRandom<BookFormat>().ToString())
+            .RuleFor(x => x.Format, f => f.PickRandom<BookFormat>())
             .RuleFor(x => x.Edition, f => f.Random.String2(f.Random.Number(1, 50)))
             .RuleFor(x => x.VolumeNumber, _random.Next(1, 3))
             .RuleFor(x => x.ASIN, f => f.Random.String2(10))

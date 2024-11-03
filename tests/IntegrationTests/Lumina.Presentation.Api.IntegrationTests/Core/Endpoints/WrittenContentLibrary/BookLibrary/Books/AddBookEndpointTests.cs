@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using FluentAssertions;
-using Lumina.Domain.Core.Aggregates.WrittenContentLibrary.BookLibraryAggregate;
+using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 using Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.WrittenContentLibrary.BookLibrary.Books.Fixtures;
 using Microsoft.AspNetCore.Http;
@@ -17,8 +17,8 @@ using System.Threading.Tasks;
 using Lumina.Domain.Common.Errors;
 using Bogus;
 using Lumina.Contracts.Enums.BookLibrary;
-using Lumina.Contracts.Requests.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Presentation.Api.IntegrationTests.Common.Converters;
+using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 #endregion
 
 namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.WrittenContentLibrary.BookLibrary.Books;

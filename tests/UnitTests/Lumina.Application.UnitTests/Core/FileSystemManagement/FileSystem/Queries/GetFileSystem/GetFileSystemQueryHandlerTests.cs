@@ -5,7 +5,7 @@ using FluentAssertions;
 using Lumina.Application.Core.FileSystemManagement.FileSystem.Queries.GetFileSystem;
 using Lumina.Contracts.Enums.FileSystem;
 using Lumina.Contracts.Responses.FileSystemManagement.FileSystem;
-using Lumina.Domain.Core.Aggregates.FileSystemManagement.FileSystemManagementAggregate.Strategies.Platform;
+using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Platform;
 using NSubstitute;
 using System;
 using System.Diagnostics.CodeAnalysis;

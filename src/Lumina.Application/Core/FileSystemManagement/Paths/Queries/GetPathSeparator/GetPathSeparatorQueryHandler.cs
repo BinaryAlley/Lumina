@@ -1,6 +1,6 @@
 ﻿#region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
-using Lumina.Domain.Core.Aggregates.FileSystemManagement.FileSystemManagementAggregate.Services;
+using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Mediator;
 using System.Threading;
 using System.Threading.Tasks;

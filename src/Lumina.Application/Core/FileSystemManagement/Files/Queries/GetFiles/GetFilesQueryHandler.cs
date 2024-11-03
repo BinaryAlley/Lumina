@@ -2,8 +2,8 @@
 using ErrorOr;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Files;
 using Lumina.Contracts.Responses.FileSystemManagement.Files;
-using Lumina.Domain.Core.Aggregates.FileSystemManagement.FileSystemManagementAggregate.Entities;
-using Lumina.Domain.Core.Aggregates.FileSystemManagement.FileSystemManagementAggregate.Services;
+using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Mediator;
 using System.Collections.Generic;
 using System.Threading;

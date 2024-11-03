@@ -62,8 +62,8 @@ class NotificationService {
         else
             console.log(message);
 
-        // set a timeout to remove the notification after 5 seconds
-        setTimeout(() => this.removeNotification(notification.id), 5000);
+        // set a timeout to remove the notification after 10 seconds (fading out effect is handled in notification.css)
+        setTimeout(() => this.removeNotification(notification.id), 10000);
     }
 
     /**
@@ -75,9 +75,8 @@ class NotificationService {
         if (index !== -1) {
             this.notifications.splice(index, 1);
             const element = document.getElementById(`notification-${id}`);
-            if (element) {
+            if (element) 
                 element.remove();
-            }
         }
     }
 
@@ -93,7 +92,7 @@ class NotificationService {
         notificationElement.id = `notification-${notification.id}`;
         notificationElement.className = `notification ${notification.type}`;
         notificationElement.innerHTML = `
-            <div class="shine-effect"></div>
+            <div class="notification-shine-effect"></div>
             <div class="notification-body">
                 <span class="notification-message">${notification.message}</span>
                 <button class="close-button" onclick="notificationService.removeNotification('${notification.id}')">×</button>

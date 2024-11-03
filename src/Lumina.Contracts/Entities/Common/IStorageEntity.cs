@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using System;
 #endregion
 
@@ -15,12 +15,12 @@ public interface IStorageEntity
     Guid Id { get; init; }
 
     /// <summary>
-    /// The time and date when the entity was added.
+    /// Gets or sets the time and date when the entity was added.
     /// </summary>
     DateTime Created { get; set; }
 
     /// <summary>
-    /// The time and date when the entity was updated.
+    /// Gets or sets the optional time and date when the entity was updated.
     /// </summary>
     DateTime? Updated { get; set; }
 }

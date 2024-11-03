@@ -69,7 +69,7 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.ToTable("Tags", (string)null);
                 });
 
-            modelBuilder.Entity("Lumina.Contracts.Entities.UsersManagement.UserEntity", b =>
+            modelBuilder.Entity("Lumina.Contracts.Entities.MediaLibrary.Management.LibraryEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("TEXT")
@@ -78,38 +78,31 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Password")
+                    b.Property<string>("LibraryType")
                         .IsRequired()
                         .HasColumnType("TEXT")
                         .HasColumnOrder(2);
 
-                    b.Property<string>("TotpSecret")
-                        .HasColumnType("TEXT")
-                        .HasColumnOrder(3);
-
-                    b.Property<DateTime?>("Updated")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Username")
+                    b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("TEXT")
                         .HasColumnOrder(1);
 
-                    b.Property<string>("VerificationToken")
-                        .HasColumnType("TEXT")
-                        .HasColumnOrder(4);
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("TEXT");
 
-                    b.Property<DateTime?>("VerificationTokenCreated")
-                        .HasColumnType("TEXT")
-                        .HasColumnOrder(5);
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users", (string)null);
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Libraries", (string)null);
                 });
 
-            modelBuilder.Entity("Lumina.Contracts.Entities.WrittenContentLibrary.BookLibrary.BookEntity", b =>
+            modelBuilder.Entity("Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary.BookEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("TEXT")
@@ -144,7 +137,6 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnOrder(19);
 
                     b.Property<string>("Format")
-                        .IsRequired()
                         .HasColumnType("TEXT")
                         .HasColumnOrder(18);
 
@@ -256,9 +248,49 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.ToTable("Books", (string)null);
                 });
 
+            modelBuilder.Entity("Lumina.Contracts.Entities.UsersManagement.UserEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(0);
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(2);
+
+                    b.Property<string>("TotpSecret")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(3);
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(1);
+
+                    b.Property<string>("VerificationToken")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(4);
+
+                    b.Property<DateTime?>("VerificationTokenCreated")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(5);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users", (string)null);
+                });
+
             modelBuilder.Entity("BookGenres", b =>
                 {
-                    b.HasOne("Lumina.Contracts.Entities.WrittenContentLibrary.BookLibrary.BookEntity", null)
+                    b.HasOne("Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary.BookEntity", null)
                         .WithMany()
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -273,7 +305,7 @@ namespace Lumina.DataAccess.Common.Migrations
 
             modelBuilder.Entity("BookTags", b =>
                 {
-                    b.HasOne("Lumina.Contracts.Entities.WrittenContentLibrary.BookLibrary.BookEntity", null)
+                    b.HasOne("Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary.BookEntity", null)
                         .WithMany()
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -286,13 +318,51 @@ namespace Lumina.DataAccess.Common.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Lumina.Contracts.Entities.WrittenContentLibrary.BookLibrary.BookEntity", b =>
+            modelBuilder.Entity("Lumina.Contracts.Entities.MediaLibrary.Management.LibraryEntity", b =>
                 {
-                    b.OwnsMany("Lumina.Contracts.Entities.WrittenContentLibrary.BookLibrary.BookRatingEntity", "Ratings", b1 =>
+                    b.HasOne("Lumina.Contracts.Entities.UsersManagement.UserEntity", "User")
+                        .WithMany("Libraries")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsMany("Lumina.Contracts.Entities.MediaLibrary.Management.LibraryContentLocationEntity", "ContentLocations", b1 =>
                         {
-                            b1.Property<int>("Id")
+                            b1.Property<Guid>("Id")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("INTEGER");
+                                .HasColumnType("TEXT");
+
+                            b1.Property<Guid>("LibraryId")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("Path")
+                                .IsRequired()
+                                .HasMaxLength(260)
+                                .HasColumnType("TEXT")
+                                .HasColumnName("Path");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("LibraryId");
+
+                            b1.ToTable("LibraryContentLocations", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("LibraryId");
+                        });
+
+                    b.Navigation("ContentLocations");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary.BookEntity", b =>
+                {
+                    b.OwnsMany("Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary.BookRatingEntity", "Ratings", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("TEXT");
 
                             b1.Property<Guid>("BookId")
                                 .HasColumnType("TEXT");
@@ -323,11 +393,11 @@ namespace Lumina.DataAccess.Common.Migrations
                                 .HasForeignKey("BookId");
                         });
 
-                    b.OwnsMany("Lumina.Contracts.Entities.WrittenContentLibrary.BookLibrary.IsbnEntity", "ISBNs", b1 =>
+                    b.OwnsMany("Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary.IsbnEntity", "ISBNs", b1 =>
                         {
-                            b1.Property<int>("Id")
+                            b1.Property<Guid>("Id")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("INTEGER");
+                                .HasColumnType("TEXT");
 
                             b1.Property<Guid>("BookId")
                                 .HasColumnType("TEXT");
@@ -356,6 +426,11 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.Navigation("ISBNs");
 
                     b.Navigation("Ratings");
+                });
+
+            modelBuilder.Entity("Lumina.Contracts.Entities.UsersManagement.UserEntity", b =>
+                {
+                    b.Navigation("Libraries");
                 });
 #pragma warning restore 612, 618
         }
