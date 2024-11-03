@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Enums.FileSystem;
+using Lumina.Domain.Common.Enums.FileSystem;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Path;
 
 #endregion

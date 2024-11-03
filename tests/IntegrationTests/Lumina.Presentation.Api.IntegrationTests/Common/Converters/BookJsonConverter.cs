@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Enums.BookLibrary;
+using Lumina.Domain.Common.Enums.BookLibrary;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using Lumina.Domain.Core.BoundedContexts.MediaContributorBoundedContext.MediaContributorAggregate.ValueObjects;

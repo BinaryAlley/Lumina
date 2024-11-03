@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using Lumina.Application.Common.Mapping.FileSystemManagement.FileSystem;
-using Lumina.Contracts.Enums.FileSystem;
+using Lumina.Domain.Common.Enums.FileSystem;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;

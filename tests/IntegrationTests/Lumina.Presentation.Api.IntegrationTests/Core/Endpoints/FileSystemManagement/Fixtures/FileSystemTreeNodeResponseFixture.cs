@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Contracts.Enums.FileSystem;
+using Lumina.Domain.Common.Enums.FileSystem;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;

@@ -6,7 +6,7 @@ using Lumina.Contracts.Entities.Common;
 using Lumina.Contracts.Entities.MediaContributors;
 using Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary;
 using Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Contracts.Enums.BookLibrary;
+using Lumina.Domain.Common.Enums.BookLibrary;
 using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using System;
 using System.Diagnostics.CodeAnalysis;

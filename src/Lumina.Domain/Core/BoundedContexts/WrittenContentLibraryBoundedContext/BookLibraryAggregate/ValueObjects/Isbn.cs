@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using Lumina.Contracts.Enums.BookLibrary;
+using Lumina.Domain.Common.Enums.BookLibrary;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Models.Core;
 using System.Collections.Generic;

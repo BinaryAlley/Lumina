@@ -3,7 +3,7 @@ using AutoFixture;
 using Bogus;
 using Lumina.Contracts.Entities.Common;
 using Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Contracts.Enums.BookLibrary;
+using Lumina.Domain.Common.Enums.BookLibrary;
 using Lumina.DataAccess.UnitTests.Common.Setup;
 using System;
 using System.Collections.Generic;

@@ -21,7 +21,4 @@
         <PackageReference Include="Mono.Posix.NETStandard" Version="5.20.1-preview" />
     </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\Lumina.Contracts\Lumina.Contracts.csproj" />
-    </ItemGroup>
 </Project>

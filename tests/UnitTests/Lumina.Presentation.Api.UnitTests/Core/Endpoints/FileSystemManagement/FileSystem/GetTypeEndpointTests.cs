@@ -2,7 +2,7 @@
 using FastEndpoints;
 using FluentAssertions;
 using Lumina.Application.Core.FileSystemManagement.FileSystem.Queries.GetFileSystem;
-using Lumina.Contracts.Enums.FileSystem;
+using Lumina.Domain.Common.Enums.FileSystem;
 using Lumina.Contracts.Responses.FileSystemManagement.FileSystem;
 using Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.FileSystem.GetType;
 using Mediator;

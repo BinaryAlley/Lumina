@@ -10,7 +10,7 @@ using Lumina.Application.UnitTests.Common.Setup;
 using Lumina.Application.UnitTests.Core.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook.Fixtures;
 using Lumina.Contracts.Entities.Common;
 using Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Contracts.Enums.BookLibrary;
+using Lumina.Domain.Common.Enums.BookLibrary;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.Common.Errors;
 using NSubstitute;

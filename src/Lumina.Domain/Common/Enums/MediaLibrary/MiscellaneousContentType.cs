@@ -1,4 +1,4 @@
-namespace Lumina.Contracts.Enums.MediaLibrary;
+namespace Lumina.Domain.Common.Enums.MediaLibrary;
 
 /// <summary>
 /// Enumeration for the types of miscellaneous content libraries.

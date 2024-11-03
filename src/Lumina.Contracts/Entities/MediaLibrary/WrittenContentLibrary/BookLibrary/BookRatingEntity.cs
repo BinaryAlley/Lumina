@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.Entities.Common;
-using Lumina.Contracts.Enums.BookLibrary;
+using Lumina.Domain.Common.Enums.BookLibrary;
 using System.Diagnostics;
 #endregion
 

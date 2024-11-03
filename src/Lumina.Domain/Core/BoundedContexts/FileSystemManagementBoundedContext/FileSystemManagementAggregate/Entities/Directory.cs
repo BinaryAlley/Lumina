@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using Lumina.Contracts.Enums.FileSystem;
+using Lumina.Domain.Common.Enums.FileSystem;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;

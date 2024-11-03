@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
-using Lumina.Contracts.Enums.BookLibrary;
+using Lumina.Domain.Common.Enums.BookLibrary;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
 using System;

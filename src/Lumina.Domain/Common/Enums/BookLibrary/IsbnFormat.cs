@@ -1,4 +1,4 @@
-namespace Lumina.Contracts.Enums.BookLibrary;
+namespace Lumina.Domain.Common.Enums.BookLibrary;
 
 /// <summary>
 /// Enumeration for the different ISBN (International Standard Book Number) formats.

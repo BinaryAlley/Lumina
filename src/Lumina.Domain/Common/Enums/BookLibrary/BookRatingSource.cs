@@ -1,4 +1,4 @@
-namespace Lumina.Contracts.Enums.BookLibrary;
+namespace Lumina.Domain.Common.Enums.BookLibrary;
 
 /// <summary>
 /// Enumeration for the various sources of book ratings.

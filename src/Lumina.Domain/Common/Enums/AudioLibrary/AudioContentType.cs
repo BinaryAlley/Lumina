@@ -1,4 +1,4 @@
-﻿namespace Lumina.Contracts.Enums.AudioLibrary;
+namespace Lumina.Domain.Common.Enums.AudioLibrary;
 
 /// <summary>
 /// Enumeration for the types of audio content libraries.

@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Enums.PhotoLibrary;
+using Lumina.Domain.Common.Enums.PhotoLibrary;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Bmp;
