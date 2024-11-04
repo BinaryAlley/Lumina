@@ -3,8 +3,7 @@ using ErrorOr;
 using Lumina.Application.Common.DataAccess.Repositories.Books;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Contracts.Entities.MediaContributors;
-using Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.Common.Enums.BookLibrary;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.Common.Primitives;
@@ -19,6 +18,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Lumina.Contracts.DTO.MediaContributors;
 #endregion
 
 namespace Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook;
@@ -51,7 +51,7 @@ public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<Boo
     {
         // TODO: update Api.Book.md documentation when the functionality is fully implemented
         List<MediaContributorId> contributorIds = [];
-        foreach (MediaContributorEntity mediaContributor in request.Contributors!)
+        foreach (MediaContributorDto mediaContributor in request.Contributors!)
         {
             // TODO: add logic to search the media contributors repository for existing contributors, based on the provided names
         }

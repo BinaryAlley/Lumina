@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Entities.UsersManagement;
+using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate;
 #endregion
 

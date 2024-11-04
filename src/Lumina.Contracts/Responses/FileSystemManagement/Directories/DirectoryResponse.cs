@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Entities.FileSystemManagement;
+using Lumina.Contracts.DTO.FileSystemManagement;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -21,5 +21,5 @@ public record DirectoryResponse(
     string Name,
     DateTime DateCreated,
     DateTime DateModified,
-    List<FileSystemItemEntity> Items
-) : FileSystemItemEntity(Path, Name, DateCreated, DateModified);
+    List<FileSystemItemDto> Items
+) : FileSystemItemDto(Path, Name, DateCreated, DateModified);

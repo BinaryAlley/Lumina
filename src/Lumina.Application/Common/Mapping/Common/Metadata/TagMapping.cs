@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Entities.Common;
+using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using System.Collections.Generic;
 using System.Linq;

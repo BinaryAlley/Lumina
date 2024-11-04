@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Entities.MediaContributors;
-using Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary;
-using Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Contracts.DTO.MediaContributors;
+using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
+using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.Common.Enums.BookLibrary;
 using System;
 using System.Collections.Generic;
@@ -36,11 +36,11 @@ namespace Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibr
 [DebuggerDisplay("Title: {Metadata.Title}")]
 public record BookResponse(
     Guid Id,
-    WrittenContentMetadataEntity Metadata,
+    WrittenContentMetadataDto Metadata,
     BookFormat? Format,
     string? Edition,
     int? VolumeNumber,
-    BookSeriesEntity? Series,
+    BookSeriesDto? Series,
     string? ASIN,
     string? GoodreadsId,
     string? LCCN,
@@ -50,9 +50,9 @@ public record BookResponse(
     string? GoogleBooksId,
     string? BarnesAndNobleId,
     string? AppleBooksId,
-    List<IsbnEntity>? ISBNs,
-    List<MediaContributorEntity>? Contributors,
-    List<BookRatingEntity>? Ratings,
+    List<IsbnDto>? ISBNs,
+    List<MediaContributorDto>? Contributors,
+    List<BookRatingDto>? Ratings,
     DateTime Created,
     DateTime? Updated
 );

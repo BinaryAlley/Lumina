@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Entities.FileSystemManagement;
+using Lumina.Contracts.DTO.FileSystemManagement;
 using System;
 using System.Diagnostics;
 #endregion
@@ -21,4 +21,4 @@ public record FileResponse(
     DateTime DateCreated,
     DateTime DateModified,
     long Size
-) : FileSystemItemEntity(Path, Name, DateCreated, DateModified);
+) : FileSystemItemDto(Path, Name, DateCreated, DateModified);

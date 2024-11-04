@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Entities.MediaLibrary.Management;
+using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
 using System.Linq;
 #endregion

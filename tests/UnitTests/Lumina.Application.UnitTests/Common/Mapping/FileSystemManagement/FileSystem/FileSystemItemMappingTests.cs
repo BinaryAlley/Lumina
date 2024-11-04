@@ -6,17 +6,16 @@ using Lumina.Application.UnitTests.Core.FileSystemManagement.Directories.Fixture
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Files.Fixtures;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.FileSystem.Fixtures;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Fixtures;
-using Lumina.Contracts.Entities.FileSystemManagement;
-using Lumina.Domain.Common.Enums.FileSystem;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
+using Lumina.Domain.Common.Enums.FileSystem;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using Lumina.Contracts.DTO.FileSystemManagement;
 #endregion
 
 namespace Lumina.Application.UnitTests.Common.Mapping.FileSystemManagement.FileSystem;
@@ -57,7 +56,7 @@ public class FileSystemItemMappingTests
         // Arrange
        
         // Act
-        FileSystemItemEntity result = domainModel.ToFileSystemItemEntity();
+        FileSystemItemDto result = domainModel.ToFileSystemItemDto();
 
         // Assert
         result.Should().NotBeNull();
@@ -147,7 +146,7 @@ public class FileSystemItemMappingTests
         FileSystemItemFixture domainModel = new(id, name, type);
 
         // Act
-        FileSystemItemEntity result = domainModel.ToFileSystemItemEntity();
+        FileSystemItemDto result = domainModel.ToFileSystemItemDto();
 
         // Assert
         result.Should().NotBeNull();

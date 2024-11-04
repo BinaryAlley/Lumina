@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Entities.MediaContributors;
-using Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary;
-using Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Contracts.DTO.MediaContributors;
+using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
+using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.Common.Enums.BookLibrary;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -31,11 +31,11 @@ namespace Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibra
 /// <param name="Ratings">The list of ratings for this book.</param>
 [DebuggerDisplay("Title: {Metadata.Title}")]
 public record AddBookRequest(
-    WrittenContentMetadataEntity? Metadata,
+    WrittenContentMetadataDto? Metadata,
     BookFormat? Format,
     string? Edition,
     int? VolumeNumber,
-    BookSeriesEntity? Series,
+    BookSeriesDto? Series,
     string? ASIN,
     string? GoodreadsId,
     string? LCCN,
@@ -45,7 +45,7 @@ public record AddBookRequest(
     string? GoogleBooksId,
     string? BarnesAndNobleId,
     string? AppleBooksId,
-    List<IsbnEntity>? ISBNs,
-    List<MediaContributorEntity>? Contributors,
-    List<BookRatingEntity>? Ratings
+    List<IsbnDto>? ISBNs,
+    List<MediaContributorDto>? Contributors,
+    List<BookRatingDto>? Ratings
 );

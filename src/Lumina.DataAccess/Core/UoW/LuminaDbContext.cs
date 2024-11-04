@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Entities.Common;
-using Lumina.Contracts.Entities.MediaLibrary.Management;
-using Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Contracts.Entities.UsersManagement;
+using Lumina.Application.Common.DataAccess.Entities.Common;
+using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Domain.Common.Events;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;

@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.FileSystemManagement.Directories;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Files;
-using Lumina.Contracts.Entities.FileSystemManagement;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Lumina.Contracts.DTO.FileSystemManagement;
 #endregion
 
 namespace Lumina.Application.Common.Mapping.FileSystemManagement.FileSystem;
@@ -18,13 +18,13 @@ namespace Lumina.Application.Common.Mapping.FileSystemManagement.FileSystem;
 public static class FileSystemItemMapping
 {
     /// <summary>
-    /// Converts <paramref name="domainEntity"/> to <see cref="FileSystemItemEntity"/>.
+    /// Converts <paramref name="domainEntity"/> to <see cref="FileSystemItemDto"/>.
     /// </summary>
     /// <param name="domainEntity">The domain entity to be converted.</param>
-    /// <returns>The converted entity.</returns>
-    public static FileSystemItemEntity ToFileSystemItemEntity(this FileSystemItem domainEntity)
+    /// <returns>The converted Dto.</returns>
+    public static FileSystemItemDto ToFileSystemItemDto(this FileSystemItem domainEntity)
     {
-        return new FileSystemItemEntity(
+        return new FileSystemItemDto(
             domainEntity.Id.Path,
             domainEntity.Name,
             DateTime.Now,

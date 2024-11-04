@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
-using Lumina.Contracts.Entities.MediaLibrary.Management;
+using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Errors;
 using Microsoft.EntityFrameworkCore;
