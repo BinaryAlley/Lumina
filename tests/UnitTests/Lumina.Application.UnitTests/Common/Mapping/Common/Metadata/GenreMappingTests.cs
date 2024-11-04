@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using FluentAssertions;
+using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.Mapping.Common.Metadata;
-using Lumina.Contracts.Entities.Common;
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;

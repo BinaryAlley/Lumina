@@ -1,14 +1,16 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using Bogus;
-using Lumina.Contracts.Entities.Common;
-using Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Application.Common.DataAccess.Entities.Common;
+using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.Common.Enums.BookLibrary;
 using Lumina.DataAccess.UnitTests.Common.Setup;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using Lumina.Contracts.DTO.Common;
+using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 #endregion
 
 namespace Lumina.DataAccess.UnitTests.Core.Repositories.Books.Fixtures;

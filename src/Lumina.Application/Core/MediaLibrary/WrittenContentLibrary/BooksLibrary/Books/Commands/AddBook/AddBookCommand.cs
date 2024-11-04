@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using Lumina.Contracts.Entities.MediaContributors;
-using Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary;
-using Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.Common.Enums.BookLibrary;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Mediator;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Lumina.Contracts.DTO.MediaContributors;
+using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
+using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 #endregion
 
 namespace Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook;
@@ -34,11 +34,11 @@ namespace Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrar
 /// <param name="Ratings">The list of ratings for this book.</param>
 [DebuggerDisplay("Title: {Title}")]
 public record AddBookCommand(
-    WrittenContentMetadataEntity? Metadata,
+    WrittenContentMetadataDto? Metadata,
     BookFormat? Format,
     string? Edition,
     int? VolumeNumber,
-    BookSeriesEntity? Series,
+    BookSeriesDto? Series,
     string? ASIN,
     string? GoodreadsId,
     string? LCCN,
@@ -48,7 +48,7 @@ public record AddBookCommand(
     string? GoogleBooksId,
     string? BarnesAndNobleId,
     string? AppleBooksId,
-    List<IsbnEntity>? ISBNs,
-    List<MediaContributorEntity>? Contributors,
-    List<BookRatingEntity>? Ratings
+    List<IsbnDto>? ISBNs,
+    List<MediaContributorDto>? Contributors,
+    List<BookRatingDto>? Ratings
 ) : IRequest<ErrorOr<BookResponse>>;

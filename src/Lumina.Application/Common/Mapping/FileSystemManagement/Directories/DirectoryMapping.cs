@@ -55,7 +55,7 @@ public static class DirectoryMapping
             domainEntity.Name,
             domainEntity.DateCreated.Value,
             domainEntity.DateModified.Value,
-            domainEntity.Items.Select(fileSystemItem => fileSystemItem.ToFileSystemItemEntity())
+            domainEntity.Items.Select(fileSystemItem => fileSystemItem.ToFileSystemItemDto())
                               .ToList()
         );
     }

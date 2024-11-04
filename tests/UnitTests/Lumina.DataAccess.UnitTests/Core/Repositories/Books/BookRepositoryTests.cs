@@ -2,8 +2,8 @@
 using EntityFrameworkCore.Testing.NSubstitute;
 using ErrorOr;
 using FluentAssertions;
-using Lumina.Contracts.Entities.Common;
-using Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Application.Common.DataAccess.Entities.Common;
+using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.Common.Enums.BookLibrary;
 using Lumina.DataAccess.Core.Repositories.Books;
 using Lumina.DataAccess.Core.UoW;
@@ -16,6 +16,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Lumina.Contracts.DTO.Common;
 #endregion
 
 namespace Lumina.DataAccess.UnitTests.Core.Repositories.Books;

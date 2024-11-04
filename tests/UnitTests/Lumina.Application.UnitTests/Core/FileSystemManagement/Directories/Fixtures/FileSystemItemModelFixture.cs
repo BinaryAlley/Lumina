@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Contracts.Entities.FileSystemManagement;
+using Lumina.Contracts.DTO.FileSystemManagement;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -9,7 +9,7 @@ using System.Linq;
 namespace Lumina.Application.UnitTests.Core.FileSystemManagement.Directories.Fixtures;
 
 /// <summary>
-/// Fixture class for the <see cref="FileSystemItemEntity"/> class.
+/// Fixture class for the <see cref="FileSystemItemDto"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class FileSystemItemModelFixture
@@ -17,12 +17,12 @@ public class FileSystemItemModelFixture
     private readonly Faker _faker = new();
 
     /// <summary>
-    /// Creates a random valid <see cref="FileSystemItemEntity"/>.
+    /// Creates a random valid <see cref="FileSystemItemDto"/>.
     /// </summary>
-    /// <returns>The created <see cref="FileSystemItemEntity"/>.</returns>
-    public FileSystemItemEntity Create()
+    /// <returns>The created <see cref="FileSystemItemDto"/>.</returns>
+    public FileSystemItemDto Create()
     {
-        return new FileSystemItemEntity(
+        return new FileSystemItemDto(
             _faker.System.FilePath(),
             _faker.System.FileName(),
             _faker.Date.Past(),
@@ -31,11 +31,11 @@ public class FileSystemItemModelFixture
     }
 
     /// <summary>
-    /// Creates a list of <see cref="FileSystemItemEntity"/>.
+    /// Creates a list of <see cref="FileSystemItemDto"/>.
     /// </summary>
     /// <param name="count">The number of elements to create.</param>
     /// <returns>The created list.</returns>
-    public List<FileSystemItemEntity> CreateMany(int count = 3)
+    public List<FileSystemItemDto> CreateMany(int count = 3)
     {
         return Enumerable.Range(0, count).Select(_ => Create()).ToList();
     }

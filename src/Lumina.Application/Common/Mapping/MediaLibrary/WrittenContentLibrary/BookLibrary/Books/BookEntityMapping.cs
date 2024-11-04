@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
+using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
-using Lumina.Contracts.Entities.Common;
-using Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary;
-using Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Domain.Common.Enums.BookLibrary;
+using Lumina.Contracts.DTO.Common;
+using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Lumina.Domain.Common.Enums.BookLibrary;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
@@ -151,7 +151,7 @@ public static class BookEntityMapping
     /// <returns>The converted response entity.</returns>
     public static BookResponse ToResponse(this BookEntity repositoryEntity)
     {
-        ReleaseInfoEntity releaseInfoEntity = new(
+        ReleaseInfoDto releaseInfoEntity = new(
             repositoryEntity.OriginalReleaseDate,
             repositoryEntity.OriginalReleaseYear,
             repositoryEntity.ReReleaseDate,
@@ -160,29 +160,29 @@ public static class BookEntityMapping
             repositoryEntity.ReleaseVersion
         );
         // language and original language make sense only if their subproperties have values
-        LanguageInfoEntity? languageInfoEntity = !string.IsNullOrWhiteSpace(repositoryEntity.LanguageCode) ||
+        LanguageInfoDto? languageInfoEntity = !string.IsNullOrWhiteSpace(repositoryEntity.LanguageCode) ||
                                           !string.IsNullOrWhiteSpace(repositoryEntity.LanguageName) ||
                                           !string.IsNullOrWhiteSpace(repositoryEntity.LanguageNativeName)
-            ? new LanguageInfoEntity(
+            ? new LanguageInfoDto(
                 repositoryEntity.LanguageCode,
                 repositoryEntity.LanguageName,
                 repositoryEntity.LanguageNativeName
             ) : null;
-        LanguageInfoEntity? originalLanguageInfoEntity = !string.IsNullOrWhiteSpace(repositoryEntity.OriginalLanguageCode) ||
+        LanguageInfoDto? originalLanguageInfoEntity = !string.IsNullOrWhiteSpace(repositoryEntity.OriginalLanguageCode) ||
                                           !string.IsNullOrWhiteSpace(repositoryEntity.OriginalLanguageName) ||
                                           !string.IsNullOrWhiteSpace(repositoryEntity.OriginalLanguageNativeName)
-            ? new LanguageInfoEntity(
+            ? new LanguageInfoDto(
                 repositoryEntity.OriginalLanguageCode,
                 repositoryEntity.OriginalLanguageName,
                 repositoryEntity.OriginalLanguageNativeName
             ) : null;
-        WrittenContentMetadataEntity metadata = new(
+        WrittenContentMetadataDto metadata = new(
             repositoryEntity.Title,
             repositoryEntity.OriginalTitle,
             repositoryEntity.Description,
             releaseInfoEntity,
-            [.. repositoryEntity.Genres],
-            [.. repositoryEntity.Tags],
+            [.. repositoryEntity.Genres.ToResponses()],
+            [.. repositoryEntity.Tags.ToResponses()],
             languageInfoEntity,
             originalLanguageInfoEntity,
             repositoryEntity.Publisher,
@@ -204,9 +204,9 @@ public static class BookEntityMapping
             repositoryEntity.GoogleBooksId,
             repositoryEntity.BarnesAndNobleId,
             repositoryEntity.AppleBooksId,
-            repositoryEntity.ISBNs,
+            [.. repositoryEntity.ISBNs.ToResponses()],
             null,
-            repositoryEntity.Ratings,
+            [.. repositoryEntity.Ratings.ToResponses()],
             repositoryEntity.Created,
             repositoryEntity.Updated
         );

@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
-using Lumina.Contracts.Entities.UsersManagement;
+using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Errors;
 using Microsoft.EntityFrameworkCore;

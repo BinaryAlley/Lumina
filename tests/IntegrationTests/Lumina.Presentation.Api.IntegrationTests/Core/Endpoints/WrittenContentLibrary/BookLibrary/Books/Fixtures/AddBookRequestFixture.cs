@@ -1,15 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using Bogus;
-using Lumina.Contracts.Entities.Common;
-using Lumina.Contracts.Entities.MediaContributors;
-using Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary;
-using Lumina.Contracts.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Domain.Common.Enums.BookLibrary;
+using Lumina.Contracts.DTO.Common;
+using Lumina.Contracts.DTO.MediaContributors;
+using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
+using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Lumina.Domain.Common.Enums.BookLibrary;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
@@ -46,8 +45,8 @@ public class AddBookRequestFixture
         int releaseYear = _random.Next(2000, 2010);
         int reReleaseYear = _random.Next(2010, 2020);
 
-        ReleaseInfoEntity releaseInfo = new Faker<ReleaseInfoEntity>()
-            .CustomInstantiator(f => new ReleaseInfoEntity(
+        ReleaseInfoDto releaseInfo = new Faker<ReleaseInfoDto>()
+            .CustomInstantiator(f => new ReleaseInfoDto(
                 default,
                 default,
                 default,
@@ -63,44 +62,44 @@ public class AddBookRequestFixture
             .RuleFor(x => x.ReleaseVersion, f => f.Random.String2(f.Random.Number(1, 50)))
             .Generate();
 
-        Faker<GenreEntity> genre = new Faker<GenreEntity>()
-            .CustomInstantiator(f => new GenreEntity(
+        Faker<GenreDto> genre = new Faker<GenreDto>()
+            .CustomInstantiator(f => new GenreDto(
                 default!
             ))
             .RuleFor(e => e.Name, f => f.Random.String2(f.Random.Number(1, 50)));
 
-        Faker<TagEntity> tag = new Faker<TagEntity>()
-            .CustomInstantiator(f => new TagEntity(
+        Faker<TagDto> tag = new Faker<TagDto>()
+            .CustomInstantiator(f => new TagDto(
                 default!
             ))
             .RuleFor(e => e.Name, f => f.Random.String2(f.Random.Number(1, 50)));
 
-        Faker<MediaContributorRoleEntity> mediaContributorRole = new Faker<MediaContributorRoleEntity>()
-            .CustomInstantiator(f => new MediaContributorRoleEntity(
+        Faker<MediaContributorRoleDto> mediaContributorRole = new Faker<MediaContributorRoleDto>()
+            .CustomInstantiator(f => new MediaContributorRoleDto(
                 default!,
                 default!
             ))
             .RuleFor(e => e.Name, f => f.Random.String2(f.Random.Number(1, 50)))
             .RuleFor(e => e.Category, f => f.Random.String2(f.Random.Number(1, 50)));
 
-        Faker<MediaContributorNameEntity> mediaContributorName = new Faker<MediaContributorNameEntity>()
-                    .CustomInstantiator(f => new MediaContributorNameEntity(
+        Faker<MediaContributorNameDto> mediaContributorName = new Faker<MediaContributorNameDto>()
+                    .CustomInstantiator(f => new MediaContributorNameDto(
                         default!,
                         default!
                     ))
                     .RuleFor(e => e.DisplayName, f => f.Random.String2(f.Random.Number(1, 50)))
                     .RuleFor(e => e.LegalName, f => f.Random.String2(f.Random.Number(1, 50)));
 
-        Faker<MediaContributorEntity> mediaContributor = new Faker<MediaContributorEntity>()
-            .CustomInstantiator(f => new MediaContributorEntity(
+        Faker<MediaContributorDto> mediaContributor = new Faker<MediaContributorDto>()
+            .CustomInstantiator(f => new MediaContributorDto(
                 default!,
                 default!
             ))
             .RuleFor(e => e.Name, mediaContributorName)
             .RuleFor(e => e.Role, mediaContributorRole);
 
-        Faker<BookRatingEntity> rating = new Faker<BookRatingEntity>()
-           .CustomInstantiator(f => new BookRatingEntity(
+        Faker<BookRatingDto> rating = new Faker<BookRatingDto>()
+           .CustomInstantiator(f => new BookRatingDto(
                 default,
                 default,
                 default,
@@ -111,8 +110,8 @@ public class AddBookRequestFixture
            .RuleFor(e => e.Source, _fixture.Create<BookRatingSource>())
            .RuleFor(e => e.VoteCount, _random.Next(1, 1000));
 
-        Faker<LanguageInfoEntity> language = new Faker<LanguageInfoEntity>()
-            .CustomInstantiator(f => new LanguageInfoEntity(
+        Faker<LanguageInfoDto> language = new Faker<LanguageInfoDto>()
+            .CustomInstantiator(f => new LanguageInfoDto(
                 default!,
                 default!,
                 default
@@ -121,8 +120,8 @@ public class AddBookRequestFixture
             .RuleFor(e => e.LanguageCode, f => f.Random.String2(2))
             .RuleFor(e => e.NativeName, f => f.Random.String2(f.Random.Number(1, 50)));
 
-        Faker<LanguageInfoEntity> originalLanguage = new Faker<LanguageInfoEntity>()
-            .CustomInstantiator(f => new LanguageInfoEntity(
+        Faker<LanguageInfoDto> originalLanguage = new Faker<LanguageInfoDto>()
+            .CustomInstantiator(f => new LanguageInfoDto(
                 default!,
                 default!,
                 default
@@ -131,8 +130,8 @@ public class AddBookRequestFixture
             .RuleFor(e => e.LanguageCode, f => f.Random.String2(2))
             .RuleFor(e => e.NativeName, f => f.Random.String2(f.Random.Number(1, 50)));
 
-        Faker<WrittenContentMetadataEntity> metadata = new Faker<WrittenContentMetadataEntity>()
-            .CustomInstantiator(f => new WrittenContentMetadataEntity(
+        Faker<WrittenContentMetadataDto> metadata = new Faker<WrittenContentMetadataDto>()
+            .CustomInstantiator(f => new WrittenContentMetadataDto(
                 default!,
                 default,
                 default,
@@ -155,8 +154,8 @@ public class AddBookRequestFixture
             .RuleFor(x => x.Publisher, f => f.Random.String2(f.Random.Number(1, 100)))
             .RuleFor(x => x.PageCount, _random.Next(100, 300));
 
-        Faker<IsbnEntity> isbn = new Faker<IsbnEntity>()
-            .CustomInstantiator(f => new IsbnEntity(
+        Faker<IsbnDto> isbn = new Faker<IsbnDto>()
+            .CustomInstantiator(f => new IsbnDto(
                 default!,
                 default
             ))

@@ -50,7 +50,7 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.ToTable("BookTags", (string)null);
                 });
 
-            modelBuilder.Entity("Lumina.Contracts.Entities.Common.GenreEntity", b =>
+            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.Common.GenreEntity", b =>
                 {
                     b.Property<string>("Name")
                         .HasMaxLength(50)
@@ -61,7 +61,7 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.ToTable("Genres", (string)null);
                 });
 
-            modelBuilder.Entity("Lumina.Contracts.Entities.Common.TagEntity", b =>
+            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.Common.TagEntity", b =>
                 {
                     b.Property<string>("Name")
                         .HasMaxLength(50)
@@ -72,7 +72,7 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.ToTable("Tags", (string)null);
                 });
 
-            modelBuilder.Entity("Lumina.Contracts.Entities.UsersManagement.UserEntity", b =>
+            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.UsersManagement.UserEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("TEXT")
@@ -112,7 +112,7 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
-            modelBuilder.Entity("Lumina.Contracts.Entities.WrittenContentLibrary.BookLibrary.BookEntity", b =>
+            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.WrittenContentLibrary.BookLibrary.BookEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("TEXT")
@@ -261,13 +261,13 @@ namespace Lumina.DataAccess.Common.Migrations
 
             modelBuilder.Entity("BookGenres", b =>
                 {
-                    b.HasOne("Lumina.Contracts.Entities.WrittenContentLibrary.BookLibrary.BookEntity", null)
+                    b.HasOne("Lumina.Application.Common.DataAccess.Entities.WrittenContentLibrary.BookLibrary.BookEntity", null)
                         .WithMany()
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Lumina.Contracts.Entities.Common.GenreEntity", null)
+                    b.HasOne("Lumina.Application.Common.DataAccess.Entities.Common.GenreEntity", null)
                         .WithMany()
                         .HasForeignKey("GenreId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -276,22 +276,22 @@ namespace Lumina.DataAccess.Common.Migrations
 
             modelBuilder.Entity("BookTags", b =>
                 {
-                    b.HasOne("Lumina.Contracts.Entities.WrittenContentLibrary.BookLibrary.BookEntity", null)
+                    b.HasOne("Lumina.Application.Common.DataAccess.Entities.WrittenContentLibrary.BookLibrary.BookEntity", null)
                         .WithMany()
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Lumina.Contracts.Entities.Common.TagEntity", null)
+                    b.HasOne("Lumina.Application.Common.DataAccess.Entities.Common.TagEntity", null)
                         .WithMany()
                         .HasForeignKey("TagId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Lumina.Contracts.Entities.WrittenContentLibrary.BookLibrary.BookEntity", b =>
+            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.WrittenContentLibrary.BookLibrary.BookEntity", b =>
                 {
-                    b.OwnsMany("Lumina.Contracts.Entities.WrittenContentLibrary.BookLibrary.BookRatingEntity", "Ratings", b1 =>
+                    b.OwnsMany("Lumina.Application.Common.DataAccess.Entities.WrittenContentLibrary.BookLibrary.BookRatingEntity", "Ratings", b1 =>
                         {
                             b1.Property<int>("Id")
                                 .ValueGeneratedOnAdd()
@@ -326,7 +326,7 @@ namespace Lumina.DataAccess.Common.Migrations
                                 .HasForeignKey("BookId");
                         });
 
-                    b.OwnsMany("Lumina.Contracts.Entities.WrittenContentLibrary.BookLibrary.IsbnEntity", "ISBNs", b1 =>
+                    b.OwnsMany("Lumina.Application.Common.DataAccess.Entities.WrittenContentLibrary.BookLibrary.IsbnEntity", "ISBNs", b1 =>
                         {
                             b1.Property<int>("Id")
                                 .ValueGeneratedOnAdd()
