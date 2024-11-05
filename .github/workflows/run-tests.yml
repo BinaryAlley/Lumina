@@ -8,6 +8,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env: # Set Environment options that are meant to be left empty so the user fills them
+      JwtSettings__SecretKey: "ds1/Ly$hFHj4-(rs^Qq.M/@sP90%j@Ma"
+      EncryptionSettings__SecretKey: "FLYO0QRo6u2VzoFOgNkkEwYNGtqhJ3QGZd7iAHNEJeM"
     steps:
       - uses: actions/checkout@v2
       - name: Set up .NET
