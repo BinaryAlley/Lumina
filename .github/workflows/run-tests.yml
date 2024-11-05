@@ -14,6 +14,10 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '8.0.x'
+      - name: Set Environment options that are meant to be left empty so the user fills them
+        env:
+          JwtSettings__SecretKey: "ds1/Ly$hFHj4-(rs^Qq.M/@sP90%j@Ma"
+          EncryptionSettings__SecretKey: "FLYO0QRo6u2VzoFOgNkkEwYNGtqhJ3QGZd7iAHNEJeM"
       - name: Restore dependencies
         run: dotnet restore src/Lumina.sln
       - name: Build
