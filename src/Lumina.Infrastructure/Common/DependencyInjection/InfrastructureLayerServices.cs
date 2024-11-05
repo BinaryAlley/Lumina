@@ -23,7 +23,8 @@ public static class InfrastructureLayerServices
         // scan the current assembly for validators and add them to the DI container
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly(), ServiceLifetime.Singleton);
 
-        services.AddTransient<IHashService, HashService>();
+        services.AddSingleton<IHashService, HashService>();
+        services.AddSingleton<ICryptographyService, CryptographyService>();
         return services;
     }
 }
