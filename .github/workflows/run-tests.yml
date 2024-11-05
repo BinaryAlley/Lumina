@@ -4,14 +4,20 @@ on:
   pull_request:
     branches:
       - master
+  workflow_dispatch: # enable manual triggers
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    environment: test
     env: # Set Environment options that are meant to be left empty so the user fills them
       JwtSettings__SecretKey: "ds1/Ly$hFHj4-(rs^Qq.M/@sP90%j@Ma"
       EncryptionSettings__SecretKey: "FLYO0QRo6u2VzoFOgNkkEwYNGtqhJ3QGZd7iAHNEJeM"
     steps:
+      - name: Overidden Environment Variables
+        run: |
+          echo "JwtSettings__SecretKey: $JwtSettings__SecretKey"
+          echo "EncryptionSettings__SecretKey: $EncryptionSettings__SecretKey"
       - uses: actions/checkout@v2
       - name: Set up .NET
         uses: actions/setup-dotnet@v1
