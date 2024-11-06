@@ -2,8 +2,6 @@
 using Lumina.Domain.Common.Enums.FileSystem;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Platform;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
-using Mono.Unix;
-using Mono.Unix.Native;
 using System;
 using System.IO;
 using System.Runtime.Versioning;
@@ -55,46 +53,94 @@ internal class FileSystemPermissionsService : IFileSystemPermissionsService // T
     /// <param name="path">The path for which to check the access.</param>
     /// <param name="accessMode">The access mode in which to check that path access.</param>
     /// <returns><see langword="true"/> if the current user has rights for the specified path and acccess mode, <see langword="false"/> otherwise.</returns>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown when trying to check access for a mode that is not supported</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when trying to check access for a mode that is not supported.</exception>
     private static bool CanAccessPathUnix(string path, FileAccessMode accessMode)
     {
-        AccessModes modes;
-        UnixFileSystemInfo fileInfo = new UnixFileInfo(path);
-        switch (accessMode)
+        try
         {
-            case FileAccessMode.ReadProperties:
-                // we would typically need execute permissions on a directory, to list its contents or view file properties
-                if (fileInfo.FileType == FileTypes.Directory)
-                    return fileInfo.CanAccess(AccessModes.X_OK);
-                // for files, just verifying existence might be sufficient for reading properties
-                return fileInfo.Exists;
-            case FileAccessMode.ReadContents:
-                return fileInfo.CanAccess(AccessModes.R_OK);
-            case FileAccessMode.Write:
-                modes = AccessModes.W_OK;
-                break;
-            case FileAccessMode.Execute:
-                modes = AccessModes.X_OK;
-                break;
-            case FileAccessMode.ListDirectory:
-                modes = AccessModes.F_OK;  // check existence, not an exact match but the closest
-                break;
-            case FileAccessMode.Delete:
-                if (fileInfo.FileType == FileTypes.Directory)
-                    return fileInfo.CanAccess(AccessModes.W_OK | AccessModes.X_OK); // to delete a directory, we need write and execute permissions on the directory itself
-                else
-                {
-                    // to delete a file, we need write permission on the parent directory
-                    string? parentDirectoryPath = Path.GetDirectoryName(path);
-                    if (string.IsNullOrEmpty(parentDirectoryPath))
-                        return false; // if path is a root directory or has no parent, deletion is not possible
-                    UnixDirectoryInfo parentDirectoryInfo = new(parentDirectoryPath);
-                    return parentDirectoryInfo.CanAccess(AccessModes.W_OK);
-                }
-            default:
-                throw new ArgumentOutOfRangeException(nameof(accessMode), "Unknown FileAccessMode");
+            switch (accessMode)
+            {
+                case FileAccessMode.ReadProperties:
+                    // for properties, we only need to check if the path exists
+                    return File.Exists(path) || Directory.Exists(path);
+                case FileAccessMode.ReadContents:
+                    // attempt to open the file for reading to verify read access
+                    if (File.Exists(path))
+                    {
+                        FileStream fileStream = File.OpenRead(path);
+                        fileStream.Dispose();
+                        return true;
+                    }
+                    return false;
+                case FileAccessMode.Write:
+                    // attempt to open the file for writing or verify directory exists
+                    if (File.Exists(path))
+                    {
+                        FileStream fileStream = File.OpenWrite(path);
+                        fileStream.Dispose();
+                        return true;
+                    }
+                    return Directory.Exists(path);
+                case FileAccessMode.Execute:
+                    // check Unix execute permission bit
+                    FileInfo fileInfo = new(path);
+                    return (fileInfo.UnixFileMode & UnixFileMode.UserExecute) != 0;
+                case FileAccessMode.ListDirectory:
+                    // attempt to list directory contents to verify access
+                    if (Directory.Exists(path))
+                    {
+                        string[] _ = Directory.GetFiles(path);
+                        return true;
+                    }
+                    return false;
+                case FileAccessMode.Delete:
+                    if (File.Exists(path))
+                    {
+                        // for files, check if parent directory is writable
+                        string? directoryPath = Path.GetDirectoryName(path);
+                        return directoryPath != null && HasWriteAccessToDirectory(directoryPath);
+                    }
+                    // for directories, check if the directory itself is writable
+                    return Directory.Exists(path) && HasWriteAccessToDirectory(path);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(accessMode), "Unknown FileAccessMode");
+            }
         }
-        return new UnixDirectoryInfo(path).CanAccess(modes);
+        catch (UnauthorizedAccessException)
+        {            
+            return false; // access denied by the operating system
+        }
+        catch (IOException)
+        {            
+            return false; // IO operation failed, indicating no access
+        }
+    }
+
+    /// <summary>
+    /// Verifies write access to a directory by attempting to create and delete a temporary file.
+    /// </summary>
+    /// <param name="path">The directory path to check for write access.</param>
+    /// <returns><see langword="true"/> if write access is granted, <see langword="false"/> otherwise.</returns>
+    private static bool HasWriteAccessToDirectory(string path)
+    {
+        try
+        {
+            // create a unique temporary filename
+            string temporaryFilePath = Path.Combine(path, string.Format(".test_{0}", Guid.NewGuid()));
+            // attempt to create and immediately delete a temporary file
+            FileStream testStream = File.Create(temporaryFilePath);
+            testStream.Dispose();
+            File.Delete(temporaryFilePath);
+            return true;
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return false;
+        }
+        catch (IOException)
+        {
+            return false;
+        }
     }
 
     /// <summary>
