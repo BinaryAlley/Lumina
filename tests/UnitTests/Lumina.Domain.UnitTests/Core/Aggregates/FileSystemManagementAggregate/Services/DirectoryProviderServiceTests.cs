@@ -33,29 +33,29 @@ public class DirectoryProviderServiceTests
     private readonly IFileSystemPermissionsService _mockFileSystemPermissionsService;
     private readonly DirectoryProviderService _sut;
     private readonly FileSystemPathIdFixture _fileSystemPathIdFixture;
-    private static readonly bool s_isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
-    private readonly string _pathSource = s_isLinux ? "/Source" : @"C:\Source";
-    private readonly string _pathSourceSubDir = s_isLinux ? "/Source/SubDir" : @"C:\Source\SubDir";
-    private readonly string _pathSourceSubDir1 = s_isLinux ? "/Source/SubDir1" : @"C:\Source\SubDir1";
-    private readonly string _pathSourceSubDir2 = s_isLinux ? "/Source/SubDir2" : @"C:\Source\SubDir2";
-    private readonly string _pathSourceFile1 = s_isLinux ? "/Source/file1.txt" : @"C:\Source\file1.txt";
-    private readonly string _pathSourceFile2 = s_isLinux ? "/Source/file2.txt" : @"C:\Source\file2.txt";
-    private readonly string _pathDestinationFile1 = s_isLinux ? "/Destination/file1.txt" : @"C:\Destination\file1.txt";
-    private readonly string _pathDestinationFile2 = s_isLinux ? "/Destination/file2.txt" : @"C:\Destination\file2.txt";
-    private readonly string _pathDestination = s_isLinux ? "/Destination" : @"C:\Destination";
-    private readonly string _pathDestinationSubDir = s_isLinux ? "/Destination/SubDir" : @"C:\Destination\SubDir";
-    private readonly string _pathDestinationSubDir1 = s_isLinux ? "/Destination/SubDir1" : @"C:\Destination\SubDir1";
-    private readonly string _pathDestinationSubDir2 = s_isLinux ? "/Destination/SubDir2" : @"C:\Destination\SubDir2";
-    private readonly string _pathDestinationFile = s_isLinux ? "/Destination/file.txt" : @"C:\Destination\file.txt";
-    private readonly string _pathVisible1 = s_isLinux ? "/Visible" : @"C:\Visible";
-    private readonly string _pathHidden1 = s_isLinux ? "/Hidden" : @"C:\Hidden";
-    private readonly string _pathVisible2 = s_isLinux ? "/Visible/" : @"C:\Visible\";
-    private readonly string _pathHidden2 = s_isLinux ? "/Hidden/" : @"C:\Hidden\";
-    private readonly string _pathValid1 = s_isLinux ? "/Valid" : @"C:\Valid";
-    private readonly string _pathInvalid1 = s_isLinux ? "/Invalid" : @"C:\Invalid";
-    private readonly string _pathValid2 = s_isLinux ? "/Valid/" : @"C:\Valid\";
-    private readonly string _pathInvalid2 = s_isLinux ? "/Invalid/" : @"C:\Invalid\";
-    private readonly char _dirSeparator = s_isLinux ? '/' : '\\';
+    private static readonly bool s_isUnix = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+    private readonly string _pathSource = s_isUnix ? "/Source" : @"C:\Source";
+    private readonly string _pathSourceSubDir = s_isUnix ? "/Source/SubDir" : @"C:\Source\SubDir";
+    private readonly string _pathSourceSubDir1 = s_isUnix ? "/Source/SubDir1" : @"C:\Source\SubDir1";
+    private readonly string _pathSourceSubDir2 = s_isUnix ? "/Source/SubDir2" : @"C:\Source\SubDir2";
+    private readonly string _pathSourceFile1 = s_isUnix ? "/Source/file1.txt" : @"C:\Source\file1.txt";
+    private readonly string _pathSourceFile2 = s_isUnix ? "/Source/file2.txt" : @"C:\Source\file2.txt";
+    private readonly string _pathDestinationFile1 = s_isUnix ? "/Destination/file1.txt" : @"C:\Destination\file1.txt";
+    private readonly string _pathDestinationFile2 = s_isUnix ? "/Destination/file2.txt" : @"C:\Destination\file2.txt";
+    private readonly string _pathDestination = s_isUnix ? "/Destination" : @"C:\Destination";
+    private readonly string _pathDestinationSubDir = s_isUnix ? "/Destination/SubDir" : @"C:\Destination\SubDir";
+    private readonly string _pathDestinationSubDir1 = s_isUnix ? "/Destination/SubDir1" : @"C:\Destination\SubDir1";
+    private readonly string _pathDestinationSubDir2 = s_isUnix ? "/Destination/SubDir2" : @"C:\Destination\SubDir2";
+    private readonly string _pathDestinationFile = s_isUnix ? "/Destination/file.txt" : @"C:\Destination\file.txt";
+    private readonly string _pathVisible1 = s_isUnix ? "/Visible" : @"C:\Visible";
+    private readonly string _pathHidden1 = s_isUnix ? "/Hidden" : @"C:\Hidden";
+    private readonly string _pathVisible2 = s_isUnix ? "/Visible/" : @"C:\Visible\";
+    private readonly string _pathHidden2 = s_isUnix ? "/Hidden/" : @"C:\Hidden\";
+    private readonly string _pathValid1 = s_isUnix ? "/Valid" : @"C:\Valid";
+    private readonly string _pathInvalid1 = s_isUnix ? "/Invalid" : @"C:\Invalid";
+    private readonly string _pathValid2 = s_isUnix ? "/Valid/" : @"C:\Valid\";
+    private readonly string _pathInvalid2 = s_isUnix ? "/Invalid/" : @"C:\Invalid\";
+    private readonly char _dirSeparator = s_isUnix ? '/' : '\\';
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DirectoryProviderServiceTests"/> class.
@@ -172,14 +172,14 @@ public class DirectoryProviderServiceTests
     {
         // Arrange
         FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId();
-        string[] subdirectories = s_isLinux
+        string[] subdirectories = s_isUnix
             ? ["/C", "/A", "/B"]
             : [@"C:\C", @"C:\A", @"C:\B"];
         _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ListDirectory, false).Returns(true);
         _mockFileSystem.Directory.GetDirectories(path.Path).Returns(subdirectories);
         _mockFileSystem.Path.DirectorySeparatorChar.Returns(_dirSeparator);
         _mockFileSystem.File.GetAttributes(Arg.Any<string>()).Returns(FileAttributes.Directory);
-        string[] expectedPaths = s_isLinux
+        string[] expectedPaths = s_isUnix
             ? ["/A/", "/B/", "/C/"]
             : [@"C:\A\", @"C:\B\", @"C:\C\"];
 
@@ -241,7 +241,7 @@ public class DirectoryProviderServiceTests
     public void GetFileName_WhenPathIsValid_ShouldReturnFileName()
     {
         // Arrange
-        string fullPath = s_isLinux
+        string fullPath = s_isUnix
             ? "/folder/subfolder/file.txt"
             : @"C:\folder\subfolder\file.txt";
         FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId(fullPath);
@@ -259,7 +259,7 @@ public class DirectoryProviderServiceTests
     public void GetFileName_WhenPathEndsWithDirectorySeparator_ShouldReturnLastSegment()
     {
         // Arrange
-        string fullPath = s_isLinux
+        string fullPath = s_isUnix
             ? "/folder/subfolder/"
             : @"C:\folder\subfolder\";
         FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId(fullPath);
@@ -278,7 +278,7 @@ public class DirectoryProviderServiceTests
     public void GetFileName_WhenPathIsRoot_ShouldReturnEmptyString()
     {
         // Arrange
-        string fullPath = s_isLinux
+        string fullPath = s_isUnix
             ? "/C/"
             : @"/";
         FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId(fullPath);
@@ -365,7 +365,7 @@ public class DirectoryProviderServiceTests
         // Arrange
         FileSystemPathId parentPath = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\Parent");
         string directoryName = "NewDirectory";
-        string fullPath = s_isLinux
+        string fullPath = s_isUnix
             ? "/Parent/NewDirectory"
             : @"C:\Parent\NewDirectory";
 
@@ -491,7 +491,7 @@ public class DirectoryProviderServiceTests
         // Arrange
         FileSystemPathId sourcePath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSource);
         FileSystemPathId destinationPath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestination);
-        string expectedNewDirectoryPath = s_isLinux
+        string expectedNewDirectoryPath = s_isUnix
             ? "/Destination - Copy (1)"
             : @"C:\Destination - Copy (1)";
         bool overrideExisting = false;
@@ -598,7 +598,7 @@ public class DirectoryProviderServiceTests
     {
         // Arrange
         FileSystemPathId sourcePath = _fileSystemPathIdFixture.CreateFileSystemPathId(
-            s_isLinux ? "/NonExistentSource" : @"C:\NonExistentSource"
+            s_isUnix ? "/NonExistentSource" : @"C:\NonExistentSource"
         );
         FileSystemPathId destinationPath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestination);
         bool overrideExisting = false;
@@ -667,7 +667,7 @@ public class DirectoryProviderServiceTests
         _mockFileSystem.File.Received(1).Move(_pathSourceFile1, _pathDestinationFile1);
         _mockFileSystem.Directory.Received(1).Move(
             _pathSourceSubDir,
-            s_isLinux ? "/Destination/SubDir" : @"C:\Destination\SubDir"
+            s_isUnix ? "/Destination/SubDir" : @"C:\Destination\SubDir"
         );
         _mockFileSystem.Directory.Received(1).Delete(sourcePath.Path);
     }
@@ -806,20 +806,20 @@ public class DirectoryProviderServiceTests
         _mockFileSystem.Directory.Exists(destPath.Path).Returns(true);
 
         _mockFileSystem.Directory.Exists(_pathSourceSubDir).Returns(true);
-        _mockFileSystem.Directory.Exists(s_isLinux ? "/Destination/SubDir" : @"C:\Destination\SubDir").Returns(true);
+        _mockFileSystem.Directory.Exists(s_isUnix ? "/Destination/SubDir" : @"C:\Destination\SubDir").Returns(true);
 
         _mockFileSystem.Directory.GetFiles(sourcePath.Path).Returns([]);
         _mockFileSystem.Directory.GetDirectories(sourcePath.Path).Returns([_pathSourceSubDir]);
 
         _mockFileSystem.Directory.GetFiles(_pathSourceSubDir).Returns(
-            s_isLinux ? ["/Source/SubDir/file.txt"] : [@"C:\Source\SubDir\file.txt"]
+            s_isUnix ? ["/Source/SubDir/file.txt"] : [@"C:\Source\SubDir\file.txt"]
         );
         _mockFileSystem.Directory.GetDirectories(_pathSourceSubDir).Returns([]);
 
         _mockFileSystem.Path.GetFileName(_pathSourceSubDir).Returns("SubDir");
-        _mockFileSystem.Path.GetFileName(s_isLinux ? "/Source/SubDir/file.txt" : @"C:\Source\SubDir\file.txt").Returns("file.txt");
+        _mockFileSystem.Path.GetFileName(s_isUnix ? "/Source/SubDir/file.txt" : @"C:\Source\SubDir\file.txt").Returns("file.txt");
 
-        _mockFileSystem.File.Exists(s_isLinux ? "/Destination/SubDir/file.txt" : @"C:\Destination\SubDir\file.txt").Returns(false);
+        _mockFileSystem.File.Exists(s_isUnix ? "/Destination/SubDir/file.txt" : @"C:\Destination\SubDir\file.txt").Returns(false);
 
         _mockFileSystem.Path.Combine(Arg.Any<string>(), Arg.Any<string>())
             .Returns(callInfo => Path.Combine(callInfo.ArgAt<string>(0), callInfo.ArgAt<string>(1)));
@@ -834,8 +834,8 @@ public class DirectoryProviderServiceTests
         result.IsError.Should().BeFalse();
         result.Value.Should().Be(destPath);
         _mockFileSystem.File.Received(1).Move(
-            s_isLinux ? "/Source/SubDir/file.txt" : @"C:\Source\SubDir\file.txt",
-            s_isLinux ? "/Destination/SubDir/file.txt" : @"C:\Destination\SubDir\file.txt"
+            s_isUnix ? "/Source/SubDir/file.txt" : @"C:\Source\SubDir\file.txt",
+            s_isUnix ? "/Destination/SubDir/file.txt" : @"C:\Destination\SubDir\file.txt"
         );
         _mockFileSystem.Directory.Received(1).Delete(_pathSourceSubDir);
         _mockFileSystem.Directory.DidNotReceive().Delete(sourcePath.Path);
@@ -846,11 +846,11 @@ public class DirectoryProviderServiceTests
     {
         // Arrange
         FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId(
-            s_isLinux ? "/OldName" : @"C:\OldName"
+            s_isUnix ? "/OldName" : @"C:\OldName"
         );
         string newName = "NewName";
-        string parentPath = s_isLinux ? "/" : @"C:\";
-        string newPath = s_isLinux ? "/NewName" : @"C:\NewName";
+        string parentPath = s_isUnix ? "/" : @"C:\";
+        string newPath = s_isUnix ? "/NewName" : @"C:\NewName";
 
         IDirectoryInfo parentDirectoryInfo = Substitute.For<IDirectoryInfo>();
         parentDirectoryInfo.FullName.Returns(parentPath);
@@ -873,11 +873,11 @@ public class DirectoryProviderServiceTests
     {
         // Arrange
         FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId(
-            s_isLinux ? "/OldName" : @"C:\OldName"
+            s_isUnix ? "/OldName" : @"C:\OldName"
         );
         string newName = "NewName";
-        string parentPath = s_isLinux ? "/" : @"C:\";
-        string newPath = s_isLinux ? "/NewName" : @"C:\NewName";
+        string parentPath = s_isUnix ? "/" : @"C:\";
+        string newPath = s_isUnix ? "/NewName" : @"C:\NewName";
 
         IDirectoryInfo parentDirectoryInfo = Substitute.For<IDirectoryInfo>();
         parentDirectoryInfo.FullName.Returns(parentPath);
@@ -899,11 +899,11 @@ public class DirectoryProviderServiceTests
     {
         // Arrange
         FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId(
-            s_isLinux ? "/OldName" : @"C:\OldName"
+            s_isUnix ? "/OldName" : @"C:\OldName"
         );
         string newName = "NewName";
-        string parentPath = s_isLinux ? "/" : @"C:\";
-        string newPath = s_isLinux ? "/NewName" : @"C:\NewName";
+        string parentPath = s_isUnix ? "/" : @"C:\";
+        string newPath = s_isUnix ? "/NewName" : @"C:\NewName";
 
         IDirectoryInfo parentDirectoryInfo = Substitute.For<IDirectoryInfo>();
         parentDirectoryInfo.FullName.Returns(parentPath);
@@ -926,7 +926,7 @@ public class DirectoryProviderServiceTests
     {
         // Arrange
         FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId(
-            s_isLinux ? "/OldName" : @"C:\OldName"
+            s_isUnix ? "/OldName" : @"C:\OldName"
         );
         string newName = "NewName";
 
@@ -946,10 +946,10 @@ public class DirectoryProviderServiceTests
     {
         // Arrange
         FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId(
-            s_isLinux ? "/OldName" : @"C:\OldName"
+            s_isUnix ? "/OldName" : @"C:\OldName"
         );
         string newName = "NewName";
-        string parentPath = s_isLinux ? "/" : @"C:\";
+        string parentPath = s_isUnix ? "/" : @"C:\";
 
         IDirectoryInfo parentDirectoryInfo = Substitute.For<IDirectoryInfo>();
         parentDirectoryInfo.FullName.Returns(parentPath);
@@ -970,7 +970,7 @@ public class DirectoryProviderServiceTests
     {
         // Arrange
         FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId(
-            s_isLinux ? "/DirectoryToDelete" : @"C:\DirectoryToDelete"
+            s_isUnix ? "/DirectoryToDelete" : @"C:\DirectoryToDelete"
         );
         _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.Delete, false).Returns(true);
         IDirectoryInfo mockDirectoryInfo = Substitute.For<IDirectoryInfo>();
@@ -990,7 +990,7 @@ public class DirectoryProviderServiceTests
     {
         // Arrange
         FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId(
-            s_isLinux ? "/DirectoryToDelete" : @"C:\DirectoryToDelete"
+            s_isUnix ? "/DirectoryToDelete" : @"C:\DirectoryToDelete"
         );
         _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.Delete, false).Returns(false);
 

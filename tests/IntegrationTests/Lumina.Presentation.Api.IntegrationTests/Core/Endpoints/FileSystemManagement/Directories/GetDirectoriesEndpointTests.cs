@@ -32,7 +32,7 @@ public class GetDirectoriesEndpointTests : IClassFixture<LuminaApiFactory>
         PropertyNameCaseInsensitive = true,
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
-    private static readonly bool s_isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+    private static readonly bool s_isUnix = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetDirectoriesEndpointTests"/> class.
@@ -103,8 +103,8 @@ public class GetDirectoriesEndpointTests : IClassFixture<LuminaApiFactory>
 
 
             DirectoryResponse firstDirectory = directories!.First();
-            firstDirectory.Name.Should().Be((s_isLinux ? "." : string.Empty) + "NestedDirectory_2");
-            firstDirectory.Path.Should().Be(System.IO.Path.Combine(testPath, (s_isLinux ? "." : string.Empty) + "NestedDirectory_2" + System.IO.Path.DirectorySeparatorChar));
+            firstDirectory.Name.Should().Be((s_isUnix ? "." : string.Empty) + "NestedDirectory_2");
+            firstDirectory.Path.Should().Be(System.IO.Path.Combine(testPath, (s_isUnix ? "." : string.Empty) + "NestedDirectory_2" + System.IO.Path.DirectorySeparatorChar));
             directories!.Count.Should().Be(1); // only directories
         }
         finally

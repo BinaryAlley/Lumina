@@ -32,7 +32,7 @@ public class GetFilesEndpointTests : IClassFixture<LuminaApiFactory>
         PropertyNameCaseInsensitive = true,
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
-    private static readonly bool s_isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+    private static readonly bool s_isUnix = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetFilesEndpointTests"/> class.
@@ -139,8 +139,8 @@ public class GetFilesEndpointTests : IClassFixture<LuminaApiFactory>
             string[] pathSegments = testPath.Split(System.IO.Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
 
             FileResponse firstDirectory = files!.First();
-            firstDirectory.Name.Should().Be((s_isLinux ? "." : string.Empty) + "TestFile_1.txt");
-            firstDirectory.Path.Should().Be(System.IO.Path.Combine(testPath, (s_isLinux ? "." : string.Empty) + "TestFile_1.txt"));
+            firstDirectory.Name.Should().Be((s_isUnix ? "." : string.Empty) + "TestFile_1.txt");
+            firstDirectory.Path.Should().Be(System.IO.Path.Combine(testPath, (s_isUnix ? "." : string.Empty) + "TestFile_1.txt"));
             FileResponse secondDirectory = files!.Last();
             secondDirectory.Name.Should().Be("TestFile_2.txt");
             secondDirectory.Path.Should().Be(System.IO.Path.Combine(testPath, "TestFile_2.txt"));

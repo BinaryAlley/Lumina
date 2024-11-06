@@ -33,7 +33,7 @@ public class GetTreeDirectoriesEndpointTests : IClassFixture<LuminaApiFactory>
         PropertyNameCaseInsensitive = true,
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
-    private static readonly bool s_isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+    private static readonly bool s_isUnix = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetTreeDirectoriesEndpointTests"/> class.
@@ -144,8 +144,8 @@ public class GetTreeDirectoriesEndpointTests : IClassFixture<LuminaApiFactory>
 
 
             FileSystemTreeNodeResponse firstNode = treeNodes!.First();
-            firstNode.Name.Should().Be((s_isLinux ? "." : string.Empty) + "NestedDirectory_2");
-            firstNode.Path.Should().Be(System.IO.Path.Combine(testPath, (s_isLinux ? "." : string.Empty) + "NestedDirectory_2" + System.IO.Path.DirectorySeparatorChar));
+            firstNode.Name.Should().Be((s_isUnix ? "." : string.Empty) + "NestedDirectory_2");
+            firstNode.Path.Should().Be(System.IO.Path.Combine(testPath, (s_isUnix ? "." : string.Empty) + "NestedDirectory_2" + System.IO.Path.DirectorySeparatorChar));
             firstNode.ItemType.Should().Be(FileSystemItemType.Directory);
             treeNodes.Should().AllSatisfy(n => n.ItemType.Should().Be(FileSystemItemType.Directory));
             treeNodes!.Count.Should().Be(1); // only directories
