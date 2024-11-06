@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Common.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Primitives;
@@ -31,10 +32,18 @@ public class Program
         // determine log path based on environment
         string logPath;
         if (Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true")
+        {
             logPath = Environment.GetEnvironmentVariable("LOG_PATH") ?? "/logs"; // use docker volume path
+            builder.WebHost.ConfigureKestrel(options =>
+            {
+                options.ListenAnyIP(5012); // HTTP only
+            });
+        }
         else
             logPath = Path.Combine(AppContext.BaseDirectory, "logs"); // use local binary path
         Directory.CreateDirectory(logPath);
+        if (!logPath.EndsWith(Path.DirectorySeparatorChar.ToString()))
+            logPath = logPath += Path.DirectorySeparatorChar;
         // set environment variable for Serilog configuration
         Environment.SetEnvironmentVariable("LOG_PATH", logPath);
 
@@ -50,7 +59,7 @@ public class Program
         app.UseSerilogRequestLogging();
 
         // configure the HTTP request pipeline.
-        if (!app.Environment.IsDevelopment())
+        if (!app.Environment.IsDevelopment() && Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") != "true")
         {
             app.UseExceptionHandler("/Home/Error");
             // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.

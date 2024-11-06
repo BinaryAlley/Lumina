@@ -8,6 +8,7 @@ using Lumina.Domain.Common.DependencyInjection;
 using Lumina.Infrastructure.Common.DependencyInjection;
 using Lumina.Presentation.Api.Common.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -45,10 +46,18 @@ public class Program
         // determine log path based on environment
         string logPath;
         if (Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true")
+        {
             logPath = Environment.GetEnvironmentVariable("LOG_PATH") ?? "/logs"; // use docker volume path
+            builder.WebHost.ConfigureKestrel(options =>
+            {
+                options.ListenAnyIP(5214); // HTTP only
+            });
+        }
         else
             logPath = Path.Combine(AppContext.BaseDirectory, "logs"); // use local binary path
         Directory.CreateDirectory(logPath);
+        if (!logPath.EndsWith(Path.DirectorySeparatorChar.ToString()))
+            logPath = logPath += Path.DirectorySeparatorChar;
         // set environment variable for Serilog configuration
         Environment.SetEnvironmentVariable("LOG_PATH", logPath);
 
@@ -58,7 +67,7 @@ public class Program
                          .ReadFrom.Services(services)
                          .Enrich.FromLogContext();
         });
-
+        string? aa = builder.Configuration.GetValue<string>("LOG_PATH");
         WebApplication app = builder.Build();
         
         app.UseSerilogRequestLogging();

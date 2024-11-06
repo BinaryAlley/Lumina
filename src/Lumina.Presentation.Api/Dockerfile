@@ -1,9 +1,9 @@
 # This stage is used when running from VS in fast mode (Default for Debug configuration)
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+RUN mkdir /logs && chown -R app:app /logs
 USER app
 WORKDIR /app
 EXPOSE 5214
-EXPOSE 7057
 
 # ==== Stage 1: Build stage
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
@@ -50,9 +50,7 @@ WORKDIR /app
 
 COPY --from=publish /app/publish .
 ENV ASPNETCORE_HTTP_PORTS=5214
-ENV ASPNETCORE_HTTPS_PORTS=7057
 EXPOSE 5214
-EXPOSE 7057
 ENTRYPOINT ["dotnet", "Lumina.Presentation.Api.dll"]
 
 # to build this Docker image, run the following command from the root of the project (location of the .sln file):
