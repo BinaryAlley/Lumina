@@ -67,7 +67,6 @@ public class Program
                          .ReadFrom.Services(services)
                          .Enrich.FromLogContext();
         });
-        string? aa = builder.Configuration.GetValue<string>("LOG_PATH");
         WebApplication app = builder.Build();
         
         app.UseSerilogRequestLogging();
