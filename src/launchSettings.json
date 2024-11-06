@@ -4,7 +4,8 @@
       "commandName": "DockerCompose",
       "commandVersion": "1.0",
       "serviceActions": {
-        "lumina-server": "StartDebugging"
+        "lumina-api": "StartDebugging",
+        "lumina-web": "StartDebugging"
       }
     }
   }

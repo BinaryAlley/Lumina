@@ -3,7 +3,7 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>disable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <BaseOutputPath>$(SolutionDir)..\bin\server\</BaseOutputPath>
+        <BaseOutputPath>$(SolutionDir)..\bin\api\</BaseOutputPath>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     </PropertyGroup>
