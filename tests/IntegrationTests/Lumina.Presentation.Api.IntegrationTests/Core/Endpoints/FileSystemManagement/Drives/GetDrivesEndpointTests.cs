@@ -29,7 +29,7 @@ public class GetDrivesEndpointTests : IClassFixture<LuminaApiFactory>
         PropertyNameCaseInsensitive = true,
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
-    private static readonly bool s_isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+    private static readonly bool s_isUnix = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetDrivesEndpointTests"/> class.
@@ -57,8 +57,8 @@ public class GetDrivesEndpointTests : IClassFixture<LuminaApiFactory>
         drives.Should().NotBeEmpty();
 
         FileSystemTreeNodeResponse firstDrive = drives!.First();
-        firstDrive.Name.Should().Be(s_isLinux ? "/" : "C:\\");
-        firstDrive.Path.Should().Be(s_isLinux ? "/" : "C:\\");
+        firstDrive.Name.Should().Be(s_isUnix ? "/" : "C:\\");
+        firstDrive.Path.Should().Be(s_isUnix ? "/" : "C:\\");
         firstDrive.ItemType.Should().Be(FileSystemItemType.Root);
         drives!.Count.Should().BeGreaterThanOrEqualTo(1);
     }

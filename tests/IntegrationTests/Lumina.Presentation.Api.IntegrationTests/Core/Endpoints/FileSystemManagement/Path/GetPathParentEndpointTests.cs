@@ -31,7 +31,7 @@ public class GetPathParentEndpointTests : IClassFixture<LuminaApiFactory>
         PropertyNameCaseInsensitive = true,
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
-    private static readonly bool s_isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+    private static readonly bool s_isUnix = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetPathParentEndpointTests"/> class.
@@ -63,7 +63,7 @@ public class GetPathParentEndpointTests : IClassFixture<LuminaApiFactory>
         string path = System.IO.Path.GetDirectoryName(testPath)!;
         while (!string.IsNullOrEmpty(path))
         {
-            string segment = s_isLinux && path == System.IO.Path.DirectorySeparatorChar.ToString() ? path : System.IO.Path.GetFileName(path);
+            string segment = s_isUnix && path == System.IO.Path.DirectorySeparatorChar.ToString() ? path : System.IO.Path.GetFileName(path);
             if (string.IsNullOrEmpty(segment))
             {
                 hierarchy.Add(System.IO.Path.GetPathRoot(path)!.TrimEnd(System.IO.Path.DirectorySeparatorChar));
