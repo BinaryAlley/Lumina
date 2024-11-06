@@ -3,13 +3,13 @@
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>disable</ImplicitUsings>
-        <BaseOutputPath>$(SolutionDir)..\bin\server\</BaseOutputPath>
+        <BaseOutputPath>$(SolutionDir)..\bin\api\</BaseOutputPath>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <UserSecretsId>37d55c87-4374-4971-82e9-012fcaad1853</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-        <ContainerRepository>lumina-server</ContainerRepository>
-        <DockerfileTag>lumina-server</DockerfileTag>
+        <ContainerRepository>lumina-api</ContainerRepository>
+        <DockerfileTag>lumina-api</DockerfileTag>
         <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
     </PropertyGroup>
 
@@ -30,6 +30,11 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="Serilog" Version="4.1.0" />
+        <PackageReference Include="Serilog.AspNetCore" Version="8.0.3" />
+        <PackageReference Include="Serilog.Enrichers.AspnetcoreHttpcontext" Version="1.1.0" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+        <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
     </ItemGroup>
 
     <ItemGroup>

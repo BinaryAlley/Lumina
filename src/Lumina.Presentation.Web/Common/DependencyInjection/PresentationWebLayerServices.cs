@@ -1,8 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using FluentValidation;
 using Lumina.Presentation.Web.Common.Api;
+using Lumina.Presentation.Web.Common.Authorization;
 using Lumina.Presentation.Web.Common.Exceptions;
 using Lumina.Presentation.Web.Common.Filters;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
 using Polly.CircuitBreaker;
@@ -12,6 +18,7 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Presentation.Web.Common.DependencyInjection;
@@ -36,6 +43,66 @@ public static class PresentationWebLayerServices
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
 
+        // configure cookie-based authentication
+        services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            .AddCookie(options =>
+            {
+                // basic path configuration
+                options.LoginPath = "/account/login";
+                options.LogoutPath = "/account/logout";
+                options.AccessDeniedPath = "/account/access-denied";
+
+                // Cookie configuration
+                options.Cookie = new CookieBuilder
+                {
+                    Name = ".Lumina.Auth", // unique name to avoid conflicts
+                    HttpOnly = true,       // prevent JavaScript access
+                    SameSite = SameSiteMode.Lax, // balance between security and functionality
+                    SecurePolicy = CookieSecurePolicy.Always, // require HTTPS
+                    Path = "/",            // make cookie available for all paths
+                    IsEssential = true     // mark as essential for GDPR
+                };
+
+                // security settings
+                options.ExpireTimeSpan = TimeSpan.FromHours(24); // TODO: perhaps make it configurable by user?
+                options.SlidingExpiration = true;
+
+                // handle validation to support various deployment scenarios
+                options.Events = new CookieAuthenticationEvents
+                {                    
+                    // handle redirects to work with different base paths
+                    OnRedirectToLogin = context =>
+                    {
+                        // preserve any base path or subdirectory
+                        string redirectPath = context.RedirectUri;
+                        if (context.Request.PathBase.HasValue)
+                            redirectPath = context.Request.PathBase + options.LoginPath + new QueryString("?returnUrl=") + Uri.EscapeDataString(context.Request.PathBase + context.Request.Path);
+                        context.Response.Redirect(redirectPath);
+                        return Task.CompletedTask;
+                    }
+                };
+            });
+
+        // add an authorization policy that ensures application is initialized with super admin account before allowing access
+        services.AddAuthorizationBuilder()
+            .AddPolicy("RequireInitialization", policy => policy.Requirements.Add(new InitializationRequirement()));
+
+        // add forwarded headers middleware to handle reverse proxy scenarios
+        services.Configure<ForwardedHeadersOptions>(options =>
+        {
+            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost;
+            options.KnownNetworks.Clear();
+            options.KnownProxies.Clear();
+        });
+
+        // configure session management to maintain user-specific data across requests
+        services.AddSession(options =>
+        {
+            options.IdleTimeout = TimeSpan.FromMinutes(30); // session expires after 30 minutes of inactivity
+            options.Cookie.HttpOnly = true; // prevent JavaScript access to session cookie, for security
+            options.Cookie.IsEssential = true; // mark session cookie as essential, for GDPR compliance
+        });
+
         // scan the current assembly for validators and register them to the DI container
         services.AddValidatorsFromAssemblyContaining<Program>(ServiceLifetime.Singleton);
 
@@ -56,12 +123,16 @@ public static class PresentationWebLayerServices
 
         AsyncPolicyWrap<HttpResponseMessage> policy = Policy.WrapAsync(retryPolicy, circuitBreakerPolicy);
 
-        // register the typed client used for the API interaction
+        // register the HTTP typed client used for the API interaction
         services.AddHttpClient<IApiHttpClient, ApiHttpClient>()
             .AddPolicyHandler(retryPolicy)
             .AddPolicyHandler(circuitBreakerPolicy);
 
+        // enable access to the current HTTP context in non-controller classes
+        services.AddHttpContextAccessor();
+
         services.AddScoped<ApiExceptionFilter>();
+        services.AddScoped<IAuthorizationHandler, InitializationHandler>();
 
         return services;
     }
