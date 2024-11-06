@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using FluentValidation;
 using Lumina.Infrastructure.Common.Models.Configuration;
-
 #endregion
 
 namespace Lumina.Infrastructure.Common.Validators;

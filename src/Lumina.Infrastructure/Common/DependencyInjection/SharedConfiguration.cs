@@ -43,9 +43,18 @@ public static class SharedConfiguration
                 .ValidateFluently()
                 .ValidateOnStart();
 
-
         services.AddOptions<MediaSettingsModel>()
                 .Bind(configuration.GetRequiredSection(MediaSettingsModel.SECTION_NAME))
+                .ValidateFluently()
+                .ValidateOnStart();
+
+        services.AddOptions<JwtSettingsModel>()
+                .Bind(configuration.GetRequiredSection(JwtSettingsModel.SECTION_NAME))
+                .ValidateFluently()
+                .ValidateOnStart();
+
+        services.AddOptions<EncryptionSettingsModel>()
+                .Bind(configuration.GetRequiredSection(EncryptionSettingsModel.SECTION_NAME))
                 .ValidateFluently()
                 .ValidateOnStart();
 
