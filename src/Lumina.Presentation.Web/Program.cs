@@ -3,6 +3,10 @@ using Lumina.Presentation.Web.Common.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Primitives;
+using Serilog;
+using System;
+using System.IO;
 using System.Threading.Tasks;
 #endregion
 
@@ -24,7 +28,26 @@ public class Program
         builder.Services.BindConfiguration(builder.Configuration);
         builder.Services.AddPresentationWebLayerServices();
 
+        // determine log path based on environment
+        string logPath;
+        if (Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true")
+            logPath = Environment.GetEnvironmentVariable("LOG_PATH") ?? "/logs"; // use docker volume path
+        else
+            logPath = Path.Combine(AppContext.BaseDirectory, "logs"); // use local binary path
+        Directory.CreateDirectory(logPath);
+        // set environment variable for Serilog configuration
+        Environment.SetEnvironmentVariable("LOG_PATH", logPath);
+
+        builder.Host.UseSerilog((context, services, configuration) =>
+        {
+            configuration.ReadFrom.Configuration(context.Configuration)
+                         .ReadFrom.Services(services)
+                         .Enrich.FromLogContext();
+        });
+
         WebApplication app = builder.Build();
+
+        app.UseSerilogRequestLogging();
 
         // configure the HTTP request pipeline.
         if (!app.Environment.IsDevelopment())
@@ -36,14 +59,22 @@ public class Program
 
         //app.UseHttpsRedirection();
         app.UseStaticFiles();
-
         app.UseRouting();
-
+        app.UseSession();
+        app.UseAuthentication();
         app.UseAuthorization();
+        app.UseForwardedHeaders();
 
-        app.MapControllerRoute(
-            name: "default",
-            pattern: "{controller=Home}/{action=Index}/{id?}");
+        // handle path base from reverse proxies
+        app.Use((context, next) =>
+        {
+            if (context.Request.Headers.TryGetValue("X-Forwarded-Prefix", out StringValues pathBase))
+                context.Request.PathBase = pathBase.ToString();
+            return next();
+        });
+
+
+        app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
 
         await app.RunAsync();
     }
