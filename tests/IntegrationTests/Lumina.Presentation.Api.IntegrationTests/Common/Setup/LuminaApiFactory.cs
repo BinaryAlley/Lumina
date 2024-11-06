@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
@@ -41,13 +42,12 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
             // clear all existing configuration sources
             config.Sources.Clear();
 
+            config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+            config.AddJsonFile($"appsettings.test.json", optional: true, reloadOnChange: true);
+            config.AddJsonFile("appsettings.shared.json", optional: true, reloadOnChange: true);
+            config.AddJsonFile($"appsettings.shared.test.json", optional: true, reloadOnChange: true);
             // add environment variables coming from CI secrets
             config.AddEnvironmentVariables();
-
-            config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-            config.AddJsonFile($"appsettings.{context.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true);
-            config.AddJsonFile("appsettings.shared.json", optional: true, reloadOnChange: true);
-            config.AddJsonFile($"appsettings.shared.{context.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true);
         });
         builder.ConfigureServices(services =>
         {
