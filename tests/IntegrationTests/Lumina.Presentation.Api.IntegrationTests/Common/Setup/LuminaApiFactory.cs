@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -35,6 +36,19 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
     /// <param name="builder">The web host builder to configure.</param>
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        builder.ConfigureAppConfiguration((context, config) =>
+        {
+            // clear all existing configuration sources
+            config.Sources.Clear();
+
+            // add environment variables coming from CI secrets
+            config.AddEnvironmentVariables();
+
+            config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+            config.AddJsonFile($"appsettings.{context.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true);
+            config.AddJsonFile("appsettings.shared.json", optional: true, reloadOnChange: true);
+            config.AddJsonFile($"appsettings.shared.{context.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true);
+        });
         builder.ConfigureServices(services =>
         {
             // remove existing DbContext configuration
