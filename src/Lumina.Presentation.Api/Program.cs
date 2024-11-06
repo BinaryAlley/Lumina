@@ -3,12 +3,16 @@ using FastEndpoints;
 using FastEndpoints.Swagger;
 using Lumina.Application.Common.DependencyInjection;
 using Lumina.DataAccess.Common.DependencyInjection;
+using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.DependencyInjection;
 using Lumina.Infrastructure.Common.DependencyInjection;
 using Lumina.Presentation.Api.Common.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using Serilog;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -38,7 +42,42 @@ public class Program
         builder.Services.AddDataAccessLayerServices();
         builder.Services.AddDomainLayerServices();
 
+        // determine log path based on environment
+        string logPath;
+        if (Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true")
+            logPath = Environment.GetEnvironmentVariable("LOG_PATH") ?? "/logs"; // use docker volume path
+        else
+            logPath = Path.Combine(AppContext.BaseDirectory, "logs"); // use local binary path
+        Directory.CreateDirectory(logPath);
+        // set environment variable for Serilog configuration
+        Environment.SetEnvironmentVariable("LOG_PATH", logPath);
+
+        builder.Host.UseSerilog((context, services, configuration) =>
+        {
+            configuration.ReadFrom.Configuration(context.Configuration)
+                         .ReadFrom.Services(services)
+                         .Enrich.FromLogContext();
+        });
+
         WebApplication app = builder.Build();
+        
+        app.UseSerilogRequestLogging();
+
+        // apply any pending migrations
+        using (IServiceScope scope = app.Services.CreateScope())
+        {
+            IServiceProvider services = scope.ServiceProvider;
+            try
+            {
+                LuminaDbContext context = services.GetRequiredService<LuminaDbContext>(); 
+                await context.Database.MigrateAsync();
+            }
+            catch (Exception ex)
+            {
+                ILogger logger = services.GetRequiredService<ILogger>();
+                logger.Fatal(ex, "Failed to run database migrations");
+            }
+        }
 
         app.UseCors("AllowAll");
 

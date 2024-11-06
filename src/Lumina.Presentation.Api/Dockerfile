@@ -3,6 +3,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 USER app
 WORKDIR /app
 EXPOSE 5214
+EXPOSE 7057
 
 # ==== Stage 1: Build stage
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
@@ -49,8 +50,10 @@ WORKDIR /app
 
 COPY --from=publish /app/publish .
 ENV ASPNETCORE_HTTP_PORTS=5214
+ENV ASPNETCORE_HTTPS_PORTS=7057
 EXPOSE 5214
+EXPOSE 7057
 ENTRYPOINT ["dotnet", "Lumina.Presentation.Api.dll"]
 
 # to build this Docker image, run the following command from the root of the project (location of the .sln file):
-# docker build --no-cache -t lumina-server -f Lumina.Presentation.Api/Dockerfile .
+# docker build --no-cache -t lumina-api -f Lumina.Presentation.Api/Dockerfile .

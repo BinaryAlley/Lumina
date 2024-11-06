@@ -31,7 +31,8 @@ bld/
 *.sln.iml
 
 # Common
-*.Development.json
+*.[Dd]evelopment.json
+*.[Tt]est.json
 
 # Windows image file caches
 Thumbs.db
