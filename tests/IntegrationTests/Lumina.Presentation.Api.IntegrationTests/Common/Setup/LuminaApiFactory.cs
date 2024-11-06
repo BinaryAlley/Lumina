@@ -46,8 +46,12 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
             config.AddJsonFile($"appsettings.test.json", optional: true, reloadOnChange: true);
             config.AddJsonFile("appsettings.shared.json", optional: true, reloadOnChange: true);
             config.AddJsonFile($"appsettings.shared.test.json", optional: true, reloadOnChange: true);
-            // add environment variables coming from CI secrets
-            config.AddEnvironmentVariables();
+            // First add the test values directly
+            config.AddInMemoryCollection(initialData: new Dictionary<string, string?>
+            {
+                ["JwtSettings:SecretKey"] = "test-key-thats-at-least-32-chars-long-for-jwt",
+                ["EncryptionSettings:SecretKey"] = "dGVzdC1rZXktdGhhdHMtYXQtbGVhc3QtMzItY2hhcnMtbG9uZy1mb3ItZW5jcnlwdGlvbg==" // base64 encoded test key
+            });
         });
         builder.ConfigureServices(services =>
         {
