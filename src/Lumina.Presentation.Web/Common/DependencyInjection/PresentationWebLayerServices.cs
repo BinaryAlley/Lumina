@@ -1,11 +1,9 @@
 #region ========================================================================= USING =====================================================================================
 using FluentValidation;
 using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.Authorization;
 using Lumina.Presentation.Web.Common.Exceptions;
 using Lumina.Presentation.Web.Common.Filters;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -83,10 +81,6 @@ public static class PresentationWebLayerServices
                 };
             });
 
-        // add an authorization policy that ensures application is initialized with super admin account before allowing access
-        services.AddAuthorizationBuilder()
-            .AddPolicy("RequireInitialization", policy => policy.Requirements.Add(new InitializationRequirement()));
-
         // add forwarded headers middleware to handle reverse proxy scenarios
         services.Configure<ForwardedHeadersOptions>(options =>
         {
@@ -132,7 +126,6 @@ public static class PresentationWebLayerServices
         services.AddHttpContextAccessor();
 
         services.AddScoped<ApiExceptionFilter>();
-        services.AddScoped<IAuthorizationHandler, InitializationHandler>();
 
         return services;
     }
