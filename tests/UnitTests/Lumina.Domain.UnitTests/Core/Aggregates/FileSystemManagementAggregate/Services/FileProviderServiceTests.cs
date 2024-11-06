@@ -34,15 +34,15 @@ public class FileProviderServiceTests
     private readonly IFileSystemPermissionsService _mockFileSystemPermissionsService;
     private readonly FileProviderService _sut;
     private readonly FileSystemPathIdFixture _fileSystemPathIdFixture;
-    private static readonly bool s_isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
-    private readonly string _pathVisible1 = s_isLinux ? "/Visible.txt" : @"C:\Visible.txt";
-    private readonly string _pathHidden1 = s_isLinux ? "/Hidden.txt" : @"C:\Hidden.txt";
-    private readonly string _pathValid1 = s_isLinux ? "/Valid.txt" : @"C:\Valid.txt";
-    private readonly string _pathInvalid1 = s_isLinux ? "/Invalid.txt" : @"C:\Invalid.txt";
-    private readonly string _pathSourceFile = s_isLinux ? "/Source/file.txt" : @"C:\Source\file.txt";
-    private readonly string _pathDestinationFile = s_isLinux ? "/Destination/file.txt" : @"C:\Destination\file.txt";
-    private readonly string _pathSource = s_isLinux ? "/Source" : @"C:\Source";
-    private readonly string _pathDestination = s_isLinux ? "/Destination" : @"C:\Destination";
+    private static readonly bool s_isUnix = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+    private readonly string _pathVisible1 = s_isUnix ? "/Visible.txt" : @"C:\Visible.txt";
+    private readonly string _pathHidden1 = s_isUnix ? "/Hidden.txt" : @"C:\Hidden.txt";
+    private readonly string _pathValid1 = s_isUnix ? "/Valid.txt" : @"C:\Valid.txt";
+    private readonly string _pathInvalid1 = s_isUnix ? "/Invalid.txt" : @"C:\Invalid.txt";
+    private readonly string _pathSourceFile = s_isUnix ? "/Source/file.txt" : @"C:\Source\file.txt";
+    private readonly string _pathDestinationFile = s_isUnix ? "/Destination/file.txt" : @"C:\Destination\file.txt";
+    private readonly string _pathSource = s_isUnix ? "/Source" : @"C:\Source";
+    private readonly string _pathDestination = s_isUnix ? "/Destination" : @"C:\Destination";
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FileProviderServiceTests"/> class.
@@ -154,10 +154,10 @@ public class FileProviderServiceTests
     {
         // Arrange
         FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId();
-        string[] files = s_isLinux
+        string[] files = s_isUnix
             ? ["/C.txt", "/A.txt", "/B.txt"]
             : [@"C:\C.txt", @"C:\A.txt", @"C:\B.txt"];
-        string[] expectedFiles = s_isLinux
+        string[] expectedFiles = s_isUnix
             ? ["/A.txt", "/B.txt", "/C.txt"]
             : [@"C:\A.txt", @"C:\B.txt", @"C:\C.txt"];
         _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ListDirectory).Returns(true);
@@ -625,7 +625,7 @@ public class FileProviderServiceTests
     {
         // Arrange
         FileSystemPathId sourcePath = _fileSystemPathIdFixture.CreateFileSystemPathId(
-            s_isLinux ? "/NonExistentSource.txt" : @"C:\NonExistentSource.txt"
+            s_isUnix ? "/NonExistentSource.txt" : @"C:\NonExistentSource.txt"
         );
         FileSystemPathId destinationPath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestination);
         bool overrideExisting = false;
@@ -737,11 +737,11 @@ public class FileProviderServiceTests
     {
         // Arrange
         FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId(
-            s_isLinux ? "/OldName.txt" : @"C:\OldName.txt"
+            s_isUnix ? "/OldName.txt" : @"C:\OldName.txt"
         );
         string newName = "NewName.txt";
-        string parentPath = s_isLinux ? "/" : @"C:\";
-        string newPath = s_isLinux ? "/NewName.txt" : @"C:\NewName.txt";
+        string parentPath = s_isUnix ? "/" : @"C:\";
+        string newPath = s_isUnix ? "/NewName.txt" : @"C:\NewName.txt";
 
         IFileInfo fileInfo = Substitute.For<IFileInfo>();
         fileInfo.DirectoryName.Returns(parentPath);
@@ -764,11 +764,11 @@ public class FileProviderServiceTests
     {
         // Arrange
         FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId(
-            s_isLinux ? "/OldName.txt" : @"C:\OldName.txt"
+            s_isUnix ? "/OldName.txt" : @"C:\OldName.txt"
         );
         string newName = "NewName.txt";
-        string parentPath = s_isLinux ? "/" : @"C:\";
-        string newPath = s_isLinux ? "/NewName.txt" : @"C:\NewName.txt";
+        string parentPath = s_isUnix ? "/" : @"C:\";
+        string newPath = s_isUnix ? "/NewName.txt" : @"C:\NewName.txt";
 
         IFileInfo fileInfo = Substitute.For<IFileInfo>();
         fileInfo.DirectoryName.Returns(parentPath);
@@ -790,11 +790,11 @@ public class FileProviderServiceTests
     {
         // Arrange
         FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId(
-            s_isLinux ? "/OldName.txt" : @"C:\OldName.txt"
+            s_isUnix ? "/OldName.txt" : @"C:\OldName.txt"
         );
         string newName = "NewName.txt";
-        string parentPath = s_isLinux ? "/" : @"C:\";
-        string newPath = s_isLinux ? "/NewName.txt" : @"C:\NewName.txt";
+        string parentPath = s_isUnix ? "/" : @"C:\";
+        string newPath = s_isUnix ? "/NewName.txt" : @"C:\NewName.txt";
 
         IFileInfo fileInfo = Substitute.For<IFileInfo>();
         fileInfo.DirectoryName.Returns(parentPath);
@@ -817,7 +817,7 @@ public class FileProviderServiceTests
     {
         // Arrange
         FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId(
-            s_isLinux ? "/OldName.txt" : @"C:\OldName.txt"
+            s_isUnix ? "/OldName.txt" : @"C:\OldName.txt"
         );
         string newName = "NewName.txt";
 
@@ -837,10 +837,10 @@ public class FileProviderServiceTests
     {
         // Arrange
         FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId(
-            s_isLinux ? "/OldName.txt" : @"C:\OldName.txt"
+            s_isUnix ? "/OldName.txt" : @"C:\OldName.txt"
         );
         string newName = "NewName.txt";
-        string parentPath = s_isLinux ? "/" : @"C:\";
+        string parentPath = s_isUnix ? "/" : @"C:\";
 
         IFileInfo fileInfo = Substitute.For<IFileInfo>();
         fileInfo.DirectoryName.Returns(parentPath);
@@ -861,11 +861,11 @@ public class FileProviderServiceTests
     {
         // Arrange
         FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId(
-            s_isLinux ? "/OldName.txt" : @"C:\OldName.txt"
+            s_isUnix ? "/OldName.txt" : @"C:\OldName.txt"
         );
         string newName = "NewName.txt";
-        string parentPath = s_isLinux ? "/" : @"C:\";
-        string newPath = s_isLinux ? "/NewName.txt" : @"C:\NewName.txt";
+        string parentPath = s_isUnix ? "/" : @"C:\";
+        string newPath = s_isUnix ? "/NewName.txt" : @"C:\NewName.txt";
 
         IFileInfo fileInfo = Substitute.For<IFileInfo>();
         fileInfo.DirectoryName.Returns(parentPath);
@@ -894,7 +894,7 @@ public class FileProviderServiceTests
     {
         // Arrange
         FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId(
-            s_isLinux ? "/FileToDelete.txt" : @"C:\FileToDelete.txt"
+            s_isUnix ? "/FileToDelete.txt" : @"C:\FileToDelete.txt"
         );
         _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.Delete).Returns(true);
         _mockFileSystem.File.Exists(path.Path).Returns(true);
@@ -913,7 +913,7 @@ public class FileProviderServiceTests
     {
         // Arrange
         FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId(
-            s_isLinux ? "/FileToDelete.txt" : @"C:\FileToDelete.txt"
+            s_isUnix ? "/FileToDelete.txt" : @"C:\FileToDelete.txt"
         );
         _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.Delete).Returns(false);
 

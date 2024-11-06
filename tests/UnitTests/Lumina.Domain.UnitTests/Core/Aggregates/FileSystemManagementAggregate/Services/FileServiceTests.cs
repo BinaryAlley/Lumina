@@ -34,20 +34,20 @@ public class FileServiceTests
     private readonly FileService _sut;
     private readonly FileSystemPathIdFixture _fileSystemPathIdFixture;
     private readonly FileFixture _fileFixture;
-    private static readonly bool s_isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
-    private readonly string _pathTestDir = s_isLinux ? "/TestDir" : @"C:\TestDir";
-    private readonly string _pathTestDirFile1 = s_isLinux ? "/TestDir/File1.txt" : @"C:\TestDir\File1.txt";
-    private readonly string _pathTestDirFile2 = s_isLinux ? "/TestDir/File2.txt" : @"C:\TestDir\File2.txt";
-    private readonly string _pathTestDirInaccessible = s_isLinux ? "/TestDir/InaccessibleFile.txt" : @"C:\TestDir\InaccessibleFile.txt";
-    private readonly string _pathDestination1 = s_isLinux ? "/Destination/" : @"C:\Destination\";
-    private readonly string _pathDestination2 = s_isLinux ? "/Destination" : @"C:\Destination";
-    private readonly string _pathSourceFile = s_isLinux ? "/Source/file.txt" : @"C:\Source\file.txt";
-    private readonly string _pathDestinationFile = s_isLinux ? "/Destination/file.txt" : @"C:\Destination\file.txt";
-    private readonly string _pathSourceOldFile = s_isLinux ? "/Source/oldfile.txt" : @"C:\Source\oldfile.txt";
-    private readonly string _pathSourceNewFile = s_isLinux ? "/Source/newfile.txt" : @"C:\Source\newfile.txt";
-    private readonly string _pathSourceExistingFile = s_isLinux ? "/Source/existingfile.txt" : @"C:\Source\existingfile.txt";
-    private readonly string _pathSourceNonExistingFile = s_isLinux ? "/Source/nonexistent.txt" : @"C:\Source\nonexistent.txt";
-    private readonly char _dirSeparator = s_isLinux ? '/' : '\\';
+    private static readonly bool s_isUnix = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+    private readonly string _pathTestDir = s_isUnix ? "/TestDir" : @"C:\TestDir";
+    private readonly string _pathTestDirFile1 = s_isUnix ? "/TestDir/File1.txt" : @"C:\TestDir\File1.txt";
+    private readonly string _pathTestDirFile2 = s_isUnix ? "/TestDir/File2.txt" : @"C:\TestDir\File2.txt";
+    private readonly string _pathTestDirInaccessible = s_isUnix ? "/TestDir/InaccessibleFile.txt" : @"C:\TestDir\InaccessibleFile.txt";
+    private readonly string _pathDestination1 = s_isUnix ? "/Destination/" : @"C:\Destination\";
+    private readonly string _pathDestination2 = s_isUnix ? "/Destination" : @"C:\Destination";
+    private readonly string _pathSourceFile = s_isUnix ? "/Source/file.txt" : @"C:\Source\file.txt";
+    private readonly string _pathDestinationFile = s_isUnix ? "/Destination/file.txt" : @"C:\Destination\file.txt";
+    private readonly string _pathSourceOldFile = s_isUnix ? "/Source/oldfile.txt" : @"C:\Source\oldfile.txt";
+    private readonly string _pathSourceNewFile = s_isUnix ? "/Source/newfile.txt" : @"C:\Source\newfile.txt";
+    private readonly string _pathSourceExistingFile = s_isUnix ? "/Source/existingfile.txt" : @"C:\Source\existingfile.txt";
+    private readonly string _pathSourceNonExistingFile = s_isUnix ? "/Source/nonexistent.txt" : @"C:\Source\nonexistent.txt";
+    private readonly char _dirSeparator = s_isUnix ? '/' : '\\';
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FileServiceTests"/> class.
@@ -742,7 +742,7 @@ public class FileServiceTests
     {
         // Arrange
         FileSystemPathId sourcePathId = _fileSystemPathIdFixture.CreateFileSystemPathId(
-            s_isLinux ? "/Source/nonexistent.txt" : _pathSourceNonExistingFile
+            s_isUnix ? "/Source/nonexistent.txt" : _pathSourceNonExistingFile
         );
         FileSystemPathId destinationPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestination2);
         bool overrideExisting = true;

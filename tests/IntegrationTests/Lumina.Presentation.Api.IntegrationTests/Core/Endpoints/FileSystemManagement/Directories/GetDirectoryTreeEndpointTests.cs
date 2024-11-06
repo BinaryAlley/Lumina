@@ -33,7 +33,7 @@ public class GetDirectoryTreeEndpointTests : IClassFixture<LuminaApiFactory>
         PropertyNameCaseInsensitive = true,
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
-    private static readonly bool s_isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+    private static readonly bool s_isUnix = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX);;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetDirectoryTreeEndpointTests"/> class.
@@ -69,7 +69,7 @@ public class GetDirectoryTreeEndpointTests : IClassFixture<LuminaApiFactory>
             treeNodes!.Should().NotBeEmpty();
 
             string[] pathSegments = testPath.Split(System.IO.Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
-            if (s_isLinux) // on UNIX, the leading slash is considered "the drive", the root location - add it!
+            if (s_isUnix) // on UNIX, the leading slash is considered "the drive", the root location - add it!
                 pathSegments = ["/", .. pathSegments];
             // recursively validate the tree structure
             void ValidateNode(FileSystemTreeNodeResponse node, int depth)
@@ -140,7 +140,7 @@ public class GetDirectoryTreeEndpointTests : IClassFixture<LuminaApiFactory>
             treeNodes!.Should().NotBeEmpty();
 
             string[] pathSegments = testPath.Split(System.IO.Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
-            if (s_isLinux) // on UNIX, the leading slash is considered "the drive", the root location - add it!
+            if (s_isUnix) // on UNIX, the leading slash is considered "the drive", the root location - add it!
                 pathSegments = ["/", .. pathSegments];
 
             // recursively validate the tree structure
@@ -173,7 +173,7 @@ public class GetDirectoryTreeEndpointTests : IClassFixture<LuminaApiFactory>
                         else if (childNode.ItemType is FileSystemItemType.File)
                         {
                             childNode.Children.Should().BeEmpty(); // files should not have children
-                            childNode.Name.Should().BeOneOf((s_isLinux ? "." : string.Empty) + "TestFile_1.txt", "TestFile_2.txt");
+                            childNode.Name.Should().BeOneOf((s_isUnix ? "." : string.Empty) + "TestFile_1.txt", "TestFile_2.txt");
                         }
                     }
                 }
@@ -215,7 +215,7 @@ public class GetDirectoryTreeEndpointTests : IClassFixture<LuminaApiFactory>
             treeNodes.Should().AllSatisfy(node => node.ItemType.Should().BeOneOf(FileSystemItemType.Directory, FileSystemItemType.Root));
 
             string[] pathSegments = testPath.Split(System.IO.Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
-            if (s_isLinux) // on UNIX, the leading slash is considered "the drive", the root location - add it!
+            if (s_isUnix) // on UNIX, the leading slash is considered "the drive", the root location - add it!
                 pathSegments = ["/", .. pathSegments];
 
             // recursively validate the tree structure
@@ -278,7 +278,7 @@ public class GetDirectoryTreeEndpointTests : IClassFixture<LuminaApiFactory>
             treeNodes.Should().AllSatisfy(node => node.ItemType.Should().BeOneOf(FileSystemItemType.Directory, FileSystemItemType.Root));
 
             string[] pathSegments = testPath.Split(System.IO.Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
-            if (s_isLinux) // on UNIX, the leading slash is considered "the drive", the root location - add it!
+            if (s_isUnix) // on UNIX, the leading slash is considered "the drive", the root location - add it!
                 pathSegments = ["/", .. pathSegments];
 
             // recursively validate the tree structure
