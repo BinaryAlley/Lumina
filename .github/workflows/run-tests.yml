@@ -6,6 +6,10 @@ on:
       - master
   workflow_dispatch: # enable manual triggers
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+    
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -24,4 +28,4 @@ jobs:
       - name: Build
         run: dotnet build src/Lumina.sln --no-restore
       - name: Run tests
-        run: dotnet test src/Lumina.sln --no-build --verbosity normal
+        run: dotnet test src/Lumina.sln --no-build --verbosity detailed
