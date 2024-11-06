@@ -34,7 +34,7 @@ public class PlatformContextManager : IPlatformContextManager
     {
         // set a default context if none is set
         if (_currentPlatformContext is null)
-            if (_operatingSystemInfo.IsOSPlatform(OSPlatform.Linux))
+            if (_operatingSystemInfo.IsOSPlatform(OSPlatform.Linux) || _operatingSystemInfo.IsOSPlatform(OSPlatform.OSX))
                 SetCurrentPlatform(PlatformType.Unix);
             else
                 SetCurrentPlatform(PlatformType.Windows);

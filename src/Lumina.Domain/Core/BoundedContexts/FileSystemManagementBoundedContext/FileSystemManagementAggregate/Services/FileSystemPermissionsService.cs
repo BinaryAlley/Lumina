@@ -40,7 +40,7 @@ internal class FileSystemPermissionsService : IFileSystemPermissionsService // T
     {
         PlatformType platformType = _platformContextManager.GetCurrentContext().Platform;
         if (platformType == PlatformType.Unix)
-            return CanAccessPathLinux(path.Path, accessMode);
+            return CanAccessPathUnix(path.Path, accessMode);
         else if (platformType == PlatformType.Windows)
 #pragma warning disable CA1416 // Validate platform compatibility
             return CanAccessPathWindows(path.Path, accessMode, isFile);
@@ -50,13 +50,13 @@ internal class FileSystemPermissionsService : IFileSystemPermissionsService // T
     }
 
     /// <summary>
-    /// Checks if a the current user has access permissions on Linux for <paramref name="path"/>, with <paramref name="accessMode"/>.
+    /// Checks if a the current user has access permissions on Unix for <paramref name="path"/>, with <paramref name="accessMode"/>.
     /// </summary>
     /// <param name="path">The path for which to check the access.</param>
     /// <param name="accessMode">The access mode in which to check that path access.</param>
     /// <returns><see langword="true"/> if the current user has rights for the specified path and acccess mode, <see langword="false"/> otherwise.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when trying to check access for a mode that is not supported</exception>
-    private static bool CanAccessPathLinux(string path, FileAccessMode accessMode)
+    private static bool CanAccessPathUnix(string path, FileAccessMode accessMode)
     {
         AccessModes modes;
         UnixFileSystemInfo fileInfo = new UnixFileInfo(path);
