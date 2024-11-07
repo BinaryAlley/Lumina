@@ -6,17 +6,9 @@ on:
       - master
   workflow_dispatch: # enable manual triggers
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-    
 jobs:
   test:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
-      max-parallel: 1
+    runs-on: ubuntu-latest
     environment: test
     steps:
       - uses: actions/checkout@v2
@@ -29,4 +21,4 @@ jobs:
       - name: Build
         run: dotnet build src/Lumina.sln --no-restore
       - name: Run tests
-        run: dotnet test src/Lumina.sln --no-build --verbosity detailed
+        run: dotnet test src/Lumina.sln --no-build --verbosity normal
