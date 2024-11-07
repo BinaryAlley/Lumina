@@ -67,7 +67,7 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
             {
                 IServiceProvider scopedServices = scope.ServiceProvider;
                 LuminaDbContext dbContext = scopedServices.GetRequiredService<LuminaDbContext>();
-                dbContext.Database.EnsureCreated();
+                dbContext.Database.Migrate(); 
             }
         });
     }
