@@ -106,7 +106,7 @@ public class GetDirectoryTreeEndpointTests : IClassFixture<LuminaApiFactory>
                     }
                 }
             }
-            FileSystemTreeNodeResponse rootNode = treeNodes!.First();
+            FileSystemTreeNodeResponse rootNode = treeNodes!.Where(node => testPath.StartsWith(node.Name)).First();
             ValidateNode(rootNode, 0);
         }
         finally
@@ -178,7 +178,7 @@ public class GetDirectoryTreeEndpointTests : IClassFixture<LuminaApiFactory>
                     }
                 }
             }
-            FileSystemTreeNodeResponse rootNode = treeNodes!.First();
+            FileSystemTreeNodeResponse rootNode = treeNodes!.Where(node => testPath.StartsWith(node.Name)).First();
             ValidateNode(rootNode, 0);
         }
         finally
@@ -241,7 +241,7 @@ public class GetDirectoryTreeEndpointTests : IClassFixture<LuminaApiFactory>
                 foreach (FileSystemTreeNodeResponse childNode in node.Children)
                     ValidateNode(childNode, depth + 1);
             }
-            FileSystemTreeNodeResponse rootNode = treeNodes!.First();
+            FileSystemTreeNodeResponse rootNode = treeNodes!.Where(node => testPath.StartsWith(node.Name)).First();
             ValidateNode(rootNode, 0);
         }
         finally
@@ -304,7 +304,7 @@ public class GetDirectoryTreeEndpointTests : IClassFixture<LuminaApiFactory>
                 foreach (FileSystemTreeNodeResponse childNode in node.Children)
                     ValidateNode(childNode, depth + 1);
             }
-            FileSystemTreeNodeResponse rootNode = treeNodes!.First();
+            FileSystemTreeNodeResponse rootNode = treeNodes!.Where(node => testPath.StartsWith(node.Name)).First();
             ValidateNode(rootNode, 0);
         }
         finally
