@@ -6,17 +6,10 @@ on:
       - master
   workflow_dispatch: # enable manual triggers
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-    
 jobs:
   test:
     runs-on: ubuntu-latest
     environment: test
-    env: # Set Environment options that are meant to be left empty so the user fills them
-      JwtSettings__SecretKey: ${{ secrets.JWT_SETTINGS_SECRET_KEY }}
-      EncryptionSettings__SecretKey: ${{ secrets.ENCRYPTION_SETTINGS_SECRET_KEY }}
     steps:
       - uses: actions/checkout@v2
       - name: Set up .NET
@@ -28,4 +21,4 @@ jobs:
       - name: Build
         run: dotnet build src/Lumina.sln --no-restore
       - name: Run tests
-        run: dotnet test src/Lumina.sln --no-build --verbosity detailed
+        run: dotnet test src/Lumina.sln --no-build --verbosity normal
