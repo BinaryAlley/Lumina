@@ -17,7 +17,7 @@ public class UserEntity : IStorageEntity
     /// <summary>
     /// Gets the Id of the user.
     /// </summary>
-    public required Guid Id { get; init; }
+    public Guid Id { get; init; }
 
     /// <summary>
     /// Gets or sets the username of the user.
