@@ -34,11 +34,11 @@
                 </div>
             </div>
             <div class="form-row">
-                <button id="btnRecoverPassword" type="button" class="abort-button h-22px w-150px" data-link="@Url.Action("RecoverPassword", "Auth")">Recover Password</button>
-                <button id="btnLogin" type="submit" class="confirm-button h-22px w-100px">Login</button>
+                <button id="btn-recover-password" type="button" class="abort-button h-22px w-150px" data-link="@_urlService.GetAbsoluteUrl("RecoverPassword", "Auth")">Recover Password</button>
+                <button id="btn-login" type="submit" class="confirm-button h-22px w-100px">Login</button>
             </div>
             <!-- 2FA -->
-            <div class="form-row mt-10 hidden" id="divTotpCode">
+            <div class="form-row mt-10 hidden" id="div-totp-code">
                 <div class="form-label">
                     <label asp-for="TotpCode">Totp Code</label>
                 </div>
@@ -47,7 +47,7 @@
                 </div>
             </div>
             <div class="form-row">
-                <button type="submit" id="btnValidateTotp" class="confirm-button h-22px w-100px hidden">Validate Code</button>
+                <button type="submit" id="btn-validate-totp" class="confirm-button h-22px w-100px hidden">Validate Code</button>
             </div>
         </div>
     </form>
@@ -60,17 +60,17 @@
             const txtUsername = form.querySelector('[name="Username"]');
             const txtPassword = form.querySelector('[name="Password"]');
             const txtTotpCode = form.querySelector('[name="TotpCode"]');
-            const divTotpCode = document.getElementById('divTotpCode');
-            const btnLogin = document.getElementById('btnLogin');
-            const btnRecoverPassword = document.getElementById('btnRecoverPassword');
-            const btnValidateTotp = document.getElementById('btnValidateTotp');
+            const divTotpCode = document.getElementById('div-totp-code');
+            const btnLogin = document.getElementById('btn-login');
+            const btnRecoverPassword = document.getElementById('btn-recover-password');
+            const btnValidateTotp = document.getElementById('btn-validate-totp');
             const formData = {
                 Username: txtUsername.value,
                 Password: txtPassword.value,
                 TotpCode: txtTotpCode.value
             };
-            const data = await callApiPostAsync('/auth/login', formData);
-            if (data && data.isTotpRequired) {
+            const data = await callApiPostAsync('@_urlService.GetAbsoluteUrl("Login", "Auth")', formData);
+            if (data && data.isTotpRequired === true) {
                 txtUsername.disabled = true;
                 txtPassword.disabled = true;
                 btnLogin.disabled = true;
@@ -82,7 +82,7 @@
             else if (data)
                 window.location.href = data;
         });
-        document.getElementById('btnRecoverPassword').addEventListener('click', () => {
+        document.getElementById('btn-recover-password').addEventListener('click', () => {
             window.location.href = '@_urlService.GetAbsoluteUrl("RecoverPassword", "Auth")';
         });
     </script>

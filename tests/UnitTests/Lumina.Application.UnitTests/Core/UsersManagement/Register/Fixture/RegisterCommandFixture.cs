@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.UsersManagement.Register;
+using Lumina.Application.Core.UsersManagement.Authentication.Commands.RegisterUser;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
 namespace Lumina.Application.UnitTests.Core.UsersManagement.Register.Fixture;
 
 /// <summary>
-/// Fixture class for the <see cref="RegisterCommand"/> class.
+/// Fixture class for the <see cref="RegisterUserCommand"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class RegisterCommandFixture
@@ -16,11 +16,11 @@ public class RegisterCommandFixture
     /// Creates a random valid command for a new account registration.
     /// </summary>
     /// <returns>The created command.</returns>
-    public static RegisterCommand CreateRegisterCommand()
+    public static RegisterUserCommand CreateRegisterCommand()
     {
         string password = "Abcd123$";
-        return new Faker<RegisterCommand>()
-            .CustomInstantiator(f => new RegisterCommand(
+        return new Faker<RegisterUserCommand>()
+            .CustomInstantiator(f => new RegisterUserCommand(
                 default!,
                 default!,
                 default!,

@@ -25,6 +25,8 @@ async function callApiGetAsync(url) {
     try {
         // create the URL for the API endpoint
         const response = await fetch(url); // call the API
+        if (response.redirected) // if a redirect is requested, perform it
+            window.location.href = response.url;
         if (!response.ok)
             throw new Error('Network response was not ok');
         const jsonResponse = await response.json();
@@ -62,8 +64,8 @@ async function callApiPostAsync(url, data, options = {}) {
         // add anti-forgery token if enabled
         if (finalOptions.useAntiForgery) {
             const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
-            if (token) 
-                headers['X-CSRF-TOKEN'] = token;
+            if (token)
+                headers['RequestVerificationToken'] = token;
         }
         // make the request
         const response = await fetch(url, {
@@ -71,7 +73,9 @@ async function callApiPostAsync(url, data, options = {}) {
             headers: headers,
             body: JSON.stringify(data)
         });
-        if (!response.ok) 
+        if (response.redirected) // if a redirect is requested, perform it
+            window.location.href = response.url;
+        if (!response.ok)
             throw new Error(`HTTP error! status: ${response.status}`);
         const jsonResponse = await response.json();
         if (jsonResponse.success) {
@@ -196,7 +200,7 @@ async function updateContent(url, addToHistory) {
  */
 function showBusyIndicator() {
     //if (ajaxCallCounter === 0)
-        //progressIndicator.classList.remove('hidden');
+    //progressIndicator.classList.remove('hidden');
     ajaxCallCounter++;
 }
 
@@ -206,7 +210,7 @@ function showBusyIndicator() {
 function hideBusyIndicator() {
     ajaxCallCounter--;
     //if (ajaxCallCounter === 0)
-        //progressIndicator.classList.add('hidden');
+    //progressIndicator.classList.add('hidden');
 }
 
 /**
@@ -341,11 +345,11 @@ const scrollHandler = function (event) {
  */
 function addHorizontalScrolling(idOrElement) {
     let element = idOrElement;
-    if (typeof idOrElement === 'string') 
+    if (typeof idOrElement === 'string')
         element = document.getElementById(idOrElement);
-    if (element instanceof HTMLElement) 
+    if (element instanceof HTMLElement)
         element.addEventListener('wheel', scrollHandler, { passive: false });
-    else 
+    else
         console.error('Invalid input: Expected an element ID or HTMLElement');
 }
 
@@ -355,11 +359,11 @@ function addHorizontalScrolling(idOrElement) {
  */
 function removeHorizontalScrolling(idOrElement) {
     let element = idOrElement;
-    if (typeof idOrElement === 'string') 
+    if (typeof idOrElement === 'string')
         element = document.getElementById(idOrElement);
-    if (element instanceof HTMLElement) 
+    if (element instanceof HTMLElement)
         element.removeEventListener('wheel', scrollHandler, { passive: false });
-    else 
+    else
         console.error('Invalid input: Expected an element ID or HTMLElement');
 }
 
@@ -413,8 +417,10 @@ function toggleAudioPlayerFullHeight() {
     contentContainer.classList.toggle('audio-player-full-height');
 }
 
-audioPlayerFullHeightToggle.addEventListener('click', toggleAudioPlayerFullHeight);
-audioPlayerClose.addEventListener('click', toggleAudioPlayerVisibility);
+if (audioPlayerFullHeightToggle)
+    audioPlayerFullHeightToggle.addEventListener('click', toggleAudioPlayerFullHeight);
+if (audioPlayerClose)
+    audioPlayerClose.addEventListener('click', toggleAudioPlayerVisibility);
 
 
 /**

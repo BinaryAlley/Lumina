@@ -51,7 +51,7 @@ public class AuthController : Controller
         // check if this is the initial super admin setup
         string? isPendingSuperAdminSetup = HttpContext.Session.GetString(HttpContextItemKeys.PENDING_SUPER_ADMIN_SETUP);
         ViewData["RegistrationType"] = isPendingSuperAdminSetup == "true" ? "Admin" : "User";
-        return View(new RegisterRequestModel());
+        return View();
     }
 
     /// <summary>
@@ -92,9 +92,17 @@ public class AuthController : Controller
     }
 
     /// <summary>
+    /// Displays the view for changing the password of an account.
+    /// </summary>
+    [HttpGet("change-password")]
+    public IActionResult ChangePassword()
+    {
+        return View();
+    }
+
+    /// <summary>
     /// Displays the view for registering a new account.
     /// </summary>
-    [InitializationCheck]
     [HttpGet("profile")]
     public IActionResult Profile()
     {
@@ -118,7 +126,7 @@ public class AuthController : Controller
     }
 
     /// <summary>
-    /// Logs in an new account.
+    /// Logs in an account.
     /// </summary>
     /// <param name="data">User credentials used for login.</param>
     /// <param name="returnUrl">The url to return to, after login (if any).</param>
@@ -166,5 +174,45 @@ public class AuthController : Controller
                                     return Json(new { success = true, data = new { isTotpRequired = true } }); // only get here when user did not enter a TOTP code at all, otherwise rethrow the validation error
             throw;
         }
+    }
+
+    /// <summary>
+    /// Logs out an account and redirects to the login page.
+    /// </summary>
+    [HttpGet("logout")]
+    public async Task<IActionResult> Logout()
+    {
+        // if the user is not logged in, redirect them to the home page
+        if (User?.Identity?.IsAuthenticated == false)
+            return RedirectToAction("Index", "Home");
+        Response.Cookies.Delete("Token");
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        return RedirectToAction("Login", "Auth");
+    }
+
+    /// <summary>
+    /// Recovers the password of an account.
+    /// </summary>
+    /// <param name="data">User credentials used for password recovery.</param>
+    [AllowAnonymous]
+    [ValidateAntiForgeryToken]
+    [HttpPost("recover-password")]
+    public async Task<IActionResult> RecoverPassword([FromBody] RecoverPasswordRequestModel data)
+    {
+        RecoverPasswordResponseModel response = await _apiHttpClient.PostAsync<RecoverPasswordResponseModel, RecoverPasswordRequestModel>("auth/recover-password", data);
+        return Json(new { success = true, data = response });
+    }
+
+    /// <summary>
+    /// Changes the password of an account.
+    /// </summary>
+    /// <param name="data">User credentials used for password change.</param>
+    [ValidateAntiForgeryToken]
+    [HttpPost("change-password")]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestModel data)
+    {
+        data = data with { Username = User?.Identity?.Name }; // assign the currently logged in user as the user for which to change the password
+        ChangePasswordResponseModel response = await _apiHttpClient.PostAsync<ChangePasswordResponseModel, ChangePasswordRequestModel>("auth/change-password", data);
+        return Json(new { success = true, data = response });
     }
 }

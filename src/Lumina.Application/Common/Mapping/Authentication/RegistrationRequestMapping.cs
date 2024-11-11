@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Core.Maintenance.ApplicationSetup.Commands;
-using Lumina.Application.Core.UsersManagement.Register;
+using Lumina.Application.Core.UsersManagement.Authentication.Commands.RegisterUser;
 using Lumina.Contracts.Requests.Authentication;
 #endregion
 
@@ -27,13 +27,13 @@ public static class RegistrationRequestMapping
     }
 
     /// <summary>
-    /// Converts <paramref name="request"/> to <see cref="RegisterCommand"/>.
+    /// Converts <paramref name="request"/> to <see cref="RegisterUserCommand"/>.
     /// </summary>
     /// <param name="request">The request to be converted.</param>
     /// <returns>The converted command.</returns>
-    public static RegisterCommand ToCommand(this RegistrationRequest request)
+    public static RegisterUserCommand ToCommand(this RegistrationRequest request)
     {
-        return new RegisterCommand(
+        return new RegisterUserCommand(
             request.Username,
             request.Password,
             request.PasswordConfirm,

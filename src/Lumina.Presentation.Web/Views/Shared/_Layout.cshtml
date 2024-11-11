@@ -1,31 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>@ViewData["Title"] - Lumina</title>
-        <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-        <link rel="stylesheet" href="~/css/button.css" asp-append-version="true" />
-        <link rel="stylesheet" href="~/css/checkbox.css" asp-append-version="true" />
-        <link rel="stylesheet" href="~/css/combobox.css" asp-append-version="true" />
-        <link rel="stylesheet" href="~/css/file-system-browser.css" asp-append-version="true" />
-        <link rel="stylesheet" href="~/css/file-system-tree-view-node.css" asp-append-version="true" />
-        <link rel="stylesheet" href="~/css/navigation-menu.css" asp-append-version="true" />
-        <link rel="stylesheet" href="~/css/notification.css" asp-append-version="true" />
-        <link rel="stylesheet" href="~/css/textbox.css" asp-append-version="true" />
-        <link rel="stylesheet" href="~/Lumina.Presentation.Web.styles.css" asp-append-version="true" />
-    </head>
-    <body>
-        <div id="page">
-            <header>
-                @await Html.PartialAsync("_NavMenu")
-            </header>
-            <main role="main">
-                <article>
-                    @RenderBody()
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Lumina</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/button.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/checkbox.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/combobox.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/file-system-browser.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/file-system-tree-view-node.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/navigation-menu.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/notification.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/textbox.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Lumina.Presentation.Web.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <div id="page">
+        <header>
+            @await Html.PartialAsync("_NavMenu")
+        </header>
+        <main role="main" style="@(User?.Identity?.IsAuthenticated == false ? "bottom: 0px;" : string.Empty)">
+            <article>
+                @RenderBody()
                 <div id="modal-background-article"></div>
-                </article>
-            </main>
+            </article>
+        </main>
+        @if (User?.Identity?.IsAuthenticated == true)
+
+        {
             <!--Audio player-->
             <div class="audio-player-container">
                 <video controls
@@ -33,15 +36,16 @@
                        height="50" width="600">
                     <source src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
                 </video>
-            <a id="audio-player-full-height-toggle">Toggle Full Height</a>
-            <a id="audio-player-close">Toggle Visibility</a>
+                <a id="audio-player-full-height-toggle">Toggle Full Height</a>
+                <a id="audio-player-close">Toggle Visibility</a>
             </div>
-        </div>
-        <!--Modal grid background-->
-        <div id="modal-background-menu"></div>
+        }
+    </div>
+    <!--Modal grid background-->
+    <div id="modal-background-menu"></div>
 
-        <script defer src="~/js/notifications.js" asp-append-version="true"></script>
-        <script defer src="~/js/site.js" asp-append-version="true"></script>
-        @await RenderSectionAsync("Scripts", required: false)
-    </body>
+    <script defer src="~/js/notifications.js" asp-append-version="true"></script>
+    <script defer src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
 </html>

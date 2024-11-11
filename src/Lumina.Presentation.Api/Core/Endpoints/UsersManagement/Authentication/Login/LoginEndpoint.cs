@@ -1,13 +1,17 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using FastEndpoints;
+using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Mapping.Authentication;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.Presentation.Api.Common.Routes.UsersManagement;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
 using Mediator;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Memory;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -40,6 +44,7 @@ public class LoginEndpoint : BaseEndpoint<LoginRequest, IResult>
         Version(1);
         AllowAnonymous();
         DontCatchExceptions();
+        Options(x => x.RequireRateLimiting("authenticationPolicy"));
     }
 
     /// <summary>

@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure;
+using Lumina.Application.Common.Infrastructure.Security;
 using Lumina.Infrastructure.Common.Models.Configuration;
 using Microsoft.Extensions.Options;
 using System;

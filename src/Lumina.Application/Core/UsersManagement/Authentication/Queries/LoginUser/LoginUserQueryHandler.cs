@@ -65,9 +65,30 @@ public class LoginUserQueryHandler : IRequestHandler<LoginUserQuery, ErrorOr<Log
             return resultSelectUser.Errors;
         else if (resultSelectUser.Value is null)
             return Errors.Authentication.InvalidUsernameOrPassword;
-        // validate the password is correct
+        // validate that the password is correct
         if (!_hashService.CheckStringAgainstHash(request.Password!, Uri.UnescapeDataString(resultSelectUser.Value.Password!)))
-            return Errors.Authentication.InvalidUsernameOrPassword;
+        {
+            // if a password reset was requested, a temp password is being used - if the hash check failed against the regular password, try against the temp one too
+            if (resultSelectUser.Value.TempPassword is not null)
+            {
+                // the temporary password should only be valid for 15 minutes, if its obsolete, remove it and return error
+                if (resultSelectUser.Value.TempPasswordCreated!.Value.AddMinutes(15) > DateTime.UtcNow)
+                {
+                    resultSelectUser.Value.TempPassword = null;
+                    resultSelectUser.Value.TempPasswordCreated = null;
+                    await userRepository.UpdateAsync(resultSelectUser.Value, cancellationToken);
+                    await _unitOfWork.SaveChangesAsync(cancellationToken);
+                    return Errors.Authentication.TempPasswordExpired;
+                }
+                else // temporary password is still valid, validate password against it
+                {
+                    if (!_hashService.CheckStringAgainstHash(request.Password!, Uri.UnescapeDataString(resultSelectUser.Value.TempPassword!)))
+                        return Errors.Authentication.InvalidUsernameOrPassword;
+                }
+            }
+            else
+                return Errors.Authentication.InvalidUsernameOrPassword;
+        }
         // create the JWT token
         string token = _jwtTokenGenerator.GenerateToken(resultSelectUser.Value.Id.ToString(), resultSelectUser.Value.Username);
         // check if the user uses TOTP

@@ -14,7 +14,8 @@ namespace Lumina.Application.Common.DataAccess.Repositories.Users;
 /// </summary>
 public interface IUserRepository : IRepository<UserEntity>,
                                    IGetAllRepositoryAction<UserEntity>,
-                                   IInsertRepositoryAction<UserEntity>
+                                   IInsertRepositoryAction<UserEntity>,
+                                   IUpdateRepositoryAction<UserEntity>
 {
     /// <summary>
     /// Gets a username identified by <paramref name="username"/> from the repository, if it exists.

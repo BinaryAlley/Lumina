@@ -12,5 +12,7 @@ public static partial class ApiRoutes
     {
         public const string REGISTER_ACCOUNT = "/auth/register";
         public const string LOGIN_ACCOUNT = "/auth/login";
+        public const string RECOVER_PASSWORD = "/auth/recover-password";
+        public const string CHANGE_PASSWORD = "/auth/change-password";
     }
 }

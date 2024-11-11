@@ -5,7 +5,7 @@ using Lumina.Application.Common.Mapping.FileSystemManagement.Paths;
 using Lumina.Contracts.Requests.FileSystemManagement.Directories;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Directories;
 using Lumina.Contracts.Responses.FileSystemManagement;
-using Lumina.Presentation.Api.Common.Routes.FileSystemManagement;
+using Lumina.Presentation.Api.Common.Routes.Maintenance;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
 using Mediator;
 using Microsoft.AspNetCore.Http;

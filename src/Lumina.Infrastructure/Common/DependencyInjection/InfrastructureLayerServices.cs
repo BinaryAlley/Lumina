@@ -1,7 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using FluentValidation;
-using Lumina.Application.Common.Infrastructure;
+using Lumina.Application.Common.Infrastructure.Authentication;
+using Lumina.Application.Common.Infrastructure.Security;
+using Lumina.Application.Common.Infrastructure.Time;
+using Lumina.Infrastructure.Core.Authentication;
 using Lumina.Infrastructure.Core.Security;
+using Lumina.Infrastructure.Core.Time;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 #endregion
@@ -25,6 +29,12 @@ public static class InfrastructureLayerServices
 
         services.AddSingleton<IHashService, HashService>();
         services.AddSingleton<ICryptographyService, CryptographyService>();
+        services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
+        services.AddSingleton<IQRCodeGenerator, QRCodeGenerator>();
+        services.AddSingleton<ITokenGenerator, TokenGenerator>();
+        services.AddSingleton<ITotpTokenGenerator, TotpTokenGenerator>();
+        services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+
         return services;
     }
 }

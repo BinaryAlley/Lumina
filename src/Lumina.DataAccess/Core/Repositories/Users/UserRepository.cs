@@ -64,4 +64,19 @@ internal sealed class UserRepository : IUserRepository
     {
         return await _luminaDbContext.Users.FirstOrDefaultAsync(user => user.Username == username, cancellationToken).ConfigureAwait(false);
     }
+
+    /// <summary>
+    /// Updates an user.
+    /// </summary>
+    /// <param name="data">Ther user to update.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successfull operation, or an error.</returns>
+    public async Task<ErrorOr<Updated>> UpdateAsync(UserEntity data, CancellationToken cancellationToken)
+    {
+        UserEntity? foundUser = await _luminaDbContext.Users.FirstOrDefaultAsync(user => user.Username == data.Username, cancellationToken).ConfigureAwait(false);
+        if (foundUser is null)
+            return Errors.Users.UserDoesNotExist;
+        _luminaDbContext.Entry(foundUser).CurrentValues.SetValues(data);
+        return Result.Updated;
+    }
 }

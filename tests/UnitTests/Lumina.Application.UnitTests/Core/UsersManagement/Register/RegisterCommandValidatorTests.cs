@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using FluentValidation.TestHelper;
 using Lumina.Application.Common.Errors;
-using Lumina.Application.Core.UsersManagement.Register;
+using Lumina.Application.Core.UsersManagement.Authentication.Commands.RegisterUser;
 using Lumina.Application.UnitTests.Core.UsersManagement.Register.Fixture;
 using System.Diagnostics.CodeAnalysis;
 #endregion
@@ -9,30 +9,30 @@ using System.Diagnostics.CodeAnalysis;
 namespace Lumina.Application.UnitTests.Core.UsersManagement.Register;
 
 /// <summary>
-/// Contains unit tests for the <see cref="RegisterCommandValidator"/> class.
+/// Contains unit tests for the <see cref="RegisterUserCommandValidator"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class RegisterCommandValidatorTests
 {
-    private readonly RegisterCommandValidator _validator;
+    private readonly RegisterUserCommandValidator _validator;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RegisterCommandValidatorTests"/> class.
     /// </summary>
     public RegisterCommandValidatorTests()
     {
-        _validator = new RegisterCommandValidator();
+        _validator = new RegisterUserCommandValidator();
     }
 
     [Fact]
     public void Validate_WhenUsernameIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        RegisterCommand command = RegisterCommandFixture.CreateRegisterCommand();
+        RegisterUserCommand command = RegisterCommandFixture.CreateRegisterCommand();
         command = command with { Username = null! };
 
         // Act
-        TestValidationResult<RegisterCommand> result = _validator.TestValidate(command);
+        TestValidationResult<RegisterUserCommand> result = _validator.TestValidate(command);
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.Username)
@@ -43,11 +43,11 @@ public class RegisterCommandValidatorTests
     public void Validate_WhenUsernameIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        RegisterCommand command = RegisterCommandFixture.CreateRegisterCommand();
+        RegisterUserCommand command = RegisterCommandFixture.CreateRegisterCommand();
         command = command with { Username = string.Empty };
 
         // Act
-        TestValidationResult<RegisterCommand> result = _validator.TestValidate(command);
+        TestValidationResult<RegisterUserCommand> result = _validator.TestValidate(command);
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.Username)
@@ -58,11 +58,11 @@ public class RegisterCommandValidatorTests
     public void Validate_WhenUsernameIsWhiteSpace_ShouldHaveValidationError()
     {
         // Arrange
-        RegisterCommand command = RegisterCommandFixture.CreateRegisterCommand();
+        RegisterUserCommand command = RegisterCommandFixture.CreateRegisterCommand();
         command = command with { Username = "   " };
 
         // Act
-        TestValidationResult<RegisterCommand> result = _validator.TestValidate(command);
+        TestValidationResult<RegisterUserCommand> result = _validator.TestValidate(command);
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.Username)
@@ -73,11 +73,11 @@ public class RegisterCommandValidatorTests
     public void Validate_WhenPasswordIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        RegisterCommand command = RegisterCommandFixture.CreateRegisterCommand();
+        RegisterUserCommand command = RegisterCommandFixture.CreateRegisterCommand();
         command = command with { Password = null! };
 
         // Act
-        TestValidationResult<RegisterCommand> result = _validator.TestValidate(command);
+        TestValidationResult<RegisterUserCommand> result = _validator.TestValidate(command);
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.Password)
@@ -88,11 +88,11 @@ public class RegisterCommandValidatorTests
     public void Validate_WhenPasswordIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        RegisterCommand command = RegisterCommandFixture.CreateRegisterCommand();
+        RegisterUserCommand command = RegisterCommandFixture.CreateRegisterCommand();
         command = command with { Password = string.Empty };
 
         // Act
-        TestValidationResult<RegisterCommand> result = _validator.TestValidate(command);
+        TestValidationResult<RegisterUserCommand> result = _validator.TestValidate(command);
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.Password)
@@ -103,11 +103,11 @@ public class RegisterCommandValidatorTests
     public void Validate_WhenPasswordIsWhiteSpace_ShouldHaveValidationError()
     {
         // Arrange
-        RegisterCommand command = RegisterCommandFixture.CreateRegisterCommand();
+        RegisterUserCommand command = RegisterCommandFixture.CreateRegisterCommand();
         command = command with { Password = "   " };
 
         // Act
-        TestValidationResult<RegisterCommand> result = _validator.TestValidate(command);
+        TestValidationResult<RegisterUserCommand> result = _validator.TestValidate(command);
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.Password)
@@ -118,11 +118,11 @@ public class RegisterCommandValidatorTests
     public void Validate_WhenPasswordConfirmIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        RegisterCommand command = RegisterCommandFixture.CreateRegisterCommand();
+        RegisterUserCommand command = RegisterCommandFixture.CreateRegisterCommand();
         command = command with { PasswordConfirm = null! };
 
         // Act
-        TestValidationResult<RegisterCommand> result = _validator.TestValidate(command);
+        TestValidationResult<RegisterUserCommand> result = _validator.TestValidate(command);
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.PasswordConfirm)
@@ -133,11 +133,11 @@ public class RegisterCommandValidatorTests
     public void Validate_WhenPasswordConfirmIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        RegisterCommand command = RegisterCommandFixture.CreateRegisterCommand();
+        RegisterUserCommand command = RegisterCommandFixture.CreateRegisterCommand();
         command = command with { PasswordConfirm = string.Empty };
 
         // Act
-        TestValidationResult<RegisterCommand> result = _validator.TestValidate(command);
+        TestValidationResult<RegisterUserCommand> result = _validator.TestValidate(command);
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.PasswordConfirm)
@@ -148,11 +148,11 @@ public class RegisterCommandValidatorTests
     public void Validate_WhenPasswordConfirmIsWhiteSpace_ShouldHaveValidationError()
     {
         // Arrange
-        RegisterCommand command = RegisterCommandFixture.CreateRegisterCommand();
+        RegisterUserCommand command = RegisterCommandFixture.CreateRegisterCommand();
         command = command with { PasswordConfirm = "   " };
 
         // Act
-        TestValidationResult<RegisterCommand> result = _validator.TestValidate(command);
+        TestValidationResult<RegisterUserCommand> result = _validator.TestValidate(command);
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.PasswordConfirm)
@@ -163,11 +163,11 @@ public class RegisterCommandValidatorTests
     public void Validate_WhenPasswordAndPasswordConfirmDontMatch_ShouldHaveValidationError()
     {
         // Arrange
-        RegisterCommand command = RegisterCommandFixture.CreateRegisterCommand();
+        RegisterUserCommand command = RegisterCommandFixture.CreateRegisterCommand();
         command = command with { PasswordConfirm = "$321Bcda" };
 
         // Act
-        TestValidationResult<RegisterCommand> result = _validator.TestValidate(command);
+        TestValidationResult<RegisterUserCommand> result = _validator.TestValidate(command);
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.Password)
@@ -184,11 +184,11 @@ public class RegisterCommandValidatorTests
     public void Validate_WhenPasswordDoesNotMatchPattern_ShouldHaveValidationError(string password)
     {
         // Arrange
-        RegisterCommand command = RegisterCommandFixture.CreateRegisterCommand();
+        RegisterUserCommand command = RegisterCommandFixture.CreateRegisterCommand();
         command = command with { Password = password, PasswordConfirm = password };
 
         // Act
-        TestValidationResult<RegisterCommand> result = _validator.TestValidate(command);
+        TestValidationResult<RegisterUserCommand> result = _validator.TestValidate(command);
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.Password)
@@ -203,11 +203,11 @@ public class RegisterCommandValidatorTests
     public void Validate_WhenPasswordMatchesPattern_ShouldNotHaveValidationError(string password)
     {
         // Arrange
-        RegisterCommand command = RegisterCommandFixture.CreateRegisterCommand();
+        RegisterUserCommand command = RegisterCommandFixture.CreateRegisterCommand();
         command = command with { Password = password, PasswordConfirm = password };
 
         // Act
-        TestValidationResult<RegisterCommand> result = _validator.TestValidate(command);
+        TestValidationResult<RegisterUserCommand> result = _validator.TestValidate(command);
 
         // Assert
         result.ShouldNotHaveValidationErrorFor(x => x.Password);
@@ -217,11 +217,11 @@ public class RegisterCommandValidatorTests
     public void Validate_WhenCommandIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        RegisterCommand command = RegisterCommandFixture.CreateRegisterCommand();
+        RegisterUserCommand command = RegisterCommandFixture.CreateRegisterCommand();
         command = command with { Password = "$321Bcda", PasswordConfirm = "$321Bcda" };
 
         // Act
-        TestValidationResult<RegisterCommand> result = _validator.TestValidate(command);
+        TestValidationResult<RegisterUserCommand> result = _validator.TestValidate(command);
 
         // Assert
         result.ShouldNotHaveValidationErrorFor(x => x.Username);

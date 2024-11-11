@@ -262,9 +262,17 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnOrder(2);
 
-                    b.Property<string>("TotpSecret")
+                    b.Property<string>("TempPassword")
                         .HasColumnType("TEXT")
                         .HasColumnOrder(3);
+
+                    b.Property<DateTime?>("TempPasswordCreated")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(7);
+
+                    b.Property<string>("TotpSecret")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(4);
 
                     b.Property<DateTime?>("Updated")
                         .HasColumnType("TEXT");
@@ -277,11 +285,11 @@ namespace Lumina.DataAccess.Common.Migrations
 
                     b.Property<string>("VerificationToken")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(4);
+                        .HasColumnOrder(5);
 
                     b.Property<DateTime?>("VerificationTokenCreated")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(5);
+                        .HasColumnOrder(6);
 
                     b.HasKey("Id");
 

@@ -14,9 +14,9 @@ namespace Lumina.Presentation.Web.Common.Models.UsersManagement;
 /// <param name="Use2fa">Indicates whether two-factor authentication (2FA) should be enabled for the new account.</param>
 [DebuggerDisplay("Username: {Username}")]
 public record RegisterRequestModel(
-    string? Username = null,
-    string? Password = null,
-    string? PasswordConfirm = null,
-    string? RegistrationType = null,
+    string? Username,
+    string? Password,
+    string? PasswordConfirm,
+    string? RegistrationType,
     bool Use2fa = true
 );

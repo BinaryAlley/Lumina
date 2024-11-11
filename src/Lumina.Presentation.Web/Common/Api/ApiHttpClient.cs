@@ -3,6 +3,7 @@ using Lumina.Presentation.Web.Common.Exceptions;
 using Lumina.Presentation.Web.Common.Models.Common;
 using Lumina.Presentation.Web.Common.Models.Configuration;
 using Lumina.Presentation.Web.Common.Models.FileSystemManagement;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -25,16 +26,19 @@ namespace Lumina.Presentation.Web.Common.Api;
 public class ApiHttpClient : IApiHttpClient
 {
     private readonly HttpClient _httpClient;
+    private readonly HttpContext? _httpContext;
     private readonly JsonSerializerOptions _jsonOptions;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ApiHttpClient"/> class.
     /// </summary>
     /// <param name="httpClient">Injected HttpClient for interacting with the API.</param>
+    /// <param name="httpContextAccessor">Injected service for providing the current HTTP context.</param>
     /// <param name="serverConfigurationOptions">Injected server configuration application settings.</param>
-    public ApiHttpClient(HttpClient httpClient, IOptionsSnapshot<ServerConfigurationModel> serverConfigurationOptions)
+    public ApiHttpClient(HttpClient httpClient, IHttpContextAccessor httpContextAccessor, IOptionsSnapshot<ServerConfigurationModel> serverConfigurationOptions)
     {
         _httpClient = httpClient;
+        _httpContext = httpContextAccessor.HttpContext;
         // read the API server configuration values from the configuration, and assign them to the injected client
         ServerConfigurationModel serverConfigurationModel = serverConfigurationOptions.Value;
         httpClient.BaseAddress = new Uri($"{serverConfigurationModel.BaseAddress}:{serverConfigurationModel.Port}/api/v{serverConfigurationModel.ApiVersion}/");
@@ -52,14 +56,14 @@ public class ApiHttpClient : IApiHttpClient
     /// </summary>
     /// <typeparam name="TResponse">The expected type of the response content.</typeparam>
     /// <param name="endpoint">The API endpoint where the request is being sent.</param>
-    /// <param name="token">The token used for authentication with the API.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>The deserialized response containing the result of the GET request.</returns>
-    public async Task<TResponse> GetAsync<TResponse>(string endpoint, string? token = null, CancellationToken cancellationToken = default)
+    public async Task<TResponse> GetAsync<TResponse>(string endpoint, CancellationToken cancellationToken = default)
     {
         using HttpRequestMessage request = new(HttpMethod.Get, endpoint);
-        if (!string.IsNullOrEmpty(token))
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        AuthenticationHeaderValue? authenticationHeader = GetAuthenticationHeader();
+        if (authenticationHeader is not null)
+            request.Headers.Authorization = authenticationHeader;
         return await SendRequestAsync<TResponse>(request, cancellationToken).ConfigureAwait(false);
     }
 
@@ -68,14 +72,14 @@ public class ApiHttpClient : IApiHttpClient
     /// </summary>
     /// <typeparam name="TResponse">The expected type of the response content.</typeparam>
     /// <param name="endpoint">The API endpoint where the request is being sent.</param>
-    /// <param name="token">The token used for authentication with the API.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="IAsyncEnumerable{T}"/> object, which allows for asynchronous iteration over the deserialized items.</returns>
-    public async IAsyncEnumerable<TResponse?> GetAsyncEnumerable<TResponse>(string endpoint, string? token = null, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    public async IAsyncEnumerable<TResponse?> GetAsyncEnumerable<TResponse>(string endpoint, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        using HttpRequestMessage request = new(HttpMethod.Get, endpoint);        
-        if (!string.IsNullOrEmpty(token))
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        using HttpRequestMessage request = new(HttpMethod.Get, endpoint);
+        AuthenticationHeaderValue? authenticationHeader = GetAuthenticationHeader();
+        if (authenticationHeader is not null)
+            request.Headers.Authorization = authenticationHeader;
         // send the request and expect only headers initially - this prevents the client from buffering the entire response
         using HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
@@ -93,14 +97,14 @@ public class ApiHttpClient : IApiHttpClient
     /// Sends a GET request to the specified <paramref name="endpoint"/> as an asynchronous operation and returns the result.
     /// </summary>
     /// <param name="endpoint">The API endpoint where the request is being sent.</param>
-    /// <param name="token">The token used for authentication with the API.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>A model containing the deserialized blob.</returns>
-    public async Task<BlobDataModel> GetBlobAsync(string endpoint, string? token = null, CancellationToken cancellationToken = default)
+    public async Task<BlobDataModel> GetBlobAsync(string endpoint, CancellationToken cancellationToken = default)
     {
         using HttpRequestMessage request = new(HttpMethod.Get, endpoint);
-        if (!string.IsNullOrEmpty(token))
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        AuthenticationHeaderValue? authenticationHeader = GetAuthenticationHeader();
+        if (authenticationHeader is not null)
+            request.Headers.Authorization = authenticationHeader;
         using HttpResponseMessage response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode)
         {
@@ -125,14 +129,14 @@ public class ApiHttpClient : IApiHttpClient
     /// </summary>
     /// <typeparam name="TResponse">The expected type of the response content.</typeparam>
     /// <param name="endpoint">The API endpoint where the request is being sent.</param>
-    /// <param name="token">The token used for authentication with the API.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>The deserialized response containing the result of the DELETE request.</returns>
-    public async Task<TResponse> DeleteAsync<TResponse>(string endpoint, string? token = null, CancellationToken cancellationToken = default)
+    public async Task<TResponse> DeleteAsync<TResponse>(string endpoint, CancellationToken cancellationToken = default)
     {
         using HttpRequestMessage request = new(HttpMethod.Delete, endpoint);
-        if (!string.IsNullOrEmpty(token))
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        AuthenticationHeaderValue? authenticationHeader = GetAuthenticationHeader();
+        if (authenticationHeader is not null)
+            request.Headers.Authorization = authenticationHeader;
         return await SendRequestAsync<TResponse>(request, cancellationToken).ConfigureAwait(false);
     }
 
@@ -143,14 +147,14 @@ public class ApiHttpClient : IApiHttpClient
     /// <typeparam name="TModel">The expected type of the payload content.</typeparam>
     /// <param name="endpoint">The API endpoint where the request is being sent.</param>
     /// <param name="data">The data to be serialized and send to the API.</param>
-    /// <param name="token">The token used for authentication with the API.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>The deserialized response containing the result of the PUT request.</returns>
-    public async Task<TResponse> PutAsync<TResponse, TModel>(string endpoint, TModel data, string? token = null, CancellationToken cancellationToken = default)
+    public async Task<TResponse> PutAsync<TResponse, TModel>(string endpoint, TModel data, CancellationToken cancellationToken = default)
     {
         using HttpRequestMessage request = new(HttpMethod.Put, endpoint);
-        if (!string.IsNullOrEmpty(token))
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        AuthenticationHeaderValue? authenticationHeader = GetAuthenticationHeader();
+        if (authenticationHeader is not null)
+            request.Headers.Authorization = authenticationHeader;
         request.Content = new StringContent(JsonSerializer.Serialize(data, _jsonOptions), Encoding.UTF8, "application/json");
         return await SendRequestAsync<TResponse>(request, cancellationToken).ConfigureAwait(false);
     }
@@ -162,14 +166,14 @@ public class ApiHttpClient : IApiHttpClient
     /// <typeparam name="TModel">The expected type of the payload content.</typeparam>
     /// <param name="endpoint">The API endpoint where the request is being sent.</param>
     /// <param name="data">The data to be serialized and sent to the API.</param>
-    /// <param name="token">The token used for authentication with the API.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>The deserialized response containing the result of the POST request.</returns>
-    public async Task<TResponse> PostAsync<TResponse, TModel>(string endpoint, TModel data, string? token = null, CancellationToken cancellationToken = default)
+    public async Task<TResponse> PostAsync<TResponse, TModel>(string endpoint, TModel data, CancellationToken cancellationToken = default)
     {
         using HttpRequestMessage request = new(HttpMethod.Post, endpoint);
-        if (!string.IsNullOrEmpty(token))
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        AuthenticationHeaderValue? authenticationHeader = GetAuthenticationHeader();
+        if (authenticationHeader is not null)
+            request.Headers.Authorization = authenticationHeader;
         request.Content = new StringContent(JsonSerializer.Serialize(data, _jsonOptions), Encoding.UTF8, "application/json");
         return await SendRequestAsync<TResponse>(request, cancellationToken).ConfigureAwait(false);
     }
@@ -202,5 +206,17 @@ public class ApiHttpClient : IApiHttpClient
             catch { /* if we can't deserialize to ProblemDetails, we'll just use the status code */ }
             throw new ApiException(problemDetails, response.StatusCode);
         }
+    }
+
+    /// <summary>
+    /// Retrieves the authentication header for the current user, if available.
+    /// </summary>
+    /// <returns>
+    /// An <see cref="AuthenticationHeaderValue"/> with a Bearer token if the user's token is found, <see langword="null"/> otherwise.
+    /// </returns>
+    private AuthenticationHeaderValue? GetAuthenticationHeader()
+    {
+        string? token = _httpContext?.User?.FindFirst("Token")?.Value;
+        return !string.IsNullOrEmpty(token) ? new AuthenticationHeaderValue("Bearer", token) : null;
     }
 }
