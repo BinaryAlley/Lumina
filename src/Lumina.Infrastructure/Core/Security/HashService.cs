@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Konscious.Security.Cryptography;
-using Lumina.Application.Common.Infrastructure;
+using Lumina.Application.Common.Infrastructure.Security;
 using System;
 using System.Security.Cryptography;
 using System.Text;

@@ -37,7 +37,7 @@ public class Program
         builder.Services.BindSharedConfiguration(builder.Configuration);
         builder.Services.BindPresentationApiLayerConfiguration(builder.Configuration);
 
-        builder.Services.AddPresentationApiLayerServices();
+        builder.Services.AddPresentationApiLayerServices(builder.Configuration);
         builder.Services.AddApplicationLayerServices();
         builder.Services.AddInfrastructureLayerServices();
         builder.Services.AddDataAccessLayerServices();
@@ -68,7 +68,7 @@ public class Program
                          .Enrich.FromLogContext();
         });
         WebApplication app = builder.Build();
-        
+
         app.UseSerilogRequestLogging();
 
         // apply any pending migrations
@@ -77,7 +77,7 @@ public class Program
             IServiceProvider services = scope.ServiceProvider;
             try
             {
-                LuminaDbContext context = services.GetRequiredService<LuminaDbContext>(); 
+                LuminaDbContext context = services.GetRequiredService<LuminaDbContext>();
                 await context.Database.MigrateAsync();
             }
             catch (Exception ex)
@@ -94,6 +94,7 @@ public class Program
         //app.UseHttpsRedirection();
 
         app.UseAuthorization();
+        app.UseRateLimiter();
 
         app.UseFastEndpoints(config =>
         {

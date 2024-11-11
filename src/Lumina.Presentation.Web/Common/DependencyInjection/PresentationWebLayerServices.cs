@@ -1,9 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using FluentValidation;
 using Lumina.Presentation.Web.Common.Api;
+using Lumina.Presentation.Web.Common.Authorization;
 using Lumina.Presentation.Web.Common.Exceptions;
 using Lumina.Presentation.Web.Common.Filters;
+using Lumina.Presentation.Web.Common.Security;
+using Lumina.Presentation.Web.Common.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -34,7 +38,7 @@ public static class PresentationWebLayerServices
     public static IServiceCollection AddPresentationWebLayerServices(this IServiceCollection services)
     {
         services.AddControllersWithViews(options => options.Filters.Add(typeof(ApiExceptionFilter)))
-            .AddJsonOptions(options => 
+            .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.MaxDepth = 256;
                 options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; // needed because file system API responses can have very nested structures
@@ -46,9 +50,9 @@ public static class PresentationWebLayerServices
             .AddCookie(options =>
             {
                 // basic path configuration
-                options.LoginPath = "/account/login";
-                options.LogoutPath = "/account/logout";
-                options.AccessDeniedPath = "/account/access-denied";
+                options.LoginPath = "/auth/login";
+                options.LogoutPath = "/auth/logout";
+                options.AccessDeniedPath = "/auth/access-denied";
 
                 // Cookie configuration
                 options.Cookie = new CookieBuilder
@@ -67,7 +71,7 @@ public static class PresentationWebLayerServices
 
                 // handle validation to support various deployment scenarios
                 options.Events = new CookieAuthenticationEvents
-                {                    
+                {
                     // handle redirects to work with different base paths
                     OnRedirectToLogin = context =>
                     {
@@ -80,6 +84,10 @@ public static class PresentationWebLayerServices
                     }
                 };
             });
+
+        // add an authorization policy that ensures application is initialized with super admin account before allowing access
+        services.AddAuthorizationBuilder()
+            .AddPolicy("RequireInitialization", policy => policy.Requirements.Add(new InitializationRequirement()));
 
         // add forwarded headers middleware to handle reverse proxy scenarios
         services.Configure<ForwardedHeadersOptions>(options =>
@@ -126,6 +134,9 @@ public static class PresentationWebLayerServices
         services.AddHttpContextAccessor();
 
         services.AddScoped<ApiExceptionFilter>();
+        services.AddScoped<IAuthorizationHandler, InitializationHandler>();
+        services.AddSingleton<ICryptographyService, CryptographyService>();
+        services.AddSingleton<IUrlService, UrlService>();
 
         return services;
     }

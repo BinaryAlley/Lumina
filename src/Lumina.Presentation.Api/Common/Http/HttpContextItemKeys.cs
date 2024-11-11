@@ -1,6 +1,4 @@
-#region ========================================================================= USING =====================================================================================
 namespace Lumina.Presentation.Api.Common.Http;
-#endregion
 
 /// <summary>
 /// Constants shared by HttpContext across a HTTP request (avoid magic strings).

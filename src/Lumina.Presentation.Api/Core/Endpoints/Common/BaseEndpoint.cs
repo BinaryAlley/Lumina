@@ -46,10 +46,12 @@ public abstract class BaseEndpoint<TRequest, TResponse> : Endpoint<TRequest, TRe
         Dictionary<string, object?> extensionsDictionary = [];
         int statusCode = error.Type switch
         {
-            ErrorType.Conflict => StatusCodes.Status409Conflict,
-            ErrorType.NotFound => StatusCodes.Status404NotFound,
             ErrorType.Validation => StatusCodes.Status400BadRequest,
+            ErrorType.Unauthorized => StatusCodes.Status403Forbidden, // DO NOT return Status401Unauthorized, that actually means lack of valid authentication credentials (not logged in)
             ErrorType.Failure => StatusCodes.Status403Forbidden,
+            ErrorType.Forbidden => StatusCodes.Status403Forbidden,
+            ErrorType.NotFound => StatusCodes.Status404NotFound,
+            ErrorType.Conflict => StatusCodes.Status409Conflict,
             _ => StatusCodes.Status500InternalServerError,
         };
 
@@ -92,7 +94,7 @@ public abstract class BaseEndpoint<TRequest, TResponse> : Endpoint<TRequest, TRe
         // return a validation problem result with the constructed error details
         return Results.ValidationProblem(
             errorsDictionary,
-            detail: "One or more validation errors occurred.",
+            detail: "One or more validation errors occurred.", // TODO: implement translation?
             instance: HttpContext.Request.Path,
             statusCode: 422,
             title: "Validation Error",

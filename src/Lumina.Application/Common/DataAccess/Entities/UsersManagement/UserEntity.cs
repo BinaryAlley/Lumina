@@ -17,7 +17,7 @@ public class UserEntity : IStorageEntity
     /// <summary>
     /// Gets the Id of the user.
     /// </summary>
-    public required Guid Id { get; init; }
+    public Guid Id { get; init; }
 
     /// <summary>
     /// Gets or sets the username of the user.
@@ -28,6 +28,11 @@ public class UserEntity : IStorageEntity
     /// Gets or sets the hashed password of the user.
     /// </summary>
     public required string Password { get; set; }
+
+    /// <summary>
+    /// Gets or sets the temporary hashed password used in password recovery.
+    /// </summary>
+    public string? TempPassword { get; set; }
 
     /// <summary>
     /// Gets or sets the optional Time-based One-Time Password (TOTP) secret for two-factor authentication.
@@ -43,6 +48,11 @@ public class UserEntity : IStorageEntity
     /// Gets or sets the optional date and time when the verification token was created.
     /// </summary>
     public DateTime? VerificationTokenCreated { get; set; }
+
+    /// <summary>
+    /// Gets or sets the date and time when the temporary password used in password recovery was created.
+    /// </summary>
+    public DateTime? TempPasswordCreated { get; set; }
 
     /// <summary>
     /// Gets the collection of libraries owned by this user.

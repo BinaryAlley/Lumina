@@ -1,4 +1,4 @@
-namespace Lumina.Presentation.Api.Common.Routes.FileSystemManagement;
+namespace Lumina.Presentation.Api.Common.Routes.Maintenance;
 
 /// <summary>
 /// Class for the collection of routes defined in this API.

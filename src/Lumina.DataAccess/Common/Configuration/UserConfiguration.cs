@@ -32,14 +32,20 @@ public class UserConfiguration : IEntityTypeConfiguration<UserEntity>
             .IsRequired()
             .HasColumnOrder(2);
 
-        builder.Property(user => user.TotpSecret)
+        builder.Property(user => user.TempPassword)
             .HasColumnOrder(3);
 
-        builder.Property(user => user.VerificationToken)
+        builder.Property(user => user.TotpSecret)
             .HasColumnOrder(4);
 
-        builder.Property(user => user.VerificationTokenCreated)
+        builder.Property(user => user.VerificationToken)
             .HasColumnOrder(5);
+
+        builder.Property(user => user.VerificationTokenCreated)
+            .HasColumnOrder(6);
+
+        builder.Property(user => user.TempPasswordCreated)
+            .HasColumnOrder(7);
 
         builder.HasMany(user => user.Libraries)
             .WithOne(library => library.User)

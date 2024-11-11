@@ -1,3 +1,7 @@
+@using Lumina.Presentation.Web.Common.Services
+
+@inject IUrlService _urlService
+
 <input type="checkbox" id="hamburger-input" class="burger-shower" />
 <label id="hamburger-menu" for="hamburger-input">
     <span></span>
@@ -9,45 +13,59 @@
                 Account
             </div>
             <ul>
-                <li><a href="account/login"><span>Login</span></a></li>
-                <li><a href="account/logout"><span>Logout</span></a></li>
-                <li><a href="account/register"><span>Register</span></a></li>
-                <li><a href="account"><span>My Account</span></a></li>
+                @if (User?.Identity?.IsAuthenticated == false)
+                {
+                    <li><a href="@_urlService.GetAbsoluteUrl("Login", "Auth")"><span>Login</span></a></li>
+                    <li><a href="@_urlService.GetAbsoluteUrl("Login", "Auth")"><span>Recover Password</span></a></li>
+                }
+                else
+                {
+                    <li><a href="@_urlService.GetAbsoluteUrl("Logout", "Auth")"><span>Logout</span></a></li>
+                }
+                @if (User?.Identity?.IsAuthenticated == true)
+                {
+                    <li><a href="@_urlService.GetAbsoluteUrl("Login", "Auth")"><span>Register</span></a></li>
+                    <li><a href="@_urlService.GetAbsoluteUrl("Login", "Auth")"><span>Change Password</span></a></li>
+                    <li><a href="@_urlService.GetAbsoluteUrl("Login", "Auth")"><span>Profile</span></a></li>
+                }
             </ul>
-            <div class="mobile-menu-heading">
-                Tools
-            </div>
-            <ul>
-                <li><a href="tools/options"><span>Options</span></a></li>
-            </ul>
-            <div class="mobile-menu-heading">
-                Library
-            </div>
-            <ul>
-                <li><a href="library/manage"><span>Manage libraries</span></a></li>
-                <li><a href="library/manage/item"><span>Add media library</span></a></li>
-            </ul>
-            <div class="mobile-menu-heading">
-                Written Content
-            </div>
-            <ul>
-                <li><a href="library/written-content-library/books-library/books" class="nav-link"><span>Books</span></a></li>
-                <li><a href="library/written-content/magazines"><span>Magazines</span></a></li>
-            </ul>
-            <div class="mobile-menu-heading">
-                Audio
-            </div>
-            <ul>
-                <li><a href="library/audio/music"><span>Music</span></a></li>
-                <li><a href="library/audio/interviews"><span>Interviews</span></a></li>
-            </ul>
-            <div class="mobile-menu-heading">
-                Video
-            </div>
-            <ul>
-                <li><a href="library/video/movies"><span>Movies</span></a></li>
-                <li><a href="library/video/tvshows"><span>TV Shows</span></a></li>
-            </ul>
+            @if (User?.Identity?.IsAuthenticated == true)
+            {
+                <div class="mobile-menu-heading">
+                    Tools
+                </div>
+                <ul>
+                    <li><a href="tools/options"><span>Options</span></a></li>
+                </ul>
+                <div class="mobile-menu-heading">
+                    Library
+                </div>
+                <ul>
+                    <li><a href="library/manage"><span>Manage libraries</span></a></li>
+                    <li><a href="library/manage/item"><span>Add media library</span></a></li>
+                </ul>
+                <div class="mobile-menu-heading">
+                    Written Content
+                </div>
+                <ul>
+                    <li><a href="library/written-content-library/books-library/books" class="nav-link"><span>Books</span></a></li>
+                    <li><a href="library/written-content/magazines"><span>Magazines</span></a></li>
+                </ul>
+                <div class="mobile-menu-heading">
+                    Audio
+                </div>
+                <ul>
+                    <li><a href="library/audio/music"><span>Music</span></a></li>
+                    <li><a href="library/audio/interviews"><span>Interviews</span></a></li>
+                </ul>
+                <div class="mobile-menu-heading">
+                    Video
+                </div>
+                <ul>
+                    <li><a href="library/video/movies"><span>Movies</span></a></li>
+                    <li><a href="library/video/tvshows"><span>TV Shows</span></a></li>
+                </ul>
+            }
             <div class="mobile-menu-heading">
                 Help
             </div>
@@ -64,48 +82,62 @@
             <input type="radio" id="account-menu" name="menu">
             <label for="account-menu">Account</label>
             <ul>
-                <li><a href="account/login">Login</a></li>
-                <li><a href="account/logout">Logout</a></li>
-                <li><a href="account/register">Register</a></li>
-                <li><a href="account">My Account</a></li>
+                @if (User?.Identity?.IsAuthenticated == false)
+                {
+                    <li><a href="@_urlService.GetAbsoluteUrl("Login", "Auth")">Login</a></li>
+                    <li><a href="@_urlService.GetAbsoluteUrl("RecoverPassword", "Auth")">Recover Password</a></li>
+                }
+                else
+                {
+                    <li><a href="@_urlService.GetAbsoluteUrl("Logout", "Auth")">Logout</a></li>
+                }
+                @if (User?.Identity?.IsAuthenticated == true)
+                {
+                    <li><a href="@_urlService.GetAbsoluteUrl("Register", "Auth")">Register</a></li>
+                    <li><a href="@_urlService.GetAbsoluteUrl("ChangePassword", "Auth")">Change Password</a></li>
+                    <li><a href="@_urlService.GetAbsoluteUrl("Profile", "Auth")">Profile</a></li>
+                }
             </ul>
         </li>
-        <li tabindex="0">
-            <input type="radio" id="tools-menu" name="menu">
-            <label for="tools-menu">Tools</label>
-            <ul>
-                <li><a href="tools/options">Options</a></li>
-            </ul>
-        </li>
-        <li tabindex="0">
-            <input type="radio" id="library-menu" name="menu">
-            <label for="library-menu">Library</label>
-            <ul>
-                <li tabindex="0"><a href="library/manage">Manage libraries</a></li>
-                <li tabindex="0"><a href="library/manage/item">Add new library</a></li>
-                <li class="has-submenu" tabindex="0">
-                    <label>Written Content</label>
-                    <ul>
-                        <li><a href="library/written-content-library/books-library/books" class="nav-link">Books</a></li>
-                        <li><a href="library/written-content/magazines">Magazines</a></li>
-                    </ul>
-                </li>
-                <li class="has-submenu" tabindex="0">
-                    <label>Audio</label>
-                    <ul>
-                        <li><a href="library/audio/music">Music</a></li>
-                        <li><a href="library/audio/interviews">Interviews</a></li>
-                    </ul>
-                </li>
-                <li class="has-submenu" tabindex="0">
-                    <label>Video</label>
-                    <ul>
-                        <li><a href="library/video/movies">Movies</a></li>
-                        <li><a href="library/video/tvshows">TV Shows</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </li>
+        @if (User?.Identity?.IsAuthenticated == true)
+        {
+            <li tabindex="0">
+                <input type="radio" id="tools-menu" name="menu">
+                <label for="tools-menu">Tools</label>
+                <ul>
+                    <li><a href="tools/options">Options</a></li>
+                </ul>
+            </li>
+            <li tabindex="0">
+                <input type="radio" id="library-menu" name="menu">
+                <label for="library-menu">Library</label>
+                <ul>
+                    <li tabindex="0"><a href="library/manage">Manage libraries</a></li>
+                    <li tabindex="0"><a href="library/manage/item">Add new library</a></li>
+                    <li class="has-submenu" tabindex="0">
+                        <label>Written Content</label>
+                        <ul>
+                            <li><a href="library/written-content-library/books-library/books" class="nav-link">Books</a></li>
+                            <li><a href="library/written-content/magazines">Magazines</a></li>
+                        </ul>
+                    </li>
+                    <li class="has-submenu" tabindex="0">
+                        <label>Audio</label>
+                        <ul>
+                            <li><a href="library/audio/music">Music</a></li>
+                            <li><a href="library/audio/interviews">Interviews</a></li>
+                        </ul>
+                    </li>
+                    <li class="has-submenu" tabindex="0">
+                        <label>Video</label>
+                        <ul>
+                            <li><a href="library/video/movies">Movies</a></li>
+                            <li><a href="library/video/tvshows">TV Shows</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        }
         <li tabindex="0">
             <input type="radio" id="help-menu" name="menu">
             <label for="help-menu">Help</label>
