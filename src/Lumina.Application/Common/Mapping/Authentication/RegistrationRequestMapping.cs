@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.Maintenance.ApplicationSetup.Commands;
+using Lumina.Application.Core.Maintenance.ApplicationSetup.Commands.SetupApplication;
 using Lumina.Application.Core.UsersManagement.Authentication.Commands.RegisterUser;
 using Lumina.Contracts.Requests.Authentication;
 #endregion

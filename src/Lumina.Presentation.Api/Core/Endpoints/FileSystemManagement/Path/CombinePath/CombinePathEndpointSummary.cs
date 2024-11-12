@@ -2,6 +2,7 @@
 using FastEndpoints;
 using Lumina.Contracts.Requests.FileSystemManagement.Path;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
+using System.Diagnostics.CodeAnalysis;
 #endregion
 
 namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.CombinePath;
@@ -9,6 +10,7 @@ namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.Combi
 /// <summary>
 /// Class used for providing a textual description for the <see cref="CombinePathEndpoint"/> API endpoint, for Swagger.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class CombinePathEndpointSummary : Summary<CombinePathEndpoint, CombinePathRequest>
 {
     /// <summary>

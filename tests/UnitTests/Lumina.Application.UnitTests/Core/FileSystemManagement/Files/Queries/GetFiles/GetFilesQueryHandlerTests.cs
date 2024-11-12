@@ -20,7 +20,6 @@ using System.Threading.Tasks;
 
 namespace Lumina.Application.UnitTests.Core.FileSystemManagement.Files.Queries.GetFiles;
 
-
 /// <summary>
 /// Contains unit tests for the <see cref="GetFilesQueryHandler"/> class.
 /// </summary>

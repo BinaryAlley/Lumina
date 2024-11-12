@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
+using System.Diagnostics.CodeAnalysis;
 #endregion
 
 namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.GetPathSeparator;
@@ -8,6 +9,7 @@ namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.GetPa
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetPathSeparatorEndpoint"/> API endpoint, for Swagger.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class GetPathSeparatorEndpointSummary : Summary<GetPathSeparatorEndpoint>
 {
     /// <summary>

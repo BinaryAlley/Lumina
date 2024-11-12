@@ -2,6 +2,7 @@
 using FastEndpoints;
 using Lumina.Contracts.Requests.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
+using System.Diagnostics.CodeAnalysis;
 
 
 #endregion
@@ -11,6 +12,7 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.M
 /// <summary>
 /// Class used for providing a textual description for the <see cref="AddLibraryEndpoint"/> API endpoint, for Swagger.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class AddLibraryEndpointSummary : Summary<AddLibraryEndpoint, AddLibraryRequest>
 {
     /// <summary>

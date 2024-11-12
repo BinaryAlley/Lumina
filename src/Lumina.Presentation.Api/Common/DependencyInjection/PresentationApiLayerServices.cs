@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -22,6 +23,7 @@ namespace Lumina.Presentation.Api.Common.DependencyInjection;
 /// <summary>
 /// Contains all services of the Presentation API layer.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public static class PresentationApiLayerServices
 {
     /// <summary>

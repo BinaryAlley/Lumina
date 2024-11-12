@@ -3,6 +3,7 @@ using FastEndpoints;
 using Lumina.Contracts.Requests.FileSystemManagement.Path;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 #endregion
 
 namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.SplitPath;
@@ -10,6 +11,7 @@ namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.Split
 /// <summary>
 /// Class used for providing a textual description for the <see cref="SplitPathEndpoint"/> API endpoint, for Swagger.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class SplitPathEndpointSummary : Summary<SplitPathEndpoint, SplitPathRequest>
 {
     /// <summary>

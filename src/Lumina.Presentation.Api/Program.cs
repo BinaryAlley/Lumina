@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Serilog;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading.Tasks;
 #endregion
@@ -24,6 +25,7 @@ namespace Lumina.Presentation.Api;
 /// <summary>
 /// Application entry point, contains the composition root module, wires up all dependencies of the application.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class Program
 {
     /// <summary>

@@ -17,6 +17,7 @@ using Polly.CircuitBreaker;
 using Polly.Retry;
 using Polly.Wrap;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json.Serialization;
@@ -28,6 +29,7 @@ namespace Lumina.Presentation.Web.Common.DependencyInjection;
 /// <summary>
 /// Contains all services of the Presentation Web layer.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public static class PresentationWebLayerServices
 {
     /// <summary>

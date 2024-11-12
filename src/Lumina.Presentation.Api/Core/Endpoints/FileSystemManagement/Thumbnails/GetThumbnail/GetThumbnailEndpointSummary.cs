@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
 using Lumina.Contracts.Requests.FileSystemManagement.Thumbnails;
+using System.Diagnostics.CodeAnalysis;
 #endregion
 
 namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Thumbnails.GetThumbnail;
@@ -8,6 +9,7 @@ namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Thumbnails
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetThumbnailEndpoint"/> API endpoint, for Swagger.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class GetThumbnailEndpointSummary : Summary<GetThumbnailEndpoint, GetThumbnailRequest>
 {
     /// <summary>

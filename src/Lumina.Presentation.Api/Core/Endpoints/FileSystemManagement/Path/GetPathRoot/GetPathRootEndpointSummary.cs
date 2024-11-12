@@ -2,6 +2,7 @@
 using FastEndpoints;
 using Lumina.Contracts.Requests.FileSystemManagement.Path;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
+using System.Diagnostics.CodeAnalysis;
 #endregion
 
 namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.GetPathRoot;
@@ -9,6 +10,7 @@ namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.GetPa
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetPathRootEndpoint"/> API endpoint, for Swagger.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class GetPathRootEndpointSummary : Summary<GetPathRootEndpoint, GetPathRootRequest>
 {
     /// <summary>

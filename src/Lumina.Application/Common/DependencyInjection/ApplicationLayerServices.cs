@@ -3,6 +3,7 @@ using FluentValidation;
 using Lumina.Application.Common.Behaviors;
 using Mediator;
 using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics.CodeAnalysis;
 #endregion
 
 namespace Lumina.Application.Common.DependencyInjection;
@@ -10,6 +11,7 @@ namespace Lumina.Application.Common.DependencyInjection;
 /// <summary>
 /// Contains all services of the Application layer.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public static class ApplicationLayerServices
 {
     /// <summary>
