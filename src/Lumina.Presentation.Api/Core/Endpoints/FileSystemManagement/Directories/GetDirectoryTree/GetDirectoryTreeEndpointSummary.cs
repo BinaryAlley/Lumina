@@ -3,6 +3,7 @@ using FastEndpoints;
 using Lumina.Contracts.Requests.FileSystemManagement.Directories;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 #endregion
 
 namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Directories.GetDirectoryTree;
@@ -10,6 +11,7 @@ namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Directorie
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetDirectoryTreeEndpoint"/> API endpoint, for Swagger.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class GetDirectoryTreeEndpointSummary : Summary<GetDirectoryTreeEndpoint, GetDirectoryTreeRequest>
 {
     /// <summary>

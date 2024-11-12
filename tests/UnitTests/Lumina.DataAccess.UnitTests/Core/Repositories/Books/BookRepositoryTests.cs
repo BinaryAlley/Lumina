@@ -28,7 +28,7 @@ public class BookRepositoryTests
 {
     private readonly LuminaDbContext _mockContext;
     private readonly BookRepository _sut;
-    private readonly BookModelFixture _bookModelFixture;
+    private readonly BookEntityFixture _bookEntityFixture;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BookRepositoryTests"/> class.
@@ -37,14 +37,14 @@ public class BookRepositoryTests
     {
         _mockContext = Create.MockedDbContextFor<LuminaDbContext>();
         _sut = new BookRepository(_mockContext);
-        _bookModelFixture = new BookModelFixture();
+        _bookEntityFixture = new BookEntityFixture();
     }
 
     [Fact]
     public async Task InsertAsync_WhenBookDoesNotExist_ShouldAddBookToContextAndReturnCreated()
     {
         // Arrange
-        BookEntity bookModel = _bookModelFixture.CreateBookModel();
+        BookEntity bookModel = _bookEntityFixture.CreateBookModel();
 
         // Act
         ErrorOr<Created> result = await _sut.InsertAsync(bookModel, CancellationToken.None);
@@ -63,7 +63,7 @@ public class BookRepositoryTests
     public async Task InsertAsync_WhenBookAlreadyExists_ShouldReturnError()
     {
         // Arrange
-        BookEntity bookModel = _bookModelFixture.CreateBookModel();
+        BookEntity bookModel = _bookEntityFixture.CreateBookModel();
 
         _mockContext.Books.Add(bookModel);
         await _mockContext.SaveChangesAsync();
@@ -85,7 +85,7 @@ public class BookRepositoryTests
         _mockContext.Set<TagEntity>().Add(existingTag);
         await _mockContext.SaveChangesAsync();
 
-        BookEntity bookModel = _bookModelFixture.CreateBookModel();
+        BookEntity bookModel = _bookEntityFixture.CreateBookModel();
         bookModel.Tags = [new("Existing"), new("New")];
 
         // Act
@@ -112,7 +112,7 @@ public class BookRepositoryTests
         _mockContext.Set<GenreEntity>().Add(existingGenre);
         await _mockContext.SaveChangesAsync();
 
-        BookEntity bookModel = _bookModelFixture.CreateBookModel();
+        BookEntity bookModel = _bookEntityFixture.CreateBookModel();
         bookModel.Genres = [new("Existing"), new("New")];
 
         // Act
@@ -137,9 +137,9 @@ public class BookRepositoryTests
         // Arrange
         List<BookEntity> books =
         [
-            _bookModelFixture.CreateBookModel(),
-            _bookModelFixture.CreateBookModel(),
-            _bookModelFixture.CreateBookModel()
+            _bookEntityFixture.CreateBookModel(),
+            _bookEntityFixture.CreateBookModel(),
+            _bookEntityFixture.CreateBookModel()
         ];
         _mockContext.Books.AddRange(books);
         await _mockContext.SaveChangesAsync();
@@ -170,7 +170,7 @@ public class BookRepositoryTests
     public async Task GetAllAsync_WhenCalled_ShouldIncludeRelatedEntities()
     {
         // Arrange
-        BookEntity book = _bookModelFixture.CreateBookModel();
+        BookEntity book = _bookEntityFixture.CreateBookModel();
         book.Tags = [new TagEntity("Tag1"), new TagEntity("Tag2")];
         book.Genres = [new GenreEntity("Genre1"), new GenreEntity("Genre2")];
         book.ISBNs = [new IsbnEntity("1234567890", IsbnFormat.Isbn10), new IsbnEntity("1234567890123", IsbnFormat.Isbn13)];

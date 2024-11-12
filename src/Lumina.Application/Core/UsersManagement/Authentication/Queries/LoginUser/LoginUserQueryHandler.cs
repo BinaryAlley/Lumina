@@ -72,7 +72,7 @@ public class LoginUserQueryHandler : IRequestHandler<LoginUserQuery, ErrorOr<Log
             if (resultSelectUser.Value.TempPassword is not null)
             {
                 // the temporary password should only be valid for 15 minutes, if its obsolete, remove it and return error
-                if (resultSelectUser.Value.TempPasswordCreated!.Value.AddMinutes(15) > DateTime.UtcNow)
+                if (resultSelectUser.Value.TempPasswordCreated!.Value.AddMinutes(15) < DateTime.UtcNow)
                 {
                     resultSelectUser.Value.TempPassword = null;
                     resultSelectUser.Value.TempPasswordCreated = null;

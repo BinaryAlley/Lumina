@@ -7,6 +7,7 @@ using Lumina.Infrastructure.Core.Authentication;
 using Lumina.Infrastructure.Core.Security;
 using Lumina.Infrastructure.Core.Time;
 using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 #endregion
 
@@ -15,6 +16,7 @@ namespace Lumina.Infrastructure.Common.DependencyInjection;
 /// <summary>
 /// Contains all services of the Infrastructure layer.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public static class InfrastructureLayerServices
 {
     /// <summary>

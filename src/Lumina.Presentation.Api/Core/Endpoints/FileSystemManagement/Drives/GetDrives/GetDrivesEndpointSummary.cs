@@ -2,6 +2,7 @@
 using FastEndpoints;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 #endregion
 
 namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Drives.GetDrives;
@@ -9,6 +10,7 @@ namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Drives.Get
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetDrivesEndpoint"/> API endpoint, for Swagger.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class GetDrivesEndpointSummary : Summary<GetDrivesEndpoint>
 {
     /// <summary>

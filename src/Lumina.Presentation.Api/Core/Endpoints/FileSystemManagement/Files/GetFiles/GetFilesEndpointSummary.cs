@@ -3,6 +3,7 @@ using FastEndpoints;
 using Lumina.Contracts.Requests.FileSystemManagement.Files;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 #endregion
 
 namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Files.GetFiles;
@@ -10,6 +11,7 @@ namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Files.GetF
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetFilesEndpoint"/> API endpoint, for Swagger.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class GetFilesEndpointSummary : Summary<GetFilesEndpoint, GetFilesRequest>
 {
     /// <summary>

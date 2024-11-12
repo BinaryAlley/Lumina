@@ -4,6 +4,7 @@ using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.File
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Path;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Platform;
 using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
 #endregion
 
@@ -12,6 +13,7 @@ namespace Lumina.Domain.Common.DependencyInjection;
 /// <summary>
 /// Contains all services of the Domain layer.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public static class DomainLayerServices
 {
     /// <summary>

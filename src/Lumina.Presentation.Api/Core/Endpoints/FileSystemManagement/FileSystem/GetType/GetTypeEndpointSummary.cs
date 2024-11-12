@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
 using Lumina.Contracts.Responses.FileSystemManagement.FileSystem;
+using System.Diagnostics.CodeAnalysis;
 #endregion
 
 namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.FileSystem.GetType;
@@ -8,6 +9,7 @@ namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.FileSystem
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetTypeEndpoint"/> API endpoint, for Swagger.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class GetTypeEndpointSummary : Summary<GetTypeEndpoint>
 {
     /// <summary>

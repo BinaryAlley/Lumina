@@ -4,6 +4,7 @@ using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
 using Lumina.Application.Common.Mapping.UsersManagement.Users;
+using Lumina.Application.UnitTests.Common.Mapping.UserManagement.Users.Fixtures;
 using Lumina.Contracts.Responses.UsersManagement.Users;
 using Lumina.Domain.Common.Enums.MediaLibrary;
 using System;
@@ -18,19 +19,21 @@ namespace Lumina.Application.UnitTests.Common.Mapping.UserManagement.Users;
 [ExcludeFromCodeCoverage]
 public class UserEntityMappingTests
 {
+    private readonly UserEntityFixture _fixture;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UserEntityMappingTests"/> class.
+    /// </summary>
+    public UserEntityMappingTests()
+    {
+        _fixture = new UserEntityFixture();
+    }
+
     [Fact]
     public void ToResponse_WhenMappingValidUserEntity_ShouldMapCorrectly()
     {
         // Arrange
-        UserEntity entity = new()
-        {
-            Id = Guid.NewGuid(),
-            Username = "testuser",
-            Password = "hashedpassword",
-            Libraries = [],
-            Created = DateTime.UtcNow,
-            Updated = null
-        };
+        UserEntity entity = UserEntityFixture.CreateUserEntity();
 
         // Act
         UserResponse result = entity.ToResponse();
@@ -51,15 +54,8 @@ public class UserEntityMappingTests
     public void ToResponse_WhenMappingDifferentUsernames_ShouldMapCorrectly(string username)
     {
         // Arrange
-        UserEntity entity = new()
-        {
-            Id = Guid.NewGuid(),
-            Username = username,
-            Password = "hashedpassword",
-            Libraries = [],
-            Created = DateTime.UtcNow,
-            Updated = null
-        };
+        UserEntity entity = UserEntityFixture.CreateUserEntity();
+        entity.Username = username;
 
         // Act
         UserResponse result = entity.ToResponse();
@@ -73,60 +69,22 @@ public class UserEntityMappingTests
     public void ToResponse_WhenMappingWithUpdatedDateTime_ShouldMapCorrectly()
     {
         // Arrange
-        DateTime updated = DateTime.UtcNow.AddDays(-1);
-        UserEntity entity = new()
-        {
-            Id = Guid.NewGuid(),
-            Username = "testuser",
-            Password = "hashedpassword",
-            Libraries = [],
-            Created = DateTime.UtcNow,
-            Updated = updated
-        };
+        UserEntity entity = UserEntityFixture.CreateUserEntity();
+        entity.Updated = DateTime.UtcNow.AddDays(-1);
 
         // Act
         UserResponse result = entity.ToResponse();
 
         // Assert
         result.Should().NotBeNull();
-        result.Updated.Should().Be(updated);
+        result.Updated.Should().Be(entity.Updated);
     }
 
     [Fact]
     public void ToResponse_WhenMappingWithLibraries_ShouldNotAffectMapping()
     {
         // Arrange
-        UserEntity entity = new()
-        {
-            Id = Guid.NewGuid(),
-            Username = "testuser",
-            Password = "hashedpassword",
-            Libraries =
-            [
-                new()
-                {
-                    Id = Guid.NewGuid(),
-                    UserId = Guid.NewGuid(),
-                    Title = "Library 1",
-                    LibraryType = LibraryType.Book,
-                    ContentLocations = [],
-                    Created = DateTime.UtcNow,
-                    Updated = null
-                },
-                new()
-                {
-                    Id = Guid.NewGuid(),
-                    UserId = Guid.NewGuid(),
-                    Title = "Library 2",
-                    LibraryType = LibraryType.Movie,
-                    ContentLocations = [],
-                    Created = DateTime.UtcNow,
-                    Updated = null
-                }
-            ],
-            Created = DateTime.UtcNow,
-            Updated = null
-        };
+        UserEntity entity = UserEntityFixture.CreateUserEntity(2);
 
         // Act
         UserResponse result = entity.ToResponse();

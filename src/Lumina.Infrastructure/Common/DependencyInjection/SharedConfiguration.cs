@@ -3,6 +3,7 @@ using Lumina.Infrastructure.Common.Models.Configuration;
 using Lumina.Infrastructure.Common.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 #endregion
@@ -12,6 +13,7 @@ namespace Lumina.Infrastructure.Common.DependencyInjection;
 /// <summary>
 /// Class containing the shared configuration bindings of the application.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public static class SharedConfiguration
 {
     /// <summary>

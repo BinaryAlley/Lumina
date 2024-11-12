@@ -48,6 +48,14 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, E
         _qRCodeGenerator = qRCodeGenerator;
     }
 
+    /// <summary>
+    /// Handles the command to register an account.
+    /// </summary>
+    /// <param name="request">The request to be handled.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="RegistrationResponse"/>, or an error message.
+    /// </returns>
     public async ValueTask<ErrorOr<RegistrationResponse>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
         // check if any users already exists (admin account is only set once!)

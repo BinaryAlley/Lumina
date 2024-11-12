@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
 using Lumina.Contracts.Requests.Authentication;
+using System.Diagnostics.CodeAnalysis;
 #endregion
 
 namespace Lumina.Presentation.Api.Core.Endpoints.Maintenance.ApplicationSetup;
@@ -8,6 +9,7 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Maintenance.ApplicationSetup;
 /// <summary>
 /// Class used for providing a textual description for the <see cref="SetupApplicationEndpoint"/> API endpoint, for Swagger.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class SetupApplicationEndpointSummary : Summary<SetupApplicationEndpoint, RegistrationRequest>
 {
     /// <summary>

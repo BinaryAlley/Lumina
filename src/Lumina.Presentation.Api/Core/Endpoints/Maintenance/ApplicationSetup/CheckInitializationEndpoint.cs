@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Application.Core.Maintenance.ApplicationSetup.Queries;
+using Lumina.Application.Core.Maintenance.ApplicationSetup.Queries.CheckInitialization;
 using Lumina.Contracts.Responses.UsersManagement;
 using Lumina.Presentation.Api.Common.Routes.Maintenance;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
