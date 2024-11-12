@@ -42,12 +42,12 @@ public class UserEntity : IStorageEntity
     /// <summary>
     /// Gets or sets the optional token used for account verification or password reset.
     /// </summary>
-    public string? VerificationToken { get; set; }
+    public string? VerificationToken { get; set; } // TODO: to be deleted, not used
 
     /// <summary>
     /// Gets or sets the optional date and time when the verification token was created.
     /// </summary>
-    public DateTime? VerificationTokenCreated { get; set; }
+    public DateTime? VerificationTokenCreated { get; set; } // TODO: to be deleted, not used
 
     /// <summary>
     /// Gets or sets the date and time when the temporary password used in password recovery was created.
