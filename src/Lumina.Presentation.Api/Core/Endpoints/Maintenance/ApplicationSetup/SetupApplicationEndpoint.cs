@@ -50,6 +50,6 @@ public class SetupApplicationEndpoint : BaseEndpoint<RegistrationRequest, IResul
     public override async Task<IResult> ExecuteAsync(RegistrationRequest request, CancellationToken cancellationToken)
     {
         ErrorOr<RegistrationResponse> result = await _sender.Send(request.ToSetupCommand(), cancellationToken).ConfigureAwait(false);
-        return result.Match(success => TypedResults.Created($"{BaseURL}api/v1{Api.Common.Routes.UsersManagement.ApiRoutes.Users.GET_USER_BY_ID}/{result.Value.Id}", result.Value), Problem);
+        return result.Match(success => TypedResults.Created($"{BaseURL}api/v1{Api.Common.Routes.UsersManagement.ApiRoutes.Users.GET_USER_BY_ID.Replace("{id}", success.Id.ToString())}", result.Value), Problem);
     }
 }

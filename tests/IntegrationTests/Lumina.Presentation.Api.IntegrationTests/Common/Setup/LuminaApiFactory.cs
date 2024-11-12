@@ -1,15 +1,18 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.DataAccess.Core.UoW;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Text;
 #endregion
 
 namespace Lumina.Presentation.Api.IntegrationTests.Common.Setup;
@@ -21,6 +24,7 @@ namespace Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
 {
     private readonly SqliteConnection _connection;
+    private const string TEST_ENCRYPTION_KEY = "MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=";
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LuminaApiFactory"/> class.
@@ -50,7 +54,7 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
             config.AddInMemoryCollection(initialData: new Dictionary<string, string?>
             {
                 ["JwtSettings:SecretKey"] = "test-key-thats-at-least-32-chars-long-for-jwt",
-                ["EncryptionSettings:SecretKey"] = "dGVzdC1rZXktdGhhdHMtYXQtbGVhc3QtMzItY2hhcnMtbG9uZy1mb3ItZW5jcnlwdGlvbg==" // base64 encoded test key
+                ["EncryptionSettings:SecretKey"] = TEST_ENCRYPTION_KEY // base64 encoded test key
             });
         });
         builder.ConfigureServices(services =>
@@ -61,6 +65,20 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
                 services.Remove(descriptor);
             // add SQLite DbContext configuration
             services.AddDbContext<LuminaDbContext>(options => options.UseSqlite(_connection));
+            // configure JWT authentication for testing
+            services.PostConfigure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = "test-issuer",
+                    ValidAudience = "test-audience",
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("test-key-thats-at-least-32-chars-long-for-jwt"))
+                };
+            });
             // build service provider and ensure database is created
             ServiceProvider servicePreovider = services.BuildServiceProvider();
             using (IServiceScope scope = servicePreovider.CreateScope())
@@ -70,7 +88,7 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
                 dbContext.Database.Migrate(); 
             }
         });
-    }
+    }    
 
     /// <summary>
     /// Disposes the connection to the database.
