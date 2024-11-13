@@ -32,6 +32,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{ACD16983-F1BD-4A92-B282-95BA8C456F6A}"
 	ProjectSection(SolutionItems) = preProject
 		..\docs\CONTRIBUTING.md = ..\docs\CONTRIBUTING.md
+		INSTALL.md = INSTALL.md
 		..\LICENSE.md = ..\LICENSE.md
 		..\README.md = ..\README.md
 		..\docs\SOURCES.md = ..\docs\SOURCES.md
@@ -84,6 +85,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "templates", "templates", "{
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lumina.Presentation.Web", "Lumina.Presentation.Web\Lumina.Presentation.Web.csproj", "{613C74E8-720C-4205-8BA7-85B23D2E7881}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SecurityTests", "SecurityTests", "{8B06B1D2-80B9-490C-9A36-C7748F58B705}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lumina.Presentation.Api.SecurityTests", "..\tests\SecurityTests\Lumina.Presentation.Api.SecurityTests\Lumina.Presentation.Api.SecurityTests.csproj", "{F72DCA2D-0349-42F9-9614-92A38D4B1EA4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -151,6 +156,10 @@ Global
 		{613C74E8-720C-4205-8BA7-85B23D2E7881}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{613C74E8-720C-4205-8BA7-85B23D2E7881}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{613C74E8-720C-4205-8BA7-85B23D2E7881}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F72DCA2D-0349-42F9-9614-92A38D4B1EA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F72DCA2D-0349-42F9-9614-92A38D4B1EA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F72DCA2D-0349-42F9-9614-92A38D4B1EA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F72DCA2D-0349-42F9-9614-92A38D4B1EA4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -178,6 +187,8 @@ Global
 		{6BD85BA8-B3C4-4D79-8858-F6D7676FF2CC} = {3C316ABB-08D5-4450-9A4E-91059DB54254}
 		{A0D07244-9CB2-4E30-85A5-97D520E4B9CC} = {0C0E5A56-AD29-4D0B-AB87-E865F8B933E2}
 		{613C74E8-720C-4205-8BA7-85B23D2E7881} = {3C316ABB-08D5-4450-9A4E-91059DB54254}
+		{8B06B1D2-80B9-490C-9A36-C7748F58B705} = {16E590D3-DD9F-4B45-BF19-C6E317A57D11}
+		{F72DCA2D-0349-42F9-9614-92A38D4B1EA4} = {8B06B1D2-80B9-490C-9A36-C7748F58B705}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4A55A28E-C657-4A0B-95EA-2931AE66004E}
