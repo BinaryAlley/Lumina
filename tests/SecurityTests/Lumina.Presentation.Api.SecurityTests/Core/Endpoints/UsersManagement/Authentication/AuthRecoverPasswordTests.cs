@@ -3,31 +3,23 @@ using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.DataAccess.Core.UoW;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Lumina.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.UsersManagement.Authentication;
+namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.UsersManagement.Authentication;
 
 /// <summary>
-/// Contains integration tests for the <see cref="RecoverPasswordEndpoint"/> class.
+/// Contains security tests for the <c>/auth/recover-password</c> route.
 /// </summary>
-/// <remarks>
-/// This test class needs to be separate from <see cref="RecoverPasswordEndpointTests"/> because rate limiting is set per application run, not HTTP client instantiation.
-/// </remarks>
 [ExcludeFromCodeCoverage]
-public class RecoverPasswordEndpointRateLimitingTests : IClassFixture<LuminaApiFactory>, IDisposable
+public class AuthRecoverPasswordTests : IClassFixture<LuminaApiFactory>, IDisposable
 {
     private readonly LuminaApiFactory _apiFactory;
     private readonly HttpClient _client;
@@ -39,13 +31,16 @@ public class RecoverPasswordEndpointRateLimitingTests : IClassFixture<LuminaApiF
     private readonly string _testUsername;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="RecoverPasswordEndpointRateLimitingTests"/> class.
+    /// Initializes a new instance of the <see cref="AuthRecoverPasswordTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public RecoverPasswordEndpointRateLimitingTests(LuminaApiFactory apiFactory)
+    public AuthRecoverPasswordTests(LuminaApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
+        // set a fake IP for this test instance
+        _client.DefaultRequestHeaders.Clear();
+        _client.DefaultRequestHeaders.Add("X-Forwarded-For", $"192.168.1.4");
         _testUsername = $"testuser_{Guid.NewGuid()}";
     }
 
@@ -75,6 +70,10 @@ public class RecoverPasswordEndpointRateLimitingTests : IClassFixture<LuminaApiF
         problemDetails["title"].GetString().Should().Be("TooManyRequests");
         problemDetails["detail"].GetString().Should().Be("Too many attempts. Please try again later.");
         problemDetails["retryAfter"].GetString().Should().Be("15");
+
+        lastResponse.Headers.Should().ContainKey("X-RateLimit-Limit");
+        lastResponse.Headers.Should().ContainKey("X-RateLimit-Reset");
+        lastResponse.Headers.Should().ContainKey("X-RateLimit-Remaining");
     }
 
     public void Dispose()
