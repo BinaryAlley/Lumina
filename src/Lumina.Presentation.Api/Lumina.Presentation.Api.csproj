@@ -1,11 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net9.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>disable</ImplicitUsings>
         <BaseOutputPath>$(SolutionDir)..\bin\api\</BaseOutputPath>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <WarningsNotAsErrors>$(WarningsNotAsErrors);NU1901;NU1902;NU1903;NU1904</WarningsNotAsErrors>
         <UserSecretsId>37d55c87-4374-4971-82e9-012fcaad1853</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <ContainerRepository>lumina-api</ContainerRepository>
@@ -18,20 +19,20 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="FastEndpoints" Version="5.30.0" />
-        <PackageReference Include="FastEndpoints.Swagger" Version="5.30.0" />
-        <PackageReference Include="Mediator.Abstractions" Version="2.1.7" />
-        <PackageReference Include="Mediator.SourceGenerator" Version="2.1.7">
+        <PackageReference Include="FastEndpoints" Version="5.31.0.6-beta" />
+        <PackageReference Include="FastEndpoints.Swagger" Version="5.31.0.6-beta" />
+        <PackageReference Include="Mediator.Abstractions" Version="3.0.0-preview.27" />
+        <PackageReference Include="Mediator.SourceGenerator" Version="3.0.0-preview.27">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.10" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.0" />
         <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.8">
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Serilog" Version="4.1.0" />
+        <PackageReference Include="Serilog" Version="4.1.1-dev-02318" />
         <PackageReference Include="Serilog.AspNetCore" Version="8.0.3" />
         <PackageReference Include="Serilog.Enrichers.AspnetcoreHttpcontext" Version="1.1.0" />
         <PackageReference Include="Serilog.Settings.Configuration" Version="8.0.4" />
