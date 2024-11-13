@@ -21,6 +21,8 @@ public static partial class Errors
         public static Error PasswordConfirmCannotBeEmpty => Error.Validation(description: nameof(PasswordConfirmCannotBeEmpty));
         public static Error NewPasswordConfirmCannotBeEmpty => Error.Validation(description: nameof(NewPasswordConfirmCannotBeEmpty));
         public static Error InvalidPassword => Error.Validation(description: nameof(InvalidPassword));
+        public static Error UsernameMustBeBetween3And255CharactersLong => Error.Validation(description: nameof(UsernameMustBeBetween3And255CharactersLong));
+        public static Error InvalidUsername => Error.Validation(description: nameof(InvalidUsername));
         public static Error PasswordsNotMatch => Error.Validation(description: nameof(PasswordsNotMatch));
         public static Error InvalidTotpCode => Error.Validation(description: nameof(InvalidTotpCode));
         public static Error InvalidUsernameOrPassword => Error.Failure(description: nameof(InvalidUsernameOrPassword));
