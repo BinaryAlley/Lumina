@@ -12,7 +12,6 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
-    environment: test
     steps:
       - uses: actions/checkout@v2
       - name: Set up .NET
