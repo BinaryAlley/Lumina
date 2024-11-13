@@ -7,7 +7,7 @@ on:
   workflow_dispatch: # enable manual triggers
 
 jobs:
-  test:
+  run-platform-tests:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
