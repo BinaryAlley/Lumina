@@ -1,7 +1,18 @@
 services:
-  lumina-server:
-    container_name: lumina-server
-    image: ${DOCKER_REGISTRY-}lumina-server
+  lumina-api:
+    container_name: lumina-api
+    image: ${DOCKER_REGISTRY-}lumina-api
     build:
       context: .
       dockerfile: Lumina.Presentation.Api/Dockerfile
+    environment:
+      - LOG_PATH=/logs
+
+  lumina-web:
+    container_name: lumina-web
+    image: ${DOCKER_REGISTRY-}lumina-web
+    build:
+      context: .
+      dockerfile: Lumina.Presentation.Web/Dockerfile
+    environment:
+      - LOG_PATH=/logs

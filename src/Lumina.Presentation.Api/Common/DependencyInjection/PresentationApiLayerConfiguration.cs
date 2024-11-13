@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 #endregion
@@ -10,6 +11,7 @@ namespace Lumina.Presentation.Api.Common.DependencyInjection;
 /// <summary>
 /// Class containing the configuration bindings of the Presentation API layer.
 /// </summary>
+[ExcludeFromCodeCoverage]
 internal static class PresentationApiLayerConfiguration
 {
     /// <summary>

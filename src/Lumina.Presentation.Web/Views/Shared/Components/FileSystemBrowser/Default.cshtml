@@ -3,15 +3,10 @@
 @using Lumina.Presentation.Web.Common.Enums.FileSystem
 @using Lumina.Presentation.Web.Common.Enums.Notifications
 @using Lumina.Presentation.Web.Common.Exceptions
-@using Lumina.Presentation.Web.Common.Models.FileManagement
-@using Lumina.Presentation.Web.Common.Models.UI
-@using Lumina.Presentation.Web.Common.Services
+@using Lumina.Presentation.Web.Common.Models.FileSystemManagement
 @using Microsoft.AspNetCore.Components
 @using System.Text.Json
 @using System.Text
-
-@inject IApiHttpClient _apiHttpClient
-@inject INotificationService _notificationService
 
 <div id="file-system-browser-dialog" class="container-background above-modal">
     <div id="file-system-browser-content">
@@ -309,9 +304,9 @@
                 <div id="navigator-navigation-controls-container">
                     <!--Navigation-->
                     <div id="navigator-history">
-                        <img src="images/ui/back.svg" id="navigator-navigate-back" class="navigation-icon" alt="Back" title="Back" />
-                        <img src="images/ui/forward.svg" id="navigator-navigate-forward" class="navigation-icon" alt="Forward" title="Forward" />
-                        <img src="images/ui/up.svg" id="navigator-navigate-up" class="navigation-icon" alt="Up One Level" title="Up One Level" />
+                        <img src="~/images/ui/back.svg" id="navigator-navigate-back" class="navigation-icon" alt="Back" title="Back" />
+                        <img src="~/images/ui/forward.svg" id="navigator-navigate-forward" class="navigation-icon" alt="Forward" title="Forward" />
+                        <img src="~/images/ui/up.svg" id="navigator-navigate-up" class="navigation-icon" alt="Up One Level" title="Up One Level" />
                     </div>
                     <!--Toggle Tree View-->
                     <svg id="navigator-toggle-tree-view-button" class="navigator-icon" width="30" height="30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -469,16 +464,16 @@
                         </div>
                     </div>
                     <button id="navigator-edit-path-button" class="navigator-edit-path-button abort-button f-16" style="height:28px; width:35px;">
-                        <img src="images/ui/edit.svg" id="navigator-edit-icon" alt="Edit Path" title="Edit Path" />
+                        <img src="~/images/ui/edit.svg" id="navigator-edit-icon" alt="Edit Path" title="Edit Path" />
                     </button>
                     <button id="navigator-navigate-button" class="navigator-navigate-button confirm-button f-16" style="height:28px; width:35px;">
-                        <img src="images/ui/check.svg" id="navigator-navigate-icon" alt="Navigate" title="Navigate" />
+                        <img src="~/images/ui/check.svg" id="navigator-navigate-icon" alt="Navigate" title="Navigate" />
                     </button>
                     <button class="file-system-browser-content-new-directory abort-button f-16" style="height:28px; width:35px;">
-                        <img src="images/ui/new-directory.svg" id="navigator-new-directory-icon" alt="New Directory" title="New Directory" />
+                        <img src="~/images/ui/new-directory.svg" id="navigator-new-directory-icon" alt="New Directory" title="New Directory" />
                     </button>
                     <button class="file-system-browser-content-favorite-directory abort-button f-16" style="height:28px; width:35px;">
-                        <img src="images/ui/favorite-star.svg" class="navigation-icon favorite-unselected" alt="Favorite directory" title="Favorite directory" />
+                        <img src="~/images/ui/favorite-star.svg" class="navigation-icon favorite-unselected" alt="Favorite directory" title="Favorite directory" />
                     </button>
                 </div>
                 <!--End File System Navigator-->

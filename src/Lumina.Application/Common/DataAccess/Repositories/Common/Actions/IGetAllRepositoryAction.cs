@@ -1,6 +1,6 @@
 ﻿#region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using Lumina.Contracts.Models.Common;
+using Lumina.Application.Common.DataAccess.Entities.Common;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;

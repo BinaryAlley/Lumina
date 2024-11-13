@@ -1,4 +1,4 @@
-name: PR Source Branch Check
+name: Pull Request Source Branch Validation Check
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
       - master
 
 jobs:
-  check-branch-name:
+  validate-pr-source:
     runs-on: ubuntu-latest
     steps:
       - name: Check source branch name

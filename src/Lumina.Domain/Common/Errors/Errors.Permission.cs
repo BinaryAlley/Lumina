@@ -11,6 +11,6 @@ public static partial class Errors
 {
     public static class Permission
     {
-        public static Error UnauthorizedAccess => Error.Failure(nameof(UnauthorizedAccess));
+        public static Error UnauthorizedAccess => Error.Failure(description: nameof(UnauthorizedAccess));
     }
 }

@@ -3,9 +3,10 @@
         <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>disable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <BaseOutputPath>$(SolutionDir)..\bin\server\</BaseOutputPath>
+        <BaseOutputPath>$(SolutionDir)..\bin\api\</BaseOutputPath>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <WarningsNotAsErrors>$(WarningsNotAsErrors);NU1901;NU1902;NU1903;NU1904</WarningsNotAsErrors>
     </PropertyGroup>
 
     <ItemGroup>
@@ -13,6 +14,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Responses\WrittenContentLibrary\BookLibrary\" />
+      <ProjectReference Include="..\Lumina.Domain\Lumina.Domain.csproj" />
     </ItemGroup>
 </Project>

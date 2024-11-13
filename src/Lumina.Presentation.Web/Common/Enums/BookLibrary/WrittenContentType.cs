@@ -1,9 +1,9 @@
-﻿namespace Lumina.Presentation.Web.Common.Enums.BookLibrary;
+namespace Lumina.Presentation.Web.Common.Enums.BookLibrary;
 
 /// <summary>
 /// Enumeration for the types of written content libraries.
 /// </summary>
-public enum WrittenContentType
+public enum WrittenContentType // TODO: to be removed?
 {
     /// <summary>
     /// A printed or written literary work.
@@ -34,6 +34,11 @@ public enum WrittenContentType
     /// A periodical publication containing articles, stories, and other content.
     /// </summary>
     Magazine,
+
+    /// <summary>
+    /// Periodical publication containing news.
+    /// </summary>
+    Newspaper,
 
     /// <summary>
     /// A style of Japanese comic books and graphic novels.

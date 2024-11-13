@@ -15,6 +15,6 @@ public class DatabaseSettingsModelValidator : AbstractValidator<DatabaseSettings
     /// </summary>
     public DatabaseSettingsModelValidator()
     {
-        RuleFor(x => x.DefaultConnection).NotEmpty().WithMessage(Errors.Errors.Configuration.DatabaseConnectionStringCannotBeEmpty.Code);
+        RuleFor(x => x.DefaultConnection).NotEmpty().WithMessage(Errors.Errors.Configuration.DatabaseConnectionStringCannotBeEmpty.Description);
     }
 }

@@ -10,6 +10,16 @@
     display: none;
 }
 
+    .enlightenment-toggle-checkbox:checked + .enlightenment-toggle + .enlightenment-dropdown {
+        display: block;
+    }
+
+    .enlightenment-toggle-checkbox:checked + .enlightenment-toggle .enlightenment-arrow {
+        background-size: 9px 11px;
+        background-position: 3px -2px;
+        transform: rotate(90deg);
+    }
+
 .enlightenment-toggle {
     display: flex;
     align-items: center;
@@ -44,6 +54,21 @@
         background-size: 12px 6px, 3px auto, 100%;
     }
 
+.enlightenment-arrow {
+    display: inline-block;
+    width: 12px;
+    height: 9px;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%22545%20-32.5%2027.5%2065%22%3E%3Cpath%20fill%3D%22%23FFF%22%20d%3D%22M568.254,-7.43524%20568.159,-7.34277%20567.977,-7.52246%20546.559,-28.9417%20525.484,-28.9417%20549.787,-4.63446%20557.439,3.01532%20557.619,3.19629%20550.067,10.7549%20525.758,35.0583%20546.834,35.0583%20568.254,13.6429%20578.792,3.10254%20568.254,-7.43524z%22%2F%3E%3C%2Fsvg%3E');
+    background-size: 10px 9px;
+    background-repeat: no-repeat;
+    background-position: 3px -0px;
+    transition: transform 0.3s ease;
+}
+
+.enlightenment-toggle-checkbox:checked + .enlightenment-toggle .enlightenment-arrow {
+    transform: rotate(90deg);
+}
+
 .enlightenment-selected-text {
     flex: 1;
     text-align: right;
@@ -66,15 +91,9 @@
     border-right: #202020 1px solid;
     padding: 3px;
     z-index: 999;
-    max-height: none;
-    overflow-y: auto;
 }
 
-    .enlightenment-dropdown > .shine-effect:first-child {
-        top: -4px;
-    }
-
-.enlightenment-item {
+.enlightenment-option {
     display: block;
     border-left: 1px solid #232323;
     border-right: 1px solid #777777;
@@ -88,32 +107,30 @@
     cursor: pointer;
 }
 
-    .enlightenment-item.first-item {
+    .enlightenment-option.first-option {
         border-top: 1px solid #232323;
         margin-top: -1px;
     }
 
-    .enlightenment-item.last-item {
+    .enlightenment-option.last-option {
         border-bottom: 1px solid #777777;
     }
 
-    .enlightenment-item.disabled {
-        color: #AAAAAA;
+    .enlightenment-option.disabled {
+        color: #AAAAAA; /* Gray color */
     }
 
-    .enlightenment-item:hover {
+    .enlightenment-option:hover {
         background-image: none;
         background: linear-gradient(to bottom, #505050, #464646, #404040, #363636);
         color: #1D8AF9;
-        box-shadow: inset 1px 0 0 0 #777777, inset -1px 0 0 0 #232323, inset 0 1px 0 0 #989898, inset 0 -1px 0 0 #151515;
+        box-shadow: inset 1px 0 0 0 #777777, /* left */
+        inset -1px 0 0 0 #232323, /* right */
+        inset 0 1px 0 0 #989898, /* top */
+        inset 0 -1px 0 0 #151515; /* bottom */
     }
 
-.enlightenment-combobox.open .enlightenment-dropdown {
-    display: block;
-}
-
 .enlightenment-combobox > .shine-effect:first-child {
-    top: 1px;
     opacity: 0;
     transition: opacity 0.5s;
 }

@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Core.Aggregates.VideoLibrary.Services;
-using Lumina.Domain.Core.Aggregates.WrittenContentLibrary.Services;
+using Lumina.Domain.Core.BoundedContexts.VideoLibraryBoundedContext.Services;
+using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.Services;
 #endregion
 
 namespace Lumina.Domain.Core.Services;

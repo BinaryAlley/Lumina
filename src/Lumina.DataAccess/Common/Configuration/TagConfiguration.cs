@@ -1,5 +1,5 @@
 ﻿#region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Models.Common;
+using Lumina.Application.Common.DataAccess.Entities.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 #endregion
@@ -7,15 +7,15 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace Lumina.DataAccess.Common.Configuration;
 
 /// <summary>
-/// Configures the entity mapping for the <see cref="TagModel"/> entity.
+/// Configures the entity mapping for the <see cref="TagEntity"/> entity.
 /// </summary>
-public class TagConfiguration : IEntityTypeConfiguration<TagModel>
+public class TagConfiguration : IEntityTypeConfiguration<TagEntity>
 {
     /// <summary>
-    /// Configures the <see cref="TagModel"/> entity.
+    /// Configures the <see cref="TagEntity"/> entity.
     /// </summary>
     /// <param name="builder">The builder to be used to configure the entity.</param>
-    public void Configure(EntityTypeBuilder<TagModel> builder)
+    public void Configure(EntityTypeBuilder<TagEntity> builder)
     {
         builder.ToTable("Tags");
         builder.HasKey(tag => tag.Name);

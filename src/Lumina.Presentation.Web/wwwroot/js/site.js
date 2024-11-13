@@ -4,8 +4,8 @@ const progressIndicator = document.getElementById('progress-indicator');
 const progressIndicatorValue = document.getElementById('progress-indicator-value');
 const progressIndicatorValueShadow = document.getElementById('progress-indicator-value-shadow');
 const progressIndicatorValueText = document.getElementById('progress-indicator-value-text');
-
-
+const audioPlayerFullHeightToggle = document.getElementById('audio-player-full-height-toggle');
+const audioPlayerClose = document.getElementById('audio-player-close');
 
 let enableConsoleDebugMessages = false; // whether to display debug messages at the developer console, or not
 
@@ -25,6 +25,8 @@ async function callApiGetAsync(url) {
     try {
         // create the URL for the API endpoint
         const response = await fetch(url); // call the API
+        if (response.redirected) // if a redirect is requested, perform it
+            window.location.href = response.url;
         if (!response.ok)
             throw new Error('Network response was not ok');
         const jsonResponse = await response.json();
@@ -38,6 +40,157 @@ async function callApiGetAsync(url) {
     }
 }
 
+/**
+ * Performs a POST request to the specified API endpoint.
+ * @param {string} url - The API endpoint URL.
+ * @param {Object} data - The data to send in the request body.
+ * @param {Object} [options] - Additional options for the request.
+ * @param {boolean} [options.useAntiForgery=true] - Whether to include anti-forgery token.
+ * @param {Object} [options.headers] - Additional headers to include.
+ * @returns {Promise<any>} The response data if successful, undefined otherwise.
+ */
+async function callApiPostAsync(url, data, options = {}) {
+    const defaultOptions = {
+        useAntiForgery: true,
+        headers: {}
+    };
+    const finalOptions = { ...defaultOptions, ...options };
+    try {
+        // prepare headers
+        const headers = {
+            'Content-Type': 'application/json',
+            ...finalOptions.headers
+        };
+        // add anti-forgery token if enabled
+        if (finalOptions.useAntiForgery) {
+            const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+            if (token)
+                headers['RequestVerificationToken'] = token;
+        }
+        // make the request
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(data)
+        });
+        if (response.redirected) // if a redirect is requested, perform it
+            window.location.href = response.url;
+        if (!response.ok)
+            throw new Error(`HTTP error! status: ${response.status}`);
+        const jsonResponse = await response.json();
+        if (jsonResponse.success) {
+            if (jsonResponse.message)
+                notificationService.show(jsonResponse.message, NotificationType.SUCCESS);
+            return jsonResponse.data;
+        }
+        else
+            notificationService.show(jsonResponse.errorMessage, NotificationType.ERROR);
+    } catch (error) {
+        console.error('Error:', error);
+        notificationService.show(error, NotificationType.ERROR);
+    }
+}
+
+//+======================================================================================+
+//|                                Website navigation                                    |
+//+======================================================================================+
+
+/**
+ * Initializes navigation by setting the initial history state, intercepting link clicks,
+ * and managing back/forward browser actions.
+ */
+function initializeNavigation() {
+    // store initial state
+    const initialState = {
+        url: window.location.href,
+        content: document.querySelector('main').innerHTML,
+        title: document.title
+    };
+    history.replaceState(initialState, document.title, window.location.href);
+    // initial nav-link binding
+    bindNavigationLinks();
+
+    // handle browser back/forward
+    window.addEventListener('popstate', handlePopState);
+}
+
+
+/**
+ * Binds AJAX navigation behavior to links marked with .nav-link class.
+ */
+function bindNavigationLinks() {
+    document.querySelectorAll('.nav-link').forEach(link => {
+        // only bind if not already bound
+        if (!link.dataset.boundNavigation) {
+            link.addEventListener('click', handleNavigation);
+            link.dataset.boundNavigation = 'true';
+        }
+    });
+}
+
+/**
+ * Handles link clicks to navigate dynamically without reloading the page.
+ * @param {Event} e - The click event for a navigation link.
+ */
+async function handleNavigation(e) {
+    e.preventDefault();
+    const url = e.target.href;
+    await updateContent(url, true);
+}
+
+/**
+ * Restores page content and title when navigating with browser back/forward buttons.
+ * @param {PopStateEvent} e - The popstate event with previous state data.
+ */
+async function handlePopState(e) {
+    if (e.state) {
+        // if we have cached content in state, use it immediately
+        if (e.state.content) {
+            document.querySelector('main').innerHTML = e.state.content;
+            document.title = e.state.title;
+        }
+        // still fetch fresh content to ensure it's up to date
+        await updateContent(e.state.url, false);
+    }
+}
+
+/**
+ * Loads new page content and updates the URL and history if required.
+ * @param {string} url - URL to fetch new content from.
+ * @param {boolean} addToHistory - Whether to add the new state to history.
+ */
+async function updateContent(url, addToHistory) {
+    try {
+        const response = await fetch(url);
+        const html = await response.text();
+
+        // parse the new content
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const content = doc.querySelector('main').innerHTML;
+        const title = doc.querySelector('title')?.textContent || document.title;
+
+        // update the page
+        document.querySelector('main').innerHTML = content;
+        document.title = title;
+
+        // bind navigation links in the new content
+        bindNavigationLinks();
+
+        // save to history if needed
+        if (addToHistory) {
+            const state = {
+                url: url,
+                content: content,
+                title: title
+            };
+            history.pushState(state, title, url);
+        }
+    } catch (error) {
+        console.error('Navigation failed:', error);
+    }
+}
+
 //+======================================================================================+
 //|                             Common Helper Functions                                  |
 //+======================================================================================+ 
@@ -47,7 +200,7 @@ async function callApiGetAsync(url) {
  */
 function showBusyIndicator() {
     //if (ajaxCallCounter === 0)
-        //progressIndicator.classList.remove('hidden');
+    //progressIndicator.classList.remove('hidden');
     ajaxCallCounter++;
 }
 
@@ -57,7 +210,7 @@ function showBusyIndicator() {
 function hideBusyIndicator() {
     ajaxCallCounter--;
     //if (ajaxCallCounter === 0)
-        //progressIndicator.classList.add('hidden');
+    //progressIndicator.classList.add('hidden');
 }
 
 /**
@@ -192,11 +345,11 @@ const scrollHandler = function (event) {
  */
 function addHorizontalScrolling(idOrElement) {
     let element = idOrElement;
-    if (typeof idOrElement === 'string') 
+    if (typeof idOrElement === 'string')
         element = document.getElementById(idOrElement);
-    if (element instanceof HTMLElement) 
+    if (element instanceof HTMLElement)
         element.addEventListener('wheel', scrollHandler, { passive: false });
-    else 
+    else
         console.error('Invalid input: Expected an element ID or HTMLElement');
 }
 
@@ -206,11 +359,11 @@ function addHorizontalScrolling(idOrElement) {
  */
 function removeHorizontalScrolling(idOrElement) {
     let element = idOrElement;
-    if (typeof idOrElement === 'string') 
+    if (typeof idOrElement === 'string')
         element = document.getElementById(idOrElement);
-    if (element instanceof HTMLElement) 
+    if (element instanceof HTMLElement)
         element.removeEventListener('wheel', scrollHandler, { passive: false });
-    else 
+    else
         console.error('Invalid input: Expected an element ID or HTMLElement');
 }
 
@@ -237,3 +390,122 @@ function getElementOffset(id) {
         height: 0
     };
 }
+
+document.querySelectorAll('.remove-form-table-row-icon').forEach(icon => {
+    icon.addEventListener('click', function () {
+        this.parentElement.remove();
+    });
+});
+
+/**
+ * Toggles the visibility of the audio player.
+ */
+function toggleAudioPlayerVisibility() {
+    const playerContainer = document.querySelector('.audio-player-container');
+    const contentContainer = document.querySelector('main');
+    playerContainer.classList.toggle('not-shown');
+    contentContainer.classList.toggle('audio-player-not-shown');
+}
+
+/**
+ * Toggles the display of the audio player as collapsed player, or full height player.
+ */
+function toggleAudioPlayerFullHeight() {
+    const playerContainer = document.querySelector('.audio-player-container');
+    const contentContainer = document.querySelector('main');
+    playerContainer.classList.toggle('full-height');
+    contentContainer.classList.toggle('audio-player-full-height');
+}
+
+if (audioPlayerFullHeightToggle)
+    audioPlayerFullHeightToggle.addEventListener('click', toggleAudioPlayerFullHeight);
+if (audioPlayerClose)
+    audioPlayerClose.addEventListener('click', toggleAudioPlayerVisibility);
+
+
+/**
+ * Closes all comboboxes except for the one passed as an argument.
+ * @param {HTMLElement} exceptionCheckbox - The checkbox of the combobox that should remain open.
+ */
+function closeAllComboboxesExcept(exceptionCheckbox) {
+    const checkedCheckboxes = document.querySelectorAll('.enlightenment-toggle-checkbox:checked, .navigator-toggle-checkbox:checked');
+    checkedCheckboxes.forEach(function (checkbox) {
+        if (!exceptionCheckbox || checkbox.id !== exceptionCheckbox.id)
+            checkbox.checked = false;
+    });
+}
+
+/**
+ * Detects changes on any combobox checkbox. If a combobox is opened, this will ensure all other comboboxes are closed.
+ */
+document.addEventListener('change', function (e) {
+    if (e.target.matches('.enlightenment-toggle-checkbox, .navigator-toggle-checkbox'))
+        if (e.target.checked)
+            closeAllComboboxesExcept(e.target);
+});
+
+/**
+ * Event handler for when an option in the combobox is clicked.
+ * This updates the displayed value of the combobox to the clicked option and closes the dropdown.
+ */
+document.addEventListener('click', function (e) {
+    if (e.target.matches('.enlightenment-option')) {
+        var text = e.target.textContent;
+        var combobox = e.target.closest('.enlightenment-combobox');
+
+        var selectedText = combobox.querySelector('.enlightenment-selected-text');
+        if (selectedText)
+            selectedText.textContent = text;
+
+        var toggleCheckbox = combobox.querySelector('.enlightenment-toggle-checkbox');
+        if (toggleCheckbox)
+            toggleCheckbox.checked = false;
+    }
+});
+
+/**
+ * Global click event for the entire document. Closes all combobox dropdowns if the clicked target is outside any combobox.
+ */
+document.addEventListener('click', function (e) {
+    // enlightenment combobox logic
+    if (!e.target.closest('.enlightenment-combobox')) {
+        const checkbox = document.querySelector('.enlightenment-toggle-checkbox:checked');
+        if (checkbox)
+            checkbox.checked = false;
+    }
+    // navigator combobox logic
+    if (!e.target.closest('.navigator-combobox') && typeof addressBar !== 'undefined' && addressBar !== null) {
+        const checkbox = document.querySelector('.navigator-toggle-checkbox:checked');
+        if (checkbox)
+            checkbox.checked = false;
+        // when drop down closes, hide address bar overflow
+        addressBar.style.overflowX = 'auto';
+        addressBar.style.overflowY = 'hidden';
+        reattachDropdown();
+    }
+});
+
+/**
+ * Event handler for navigation combobox drop down item clicks.
+ */
+document.addEventListener("click", function (e) {
+    if (e.target.matches('.navigator-option')) {
+        // the address bar drop downs may be destroyed when an option is clicked - they are regenerated each time anyway
+        addressBar.removeEventListener('scroll', adjustDropdownPosition);
+
+        var parentElement = e.target.parentElement;
+        if (parentElement)
+            parentElement.remove();
+    }
+});
+
+/**
+ * Prevents the global document click event from propagating when clicking on a combobox. 
+ * This ensures the dropdown doesn't close unintentionally.
+ */
+document.addEventListener('click', function (e) {
+    if (e.target.closest('.enlightenment-combobox, .navigator-combobox'))
+        e.stopPropagation();
+});
+
+document.addEventListener('DOMContentLoaded', initializeNavigation);

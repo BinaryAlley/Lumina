@@ -1,4 +1,4 @@
-name: Branch Naming Convention Check
+name: Branch Push Naming Convention Check
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - master
 
 jobs:
-  check-branch-name:
+  validate-branch-push:
     runs-on: ubuntu-latest
     steps:
       - name: Check branch name

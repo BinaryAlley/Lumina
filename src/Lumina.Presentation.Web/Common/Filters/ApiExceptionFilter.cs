@@ -31,7 +31,7 @@ public class ApiExceptionFilter : IExceptionFilter
         if (context.Exception is ApiException apiException)
         {
             // handle unauthorized errors by prompting the user to re-login
-            if (apiException.HttpStatusCode == HttpStatusCode.Unauthorized)
+            if (apiException.HttpStatusCode == HttpStatusCode.Unauthorized) // HTTP 401 Unauthorized actually means lack of valid authentication credentials (not logged in)
             {
                 SignOutSynchronously(context.HttpContext);
                 string currentUrl = context.HttpContext.Request.GetDisplayUrl();

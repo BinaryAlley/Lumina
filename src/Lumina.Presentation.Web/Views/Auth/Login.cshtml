@@ -1,0 +1,89 @@
+@*
+/auth/login/
+*@
+
+@using Lumina.Presentation.Web.Common.Models.UsersManagement
+@using Lumina.Presentation.Web.Common.Services
+
+@inject IUrlService _urlService
+
+@model LoginRequestModel
+
+<div class="enlightenment-panel shadow-effect p-2 mx-auto panel w-50 mb-10" style="min-width: 320px; margin-top: 1rem;">
+    <div class="shine-effect"></div>
+    <form asp-controller="Auth" asp-action="Login" method="post" id="login-form" class="inline">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="ReturnUrl" value="@ViewData["ReturnUrl"]" />
+        <div class="form-container">
+            <!-- Username -->
+            <div class="form-row">
+                <div class="form-label">
+                    <label asp-for="Username">Username</label>:
+                </div>
+                <div class="form-field">
+                    <input asp-for="Username" autocomplete="username" class="enlightenment-input" />
+                </div>
+            </div>
+            <!-- Password -->
+            <div class="form-row">
+                <div class="form-label">
+                    <label asp-for="Password">Password</label>:
+                </div>
+                <div class="form-field">
+                    <input type="password" asp-for="Password" autocomplete="current-password" class="enlightenment-input" />
+                </div>
+            </div>
+            <div class="form-row">
+                <button id="btn-recover-password" type="button" class="abort-button h-22px w-150px" data-link="@_urlService.GetAbsoluteUrl("RecoverPassword", "Auth")">Recover Password</button>
+                <button id="btn-login" type="submit" class="confirm-button h-22px w-100px">Login</button>
+            </div>
+            <!-- 2FA -->
+            <div class="form-row mt-10 hidden" id="div-totp-code">
+                <div class="form-label">
+                    <label asp-for="TotpCode">Totp Code</label>
+                </div>
+                <div class="form-field">
+                    <input type="number" asp-for="TotpCode" autocomplete="one-time-code" class="enlightenment-input" />
+                </div>
+            </div>
+            <div class="form-row">
+                <button type="submit" id="btn-validate-totp" class="confirm-button h-22px w-100px hidden">Validate Code</button>
+            </div>
+        </div>
+    </form>
+</div>
+@section Scripts {
+    <script type="text/javascript" defer>
+         document.getElementById('login-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const form = event.target;
+            const txtUsername = form.querySelector('[name="Username"]');
+            const txtPassword = form.querySelector('[name="Password"]');
+            const txtTotpCode = form.querySelector('[name="TotpCode"]');
+            const divTotpCode = document.getElementById('div-totp-code');
+            const btnLogin = document.getElementById('btn-login');
+            const btnRecoverPassword = document.getElementById('btn-recover-password');
+            const btnValidateTotp = document.getElementById('btn-validate-totp');
+            const formData = {
+                Username: txtUsername.value,
+                Password: txtPassword.value,
+                TotpCode: txtTotpCode.value
+            };
+            const data = await callApiPostAsync('@_urlService.GetAbsoluteUrl("Login", "Auth")', formData);
+            if (data && data.isTotpRequired === true) {
+                txtUsername.disabled = true;
+                txtPassword.disabled = true;
+                btnLogin.disabled = true;
+                btnRecoverPassword.disabled = true;
+                divTotpCode.classList.replace('hidden', 'inline');
+                btnValidateTotp.classList.replace('hidden', 'block');
+                txtTotpCode.focus();
+            }
+            else if (data)
+                window.location.href = data;
+        });
+        document.getElementById('btn-recover-password').addEventListener('click', () => {
+            window.location.href = '@_urlService.GetAbsoluteUrl("RecoverPassword", "Auth")';
+        });
+    </script>
+}

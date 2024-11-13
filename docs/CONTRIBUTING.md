@@ -99,39 +99,11 @@ public interface IUserService
 
 ### C# Specific
 #### Code Conventions:
-- Each class, interface and struct should use the following `#region`s to group code sections:
+- Group `using`s with the following `#region`:
 ```csharp
 #region ========================================================================= USING =====================================================================================
 using System;
 #endregion
-
-namespace Current.Namespace;
-
-public class DhlDeliveryServiceProvider : IDeliveryServiceProvider
-{
-    #region ================================================================== FIELD MEMBERS ================================================================================
-    private readonly ITaxCalculator _taxCalculator;
-    #endregion
-
-    #region ====================================================================== CTOR =====================================================================================
-    public GetDirectoryTreeQueryHandler(ITaxCalculator taxCalculator)
-    {
-        _taxCalculator = taxCalculator;
-    }
-    #endregion
-
-    #region ===================================================================== METHODS ===================================================================================
-    public void Deliver()
-    {
-        // code
-    }
-
-    public decimal CalculateCost()
-    {
-        // code
-    }
-    #endregion
-}
 ```
 - Enforce one type per file. For example:
 ```csharp

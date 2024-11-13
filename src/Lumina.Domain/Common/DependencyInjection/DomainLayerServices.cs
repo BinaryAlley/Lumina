@@ -1,12 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Services;
-using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Strategies.Environment;
-using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Strategies.Path;
-using Lumina.Domain.Core.Aggregates.FileManagement.FileManagementAggregate.Strategies.Platform;
+using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
+using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Path;
+using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Platform;
 using Microsoft.Extensions.DependencyInjection;
-using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
-using System.Runtime.InteropServices;
 #endregion
 
 namespace Lumina.Domain.Common.DependencyInjection;
@@ -14,6 +13,7 @@ namespace Lumina.Domain.Common.DependencyInjection;
 /// <summary>
 /// Contains all services of the Domain layer.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public static class DomainLayerServices
 {
     /// <summary>

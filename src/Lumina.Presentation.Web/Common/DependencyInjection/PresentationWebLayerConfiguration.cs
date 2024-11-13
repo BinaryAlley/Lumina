@@ -1,13 +1,17 @@
+#region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Common.Models.Configuration;
 using Lumina.Presentation.Web.Common.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics.CodeAnalysis;
+#endregion
 
 namespace Lumina.Presentation.Web.Common.DependencyInjection;
 
 /// <summary>
 /// Class containing the configuration bindings of the Lumina.Presentation.Web project.
 /// </summary>
+[ExcludeFromCodeCoverage]
 internal static class PresentationWebLayerConfiguration
 {
     /// <summary>
@@ -26,6 +30,12 @@ internal static class PresentationWebLayerConfiguration
                          .Bind(configuration.GetRequiredSection(ServerConfigurationModel.SECTION_NAME))
                          .ValidateFluently()
                          .ValidateOnStart();
+
+        serviceCollection.AddOptions<EncryptionSettingsModel>()
+                         .Bind(configuration.GetRequiredSection(EncryptionSettingsModel.SECTION_NAME))
+                         .ValidateFluently()
+                         .ValidateOnStart();
+
         return serviceCollection;
     }
 }

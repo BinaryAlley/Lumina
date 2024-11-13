@@ -1,5 +1,7 @@
 ﻿#region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Models.Common;
+using Lumina.Application.Common.DataAccess.Entities.Common;
+
+
 
 #endregion
 

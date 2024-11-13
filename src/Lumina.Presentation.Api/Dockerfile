@@ -1,5 +1,6 @@
 # This stage is used when running from VS in fast mode (Default for Debug configuration)
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+RUN mkdir /logs && chown -R app:app /logs
 USER app
 WORKDIR /app
 EXPOSE 5214
@@ -53,4 +54,4 @@ EXPOSE 5214
 ENTRYPOINT ["dotnet", "Lumina.Presentation.Api.dll"]
 
 # to build this Docker image, run the following command from the root of the project (location of the .sln file):
-# docker build --no-cache -t lumina-server -f Lumina.Presentation.Api/Dockerfile .
+# docker build --no-cache -t lumina-api -f Lumina.Presentation.Api/Dockerfile .
