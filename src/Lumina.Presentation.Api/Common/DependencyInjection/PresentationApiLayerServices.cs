@@ -5,15 +5,14 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Json;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Text;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 #endregion
@@ -44,13 +43,35 @@ public static class PresentationApiLayerServices
             jsonOptions.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; // needed because file system API responses can have very nested structures
         });
 
+        // TODO: also implement account locking after a number of failed login attempts
         services.AddRateLimiter(options =>
         {
             options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
             options.OnRejected = async (context, cancellationToken) =>
             {
+                ILogger logger = context.HttpContext.RequestServices.GetRequiredService<ILogger>();
+
+                string clientIp = context.HttpContext.Request.Headers["X-Forwarded-For"]
+                    .FirstOrDefault()?.Split(',')[0].Trim()
+                    ?? context.HttpContext.Connection.RemoteIpAddress?.ToString()
+                    ?? "unknown";
+                Log.Warning(
+                    "Rate limit exceeded. IP: {IpAddress}, Route: {Route}, Lease Acquired: {IsAcquired}",
+                    clientIp,
+                    context.HttpContext.Request.Path,
+                    context.Lease.IsAcquired); // when False, the request was rejected because it exceeded rate limits
+
                 context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
                 context.HttpContext.Response.ContentType = "application/problem+json";
+
+                // set standard rate limit headers
+                if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out TimeSpan retryAfter))
+                    context.HttpContext.Response.Headers.RetryAfter = ((int)retryAfter.TotalSeconds).ToString();
+
+                // set custom rate limit headers
+                context.HttpContext.Response.Headers["X-RateLimit-Limit"] = "10";
+                context.HttpContext.Response.Headers["X-RateLimit-Remaining"] = "0";
+                context.HttpContext.Response.Headers["X-RateLimit-Reset"] = DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeSeconds().ToString();
 
                 var problem = new
                 {
@@ -63,12 +84,21 @@ public static class PresentationApiLayerServices
 
                 await context.HttpContext.Response.WriteAsJsonAsync(problem, cancellationToken);
             };
-            options.AddFixedWindowLimiter("authenticationPolicy", config =>
+            options.AddPolicy("authenticationPolicy", httpContext =>
             {
-                config.PermitLimit = 10;  // allow 10 attempts
-                config.Window = TimeSpan.FromMinutes(15);  // within 15 minute window
-                config.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-                config.QueueLimit = 0;  // don't queue requests
+                string clientIp = httpContext.Request.Headers["X-Forwarded-For"] // first check forwarded headers, in case this is behind a reverse proxy 
+                    .FirstOrDefault()?.Split(',')[0].Trim() // take first IP, if multiple available, to avoid IP spoofing attempts
+                    ?? httpContext.Connection.RemoteIpAddress?.ToString() // then try RemoteIpAddress
+                    ?? "unknown"; // fallback if both are null
+                return RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey: $"auth_{clientIp}",
+                    factory: _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 10, // allow 10 attempts
+                        Window = TimeSpan.FromMinutes(15), // within 15 minute window
+                        QueueLimit = 0,  // don't queue requests
+                        AutoReplenishment = true  // automatically reset rate limiter tokens
+                    });
             });
         });
 

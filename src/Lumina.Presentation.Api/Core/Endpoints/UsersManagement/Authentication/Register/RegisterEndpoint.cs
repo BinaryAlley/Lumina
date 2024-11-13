@@ -7,6 +7,7 @@ using Lumina.Contracts.Responses.Authentication;
 using Lumina.Presentation.Api.Common.Routes.UsersManagement;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
 using Mediator;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -40,6 +41,7 @@ public class RegisterEndpoint : BaseEndpoint<RegistrationRequest, IResult>
         Version(1);
         AllowAnonymous();
         DontCatchExceptions();
+        Options(x => x.RequireRateLimiting("authenticationPolicy"));
     }
 
     /// <summary>
