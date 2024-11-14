@@ -84,7 +84,10 @@
         <p id="register-success" class="text-light-one w-100 hidden">Account Created</p>
         <img id="totp-image" class="w-200px h-200px h-align-m mx-auto mt-10 hidden" />
         <p id="totp-message" class="text-light-one w-100 hidden">Scan Totp Code</p>
-        <button id="btn-login" type="button" class="confirm-button h-22px w-80px hidden" data-link="@_urlService.GetAbsoluteUrl("Login", "Auth")">Login</button>
+        @if (User?.Identity?.IsAuthenticated == false)
+        {
+            <button id="btn-login" type="button" class="confirm-button h-22px w-80px mx-auto mt-10 hidden" data-link="@_urlService.GetAbsoluteUrl("Login", "Auth")">Login</button>
+        }
     </div>
 </div>
 @section Scripts {
