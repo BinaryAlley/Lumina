@@ -44,34 +44,34 @@ public static class PresentationApiLayerServices
         });
 
         // TODO: also implement account locking after a number of failed login attempts
-        services.AddRateLimiter(options =>
+        services.AddRateLimiter(rateLimiterOptions =>
         {
-            options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-            options.OnRejected = async (context, cancellationToken) =>
+            rateLimiterOptions.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+            rateLimiterOptions.OnRejected = async (onRejectedContext, cancellationToken) =>
             {
-                ILogger logger = context.HttpContext.RequestServices.GetRequiredService<ILogger>();
+                ILogger logger = onRejectedContext.HttpContext.RequestServices.GetRequiredService<ILogger>();
 
-                string clientIp = context.HttpContext.Request.Headers["X-Forwarded-For"]
+                string clientIp = onRejectedContext.HttpContext.Request.Headers["X-Forwarded-For"]
                     .FirstOrDefault()?.Split(',')[0].Trim()
-                    ?? context.HttpContext.Connection.RemoteIpAddress?.ToString()
+                    ?? onRejectedContext.HttpContext.Connection.RemoteIpAddress?.ToString()
                     ?? "unknown";
                 Log.Warning(
                     "Rate limit exceeded. IP: {IpAddress}, Route: {Route}, Lease Acquired: {IsAcquired}",
                     clientIp,
-                    context.HttpContext.Request.Path,
-                    context.Lease.IsAcquired); // when False, the request was rejected because it exceeded rate limits
+                    onRejectedContext.HttpContext.Request.Path,
+                    onRejectedContext.Lease.IsAcquired); // when False, the request was rejected because it exceeded rate limits
 
-                context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
-                context.HttpContext.Response.ContentType = "application/problem+json";
+                onRejectedContext.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+                onRejectedContext.HttpContext.Response.ContentType = "application/problem+json";
 
                 // set standard rate limit headers
-                if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out TimeSpan retryAfter))
-                    context.HttpContext.Response.Headers.RetryAfter = ((int)retryAfter.TotalSeconds).ToString();
+                if (onRejectedContext.Lease.TryGetMetadata(MetadataName.RetryAfter, out TimeSpan retryAfter))
+                    onRejectedContext.HttpContext.Response.Headers.RetryAfter = ((int)retryAfter.TotalSeconds).ToString();
 
                 // set custom rate limit headers
-                context.HttpContext.Response.Headers["X-RateLimit-Limit"] = "10";
-                context.HttpContext.Response.Headers["X-RateLimit-Remaining"] = "0";
-                context.HttpContext.Response.Headers["X-RateLimit-Reset"] = DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeSeconds().ToString();
+                onRejectedContext.HttpContext.Response.Headers["X-RateLimit-Limit"] = "10";
+                onRejectedContext.HttpContext.Response.Headers["X-RateLimit-Remaining"] = "0";
+                onRejectedContext.HttpContext.Response.Headers["X-RateLimit-Reset"] = DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeSeconds().ToString();
 
                 var problem = new
                 {
@@ -82,9 +82,9 @@ public static class PresentationApiLayerServices
                     retryAfter = "15"
                 };
 
-                await context.HttpContext.Response.WriteAsJsonAsync(problem, cancellationToken);
+                await onRejectedContext.HttpContext.Response.WriteAsJsonAsync(problem, cancellationToken);
             };
-            options.AddPolicy("authenticationPolicy", httpContext =>
+            rateLimiterOptions.AddPolicy("authenticationPolicy", httpContext =>
             {
                 string clientIp = httpContext.Request.Headers["X-Forwarded-For"] // first check forwarded headers, in case this is behind a reverse proxy 
                     .FirstOrDefault()?.Split(',')[0].Trim() // take first IP, if multiple available, to avoid IP spoofing attempts
@@ -104,36 +104,36 @@ public static class PresentationApiLayerServices
 
         // add authentication and specify the JWT scheme to check tokens against
         services.AddAuthentication(defaultScheme: JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
+            .AddJwtBearer(jwtBearerOptions =>
             {
-                options.TokenValidationParameters = new TokenValidationParameters()
+                jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters()
                 {
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = configuration["JwtSettings:Issuer"],
-                    ValidAudience = configuration["JwtSettings:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:SecretKey"]!)),
+                    ValidIssuer = configuration.GetValue<string>("JwtSettings:Issuer"),
+                    ValidAudience = configuration.GetValue<string>("JwtSettings:Audience"),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetValue<string>("JwtSettings:SecretKey")!)),
                 };
 
-                options.Events = new JwtBearerEvents
+                jwtBearerOptions.Events = new JwtBearerEvents
                 {
-                    OnChallenge = context => // event triggered when authentication is not successful for whatever reason
+                    OnChallenge = jwtBearerChallengeContext => // event triggered when authentication is not successful for whatever reason
                     {
-                        context.HandleResponse(); // prevent the default 401 response
+                        jwtBearerChallengeContext.HandleResponse(); // prevent the default 401 response
                         // set the response status code to 401 Unauthorized
-                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                        context.Response.ContentType = "application/problem+json";
+                        jwtBearerChallengeContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        jwtBearerChallengeContext.Response.ContentType = "application/problem+json";
                         
-                        IProblemDetailsService problemDetailsService = context.HttpContext.RequestServices.GetRequiredService<IProblemDetailsService>();
-                        return context.Response.WriteAsJsonAsync(new
+                        IProblemDetailsService problemDetailsService = jwtBearerChallengeContext.HttpContext.RequestServices.GetRequiredService<IProblemDetailsService>();
+                        return jwtBearerChallengeContext.Response.WriteAsJsonAsync(new
                         {
                             type = "https://tools.ietf.org/html/rfc7235#section-3.1",
                             status = StatusCodes.Status401Unauthorized,
                             title = "Unauthorized",
                             detail = "You are not authorized",
-                            instance = context.HttpContext.Request.Path
+                            instance = jwtBearerChallengeContext.HttpContext.Request.Path
                         });
                     }
                 };
@@ -141,34 +141,45 @@ public static class PresentationApiLayerServices
 
         services.AddAuthorization();
 
-        services.AddFastEndpoints(
-        o => o.Assemblies =
-        [
-            typeof(Program).Assembly
-        ]);
+        services.AddFastEndpoints(endpointDiscoveryOptions => endpointDiscoveryOptions.Assemblies = [ typeof(Program).Assembly ]);
+
+        services.AddOpenApi();
+
         services.SwaggerDocument(documentOptions =>
         {
-            documentOptions.SerializerSettings = s =>
+            documentOptions.EnableJWTBearerAuth = true; 
+            documentOptions.SerializerSettings = jsonSerializerOptions =>
             {
-                s.PropertyNamingPolicy = null;
-                s.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+                jsonSerializerOptions.PropertyNamingPolicy = null;
+                jsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
             };
             documentOptions.MaxEndpointVersion = 1;
             documentOptions.MinEndpointVersion = 1;
-            documentOptions.DocumentSettings = s =>
+            documentOptions.DocumentSettings = aspNetCoreOpenApiDocumentGeneratorSettings =>
             {
-                s.DocumentName = "Release 1.0";
-                s.Title = "Lumina API";
-                s.Version = "v1.0";
+                aspNetCoreOpenApiDocumentGeneratorSettings.DocumentName = "v1";
+                aspNetCoreOpenApiDocumentGeneratorSettings.Title = "Lumina API v1";
+                aspNetCoreOpenApiDocumentGeneratorSettings.Version = "v1";
             };
             documentOptions.RemoveEmptyRequestSchema = true;
-            documentOptions.ShortSchemaNames = true;            
-        });
+            documentOptions.ShortSchemaNames = true;
+        }); // for an eventual next version:
+        //.SwaggerDocument(documentOptions => 
+        //{
+        //    documentOptions.MaxEndpointVersion = 2;
+        //    documentOptions.MinEndpointVersion = 2;
+        //    documentOptions.DocumentSettings = aspNetCoreOpenApiDocumentGeneratorSettings =>
+        //    {
+        //        aspNetCoreOpenApiDocumentGeneratorSettings.DocumentName = "v2";
+        //        aspNetCoreOpenApiDocumentGeneratorSettings.Title = "Lumina API v2";
+        //        aspNetCoreOpenApiDocumentGeneratorSettings.Version = "v2";
+        //    };
+        //});
 
-        services.AddCors(options =>
+        services.AddCors(corsOptions =>
         {
-            options.AddPolicy("AllowAll",
-                 builder => builder
+            corsOptions.AddPolicy("AllowAll",
+                 corsPolicyBuilder => corsPolicyBuilder
                      .AllowAnyOrigin()
                      .AllowAnyMethod()
                      .AllowAnyHeader());

@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using FastEndpoints.Swagger;
 using Lumina.Application.Common.DependencyInjection;
 using Lumina.DataAccess.Common.DependencyInjection;
 using Lumina.DataAccess.Core.UoW;
@@ -13,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using Scalar.AspNetCore;
 using Serilog;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -106,7 +106,18 @@ public class Program
             config.Versioning.PrependToRoute = true;
             config.Endpoints.ShortNames = true;
         });
-        app.UseSwaggerGen();
+
+        // add API documentation (OpenApi/Scalar)
+        app.MapOpenApi();
+        app.UseOpenApi(openApiDocumentMiddlewareSettings => openApiDocumentMiddlewareSettings.Path = "/openapi/{documentName}.json"); // this is needed for API versioning to work correctly with Scalar
+        app.MapScalarApiReference(scalarOptions =>
+        {
+            scalarOptions.WithTitle("Lumina API")
+                .WithTheme(ScalarTheme.BluePlanet)
+                .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient)
+                //.WithFavicon() // TODO: enable when favicon is added
+                .WithDotNetFlag(true);
+        });
 
         string mediaRootDirectoryPathSetting = app.Configuration.GetValue<string>("MediaSettings:RootDirectory") ?? string.Empty;
         string mediaRootPath = Path.Combine(AppContext.BaseDirectory, mediaRootDirectoryPathSetting);
