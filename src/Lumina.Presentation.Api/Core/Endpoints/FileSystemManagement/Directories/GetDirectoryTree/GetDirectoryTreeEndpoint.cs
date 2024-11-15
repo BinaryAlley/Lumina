@@ -40,7 +40,6 @@ public class GetDirectoryTreeEndpoint : BaseEndpoint<GetDirectoryTreeRequest, IR
         Verbs(Http.GET);
         Routes(ApiRoutes.Directories.GET_DIRECTORY_TREE);
         Version(1);
-        AllowAnonymous();
         DontCatchExceptions();
     }
 

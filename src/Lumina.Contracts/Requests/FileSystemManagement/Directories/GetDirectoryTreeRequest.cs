@@ -8,9 +8,9 @@ namespace Lumina.Contracts.Requests.FileSystemManagement.Directories;
 /// <summary>
 /// Represents a request to get the tree of directories that make up a file system path.
 /// </summary>
-/// <param name="Path">The file system path for which to get the directory tree.</param>
-/// <param name="IncludeFiles">Whether to include files along the directories or not.</param>
-/// <param name="IncludeHiddenElements">Whether to include hidden file system elements or not.</param>
+/// <param name="Path">The file system path for which to get the directory tree. Required.</param>
+/// <param name="IncludeFiles">Whether to include files along the directories or not. Optional.</param>
+/// <param name="IncludeHiddenElements">Whether to include hidden file system elements or not. Optional.</param>
 [DebuggerDisplay("Path: {Path}")]
 public record GetDirectoryTreeRequest(
     string? Path,

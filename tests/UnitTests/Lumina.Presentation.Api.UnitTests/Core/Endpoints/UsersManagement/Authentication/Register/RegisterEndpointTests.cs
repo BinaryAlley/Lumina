@@ -69,7 +69,7 @@ public class RegisterEndpointTests
             .Returns(expectedError);
 
         // Act
-        IResult result = await _sut.ExecuteAsync(request, cancellationToken);
+        IResult result = await _sut. ExecuteAsync(request, cancellationToken);
 
         // Assert
         result.Should().BeOfType<ProblemHttpResult>();
@@ -79,7 +79,7 @@ public class RegisterEndpointTests
         problemDetails.ProblemDetails.Should().BeOfType<HttpValidationProblemDetails>();
         HttpValidationProblemDetails validationProblemDetails = (HttpValidationProblemDetails)problemDetails.ProblemDetails;
         validationProblemDetails.Status.Should().Be(StatusCodes.Status422UnprocessableEntity);
-        validationProblemDetails.Title.Should().Be("Validation Error");
+        validationProblemDetails.Title.Should().Be("General.Validation");
         validationProblemDetails.Type.Should().Be("https://tools.ietf.org/html/rfc4918#section-11.2");
         validationProblemDetails.Errors.Should().ContainSingle()
             .Which.Should().BeEquivalentTo(new

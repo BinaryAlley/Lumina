@@ -35,7 +35,6 @@ public class GetPathSeparatorEndpoint : EndpointWithoutRequest<IResult>
         Verbs(Http.GET);
         Routes(ApiRoutes.Path.GET_PATH_SEPARATOR);
         Version(1);
-        AllowAnonymous();
         DontCatchExceptions();
     }
 

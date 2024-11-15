@@ -99,9 +99,9 @@ public class GetThumbnailEndpointTests : IClassFixture<LuminaApiFactory>, IClass
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
         problemDetails.Should().NotBeNull();
         problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status422UnprocessableEntity);
-        problemDetails["title"].GetString().Should().Be("Validation Error");
+        problemDetails["title"].GetString().Should().Be("General.Validation");
         problemDetails["instance"].GetString().Should().Be("/api/v1/thumbnails/get-thumbnail");
-        problemDetails["detail"].GetString().Should().Be("One or more validation errors occurred.");
+        problemDetails["detail"].GetString().Should().Be("OneOrMoreValidationErrorsOccurred");
         problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc4918#section-11.2");
         problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
 
@@ -125,9 +125,9 @@ public class GetThumbnailEndpointTests : IClassFixture<LuminaApiFactory>, IClass
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
         problemDetails.Should().NotBeNull();
         problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status422UnprocessableEntity);
-        problemDetails["title"].GetString().Should().Be("Validation Error");
+        problemDetails["title"].GetString().Should().Be("General.Validation");
         problemDetails["instance"].GetString().Should().Be("/api/v1/thumbnails/get-thumbnail");
-        problemDetails["detail"].GetString().Should().Be("One or more validation errors occurred.");
+        problemDetails["detail"].GetString().Should().Be("OneOrMoreValidationErrorsOccurred");
         problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc4918#section-11.2");
         problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
 

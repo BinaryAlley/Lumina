@@ -38,7 +38,6 @@ public class AddLibraryEndpoint : BaseEndpoint<AddLibraryRequest, IResult>
         Verbs(Http.POST);
         Routes(ApiRoutes.Libraries.ADD_LIBRARY);
         Version(1);
-        AllowAnonymous();
         DontCatchExceptions();
     }
 

@@ -111,8 +111,8 @@ public class GetDirectoryTreeEndpointTests
         problemDetails.ProblemDetails.Should().BeOfType<HttpValidationProblemDetails>();
         HttpValidationProblemDetails validationProblemDetails = (HttpValidationProblemDetails)problemDetails.ProblemDetails;
         validationProblemDetails.Status.Should().Be(StatusCodes.Status422UnprocessableEntity);
-        validationProblemDetails.Title.Should().Be("Validation Error");
-        validationProblemDetails.Detail.Should().Be("One or more validation errors occurred.");
+        validationProblemDetails.Title.Should().Be("General.Validation");
+        validationProblemDetails.Detail.Should().Be("OneOrMoreValidationErrorsOccurred");
         validationProblemDetails.Type.Should().Be("https://tools.ietf.org/html/rfc4918#section-11.2");
         validationProblemDetails.Errors.Should().ContainSingle()
             .Which.Should().BeEquivalentTo(new

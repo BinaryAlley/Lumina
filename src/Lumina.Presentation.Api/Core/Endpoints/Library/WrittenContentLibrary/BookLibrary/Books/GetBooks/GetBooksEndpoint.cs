@@ -38,7 +38,6 @@ public class GetBooksEndpoint : BaseEndpoint<EmptyRequest, IResult>
         Verbs(Http.GET);
         Routes(ApiRoutes.Books.GET_BOOKS);
         Version(1);
-        AllowAnonymous();
         DontCatchExceptions();
     }
 

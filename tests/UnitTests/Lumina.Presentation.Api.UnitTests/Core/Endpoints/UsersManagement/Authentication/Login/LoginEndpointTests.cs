@@ -78,7 +78,7 @@ public class LoginEndpointTests
         problemDetails.ProblemDetails.Should().BeOfType<HttpValidationProblemDetails>();
         HttpValidationProblemDetails validationProblemDetails = (HttpValidationProblemDetails)problemDetails.ProblemDetails;
         validationProblemDetails.Status.Should().Be(StatusCodes.Status422UnprocessableEntity);
-        validationProblemDetails.Title.Should().Be("Validation Error");
+        validationProblemDetails.Title.Should().Be("General.Validation");
         validationProblemDetails.Type.Should().Be("https://tools.ietf.org/html/rfc4918#section-11.2");
         validationProblemDetails.Errors.Should().ContainSingle()
             .Which.Should().BeEquivalentTo(new

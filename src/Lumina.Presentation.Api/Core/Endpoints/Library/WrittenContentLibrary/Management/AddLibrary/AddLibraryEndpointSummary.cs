@@ -2,6 +2,9 @@
 using FastEndpoints;
 using Lumina.Contracts.Requests.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
+using Lumina.Domain.Common.Enums.MediaLibrary;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 
@@ -23,10 +26,20 @@ public class AddLibraryEndpointSummary : Summary<AddLibraryEndpoint, AddLibraryR
         Summary = "Adds a new media library.";
         Description = "Creates a new media library and returns its details, including the location of the newly created resource.";
 
-        RequestParam(r => r.UserId, "The Id of the user owning the media library.");
-        RequestParam(r => r.Title, "The title of the media library.");
-        RequestParam(r => r.LibraryType, "The type of the media library.");
-        RequestParam(r => r.ContentLocations, ">The file system paths of the directories where the media library elements are located.");
+        ExampleRequest = new AddLibraryRequest(
+            UserId: Guid.NewGuid(),
+            Title: "TV Shows",
+            LibraryType: LibraryType.TvShow,
+            ContentLocations: [
+                "/media/tv shows/drama/",
+                "/media/tv shows/SCI-FI/",
+            ]
+        );
+
+        RequestParam(r => r.UserId, "The Id of the user owning the media library. Required.");
+        RequestParam(r => r.Title, "The title of the media library. Required.");
+        RequestParam(r => r.LibraryType, "The type of the media library. Required.");
+        RequestParam(r => r.ContentLocations, ">The file system paths of the directories where the media library elements are located. Required.");
 
         ResponseParam<LibraryResponse>(r => r.Id, "The unique identifier of the entity.");
         ResponseParam<LibraryResponse>(r => r.UserId, "The Id of the user owning the media library.");
@@ -35,7 +48,76 @@ public class AddLibraryEndpointSummary : Summary<AddLibraryEndpoint, AddLibraryR
         ResponseParam<LibraryResponse>(r => r.ContentLocations, "The file system paths of the directories where the media library elements are located.");
         ResponseParam<LibraryResponse>(r => r.Created, "The date and time when the entity was created.");
         ResponseParam<LibraryResponse>(r => r.Updated, "The date and time when the entity was last updated.");
-        Response<LibraryResponse>(201, "The media library was successfully created.", "The location of the created resource is provided in the Location header.");
-        Response<ProblemDetails>(422, "The request did not pass validation checks.", "application/problem+json");
+
+
+        Response(201, "The media library was successfully created.", example:
+            new LibraryResponse(
+                Id: Guid.NewGuid(),
+                UserId: Guid.NewGuid(),
+                Title: "TV Shows",
+                LibraryType: LibraryType.TvShow,
+                ContentLocations: ["/media/tv shows/drama/", "/media/tv shows/SCI-FI/"],
+                Created: DateTime.UtcNow,
+                Updated: default
+            ));
+
+
+        Response(401, "Authentication required.", "application/problem+json",
+            example: new[]
+            {
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc7235#section-3.1",
+                    status = 401,
+                    title = "Unauthorized",
+                    detail = "You are not authorized",
+                    instance = "/api/v1/libraries"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc7235#section-3.1",
+                    status = 401,
+                    title = "Unauthorized",
+                    detail = "Invalid token: The token expired at '01/01/2024 01:00:00'",
+                    instance = "/api/v1/libraries"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc7235#section-3.1",
+                    status = 401,
+                    title = "Unauthorized",
+                    detail = "The token is invalid",
+                    instance = "/api/v1/libraries"
+                }
+            }
+        );
+
+        Response(422, "The request did not pass validation checks.", "application/problem+json",
+            example: new
+            {
+                type = "https://tools.ietf.org/html/rfc4918#section-11.2",
+                title = "General.Validation",
+                status = 422,
+                detail = "OneOrMoreValidationErrorsOccurred",
+                instance = "/api/v1/libraries",
+                errors = new Dictionary<string, string[]>
+                {
+                    {
+                        "General.Validation", new[]
+                        {
+                            "UserIdCannotBeEmpty",
+                            "LibraryTypeCannotBeNull",
+                            "UnknownLibraryType",
+                            "PathsListCannotBeNull",
+                            "PathsListCannotBeEmpty",
+                            "PathCannotBeEmpty",
+                            "TitleCannotBeEmpty",
+                            "TitleMustBeMaximum255CharactersLong"
+                        }
+                    }
+                },
+                traceId = "00-2470be4248a2a5a0c6f70579975a6954-b9c3ba9544a03500-00"
+            }
+        );
     }
 }

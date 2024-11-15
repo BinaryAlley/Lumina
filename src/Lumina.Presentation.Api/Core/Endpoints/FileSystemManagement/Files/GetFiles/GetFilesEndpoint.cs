@@ -39,7 +39,6 @@ public class GetFilesEndpoint : BaseEndpoint<GetFilesRequest, IResult>
         Verbs(Http.GET);
         Routes(ApiRoutes.Files.GET_FILES);
         Version(1);
-        AllowAnonymous();
         DontCatchExceptions();
     }
 

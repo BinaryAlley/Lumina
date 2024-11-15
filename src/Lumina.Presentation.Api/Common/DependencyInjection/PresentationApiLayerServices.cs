@@ -79,7 +79,7 @@ public static class PresentationApiLayerServices
                     title = "TooManyRequests", // TODO: implement translation?
                     status = StatusCodes.Status429TooManyRequests,
                     detail = "Too many attempts. Please try again later.",
-                    retryAfter = "15"
+                    retryAfter = "900"
                 };
 
                 await onRejectedContext.HttpContext.Response.WriteAsJsonAsync(problem, cancellationToken);
@@ -125,14 +125,35 @@ public static class PresentationApiLayerServices
                         // set the response status code to 401 Unauthorized
                         jwtBearerChallengeContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
                         jwtBearerChallengeContext.Response.ContentType = "application/problem+json";
-                        
-                        IProblemDetailsService problemDetailsService = jwtBearerChallengeContext.HttpContext.RequestServices.GetRequiredService<IProblemDetailsService>();
+
+                        string errorDetails = "Authentication failed";
+                        if (!string.IsNullOrEmpty(jwtBearerChallengeContext.Error))
+                        {
+                            errorDetails = jwtBearerChallengeContext.Error switch
+                            { // TODO: implement translation
+                                "invalid_token" => !string.IsNullOrEmpty(jwtBearerChallengeContext.ErrorDescription)
+                                    ? $"Invalid token: {jwtBearerChallengeContext.ErrorDescription}"
+                                    : "The token is invalid",
+                                "expired_token" => "The token has expired",
+                                _ => $"Authentication failed{(jwtBearerChallengeContext.Error is not null ? ": " + jwtBearerChallengeContext.Error : string.Empty)}"
+                            };
+                        }
+
+                        string detail = jwtBearerChallengeContext.Error switch
+                        {
+                            "invalid_token" => !string.IsNullOrEmpty(jwtBearerChallengeContext.ErrorDescription)
+                                ? $"Invalid token: {jwtBearerChallengeContext.ErrorDescription}"
+                                : "The token is invalid",
+                            "expired_token" => "The token has expired",
+                            _ => $"Authentication failed{(jwtBearerChallengeContext.Error is not null ? ": " + jwtBearerChallengeContext.Error : string.Empty)}"
+                        };
+
                         return jwtBearerChallengeContext.Response.WriteAsJsonAsync(new
                         {
                             type = "https://tools.ietf.org/html/rfc7235#section-3.1",
                             status = StatusCodes.Status401Unauthorized,
                             title = "Unauthorized",
-                            detail = "You are not authorized",
+                            detail,
                             instance = jwtBearerChallengeContext.HttpContext.Request.Path
                         });
                     }

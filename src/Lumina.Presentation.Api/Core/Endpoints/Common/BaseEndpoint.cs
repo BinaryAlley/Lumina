@@ -94,10 +94,10 @@ public abstract class BaseEndpoint<TRequest, TResponse> : Endpoint<TRequest, TRe
         // return a validation problem result with the constructed error details
         return Results.ValidationProblem(
             errorsDictionary,
-            detail: "One or more validation errors occurred.", // TODO: implement translation?
+            detail: "OneOrMoreValidationErrorsOccurred", 
             instance: HttpContext.Request.Path,
             statusCode: 422,
-            title: "Validation Error",
+            title: "General.Validation",
             extensions: extensionsDictionary
         );
     }

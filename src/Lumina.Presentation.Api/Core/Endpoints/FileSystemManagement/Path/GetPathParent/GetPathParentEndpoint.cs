@@ -39,7 +39,6 @@ public class GetPathParentEndpoint : BaseEndpoint<GetPathParentRequest, IResult>
         Verbs(Http.GET);
         Routes(ApiRoutes.Path.GET_PATH_PARENT);
         Version(1);
-        AllowAnonymous();
         DontCatchExceptions();
     }
 

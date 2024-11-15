@@ -7,9 +7,9 @@ namespace Lumina.Contracts.Requests.Authentication;
 /// <summary>
 /// Represents the request model for user authentication.
 /// </summary>
-/// <param name="Username">The username of the account to authenticate.</param>
-/// <param name="Password">The password of the account to authenticate.</param>
-/// <param name="TotpCode">The TOTP (Time-Based One-Time Password) of the account to authenticate.</param>
+/// <param name="Username">The username of the account to authenticate. Required.</param>
+/// <param name="Password">The password of the account to authenticate. Required.</param>
+/// <param name="TotpCode">The TOTP (Time-Based One-Time Password) of the account to authenticate. Optional.</param>
 [DebuggerDisplay("Username: {Username}")]
 public record LoginRequest(
     string? Username,

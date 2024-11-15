@@ -39,7 +39,6 @@ public class SplitPathEndpoint : BaseEndpoint<SplitPathRequest, IResult>
         Verbs(Http.GET);
         Routes(ApiRoutes.Path.SPLIT);
         Version(1);
-        AllowAnonymous();
         DontCatchExceptions();
     }
 

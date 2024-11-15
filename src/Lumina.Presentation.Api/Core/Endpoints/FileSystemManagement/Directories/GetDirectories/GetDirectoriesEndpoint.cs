@@ -40,7 +40,6 @@ public class GetDirectoriesEndpoint : BaseEndpoint<GetDirectoriesRequest, IResul
         Verbs(Http.GET);
         Routes(ApiRoutes.Directories.GET_DIRECTORIES);
         Version(1);
-        AllowAnonymous();
         DontCatchExceptions();
     }
 

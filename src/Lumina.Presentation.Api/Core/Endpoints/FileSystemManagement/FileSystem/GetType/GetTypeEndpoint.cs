@@ -40,7 +40,6 @@ public class GetTypeEndpoint : BaseEndpoint<EmptyRequest, IResult>
         Verbs(Http.GET);
         Routes(ApiRoutes.FileSystem.GET_TYPES);
         Version(1);
-        AllowAnonymous();
         DontCatchExceptions();
     }
 
