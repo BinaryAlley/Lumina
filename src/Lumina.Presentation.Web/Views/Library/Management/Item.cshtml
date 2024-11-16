@@ -60,17 +60,17 @@
             <!-- Directories -->
             <div class="form-row mt-10">
                 <div class="form-label">
-                    <label asp-for="Paths">Directories</label>
+                    <label asp-for="ContentLocations">Directories</label>
                     <span class="mandatory-field">*</span>:
                     <img src="~/images/ui/add-directory.svg" alt="Add directory" id="add-media-directory" title="Add directory" class="add-form-table-row-icon ml-5" />
                 </div>
             </div>
             <div class="form-row">
                 <div class="form-table w-100">
-                    @for (int i = 0; i < Model.Paths.Count; i++)
+                    @for (int i = 0; i < Model.ContentLocations.Count; i++)
                     {
                         <div class="form-table-row">
-                            <span title="@Model.Paths[i]">@Model.Paths[i]</span>
+                            <span title="@Model.ContentLocations[i]">@Model.ContentLocations[i]</span>
                             <img src="~/images/ui/delete.svg" alt="Remove" title="Remove" class="remove-form-table-row-icon" />
                         </div>
                     }
@@ -85,6 +85,35 @@
 </div>
 @section Scripts {
     <script type="text/javascript" defer>
+        document.getElementById('add-media-library-form').addEventListener('keypress', async (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                const form = event.target.closest('form');
+                await handleAddMediaLibrary(form);
+            }
+        });
+
+        document.getElementById('add-media-library-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            await handleAddMediaLibrary(event.target);
+        });
+
+        async function handleAddMediaLibrary(form) {
+            const formData = {
+                Id: form.querySelector('[name="Id"]').value || null,
+                Title: form.querySelector('[name="Title"]').value,
+                LibraryType: form.querySelector('.enlightenment-selected-text').textContent,
+                ContentLocations: Array.from(form.querySelectorAll('.form-table-row span'))
+                    .map(span => span.textContent)
+            };
+            const result = await callApiPostAsync('/library/manage/item', formData);
+            if (result) {
+                // Optional: Handle successful response
+                // For example, redirect after success
+                // window.location.href = '/library/manage';
+            }
+        }
+
         document.getElementById('add-media-directory').addEventListener('click', function () {
             showFileSystemBrowserDialogAsync('C:\\Users\\', true, false, addNewPaths); // TODO: take path and include hidden elements from settings
         });
@@ -108,23 +137,5 @@
                 }
             });
         }
-
-        document.getElementById('add-media-library-form').addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const form = event.target;
-            const formData = {
-                Id: form.querySelector('[name="Id"]').value || null,
-                Title: form.querySelector('[name="Title"]').value,
-                LibraryType: form.querySelector('.enlightenment-selected-text').textContent,
-                Paths: Array.from(form.querySelectorAll('.form-table-row span'))
-                    .map(span => span.textContent)
-            };
-            const result = await callApiPostAsync('/library/manage/item', formData);
-            if (result) {
-                // Optional: Handle successful response
-                // For example, redirect after success
-                // window.location.href = '/library/manage';
-            }
-        });
     </script>
 }
