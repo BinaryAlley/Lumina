@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Common.Api;
 using Lumina.Presentation.Web.Common.Models.FileSystemManagement;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading;
@@ -12,6 +13,7 @@ namespace Lumina.Presentation.Web.Controllers.FileSystemManagement;
 /// <summary>
 /// Controller for managing file system paths.
 /// </summary>
+[Authorize]
 [Route("[controller]")]
 public class PathController : Controller
 {
