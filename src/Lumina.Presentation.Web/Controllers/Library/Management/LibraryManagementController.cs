@@ -2,6 +2,7 @@
 using Lumina.Presentation.Web.Common.Api;
 using Lumina.Presentation.Web.Common.Enums.Library;
 using Lumina.Presentation.Web.Common.Models.Libraries;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using System;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace Lumina.Presentation.Web.Controllers.Library.Management;
 
+[Authorize]
 [Route("/library/manage/")]
 public class LibraryManagementController : Controller
 {

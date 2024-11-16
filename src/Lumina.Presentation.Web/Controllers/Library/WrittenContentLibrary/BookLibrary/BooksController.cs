@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 
 namespace Lumina.Presentation.Web.Controllers.Library.WrittenContentLibrary.BookLibrary;
 
+[Authorize]
 [Route("/library/written-content-library/books-library/books/")]
 public class BooksController : Controller
 {

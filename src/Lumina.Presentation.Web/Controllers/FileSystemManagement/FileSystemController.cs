@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Common.Api;
 using Lumina.Presentation.Web.Common.Models.FileSystemManagement;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,6 +12,7 @@ namespace Lumina.Presentation.Web.Controllers.FileSystemManagement;
 /// <summary>
 /// Controller for managing file systems.
 /// </summary>
+[Authorize]
 [Route("/file-system")]
 public class FileSystemController : Controller
 {
