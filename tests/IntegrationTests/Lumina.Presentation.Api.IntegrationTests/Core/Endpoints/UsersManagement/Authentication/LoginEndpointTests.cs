@@ -29,13 +29,13 @@ namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.UsersManagemen
 /// Contains integration tests for the <see cref="LoginEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
+public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
 {
+    private HttpClient _client;
+    private readonly AuthenticatedLuminaApiFactory _apiFactory;
     private readonly HashService _hashService;
     private readonly ICryptographyService _cryptographyService;
     private readonly TotpTokenGenerator _totpTokenGenerator;
-    private readonly LuminaApiFactory _apiFactory;
-    private readonly HttpClient _client;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -47,16 +47,25 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
     /// Initializes a new instance of the <see cref="LoginEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public LoginEndpointTests(LuminaApiFactory apiFactory)
+    public LoginEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
     {
-        _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
+        _apiFactory = apiFactory;
         _hashService = new HashService();
         _totpTokenGenerator = new TotpTokenGenerator();
         _testUsername = $"testuser_{Guid.NewGuid()}";
 
         using IServiceScope scope = apiFactory.Services.CreateScope();
         _cryptographyService = scope.ServiceProvider.GetRequiredService<ICryptographyService>();
+    }
+
+    /// <summary>
+    /// Initializes authenticated API client.
+    /// </summary>
+    public async Task InitializeAsync()
+    {
+        _client = _apiFactory.CreateClient();
+        await Task.CompletedTask;
     }
 
     [Fact]
@@ -304,7 +313,10 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
         return user;
     }
 
-    public void Dispose()
+    /// <summary>
+    /// Disposes API factory resources.
+    /// </summary>
+    public async Task DisposeAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
@@ -313,7 +325,7 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
         if (user is not null)
         {
             dbContext.Users.Remove(user);
-            dbContext.SaveChanges();
+            await dbContext.SaveChangesAsync();
         }
     }
 }

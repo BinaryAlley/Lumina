@@ -5,6 +5,7 @@ using Lumina.Contracts.Responses.UsersManagement;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Infrastructure.Core.Security;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -23,10 +24,10 @@ namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.Maintenance.Ap
 /// Contains integration tests for the <see cref="CheckInitializationEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class CheckInitializationEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
+public class CheckInitializationEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
 {
-    private readonly LuminaApiFactory _apiFactory;
-    private readonly HttpClient _client;
+    private HttpClient _client;
+    private readonly AuthenticatedLuminaApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -38,11 +39,20 @@ public class CheckInitializationEndpointTests : IClassFixture<LuminaApiFactory>,
     /// Initializes a new instance of the <see cref="CheckInitializationEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public CheckInitializationEndpointTests(LuminaApiFactory apiFactory)
+    public CheckInitializationEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
     {
-        _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
+        _apiFactory = apiFactory;
         _testUsername = $"testuser_{Guid.NewGuid()}";
+    }
+
+    /// <summary>
+    /// Initializes authenticated API client.
+    /// </summary>
+    public async Task InitializeAsync()
+    {
+        _client = _apiFactory.CreateClient();
+        await Task.CompletedTask;
     }
 
     [Fact]
@@ -117,16 +127,12 @@ public class CheckInitializationEndpointTests : IClassFixture<LuminaApiFactory>,
         return user;
     }
 
-    public void Dispose()
+    /// <summary>
+    /// Disposes API factory resources.
+    /// </summary>
+    public Task DisposeAsync()
     {
-        using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
-
-        UserEntity? user = dbContext.Users.FirstOrDefault(u => u.Username == _testUsername);
-        if (user is not null)
-        {
-            dbContext.Users.Remove(user);
-            dbContext.SaveChanges();
-        }
+        _apiFactory.Dispose();
+        return Task.CompletedTask;
     }
 }

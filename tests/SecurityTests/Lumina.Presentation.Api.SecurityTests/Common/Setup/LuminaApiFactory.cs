@@ -22,7 +22,7 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
 {
     private readonly SqliteConnection _connection;
     private const string TEST_ENCRYPTION_KEY = "MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=";
-
+    
     /// <summary>
     /// Initializes a new instance of the <see cref="LuminaApiFactory"/> class.
     /// </summary>
@@ -52,6 +52,8 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
             {
                 ["JwtSettings:SecretKey"] = "test-key-thats-at-least-32-chars-long-for-jwt",
                 ["JwtSettings:ExpiryMinutes"] = "15", // control the expiry time during tests
+                ["JwtSettings:Issuer"] = "Lumina",
+                ["JwtSettings:Audience"] = "Lumina",
                 ["EncryptionSettings:SecretKey"] = TEST_ENCRYPTION_KEY // base64 encoded test key
             });
         });
@@ -72,8 +74,8 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = "test-issuer",
-                    ValidAudience = "test-audience",
+                    ValidIssuer = "Lumina",
+                    ValidAudience = "Lumina",
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("test-key-thats-at-least-32-chars-long-for-jwt"))
                 };
             });
