@@ -25,6 +25,9 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
 {
     private readonly SqliteConnection _connection;
     private const string TEST_ENCRYPTION_KEY = "MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=";
+    private static byte s_IpClass = 25;
+
+    public static byte IpClass => s_IpClass++;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LuminaApiFactory"/> class.
@@ -54,6 +57,8 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
             config.AddInMemoryCollection(initialData: new Dictionary<string, string?>
             {
                 ["JwtSettings:SecretKey"] = "test-key-thats-at-least-32-chars-long-for-jwt",
+                ["JwtSettings:Issuer"] = "test-issuer",
+                ["JwtSettings:Audience"] = "test-audience",
                 ["EncryptionSettings:SecretKey"] = TEST_ENCRYPTION_KEY // base64 encoded test key
             });
         });

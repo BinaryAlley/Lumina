@@ -4,8 +4,6 @@ using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.DataAccess.Core.UoW;
-using Lumina.Infrastructure.Core.Security;
-using Lumina.Presentation.Api.IntegrationTests.Common.Fixtures;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,7 +13,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -29,42 +26,41 @@ namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.UsersManagemen
 /// Contains integration tests for the <see cref="ChangePasswordEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class ChangePasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
+public class ChangePasswordEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
 {
-    private readonly HashService _hashService;
-    private readonly LuminaApiFactory _apiFactory;
-    private readonly HttpClient _client;
+    private HttpClient _client;
+    private readonly AuthenticatedLuminaApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
-    private readonly string _testUsername;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ChangePasswordEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public ChangePasswordEndpointTests(LuminaApiFactory apiFactory)
+    public ChangePasswordEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
     {
-        _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
-        _hashService = new HashService();
-        _testUsername = $"testuser_{Guid.NewGuid()}";
+        _apiFactory = apiFactory;
+    }
 
-        // Set authorization header with unique username
-        string token = JwtFixture.GenerateJwtToken(_testUsername, ["User"]);
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+    /// <summary>
+    /// Initializes authenticated API client.
+    /// </summary>
+    public async Task InitializeAsync()
+    {
+        _client = await _apiFactory.CreateAuthenticatedClientAsync();
     }
 
     [Fact]
     public async Task ExecuteAsync_WhenCalledWithValidRequest_ShouldChangePasswordSuccessfully()
     {
         // Arrange
-        UserEntity user = await CreateTestUser();
         ChangePasswordRequest request = new(
-            Username: user.Username,
-            CurrentPassword: "OldPass123!",
+            Username: _apiFactory.TestUsername,
+            CurrentPassword: "TestPass123!",
             NewPassword: "NewPass123!",
             NewPasswordConfirm: "NewPass123!"
         );
@@ -73,10 +69,10 @@ public class ChangePasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDis
         HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/auth/change-password", request);
 
         // Assert
+        string content = await response.Content.ReadAsStringAsync();
         response.EnsureSuccessStatusCode();
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        string content = await response.Content.ReadAsStringAsync();
         ChangePasswordResponse? result = JsonSerializer.Deserialize<ChangePasswordResponse>(content, _jsonOptions);
 
         result.Should().NotBeNull();
@@ -87,9 +83,8 @@ public class ChangePasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDis
     public async Task ExecuteAsync_WhenPasswordsDoNotMatch_ShouldReturnValidationError()
     {
         // Arrange
-        UserEntity user = await CreateTestUser();
         ChangePasswordRequest request = new(
-            Username: user.Username,
+            Username: _apiFactory.TestUsername,
             CurrentPassword: "OldPass123!",
             NewPassword: "NewPass123!",
             NewPasswordConfirm: "DifferentPass123!"
@@ -147,9 +142,8 @@ public class ChangePasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDis
     public async Task ExecuteAsync_WhenCurrentPasswordIsIncorrect_ShouldReturnForbidden()
     {
         // Arrange
-        UserEntity user = await CreateTestUser();
         ChangePasswordRequest request = new(
-            Username: user.Username,
+            Username: _apiFactory.TestUsername,
             CurrentPassword: "WrongPass123!",
             NewPassword: "NewPass123!",
             NewPasswordConfirm: "NewPass123!"
@@ -202,9 +196,8 @@ public class ChangePasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDis
     public async Task ExecuteAsync_WhenCancellationRequested_ShouldThrowTaskCanceledException()
     {
         // Arrange
-        UserEntity user = await CreateTestUser();
         ChangePasswordRequest request = new(
-            Username: user.Username,
+            Username: _apiFactory.TestUsername,
             CurrentPassword: "OldPass123!",
             NewPassword: "NewPass123!",
             NewPasswordConfirm: "NewPass123!"
@@ -222,34 +215,19 @@ public class ChangePasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDis
         await act.Should().ThrowAsync<TaskCanceledException>();
     }
 
-    private async Task<UserEntity> CreateTestUser()
+    /// <summary>
+    /// Disposes API factory resources.
+    /// </summary>
+    public async Task DisposeAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
 
-        UserEntity user = new()
-        {
-            Username = _testUsername,
-            Password = _hashService.HashString("OldPass123!"),
-            Libraries = [],
-            Created = DateTime.UtcNow
-        };
-
-        dbContext.Users.Add(user);
-        await dbContext.SaveChangesAsync();
-        return user;
-    }
-
-    public void Dispose()
-    {
-        using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
-
-        UserEntity? user = dbContext.Users.FirstOrDefault(u => u.Username == _testUsername);
+        UserEntity? user = dbContext.Users.FirstOrDefault(u => u.Username == _apiFactory.TestUsername!);
         if (user is not null)
         {
             dbContext.Users.Remove(user);
-            dbContext.SaveChanges();
+            await dbContext.SaveChangesAsync();
         }
     }
 }
