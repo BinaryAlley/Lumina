@@ -129,11 +129,10 @@ public class AuthController : Controller
     /// Logs in an account.
     /// </summary>
     /// <param name="data">User credentials used for login.</param>
-    /// <param name="returnUrl">The url to return to, after login (if any).</param>
     [AllowAnonymous]
     [ValidateAntiForgeryToken]
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginRequestModel data, string? returnUrl = null)
+    public async Task<IActionResult> Login([FromBody] LoginRequestModel data)
     {
         try
         {
@@ -158,7 +157,7 @@ public class AuthController : Controller
             ClaimsIdentity claimsIdentity = new(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
             // return success status and redirect URL
-            return Json(new { success = true, data = string.IsNullOrEmpty(returnUrl) || !Url.IsLocalUrl(returnUrl) ? Url.Content("~/") : Url.Content(returnUrl) });
+            return Json(new { success = true, data = string.IsNullOrEmpty(data.ReturnUrl) || !Url.IsLocalUrl(data.ReturnUrl) ? Url.Content("~/") : Url.Content(data.ReturnUrl) });
         }
         catch (ApiException ex)
         {
