@@ -10,7 +10,7 @@ using System.Diagnostics.CodeAnalysis;
 
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.Management.AddLibrary;
+namespace Lumina.Presentation.Api.Core.Endpoints.Library.Management.AddLibrary;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="AddLibraryEndpoint"/> API endpoint, for Swagger.
