@@ -8,6 +8,8 @@ using Lumina.Presentation.Api.Common.Routes.Library.Management;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
 using Mediator;
 using Microsoft.AspNetCore.Http;
+using System;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -48,7 +50,8 @@ public class AddLibraryEndpoint : BaseEndpoint<AddLibraryRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(AddLibraryRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<LibraryResponse> result = await _sender.Send(request.ToCommand(), cancellationToken).ConfigureAwait(false);
+        string? user = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        ErrorOr<LibraryResponse> result = await _sender.Send(request.ToCommand(Guid.Parse(user!)), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Created($"{BaseURL}api/v1{ApiRoutes.Libraries.ADD_LIBRARY}/{result.Value.Id}", result.Value), Problem);
     }
 }

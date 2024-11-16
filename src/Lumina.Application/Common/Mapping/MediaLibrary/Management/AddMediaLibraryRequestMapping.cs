@@ -2,6 +2,7 @@
 using Lumina.Application.Core.MediaLibrary.Management.Commands.AddLibrary;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook;
 using Lumina.Contracts.Requests.MediaLibrary.Management;
+using System;
 #endregion
 
 namespace Lumina.Application.Common.Mapping.MediaLibrary.Management;
@@ -15,11 +16,12 @@ public static class AddMediaLibraryRequestMapping
     /// Converts <paramref name="request"/> to <see cref="AddLibraryCommand"/>.
     /// </summary>
     /// <param name="request">The request to be converted.</param>
+    /// <param name="userId">The Id of the user owning the media library. Required.</param>
     /// <returns>The converted command.</returns>
-    public static AddLibraryCommand ToCommand(this AddLibraryRequest request)
+    public static AddLibraryCommand ToCommand(this AddLibraryRequest request, Guid userId)
     {
         return new AddLibraryCommand(
-            request.UserId,
+            userId,
             request.Title,
             request.LibraryType,
             request.ContentLocations
