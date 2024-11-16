@@ -54,9 +54,10 @@
 </div>
 @section Scripts {
     <script type="text/javascript" defer>
-         document.getElementById('login-form').addEventListener('submit', async (event) => {
+        document.getElementById('login-form').addEventListener('submit', async (event) => {
             event.preventDefault();
             const form = event.target;
+            const returnUrlInput = form.querySelector('[name="ReturnUrl"]');
             const txtUsername = form.querySelector('[name="Username"]');
             const txtPassword = form.querySelector('[name="Password"]');
             const txtTotpCode = form.querySelector('[name="TotpCode"]');
@@ -67,7 +68,8 @@
             const formData = {
                 Username: txtUsername.value,
                 Password: txtPassword.value,
-                TotpCode: txtTotpCode.value
+                TotpCode: txtTotpCode.value,
+                ReturnUrl: returnUrlInput.value
             };
             const data = await callApiPostAsync('@_urlService.GetAbsoluteUrl("Login", "Auth")', formData);
             if (data && data.isTotpRequired === true) {
