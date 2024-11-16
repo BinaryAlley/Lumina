@@ -54,9 +54,20 @@
 </div>
 @section Scripts {
     <script type="text/javascript" defer>
+        document.getElementById('login-form').addEventListener('keypress', async (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                const form = event.target.closest('form');
+                await handleLogin(form);
+            }
+        });
+
         document.getElementById('login-form').addEventListener('submit', async (event) => {
             event.preventDefault();
-            const form = event.target;
+            await handleLogin(event.target);
+        });
+
+        async function handleLogin(form) {
             const returnUrlInput = form.querySelector('[name="ReturnUrl"]');
             const txtUsername = form.querySelector('[name="Username"]');
             const txtPassword = form.querySelector('[name="Password"]');
@@ -83,7 +94,7 @@
             }
             else if (data)
                 window.location.href = data;
-        });
+        }
         document.getElementById('btn-recover-password').addEventListener('click', () => {
             window.location.href = '@_urlService.GetAbsoluteUrl("RecoverPassword", "Auth")';
         });

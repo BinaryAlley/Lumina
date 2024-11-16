@@ -92,9 +92,20 @@
 </div>
 @section Scripts {
     <script type="text/javascript" defer>
+        document.getElementById('register-account-form').addEventListener('keypress', async (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                const form = event.target.closest('form');
+                await handleRegisterAccount(form);
+            }
+        });
+
         document.getElementById('register-account-form').addEventListener('submit', async (event) => {
             event.preventDefault();
-            const form = event.target;
+            await handleRegisterAccount(event.target);
+        });
+
+        async function handleRegisterAccount(form) {
             const txtUsername = form.querySelector('[name="Username"]');
             const txtPassword = form.querySelector('[name="Password"]');
             const txtPasswordConfirm = form.querySelector('[name="PasswordConfirm"]');
@@ -127,7 +138,7 @@
                     totpImage.setAttribute('src', data.totpSecret);
                 }
             }
-        });
+        }
         document.querySelector('[name="Use2fa"]').addEventListener('change', function () {
             const isChecked = this.checked;
             document.getElementById('#register-two-fa-attention').classList.replace(

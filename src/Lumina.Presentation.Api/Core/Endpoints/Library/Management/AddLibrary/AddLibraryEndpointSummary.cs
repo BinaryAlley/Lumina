@@ -27,7 +27,6 @@ public class AddLibraryEndpointSummary : Summary<AddLibraryEndpoint, AddLibraryR
         Description = "Creates a new media library and returns its details, including the location of the newly created resource.";
 
         ExampleRequest = new AddLibraryRequest(
-            UserId: Guid.NewGuid(),
             Title: "TV Shows",
             LibraryType: LibraryType.TvShow,
             ContentLocations: [
@@ -36,7 +35,6 @@ public class AddLibraryEndpointSummary : Summary<AddLibraryEndpoint, AddLibraryR
             ]
         );
 
-        RequestParam(r => r.UserId, "The Id of the user owning the media library. Required.");
         RequestParam(r => r.Title, "The title of the media library. Required.");
         RequestParam(r => r.LibraryType, "The type of the media library. Required.");
         RequestParam(r => r.ContentLocations, ">The file system paths of the directories where the media library elements are located. Required.");

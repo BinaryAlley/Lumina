@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
 #endregion
 
@@ -35,7 +36,7 @@ public class LibraryManagementController : Controller
         {
             Id = id,
             LibraryType = LibraryType.Book,
-            Paths = ["a", "b", "c"],
+            ContentLocations = ["a", "b", "c"],
             Title = ""
         };
         return View("/Views/Library/Management/Item.cshtml", libraryModel);

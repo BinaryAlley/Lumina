@@ -20,19 +20,19 @@ public class AddMediaLibraryRequestMappingTests
     public void ToCommand_WhenMappingValidRequest_ShouldMapCorrectly()
     {
         // Arrange
+        Guid userId = Guid.NewGuid();
         AddLibraryRequest request = new(
-            Guid.NewGuid(),
             "My Library",
             LibraryType.Book,
             ["C:/Books", "D:/Media/Books"]
         );
 
         // Act
-        AddLibraryCommand result = request.ToCommand();
+        AddLibraryCommand result = request.ToCommand(userId);
 
         // Assert
         result.Should().NotBeNull();
-        result.UserId.Should().Be(request.UserId);
+        result.UserId.Should().Be(userId);
         result.Title.Should().Be(request.Title);
         result.LibraryType.Should().Be(request.LibraryType);
         result.ContentLocations.Should().BeEquivalentTo(request.ContentLocations);
@@ -46,19 +46,19 @@ public class AddMediaLibraryRequestMappingTests
     public void ToCommand_WhenMappingDifferentLibraryTypes_ShouldMapCorrectly(LibraryType libraryType)
     {
         // Arrange
+        Guid userId = Guid.NewGuid();
         AddLibraryRequest request = new(
-            Guid.NewGuid(),
             "My Library",
             libraryType,
             ["C:/Media"]
         );
 
         // Act
-        AddLibraryCommand result = request.ToCommand();
+        AddLibraryCommand result = request.ToCommand(userId);
 
         // Assert
         result.Should().NotBeNull();
-        result.UserId.Should().Be(request.UserId);
+        result.UserId.Should().Be(userId);
         result.Title.Should().Be(request.Title);
         result.LibraryType.Should().Be(libraryType);
         result.ContentLocations.Should().BeEquivalentTo(request.ContentLocations);
@@ -76,15 +76,15 @@ public class AddMediaLibraryRequestMappingTests
             "F:/Reading Material"
         ];
 
+        Guid userId = Guid.NewGuid();
         AddLibraryRequest request = new(
-            Guid.NewGuid(),
             "My Library",
             LibraryType.Book,
             contentLocations
         );
 
         // Act
-        AddLibraryCommand result = request.ToCommand();
+        AddLibraryCommand result = request.ToCommand(userId);
 
         // Assert
         result.Should().NotBeNull();

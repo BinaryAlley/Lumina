@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Common.Enums.Library;
 using System;
 using System.Collections.Generic;
@@ -31,5 +31,5 @@ public class LibraryModel
     /// <summary>
     /// Gets or sets the collection of directories that contain the library files.
     /// </summary>
-    public List<string> Paths { get; set; } = [];
+    public List<string> ContentLocations { get; set; } = [];
 }
