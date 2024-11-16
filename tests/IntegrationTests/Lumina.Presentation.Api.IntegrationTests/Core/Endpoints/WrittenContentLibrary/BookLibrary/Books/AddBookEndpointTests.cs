@@ -27,9 +27,10 @@ namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.WrittenContent
 /// Contains integration tests for the <see cref="AddBookEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class AddBookEndpointTests : IClassFixture<LuminaApiFactory>
+public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
 {
-    private readonly HttpClient _client;
+    private HttpClient _client;
+    private readonly AuthenticatedLuminaApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         ReferenceHandler = ReferenceHandler.Preserve,
@@ -45,10 +46,19 @@ public class AddBookEndpointTests : IClassFixture<LuminaApiFactory>
     /// Initializes a new instance of the <see cref="AddBookEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public AddBookEndpointTests(LuminaApiFactory apiFactory)
+    public AddBookEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
+        _apiFactory = apiFactory;
         _requestBookFixture = new AddBookRequestFixture();
+    }
+
+    /// <summary>
+    /// Initializes authenticated API client.
+    /// </summary>
+    public async Task InitializeAsync()
+    {
+        _client = await _apiFactory.CreateAuthenticatedClientAsync();
     }
 
     [Fact]
@@ -1594,5 +1604,14 @@ public class AddBookEndpointTests : IClassFixture<LuminaApiFactory>
         Book? bookResponse = await response.Content.ReadFromJsonAsync<Book>(_jsonOptions);
         response.StatusCode.Should().Be(HttpStatusCode.Created);
         bookResponse.Should().NotBeNull();
+    }
+
+    /// <summary>
+    /// Disposes API factory resources.
+    /// </summary>
+    public Task DisposeAsync()
+    {
+        _apiFactory.Dispose();
+        return Task.CompletedTask;
     }
 }

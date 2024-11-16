@@ -26,10 +26,10 @@ namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.Maintenance.Ap
 /// Contains integration tests for the <see cref="SetupApplicationEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class SetupApplicationEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
+public class SetupApplicationEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
 {
-    private readonly LuminaApiFactory _apiFactory;
-    private readonly HttpClient _client;
+    private HttpClient _client;
+    private readonly AuthenticatedLuminaApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -41,11 +41,20 @@ public class SetupApplicationEndpointTests : IClassFixture<LuminaApiFactory>, ID
     /// Initializes a new instance of the <see cref="SetupApplicationEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public SetupApplicationEndpointTests(LuminaApiFactory apiFactory)
+    public SetupApplicationEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
     {
-        _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
+        _apiFactory = apiFactory;
         _testUsername = $"testuser_{Guid.NewGuid()}";
+    }
+
+    /// <summary>
+    /// Initializes authenticated API client.
+    /// </summary>
+    public async Task InitializeAsync()
+    {
+        _client = _apiFactory.CreateClient();
+        await Task.CompletedTask;
     }
 
     [Fact]
@@ -172,7 +181,10 @@ public class SetupApplicationEndpointTests : IClassFixture<LuminaApiFactory>, ID
         return user;
     }
 
-    public void Dispose()
+    /// <summary>
+    /// Disposes API factory resources.
+    /// </summary>
+    public async Task DisposeAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
@@ -181,7 +193,7 @@ public class SetupApplicationEndpointTests : IClassFixture<LuminaApiFactory>, ID
         if (user is not null)
         {
             dbContext.Users.Remove(user);
-            dbContext.SaveChanges();
+            await dbContext.SaveChangesAsync();
         }
     }
 }

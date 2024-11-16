@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using ErrorOr;
 using FastEndpoints;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Paths;
 using Lumina.Contracts.Requests.FileSystemManagement.Path;
@@ -37,7 +38,6 @@ public class CheckPathExistsEndpoint : BaseEndpoint<CheckPathExistsRequest, IRes
         Verbs(Http.GET);
         Routes(ApiRoutes.Path.CHECK_PATH_EXISTS);
         Version(1);
-        AllowAnonymous();
         DontCatchExceptions();
     }
 
@@ -48,7 +48,7 @@ public class CheckPathExistsEndpoint : BaseEndpoint<CheckPathExistsRequest, IRes
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(CheckPathExistsRequest request, CancellationToken cancellationToken)
     {
-        PathExistsResponse result = await _sender.Send(request.ToQuery(), cancellationToken).ConfigureAwait(false);
-        return TypedResults.Ok(result);
+        ErrorOr<PathExistsResponse> result = await _sender.Send(request.ToQuery(), cancellationToken).ConfigureAwait(false);
+        return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

@@ -22,9 +22,10 @@ namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.FileSystemMana
 /// Contains integration tests for the <see cref="GetPathParentEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetPathParentEndpointTests : IClassFixture<LuminaApiFactory>
+public class GetPathParentEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
 {
-    private readonly HttpClient _client;
+    private HttpClient _client;
+    private readonly AuthenticatedLuminaApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         ReferenceHandler = ReferenceHandler.Preserve,
@@ -37,9 +38,18 @@ public class GetPathParentEndpointTests : IClassFixture<LuminaApiFactory>
     /// Initializes a new instance of the <see cref="GetPathParentEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetPathParentEndpointTests(LuminaApiFactory apiFactory)
+    public GetPathParentEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
+        _apiFactory = apiFactory;
+    }
+
+    /// <summary>
+    /// Initializes authenticated API client.
+    /// </summary>
+    public async Task InitializeAsync()
+    {
+        _client = await _apiFactory.CreateAuthenticatedClientAsync();
     }
 
     [Fact]
@@ -187,5 +197,14 @@ public class GetPathParentEndpointTests : IClassFixture<LuminaApiFactory>
 
         // Assert
         await act.Should().ThrowAsync<TaskCanceledException>();
+    }
+
+    /// <summary>
+    /// Disposes API factory resources.
+    /// </summary>
+    public Task DisposeAsync()
+    {
+        _apiFactory.Dispose();
+        return Task.CompletedTask;
     }
 }

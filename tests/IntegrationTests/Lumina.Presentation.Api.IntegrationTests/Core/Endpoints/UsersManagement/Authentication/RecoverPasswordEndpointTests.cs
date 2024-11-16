@@ -31,13 +31,13 @@ namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.UsersManagemen
 /// Contains integration tests for the <see cref="RecoverPasswordEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class RecoverPasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
+public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
 {
+    private HttpClient _client;
+    private readonly AuthenticatedLuminaApiFactory _apiFactory;
     private readonly HashService _hashService;
     private readonly ICryptographyService _cryptographyService;
     private readonly TotpTokenGenerator _totpTokenGenerator;
-    private readonly LuminaApiFactory _apiFactory;
-    private readonly HttpClient _client;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -49,10 +49,10 @@ public class RecoverPasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDi
     /// Initializes a new instance of the <see cref="RecoverPasswordEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public RecoverPasswordEndpointTests(LuminaApiFactory apiFactory)
+    public RecoverPasswordEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
     {
-        _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
+        _apiFactory = apiFactory;
         _hashService = new HashService();
         _totpTokenGenerator = new TotpTokenGenerator();
         _testUsername = $"testuser_{Guid.NewGuid()}";
@@ -60,6 +60,15 @@ public class RecoverPasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDi
         // get the encryption service with the test key from factory
         using IServiceScope scope = apiFactory.Services.CreateScope();
         _cryptographyService = scope.ServiceProvider.GetRequiredService<ICryptographyService>();
+    }
+
+    /// <summary>
+    /// Initializes authenticated API client.
+    /// </summary>
+    public async Task InitializeAsync()
+    {
+        _client = _apiFactory.CreateClient();
+        await Task.CompletedTask;
     }
 
     [Fact]
@@ -324,7 +333,10 @@ public class RecoverPasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDi
         return user;
     }
 
-    public void Dispose()
+    /// <summary>
+    /// Disposes API factory resources.
+    /// </summary>
+    public async Task DisposeAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
@@ -333,7 +345,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDi
         if (user is not null)
         {
             dbContext.Users.Remove(user);
-            dbContext.SaveChanges();
+            await dbContext.SaveChangesAsync();
         }
     }
 }

@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using ErrorOr;
 using FastEndpoints;
 using FluentAssertions;
 using Lumina.Application.Core.FileSystemManagement.Paths.Queries.CheckPathExists;
@@ -84,12 +85,12 @@ public class CheckPathExistsEndpointTests
         TaskCompletionSource<bool> cancellationRequested = new();
 
         _mockSender.Send(Arg.Any<CheckPathExistsQuery>(), Arg.Any<CancellationToken>())
-            .Returns(callInfo => new ValueTask<PathExistsResponse>(Task.Run(async () =>
+            .Returns(callInfo => new ValueTask<ErrorOr<PathExistsResponse>>(Task.Run(async () =>
             {
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return new PathExistsResponse(true);
+                return ErrorOrFactory.From(new PathExistsResponse(true));
             }, callInfo.Arg<CancellationToken>())));
 
         // Act
