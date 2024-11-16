@@ -14,6 +14,6 @@ namespace Lumina.Application.Core.FileSystemManagement.Paths.Queries.CheckPathEx
 /// <param name="IncludeHiddenElements">Whether to include hidden file system elements or not.</param>
 [DebuggerDisplay("Path: {Path}, IncludeHiddenElements: {IncludeHiddenElements}")]
 public record CheckPathExistsQuery(
-    string? Path, 
+    string? Path,
     bool IncludeHiddenElements
 ) : IRequest<ErrorOr<PathExistsResponse>>;

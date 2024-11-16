@@ -2,7 +2,9 @@
 using FluentAssertions;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Microsoft.AspNetCore.Http;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http;
@@ -18,9 +20,10 @@ namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.FileSystemMana
 /// Contains integration tests for the <see cref="CheckPathExistsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class CheckPathExistsEndpointTests : IClassFixture<LuminaApiFactory>
+public class CheckPathExistsEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
 {
-    private readonly HttpClient _client;
+    private HttpClient _client;
+    private readonly AuthenticatedLuminaApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         ReferenceHandler = ReferenceHandler.Preserve,
@@ -32,9 +35,18 @@ public class CheckPathExistsEndpointTests : IClassFixture<LuminaApiFactory>
     /// Initializes a new instance of the <see cref="CheckPathExistsEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public CheckPathExistsEndpointTests(LuminaApiFactory apiFactory)
+    public CheckPathExistsEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
+        _apiFactory = apiFactory;
+    }
+
+    /// <summary>
+    /// Initializes authenticated API client.
+    /// </summary>
+    public async Task InitializeAsync()
+    {
+        _client = await _apiFactory.CreateAuthenticatedClientAsync();
     }
 
     [Fact]
@@ -72,7 +84,7 @@ public class CheckPathExistsEndpointTests : IClassFixture<LuminaApiFactory>
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithEmptyPath_ShouldReturnOkResultWithExistsFalse()
+    public async Task ExecuteAsync_WhenCalledWithEmptyPath_ShouldReturnValidationProblemResult()
     {
         // Arrange
         string path = "";
@@ -81,11 +93,20 @@ public class CheckPathExistsEndpointTests : IClassFixture<LuminaApiFactory>
         HttpResponseMessage response = await _client.GetAsync($"/api/v1/path/check-path-exists?path={Uri.EscapeDataString(path)}&includeHiddenElements=false");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.Should().Be(HttpStatusCode.UnprocessableContent);
+        response.Content.Headers.ContentType?.MediaType.Should().Be("application/problem+json");
         string content = await response.Content.ReadAsStringAsync();
-        PathExistsResponse? result = JsonSerializer.Deserialize<PathExistsResponse>(content, _jsonOptions);
-        result.Should().NotBeNull();
-        result!.Exists.Should().BeFalse();
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        problemDetails.Should().NotBeNull();
+        problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status422UnprocessableEntity);
+        problemDetails["title"].GetString().Should().Be("Validation Error");
+        problemDetails["instance"].GetString().Should().Be("/api/v1/path/check-path-exists");
+        problemDetails["detail"].GetString().Should().Be("One or more validation errors occurred.");
+        problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc4918#section-11.2");
+        problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
+
+        Dictionary<string, string[]>? errors = problemDetails["errors"].Deserialize<Dictionary<string, string[]>>(_jsonOptions);
+        errors.Should().ContainKey("General.Validation").WhoseValue.Should().BeEquivalentTo(["PathCannotBeEmpty"]);
     }
 
     [Fact]
@@ -122,5 +143,14 @@ public class CheckPathExistsEndpointTests : IClassFixture<LuminaApiFactory>
 
         // Assert
         await act.Should().ThrowAsync<TaskCanceledException>();
+    }
+
+    /// <summary>
+    /// Disposes API factory resources.
+    /// </summary>
+    public Task DisposeAsync()
+    {
+        _apiFactory.Dispose();
+        return Task.CompletedTask;
     }
 }

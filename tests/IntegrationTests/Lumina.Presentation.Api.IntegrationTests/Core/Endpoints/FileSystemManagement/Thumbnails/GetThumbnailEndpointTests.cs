@@ -20,9 +20,10 @@ namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.FileSystemMana
 /// Contains integration tests for the <see cref="GetThumbnailEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetThumbnailEndpointTests : IClassFixture<LuminaApiFactory>, IClassFixture<TestImageFixture>
+public class GetThumbnailEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IClassFixture<TestImageFixture>, IAsyncLifetime
 {
-    private readonly HttpClient _client;
+    private HttpClient _client;
+    private readonly AuthenticatedLuminaApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         ReferenceHandler = ReferenceHandler.Preserve,
@@ -36,10 +37,19 @@ public class GetThumbnailEndpointTests : IClassFixture<LuminaApiFactory>, IClass
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
     /// <param name="imageFixture">Fixture for creating and managing test images.</param>
-    public GetThumbnailEndpointTests(LuminaApiFactory apiFactory, TestImageFixture imageFixture)
+    public GetThumbnailEndpointTests(AuthenticatedLuminaApiFactory apiFactory, TestImageFixture imageFixture)
     {
         _client = apiFactory.CreateClient();
+        _apiFactory = apiFactory;
         _testImagePath = imageFixture.ImagePath;
+    }
+
+    /// <summary>
+    /// Initializes authenticated API client.
+    /// </summary>
+    public async Task InitializeAsync()
+    {
+        _client = await _apiFactory.CreateAuthenticatedClientAsync();
     }
 
     [Fact]
@@ -151,5 +161,14 @@ public class GetThumbnailEndpointTests : IClassFixture<LuminaApiFactory>, IClass
 
         // Assert
         await act.Should().ThrowAsync<TaskCanceledException>();
+    }
+
+    /// <summary>
+    /// Disposes API factory resources.
+    /// </summary>
+    public Task DisposeAsync()
+    {
+        _apiFactory.Dispose();
+        return Task.CompletedTask;
     }
 }

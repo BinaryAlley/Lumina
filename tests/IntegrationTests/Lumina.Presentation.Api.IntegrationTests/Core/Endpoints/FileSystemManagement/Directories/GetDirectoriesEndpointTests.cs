@@ -23,9 +23,10 @@ namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.FileSystemMana
 /// Contains integration tests for the <see cref="GetDirectoriesEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetDirectoriesEndpointTests : IClassFixture<LuminaApiFactory>
+public class GetDirectoriesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
 {
-    private readonly HttpClient _client;
+    private HttpClient _client;
+    private readonly AuthenticatedLuminaApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         ReferenceHandler = ReferenceHandler.Preserve,
@@ -38,9 +39,18 @@ public class GetDirectoriesEndpointTests : IClassFixture<LuminaApiFactory>
     /// Initializes a new instance of the <see cref="GetDirectoriesEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetDirectoriesEndpointTests(LuminaApiFactory apiFactory)
+    public GetDirectoriesEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
+        _apiFactory = apiFactory;
+    }
+
+    /// <summary>
+    /// Initializes authenticated API client.
+    /// </summary>
+    public async Task InitializeAsync()
+    {
+        _client = await _apiFactory.CreateAuthenticatedClientAsync();
     }
 
     [Fact]
@@ -59,10 +69,10 @@ public class GetDirectoriesEndpointTests : IClassFixture<LuminaApiFactory>
             HttpResponseMessage response = await _client.GetAsync($"/api/v1/directories/get-directories?path={encodedPath}&includeHiddenElements={includeHiddenElements}");
 
             // Assert
+            string content = await response.Content.ReadAsStringAsync();
             response.EnsureSuccessStatusCode();
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            string content = await response.Content.ReadAsStringAsync();
             List<DirectoryResponse>? directories = JsonSerializer.Deserialize<List<DirectoryResponse>>(content, _jsonOptions);
 
             directories.Should().NotBeNull();
@@ -200,5 +210,14 @@ public class GetDirectoriesEndpointTests : IClassFixture<LuminaApiFactory>
 
         // Assert
         await act.Should().ThrowAsync<TaskCanceledException>();
+    }
+
+    /// <summary>
+    /// Disposes API factory resources.
+    /// </summary>
+    public Task DisposeAsync()
+    {
+        _apiFactory.Dispose();
+        return Task.CompletedTask;
     }
 }

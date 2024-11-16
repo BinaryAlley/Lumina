@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using FluentAssertions;
-using Lumina.Domain.Common.Enums.FileSystem;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
+using Lumina.Domain.Common.Enums.FileSystem;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -20,9 +20,10 @@ namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.FileSystemMana
 /// Contains integration tests for the <see cref="GetDrivesEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetDrivesEndpointTests : IClassFixture<LuminaApiFactory>
+public class GetDrivesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
 {
-    private readonly HttpClient _client;
+    private HttpClient _client;
+    private readonly AuthenticatedLuminaApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         ReferenceHandler = ReferenceHandler.Preserve,
@@ -32,12 +33,30 @@ public class GetDrivesEndpointTests : IClassFixture<LuminaApiFactory>
     private static readonly bool s_isUnix = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
 
     /// <summary>
+    /// Initializes authenticated API client.
+    /// </summary>
+    public async Task InitializeAsync()
+    {
+        _client = await _apiFactory.CreateAuthenticatedClientAsync();
+    }
+
+    /// <summary>
+    /// Disposes API factory resources.
+    /// </summary>
+    public Task DisposeAsync()
+    {
+        _apiFactory.Dispose();
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="GetDrivesEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetDrivesEndpointTests(LuminaApiFactory apiFactory)
+    public GetDrivesEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
+        _apiFactory = apiFactory;
     }
 
     [Fact]
