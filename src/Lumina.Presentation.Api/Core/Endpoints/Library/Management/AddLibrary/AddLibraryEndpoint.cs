@@ -12,7 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.Management.AddLibrary;
+namespace Lumina.Presentation.Api.Core.Endpoints.Library.Management.AddLibrary;
 
 /// <summary>
 /// API endpoint for the <c>/library</c> route.
