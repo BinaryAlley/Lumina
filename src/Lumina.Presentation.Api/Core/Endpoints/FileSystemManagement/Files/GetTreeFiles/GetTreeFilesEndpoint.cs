@@ -39,7 +39,6 @@ public class GetTreeFilesEndpoint : BaseEndpoint<GetTreeFilesRequest, IResult>
         Verbs(Http.GET);
         Routes(ApiRoutes.Files.GET_TREE_FILES);
         Version(1);
-        AllowAnonymous();
         DontCatchExceptions();
     }
 

@@ -38,7 +38,6 @@ public class GetPathRootEndpoint : BaseEndpoint<GetPathRootRequest, IResult>
         Verbs(Http.GET);
         Routes(ApiRoutes.Path.GET_PATH_ROOT);
         Version(1);
-        AllowAnonymous();
         DontCatchExceptions();
     }
 

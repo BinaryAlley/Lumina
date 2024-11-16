@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using System.Diagnostics;
-using System.Text.Json.Serialization;
 #endregion
 
 namespace Lumina.Contracts.Requests.FileSystemManagement.Thumbnails;

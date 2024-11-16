@@ -40,7 +40,6 @@ public class GetThumbnailEndpoint : BaseEndpoint<GetThumbnailRequest, IResult>
         Verbs(Http.GET);
         Routes(ApiRoutes.Thumbnails.GET_THUMBNAIL);
         Version(1);
-        AllowAnonymous();
         DontCatchExceptions();
     }
 

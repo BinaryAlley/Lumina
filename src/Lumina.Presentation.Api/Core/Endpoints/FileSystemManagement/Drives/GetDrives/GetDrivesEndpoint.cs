@@ -38,7 +38,6 @@ public class GetDrivesEndpoint : BaseEndpoint<EmptyRequest, IResult>
         Verbs(Http.GET);
         Routes(ApiRoutes.Drives.GET_DRIVES);
         Version(1);
-        AllowAnonymous();
         DontCatchExceptions();
     }
 

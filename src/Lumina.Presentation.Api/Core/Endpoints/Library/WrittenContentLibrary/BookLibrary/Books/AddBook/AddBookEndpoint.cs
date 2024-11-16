@@ -38,7 +38,6 @@ public class AddBookEndpoint : BaseEndpoint<AddBookRequest, IResult>
         Verbs(Http.POST);
         Routes(ApiRoutes.Books.ADD_BOOK);
         Version(1);
-        AllowAnonymous();
         DontCatchExceptions();
     }
 

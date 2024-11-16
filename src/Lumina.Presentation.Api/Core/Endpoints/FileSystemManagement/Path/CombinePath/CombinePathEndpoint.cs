@@ -38,7 +38,6 @@ public class CombinePathEndpoint : BaseEndpoint<CombinePathRequest, IResult>
         Verbs(Http.GET);
         Routes(ApiRoutes.Path.COMBINE);
         Version(1);
-        AllowAnonymous();
         DontCatchExceptions();
     }
 

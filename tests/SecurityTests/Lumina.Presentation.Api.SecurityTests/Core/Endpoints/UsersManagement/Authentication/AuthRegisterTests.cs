@@ -102,7 +102,7 @@ public class AuthRegisterTests : IClassFixture<LuminaApiFactory>, IDisposable
         problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc7231#section-6.5.29");
         problemDetails["title"].GetString().Should().Be("TooManyRequests");
         problemDetails["detail"].GetString().Should().Be("Too many attempts. Please try again later.");
-        problemDetails["retryAfter"].GetString().Should().Be("15");
+        problemDetails["retryAfter"].GetString().Should().Be("900");
 
         lastResponse.Headers.Should().ContainKey("X-RateLimit-Limit");
         lastResponse.Headers.Should().ContainKey("X-RateLimit-Reset");

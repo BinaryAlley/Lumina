@@ -20,6 +20,9 @@ public class CheckInitializationEndpointSummary : Summary<CheckInitializationEnd
         Summary = "Checks the initialization status of the application.";
         Description = "Checks the initialization status of the application (if the Admin account exists).";
 
-        Response<InitializationResponse>(200, "The application initialization status is returned.");
+        Response(200, "The application initialization status is returned.",
+            example: new InitializationResponse(
+                IsInitialized: true
+            ));
     }
 }

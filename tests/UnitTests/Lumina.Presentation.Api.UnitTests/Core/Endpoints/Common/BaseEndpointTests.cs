@@ -57,8 +57,8 @@ public class BaseEndpointTests
         problemDetails.ProblemDetails.Should().BeOfType<HttpValidationProblemDetails>();
         HttpValidationProblemDetails validationProblemDetails = (HttpValidationProblemDetails)problemDetails.ProblemDetails;
         validationProblemDetails.Status.Should().Be(StatusCodes.Status422UnprocessableEntity);
-        validationProblemDetails.Title.Should().Be("Validation Error");
-        validationProblemDetails.Detail.Should().Be("One or more validation errors occurred.");
+        validationProblemDetails.Title.Should().Be("General.Validation");
+        validationProblemDetails.Detail.Should().Be("OneOrMoreValidationErrorsOccurred");
         validationProblemDetails.Type.Should().Be("https://tools.ietf.org/html/rfc4918#section-11.2");
         validationProblemDetails.Errors.Should().HaveCount(2);
         validationProblemDetails.Errors["Code1"].Should().BeEquivalentTo(["Description1"]);
@@ -112,8 +112,8 @@ public class BaseEndpointTests
         ProblemHttpResult problemResult = (ProblemHttpResult)result;
         problemResult.StatusCode.Should().Be(422);
         problemResult.ProblemDetails.Status.Should().Be(StatusCodes.Status422UnprocessableEntity);
-        problemResult.ProblemDetails.Title.Should().Be("Validation Error");
-        problemResult.ProblemDetails.Detail.Should().Be("One or more validation errors occurred.");
+        problemResult.ProblemDetails.Title.Should().Be("General.Validation");
+        problemResult.ProblemDetails.Detail.Should().Be("OneOrMoreValidationErrorsOccurred");
         problemResult.ProblemDetails.Instance.Should().NotBeNull();
         problemResult.ProblemDetails.Extensions.Should().ContainKey("traceId");
     }
@@ -159,8 +159,8 @@ public class BaseEndpointTests
         problemDetails.ProblemDetails.Should().BeOfType<HttpValidationProblemDetails>();
         HttpValidationProblemDetails validationProblemDetails = (HttpValidationProblemDetails)problemDetails.ProblemDetails;
         validationProblemDetails.Status.Should().Be(StatusCodes.Status422UnprocessableEntity);
-        validationProblemDetails.Title.Should().Be("Validation Error");
-        validationProblemDetails.Detail.Should().Be("One or more validation errors occurred.");
+        validationProblemDetails.Title.Should().Be("General.Validation");
+        validationProblemDetails.Detail.Should().Be("OneOrMoreValidationErrorsOccurred");
         validationProblemDetails.Type.Should().Be("https://tools.ietf.org/html/rfc4918#section-11.2");
         validationProblemDetails.Errors.Should().HaveCount(2);
         validationProblemDetails.Errors["Code1"].Should().BeEquivalentTo(["Description1"]);

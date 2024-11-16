@@ -226,8 +226,8 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
         problemDetails.Should().NotBeNull();
         problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status422UnprocessableEntity);
         problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc4918#section-11.2");
-        problemDetails["title"].GetString().Should().Be("Validation Error");
-        problemDetails["detail"].GetString().Should().Be("One or more validation errors occurred.");
+        problemDetails["title"].GetString().Should().Be("General.Validation");
+        problemDetails["detail"].GetString().Should().Be("OneOrMoreValidationErrorsOccurred");
         problemDetails["instance"].GetString().Should().Be("/api/v1/auth/login");
         problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
 

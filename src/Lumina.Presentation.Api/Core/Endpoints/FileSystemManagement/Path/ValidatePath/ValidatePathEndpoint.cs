@@ -37,7 +37,6 @@ public class ValidatePathEndpoint : BaseEndpoint<ValidatePathRequest, IResult>
         Verbs(Http.GET);
         Routes(ApiRoutes.Path.VALIDATE);
         Version(1);
-        AllowAnonymous();
         DontCatchExceptions();
     }
 
