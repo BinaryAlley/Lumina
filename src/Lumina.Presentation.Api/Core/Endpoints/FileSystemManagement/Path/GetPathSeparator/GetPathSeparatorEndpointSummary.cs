@@ -7,7 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.GetPathSeparator;
 
 /// <summary>
-/// Class used for providing a textual description for the <see cref="GetPathSeparatorEndpoint"/> API endpoint, for Swagger.
+/// Class used for providing a textual description for the <see cref="GetPathSeparatorEndpoint"/> API endpoint, for OpenAPI.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetPathSeparatorEndpointSummary : Summary<GetPathSeparatorEndpoint>

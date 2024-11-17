@@ -9,7 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authentication.ChangePassword;
 
 /// <summary>
-/// Class used for providing a textual description for the <see cref="ChangePasswordEndpoint"/> API endpoint, for Swagger.
+/// Class used for providing a textual description for the <see cref="ChangePasswordEndpoint"/> API endpoint, for OpenAPI.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class ChangePasswordEndpointSummary : Summary<ChangePasswordEndpoint, ChangePasswordRequest>

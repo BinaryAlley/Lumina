@@ -14,9 +14,14 @@ namespace Lumina.Presentation.Web.Common.Models.Libraries;
 public class LibraryModel
 {
     /// <summary>
-    /// Gets or sets the unique identifier of the library.
+    /// Gets or sets the unique identifier of the media library.
     /// </summary>
     public Guid? Id { get; set; }
+
+    /// <summary>
+    /// Gets or sets the unique identifier of the user owning the media library.
+    /// </summary>
+    public Guid? UserId { get; set; }
 
     /// <summary>
     /// Gets or sets the title of the library.
@@ -26,7 +31,7 @@ public class LibraryModel
     /// <summary>
     /// Gets or sets the type of the library.
     /// </summary>
-    public LibraryType? LibraryType { get; set; }
+    public string? LibraryType { get; set; }
 
     /// <summary>
     /// Gets or sets the collection of directories that contain the library files.

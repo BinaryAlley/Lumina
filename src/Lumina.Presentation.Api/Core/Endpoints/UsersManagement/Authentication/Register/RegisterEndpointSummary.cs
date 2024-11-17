@@ -13,7 +13,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authentication.Register;
 
 /// <summary>
-/// Class used for providing a textual description for the <see cref="RegisterEndpoint"/> API endpoint, for Swagger.
+/// Class used for providing a textual description for the <see cref="RegisterEndpoint"/> API endpoint, for OpenAPI.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class RegisterEndpointSummary : Summary<RegisterEndpoint, RegistrationRequest>

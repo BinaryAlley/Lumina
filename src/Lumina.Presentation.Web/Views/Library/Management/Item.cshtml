@@ -11,15 +11,18 @@
     var scriptId = ScriptIdentifierHelper.GenerateScriptId();
 }
 
+@inject IUrlService _urlService
+
 @model LibraryModel
 
 @await Component.InvokeAsync("FileSystemBrowser")
 
 <div class="enlightenment-panel shadow-effect p-2 mx-auto panel w-50 mb-10" style="min-width: 320px; margin-top: 1rem;">
     <div class="shine-effect"></div>
-    <form asp-controller="LibraryManagement" asp-action="EditLibrary" method="post" id="add-media-library-form">
+    <form asp-controller="LibraryManagement" asp-action="EditLibrary" method="post" id="add-media-library-form" class="inline">
         @Html.AntiForgeryToken()
         <input type="hidden" asp-for="Id" value="@id" />
+        <input type="hidden" asp-for="UserId" value="@Model.UserId"/>
         <div class="form-row">
             <h1 class="text-light-two w-100 text-center pt-0 pb-0 engraved-title">@(id is not null ? "Edit" : "Add New") Library</h1>
         </div>
@@ -52,9 +55,44 @@
                         <div class="enlightenment-dropdown">
                             <div class="shine-effect" style="top: -4px;"></div>
                             <!-- Dropdown options remain the same -->
-                            <div class="enlightenment-option first-option disabled">Book</div>
+                            <div class="enlightenment-option first-option disabled">Written Content</div>
                             <div class="enlightenment-option" data-value="Book">Book</div>
-                            <!-- ... rest of the options ... -->
+                            <div class="enlightenment-option" data-value="EBook">E Book</div>
+                            <div class="enlightenment-option" data-value="BookSeries">Book Series</div>
+                            <div class="enlightenment-option" data-value="ComicBook">Comic Book</div>
+                            <div class="enlightenment-option" data-value="ComicSeries">Comic Series</div>
+                            <div class="enlightenment-option" data-value="Magazine">Magazine</div>
+                            <div class="enlightenment-option" data-value="Manga">Manga</div>
+                            <div class="enlightenment-option" data-value="GraphicNovel">Graphic Novel</div>
+                            <div class="enlightenment-option" data-value="AcademicPaper">Academic Paper</div>
+                            <div class="enlightenment-option" data-value="SheetMusic">Sheet Music</div>
+                            <div class="enlightenment-option" data-value="Screenplay">Screenplay</div>
+                            <div class="enlightenment-option disabled">Video Content</div>
+                            <div class="enlightenment-option" data-value="TvShow">Tv Show</div>
+                            <div class="enlightenment-option" data-value="Movie">Movie</div>
+                            <div class="enlightenment-option" data-value="FilmSeries">Film Series</div>
+                            <div class="enlightenment-option" data-value="FilmFranchise">Film Franchise</div>
+                            <div class="enlightenment-option" data-value="Concert">Concert</div>
+                            <div class="enlightenment-option" data-value="Documentary">Documentary</div>
+                            <div class="enlightenment-option" data-value="Tutorial">Tutorial</div>
+                            <div class="enlightenment-option" data-value="Personal">Personal</div>
+                            <div class="enlightenment-option" data-value="Anime">Anime</div>
+                            <div class="enlightenment-option" data-value="Youtube">Youtube</div>
+                            <div class="enlightenment-option" data-value="Videoclip">Videoclip</div>
+                            <div class="enlightenment-option disabled">Audio Content</div>
+                            <div class="enlightenment-option" data-value="Music">Music</div>
+                            <div class="enlightenment-option" data-value="AudioBook">Audio Book</div>
+                            <div class="enlightenment-option" data-value="LivePerformance">Live Performance</div>
+                            <div class="enlightenment-option" data-value="Interview">Interview</div>
+                            <div class="enlightenment-option" data-value="Cover">Cover</div>
+                            <div class="enlightenment-option" data-value="Remix">Remix</div>
+                            <div class="enlightenment-option" data-value="Soundeffect">Soundeffect</div>
+                            <div class="enlightenment-option" data-value="Podcast">Podcast</div>
+                            <div class="enlightenment-option" data-value="RadioShow">Radio Show</div>
+                            <div class="enlightenment-option disabled">Visual Content</div>
+                            <div class="enlightenment-option" data-value="PhotoAlbum">Photo Album</div>
+                            <div class="enlightenment-option disabled">Miscellaneous Content</div>
+                            <div class="enlightenment-option last-option" data-value="Other">Other</div>
                         </div>
                     </div>
                 </div>
@@ -85,9 +123,18 @@
             </div>
         </div>
     </form>
+    <!-- section success -->
+    <div class="text-center w-100">
+        <p id="save-success" class="text-light-one w-100 hidden">Library Saved</p>
+        <button id="btn-back-to-libraries" type="button" class="abort-button h-22px w-150px mx-auto mt-10 hidden">Back To Libraries</button>
+        <button id="btn-add-new-library" type="button" class="confirm-button h-22px w-150px mx-auto mt-10 hidden">Add New Library</button>
+    </div>
 </div>
 @section Scripts {
     <script type="text/javascript" data-form="@scriptId" defer>
+        const saveSuccess = document.getElementById('save-success');
+        const btnBackToLibraries = document.getElementById('btn-back-to-libraries');
+        const btnAddNewLibrary = document.getElementById('btn-add-new-library');
 
         document.getElementById('add-media-library-form').addEventListener('keypress', async (event) => {
             if (event.key === 'Enter') {
@@ -105,18 +152,28 @@
         async function handleAddMediaLibrary(form) {
             const formData = {
                 Id: form.querySelector('[name="Id"]').value || null,
+                UserId: form.querySelector('[name="UserId"]').value || null,
                 Title: form.querySelector('[name="Title"]').value,
                 LibraryType: form.querySelector('.enlightenment-selected-text').textContent,
                 ContentLocations: Array.from(form.querySelectorAll('.form-table-row span'))
                     .map(span => span.textContent)
             };
-            const result = await callApiPostAsync('/library/manage/item', formData);
-            if (result) {
-                // Optional: Handle successful response
-                // For example, redirect after success
-                // window.location.href = '/library/manage';
+            const data = await callApiPostAsync('@_urlService.GetAbsoluteUrl("SaveLibrary", "LibraryManagement")', formData);
+            if (data) {
+                form.classList.replace('inline', 'hidden');
+                saveSuccess.classList.replace('hidden', 'inline');
+                btnAddNewLibrary.classList.replace('hidden', 'block');
+                btnBackToLibraries.classList.replace('hidden', 'block');
             }
         }
+
+        btnBackToLibraries.addEventListener('click', () => {
+            window.location.href = '@_urlService.GetAbsoluteUrl("Index", "LibraryManagement")';
+        });
+
+        btnAddNewLibrary.addEventListener('click', () => {
+            window.location.href = '@_urlService.GetAbsoluteUrl("EditLibrary", "LibraryManagement")';
+        });
 
         document.getElementById('add-media-directory').addEventListener('click', function () {
             showFileSystemBrowserDialogAsync('C:\\Users\\', true, false, addNewPaths); // TODO: take path and include hidden elements from settings

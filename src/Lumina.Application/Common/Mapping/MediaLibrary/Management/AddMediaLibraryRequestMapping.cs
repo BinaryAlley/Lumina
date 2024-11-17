@@ -2,6 +2,7 @@
 using Lumina.Application.Core.MediaLibrary.Management.Commands.AddLibrary;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook;
 using Lumina.Contracts.Requests.MediaLibrary.Management;
+using Lumina.Domain.Common.Enums.MediaLibrary;
 using System;
 #endregion
 
@@ -16,7 +17,7 @@ public static class AddMediaLibraryRequestMapping
     /// Converts <paramref name="request"/> to <see cref="AddLibraryCommand"/>.
     /// </summary>
     /// <param name="request">The request to be converted.</param>
-    /// <param name="userId">The Id of the user owning the media library. Required.</param>
+    /// <param name="userId">The Id of the user owning the media library.</param>
     /// <returns>The converted command.</returns>
     public static AddLibraryCommand ToCommand(this AddLibraryRequest request, Guid userId)
     {

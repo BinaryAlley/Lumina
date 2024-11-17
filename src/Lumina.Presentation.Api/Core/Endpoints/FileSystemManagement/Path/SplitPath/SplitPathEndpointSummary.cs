@@ -9,7 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.SplitPath;
 
 /// <summary>
-/// Class used for providing a textual description for the <see cref="SplitPathEndpoint"/> API endpoint, for Swagger.
+/// Class used for providing a textual description for the <see cref="SplitPathEndpoint"/> API endpoint, for OpenAPI.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class SplitPathEndpointSummary : Summary<SplitPathEndpoint, SplitPathRequest>

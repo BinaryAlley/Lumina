@@ -6,14 +6,12 @@ using Lumina.Domain.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-
-
 #endregion
 
 namespace Lumina.Presentation.Api.Core.Endpoints.Library.Management.AddLibrary;
 
 /// <summary>
-/// Class used for providing a textual description for the <see cref="AddLibraryEndpoint"/> API endpoint, for Swagger.
+/// Class used for providing a textual description for the <see cref="AddLibraryEndpoint"/> API endpoint, for OpenAPI.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class AddLibraryEndpointSummary : Summary<AddLibraryEndpoint, AddLibraryRequest>
@@ -28,7 +26,7 @@ public class AddLibraryEndpointSummary : Summary<AddLibraryEndpoint, AddLibraryR
 
         ExampleRequest = new AddLibraryRequest(
             Title: "TV Shows",
-            LibraryType: LibraryType.TvShow,
+            LibraryType: "TvShow",
             ContentLocations: [
                 "/media/tv shows/drama/",
                 "/media/tv shows/SCI-FI/",

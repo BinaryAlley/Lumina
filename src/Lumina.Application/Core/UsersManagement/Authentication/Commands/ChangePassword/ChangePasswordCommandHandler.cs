@@ -46,7 +46,7 @@ public class ChangePasswordCommandHandler : IRequestHandler<ChangePasswordComman
     public async ValueTask<ErrorOr<ChangePasswordResponse>> Handle(ChangePasswordCommand request, CancellationToken cancellationToken)
     {
         IUserRepository userRepository = _unitOfWork.GetRepository<IUserRepository>();
-        ErrorOr<UserEntity?> resultSelectUser = await userRepository.GetByUsernameAsync(request.Username!, cancellationToken);
+        ErrorOr<UserEntity?> resultSelectUser = await userRepository.GetByUsernameAsync(request.Username!, cancellationToken).ConfigureAwait(false);
         if (resultSelectUser.IsError)
             return resultSelectUser.Errors;
         else if (resultSelectUser.Value is null)
@@ -59,7 +59,7 @@ public class ChangePasswordCommandHandler : IRequestHandler<ChangePasswordComman
         resultSelectUser.Value.TempPassword = null;
         resultSelectUser.Value.TempPasswordCreated = null;
         // update the user
-        ErrorOr<Updated> resultUpdateUser = await userRepository.UpdateAsync(resultSelectUser.Value, cancellationToken);
+        ErrorOr<Updated> resultUpdateUser = await userRepository.UpdateAsync(resultSelectUser.Value, cancellationToken).ConfigureAwait(false);
         if (resultUpdateUser.IsError)
             return resultUpdateUser.Errors;
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

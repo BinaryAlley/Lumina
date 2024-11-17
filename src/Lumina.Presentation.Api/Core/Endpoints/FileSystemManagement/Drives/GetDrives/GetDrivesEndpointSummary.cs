@@ -9,7 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Drives.GetDrives;
 
 /// <summary>
-/// Class used for providing a textual description for the <see cref="GetDrivesEndpoint"/> API endpoint, for Swagger.
+/// Class used for providing a textual description for the <see cref="GetDrivesEndpoint"/> API endpoint, for OpenAPI.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetDrivesEndpointSummary : Summary<GetDrivesEndpoint>

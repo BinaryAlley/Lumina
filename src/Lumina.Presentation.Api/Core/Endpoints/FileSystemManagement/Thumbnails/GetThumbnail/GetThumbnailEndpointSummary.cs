@@ -8,7 +8,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Thumbnails.GetThumbnail;
 
 /// <summary>
-/// Class used for providing a textual description for the <see cref="GetThumbnailEndpoint"/> API endpoint, for Swagger.
+/// Class used for providing a textual description for the <see cref="GetThumbnailEndpoint"/> API endpoint, for OpenAPI.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetThumbnailEndpointSummary : Summary<GetThumbnailEndpoint, GetThumbnailRequest>

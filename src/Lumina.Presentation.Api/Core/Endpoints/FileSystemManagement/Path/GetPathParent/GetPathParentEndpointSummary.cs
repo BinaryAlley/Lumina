@@ -9,7 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.GetPathParent;
 
 /// <summary>
-/// Class used for providing a textual description for the <see cref="GetPathParentEndpoint"/> API endpoint, for Swagger.
+/// Class used for providing a textual description for the <see cref="GetPathParentEndpoint"/> API endpoint, for OpenAPI.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetPathParentEndpointSummary : Summary<GetPathParentEndpoint, GetPathParentRequest>

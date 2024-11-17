@@ -9,7 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.CombinePath;
 
 /// <summary>
-/// Class used for providing a textual description for the <see cref="CombinePathEndpoint"/> API endpoint, for Swagger.
+/// Class used for providing a textual description for the <see cref="CombinePathEndpoint"/> API endpoint, for OpenAPI.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class CombinePathEndpointSummary : Summary<CombinePathEndpoint, CombinePathRequest>

@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -40,7 +39,7 @@ public class FilesController : Controller
     public async Task<IActionResult> GetTreeFiles([FromQuery] string path, [FromQuery] bool includeHiddenElements, CancellationToken cancellationToken)
     {
         IEnumerable<FileSystemTreeNodeModel> response = await _apiHttpClient.GetAsync<FileSystemTreeNodeModel[]>(
-            $"files/get-tree-files?path={Uri.EscapeDataString(path)}&includeHiddenElements={includeHiddenElements}", cancellationToken: cancellationToken);
+            $"files/get-tree-files?path={Uri.EscapeDataString(path)}&includeHiddenElements={includeHiddenElements}", cancellationToken);
         return Json(new { success = true, data = response });
     }
 
@@ -54,7 +53,7 @@ public class FilesController : Controller
     public async Task<IActionResult> GetFiles([FromQuery] string path, [FromQuery] bool includeHiddenElements, CancellationToken cancellationToken)
     {
         IEnumerable<FileModel> response = await _apiHttpClient.GetAsync<FileModel[]>(
-           $"files/get-files?path={Uri.EscapeDataString(path)}&includeHiddenElements={includeHiddenElements}", cancellationToken: cancellationToken);
+           $"files/get-files?path={Uri.EscapeDataString(path)}&includeHiddenElements={includeHiddenElements}", cancellationToken);
         return Json(new { success = true, data = response });
     }
 }

@@ -11,6 +11,7 @@ public static partial class Errors
 {
     public static class Authorization
     {
+        public static Error NotAuthorized => Error.Unauthorized(description: nameof(NotAuthorized));
         public static Error AdminAccountAlreadyCreated => Error.Unauthorized(description: nameof(AdminAccountAlreadyCreated));
     }
 }

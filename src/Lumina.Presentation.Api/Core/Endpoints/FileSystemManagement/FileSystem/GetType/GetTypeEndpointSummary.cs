@@ -8,7 +8,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.FileSystem.GetType;
 
 /// <summary>
-/// Class used for providing a textual description for the <see cref="GetTypeEndpoint"/> API endpoint, for Swagger.
+/// Class used for providing a textual description for the <see cref="GetTypeEndpoint"/> API endpoint, for OpenAPI.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetTypeEndpointSummary : Summary<GetTypeEndpoint, FileSystemTypeResponse>

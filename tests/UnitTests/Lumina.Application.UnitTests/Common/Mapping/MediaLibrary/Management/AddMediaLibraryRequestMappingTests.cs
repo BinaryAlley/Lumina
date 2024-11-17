@@ -23,7 +23,7 @@ public class AddMediaLibraryRequestMappingTests
         Guid userId = Guid.NewGuid();
         AddLibraryRequest request = new(
             "My Library",
-            LibraryType.Book,
+            "Book",
             ["C:/Books", "D:/Media/Books"]
         );
 
@@ -49,7 +49,7 @@ public class AddMediaLibraryRequestMappingTests
         Guid userId = Guid.NewGuid();
         AddLibraryRequest request = new(
             "My Library",
-            libraryType,
+            libraryType.ToString(),
             ["C:/Media"]
         );
 
@@ -60,7 +60,7 @@ public class AddMediaLibraryRequestMappingTests
         result.Should().NotBeNull();
         result.UserId.Should().Be(userId);
         result.Title.Should().Be(request.Title);
-        result.LibraryType.Should().Be(libraryType);
+        result.LibraryType.Should().Be(libraryType.ToString());
         result.ContentLocations.Should().BeEquivalentTo(request.ContentLocations);
     }
 
@@ -79,7 +79,7 @@ public class AddMediaLibraryRequestMappingTests
         Guid userId = Guid.NewGuid();
         AddLibraryRequest request = new(
             "My Library",
-            LibraryType.Book,
+            "Book",
             contentLocations
         );
 
