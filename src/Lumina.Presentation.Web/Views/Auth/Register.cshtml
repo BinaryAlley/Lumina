@@ -7,6 +7,8 @@
 
 @{
     string? registrationType = ViewData["RegistrationType"] as string;
+    // generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler
+    var scriptId = ScriptIdentifierHelper.GenerateScriptId();
 }
 
 @inject IUrlService _urlService
@@ -91,7 +93,8 @@
     </div>
 </div>
 @section Scripts {
-    <script type="text/javascript" defer>
+    <script type="text/javascript" data-form="@scriptId" defer>
+        const btnLogin = document.getElementById('btn-login');
         document.getElementById('register-account-form').addEventListener('keypress', async (event) => {
             if (event.key === 'Enter') {
                 event.preventDefault();
@@ -111,7 +114,6 @@
             const txtPasswordConfirm = form.querySelector('[name="PasswordConfirm"]');
             const chkUse2FA = form.querySelector('[name="Use2fa"]');
             const registerSuccess = document.getElementById('register-success');
-            const btnLogin = document.getElementById('btn-login');
             const totpMessage = document.querySelector('#totp-message');
             const totpImage = document.querySelector('#totp-image');
             const formData = {
@@ -128,7 +130,8 @@
                 txtPasswordConfirm.value = '';
                 form.classList.replace('inline', 'hidden');
                 registerSuccess.classList.replace('hidden', 'inline');
-                btnLogin.classList.replace('hidden', 'block');
+                if (btnLogin)
+                    btnLogin.classList.replace('hidden', 'block');
                 if (chkUse2FA.checked) {
                     totpMessage.classList.remove('hidden');
                     totpMessage.classList.add('block');
@@ -147,8 +150,10 @@
             );
             document.getElementById('#hidden-use-two-fa').value = isChecked.toString();
         });
-        document.getElementById('btn-login').addEventListener('click', () => {
-            window.location.href = '@_urlService.GetAbsoluteUrl("Login", "Auth")';
-        });
+        if (btnLogin) {
+            btnLogin.addEventListener('click', () => {
+                window.location.href = '@_urlService.GetAbsoluteUrl("Login", "Auth")';
+            });
+        }
     </script>
 }

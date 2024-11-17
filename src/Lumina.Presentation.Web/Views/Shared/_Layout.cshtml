@@ -46,6 +46,8 @@
 
     <script defer src="~/js/notifications.js" asp-append-version="true"></script>
     <script defer src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+    <div data-section="scripts">
+        @await RenderSectionAsync("Scripts", required: false)
+    </div>
 </body>
 </html>
