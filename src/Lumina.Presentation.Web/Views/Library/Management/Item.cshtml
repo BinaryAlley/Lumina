@@ -3,9 +3,12 @@
 *@
 
 @using Lumina.Presentation.Web.Common.Models.Libraries
+@using Lumina.Presentation.Web.Common.Services
 
 @{
     var id = Context.Request.RouteValues["id"] as string;
+    // generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler
+    var scriptId = ScriptIdentifierHelper.GenerateScriptId();
 }
 
 @model LibraryModel
@@ -84,7 +87,8 @@
     </form>
 </div>
 @section Scripts {
-    <script type="text/javascript" defer>
+    <script type="text/javascript" data-form="@scriptId" defer>
+
         document.getElementById('add-media-library-form').addEventListener('keypress', async (event) => {
             if (event.key === 'Enter') {
                 event.preventDefault();
@@ -116,6 +120,12 @@
 
         document.getElementById('add-media-directory').addEventListener('click', function () {
             showFileSystemBrowserDialogAsync('C:\\Users\\', true, false, addNewPaths); // TODO: take path and include hidden elements from settings
+        });
+
+        document.querySelectorAll('.remove-form-table-row-icon').forEach(icon => {
+            icon.addEventListener('click', function () {
+                this.parentElement.remove();
+            });
         });
 
         function addNewPaths(selectedPaths) {
