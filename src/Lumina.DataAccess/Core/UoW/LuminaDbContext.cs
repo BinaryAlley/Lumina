@@ -9,6 +9,8 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.DataAccess.Core.UoW;
@@ -45,13 +47,37 @@ public class LuminaDbContext : DbContext
         base.OnModelCreating(modelBuilder);
     }
 
-    // TODO: implement async versions of SaveChanges
-
     /// <summary>
     /// Overrides the SaveChanges method of the DbContext class to automatically set the Created and Updated properties of entities that implement the <see cref="IStorageEntity"/>.
     /// </summary>
     /// <returns>The number of objects written to the underlying database.</returns>
     public override int SaveChanges()
+    {
+        HandleTimestamps();
+        return base.SaveChanges();
+    }
+
+    /// <summary>
+    /// Overrides the SaveChangesAsync method of the DbContext class to automatically set the Created and Updated properties of entities that implement the <see cref="IStorageEntity"/>.
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns>A <see cref="Task"/> containing the number of objects written to the underlying database.</returns>
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        HandleTimestamps();
+        return base.SaveChangesAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// Updates timestamp properties for tracked entities implementing <see cref="IStorageEntity"/> based on their state in the change tracker.
+    /// </summary>
+    /// <remarks>
+    /// <list type="bullet">
+    /// <item><description><c>Created</c>: Set for added entities.</description></item>
+    /// <item><description><c>Updated</c>: Set for modified entities.</description></item>
+    /// </list>
+    /// </remarks>
+    private void HandleTimestamps()
     {
         // get all the entity entries that are either added or modified
         IEnumerable<EntityEntry> entries = ChangeTracker.Entries()
@@ -66,6 +92,5 @@ public class LuminaDbContext : DbContext
             else if (entityEntry.State == EntityState.Modified)
                 ((IStorageEntity)entityEntry.Entity).Updated = DateTime.UtcNow;
         }
-        return base.SaveChanges();
     }
 }
