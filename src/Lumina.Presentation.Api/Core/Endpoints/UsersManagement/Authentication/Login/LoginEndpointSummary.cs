@@ -10,7 +10,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authentication.Login;
 
 /// <summary>
-/// Class used for providing a textual description for the <see cref="LoginEndpoint"/> API endpoint, for Swagger.
+/// Class used for providing a textual description for the <see cref="LoginEndpoint"/> API endpoint, for OpenAPI.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class LoginEndpointSummary : Summary<LoginEndpoint, LoginRequest>

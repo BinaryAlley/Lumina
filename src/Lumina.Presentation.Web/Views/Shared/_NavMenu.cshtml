@@ -24,9 +24,9 @@
                 }
                 @if (User?.Identity?.IsAuthenticated == true)
                 {
-                    <li><a href="@_urlService.GetAbsoluteUrl("Login", "Auth")"><span>Register</span></a></li>
-                    <li><a href="@_urlService.GetAbsoluteUrl("Login", "Auth")"><span>Change Password</span></a></li>
-                    <li><a href="@_urlService.GetAbsoluteUrl("Login", "Auth")"><span>Profile</span></a></li>
+                    <li><a href="@_urlService.GetAbsoluteUrl("Register", "Auth")" class="nav-link"><span>Register</span></a></li>
+                    <li><a href="@_urlService.GetAbsoluteUrl("ChangePassword", "Auth")" class="nav-link"><span>Change Password</span></a></li>
+                    <li><a href="@_urlService.GetAbsoluteUrl("Profile", "Auth")" class="nav-link"><span>Profile</span></a></li>
                 }
             </ul>
             @if (User?.Identity?.IsAuthenticated == true)
@@ -42,7 +42,7 @@
                 </div>
                 <ul>
                     <li><a href="library/manage"><span>Manage libraries</span></a></li>
-                    <li><a href="library/manage/item"><span>Add media library</span></a></li>
+                    <li><a href="@_urlService.GetAbsoluteUrl("EditLibrary", "LibraryManagement")" class="nav-link"><span>Add new library</span></a></li>
                 </ul>
                 <div class="mobile-menu-heading">
                     Written Content
@@ -93,9 +93,9 @@
                 }
                 @if (User?.Identity?.IsAuthenticated == true)
                 {
-                    <li><a href="@_urlService.GetAbsoluteUrl("Register", "Auth")">Register</a></li>
-                    <li><a href="@_urlService.GetAbsoluteUrl("ChangePassword", "Auth")">Change Password</a></li>
-                    <li><a href="@_urlService.GetAbsoluteUrl("Profile", "Auth")">Profile</a></li>
+                    <li><a href="@_urlService.GetAbsoluteUrl("Register", "Auth")" class="nav-link">Register</a></li>
+                    <li><a href="@_urlService.GetAbsoluteUrl("ChangePassword", "Auth")" class="nav-link">Change Password</a></li>
+                    <li><a href="@_urlService.GetAbsoluteUrl("Profile", "Auth")" class="nav-link">Profile</a></li>
                 }
             </ul>
         </li>
@@ -113,7 +113,7 @@
                 <label for="library-menu">Library</label>
                 <ul>
                     <li tabindex="0"><a href="library/manage">Manage libraries</a></li>
-                    <li tabindex="0"><a href="library/manage/item">Add new library</a></li>
+                    <li tabindex="0"><a href="@_urlService.GetAbsoluteUrl("EditLibrary", "LibraryManagement")" class="nav-link">Add new library</a></li>
                     <li class="has-submenu" tabindex="0">
                         <label>Written Content</label>
                         <ul>

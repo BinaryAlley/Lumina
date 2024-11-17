@@ -34,7 +34,7 @@ public class DrivesController : Controller
     [HttpGet("get-drives")]
     public async Task<IActionResult> GetDrives(CancellationToken cancellationToken)
     {
-        FileSystemTreeNodeModel[] response = await _apiHttpClient.GetAsync<FileSystemTreeNodeModel[]>($"drives/get-drives", cancellationToken: cancellationToken);
+        FileSystemTreeNodeModel[] response = await _apiHttpClient.GetAsync<FileSystemTreeNodeModel[]>($"drives/get-drives", cancellationToken);
         return Json(new { success = true, data = new { drives = response } });
     }
 }

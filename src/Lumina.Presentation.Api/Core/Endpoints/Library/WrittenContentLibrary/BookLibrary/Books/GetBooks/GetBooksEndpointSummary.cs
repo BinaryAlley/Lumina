@@ -13,7 +13,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.GetBooks;
 
 /// <summary>
-/// Class used for providing a textual description for the <see cref="GetBooksEndpoint"/> API endpoint, for Swagger.
+/// Class used for providing a textual description for the <see cref="GetBooksEndpoint"/> API endpoint, for OpenAPI.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetBooksEndpointSummary : Summary<GetBooksEndpoint>

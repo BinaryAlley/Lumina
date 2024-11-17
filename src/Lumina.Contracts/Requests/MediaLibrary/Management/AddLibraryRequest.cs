@@ -1,6 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Enums.MediaLibrary;
-using System;
 using System.Diagnostics;
 #endregion
 
@@ -15,6 +13,6 @@ namespace Lumina.Contracts.Requests.MediaLibrary.Management;
 [DebuggerDisplay("Title: {Title}")]
 public record AddLibraryRequest(
     string? Title,
-    LibraryType? LibraryType,
+    string? LibraryType,
     string[]? ContentLocations
 );

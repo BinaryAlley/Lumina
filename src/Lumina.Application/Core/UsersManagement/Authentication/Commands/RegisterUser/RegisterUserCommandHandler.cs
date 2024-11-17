@@ -60,7 +60,7 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, E
     {
         // check if any users already exists (admin account is only set once!)
         IUserRepository userRepository = _unitOfWork.GetRepository<IUserRepository>();
-        ErrorOr<UserEntity?> resultSelectUser = await userRepository.GetByUsernameAsync(request.Username!, cancellationToken);
+        ErrorOr<UserEntity?> resultSelectUser = await userRepository.GetByUsernameAsync(request.Username!, cancellationToken).ConfigureAwait(false);
         if (resultSelectUser.IsError)
             return resultSelectUser.Errors;
         else if (resultSelectUser.Value is not null)
@@ -85,7 +85,7 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, E
             user.TotpSecret = _cryptographyService.Encrypt(Convert.ToBase64String(secret));
         }
         // insert the user
-        ErrorOr<Created> resultInsertUser = await userRepository.InsertAsync(user, cancellationToken);
+        ErrorOr<Created> resultInsertUser = await userRepository.InsertAsync(user, cancellationToken).ConfigureAwait(false);
         if (resultInsertUser.IsError)
             return resultInsertUser.Errors;
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

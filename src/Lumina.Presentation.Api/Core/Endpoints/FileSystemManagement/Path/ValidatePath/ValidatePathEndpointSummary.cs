@@ -9,7 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.ValidatePath;
 
 /// <summary>
-/// Class used for providing a textual description for the <see cref="ValidatePathEndpoint"/> API endpoint, for Swagger.
+/// Class used for providing a textual description for the <see cref="ValidatePathEndpoint"/> API endpoint, for OpenAPI.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class ValidatePathEndpointSummary : Summary<ValidatePathEndpoint, ValidatePathRequest>

@@ -34,7 +34,7 @@ public class FileSystemController : Controller
     [HttpGet("get-type")]
     public async Task<IActionResult> GetType(CancellationToken cancellationToken)
     {
-        FileSystemTypeModel response = await _apiHttpClient.GetAsync<FileSystemTypeModel>($"file-system/get-type", cancellationToken: cancellationToken);
+        FileSystemTypeModel response = await _apiHttpClient.GetAsync<FileSystemTypeModel>($"file-system/get-type", cancellationToken);
         return Json(new { success = true, data = new { platformType = response.PlatformType.ToString() } });
     }
 }

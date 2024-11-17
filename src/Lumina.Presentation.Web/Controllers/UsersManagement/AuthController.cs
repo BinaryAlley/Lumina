@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
@@ -113,15 +114,16 @@ public class AuthController : Controller
     /// Registers a new account.
     /// </summary>
     /// <param name="data">User credentials used for registration.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     [AllowAnonymous]
     [ValidateAntiForgeryToken]
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] RegisterRequestModel data)
+    public async Task<IActionResult> Register([FromBody] RegisterRequestModel data, CancellationToken cancellationToken)
     {
         // call different endpoints based on the view hidden field - registration for normal users, or initial application admin account setup
         string endpoint = data.RegistrationType == "Admin" ? "initialization" : "auth/register";
         // attempt API registration
-        RegisterResponseModel response = await _apiHttpClient.PostAsync<RegisterResponseModel, RegisterRequestModel>(endpoint, data);
+        RegisterResponseModel response = await _apiHttpClient.PostAsync<RegisterResponseModel, RegisterRequestModel>(endpoint, data, cancellationToken);
         return Json(new { success = true, data = response });
     }
 
@@ -129,15 +131,16 @@ public class AuthController : Controller
     /// Logs in an account.
     /// </summary>
     /// <param name="data">User credentials used for login.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     [AllowAnonymous]
     [ValidateAntiForgeryToken]
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginRequestModel data)
+    public async Task<IActionResult> Login([FromBody] LoginRequestModel data, CancellationToken cancellationToken)
     {
         try
         {
             // attempt API registration
-            LoginResponseModel response = await _apiHttpClient.PostAsync<LoginResponseModel, LoginRequestModel>("auth/login", data);
+            LoginResponseModel response = await _apiHttpClient.PostAsync<LoginResponseModel, LoginRequestModel>("auth/login", data, cancellationToken);
             // store the received token in a secure cookie            
             Response.Cookies.Delete("Token");
             Response.Cookies.Append("Token", _cryptographyService.Encrypt(response.Token!), new CookieOptions
@@ -193,12 +196,13 @@ public class AuthController : Controller
     /// Recovers the password of an account.
     /// </summary>
     /// <param name="data">User credentials used for password recovery.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     [AllowAnonymous]
     [ValidateAntiForgeryToken]
     [HttpPost("recover-password")]
-    public async Task<IActionResult> RecoverPassword([FromBody] RecoverPasswordRequestModel data)
+    public async Task<IActionResult> RecoverPassword([FromBody] RecoverPasswordRequestModel data, CancellationToken cancellationToken)
     {
-        RecoverPasswordResponseModel response = await _apiHttpClient.PostAsync<RecoverPasswordResponseModel, RecoverPasswordRequestModel>("auth/recover-password", data);
+        RecoverPasswordResponseModel response = await _apiHttpClient.PostAsync<RecoverPasswordResponseModel, RecoverPasswordRequestModel>("auth/recover-password", data, cancellationToken);
         return Json(new { success = true, data = response });
     }
 
@@ -206,12 +210,13 @@ public class AuthController : Controller
     /// Changes the password of an account.
     /// </summary>
     /// <param name="data">User credentials used for password change.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     [ValidateAntiForgeryToken]
     [HttpPost("change-password")]
-    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestModel data)
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestModel data, CancellationToken cancellationToken)
     {
         data = data with { Username = User?.Identity?.Name }; // assign the currently logged in user as the user for which to change the password
-        ChangePasswordResponseModel response = await _apiHttpClient.PostAsync<ChangePasswordResponseModel, ChangePasswordRequestModel>("auth/change-password", data);
+        ChangePasswordResponseModel response = await _apiHttpClient.PostAsync<ChangePasswordResponseModel, ChangePasswordRequestModel>("auth/change-password", data, cancellationToken);
         return Json(new { success = true, data = response });
     }
 }

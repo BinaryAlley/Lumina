@@ -10,7 +10,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Directories.GetDirectories;
 
 /// <summary>
-/// Class used for providing a textual description for the <see cref="GetDirectoriesEndpoint"/> API endpoint, for Swagger.
+/// Class used for providing a textual description for the <see cref="GetDirectoriesEndpoint"/> API endpoint, for OpenAPI.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetDirectoriesEndpointSummary : Summary<GetDirectoriesEndpoint, GetDirectoriesRequest>

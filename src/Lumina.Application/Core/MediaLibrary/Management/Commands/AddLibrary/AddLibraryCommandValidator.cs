@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using FluentValidation;
+using Lumina.Domain.Common.Enums.MediaLibrary;
 using Lumina.Domain.Common.Errors;
 using System;
 #endregion
@@ -22,7 +23,8 @@ public class AddLibraryCommandValidator : AbstractValidator<AddLibraryCommand>
 
         RuleFor(x => x.LibraryType)
             .NotNull().WithMessage(Errors.Library.LibraryTypeCannotBeNull.Description)
-            .IsInEnum().WithMessage(Errors.Library.UnknownLibraryType.Description);
+            .Must(x => Enum.TryParse<LibraryType>(x, out _))
+            .WithMessage(Errors.Library.UnknownLibraryType.Description);
 
         RuleFor(x => x.ContentLocations)
             .NotNull().WithMessage(Errors.Library.PathsListCannotBeNull.Description)

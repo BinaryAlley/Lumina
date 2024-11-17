@@ -20,6 +20,6 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Commands.AddLibrary;
 public record AddLibraryCommand(
     Guid UserId,
     string? Title,
-    LibraryType? LibraryType,
+    string? LibraryType,
     string[]? ContentLocations
 ) : IRequest<ErrorOr<LibraryResponse>>;

@@ -9,7 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authentication.RecoverPassword;
 
 /// <summary>
-/// Class used for providing a textual description for the <see cref="RecoverPasswordEndpoint"/> API endpoint, for Swagger.
+/// Class used for providing a textual description for the <see cref="RecoverPasswordEndpoint"/> API endpoint, for OpenAPI.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class RecoverPasswordEndpointSummary : Summary<RecoverPasswordEndpoint, RecoverPasswordRequest>

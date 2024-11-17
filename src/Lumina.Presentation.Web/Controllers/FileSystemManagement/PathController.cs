@@ -36,7 +36,7 @@ public class PathController : Controller
     [HttpGet("get-path-root")]
     public async Task<IActionResult> GetPathRoot([FromQuery] string path, CancellationToken cancellationToken)
     {
-        PathSegmentModel response = await _apiHttpClient.GetAsync<PathSegmentModel>($"path/get-path-root?path={Uri.EscapeDataString(path)}", cancellationToken: cancellationToken);
+        PathSegmentModel response = await _apiHttpClient.GetAsync<PathSegmentModel>($"path/get-path-root?path={Uri.EscapeDataString(path)}", cancellationToken);
         return Json(new { success = true, data = new { root = response } });
     }
 
@@ -47,7 +47,7 @@ public class PathController : Controller
     [HttpGet("get-path-separator")]
     public async Task<IActionResult> GetPathSeparator(CancellationToken cancellationToken)
     {
-        PathSeparatorModel response = await _apiHttpClient.GetAsync<PathSeparatorModel>($"path/get-path-separator", cancellationToken: cancellationToken);
+        PathSeparatorModel response = await _apiHttpClient.GetAsync<PathSeparatorModel>($"path/get-path-separator", cancellationToken);
         return Json(new { success = true, data = new { pathSeparator = response.Separator } });
     }
 
@@ -59,7 +59,7 @@ public class PathController : Controller
     [HttpGet("get-path-parent")]
     public async Task<IActionResult> GetPathParent([FromQuery] string path, CancellationToken cancellationToken)
     {
-        PathSegmentModel[] response = await _apiHttpClient.GetAsync<PathSegmentModel[]>($"path/get-path-parent?path={Uri.EscapeDataString(path)}", cancellationToken: cancellationToken);
+        PathSegmentModel[] response = await _apiHttpClient.GetAsync<PathSegmentModel[]>($"path/get-path-parent?path={Uri.EscapeDataString(path)}", cancellationToken);
         return Json(new { success = true, data = new { pathSegments = response } });
     }
 
@@ -71,7 +71,7 @@ public class PathController : Controller
     [HttpGet("split")]
     public async Task<IActionResult> SplitPath([FromQuery] string path, CancellationToken cancellationToken)
     {
-        PathSegmentModel[] response = await _apiHttpClient.GetAsync<PathSegmentModel[]>($"path/split?path={Uri.EscapeDataString(path)}", cancellationToken: cancellationToken);
+        PathSegmentModel[] response = await _apiHttpClient.GetAsync<PathSegmentModel[]>($"path/split?path={Uri.EscapeDataString(path)}", cancellationToken);
         return Json(new { success = true, data = new { pathSegments = response } });
     }
 
@@ -83,7 +83,7 @@ public class PathController : Controller
     [HttpGet("validate")]
     public async Task<IActionResult> ValidatePath([FromQuery] string path, CancellationToken cancellationToken)
     {
-        PathValidModel response = await _apiHttpClient.GetAsync<PathValidModel>($"path/validate?path={Uri.EscapeDataString(path)}", cancellationToken: cancellationToken);
+        PathValidModel response = await _apiHttpClient.GetAsync<PathValidModel>($"path/validate?path={Uri.EscapeDataString(path)}", cancellationToken);
         return Json(new { success = true, data = new { isValid = response.IsValid } });
     }
 
@@ -96,7 +96,7 @@ public class PathController : Controller
     [HttpGet("check-path-exists")]
     public async Task<IActionResult> CheckPathExists([FromQuery] string path, [FromQuery] bool includeHiddenElements, CancellationToken cancellationToken)
     {
-        PathExistsModel response = await _apiHttpClient.GetAsync<PathExistsModel>($"path/check-path-exists?path={Uri.EscapeDataString(path)}&includeHiddenElements={includeHiddenElements}", cancellationToken: cancellationToken);
+        PathExistsModel response = await _apiHttpClient.GetAsync<PathExistsModel>($"path/check-path-exists?path={Uri.EscapeDataString(path)}&includeHiddenElements={includeHiddenElements}", cancellationToken);
         return Json(new { success = true, data = new { exists = response.Exists } });
     }
 }

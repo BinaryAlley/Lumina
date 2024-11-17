@@ -10,7 +10,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Lumina.Presentation.Api.Core.Endpoints.Maintenance.ApplicationSetup;
 
 /// <summary>
-/// Class used for providing a textual description for the <see cref="SetupApplicationEndpoint"/> API endpoint, for Swagger.
+/// Class used for providing a textual description for the <see cref="SetupApplicationEndpoint"/> API endpoint, for OpenAPI.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class SetupApplicationEndpointSummary : Summary<SetupApplicationEndpoint, RegistrationRequest>

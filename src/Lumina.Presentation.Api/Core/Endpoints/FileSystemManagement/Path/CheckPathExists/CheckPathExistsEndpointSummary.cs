@@ -10,7 +10,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.CheckPathExists;
 
 /// <summary>
-/// Class used for providing a textual description for the <see cref="CheckPathExistsEndpoint"/> API endpoint, for Swagger.
+/// Class used for providing a textual description for the <see cref="CheckPathExistsEndpoint"/> API endpoint, for OpenAPI.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class CheckPathExistsEndpointSummary : Summary<CheckPathExistsEndpoint, CheckPathExistsRequest>

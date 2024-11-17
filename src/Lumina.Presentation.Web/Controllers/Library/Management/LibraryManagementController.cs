@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using System;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
@@ -30,24 +31,27 @@ public class LibraryManagementController : Controller
     }
 
     [HttpGet("item/{id?}")]
-    public IActionResult EditLibrary(Guid? id = null)
+    public async Task<IActionResult> EditLibrary(Guid? id = null, CancellationToken cancellationToken = default)
     {
-        LibraryModel libraryModel = new()
-        {
-            Id = id,
-            LibraryType = LibraryType.Book,
-            ContentLocations = ["a", "b", "c"],
-            Title = ""
-        };
+        LibraryModel libraryModel = new();
+        if (id is not null)
+            libraryModel = await _apiHttpClient.GetAsync<LibraryModel>($"libraries/{id}", cancellationToken);
         return View("/Views/Library/Management/Item.cshtml", libraryModel);
     }
 
+    /// <summary>
+    /// Adds a new media library, or updates an existing one.
+    /// </summary>
+    /// <param name="data">The model containing the new library data.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    [ValidateAntiForgeryToken]
     [HttpPost("item")]
-    public async Task<IActionResult> SaveLibraryAsync([FromBody] LibraryModel model)
+    public async Task<IActionResult> SaveLibrary([FromBody] LibraryModel data, CancellationToken cancellationToken)
     {
-        LibraryModel response = model.Id.HasValue
-            ? await _apiHttpClient.PutAsync<LibraryModel, LibraryModel>($"libraries/{model.Id}", model)
-            : await _apiHttpClient.PostAsync<LibraryModel, LibraryModel>("libraries", model);
-        return Json(new { success = true });
+        // call different API endpoints based on whether this is a new library or an existing one
+        LibraryModel response = data.Id.HasValue
+            ? await _apiHttpClient.PutAsync<LibraryModel, LibraryModel>($"libraries/{data.Id}", data, cancellationToken)
+            : await _apiHttpClient.PostAsync<LibraryModel, LibraryModel>("libraries", data, cancellationToken);
+        return Json(new { success = true, data = response });
     }
 }

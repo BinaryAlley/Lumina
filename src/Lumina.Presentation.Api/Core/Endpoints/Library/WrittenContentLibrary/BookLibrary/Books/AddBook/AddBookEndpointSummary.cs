@@ -14,7 +14,7 @@ using System;
 namespace Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.AddBook;
 
 /// <summary>
-/// Class used for providing a textual description for the <see cref="AddBookEndpoint"/> API endpoint, for Swagger.
+/// Class used for providing a textual description for the <see cref="AddBookEndpoint"/> API endpoint, for OpenAPI.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class AddLibraryEndpointSummary : Summary<AddBookEndpoint, AddBookRequest>
