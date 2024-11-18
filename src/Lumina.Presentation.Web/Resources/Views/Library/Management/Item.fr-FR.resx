@@ -1,0 +1,276 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AcademicPaper" xml:space="preserve">
+    <value>Article Académique</value>
+  </data>
+  <data name="AddDirectory" xml:space="preserve">
+    <value>Ajouter un répertoire</value>
+  </data>
+  <data name="AddNewLibrary" xml:space="preserve">
+    <value>Ajouter Une Nouvelle Bibliothèque</value>
+  </data>
+  <data name="Anime" xml:space="preserve">
+    <value>Animé</value>
+  </data>
+  <data name="AudioBook" xml:space="preserve">
+    <value>Livre Audio</value>
+  </data>
+  <data name="AudioContent" xml:space="preserve">
+    <value>Contenu Audio</value>
+  </data>
+  <data name="BackToLibraries" xml:space="preserve">
+    <value>Retour Aux Bibliothèques</value>
+  </data>
+  <data name="Book" xml:space="preserve">
+    <value>Livre</value>
+  </data>
+  <data name="BookSeries" xml:space="preserve">
+    <value>Série de Livres</value>
+  </data>
+  <data name="ComicBook" xml:space="preserve">
+    <value>Bande Dessinée</value>
+  </data>
+  <data name="ComicSeries" xml:space="preserve">
+    <value>Série de Bandes Dessinées</value>
+  </data>
+  <data name="Concert" xml:space="preserve">
+    <value>Concert</value>
+  </data>
+  <data name="Cover" xml:space="preserve">
+    <value>Reprise</value>
+  </data>
+  <data name="DescriptionDirectories" xml:space="preserve">
+    <value>Sélectionnez les dossiers contenant les fichiers multimédias de cette bibliothèque</value>
+  </data>
+  <data name="DescriptionLibraryType" xml:space="preserve">
+    <value>Choisissez le type de contenu multimédia que contiendra cette bibliothèque</value>
+  </data>
+  <data name="DescriptionTitle" xml:space="preserve">
+    <value>Un nom pour identifier cette bibliothèque</value>
+  </data>
+  <data name="Directories" xml:space="preserve">
+    <value>Répertoires</value>
+  </data>
+  <data name="Documentary" xml:space="preserve">
+    <value>Documentaire</value>
+  </data>
+  <data name="EBook" xml:space="preserve">
+    <value>Livre Numérique</value>
+  </data>
+  <data name="EditLibrary" xml:space="preserve">
+    <value>Modifier La Bibliothèque</value>
+  </data>
+  <data name="FilmFranchise" xml:space="preserve">
+    <value>Franchise Cinématographique</value>
+  </data>
+  <data name="FilmSeries" xml:space="preserve">
+    <value>Saga Cinématographique</value>
+  </data>
+  <data name="GeneralInformation" xml:space="preserve">
+    <value>Informations Générales</value>
+  </data>
+  <data name="GraphicNovel" xml:space="preserve">
+    <value>Roman Graphique</value>
+  </data>
+  <data name="Interview" xml:space="preserve">
+    <value>Entretien</value>
+  </data>
+  <data name="LibrarySaved" xml:space="preserve">
+    <value>Bibliothèque Enregistrée</value>
+  </data>
+  <data name="LibraryType" xml:space="preserve">
+    <value>Type de Bibliothèque</value>
+  </data>
+  <data name="LivePerformance" xml:space="preserve">
+    <value>Concert Live</value>
+  </data>
+  <data name="Magazine" xml:space="preserve">
+    <value>Magazine</value>
+  </data>
+  <data name="Manga" xml:space="preserve">
+    <value>Manga</value>
+  </data>
+  <data name="MiscellaneousContent" xml:space="preserve">
+    <value>Contenu Divers</value>
+  </data>
+  <data name="Movie" xml:space="preserve">
+    <value>Film</value>
+  </data>
+  <data name="Music" xml:space="preserve">
+    <value>Musique</value>
+  </data>
+  <data name="Other" xml:space="preserve">
+    <value>Autre</value>
+  </data>
+  <data name="Personal" xml:space="preserve">
+    <value>Personnel</value>
+  </data>
+  <data name="PhotoAlbum" xml:space="preserve">
+    <value>Album Photo</value>
+  </data>
+  <data name="Podcast" xml:space="preserve">
+    <value>Podcast</value>
+  </data>
+  <data name="RadioShow" xml:space="preserve">
+    <value>Émission Radio</value>
+  </data>
+  <data name="Remix" xml:space="preserve">
+    <value>Remixage</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>Supprimer</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Enregistrer</value>
+  </data>
+  <data name="Screenplay" xml:space="preserve">
+    <value>Scénario</value>
+  </data>
+  <data name="SheetMusic" xml:space="preserve">
+    <value>Partition Musicale</value>
+  </data>
+  <data name="Soundeffect" xml:space="preserve">
+    <value>Effet Sonore</value>
+  </data>
+  <data name="Title" xml:space="preserve">
+    <value>Titre</value>
+  </data>
+  <data name="Tutorial" xml:space="preserve">
+    <value>Tutoriel</value>
+  </data>
+  <data name="TvShow" xml:space="preserve">
+    <value>Série Télévisée</value>
+  </data>
+  <data name="Videoclip" xml:space="preserve">
+    <value>Clip Vidéo</value>
+  </data>
+  <data name="VideoContent" xml:space="preserve">
+    <value>Contenu Vidéo</value>
+  </data>
+  <data name="VisualContent" xml:space="preserve">
+    <value>Contenu Visuel</value>
+  </data>
+  <data name="WrittenContent" xml:space="preserve">
+    <value>Contenu Écrit</value>
+  </data>
+  <data name="YouTube" xml:space="preserve">
+    <value>YouTube</value>
+  </data>
+</root>
