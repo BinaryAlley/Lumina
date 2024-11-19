@@ -1,0 +1,507 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AdminAccountAlreadyCreated" xml:space="preserve">
+    <value>管理者アカウントは既に作成されています!</value>
+  </data>
+  <data name="Application theme cannot be empty!" xml:space="preserve">
+    <value>アプリケーションのテーマを選択してください!</value>
+  </data>
+  <data name="AsinMustBe10CharactersLong" xml:space="preserve">
+    <value>ASINは10文字でなければなりません！</value>
+  </data>
+  <data name="BarnesAndNoblesIdMustBe10CharactersLong" xml:space="preserve">
+    <value>Barnes&amp;NobleのIDは10文字でなければなりません！</value>
+  </data>
+  <data name="BitrateMustBeAPositiveNumber" xml:space="preserve">
+    <value>ビットレートは正の数でなければなりません！</value>
+  </data>
+  <data name="BookAlreadyExists" xml:space="preserve">
+    <value>本はすでに存在します！</value>
+  </data>
+  <data name="CannotNavigateUp" xml:space="preserve">
+    <value>上の階層に移動できません！</value>
+  </data>
+  <data name="CodecCannotBeEmpty" xml:space="preserve">
+    <value>コーデックを空にすることはできません！</value>
+  </data>
+  <data name="ContributorDisplayNameCannotBeEmpty" xml:space="preserve">
+    <value>出演者の表示名を空にすることはできません！</value>
+  </data>
+  <data name="ContributorDisplayNameMustBeMaximum100CharactersLong" xml:space="preserve">
+    <value>出演者の表示名は最大100文字までです！</value>
+  </data>
+  <data name="ContributorLegalNameMustBeMaximum100CharactersLong" xml:space="preserve">
+    <value>出演者の本名は最大100文字までです！</value>
+  </data>
+  <data name="ContributorNameCannotBeEmpty" xml:space="preserve">
+    <value>出演者名を空にすることはできません！</value>
+  </data>
+  <data name="ContributorRoleCannotBeNull" xml:space="preserve">
+    <value>出演者の役割をnullにすることはできません！</value>
+  </data>
+  <data name="ContributorsListCannotBeNull" xml:space="preserve">
+    <value>出演者リストをnullにすることはできません！</value>
+  </data>
+  <data name="CountryCodeMustBe2CharactersLong" xml:space="preserve">
+    <value>国コードは2文字でなければなりません！</value>
+  </data>
+  <data name="CurrentPasswordCannotBeEmpty" xml:space="preserve">
+    <value>現在のパスワードを入力してください!</value>
+  </data>
+  <data name="DatabaseConnectionStringCannotBeEmpty" xml:space="preserve">
+    <value>データベース接続文字列を入力してください!</value>
+  </data>
+  <data name="DescriptionMustBeMaximum2000CharactersLong" xml:space="preserve">
+    <value>説明文は最大2000文字までです！</value>
+  </data>
+  <data name="DirectoryAlreadyExists" xml:space="preserve">
+    <value>ディレクトリはすでに存在します！</value>
+  </data>
+  <data name="DirectoryCopyError" xml:space="preserve">
+    <value>ディレクトリのコピーに失敗しました！</value>
+  </data>
+  <data name="DirectoryMoveError" xml:space="preserve">
+    <value>ディレクトリの移動に失敗しました！</value>
+  </data>
+  <data name="DirectoryNotFound" xml:space="preserve">
+    <value>ディレクトリが見つかりません！</value>
+  </data>
+  <data name="EditionMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>版の名称は最大50文字までです！</value>
+  </data>
+  <data name="EncryptionSecretKeyCannotBeEmpty" xml:space="preserve">
+    <value>暗号化シークレットキーを入力してください!</value>
+  </data>
+  <data name="EncryptionSecretKeyMustBeABase64String" xml:space="preserve">
+    <value>暗号化シークレットキーはBase64形式の文字列である必要があります!</value>
+  </data>
+  <data name="ErrorPersistingMediaLibrary" xml:space="preserve">
+    <value>メディアライブラリの保存に失敗しました!</value>
+  </data>
+  <data name="ExtensionCannotBeEmpty" xml:space="preserve">
+    <value>ファイルの拡張子を空にすることはできません！</value>
+  </data>
+  <data name="FileAlreadyExists" xml:space="preserve">
+    <value>ファイルはすでに存在します！</value>
+  </data>
+  <data name="FileCopyError" xml:space="preserve">
+    <value>ファイルのコピーに失敗しました！</value>
+  </data>
+  <data name="FileMoveError" xml:space="preserve">
+    <value>ファイルの移動に失敗しました！</value>
+  </data>
+  <data name="FileNotFound" xml:space="preserve">
+    <value>ファイルが見つかりません！</value>
+  </data>
+  <data name="General.Validation" xml:space="preserve">
+    <value>検証</value>
+  </data>
+  <data name="GenreNameCannotBeEmpty" xml:space="preserve">
+    <value>ジャンル名を空にすることはできません！</value>
+  </data>
+  <data name="GenreNameMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>ジャンル名は最大50文字までです！</value>
+  </data>
+  <data name="GenresListCannotBeNull" xml:space="preserve">
+    <value>ジャンルリストをnullにすることはできません！</value>
+  </data>
+  <data name="GoodreadsIdMustBeNumeric" xml:space="preserve">
+    <value>GoodreadsのIDは数値でなければなりません！</value>
+  </data>
+  <data name="GoogleBooksIdMustBe12CharactersLong" xml:space="preserve">
+    <value>Google BooksのIDは12文字でなければなりません！</value>
+  </data>
+  <data name="ImageQualityMustBeBetweenZeroAndOneHundred" xml:space="preserve">
+    <value>画質は0から100の間でなければなりません！</value>
+  </data>
+  <data name="InvalidAppleBooksIdFormat" xml:space="preserve">
+    <value>Apple BooksのID形式が無効です！</value>
+  </data>
+  <data name="InvalidBarnesAndNoblesIdFormat" xml:space="preserve">
+    <value>Barnes&amp;NobleのID形式が無効です！</value>
+  </data>
+  <data name="InvalidCurrentPassword" xml:space="preserve">
+    <value>現在のパスワードが無効です!</value>
+  </data>
+  <data name="InvalidGoogleBooksIdFormat" xml:space="preserve">
+    <value>Google BooksのID形式が無効です！</value>
+  </data>
+  <data name="InvalidIsbn10Format" xml:space="preserve">
+    <value>無効なISBN10形式です！</value>
+  </data>
+  <data name="InvalidIsbn13Format" xml:space="preserve">
+    <value>無効なISBN13形式です！</value>
+  </data>
+  <data name="InvalidIsoCode" xml:space="preserve">
+    <value>無効なISOコードです！</value>
+  </data>
+  <data name="InvalidLccnFormat" xml:space="preserve">
+    <value>無効なLCCN形式です！</value>
+  </data>
+  <data name="InvalidOclcFormat" xml:space="preserve">
+    <value>無効なOCLC形式です！</value>
+  </data>
+  <data name="InvalidOpenLibraryId" xml:space="preserve">
+    <value>OpenLibraryのIDが無効です！</value>
+  </data>
+  <data name="InvalidPassword" xml:space="preserve">
+    <value>パスワードが無効です!</value>
+  </data>
+  <data name="InvalidPath" xml:space="preserve">
+    <value>無効なパスです！</value>
+  </data>
+  <data name="InvalidTotpCode" xml:space="preserve">
+    <value>TOTPコードが無効です!</value>
+  </data>
+  <data name="InvalidUsername" xml:space="preserve">
+    <value>ユーザー名が無効です!</value>
+  </data>
+  <data name="InvalidUsernameOrPassword" xml:space="preserve">
+    <value>ユーザー名またはパスワードが無効です!</value>
+  </data>
+  <data name="IsbnListCannotBeNull" xml:space="preserve">
+    <value>ISBNリストをnullにすることはできません！</value>
+  </data>
+  <data name="IsbnValueCannotBeEmpty" xml:space="preserve">
+    <value>ISBN値を空にすることはできません！</value>
+  </data>
+  <data name="JwtAudienceCannotBeEmpty" xml:space="preserve">
+    <value>JWT対象者を入力してください!</value>
+  </data>
+  <data name="JwtExpiryMinutesMustBePositive" xml:space="preserve">
+    <value>JWT有効期限（分）は正の値である必要があります!</value>
+  </data>
+  <data name="JwtIssuerCannotBeEmptyc" xml:space="preserve">
+    <value>JWT発行者を入力してください!</value>
+  </data>
+  <data name="JwtSecretKeyCannotBeEmpty" xml:space="preserve">
+    <value>JWT秘密鍵を入力してください!</value>
+  </data>
+  <data name="JwtSecretKeyTooShort" xml:space="preserve">
+    <value>JWT秘密鍵が短すぎます!</value>
+  </data>
+  <data name="LanguageCodeCannotBeEmpty" xml:space="preserve">
+    <value>言語コードを空にすることはできません！</value>
+  </data>
+  <data name="LanguageCodeMustBe2CharactersLong" xml:space="preserve">
+    <value>言語コードは2文字でなければなりません！</value>
+  </data>
+  <data name="LanguageNameCannotBeEmpty" xml:space="preserve">
+    <value>言語名を空にすることはできません！</value>
+  </data>
+  <data name="LanguageNameMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>言語名は最大50文字までです！</value>
+  </data>
+  <data name="LanguageNativeNameMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>言語の固有名は最大50文字までです！</value>
+  </data>
+  <data name="LibraryAlreadyExists" xml:space="preserve">
+    <value>ライブラリはすでに存在します！</value>
+  </data>
+  <data name="LibraryIdCannotBeEmpty" xml:space="preserve">
+    <value>ライブラリIDを空にすることはできません！</value>
+  </data>
+  <data name="LibraryNotFound" xml:space="preserve">
+    <value>ライブラリが見つかりません！</value>
+  </data>
+  <data name="LibraryThingIdMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>LibraryThingのIDは最大50文字までです！</value>
+  </data>
+  <data name="LibraryTypeCannotBeNull" xml:space="preserve">
+    <value>ライブラリタイプをnullにすることはできません！</value>
+  </data>
+  <data name="MediaRootDirectoryCannotBeEmpty" xml:space="preserve">
+    <value>メディアのルートディレクトリを入力してください!</value>
+  </data>
+  <data name="MetadataCannotBeNull" xml:space="preserve">
+    <value>メタデータをnullにすることはできません！</value>
+  </data>
+  <data name="NameCannotBeEmpty" xml:space="preserve">
+    <value>名前を空にすることはできません！</value>
+  </data>
+  <data name="NewPasswordCannotBeEmpty" xml:space="preserve">
+    <value>新しいパスワードを入力してください!</value>
+  </data>
+  <data name="NewPasswordConfirmCannotBeEmpty" xml:space="preserve">
+    <value>新しいパスワードの確認を入力してください!</value>
+  </data>
+  <data name="NotAuthorized" xml:space="preserve">
+    <value>この操作を実行する権限がありません!</value>
+  </data>
+  <data name="NoThumbnail" xml:space="preserve">
+    <value>サムネイルがありません！</value>
+  </data>
+  <data name="OneOrMoreValidationErrorsOccurred" xml:space="preserve">
+    <value>一つ以上の検証エラーが発生しました</value>
+  </data>
+  <data name="OriginalReleaseDateAndYearMustMatch" xml:space="preserve">
+    <value>公開日と公開年が一致しなければなりません！</value>
+  </data>
+  <data name="OriginalReleaseYearMustBeBetween1And9999" xml:space="preserve">
+    <value>公開年は1から9999の間でなければなりません！</value>
+  </data>
+  <data name="OriginalTitleMustBeMaximum255CharactersLong" xml:space="preserve">
+    <value>原題は最大255文字までです！</value>
+  </data>
+  <data name="PageCountMustBeGreaterThanZero" xml:space="preserve">
+    <value>ページ数は0より大きくなければなりません！</value>
+  </data>
+  <data name="ParentNodeCannotBeNull" xml:space="preserve">
+    <value>親ノードをnullにすることはできません!</value>
+  </data>
+  <data name="PasswordCannotBeEmpty" xml:space="preserve">
+    <value>パスワードを入力してください!</value>
+  </data>
+  <data name="PasswordConfirmCannotBeEmpty" xml:space="preserve">
+    <value>パスワード確認を入力してください!</value>
+  </data>
+  <data name="PasswordResetAlreadyRequested" xml:space="preserve">
+    <value>パスワードリセットは既に申請済みです!</value>
+  </data>
+  <data name="PasswordsNotMatch" xml:space="preserve">
+    <value>パスワードが一致しません!</value>
+  </data>
+  <data name="PathCannotBeEmpty" xml:space="preserve">
+    <value>パスを空にすることはできません！</value>
+  </data>
+  <data name="PathMustBeMaximum260CharactersLong" xml:space="preserve">
+    <value>パスは最大260文字までです!</value>
+  </data>
+  <data name="PathsListCannotBeEmpty" xml:space="preserve">
+    <value>パスリストを空にすることはできません！</value>
+  </data>
+  <data name="PathsListCannotBeNull" xml:space="preserve">
+    <value>パスリストをnullにすることはできません！</value>
+  </data>
+  <data name="PublisherMustBeMaximum100CharactersLong" xml:space="preserve">
+    <value>出版社名は最大100文字までです！</value>
+  </data>
+  <data name="RatingMaxValueMustBePositive" xml:space="preserve">
+    <value>評価の最大値は正の数でなければなりません！</value>
+  </data>
+  <data name="RatingsListCannotBeNull" xml:space="preserve">
+    <value>評価リストをnullにすることはできません！</value>
+  </data>
+  <data name="RatingValueCannotBeGreaterThanMaxValue" xml:space="preserve">
+    <value>評価値は最大値を超えることはできません！</value>
+  </data>
+  <data name="RatingValueMustBePositive" xml:space="preserve">
+    <value>評価値は正の数でなければなりません！</value>
+  </data>
+  <data name="RatingVoteCountMustBePositive" xml:space="preserve">
+    <value>評価の投票数は正の数でなければなりません！</value>
+  </data>
+  <data name="ReleaseInfoCannotBeNull" xml:space="preserve">
+    <value>リリース情報をnullにすることはできません！</value>
+  </data>
+  <data name="ReleaseVersionMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>リリースバージョンは最大50文字までです！</value>
+  </data>
+  <data name="ReReleaseDateAndYearMustMatch" xml:space="preserve">
+    <value>再公開日と再公開年が一致しなければなりません！</value>
+  </data>
+  <data name="ReReleaseDateCannotBeEarlierThanOriginalReleaseDate" xml:space="preserve">
+    <value>再公開日は公開日より前であってはなりません！</value>
+  </data>
+  <data name="ReReleaseYearCannotBeEarlierThanOriginalReleaseYear" xml:space="preserve">
+    <value>再公開年は公開年より前であってはなりません！</value>
+  </data>
+  <data name="ReReleaseYearMustBeBetween1And9999" xml:space="preserve">
+    <value>再公開年は1から9999の間でなければなりません！</value>
+  </data>
+  <data name="RoleCategoryCannotBeEmpty" xml:space="preserve">
+    <value>役割カテゴリを空にすることはできません！</value>
+  </data>
+  <data name="RoleCategoryMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>役割カテゴリは最大50文字までです！</value>
+  </data>
+  <data name="RoleNameCannotBeEmpty" xml:space="preserve">
+    <value>役割名を空にすることはできません！</value>
+  </data>
+  <data name="RoleNameMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>役割名は最大50文字までです！</value>
+  </data>
+  <data name="StreamIdCannotBeEmpty" xml:space="preserve">
+    <value>ストリームIDを空にすることはできません！</value>
+  </data>
+  <data name="TagNameCannotBeEmpty" xml:space="preserve">
+    <value>タグ名を空にすることはできません！</value>
+  </data>
+  <data name="TagNameMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>タグ名は最大50文字までです！</value>
+  </data>
+  <data name="TagsListCannotBeNull" xml:space="preserve">
+    <value>タグリストをnullにすることはできません！</value>
+  </data>
+  <data name="TempPasswordExpired" xml:space="preserve">
+    <value>仮パスワードの有効期限が切れました!</value>
+  </data>
+  <data name="TheBookIsAlreadyInTheSeries" xml:space="preserve">
+    <value>この本はすでにシリーズに含まれています！</value>
+  </data>
+  <data name="TheBookIsNotInTheSeries" xml:space="preserve">
+    <value>この本はシリーズに含まれていません！</value>
+  </data>
+  <data name="TitleCannotBeEmpty" xml:space="preserve">
+    <value>タイトルを空にすることはできません！</value>
+  </data>
+  <data name="TitleMustBeMaximum255CharactersLong" xml:space="preserve">
+    <value>タイトルは最大255文字までです！</value>
+  </data>
+  <data name="TotpCannotBeEmpty" xml:space="preserve">
+    <value>TOTPコードを入力してください!</value>
+  </data>
+  <data name="UnauthorizedAccess" xml:space="preserve">
+    <value>このリソースにアクセスする権限がありません！</value>
+  </data>
+  <data name="UnknownBookFormat" xml:space="preserve">
+    <value>不明な書籍フォーマットです！</value>
+  </data>
+  <data name="UnknownIsbnFormat" xml:space="preserve">
+    <value>不明なISBN形式です！</value>
+  </data>
+  <data name="UnknownLibraryType" xml:space="preserve">
+    <value>ライブラリタイプが不明です！</value>
+  </data>
+  <data name="UserAlreadyExists" xml:space="preserve">
+    <value>ユーザーはすでに存在します！</value>
+  </data>
+  <data name="UserDoesNotExist" xml:space="preserve">
+    <value>ユーザーが存在しません！</value>
+  </data>
+  <data name="UserIdCannotBeEmpty" xml:space="preserve">
+    <value>ユーザーIDを空にすることはできません！</value>
+  </data>
+  <data name="UsernameAlreadyExists" xml:space="preserve">
+    <value>このユーザー名は既に使用されています!</value>
+  </data>
+  <data name="UsernameCannotBeEmpty" xml:space="preserve">
+    <value>ユーザー名を入力してください!</value>
+  </data>
+  <data name="UsernameDoesNotExist" xml:space="preserve">
+    <value>このユーザー名は存在しません!</value>
+  </data>
+  <data name="UsernameMustBeBetween3And255CharactersLong" xml:space="preserve">
+    <value>ユーザー名は3文字から255文字の間で入力してください!</value>
+  </data>
+  <data name="VolumeNumberMustBeGreaterThanZero" xml:space="preserve">
+    <value>巻数は0より大きくなければなりません！</value>
+  </data>
+</root>
