@@ -1,0 +1,507 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AdminAccountAlreadyCreated" xml:space="preserve">
+    <value>管理员账号已创建！</value>
+  </data>
+  <data name="Application theme cannot be empty!" xml:space="preserve">
+    <value>应用主题不能为空！</value>
+  </data>
+  <data name="AsinMustBe10CharactersLong" xml:space="preserve">
+    <value>ASIN必须是10个字符！</value>
+  </data>
+  <data name="BarnesAndNoblesIdMustBe10CharactersLong" xml:space="preserve">
+    <value>Barnes&amp;Noble ID必须是10个字符！</value>
+  </data>
+  <data name="BitrateMustBeAPositiveNumber" xml:space="preserve">
+    <value>比特率必须是正数！</value>
+  </data>
+  <data name="BookAlreadyExists" xml:space="preserve">
+    <value>图书已存在！</value>
+  </data>
+  <data name="CannotNavigateUp" xml:space="preserve">
+    <value>无法向上导航！</value>
+  </data>
+  <data name="CodecCannotBeEmpty" xml:space="preserve">
+    <value>编解码器不能为空！</value>
+  </data>
+  <data name="ContributorDisplayNameCannotBeEmpty" xml:space="preserve">
+    <value>参与者显示名称不能为空！</value>
+  </data>
+  <data name="ContributorDisplayNameMustBeMaximum100CharactersLong" xml:space="preserve">
+    <value>参与者显示名称最多只能有100个字符！</value>
+  </data>
+  <data name="ContributorLegalNameMustBeMaximum100CharactersLong" xml:space="preserve">
+    <value>参与者法定姓名最多只能有100个字符！</value>
+  </data>
+  <data name="ContributorNameCannotBeEmpty" xml:space="preserve">
+    <value>参与者姓名不能为空！</value>
+  </data>
+  <data name="ContributorRoleCannotBeNull" xml:space="preserve">
+    <value>参与者角色不能为空！</value>
+  </data>
+  <data name="ContributorsListCannotBeNull" xml:space="preserve">
+    <value>参与者列表不能为空！</value>
+  </data>
+  <data name="CountryCodeMustBe2CharactersLong" xml:space="preserve">
+    <value>国家代码必须是2个字符！</value>
+  </data>
+  <data name="CurrentPasswordCannotBeEmpty" xml:space="preserve">
+    <value>当前密码不能为空！</value>
+  </data>
+  <data name="DatabaseConnectionStringCannotBeEmpty" xml:space="preserve">
+    <value>数据库连接字符串不能为空！</value>
+  </data>
+  <data name="DescriptionMustBeMaximum2000CharactersLong" xml:space="preserve">
+    <value>描述最多只能有2000个字符！</value>
+  </data>
+  <data name="DirectoryAlreadyExists" xml:space="preserve">
+    <value>目录已存在！</value>
+  </data>
+  <data name="DirectoryCopyError" xml:space="preserve">
+    <value>复制目录时出错！</value>
+  </data>
+  <data name="DirectoryMoveError" xml:space="preserve">
+    <value>移动目录时出错！</value>
+  </data>
+  <data name="DirectoryNotFound" xml:space="preserve">
+    <value>找不到目录！</value>
+  </data>
+  <data name="EditionMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>版本最多只能有50个字符！</value>
+  </data>
+  <data name="EncryptionSecretKeyCannotBeEmpty" xml:space="preserve">
+    <value>加密密钥不能为空！</value>
+  </data>
+  <data name="EncryptionSecretKeyMustBeABase64String" xml:space="preserve">
+    <value>加密密钥必须是Base64字符串！</value>
+  </data>
+  <data name="ErrorPersistingMediaLibrary" xml:space="preserve">
+    <value>保存媒体库时出错！</value>
+  </data>
+  <data name="ExtensionCannotBeEmpty" xml:space="preserve">
+    <value>文件扩展名不能为空！</value>
+  </data>
+  <data name="FileAlreadyExists" xml:space="preserve">
+    <value>文件已存在！</value>
+  </data>
+  <data name="FileCopyError" xml:space="preserve">
+    <value>复制文件时出错！</value>
+  </data>
+  <data name="FileMoveError" xml:space="preserve">
+    <value>移动文件时出错！</value>
+  </data>
+  <data name="FileNotFound" xml:space="preserve">
+    <value>找不到文件！</value>
+  </data>
+  <data name="General.Validation" xml:space="preserve">
+    <value>验证</value>
+  </data>
+  <data name="GenreNameCannotBeEmpty" xml:space="preserve">
+    <value>类型名称不能为空！</value>
+  </data>
+  <data name="GenreNameMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>类型名称最多只能有50个字符！</value>
+  </data>
+  <data name="GenresListCannotBeNull" xml:space="preserve">
+    <value>类型列表不能为空！</value>
+  </data>
+  <data name="GoodreadsIdMustBeNumeric" xml:space="preserve">
+    <value>Goodreads ID必须是数字！</value>
+  </data>
+  <data name="GoogleBooksIdMustBe12CharactersLong" xml:space="preserve">
+    <value>Google Books ID必须是12个字符！</value>
+  </data>
+  <data name="ImageQualityMustBeBetweenZeroAndOneHundred" xml:space="preserve">
+    <value>图像质量必须在0到100之间！</value>
+  </data>
+  <data name="InvalidAppleBooksIdFormat" xml:space="preserve">
+    <value>Apple Books ID格式无效！</value>
+  </data>
+  <data name="InvalidBarnesAndNoblesIdFormat" xml:space="preserve">
+    <value>Barnes&amp;Noble ID格式无效！</value>
+  </data>
+  <data name="InvalidCurrentPassword" xml:space="preserve">
+    <value>当前密码无效！</value>
+  </data>
+  <data name="InvalidGoogleBooksIdFormat" xml:space="preserve">
+    <value>Google Books ID格式无效！</value>
+  </data>
+  <data name="InvalidIsbn10Format" xml:space="preserve">
+    <value>无效的ISBN10格式！</value>
+  </data>
+  <data name="InvalidIsbn13Format" xml:space="preserve">
+    <value>无效的ISBN13格式！</value>
+  </data>
+  <data name="InvalidIsoCode" xml:space="preserve">
+    <value>无效的ISO代码！</value>
+  </data>
+  <data name="InvalidLccnFormat" xml:space="preserve">
+    <value>无效的LCCN格式！</value>
+  </data>
+  <data name="InvalidOclcFormat" xml:space="preserve">
+    <value>无效的OCLC格式！</value>
+  </data>
+  <data name="InvalidOpenLibraryId" xml:space="preserve">
+    <value>无效的OpenLibrary ID！</value>
+  </data>
+  <data name="InvalidPassword" xml:space="preserve">
+    <value>密码无效！</value>
+  </data>
+  <data name="InvalidPath" xml:space="preserve">
+    <value>路径无效！</value>
+  </data>
+  <data name="InvalidTotpCode" xml:space="preserve">
+    <value>TOTP验证码无效！</value>
+  </data>
+  <data name="InvalidUsername" xml:space="preserve">
+    <value>用户名无效！</value>
+  </data>
+  <data name="InvalidUsernameOrPassword" xml:space="preserve">
+    <value>用户名或密码无效！</value>
+  </data>
+  <data name="IsbnListCannotBeNull" xml:space="preserve">
+    <value>ISBN列表不能为空！</value>
+  </data>
+  <data name="IsbnValueCannotBeEmpty" xml:space="preserve">
+    <value>ISBN值不能为空！</value>
+  </data>
+  <data name="JwtAudienceCannotBeEmpty" xml:space="preserve">
+    <value>JWT受众不能为空！</value>
+  </data>
+  <data name="JwtExpiryMinutesMustBePositive" xml:space="preserve">
+    <value>JWT过期时间（分钟）必须为正数！</value>
+  </data>
+  <data name="JwtIssuerCannotBeEmptyc" xml:space="preserve">
+    <value>JWT颁发者不能为空！</value>
+  </data>
+  <data name="JwtSecretKeyCannotBeEmpty" xml:space="preserve">
+    <value>JWT密钥不能为空！</value>
+  </data>
+  <data name="JwtSecretKeyTooShort" xml:space="preserve">
+    <value>JWT密钥太短！</value>
+  </data>
+  <data name="LanguageCodeCannotBeEmpty" xml:space="preserve">
+    <value>语言代码不能为空！</value>
+  </data>
+  <data name="LanguageCodeMustBe2CharactersLong" xml:space="preserve">
+    <value>语言代码必须是2个字符！</value>
+  </data>
+  <data name="LanguageNameCannotBeEmpty" xml:space="preserve">
+    <value>语言名称不能为空！</value>
+  </data>
+  <data name="LanguageNameMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>语言名称最多只能有50个字符！</value>
+  </data>
+  <data name="LanguageNativeNameMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>语言本地名称最多只能有50个字符！</value>
+  </data>
+  <data name="LibraryAlreadyExists" xml:space="preserve">
+    <value>库已存在！</value>
+  </data>
+  <data name="LibraryIdCannotBeEmpty" xml:space="preserve">
+    <value>库ID不能为空！</value>
+  </data>
+  <data name="LibraryNotFound" xml:space="preserve">
+    <value>找不到库！</value>
+  </data>
+  <data name="LibraryThingIdMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>LibraryThing ID最多只能有50个字符！</value>
+  </data>
+  <data name="LibraryTypeCannotBeNull" xml:space="preserve">
+    <value>库类型不能为空！</value>
+  </data>
+  <data name="MediaRootDirectoryCannotBeEmpty" xml:space="preserve">
+    <value>媒体根目录不能为空！</value>
+  </data>
+  <data name="MetadataCannotBeNull" xml:space="preserve">
+    <value>元数据不能为空！</value>
+  </data>
+  <data name="NameCannotBeEmpty" xml:space="preserve">
+    <value>名称不能为空！</value>
+  </data>
+  <data name="NewPasswordCannotBeEmpty" xml:space="preserve">
+    <value>新密码不能为空！</value>
+  </data>
+  <data name="NewPasswordConfirmCannotBeEmpty" xml:space="preserve">
+    <value>新密码确认不能为空！</value>
+  </data>
+  <data name="NotAuthorized" xml:space="preserve">
+    <value>您无权执行此操作！</value>
+  </data>
+  <data name="NoThumbnail" xml:space="preserve">
+    <value>没有缩略图！</value>
+  </data>
+  <data name="OneOrMoreValidationErrorsOccurred" xml:space="preserve">
+    <value>发生一个或多个验证错误</value>
+  </data>
+  <data name="OriginalReleaseDateAndYearMustMatch" xml:space="preserve">
+    <value>原始发行日期和年份必须匹配！</value>
+  </data>
+  <data name="OriginalReleaseYearMustBeBetween1And9999" xml:space="preserve">
+    <value>原始发行年份必须在1到9999之间！</value>
+  </data>
+  <data name="OriginalTitleMustBeMaximum255CharactersLong" xml:space="preserve">
+    <value>原始标题最多只能有255个字符！</value>
+  </data>
+  <data name="PageCountMustBeGreaterThanZero" xml:space="preserve">
+    <value>页数必须大于零！</value>
+  </data>
+  <data name="ParentNodeCannotBeNull" xml:space="preserve">
+    <value>父节点不能为空！</value>
+  </data>
+  <data name="PasswordCannotBeEmpty" xml:space="preserve">
+    <value>密码不能为空！</value>
+  </data>
+  <data name="PasswordConfirmCannotBeEmpty" xml:space="preserve">
+    <value>确认密码不能为空！</value>
+  </data>
+  <data name="PasswordResetAlreadyRequested" xml:space="preserve">
+    <value>密码重置请求已发送！</value>
+  </data>
+  <data name="PasswordsNotMatch" xml:space="preserve">
+    <value>密码不匹配！</value>
+  </data>
+  <data name="PathCannotBeEmpty" xml:space="preserve">
+    <value>路径不能为空！</value>
+  </data>
+  <data name="PathMustBeMaximum260CharactersLong" xml:space="preserve">
+    <value>路径不得超过260个字符！</value>
+  </data>
+  <data name="PathsListCannotBeEmpty" xml:space="preserve">
+    <value>路径列表不能为空！</value>
+  </data>
+  <data name="PathsListCannotBeNull" xml:space="preserve">
+    <value>路径列表不能为空！</value>
+  </data>
+  <data name="PublisherMustBeMaximum100CharactersLong" xml:space="preserve">
+    <value>出版社名称最多只能有100个字符！</value>
+  </data>
+  <data name="RatingMaxValueMustBePositive" xml:space="preserve">
+    <value>评分最大值必须为正数！</value>
+  </data>
+  <data name="RatingsListCannotBeNull" xml:space="preserve">
+    <value>评分列表不能为空！</value>
+  </data>
+  <data name="RatingValueCannotBeGreaterThanMaxValue" xml:space="preserve">
+    <value>评分值不能大于最大值！</value>
+  </data>
+  <data name="RatingValueMustBePositive" xml:space="preserve">
+    <value>评分值必须为正数！</value>
+  </data>
+  <data name="RatingVoteCountMustBePositive" xml:space="preserve">
+    <value>评分投票数必须为正数！</value>
+  </data>
+  <data name="ReleaseInfoCannotBeNull" xml:space="preserve">
+    <value>发行信息不能为空！</value>
+  </data>
+  <data name="ReleaseVersionMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>发行版本最多只能有50个字符！</value>
+  </data>
+  <data name="ReReleaseDateAndYearMustMatch" xml:space="preserve">
+    <value>重发行日期和年份必须匹配！</value>
+  </data>
+  <data name="ReReleaseDateCannotBeEarlierThanOriginalReleaseDate" xml:space="preserve">
+    <value>重发行日期不能早于原始发行日期！</value>
+  </data>
+  <data name="ReReleaseYearCannotBeEarlierThanOriginalReleaseYear" xml:space="preserve">
+    <value>重发行年份不能早于原始发行年份！</value>
+  </data>
+  <data name="ReReleaseYearMustBeBetween1And9999" xml:space="preserve">
+    <value>重发行年份必须在1到9999之间！</value>
+  </data>
+  <data name="RoleCategoryCannotBeEmpty" xml:space="preserve">
+    <value>角色类别不能为空！</value>
+  </data>
+  <data name="RoleCategoryMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>角色类别最多只能有50个字符！</value>
+  </data>
+  <data name="RoleNameCannotBeEmpty" xml:space="preserve">
+    <value>角色名称不能为空！</value>
+  </data>
+  <data name="RoleNameMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>角色名称最多只能有50个字符！</value>
+  </data>
+  <data name="StreamIdCannotBeEmpty" xml:space="preserve">
+    <value>流ID不能为空！</value>
+  </data>
+  <data name="TagNameCannotBeEmpty" xml:space="preserve">
+    <value>标签名称不能为空！</value>
+  </data>
+  <data name="TagNameMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>标签名称最多只能有50个字符！</value>
+  </data>
+  <data name="TagsListCannotBeNull" xml:space="preserve">
+    <value>标签列表不能为空！</value>
+  </data>
+  <data name="TempPasswordExpired" xml:space="preserve">
+    <value>临时密码已过期！</value>
+  </data>
+  <data name="TheBookIsAlreadyInTheSeries" xml:space="preserve">
+    <value>该图书已在系列中！</value>
+  </data>
+  <data name="TheBookIsNotInTheSeries" xml:space="preserve">
+    <value>该图书不在系列中！</value>
+  </data>
+  <data name="TitleCannotBeEmpty" xml:space="preserve">
+    <value>标题不能为空！</value>
+  </data>
+  <data name="TitleMustBeMaximum255CharactersLong" xml:space="preserve">
+    <value>标题最多只能有255个字符！</value>
+  </data>
+  <data name="TotpCannotBeEmpty" xml:space="preserve">
+    <value>TOTP验证码不能为空！</value>
+  </data>
+  <data name="UnauthorizedAccess" xml:space="preserve">
+    <value>您无权访问此资源！</value>
+  </data>
+  <data name="UnknownBookFormat" xml:space="preserve">
+    <value>未知的图书格式！</value>
+  </data>
+  <data name="UnknownIsbnFormat" xml:space="preserve">
+    <value>未知的ISBN格式！</value>
+  </data>
+  <data name="UnknownLibraryType" xml:space="preserve">
+    <value>未知的库类型！</value>
+  </data>
+  <data name="UserAlreadyExists" xml:space="preserve">
+    <value>用户已存在！</value>
+  </data>
+  <data name="UserDoesNotExist" xml:space="preserve">
+    <value>用户不存在！</value>
+  </data>
+  <data name="UserIdCannotBeEmpty" xml:space="preserve">
+    <value>用户ID不能为空！</value>
+  </data>
+  <data name="UsernameAlreadyExists" xml:space="preserve">
+    <value>用户名已存在！</value>
+  </data>
+  <data name="UsernameCannotBeEmpty" xml:space="preserve">
+    <value>用户名不能为空！</value>
+  </data>
+  <data name="UsernameDoesNotExist" xml:space="preserve">
+    <value>用户名不存在！</value>
+  </data>
+  <data name="UsernameMustBeBetween3And255CharactersLong" xml:space="preserve">
+    <value>用户名必须在3到255个字符之间！</value>
+  </data>
+  <data name="VolumeNumberMustBeGreaterThanZero" xml:space="preserve">
+    <value>卷号必须大于零！</value>
+  </data>
+</root>
