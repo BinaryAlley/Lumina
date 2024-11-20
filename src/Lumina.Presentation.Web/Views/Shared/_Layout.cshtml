@@ -1,3 +1,7 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+
+@inject IViewLocalizer _localizer
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,7 +31,6 @@
             </article>
         </main>
         @if (User?.Identity?.IsAuthenticated == true)
-
         {
             <!--Audio player-->
             <div class="audio-player-container">
@@ -36,8 +39,8 @@
                        height="50" width="600">
                     <source src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
                 </video>
-                <a id="audio-player-full-height-toggle">Toggle Full Height</a>
-                <a id="audio-player-close">Toggle Visibility</a>
+                <a id="audio-player-full-height-toggle">@_localizer["ToggleFullHeight"]</a>
+                <a id="audio-player-close">@_localizer["ToggleVisibility"]</a>
             </div>
         }
     </div>

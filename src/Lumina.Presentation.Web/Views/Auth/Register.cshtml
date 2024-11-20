@@ -4,6 +4,7 @@
 
 @using Lumina.Presentation.Web.Common.Models.UsersManagement
 @using Lumina.Presentation.Web.Common.Services
+@using Microsoft.AspNetCore.Mvc.Localization
 
 @{
     string? registrationType = ViewData["RegistrationType"] as string;
@@ -12,12 +13,13 @@
 }
 
 @inject IUrlService _urlService
+@inject IViewLocalizer _localizer
 
 @model RegisterRequestModel
 
 <div class="enlightenment-panel shadow-effect p-2 mx-auto panel w-50 mb-10" style="min-width: 320px; margin-top: 1rem;">
     <div class="shine-effect"></div>
-    <form asp-controller="Auth" asp-action="Register" method="post" id="register-account-form" class="inline">
+    <form method="post" id="register-account-form" class="inline">
         @Html.AntiForgeryToken()
         <!-- section for determining registration type (regular user/admin) -->
         <input type="hidden" name="RegistrationType" value="@registrationType" />
@@ -25,41 +27,41 @@
             @if (registrationType == "Admin")
             {
                 <div class="form-row">
-                    <p class="invalid-feedback w-95 text-center f-18">Admin account registration</p>
+                    <p class="invalid-feedback w-95 text-center f-18">@_localizer["AdminAccountRegistration"]</p>
                 </div>
             }
             <!-- Username -->
             <div class="form-row">
                 <div class="form-label">
-                    <label asp-for="Username">Username</label>
+                    <label asp-for="Username">@_localizer["Username"]</label>
                     <span class="mandatory-field">*</span>:
                 </div>
                 <div class="form-field">
                     <input asp-for="Username" autocomplete="username" class="enlightenment-input" />
                 </div>
-                <small class="form-label text-disabled form-description">DescriptionUsername</small>
+                <small class="form-label text-disabled form-description">@_localizer["DescriptionUsername"]</small>
             </div>
             <!-- Password -->
             <div class="form-row">
                 <div class="form-label">
-                    <label asp-for="Password">Password</label>
+                    <label asp-for="Password">@_localizer["Password"]</label>
                     <span class="mandatory-field">*</span>:
                 </div>
                 <div class="form-field">
                     <input type="password" asp-for="Password" autocomplete="new-password" class="enlightenment-input" />
                 </div>
-                <small class="form-label text-disabled form-description">DescriptionPassword</small>
+                <small class="form-label text-disabled form-description">@_localizer["DescriptionPassword"]</small>
             </div>
             <!-- Password Confirm-->
             <div class="form-row">
                 <div class="form-label">
-                    <label asp-for="PasswordConfirm">Password Confirm</label>
+                    <label asp-for="PasswordConfirm">@_localizer["PasswordConfirm"]</label>
                     <span class="mandatory-field">*</span>:
                 </div>
                 <div class="form-field">
                     <input type="password" asp-for="PasswordConfirm" autocomplete="new-password" class="enlightenment-input" />
                 </div>
-                <small class="form-label text-disabled form-description">DescriptionPasswordConfirm</small>
+                <small class="form-label text-disabled form-description">@_localizer["DescriptionPasswordConfirm"]</small>
             </div>
             <!-- 2FA -->
             <input type="hidden" id="hidden-use-two-fa" name="use2fa" value="true">
@@ -68,27 +70,27 @@
                     <label class="enlightenment-checkbox-label">
                         <input type="checkbox" asp-for="Use2fa" class="enlightenment-checkbox-hidden" value="true" checked/>
                         <span class="enlightenment-checkbox"></span>
-                        Enable two factor authentication
+                        @_localizer["EnableTwoFactorAuthentication"]
                     </label>
                 </div>
-                <small class="form-label text-disabled form-description">Description2Fa</small>
+                <small class="form-label text-disabled form-description">@_localizer["Description2Fa"]</small>
             </div>
             <div class="form-row">
-                <span id="register-two-fa-attention" class="invalid-feedback w-95 text-center hidden">Password recovery is allowed only if two factor authentication is enabled!</span>
+                <span id="register-two-fa-attention" class="invalid-feedback w-95 text-center hidden">@_localizer["DisclaimerTwoFactor"]</span>
             </div>
             <div class="form-row" style="justify-content: center;">
-                <button type="submit" class="confirm-button h-22px w-100px">Register</button>
+                <button type="submit" class="confirm-button h-22px">@_localizer["RegisterKey"]</button>
             </div>
         </div>
     </form>
     <!-- section registration success -->
     <div class="text-center w-100">
-        <p id="register-success" class="text-light-one w-100 hidden">Account Created</p>
+        <p id="register-success" class="text-light-one w-100 hidden">@_localizer["AccountCreated"]</p>
         <img id="totp-image" class="w-200px h-200px h-align-m mx-auto mt-10 hidden" />
-        <p id="totp-message" class="text-light-one w-100 hidden">Scan Totp Code</p>
+        <p id="totp-message" class="text-light-one w-100 hidden">@_localizer["ScanTotpCode"]</p>
         @if (User?.Identity?.IsAuthenticated == false)
         {
-            <button id="btn-login" type="button" class="confirm-button h-22px w-80px mx-auto mt-10 hidden">Login</button>
+            <button id="btn-login" type="button" class="confirm-button h-22px mx-auto mt-10 hidden">@_localizer["Login"]</button>
         }
     </div>
 </div>
@@ -144,11 +146,11 @@
         }
         document.querySelector('[name="Use2fa"]').addEventListener('change', function () {
             const isChecked = this.checked;
-            document.getElementById('#register-two-fa-attention').classList.replace(
+            document.getElementById('register-two-fa-attention').classList.replace(
                 isChecked ? 'inline' : 'hidden',
                 isChecked ? 'hidden' : 'inline'
             );
-            document.getElementById('#hidden-use-two-fa').value = isChecked.toString();
+            document.getElementById('hidden-use-two-fa').value = isChecked.toString();
         });
         if (btnLogin) {
             btnLogin.addEventListener('click', () => {

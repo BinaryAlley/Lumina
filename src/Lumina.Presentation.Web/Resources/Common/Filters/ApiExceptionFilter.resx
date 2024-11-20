@@ -465,6 +465,9 @@
   <data name="TitleMustBeMaximum255CharactersLong" xml:space="preserve">
     <value>Title must be maximum 255 characters long!</value>
   </data>
+  <data name="TooManyRequests" xml:space="preserve">
+    <value>Too many requests! Please try again in 15 minutes!</value>
+  </data>
   <data name="TotpCannotBeEmpty" xml:space="preserve">
     <value>The TOTP code cannot be empty!</value>
   </data>

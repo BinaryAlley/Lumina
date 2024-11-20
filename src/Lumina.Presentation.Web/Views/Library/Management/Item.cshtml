@@ -4,6 +4,7 @@
 
 @using Lumina.Presentation.Web.Common.Models.Libraries
 @using Lumina.Presentation.Web.Common.Services
+@using Microsoft.AspNetCore.Mvc.Localization
 
 @{
     var id = Context.Request.RouteValues["id"] as string;
@@ -12,6 +13,7 @@
 }
 
 @inject IUrlService _urlService
+@inject IViewLocalizer _localizer
 
 @model LibraryModel
 
@@ -19,30 +21,32 @@
 
 <div class="enlightenment-panel shadow-effect p-2 mx-auto panel w-50 mb-10" style="min-width: 320px; margin-top: 1rem;">
     <div class="shine-effect"></div>
-    <form asp-controller="LibraryManagement" asp-action="EditLibrary" method="post" id="add-media-library-form" class="inline">
+    <form method="post" id="add-media-library-form" class="inline">
         @Html.AntiForgeryToken()
         <input type="hidden" asp-for="Id" value="@id" />
         <input type="hidden" asp-for="UserId" value="@Model.UserId"/>
         <div class="form-row">
-            <h1 class="text-light-two w-100 text-center pt-0 pb-0 engraved-title">@(id is not null ? "Edit" : "Add New") Library</h1>
+            <h1 class="text-light-two w-100 text-center pt-0 pb-0 engraved-title">
+                @(_localizer[id is not null ? "EditLibrary" : "AddNewLibrary"])
+            </h1>
         </div>
         <div class="form-container">
-            <h3 class="text-light-two">General Information</h3>
+            <h3 class="text-light-two">@_localizer["GeneralInformation"]</h3>
             <!-- Title -->
             <div class="form-row">
                 <div class="form-label">
-                    <label asp-for="Title">Title</label>
+                    <label asp-for="Title">@_localizer["Title"]</label>
                     <span class="mandatory-field">*</span>:
                 </div>
                 <div class="form-field">
                     <input asp-for="Title" class="enlightenment-input" />
                 </div>
-                <small class="form-label text-disabled form-description">DescriptionTitle</small>
+                <small class="form-label text-disabled form-description">@_localizer["DescriptionTitle"]</small>
             </div>
             <!-- Library Type -->
             <div class="form-row">
                 <div class="form-label">
-                    <label asp-for="LibraryType">Library Type</label>
+                    <label asp-for="LibraryType">@_localizer["LibraryType"]</label>
                     <span class="mandatory-field">*</span>:
                 </div>
                 <div class="form-field">
@@ -50,60 +54,59 @@
                         <div class="shine-effect" style="top: 1px;"></div>
                         <input type="checkbox" class="enlightenment-toggle-checkbox" id="library-type" />
                         <label class="enlightenment-toggle" for="library-type">
-                            <span class="enlightenment-selected-text">@Model.LibraryType</span>
+                            <span id="library-selected-item" class="enlightenment-selected-text" data-value="@(Model.LibraryType ?? "Book")">@(Model.LibraryType ?? _localizer["Book"].Value)</span>
                         </label>
                         <div class="enlightenment-dropdown">
                             <div class="shine-effect" style="top: -4px;"></div>
-                            <!-- Dropdown options remain the same -->
-                            <div class="enlightenment-option first-option disabled">Written Content</div>
-                            <div class="enlightenment-option" data-value="Book">Book</div>
-                            <div class="enlightenment-option" data-value="EBook">E Book</div>
-                            <div class="enlightenment-option" data-value="BookSeries">Book Series</div>
-                            <div class="enlightenment-option" data-value="ComicBook">Comic Book</div>
-                            <div class="enlightenment-option" data-value="ComicSeries">Comic Series</div>
-                            <div class="enlightenment-option" data-value="Magazine">Magazine</div>
-                            <div class="enlightenment-option" data-value="Manga">Manga</div>
-                            <div class="enlightenment-option" data-value="GraphicNovel">Graphic Novel</div>
-                            <div class="enlightenment-option" data-value="AcademicPaper">Academic Paper</div>
-                            <div class="enlightenment-option" data-value="SheetMusic">Sheet Music</div>
-                            <div class="enlightenment-option" data-value="Screenplay">Screenplay</div>
-                            <div class="enlightenment-option disabled">Video Content</div>
-                            <div class="enlightenment-option" data-value="TvShow">Tv Show</div>
-                            <div class="enlightenment-option" data-value="Movie">Movie</div>
-                            <div class="enlightenment-option" data-value="FilmSeries">Film Series</div>
-                            <div class="enlightenment-option" data-value="FilmFranchise">Film Franchise</div>
-                            <div class="enlightenment-option" data-value="Concert">Concert</div>
-                            <div class="enlightenment-option" data-value="Documentary">Documentary</div>
-                            <div class="enlightenment-option" data-value="Tutorial">Tutorial</div>
-                            <div class="enlightenment-option" data-value="Personal">Personal</div>
-                            <div class="enlightenment-option" data-value="Anime">Anime</div>
-                            <div class="enlightenment-option" data-value="Youtube">Youtube</div>
-                            <div class="enlightenment-option" data-value="Videoclip">Videoclip</div>
-                            <div class="enlightenment-option disabled">Audio Content</div>
-                            <div class="enlightenment-option" data-value="Music">Music</div>
-                            <div class="enlightenment-option" data-value="AudioBook">Audio Book</div>
-                            <div class="enlightenment-option" data-value="LivePerformance">Live Performance</div>
-                            <div class="enlightenment-option" data-value="Interview">Interview</div>
-                            <div class="enlightenment-option" data-value="Cover">Cover</div>
-                            <div class="enlightenment-option" data-value="Remix">Remix</div>
-                            <div class="enlightenment-option" data-value="Soundeffect">Soundeffect</div>
-                            <div class="enlightenment-option" data-value="Podcast">Podcast</div>
-                            <div class="enlightenment-option" data-value="RadioShow">Radio Show</div>
-                            <div class="enlightenment-option disabled">Visual Content</div>
-                            <div class="enlightenment-option" data-value="PhotoAlbum">Photo Album</div>
-                            <div class="enlightenment-option disabled">Miscellaneous Content</div>
-                            <div class="enlightenment-option last-option" data-value="Other">Other</div>
+                            <div class="enlightenment-option first-option disabled">@_localizer["WrittenContent"]</div>
+                            <div class="enlightenment-option" data-value="Book">@_localizer["Book"]</div>
+                            <div class="enlightenment-option" data-value="EBook">@_localizer["EBook"]</div>
+                            <div class="enlightenment-option" data-value="BookSeries">@_localizer["BookSeries"]</div>
+                            <div class="enlightenment-option" data-value="ComicBook">@_localizer["ComicBook"]</div>
+                            <div class="enlightenment-option" data-value="ComicSeries">@_localizer["ComicSeries"]</div>
+                            <div class="enlightenment-option" data-value="Magazine">@_localizer["Magazine"]</div>
+                            <div class="enlightenment-option" data-value="Manga">@_localizer["Manga"]</div>
+                            <div class="enlightenment-option" data-value="GraphicNovel">@_localizer["GraphicNovel"]</div>
+                            <div class="enlightenment-option" data-value="AcademicPaper">@_localizer["AcademicPaper"]</div>
+                            <div class="enlightenment-option" data-value="SheetMusic">@_localizer["SheetMusic"]</div>
+                            <div class="enlightenment-option" data-value="Screenplay">@_localizer["Screenplay"]</div>
+                            <div class="enlightenment-option disabled">@_localizer["VideoContent"]</div>
+                            <div class="enlightenment-option" data-value="TvShow">@_localizer["TvShow"]</div>
+                            <div class="enlightenment-option" data-value="Movie">@_localizer["Movie"]</div>
+                            <div class="enlightenment-option" data-value="FilmSeries">@_localizer["FilmSeries"]</div>
+                            <div class="enlightenment-option" data-value="FilmFranchise">@_localizer["FilmFranchise"]</div>
+                            <div class="enlightenment-option" data-value="Concert">@_localizer["Concert"]</div>
+                            <div class="enlightenment-option" data-value="Documentary">@_localizer["Documentary"]</div>
+                            <div class="enlightenment-option" data-value="Tutorial">@_localizer["Tutorial"]</div>
+                            <div class="enlightenment-option" data-value="Personal">@_localizer["Personal"]</div>
+                            <div class="enlightenment-option" data-value="Anime">@_localizer["Anime"]</div>
+                            <div class="enlightenment-option" data-value="Youtube">@_localizer["Youtube"]</div>
+                            <div class="enlightenment-option" data-value="Videoclip">@_localizer["Videoclip"]</div>
+                            <div class="enlightenment-option disabled">@_localizer["AudioContent"]</div>
+                            <div class="enlightenment-option" data-value="Music">@_localizer["Music"]</div>
+                            <div class="enlightenment-option" data-value="AudioBook">@_localizer["AudioBook"]</div>
+                            <div class="enlightenment-option" data-value="LivePerformance">@_localizer["LivePerformance"]</div>
+                            <div class="enlightenment-option" data-value="Interview">@_localizer["Interview"]</div>
+                            <div class="enlightenment-option" data-value="Cover">@_localizer["Cover"]</div>
+                            <div class="enlightenment-option" data-value="Remix">@_localizer["Remix"]</div>
+                            <div class="enlightenment-option" data-value="Soundeffect">@_localizer["Soundeffect"]</div>
+                            <div class="enlightenment-option" data-value="Podcast">@_localizer["Podcast"]</div>
+                            <div class="enlightenment-option" data-value="RadioShow">@_localizer["RadioShow"]</div>
+                            <div class="enlightenment-option disabled">@_localizer["VisualContent"]</div>
+                            <div class="enlightenment-option" data-value="PhotoAlbum">@_localizer["PhotoAlbum"]</div>
+                            <div class="enlightenment-option disabled">@_localizer["MiscellaneousContent"]</div>
+                            <div class="enlightenment-option last-option" data-value="Other">@_localizer["Other"]</div>
                         </div>
                     </div>
                 </div>
-                <small class="form-label text-disabled form-description">DescriptionLibraryType</small>
+                <small class="form-label text-disabled form-description">@_localizer["DescriptionLibraryType"]</small>
             </div>
             <!-- Directories -->
             <div class="form-row mt-10">
                 <div class="form-label">
-                    <label asp-for="ContentLocations">Directories</label>
+                    <label asp-for="ContentLocations">@_localizer["Directories"]</label>
                     <span class="mandatory-field">*</span>:
-                    <img src="~/images/ui/add-directory.svg" alt="Add directory" id="add-media-directory" title="Add directory" class="add-form-table-row-icon ml-5" />
+                    <img src="~/images/ui/add-directory.svg" alt="@_localizer["AddDirectory"]" id="add-media-directory" title="@_localizer["AddDirectory"]" class="add-form-table-row-icon ml-5" />
                 </div>
             </div>
             <div class="form-row">
@@ -112,22 +115,22 @@
                     {
                         <div class="form-table-row">
                             <span title="@Model.ContentLocations[i]">@Model.ContentLocations[i]</span>
-                            <img src="~/images/ui/delete.svg" alt="Remove" title="Remove" class="remove-form-table-row-icon" />
+                            <img src="~/images/ui/delete.svg" alt="@_localizer["Remove"]" title="@_localizer["Remove"]" class="remove-form-table-row-icon" />
                         </div>
                     }
                 </div>
-                <small class="form-label text-disabled form-description">DescriptionDirectories</small>
+                <small class="form-label text-disabled form-description">@_localizer["DescriptionDirectories"]</small>
             </div>
             <div class="form-row">
-                <button type="submit" class="confirm-button w-100px">Save</button>
+                <button type="submit" class="confirm-button w-100px">@_localizer["Save"]</button>
             </div>
         </div>
     </form>
     <!-- section success -->
     <div class="text-center w-100">
-        <p id="save-success" class="text-light-one w-100 hidden">Library Saved</p>
-        <button id="btn-back-to-libraries" type="button" class="abort-button h-22px w-150px mx-auto mt-10 hidden">Back To Libraries</button>
-        <button id="btn-add-new-library" type="button" class="confirm-button h-22px w-150px mx-auto mt-10 hidden">Add New Library</button>
+        <p id="save-success" class="text-light-one w-100 hidden">@_localizer["LibrarySaved"]</p>
+        <button id="btn-back-to-libraries" type="button" class="abort-button h-22px w-150px mx-auto mt-10 hidden">@_localizer["BackToLibraries"]</button>
+        <button id="btn-add-new-library" type="button" class="confirm-button h-22px w-150px mx-auto mt-10 hidden">@_localizer["AddNewLibrary"]</button>
     </div>
 </div>
 @section Scripts {
@@ -154,7 +157,7 @@
                 Id: form.querySelector('[name="Id"]').value || null,
                 UserId: form.querySelector('[name="UserId"]').value || null,
                 Title: form.querySelector('[name="Title"]').value,
-                LibraryType: form.querySelector('.enlightenment-selected-text').textContent,
+                LibraryType: form.querySelector('#library-selected-item').getAttribute('data-value'),
                 ContentLocations: Array.from(form.querySelectorAll('.form-table-row span'))
                     .map(span => span.textContent)
             };
@@ -198,7 +201,7 @@
                     formTable.insertAdjacentHTML('beforeend', `
                         <div class="form-table-row">
                             <span title="${path}">${path}</span>
-                            <img src="/images/ui/delete.svg" alt="Remove" title="Remove" class="remove-form-table-row-icon" onclick="this.closest('.form-table-row').remove();" />
+                            <img src="/images/ui/delete.svg" alt="@_localizer["Remove"]" title="@_localizer["Remove"]" class="remove-form-table-row-icon" onclick="this.closest('.form-table-row').remove();" />
                         </div>
                     `);
                 }

@@ -15,7 +15,7 @@ namespace Lumina.Presentation.Web.Controllers.FileSystemManagement;
 /// Controller for managing file system files.
 /// </summary>
 [Authorize]
-[Route("[controller]")]
+[Route("files")]
 public class FilesController : Controller
 {
     private readonly IApiHttpClient _apiHttpClient;
@@ -39,7 +39,7 @@ public class FilesController : Controller
     public async Task<IActionResult> GetTreeFiles([FromQuery] string path, [FromQuery] bool includeHiddenElements, CancellationToken cancellationToken)
     {
         IEnumerable<FileSystemTreeNodeModel> response = await _apiHttpClient.GetAsync<FileSystemTreeNodeModel[]>(
-            $"files/get-tree-files?path={Uri.EscapeDataString(path)}&includeHiddenElements={includeHiddenElements}", cancellationToken);
+            $"files/get-tree-files?path={Uri.EscapeDataString(path)}&includeHiddenElements={includeHiddenElements}", cancellationToken).ConfigureAwait(false);
         return Json(new { success = true, data = response });
     }
 
@@ -53,7 +53,7 @@ public class FilesController : Controller
     public async Task<IActionResult> GetFiles([FromQuery] string path, [FromQuery] bool includeHiddenElements, CancellationToken cancellationToken)
     {
         IEnumerable<FileModel> response = await _apiHttpClient.GetAsync<FileModel[]>(
-           $"files/get-files?path={Uri.EscapeDataString(path)}&includeHiddenElements={includeHiddenElements}", cancellationToken);
+           $"files/get-files?path={Uri.EscapeDataString(path)}&includeHiddenElements={includeHiddenElements}", cancellationToken).ConfigureAwait(false);
         return Json(new { success = true, data = response });
     }
 }

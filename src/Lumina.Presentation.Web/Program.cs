@@ -1,7 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Common.DependencyInjection;
+using Lumina.Presentation.Web.Common.Utilities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing.Constraints;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Primitives;
@@ -9,6 +12,7 @@ using Serilog;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 #endregion
 
@@ -58,6 +62,7 @@ public class Program
 
         WebApplication app = builder.Build();
 
+        app.UseRequestLocalization();
         app.UseSerilogRequestLogging();
 
         // configure the HTTP request pipeline.
@@ -69,7 +74,21 @@ public class Program
         }
 
         //app.UseHttpsRedirection();
-        app.UseStaticFiles();
+        app.UseStaticFiles(new StaticFileOptions
+        {
+            OnPrepareResponse = staticFileResponseContext =>
+            {
+                // disable static file caching during development
+                if (app.Environment.IsDevelopment())
+                {
+                    staticFileResponseContext.Context.Response.Headers.Append("Cache-Control", "no-cache, no-store");
+                    staticFileResponseContext.Context.Response.Headers.Append("Expires", "-1");
+                }
+            },
+            // prevent static files from being processed by routing
+            ServeUnknownFileTypes = true
+        });
+        app.UseCultureRedirect(); // if the user attempts to go to a localized route without providing a culture, redirect to default culture
         app.UseRouting();
         app.UseSession();
         app.UseAuthentication();
@@ -84,8 +103,17 @@ public class Program
             return next();
         });
 
-
-        app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
+        // use localized routes for those that need localization
+        app.MapControllerRoute(
+            name: "localized",
+            pattern: "{culture}/{*catchall}",
+            constraints: new { culture = new RegexRouteConstraint("^[a-z]{2}(?:-[A-Z]{2})?$") }
+        );
+        // for the rest, use default routing
+        app.MapControllerRoute(
+            name: "default",
+            pattern: "{*catchall}"
+        );
 
         await app.RunAsync();
     }

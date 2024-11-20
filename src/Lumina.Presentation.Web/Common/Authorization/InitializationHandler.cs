@@ -37,7 +37,7 @@ public class InitializationHandler : AuthorizationHandler<InitializationRequirem
     /// <param name="requirement">The initialization requirement to be evaluated.</param>
     protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, InitializationRequirement requirement)
     {
-        InitializationModel result = await _apiHttpClient.GetAsync<InitializationModel>("initialization/");
+        InitializationModel result = await _apiHttpClient.GetAsync<InitializationModel>("initialization/").ConfigureAwait(false);
         HttpContext? httpContext = context.Resource as HttpContext;
         if (result.IsInitialized)
         {

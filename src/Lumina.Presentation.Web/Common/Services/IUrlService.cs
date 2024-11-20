@@ -1,5 +1,8 @@
 namespace Lumina.Presentation.Web.Common.Services;
 
+/// <summary>
+/// Interface for the service for generating URLs from action and controller names, with URL localization.
+/// </summary>
 public interface IUrlService
 {
     /// <summary>

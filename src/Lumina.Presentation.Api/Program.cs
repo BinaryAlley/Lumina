@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Logging;
 using Scalar.AspNetCore;
 using Serilog;
 using System;
@@ -84,8 +85,8 @@ public class Program
             }
             catch (Exception ex)
             {
-                ILogger logger = services.GetRequiredService<ILogger>();
-                logger.Fatal(ex, "Failed to run database migrations");
+                Microsoft.Extensions.Logging.ILogger logger = services.GetRequiredService<Microsoft.Extensions.Logging.ILogger>();
+                logger.LogCritical(ex, "Failed to run database migrations");
             }
         }
 

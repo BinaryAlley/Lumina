@@ -52,7 +52,6 @@ public class FluentValidationOptions<TOptions> : IValidateOptions<TOptions> wher
             return ValidateOptionsResult.Success;
 
         // if the validation fails, collect the error messages
-        // TODO: add translation support for the error messages
         string[] errors = validationResult.Errors.Select(x => $"Options validation failed for '{x.PropertyName}' with error: '{x.ErrorMessage}'")
                                                  .ToArray();
 

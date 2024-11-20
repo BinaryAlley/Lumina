@@ -144,6 +144,9 @@
   <data name="Interviews" xml:space="preserve">
     <value>面试</value>
   </data>
+  <data name="Language" xml:space="preserve">
+    <value>语言</value>
+  </data>
   <data name="Library" xml:space="preserve">
     <value>媒体库</value>
   </data>

@@ -251,6 +251,7 @@ async function updateContent(url, addToHistory) {
             history.pushState(state, title, url);
         }
     } catch (error) {
+        notificationService.show('Navigation failed', NotificationType.ERROR);
         console.error('Navigation failed:', error);
     }
 }
@@ -529,12 +530,18 @@ document.addEventListener('change', function (e) {
 document.addEventListener('click', function (e) {
     if (e.target.matches('.enlightenment-option')) {
         var text = e.target.textContent;
+        var value = e.target.getAttribute('data-value');
         var combobox = e.target.closest('.enlightenment-combobox');
 
+        // update the displayed text
         var selectedText = combobox.querySelector('.enlightenment-selected-text');
-        if (selectedText)
+        if (selectedText) {
             selectedText.textContent = text;
+            // update the data-value attribute with the actual value
+            selectedText.setAttribute('data-value', value);
+        }
 
+        // close the dropdown
         var toggleCheckbox = combobox.querySelector('.enlightenment-toggle-checkbox');
         if (toggleCheckbox)
             toggleCheckbox.checked = false;

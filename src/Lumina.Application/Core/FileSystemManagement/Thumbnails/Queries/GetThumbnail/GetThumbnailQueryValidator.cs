@@ -16,6 +16,6 @@ public class GetThumbnailQueryValidator : AbstractValidator<GetThumbnailQuery>
     public GetThumbnailQueryValidator()
     {
         RuleFor(x => x.Path).NotEmpty().WithMessage(Errors.FileSystemManagement.PathCannotBeEmpty.Description);
-        RuleFor(x => x.Quality).InclusiveBetween(0, 100).WithMessage(Errors.Thumbnails.ImageQaulityMustBeBetweenZeroAndOneHundred.Description);
+        RuleFor(x => x.Quality).InclusiveBetween(0, 100).WithMessage(Errors.Thumbnails.ImageQualityMustBeBetweenZeroAndOneHundred.Description);
     }
 }

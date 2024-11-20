@@ -465,6 +465,9 @@
   <data name="TitleMustBeMaximum255CharactersLong" xml:space="preserve">
     <value>タイトルは最大255文字までです！</value>
   </data>
+  <data name="TooManyRequests" xml:space="preserve">
+    <value>リクエストが多すぎます！15分後にもう一度お試しください！</value>
+  </data>
   <data name="TotpCannotBeEmpty" xml:space="preserve">
     <value>TOTPコードを入力してください!</value>
   </data>

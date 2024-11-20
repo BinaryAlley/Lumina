@@ -465,6 +465,9 @@
   <data name="TitleMustBeMaximum255CharactersLong" xml:space="preserve">
     <value>标题最多只能有255个字符！</value>
   </data>
+  <data name="TooManyRequests" xml:space="preserve">
+    <value>请求过多！请15分钟后重试！</value>
+  </data>
   <data name="TotpCannotBeEmpty" xml:space="preserve">
     <value>TOTP验证码不能为空！</value>
   </data>
