@@ -20,7 +20,7 @@ public class InitializationCheckAttribute : ActionFilterAttribute
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         IAuthorizationService authorizationService = context.HttpContext.RequestServices.GetRequiredService<IAuthorizationService>();
-        await authorizationService.AuthorizeAsync(context.HttpContext.User, context.HttpContext, "RequireInitialization");
-        await next();
+        await authorizationService.AuthorizeAsync(context.HttpContext.User, context.HttpContext, "RequireInitialization").ConfigureAwait(false);
+        await next().ConfigureAwait(false);
     }
 }

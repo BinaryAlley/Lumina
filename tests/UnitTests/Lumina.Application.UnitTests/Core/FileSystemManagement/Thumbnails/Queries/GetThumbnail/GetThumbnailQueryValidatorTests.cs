@@ -72,7 +72,7 @@ public class GetThumbnailQueryValidatorTests
         TestValidationResult<GetThumbnailQuery> result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Quality).WithErrorMessage(Errors.Thumbnails.ImageQaulityMustBeBetweenZeroAndOneHundred.Description);
+        result.ShouldHaveValidationErrorFor(x => x.Quality).WithErrorMessage(Errors.Thumbnails.ImageQualityMustBeBetweenZeroAndOneHundred.Description);
     }
 
     [Fact]
@@ -85,7 +85,7 @@ public class GetThumbnailQueryValidatorTests
         TestValidationResult<GetThumbnailQuery> result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Quality).WithErrorMessage(Errors.Thumbnails.ImageQaulityMustBeBetweenZeroAndOneHundred.Description);
+        result.ShouldHaveValidationErrorFor(x => x.Quality).WithErrorMessage(Errors.Thumbnails.ImageQualityMustBeBetweenZeroAndOneHundred.Description);
     }
 
     [Fact]

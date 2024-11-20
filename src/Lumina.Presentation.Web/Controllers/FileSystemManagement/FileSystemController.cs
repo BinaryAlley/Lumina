@@ -13,7 +13,7 @@ namespace Lumina.Presentation.Web.Controllers.FileSystemManagement;
 /// Controller for managing file systems.
 /// </summary>
 [Authorize]
-[Route("/file-system")]
+[Route("file-system")]
 public class FileSystemController : Controller
 {
     private readonly IApiHttpClient _apiHttpClient;
@@ -34,7 +34,7 @@ public class FileSystemController : Controller
     [HttpGet("get-type")]
     public async Task<IActionResult> GetType(CancellationToken cancellationToken)
     {
-        FileSystemTypeModel response = await _apiHttpClient.GetAsync<FileSystemTypeModel>($"file-system/get-type", cancellationToken);
+        FileSystemTypeModel response = await _apiHttpClient.GetAsync<FileSystemTypeModel>($"file-system/get-type", cancellationToken).ConfigureAwait(false);
         return Json(new { success = true, data = new { platformType = response.PlatformType.ToString() } });
     }
 }

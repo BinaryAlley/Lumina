@@ -142,7 +142,7 @@ public class GetThumbnailEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
 
         Dictionary<string, string[]>? errors = problemDetails["errors"].Deserialize<Dictionary<string, string[]>>(_jsonOptions);
-        errors.Should().ContainKey("General.Validation").WhoseValue.Should().BeEquivalentTo(["ImageQaulityMustBeBetweenZeroAndOneHundred"]);
+        errors.Should().ContainKey("General.Validation").WhoseValue.Should().BeEquivalentTo(["ImageQualityMustBeBetweenZeroAndOneHundred"]);
     }
 
     [Fact]

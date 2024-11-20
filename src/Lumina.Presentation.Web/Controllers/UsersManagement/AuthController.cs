@@ -5,11 +5,13 @@ using Lumina.Presentation.Web.Common.Filters;
 using Lumina.Presentation.Web.Common.Http;
 using Lumina.Presentation.Web.Common.Models.UsersManagement;
 using Lumina.Presentation.Web.Common.Security;
+using Lumina.Presentation.Web.Common.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
@@ -24,21 +26,24 @@ namespace Lumina.Presentation.Web.Controllers.UsersManagement;
 /// Controller for authentication related operations.
 /// </summary>
 [Authorize]
-[Route("/auth/")]
+[Route("{culture}/auth")]
 public class AuthController : Controller
 {
     private readonly IApiHttpClient _apiHttpClient;
     private readonly ICryptographyService _cryptographyService;
+    private readonly IUrlService _urlService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AuthController"/> class.
     /// </summary>
     /// <param name="apiHttpClient">Injected service for interactions with the API.</param>
     /// <param name="cryptographyService">Injected service for cryptographic functionality.</param>
-    public AuthController(IApiHttpClient apiHttpClient, ICryptographyService cryptographyService)
+    /// <param name="urlService">Injected service for generating URLs from action and controller names, with localization.</param>
+    public AuthController(IApiHttpClient apiHttpClient, ICryptographyService cryptographyService, IUrlService urlService)
     {
         _apiHttpClient = apiHttpClient;
         _cryptographyService = cryptographyService;
+        _urlService = urlService;
     }
 
     /// <summary>
@@ -67,14 +72,14 @@ public class AuthController : Controller
         ViewData["ReturnUrl"] = returnUrl;
         // if the user is already logged in, redirect them to the home page
         if (User?.Identity?.IsAuthenticated == true)
-            return RedirectToAction("Index", "Home");
+            return Redirect(_urlService.GetAbsoluteUrl("Index", "Home")!);
         // check if the application is initialized (does contain at least the super user account); if it's not, redirect to registration view 
         string? isPendingSuperAdminSetup = HttpContext.Session.GetString(HttpContextItemKeys.PENDING_SUPER_ADMIN_SETUP);
         if (isPendingSuperAdminSetup == "true")
             // TODO: should be:
             // return View("~/Views/Auth/Register", new RegisterRequestDto());
             // but doesn't work because of an ASP.NET bug: https://github.com/dotnet/AspNetCore.Docs/issues/25157
-            return RedirectToAction("Register", "Auth");
+            return Redirect(_urlService.GetAbsoluteUrl("Register", "Auth")!);
         return View(new LoginRequestModel());
     }
 
@@ -88,7 +93,7 @@ public class AuthController : Controller
     {
         // if the user is already logged in, redirect them to the home page
         if (User?.Identity?.IsAuthenticated == true)
-            return RedirectToAction("Index", "Home");
+            return Redirect(_urlService.GetAbsoluteUrl("Index", "Home")!);
         return View();
     }
 
@@ -123,7 +128,7 @@ public class AuthController : Controller
         // call different endpoints based on the view hidden field - registration for normal users, or initial application admin account setup
         string endpoint = data.RegistrationType == "Admin" ? "initialization" : "auth/register";
         // attempt API registration
-        RegisterResponseModel response = await _apiHttpClient.PostAsync<RegisterResponseModel, RegisterRequestModel>(endpoint, data, cancellationToken);
+        RegisterResponseModel response = await _apiHttpClient.PostAsync<RegisterResponseModel, RegisterRequestModel>(endpoint, data, cancellationToken).ConfigureAwait(false);
         return Json(new { success = true, data = response });
     }
 
@@ -140,7 +145,7 @@ public class AuthController : Controller
         try
         {
             // attempt API registration
-            LoginResponseModel response = await _apiHttpClient.PostAsync<LoginResponseModel, LoginRequestModel>("auth/login", data, cancellationToken);
+            LoginResponseModel response = await _apiHttpClient.PostAsync<LoginResponseModel, LoginRequestModel>("auth/login", data, cancellationToken).ConfigureAwait(false);
             // store the received token in a secure cookie            
             Response.Cookies.Delete("Token");
             Response.Cookies.Append("Token", _cryptographyService.Encrypt(response.Token!), new CookieOptions
@@ -148,7 +153,9 @@ public class AuthController : Controller
                 Expires = DateTimeOffset.UtcNow.AddMonths(1),
                 Path = "/",
                 HttpOnly = true,
-                Secure = true
+                Secure = true,
+                IsEssential = true,
+                SameSite = SameSiteMode.Strict
             });
             // tell asp.net we are logged in
             List<Claim> claims =
@@ -158,9 +165,29 @@ public class AuthController : Controller
                 new Claim("Token", response.Token!),
             ];
             ClaimsIdentity claimsIdentity = new(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity)).ConfigureAwait(false);
+            // get current culture from route data or use default if not set
+            string currentCulture = HttpContext.Request.RouteValues["culture"]?.ToString() ?? "en-US";
+            // handle ReturnUrl and ensure it includes the correct culture
+            string redirectUrl;
+            if (!string.IsNullOrEmpty(data.ReturnUrl) && Url.IsLocalUrl(data.ReturnUrl)) // ensure that return URL contains the correct culture
+                redirectUrl = data.ReturnUrl.StartsWith($"/{currentCulture}/") ? data.ReturnUrl : $"/{currentCulture}{data.ReturnUrl}";
+            else
+            {
+                // if no ReturnUrl is provided or it's invalid, use a default URL with respect to base paths
+                redirectUrl = Url.Content("~/");
+
+                // handle reverse proxy scenarios by respecting any base path or forwarded headers
+                if (HttpContext.Request.Headers.TryGetValue("X-Forwarded-Prefix", out StringValues pathBase))
+                    redirectUrl = pathBase + redirectUrl;
+
+                // ensure that default redirect contains the correct culture
+                if (!redirectUrl.StartsWith($"/{currentCulture}/"))
+                    redirectUrl = $"/{currentCulture}{redirectUrl}";
+            }
+
             // return success status and redirect URL
-            return Json(new { success = true, data = string.IsNullOrEmpty(data.ReturnUrl) || !Url.IsLocalUrl(data.ReturnUrl) ? Url.Content("~/") : Url.Content(data.ReturnUrl) });
+            return Json(new { success = true, data = redirectUrl });
         }
         catch (ApiException ex)
         {
@@ -186,10 +213,10 @@ public class AuthController : Controller
     {
         // if the user is not logged in, redirect them to the home page
         if (User?.Identity?.IsAuthenticated == false)
-            return RedirectToAction("Index", "Home");
+            return Redirect(_urlService.GetAbsoluteUrl("Index", "Home")!);
         Response.Cookies.Delete("Token");
-        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-        return RedirectToAction("Login", "Auth");
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme).ConfigureAwait(false);
+        return Redirect(_urlService.GetAbsoluteUrl("Login", "Auth")!);
     }
 
     /// <summary>
@@ -202,7 +229,7 @@ public class AuthController : Controller
     [HttpPost("recover-password")]
     public async Task<IActionResult> RecoverPassword([FromBody] RecoverPasswordRequestModel data, CancellationToken cancellationToken)
     {
-        RecoverPasswordResponseModel response = await _apiHttpClient.PostAsync<RecoverPasswordResponseModel, RecoverPasswordRequestModel>("auth/recover-password", data, cancellationToken);
+        RecoverPasswordResponseModel response = await _apiHttpClient.PostAsync<RecoverPasswordResponseModel, RecoverPasswordRequestModel>("auth/recover-password", data, cancellationToken).ConfigureAwait(false);
         return Json(new { success = true, data = response });
     }
 
@@ -216,7 +243,7 @@ public class AuthController : Controller
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestModel data, CancellationToken cancellationToken)
     {
         data = data with { Username = User?.Identity?.Name }; // assign the currently logged in user as the user for which to change the password
-        ChangePasswordResponseModel response = await _apiHttpClient.PostAsync<ChangePasswordResponseModel, ChangePasswordRequestModel>("auth/change-password", data, cancellationToken);
+        ChangePasswordResponseModel response = await _apiHttpClient.PostAsync<ChangePasswordResponseModel, ChangePasswordRequestModel>("auth/change-password", data, cancellationToken).ConfigureAwait(false);
         return Json(new { success = true, data = response });
     }
 }

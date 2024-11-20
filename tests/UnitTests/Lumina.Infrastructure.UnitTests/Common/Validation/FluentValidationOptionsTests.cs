@@ -121,7 +121,6 @@ public class FluentValidationOptionsTests
         // Assert
         result.Should().BeOfType<ValidateOptionsResult>();
         result.Failed.Should().BeTrue();
-        // TODO: should be modified to account for translation of error messages
         result.Failures.Should().ContainSingle()
             .Which.Should().Contain("Options validation failed for 'PropertyName' with error: 'Error Message'");
 

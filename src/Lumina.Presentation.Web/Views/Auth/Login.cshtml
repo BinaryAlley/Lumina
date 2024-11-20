@@ -4,26 +4,28 @@
 
 @using Lumina.Presentation.Web.Common.Models.UsersManagement
 @using Lumina.Presentation.Web.Common.Services
-
-@inject IUrlService _urlService
+@using Microsoft.AspNetCore.Mvc.Localization
 
 @{
     // generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler
     var scriptId = ScriptIdentifierHelper.GenerateScriptId();
 }
 
+@inject IUrlService _urlService
+@inject IViewLocalizer _localizer
+
 @model LoginRequestModel
 
 <div class="enlightenment-panel shadow-effect p-2 mx-auto panel w-50 mb-10" style="min-width: 320px; margin-top: 1rem;">
     <div class="shine-effect"></div>
-    <form asp-controller="Auth" asp-action="Login" method="post" id="login-form" class="inline">
+    <form method="post" id="login-form" class="inline">
         @Html.AntiForgeryToken()
         <input type="hidden" name="ReturnUrl" value="@ViewData["ReturnUrl"]" />
         <div class="form-container">
             <!-- Username -->
             <div class="form-row">
                 <div class="form-label">
-                    <label asp-for="Username">Username</label>:
+                    <label asp-for="Username">@_localizer["Username"]</label>:
                 </div>
                 <div class="form-field">
                     <input asp-for="Username" autocomplete="username" class="enlightenment-input" />
@@ -32,27 +34,27 @@
             <!-- Password -->
             <div class="form-row">
                 <div class="form-label">
-                    <label asp-for="Password">Password</label>:
+                    <label asp-for="Password">@_localizer["Password"]</label>:
                 </div>
                 <div class="form-field">
                     <input type="password" asp-for="Password" autocomplete="current-password" class="enlightenment-input" />
                 </div>
             </div>
             <div class="form-row">
-                <button id="btn-recover-password" type="button" class="abort-button h-22px w-150px">Recover Password</button>
-                <button id="btn-login" type="submit" class="confirm-button h-22px w-100px">Login</button>
+                <button id="btn-recover-password" type="button" class="abort-button h-22px">@_localizer["RecoverPassword"]</button>
+                <button id="btn-login" type="submit" class="confirm-button h-22px">@_localizer["LoginKey"]</button>
             </div>
             <!-- 2FA -->
             <div class="form-row mt-10 hidden" id="div-totp-code">
                 <div class="form-label">
-                    <label asp-for="TotpCode">Totp Code</label>
+                    <label asp-for="TotpCode">@_localizer["TotpCode"]</label>
                 </div>
                 <div class="form-field">
                     <input type="number" asp-for="TotpCode" autocomplete="one-time-code" class="enlightenment-input" />
                 </div>
             </div>
             <div class="form-row">
-                <button type="submit" id="btn-validate-totp" class="confirm-button h-22px w-100px hidden">Validate Code</button>
+                <button type="submit" id="btn-validate-totp" class="confirm-button h-22px hidden">@_localizer["ValidateCode"]</button>
             </div>
         </div>
     </form>

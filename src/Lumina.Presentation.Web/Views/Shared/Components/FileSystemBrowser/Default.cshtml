@@ -4,9 +4,12 @@
 @using Lumina.Presentation.Web.Common.Enums.Notifications
 @using Lumina.Presentation.Web.Common.Exceptions
 @using Lumina.Presentation.Web.Common.Models.FileSystemManagement
+@using Microsoft.AspNetCore.Mvc.Localization
 @using Microsoft.AspNetCore.Components
 @using System.Text.Json
 @using System.Text
+
+@inject IViewLocalizer _localizer
 
 <div id="file-system-browser-dialog" class="container-background above-modal">
     <div id="file-system-browser-content">
@@ -18,7 +21,7 @@
                 <div id="navigator-view-mode-container">
                     <!--List View Mode-->
                     <svg id="navigator-list-view" class="navigator-icon" width="30" height="30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
-                        <title>List View</title>
+                        <title>@_localizer["ListView"]</title>
                         <defs>
                             <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
                                 <feComponentTransfer in="SourceAlpha" result="adjustedAlpha">
@@ -70,7 +73,7 @@
                     </svg>
                     <!--Details View Mode-->
                     <svg id="navigator-details-view" class="navigator-icon" width="30" height="30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
-                        <title>Details View</title>
+                        <title>@_localizer["DetailsView"]</title>
                         <defs>
                             <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
                                 <feComponentTransfer in="SourceAlpha" result="adjustedAlpha">
@@ -121,7 +124,7 @@
                     </svg>
                     <!--Small Icons View Mode-->
                     <svg id="navigator-small-icons-view" class="navigator-icon" width="30" height="30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
-                        <title>Small Icons View</title>
+                        <title>@_localizer["SmallIconsView"]</title>
                         <defs>
                             <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
                                 <feComponentTransfer in="SourceAlpha" result="adjustedAlpha">
@@ -182,7 +185,7 @@
                     </svg>
                     <!--Medium Icons View Mode-->
                     <svg id="navigator-medium-icons-view" class="navigator-icon" width="30" height="30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
-                        <title>Medium Icons View</title>
+                        <title>@_localizer["MediumIconsView"]</title>
                         <defs>
                             <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
                                 <feComponentTransfer in="SourceAlpha" result="adjustedAlpha">
@@ -228,7 +231,7 @@
                     </svg>
                     <!--Large Icons View Mode-->
                     <svg id="navigator-large-icons-view" class="navigator-icon" width="30" height="30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
-                        <title>Large Icons View</title>
+                        <title>@_localizer["LargeIconsView"]</title>
                         <defs>
                             <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
                                 <feComponentTransfer in="SourceAlpha" result="adjustedAlpha">
@@ -265,7 +268,7 @@
                     </svg>
                     <!--Extra Large Icons View Mode-->
                     <svg id="navigator-extra-large-icons-view" class="navigator-icon" width="30" height="30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
-                        <title>Extra Large Icons View</title>
+                        <title>@_localizer["ExtraLargeIconsView"]</title>
                         <defs>
                             <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
                                 <feComponentTransfer in="SourceAlpha" result="adjustedAlpha">
@@ -304,13 +307,13 @@
                 <div id="navigator-navigation-controls-container">
                     <!--Navigation-->
                     <div id="navigator-history">
-                        <img src="~/images/ui/back.svg" id="navigator-navigate-back" class="navigation-icon" alt="Back" title="Back" />
-                        <img src="~/images/ui/forward.svg" id="navigator-navigate-forward" class="navigation-icon" alt="Forward" title="Forward" />
-                        <img src="~/images/ui/up.svg" id="navigator-navigate-up" class="navigation-icon" alt="Up One Level" title="Up One Level" />
+                        <img src="~/images/ui/back.svg" id="navigator-navigate-back" class="navigation-icon" alt="@_localizer["Back"]" title="@_localizer["Back"]" />
+                        <img src="~/images/ui/forward.svg" id="navigator-navigate-forward" class="navigation-icon" alt="@_localizer["Forward"]" title="@_localizer["Forward"]" />
+                        <img src="~/images/ui/up.svg" id="navigator-navigate-up" class="navigation-icon" alt="@_localizer["UpOneLevel"]" title="@_localizer["UpOneLevel"]" />
                     </div>
                     <!--Toggle Tree View-->
                     <svg id="navigator-toggle-tree-view-button" class="navigator-icon" width="30" height="30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
-                        <title>Toggle Tree View</title>
+                        <title>@_localizer["ToggleTreeView"]</title>
                         <defs>
                             <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
                                 <feComponentTransfer in="SourceAlpha" result="adjustedAlpha">
@@ -346,7 +349,7 @@
                     </svg>
                     <!--Toggle Thumbnails-->
                     <svg id="navigator-toggle-thumbnails-button" class="navigator-icon" width="30" height="30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
-                        <title>Toggle Thumbanils</title>
+                        <title>@_localizer["ToggleThumbanils"]</title>
                         <defs>
                             <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
                                 <feComponentTransfer in="SourceAlpha" result="adjustedAlpha">
@@ -382,7 +385,7 @@
                     </svg>
                     <!--Toggle Hidden Elements-->
                     <svg id="navigator-toggle-hidden-button" class="navigator-icon" width="30" height="30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
-                        <title>Toggle Hidden Items</title>
+                        <title>@_localizer["ToggleHiddenItems"]</title>
                         <defs>
                             <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
                                 <feComponentTransfer in="SourceAlpha" result="adjustedAlpha">
@@ -420,7 +423,7 @@
                     </svg>
                     <!--Toggle Selection Mode-->
                     <svg id="navigator-toggle-selection-button" class="navigator-icon" width="30" height="30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
-                        <title>Toggle Selection Mode</title>
+                        <title>@_localizer["ToggleSelectionMode"]</title>
                         <defs>
                             <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
                                 <feComponentTransfer in="SourceAlpha" result="adjustedAlpha">
@@ -464,16 +467,16 @@
                         </div>
                     </div>
                     <button id="navigator-edit-path-button" class="navigator-edit-path-button abort-button f-16" style="height:28px; width:35px;">
-                        <img src="~/images/ui/edit.svg" id="navigator-edit-icon" alt="Edit Path" title="Edit Path" />
+                        <img src="~/images/ui/edit.svg" id="navigator-edit-icon" alt="@_localizer["EditPath"]" title="@_localizer["EditPath"]" />
                     </button>
                     <button id="navigator-navigate-button" class="navigator-navigate-button confirm-button f-16" style="height:28px; width:35px;">
-                        <img src="~/images/ui/check.svg" id="navigator-navigate-icon" alt="Navigate" title="Navigate" />
+                        <img src="~/images/ui/check.svg" id="navigator-navigate-icon" alt="@_localizer["Navigate"]" title="@_localizer["Navigate"]" />
                     </button>
                     <button class="file-system-browser-content-new-directory abort-button f-16" style="height:28px; width:35px;">
-                        <img src="~/images/ui/new-directory.svg" id="navigator-new-directory-icon" alt="New Directory" title="New Directory" />
+                        <img src="~/images/ui/new-directory.svg" id="navigator-new-directory-icon" alt="@_localizer["NewDirectory"]" title="@_localizer["NewDirectory"]" />
                     </button>
                     <button class="file-system-browser-content-favorite-directory abort-button f-16" style="height:28px; width:35px;">
-                        <img src="~/images/ui/favorite-star.svg" class="navigation-icon favorite-unselected" alt="Favorite directory" title="Favorite directory" />
+                        <img src="~/images/ui/favorite-star.svg" class="navigation-icon favorite-unselected" alt="@_localizer["FavoriteDirectory"]" title="@_localizer["FavoriteDirectory"]" />
                     </button>
                 </div>
                 <!--End File System Navigator-->
@@ -492,7 +495,7 @@
                 <div id="file-system-browser-file-system-directories">
                     <div id="file-system-browser-file-system-explorer-container" class="scroll-horizontal">
                         <div id="file-system-browser-file-system-explorer-details-header" style="height: 0px;">
-                            <span>Name</span>
+                            <span>@_localizer["Name"]</span>
                         </div>
                         <div id="file-system-browser-file-system-explorer">
                         </div>
@@ -502,20 +505,20 @@
         </div>
         <div id="file-system-browser-actions-container">
             <div id="file-system-browser-actions-path-container">
-                <label class="text-light-one">Directory</label>
+                <label class="text-light-one">@_localizer["Directory"]</label>
                 <input type="text" id="file-system-browser-selected-element" Name="file-system-browser-selected-element" class="enlightenment-input w-100" readonly autocomplete="on" />
             </div>
             <div id="file-system-browser-actions">
-                <button id="file-system-browser-cancel-button" class="abort-button w-100px">Cancel</button>
-                <button id="file-system-browser-confirm-button" class="confirm-button w-100px" disabled>Open</button>
+                <button id="file-system-browser-cancel-button" class="abort-button w-100px">@_localizer["Cancel"]</button>
+                <button id="file-system-browser-confirm-button" class="confirm-button w-100px" disabled>@_localizer["Open"]</button>
             </div>
         </div>
     </div>
     @* <div id="divModal"></div>
-    <label class="text-light-one">Enter new directory name:</label>
+    <label class="text-light-one">@_localizer["EnterNewDirectoryName"]</label>
     <EnlightenmentInput Type="text" Name="newDirectoryName" AutoComplete="true" />
-    <EnlightenmentButton IsConfirmButton="false">Cancel</EnlightenmentButton>
-    <EnlightenmentButton>Confirm</EnlightenmentButton> *@
+    <EnlightenmentButton IsConfirmButton="false">@_localizer["Cancel"]</EnlightenmentButton>
+    <EnlightenmentButton>@_localizer["Confirm"]</EnlightenmentButton> *@
 </div>
 <div id="visible-selection-rectangle"></div>
 <div id="selection-rectangle"></div>

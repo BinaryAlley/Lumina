@@ -13,7 +13,7 @@ namespace Lumina.Presentation.Web.Controllers.FileSystemManagement;
 /// Controller for managing file system drives.
 /// </summary>
 [Authorize]
-[Route("[controller]")]
+[Route("drives")]
 public class DrivesController : Controller
 {
     private readonly IApiHttpClient _apiHttpClient;
@@ -34,7 +34,7 @@ public class DrivesController : Controller
     [HttpGet("get-drives")]
     public async Task<IActionResult> GetDrives(CancellationToken cancellationToken)
     {
-        FileSystemTreeNodeModel[] response = await _apiHttpClient.GetAsync<FileSystemTreeNodeModel[]>($"drives/get-drives", cancellationToken);
+        FileSystemTreeNodeModel[] response = await _apiHttpClient.GetAsync<FileSystemTreeNodeModel[]>($"drives/get-drives", cancellationToken).ConfigureAwait(false);
         return Json(new { success = true, data = new { drives = response } });
     }
 }

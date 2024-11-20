@@ -144,6 +144,9 @@
   <data name="Interviews" xml:space="preserve">
     <value>Entrevistas</value>
   </data>
+  <data name="Language" xml:space="preserve">
+    <value>Lenguaje</value>
+  </data>
   <data name="Library" xml:space="preserve">
     <value>Biblioteca</value>
   </data>

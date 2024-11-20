@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using Serilog;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -49,13 +49,13 @@ public static class PresentationApiLayerServices
             rateLimiterOptions.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
             rateLimiterOptions.OnRejected = async (onRejectedContext, cancellationToken) =>
             {
-                ILogger logger = onRejectedContext.HttpContext.RequestServices.GetRequiredService<ILogger>();
+                ILogger<Program> logger = onRejectedContext.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
 
                 string clientIp = onRejectedContext.HttpContext.Request.Headers["X-Forwarded-For"]
                     .FirstOrDefault()?.Split(',')[0].Trim()
                     ?? onRejectedContext.HttpContext.Connection.RemoteIpAddress?.ToString()
                     ?? "unknown";
-                Log.Warning(
+                logger.LogWarning(
                     "Rate limit exceeded. IP: {IpAddress}, Route: {Route}, Lease Acquired: {IsAcquired}",
                     clientIp,
                     onRejectedContext.HttpContext.Request.Path,
@@ -76,9 +76,9 @@ public static class PresentationApiLayerServices
                 var problem = new
                 {
                     type = "https://tools.ietf.org/html/rfc7231#section-6.5.29",
-                    title = "TooManyRequests", // TODO: implement translation?
+                    title = "TooManyRequests", 
                     status = StatusCodes.Status429TooManyRequests,
-                    detail = "Too many attempts. Please try again later.",
+                    detail = "TooManyRequests",
                     retryAfter = "900"
                 };
 

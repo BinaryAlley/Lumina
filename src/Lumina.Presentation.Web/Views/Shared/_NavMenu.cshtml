@@ -1,6 +1,8 @@
 @using Lumina.Presentation.Web.Common.Services
+@using Microsoft.AspNetCore.Mvc.Localization
 
 @inject IUrlService _urlService
+@inject IViewLocalizer _localizer
 
 <input type="checkbox" id="hamburger-input" class="burger-shower" />
 <label id="hamburger-menu" for="hamburger-input">
@@ -10,68 +12,85 @@
     <nav id="mobile-menu">
         <div id="mobile-menu-content">
             <div class="mobile-menu-heading">
-                Account
+                @_localizer["Account"]
             </div>
             <ul>
                 @if (User?.Identity?.IsAuthenticated == false)
                 {
-                    <li><a href="@_urlService.GetAbsoluteUrl("Login", "Auth")"><span>Login</span></a></li>
-                    <li><a href="@_urlService.GetAbsoluteUrl("Login", "Auth")"><span>Recover Password</span></a></li>
+                    <li><a href="@_urlService.GetAbsoluteUrl("Login", "Auth")"><span>@_localizer["Login"]</span></a></li>
+                    <li><a href="@_urlService.GetAbsoluteUrl("Login", "Auth")"><span>@_localizer["RecoverPassword"]</span></a></li>
                 }
                 else
                 {
-                    <li><a href="@_urlService.GetAbsoluteUrl("Logout", "Auth")"><span>Logout</span></a></li>
+                    <li><a href="@_urlService.GetAbsoluteUrl("Logout", "Auth")"><span>@_localizer["Logout"]</span></a></li>
                 }
                 @if (User?.Identity?.IsAuthenticated == true)
                 {
-                    <li><a href="@_urlService.GetAbsoluteUrl("Register", "Auth")" class="nav-link"><span>Register</span></a></li>
-                    <li><a href="@_urlService.GetAbsoluteUrl("ChangePassword", "Auth")" class="nav-link"><span>Change Password</span></a></li>
-                    <li><a href="@_urlService.GetAbsoluteUrl("Profile", "Auth")" class="nav-link"><span>Profile</span></a></li>
+                    <li><a href="@_urlService.GetAbsoluteUrl("Register", "Auth")" class="nav-link"><span>@_localizer["Register"]</span></a></li>
+                    <li><a href="@_urlService.GetAbsoluteUrl("ChangePassword", "Auth")" class="nav-link"><span>@_localizer["ChangePassword"]</span></a></li>
+                    <li><a href="@_urlService.GetAbsoluteUrl("Profile", "Auth")" class="nav-link"><span>@_localizer["Profile"]</span></a></li>
                 }
             </ul>
             @if (User?.Identity?.IsAuthenticated == true)
             {
                 <div class="mobile-menu-heading">
-                    Tools
+                    @_localizer["Library"]
                 </div>
                 <ul>
-                    <li><a href="tools/options"><span>Options</span></a></li>
+                    <li><a href="library/manage" class="nav-link"><span>@_localizer["ManageLibraries"]</span></a></li>
+                    <li><a href="@_urlService.GetAbsoluteUrl("EditLibrary", "LibraryManagement")" class="nav-link"><span>@_localizer["AddNewLibrary"]</span></a></li>
                 </ul>
                 <div class="mobile-menu-heading">
-                    Library
+                    @_localizer["WrittenContent"]
                 </div>
                 <ul>
-                    <li><a href="library/manage"><span>Manage libraries</span></a></li>
-                    <li><a href="@_urlService.GetAbsoluteUrl("EditLibrary", "LibraryManagement")" class="nav-link"><span>Add new library</span></a></li>
+                    <li><a href="library/written-content-library/books-library/books" class="nav-link"><span>@_localizer["Books"]</span></a></li>
+                    <li><a href="library/written-content/magazines" class="nav-link"><span>@_localizer["Magazines"]</span></a></li>
                 </ul>
                 <div class="mobile-menu-heading">
-                    Written Content
+                    @_localizer["Audio"]
                 </div>
                 <ul>
-                    <li><a href="library/written-content-library/books-library/books" class="nav-link"><span>Books</span></a></li>
-                    <li><a href="library/written-content/magazines"><span>Magazines</span></a></li>
+                    <li><a href="library/audio/music" class="nav-link"><span>@_localizer["Music"]</span></a></li>
+                    <li><a href="library/audio/interviews" class="nav-link"><span>@_localizer["Interviews"]</span></a></li>
                 </ul>
                 <div class="mobile-menu-heading">
-                    Audio
+                    @_localizer["Video"]
                 </div>
                 <ul>
-                    <li><a href="library/audio/music"><span>Music</span></a></li>
-                    <li><a href="library/audio/interviews"><span>Interviews</span></a></li>
-                </ul>
-                <div class="mobile-menu-heading">
-                    Video
-                </div>
-                <ul>
-                    <li><a href="library/video/movies"><span>Movies</span></a></li>
-                    <li><a href="library/video/tvshows"><span>TV Shows</span></a></li>
+                    <li><a href="library/video/movies" class="nav-link"><span>@_localizer["Movies"]</span></a></li>
+                    <li><a href="library/video/tvshows" class="nav-link"><span>@_localizer["TvShows"]</span></a></li>
                 </ul>
             }
             <div class="mobile-menu-heading">
-                Help
+                @_localizer["Language"]
             </div>
             <ul>
-                <li><a href="help/documentation"><span>Documentation</span></a></li>
-                <li><a href="help/about"><span>About</span></a></li>
+                <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=zh-cn&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)"><span>简体中文</span></a></li><!--CN-->
+                <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=de-de&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)"><span>Deutsch</span></a></li><!--DE-->
+                <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=en-us&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)"><span>English</span></a></li><!--EN-->
+                <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=es-es&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)"><span>Español</span></a></li><!--ES-->
+                <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=fr-fr&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)"><span>Français</span></a></li><!--FR-->
+                <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=it-it&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)"><span>Italiano</span></a></li><!--IT-->
+                <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=ja-jp&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)"><span>日本語</span></a></li><!--JP-->
+                <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=ro-ro&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)"><span>Română</span></a></li><!--RO-->
+                <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=ru-ru&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)"><span>Русский</span></a></li><!--RU-->
+            </ul>
+            @if (User?.Identity?.IsAuthenticated == true)
+            {
+                <div class="mobile-menu-heading">
+                    @_localizer["Tools"]
+                </div>
+                <ul>
+                    <li><a href="tools/options" class="nav-link"><span>@_localizer["Options"]</span></a></li>
+                </ul>
+            }
+            <div class="mobile-menu-heading">
+                @_localizer["Help"]
+            </div>
+            <ul>
+                <li><a href="help/documentation" class="nav-link"><span>@_localizer["Documentation"]</span></a></li>
+                <li><a href="help/about" class="nav-link"><span>@_localizer["About"]</span></a></li>
             </ul>
         </div>
     </nav>
@@ -80,70 +99,87 @@
     <ul>
         <li tabindex="0">
             <input type="radio" id="account-menu" name="menu">
-            <label for="account-menu">Account</label>
+            <label for="account-menu">@_localizer["Account"]</label>
             <ul>
                 @if (User?.Identity?.IsAuthenticated == false)
                 {
-                    <li><a href="@_urlService.GetAbsoluteUrl("Login", "Auth")">Login</a></li>
-                    <li><a href="@_urlService.GetAbsoluteUrl("RecoverPassword", "Auth")">Recover Password</a></li>
+                    <li><a href="@_urlService.GetAbsoluteUrl("Login", "Auth")">@_localizer["Login"]</a></li>
+                    <li><a href="@_urlService.GetAbsoluteUrl("RecoverPassword", "Auth")">@_localizer["RecoverPassword"]</a></li>
                 }
                 else
                 {
-                    <li><a href="@_urlService.GetAbsoluteUrl("Logout", "Auth")">Logout</a></li>
+                    <li><a href="@_urlService.GetAbsoluteUrl("Logout", "Auth")">@_localizer["Logout"]</a></li>
                 }
                 @if (User?.Identity?.IsAuthenticated == true)
                 {
-                    <li><a href="@_urlService.GetAbsoluteUrl("Register", "Auth")" class="nav-link">Register</a></li>
-                    <li><a href="@_urlService.GetAbsoluteUrl("ChangePassword", "Auth")" class="nav-link">Change Password</a></li>
-                    <li><a href="@_urlService.GetAbsoluteUrl("Profile", "Auth")" class="nav-link">Profile</a></li>
+                    <li><a href="@_urlService.GetAbsoluteUrl("Register", "Auth")" class="nav-link">@_localizer["Register"]</a></li>
+                    <li><a href="@_urlService.GetAbsoluteUrl("ChangePassword", "Auth")" class="nav-link">@_localizer["ChangePassword"]</a></li>
+                    <li><a href="@_urlService.GetAbsoluteUrl("Profile", "Auth")" class="nav-link">@_localizer["Profile"]</a></li>
                 }
             </ul>
         </li>
         @if (User?.Identity?.IsAuthenticated == true)
         {
             <li tabindex="0">
-                <input type="radio" id="tools-menu" name="menu">
-                <label for="tools-menu">Tools</label>
-                <ul>
-                    <li><a href="tools/options">Options</a></li>
-                </ul>
-            </li>
-            <li tabindex="0">
                 <input type="radio" id="library-menu" name="menu">
-                <label for="library-menu">Library</label>
+                <label for="library-menu">@_localizer["Library"]</label>
                 <ul>
-                    <li tabindex="0"><a href="library/manage">Manage libraries</a></li>
-                    <li tabindex="0"><a href="@_urlService.GetAbsoluteUrl("EditLibrary", "LibraryManagement")" class="nav-link">Add new library</a></li>
+                    <li tabindex="0"><a href="library/manage" class="nav-link">@_localizer["ManageLibraries"]</a></li>
+                    <li tabindex="0"><a href="@_urlService.GetAbsoluteUrl("EditLibrary", "LibraryManagement")" class="nav-link">@_localizer["AddNewLibrary"]</a></li>
                     <li class="has-submenu" tabindex="0">
-                        <label>Written Content</label>
+                        <label>@_localizer["WrittenContent"]</label>
                         <ul>
-                            <li><a href="library/written-content-library/books-library/books" class="nav-link">Books</a></li>
-                            <li><a href="library/written-content/magazines">Magazines</a></li>
+                            <li><a href="library/written-content-library/books-library/books" class="nav-link">@_localizer["Books"]</a></li>
+                            <li><a href="library/written-content/magazines" class="nav-link">@_localizer["Magazines"]</a></li>
                         </ul>
                     </li>
                     <li class="has-submenu" tabindex="0">
-                        <label>Audio</label>
+                        <label>@_localizer["Audio"]</label>
                         <ul>
-                            <li><a href="library/audio/music">Music</a></li>
-                            <li><a href="library/audio/interviews">Interviews</a></li>
+                            <li><a href="library/audio/music" class="nav-link">@_localizer["Music"]</a></li>
+                            <li><a href="library/audio/interviews" class="nav-link">@_localizer["Interviews"]</a></li>
                         </ul>
                     </li>
                     <li class="has-submenu" tabindex="0">
-                        <label>Video</label>
+                        <label>@_localizer["Video"]</label>
                         <ul>
-                            <li><a href="library/video/movies">Movies</a></li>
-                            <li><a href="library/video/tvshows">TV Shows</a></li>
+                            <li><a href="library/video/movies" class="nav-link">@_localizer["Movies"]</a></li>
+                            <li><a href="library/video/tvshows" class="nav-link">@_localizer["TvShows"]</a></li>
                         </ul>
                     </li>
                 </ul>
             </li>
         }
         <li tabindex="0">
-            <input type="radio" id="help-menu" name="menu">
-            <label for="help-menu">Help</label>
+            <input type="radio" id="tools-menu" name="menu">
+            <label for="tools-menu">@_localizer["Tools"]</label>
             <ul>
-                <li><a href="help/documentation">Documentation</a></li>
-                <li><a href="help/about">About</a></li>
+                <li class="has-submenu" tabindex="0">
+                    <label>@_localizer["Language"]</label>
+                    <ul>
+                        <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=zh-cn&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)">简体中文</a></li><!--CN-->
+                        <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=de-de&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)">Deutsch</a></li><!--DE-->
+                        <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=en-us&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)">English</a></li><!--EN-->
+                        <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=es-es&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)">Español</a></li><!--ES-->
+                        <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=fr-fr&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)">Français</a></li><!--FR-->
+                        <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=it-it&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)">Italiano</a></li><!--IT-->
+                        <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=ja-jp&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)">日本語</a></li><!--JP-->
+                        <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=ro-ro&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)">Română</a></li><!--RO-->
+                        <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=ru-ru&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)">Русский</a></li><!--RU-->
+                    </ul>
+                </li>
+                @if (User?.Identity?.IsAuthenticated == true)
+                {
+                    <li><a href="tools/options" class="nav-link">@_localizer["Options"]</a></li>
+                }
+            </ul>
+        </li>
+        <li tabindex="0">
+            <input type="radio" id="help-menu" name="menu">
+            <label for="help-menu">@_localizer["Help"]</label>
+            <ul>
+                <li><a href="help/documentation" class="nav-link">@_localizer["Documentation"]</a></li>
+                <li><a href="help/about" class="nav-link">@_localizer["About"]</a></li>
             </ul>
         </li>
     </ul>
