@@ -7,6 +7,7 @@ using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Security;
+using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.Application.Core.UsersManagement.Authentication.Queries.LoginUser;
 using Lumina.Application.UnitTests.Common.Mapping.UserManagement.Users.Fixtures;
 using Lumina.Contracts.Responses.Authentication;
@@ -31,6 +32,7 @@ public class LoginUserQueryHandlerTests
     private readonly ITotpTokenGenerator _mockTotpTokenGenerator;
     private readonly ICryptographyService _mockCryptographyService;
     private readonly IUserRepository _mockUserRepository;
+    private readonly IDateTimeProvider _mockDateTimeProvider;
     private readonly LoginUserQueryHandler _sut;
 
     /// <summary>
@@ -44,15 +46,18 @@ public class LoginUserQueryHandlerTests
         _mockTotpTokenGenerator = Substitute.For<ITotpTokenGenerator>();
         _mockCryptographyService = Substitute.For<ICryptographyService>();
         _mockUserRepository = Substitute.For<IUserRepository>();
+        _mockDateTimeProvider = Substitute.For<IDateTimeProvider>();
 
         _mockUnitOfWork.GetRepository<IUserRepository>().Returns(_mockUserRepository);
+        _mockDateTimeProvider.UtcNow.Returns(DateTime.UtcNow);
 
         _sut = new LoginUserQueryHandler(
             _mockUnitOfWork,
             _mockHashService,
             _mockJwtTokenGenerator,
             _mockTotpTokenGenerator,
-            _mockCryptographyService);
+            _mockCryptographyService,
+            _mockDateTimeProvider);
     }
 
     [Fact]

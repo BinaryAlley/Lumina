@@ -1,13 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Errors;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 #endregion
 
 namespace Lumina.DataAccess.Core.Repositories.Users;
@@ -62,7 +63,17 @@ internal sealed class UserRepository : IUserRepository
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a <see cref="UserEntity"/> if found, or an error.</returns>
     public async Task<ErrorOr<UserEntity?>> GetByUsernameAsync(string username, CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.Users.FirstOrDefaultAsync(user => user.Username == username, cancellationToken).ConfigureAwait(false);
+        return await _luminaDbContext.Users
+            .Include(user => user.Libraries)
+            .ThenInclude(library => library.ContentLocations)
+            .Include(user => user.UserPermissions)
+            .ThenInclude(userPermission => userPermission.Permission)
+            .Include(user => user.UserRoles)
+            .ThenInclude(userRole => userRole.Role)
+            .ThenInclude(role => role.RolePermissions)
+            .ThenInclude(rolePermission => rolePermission.Permission)
+            .FirstOrDefaultAsync(user => user.Username == username, cancellationToken)
+            .ConfigureAwait(false);
     }
 
     /// <summary>
@@ -73,10 +84,41 @@ internal sealed class UserRepository : IUserRepository
     /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successfull operation, or an error.</returns>
     public async Task<ErrorOr<Updated>> UpdateAsync(UserEntity data, CancellationToken cancellationToken)
     {
-        UserEntity? foundUser = await _luminaDbContext.Users.FirstOrDefaultAsync(user => user.Username == data.Username, cancellationToken).ConfigureAwait(false);
+        UserEntity? foundUser = await _luminaDbContext.Users
+            .Include(user => user.Libraries)
+            .ThenInclude(library => library.ContentLocations)
+            .Include(user => user.UserPermissions)
+            .ThenInclude(userPermission => userPermission.Permission)
+            .Include(user => user.UserRoles)
+            .ThenInclude(userRole => userRole.Role)
+            .ThenInclude(role => role.RolePermissions)
+            .ThenInclude(rolePermission => rolePermission.Permission)
+            .FirstOrDefaultAsync(user => user.Username == data.Username, cancellationToken)
+            .ConfigureAwait(false);
         if (foundUser is null)
             return Errors.Users.UserDoesNotExist;
         _luminaDbContext.Entry(foundUser).CurrentValues.SetValues(data);
         return Result.Updated;
+    }
+
+    /// <summary>
+    /// Gets a <see cref="UserEntity"/> identified by <paramref name="id"/> from the storage medium.
+    /// </summary>
+    /// <param name="id">The id of the user to get.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a <see cref="UserEntity"/> identified by <paramref name="id"/>, or an error.</returns>
+    public async Task<ErrorOr<UserEntity?>> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        return await _luminaDbContext.Users
+            .Include(user => user.Libraries)
+            .ThenInclude(library => library.ContentLocations)
+            .Include(user => user.UserPermissions)
+            .ThenInclude(userPermission => userPermission.Permission)
+            .Include(user => user.UserRoles)
+            .ThenInclude(userRole => userRole.Role)
+            .ThenInclude(role => role.RolePermissions)
+            .ThenInclude(rolePermission => rolePermission.Permission)
+            .FirstOrDefaultAsync(user => user.Id == id, cancellationToken)
+            .ConfigureAwait(false);
     }
 }

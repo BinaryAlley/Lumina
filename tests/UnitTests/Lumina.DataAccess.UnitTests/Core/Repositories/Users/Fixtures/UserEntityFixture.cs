@@ -44,12 +44,12 @@ public class UserEntityFixture
             .RuleFor(x => x.Password, f => f.Internet.Password(12))
             .RuleFor(x => x.TempPassword, f => f.Random.Bool() ? f.Internet.Password(8) : null)
             .RuleFor(x => x.TotpSecret, f => f.Random.Bool() ? f.Random.String2(32, "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567") : null)
-            .RuleFor(x => x.VerificationToken, f => f.Random.Bool() ? f.Random.Guid().ToString() : null)
-            .RuleFor(x => x.VerificationTokenCreated, (f, u) => u.VerificationToken != null ? f.Date.Past() : null)
             .RuleFor(x => x.TempPasswordCreated, (f, u) => u.TempPassword != null ? f.Date.Past() : null)
             .RuleFor(x => x.Libraries, _ => CreateLibraries(_faker.Random.Number(1, 3), userId))
-            .RuleFor(x => x.Created, f => f.Date.Past())
-            .RuleFor(x => x.Updated, f => f.Random.Bool() ? f.Date.Recent() : null)
+            .RuleFor(x => x.CreatedOnUtc, f => f.Date.Past())
+            .RuleFor(x => x.CreatedBy, _ => userId)
+            .RuleFor(x => x.UpdatedOnUtc, f => f.Random.Bool() ? f.Date.Recent() : null)
+            .RuleFor(x => x.UpdatedBy, _ => userId)
             .Generate();
     }
 

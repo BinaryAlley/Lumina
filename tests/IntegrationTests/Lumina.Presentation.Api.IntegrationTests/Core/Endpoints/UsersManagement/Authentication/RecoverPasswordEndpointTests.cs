@@ -242,7 +242,10 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
                 Password = _hashService.HashString("OldPass123!"),
                 TotpSecret = null, // No TOTP configured
                 Libraries = [],
-                Created = DateTime.UtcNow
+                UserPermissions = [],
+                UserRoles = [],
+                CreatedBy = Guid.NewGuid(),
+                CreatedOnUtc = DateTime.UtcNow
             };
             dbContext.Users.Add(userWithoutTotp);
             await dbContext.SaveChangesAsync();
@@ -306,7 +309,10 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
             Password = _hashService.HashString("OldPass123!"),
             TotpSecret = _cryptographyService.Encrypt(Convert.ToBase64String(totpSecret)),
             Libraries = [],
-            Created = DateTime.UtcNow
+            UserPermissions = [],
+            UserRoles = [],
+            CreatedBy = Guid.NewGuid(),
+            CreatedOnUtc = DateTime.UtcNow
         };
 
         dbContext.Users.Add(user);
@@ -325,7 +331,10 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
             Password = _hashService.HashString("OldPass123!"),
             TotpSecret = null,
             Libraries = [],
-            Created = DateTime.UtcNow
+            UserPermissions = [],
+            UserRoles = [],
+            CreatedBy = Guid.NewGuid(),
+            CreatedOnUtc = DateTime.UtcNow
         };
 
         dbContext.Users.Add(user);

@@ -33,24 +33,53 @@ public class UserConfiguration : IEntityTypeConfiguration<UserEntity>
             .HasColumnOrder(2);
 
         builder.Property(user => user.TempPassword)
+            .HasDefaultValue(null)
             .HasColumnOrder(3);
 
         builder.Property(user => user.TotpSecret)
+            .HasDefaultValue(null)
             .HasColumnOrder(4);
 
-        builder.Property(user => user.VerificationToken)
+        builder.Property(user => user.TempPasswordCreated)
+            .HasDefaultValue(null)
             .HasColumnOrder(5);
 
-        builder.Property(user => user.VerificationTokenCreated)
-            .HasColumnOrder(6);
-
-        builder.Property(user => user.TempPasswordCreated)
-            .HasColumnOrder(7);
-
+        // relationships
         builder.HasMany(user => user.Libraries)
             .WithOne(library => library.User)
             .HasForeignKey(library => library.UserId)
             .IsRequired() // a library must have a user
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(user => user.UserRoles)
+            .WithOne(userRole => userRole.User)
+            .HasForeignKey(userRole => userRole.UserId)
+            .OnDelete(DeleteBehavior.Cascade); 
+
+        builder.HasMany(user => user.UserPermissions)
+            .WithOne(userPermission => userPermission.User)
+            .HasForeignKey(userPermission => userPermission.UserId)
+            .OnDelete(DeleteBehavior.Cascade); 
+
+        // audit
+        builder.Property(user => user.CreatedOnUtc)
+            .IsRequired()
+            .HasColumnOrder(6);
+
+        builder.Property(user => user.CreatedBy)
+            .IsRequired()
+            .HasColumnOrder(7);
+
+        builder.Property(user => user.UpdatedOnUtc)
+            .HasDefaultValue(null)
+            .HasColumnOrder(8);
+
+        builder.Property(user => user.UpdatedBy)
+            .HasDefaultValue(null)
+            .HasColumnOrder(9);
+
+        // indexes
+        builder.HasIndex(user => user.Username)
+            .IsUnique(); // queried frequently
     }
 }

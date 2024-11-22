@@ -1,12 +1,15 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Repositories.Books;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.Infrastructure.Authentication;
+using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.DataAccess.Common.DependencyInjection;
 using Lumina.DataAccess.Core.Repositories.Common.Factory;
 using Lumina.DataAccess.Core.UoW;
+using Lumina.DataAccess.UnitTests.Common.Setup;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
@@ -47,6 +50,8 @@ public class UnitOfWorkTests
         // Arrange
         ServiceCollection services = new();
         DataAccessLayerServices.AddDataAccessLayerServices(services);
+        services.AddTransient<ICurrentUserService, TestCurrentUserService>();
+        services.AddTransient<IDateTimeProvider, TestDateTimeProvider>();
         ServiceProvider serviceProvider = services.BuildServiceProvider();
         UnitOfWork unitOfWork = (UnitOfWork)serviceProvider.GetRequiredService<IUnitOfWork>();
 
@@ -63,6 +68,8 @@ public class UnitOfWorkTests
         // Arrange
         ServiceCollection services = new();
         DataAccessLayerServices.AddDataAccessLayerServices(services);
+        services.AddTransient<ICurrentUserService, TestCurrentUserService>();
+        services.AddTransient<IDateTimeProvider, TestDateTimeProvider>();
         ServiceProvider serviceProvider = services.BuildServiceProvider();
         UnitOfWork unitOfWork = (UnitOfWork)serviceProvider.GetRequiredService<IUnitOfWork>();
         int initialCount = unitOfWork.Repositories.Count;
@@ -96,6 +103,8 @@ public class UnitOfWorkTests
         // Arrange
         ServiceCollection services = new();
         DataAccessLayerServices.AddDataAccessLayerServices(services);
+        services.AddTransient<ICurrentUserService, TestCurrentUserService>();
+        services.AddTransient<IDateTimeProvider, TestDateTimeProvider>();
         ServiceProvider serviceProvider = services.BuildServiceProvider();
         UnitOfWork unitOfWork = (UnitOfWork)serviceProvider.GetRequiredService<IUnitOfWork>();
         unitOfWork.ResetRepositories();
@@ -113,6 +122,8 @@ public class UnitOfWorkTests
         // Arrange
         ServiceCollection services = new();
         DataAccessLayerServices.AddDataAccessLayerServices(services);
+        services.AddTransient<ICurrentUserService, TestCurrentUserService>();
+        services.AddTransient<IDateTimeProvider, TestDateTimeProvider>();
         ServiceProvider serviceProvider = services.BuildServiceProvider();
         UnitOfWork unitOfWork = (UnitOfWork)serviceProvider.GetRequiredService<IUnitOfWork>();
 

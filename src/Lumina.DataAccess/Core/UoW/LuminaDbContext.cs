@@ -1,16 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Common;
+using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Domain.Common.Events;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.DataAccess.Core.UoW;
@@ -25,6 +20,11 @@ public class LuminaDbContext : DbContext
     public virtual DbSet<BookEntity> Books { get; set; } = null!;
     public virtual DbSet<UserEntity> Users { get; set; } = null!;
     public virtual DbSet<LibraryEntity> Libraries { get; set; } = null!;
+    public virtual DbSet<RoleEntity> Roles { get; set; } = null!;
+    public virtual DbSet<UserRoleEntity> UserRoles { get; set; } = null!;
+    public virtual DbSet<PermissionEntity> Permissions { get; set; } = null!;
+    public virtual DbSet<UserPermissionEntity> UserPermissions { get; set; } = null!;
+    public virtual DbSet<RolePermissionEntity> RolePermissions { get; set; } = null!;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LuminaDbContext"/> class.
@@ -45,52 +45,5 @@ public class LuminaDbContext : DbContext
                     .ApplyConfigurationsFromAssembly(typeof(LuminaDbContext).Assembly);
 
         base.OnModelCreating(modelBuilder);
-    }
-
-    /// <summary>
-    /// Overrides the SaveChanges method of the DbContext class to automatically set the Created and Updated properties of entities that implement the <see cref="IStorageEntity"/>.
-    /// </summary>
-    /// <returns>The number of objects written to the underlying database.</returns>
-    public override int SaveChanges()
-    {
-        HandleTimestamps();
-        return base.SaveChanges();
-    }
-
-    /// <summary>
-    /// Overrides the SaveChangesAsync method of the DbContext class to automatically set the Created and Updated properties of entities that implement the <see cref="IStorageEntity"/>.
-    /// </summary>
-    /// <param name="cancellationToken"></param>
-    /// <returns>A <see cref="Task"/> containing the number of objects written to the underlying database.</returns>
-    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-    {
-        HandleTimestamps();
-        return base.SaveChangesAsync(cancellationToken);
-    }
-
-    /// <summary>
-    /// Updates timestamp properties for tracked entities implementing <see cref="IStorageEntity"/> based on their state in the change tracker.
-    /// </summary>
-    /// <remarks>
-    /// <list type="bullet">
-    /// <item><description><c>Created</c>: Set for added entities.</description></item>
-    /// <item><description><c>Updated</c>: Set for modified entities.</description></item>
-    /// </list>
-    /// </remarks>
-    private void HandleTimestamps()
-    {
-        // get all the entity entries that are either added or modified
-        IEnumerable<EntityEntry> entries = ChangeTracker.Entries()
-                                                        .Where(entity => entity.Entity is IStorageEntity &&
-                                                                        (entity.State is EntityState.Added or EntityState.Modified));
-        foreach (EntityEntry? entityEntry in entries)
-        {
-            // if the entity is in Added state, set the Created property to the current date and time
-            if (entityEntry.State == EntityState.Added)
-                ((IStorageEntity)entityEntry.Entity).Created = DateTime.UtcNow;
-            // otherwise, if the entity is in Modified state, set the Updated property to the current date and time
-            else if (entityEntry.State == EntityState.Modified)
-                ((IStorageEntity)entityEntry.Entity).Updated = DateTime.UtcNow;
-        }
     }
 }

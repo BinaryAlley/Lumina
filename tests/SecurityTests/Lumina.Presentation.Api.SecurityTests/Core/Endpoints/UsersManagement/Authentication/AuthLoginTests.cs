@@ -79,7 +79,7 @@ public class AuthLoginTests : IClassFixture<LuminaApiFactory>, IDisposable
         // Assert
         JwtSecurityTokenHandler handler = new();
         JwtSecurityToken token = handler.ReadJwtToken(result!.Token);
-       
+
         string expValue = token.Claims.First(c => c.Type == "exp").Value; // get token claims
         DateTimeOffset tokenExpiration = DateTimeOffset.FromUnixTimeSeconds(long.Parse(expValue));
         DateTimeOffset expectedExpiration = beforeRequest.AddMinutes(15);
@@ -142,7 +142,7 @@ public class AuthLoginTests : IClassFixture<LuminaApiFactory>, IDisposable
         // Assert
         // check for timing consistency to prevent timing attacks
         double stdDev = CalculateStandardDeviation(timings);
-        stdDev.Should().BeLessThan(200); 
+        stdDev.Should().BeLessThan(200);
     }
 
     [Fact]
@@ -267,7 +267,10 @@ public class AuthLoginTests : IClassFixture<LuminaApiFactory>, IDisposable
             Username = _testUsername,
             Password = _hashService.HashString("TestPass123!"),
             Libraries = [],
-            Created = DateTime.UtcNow
+            UserPermissions = [],
+            UserRoles = [],
+            CreatedBy = Guid.NewGuid(),
+            CreatedOnUtc = DateTime.UtcNow
         };
 
         dbContext.Users.Add(user);
@@ -287,47 +290,10 @@ public class AuthLoginTests : IClassFixture<LuminaApiFactory>, IDisposable
             Password = _hashService.HashString("TestPass123!"),
             TotpSecret = _cryptographyService.Encrypt(Convert.ToBase64String(totpSecret)),
             Libraries = [],
-            Created = DateTime.UtcNow
-        };
-
-        dbContext.Users.Add(user);
-        await dbContext.SaveChangesAsync();
-        return user;
-    }
-
-    private async Task<UserEntity> CreateTestUserWithTempPassword()
-    {
-        using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
-
-        UserEntity user = new()
-        {
-            Username = _testUsername,
-            Password = _hashService.HashString("TestPass123!"),
-            TempPassword = Uri.EscapeDataString(_hashService.HashString("TempPass123!")),
-            TempPasswordCreated = DateTime.UtcNow,
-            Libraries = [],
-            Created = DateTime.UtcNow
-        };
-
-        dbContext.Users.Add(user);
-        await dbContext.SaveChangesAsync();
-        return user;
-    }
-
-    private async Task<UserEntity> CreateTestUserWithExpiredTempPassword()
-    {
-        using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
-
-        UserEntity user = new()
-        {
-            Username = _testUsername,
-            Password = _hashService.HashString("TestPass123!"),
-            TempPassword = Uri.EscapeDataString(_hashService.HashString("TempPass123!")),
-            TempPasswordCreated = DateTime.UtcNow.AddMinutes(-16), // expired (> 15 minutes old)
-            Libraries = [],
-            Created = DateTime.UtcNow
+            UserPermissions = [],
+            UserRoles = [],
+            CreatedBy = Guid.NewGuid(),
+            CreatedOnUtc = DateTime.UtcNow
         };
 
         dbContext.Users.Add(user);

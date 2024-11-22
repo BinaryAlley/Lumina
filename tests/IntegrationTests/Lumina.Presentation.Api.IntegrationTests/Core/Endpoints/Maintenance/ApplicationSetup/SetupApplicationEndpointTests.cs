@@ -173,7 +173,10 @@ public class SetupApplicationEndpointTests : IClassFixture<AuthenticatedLuminaAp
             Username = _testUsername,
             Password = new HashService().HashString("TestPass123!"),
             Libraries = [],
-            Created = DateTime.UtcNow
+            UserPermissions = [],
+            UserRoles = [], // TODO: test default role and permissions?
+            CreatedBy = Guid.NewGuid(),
+            CreatedOnUtc = DateTime.UtcNow
         };
 
         dbContext.Users.Add(user);

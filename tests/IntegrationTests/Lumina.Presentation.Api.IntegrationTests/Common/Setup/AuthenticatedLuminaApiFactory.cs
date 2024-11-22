@@ -76,7 +76,10 @@ public class AuthenticatedLuminaApiFactory : LuminaApiFactory, IDisposable
             Username = TestUsername!,
             Password = _hashService.HashString("TestPass123!"),
             Libraries = [],
-            Created = DateTime.UtcNow
+            UserPermissions = [],
+            UserRoles = [],
+            CreatedBy = Guid.NewGuid(),
+            CreatedOnUtc = DateTime.UtcNow
         };
 
         dbContext.Users.Add(user);

@@ -44,13 +44,16 @@ public class UserEntityFixture
                 Id = userId,
                 Username = default!,
                 Password = default!,
-                Created = default,
+                CreatedOnUtc = default,
                 TotpSecret = default,
-                Libraries = libraries
+                Libraries = libraries,
+                UserPermissions = [],
+                UserRoles = [],
+                CreatedBy = userId
             })
             .RuleFor(x => x.Username, f => f.Internet.UserName())
             .RuleFor(x => x.Password, f => Uri.EscapeDataString(f.Internet.Password()))
-            .RuleFor(x => x.Created, f => f.Date.Past())
+            .RuleFor(x => x.CreatedOnUtc, f => f.Date.Past())
             .RuleFor(x => x.TotpSecret, f => f.Random.Bool() ? f.Random.String2(32) : null)
             .Generate();
     }

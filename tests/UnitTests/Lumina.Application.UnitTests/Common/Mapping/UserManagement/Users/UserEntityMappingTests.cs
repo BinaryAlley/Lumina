@@ -42,8 +42,8 @@ public class UserEntityMappingTests
         result.Should().NotBeNull();
         result.Id.Should().Be(entity.Id);
         result.Username.Should().Be(entity.Username);
-        result.Created.Should().Be(entity.Created);
-        result.Updated.Should().Be(entity.Updated);
+        result.Created.Should().Be(entity.CreatedOnUtc);
+        result.Updated.Should().Be(entity.UpdatedOnUtc);
     }
 
     [Theory]
@@ -70,14 +70,14 @@ public class UserEntityMappingTests
     {
         // Arrange
         UserEntity entity = UserEntityFixture.CreateUserEntity();
-        entity.Updated = DateTime.UtcNow.AddDays(-1);
+        entity.UpdatedOnUtc = DateTime.UtcNow.AddDays(-1);
 
         // Act
         UserResponse result = entity.ToResponse();
 
         // Assert
         result.Should().NotBeNull();
-        result.Updated.Should().Be(entity.Updated);
+        result.Updated.Should().Be(entity.UpdatedOnUtc);
     }
 
     [Fact]
@@ -93,7 +93,7 @@ public class UserEntityMappingTests
         result.Should().NotBeNull();
         result.Id.Should().Be(entity.Id);
         result.Username.Should().Be(entity.Username);
-        result.Created.Should().Be(entity.Created);
-        result.Updated.Should().Be(entity.Updated);
+        result.Created.Should().Be(entity.CreatedOnUtc);
+        result.Updated.Should().Be(entity.UpdatedOnUtc);
     }
 }

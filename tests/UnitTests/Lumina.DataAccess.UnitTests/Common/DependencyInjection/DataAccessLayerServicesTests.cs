@@ -2,10 +2,13 @@
 using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Repositories.Books;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.Infrastructure.Authentication;
+using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.DataAccess.Common.DependencyInjection;
 using Lumina.DataAccess.Core.Repositories.Books;
 using Lumina.DataAccess.Core.Repositories.Common.Factory;
 using Lumina.DataAccess.Core.UoW;
+using Lumina.DataAccess.UnitTests.Common.Setup;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics.CodeAnalysis;
@@ -46,6 +49,8 @@ public class DataAccessLayerServicesTests
 
         // Act
         DataAccessLayerServices.AddDataAccessLayerServices(services);
+        services.AddTransient<ICurrentUserService, TestCurrentUserService>();
+        services.AddTransient<IDateTimeProvider, TestDateTimeProvider>();
 
         // Assert
         ServiceDescriptor? descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<LuminaDbContext>));
@@ -65,6 +70,10 @@ public class DataAccessLayerServicesTests
 
         // Act
         DataAccessLayerServices.AddDataAccessLayerServices(services);
+
+        services.AddTransient<ICurrentUserService, TestCurrentUserService>();
+        services.AddTransient<IDateTimeProvider, TestDateTimeProvider>();
+        
         ServiceProvider serviceProvider = services.BuildServiceProvider();
 
         // Assert

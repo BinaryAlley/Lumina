@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Repositories.Common.Base;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.DataAccess.Common.Interceptors;
 using Lumina.DataAccess.Core.Repositories.Common.Factory;
 using Lumina.DataAccess.Core.UoW;
 using Microsoft.EntityFrameworkCore;
@@ -31,11 +32,13 @@ public static class DataAccessLayerServices
         string? basePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         if (!Directory.Exists(basePath))
             throw new DirectoryNotFoundException($"The base path '{basePath}' does not exist.");
-        services.AddDbContext<LuminaDbContext>(options =>
+        services.AddDbContext<LuminaDbContext>((serviceProvider, options) =>
         {
             options.UseSqlite($"Data Source={Path.Combine(basePath, "Lumina.db")}");
+            options.AddInterceptors(serviceProvider.GetRequiredService<UpdateAuditableEntitiesInterceptor>());
         });
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<UpdateAuditableEntitiesInterceptor>();
 
         Type[]? dataAccessLayerTypes = Assembly.GetExecutingAssembly().GetTypes();
         Type? genericRepositoryType = typeof(IRepository<>);
@@ -45,16 +48,16 @@ public static class DataAccessLayerServices
         services.AddScoped(iRepositoryFactoryType!, repositoryFactoryType!);
 
         // get all classes implementing IRepository (all repository classes) and register them as their corresponding repository interface
-        IEnumerable<Type> repositoryTypes = dataAccessLayerTypes.Where(t => !t.IsInterface &&
-                                                                             t.GetInterfaces()
-                                                                              .Any(i => i.IsGenericType &&
-                                                                                        i.GetGenericTypeDefinition() == genericRepositoryType));
+        IEnumerable<Type> repositoryTypes = dataAccessLayerTypes.Where(type => !type.IsInterface &&
+                                                                                type.GetInterfaces()
+                                                                                    .Any(type => type.IsGenericType &&
+                                                                                                 type.GetGenericTypeDefinition() == genericRepositoryType));
         foreach (Type type in repositoryTypes)
         {
             services.AddScoped(type.GetInterfaces() // TODO: change to scoped when DbContext is implemented
-                                   .Where(i => !i.IsGenericType &&
-                                                i.GetInterfaces()
-                                                 .Any(j => j.GetGenericTypeDefinition() == genericRepositoryType))
+                                   .Where(type => !type.IsGenericType &&
+                                                   type.GetInterfaces()
+                                                       .Any(type => type.GetGenericTypeDefinition() == genericRepositoryType))
                                    .First(), type);
         }
     }

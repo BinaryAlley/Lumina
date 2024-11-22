@@ -6,6 +6,7 @@ using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Security;
+using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.Contracts.Responses.Authentication;
 using Mediator;
 using System;
@@ -27,6 +28,7 @@ public class SetupApplicationCommandHandler : IRequestHandler<SetupApplicationCo
     private readonly ICryptographyService _cryptographyService;
     private readonly ITotpTokenGenerator _totpTokenGenerator;
     private readonly IQRCodeGenerator _qRCodeGenerator;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SetupApplicationCommandHandler"/> class.
@@ -36,18 +38,21 @@ public class SetupApplicationCommandHandler : IRequestHandler<SetupApplicationCo
     /// <param name="cryptographyService">Injected service for cryptographic functionality.</param>
     /// <param name="totpTokenGenerator">Injected service for generating and validating TOTP tokens.</param>
     /// <param name="qRCodeGenerator">Injected service for generating QR codes.</param>
+    /// <param name="dateTimeProvider">Injected service for time related concerns.</param>
     public SetupApplicationCommandHandler(
         IUnitOfWork unitOfWork,
         IHashService hashService,
         ICryptographyService cryptographyService,
         ITotpTokenGenerator totpTokenGenerator,
-        IQRCodeGenerator qRCodeGenerator)
+        IQRCodeGenerator qRCodeGenerator,
+        IDateTimeProvider dateTimeProvider)
     {
         _unitOfWork = unitOfWork;
         _hashService = hashService;
         _cryptographyService = cryptographyService;
         _totpTokenGenerator = totpTokenGenerator;
         _qRCodeGenerator = qRCodeGenerator;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     /// <summary>
@@ -69,13 +74,17 @@ public class SetupApplicationCommandHandler : IRequestHandler<SetupApplicationCo
             return Errors.Authorization.AdminAccountAlreadyCreated;
         // no users are present, register the admin one
         string? totpSecret = null;
+        Guid id = Guid.NewGuid();
         UserEntity user = new()
         {
-            Id = Guid.NewGuid(),
+            Id = id,
             Username = request.Username!,
             Password = Uri.EscapeDataString(_hashService.HashString(request.Password!)),
-            Created = DateTime.UtcNow,
-            Libraries = []
+            CreatedOnUtc = _dateTimeProvider.UtcNow,
+            Libraries = [],
+            UserPermissions = [], // TODO: implement default roles and permissions
+            UserRoles = [],
+            CreatedBy = id
         };
         // if the user enabled two factor auth, include a QR with the totp secret
         if (request.Use2fa)

@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using System;
@@ -12,7 +13,7 @@ namespace Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 /// Repository entity for a user.
 /// </summary>
 [DebuggerDisplay("Username: {Username}")]
-public class UserEntity : IStorageEntity
+public class UserEntity : IStorageEntity, IAuditableEntity
 {
     /// <summary>
     /// Gets the Id of the user.
@@ -40,16 +41,6 @@ public class UserEntity : IStorageEntity
     public string? TotpSecret { get; set; }
 
     /// <summary>
-    /// Gets or sets the optional token used for account verification or password reset.
-    /// </summary>
-    public string? VerificationToken { get; set; } // TODO: to be deleted, not used
-
-    /// <summary>
-    /// Gets or sets the optional date and time when the verification token was created.
-    /// </summary>
-    public DateTime? VerificationTokenCreated { get; set; } // TODO: to be deleted, not used
-
-    /// <summary>
     /// Gets or sets the date and time when the temporary password used in password recovery was created.
     /// </summary>
     public DateTime? TempPasswordCreated { get; set; }
@@ -60,12 +51,32 @@ public class UserEntity : IStorageEntity
     public required ICollection<LibraryEntity> Libraries { get; init; } = [];
 
     /// <summary>
+    /// Gets the collection of user roles associations that include this user.
+    /// </summary>
+    public required ICollection<UserRoleEntity> UserRoles { get; init; } = [];
+
+    /// <summary>
+    /// Gets the collection of user permission associations that include this user.
+    /// </summary>
+    public required ICollection<UserPermissionEntity> UserPermissions { get; init; } = [];
+
+    /// <summary>
     /// Gets the time and date when the entity was added.
     /// </summary>
-    public required DateTime Created { get; set; }
+    public required DateTime CreatedOnUtc { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Id of the user that created the entity.
+    /// </summary>
+    public required Guid CreatedBy { get; set; }
 
     /// <summary>
     /// Gets the optional time and date when the entity was updated.
     /// </summary>
-    public DateTime? Updated { get; set; }
+    public DateTime? UpdatedOnUtc { get; set; }
+
+    /// <summary>
+    /// Gets or sets the optional Id of the user that updated the entity.
+    /// </summary>
+    public Guid? UpdatedBy { get; set; }
 }

@@ -20,8 +20,8 @@ public static class UserEntityMapping
         return new UserResponse(
             repositoryEntity.Id,
             repositoryEntity.Username,
-            repositoryEntity.Created,
-            repositoryEntity.Updated
+            repositoryEntity.CreatedOnUtc,
+            repositoryEntity.UpdatedOnUtc
         );
     }
 }
