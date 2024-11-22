@@ -245,7 +245,10 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
             Username = _testUsername,
             Password = _hashService.HashString("TestPass123!"),
             Libraries = [],
-            Created = DateTime.UtcNow
+            UserPermissions = [],
+            UserRoles = [],
+            CreatedBy = Guid.NewGuid(),
+            CreatedOnUtc = DateTime.UtcNow
         };
 
         dbContext.Users.Add(user);
@@ -265,7 +268,10 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
             Password = _hashService.HashString("TestPass123!"),
             TotpSecret = _cryptographyService.Encrypt(Convert.ToBase64String(totpSecret)),
             Libraries = [],
-            Created = DateTime.UtcNow
+            UserPermissions = [],
+            UserRoles = [],
+            CreatedBy = Guid.NewGuid(),
+            CreatedOnUtc = DateTime.UtcNow
         };
 
         dbContext.Users.Add(user);
@@ -285,7 +291,10 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
             TempPassword = Uri.EscapeDataString(_hashService.HashString("TempPass123!")),
             TempPasswordCreated = DateTime.UtcNow,
             Libraries = [],
-            Created = DateTime.UtcNow
+            UserPermissions = [],
+            UserRoles = [],
+            CreatedBy = Guid.NewGuid(),
+            CreatedOnUtc = DateTime.UtcNow
         };
 
         dbContext.Users.Add(user);
@@ -305,7 +314,10 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
             TempPassword = Uri.EscapeDataString(_hashService.HashString("TempPass123!")),
             TempPasswordCreated = DateTime.UtcNow.AddMinutes(-16), // expired (> 15 minutes old)
             Libraries = [],
-            Created = DateTime.UtcNow
+            UserPermissions = [],
+            UserRoles = [],
+            CreatedBy = Guid.NewGuid(),
+            CreatedOnUtc = DateTime.UtcNow
         };
 
         dbContext.Users.Add(user);

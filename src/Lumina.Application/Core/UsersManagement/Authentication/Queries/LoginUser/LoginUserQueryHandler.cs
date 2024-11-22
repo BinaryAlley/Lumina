@@ -6,6 +6,7 @@ using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Security;
+using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.Contracts.Responses.Authentication;
 using Mediator;
 using System;
@@ -25,6 +26,7 @@ public class LoginUserQueryHandler : IRequestHandler<LoginUserQuery, ErrorOr<Log
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
     private readonly ITotpTokenGenerator _totpTokenGenerator;
     private readonly ICryptographyService _cryptographyService;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LoginUserQueryHandler"/> class.
@@ -34,18 +36,21 @@ public class LoginUserQueryHandler : IRequestHandler<LoginUserQuery, ErrorOr<Log
     /// <param name="jwtTokenGenerator">Injected service for generating JWT tokens.</param>
     /// <param name="totpTokenGenerator">Injected service for generating and validating TOTP tokens.</param>
     /// <param name="cryptographyService">Injected service for cryptographic functionality.</param>
+    /// <param name="dateTimeProvider">Injected service for time related concerns.</param>
     public LoginUserQueryHandler(
         IUnitOfWork unitOfWork, 
         IHashService hashService, 
         IJwtTokenGenerator jwtTokenGenerator, 
         ITotpTokenGenerator totpTokenGenerator, 
-        ICryptographyService cryptographyService)
+        ICryptographyService cryptographyService,
+        IDateTimeProvider dateTimeProvider)
     {
         _unitOfWork = unitOfWork;
         _hashService = hashService;
         _jwtTokenGenerator = jwtTokenGenerator;
         _totpTokenGenerator = totpTokenGenerator;
         _cryptographyService = cryptographyService;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     /// <summary>
@@ -72,7 +77,7 @@ public class LoginUserQueryHandler : IRequestHandler<LoginUserQuery, ErrorOr<Log
             if (resultSelectUser.Value.TempPassword is not null)
             {
                 // the temporary password should only be valid for 15 minutes, if its obsolete, remove it and return error
-                if (resultSelectUser.Value.TempPasswordCreated!.Value.AddMinutes(15) < DateTime.UtcNow)
+                if (resultSelectUser.Value.TempPasswordCreated!.Value.AddMinutes(15) < _dateTimeProvider.UtcNow)
                 {
                     resultSelectUser.Value.TempPassword = null;
                     resultSelectUser.Value.TempPasswordCreated = null;

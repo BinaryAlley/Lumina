@@ -36,11 +36,12 @@ public class UserMappingTests
             Username = "oldusername",
             Password = "hashedpassword",
             TotpSecret = "totpsecret",
-            VerificationToken = "verificationtoken",
-            VerificationTokenCreated = DateTime.UtcNow,
             Libraries = [],
-            Created = DateTime.UtcNow,
-            Updated = null
+            UserPermissions = [],
+            UserRoles = [],
+            CreatedBy = Guid.NewGuid(),
+            CreatedOnUtc = DateTime.UtcNow,
+            UpdatedOnUtc = null
         };
 
         // Act
@@ -55,11 +56,13 @@ public class UserMappingTests
         result.Id.Should().Be(repositoryEntity.Id);
         result.Password.Should().Be(repositoryEntity.Password);
         result.TotpSecret.Should().Be(repositoryEntity.TotpSecret);
-        result.VerificationToken.Should().Be(repositoryEntity.VerificationToken);
-        result.VerificationTokenCreated.Should().Be(repositoryEntity.VerificationTokenCreated);
         result.Libraries.Should().BeSameAs(repositoryEntity.Libraries);
-        result.Created.Should().Be(repositoryEntity.Created);
-        result.Updated.Should().Be(repositoryEntity.Updated);
+        result.UserPermissions.Should().BeSameAs(repositoryEntity.UserPermissions);
+        result.UserRoles.Should().BeSameAs(repositoryEntity.UserRoles);
+        result.CreatedOnUtc.Should().Be(repositoryEntity.CreatedOnUtc);
+        result.CreatedBy.Should().Be(repositoryEntity.CreatedBy);
+        result.UpdatedOnUtc.Should().Be(repositoryEntity.UpdatedOnUtc);
+        result.UpdatedBy.Should().Be(repositoryEntity.UpdatedBy);
     }
 
     [Theory]
@@ -81,8 +84,11 @@ public class UserMappingTests
             Username = "oldusername",
             Password = "hashedpassword",
             Libraries = [],
-            Created = DateTime.UtcNow,
-            Updated = null
+            UserPermissions = [],
+            UserRoles = [],
+            CreatedBy = Guid.NewGuid(),
+            CreatedOnUtc = DateTime.UtcNow,
+            UpdatedOnUtc = null
         };
 
         // Act
@@ -132,8 +138,11 @@ public class UserMappingTests
             Username = "oldusername",
             Password = "hashedpassword",
             Libraries = libraries,
-            Created = DateTime.UtcNow,
-            Updated = null
+            UserPermissions = [],
+            UserRoles = [],
+            CreatedBy = Guid.NewGuid(),
+            CreatedOnUtc = DateTime.UtcNow,
+            UpdatedOnUtc = null
         };
 
         // Act

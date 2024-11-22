@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.DataAccess.Common.Interceptors;
 using Lumina.DataAccess.Core.UoW;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
@@ -64,7 +65,11 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
             if (descriptor is not null)
                 services.Remove(descriptor);
             // add SQLite DbContext configuration
-            services.AddDbContext<LuminaDbContext>(options => options.UseSqlite(_connection));
+            services.AddDbContext<LuminaDbContext>((serviceProvider, options) =>
+            {
+                options.UseSqlite(_connection);
+                options.AddInterceptors(serviceProvider.GetRequiredService<UpdateAuditableEntitiesInterceptor>());
+            });
             // configure JWT authentication for testing
             services.PostConfigure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
             {

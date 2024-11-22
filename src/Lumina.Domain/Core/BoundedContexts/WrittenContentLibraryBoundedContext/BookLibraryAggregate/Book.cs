@@ -244,7 +244,7 @@ public sealed class Book : AggregateRoot<BookId>
             googleBooksId,
             barnesAndNobleId,
             appleBooksId,
-            DateTime.UtcNow,
+            DateTime.UtcNow, // TODO: should be IDateTimeProvider
             default,
             isbns,
             contributors,

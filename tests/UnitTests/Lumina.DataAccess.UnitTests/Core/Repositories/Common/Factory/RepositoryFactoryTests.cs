@@ -1,8 +1,11 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Repositories.Books;
+using Lumina.Application.Common.Infrastructure.Authentication;
+using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.DataAccess.Common.DependencyInjection;
 using Lumina.DataAccess.Core.Repositories.Common.Factory;
+using Lumina.DataAccess.UnitTests.Common.Setup;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -22,6 +25,9 @@ public class RepositoryFactoryTests
         // Arrange
         ServiceCollection services = new();
         DataAccessLayerServices.AddDataAccessLayerServices(services);
+
+        services.AddTransient<ICurrentUserService, TestCurrentUserService>();
+        services.AddTransient<IDateTimeProvider, TestDateTimeProvider>();
         ServiceProvider serviceProvider = services.BuildServiceProvider();
         RepositoryFactory repositoryFactory = new(serviceProvider);
 

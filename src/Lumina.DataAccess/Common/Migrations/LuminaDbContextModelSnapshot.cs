@@ -15,7 +15,7 @@ namespace Lumina.DataAccess.Common.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.10");
+            modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
 
             modelBuilder.Entity("BookGenres", b =>
                 {
@@ -45,6 +45,185 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.HasIndex("TagId");
 
                     b.ToTable("BookTags", (string)null);
+                });
+
+            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.Authorization.PermissionEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(0);
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(3);
+
+                    b.Property<DateTime>("CreatedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(2);
+
+                    b.Property<string>("PermissionName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(1);
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(5);
+
+                    b.Property<DateTime?>("UpdatedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(4);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Permissions", (string)null);
+                });
+
+            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.Authorization.RoleEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(0);
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(3);
+
+                    b.Property<DateTime>("CreatedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(2);
+
+                    b.Property<string>("RoleName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(1);
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(5);
+
+                    b.Property<DateTime?>("UpdatedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(4);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Roles", (string)null);
+                });
+
+            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.Authorization.RolePermissionEntity", b =>
+                {
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("PermissionId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(2);
+
+                    b.Property<DateTime>("CreatedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(1);
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(4);
+
+                    b.Property<DateTime?>("UpdatedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(3);
+
+                    b.HasKey("RoleId", "PermissionId");
+
+                    b.HasIndex("PermissionId");
+
+                    b.HasIndex("RoleId", "PermissionId")
+                        .IsUnique();
+
+                    b.ToTable("RolePermissions", (string)null);
+                });
+
+            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.Authorization.UserPermissionEntity", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("PermissionId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(2);
+
+                    b.Property<DateTime>("CreatedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(1);
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(4);
+
+                    b.Property<DateTime?>("UpdatedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(3);
+
+                    b.HasKey("UserId", "PermissionId");
+
+                    b.HasIndex("PermissionId");
+
+                    b.HasIndex("UserId", "PermissionId")
+                        .IsUnique();
+
+                    b.ToTable("UserPermissions", (string)null);
+                });
+
+            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.Authorization.UserRoleEntity", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(2);
+
+                    b.Property<DateTime>("CreatedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(1);
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(4);
+
+                    b.Property<DateTime?>("UpdatedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(3);
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.HasIndex("UserId", "RoleId")
+                        .IsUnique();
+
+                    b.ToTable("UserRoles", (string)null);
                 });
 
             modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.Common.GenreEntity", b =>
@@ -254,8 +433,13 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnOrder(0);
 
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("TEXT");
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(7);
+
+                    b.Property<DateTime>("CreatedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(6);
 
                     b.Property<string>("Password")
                         .IsRequired()
@@ -268,14 +452,19 @@ namespace Lumina.DataAccess.Common.Migrations
 
                     b.Property<DateTime?>("TempPasswordCreated")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(7);
+                        .HasColumnOrder(5);
 
                     b.Property<string>("TotpSecret")
                         .HasColumnType("TEXT")
                         .HasColumnOrder(4);
 
-                    b.Property<DateTime?>("Updated")
-                        .HasColumnType("TEXT");
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(9);
+
+                    b.Property<DateTime?>("UpdatedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(8);
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -283,15 +472,10 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnOrder(1);
 
-                    b.Property<string>("VerificationToken")
-                        .HasColumnType("TEXT")
-                        .HasColumnOrder(5);
-
-                    b.Property<DateTime?>("VerificationTokenCreated")
-                        .HasColumnType("TEXT")
-                        .HasColumnOrder(6);
-
                     b.HasKey("Id");
+
+                    b.HasIndex("Username")
+                        .IsUnique();
 
                     b.ToTable("Users", (string)null);
                 });
@@ -324,6 +508,63 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasForeignKey("TagId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.Authorization.RolePermissionEntity", b =>
+                {
+                    b.HasOne("Lumina.Application.Common.DataAccess.Entities.Authorization.PermissionEntity", "Permission")
+                        .WithMany("RolePermissions")
+                        .HasForeignKey("PermissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Lumina.Application.Common.DataAccess.Entities.Authorization.RoleEntity", "Role")
+                        .WithMany("RolePermissions")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Permission");
+
+                    b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.Authorization.UserPermissionEntity", b =>
+                {
+                    b.HasOne("Lumina.Application.Common.DataAccess.Entities.Authorization.PermissionEntity", "Permission")
+                        .WithMany("UserPermissions")
+                        .HasForeignKey("PermissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Lumina.Application.Common.DataAccess.Entities.UsersManagement.UserEntity", "User")
+                        .WithMany("UserPermissions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Permission");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.Authorization.UserRoleEntity", b =>
+                {
+                    b.HasOne("Lumina.Application.Common.DataAccess.Entities.Authorization.RoleEntity", "Role")
+                        .WithMany("UserRoles")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Lumina.Application.Common.DataAccess.Entities.UsersManagement.UserEntity", "User")
+                        .WithMany("UserRoles")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management.LibraryEntity", b =>
@@ -375,8 +616,7 @@ namespace Lumina.DataAccess.Common.Migrations
                             b1.Property<Guid>("BookId")
                                 .HasColumnType("TEXT");
 
-                            b1.Property<decimal?>("MaxValue")
-                                .IsRequired()
+                            b1.Property<decimal>("MaxValue")
                                 .HasColumnType("decimal(3,2)");
 
                             b1.Property<string>("Source")
@@ -384,8 +624,7 @@ namespace Lumina.DataAccess.Common.Migrations
                                 .HasMaxLength(50)
                                 .HasColumnType("TEXT");
 
-                            b1.Property<decimal?>("Value")
-                                .IsRequired()
+                            b1.Property<decimal>("Value")
                                 .HasColumnType("decimal(3,2)");
 
                             b1.Property<int?>("VoteCount")
@@ -436,9 +675,27 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.Navigation("Ratings");
                 });
 
+            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.Authorization.PermissionEntity", b =>
+                {
+                    b.Navigation("RolePermissions");
+
+                    b.Navigation("UserPermissions");
+                });
+
+            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.Authorization.RoleEntity", b =>
+                {
+                    b.Navigation("RolePermissions");
+
+                    b.Navigation("UserRoles");
+                });
+
             modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.UsersManagement.UserEntity", b =>
                 {
                     b.Navigation("Libraries");
+
+                    b.Navigation("UserPermissions");
+
+                    b.Navigation("UserRoles");
                 });
 #pragma warning restore 612, 618
         }

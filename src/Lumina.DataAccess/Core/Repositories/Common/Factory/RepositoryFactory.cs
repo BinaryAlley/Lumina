@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using Microsoft.Extensions.DependencyInjection;
 using System;
 #endregion
@@ -22,13 +22,13 @@ public class RepositoryFactory : IRepositoryFactory
     }
 
     /// <summary>
-    /// Creates a new repository of type <typeparamref name="TResult"/>.
+    /// Creates a new repository of type <typeparamref name="TRepository"/>.
     /// </summary>
-    /// <typeparam name="TResult">The type of repository to create.</typeparam>
-    /// <returns>A repository of type <typeparamref name="TResult"/>.</returns>
+    /// <typeparam name="TRepository">The type of repository to create.</typeparam>
+    /// <returns>A repository of type <typeparamref name="TRepository"/>.</returns>
     /// <exception cref="ArgumentException">Thrown when the type of the requested repository has not been registered.</exception>
-    public TResult CreateRepository<TResult>() where TResult : notnull
+    public TRepository CreateRepository<TRepository>() where TRepository : notnull
     {
-        return _serviceProvider.GetRequiredService<TResult>() ?? throw new ArgumentException();
+        return _serviceProvider.GetRequiredService<TRepository>() ?? throw new ArgumentException();
     }
 }

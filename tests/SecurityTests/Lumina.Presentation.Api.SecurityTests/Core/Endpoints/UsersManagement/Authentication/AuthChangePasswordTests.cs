@@ -113,7 +113,10 @@ public class AuthChangePasswordTests : IClassFixture<LuminaApiFactory>, IDisposa
             Username = _testUsername,
             Password = _hashService.HashString("TestPass123!"),
             Libraries = [],
-            Created = DateTime.UtcNow
+            UserRoles = [],
+            UserPermissions = [],
+            CreatedBy = Guid.NewGuid(),
+            CreatedOnUtc = DateTime.UtcNow
         };
 
         dbContext.Users.Add(user);

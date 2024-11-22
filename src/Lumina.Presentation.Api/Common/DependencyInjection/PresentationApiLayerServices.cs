@@ -1,6 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
 using FastEndpoints.Swagger;
+using Lumina.Application.Common.Infrastructure.Authentication;
+using Lumina.Presentation.Api.Common.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -205,6 +207,8 @@ public static class PresentationApiLayerServices
                      .AllowAnyMethod()
                      .AllowAnyHeader());
         });
+
+        services.AddScoped<ICurrentUserService, HttpContextCurrentUserService>();
 
         return services;
     }

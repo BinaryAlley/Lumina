@@ -1,9 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using FluentValidation;
 using Lumina.Application.Common.Infrastructure.Authentication;
+using Lumina.Application.Common.Infrastructure.Authorization.Policies.Over18;
 using Lumina.Application.Common.Infrastructure.Security;
 using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.Infrastructure.Core.Authentication;
+using Lumina.Infrastructure.Core.Authorization.Policies.Common.Factory;
+using Lumina.Infrastructure.Core.Authorization.Policies.Over18;
 using Lumina.Infrastructure.Core.Security;
 using Lumina.Infrastructure.Core.Time;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,6 +39,10 @@ public static class InfrastructureLayerServices
         services.AddSingleton<ITokenGenerator, TokenGenerator>();
         services.AddSingleton<ITotpTokenGenerator, TotpTokenGenerator>();
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+
+        // authorization
+        services.AddScoped<IOver18Policy, Over18Policy>();
+        services.AddScoped<IAuthorizationPolicyFactory, AuthorizationPolicyFactory>();
 
         return services;
     }

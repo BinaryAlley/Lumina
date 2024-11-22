@@ -3,6 +3,7 @@ using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Common.Actions;
 using Lumina.Application.Common.DataAccess.Repositories.Common.Base;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -13,6 +14,7 @@ namespace Lumina.Application.Common.DataAccess.Repositories.Users;
 /// Interface for the repository for users.
 /// </summary>
 public interface IUserRepository : IRepository<UserEntity>,
+                                   IGetByIdRepositoryAction<UserEntity, Guid>,
                                    IGetAllRepositoryAction<UserEntity>,
                                    IInsertRepositoryAction<UserEntity>,
                                    IUpdateRepositoryAction<UserEntity>
