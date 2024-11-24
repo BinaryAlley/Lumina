@@ -14,10 +14,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="FastEndpoints.Swagger" Version="5.31.0.6-beta" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\Lumina.Domain\Lumina.Domain.csproj" />
     </ItemGroup>
 </Project>
