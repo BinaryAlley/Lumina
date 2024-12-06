@@ -101,7 +101,7 @@ public class UserEntityFixture
             UserId = _fixture.Create<Guid>(),
             Title = _fixture.Create<string>(),
             LibraryType = _fixture.Create<LibraryType>(),
-            ContentLocations = new List<LibraryContentLocationEntity>(),
+            ContentLocations = [],
             Created = _fixture.Create<DateTime>(),
             Updated = _fixture.Create<DateTime>()
         });

@@ -1,0 +1,14 @@
+@*
+/auth/access-denied/
+*@
+
+@using Microsoft.AspNetCore.Mvc.Localization
+
+@inject IViewLocalizer _localizer
+
+<div class="enlightenment-panel shadow-effect p-2 mx-auto panel w-55 mb-10" style="min-width: 320px; margin-top: 1rem;">
+    <div class="shine-effect"></div>
+    <div class="text-center w-100">
+        <p id="change-password-success" class="invalid-feedback f-18 w-100"><b>@_localizer["NotAllowedToAccessResource"]</b></p>
+    </div>
+</div>

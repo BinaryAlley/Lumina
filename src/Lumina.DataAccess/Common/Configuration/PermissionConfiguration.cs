@@ -25,24 +25,30 @@ public class PermissionConfiguration : IEntityTypeConfiguration<PermissionEntity
 
         builder.Property(permission => permission.PermissionName)
             .IsRequired()
+            .HasConversion<string>()
             .HasMaxLength(100)
             .HasColumnOrder(1);
+
+        builder.Property(permission => permission.PermissionDescription)
+            .HasMaxLength(255)
+            .HasDefaultValue(null)
+            .HasColumnOrder(2);
 
         // audit
         builder.Property(permission => permission.CreatedOnUtc)
             .IsRequired()
-            .HasColumnOrder(2);
+            .HasColumnOrder(3);
 
         builder.Property(permission => permission.CreatedBy)
             .IsRequired()
-            .HasColumnOrder(3);
+            .HasColumnOrder(4);
 
         builder.Property(permission => permission.UpdatedOnUtc)
             .HasDefaultValue(null)
-            .HasColumnOrder(4);
+            .HasColumnOrder(5);
 
         builder.Property(permission => permission.UpdatedBy)
             .HasDefaultValue(null)
-            .HasColumnOrder(5);
+            .HasColumnOrder(6);
     }
 }

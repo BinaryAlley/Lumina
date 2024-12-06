@@ -16,12 +16,18 @@ using System.Threading.Tasks;
 
 namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Maintenance.ApplicationSetup;
 
+/// <summary>
+/// Contains unit tests for the <see cref="CheckInitializationEndpoint"/> class.
+/// </summary>
 [ExcludeFromCodeCoverage]
 public class CheckInitializationEndpointTests
 {
     private readonly ISender _mockSender;
     private readonly CheckInitializationEndpoint _sut;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CheckInitializationEndpointTests"/> class.
+    /// </summary>
     public CheckInitializationEndpointTests()
     {
         _mockSender = Substitute.For<ISender>();

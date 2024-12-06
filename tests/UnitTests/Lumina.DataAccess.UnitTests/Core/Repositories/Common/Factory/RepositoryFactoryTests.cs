@@ -6,6 +6,7 @@ using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.DataAccess.Common.DependencyInjection;
 using Lumina.DataAccess.Core.Repositories.Common.Factory;
 using Lumina.DataAccess.UnitTests.Common.Setup;
+using Lumina.DataAccess.UnitTests.Core.Repositories.Common.Factory.Fixtures;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -50,8 +51,6 @@ public class RepositoryFactoryTests
 
         // Act & Assert
         Action act = () => repositoryFactory.CreateRepository<IUnregisteredRepository>();
-        act.Should().Throw<InvalidOperationException>().WithMessage("No service for type 'Lumina.DataAccess.UnitTests.Core.Repositories.Common.Factory.IUnregisteredRepository' has been registered.");
+        act.Should().Throw<InvalidOperationException>().WithMessage("No service for type 'Lumina.DataAccess.UnitTests.Core.Repositories.Common.Factory.Fixtures.IUnregisteredRepository' has been registered.");
     }
 }
-
-public interface IUnregisteredRepository { }

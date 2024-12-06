@@ -56,7 +56,7 @@ internal sealed class UserRepository : IUserRepository
     }
 
     /// <summary>
-    /// Gets a username identified by <paramref name="username"/> from the repository, if it exists.
+    /// Gets a user identified by <paramref name="username"/> from the repository, if it exists.
     /// </summary>
     /// <param name="username">The username of the user to get.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>

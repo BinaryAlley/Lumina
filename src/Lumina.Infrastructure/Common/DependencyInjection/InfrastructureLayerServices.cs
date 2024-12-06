@@ -1,10 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using FluentValidation;
 using Lumina.Application.Common.Infrastructure.Authentication;
+using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.Over18;
 using Lumina.Application.Common.Infrastructure.Security;
 using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.Infrastructure.Core.Authentication;
+using Lumina.Infrastructure.Core.Authorization;
 using Lumina.Infrastructure.Core.Authorization.Policies.Common.Factory;
 using Lumina.Infrastructure.Core.Authorization.Policies.Over18;
 using Lumina.Infrastructure.Core.Security;
@@ -43,7 +45,7 @@ public static class InfrastructureLayerServices
         // authorization
         services.AddScoped<IOver18Policy, Over18Policy>();
         services.AddScoped<IAuthorizationPolicyFactory, AuthorizationPolicyFactory>();
-
+        services.AddScoped<IAuthorizationService, AuthorizationService>();
         return services;
     }
 }

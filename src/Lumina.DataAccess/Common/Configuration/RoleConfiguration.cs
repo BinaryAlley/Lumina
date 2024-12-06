@@ -25,24 +25,30 @@ public class RoleConfiguration : IEntityTypeConfiguration<RoleEntity>
 
         builder.Property(role => role.RoleName)
             .IsRequired()
+            .HasConversion<string>()
             .HasMaxLength(100)
             .HasColumnOrder(1);
+
+        builder.Property(permission => permission.RoleDescription)
+            .HasMaxLength(255)
+            .HasDefaultValue(null)
+            .HasColumnOrder(2);
 
         // audit
         builder.Property(role => role.CreatedOnUtc)
             .IsRequired()
-            .HasColumnOrder(2);
+            .HasColumnOrder(3);
 
         builder.Property(role => role.CreatedBy)
             .IsRequired()
-            .HasColumnOrder(3);
+            .HasColumnOrder(4);
 
         builder.Property(role => role.UpdatedOnUtc)
             .HasDefaultValue(null)
-            .HasColumnOrder(4);
+            .HasColumnOrder(5);
 
         builder.Property(role => role.UpdatedBy)
             .HasDefaultValue(null)
-            .HasColumnOrder(5);
+            .HasColumnOrder(6);
     }
 }

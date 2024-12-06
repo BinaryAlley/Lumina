@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Common.Api;
 using Lumina.Presentation.Web.Common.Exceptions;
-using Lumina.Presentation.Web.Common.Filters;
+using Lumina.Presentation.Web.Common.Filters.ActionFilters;
 using Lumina.Presentation.Web.Common.Http;
 using Lumina.Presentation.Web.Common.Models.UsersManagement;
 using Lumina.Presentation.Web.Common.Security;
@@ -111,6 +111,16 @@ public class AuthController : Controller
     /// </summary>
     [HttpGet("profile")]
     public IActionResult Profile()
+    {
+        return View();
+    }
+
+    /// <summary>
+    /// Displays the view for registering a new account.
+    /// </summary>
+    [AllowAnonymous]
+    [HttpGet("access-denied")]
+    public IActionResult AccessDenied()
     {
         return View();
     }

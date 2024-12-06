@@ -15,7 +15,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Filters;
+namespace Lumina.Presentation.Web.Common.Filters.ExceptionFilters;
 
 /// <summary>
 /// Filters API exceptions and provides centralized handling for API-related errors.
@@ -45,7 +45,7 @@ public class ApiExceptionFilter : IExceptionFilter
         // check if the exception is an ApiException
         if (context.Exception is ApiException apiException)
         {
-            // Log all available details for debugging/monitoring
+            // log all available details for debugging/monitoring
             _logger.LogError(
                 apiException,
                 "API Exception occurred. Status: {StatusCode}, Title: {Title}, Detail: {Detail}, Extensions: {Extensions}",
@@ -73,9 +73,7 @@ public class ApiExceptionFilter : IExceptionFilter
                         errorMessage.AppendLine($"<b>{_stringLocalizer[apiException.ProblemDetails.Title]}</b><br>");
 
                     if (apiException.ProblemDetails.Extensions?.TryGetValue("errors", out JsonElement errorsObj) == true)
-                    {
                         if (errorsObj.ValueKind == JsonValueKind.Object)
-                        {
                             foreach (JsonProperty error in errorsObj.EnumerateObject())
                             {
                                 _logger.LogError("Validation error {Field}: {@ErrorValues}", error.Name, error.Value.EnumerateArray().Select(jsonElement => jsonElement.ToString()));
@@ -83,8 +81,6 @@ public class ApiExceptionFilter : IExceptionFilter
                                     foreach (JsonElement errorValue in error.Value.EnumerateArray())
                                         errorMessage.AppendLine($"{_stringLocalizer[errorValue.ToString()]}<br>");
                             }
-                        }
-                    }
                 }
                 else
                 {

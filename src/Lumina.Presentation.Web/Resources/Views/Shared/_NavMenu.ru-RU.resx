@@ -126,8 +126,17 @@
   <data name="AddNewLibrary" xml:space="preserve">
     <value>Добавить новую библиотеку</value>
   </data>
+  <data name="Administrator" xml:space="preserve">
+    <value>Администратор</value>
+  </data>
   <data name="Audio" xml:space="preserve">
     <value>Аудио</value>
+  </data>
+  <data name="Authentication" xml:space="preserve">
+    <value>Аутентификация</value>
+  </data>
+  <data name="Authorization" xml:space="preserve">
+    <value>Авторизация</value>
   </data>
   <data name="Books" xml:space="preserve">
     <value>Книги</value>

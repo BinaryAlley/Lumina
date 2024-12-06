@@ -32,7 +32,7 @@ public class GetPathRootQueryHandler : IRequestHandler<GetPathRootQuery, ErrorOr
     /// </summary>
     /// <param name="request">The query containing the requested path.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>The root of the specified path.</returns>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the root of the specified path, or an error.</returns>
     public ValueTask<ErrorOr<PathSegmentResponse>> Handle(GetPathRootQuery request, CancellationToken cancellationToken)
     {
         ErrorOr<PathSegment> result = _pathService.GetPathRoot(request.Path!);

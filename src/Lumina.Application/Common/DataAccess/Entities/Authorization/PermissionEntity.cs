@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Common;
+using Lumina.Domain.Common.Enums.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -21,17 +22,22 @@ public class PermissionEntity : IStorageEntity, IAuditableEntity
     /// <summary>
     /// Gets the name of the permission.
     /// </summary>
-    public required string PermissionName { get; init; }
+    public required AuthorizationPermission PermissionName { get; init; }
 
     /// <summary>
-    /// Gets the collection of role permission associations that include this permission.
+    /// Gets the description of the permission.
     /// </summary>
-    public required ICollection<RolePermissionEntity> RolePermissions { get; init; } = [];
+    public string? PermissionDescription { get; set; }
 
     /// <summary>
-    /// Gets the collection of user permission associations that include this permission.
+    /// Gets or sets the collection of role permission associations that include this permission.
     /// </summary>
-    public required ICollection<UserPermissionEntity> UserPermissions { get; init; } = [];
+    public ICollection<RolePermissionEntity> RolePermissions { get; set; } = [];
+
+    /// <summary>
+    /// Gets or sets the collection of user permission associations that include this permission.
+    /// </summary>
+    public ICollection<UserPermissionEntity> UserPermissions { get; set; } = [];
 
     /// <summary>
     /// Gets or sets the time and date when the entity was added.

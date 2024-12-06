@@ -126,8 +126,17 @@
   <data name="AddNewLibrary" xml:space="preserve">
     <value>新規ライブラリを追加</value>
   </data>
+  <data name="Administrator" xml:space="preserve">
+    <value>管理者</value>
+  </data>
   <data name="Audio" xml:space="preserve">
     <value>音声</value>
+  </data>
+  <data name="Authentication" xml:space="preserve">
+    <value>認証</value>
+  </data>
+  <data name="Authorization" xml:space="preserve">
+    <value>認可</value>
   </data>
   <data name="Books" xml:space="preserve">
     <value>書籍</value>

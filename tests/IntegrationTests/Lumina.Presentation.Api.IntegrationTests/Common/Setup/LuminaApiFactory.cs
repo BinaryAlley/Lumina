@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Presentation.Api.IntegrationTests.Common.Setup;
@@ -98,7 +99,27 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
                 dbContext.Database.Migrate(); 
             }
         });
-    }    
+    }
+
+    /// <summary>
+    /// Resets the in-memory SQLite database to its original state.
+    /// </summary>
+    public async Task ResetDatabaseAsync()
+    {
+        using IServiceScope scope = Services.CreateScope();
+        LuminaDbContext context = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+
+        context.Books.RemoveRange(context.Books);
+        context.Libraries.RemoveRange(context.Libraries);
+        context.RolePermissions.RemoveRange(context.RolePermissions);
+        context.UserRoles.RemoveRange(context.UserRoles);
+        context.Roles.RemoveRange(context.Roles);
+        context.Permissions.RemoveRange(context.Permissions);
+        context.Users.RemoveRange(context.Users);
+        context.UserPermissions.RemoveRange(context.UserPermissions);
+
+        await context.SaveChangesAsync();
+    }
 
     /// <summary>
     /// Disposes the connection to the database.

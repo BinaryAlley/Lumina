@@ -3,6 +3,7 @@ using ErrorOr;
 using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
+using Lumina.Application.Common.DataAccess.Seed;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
@@ -35,6 +36,7 @@ public class SetupApplicationCommandHandlerTests
     private readonly IQRCodeGenerator _mockQRCodeGenerator;
     private readonly IUserRepository _mockUserRepository;
     private readonly IDateTimeProvider _mockDateTimeProvider;
+    private readonly IDataSeedService _mockDataSeedService;
     private readonly SetupApplicationCommandHandler _sut;
     private readonly SetupApplicationCommandFixture _setupApplicationCommandFixture;
 
@@ -50,6 +52,7 @@ public class SetupApplicationCommandHandlerTests
         _mockQRCodeGenerator = Substitute.For<IQRCodeGenerator>();
         _mockUserRepository = Substitute.For<IUserRepository>();
         _mockDateTimeProvider = Substitute.For<IDateTimeProvider>();
+        _mockDataSeedService = Substitute.For<IDataSeedService>();
         _setupApplicationCommandFixture = new SetupApplicationCommandFixture();
 
         _mockUnitOfWork.GetRepository<IUserRepository>().Returns(_mockUserRepository);
@@ -61,7 +64,8 @@ public class SetupApplicationCommandHandlerTests
             _mockCryptographyService,
             _mockTotpTokenGenerator,
             _mockQRCodeGenerator,
-            _mockDateTimeProvider);
+            _mockDateTimeProvider,
+            _mockDataSeedService);
     }
 
     [Fact]
@@ -195,5 +199,155 @@ public class SetupApplicationCommandHandlerTests
         await _mockUserRepository.Received(1).GetAllAsync(Arg.Any<CancellationToken>());
         await _mockUserRepository.Received(1).InsertAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task Handle_WhenSetDefaultAuthorizationPermissionsFails_ShouldReturnError()
+    {
+        // Arrange
+        SetupApplicationCommand command = _setupApplicationCommandFixture.CreateSetupApplicationCommand();
+        Error error = Error.Failure("Database.Error", "Failed to set default permissions");
+
+        _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
+            .Returns(ErrorOrFactory.From(Enumerable.Empty<UserEntity>()));
+        _mockUserRepository.InsertAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Created);
+        _mockDataSeedService.SetDefaultAuthorizationPermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(error);
+
+        // Act
+        ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.IsError.Should().BeTrue();
+        result.FirstError.Should().Be(error);
+
+        await _mockDataSeedService.Received(1).SetDefaultAuthorizationPermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockDataSeedService.DidNotReceive().SetDefaultAuthorizationRolesAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task Handle_WhenSetDefaultAuthorizationRolesFails_ShouldReturnError()
+    {
+        // Arrange
+        SetupApplicationCommand command = _setupApplicationCommandFixture.CreateSetupApplicationCommand();
+        Error error = Error.Failure("Database.Error", "Failed to set default roles");
+
+        _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
+            .Returns(ErrorOrFactory.From(Enumerable.Empty<UserEntity>()));
+        _mockUserRepository.InsertAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Created);
+        _mockDataSeedService.SetDefaultAuthorizationPermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Created);
+        _mockDataSeedService.SetDefaultAuthorizationRolesAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(error);
+
+        // Act
+        ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.IsError.Should().BeTrue();
+        result.FirstError.Should().Be(error);
+
+        await _mockDataSeedService.Received(1).SetDefaultAuthorizationPermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockDataSeedService.Received(1).SetDefaultAuthorizationRolesAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockDataSeedService.DidNotReceive().SetAdminRolePermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task Handle_WhenSetAdminRolePermissionsFails_ShouldReturnError()
+    {
+        // Arrange
+        SetupApplicationCommand command = _setupApplicationCommandFixture.CreateSetupApplicationCommand();
+        Error error = Error.Failure("Database.Error", "Failed to set admin role permissions");
+
+        _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
+            .Returns(ErrorOrFactory.From(Enumerable.Empty<UserEntity>()));
+        _mockUserRepository.InsertAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Created);
+        _mockDataSeedService.SetDefaultAuthorizationPermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Created);
+        _mockDataSeedService.SetDefaultAuthorizationRolesAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Created);
+        _mockDataSeedService.SetAdminRolePermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(error);
+
+        // Act
+        ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.IsError.Should().BeTrue();
+        result.FirstError.Should().Be(error);
+
+        await _mockDataSeedService.Received(1).SetDefaultAuthorizationPermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockDataSeedService.Received(1).SetDefaultAuthorizationRolesAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockDataSeedService.Received(1).SetAdminRolePermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockDataSeedService.DidNotReceive().SetAdminRoleToAdministratorAccount(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task Handle_WhenSetAdminRoleToAdministratorAccountFails_ShouldReturnError()
+    {
+        // Arrange
+        SetupApplicationCommand command = _setupApplicationCommandFixture.CreateSetupApplicationCommand();
+        Error error = Error.Failure("Database.Error", "Failed to set admin role to administrator account");
+
+        _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
+            .Returns(ErrorOrFactory.From(Enumerable.Empty<UserEntity>()));
+        _mockUserRepository.InsertAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Created);
+        _mockDataSeedService.SetDefaultAuthorizationPermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Created);
+        _mockDataSeedService.SetDefaultAuthorizationRolesAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Created);
+        _mockDataSeedService.SetAdminRolePermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Created);
+        _mockDataSeedService.SetAdminRoleToAdministratorAccount(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(error);
+
+        // Act
+        ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.IsError.Should().BeTrue();
+        result.FirstError.Should().Be(error);
+
+        await _mockDataSeedService.Received(1).SetDefaultAuthorizationPermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockDataSeedService.Received(1).SetDefaultAuthorizationRolesAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockDataSeedService.Received(1).SetAdminRolePermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockDataSeedService.Received(1).SetAdminRoleToAdministratorAccount(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task Handle_WhenAllOperationsSucceed_ShouldReturnSuccessResponse()
+    {
+        // Arrange
+        SetupApplicationCommand command = _setupApplicationCommandFixture.CreateSetupApplicationCommand();
+
+        _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
+            .Returns(ErrorOrFactory.From(Enumerable.Empty<UserEntity>()));
+        _mockUserRepository.InsertAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Created);
+        _mockDataSeedService.SetDefaultAuthorizationPermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Created);
+        _mockDataSeedService.SetDefaultAuthorizationRolesAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Created);
+        _mockDataSeedService.SetAdminRolePermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Created);
+        _mockDataSeedService.SetAdminRoleToAdministratorAccount(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Created);
+
+        // Act
+        ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.IsError.Should().BeFalse();
+        result.Value.Should().NotBeNull();
+        result.Value.Username.Should().Be(command.Username);
+
+        await _mockDataSeedService.Received(1).SetDefaultAuthorizationPermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockDataSeedService.Received(1).SetDefaultAuthorizationRolesAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockDataSeedService.Received(1).SetAdminRolePermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockDataSeedService.Received(1).SetAdminRoleToAdministratorAccount(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
     }
 }

@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Filters;
+namespace Lumina.Presentation.Web.Common.Filters.ActionFilters;
 
 /// <summary>
 /// Attribute that enforces application initialization checks on controller actions.

@@ -21,7 +21,9 @@ public class UserRoleConfiguration : IEntityTypeConfiguration<UserRoleEntity>
 
         // composite primary key
         builder.HasKey(userRole => new { userRole.UserId, userRole.RoleId });
-        
+
+        builder.Ignore(userRole => userRole.Id); // Id is only needed as a generic constraint for the repository, but this entity uses a composite key as Id
+
         // foreign key: User
         builder.HasOne(userRole => userRole.User)
             .WithMany(user => user.UserRoles)
