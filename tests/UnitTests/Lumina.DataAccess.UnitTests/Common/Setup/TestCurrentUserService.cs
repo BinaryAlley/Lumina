@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Infrastructure.Authentication;
 using System;
+using System.Diagnostics.CodeAnalysis;
 #endregion
 
 namespace Lumina.DataAccess.UnitTests.Common.Setup;
@@ -8,6 +9,7 @@ namespace Lumina.DataAccess.UnitTests.Common.Setup;
 /// <summary>
 /// Fake service for retrieving the current user's information during tests.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class TestCurrentUserService : ICurrentUserService
 {
     private Guid userId;

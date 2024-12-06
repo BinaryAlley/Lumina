@@ -1,12 +1,16 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
+using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.Common.Base;
+using Lumina.Domain.Common.Enums.Authorization;
+using Lumina.Domain.Common.Errors;
 using Lumina.Infrastructure.Core.Authorization.Policies.Common.Factory;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -37,10 +41,10 @@ public class AuthorizationService : IAuthorizationService
     /// Determines whether the specified user has a specific permission.
     /// </summary>
     /// <param name="userId">The Id of the user for whom to check the permission.</param>
-    /// <param name="permission">The name of the permission to check.</param>
+    /// <param name="permission">The permission to check.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns><see langword="true"/> if the user has the specified permission, <see langword="false"/> otherwise.</returns>
-    public async Task<bool> HasPermissionAsync(Guid userId, string permission, CancellationToken cancellationToken)
+    public async Task<bool> HasPermissionAsync(Guid userId, AuthorizationPermission permission, CancellationToken cancellationToken)
     {
         ErrorOr<UserEntity?> getUserResult = await _userRepository.GetByIdAsync(userId, cancellationToken).ConfigureAwait(false);
         if (getUserResult.IsError || getUserResult.Value is null)
@@ -60,10 +64,10 @@ public class AuthorizationService : IAuthorizationService
     /// Determines whether the specified user belongs to a specific role.
     /// </summary>
     /// <param name="userId">The Id of the user for whom to check the role.</param>
-    /// <param name="role">The name of the role to check.</param>
+    /// <param name="role">The role to check.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns><see langword="true"/> if the user is in the specified role, <see langword="false"/> otherwise.</returns>
-    public async Task<bool> IsInRoleAsync(Guid userId, string role, CancellationToken cancellationToken)
+    public async Task<bool> IsInRoleAsync(Guid userId, AuthorizationRole role, CancellationToken cancellationToken)
     {
         ErrorOr<UserEntity?> getUserResult = await _userRepository.GetByIdAsync(userId, cancellationToken).ConfigureAwait(false);
         if (getUserResult.IsError || getUserResult.Value is null)
@@ -83,5 +87,50 @@ public class AuthorizationService : IAuthorizationService
         // resolve the authorization policy dynamically using the factory
         IAuthorizationPolicy policy = _authorizationPolicyFactory.CreatePolicy<TAuthorizationPolicy>();
         return await policy.EvaluateAsync(userId, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Retrieves all authorization roles and permissions of a user identified by <paramref name="userId"/>.
+    /// </summary>
+    /// <param name="userId">The id of the user for whom to retrieve the authorization roles and permissions.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a <see cref="UserAuthorizationEntity"/>, or an error.</returns>
+    public async Task<ErrorOr<UserAuthorizationEntity>> GetUserAuthorizationAsync(Guid userId, CancellationToken cancellationToken)
+    {
+        ErrorOr<UserEntity?> getUserResult = await _userRepository.GetByIdAsync(userId, cancellationToken).ConfigureAwait(false);
+
+        if (getUserResult.IsError)
+            return getUserResult.Errors;
+
+        if (getUserResult.Value is null)
+            return Errors.Users.UserDoesNotExist;
+
+        // get all roles
+        HashSet<AuthorizationRole> roles = getUserResult.Value.UserRoles
+            .Select(userRole => userRole.Role.RoleName)
+            .ToHashSet();
+
+        // get direct user permissions
+        HashSet<AuthorizationPermission> directPermissions = getUserResult.Value.UserPermissions
+            .Select(userPermission => userPermission.Permission.PermissionName)
+            .ToHashSet();
+
+        // get permissions from roles
+        HashSet<AuthorizationPermission> rolePermissions = getUserResult.Value.UserRoles
+            .SelectMany(userRole => userRole.Role.RolePermissions)
+            .Select(rolePermission => rolePermission.Permission.PermissionName)
+            .ToHashSet();
+
+        // combine all permissions
+        HashSet<AuthorizationPermission> allPermissions = directPermissions
+            .Union(rolePermissions)
+            .ToHashSet();
+
+        return new UserAuthorizationEntity
+        {
+            UserId = userId,
+            Roles = roles,
+            Permissions = allPermissions
+        };
     }
 }

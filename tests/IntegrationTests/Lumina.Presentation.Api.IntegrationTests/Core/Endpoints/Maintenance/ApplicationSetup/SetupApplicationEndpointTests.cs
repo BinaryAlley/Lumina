@@ -1,12 +1,15 @@
 #region ========================================================================= USING =====================================================================================
 using FluentAssertions;
+using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.DataAccess.Core.UoW;
+using Lumina.Domain.Common.Enums.Authorization;
 using Lumina.Infrastructure.Core.Security;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -67,6 +70,7 @@ public class SetupApplicationEndpointTests : IClassFixture<AuthenticatedLuminaAp
             PasswordConfirm: "TestPass123!",
             Use2fa: true
         );
+        await _apiFactory.ResetDatabaseAsync();
 
         // Act
         HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/initialization", request);
@@ -84,6 +88,9 @@ public class SetupApplicationEndpointTests : IClassFixture<AuthenticatedLuminaAp
 
         response.Headers.Location.Should().NotBeNull();
         response.Headers.Location!.ToString().Should().Be($"http://localhost/api/v1/users/{result.Id}");
+
+        // verify default permissions, roles, and role permissions are set
+        await VerifyDefaultSetup(result.Id);
     }
 
     [Fact]
@@ -96,6 +103,7 @@ public class SetupApplicationEndpointTests : IClassFixture<AuthenticatedLuminaAp
             PasswordConfirm: "TestPass123!",
             Use2fa: false
         );
+        await _apiFactory.ResetDatabaseAsync();
 
         // Act
         HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/initialization", request);
@@ -112,6 +120,9 @@ public class SetupApplicationEndpointTests : IClassFixture<AuthenticatedLuminaAp
 
         response.Headers.Location.Should().NotBeNull();
         response.Headers.Location!.ToString().Should().Be($"http://localhost/api/v1/users/{result.Id}");
+
+        // verify default permissions, roles, and role permissions are set
+        await VerifyDefaultSetup(result.Id);
     }
 
     [Fact]
@@ -161,6 +172,35 @@ public class SetupApplicationEndpointTests : IClassFixture<AuthenticatedLuminaAp
         Dictionary<string, string[]>? errors = problemDetails!["errors"].Deserialize<Dictionary<string, string[]>>(_jsonOptions);
         errors.Should().ContainKey("General.Validation")
             .WhoseValue.Should().Contain(["UsernameCannotBeEmpty", "PasswordCannotBeEmpty", "PasswordConfirmCannotBeEmpty"]);
+    }
+
+    private async Task VerifyDefaultSetup(Guid userId)
+    {
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        
+        // TODO: update list when defaults change
+        // verify default permissions
+        List<PermissionEntity> permissions = await dbContext.Permissions.ToListAsync();
+        permissions.Should().Contain(p => p.PermissionName == AuthorizationPermission.CanViewUsers);
+        permissions.Should().Contain(p => p.PermissionName == AuthorizationPermission.CanDeleteUsers);
+        permissions.Should().Contain(p => p.PermissionName == AuthorizationPermission.CanRegisterUsers);
+
+        // verify default roles
+        List<RoleEntity> roles = await dbContext.Roles.ToListAsync();
+        RoleEntity? adminRole = roles.FirstOrDefault(r => r.RoleName == AuthorizationRole.Admin);
+        adminRole.Should().NotBeNull();
+
+        // verify admin role permissions
+        List<RolePermissionEntity> rolePermissions = await dbContext.RolePermissions
+            .Where(rp => rp.RoleId == adminRole!.Id)
+            .ToListAsync();
+        rolePermissions.Should().NotBeEmpty();
+        rolePermissions.Should().Contain(rp => permissions.Any(p => p.Id == rp.PermissionId));
+
+        // verify user has admin role
+        UserRoleEntity? userRole = await dbContext.UserRoles.FirstOrDefaultAsync(ur => ur.UserId == userId && ur.RoleId == adminRole!.Id);
+        userRole.Should().NotBeNull();
     }
 
     private async Task<UserEntity> CreateTestUser()

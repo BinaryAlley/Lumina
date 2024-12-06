@@ -6,6 +6,7 @@ using Lumina.Contracts.Responses.Authentication;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Infrastructure.Core.Security;
 using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -62,6 +63,16 @@ public class AuthChangePasswordTests : IClassFixture<LuminaApiFactory>, IDisposa
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        string content = await response.Content.ReadAsStringAsync();
+
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        problemDetails.Should().NotBeNull();
+        problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status401Unauthorized);
+        problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc7235#section-3.1");
+        problemDetails["title"].GetString().Should().Be("Unauthorized");
+        problemDetails["instance"].GetProperty("value").GetString().Should().Be("/api/v1/auth/change-password");
+        problemDetails["detail"].GetString().Should().Be("Authentication failed");
     }
 
     [Fact]
@@ -138,6 +149,9 @@ public class AuthChangePasswordTests : IClassFixture<LuminaApiFactory>, IDisposa
         return user;
     }
 
+    /// <summary>
+    /// Disposes API factory resources.
+    /// </summary>
     public void Dispose()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();

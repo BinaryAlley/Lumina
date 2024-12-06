@@ -73,6 +73,7 @@ public class AuthenticatedLuminaApiFactory : LuminaApiFactory, IDisposable
         // create test user
         UserEntity user = new()
         {
+            Id = Guid.NewGuid(),
             Username = TestUsername!,
             Password = _hashService.HashString("TestPass123!"),
             Libraries = [],

@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Common;
+using Lumina.Domain.Common.Enums.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -21,17 +22,22 @@ public class RoleEntity : IStorageEntity
     /// <summary>
     /// Gets the name of the role.
     /// </summary>
-    public required string RoleName { get; init; }
+    public required AuthorizationRole RoleName { get; init; }
 
     /// <summary>
-    /// Gets the collection of user roles associations that include this role.
+    /// Gets or sets the description of the role.
     /// </summary>
-    public required ICollection<UserRoleEntity> UserRoles { get; init; } = [];
+    public string? RoleDescription { get; set; }
 
     /// <summary>
-    /// Gets the collection of role permission associations that include this role.
+    /// Gets or sets the collection of user roles associations that include this role.
     /// </summary>
-    public required ICollection<RolePermissionEntity> RolePermissions { get; init; } = [];
+    public ICollection<UserRoleEntity> UserRoles { get; set; } = [];
+
+    /// <summary>
+    /// Gets or sets the collection of role permission associations that include this role.
+    /// </summary>
+    public ICollection<RolePermissionEntity> RolePermissions { get; set; } = [];
 
     /// <summary>
     /// Gets or sets the time and date when the entity was added.

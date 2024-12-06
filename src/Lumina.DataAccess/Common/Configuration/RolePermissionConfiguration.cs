@@ -21,6 +21,8 @@ public class RolePermissionConfiguration : IEntityTypeConfiguration<RolePermissi
 
         // composite primary key
         builder.HasKey(rolePermission => new { rolePermission.RoleId, rolePermission.PermissionId });
+        
+        builder.Ignore(rolePermission => rolePermission.Id); // Id is only needed as a generic constraint for the repository, but this entity uses a composite key as Id
 
         // foreign key: Role
         builder.HasOne(rolePermission => rolePermission.Role)

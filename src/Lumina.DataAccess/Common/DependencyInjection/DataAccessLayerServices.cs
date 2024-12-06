@@ -1,8 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Repositories.Common.Base;
+using Lumina.Application.Common.DataAccess.Seed;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.DataAccess.Common.Interceptors;
 using Lumina.DataAccess.Core.Repositories.Common.Factory;
+using Lumina.DataAccess.Core.Seed;
 using Lumina.DataAccess.Core.UoW;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -60,5 +62,7 @@ public static class DataAccessLayerServices
                                                        .Any(type => type.GetGenericTypeDefinition() == genericRepositoryType))
                                    .First(), type);
         }
+
+        services.AddScoped<IDataSeedService, DataSeedService>();
     }
 }

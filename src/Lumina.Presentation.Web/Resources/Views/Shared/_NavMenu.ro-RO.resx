@@ -126,8 +126,17 @@
   <data name="AddNewLibrary" xml:space="preserve">
     <value>Adăugare bibliotecă nouă</value>
   </data>
+  <data name="Administrator" xml:space="preserve">
+    <value>Administrator</value>
+  </data>
   <data name="Audio" xml:space="preserve">
     <value>Audio</value>
+  </data>
+  <data name="Authentication" xml:space="preserve">
+    <value>Autentificare</value>
+  </data>
+  <data name="Authorization" xml:space="preserve">
+    <value>Autorizare</value>
   </data>
   <data name="Books" xml:space="preserve">
     <value>Cărți</value>

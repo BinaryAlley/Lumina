@@ -85,7 +85,7 @@ public class Program
             }
             catch (Exception ex)
             {
-                Microsoft.Extensions.Logging.ILogger logger = services.GetRequiredService<Microsoft.Extensions.Logging.ILogger>();
+                ILogger<Program> logger = services.GetRequiredService<ILogger<Program>>();
                 logger.LogCritical(ex, "Failed to run database migrations");
             }
         }

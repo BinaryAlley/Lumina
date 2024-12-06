@@ -22,6 +22,8 @@ public class UserPermissionConfiguration : IEntityTypeConfiguration<UserPermissi
         // composite primary key
         builder.HasKey(userPermission => new { userPermission.UserId, userPermission.PermissionId });
 
+        builder.Ignore(userPermission => userPermission.Id); // Id is only needed as a generic constraint for the repository, but this entity uses a composite key as Id
+
         // foreign key: User
         builder.HasOne(userPermission => userPermission.User)
             .WithMany(user => user.UserPermissions)

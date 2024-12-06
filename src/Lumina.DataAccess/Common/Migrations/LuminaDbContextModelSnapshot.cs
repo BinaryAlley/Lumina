@@ -56,9 +56,14 @@ namespace Lumina.DataAccess.Common.Migrations
 
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(3);
+                        .HasColumnOrder(4);
 
                     b.Property<DateTime>("CreatedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(3);
+
+                    b.Property<string>("PermissionDescription")
+                        .HasMaxLength(255)
                         .HasColumnType("TEXT")
                         .HasColumnOrder(2);
 
@@ -70,11 +75,11 @@ namespace Lumina.DataAccess.Common.Migrations
 
                     b.Property<Guid?>("UpdatedBy")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(5);
+                        .HasColumnOrder(6);
 
                     b.Property<DateTime?>("UpdatedOnUtc")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(4);
+                        .HasColumnOrder(5);
 
                     b.HasKey("Id");
 
@@ -90,9 +95,14 @@ namespace Lumina.DataAccess.Common.Migrations
 
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(3);
+                        .HasColumnOrder(4);
 
                     b.Property<DateTime>("CreatedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(3);
+
+                    b.Property<string>("RoleDescription")
+                        .HasMaxLength(255)
                         .HasColumnType("TEXT")
                         .HasColumnOrder(2);
 
@@ -104,11 +114,11 @@ namespace Lumina.DataAccess.Common.Migrations
 
                     b.Property<Guid?>("UpdatedBy")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(5);
+                        .HasColumnOrder(6);
 
                     b.Property<DateTime?>("UpdatedOnUtc")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(4);
+                        .HasColumnOrder(5);
 
                     b.HasKey("Id");
 
@@ -130,9 +140,6 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.Property<DateTime>("CreatedOnUtc")
                         .HasColumnType("TEXT")
                         .HasColumnOrder(1);
-
-                    b.Property<Guid>("Id")
-                        .HasColumnType("TEXT");
 
                     b.Property<Guid?>("UpdatedBy")
                         .HasColumnType("TEXT")
@@ -168,9 +175,6 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnOrder(1);
 
-                    b.Property<Guid>("Id")
-                        .HasColumnType("TEXT");
-
                     b.Property<Guid?>("UpdatedBy")
                         .HasColumnType("TEXT")
                         .HasColumnOrder(4);
@@ -204,9 +208,6 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.Property<DateTime>("CreatedOnUtc")
                         .HasColumnType("TEXT")
                         .HasColumnOrder(1);
-
-                    b.Property<Guid>("Id")
-                        .HasColumnType("TEXT");
 
                     b.Property<Guid?>("UpdatedBy")
                         .HasColumnType("TEXT")

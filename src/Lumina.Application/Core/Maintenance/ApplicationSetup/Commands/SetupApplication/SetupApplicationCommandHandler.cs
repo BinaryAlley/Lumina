@@ -1,7 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
+using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Application.Common.DataAccess.Repositories.Authorization;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
+using Lumina.Application.Common.DataAccess.Seed;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
@@ -29,6 +32,7 @@ public class SetupApplicationCommandHandler : IRequestHandler<SetupApplicationCo
     private readonly ITotpTokenGenerator _totpTokenGenerator;
     private readonly IQRCodeGenerator _qRCodeGenerator;
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly IDataSeedService _dataSeedService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SetupApplicationCommandHandler"/> class.
@@ -39,13 +43,15 @@ public class SetupApplicationCommandHandler : IRequestHandler<SetupApplicationCo
     /// <param name="totpTokenGenerator">Injected service for generating and validating TOTP tokens.</param>
     /// <param name="qRCodeGenerator">Injected service for generating QR codes.</param>
     /// <param name="dateTimeProvider">Injected service for time related concerns.</param>
+    /// <param name="dataSeedService">Injected service for the initial persistence medium data seed.</param>
     public SetupApplicationCommandHandler(
         IUnitOfWork unitOfWork,
         IHashService hashService,
         ICryptographyService cryptographyService,
         ITotpTokenGenerator totpTokenGenerator,
         IQRCodeGenerator qRCodeGenerator,
-        IDateTimeProvider dateTimeProvider)
+        IDateTimeProvider dateTimeProvider,
+        IDataSeedService dataSeedService)
     {
         _unitOfWork = unitOfWork;
         _hashService = hashService;
@@ -53,6 +59,7 @@ public class SetupApplicationCommandHandler : IRequestHandler<SetupApplicationCo
         _totpTokenGenerator = totpTokenGenerator;
         _qRCodeGenerator = qRCodeGenerator;
         _dateTimeProvider = dateTimeProvider;
+        _dataSeedService = dataSeedService;
     }
 
     /// <summary>
@@ -67,10 +74,10 @@ public class SetupApplicationCommandHandler : IRequestHandler<SetupApplicationCo
     {
         // check if any users already exists (admin account is only set once!)
         IUserRepository userRepository = _unitOfWork.GetRepository<IUserRepository>();
-        ErrorOr<IEnumerable<UserEntity>> resultSelectUser = await userRepository.GetAllAsync(cancellationToken);
-        if (resultSelectUser.IsError)
-            return resultSelectUser.Errors;
-        else if (resultSelectUser.Value.Any())
+        ErrorOr<IEnumerable<UserEntity>> selectUserResult = await userRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+        if (selectUserResult.IsError)
+            return selectUserResult.Errors;
+        else if (selectUserResult.Value.Any())
             return Errors.Authorization.AdminAccountAlreadyCreated;
         // no users are present, register the admin one
         string? totpSecret = null;
@@ -82,7 +89,7 @@ public class SetupApplicationCommandHandler : IRequestHandler<SetupApplicationCo
             Password = Uri.EscapeDataString(_hashService.HashString(request.Password!)),
             CreatedOnUtc = _dateTimeProvider.UtcNow,
             Libraries = [],
-            UserPermissions = [], // TODO: implement default roles and permissions
+            UserPermissions = [], 
             UserRoles = [],
             CreatedBy = id
         };
@@ -97,10 +104,28 @@ public class SetupApplicationCommandHandler : IRequestHandler<SetupApplicationCo
             user.TotpSecret = _cryptographyService.Encrypt(Convert.ToBase64String(secret));
         }
         // insert the user
-        ErrorOr<Created> resultInsertUser = await userRepository.InsertAsync(user, cancellationToken);
-        if (resultInsertUser.IsError)
-            return resultInsertUser.Errors;
+        ErrorOr<Created> insertUserResult = await userRepository.InsertAsync(user, cancellationToken).ConfigureAwait(false);
+        if (insertUserResult.IsError)
+            return insertUserResult.Errors;
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+        // set the default permissions, roles, roles permissions
+        ErrorOr<Created> setPermissionsResult = await _dataSeedService.SetDefaultAuthorizationPermissionsAsync(id, cancellationToken).ConfigureAwait(false);
+        if (setPermissionsResult.IsError)
+            return setPermissionsResult.Errors;
+
+        ErrorOr<Created> setRoleResult = await _dataSeedService.SetDefaultAuthorizationRolesAsync(id, cancellationToken).ConfigureAwait(false);
+        if (setRoleResult.IsError)
+            return setRoleResult.Errors;
+
+        ErrorOr<Created> setRolePermissionResult = await _dataSeedService.SetAdminRolePermissionsAsync(id, cancellationToken).ConfigureAwait(false);
+        if (setRolePermissionResult.IsError)
+            return setRolePermissionResult.Errors;
+
+        ErrorOr<Created> setRoleToAdminResult = await _dataSeedService.SetAdminRoleToAdministratorAccount(id, cancellationToken).ConfigureAwait(false);
+        if (setRoleToAdminResult.IsError)
+            return setRoleToAdminResult.Errors;
+
         // TODO: insert the default admin profile preferences when they are implemented
         // if 2FA was enabled, the TOTP secret needs to be delivered to the client unhashed, so it can be displayed 
         return new RegistrationResponse(user.Id, user.Username, totpSecret);

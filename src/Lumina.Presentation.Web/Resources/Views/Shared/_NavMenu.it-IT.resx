@@ -126,8 +126,17 @@
   <data name="AddNewLibrary" xml:space="preserve">
     <value>Aggiungi nuova libreria</value>
   </data>
+  <data name="Administrator" xml:space="preserve">
+    <value>Amministratore</value>
+  </data>
   <data name="Audio" xml:space="preserve">
     <value>Audio</value>
+  </data>
+  <data name="Authentication" xml:space="preserve">
+    <value>Autenticazione</value>
+  </data>
+  <data name="Authorization" xml:space="preserve">
+    <value>Autorizzazione</value>
   </data>
   <data name="Books" xml:space="preserve">
     <value>Libri</value>

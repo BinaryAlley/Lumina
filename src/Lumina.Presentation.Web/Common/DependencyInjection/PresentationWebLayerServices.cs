@@ -3,8 +3,10 @@ using FluentValidation;
 using Lumina.Presentation.Web.Common.Api;
 using Lumina.Presentation.Web.Common.Authorization;
 using Lumina.Presentation.Web.Common.Exceptions;
-using Lumina.Presentation.Web.Common.Filters;
+using Lumina.Presentation.Web.Common.Filters.AuthorizationFilters;
+using Lumina.Presentation.Web.Common.Filters.ExceptionFilters;
 using Lumina.Presentation.Web.Common.MiddlewareFilters;
+using Lumina.Presentation.Web.Common.Models.Authorization;
 using Lumina.Presentation.Web.Common.Security;
 using Lumina.Presentation.Web.Common.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -203,8 +205,13 @@ public static class PresentationWebLayerServices
 
         // register the HTTP typed client used for the API interaction
         services.AddHttpClient<IApiHttpClient, ApiHttpClient>()
+            .AddHttpMessageHandler<CachedAuthorizationHandler>()
             .AddPolicyHandler(retryPolicy)
             .AddPolicyHandler(circuitBreakerPolicy);
+
+        services.AddScoped<CachedAuthorizationHandler>();
+        services.AddScoped<ApiAuthorizationFilter>();
+        services.AddScoped<AuthorizationRequirementModel>();
 
         // enable access to the current HTTP context in non-controller classes
         services.AddHttpContextAccessor();
@@ -213,6 +220,7 @@ public static class PresentationWebLayerServices
         services.AddScoped<IAuthorizationHandler, InitializationHandler>();
         services.AddSingleton<ICryptographyService, CryptographyService>();
         services.AddSingleton<IUrlService, UrlService>();
+        services.AddHybridCache(); // used for caching authorization roles, permissions and policies
 
         return services;
     }
