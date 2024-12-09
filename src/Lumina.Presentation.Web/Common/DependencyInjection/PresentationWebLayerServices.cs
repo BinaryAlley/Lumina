@@ -218,6 +218,7 @@ public static class PresentationWebLayerServices
 
         services.AddScoped<ApiExceptionFilter>();
         services.AddScoped<IAuthorizationHandler, InitializationHandler>();
+        services.AddScoped<Authorization.IAuthorizationService, AuthorizationService>();
         services.AddSingleton<ICryptographyService, CryptographyService>();
         services.AddSingleton<IUrlService, UrlService>();
         services.AddHybridCache(); // used for caching authorization roles, permissions and policies
