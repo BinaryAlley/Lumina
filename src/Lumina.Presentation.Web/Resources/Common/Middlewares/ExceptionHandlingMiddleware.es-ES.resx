@@ -120,6 +120,9 @@
   <data name="AdminAccountAlreadyCreated" xml:space="preserve">
     <value>¡La cuenta de administrador ya está creada!</value>
   </data>
+  <data name="AdminRoleCannotBeDeleted" xml:space="preserve">
+    <value>¡El rol de administrador no puede ser eliminado!</value>
+  </data>
   <data name="Application theme cannot be empty!" xml:space="preserve">
     <value>¡El tema de la aplicación no puede estar vacío!</value>
   </data>

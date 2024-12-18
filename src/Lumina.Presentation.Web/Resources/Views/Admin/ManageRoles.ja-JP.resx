@@ -132,6 +132,9 @@
   <data name="DeleteRole" xml:space="preserve">
     <value>ロールを削除する</value>
   </data>
+  <data name="DeleteRoleConfirm" xml:space="preserve">
+    <value>選択したロールを削除してもよろしいですか？</value>
+  </data>
   <data name="RoleCreated" xml:space="preserve">
     <value>ロールが作成されました！</value>
   </data>

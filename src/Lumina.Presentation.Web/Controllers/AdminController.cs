@@ -2,6 +2,7 @@
 using Lumina.Presentation.Web.Common.Api;
 using Lumina.Presentation.Web.Common.Attributes;
 using Lumina.Presentation.Web.Common.Models.Authorization;
+using Lumina.Presentation.Web.Common.Models.UsersManagement;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -50,7 +51,8 @@ public class AdminController : Controller
     [HttpGet("manage-permissions")]
     public async Task<IActionResult> ManagePermissions(CancellationToken cancellationToken)
     {
-        ViewData["Roles"] = await _apiHttpClient.GetAsync<RoleModel>($"roles/", cancellationToken).ConfigureAwait(false);
+        ViewData["users"] = await _apiHttpClient.GetAsync<UserModel[]>($"auth/users", cancellationToken).ConfigureAwait(false);
+        ViewData["roles"] = await _apiHttpClient.GetAsync<RoleModel[]>($"roles/", cancellationToken).ConfigureAwait(false);
         return View();
     }
 
@@ -94,7 +96,7 @@ public class AdminController : Controller
     /// </summary>
     /// <param name="model">The model containing the data of the role to be updated.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    [HttpPost("update-role")]
+    [HttpPut("update-role")]
     public async Task<IActionResult> UpdateRole([FromBody] UpdateRoleRequestModel model, CancellationToken cancellationToken)
     {
         RolePermissionsModel response = await _apiHttpClient.PutAsync<RolePermissionsModel, UpdateRoleRequestModel>($"roles/", model, cancellationToken).ConfigureAwait(false);

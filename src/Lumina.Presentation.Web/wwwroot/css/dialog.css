@@ -1,0 +1,121 @@
+﻿.dialog-modal-background {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000000;
+    opacity: 0.6;
+    z-index: 1998;
+}
+
+.dialog-container {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 999;
+    width: 400px;
+    max-width: 90%;
+}
+
+.dialog {
+    background: linear-gradient(135deg, #404040, #232323);
+    border-radius: 4px;
+    border-top: 1px solid #505050;
+    border-left: 1px solid #505050;
+    border-right: 1px solid #000;
+    border-bottom: 1px solid #000;
+    box-shadow: 5px 5px 5px var(--shadow-color);
+    overflow: hidden;
+    animation: fadeIn 0.3s ease-out;
+    position: relative;
+}
+
+.dialog-content {
+    padding: 20px;
+}
+
+.dialog-header {
+    padding-bottom: 15px;
+    border-bottom: 1px solid #000;
+    position: relative;
+}
+
+    .dialog-header h2 {
+        margin: 0;
+        color: var(--text-foreground);
+        font-family: monospace;
+        font-size: 1.1rem;
+    }
+
+.dialog-shine-effect {
+    background: linear-gradient(to right, transparent, #fff, transparent);
+    width: 100%;
+    top: -1px;
+    height: 1px;
+    position: absolute;
+    pointer-events: none;
+}
+
+.dialog-body {
+    padding: 20px;
+    color: var(--text-foreground);
+    font-family: monospace;
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+}
+
+.dialog-icon {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+    .dialog-icon.info {
+        background-image: url('path-to-info-icon.svg');
+    }
+
+    .dialog-icon.warning {
+        background-image: url('path-to-warning-icon.svg');
+    }
+
+    .dialog-icon.error {
+        background-image: url('path-to-error-icon.svg');
+    }
+
+    .dialog-icon.question {
+        background-image: url('path-to-question-icon.svg');
+    }
+
+.dialog-message {
+    flex-grow: 1;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    hyphens: auto;
+    white-space: pre-wrap;
+}
+
+.dialog-buttons {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 15px;
+    gap: 10px;
+    border-top: 1px solid #000;
+}
+
+.dialog-button {
+    padding: 2px 16px;
+    font-weight: 500;
+}
+
+@keyframes dialogAppear {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

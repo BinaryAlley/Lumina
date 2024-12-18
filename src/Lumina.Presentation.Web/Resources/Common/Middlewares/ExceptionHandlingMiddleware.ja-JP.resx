@@ -120,6 +120,9 @@
   <data name="AdminAccountAlreadyCreated" xml:space="preserve">
     <value>管理者アカウントは既に作成されています!</value>
   </data>
+  <data name="AdminRoleCannotBeDeleted" xml:space="preserve">
+    <value>管理者ロールは削除できません！</value>
+  </data>
   <data name="Application theme cannot be empty!" xml:space="preserve">
     <value>アプリケーションのテーマを選択してください!</value>
   </data>

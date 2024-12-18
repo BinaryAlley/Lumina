@@ -15,6 +15,7 @@ public static partial class Errors
         public static Error AdminAccountAlreadyCreated => Error.Conflict(description: nameof(AdminAccountAlreadyCreated));
         public static Error AdminAccountNotFound => Error.NotFound(description: nameof(AdminAccountNotFound));
         public static Error AdminRoleNotFound => Error.NotFound(description: nameof(AdminRoleNotFound));
+        public static Error AdminRoleCannotBeDeleted => Error.Forbidden(description: nameof(AdminRoleCannotBeDeleted));
         public static Error RoleNotFound => Error.NotFound(description: nameof(RoleNotFound));
         public static Error PermissionAlreadyExists => Error.Unauthorized(description: nameof(PermissionAlreadyExists));
         public static Error RoleAlreadyExists => Error.Conflict(description: nameof(RoleAlreadyExists));

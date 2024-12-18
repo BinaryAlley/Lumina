@@ -132,6 +132,9 @@
   <data name="DeleteRole" xml:space="preserve">
     <value>Eliminar rol</value>
   </data>
+  <data name="DeleteRoleConfirm" xml:space="preserve">
+    <value>¿Está seguro de que desea eliminar el rol seleccionado?</value>
+  </data>
   <data name="RoleCreated" xml:space="preserve">
     <value>¡El rol ha sido creado!</value>
   </data>

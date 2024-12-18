@@ -110,9 +110,10 @@
             };
 
             const isRoleSelected = formData.roleId !== '';
-            const url =  isRoleSelected ? '@_urlService.GetAbsoluteUrl("UpdateRole", "Admin")' : '@_urlService.GetAbsoluteUrl("CreateRole", "Admin")';
 
-            const data = await callApiPostAsync(url, formData);
+            const data = isRoleSelected ? 
+                  await callApiPutAsync('@_urlService.GetAbsoluteUrl("UpdateRole", "Admin")', formData) :
+                  await callApiPostAsync('@_urlService.GetAbsoluteUrl("CreateRole", "Admin")', formData);
             if (data) {
                 await fetchRoles();
                 notificationService.show(isRoleSelected ? '@_localizer["RoleUpdated"]' : '@_localizer["RoleCreated"]', NotificationType.SUCCESS);
@@ -121,21 +122,15 @@
 
         btnDeleteRole.addEventListener('click', async function(e) {
             const roleId = document.getElementById('authorization-roles-selected-id').value;
-
-            // const confirmDelete = await showDialog(
-            //     translationService.Translate(Terms.ConfirmRoleDelete),
-            //     translationService.Translate(Terms.Confirmation),
-            //     'YES_NO'
-            // );
-
-            // if (confirmDelete) {
-                 const url = '@_urlService.GetAbsoluteUrl("DeleteRole", "Admin", new { roleId = default(Guid) })';
-                 const success = await callApiDeleteAsync(url.replace('/@(default(Guid))', `/${roleId}`)); // roleId needs to be replaced here, because GetAbsoluteUrl is server side, roleId is client side
-                 if (success) {
-                     await fetchRoles();
-                     notificationService.show('@_localizer["RoleDeleted"]', NotificationType.SUCCESS);
-                 }
-            // }
+            // ask the user for confirmation before deleting the role
+            if (await dialogService.show('@_localizer["DeleteRoleConfirm"]', jsLocalizedDialogs.confirmation, DialogButtons.YES_NO_CANCEL, DialogIcon.QUESTION) === DialogButton.YES) {
+                const url = '@_urlService.GetAbsoluteUrl("DeleteRole", "Admin", new { roleId = default(Guid) })';
+                const success = await callApiDeleteAsync(url.replace('/@(default(Guid))', `/${roleId}`)); // roleId needs to be replaced here, because GetAbsoluteUrl is server side, roleId is client side
+                if (success) {
+                    await fetchRoles();
+                    notificationService.show('@_localizer["RoleDeleted"]', NotificationType.SUCCESS);
+                }
+            }
         });
 
          // on role dropdown change
