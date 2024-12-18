@@ -38,7 +38,7 @@ public class GetFilesQueryHandler : IRequestHandler<GetFilesQuery, ErrorOr<IEnum
     /// </returns>
     public ValueTask<ErrorOr<IEnumerable<FileResponse>>> Handle(GetFilesQuery request, CancellationToken cancellationToken)
     {
-        ErrorOr<IEnumerable<File>> result = _fileService.GetFiles(request.Path!, request.IncludeHiddenElements);
-        return ValueTask.FromResult(result.Match(values => ErrorOrFactory.From(values.ToResponses()), errors => errors));
+        ErrorOr<IEnumerable<File>> getFilesResult = _fileService.GetFiles(request.Path!, request.IncludeHiddenElements);
+        return ValueTask.FromResult(getFilesResult.Match(values => ErrorOrFactory.From(values.ToResponses()), errors => errors));
     }
 }

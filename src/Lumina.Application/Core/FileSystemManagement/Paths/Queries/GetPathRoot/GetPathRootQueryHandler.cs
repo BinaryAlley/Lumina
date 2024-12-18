@@ -35,7 +35,7 @@ public class GetPathRootQueryHandler : IRequestHandler<GetPathRootQuery, ErrorOr
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the root of the specified path, or an error.</returns>
     public ValueTask<ErrorOr<PathSegmentResponse>> Handle(GetPathRootQuery request, CancellationToken cancellationToken)
     {
-        ErrorOr<PathSegment> result = _pathService.GetPathRoot(request.Path!);
-        return ValueTask.FromResult(result.Match(values => ErrorOrFactory.From(values.ToResponse()), errors => errors));
+        ErrorOr<PathSegment> getPathRootResult = _pathService.GetPathRoot(request.Path!);
+        return ValueTask.FromResult(getPathRootResult.Match(values => ErrorOrFactory.From(values.ToResponse()), errors => errors));
     }
 }

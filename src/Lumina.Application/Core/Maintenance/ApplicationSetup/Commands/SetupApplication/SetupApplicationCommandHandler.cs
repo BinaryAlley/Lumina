@@ -1,8 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.DataAccess.Repositories.Authorization;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.Seed;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -74,10 +72,10 @@ public class SetupApplicationCommandHandler : IRequestHandler<SetupApplicationCo
     {
         // check if any users already exists (admin account is only set once!)
         IUserRepository userRepository = _unitOfWork.GetRepository<IUserRepository>();
-        ErrorOr<IEnumerable<UserEntity>> selectUserResult = await userRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
-        if (selectUserResult.IsError)
-            return selectUserResult.Errors;
-        else if (selectUserResult.Value.Any())
+        ErrorOr<IEnumerable<UserEntity>> selectUsersResult = await userRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+        if (selectUsersResult.IsError)
+            return selectUsersResult.Errors;
+        else if (selectUsersResult.Value.Any())
             return Errors.Authorization.AdminAccountAlreadyCreated;
         // no users are present, register the admin one
         string? totpSecret = null;

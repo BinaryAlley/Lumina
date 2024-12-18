@@ -31,7 +31,7 @@ public interface IAuthorizationService
     /// <param name="role">The role to check.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns><see langword="true"/> if the user is in the specified role, <see langword="false"/> otherwise.</returns>
-    Task<bool> IsInRoleAsync(Guid userId, AuthorizationRole role, CancellationToken cancellationToken);
+    Task<bool> IsInRoleAsync(Guid userId, string role, CancellationToken cancellationToken);
 
     /// <summary>
     /// Evaluates whether the specified user meets the conditions defined in the specified authorization policy.

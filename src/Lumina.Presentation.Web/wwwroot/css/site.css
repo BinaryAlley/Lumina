@@ -176,15 +176,15 @@ main {
 }
 
 .transparent {
-    background-color: transparent;
+    background-color: transparent !important;
 }
 
 .no-border {
-    border: 0px;
+    border: 0px !important;
 }
 
 .no-underline {
-    text-decoration: none;
+    text-decoration: none !important;
 }
 
 .form-container {
@@ -270,6 +270,13 @@ main {
     -webkit-background-clip: text;
     color: transparent;
     text-shadow: var(--highlight-color) 2px 2px 2px;
+}
+
+.inset-panel {
+    border-top: #000 1px solid;
+    border-left: #000 1px solid;
+    border-right: #777 1px solid;
+    border-bottom: #999 1px solid;
 }
 
 .engraved-panel {

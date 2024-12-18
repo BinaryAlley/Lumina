@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Routing;
 using System;
 using System.Linq;
+using System.Reflection;
 #endregion
 
 namespace Lumina.Presentation.Web.Common.Services;
@@ -36,8 +37,9 @@ public class UrlService : IUrlService
     /// </summary>
     /// <param name="action">The action name within the controller.</param>
     /// <param name="controller">The controller name.</param>
+    /// <param name="additionalRouteValues">Optional additional route values, like query parameters.</param>
     /// <returns>An absolute URL to the specified action.</returns>
-    public string? GetAbsoluteUrl(string action, string controller)
+    public string? GetAbsoluteUrl(string action, string controller, object? additionalRouteValues = null)
     {
         HttpContext? httpContext = _httpContextAccessor.HttpContext;
         if (httpContext is null)
@@ -48,16 +50,24 @@ public class UrlService : IUrlService
         ControllerActionDescriptor? controllerActionDescriptor = _actionDescriptorCollectionProvider
             .ActionDescriptors.Items
             .OfType<ControllerActionDescriptor>()
-            .FirstOrDefault(ad =>
-                ad.ControllerName.Equals(controller, StringComparison.OrdinalIgnoreCase) &&
-                ad.ActionName.Equals(action, StringComparison.OrdinalIgnoreCase));
+            .FirstOrDefault(controllerActionDescription =>
+                controllerActionDescription.ControllerName.Equals(controller, StringComparison.OrdinalIgnoreCase) &&
+                controllerActionDescription.ActionName.Equals(action, StringComparison.OrdinalIgnoreCase));
         if (controllerActionDescriptor is null)
             return null;
         // check if the route template contains {culture}
         string? routeTemplate = controllerActionDescriptor.AttributeRouteInfo?.Template;
         bool needsCulture = routeTemplate?.Contains("{culture}") == true;
+        // merge culture and additional values
+        RouteValueDictionary routeValues = [];
+        if (needsCulture)
+            routeValues.Add("culture", culture);
+        if (additionalRouteValues is not null)
+            foreach (PropertyInfo prop in additionalRouteValues.GetType().GetProperties())
+                routeValues.Add(prop.Name, prop.GetValue(additionalRouteValues));
+
         // create route values based on whether the controller is localized
         object values = needsCulture ? new { culture, action } : new { action };
-        return _linkGenerator.GetUriByAction(httpContext: httpContext, action: action, controller: controller, values: values, scheme: scheme);
+        return _linkGenerator.GetUriByAction(httpContext: httpContext, action: action, controller: controller, values: routeValues, scheme: scheme); 
     }
 }

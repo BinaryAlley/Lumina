@@ -12,8 +12,8 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Queries;
 /// Query for getting a media library by its Id.
 /// </summary>
 /// <param name="Id">The Id of the media library to get.</param>
-/// <param name="UserId">The Id os the user requesting the media library.</param>
-[DebuggerDisplay("Path: {Path}")]
+/// <param name="UserId">The Id of the user requesting the media library.</param>
+[DebuggerDisplay("Id: {Id}")]
 public record GetLibraryQuery(
     Guid Id,
     Guid UserId

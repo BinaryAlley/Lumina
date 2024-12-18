@@ -95,6 +95,110 @@ async function callApiPostAsync(url, data, options = {}) {
     }
 }
 
+/**
+ * Performs a PUT request to the specified API endpoint.
+ * @param {string} url - The API endpoint URL.
+ * @param {Object} data - The data to send in the request body.
+ * @param {Object} [options] - Additional options for the request.
+ * @param {boolean} [options.useAntiForgery=true] - Whether to include anti-forgery token.
+ * @param {Object} [options.headers] - Additional headers to include.
+ * @returns {Promise<any>} The response data if successful, undefined otherwise.
+ */
+async function callApiPutAsync(url, data, options = {}) {
+    const defaultOptions = {
+        useAntiForgery: true,
+        headers: {}
+    };
+    const finalOptions = { ...defaultOptions, ...options };
+    try {
+        // prepare headers
+        const headers = {
+            'Content-Type': 'application/json',
+            ...finalOptions.headers
+        };
+        // add anti-forgery token if enabled
+        if (finalOptions.useAntiForgery) {
+            const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+            if (token)
+                headers['RequestVerificationToken'] = token;
+        }
+        // make the request
+        const response = await fetch(url, {
+            method: 'PUT',
+            headers: headers,
+            body: JSON.stringify(data)
+        });
+        if (response.redirected) // if a redirect is requested, perform it
+            window.location.href = response.url;
+        else {
+            if (!response.ok)
+                throw new Error(`HTTP error! status: ${response.status}`);
+            const jsonResponse = await response.json();
+            if (jsonResponse.success) {
+                if (jsonResponse.message)
+                    notificationService.show(jsonResponse.message, NotificationType.SUCCESS);
+                return jsonResponse.data;
+            }
+            else
+                notificationService.show(jsonResponse.errorMessage, NotificationType.ERROR);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        notificationService.show(error, NotificationType.ERROR);
+    }
+}
+
+/**
+ * Performs a DELETE request to the specified API endpoint.
+ * @param {string} url - The API endpoint URL.
+ * @param {Object} [options] - Additional options for the request.
+ * @param {boolean} [options.useAntiForgery=true] - Whether to include anti-forgery token.
+ * @param {Object} [options.headers] - Additional headers to include.
+ * @returns {Promise<any>} The response data if successful, undefined otherwise.
+ */
+async function callApiDeleteAsync(url, options = {}) {
+    const defaultOptions = {
+        useAntiForgery: true,
+        headers: {}
+    };
+    const finalOptions = { ...defaultOptions, ...options };
+    try {
+        // prepare headers
+        const headers = {
+            'Content-Type': 'application/json',
+            ...finalOptions.headers
+        };
+        // add anti-forgery token if enabled
+        if (finalOptions.useAntiForgery) {
+            const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+            if (token)
+                headers['RequestVerificationToken'] = token;
+        }
+        // make the request
+        const response = await fetch(url, {
+            method: 'DELETE',
+            headers: headers
+        });
+        if (response.redirected) // if a redirect is requested, perform it
+            window.location.href = response.url;
+        else {
+            if (!response.ok)
+                throw new Error(`HTTP error! status: ${response.status}`);
+            const jsonResponse = await response.json();
+            if (jsonResponse.success) {
+                if (jsonResponse.message)
+                    notificationService.show(jsonResponse.message, NotificationType.SUCCESS);
+                return jsonResponse.success;
+            }
+            else
+                notificationService.show(jsonResponse.errorMessage, NotificationType.ERROR);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        notificationService.show(error, NotificationType.ERROR);
+    }
+}
+
 //+======================================================================================+
 //|                                Website navigation                                    |
 //+======================================================================================+
@@ -224,9 +328,9 @@ async function updateContent(url, addToHistory) {
                     newScript.textContent = `
                         (function() {
                             const safeGetElement = (id) => document.getElementById(id);
-                            const safeAddEventListener = (element, event, handler) => {
+                            const safeAddEventListener = (element, e, handler) => {
                                 if (element) 
-                                    element.addEventListener(event, handler);
+                                    element.addEventListener(e, handler);
                             };
                             ${script.textContent}
                         })();
@@ -251,7 +355,7 @@ async function updateContent(url, addToHistory) {
             history.pushState(state, title, url);
         }
     } catch (error) {
-        notificationService.show('Navigation failed', NotificationType.ERROR);
+        notificationService.show(jsLocalizedMessages.navigationFailed, NotificationType.ERROR);
         console.error('Navigation failed:', error);
     }
 }
@@ -417,11 +521,11 @@ function getScrollbarWidth() {
 
 /**
  * Handles the wheel event for horizontal scrolling.
- * @param {WheelEvent} event - The wheel event object.
+ * @param {WheelEvent} e - The wheel event object.
  */
-const scrollHandler = function (event) {
-    event.preventDefault();
-    this.scrollLeft += (event.deltaY > 0 ? 1 : -1) * 80;
+const scrollHandler = function (e) {
+    e.preventDefault();
+    this.scrollLeft += (e.deltaY > 0 ? 1 : -1) * 80;
 };
 
 /**

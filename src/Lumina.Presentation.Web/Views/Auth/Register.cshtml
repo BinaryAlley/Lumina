@@ -17,97 +17,100 @@
 
 @model RegisterRequestModel
 
-<div class="enlightenment-panel shadow-effect p-2 mx-auto panel w-50 mb-10" style="min-width: 320px; margin-top: 1rem;">
-    <div class="shine-effect"></div>
-    <form method="post" id="register-account-form" class="inline">
-        @Html.AntiForgeryToken()
-        <!-- section for determining registration type (regular user/admin) -->
-        <input type="hidden" name="RegistrationType" value="@registrationType" />
-        <div class="form-container">
-            @if (registrationType == "Admin")
-            {
+<div style="display: grid; grid-template-rows: auto 1fr;"><!--container with two rows, one fixed, one filling remaining space-->
+    <div style="min-height: 1rem;"></div><!--the first row is a dummy row for "margin", because setting a margin on the next row would offset the parent's position-->
+    <div class="enlightenment-panel shadow-effect p-2 mx-auto panel w-50 mb-10" style="min-width: 320px;">
+        <div class="shine-effect"></div>
+        <form method="post" id="register-account-form" class="inline">
+            @Html.AntiForgeryToken()
+            <!-- section for determining registration type (regular user/admin) -->
+            <input type="hidden" name="RegistrationType" value="@registrationType" />
+            <div class="form-container">
+                @if (registrationType == "Admin")
+                {
+                    <div class="form-row">
+                        <p class="invalid-feedback w-95 text-center f-18">@_localizer["AdminAccountRegistration"]</p>
+                    </div>
+                }
+                <!-- Username -->
                 <div class="form-row">
-                    <p class="invalid-feedback w-95 text-center f-18">@_localizer["AdminAccountRegistration"]</p>
+                    <div class="form-label">
+                        <label asp-for="Username">@_localizer["Username"]</label>
+                        <span class="mandatory-field">*</span>:
+                    </div>
+                    <div class="form-field">
+                        <input asp-for="Username" autocomplete="username" class="enlightenment-input" />
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionUsername"]</small>
                 </div>
+                <!-- Password -->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label asp-for="Password">@_localizer["Password"]</label>
+                        <span class="mandatory-field">*</span>:
+                    </div>
+                    <div class="form-field">
+                        <input type="password" asp-for="Password" autocomplete="new-password" class="enlightenment-input" />
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionPassword"]</small>
+                </div>
+                <!-- Password Confirm-->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label asp-for="PasswordConfirm">@_localizer["PasswordConfirm"]</label>
+                        <span class="mandatory-field">*</span>:
+                    </div>
+                    <div class="form-field">
+                        <input type="password" asp-for="PasswordConfirm" autocomplete="new-password" class="enlightenment-input" />
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionPasswordConfirm"]</small>
+                </div>
+                <!-- 2FA -->
+                <input type="hidden" id="hidden-use-two-fa" name="use2fa" value="true">
+                <div class="form-row">
+                    <div class="form-field">
+                        <label class="enlightenment-checkbox-label">
+                            <input type="checkbox" asp-for="Use2fa" class="enlightenment-checkbox-hidden" value="true" checked/>
+                            <span class="enlightenment-checkbox"></span>
+                            @_localizer["EnableTwoFactorAuthentication"]
+                        </label>
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["Description2Fa"]</small>
+                </div>
+                <div class="form-row">
+                    <span id="register-two-fa-attention" class="invalid-feedback w-95 text-center hidden">@_localizer["DisclaimerTwoFactor"]</span>
+                </div>
+                <div class="form-row" style="justify-content: center;">
+                    <button type="submit" class="confirm-button h-22px">@_localizer["RegisterKey"]</button>
+                </div>
+            </div>
+        </form>
+        <!-- section registration success -->
+        <div class="text-center w-100">
+            <p id="register-success" class="text-light-one w-100 hidden">@_localizer["AccountCreated"]</p>
+            <img id="totp-image" class="w-200px h-200px h-align-m mx-auto mt-10 hidden" />
+            <p id="totp-message" class="text-light-one w-100 hidden">@_localizer["ScanTotpCode"]</p>
+            @if (User?.Identity?.IsAuthenticated == false)
+            {
+                <button id="btn-login" type="button" class="confirm-button h-22px mx-auto mt-10 hidden">@_localizer["Login"]</button>
             }
-            <!-- Username -->
-            <div class="form-row">
-                <div class="form-label">
-                    <label asp-for="Username">@_localizer["Username"]</label>
-                    <span class="mandatory-field">*</span>:
-                </div>
-                <div class="form-field">
-                    <input asp-for="Username" autocomplete="username" class="enlightenment-input" />
-                </div>
-                <small class="form-label text-disabled form-description">@_localizer["DescriptionUsername"]</small>
-            </div>
-            <!-- Password -->
-            <div class="form-row">
-                <div class="form-label">
-                    <label asp-for="Password">@_localizer["Password"]</label>
-                    <span class="mandatory-field">*</span>:
-                </div>
-                <div class="form-field">
-                    <input type="password" asp-for="Password" autocomplete="new-password" class="enlightenment-input" />
-                </div>
-                <small class="form-label text-disabled form-description">@_localizer["DescriptionPassword"]</small>
-            </div>
-            <!-- Password Confirm-->
-            <div class="form-row">
-                <div class="form-label">
-                    <label asp-for="PasswordConfirm">@_localizer["PasswordConfirm"]</label>
-                    <span class="mandatory-field">*</span>:
-                </div>
-                <div class="form-field">
-                    <input type="password" asp-for="PasswordConfirm" autocomplete="new-password" class="enlightenment-input" />
-                </div>
-                <small class="form-label text-disabled form-description">@_localizer["DescriptionPasswordConfirm"]</small>
-            </div>
-            <!-- 2FA -->
-            <input type="hidden" id="hidden-use-two-fa" name="use2fa" value="true">
-            <div class="form-row">
-                <div class="form-field">
-                    <label class="enlightenment-checkbox-label">
-                        <input type="checkbox" asp-for="Use2fa" class="enlightenment-checkbox-hidden" value="true" checked/>
-                        <span class="enlightenment-checkbox"></span>
-                        @_localizer["EnableTwoFactorAuthentication"]
-                    </label>
-                </div>
-                <small class="form-label text-disabled form-description">@_localizer["Description2Fa"]</small>
-            </div>
-            <div class="form-row">
-                <span id="register-two-fa-attention" class="invalid-feedback w-95 text-center hidden">@_localizer["DisclaimerTwoFactor"]</span>
-            </div>
-            <div class="form-row" style="justify-content: center;">
-                <button type="submit" class="confirm-button h-22px">@_localizer["RegisterKey"]</button>
-            </div>
         </div>
-    </form>
-    <!-- section registration success -->
-    <div class="text-center w-100">
-        <p id="register-success" class="text-light-one w-100 hidden">@_localizer["AccountCreated"]</p>
-        <img id="totp-image" class="w-200px h-200px h-align-m mx-auto mt-10 hidden" />
-        <p id="totp-message" class="text-light-one w-100 hidden">@_localizer["ScanTotpCode"]</p>
-        @if (User?.Identity?.IsAuthenticated == false)
-        {
-            <button id="btn-login" type="button" class="confirm-button h-22px mx-auto mt-10 hidden">@_localizer["Login"]</button>
-        }
     </div>
 </div>
 @section Scripts {
     <script type="text/javascript" data-form="@scriptId" defer>
         const btnLogin = document.getElementById('btn-login');
-        document.getElementById('register-account-form').addEventListener('keypress', async (event) => {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                const form = event.target.closest('form');
+        document.getElementById('register-account-form').addEventListener('keypress', async (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const form = e.target.closest('form');
                 await handleRegisterAccount(form);
             }
         });
 
-        document.getElementById('register-account-form').addEventListener('submit', async (event) => {
-            event.preventDefault();
-            await handleRegisterAccount(event.target);
+        document.getElementById('register-account-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await handleRegisterAccount(e.target);
         });
 
         async function handleRegisterAccount(form) {

@@ -189,6 +189,9 @@
   <data name="Register" xml:space="preserve">
     <value>注册</value>
   </data>
+  <data name="ManagePermissions" xml:space="preserve">
+    <value>管理权限</value>
+  </data>
   <data name="Tools" xml:space="preserve">
     <value>工具</value>
   </data>
@@ -200,5 +203,8 @@
   </data>
   <data name="WrittenContent" xml:space="preserve">
     <value>文字内容</value>
+  </data>
+  <data name="ManageRoles" xml:space="preserve">
+    <value>管理角色</value>
   </data>
 </root>

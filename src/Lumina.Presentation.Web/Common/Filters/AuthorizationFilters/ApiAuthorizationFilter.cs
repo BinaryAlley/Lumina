@@ -1,6 +1,9 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Common.Authorization;
+using Lumina.Presentation.Web.Common.Exceptions;
 using Lumina.Presentation.Web.Common.Models.Authorization;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Threading.Tasks;
@@ -33,7 +36,18 @@ public class ApiAuthorizationFilter : IAsyncAuthorizationFilter
     /// <param name="context">The authorization filter context.</param>
     public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
-        if (!await _authorizationService.EvaluateAuthorizationAsync(_requirement))
-            context.Result = new ForbidResult();
+        try
+        {
+            if (!await _authorizationService.EvaluateAuthorizationAsync(_requirement))
+                context.Result = new ForbidResult();
+        }
+        catch (ApiException ex)
+        {
+            if (ex.HttpStatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                context.HttpContext.Response.Cookies.Delete("Token");
+            }
+        }
     }
 }

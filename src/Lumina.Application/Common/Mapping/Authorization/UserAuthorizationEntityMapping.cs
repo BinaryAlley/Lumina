@@ -11,16 +11,16 @@ namespace Lumina.Application.Common.Mapping.Authorization;
 public static class UserAuthorizationEntityMapping
 {
     /// <summary>
-    /// Converts <paramref name="infrastructureEntity"/> to <see cref="GetAuthorizationResponse"/>.
+    /// Converts <paramref name="repositoryEntity"/> to <see cref="AuthorizationResponse"/>.
     /// </summary>
-    /// <param name="infrastructureEntity">The infrastructure entity to be converted.</param>
+    /// <param name="repositoryEntity">The infrastructure entity to be converted.</param>
     /// <returns>The converted response.</returns>
-    public static GetAuthorizationResponse ToResponse(this UserAuthorizationEntity infrastructureEntity)
+    public static AuthorizationResponse ToResponse(this UserAuthorizationEntity repositoryEntity)
     {
-        return new GetAuthorizationResponse(
-            infrastructureEntity.UserId,
-            infrastructureEntity.Roles,
-            infrastructureEntity.Permissions
+        return new AuthorizationResponse(
+            repositoryEntity.UserId,
+            repositoryEntity.Roles,
+            repositoryEntity.Permissions
         );
     }
 }

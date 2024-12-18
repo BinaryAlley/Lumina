@@ -417,7 +417,7 @@ function renderAddressBar(pathSegments) {
 /**
  * Handle the change event for the comboboxes inside the path-segments.
  * This function is triggered when any of the comboboxes (checkboxes) in the navigation bar is toggled.
- * @param {Event} event - The change event object. 
+ * @param {Event} e - The change event object. 
  */
 async function handlePathSegmentComboboxChangeAsync(e) {
     // ensure the event was triggered by an element with the 'navigator-toggle-checkbox' class
@@ -961,7 +961,7 @@ async function handleFileSystemEntityMouseUpAsync(e) {
 
 /**
  * Handler for the mouse down event of file system browser dialog files and directories elements.
- * @param {any} event
+ * @param {MouseEvent} e - The mouse event whose propagation is stopped.
  */
 function handleFileSystemEntityMouseDown(e) {
     // stop the event from bubbling up to the explorer - we dont want to start selection rectangles when clicking files or directories

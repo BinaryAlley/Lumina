@@ -89,6 +89,7 @@ public class Program
             ServeUnknownFileTypes = true
         });
         app.UseCultureRedirect(); // if the user attempts to go to a localized route without providing a culture, redirect to default culture
+        app.UseApiExceptionHandling(); // handle any problem details returned by the API
         app.UseRouting();
         app.UseSession();
         app.UseAuthentication();

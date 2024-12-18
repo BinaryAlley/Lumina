@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Enums.Authorization;
 using Lumina.Presentation.Web.Common.Filters.TypeFilters;
 using Lumina.Presentation.Web.Common.Models.Authorization;
 #endregion
@@ -18,7 +17,7 @@ public class RequireRoleAttribute : ApiAuthorizationAttribute
     /// Initializes a new instance of the <see cref="RequireRoleAttribute"/> class.
     /// </summary>
     /// <param name="roles">One or more roles that are allowed to access the endpoint.</param>
-    public RequireRoleAttribute(params AuthorizationRole[] roles) : base()
+    public RequireRoleAttribute(params string[] roles) : base()
     {
         Arguments = [new AuthorizationRequirementModel { Roles = roles }];
     }

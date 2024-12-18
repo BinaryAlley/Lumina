@@ -2,8 +2,8 @@
 using ErrorOr;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Directories;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Mediator;
 using System.Collections.Generic;
 using System.Threading;
@@ -38,7 +38,7 @@ public class GetTreeDirectoriesQueryHandler : IRequestHandler<GetTreeDirectories
     /// </returns>
     public ValueTask<ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>> Handle(GetTreeDirectoriesQuery request, CancellationToken cancellationToken)
     {
-        ErrorOr<IEnumerable<Directory>> result = _directoryService.GetSubdirectories(request.Path!, request.IncludeHiddenElements);
-        return ValueTask.FromResult(result.Match(values => ErrorOrFactory.From(values.ToFileSystemTreeNodeResponses()), errors => errors));
+        ErrorOr<IEnumerable<Directory>> getSubdirectoriesResult = _directoryService.GetSubdirectories(request.Path!, request.IncludeHiddenElements);
+        return ValueTask.FromResult(getSubdirectoriesResult.Match(values => ErrorOrFactory.From(values.ToFileSystemTreeNodeResponses()), errors => errors));
     }
 }

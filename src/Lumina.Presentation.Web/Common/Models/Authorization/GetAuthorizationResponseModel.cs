@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Common.Enums.Authorization;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
@@ -16,6 +15,6 @@ namespace Lumina.Presentation.Web.Common.Models.Authorization;
 [DebuggerDisplay("UserId: {UserId}")]
 public record GetAuthorizationResponse(
     Guid UserId,
-    AuthorizationRole[] Roles,
+    string[] Roles,
     AuthorizationPermission[] Permissions
 );

@@ -35,7 +35,7 @@ public class GetThumbnailQueryHandler : IRequestHandler<GetThumbnailQuery, Error
     /// <returns>An <see cref="ErrorOr{T}"/> containing either a thumbnail, or an error.</returns>
     public async ValueTask<ErrorOr<ThumbnailResponse>> Handle(GetThumbnailQuery request, CancellationToken cancellationToken)
     {
-        ErrorOr<Thumbnail> result = await _thumbnailsService.GetThumbnailAsync(request.Path!, request.Quality, cancellationToken);
-        return await ValueTask.FromResult(result.Match(value => ErrorOrFactory.From(value.ToResponse()), errors => errors));
+        ErrorOr<Thumbnail> getThumbnailResult = await _thumbnailsService.GetThumbnailAsync(request.Path!, request.Quality, cancellationToken);
+        return await ValueTask.FromResult(getThumbnailResult.Match(value => ErrorOrFactory.From(value.ToResponse()), errors => errors));
     }
 }

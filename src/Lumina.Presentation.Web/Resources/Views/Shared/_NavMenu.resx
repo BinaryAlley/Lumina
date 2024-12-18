@@ -189,6 +189,9 @@
   <data name="Register" xml:space="preserve">
     <value>Register</value>
   </data>
+  <data name="ManagePermissions" xml:space="preserve">
+    <value>Manage permissions</value>
+  </data>
   <data name="Tools" xml:space="preserve">
     <value>Tools</value>
   </data>
@@ -200,5 +203,8 @@
   </data>
   <data name="WrittenContent" xml:space="preserve">
     <value>Written Content</value>
+  </data>
+  <data name="ManageRoles" xml:space="preserve">
+    <value>Manage roles</value>
   </data>
 </root>

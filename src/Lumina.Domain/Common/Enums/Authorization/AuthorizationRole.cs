@@ -1,10 +1,10 @@
-namespace Lumina.Domain.Common.Enums.Authorization;
+//namespace Lumina.Domain.Common.Enums.Authorization;
 
-/// <summary>
-/// Enumeration for authorization roles.
-/// </summary>
-public enum AuthorizationRole
-{
-    None = 0,
-    Admin = 1
-}
+///// <summary>
+///// Enumeration for authorization roles.
+///// </summary>
+//public enum AuthorizationRole
+//{
+//    None = 0,
+//    Admin = 1
+//}

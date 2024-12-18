@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Presentation.Web.Common.Models.Common;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Caching.Memory;
 using System;
@@ -42,13 +43,19 @@ public class CachedAuthorizationHandler : DelegatingHandler
         if (!requestPath.EndsWith(AUTHORIZATION_ENDPOINT, StringComparison.OrdinalIgnoreCase))
             return await base.SendAsync(request, cancellationToken);
         // otherwise, check the hybrid cache to see if there is a cached authorization
-        string response = await _hybridCache.GetOrCreateAsync(
+        CachedResponseModel response = await _hybridCache.GetOrCreateAsync(
             AUTHORIZATION_ENDPOINT,
             async (cancellationToken) =>
             {
                 // perform the actual API call if cache is empty or expired
                 HttpResponseMessage result = await base.SendAsync(request, cancellationToken);
-                return await result.Content.ReadAsStringAsync(cancellationToken);
+                string content = await result.Content.ReadAsStringAsync(cancellationToken);
+                // cache both status code and content
+                return new CachedResponseModel
+                {
+                    Content = content,
+                    StatusCode = result.StatusCode
+                };
             },
             new HybridCacheEntryOptions()
             {
@@ -56,9 +63,9 @@ public class CachedAuthorizationHandler : DelegatingHandler
             },
             cancellationToken: cancellationToken
         );
-        return new HttpResponseMessage(HttpStatusCode.OK)
+        return new HttpResponseMessage(response.StatusCode)
         {
-            Content = new StringContent(response)
+            Content = new StringContent(response.Content)
         };
     }
 }

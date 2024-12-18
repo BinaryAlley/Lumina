@@ -24,12 +24,12 @@ public class UserAuthorizationEntityMappingTests
         UserAuthorizationEntity entity = new()
         {
             UserId = Guid.NewGuid(),
-            Roles = new HashSet<AuthorizationRole> { AuthorizationRole.Admin },
+            Roles = new HashSet<string> { "Admin" },
             Permissions = new HashSet<AuthorizationPermission> { AuthorizationPermission.CanViewUsers }
         };
 
         // Act
-        GetAuthorizationResponse result = entity.ToResponse();
+        AuthorizationResponse result = entity.ToResponse();
 
         // Assert
         result.Should().NotBeNull();
@@ -45,12 +45,12 @@ public class UserAuthorizationEntityMappingTests
         UserAuthorizationEntity entity = new()
         {
             UserId = Guid.NewGuid(),
-            Roles = new HashSet<AuthorizationRole>(),
+            Roles = new HashSet<string>(),
             Permissions = new HashSet<AuthorizationPermission>()
         };
 
         // Act
-        GetAuthorizationResponse result = entity.ToResponse();
+        AuthorizationResponse result = entity.ToResponse();
 
         // Assert
         result.Should().NotBeNull();
@@ -66,10 +66,9 @@ public class UserAuthorizationEntityMappingTests
         UserAuthorizationEntity entity = new()
         {
             UserId = Guid.NewGuid(),
-            Roles = new HashSet<AuthorizationRole>
+            Roles = new HashSet<string>
             {
-                AuthorizationRole.Admin,
-                AuthorizationRole.None
+                "Admin"
             },
             Permissions = new HashSet<AuthorizationPermission>
             {
@@ -80,7 +79,7 @@ public class UserAuthorizationEntityMappingTests
         };
 
         // Act
-        GetAuthorizationResponse result = entity.ToResponse();
+        AuthorizationResponse result = entity.ToResponse();
 
         // Assert
         result.Should().NotBeNull();
@@ -99,12 +98,12 @@ public class UserAuthorizationEntityMappingTests
         UserAuthorizationEntity entity = new()
         {
             UserId = Guid.Parse(userIdString),
-            Roles = new HashSet<AuthorizationRole> { AuthorizationRole.Admin },
+            Roles = new HashSet<string> { "Admin" },
             Permissions = new HashSet<AuthorizationPermission> { AuthorizationPermission.CanViewUsers }
         };
 
         // Act
-        GetAuthorizationResponse result = entity.ToResponse();
+        AuthorizationResponse result = entity.ToResponse();
 
         // Assert
         result.Should().NotBeNull();

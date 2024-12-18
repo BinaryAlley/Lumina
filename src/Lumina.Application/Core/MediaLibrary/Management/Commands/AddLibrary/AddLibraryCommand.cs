@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using Lumina.Domain.Common.Enums.MediaLibrary;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
 using Mediator;
 using System;

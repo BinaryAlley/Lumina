@@ -31,9 +31,9 @@ public class GetAuthorizationEndpointSummary : Summary<GetAuthorizationEndpoint,
         RequestParam(r => r.UserId, "The Id of the user for whom to get the authorization. Required.");
 
         Response(200, "The authorization roles and permissions of the account are returned.",
-            example: new GetAuthorizationResponse(
+            example: new AuthorizationResponse(
                 UserId: Guid.NewGuid(),
-                Roles: new HashSet<AuthorizationRole>() { AuthorizationRole.Admin },
+                Roles: new HashSet<string>() { "Admin" },
                 Permissions: new HashSet<AuthorizationPermission>() { AuthorizationPermission.CanRegisterUsers, AuthorizationPermission.CanDeleteUsers }
             ));
 

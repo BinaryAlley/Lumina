@@ -46,22 +46,22 @@ public class ChangePasswordCommandHandler : IRequestHandler<ChangePasswordComman
     public async ValueTask<ErrorOr<ChangePasswordResponse>> Handle(ChangePasswordCommand request, CancellationToken cancellationToken)
     {
         IUserRepository userRepository = _unitOfWork.GetRepository<IUserRepository>();
-        ErrorOr<UserEntity?> resultSelectUser = await userRepository.GetByUsernameAsync(request.Username!, cancellationToken).ConfigureAwait(false);
-        if (resultSelectUser.IsError)
-            return resultSelectUser.Errors;
-        else if (resultSelectUser.Value is null)
+        ErrorOr<UserEntity?> getUserResult = await userRepository.GetByUsernameAsync(request.Username!, cancellationToken).ConfigureAwait(false);
+        if (getUserResult.IsError)
+            return getUserResult.Errors;
+        else if (getUserResult.Value is null)
             return Errors.Authentication.UsernameDoesNotExist;
         // validate if the current password is correct
-        if (!_hashService.CheckStringAgainstHash(request.CurrentPassword!, Uri.UnescapeDataString(resultSelectUser.Value.Password!)))
+        if (!_hashService.CheckStringAgainstHash(request.CurrentPassword!, Uri.UnescapeDataString(getUserResult.Value.Password!)))
             return Errors.Authentication.InvalidCurrentPassword;
-        resultSelectUser.Value.Password = Uri.EscapeDataString(_hashService.HashString(request.NewPassword!));
+        getUserResult.Value.Password = Uri.EscapeDataString(_hashService.HashString(request.NewPassword!));
         // if the password change was initiated via a password reset, remote the temporary password that was generated in the process
-        resultSelectUser.Value.TempPassword = null;
-        resultSelectUser.Value.TempPasswordCreated = null;
+        getUserResult.Value.TempPassword = null;
+        getUserResult.Value.TempPasswordCreated = null;
         // update the user
-        ErrorOr<Updated> resultUpdateUser = await userRepository.UpdateAsync(resultSelectUser.Value, cancellationToken).ConfigureAwait(false);
-        if (resultUpdateUser.IsError)
-            return resultUpdateUser.Errors;
+        ErrorOr<Updated> updateUserResult = await userRepository.UpdateAsync(getUserResult.Value, cancellationToken).ConfigureAwait(false);
+        if (updateUserResult.IsError)
+            return updateUserResult.Errors;
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return new ChangePasswordResponse(true);
     }

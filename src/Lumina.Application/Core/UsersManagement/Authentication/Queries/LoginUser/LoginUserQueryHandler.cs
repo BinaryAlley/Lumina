@@ -65,29 +65,29 @@ public class LoginUserQueryHandler : IRequestHandler<LoginUserQuery, ErrorOr<Log
     {
         // check if any users already exists
         IUserRepository userRepository = _unitOfWork.GetRepository<IUserRepository>();
-        ErrorOr<UserEntity?> resultSelectUser = await userRepository.GetByUsernameAsync(request.Username!, cancellationToken).ConfigureAwait(false);
-        if (resultSelectUser.IsError)
-            return resultSelectUser.Errors;
-        else if (resultSelectUser.Value is null)
+        ErrorOr<UserEntity?> getUserResult = await userRepository.GetByUsernameAsync(request.Username!, cancellationToken).ConfigureAwait(false);
+        if (getUserResult.IsError)
+            return getUserResult.Errors;
+        else if (getUserResult.Value is null)
             return Errors.Authentication.InvalidUsernameOrPassword;
         // validate that the password is correct
-        if (!_hashService.CheckStringAgainstHash(request.Password!, Uri.UnescapeDataString(resultSelectUser.Value.Password!)))
+        if (!_hashService.CheckStringAgainstHash(request.Password!, Uri.UnescapeDataString(getUserResult.Value.Password!)))
         {
             // if a password reset was requested, a temp password is being used - if the hash check failed against the regular password, try against the temp one too
-            if (resultSelectUser.Value.TempPassword is not null)
+            if (getUserResult.Value.TempPassword is not null)
             {
                 // the temporary password should only be valid for 15 minutes, if its obsolete, remove it and return error
-                if (resultSelectUser.Value.TempPasswordCreated!.Value.AddMinutes(15) < _dateTimeProvider.UtcNow)
+                if (getUserResult.Value.TempPasswordCreated!.Value.AddMinutes(15) < _dateTimeProvider.UtcNow)
                 {
-                    resultSelectUser.Value.TempPassword = null;
-                    resultSelectUser.Value.TempPasswordCreated = null;
-                    await userRepository.UpdateAsync(resultSelectUser.Value, cancellationToken);
+                    getUserResult.Value.TempPassword = null;
+                    getUserResult.Value.TempPasswordCreated = null;
+                    await userRepository.UpdateAsync(getUserResult.Value, cancellationToken);
                     await _unitOfWork.SaveChangesAsync(cancellationToken);
                     return Errors.Authentication.TempPasswordExpired;
                 }
                 else // temporary password is still valid, validate password against it
                 {
-                    if (!_hashService.CheckStringAgainstHash(request.Password!, Uri.UnescapeDataString(resultSelectUser.Value.TempPassword!)))
+                    if (!_hashService.CheckStringAgainstHash(request.Password!, Uri.UnescapeDataString(getUserResult.Value.TempPassword!)))
                         return Errors.Authentication.InvalidUsernameOrPassword;
                 }
             }
@@ -95,14 +95,14 @@ public class LoginUserQueryHandler : IRequestHandler<LoginUserQuery, ErrorOr<Log
                 return Errors.Authentication.InvalidUsernameOrPassword;
         }
         // create the JWT token
-        string token = _jwtTokenGenerator.GenerateToken(resultSelectUser.Value.Id.ToString(), resultSelectUser.Value.Username);
+        string token = _jwtTokenGenerator.GenerateToken(getUserResult.Value.Id.ToString(), getUserResult.Value.Username);
         // check if the user uses TOTP
-        bool usesTotp = !string.IsNullOrEmpty(resultSelectUser.Value.TotpSecret);
+        bool usesTotp = !string.IsNullOrEmpty(getUserResult.Value.TotpSecret);
         if (usesTotp && string.IsNullOrEmpty(request.TotpCode)) 
             return Errors.Authentication.InvalidTotpCode;
         else if (usesTotp && !string.IsNullOrEmpty(request.TotpCode)) // and if they do, validate it
-            if (!_totpTokenGenerator.ValidateToken(Convert.FromBase64String(_cryptographyService.Decrypt(resultSelectUser.Value.TotpSecret!)), request.TotpCode))
+            if (!_totpTokenGenerator.ValidateToken(Convert.FromBase64String(_cryptographyService.Decrypt(getUserResult.Value.TotpSecret!)), request.TotpCode))
                 return Errors.Authentication.InvalidTotpCode;
-        return new LoginResponse(resultSelectUser.Value.Id, resultSelectUser.Value.Username, token, usesTotp);
+        return new LoginResponse(getUserResult.Value.Id, getUserResult.Value.Username, token, usesTotp);
     }
 }

@@ -1,0 +1,237 @@
+@*
+/admin/manage-roles/
+*@
+
+@using Lumina.Presentation.Web.Common.Services
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Lumina.Presentation.Web.Common.Models.Authorization
+
+@{
+    var roles = ViewData["roles"] as RoleModel[];
+    var rolePermissions = ViewData["rolePermissions"] as PermissionModel[];
+    // generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler
+    var scriptId = ScriptIdentifierHelper.GenerateScriptId();
+}
+
+@inject IViewLocalizer _localizer
+@inject IUrlService _urlService
+
+<form id="authorization-roles-form" method="post" class="w-100 h-100 mx-auto pl-10 pr-10 pt-10 pb-10">
+    <div id="authorization-roles-container">
+        <input type="hidden" name="authorization-roles-selected-id" id="authorization-roles-selected-id" value="" />
+        <!-- Roles dropdown row -->
+        <div class="h-30px w-100 text-end mb-5">
+            <label for="authorization-roles-combobox" class="text-light-one">@_localizer["Roles"]</label>
+
+            <div class="enlightenment-combobox w-250px inline-block" id="authorization-roles-combobox">
+                <div class="shine-effect" style="top: 1px;"></div>
+                <input type="checkbox" id="authorization-roles-combobox-toggle" class="enlightenment-toggle-checkbox" />
+                <label class="enlightenment-toggle" for="authorization-roles-combobox-toggle">
+                    <span class="enlightenment-selected-text">@_localizer["SelectARole"]</span>
+                </label>
+                <div class="enlightenment-dropdown" id="authorization-roles-combobox-dropdown">
+                    <div class="shine-effect" style="top: -4px;"></div>
+                    <div class="enlightenment-option first-option disabled">@_localizer["SelectARole"]</div>
+                    @if (roles is not null)
+                    {
+                        @for (int i = 0; i < roles.Length; i++)
+                        {
+                            <div class="enlightenment-option @(i == roles.Length - 1 ? "last-option" : "")" data-value="@roles[i].Id">@roles[i].RoleName</div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Role name input row -->
+        <div class="h-30px w-100 text-end mb-5">
+            <label for="txt-role-name" class="text-light-one">@_localizer["RoleName"]</label>
+            <input type="text" id="txt-role-name" name="authorization-role-name" class="enlightenment-input w-250px" />
+        </div>
+
+        <!-- Permissions row -->
+        <div id="authorization-roles-permissions-container" class="">
+            <div id="authorization-roles-permissions">
+                <div id="authorization-roles-permissions-scroll" class="scroll-horizontal">
+                    <div id="authorization-roles-permissions-list" class="list" style="flex-direction: column;">
+                        @if (rolePermissions is not null)
+                        {
+                            @foreach (var rolePermission in rolePermissions)
+                            {
+                                <div class="e no-border transparent mt-5 mb-5">
+                                    <label class="enlightenment-checkbox-label">
+                                        <input type="checkbox" class="enlightenment-checkbox-hidden" name="authorization-role-permissions" value="@rolePermission.Id">
+                                        <span class="enlightenment-checkbox"></span>
+                                        @_localizer[rolePermission.PermissionName.ToString()]
+                                    </label>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit Button Row -->
+        <div class="w-100 h-25px mt-5 text-end">
+            <button id="btn-delete-role" type="button" class="abort-button f-14 h-24px v-align-t hidden">@_localizer["DeleteRole"]</button>
+            <button id="btn-confirm-role" type="submit" class="confirm-button f-14 h-24px v-align-t">@_localizer["CreateRole"]</button>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <script type="text/javascript" data-form="@scriptId" defer>
+        const btnDeleteRole = document.getElementById('btn-delete-role');
+        const btnConfirmRole = document.getElementById('btn-confirm-role');
+        const txtRoleName = document.getElementById('txt-role-name');
+        const form = document.getElementById('authorization-roles-form');
+        const dropdown = document.getElementById('authorization-roles-combobox-dropdown')
+        // on Enter key pressed
+        form.addEventListener('keypress', async (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                await handleRoleSubmit(e.target.closest('form'));
+            }
+        });
+        // on form submit event
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await handleRoleSubmit(e.target);
+        });
+
+        // create new or update existing role
+        async function handleRoleSubmit(form) {
+            const formData = {
+                roleId: document.getElementById('authorization-roles-selected-id').value,
+                roleName: txtRoleName.value,
+                permissions: Array.from(form.querySelectorAll("input[name='authorization-role-permissions']:checked"))
+                    .map(checkbox => checkbox.value)
+            };
+
+            const isRoleSelected = formData.roleId !== '';
+            const url =  isRoleSelected ? '@_urlService.GetAbsoluteUrl("UpdateRole", "Admin")' : '@_urlService.GetAbsoluteUrl("CreateRole", "Admin")';
+
+            const data = await callApiPostAsync(url, formData);
+            if (data) {
+                await fetchRoles();
+                notificationService.show(isRoleSelected ? '@_localizer["RoleUpdated"]' : '@_localizer["RoleCreated"]', NotificationType.SUCCESS);
+            }
+        }
+
+        btnDeleteRole.addEventListener('click', async function(e) {
+            const roleId = document.getElementById('authorization-roles-selected-id').value;
+
+            // const confirmDelete = await showDialog(
+            //     translationService.Translate(Terms.ConfirmRoleDelete),
+            //     translationService.Translate(Terms.Confirmation),
+            //     'YES_NO'
+            // );
+
+            // if (confirmDelete) {
+                 const url = '@_urlService.GetAbsoluteUrl("DeleteRole", "Admin", new { roleId = default(Guid) })';
+                 const success = await callApiDeleteAsync(url.replace('/@(default(Guid))', `/${roleId}`)); // roleId needs to be replaced here, because GetAbsoluteUrl is server side, roleId is client side
+                 if (success) {
+                     await fetchRoles();
+                     notificationService.show('@_localizer["RoleDeleted"]', NotificationType.SUCCESS);
+                 }
+            // }
+        });
+
+         // on role dropdown change
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('enlightenment-option')) {
+                const roleId = e.target.dataset.value;
+                const selectedText = e.target.textContent;
+                const txtRoleName = document.getElementById('txt-role-name');
+                txtRoleName.value = roleId ? selectedText : '';
+
+                fetchRolePermissions(roleId);
+
+                const roleIdInput = document.getElementById('authorization-roles-selected-id');
+
+                if (roleId) {
+                    btnDeleteRole.classList.remove('hidden');
+                    btnDeleteRole.classList.add('inline');
+                    btnConfirmRole.textContent = '@_localizer["UpdateRole"]';
+                    roleIdInput.value = roleId;
+                } else {
+                    roleIdInput.value = '';
+                    btnDeleteRole.classList.remove('inline');
+                    btnDeleteRole.classList.add('hidden');
+                    btnConfirmRole.textContent = '@_localizer["CreateRole"]';
+                }
+            }
+        });
+
+        async function fetchRoles() {
+            const url = '@_urlService.GetAbsoluteUrl("GetRoles", "Admin")';
+            const data = await callApiGetAsync(url);
+            if (data) {
+                // clear the roles drop down list
+                const rolesDropdown = document.querySelector("#authorization-roles-combobox .enlightenment-dropdown");
+                rolesDropdown.innerHTML = `
+                    <div class="shine-effect" style="top: -4px;"></div>
+                    <div class="enlightenment-option first-option disabled">'@_localizer["SelectARole"]'</div>
+                `;
+
+                // populate the roles drop down
+                data.forEach((role, index) => {
+                    const option = document.createElement('div');
+                    option.className = `enlightenment-option ${index === data.length - 1 ? 'last-option' : ''}`;
+                    option.dataset.value = role.id;
+                    option.textContent = role.roleName;
+                    rolesDropdown.appendChild(option);
+                });
+
+                // update the text of the toggle button of the combobox
+                document.querySelector('.enlightenment-selected-text').textContent = '@_localizer["SelectARole"]';
+
+                // all permissions should be "unchecked"
+                document.querySelectorAll("input[name='authorization-role-permissions']")
+                    .forEach(input => input.checked = false);
+
+                // the delete button should be hidden
+                btnDeleteRole.classList.remove('inline');
+                btnDeleteRole.classList.add('hidden');
+
+                // the "update" button should be "create"
+                btnConfirmRole.textContent = '@_localizer["CreateRole"]';
+
+                // the input for the role name should also have its text emptied
+                txtRoleName.value = '';
+            }
+        }
+
+        async function fetchRolePermissions(roleId) {
+            if (roleId) {
+                const url = '@_urlService.GetAbsoluteUrl("GetPermissionsByRoleId", "Admin", new { roleId = default(Guid) })';
+                const data = await callApiGetAsync(url.replace('/@(default(Guid))', `/${roleId}`)); // roleId needs to be replaced here, because GetAbsoluteUrl is server side, roleId is client side
+                if (data) {
+                    // clear all checkboxes
+                    document.querySelectorAll("input[name='authorization-role-permissions']")
+                        .forEach(input => input.checked = false);
+
+                    // check the checkboxes for which permissions are assigned
+                    data.permissions.forEach(p => {
+                        const checkbox = document.querySelector(
+                            `input[name='authorization-role-permissions'][value='${p.id}']`
+                        );
+                        if (checkbox) checkbox.checked = true;
+                    });
+                }
+            } else {
+                // if no role is selected, clear checkboxes
+                document.querySelectorAll("input[name='authorization-role-permissions']")
+                    .forEach(input => input.checked = false);
+            }
+        }
+        // when form's height changes, adjust the roles combobox dropdown maximum height accordingly, so it doesn't cause an <article> section overflow
+        const resizeObserver = new ResizeObserver(entries => {
+            const formHeight = form.getBoundingClientRect().height;
+            dropdown.style.maxHeight = `calc(${formHeight}px - 50px)`;
+            dropdown.style.overflowY = `auto`;
+        });
+        resizeObserver.observe(form);
+    </script>
+}

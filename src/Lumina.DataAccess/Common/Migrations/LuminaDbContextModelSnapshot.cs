@@ -62,11 +62,6 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnOrder(3);
 
-                    b.Property<string>("PermissionDescription")
-                        .HasMaxLength(255)
-                        .HasColumnType("TEXT")
-                        .HasColumnOrder(2);
-
                     b.Property<string>("PermissionName")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -100,11 +95,6 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.Property<DateTime>("CreatedOnUtc")
                         .HasColumnType("TEXT")
                         .HasColumnOrder(3);
-
-                    b.Property<string>("RoleDescription")
-                        .HasMaxLength(255)
-                        .HasColumnType("TEXT")
-                        .HasColumnOrder(2);
 
                     b.Property<string>("RoleName")
                         .IsRequired()

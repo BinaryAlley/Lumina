@@ -12,5 +12,6 @@ public static partial class Errors
     public static class Persistence
     {
         public static Error ErrorPersistingMediaLibrary => Error.Failure(description: nameof(ErrorPersistingMediaLibrary));
+        public static Error ErrorPersistingAuthorizationRole => Error.Failure(description: nameof(ErrorPersistingAuthorizationRole));
     }
 }

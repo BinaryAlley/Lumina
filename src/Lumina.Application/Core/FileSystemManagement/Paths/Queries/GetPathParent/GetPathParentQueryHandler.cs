@@ -38,7 +38,7 @@ public class GetPathParentQueryHandler : IRequestHandler<GetPathParentQuery, Err
     /// </returns>
     public ValueTask<ErrorOr<IEnumerable<PathSegmentResponse>>> Handle(GetPathParentQuery request, CancellationToken cancellationToken)
     {
-        ErrorOr<IEnumerable<PathSegment>> result = _pathService.GoUpOneLevel(request.Path!);
-        return ValueTask.FromResult(result.Match(values => ErrorOrFactory.From(values.ToResponses()), errors => errors));
+        ErrorOr<IEnumerable<PathSegment>> goUpOneLevelResult = _pathService.GoUpOneLevel(request.Path!);
+        return ValueTask.FromResult(goUpOneLevelResult.Match(values => ErrorOrFactory.From(values.ToResponses()), errors => errors));
     }
 }

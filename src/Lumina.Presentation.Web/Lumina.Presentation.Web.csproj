@@ -63,31 +63,31 @@
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Update="Resources\Common\Filters\ApiExceptionFilter.de-DE.resx">
+      <EmbeddedResource Update="Resources\Common\Middlewares\ExceptionHandlingMiddleware.de-DE.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Common\Filters\ApiExceptionFilter.en-US.resx">
+      <EmbeddedResource Update="Resources\Common\Middlewares\ExceptionHandlingMiddleware.en-US.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Common\Filters\ApiExceptionFilter.es-ES.resx">
+      <EmbeddedResource Update="Resources\Common\Middlewares\ExceptionHandlingMiddleware.es-ES.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Common\Filters\ApiExceptionFilter.fr-FR.resx">
+      <EmbeddedResource Update="Resources\Common\Middlewares\ExceptionHandlingMiddleware.fr-FR.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Common\Filters\ApiExceptionFilter.it-IT.resx">
+      <EmbeddedResource Update="Resources\Common\Middlewares\ExceptionHandlingMiddleware.it-IT.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Common\Filters\ApiExceptionFilter.ja-JP.resx">
+      <EmbeddedResource Update="Resources\Common\Middlewares\ExceptionHandlingMiddleware.ja-JP.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Common\Filters\ApiExceptionFilter.ro-RO.resx">
+      <EmbeddedResource Update="Resources\Common\Middlewares\ExceptionHandlingMiddleware.ro-RO.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Common\Filters\ApiExceptionFilter.ru-RU.resx">
+      <EmbeddedResource Update="Resources\Common\Middlewares\ExceptionHandlingMiddleware.ru-RU.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Common\Filters\ApiExceptionFilter.zh-CN.resx">
+      <EmbeddedResource Update="Resources\Common\Middlewares\ExceptionHandlingMiddleware.zh-CN.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
       <EmbeddedResource Update="Resources\Views\Auth\ChangePassword.de-DE.resx">

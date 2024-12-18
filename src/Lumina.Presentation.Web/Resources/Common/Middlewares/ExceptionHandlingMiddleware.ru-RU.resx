@@ -1,0 +1,531 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AdminAccountAlreadyCreated" xml:space="preserve">
+    <value>Учетная запись администратора уже создана!</value>
+  </data>
+  <data name="Application theme cannot be empty!" xml:space="preserve">
+    <value>Тема приложения не может быть пустой!</value>
+  </data>
+  <data name="AsinMustBe10CharactersLong" xml:space="preserve">
+    <value>ASIN должен состоять из 10 символов!</value>
+  </data>
+  <data name="BarnesAndNoblesIdMustBe10CharactersLong" xml:space="preserve">
+    <value>Идентификатор Barnes&amp;Noble должен состоять из 10 символов!</value>
+  </data>
+  <data name="BitrateMustBeAPositiveNumber" xml:space="preserve">
+    <value>Битрейт должен быть положительным числом!</value>
+  </data>
+  <data name="BookAlreadyExists" xml:space="preserve">
+    <value>Книга уже существует!</value>
+  </data>
+  <data name="CannotNavigateUp" xml:space="preserve">
+    <value>Невозможно перейти на уровень выше!</value>
+  </data>
+  <data name="CodecCannotBeEmpty" xml:space="preserve">
+    <value>Кодек не может быть пустым!</value>
+  </data>
+  <data name="ContributorDisplayNameCannotBeEmpty" xml:space="preserve">
+    <value>Отображаемое имя участника не может быть пустым!</value>
+  </data>
+  <data name="ContributorDisplayNameMustBeMaximum100CharactersLong" xml:space="preserve">
+    <value>Отображаемое имя участника не должно превышать 100 символов!</value>
+  </data>
+  <data name="ContributorLegalNameMustBeMaximum100CharactersLong" xml:space="preserve">
+    <value>Официальное имя участника не должно превышать 100 символов!</value>
+  </data>
+  <data name="ContributorNameCannotBeEmpty" xml:space="preserve">
+    <value>Имя участника не может быть пустым!</value>
+  </data>
+  <data name="ContributorRoleCannotBeNull" xml:space="preserve">
+    <value>Роль участника не может быть пустой!</value>
+  </data>
+  <data name="ContributorsListCannotBeNull" xml:space="preserve">
+    <value>Список участников не может быть пустым!</value>
+  </data>
+  <data name="CountryCodeMustBe2CharactersLong" xml:space="preserve">
+    <value>Код страны должен состоять из 2 символов!</value>
+  </data>
+  <data name="CurrentPasswordCannotBeEmpty" xml:space="preserve">
+    <value>Текущий пароль не может быть пустым!</value>
+  </data>
+  <data name="DatabaseConnectionStringCannotBeEmpty" xml:space="preserve">
+    <value>Строка подключения к базе данных не может быть пустой!</value>
+  </data>
+  <data name="DescriptionMustBeMaximum2000CharactersLong" xml:space="preserve">
+    <value>Описание не должно превышать 2000 символов!</value>
+  </data>
+  <data name="DirectoryAlreadyExists" xml:space="preserve">
+    <value>Каталог уже существует!</value>
+  </data>
+  <data name="DirectoryCopyError" xml:space="preserve">
+    <value>Ошибка копирования каталога!</value>
+  </data>
+  <data name="DirectoryMoveError" xml:space="preserve">
+    <value>Ошибка при перемещении каталога!</value>
+  </data>
+  <data name="DirectoryNotFound" xml:space="preserve">
+    <value>Каталог не найден!</value>
+  </data>
+  <data name="EditionMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>Название издания не должно превышать 50 символов!</value>
+  </data>
+  <data name="EncryptionSecretKeyCannotBeEmpty" xml:space="preserve">
+    <value>Секретный ключ шифрования не может быть пустым!</value>
+  </data>
+  <data name="EncryptionSecretKeyMustBeABase64String" xml:space="preserve">
+    <value>Секретный ключ шифрования должен быть строкой в формате Base64!</value>
+  </data>
+  <data name="ErrorPersistingAuthorizationRole" xml:space="preserve">
+    <value>Ошибка при сохранении роли авторизации!</value>
+  </data>
+  <data name="ErrorPersistingMediaLibrary" xml:space="preserve">
+    <value>Ошибка при сохранении медиатеки!</value>
+  </data>
+  <data name="ExtensionCannotBeEmpty" xml:space="preserve">
+    <value>Расширение файла не может быть пустым!</value>
+  </data>
+  <data name="FileAlreadyExists" xml:space="preserve">
+    <value>Файл уже существует!</value>
+  </data>
+  <data name="FileCopyError" xml:space="preserve">
+    <value>Ошибка копирования файла!</value>
+  </data>
+  <data name="FileMoveError" xml:space="preserve">
+    <value>Ошибка при перемещении файла!</value>
+  </data>
+  <data name="FileNotFound" xml:space="preserve">
+    <value>Файл не найден!</value>
+  </data>
+  <data name="General.Validation" xml:space="preserve">
+    <value>Проверка</value>
+  </data>
+  <data name="GenreNameCannotBeEmpty" xml:space="preserve">
+    <value>Название жанра не может быть пустым!</value>
+  </data>
+  <data name="GenreNameMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>Название жанра не должно превышать 50 символов!</value>
+  </data>
+  <data name="GenresListCannotBeNull" xml:space="preserve">
+    <value>Список жанров не может быть пустым!</value>
+  </data>
+  <data name="GoodreadsIdMustBeNumeric" xml:space="preserve">
+    <value>Идентификатор Goodreads должен быть числовым!</value>
+  </data>
+  <data name="GoogleBooksIdMustBe12CharactersLong" xml:space="preserve">
+    <value>Идентификатор Google Books должен состоять из 12 символов!</value>
+  </data>
+  <data name="ImageQualityMustBeBetweenZeroAndOneHundred" xml:space="preserve">
+    <value>Качество изображения должно быть между 0 и 100!</value>
+  </data>
+  <data name="InvalidAppleBooksIdFormat" xml:space="preserve">
+    <value>Неверный формат идентификатора Apple Books!</value>
+  </data>
+  <data name="InvalidBarnesAndNoblesIdFormat" xml:space="preserve">
+    <value>Неверный формат идентификатора Barnes&amp;Noble!</value>
+  </data>
+  <data name="InvalidCurrentPassword" xml:space="preserve">
+    <value>Неверный текущий пароль!</value>
+  </data>
+  <data name="InvalidGoogleBooksIdFormat" xml:space="preserve">
+    <value>Неверный формат идентификатора Google Books!</value>
+  </data>
+  <data name="InvalidIsbn10Format" xml:space="preserve">
+    <value>Неверный формат ISBN10!</value>
+  </data>
+  <data name="InvalidIsbn13Format" xml:space="preserve">
+    <value>Неверный формат ISBN13!</value>
+  </data>
+  <data name="InvalidIsoCode" xml:space="preserve">
+    <value>Недействительный ISO-код!</value>
+  </data>
+  <data name="InvalidLccnFormat" xml:space="preserve">
+    <value>Неверный формат LCCN!</value>
+  </data>
+  <data name="InvalidOclcFormat" xml:space="preserve">
+    <value>Неверный формат OCLC!</value>
+  </data>
+  <data name="InvalidOpenLibraryId" xml:space="preserve">
+    <value>Недействительный идентификатор OpenLibrary!</value>
+  </data>
+  <data name="InvalidPassword" xml:space="preserve">
+    <value>Неверный пароль!</value>
+  </data>
+  <data name="InvalidPath" xml:space="preserve">
+    <value>Недопустимый путь!</value>
+  </data>
+  <data name="InvalidTotpCode" xml:space="preserve">
+    <value>Неверный код TOTP!</value>
+  </data>
+  <data name="InvalidUsername" xml:space="preserve">
+    <value>Неверное имя пользователя!</value>
+  </data>
+  <data name="InvalidUsernameOrPassword" xml:space="preserve">
+    <value>Неверное имя пользователя или пароль!</value>
+  </data>
+  <data name="IsbnListCannotBeNull" xml:space="preserve">
+    <value>Список ISBN не может быть пустым!</value>
+  </data>
+  <data name="IsbnValueCannotBeEmpty" xml:space="preserve">
+    <value>Значение ISBN не может быть пустым!</value>
+  </data>
+  <data name="JwtAudienceCannotBeEmpty" xml:space="preserve">
+    <value>Целевая аудитория JWT не может быть пустой!</value>
+  </data>
+  <data name="JwtExpiryMinutesMustBePositive" xml:space="preserve">
+    <value>Время истечения JWT в минутах должно быть положительным!</value>
+  </data>
+  <data name="JwtIssuerCannotBeEmptyc" xml:space="preserve">
+    <value>Издатель JWT не может быть пустым!</value>
+  </data>
+  <data name="JwtSecretKeyCannotBeEmpty" xml:space="preserve">
+    <value>Секретный ключ JWT не может быть пустым!</value>
+  </data>
+  <data name="JwtSecretKeyTooShort" xml:space="preserve">
+    <value>Секретный ключ JWT слишком короткий!</value>
+  </data>
+  <data name="LanguageCodeCannotBeEmpty" xml:space="preserve">
+    <value>Код языка не может быть пустым!</value>
+  </data>
+  <data name="LanguageCodeMustBe2CharactersLong" xml:space="preserve">
+    <value>Код языка должен состоять из 2 символов!</value>
+  </data>
+  <data name="LanguageNameCannotBeEmpty" xml:space="preserve">
+    <value>Название языка не может быть пустым!</value>
+  </data>
+  <data name="LanguageNameMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>Название языка не должно превышать 50 символов!</value>
+  </data>
+  <data name="LanguageNativeNameMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>Исходное название языка не должно превышать 50 символов!</value>
+  </data>
+  <data name="LibraryAlreadyExists" xml:space="preserve">
+    <value>Библиотека уже существует!</value>
+  </data>
+  <data name="LibraryIdCannotBeEmpty" xml:space="preserve">
+    <value>Идентификатор библиотеки не может быть пустым!</value>
+  </data>
+  <data name="LibraryNotFound" xml:space="preserve">
+    <value>Библиотека не найдена!</value>
+  </data>
+  <data name="LibraryThingIdMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>Идентификатор LibraryThing не должен превышать 50 символов!</value>
+  </data>
+  <data name="LibraryTypeCannotBeNull" xml:space="preserve">
+    <value>Тип библиотеки не может быть пустым!</value>
+  </data>
+  <data name="MediaRootDirectoryCannotBeEmpty" xml:space="preserve">
+    <value>Корневая папка медиафайлов не может быть пустой!</value>
+  </data>
+  <data name="MetadataCannotBeNull" xml:space="preserve">
+    <value>Метаданные не могут быть пустыми!</value>
+  </data>
+  <data name="NameCannotBeEmpty" xml:space="preserve">
+    <value>Имя не может быть пустым!</value>
+  </data>
+  <data name="NewPasswordCannotBeEmpty" xml:space="preserve">
+    <value>Новый пароль не может быть пустым!</value>
+  </data>
+  <data name="NewPasswordConfirmCannotBeEmpty" xml:space="preserve">
+    <value>Подтверждение нового пароля не может быть пустым!</value>
+  </data>
+  <data name="NotAuthorized" xml:space="preserve">
+    <value>У вас нет прав для выполнения этой операции!</value>
+  </data>
+  <data name="NotFound" xml:space="preserve">
+    <value>Указанный ресурс не найден!</value>
+  </data>
+  <data name="NoThumbnail" xml:space="preserve">
+    <value>Нет миниатюры!</value>
+  </data>
+  <data name="OneOrMoreValidationErrorsOccurred" xml:space="preserve">
+    <value>Обнаружена одна или несколько ошибок проверки</value>
+  </data>
+  <data name="OriginalReleaseDateAndYearMustMatch" xml:space="preserve">
+    <value>Дата и год первого выпуска должны совпадать!</value>
+  </data>
+  <data name="OriginalReleaseYearMustBeBetween1And9999" xml:space="preserve">
+    <value>Год первого выпуска должен быть между 1 и 9999!</value>
+  </data>
+  <data name="OriginalTitleMustBeMaximum255CharactersLong" xml:space="preserve">
+    <value>Оригинальное название не должно превышать 255 символов!</value>
+  </data>
+  <data name="PageCountMustBeGreaterThanZero" xml:space="preserve">
+    <value>Количество страниц должно быть больше нуля!</value>
+  </data>
+  <data name="ParentNodeCannotBeNull" xml:space="preserve">
+    <value>Родительский узел не может быть пустым!</value>
+  </data>
+  <data name="PasswordCannotBeEmpty" xml:space="preserve">
+    <value>Пароль не может быть пустым!</value>
+  </data>
+  <data name="PasswordConfirmCannotBeEmpty" xml:space="preserve">
+    <value>Подтверждение пароля не может быть пустым!</value>
+  </data>
+  <data name="PasswordResetAlreadyRequested" xml:space="preserve">
+    <value>Сброс пароля уже запрошен!</value>
+  </data>
+  <data name="PasswordsNotMatch" xml:space="preserve">
+    <value>Пароли не совпадают!</value>
+  </data>
+  <data name="PathCannotBeEmpty" xml:space="preserve">
+    <value>Путь не может быть пустым!</value>
+  </data>
+  <data name="PathMustBeMaximum260CharactersLong" xml:space="preserve">
+    <value>Путь не должен превышать 260 символов!</value>
+  </data>
+  <data name="PathsListCannotBeEmpty" xml:space="preserve">
+    <value>Список путей не может быть пустым!</value>
+  </data>
+  <data name="PathsListCannotBeNull" xml:space="preserve">
+    <value>Список путей не может быть пустым!</value>
+  </data>
+  <data name="PermissionsListCannotBeEmpty" xml:space="preserve">
+    <value>Список разрешений не может быть пустым!</value>
+  </data>
+  <data name="PermissionsListCannotBeNull" xml:space="preserve">
+    <value>Список разрешений не может быть пустым!</value>
+  </data>
+  <data name="PublisherMustBeMaximum100CharactersLong" xml:space="preserve">
+    <value>Название издательства не должно превышать 100 символов!</value>
+  </data>
+  <data name="RatingMaxValueMustBePositive" xml:space="preserve">
+    <value>Максимальное значение рейтинга должно быть положительным!</value>
+  </data>
+  <data name="RatingsListCannotBeNull" xml:space="preserve">
+    <value>Список рейтингов не может быть пустым!</value>
+  </data>
+  <data name="RatingValueCannotBeGreaterThanMaxValue" xml:space="preserve">
+    <value>Значение рейтинга не может быть больше максимального значения!</value>
+  </data>
+  <data name="RatingValueMustBePositive" xml:space="preserve">
+    <value>Значение рейтинга должно быть положительным!</value>
+  </data>
+  <data name="RatingVoteCountMustBePositive" xml:space="preserve">
+    <value>Количество голосов рейтинга должно быть положительным!</value>
+  </data>
+  <data name="ReleaseInfoCannotBeNull" xml:space="preserve">
+    <value>Информация о выпуске не может быть пустой!</value>
+  </data>
+  <data name="ReleaseVersionMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>Версия релиза не должна превышать 50 символов!</value>
+  </data>
+  <data name="ReReleaseDateAndYearMustMatch" xml:space="preserve">
+    <value>Дата и год переиздания должны совпадать!</value>
+  </data>
+  <data name="ReReleaseDateCannotBeEarlierThanOriginalReleaseDate" xml:space="preserve">
+    <value>Дата переиздания не может быть раньше даты первого выпуска!</value>
+  </data>
+  <data name="ReReleaseYearCannotBeEarlierThanOriginalReleaseYear" xml:space="preserve">
+    <value>Год переиздания не может быть раньше года первого выпуска!</value>
+  </data>
+  <data name="ReReleaseYearMustBeBetween1And9999" xml:space="preserve">
+    <value>Год переиздания должен быть между 1 и 9999!</value>
+  </data>
+  <data name="RoleAlreadyExists" xml:space="preserve">
+    <value>Роль уже существует!</value>
+  </data>
+  <data name="RoleCategoryCannotBeEmpty" xml:space="preserve">
+    <value>Категория роли не может быть пустой!</value>
+  </data>
+  <data name="RoleCategoryMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>Категория роли не должна превышать 50 символов!</value>
+  </data>
+  <data name="RoleIdCannotBeEmpty" xml:space="preserve">
+    <value>Идентификатор роли не может быть пустым!</value>
+  </data>
+  <data name="RoleNameCannotBeEmpty" xml:space="preserve">
+    <value>Название роли не может быть пустым!</value>
+  </data>
+  <data name="RoleNameMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>Название роли не должно превышать 50 символов!</value>
+  </data>
+  <data name="RoleNotFound" xml:space="preserve">
+    <value>Роль не найдена</value>
+  </data>
+  <data name="StreamIdCannotBeEmpty" xml:space="preserve">
+    <value>Идентификатор потока не может быть пустым!</value>
+  </data>
+  <data name="TagNameCannotBeEmpty" xml:space="preserve">
+    <value>Название тега не может быть пустым!</value>
+  </data>
+  <data name="TagNameMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>Название тега не должно превышать 50 символов!</value>
+  </data>
+  <data name="TagsListCannotBeNull" xml:space="preserve">
+    <value>Список тегов не может быть пустым!</value>
+  </data>
+  <data name="TempPasswordExpired" xml:space="preserve">
+    <value>Временный пароль истек!</value>
+  </data>
+  <data name="TheBookIsAlreadyInTheSeries" xml:space="preserve">
+    <value>Книга уже входит в серию!</value>
+  </data>
+  <data name="TheBookIsNotInTheSeries" xml:space="preserve">
+    <value>Книга не входит в серию!</value>
+  </data>
+  <data name="TitleCannotBeEmpty" xml:space="preserve">
+    <value>Название не может быть пустым!</value>
+  </data>
+  <data name="TitleMustBeMaximum255CharactersLong" xml:space="preserve">
+    <value>Название не должно превышать 255 символов!</value>
+  </data>
+  <data name="TooManyRequests" xml:space="preserve">
+    <value>Слишком много запросов! Пожалуйста, повторите попытку через 15 минут!</value>
+  </data>
+  <data name="TotpCannotBeEmpty" xml:space="preserve">
+    <value>Код TOTP не может быть пустым!</value>
+  </data>
+  <data name="UnauthorizedAccess" xml:space="preserve">
+    <value>У вас нет прав доступа к этому ресурсу!</value>
+  </data>
+  <data name="UnknownBookFormat" xml:space="preserve">
+    <value>Неизвестный формат книги!</value>
+  </data>
+  <data name="UnknownIsbnFormat" xml:space="preserve">
+    <value>Неизвестный формат ISBN!</value>
+  </data>
+  <data name="UnknownLibraryType" xml:space="preserve">
+    <value>Неизвестный тип библиотеки!</value>
+  </data>
+  <data name="UserAlreadyExists" xml:space="preserve">
+    <value>Пользователь уже существует!</value>
+  </data>
+  <data name="UserDoesNotExist" xml:space="preserve">
+    <value>Пользователь не существует!</value>
+  </data>
+  <data name="UserIdCannotBeEmpty" xml:space="preserve">
+    <value>Идентификатор пользователя не может быть пустым!</value>
+  </data>
+  <data name="UsernameAlreadyExists" xml:space="preserve">
+    <value>Имя пользователя уже существует!</value>
+  </data>
+  <data name="UsernameCannotBeEmpty" xml:space="preserve">
+    <value>Имя пользователя не может быть пустым!</value>
+  </data>
+  <data name="UsernameDoesNotExist" xml:space="preserve">
+    <value>Имя пользователя не существует!</value>
+  </data>
+  <data name="UsernameMustBeBetween3And255CharactersLong" xml:space="preserve">
+    <value>Имя пользователя должно содержать от 3 до 255 символов!</value>
+  </data>
+  <data name="VolumeNumberMustBeGreaterThanZero" xml:space="preserve">
+    <value>Номер тома должен быть больше нуля!</value>
+  </data>
+</root>

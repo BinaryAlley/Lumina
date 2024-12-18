@@ -1,0 +1,101 @@
+@*
+/admin/manage-permissions/
+*@
+
+@using Lumina.Presentation.Web.Common.Models.Authorization
+@using Microsoft.AspNetCore.Mvc.Localization
+
+@{
+    var roles = ViewData["roles"] as RoleModel[];
+    var rolePermissions = ViewData["rolePermissions"] as PermissionModel[];
+} 
+
+@inject IViewLocalizer _localizer
+
+<form id="rolesPermissionsForm" method="post" action="/Permissions/CreateRole">
+    <input type="hidden" name="rolesRoleId" id="rolesRoleId" value="" />
+    <!-- Roles dropdown row -->
+    <div class="h-30px w-100 text-end">
+        <label for="rolesRolesDropdown" class="text-light-one">@_localizer["Roles"]</label>
+
+        <div class="enlightenment-combobox w-250px inline-block" id="rolesRolesDropdown">
+            <div class="shine-effect" style="top: 1px;"></div>
+            <input type="checkbox" id="rolesRolesDropdownToggle" class="enlightenment-toggle-checkbox" />
+            <label class="enlightenment-toggle" for="rolesRolesDropdownToggle">
+                <span class="enlightenment-selected-text">@_localizer["SelectARole"]</span>
+            </label>
+            <div class="enlightenment-dropdown">
+                <div class="shine-effect" style="top: -4px;"></div>
+                <div class="enlightenment-option first-option disabled">@_localizer["SelectARole"]</div>
+                @if (roles is not null)
+                {
+                    @for (int i = 0; i < roles.Length; i++)
+                    {
+                        <div class="enlightenment-option @(i == roles.Length - 1 ? "last-option" : "")" data-value="@roles[i].Id">@roles[i].RoleName</div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Role name input row -->
+    <div class="h-30px w-100 text-end mb-5">
+        <label for="rolesRoleInput" class="text-light-one">@_localizer["RoleName"]</label>
+        <input type="text" id="rolesRoleInput" name="roleName" class="enlightenment-input w-250px" />
+    </div>
+
+    <!-- Permissions row -->
+    <div class="containerRoles row panel inset">
+        <div class="explorerContainer">
+            <div class="explorer">
+                @if (rolePermissions is not null)
+                {
+                    @foreach (var rolePermission in rolePermissions)
+                    {
+                        <div class="e no-border transparent">
+                            <label class="enlightenment-checkbox-label">
+                                <input type="checkbox" class="enlightenment-checkbox-hidden" name="rolePermissions" value="@rolePermission.Id">
+                                <span class="enlightenment-checkbox"></span>
+                                @_localizer[rolePermission.PermissionName.ToString()]
+                            </label>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Submit Button Row -->
+    <div class="w-100 text-end">
+        <button type="button" class="abort-button f-14 h-24px v-align-t hidden" id="rolesDeleteRoleBtn">@_localizer["DeleteRole"]</button>
+        <button type="submit" class="confirm-button f-14 h-24px v-align-t" id="rolesConfirmBtn">@_localizer["CreateRole"]</button>
+    </div>
+</form>
+
+@* <div class="enlightenment-panel shadow-effect p-2 mx-auto panel w-90 mb-10" style="min-width: 320px; margin-top: 1rem;">
+    <div class="shine-effect"></div>
+    <form method="post" id="add-media-library-form" class="inline">
+        @Html.AntiForgeryToken()
+        @{
+            <div class="form-field">
+                <div class="enlightenment-combobox inline-block w-100">
+                    <div class="shine-effect" style="top: 1px;"></div>
+                    <input type="checkbox" class="enlightenment-toggle-checkbox" id="library-type" />
+                    <label class="enlightenment-toggle" for="library-type">
+                        <span id="library-selected-item" class="enlightenment-selected-text" data-value="None">@_localizer["None"]</span>
+                    </label>
+                    <div class="enlightenment-dropdown">
+                        <div class="shine-effect" style="top: -4px;"></div>
+                        <div class="enlightenment-option first-option disabled">@_localizer["None"]</div>
+                        @foreach (var item in aa!)
+                        {
+                            <div class="enlightenment-option">@_localizer[item.ToString()]</div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+        <p>a</p>
+
+    </form>
+</div> *@

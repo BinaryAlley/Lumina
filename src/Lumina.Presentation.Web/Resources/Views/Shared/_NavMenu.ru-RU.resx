@@ -189,6 +189,9 @@
   <data name="Register" xml:space="preserve">
     <value>Регистрация</value>
   </data>
+  <data name="ManagePermissions" xml:space="preserve">
+    <value>Управление разрешениями</value>
+  </data>
   <data name="Tools" xml:space="preserve">
     <value>Инструменты</value>
   </data>
@@ -200,5 +203,8 @@
   </data>
   <data name="WrittenContent" xml:space="preserve">
     <value>Письменный Контент</value>
+  </data>
+  <data name="ManageRoles" xml:space="preserve">
+    <value>Управление ролями</value>
   </data>
 </root>

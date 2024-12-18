@@ -2,16 +2,11 @@
 using ErrorOr;
 using FastEndpoints;
 using FluentAssertions;
-using Lumina.Application.Core.UsersManagement.Authentication.Queries.LoginUser;
 using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetAuthorization;
-using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Requests.Authorization;
-using Lumina.Contracts.Responses.Authentication;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.Domain.Common.Enums.Authorization;
-using Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authentication.Login;
 using Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authorization.GetAuthorization;
-using Lumina.Presentation.Api.UnitTests.Core.Endpoints.UsersManagement.Authentication.Login.Fixtures;
 using Lumina.Presentation.Api.UnitTests.Core.Endpoints.UsersManagement.Authorization.GetAuthorization.Fixtures;
 using Mediator;
 using Microsoft.AspNetCore.Http;
@@ -51,9 +46,9 @@ public class GetAuthorizationEndpointTests
         // Arrange
         GetAuthorizationRequest request = GetAuthorizationRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
-        GetAuthorizationResponse expectedResponse = new(
+        AuthorizationResponse expectedResponse = new(
             request.UserId!.Value,
-            new HashSet<AuthorizationRole> { AuthorizationRole.Admin },
+            new HashSet<string> { "Admin" },
             new HashSet<AuthorizationPermission> { AuthorizationPermission.CanViewUsers });
 
         _mockSender.Send(Arg.Any<GetAuthorizationQuery>(), Arg.Any<CancellationToken>())
@@ -63,7 +58,7 @@ public class GetAuthorizationEndpointTests
         IResult result = await _sut.ExecuteAsync(request, cancellationToken);
 
         // Assert
-        GetAuthorizationResponse actualResponse = result.Should().BeOfType<Ok<GetAuthorizationResponse>>().Subject.Value!;
+        AuthorizationResponse actualResponse = result.Should().BeOfType<Ok<AuthorizationResponse>>().Subject.Value!;
         actualResponse.Should().BeEquivalentTo(expectedResponse);
     }
 
@@ -102,9 +97,9 @@ public class GetAuthorizationEndpointTests
         CancellationToken cancellationToken = CancellationToken.None;
 
         _mockSender.Send(Arg.Any<GetAuthorizationQuery>(), Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(new GetAuthorizationResponse(
+            .Returns(ErrorOrFactory.From(new AuthorizationResponse(
                 request.UserId!.Value,
-                new HashSet<AuthorizationRole>().ToHashSet(),
+                new HashSet<string>().ToHashSet(),
                 new HashSet<AuthorizationPermission>().ToHashSet()
             )));
 
@@ -128,14 +123,14 @@ public class GetAuthorizationEndpointTests
         TaskCompletionSource<bool> cancellationRequested = new();
 
         _mockSender.Send(Arg.Any<GetAuthorizationQuery>(), Arg.Any<CancellationToken>())
-            .Returns(callInfo => new ValueTask<ErrorOr<GetAuthorizationResponse>>(Task.Run(async () =>
+            .Returns(callInfo => new ValueTask<ErrorOr<AuthorizationResponse>>(Task.Run(async () =>
             {
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return ErrorOrFactory.From(new GetAuthorizationResponse(
+                return ErrorOrFactory.From(new AuthorizationResponse(
                     request.UserId!.Value,
-                    new HashSet<AuthorizationRole>().ToHashSet(),
+                    new HashSet<string>().ToHashSet(),
                     new HashSet<AuthorizationPermission>().ToHashSet()
                 ));
             }, callInfo.Arg<CancellationToken>())));

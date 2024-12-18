@@ -125,19 +125,31 @@ public class ApiHttpClient : IApiHttpClient
     }
 
     /// <summary>
-    /// Sends a DELETE request to the specified <paramref name="endpoint"/> as an asynchronous operation and returns the result.
+    /// Sends a DELETE request to the specified <paramref name="endpoint"/> as an asynchronous operation.
     /// </summary>
-    /// <typeparam name="TResponse">The expected type of the response content.</typeparam>
     /// <param name="endpoint">The API endpoint where the request is being sent.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>The deserialized response containing the result of the DELETE request.</returns>
-    public async Task<TResponse> DeleteAsync<TResponse>(string endpoint, CancellationToken cancellationToken = default)
+    public async Task DeleteAsync(string endpoint, CancellationToken cancellationToken = default)
     {
         using HttpRequestMessage request = new(HttpMethod.Delete, endpoint);
         AuthenticationHeaderValue? authenticationHeader = GetAuthenticationHeader();
         if (authenticationHeader is not null)
             request.Headers.Authorization = authenticationHeader;
-        return await SendRequestAsync<TResponse>(request, cancellationToken).ConfigureAwait(false);
+        //return await SendRequestAsync<TResponse>(request, cancellationToken).ConfigureAwait(false);
+        // send the HTTP request and read the response
+        HttpResponseMessage response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
+        if (!response.IsSuccessStatusCode)
+        {
+            ProblemDetailsModel? problemDetails = null;
+            string content = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            // attempt to deserialize the response content to ProblemDetailsModel if the request fails
+            try
+            {
+                problemDetails = JsonSerializer.Deserialize<ProblemDetailsModel>(content, _jsonOptions);
+            }
+            catch { /* if we can't deserialize to ProblemDetails, we'll just use the status code */ }
+            throw new ApiException(problemDetails, response.StatusCode);
+        }
     }
 
     /// <summary>

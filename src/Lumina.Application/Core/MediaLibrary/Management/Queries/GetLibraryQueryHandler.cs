@@ -42,14 +42,14 @@ public class GetLibraryQueryHandler : IRequestHandler<GetLibraryQuery, ErrorOr<L
     public async ValueTask<ErrorOr<LibraryResponse>> Handle(GetLibraryQuery request, CancellationToken cancellationToken)
     {
         ILibraryRepository libraryRepository = _unitOfWork.GetRepository<ILibraryRepository>();
-        ErrorOr<LibraryEntity?> resultGetLibrary = await libraryRepository.GetByIdAsync(request.Id, cancellationToken).ConfigureAwait(false);
-        if (resultGetLibrary.IsError)
-            return resultGetLibrary.Errors;
-        else if (resultGetLibrary.Value is null)
+        ErrorOr<LibraryEntity?> getLibraryResult = await libraryRepository.GetByIdAsync(request.Id, cancellationToken).ConfigureAwait(false);
+        if (getLibraryResult.IsError)
+            return getLibraryResult.Errors;
+        else if (getLibraryResult.Value is null)
             return DomainErrors.Library.LibraryNotFound;
         // if the user that requested the library is not an Admin or is not the owner of the library, they do not have the right to view it
-        if (resultGetLibrary.Value.UserId != request.UserId) // TODO: after implementing the Admin role, add that permission check here too
+        if (getLibraryResult.Value.UserId != request.UserId) // TODO: after implementing the Admin role, add that permission check here too
             return ApplicationErrors.Authorization.NotAuthorized;
-        return resultGetLibrary.Value.ToResponse();
+        return getLibraryResult.Value.ToResponse();
     }
 }

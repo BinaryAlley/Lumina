@@ -13,7 +13,7 @@ public class AuthorizationRequirementModel
     /// <summary>
     /// The collection of roles required for accessing the resource.
     /// </summary>
-    public AuthorizationRole[]? Roles { get; set; }
+    public string[]? Roles { get; set; }
 
     /// <summary>
     /// The collection of permissions required for accessing the resource.

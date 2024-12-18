@@ -23,7 +23,7 @@ public class AuthorizationServiceFixture
     /// <returns>The created user entity.</returns>
     public static UserEntity CreateUserWithPermissions(
         IEnumerable<AuthorizationPermission>? directPermissions = null,
-        Dictionary<AuthorizationRole, IEnumerable<AuthorizationPermission>>? rolePermissions = null)
+        Dictionary<string, IEnumerable<AuthorizationPermission>>? rolePermissions = null)
     {
         Guid userId = Guid.NewGuid();
         DateTime utcNow = DateTime.UtcNow;
@@ -70,7 +70,7 @@ public class AuthorizationServiceFixture
 
         if (rolePermissions is not null)
         {
-            foreach (KeyValuePair<AuthorizationRole, IEnumerable<AuthorizationPermission>> rolePerm in rolePermissions)
+            foreach (KeyValuePair<string, IEnumerable<AuthorizationPermission>> rolePerm in rolePermissions)
             {
                 Guid roleId = Guid.NewGuid();
                 RoleEntity role = new()
