@@ -141,14 +141,14 @@ public class SetupApplicationEndpointTests : IClassFixture<AuthenticatedLuminaAp
         HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/initialization", request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
         string content = await response.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
         problemDetails.Should().NotBeNull();
-        problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status403Forbidden);
-        problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.4");
-        problemDetails["title"].GetString().Should().Be("General.Unauthorized");
+        problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status409Conflict);
+        problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.10");
+        problemDetails["title"].GetString().Should().Be("General.Conflict");
         problemDetails["detail"].GetString().Should().Be("AdminAccountAlreadyCreated");
         problemDetails["instance"].GetString().Should().Be("/api/v1/initialization");
         problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
