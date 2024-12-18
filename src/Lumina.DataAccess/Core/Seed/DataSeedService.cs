@@ -48,9 +48,9 @@ public class DataSeedService : IDataSeedService
         // create the default authorization permissions and add them to the repository.
         PermissionEntity[] defaultPermissions =
         [
-            new() { PermissionName = AuthorizationPermission.CanViewUsers, PermissionDescription = "Can view users", CreatedBy = adminId, CreatedOnUtc = _dateTimeProvider.UtcNow },
-            new() { PermissionName = AuthorizationPermission.CanDeleteUsers, PermissionDescription = "Can delete users", CreatedBy = adminId, CreatedOnUtc = _dateTimeProvider.UtcNow },
-            new() { PermissionName = AuthorizationPermission.CanRegisterUsers, PermissionDescription = "Can register users", CreatedBy = adminId, CreatedOnUtc = _dateTimeProvider.UtcNow }
+            new() { PermissionName = AuthorizationPermission.CanViewUsers, CreatedBy = adminId, CreatedOnUtc = _dateTimeProvider.UtcNow },
+            new() { PermissionName = AuthorizationPermission.CanDeleteUsers, CreatedBy = adminId, CreatedOnUtc = _dateTimeProvider.UtcNow },
+            new() { PermissionName = AuthorizationPermission.CanRegisterUsers, CreatedBy = adminId, CreatedOnUtc = _dateTimeProvider.UtcNow }
         ];
         foreach (PermissionEntity permission in defaultPermissions)
         {
@@ -75,7 +75,7 @@ public class DataSeedService : IDataSeedService
         // create the default authorization roles and add them to the repository
         RoleEntity[] defaultRoles =
         [
-            new() { RoleName = AuthorizationRole.Admin, RoleDescription = "Administrator role", CreatedBy = userId, CreatedOnUtc = _dateTimeProvider.UtcNow }
+            new() { RoleName = "Admin", CreatedBy = userId, CreatedOnUtc = _dateTimeProvider.UtcNow }
         ];
         foreach (RoleEntity role in defaultRoles)
         {
@@ -100,7 +100,7 @@ public class DataSeedService : IDataSeedService
         IPermissionRepository permissionRepository = _unitOfWork.GetRepository<IPermissionRepository>();
 
         // get the admin role
-        ErrorOr<RoleEntity?> getAdminRoleResult = await roleRepository.GetByNameAsync(AuthorizationRole.Admin, cancellationToken).ConfigureAwait(false);
+        ErrorOr<RoleEntity?> getAdminRoleResult = await roleRepository.GetByNameAsync("Admin", cancellationToken).ConfigureAwait(false);
         if (getAdminRoleResult.IsError)
             return getAdminRoleResult.Errors;
 
@@ -146,7 +146,7 @@ public class DataSeedService : IDataSeedService
 
 
         // get the admin role
-        ErrorOr<RoleEntity?> getAdminRoleResult = await roleRepository.GetByNameAsync(AuthorizationRole.Admin, cancellationToken).ConfigureAwait(false);
+        ErrorOr<RoleEntity?> getAdminRoleResult = await roleRepository.GetByNameAsync("Admin", cancellationToken).ConfigureAwait(false);
         if (getAdminRoleResult.IsError)
             return getAdminRoleResult.Errors;
 

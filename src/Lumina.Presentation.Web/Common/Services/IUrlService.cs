@@ -10,6 +10,7 @@ public interface IUrlService
     /// </summary>
     /// <param name="action">The action name within the controller.</param>
     /// <param name="controller">The controller name.</param>
+    /// <param name="additionalRouteValues">Optional additional route values, like query parameters.</param>
     /// <returns>An absolute URL to the specified action.</returns>
-    string? GetAbsoluteUrl(string action, string controller);
+    string? GetAbsoluteUrl(string action, string controller, object? additionalRouteValues = null);
 }

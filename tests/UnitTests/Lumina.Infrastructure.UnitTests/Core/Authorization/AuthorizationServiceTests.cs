@@ -102,9 +102,9 @@ public class AuthorizationServiceTests
     public async Task HasPermissionAsync_WhenUserHasPermissionThroughRole_ShouldReturnTrue()
     {
         // Arrange
-        Dictionary<AuthorizationRole, IEnumerable<AuthorizationPermission>> rolePermissions = new()
+        Dictionary<string, IEnumerable<AuthorizationPermission>> rolePermissions = new()
         {
-            { AuthorizationRole.Admin, new[] { AuthorizationPermission.CanViewUsers } }
+            { "Admin", new[] { AuthorizationPermission.CanViewUsers } }
         };
 
         UserEntity user = AuthorizationServiceFixture.CreateUserWithPermissions(
@@ -160,9 +160,9 @@ public class AuthorizationServiceTests
     public async Task HasPermissionAsync_WhenUserHasPermissionBothDirectlyAndThroughRole_ShouldReturnTrue()
     {
         // Arrange
-        Dictionary<AuthorizationRole, IEnumerable<AuthorizationPermission>> rolePermissions = new()
+        Dictionary<string, IEnumerable<AuthorizationPermission>> rolePermissions = new()
         {
-            { AuthorizationRole.Admin, new[] { AuthorizationPermission.CanViewUsers } }
+            { "Admin", new[] { AuthorizationPermission.CanViewUsers } }
         };
 
         UserEntity user = AuthorizationServiceFixture.CreateUserWithPermissions(
@@ -189,7 +189,7 @@ public class AuthorizationServiceTests
             .Returns(ErrorOrFactory.From<UserEntity?>(null));
 
         // Act
-        bool result = await _sut.IsInRoleAsync(userId, AuthorizationRole.Admin, CancellationToken.None);
+        bool result = await _sut.IsInRoleAsync(userId, "Admin", CancellationToken.None);
 
         // Assert
         result.Should().BeFalse();
@@ -206,7 +206,7 @@ public class AuthorizationServiceTests
             .Returns(error);
 
         // Act
-        bool result = await _sut.IsInRoleAsync(userId, AuthorizationRole.Admin, CancellationToken.None);
+        bool result = await _sut.IsInRoleAsync(userId, "Admin", CancellationToken.None);
 
         // Assert
         result.Should().BeFalse();
@@ -217,9 +217,9 @@ public class AuthorizationServiceTests
     public async Task IsInRoleAsync_WhenUserHasRole_ShouldReturnTrue()
     {
         // Arrange
-        Dictionary<AuthorizationRole, IEnumerable<AuthorizationPermission>> rolePermissions = new()
+        Dictionary<string, IEnumerable<AuthorizationPermission>> rolePermissions = new()
         {
-            { AuthorizationRole.Admin, Array.Empty<AuthorizationPermission>() }
+            { "Admin", Array.Empty<AuthorizationPermission>() }
         };
 
         UserEntity user = AuthorizationServiceFixture.CreateUserWithPermissions(
@@ -229,7 +229,7 @@ public class AuthorizationServiceTests
             .Returns(ErrorOrFactory.From<UserEntity?>(user));
 
         // Act
-        bool result = await _sut.IsInRoleAsync(user.Id, AuthorizationRole.Admin, CancellationToken.None);
+        bool result = await _sut.IsInRoleAsync(user.Id, "Admin", CancellationToken.None);
 
         // Assert
         result.Should().BeTrue();
@@ -240,9 +240,9 @@ public class AuthorizationServiceTests
     public async Task IsInRoleAsync_WhenUserHasDifferentRole_ShouldReturnFalse()
     {
         // Arrange
-        Dictionary<AuthorizationRole, IEnumerable<AuthorizationPermission>> rolePermissions = new()
+        Dictionary<string, IEnumerable<AuthorizationPermission>> rolePermissions = new()
         {
-            { AuthorizationRole.None, Array.Empty<AuthorizationPermission>() }
+            { "", Array.Empty<AuthorizationPermission>() }
         };
 
         UserEntity user = AuthorizationServiceFixture.CreateUserWithPermissions(
@@ -252,7 +252,7 @@ public class AuthorizationServiceTests
             .Returns(ErrorOrFactory.From<UserEntity?>(user));
 
         // Act
-        bool result = await _sut.IsInRoleAsync(user.Id, AuthorizationRole.Admin, CancellationToken.None);
+        bool result = await _sut.IsInRoleAsync(user.Id, "Admin", CancellationToken.None);
 
         // Assert
         result.Should().BeFalse();
@@ -269,7 +269,7 @@ public class AuthorizationServiceTests
             .Returns(ErrorOrFactory.From<UserEntity?>(user));
 
         // Act
-        bool result = await _sut.IsInRoleAsync(user.Id, AuthorizationRole.Admin, CancellationToken.None);
+        bool result = await _sut.IsInRoleAsync(user.Id, "Admin", CancellationToken.None);
 
         // Assert
         result.Should().BeFalse();
@@ -484,10 +484,10 @@ public class AuthorizationServiceTests
     public async Task GetUserAuthorizationAsync_WhenUserHasOnlyRolePermissions_ShouldReturnCorrectRolesAndPermissions()
     {
         // Arrange
-        Dictionary<AuthorizationRole, IEnumerable<AuthorizationPermission>> rolePermissions = new()
+        Dictionary<string, IEnumerable<AuthorizationPermission>> rolePermissions = new()
         {
             {
-                AuthorizationRole.Admin,
+                "Admin",
                 new[] { AuthorizationPermission.CanViewUsers, AuthorizationPermission.CanDeleteUsers }
             }
         };
@@ -504,7 +504,7 @@ public class AuthorizationServiceTests
         // Assert
         result.IsError.Should().BeFalse();
         result.Value.UserId.Should().Be(user.Id);
-        result.Value.Roles.Should().BeEquivalentTo([AuthorizationRole.Admin]);
+        result.Value.Roles.Should().BeEquivalentTo(["Admin"]);
         result.Value.Permissions.Should().BeEquivalentTo(
         [
             AuthorizationPermission.CanViewUsers,
@@ -517,10 +517,10 @@ public class AuthorizationServiceTests
     public async Task GetUserAuthorizationAsync_WhenUserHasBothDirectAndRolePermissions_ShouldReturnCombinedPermissions()
     {
         // Arrange
-        Dictionary<AuthorizationRole, IEnumerable<AuthorizationPermission>> rolePermissions = new()
+        Dictionary<string, IEnumerable<AuthorizationPermission>> rolePermissions = new()
         {
             {
-                AuthorizationRole.Admin,
+                "Admin",
                 new[] { AuthorizationPermission.CanViewUsers, AuthorizationPermission.CanDeleteUsers }
             }
         };
@@ -538,7 +538,7 @@ public class AuthorizationServiceTests
         // Assert
         result.IsError.Should().BeFalse();
         result.Value.UserId.Should().Be(user.Id);
-        result.Value.Roles.Should().BeEquivalentTo([AuthorizationRole.Admin]);
+        result.Value.Roles.Should().BeEquivalentTo(["Admin"]);
         result.Value.Permissions.Should().BeEquivalentTo(
         [
             AuthorizationPermission.CanViewUsers,
@@ -552,14 +552,14 @@ public class AuthorizationServiceTests
     public async Task GetUserAuthorizationAsync_WhenUserHasMultipleRoles_ShouldReturnAllRolesAndPermissions()
     {
         // Arrange
-        Dictionary<AuthorizationRole, IEnumerable<AuthorizationPermission>> rolePermissions = new()
+        Dictionary<string, IEnumerable<AuthorizationPermission>> rolePermissions = new()
         {
             {
-                AuthorizationRole.Admin,
+                "Admin",
                 new[] { AuthorizationPermission.CanViewUsers }
             },
             {
-                AuthorizationRole.None,
+                "",
                 new[] { AuthorizationPermission.CanDeleteUsers }
             }
         };
@@ -576,7 +576,7 @@ public class AuthorizationServiceTests
         // Assert
         result.IsError.Should().BeFalse();
         result.Value.UserId.Should().Be(user.Id);
-        result.Value.Roles.Should().BeEquivalentTo([AuthorizationRole.Admin, AuthorizationRole.None]);
+        result.Value.Roles.Should().BeEquivalentTo(["Admin", ""]);
         result.Value.Permissions.Should().BeEquivalentTo(
         [
             AuthorizationPermission.CanViewUsers,

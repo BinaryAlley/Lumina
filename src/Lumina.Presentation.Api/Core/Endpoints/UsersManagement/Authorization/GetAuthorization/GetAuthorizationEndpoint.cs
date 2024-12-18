@@ -43,13 +43,13 @@ public class GetAuthorizationEndpoint : BaseEndpoint<GetAuthorizationRequest, IR
     }
 
     /// <summary>
-    /// Gets the authentication roles and permissions of an account.
+    /// Gets the authorization roles and permissions of an account.
     /// </summary>
-    /// <param name="request">The request containing the account for which to get the authentication roles and permissions.</param>
+    /// <param name="request">The request containing the account for which to get the authorization roles and permissions.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(GetAuthorizationRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<GetAuthorizationResponse> result = await _sender.Send(request.ToQuery(), cancellationToken).ConfigureAwait(false);
+        ErrorOr<AuthorizationResponse> result = await _sender.Send(request.ToQuery(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

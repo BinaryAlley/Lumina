@@ -67,7 +67,7 @@ public class AuthorizationService : IAuthorizationService
     /// <param name="role">The role to check.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns><see langword="true"/> if the user is in the specified role, <see langword="false"/> otherwise.</returns>
-    public async Task<bool> IsInRoleAsync(Guid userId, AuthorizationRole role, CancellationToken cancellationToken)
+    public async Task<bool> IsInRoleAsync(Guid userId, string role, CancellationToken cancellationToken)
     {
         ErrorOr<UserEntity?> getUserResult = await _userRepository.GetByIdAsync(userId, cancellationToken).ConfigureAwait(false);
         if (getUserResult.IsError || getUserResult.Value is null)
@@ -106,7 +106,7 @@ public class AuthorizationService : IAuthorizationService
             return Errors.Users.UserDoesNotExist;
 
         // get all roles
-        HashSet<AuthorizationRole> roles = getUserResult.Value.UserRoles
+        HashSet<string> roles = getUserResult.Value.UserRoles
             .Select(userRole => userRole.Role.RoleName)
             .ToHashSet();
 

@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using Lumina.Application.Common.Mapping.FileSystemManagement.FileSystem;
-using Lumina.Domain.Common.Enums.FileSystem;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
+using Lumina.Domain.Common.Enums.FileSystem;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
@@ -81,10 +81,10 @@ public class GetDirectoryTreeQueryHandler : IRequestHandler<GetDirectoryTreeQuer
     /// </returns>
     private ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> GetDrives()
     {
-        ErrorOr<IEnumerable<FileSystemItem>> driveResult = _driveService.GetDrives();
-        if (driveResult.IsError)
-            return driveResult.Errors;
-        return ErrorOrFactory.From(driveResult.Value.ToTreeNodeResponses());
+        ErrorOr<IEnumerable<FileSystemItem>> getDrivesResult = _driveService.GetDrives();
+        if (getDrivesResult.IsError)
+            return getDrivesResult.Errors;
+        return ErrorOrFactory.From(getDrivesResult.Value.ToTreeNodeResponses());
     }
 
     /// <summary>
@@ -138,11 +138,11 @@ public class GetDirectoryTreeQueryHandler : IRequestHandler<GetDirectoryTreeQuer
     private ErrorOr<Success> LoadChildren(FileSystemTreeNodeResponse node, bool includeFiles, bool includeHiddenElements)
     {
         // get subdirectories under the current node's path
-        ErrorOr<IEnumerable<Directory>> subDirectoriesResult = _directoryService.GetSubdirectories(node.Path, includeHiddenElements);
-        if (subDirectoriesResult.IsError)
-            return subDirectoriesResult.Errors;
+        ErrorOr<IEnumerable<Directory>> getSubDirectoriesResult = _directoryService.GetSubdirectories(node.Path, includeHiddenElements);
+        if (getSubDirectoriesResult.IsError)
+            return getSubDirectoriesResult.Errors;
         // add each subdirectory as a child node of the current directory
-        foreach (Directory subDirectory in subDirectoriesResult.Value ?? [])
+        foreach (Directory subDirectory in getSubDirectoriesResult.Value ?? [])
         {
             FileSystemTreeNodeResponse subDirNode = new()
             {
@@ -157,11 +157,11 @@ public class GetDirectoryTreeQueryHandler : IRequestHandler<GetDirectoryTreeQuer
         if (includeFiles)
         {
             // get files under the current node's path
-            ErrorOr<IEnumerable<File>> filesResult = _fileService.GetFiles(node.Path, includeHiddenElements);
-            if (filesResult.IsError)
-                return filesResult.Errors;
+            ErrorOr<IEnumerable<File>> getFilesResult = _fileService.GetFiles(node.Path, includeHiddenElements);
+            if (getFilesResult.IsError)
+                return getFilesResult.Errors;
             // add each file as a child node of the current directory
-            foreach (File file in filesResult.Value)
+            foreach (File file in getFilesResult.Value)
             {
                 FileSystemTreeNodeResponse fileNode = new()
                 {

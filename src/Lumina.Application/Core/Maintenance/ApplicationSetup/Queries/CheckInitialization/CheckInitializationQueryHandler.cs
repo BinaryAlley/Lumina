@@ -3,9 +3,7 @@ using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Contracts.Responses.FileSystemManagement.Path;
 using Lumina.Contracts.Responses.UsersManagement;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Mediator;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,9 +40,9 @@ public class CheckInitializationQueryHandler : IRequestHandler<CheckInitializati
     {
         IUserRepository userRepository = _unitOfWork.GetRepository<IUserRepository>();
         // if the repository reports an error, or there are no users, the application has not been initialized
-        ErrorOr<IEnumerable<UserEntity>> resultSelectUser = await userRepository.GetAllAsync(cancellationToken);
-        if (!resultSelectUser.IsError)
-            return new InitializationResponse(resultSelectUser.Value.Any());
+        ErrorOr<IEnumerable<UserEntity>> selectUsersResult = await userRepository.GetAllAsync(cancellationToken);
+        if (!selectUsersResult.IsError)
+            return new InitializationResponse(selectUsersResult.Value.Any());
         return new InitializationResponse(false);
     }
 }

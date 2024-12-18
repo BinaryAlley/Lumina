@@ -25,11 +25,6 @@ public class PermissionEntity : IStorageEntity, IAuditableEntity
     public required AuthorizationPermission PermissionName { get; init; }
 
     /// <summary>
-    /// Gets the description of the permission.
-    /// </summary>
-    public string? PermissionDescription { get; set; }
-
-    /// <summary>
     /// Gets or sets the collection of role permission associations that include this permission.
     /// </summary>
     public ICollection<RolePermissionEntity> RolePermissions { get; set; } = [];
@@ -42,12 +37,12 @@ public class PermissionEntity : IStorageEntity, IAuditableEntity
     /// <summary>
     /// Gets or sets the time and date when the entity was added.
     /// </summary>
-    public required DateTime CreatedOnUtc { get; set; }
+    public DateTime CreatedOnUtc { get; set; }
 
     /// <summary>
     /// Gets or sets the Id of the user that created the entity.
     /// </summary>
-    public required Guid CreatedBy { get; set; }
+    public Guid CreatedBy { get; set; }
 
     /// <summary>
     /// Gets or sets the optional time and date when the entity was updated.

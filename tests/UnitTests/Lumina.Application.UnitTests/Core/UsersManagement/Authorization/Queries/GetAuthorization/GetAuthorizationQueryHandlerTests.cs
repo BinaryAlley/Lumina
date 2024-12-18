@@ -50,7 +50,7 @@ public class GetAuthorizationQueryHandlerTests
             .Returns(ErrorOrFactory.From(authEntity));
 
         // Act
-        ErrorOr<GetAuthorizationResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<AuthorizationResponse> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
         result.IsError.Should().BeFalse();
@@ -76,7 +76,7 @@ public class GetAuthorizationQueryHandlerTests
             .Returns(ErrorOrFactory.From(targetAuthEntity));
 
         // Act
-        ErrorOr<GetAuthorizationResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<AuthorizationResponse> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
         result.IsError.Should().BeFalse();
@@ -99,7 +99,7 @@ public class GetAuthorizationQueryHandlerTests
             .Returns(ErrorOrFactory.From(currentUserAuth));
 
         // Act
-        ErrorOr<GetAuthorizationResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<AuthorizationResponse> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
         result.IsError.Should().BeTrue();
@@ -120,7 +120,7 @@ public class GetAuthorizationQueryHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<GetAuthorizationResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<AuthorizationResponse> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
         result.IsError.Should().BeTrue();
@@ -144,7 +144,7 @@ public class GetAuthorizationQueryHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<GetAuthorizationResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<AuthorizationResponse> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
         result.IsError.Should().BeTrue();

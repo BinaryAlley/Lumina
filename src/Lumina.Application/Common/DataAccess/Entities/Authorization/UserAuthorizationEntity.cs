@@ -8,7 +8,7 @@ using System.Diagnostics;
 namespace Lumina.Application.Common.DataAccess.Entities.Authorization;
 
 /// <summary>
-/// Data Transfer object containing all the authorization info of a user.
+/// Data Transfer Object containing all the authorization info of a user.
 /// </summary>
 [DebuggerDisplay("UserId: {UserId}")]
 public class UserAuthorizationEntity
@@ -21,7 +21,7 @@ public class UserAuthorizationEntity
     /// <summary>
     /// Gets the collection of roles associated to the user.
     /// </summary>
-    public required IReadOnlySet<AuthorizationRole> Roles { get; init; }
+    public required IReadOnlySet<string> Roles { get; init; }
 
     /// <summary>
     /// Gets the collection of permissions associated to the user.

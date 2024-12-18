@@ -25,7 +25,7 @@
             @await Html.PartialAsync("_NavMenu")
         </header>
         <main role="main" style="@(User?.Identity?.IsAuthenticated == false ? "bottom: 0px;" : string.Empty)">
-            <article>
+            <article class="h-100"> <!--needs to be 100% height so that child pages that require full height as well, can stretch-->
                 @RenderBody()
                 <div id="modal-background-article"></div>
             </article>
@@ -47,6 +47,11 @@
     <!--Modal grid background-->
     <div id="modal-background-menu"></div>
 
+    <script>
+        var jsLocalizedMessages = {
+            navigationFailed: '@_localizer["NavigationFailed"]',
+        };
+    </script>
     <script defer src="~/js/notifications.js" asp-append-version="true"></script>
     <script defer src="~/js/site.js" asp-append-version="true"></script>
     <div data-section="scripts">

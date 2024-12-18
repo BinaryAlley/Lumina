@@ -46,13 +46,13 @@ public class UpdateLibraryCommandHandler : IRequestHandler<UpdateLibraryCommand,
     {
         // get a library repository
         ILibraryRepository libraryRepository = _unitOfWork.GetRepository<ILibraryRepository>();
-        ErrorOr<LibraryEntity?> resultGetLibrary = await libraryRepository.GetByIdAsync(request.Id, cancellationToken).ConfigureAwait(false);
-        if (resultGetLibrary.IsError)
-            return resultGetLibrary.Errors;
-        else if (resultGetLibrary.Value is null)
+        ErrorOr<LibraryEntity?> getLibraryResult = await libraryRepository.GetByIdAsync(request.Id, cancellationToken).ConfigureAwait(false);
+        if (getLibraryResult.IsError)
+            return getLibraryResult.Errors;
+        else if (getLibraryResult.Value is null)
             return DomainErrors.Library.LibraryNotFound;
         // if the user that made the request is not an Admin or is not the owner of the library, they do not have the right to update it
-        if (resultGetLibrary.Value.UserId != request.CurrentUserId) // TODO: after implementing the Admin role, add that permission check here too
+        if (getLibraryResult.Value.UserId != request.CurrentUserId) // TODO: after implementing the Admin role, add that permission check here too
             return ApplicationErrors.Authorization.NotAuthorized;
 
         // create a domain library object
@@ -75,11 +75,11 @@ public class UpdateLibraryCommandHandler : IRequestHandler<UpdateLibraryCommand,
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         // retrieve the updated media library from the persistence medium and return it
-        ErrorOr<LibraryEntity?> retrievedLibraryResult = await libraryRepository.GetByIdAsync(createLibraryResult.Value.Id.Value, cancellationToken).ConfigureAwait(false);
-        if (retrievedLibraryResult.IsError)
-            return retrievedLibraryResult.Errors;
-        if (retrievedLibraryResult.Value is null)
+        ErrorOr<LibraryEntity?> getCreatedLibraryResult = await libraryRepository.GetByIdAsync(createLibraryResult.Value.Id.Value, cancellationToken).ConfigureAwait(false);
+        if (getCreatedLibraryResult.IsError)
+            return getCreatedLibraryResult.Errors;
+        if (getCreatedLibraryResult.Value is null)
             return ApplicationErrors.Persistence.ErrorPersistingMediaLibrary;
-        return retrievedLibraryResult.Value.ToResponse();
+        return getCreatedLibraryResult.Value.ToResponse();
     }
 }

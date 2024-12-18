@@ -60,7 +60,7 @@ internal sealed class LibraryRepository : ILibraryRepository
     /// <summary>
     /// Updates a media library.
     /// </summary>
-    /// <param name="data">Ther media library to update.</param>
+    /// <param name="data">The media library to update.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successfull operation, or an error.</returns>
     public async Task<ErrorOr<Updated>> UpdateAsync(LibraryEntity data, CancellationToken cancellationToken)

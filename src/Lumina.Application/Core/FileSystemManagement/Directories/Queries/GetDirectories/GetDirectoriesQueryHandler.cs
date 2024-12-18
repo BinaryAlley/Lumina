@@ -38,7 +38,7 @@ public class GetDirectoriesQueryHandler : IRequestHandler<GetDirectoriesQuery, E
     /// </returns>
     public ValueTask<ErrorOr<IEnumerable<DirectoryResponse>>> Handle(GetDirectoriesQuery request, CancellationToken cancellationToken)
     {
-        ErrorOr<IEnumerable<Directory>> result = _directoryService.GetSubdirectories(request.Path!, request.IncludeHiddenElements);
-        return ValueTask.FromResult(result.Match(values => ErrorOrFactory.From(values.ToResponses()), errors => errors));
+        ErrorOr<IEnumerable<Directory>> getSubdirectoriesResult = _directoryService.GetSubdirectories(request.Path!, request.IncludeHiddenElements);
+        return ValueTask.FromResult(getSubdirectoriesResult.Match(values => ErrorOrFactory.From(values.ToResponses()), errors => errors));
     }
 }

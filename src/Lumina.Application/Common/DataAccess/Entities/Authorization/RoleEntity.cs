@@ -12,7 +12,7 @@ namespace Lumina.Application.Common.DataAccess.Entities.Authorization;
 /// Repository entity for a permission in the authorization system.
 /// </summary>
 [DebuggerDisplay("RoleName: {RoleName}")]
-public class RoleEntity : IStorageEntity
+public class RoleEntity : IStorageEntity, IAuditableEntity
 {
     /// <summary>
     /// Gets the Id of the role.
@@ -22,12 +22,7 @@ public class RoleEntity : IStorageEntity
     /// <summary>
     /// Gets the name of the role.
     /// </summary>
-    public required AuthorizationRole RoleName { get; init; }
-
-    /// <summary>
-    /// Gets or sets the description of the role.
-    /// </summary>
-    public string? RoleDescription { get; set; }
+    public required string RoleName { get; init; }
 
     /// <summary>
     /// Gets or sets the collection of user roles associations that include this role.
@@ -42,12 +37,12 @@ public class RoleEntity : IStorageEntity
     /// <summary>
     /// Gets or sets the time and date when the entity was added.
     /// </summary>
-    public required DateTime CreatedOnUtc { get; set; }
+    public DateTime CreatedOnUtc { get; set; }
 
     /// <summary>
     /// Gets or sets the Id of the user that created the entity.
     /// </summary>
-    public required Guid CreatedBy { get; set; }
+    public Guid CreatedBy { get; set; }
 
     /// <summary>
     /// Gets or sets the optional time and date when the entity was updated.

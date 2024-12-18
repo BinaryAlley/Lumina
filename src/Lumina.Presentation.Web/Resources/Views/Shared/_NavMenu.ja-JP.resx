@@ -189,6 +189,9 @@
   <data name="Register" xml:space="preserve">
     <value>登録</value>
   </data>
+  <data name="ManagePermissions" xml:space="preserve">
+    <value>権限を管理する</value>
+  </data>
   <data name="Tools" xml:space="preserve">
     <value>ツール</value>
   </data>
@@ -200,5 +203,8 @@
   </data>
   <data name="WrittenContent" xml:space="preserve">
     <value>文字コンテンツ</value>
+  </data>
+  <data name="ManageRoles" xml:space="preserve">
+    <value>ロールを管理する</value>
   </data>
 </root>

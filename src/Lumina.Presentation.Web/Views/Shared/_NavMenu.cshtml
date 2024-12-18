@@ -1,8 +1,12 @@
+@using Lumina.Presentation.Web.Common.Authorization
+@using Lumina.Presentation.Web.Common.Enums.Authorization
 @using Lumina.Presentation.Web.Common.Services
 @using Microsoft.AspNetCore.Mvc.Localization
+@using System.Threading
 
 @inject IUrlService _urlService
 @inject IViewLocalizer _localizer
+@inject IAuthorizationService _auth
 
 <input type="checkbox" id="hamburger-input" class="burger-shower" />
 <label id="hamburger-menu" for="hamburger-input">
@@ -33,6 +37,16 @@
             </ul>
             @if (User?.Identity?.IsAuthenticated == true)
             {
+                @if (await _auth.IsInRoleAsync("Admin", CancellationToken.None))
+                {
+                    <div class="mobile-menu-heading">
+                        @_localizer["Administrator"]
+                    </div>
+                    <ul>
+                        <li><a href="@_urlService.GetAbsoluteUrl("ManageRoles", "Admin")" class="nav-link"><span>@_localizer["ManageRoles"]</span></a></li>
+                        <li><a href="@_urlService.GetAbsoluteUrl("ManagePermissions", "Admin")" class="nav-link"><span>@_localizer["ManagePermissions"]</span></a></li>
+                    </ul>
+                }
                 <div class="mobile-menu-heading">
                     @_localizer["Library"]
                 </div>
@@ -120,6 +134,18 @@
         </li>
         @if (User?.Identity?.IsAuthenticated == true)
         {
+            @if (await _auth.IsInRoleAsync("Admin", CancellationToken.None))
+            {
+
+                <li tabindex="0">
+                    <input type="radio" id="administrator-menu" name="menu">
+                    <label for="administrator-menu">@_localizer["Administrator"]</label>
+                    <ul>
+                        <li><a href="@_urlService.GetAbsoluteUrl("ManageRoles", "Admin")" class="nav-link">@_localizer["ManageRoles"]</a></li>
+                        <li><a href="@_urlService.GetAbsoluteUrl("ManagePermissions", "Admin")" class="nav-link">@_localizer["ManagePermissions"]</a></li>
+                    </ul>
+                </li>
+            }
             <li tabindex="0">
                 <input type="radio" id="library-menu" name="menu">
                 <label for="library-menu">@_localizer["Library"]</label>

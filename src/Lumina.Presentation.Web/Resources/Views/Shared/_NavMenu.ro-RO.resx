@@ -189,6 +189,9 @@
   <data name="Register" xml:space="preserve">
     <value>Înregistrare</value>
   </data>
+  <data name="ManagePermissions" xml:space="preserve">
+    <value>Gestionare permisiuni</value>
+  </data>
   <data name="Tools" xml:space="preserve">
     <value>Unelte</value>
   </data>
@@ -200,5 +203,8 @@
   </data>
   <data name="WrittenContent" xml:space="preserve">
     <value>Conținut Scris</value>
+  </data>
+  <data name="ManageRoles" xml:space="preserve">
+    <value>Gestionare roluri</value>
   </data>
 </root>

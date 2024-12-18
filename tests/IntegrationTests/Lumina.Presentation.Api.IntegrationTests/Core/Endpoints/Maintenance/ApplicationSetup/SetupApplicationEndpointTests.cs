@@ -188,7 +188,7 @@ public class SetupApplicationEndpointTests : IClassFixture<AuthenticatedLuminaAp
 
         // verify default roles
         List<RoleEntity> roles = await dbContext.Roles.ToListAsync();
-        RoleEntity? adminRole = roles.FirstOrDefault(r => r.RoleName == AuthorizationRole.Admin);
+        RoleEntity? adminRole = roles.FirstOrDefault(r => r.RoleName == "Admin");
         adminRole.Should().NotBeNull();
 
         // verify admin role permissions

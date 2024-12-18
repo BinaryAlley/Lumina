@@ -5,13 +5,9 @@ using System.Diagnostics;
 namespace Lumina.Contracts.DTO.MediaLibrary.Management;
 
 /// <summary>
-/// Repository entity for a media library content location.
+/// Data transfer object for a media library content location.
 /// </summary>
 [DebuggerDisplay("Path: {Path}")]
-public class LibraryContentLocationDto
-{
-    /// <summary>
-    /// Gets or sets the path of the media library content location.
-    /// </summary>
-    public required string Path { get; set; }
-}
+public record LibraryContentLocationDto(
+    string Path
+);

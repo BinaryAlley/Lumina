@@ -15,4 +15,4 @@ namespace Lumina.Application.Core.UsersManagement.Authorization.Queries.GetAutho
 [DebuggerDisplay("UserId: {UserId}")]
 public record GetAuthorizationQuery(
     Guid? UserId
-) : IRequest<ErrorOr<GetAuthorizationResponse>>;
+) : IRequest<ErrorOr<AuthorizationResponse>>;

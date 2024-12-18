@@ -62,11 +62,11 @@ public class AddLibraryCommandHandler : IRequestHandler<AddLibraryCommand, Error
             return insertLibraryResult.Errors;
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         // retrieve the newly saved media library from the persistence medium and return it
-        ErrorOr<LibraryEntity?> retrievedLibraryResult = await libraryRepository.GetByIdAsync(createLibraryResult.Value.Id.Value, cancellationToken).ConfigureAwait(false);
-        if (retrievedLibraryResult.IsError)
-            return retrievedLibraryResult.Errors;
-        if (retrievedLibraryResult.Value is null)
+        ErrorOr<LibraryEntity?> getLibraryResult = await libraryRepository.GetByIdAsync(createLibraryResult.Value.Id.Value, cancellationToken).ConfigureAwait(false);
+        if (getLibraryResult.IsError)
+            return getLibraryResult.Errors;
+        if (getLibraryResult.Value is null)
             return Errors.Persistence.ErrorPersistingMediaLibrary;
-        return retrievedLibraryResult.Value.ToResponse();
+        return getLibraryResult.Value.ToResponse();
     }
 }

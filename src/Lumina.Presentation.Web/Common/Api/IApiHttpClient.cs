@@ -39,13 +39,11 @@ public interface IApiHttpClient
     Task<BlobDataModel> GetBlobAsync(string endpoint, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Sends a DELETE request to the specified <paramref name="endpoint"/> as an asynchronous operation and returns the result.
+    /// Sends a DELETE request to the specified <paramref name="endpoint"/> as an asynchronous operation.
     /// </summary>
-    /// <typeparam name="TResponse">The expected type of the response content.</typeparam>
     /// <param name="endpoint">The API endpoint where the request is being sent.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>The deserialized response containing the result of the DELETE request.</returns>
-    Task<TResponse> DeleteAsync<TResponse>(string endpoint, CancellationToken cancellationToken = default);
+    Task DeleteAsync(string endpoint, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Sends a PUT request to the specified <paramref name="endpoint"/> as an asynchronous operation and returns the result.

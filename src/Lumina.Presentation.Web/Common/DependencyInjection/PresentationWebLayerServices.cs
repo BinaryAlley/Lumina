@@ -4,7 +4,6 @@ using Lumina.Presentation.Web.Common.Api;
 using Lumina.Presentation.Web.Common.Authorization;
 using Lumina.Presentation.Web.Common.Exceptions;
 using Lumina.Presentation.Web.Common.Filters.AuthorizationFilters;
-using Lumina.Presentation.Web.Common.Filters.ExceptionFilters;
 using Lumina.Presentation.Web.Common.MiddlewareFilters;
 using Lumina.Presentation.Web.Common.Models.Authorization;
 using Lumina.Presentation.Web.Common.Security;
@@ -49,7 +48,7 @@ public static class PresentationWebLayerServices
     {
         services.AddControllersWithViews(mvcOptions =>
         {
-            mvcOptions.Filters.Add<ApiExceptionFilter>();
+            //mvcOptions.Filters.Add<ApiExceptionFilter>();
             mvcOptions.Filters.Add(new MiddlewareFilterAttribute(typeof(LocalizationPipeline))); // add localization middleware filter
         })
         .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
@@ -216,7 +215,6 @@ public static class PresentationWebLayerServices
         // enable access to the current HTTP context in non-controller classes
         services.AddHttpContextAccessor();
 
-        services.AddScoped<ApiExceptionFilter>();
         services.AddScoped<IAuthorizationHandler, InitializationHandler>();
         services.AddScoped<Authorization.IAuthorizationService, AuthorizationService>();
         services.AddSingleton<ICryptographyService, CryptographyService>();

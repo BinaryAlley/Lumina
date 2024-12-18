@@ -52,7 +52,7 @@ public class GetAuthorizationEndpointTests : IClassFixture<AuthenticatedLuminaAp
             { 
                 new JsonStringEnumConverter(JsonNamingPolicy.CamelCase), 
                 new ReadOnlySetConverter<AuthorizationPermission>(),
-                new ReadOnlySetConverter<AuthorizationRole>()
+                new ReadOnlySetConverter<string>()
             }
         };
     }
@@ -89,11 +89,11 @@ public class GetAuthorizationEndpointTests : IClassFixture<AuthenticatedLuminaAp
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         string content = await response.Content.ReadAsStringAsync();
-        GetAuthorizationResponse? result = JsonSerializer.Deserialize<GetAuthorizationResponse>(content, _jsonOptions);
+        AuthorizationResponse? result = JsonSerializer.Deserialize<AuthorizationResponse>(content, _jsonOptions);
 
         result.Should().NotBeNull();
         result!.UserId.Should().Be(user.Id);
-        result.Roles.Should().Contain(AuthorizationRole.Admin);
+        result.Roles.Should().Contain("Admin");
         result.Permissions.Should().Contain(AuthorizationPermission.CanViewUsers);
     }
 
@@ -169,7 +169,7 @@ public class GetAuthorizationEndpointTests : IClassFixture<AuthenticatedLuminaAp
         RoleEntity adminRole = new()
         {
             Id = Guid.NewGuid(),
-            RoleName = AuthorizationRole.Admin,
+            RoleName = "Admin",
             CreatedOnUtc = DateTime.UtcNow,
             CreatedBy = Guid.NewGuid()
         };

@@ -36,7 +36,7 @@ public class CombinePathCommandHandler : IRequestHandler<CombinePathCommand, Err
     /// </returns>
     public ValueTask<ErrorOr<PathSegmentResponse>> Handle(CombinePathCommand request, CancellationToken cancellationToken)
     {
-        ErrorOr<string> result = _pathService.CombinePath(request.OriginalPath!, request.NewPath!);
-        return ValueTask.FromResult(result.Match(values => ErrorOrFactory.From(new PathSegmentResponse(result.Value)), errors => errors));
+        ErrorOr<string> combinePathResult = _pathService.CombinePath(request.OriginalPath!, request.NewPath!);
+        return ValueTask.FromResult(combinePathResult.Match(values => ErrorOrFactory.From(new PathSegmentResponse(combinePathResult.Value)), errors => errors));
     }
 }

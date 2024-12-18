@@ -4,8 +4,8 @@ using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Repositories.Authorization;
 using Lumina.Application.Common.Errors;
 using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Enums.Authorization;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -37,7 +37,7 @@ internal sealed class RoleRepository : IRoleRepository
     /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successfull operation, or an error.</returns>
     public async Task<ErrorOr<Created>> InsertAsync(RoleEntity role, CancellationToken cancellationToken)
     {
-        bool roleExists = await _luminaDbContext.Roles.AnyAsync(repositoryRole => repositoryRole.Id == role.Id, cancellationToken).ConfigureAwait(false);
+        bool roleExists = await _luminaDbContext.Roles.AnyAsync(repositoryRole => repositoryRole.Id == role.Id || repositoryRole.RoleName == role.RoleName, cancellationToken).ConfigureAwait(false);
         if (roleExists)
             return Errors.Authorization.RoleAlreadyExists;
 
@@ -61,12 +61,69 @@ internal sealed class RoleRepository : IRoleRepository
     /// <param name="roleType">The type of role to get.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a <see cref="RoleEntity"/> if found, or an error.</returns>
-    public async Task<ErrorOr<RoleEntity?>> GetByNameAsync(AuthorizationRole roleType, CancellationToken cancellationToken)
+    public async Task<ErrorOr<RoleEntity?>> GetByNameAsync(string roleType, CancellationToken cancellationToken)
     {
         return await _luminaDbContext.Roles
             .Include(role => role.RolePermissions)
             .ThenInclude(library => library.Permission)
             .FirstOrDefaultAsync(role => role.RoleName == roleType, cancellationToken)
             .ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Gets a <see cref="RoleEntity"/> identified by <paramref name="id"/> from the storage medium.
+    /// </summary>
+    /// <param name="id">The id of the authorization role to get.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a <see cref="RoleEntity"/> identified by <paramref name="id"/>, or an error.</returns>
+    public async Task<ErrorOr<RoleEntity?>> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        return await _luminaDbContext.Roles
+           .Include(role => role.RolePermissions)
+           .ThenInclude(rolePermission => rolePermission.Permission)
+           .FirstOrDefaultAsync(role => role.Id == id, cancellationToken)
+           .ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Updates a role.
+    /// </summary>
+    /// <param name="data">The role to update.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successfull operation, or an error.</returns>
+    public async Task<ErrorOr<Updated>> UpdateAsync(RoleEntity data, CancellationToken cancellationToken)
+    {
+        // check if a role with the requested Id exists, and retrieve it
+        RoleEntity? foundRole = await _luminaDbContext.Roles
+            .Include(role => role.RolePermissions)
+            .ThenInclude(rolePermission => rolePermission.Permission)
+            .FirstOrDefaultAsync(role => role.Id == data.Id, cancellationToken).ConfigureAwait(false);
+        if (foundRole is null)
+            return Errors.Authorization.RoleNotFound;
+        // update scalar properties
+        _luminaDbContext.Entry(foundRole).CurrentValues.SetValues(data);
+        // update owned entities (their changes are not automatically tracked by EF)
+        foundRole.RolePermissions.Clear();
+        foreach (RolePermissionEntity rolePermission in data.RolePermissions)
+            foundRole.RolePermissions.Add(rolePermission);
+        return Result.Updated;
+    }
+
+    /// <summary>
+    /// Deletes a role identified by <paramref name="id"/> from the storage medium.
+    /// </summary>
+    /// <param name="id">The id of the role to be deleted.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successfull operation, or an error.</returns>
+    public async Task<ErrorOr<Deleted>> DeleteByIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        // check if a role with the requested Id exists, and retrieve it
+        RoleEntity? foundRole = await _luminaDbContext.Roles
+            .FirstOrDefaultAsync(role => role.Id == id, cancellationToken).ConfigureAwait(false);
+        if (foundRole is null)
+            return Errors.Authorization.RoleNotFound;
+        // then, remove it
+        _luminaDbContext.Remove(foundRole);
+        return Result.Deleted;
     }
 }

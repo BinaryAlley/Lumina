@@ -65,10 +65,10 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, E
     {
         // check if any users already exists (admin account is only set once!)
         IUserRepository userRepository = _unitOfWork.GetRepository<IUserRepository>();
-        ErrorOr<UserEntity?> resultSelectUser = await userRepository.GetByUsernameAsync(request.Username!, cancellationToken).ConfigureAwait(false);
-        if (resultSelectUser.IsError)
-            return resultSelectUser.Errors;
-        else if (resultSelectUser.Value is not null)
+        ErrorOr<UserEntity?> getUserRResult = await userRepository.GetByUsernameAsync(request.Username!, cancellationToken).ConfigureAwait(false);
+        if (getUserRResult.IsError)
+            return getUserRResult.Errors;
+        else if (getUserRResult.Value is not null)
             return Errors.Authentication.UsernameAlreadyExists;
         string? totpSecret = null;
         Guid id = Guid.NewGuid();
@@ -94,9 +94,9 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, E
             user.TotpSecret = _cryptographyService.Encrypt(Convert.ToBase64String(secret));
         }
         // insert the user
-        ErrorOr<Created> resultInsertUser = await userRepository.InsertAsync(user, cancellationToken).ConfigureAwait(false);
-        if (resultInsertUser.IsError)
-            return resultInsertUser.Errors;
+        ErrorOr<Created> insertUserResult = await userRepository.InsertAsync(user, cancellationToken).ConfigureAwait(false);
+        if (insertUserResult.IsError)
+            return insertUserResult.Errors;
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         // TODO: insert the default admin profile preferences when they are implemented
         // if 2FA was enabled, the TOTP secret needs to be delivered to the client unhashed, so it can be displayed 
