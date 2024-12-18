@@ -132,6 +132,9 @@
   <data name="DeleteRole" xml:space="preserve">
     <value>删除角色</value>
   </data>
+  <data name="DeleteRoleConfirm" xml:space="preserve">
+    <value>您确定要删除选定的角色吗？</value>
+  </data>
   <data name="RoleCreated" xml:space="preserve">
     <value>角色已创建！</value>
   </data>

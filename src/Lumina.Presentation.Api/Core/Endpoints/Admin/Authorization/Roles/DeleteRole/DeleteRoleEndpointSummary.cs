@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Contracts.DTO.Authentication;
 using Lumina.Contracts.Requests.Authorization;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.Domain.Common.Enums.Authorization;
@@ -9,44 +8,29 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Admin.Authorization.Roles.UpdateRole;
+namespace Lumina.Presentation.Api.Core.Endpoints.Admin.Authorization.Roles.DeleteRole;
 
 /// <summary>
-/// Class used for providing a textual description for the <see cref="UpdateRoleEndpoint"/> API endpoint, for OpenAPI.
+/// Class used for providing a textual description for the <see cref="DeleteRoleEndpoint"/> API endpoint, for OpenAPI.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class UpdateRoleEndpointSummary : Summary<UpdateRoleEndpoint, UpdateRoleRequest>
+public class DeleteRoleEndpointSummary : Summary<DeleteRoleEndpoint, DeleteRoleRequest>
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="UpdateRoleEndpointSummary"/> class.
+    /// Initializes a new instance of the <see cref="DeleteRoleEndpointSummary"/> class.
     /// </summary>
-    public UpdateRoleEndpointSummary()
+    public DeleteRoleEndpointSummary()
     {
-        Summary = "Updates an existing authorization role.";
-        Description = "Updates an existing authorization role and returns its details.";
+        Summary = "Deletes an authorization role.";
+        Description = "Deletes an of authorization role and its associated permissions.";
 
-        ExampleRequest = new UpdateRoleRequest(
-            RoleId: Guid.NewGuid(),
-            RoleName: "Editor",
-            Permissions: [
-                Guid.NewGuid(),
-                Guid.NewGuid(),
-            ]
+        ExampleRequest = new DeleteRoleRequest(
+            RoleId: Guid.NewGuid()
         );
 
         RequestParam(r => r.RoleId, "The Id of the role. Required.");
-        RequestParam(r => r.RoleName, "The name of the role. Required.");
-        RequestParam(r => r.Permissions, "The collection or permissions of the role. Required.");
 
-        ResponseParam<RolePermissionsResponse>(r => r.Role, "The authorization role entity.");
-        ResponseParam<RolePermissionsResponse>(r => r.Permissions, "The list of permissions of the role entity.");
-
-
-        Response(200, "The authorization role was successfully updated.", example:
-            new RolePermissionsResponse(
-                Role: new RoleDto(Id: Guid.NewGuid(), "Editor"),
-                Permissions: [new PermissionDto(Guid.NewGuid(), AuthorizationPermission.CanDeleteUsers), new PermissionDto(Guid.NewGuid(), AuthorizationPermission.CanViewUsers)]
-            ));
+        Response(204, "The authorization role was successfully deleted.");
 
         Response(401, "Authentication required.", "application/problem+json",
             example: new[]
@@ -78,15 +62,27 @@ public class UpdateRoleEndpointSummary : Summary<UpdateRoleEndpoint, UpdateRoleR
             }
         );
 
-        Response(403, "The request failed because the current user is not an Admin.", "application/problem+json",
-            example: new
+        Response(403, "The request failed because the Admin role cannot be deleted, or current user is not an Admin.", "application/problem+json",
+            example: new[]
             {
-                type = "https://tools.ietf.org/html/rfc9110#section-15.5.4",
-                title = "General.Failure",
-                status = 403,
-                detail = "NotAuthorized",
-                instance = "/api/v1/roles",
-                traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.4",
+                    title = "General.Failure",
+                    status = 403,
+                    detail = "AdminRoleCannotBeDeleted",
+                    instance = "/api/v1/roles",
+                    traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.4",
+                    title = "General.Failure",
+                    status = 403,
+                    detail = "NotAuthorized",
+                    instance = "/api/v1/roles",
+                    traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
+                }
             }
         );
 
@@ -115,12 +111,7 @@ public class UpdateRoleEndpointSummary : Summary<UpdateRoleEndpoint, UpdateRoleR
                     {
                         "General.Validation", new[]
                         {
-                            "RoleIdCannotBeEmpty",
-                            "RoleNameCannotBeNull",
-                            "RoleNameCannotBeEmpty",
-                            "PermissionsListCannotBeNull",
-                            "PermissionsListCannotBeEmpty",
-                            "PermissionIdCannotBeEmpty"
+                            "RoleIdCannotBeEmpty"
                         }
                     }
                 },

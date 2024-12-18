@@ -132,6 +132,9 @@
   <data name="DeleteRole" xml:space="preserve">
     <value>Ștergere rol</value>
   </data>
+  <data name="DeleteRoleConfirm" xml:space="preserve">
+    <value>Sunteți sigur că doriți să ștergeți rolul selectat?</value>
+  </data>
   <data name="RoleCreated" xml:space="preserve">
     <value>Rolul a fost creat!</value>
   </data>

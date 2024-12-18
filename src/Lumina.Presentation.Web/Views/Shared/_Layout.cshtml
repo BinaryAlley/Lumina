@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="~/css/file-system-tree-view-node.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/navigation-menu.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/notification.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/dialog.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/textbox.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Lumina.Presentation.Web.styles.css" asp-append-version="true" />
 </head>
@@ -51,8 +52,25 @@
         var jsLocalizedMessages = {
             navigationFailed: '@_localizer["NavigationFailed"]',
         };
+        var jsLocalizedDialogs = {
+            // button texts
+            ok: '@_localizer["Ok"]',
+            cancel: '@_localizer["Cancel"]',
+            yes: '@_localizer["Yes"]',
+            no: '@_localizer["No"]',
+            retry: '@_localizer["Retry"]',
+            abort: '@_localizer["Abort"]',
+            ignore: '@_localizer["Ignore"]',
+            // default titles
+            confirmation: '@_localizer["Confirmation"]',
+            warning: '@_localizer["Warning"]',
+            error: '@_localizer["Error"]',
+            information: '@_localizer["Information"]'
+        };
+
     </script>
     <script defer src="~/js/notifications.js" asp-append-version="true"></script>
+    <script defer src="~/js/dialogs.js" asp-append-version="true"></script>
     <script defer src="~/js/site.js" asp-append-version="true"></script>
     <div data-section="scripts">
         @await RenderSectionAsync("Scripts", required: false)

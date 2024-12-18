@@ -62,7 +62,8 @@ public class DeleteRoleCommandHandler : IRequestHandler<DeleteRoleCommand, Error
             return getExistingRoleResult.Errors;
         else if (getExistingRoleResult.Value is null)
             return Errors.Authorization.RoleNotFound;
-
+        else if (getExistingRoleResult.Value.RoleName == "Admin")
+            return Errors.Authorization.AdminRoleCannotBeDeleted;
         // delete the role and its permissions
         ErrorOr<Deleted> deleteRoleResult = await roleRepository.DeleteByIdAsync(request.RoleId, cancellationToken).ConfigureAwait(false);
         if (deleteRoleResult.IsError)

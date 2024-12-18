@@ -120,6 +120,9 @@
   <data name="AdminAccountAlreadyCreated" xml:space="preserve">
     <value>Contul de administrator a fost deja creat!</value>
   </data>
+  <data name="AdminRoleCannotBeDeleted" xml:space="preserve">
+    <value>Rolul de administrator nu poate fi șters!</value>
+  </data>
   <data name="Application theme cannot be empty!" xml:space="preserve">
     <value>Tema aplicației nu poate fi goală!</value>
   </data>

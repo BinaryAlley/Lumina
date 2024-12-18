@@ -117,13 +117,46 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Abort" xml:space="preserve">
+    <value>Прервать</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Отмена</value>
+  </data>
+  <data name="Confirmation" xml:space="preserve">
+    <value>Подтверждение</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Ошибка</value>
+  </data>
+  <data name="Ignore" xml:space="preserve">
+    <value>Игнорировать</value>
+  </data>
+  <data name="Information" xml:space="preserve">
+    <value>Информация</value>
+  </data>
   <data name="NavigationFailed" xml:space="preserve">
     <value>Навигация не удалась!</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>Нет</value>
+  </data>
+  <data name="Ok" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Retry" xml:space="preserve">
+    <value>Повторить</value>
   </data>
   <data name="ToggleFullHeight" xml:space="preserve">
     <value>Переключить Полную Высоту</value>
   </data>
   <data name="ToggleVisibility" xml:space="preserve">
     <value>Переключить Видимость</value>
+  </data>
+  <data name="Warning" xml:space="preserve">
+    <value>Предупреждение</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>Да</value>
   </data>
 </root>

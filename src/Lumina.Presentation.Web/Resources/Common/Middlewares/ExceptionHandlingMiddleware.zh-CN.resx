@@ -120,6 +120,9 @@
   <data name="AdminAccountAlreadyCreated" xml:space="preserve">
     <value>管理员账号已创建！</value>
   </data>
+  <data name="AdminRoleCannotBeDeleted" xml:space="preserve">
+    <value>管理员角色无法删除！</value>
+  </data>
   <data name="Application theme cannot be empty!" xml:space="preserve">
     <value>应用主题不能为空！</value>
   </data>
@@ -437,6 +440,9 @@
   </data>
   <data name="ReReleaseYearMustBeBetween1And9999" xml:space="preserve">
     <value>重发行年份必须在1到9999之间！</value>
+  </data>
+  <data name="RoleAlreadyExists" xml:space="preserve">
+    <value>角色已存在！</value>
   </data>
   <data name="RoleCategoryCannotBeEmpty" xml:space="preserve">
     <value>角色类别不能为空！</value>

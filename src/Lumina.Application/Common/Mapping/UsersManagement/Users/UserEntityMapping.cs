@@ -1,6 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Contracts.Responses.UsersManagement.Users;
+using System.Collections.Generic;
+using System.Linq;
 #endregion
 
 namespace Lumina.Application.Common.Mapping.UsersManagement.Users;
@@ -23,5 +25,15 @@ public static class UserEntityMapping
             repositoryEntity.CreatedOnUtc,
             repositoryEntity.UpdatedOnUtc
         );
+    }
+
+    /// <summary>
+    /// Converts <paramref name="repositoryEntities"/> to a collection of <see cref="UserResponse"/>.
+    /// </summary>
+    /// <param name="repositoryEntities">The repository entities to be converted.</param>
+    /// <returns>The converted responses.</returns>
+    public static IEnumerable<UserResponse> ToResponses(this IEnumerable<UserEntity> repositoryEntities)
+    {
+        return repositoryEntities.Select(role => role.ToResponse());
     }
 }
