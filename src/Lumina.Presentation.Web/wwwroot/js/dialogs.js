@@ -97,10 +97,10 @@ class DialogService {
     }
 
     /**
- * Creates and displays a dialog element in the DOM.
- * @private
- * @param {Object} dialog - The dialog configuration object.
- */
+     * Creates and displays a dialog element in the DOM.
+     * @private
+     * @param {Object} dialog - The dialog configuration object.
+     */
     displayDialog(dialog) {
         const modalBackground = document.getElementById('modal-background-article');
         modalBackground.style.display = 'block';
@@ -126,19 +126,41 @@ class DialogService {
                 </div>
             </div>
         `;
+        // add a resize observer to handle content height
+        const resizeObserver = new ResizeObserver(() => {
+            const modalHeight = modalBackground.clientHeight;
+            const dialogContent = dialogElement.querySelector('.dialog-content');
+            dialogContent.style.maxHeight = `${modalHeight - 50}px`;
+            dialogContent.style.overflowY = 'auto';
+        });
+
+        resizeObserver.observe(modalBackground);
+
+        // cleanup observer when dialog is closed
+        const cleanup = () => {
+            resizeObserver.disconnect();
+            document.removeEventListener('keydown', keyHandler);
+        };
 
         // add click handlers for buttons
         const buttons = dialogElement.querySelectorAll('.dialog-button');
         buttons.forEach(button => {
-            button.addEventListener('click', () => this.handleButtonClick(button.dataset.button));
+            button.addEventListener('click', () => {
+                cleanup();
+                this.handleButtonClick(button.dataset.button);
+            });
         });
 
         // add keyboard support
         const keyHandler = (e) => {
-            if (e.key === 'Escape' && dialog.buttons.includes(DialogButton.CANCEL)) 
+            if (e.key === 'Escape' && dialog.buttons.includes(DialogButton.CANCEL)) {
+                cleanup();
                 this.handleButtonClick(DialogButton.CANCEL);
-            if (e.key === 'Enter' && dialog.buttons.includes(DialogButton.OK)) 
+            }
+            if (e.key === 'Enter' && dialog.buttons.includes(DialogButton.OK)) {
+                cleanup();
                 this.handleButtonClick(DialogButton.OK);
+            }
         };
         document.addEventListener('keydown', keyHandler);
 

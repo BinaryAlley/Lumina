@@ -40,6 +40,10 @@ Several icons used in this project were adapted from icons sourced from [svgrepo
 - [`toggle-hidden.svg`](https://www.svgrepo.com/svg/470389/hidden) (MIT License)
 - [`delete.svg`](https://www.svgrepo.com/svg/488148/delete) (MIT License)
 - [`add-directory.svg`](https://www.svgrepo.com/svg/488040/add-folder) (MIT License)
+- [`information.svg`](https://www.svgrepo.com/svg/403685/information) (MIT License)
+- [`question.svg`](https://www.svgrepo.com/svg/486470/question-filled) (MIT License)
+- [`warning.svg`](https://www.svgrepo.com/svg/454067/warning) (MIT License)
+- [`error.svg`](https://www.svgrepo.com/svg/486408/error-filled) (MIT License)
 
 ## License
 
