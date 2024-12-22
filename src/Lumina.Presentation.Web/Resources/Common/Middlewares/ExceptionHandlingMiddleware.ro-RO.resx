@@ -141,6 +141,9 @@
   <data name="CannotNavigateUp" xml:space="preserve">
     <value>Nu se poate naviga în sus!</value>
   </data>
+  <data name="CannotRemoveLastAdmin" xml:space="preserve">
+    <value>Nu se poate elimina ultimul rol de Admin atribuit unui utilizator!</value>
+  </data>
   <data name="CodecCannotBeEmpty" xml:space="preserve">
     <value>Codecul nu poate fi gol!</value>
   </data>
@@ -515,6 +518,9 @@
   </data>
   <data name="UserIdCannotBeEmpty" xml:space="preserve">
     <value>ID-ul utilizatorului nu poate fi gol!</value>
+  </data>
+  <data name="UserMustHaveRoleOrDirectPermissions" xml:space="preserve">
+    <value>Utilizatorul trebuie să aibă permisiuni din rol sau permisiuni directe!</value>
   </data>
   <data name="UsernameAlreadyExists" xml:space="preserve">
     <value>Numele de utilizator există deja!</value>

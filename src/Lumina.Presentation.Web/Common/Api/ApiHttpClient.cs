@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
@@ -206,7 +207,12 @@ public class ApiHttpClient : IApiHttpClient
         string content = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
         // if the response is successful, deserialize the content to TResponse and return it
         if (response.IsSuccessStatusCode)
+        {
+            // handle empty content case
+            if (string.IsNullOrEmpty(content))
+                return default!;
             return JsonSerializer.Deserialize<TResponse>(content, _jsonOptions)!;
+        }
         else
         {
             ProblemDetailsModel? problemDetails = null;

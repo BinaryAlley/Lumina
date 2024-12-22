@@ -48,7 +48,7 @@ public class GetAuthorizationEndpointTests
         CancellationToken cancellationToken = CancellationToken.None;
         AuthorizationResponse expectedResponse = new(
             request.UserId!.Value,
-            new HashSet<string> { "Admin" },
+            "Admin",
             new HashSet<AuthorizationPermission> { AuthorizationPermission.CanViewUsers });
 
         _mockSender.Send(Arg.Any<GetAuthorizationQuery>(), Arg.Any<CancellationToken>())
@@ -99,7 +99,7 @@ public class GetAuthorizationEndpointTests
         _mockSender.Send(Arg.Any<GetAuthorizationQuery>(), Arg.Any<CancellationToken>())
             .Returns(ErrorOrFactory.From(new AuthorizationResponse(
                 request.UserId!.Value,
-                new HashSet<string>().ToHashSet(),
+                string.Empty,
                 new HashSet<AuthorizationPermission>().ToHashSet()
             )));
 
@@ -130,7 +130,7 @@ public class GetAuthorizationEndpointTests
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
                 return ErrorOrFactory.From(new AuthorizationResponse(
                     request.UserId!.Value,
-                    new HashSet<string>().ToHashSet(),
+                    string.Empty,
                     new HashSet<AuthorizationPermission>().ToHashSet()
                 ));
             }, callInfo.Arg<CancellationToken>())));

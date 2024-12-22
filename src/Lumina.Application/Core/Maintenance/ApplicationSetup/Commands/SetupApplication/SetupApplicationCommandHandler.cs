@@ -87,8 +87,8 @@ public class SetupApplicationCommandHandler : IRequestHandler<SetupApplicationCo
             Password = Uri.EscapeDataString(_hashService.HashString(request.Password!)),
             CreatedOnUtc = _dateTimeProvider.UtcNow,
             Libraries = [],
-            UserPermissions = [], 
-            UserRoles = [],
+            UserPermissions = [],
+            UserRole = null,
             CreatedBy = id
         };
         // if the user enabled two factor auth, include a QR with the totp secret

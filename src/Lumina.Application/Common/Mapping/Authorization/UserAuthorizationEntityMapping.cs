@@ -19,7 +19,7 @@ public static class UserAuthorizationEntityMapping
     {
         return new AuthorizationResponse(
             repositoryEntity.UserId,
-            repositoryEntity.Roles,
+            repositoryEntity.Role,
             repositoryEntity.Permissions
         );
     }

@@ -24,7 +24,7 @@ public class UserAuthorizationEntityMappingTests
         UserAuthorizationEntity entity = new()
         {
             UserId = Guid.NewGuid(),
-            Roles = new HashSet<string> { "Admin" },
+            Role = "Admin",
             Permissions = new HashSet<AuthorizationPermission> { AuthorizationPermission.CanViewUsers }
         };
 
@@ -34,7 +34,7 @@ public class UserAuthorizationEntityMappingTests
         // Assert
         result.Should().NotBeNull();
         result.UserId.Should().Be(entity.UserId);
-        result.Roles.Should().BeEquivalentTo(entity.Roles);
+        result.Role.Should().BeEquivalentTo(entity.Role);
         result.Permissions.Should().BeEquivalentTo(entity.Permissions);
     }
 
@@ -45,7 +45,7 @@ public class UserAuthorizationEntityMappingTests
         UserAuthorizationEntity entity = new()
         {
             UserId = Guid.NewGuid(),
-            Roles = new HashSet<string>(),
+            Role = string.Empty,
             Permissions = new HashSet<AuthorizationPermission>()
         };
 
@@ -55,7 +55,7 @@ public class UserAuthorizationEntityMappingTests
         // Assert
         result.Should().NotBeNull();
         result.UserId.Should().Be(entity.UserId);
-        result.Roles.Should().BeEmpty();
+        result.Role.Should().BeEmpty();
         result.Permissions.Should().BeEmpty();
     }
 
@@ -66,10 +66,7 @@ public class UserAuthorizationEntityMappingTests
         UserAuthorizationEntity entity = new()
         {
             UserId = Guid.NewGuid(),
-            Roles = new HashSet<string>
-            {
-                "Admin"
-            },
+            Role = "Admin",
             Permissions = new HashSet<AuthorizationPermission>
             {
                 AuthorizationPermission.CanViewUsers,
@@ -84,7 +81,7 @@ public class UserAuthorizationEntityMappingTests
         // Assert
         result.Should().NotBeNull();
         result.UserId.Should().Be(entity.UserId);
-        result.Roles.Should().BeEquivalentTo(entity.Roles);
+        result.Role.Should().BeEquivalentTo(entity.Role);
         result.Permissions.Should().BeEquivalentTo(entity.Permissions);
     }
 
@@ -98,7 +95,7 @@ public class UserAuthorizationEntityMappingTests
         UserAuthorizationEntity entity = new()
         {
             UserId = Guid.Parse(userIdString),
-            Roles = new HashSet<string> { "Admin" },
+            Role = "Admin",
             Permissions = new HashSet<AuthorizationPermission> { AuthorizationPermission.CanViewUsers }
         };
 
@@ -108,7 +105,7 @@ public class UserAuthorizationEntityMappingTests
         // Assert
         result.Should().NotBeNull();
         result.UserId.Should().Be(entity.UserId);
-        result.Roles.Should().BeEquivalentTo(entity.Roles);
+        result.Role.Should().BeEquivalentTo(entity.Role);
         result.Permissions.Should().BeEquivalentTo(entity.Permissions);
     }
 }

@@ -19,9 +19,9 @@ public class UserAuthorizationEntity
     public required Guid UserId { get; init; }
 
     /// <summary>
-    /// Gets the collection of roles associated to the user.
+    /// Gets the role associated to the user.
     /// </summary>
-    public required IReadOnlySet<string> Roles { get; init; }
+    public required string? Role { get; init; }
 
     /// <summary>
     /// Gets the collection of permissions associated to the user.

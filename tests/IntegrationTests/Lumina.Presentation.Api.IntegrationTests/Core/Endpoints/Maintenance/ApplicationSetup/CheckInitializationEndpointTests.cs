@@ -120,7 +120,7 @@ public class CheckInitializationEndpointTests : IClassFixture<AuthenticatedLumin
             Password = new HashService().HashString("TestPass123!"),
             Libraries = [],
             UserPermissions = [],
-            UserRoles = [],
+            UserRole = null,
             CreatedBy = Guid.NewGuid(),
             CreatedOnUtc = DateTime.UtcNow
         };

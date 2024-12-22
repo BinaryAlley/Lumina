@@ -10,7 +10,7 @@ namespace Lumina.Presentation.Web.Common.Models.Authorization;
 /// </summary>
 /// <param name="RoleId">The Id of the role.</param>
 /// <param name="RoleName">The name of the role.</param>
-/// <param name="Permissions">The collection or permissions of the role.</param>
+/// <param name="Permissions">The collection of Ids of the permissions of the role.</param>
 public record UpdateRoleRequestModel(
     Guid RoleId,
     string? RoleName,

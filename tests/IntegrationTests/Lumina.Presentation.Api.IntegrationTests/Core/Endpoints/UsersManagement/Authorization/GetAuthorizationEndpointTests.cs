@@ -73,7 +73,7 @@ public class GetAuthorizationEndpointTests : IClassFixture<AuthenticatedLuminaAp
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
 
         UserEntity user = await dbContext.Users
-            .Include(user => user.UserRoles)
+            .Include(user => user.UserRole)
                 .ThenInclude(userRole => userRole.Role)
             .Include(user => user.UserPermissions)
                 .ThenInclude(userPermission => userPermission.Permission)
@@ -93,7 +93,7 @@ public class GetAuthorizationEndpointTests : IClassFixture<AuthenticatedLuminaAp
 
         result.Should().NotBeNull();
         result!.UserId.Should().Be(user.Id);
-        result.Roles.Should().Contain("Admin");
+        result.Role.Should().Contain("Admin");
         result.Permissions.Should().Contain(AuthorizationPermission.CanViewUsers);
     }
 
@@ -164,8 +164,9 @@ public class GetAuthorizationEndpointTests : IClassFixture<AuthenticatedLuminaAp
         await act.Should().ThrowAsync<TaskCanceledException>();
     }
 
-    private static async Task<UserEntity> AddRolesAndPermissionsToUser(UserEntity user, LuminaDbContext dbContext)
+    private static async Task<UserEntity> AddRolesAndPermissionsToUser(UserEntity existingUser, LuminaDbContext dbContext)
     {
+        // create and save role and permission first
         RoleEntity adminRole = new()
         {
             Id = Guid.NewGuid(),
@@ -182,6 +183,11 @@ public class GetAuthorizationEndpointTests : IClassFixture<AuthenticatedLuminaAp
             CreatedBy = Guid.NewGuid()
         };
 
+        await dbContext.Roles.AddAsync(adminRole);
+        await dbContext.Permissions.AddAsync(viewUsersPermission);
+        await dbContext.SaveChangesAsync();
+
+        // create role permission
         RolePermissionEntity rolePermission = new()
         {
             Id = Guid.NewGuid(),
@@ -189,30 +195,36 @@ public class GetAuthorizationEndpointTests : IClassFixture<AuthenticatedLuminaAp
             PermissionId = viewUsersPermission.Id,
             Role = adminRole,
             RoleId = adminRole.Id,
-            CreatedBy = user.Id,
+            CreatedBy = existingUser.Id,
             CreatedOnUtc = DateTime.UtcNow
         };
+        await dbContext.RolePermissions.AddAsync(rolePermission);
+        await dbContext.SaveChangesAsync();
 
+        // remove existing user role if any
+        if (existingUser.UserRole != null)
+            dbContext.UserRoles.Remove(existingUser.UserRole);
+
+        // add new user role
         UserRoleEntity userRole = new()
         {
             Id = Guid.NewGuid(),
-            UserId = user.Id,
-            User = user,
-            RoleId = adminRole.Id,
+            User = existingUser,
+            UserId = existingUser.Id,
             Role = adminRole,
+            RoleId = adminRole.Id,
             CreatedOnUtc = DateTime.UtcNow,
             CreatedBy = Guid.NewGuid()
         };
-
-
-        dbContext.Roles.Add(adminRole);
-        dbContext.Permissions.Add(viewUsersPermission);
-        dbContext.RolePermissions.Add(rolePermission);
-        user.UserRoles.Add(userRole);
+        await dbContext.UserRoles.AddAsync(userRole);
         await dbContext.SaveChangesAsync();
 
-        return user;
+        // refresh the user entity
+        await dbContext.Entry(existingUser).ReloadAsync();
+
+        return existingUser;
     }
+
 
     /// <summary>
     /// Disposes API factory resources.

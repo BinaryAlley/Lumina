@@ -446,7 +446,7 @@ public class AuthorizationServiceTests
         // Assert
         result.IsError.Should().BeFalse();
         result.Value.UserId.Should().Be(user.Id);
-        result.Value.Roles.Should().BeEmpty();
+        result.Value.Role.Should().BeNull();
         result.Value.Permissions.Should().BeEmpty();
         await _mockUserRepository.Received(1).GetByIdAsync(user.Id, Arg.Any<CancellationToken>());
     }
@@ -471,7 +471,7 @@ public class AuthorizationServiceTests
         // Assert
         result.IsError.Should().BeFalse();
         result.Value.UserId.Should().Be(user.Id);
-        result.Value.Roles.Should().BeEmpty();
+        result.Value.Role.Should().BeNull();
         result.Value.Permissions.Should().BeEquivalentTo(
         [
             AuthorizationPermission.CanViewUsers,
@@ -504,7 +504,7 @@ public class AuthorizationServiceTests
         // Assert
         result.IsError.Should().BeFalse();
         result.Value.UserId.Should().Be(user.Id);
-        result.Value.Roles.Should().BeEquivalentTo(["Admin"]);
+        result.Value.Role.Should().BeEquivalentTo("Admin");
         result.Value.Permissions.Should().BeEquivalentTo(
         [
             AuthorizationPermission.CanViewUsers,
@@ -538,49 +538,12 @@ public class AuthorizationServiceTests
         // Assert
         result.IsError.Should().BeFalse();
         result.Value.UserId.Should().Be(user.Id);
-        result.Value.Roles.Should().BeEquivalentTo(["Admin"]);
+        result.Value.Role.Should().BeEquivalentTo("Admin");
         result.Value.Permissions.Should().BeEquivalentTo(
         [
             AuthorizationPermission.CanViewUsers,
             AuthorizationPermission.CanDeleteUsers,
             AuthorizationPermission.CanRegisterUsers
-        ]);
-        await _mockUserRepository.Received(1).GetByIdAsync(user.Id, Arg.Any<CancellationToken>());
-    }
-
-    [Fact]
-    public async Task GetUserAuthorizationAsync_WhenUserHasMultipleRoles_ShouldReturnAllRolesAndPermissions()
-    {
-        // Arrange
-        Dictionary<string, IEnumerable<AuthorizationPermission>> rolePermissions = new()
-        {
-            {
-                "Admin",
-                new[] { AuthorizationPermission.CanViewUsers }
-            },
-            {
-                "",
-                new[] { AuthorizationPermission.CanDeleteUsers }
-            }
-        };
-
-        UserEntity user = AuthorizationServiceFixture.CreateUserWithPermissions(
-            rolePermissions: rolePermissions);
-
-        _mockUserRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From<UserEntity?>(user));
-
-        // Act
-        ErrorOr<UserAuthorizationEntity> result = await _sut.GetUserAuthorizationAsync(user.Id, CancellationToken.None);
-
-        // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.UserId.Should().Be(user.Id);
-        result.Value.Roles.Should().BeEquivalentTo(["Admin", ""]);
-        result.Value.Permissions.Should().BeEquivalentTo(
-        [
-            AuthorizationPermission.CanViewUsers,
-            AuthorizationPermission.CanDeleteUsers
         ]);
         await _mockUserRepository.Received(1).GetByIdAsync(user.Id, Arg.Any<CancellationToken>());
     }

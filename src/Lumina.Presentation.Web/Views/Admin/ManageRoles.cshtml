@@ -8,7 +8,7 @@
 
 @{
     var roles = ViewData["roles"] as RoleModel[];
-    var rolePermissions = ViewData["rolePermissions"] as PermissionModel[];
+    var permissions = ViewData["permissions"] as PermissionModel[];
     // generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler
     var scriptId = ScriptIdentifierHelper.GenerateScriptId();
 }
@@ -54,15 +54,15 @@
             <div id="authorization-roles-permissions">
                 <div id="authorization-roles-permissions-scroll" class="scroll-horizontal">
                     <div id="authorization-roles-permissions-list" class="list" style="flex-direction: column;">
-                        @if (rolePermissions is not null)
+                        @if (permissions is not null)
                         {
-                            @foreach (var rolePermission in rolePermissions)
+                            @foreach (var permission in permissions)
                             {
                                 <div class="e no-border transparent mt-5 mb-5">
                                     <label class="enlightenment-checkbox-label">
-                                        <input type="checkbox" class="enlightenment-checkbox-hidden" name="authorization-role-permissions" value="@rolePermission.Id">
+                                        <input type="checkbox" class="enlightenment-checkbox-hidden" name="authorization-role-permissions" value="@permission.Id">
                                         <span class="enlightenment-checkbox"></span>
-                                        @_localizer[rolePermission.PermissionName.ToString()]
+                                        @_localizer[permission.PermissionName.ToString()]
                                     </label>
                                 </div>
                             }
@@ -82,28 +82,20 @@
 
 @section Scripts {
     <script type="text/javascript" data-form="@scriptId" defer>
+        // create cleanup registry for this view
+        const cleanupFunctions = [];
+
         const btnDeleteRole = document.getElementById('btn-delete-role');
         const btnConfirmRole = document.getElementById('btn-confirm-role');
         const txtRoleName = document.getElementById('txt-role-name');
         const form = document.getElementById('authorization-roles-form');
-        const dropdown = document.getElementById('authorization-roles-combobox-dropdown')
-        // on Enter key pressed
-        form.addEventListener('keypress', async (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                await handleRoleSubmit(e.target.closest('form'));
-            }
-        });
-        // on form submit event
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            await handleRoleSubmit(e.target);
-        });
+        const dropdown = document.getElementById('authorization-roles-combobox-dropdown');
+        const roleIdInput = document.getElementById('authorization-roles-selected-id');
 
         // create new or update existing role
-        async function handleRoleSubmit(form) {
+        async function handleRoleSubmitAsync() {
             const formData = {
-                roleId: document.getElementById('authorization-roles-selected-id').value,
+                roleId: roleIdInput.value,
                 roleName: txtRoleName.value,
                 permissions: Array.from(form.querySelectorAll("input[name='authorization-role-permissions']:checked"))
                     .map(checkbox => checkbox.value)
@@ -111,57 +103,17 @@
 
             const isRoleSelected = formData.roleId !== '';
 
-            const data = isRoleSelected ? 
-                  await callApiPutAsync('@_urlService.GetAbsoluteUrl("UpdateRole", "Admin")', formData) :
-                  await callApiPostAsync('@_urlService.GetAbsoluteUrl("CreateRole", "Admin")', formData);
+            const data = isRoleSelected ?
+                    await callApiPutAsync('@_urlService.GetAbsoluteUrl("UpdateRole", "Admin")', formData) :
+                    await callApiPostAsync('@_urlService.GetAbsoluteUrl("CreateRole", "Admin")', formData);
             if (data) {
-                await fetchRoles();
+                await fetchRolesAsync();
                 notificationService.show(isRoleSelected ? '@_localizer["RoleUpdated"]' : '@_localizer["RoleCreated"]', NotificationType.SUCCESS);
             }
         }
 
-        btnDeleteRole.addEventListener('click', async function(e) {
-            const roleId = document.getElementById('authorization-roles-selected-id').value;
-            // ask the user for confirmation before deleting the role
-            if (await dialogService.show('@_localizer["DeleteRoleConfirm"]', jsLocalizedDialogs.confirmation, DialogButtons.YES_NO_CANCEL, DialogIcon.QUESTION) === DialogButton.YES) {
-                const url = '@_urlService.GetAbsoluteUrl("DeleteRole", "Admin", new { roleId = default(Guid) })';
-                const success = await callApiDeleteAsync(url.replace('/@(default(Guid))', `/${roleId}`)); // roleId needs to be replaced here, because GetAbsoluteUrl is server side, roleId is client side
-                if (success) {
-                    await fetchRoles();
-                    notificationService.show('@_localizer["RoleDeleted"]', NotificationType.SUCCESS);
-                }
-            }
-        });
-
-         // on role dropdown change
-        document.addEventListener('click', function(e) {
-            if (e.target.classList.contains('enlightenment-option')) {
-                const roleId = e.target.dataset.value;
-                const selectedText = e.target.textContent;
-                const txtRoleName = document.getElementById('txt-role-name');
-                txtRoleName.value = roleId ? selectedText : '';
-
-                fetchRolePermissions(roleId);
-
-                const roleIdInput = document.getElementById('authorization-roles-selected-id');
-
-                if (roleId) {
-                    btnDeleteRole.classList.remove('hidden');
-                    btnDeleteRole.classList.add('inline');
-                    btnConfirmRole.textContent = '@_localizer["UpdateRole"]';
-                    roleIdInput.value = roleId;
-                } else {
-                    roleIdInput.value = '';
-                    btnDeleteRole.classList.remove('inline');
-                    btnDeleteRole.classList.add('hidden');
-                    btnConfirmRole.textContent = '@_localizer["CreateRole"]';
-                }
-            }
-        });
-
-        async function fetchRoles() {
-            const url = '@_urlService.GetAbsoluteUrl("GetRoles", "Admin")';
-            const data = await callApiGetAsync(url);
+        async function fetchRolesAsync() {
+            const data = await callApiGetAsync('@_urlService.GetAbsoluteUrl("GetRoles", "Admin")');
             if (data) {
                 // clear the roles drop down list
                 const rolesDropdown = document.querySelector("#authorization-roles-combobox .enlightenment-dropdown");
@@ -198,7 +150,7 @@
             }
         }
 
-        async function fetchRolePermissions(roleId) {
+        async function fetchRolePermissionsAsync(roleId) {
             if (roleId) {
                 const url = '@_urlService.GetAbsoluteUrl("GetPermissionsByRoleId", "Admin", new { roleId = default(Guid) })';
                 const data = await callApiGetAsync(url.replace('/@(default(Guid))', `/${roleId}`)); // roleId needs to be replaced here, because GetAbsoluteUrl is server side, roleId is client side
@@ -221,6 +173,72 @@
                     .forEach(input => input.checked = false);
             }
         }
+
+        // on Enter key pressed
+        const handleEnterKey = async function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                await handleRoleSubmitAsync();
+            }
+        };
+
+        // on form submit event
+        const handleSubmit = async function(e) {
+            e.preventDefault();
+            await handleRoleSubmitAsync();
+        };
+
+        // on delete role button click
+        const handleBtnDeleteRoleClick = async function(e) {
+            // ask the user for confirmation before deleting the role
+            if (await dialogService.show('@_localizer["DeleteRoleConfirm"]', jsLocalizedDialogs.confirmation, DialogButtons.YES_NO, DialogIcon.QUESTION) === DialogButton.YES) {
+                const url = '@_urlService.GetAbsoluteUrl("DeleteRole", "Admin", new { roleId = default(Guid) })';
+                const success = await callApiDeleteAsync(url.replace('/@(default(Guid))', `/${roleIdInput.value}`)); // roleId needs to be replaced here, because GetAbsoluteUrl is server side, roleId is client side
+                if (success) {
+                    await fetchRolesAsync();
+                    notificationService.show('@_localizer["RoleDeleted"]', NotificationType.SUCCESS);
+                }
+            }
+        };
+
+        // on document click
+        const handleDocumentClick = async function(e) {
+            // roles dropdown change
+            if (e.target.closest('#authorization-roles-combobox .enlightenment-option')) {
+                const roleId = e.target.dataset.value;
+                const selectedText = e.target.textContent;
+                txtRoleName.value = roleId ? selectedText : '';
+
+                await fetchRolePermissionsAsync(roleId);
+
+                if (roleId) {
+                    btnDeleteRole.classList.remove('hidden');
+                    btnDeleteRole.classList.add('inline');
+                    btnConfirmRole.textContent = '@_localizer["UpdateRole"]';
+                    roleIdInput.value = roleId;
+                } else {
+                    roleIdInput.value = '';
+                    btnDeleteRole.classList.remove('inline');
+                    btnDeleteRole.classList.add('hidden');
+                    btnConfirmRole.textContent = '@_localizer["CreateRole"]';
+                }
+            }
+        };
+
+        // add listeners
+        form.addEventListener('keypress', handleEnterKey);
+        form.addEventListener('submit', handleSubmit);
+        btnDeleteRole.addEventListener('click', handleBtnDeleteRoleClick);
+        document.addEventListener('click', handleDocumentClick);
+
+        // register cleanup for these listeners
+        cleanupFunctions.push(() => {
+            form.removeEventListener('keypress', handleEnterKey);
+            form.removeEventListener('submit', handleSubmit);
+            btnDeleteRole.removeEventListener('click', handleBtnDeleteRoleClick);
+            document.removeEventListener('click', handleDocumentClick);
+        });
+
         // when form's height changes, adjust the roles combobox dropdown maximum height accordingly, so it doesn't cause an <article> section overflow
         const resizeObserver = new ResizeObserver(entries => {
             const formHeight = form.getBoundingClientRect().height;
@@ -228,5 +246,18 @@
             dropdown.style.overflowY = `auto`;
         });
         resizeObserver.observe(form);
+
+        // register cleanup for observer
+        cleanupFunctions.push(() => {
+            resizeObserver.disconnect();
+        });
+
+        // store all cleanups for this view on window object using the scriptId
+        window.viewCleanups = window.viewCleanups || {};
+        window.viewCleanups['@scriptId'] = () => {
+            cleanupFunctions.forEach(cleanup => cleanup());
+            console.log(`Unloaded @scriptId`);
+        };
+        console.log(`Loaded @scriptId`);
     </script>
 }

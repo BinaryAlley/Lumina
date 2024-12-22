@@ -138,24 +138,18 @@
 </div>
 @section Scripts {
     <script type="text/javascript" data-form="@scriptId" defer>
+        // create cleanup registry for this view
+        const cleanupFunctions = [];
+
         const saveSuccess = document.getElementById('save-success');
         const btnBackToLibraries = document.getElementById('btn-back-to-libraries');
         const btnAddNewLibrary = document.getElementById('btn-add-new-library');
         const form = document.getElementById('add-media-library-form');
+        const imgAddMediaDirectory = document.getElementById('add-media-directory');
+        const formTable = document.querySelector('.form-table');
 
-        form.addEventListener('keypress', async (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                await handleAddMediaLibrary(e.target.closest('form'));
-            }
-        });
-
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            await handleAddMediaLibrary(e.target);
-        });
-
-        async function handleAddMediaLibrary(form) {
+        // create new or update existing media library
+        async function handleAddMediaLibraryAsync() {
             const formData = {
                 Id: form.querySelector('[name="Id"]').value || null,
                 UserId: form.querySelector('[name="UserId"]').value || null,
@@ -173,25 +167,7 @@
             }
         }
 
-        btnBackToLibraries.addEventListener('click', () => {
-            window.location.href = '@_urlService.GetAbsoluteUrl("Index", "LibraryManagement")';
-        });
-
-        btnAddNewLibrary.addEventListener('click', () => {
-            window.location.href = '@_urlService.GetAbsoluteUrl("EditLibrary", "LibraryManagement")';
-        });
-
-        document.getElementById('add-media-directory').addEventListener('click', function () {
-            showFileSystemBrowserDialogAsync('C:\\Users\\', true, false, addNewPaths); // TODO: take path and include hidden elements from settings
-        });
-
-        document.querySelectorAll('.remove-form-table-row-icon').forEach(icon => {
-            icon.addEventListener('click', function () {
-                this.parentElement.remove();
-            });
-        });
-
-        function addNewPaths(selectedPaths) {
+        function addNewFileSystemPaths(selectedPaths) {
             // get the form table where the new paths will be added
             const formTable = document.querySelector('.form-table');
             // process the selected paths
@@ -210,5 +186,66 @@
                 }
             });
         }
+
+        // on Enter key pressed
+        const handleEnterKey = async function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                await handleAddMediaLibraryAsync();
+            }
+        };
+
+        // on form submit event
+        const handleSubmit = async function(e) {
+            e.preventDefault();
+            await handleAddMediaLibraryAsync();
+        };
+
+        // on back to libraries button click
+        const handleBtnBackToLibrariesClick = function() {
+            window.location.href = '@_urlService.GetAbsoluteUrl("Index", "LibraryManagement")';
+        };
+
+        // on add new library button click
+        const handleBtnAddNewLibraryClick = function() {
+            window.location.href = '@_urlService.GetAbsoluteUrl("EditLibrary", "LibraryManagement")';
+        };
+
+        // on add media directory image click
+        const handleImgAddMediaDirectoryClick = async function() {
+            await showFileSystemBrowserDialogAsync('C:\\Users\\', true, false, addNewFileSystemPaths); // TODO: take path and include hidden elements from settings
+        };
+
+        // on remove row icon click
+        const handleRowRemoval = (e) => {
+            if (e.target.matches('.remove-form-table-row-icon')) 
+                e.target.parentElement.remove();
+        };
+
+        // add listeners
+        form.addEventListener('keypress', handleEnterKey);
+        form.addEventListener('submit', handleSubmit);
+        btnBackToLibraries.addEventListener('click', handleBtnBackToLibrariesClick);
+        btnAddNewLibrary.addEventListener('click', handleBtnAddNewLibraryClick);
+        imgAddMediaDirectory.addEventListener('click', handleImgAddMediaDirectoryClick);
+        formTable.addEventListener('click', handleRowRemoval);
+
+        // register cleanup for these listeners
+        cleanupFunctions.push(() => {
+            form.removeEventListener('keypress', handleEnterKey);
+            form.removeEventListener('submit', handleSubmit);
+            btnBackToLibraries.removeEventListener('click', handleBtnBackToLibrariesClick);
+            btnAddNewLibrary.removeEventListener('click', handleBtnAddNewLibraryClick);
+            imgAddMediaDirectory.removeEventListener('click', handleImgAddMediaDirectoryClick);
+            formTable.removeEventListener('click', handleRowRemoval);
+        });
+
+        // store all cleanups for this view on window object using the scriptId
+        window.viewCleanups = window.viewCleanups || {};
+        window.viewCleanups['@scriptId'] = () => {
+            cleanupFunctions.forEach(cleanup => cleanup());
+            console.log(`Unloaded @scriptId`);
+        };
+        console.log(`Loaded @scriptId`);
     </script>
 }

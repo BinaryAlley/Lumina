@@ -243,7 +243,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
                 TotpSecret = null, // No TOTP configured
                 Libraries = [],
                 UserPermissions = [],
-                UserRoles = [],
+                UserRole = null,
                 CreatedBy = Guid.NewGuid(),
                 CreatedOnUtc = DateTime.UtcNow
             };
@@ -310,7 +310,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
             TotpSecret = _cryptographyService.Encrypt(Convert.ToBase64String(totpSecret)),
             Libraries = [],
             UserPermissions = [],
-            UserRoles = [],
+            UserRole = null,
             CreatedBy = Guid.NewGuid(),
             CreatedOnUtc = DateTime.UtcNow
         };
@@ -332,7 +332,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
             TotpSecret = null,
             Libraries = [],
             UserPermissions = [],
-            UserRoles = [],
+            UserRole = null,
             CreatedBy = Guid.NewGuid(),
             CreatedOnUtc = DateTime.UtcNow
         };

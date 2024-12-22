@@ -12,7 +12,6 @@ public static partial class Errors
     public static class Library
     {     
         public static Error LibraryIdCannotBeEmpty => Error.Forbidden(description: nameof(LibraryIdCannotBeEmpty));
-        public static Error UserIdCannotBeEmpty => Error.Forbidden(description: nameof(UserIdCannotBeEmpty));
         public static Error LibraryAlreadyExists => Error.Conflict(description: nameof(LibraryAlreadyExists));
         public static Error LibraryNotFound => Error.NotFound(description: nameof(LibraryNotFound));
         public static Error LibraryTypeCannotBeNull => Error.Validation(description: nameof(LibraryTypeCannotBeNull));

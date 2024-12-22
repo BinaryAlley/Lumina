@@ -18,8 +18,8 @@ public class AddLibraryCommandValidator : AbstractValidator<AddLibraryCommand>
     public AddLibraryCommandValidator()
     {
         RuleFor(x => x.UserId)
-            .NotEmpty().WithMessage(Errors.Library.UserIdCannotBeEmpty.Description)
-            .Must(id => id != Guid.Empty).WithMessage(Errors.Library.UserIdCannotBeEmpty.Description);
+            .NotEmpty().WithMessage(Errors.Users.UserIdCannotBeEmpty.Description)
+            .Must(id => id != Guid.Empty).WithMessage(Errors.Users.UserIdCannotBeEmpty.Description);
 
         RuleFor(x => x.LibraryType)
             .NotNull().WithMessage(Errors.Library.LibraryTypeCannotBeNull.Description)

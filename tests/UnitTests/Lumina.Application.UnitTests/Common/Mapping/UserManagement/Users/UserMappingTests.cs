@@ -38,7 +38,7 @@ public class UserMappingTests
             TotpSecret = "totpsecret",
             Libraries = [],
             UserPermissions = [],
-            UserRoles = [],
+            UserRole = null,
             CreatedBy = Guid.NewGuid(),
             CreatedOnUtc = DateTime.UtcNow,
             UpdatedOnUtc = null
@@ -58,7 +58,7 @@ public class UserMappingTests
         result.TotpSecret.Should().Be(repositoryEntity.TotpSecret);
         result.Libraries.Should().BeSameAs(repositoryEntity.Libraries);
         result.UserPermissions.Should().BeSameAs(repositoryEntity.UserPermissions);
-        result.UserRoles.Should().BeSameAs(repositoryEntity.UserRoles);
+        result.UserRole.Should().BeSameAs(repositoryEntity.UserRole);
         result.CreatedOnUtc.Should().Be(repositoryEntity.CreatedOnUtc);
         result.CreatedBy.Should().Be(repositoryEntity.CreatedBy);
         result.UpdatedOnUtc.Should().Be(repositoryEntity.UpdatedOnUtc);
@@ -85,7 +85,7 @@ public class UserMappingTests
             Password = "hashedpassword",
             Libraries = [],
             UserPermissions = [],
-            UserRoles = [],
+            UserRole = null,
             CreatedBy = Guid.NewGuid(),
             CreatedOnUtc = DateTime.UtcNow,
             UpdatedOnUtc = null
@@ -139,7 +139,7 @@ public class UserMappingTests
             Password = "hashedpassword",
             Libraries = libraries,
             UserPermissions = [],
-            UserRoles = [],
+            UserRole = null,
             CreatedBy = Guid.NewGuid(),
             CreatedOnUtc = DateTime.UtcNow,
             UpdatedOnUtc = null

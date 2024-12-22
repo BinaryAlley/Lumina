@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
+using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.DataAccess.Core.UoW;
@@ -7,6 +8,7 @@ using Lumina.Domain.Common.Errors;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -65,13 +67,11 @@ internal sealed class UserRepository : IUserRepository
     {
         return await _luminaDbContext.Users
             .Include(user => user.Libraries)
-            .ThenInclude(library => library.ContentLocations)
+                .ThenInclude(library => library.ContentLocations)
             .Include(user => user.UserPermissions)
-            .ThenInclude(userPermission => userPermission.Permission)
-            .Include(user => user.UserRoles)
-            .ThenInclude(userRole => userRole.Role)
-            .ThenInclude(role => role.RolePermissions)
-            .ThenInclude(rolePermission => rolePermission.Permission)
+                .ThenInclude(userPermission => userPermission.Permission)
+            .Include(user => user.UserRole!.Role.RolePermissions)
+                .ThenInclude(rolePermission => rolePermission.Permission)
             .FirstOrDefaultAsync(user => user.Username == username, cancellationToken)
             .ConfigureAwait(false);
     }
@@ -86,20 +86,51 @@ internal sealed class UserRepository : IUserRepository
     {
         UserEntity? foundUser = await _luminaDbContext.Users
             .Include(user => user.Libraries)
-            .ThenInclude(library => library.ContentLocations)
+                .ThenInclude(library => library.ContentLocations)
             .Include(user => user.UserPermissions)
-            .ThenInclude(userPermission => userPermission.Permission)
-            .Include(user => user.UserRoles)
-            .ThenInclude(userRole => userRole.Role)
-            .ThenInclude(role => role.RolePermissions)
-            .ThenInclude(rolePermission => rolePermission.Permission)
+                .ThenInclude(userPermission => userPermission.Permission)
+            .Include(user => user.UserRole!.Role.RolePermissions)
+                .ThenInclude(rolePermission => rolePermission.Permission)
             .FirstOrDefaultAsync(user => user.Username == data.Username, cancellationToken)
             .ConfigureAwait(false);
         if (foundUser is null)
             return Errors.Users.UserDoesNotExist;
+
+        // update scalar properties
         _luminaDbContext.Entry(foundUser).CurrentValues.SetValues(data);
+
+        // update user permissions
+        List<UserPermissionEntity> existingPermissions = [.. foundUser.UserPermissions];
+        foreach (UserPermissionEntity permission in existingPermissions)
+            _luminaDbContext.UserPermissions.Remove(permission);
+
+        foreach (UserPermissionEntity permission in data.UserPermissions)
+        {
+            _luminaDbContext.UserPermissions.Add(new UserPermissionEntity
+            {
+                UserId = foundUser.Id,
+                PermissionId = permission.PermissionId,
+                Permission = permission.Permission,
+                User = foundUser
+            });
+        }
+
+        // update user role
+        if (foundUser.UserRole != null)
+            _luminaDbContext.UserRoles.Remove(foundUser.UserRole);
+        if (data.UserRole is not null)
+        {
+            _luminaDbContext.UserRoles.Add(new UserRoleEntity
+            {
+                UserId = foundUser.Id,
+                RoleId = data.UserRole.RoleId,
+                Role = data.UserRole.Role,
+                User = foundUser
+            });
+        }
         return Result.Updated;
     }
+
 
     /// <summary>
     /// Gets a <see cref="UserEntity"/> identified by <paramref name="id"/> from the storage medium.
@@ -111,13 +142,11 @@ internal sealed class UserRepository : IUserRepository
     {
         return await _luminaDbContext.Users
             .Include(user => user.Libraries)
-            .ThenInclude(library => library.ContentLocations)
+                .ThenInclude(library => library.ContentLocations)
             .Include(user => user.UserPermissions)
-            .ThenInclude(userPermission => userPermission.Permission)
-            .Include(user => user.UserRoles)
-            .ThenInclude(userRole => userRole.Role)
-            .ThenInclude(role => role.RolePermissions)
-            .ThenInclude(rolePermission => rolePermission.Permission)
+                .ThenInclude(userPermission => userPermission.Permission)
+            .Include(user => user.UserRole!.Role.RolePermissions)
+                .ThenInclude(rolePermission => rolePermission.Permission)
             .FirstOrDefaultAsync(user => user.Id == id, cancellationToken)
             .ConfigureAwait(false);
     }

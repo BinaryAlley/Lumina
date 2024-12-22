@@ -141,6 +141,9 @@
   <data name="CannotNavigateUp" xml:space="preserve">
     <value>上の階層に移動できません！</value>
   </data>
+  <data name="CannotRemoveLastAdmin" xml:space="preserve">
+    <value>最後の管理者権限を削除できません！</value>
+  </data>
   <data name="CodecCannotBeEmpty" xml:space="preserve">
     <value>コーデックを空にすることはできません！</value>
   </data>
@@ -515,6 +518,9 @@
   </data>
   <data name="UserIdCannotBeEmpty" xml:space="preserve">
     <value>ユーザーIDを空にすることはできません！</value>
+  </data>
+  <data name="UserMustHaveRoleOrDirectPermissions" xml:space="preserve">
+    <value>ユーザーにはロール権限か直接権限のいずれかが必要です！</value>
   </data>
   <data name="UsernameAlreadyExists" xml:space="preserve">
     <value>このユーザー名は既に使用されています!</value>

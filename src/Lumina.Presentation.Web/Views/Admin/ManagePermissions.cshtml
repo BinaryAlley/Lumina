@@ -2,100 +2,231 @@
 /admin/manage-permissions/
 *@
 
-@using Lumina.Presentation.Web.Common.Models.Authorization
+@using Lumina.Presentation.Web.Common.Models.UsersManagement
+@using Lumina.Presentation.Web.Common.Services
 @using Microsoft.AspNetCore.Mvc.Localization
+@using Lumina.Presentation.Web.Common.Models.Authorization
 
 @{
     var roles = ViewData["roles"] as RoleModel[];
-    var rolePermissions = ViewData["rolePermissions"] as PermissionModel[];
-} 
+    var users = ViewData["users"] as UserModel[];
+    var permissions = ViewData["permissions"] as PermissionModel[];
+    // generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler
+    var scriptId = ScriptIdentifierHelper.GenerateScriptId();
+}
 
 @inject IViewLocalizer _localizer
+@inject IUrlService _urlService
 
-<form id="rolesPermissionsForm" method="post" action="/Permissions/CreateRole">
-    <input type="hidden" name="rolesRoleId" id="rolesRoleId" value="" />
-    <!-- Roles dropdown row -->
-    <div class="h-30px w-100 text-end">
-        <label for="rolesRolesDropdown" class="text-light-one">@_localizer["Roles"]</label>
+<form id="authorization-permissions-form" method="post" class="w-100 h-100 mx-auto pl-10 pr-10 pt-10 pb-10">
+    <div id="authorization-permissions-container">
+        <input type="hidden" name="authorization-users-selected-id" id="authorization-users-selected-id" value="" />
+        <input type="hidden" name="authorization-roles-selected-id" id="authorization-roles-selected-id" value="" />
+        <!-- Users dropdown row -->
+        <div class="h-30px w-100 text-end mb-5">
+            <label for="authorization-users-combobox" class="text-light-one">@_localizer["Users"]</label>
 
-        <div class="enlightenment-combobox w-250px inline-block" id="rolesRolesDropdown">
-            <div class="shine-effect" style="top: 1px;"></div>
-            <input type="checkbox" id="rolesRolesDropdownToggle" class="enlightenment-toggle-checkbox" />
-            <label class="enlightenment-toggle" for="rolesRolesDropdownToggle">
-                <span class="enlightenment-selected-text">@_localizer["SelectARole"]</span>
-            </label>
-            <div class="enlightenment-dropdown">
-                <div class="shine-effect" style="top: -4px;"></div>
-                <div class="enlightenment-option first-option disabled">@_localizer["SelectARole"]</div>
-                @if (roles is not null)
-                {
-                    @for (int i = 0; i < roles.Length; i++)
+            <div class="enlightenment-combobox w-250px inline-block" id="authorization-users-combobox">
+                <div class="shine-effect" style="top: 1px;"></div>
+                <input type="checkbox" id="authorization-users-combobox-toggle" class="enlightenment-toggle-checkbox" />
+                <label class="enlightenment-toggle" for="authorization-users-combobox-toggle">
+                    <span class="enlightenment-selected-text">@_localizer["SelectAUser"]</span>
+                </label>
+                <div class="enlightenment-dropdown" id="authorization-users-combobox-dropdown">
+                    <div class="shine-effect" style="top: -4px;"></div>
+                    <div class="enlightenment-option first-option disabled">@_localizer["SelectAUser"]</div>
+                    @if (users is not null)
                     {
-                        <div class="enlightenment-option @(i == roles.Length - 1 ? "last-option" : "")" data-value="@roles[i].Id">@roles[i].RoleName</div>
-                    }
-                }
-            </div>
-        </div>
-    </div>
-
-    <!-- Role name input row -->
-    <div class="h-30px w-100 text-end mb-5">
-        <label for="rolesRoleInput" class="text-light-one">@_localizer["RoleName"]</label>
-        <input type="text" id="rolesRoleInput" name="roleName" class="enlightenment-input w-250px" />
-    </div>
-
-    <!-- Permissions row -->
-    <div class="containerRoles row panel inset">
-        <div class="explorerContainer">
-            <div class="explorer">
-                @if (rolePermissions is not null)
-                {
-                    @foreach (var rolePermission in rolePermissions)
-                    {
-                        <div class="e no-border transparent">
-                            <label class="enlightenment-checkbox-label">
-                                <input type="checkbox" class="enlightenment-checkbox-hidden" name="rolePermissions" value="@rolePermission.Id">
-                                <span class="enlightenment-checkbox"></span>
-                                @_localizer[rolePermission.PermissionName.ToString()]
-                            </label>
-                        </div>
-                    }
-                }
-            </div>
-        </div>
-    </div>
-
-    <!-- Submit Button Row -->
-    <div class="w-100 text-end">
-        <button type="button" class="abort-button f-14 h-24px v-align-t hidden" id="rolesDeleteRoleBtn">@_localizer["DeleteRole"]</button>
-        <button type="submit" class="confirm-button f-14 h-24px v-align-t" id="rolesConfirmBtn">@_localizer["CreateRole"]</button>
-    </div>
-</form>
-
-@* <div class="enlightenment-panel shadow-effect p-2 mx-auto panel w-90 mb-10" style="min-width: 320px; margin-top: 1rem;">
-    <div class="shine-effect"></div>
-    <form method="post" id="add-media-library-form" class="inline">
-        @Html.AntiForgeryToken()
-        @{
-            <div class="form-field">
-                <div class="enlightenment-combobox inline-block w-100">
-                    <div class="shine-effect" style="top: 1px;"></div>
-                    <input type="checkbox" class="enlightenment-toggle-checkbox" id="library-type" />
-                    <label class="enlightenment-toggle" for="library-type">
-                        <span id="library-selected-item" class="enlightenment-selected-text" data-value="None">@_localizer["None"]</span>
-                    </label>
-                    <div class="enlightenment-dropdown">
-                        <div class="shine-effect" style="top: -4px;"></div>
-                        <div class="enlightenment-option first-option disabled">@_localizer["None"]</div>
-                        @foreach (var item in aa!)
+                        @for (int i = 0; i < users.Length; i++)
                         {
-                            <div class="enlightenment-option">@_localizer[item.ToString()]</div>
+                            <div class="enlightenment-option @(i == users.Length - 1 ? "last-option" : "")" data-value="@users[i].Id">@users[i].Username</div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Roles dropdown row -->
+        <div class="h-30px w-100 text-end mb-5">
+            <label for="authorization-roles-combobox" class="text-light-one">@_localizer["Roles"]</label>
+
+            <div class="enlightenment-combobox w-250px inline-block" id="authorization-roles-combobox">
+                <div class="shine-effect" style="top: 1px;"></div>
+                <input type="checkbox" id="authorization-roles-combobox-toggle" class="enlightenment-toggle-checkbox" />
+                <label class="enlightenment-toggle" for="authorization-roles-combobox-toggle">
+                    <span class="enlightenment-selected-text">@_localizer["SelectARole"]</span>
+                </label>
+                <div class="enlightenment-dropdown" id="authorization-roles-combobox-dropdown">
+                    <div class="shine-effect" style="top: -4px;"></div>
+                    <div class="enlightenment-option first-option disabled">@_localizer["SelectARole"]</div>
+                    @if (roles is not null)
+                    {
+                        @for (int i = 0; i < roles.Length; i++)
+                        {
+                            <div class="enlightenment-option @(i == roles.Length - 1 ? "last-option" : "")" data-value="@roles[i].Id">@roles[i].RoleName</div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Permissions row -->
+        <div id="authorization-permissions-permissions-container" class="">
+            <div id="authorization-permissions-permissions">
+                <div id="authorization-permissions-permissions-scroll" class="scroll-horizontal">
+                    <div id="authorization-permissions-permissions-list" class="list" style="flex-direction: column;">
+                        @if (permissions is not null)
+                        {
+                            @foreach (var permission in permissions)
+                            {
+                                <div class="e no-border transparent mt-5 mb-5">
+                                    <label class="enlightenment-checkbox-label">
+                                        <input type="checkbox" class="enlightenment-checkbox-hidden" name="authorization-permissions-permissions" value="@permission.Id">
+                                        <span class="enlightenment-checkbox"></span>
+                                        @_localizer[permission.PermissionName.ToString()]
+                                    </label>
+                                </div>
+                            }
                         }
                     </div>
                 </div>
             </div>
-        }
-        <p>a</p>
+        </div>
 
-    </form>
-</div> *@
+        <!-- Submit Button Row -->
+        <div class="w-100 h-25px mt-5 text-end">
+            <button id="btn-update-user" type="submit" class="confirm-button f-14 h-24px v-align-t" disabled>@_localizer["Update"]</button>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <script type="text/javascript" data-form="@scriptId" defer>
+        // create cleanup registry for this view
+        const cleanupFunctions = [];
+        
+        const btnUpdateUser = document.getElementById('btn-update-user');
+        const form = document.getElementById('authorization-permissions-form');
+        const rolesDropdown = document.getElementById('authorization-roles-combobox-dropdown');
+        const usersDropdown = document.getElementById('authorization-users-combobox-dropdown');
+        const roleIdInput = document.getElementById('authorization-roles-selected-id');
+        const userIdInput = document.getElementById('authorization-users-selected-id');
+
+        // update user permissions and role
+        async function handleUserAuthorizationSubmitAsync() {
+            const formData = {
+                userId: userIdInput.value,
+                roleId: roleIdInput.value !== '' ? roleIdInput.value : null,
+                permissions: Array.from(form.querySelectorAll("input[name='authorization-permissions-permissions']:checked"))
+                    .map(checkbox => checkbox.value)
+            };
+
+            const data = await callApiPutAsync('@_urlService.GetAbsoluteUrl("UpdateUserAuthorization", "Admin")', formData);
+            if (data)
+                notificationService.show('@_localizer["UserAuthorizationUpdated"]', NotificationType.SUCCESS);
+        }
+
+        async function fetchUserRoleAsync(userId) {
+            const url = '@_urlService.GetAbsoluteUrl("GetRoleByUserId", "Admin", new { userId = default(Guid) })';
+            const data = await callApiGetAsync(url.replace('/@(default(Guid))', `/${userId}`)); // userId needs to be replaced here, because GetAbsoluteUrl is server side, userId is client side
+            if (data) {
+                var roleElement = document.querySelector('#authorization-roles-combobox .enlightenment-option[data-value="' + data.id + '"]');
+                var roleName = roleElement.textContent;
+                document.querySelector('#authorization-roles-combobox .enlightenment-selected-text').textContent = roleName;
+                document.querySelector('#authorization-roles-combobox .enlightenment-toggle').dataset.value = data.id;
+                roleIdInput.value = data.id;
+            }
+        }
+
+        async function fetchUserPermissionsAsync(userId) {
+            const url = '@_urlService.GetAbsoluteUrl("GetPermissionsByUserId", "Admin", new { userId = default(Guid) })';
+            const data = await callApiGetAsync(url.replace('/@(default(Guid))', `/${userId}`)); // userId needs to be replaced here, because GetAbsoluteUrl is server side, userId is client side
+            if (data) {
+                // clear all checkboxes
+                document.querySelectorAll("input[name='authorization-permissions-permissions']")
+                    .forEach(input => input.checked = false);
+
+                // check the checkboxes for which permissions are assigned
+                data.forEach(p => {
+                    const checkbox = document.querySelector(`input[name='authorization-permissions-permissions'][value='${p.id}']`);
+                    if (checkbox)
+                        checkbox.checked = true;
+                });
+            }
+        }
+
+        // on Enter key pressed
+        const handleEnterKey = async function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                await handleUserAuthorizationSubmitAsync();
+            }
+        };
+
+        // on form submit event
+        const handleSubmit = async function(e) {
+            e.preventDefault();
+            await handleUserAuthorizationSubmitAsync();
+        };
+
+        // on document click
+        const handleDocumentClick = async function(e) {
+            // users dropdown change
+            if (e.target.closest('#authorization-users-combobox .enlightenment-option')) {
+                var selectedUserId = e.target.dataset.value;
+                document.querySelector('#authorization-roles-combobox .enlightenment-selected-text').textContent = '@_localizer["SelectARole"]';
+                document.querySelectorAll("input[name='authorization-permissions-permissions']").forEach(input => input.checked = false);
+                roleIdInput.value = '';
+                userIdInput.value = '';
+                if (selectedUserId) {
+                    userIdInput.value = selectedUserId;
+                    btnUpdateUser.disabled = false;
+                    await fetchUserRoleAsync(selectedUserId);
+                    await fetchUserPermissionsAsync(selectedUserId);
+                } 
+                else 
+                    btnUpdateUser.disabled = true;
+            } 
+            // roles dropdown change
+            else if (e.target.closest('#authorization-roles-combobox .enlightenment-option')) {
+                const roleId = e.target.dataset.value;
+                roleIdInput.value = roleId || '';
+            }
+        };
+
+        // add listeners
+        form.addEventListener('keypress', handleEnterKey);
+        form.addEventListener('submit', handleSubmit);
+        document.addEventListener('click', handleDocumentClick);
+
+        // register cleanup for these listeners
+        cleanupFunctions.push(() => {
+            form.removeEventListener('keypress', handleEnterKey);
+            form.removeEventListener('submit', handleSubmit);
+            document.removeEventListener('click', handleDocumentClick);
+        });
+
+        // when form's height changes, adjust the roles combobox dropdown maximum height accordingly, so it doesn't cause an <article> section overflow
+        const resizeObserver = new ResizeObserver(entries => {
+            const formHeight = form.getBoundingClientRect().height;
+            usersDropdown.style.maxHeight = `calc(${formHeight}px - 50px)`;
+            rolesDropdown.style.maxHeight = `calc(${formHeight}px - 90px)`;
+            usersDropdown.style.overflowY = `auto`;
+            rolesDropdown.style.overflowY = `auto`;
+        });
+        resizeObserver.observe(form);
+
+        // register cleanup for observer
+        cleanupFunctions.push(() => {
+            resizeObserver.disconnect();
+        });
+
+        // store all cleanups for this view on window object using the scriptId
+        window.viewCleanups = window.viewCleanups || {};
+        window.viewCleanups['@scriptId'] = () => {
+            cleanupFunctions.forEach(cleanup => cleanup());
+            console.log(`Unloaded @scriptId`);
+        };
+        console.log(`Loaded @scriptId`);
+    </script>
+}

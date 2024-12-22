@@ -99,28 +99,23 @@
 </div>
 @section Scripts {
     <script type="text/javascript" data-form="@scriptId" defer>
+        // create cleanup registry for this view
+        const cleanupFunctions = [];
+
+        const form = document.getElementById('register-account-form');
+        const txtUsername = form.querySelector('[name="Username"]');
+        const txtPassword = form.querySelector('[name="Password"]');
+        const txtPasswordConfirm = form.querySelector('[name="PasswordConfirm"]');
+        const chkUse2FA = form.querySelector('[name="Use2fa"]');
+        const registerSuccess = document.getElementById('register-success');
+        const totpMessage = document.querySelector('#totp-message');
+        const totpImage = document.querySelector('#totp-image');
         const btnLogin = document.getElementById('btn-login');
-        document.getElementById('register-account-form').addEventListener('keypress', async (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                const form = e.target.closest('form');
-                await handleRegisterAccount(form);
-            }
-        });
+        const spnTwoFaAttention = document.getElementById('register-two-fa-attention');
+        const useTwoFaInput = document.getElementById('hidden-use-two-fa');
 
-        document.getElementById('register-account-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            await handleRegisterAccount(e.target);
-        });
-
-        async function handleRegisterAccount(form) {
-            const txtUsername = form.querySelector('[name="Username"]');
-            const txtPassword = form.querySelector('[name="Password"]');
-            const txtPasswordConfirm = form.querySelector('[name="PasswordConfirm"]');
-            const chkUse2FA = form.querySelector('[name="Use2fa"]');
-            const registerSuccess = document.getElementById('register-success');
-            const totpMessage = document.querySelector('#totp-message');
-            const totpImage = document.querySelector('#totp-image');
+        // perform the account registration
+        async function handleRegisterAccountAsync() {
             const formData = {
                 Username: txtUsername.value,
                 Password: txtPassword.value,
@@ -147,18 +142,56 @@
                 }
             }
         }
-        document.querySelector('[name="Use2fa"]').addEventListener('change', function () {
+
+        // on Enter key pressed
+        const handleEnterKey = async function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                await handleRegisterAccountAsync();
+            }
+        };
+
+        // on form submit event
+        const handleSubmit = async function(e) {
+            e.preventDefault();
+            await handleRegisterAccountAsync();
+        };
+
+        // on use 2FA change event
+        const handleChkUse2FAChange = function() {
             const isChecked = this.checked;
-            document.getElementById('register-two-fa-attention').classList.replace(
+            spnTwoFaAttention.classList.replace(
                 isChecked ? 'inline' : 'hidden',
                 isChecked ? 'hidden' : 'inline'
             );
-            document.getElementById('hidden-use-two-fa').value = isChecked.toString();
+            useTwoFaInput.value = isChecked.toString();
+        };
+
+        // on login button click
+        const handleBtnLoginClick = function() {
+            window.location.href = '@_urlService.GetAbsoluteUrl("Login", "Auth")';
+        };
+
+        // add listeners
+        form.addEventListener('keypress', handleEnterKey);
+        form.addEventListener('submit', handleSubmit);
+        chkUse2FA.addEventListener('click', handleChkUse2FAChange);
+        btnLogin.addEventListener('click', handleBtnLoginClick);
+
+        // register cleanup for these listeners
+        cleanupFunctions.push(() => {
+            form.removeEventListener('keypress', handleEnterKey);
+            form.removeEventListener('submit', handleSubmit);
+            chkUse2FA.removeEventListener('click', handleChkUse2FAChange);
+            btnLogin.removeEventListener('click', handleBtnLoginClick);
         });
-        if (btnLogin) {
-            btnLogin.addEventListener('click', () => {
-                window.location.href = '@_urlService.GetAbsoluteUrl("Login", "Auth")';
-            });
-        }
+
+        // store all cleanups for this view on window object using the scriptId
+        window.viewCleanups = window.viewCleanups || {};
+        window.viewCleanups['@scriptId'] = () => {
+            cleanupFunctions.forEach(cleanup => cleanup());
+            console.log(`Unloaded @scriptId`);
+        };
+        console.log(`Loaded @scriptId`);
     </script>
 }

@@ -1,15 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Enums.Authorization;
-using System;
 #endregion
 
 namespace Lumina.Presentation.Web.Common.Models.Authorization;
 
 /// <summary>
-/// Represents a model for an authorization role.
+/// Represents a model for an authorization role with its permissions.
 /// </summary>
-/// <param name="Id">The Id of the authorization role.</param>
 /// <param name="Role">The authorization role.</param>
+/// <param name="Permissions">The permissions of the authorization role.</param>
 public record RolePermissionsModel(
     RoleModel Role,
     PermissionModel[] Permissions
