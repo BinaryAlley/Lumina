@@ -155,7 +155,7 @@ public class UserRepositoryTests
             TempPassword = "TempPass456",
             TotpSecret = "NewSecret",
             Libraries = [],
-            UserRoles = [],
+            UserRole = null,
             UserPermissions = [],
             CreatedBy = existingUser.Id,
             CreatedOnUtc = existingUser.CreatedOnUtc,

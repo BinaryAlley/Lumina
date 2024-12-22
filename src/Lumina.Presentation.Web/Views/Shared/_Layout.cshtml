@@ -29,6 +29,7 @@
             <article class="h-100"> <!--needs to be 100% height so that child pages that require full height as well, can stretch-->
                 @RenderBody()
                 <div id="modal-background-article"></div>
+                <div class="dialog-container"></div>
             </article>
         </main>
         @if (User?.Identity?.IsAuthenticated == true)

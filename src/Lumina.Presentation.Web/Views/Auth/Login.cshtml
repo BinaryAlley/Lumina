@@ -64,28 +64,21 @@
 </div>
 @section Scripts {
     <script type="text/javascript" data-form="@scriptId" defer>
-        document.getElementById('login-form').addEventListener('keypress', async (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                const form = e.target.closest('form');
-                await handleLogin(form);
-            }
-        });
+        // create cleanup registry for this view
+        const cleanupFunctions = [];
 
-        document.getElementById('login-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            await handleLogin(e.target);
-        });
-
-        async function handleLogin(form) {
-            const returnUrlInput = form.querySelector('[name="ReturnUrl"]');
-            const txtUsername = form.querySelector('[name="Username"]');
-            const txtPassword = form.querySelector('[name="Password"]');
-            const txtTotpCode = form.querySelector('[name="TotpCode"]');
-            const divTotpCode = document.getElementById('div-totp-code');
-            const btnLogin = document.getElementById('btn-login');
-            const btnRecoverPassword = document.getElementById('btn-recover-password');
-            const btnValidateTotp = document.getElementById('btn-validate-totp');
+        const form = document.getElementById('login-form');
+        const returnUrlInput = form.querySelector('[name="ReturnUrl"]');
+        const txtUsername = form.querySelector('[name="Username"]');
+        const txtPassword = form.querySelector('[name="Password"]');
+        const txtTotpCode = form.querySelector('[name="TotpCode"]');
+        const divTotpCode = document.getElementById('div-totp-code');
+        const btnLogin = document.getElementById('btn-login');
+        const btnRecoverPassword = document.getElementById('btn-recover-password');
+        const btnValidateTotp = document.getElementById('btn-validate-totp');
+        
+        // perform the authentication
+        async function handleLoginAsync() {
             const formData = {
                 Username: txtUsername.value,
                 Password: txtPassword.value,
@@ -105,8 +98,44 @@
             else if (data)
                 window.location.href = data;
         }
-        document.getElementById('btn-recover-password').addEventListener('click', () => {
+
+        // on Enter key pressed
+        const handleEnterKey = async function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                await handleLoginAsync();
+            }
+        };
+
+        // on form submit event
+        const handleSubmit = async function(e) {
+            e.preventDefault();
+            await handleLoginAsync();
+        };
+
+        // on recover password button click
+        const handleBtnRecoverPasswordClick = function() {
             window.location.href = '@_urlService.GetAbsoluteUrl("RecoverPassword", "Auth")';
+        };
+
+        // add listeners
+        form.addEventListener('keypress', handleEnterKey);
+        form.addEventListener('submit', handleSubmit);
+        btnRecoverPassword.addEventListener('click', handleBtnRecoverPasswordClick);
+
+        // register cleanup for these listeners
+        cleanupFunctions.push(() => {
+            form.removeEventListener('keypress', handleEnterKey);
+            form.removeEventListener('submit', handleSubmit);
+            btnRecoverPassword.removeEventListener('click', handleBtnRecoverPasswordClick);
         });
+
+        // store all cleanups for this view on window object using the scriptId
+        window.viewCleanups = window.viewCleanups || {};
+        window.viewCleanups['@scriptId'] = () => {
+            cleanupFunctions.forEach(cleanup => cleanup());
+            console.log(`Unloaded @scriptId`);
+        };
+        console.log(`Loaded @scriptId`);
     </script>
 }

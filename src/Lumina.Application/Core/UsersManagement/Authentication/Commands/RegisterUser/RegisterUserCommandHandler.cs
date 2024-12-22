@@ -80,7 +80,7 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, E
             CreatedOnUtc = _dateTimeProvider.UtcNow,
             Libraries = [],
             UserPermissions = [],
-            UserRoles = [],
+            UserRole = null,
             CreatedBy = id
         };
         // if the user enabled two factor auth, include a QR with the totp secret

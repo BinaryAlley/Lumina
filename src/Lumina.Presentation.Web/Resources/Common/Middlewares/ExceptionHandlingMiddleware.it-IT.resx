@@ -141,6 +141,9 @@
   <data name="CannotNavigateUp" xml:space="preserve">
     <value>Impossibile navigare verso l'alto!</value>
   </data>
+  <data name="CannotRemoveLastAdmin" xml:space="preserve">
+    <value>Impossibile rimuovere l'ultimo ruolo Admin assegnato all'utente!</value>
+  </data>
   <data name="CodecCannotBeEmpty" xml:space="preserve">
     <value>Il codec non può essere vuoto!</value>
   </data>
@@ -515,6 +518,9 @@
   </data>
   <data name="UserIdCannotBeEmpty" xml:space="preserve">
     <value>L'ID utente non può essere vuoto!</value>
+  </data>
+  <data name="UserMustHaveRoleOrDirectPermissions" xml:space="preserve">
+    <value>L'utente deve avere permessi da ruolo o permessi diretti!</value>
   </data>
   <data name="UsernameAlreadyExists" xml:space="preserve">
     <value>Il nome utente esiste già!</value>

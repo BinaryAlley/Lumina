@@ -141,6 +141,9 @@
   <data name="CannotNavigateUp" xml:space="preserve">
     <value>Невозможно перейти на уровень выше!</value>
   </data>
+  <data name="CannotRemoveLastAdmin" xml:space="preserve">
+    <value>Невозможно удалить последнюю роль администратора, назначенную пользователю!</value>
+  </data>
   <data name="CodecCannotBeEmpty" xml:space="preserve">
     <value>Кодек не может быть пустым!</value>
   </data>
@@ -515,6 +518,9 @@
   </data>
   <data name="UserIdCannotBeEmpty" xml:space="preserve">
     <value>Идентификатор пользователя не может быть пустым!</value>
+  </data>
+  <data name="UserMustHaveRoleOrDirectPermissions" xml:space="preserve">
+    <value>У пользователя должны быть разрешения роли или прямые разрешения!</value>
   </data>
   <data name="UsernameAlreadyExists" xml:space="preserve">
     <value>Имя пользователя уже существует!</value>

@@ -268,7 +268,7 @@ public class AuthLoginTests : IClassFixture<LuminaApiFactory>, IDisposable
             Password = _hashService.HashString("TestPass123!"),
             Libraries = [],
             UserPermissions = [],
-            UserRoles = [],
+            UserRole = null,
             CreatedBy = Guid.NewGuid(),
             CreatedOnUtc = DateTime.UtcNow
         };
@@ -291,7 +291,7 @@ public class AuthLoginTests : IClassFixture<LuminaApiFactory>, IDisposable
             TotpSecret = _cryptographyService.Encrypt(Convert.ToBase64String(totpSecret)),
             Libraries = [],
             UserPermissions = [],
-            UserRoles = [],
+            UserRole = null,
             CreatedBy = Guid.NewGuid(),
             CreatedOnUtc = DateTime.UtcNow
         };

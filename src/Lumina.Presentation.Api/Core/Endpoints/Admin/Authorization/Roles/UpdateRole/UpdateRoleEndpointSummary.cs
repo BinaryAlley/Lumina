@@ -36,7 +36,7 @@ public class UpdateRoleEndpointSummary : Summary<UpdateRoleEndpoint, UpdateRoleR
 
         RequestParam(r => r.RoleId, "The Id of the role. Required.");
         RequestParam(r => r.RoleName, "The name of the role. Required.");
-        RequestParam(r => r.Permissions, "The collection or permissions of the role. Required.");
+        RequestParam(r => r.Permissions, "The collection of Ids of the permissions of the role. Required.");
 
         ResponseParam<RolePermissionsResponse>(r => r.Role, "The authorization role entity.");
         ResponseParam<RolePermissionsResponse>(r => r.Permissions, "The list of permissions of the role entity.");

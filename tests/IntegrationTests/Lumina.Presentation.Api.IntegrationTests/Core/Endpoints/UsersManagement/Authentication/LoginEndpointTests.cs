@@ -246,7 +246,7 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
             Password = _hashService.HashString("TestPass123!"),
             Libraries = [],
             UserPermissions = [],
-            UserRoles = [],
+            UserRole = null,
             CreatedBy = Guid.NewGuid(),
             CreatedOnUtc = DateTime.UtcNow
         };
@@ -269,7 +269,7 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
             TotpSecret = _cryptographyService.Encrypt(Convert.ToBase64String(totpSecret)),
             Libraries = [],
             UserPermissions = [],
-            UserRoles = [],
+            UserRole = null,
             CreatedBy = Guid.NewGuid(),
             CreatedOnUtc = DateTime.UtcNow
         };
@@ -292,7 +292,7 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
             TempPasswordCreated = DateTime.UtcNow,
             Libraries = [],
             UserPermissions = [],
-            UserRoles = [],
+            UserRole = null,
             CreatedBy = Guid.NewGuid(),
             CreatedOnUtc = DateTime.UtcNow
         };
@@ -315,7 +315,7 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
             TempPasswordCreated = DateTime.UtcNow.AddMinutes(-16), // expired (> 15 minutes old)
             Libraries = [],
             UserPermissions = [],
-            UserRoles = [],
+            UserRole = null,
             CreatedBy = Guid.NewGuid(),
             CreatedOnUtc = DateTime.UtcNow
         };

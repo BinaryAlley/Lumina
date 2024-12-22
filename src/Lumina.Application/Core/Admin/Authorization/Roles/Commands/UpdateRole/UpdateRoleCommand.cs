@@ -14,7 +14,7 @@ namespace Lumina.Application.Core.Admin.Authorization.Roles.Commands.UpdateRole;
 /// </summary>
 /// <param name="RoleId">The Id of the role.</param>
 /// <param name="RoleName">The name of the role.</param>
-/// <param name="Permissions">The collection or permissions of the role.</param>
+/// <param name="Permissions">The collection of Ids of the permissions of the role.</param>
 [DebuggerDisplay("RoleName: {RoleName}")]
 public record UpdateRoleCommand(
     Guid RoleId,

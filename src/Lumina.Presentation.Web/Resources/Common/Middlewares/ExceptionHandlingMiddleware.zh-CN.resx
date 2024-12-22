@@ -141,6 +141,9 @@
   <data name="CannotNavigateUp" xml:space="preserve">
     <value>无法向上导航！</value>
   </data>
+  <data name="CannotRemoveLastAdmin" xml:space="preserve">
+    <value>无法删除用户的最后一个管理员角色！</value>
+  </data>
   <data name="CodecCannotBeEmpty" xml:space="preserve">
     <value>编解码器不能为空！</value>
   </data>
@@ -515,6 +518,9 @@
   </data>
   <data name="UserIdCannotBeEmpty" xml:space="preserve">
     <value>用户ID不能为空！</value>
+  </data>
+  <data name="UserMustHaveRoleOrDirectPermissions" xml:space="preserve">
+    <value>用户必须具有角色权限或直接权限！</value>
   </data>
   <data name="UsernameAlreadyExists" xml:space="preserve">
     <value>用户名已存在！</value>

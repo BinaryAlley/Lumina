@@ -188,9 +188,6 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("TEXT");
-
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("TEXT")
                         .HasColumnOrder(2);
@@ -198,6 +195,9 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.Property<DateTime>("CreatedOnUtc")
                         .HasColumnType("TEXT")
                         .HasColumnOrder(1);
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("TEXT");
 
                     b.Property<Guid?>("UpdatedBy")
                         .HasColumnType("TEXT")
@@ -207,7 +207,7 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnOrder(3);
 
-                    b.HasKey("UserId", "RoleId");
+                    b.HasKey("UserId");
 
                     b.HasIndex("RoleId");
 
@@ -548,8 +548,8 @@ namespace Lumina.DataAccess.Common.Migrations
                         .IsRequired();
 
                     b.HasOne("Lumina.Application.Common.DataAccess.Entities.UsersManagement.UserEntity", "User")
-                        .WithMany("UserRoles")
-                        .HasForeignKey("UserId")
+                        .WithOne("UserRole")
+                        .HasForeignKey("Lumina.Application.Common.DataAccess.Entities.Authorization.UserRoleEntity", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -686,7 +686,8 @@ namespace Lumina.DataAccess.Common.Migrations
 
                     b.Navigation("UserPermissions");
 
-                    b.Navigation("UserRoles");
+                    b.Navigation("UserRole")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

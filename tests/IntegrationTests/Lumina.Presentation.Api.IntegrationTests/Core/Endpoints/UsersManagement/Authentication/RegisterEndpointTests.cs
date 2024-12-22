@@ -192,7 +192,7 @@ public class RegisterEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
             Password = new HashService().HashString("TestPass123!"),
             Libraries = [],
             UserPermissions = [],
-            UserRoles = [],
+            UserRole = null,
             CreatedBy = Guid.NewGuid(),
             CreatedOnUtc = DateTime.UtcNow
         };

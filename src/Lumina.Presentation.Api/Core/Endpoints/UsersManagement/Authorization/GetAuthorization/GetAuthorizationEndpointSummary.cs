@@ -22,7 +22,7 @@ public class GetAuthorizationEndpointSummary : Summary<GetAuthorizationEndpoint,
     public GetAuthorizationEndpointSummary()
     {
         Summary = "Gets the authorization details of an account.";
-        Description = "Gets the authorization roles and permissions of an account.";
+        Description = "Gets the authorization role and permissions of an account.";
 
         ExampleRequest = new GetAuthorizationRequest(
             UserId: Guid.NewGuid()
@@ -30,10 +30,10 @@ public class GetAuthorizationEndpointSummary : Summary<GetAuthorizationEndpoint,
 
         RequestParam(r => r.UserId, "The Id of the user for whom to get the authorization. Required.");
 
-        Response(200, "The authorization roles and permissions of the account are returned.",
+        Response(200, "The authorization role and permissions of the account are returned.",
             example: new AuthorizationResponse(
                 UserId: Guid.NewGuid(),
-                Roles: new HashSet<string>() { "Admin" },
+                Role: "Admin",
                 Permissions: new HashSet<AuthorizationPermission>() { AuthorizationPermission.CanRegisterUsers, AuthorizationPermission.CanDeleteUsers }
             ));
 

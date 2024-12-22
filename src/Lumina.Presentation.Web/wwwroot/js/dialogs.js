@@ -47,12 +47,6 @@ class DialogService {
     constructor() {
         this.dialogQueue = [];
         this.isDialogOpen = false;
-
-        // create dialog container inside the article element
-        const articleElement = document.querySelector('article');
-        this.container = document.createElement('div');
-        this.container.className = 'dialog-container';
-        articleElement.appendChild(this.container);
     }
 
     /**
@@ -104,7 +98,7 @@ class DialogService {
     displayDialog(dialog) {
         const modalBackground = document.getElementById('modal-background-article');
         modalBackground.style.display = 'block';
-        this.container.style.display = 'block';
+        document.querySelector('.dialog-container').style.display = 'block';
         const dialogElement = document.createElement('div');
         dialogElement.className = 'dialog';
 
@@ -164,7 +158,7 @@ class DialogService {
         };
         document.addEventListener('keydown', keyHandler);
 
-        this.container.appendChild(dialogElement);
+        document.querySelector('.dialog-container').appendChild(dialogElement);
     }
 
     /**
@@ -174,7 +168,7 @@ class DialogService {
      */
     handleButtonClick(buttonType) {
         const currentDialog = this.dialogQueue.shift();
-        const dialogElement = this.container.querySelector('.dialog');
+        const dialogElement = document.querySelector('.dialog-container').querySelector('.dialog');
 
         if (dialogElement) 
             dialogElement.remove();
@@ -182,7 +176,7 @@ class DialogService {
         if (this.dialogQueue.length === 0) {
             const modalBackground = document.getElementById('modal-background-article');
             modalBackground.style.display = 'none';
-            this.container.style.display = 'none';
+            document.querySelector('.dialog-container').style.display = 'none';
         }
 
         currentDialog.resolve(buttonType);

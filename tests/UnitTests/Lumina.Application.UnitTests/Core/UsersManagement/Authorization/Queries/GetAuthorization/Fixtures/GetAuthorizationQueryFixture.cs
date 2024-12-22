@@ -38,14 +38,12 @@ public class GetAuthorizationQueryFixture
     /// <returns>The created entity.</returns>
     public static UserAuthorizationEntity CreateUserAuthorizationEntity(Guid? userId = null, bool isAdmin = false)
     {
-        IReadOnlySet<string> roles = isAdmin
-            ? ["Admin"]
-            : new HashSet<string>();
+        string role = isAdmin ? "Admin" : string.Empty;
 
         return new UserAuthorizationEntity
         {
             UserId = userId ?? Guid.NewGuid(),
-            Roles = roles,
+            Role = role,
             Permissions = new HashSet<AuthorizationPermission>
             {
                 AuthorizationPermission.CanViewUsers,

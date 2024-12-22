@@ -28,7 +28,58 @@ public class AuthorizationServiceFixture
         Guid userId = Guid.NewGuid();
         DateTime utcNow = DateTime.UtcNow;
         List<UserPermissionEntity> userPermissions = [];
-        List<UserRoleEntity> userRoles = [];
+        UserRoleEntity? userRole = null;
+
+        // create role first if rolePermissions is provided
+        if (rolePermissions is not null)
+        {
+            foreach (KeyValuePair<string, IEnumerable<AuthorizationPermission>> rolePerm in rolePermissions)
+            {
+                Guid roleId = Guid.NewGuid();
+                RoleEntity role = new()
+                {
+                    Id = roleId,
+                    RoleName = rolePerm.Key,
+                    CreatedOnUtc = utcNow,
+                    CreatedBy = userId,
+                    RolePermissions = []
+                };
+
+                foreach (AuthorizationPermission permission in rolePerm.Value)
+                {
+                    Guid permissionId = Guid.NewGuid();
+                    PermissionEntity permissionEntity = new()
+                    {
+                        Id = permissionId,
+                        PermissionName = permission,
+                        CreatedOnUtc = utcNow,
+                        CreatedBy = userId
+                    };
+
+                    role.RolePermissions.Add(new RolePermissionEntity
+                    {
+                        Id = Guid.NewGuid(),
+                        RoleId = roleId,
+                        Role = role,
+                        PermissionId = permissionId,
+                        Permission = permissionEntity,
+                        CreatedOnUtc = utcNow,
+                        CreatedBy = userId
+                    });
+                }
+
+                userRole = new UserRoleEntity
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = userId,
+                    RoleId = roleId,
+                    Role = role,
+                    CreatedOnUtc = utcNow,
+                    CreatedBy = userId,
+                    User = null!
+                };
+            }
+        }
 
         UserEntity user = new()
         {
@@ -39,7 +90,7 @@ public class AuthorizationServiceFixture
             CreatedBy = userId,
             Libraries = [],
             UserPermissions = userPermissions,
-            UserRoles = userRoles
+            UserRole = userRole
         };
 
         if (directPermissions is not null)
@@ -105,7 +156,7 @@ public class AuthorizationServiceFixture
                     });
                 }
 
-                userRoles.Add(new UserRoleEntity
+                userRole = new UserRoleEntity
                 {
                     Id = Guid.NewGuid(),
                     UserId = userId,
@@ -114,7 +165,7 @@ public class AuthorizationServiceFixture
                     Role = role,
                     CreatedOnUtc = utcNow,
                     CreatedBy = userId
-                });
+                };
             }
         }
 

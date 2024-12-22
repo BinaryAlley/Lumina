@@ -219,7 +219,7 @@ function initializeNavigation() {
     bindNavigationLinks();
 
     // handle browser back/forward
-    window.addEventListener('popstate', handlePopState);
+    window.addEventListener('popstate', handlePopStateAsync);
 }
 
 /**
@@ -229,7 +229,7 @@ function bindNavigationLinks() {
     document.querySelectorAll('.nav-link').forEach(link => {
         // only bind if not already bound
         if (!link.dataset.boundNavigation) {
-            link.addEventListener('click', handleNavigation);
+            link.addEventListener('click', handleNavigationAsync);
             link.dataset.boundNavigation = 'true';
         }
     });
@@ -239,17 +239,17 @@ function bindNavigationLinks() {
  * Handles link clicks to navigate dynamically without reloading the page.
  * @param {Event} e - The click event for a navigation link.
  */
-async function handleNavigation(e) {
+async function handleNavigationAsync(e) {
     e.preventDefault();
     const url = e.target.href;
-    await updateContent(url, true);
+    await updateContentAsync(url, true);
 }
 
 /**
  * Restores page content and title when navigating with browser back/forward buttons.
  * @param {PopStateEvent} e - The popstate event with previous state data.
  */
-async function handlePopState(e) {
+async function handlePopStateAsync(e) {
     if (e.state) {
         // if we have cached content in state, use it immediately
         if (e.state.content) {
@@ -257,7 +257,7 @@ async function handlePopState(e) {
             document.title = e.state.title;
         }
         // still fetch fresh content to ensure it's up to date
-        await updateContent(e.state.url, false);
+        await updateContentAsync(e.state.url, false);
     }
 }
 
@@ -266,8 +266,18 @@ async function handlePopState(e) {
  * @param {string} url - URL to fetch new content from.
  * @param {boolean} addToHistory - Whether to add the new state to history.
  */
-async function updateContent(url, addToHistory) {
+async function updateContentAsync(url, addToHistory) {
     try {
+        // first, run cleanup of current view's scripts (unsubscribes handlers in the currently displayed razor views' script section, so it can be properly unloaded)
+        if (window.viewCleanups) {
+            Object.values(window.viewCleanups).forEach(cleanup => {
+                if (typeof cleanup === 'function')
+                    cleanup();
+            });
+            // reset cleanups object
+            window.viewCleanups = {};
+        }
+
         const response = await fetch(url);
         const html = await response.text();
 
@@ -277,107 +287,102 @@ async function updateContent(url, addToHistory) {
         const content = doc.querySelector('main').innerHTML;
         const title = doc.querySelector('title')?.textContent || document.title;
 
-        // find scripts section content
-        const scriptsSection = doc.querySelector('[data-section="scripts"]');
-
-        // update the page
+        // update the page content
         document.querySelector('main').innerHTML = content;
         document.title = title;
 
-        // handle Scripts section of the loaded view
-        if (scriptsSection) {
-            // get or create scripts container
-            let scriptsContainer = document.querySelector('[data-section="scripts"]');
-            if (!scriptsContainer) {
-                scriptsContainer = document.createElement('div');
-                scriptsContainer.setAttribute('data-section', 'scripts');
-                document.body.appendChild(scriptsContainer);
-            }
+        // process all scripts in order: component scripts first, then view scripts
+        const componentScripts = doc.querySelectorAll('script[data-component-script]');
+        for (const script of componentScripts) {
+            const newScript = document.createElement('script');
+            // copy script attributes
+            Array.from(script.attributes).forEach(attr => {
+                newScript.setAttribute(attr.name, attr.value);
+            });
 
-            // clear existing scripts in container
-            scriptsContainer.innerHTML = '';
-
-            // extract and execute scripts
-            const scriptElements = Array.from(scriptsSection.getElementsByTagName('script'));
-
-            for (const script of scriptElements) {
-                const scriptId = script.getAttribute('data-form');
-
-                // remove existing script with same Id if it exists
-                const existingScript = document.querySelector(`script[data-form="${scriptId}"]`);
-                if (existingScript) 
-                    existingScript.remove();
-
-                const newScript = document.createElement('script');
-
-                // copy script attributes
-                Array.from(script.attributes).forEach(attr => {
-                    newScript.setAttribute(attr.name, attr.value);
+            if (script.src) {
+                // wait for external script to fully load before continuing
+                await new Promise((resolve, reject) => {
+                    newScript.onload = resolve;
+                    newScript.onerror = reject;
+                    document.body.appendChild(newScript);
                 });
-
-                // handle both inline and external scripts
-                if (script.src) {
-                    newScript.src = script.src;
-                    // wait for external script to load
-                    await new Promise((resolve, reject) => {
-                        newScript.onload = resolve;
-                        newScript.onerror = reject;
-                    });
-                } else {
-                    // wrap inline scripts in a safety check
-                    newScript.textContent = `
-                        (function() {
-                            const safeGetElement = (id) => document.getElementById(id);
-                            const safeAddEventListener = (element, e, handler) => {
-                                if (element) 
-                                    element.addEventListener(e, handler);
-                            };
-                            ${script.textContent}
-                        })();
-                    `;
-                }
-
-                // add script to scripts container
-                scriptsContainer.appendChild(newScript);
             }
         }
+        // execute component initialization scripts
+        const componentInits = doc.querySelectorAll('script[data-component-init]');
+        for (const script of componentInits) {
+            const newScript = document.createElement('script');
+            // copy script attributes
+            Array.from(script.attributes).forEach(attr => {
+                newScript.setAttribute(attr.name, attr.value);
+            });
+            newScript.textContent = script.textContent;
+            document.body.appendChild(newScript);
+        }
+        // process view scripts
+        const viewScripts = doc.querySelector('[data-section="scripts"]')?.getElementsByTagName('script') || [];
 
+        // get or create scripts container
+        let scriptsContainer = document.querySelector('[data-section="scripts"]');
+        if (!scriptsContainer) {
+            scriptsContainer = document.createElement('div');
+            scriptsContainer.setAttribute('data-section', 'scripts');
+            document.body.appendChild(scriptsContainer);
+        }
+        // clear existing scripts in container
+        scriptsContainer.innerHTML = '';
+
+        // process view scripts
+        for (const script of viewScripts) {
+            const scriptId = script.getAttribute('data-form');
+            // remove existing script with same Id if it exists
+            const existingScript = document.querySelector(`script[data-form="${scriptId}"]`);
+            if (existingScript) 
+                existingScript.remove();
+
+            const newScript = document.createElement('script');
+            // copy script attributes
+            Array.from(script.attributes).forEach(attr => {
+                newScript.setAttribute(attr.name, attr.value);
+            });
+
+            // handle both inline and external scripts
+            if (script.src) {
+                newScript.src = script.src;
+                // wait for external script to load
+                await new Promise((resolve, reject) => {
+                    newScript.onload = resolve;
+                    newScript.onerror = reject;
+                });
+            } else {
+                // wrap inline scripts in a safety check
+                newScript.textContent = `
+                    (function() {
+                        const safeGetElement = (id) => document.getElementById(id);
+                        const safeAddEventListener = (element, e, handler) => {
+                            if (element) 
+                                element.addEventListener(e, handler);
+                        };
+                        ${script.textContent}
+                    })();
+                `;
+            }
+            // add script to scripts container
+            scriptsContainer.appendChild(newScript);
+        }
         // bind navigation links in the new content
         bindNavigationLinks();
 
         // save to history if needed
         if (addToHistory) {
-            const state = {
-                url: url,
-                content: content,
-                title: title
-            };
+            const state = { url, content, title };
             history.pushState(state, title, url);
         }
     } catch (error) {
         notificationService.show(jsLocalizedMessages.navigationFailed, NotificationType.ERROR);
         console.error('Navigation failed:', error);
     }
-}
-
-/**
- * Dynamically loads and executes scripts within the content area once.
- * @param {HTMLElement} container - The container to scan for scripts.
- */
-function executeScriptsOnce(container) {
-    // Find all script tags inside the container
-    container.querySelectorAll('script').forEach(script => {
-        if (!script.dataset.executed) {
-            const newScript = document.createElement('script');
-            newScript.textContent = script.textContent; // Inline scripts
-            if (script.src) newScript.src = script.src; // External scripts
-            newScript.async = script.async;
-            newScript.defer = script.defer;
-
-            script.dataset.executed = 'true'; // Mark the script as executed
-            document.body.appendChild(newScript);
-        }
-    });
 }
 
 //+======================================================================================+
@@ -432,7 +437,7 @@ function updateOperationProgress(completed, total) {
  * @param {any} blob The blob to convert.
  * @returns The converted Base64 string.
  */
-async function blobToBase64(blob) {
+async function blobToBase64Async(blob) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onloadend = () => resolve(reader.result.split(',')[1]);

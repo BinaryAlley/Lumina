@@ -22,12 +22,12 @@ public class UpdateLibraryCommandValidator : AbstractValidator<UpdateLibraryComm
             .Must(id => id != Guid.Empty).WithMessage(Errors.Library.LibraryIdCannotBeEmpty.Description);
         
         RuleFor(x => x.CurrentUserId)
-            .NotEmpty().WithMessage(Errors.Library.UserIdCannotBeEmpty.Description)
-            .Must(id => id != Guid.Empty).WithMessage(Errors.Library.UserIdCannotBeEmpty.Description);
+            .NotEmpty().WithMessage(Errors.Users.UserIdCannotBeEmpty.Description)
+            .Must(id => id != Guid.Empty).WithMessage(Errors.Users.UserIdCannotBeEmpty.Description);
 
         RuleFor(x => x.OwnerId)
-            .NotEmpty().WithMessage(Errors.Library.UserIdCannotBeEmpty.Description)
-            .Must(id => id != Guid.Empty).WithMessage(Errors.Library.UserIdCannotBeEmpty.Description);
+            .NotEmpty().WithMessage(Errors.Users.UserIdCannotBeEmpty.Description)
+            .Must(id => id != Guid.Empty).WithMessage(Errors.Users.UserIdCannotBeEmpty.Description);
 
         RuleFor(x => x.LibraryType)
             .NotNull().WithMessage(Errors.Library.LibraryTypeCannotBeNull.Description)

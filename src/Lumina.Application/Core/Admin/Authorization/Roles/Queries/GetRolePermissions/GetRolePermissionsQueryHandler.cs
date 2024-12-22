@@ -51,6 +51,7 @@ public class GetRolePermissionsQueryHandler : IRequestHandler<GetRolePermissions
         bool isAdmin = await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false);
         if (!isAdmin)
             return Errors.Authorization.NotAuthorized;
+        // get the role from the repository and return its role permissions
         ErrorOr<RoleEntity?> getRoleResult = await _roleRepository.GetByIdAsync(request.RoleId, cancellationToken).ConfigureAwait(false);
         if (getRoleResult.IsError)
             return getRoleResult.Errors;

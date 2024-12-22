@@ -55,9 +55,8 @@ public class AuthorizationService : IAuthorizationService
             return true;
 
         // check if any of the user's roles grant the permission
-        return getUserResult.Value.UserRoles
-            .SelectMany(userRole => userRole.Role.RolePermissions)
-            .Any(rolePermission => rolePermission.Permission.PermissionName == permission);
+        return getUserResult.Value.UserRole?.Role.RolePermissions
+            .Any(rolePermission => rolePermission.Permission.PermissionName == permission) == true;
     }
 
     /// <summary>
@@ -72,7 +71,7 @@ public class AuthorizationService : IAuthorizationService
         ErrorOr<UserEntity?> getUserResult = await _userRepository.GetByIdAsync(userId, cancellationToken).ConfigureAwait(false);
         if (getUserResult.IsError || getUserResult.Value is null)
             return false;
-        return getUserResult.Value.UserRoles.Any(userRole => userRole.Role.RoleName == role);
+        return getUserResult.Value.UserRole?.Role.RoleName == role;
     }
 
     /// <summary>
@@ -106,9 +105,7 @@ public class AuthorizationService : IAuthorizationService
             return Errors.Users.UserDoesNotExist;
 
         // get all roles
-        HashSet<string> roles = getUserResult.Value.UserRoles
-            .Select(userRole => userRole.Role.RoleName)
-            .ToHashSet();
+        string? role = getUserResult.Value.UserRole?.Role.RoleName;
 
         // get direct user permissions
         HashSet<AuthorizationPermission> directPermissions = getUserResult.Value.UserPermissions
@@ -116,20 +113,17 @@ public class AuthorizationService : IAuthorizationService
             .ToHashSet();
 
         // get permissions from roles
-        HashSet<AuthorizationPermission> rolePermissions = getUserResult.Value.UserRoles
-            .SelectMany(userRole => userRole.Role.RolePermissions)
+        HashSet<AuthorizationPermission>? rolePermissions = getUserResult.Value.UserRole?.Role.RolePermissions
             .Select(rolePermission => rolePermission.Permission.PermissionName)
             .ToHashSet();
 
         // combine all permissions
-        HashSet<AuthorizationPermission> allPermissions = directPermissions
-            .Union(rolePermissions)
-            .ToHashSet();
+        HashSet<AuthorizationPermission> allPermissions = rolePermissions is not null ? directPermissions.Union(rolePermissions).ToHashSet() : directPermissions;
 
         return new UserAuthorizationEntity
         {
             UserId = userId,
-            Roles = roles,
+            Role = role,
             Permissions = allPermissions
         };
     }

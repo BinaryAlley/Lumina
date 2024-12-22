@@ -19,19 +19,19 @@ public class UserRoleConfiguration : IEntityTypeConfiguration<UserRoleEntity>
     {
         builder.ToTable("UserRoles");
 
-        // composite primary key
-        builder.HasKey(userRole => new { userRole.UserId, userRole.RoleId });
+        // primary key
+        builder.HasKey(userRole => userRole.UserId );
 
         builder.Ignore(userRole => userRole.Id); // Id is only needed as a generic constraint for the repository, but this entity uses a composite key as Id
 
-        // foreign key: User
+        // foreign key: User (one-to-one relationship)
         builder.HasOne(userRole => userRole.User)
-            .WithMany(user => user.UserRoles)
-            .HasForeignKey(userRole => userRole.UserId)
+            .WithOne(user => user.UserRole)
+            .HasForeignKey<UserRoleEntity>(userRole => userRole.UserId)
             .IsRequired()
-            .OnDelete(DeleteBehavior.Cascade); // deleting a User deletes associated UserRoles
+            .OnDelete(DeleteBehavior.Cascade); // deleting a User deletes associated UserRole
 
-        // foreign key: Role
+        // foreign key: Role (many-to-one relationship)
         builder.HasOne(userRole => userRole.Role)
             .WithMany(role => role.UserRoles)
             .HasForeignKey(userRole => userRole.RoleId)

@@ -55,7 +55,7 @@ public class GetAuthorizationQueryHandlerTests
         // Assert
         result.IsError.Should().BeFalse();
         result.Value.UserId.Should().Be(userId);
-        result.Value.Roles.Should().BeEquivalentTo(authEntity.Roles);
+        result.Value.Role.Should().BeEquivalentTo(authEntity.Role);
         result.Value.Permissions.Should().BeEquivalentTo(authEntity.Permissions);
     }
 
@@ -81,7 +81,7 @@ public class GetAuthorizationQueryHandlerTests
         // Assert
         result.IsError.Should().BeFalse();
         result.Value.UserId.Should().Be(targetUserId);
-        result.Value.Roles.Should().BeEquivalentTo(targetAuthEntity.Roles);
+        result.Value.Role.Should().BeEquivalentTo(targetAuthEntity.Role);
         result.Value.Permissions.Should().BeEquivalentTo(targetAuthEntity.Permissions);
     }
 

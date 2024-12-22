@@ -40,7 +40,7 @@ public class AdminController : Controller
     {
         // get the list of roles and permissions from the API
         ViewData["roles"] = await _apiHttpClient.GetAsync<RoleModel[]>($"roles/", cancellationToken).ConfigureAwait(false);
-        ViewData["rolePermissions"] = await _apiHttpClient.GetAsync<PermissionModel[]>($"permissions/", cancellationToken).ConfigureAwait(false);
+        ViewData["permissions"] = await _apiHttpClient.GetAsync<PermissionModel[]>($"permissions/", cancellationToken).ConfigureAwait(false);
         return View();
     }
 
@@ -53,6 +53,7 @@ public class AdminController : Controller
     {
         ViewData["users"] = await _apiHttpClient.GetAsync<UserModel[]>($"auth/users", cancellationToken).ConfigureAwait(false);
         ViewData["roles"] = await _apiHttpClient.GetAsync<RoleModel[]>($"roles/", cancellationToken).ConfigureAwait(false);
+        ViewData["permissions"] = await _apiHttpClient.GetAsync<PermissionModel[]>($"permissions/", cancellationToken).ConfigureAwait(false);
         return View();
     }
 
@@ -65,6 +66,30 @@ public class AdminController : Controller
     public async Task<IActionResult> GetPermissionsByRoleId(Guid roleId, CancellationToken cancellationToken)
     {
         RolePermissionsModel response = await _apiHttpClient.GetAsync<RolePermissionsModel>($"roles/{roleId}/permissions", cancellationToken).ConfigureAwait(false);
+        return Json(new { success = true, data = response });
+    }
+
+    /// <summary>
+    /// Gets the authorization permissions of a user identified by <paramref name="userId"/>.
+    /// </summary>
+    /// <param name="userId">The Id of the user for whom to get the list of permissions.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    [HttpGet("get-permissions-by-user-id/{userId}")]
+    public async Task<IActionResult> GetPermissionsByUserId(Guid userId, CancellationToken cancellationToken)
+    {
+        PermissionModel[] response = await _apiHttpClient.GetAsync<PermissionModel[]>($"auth/users/{userId}/permissions", cancellationToken).ConfigureAwait(false);
+        return Json(new { success = true, data = response });
+    }
+
+    /// <summary>
+    /// Gets the authorization role of a user identified by <paramref name="userId"/>.
+    /// </summary>
+    /// <param name="userId">The Id of the user for whom to get the role.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    [HttpGet("get-role-by-user-id/{userId}")]
+    public async Task<IActionResult> GetRoleByUserId(Guid userId, CancellationToken cancellationToken)
+    {
+        RoleModel? response = await _apiHttpClient.GetAsync<RoleModel?>($"auth/users/{userId}/role", cancellationToken).ConfigureAwait(false);
         return Json(new { success = true, data = response });
     }
 
@@ -113,5 +138,17 @@ public class AdminController : Controller
     {
         await _apiHttpClient.DeleteAsync($"roles/{roleId}", cancellationToken).ConfigureAwait(false);
         return Json(new { success = true });
+    }
+
+    /// <summary>
+    /// Updates an authorization role with the specified name and associated permissions.
+    /// </summary>
+    /// <param name="model">The model containing the data of the role to be updated.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    [HttpPut("update-user-authorization")]
+    public async Task<IActionResult> UpdateUserAuthorization([FromBody] UpdateUserRoleAndPermissionsRequestModel model, CancellationToken cancellationToken)
+    {
+        GetAuthorizationResponse response = await _apiHttpClient.PutAsync<GetAuthorizationResponse, UpdateUserRoleAndPermissionsRequestModel>($"auth/users/{model.UserId}/role-and-permissions", model, cancellationToken).ConfigureAwait(false);
+        return Json(new { success = true, data = response });
     }
 }

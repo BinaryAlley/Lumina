@@ -52,7 +52,7 @@ public class AuthorizationService : IAuthorizationService
     public async Task<bool> IsInRoleAsync(string role, CancellationToken cancellationToken)
     {
         GetAuthorizationResponse authorization = await GetUserAuthorizationAsync(cancellationToken).ConfigureAwait(false);
-        return authorization.Roles.Contains(role);
+        return authorization.Role == role;
     }
 
     /// <summary>
@@ -75,7 +75,7 @@ public class AuthorizationService : IAuthorizationService
     {
         GetAuthorizationResponse authorization = await GetUserAuthorizationAsync(CancellationToken.None);
 
-        if (requirement.Roles?.Length > 0 && !requirement.Roles.Any(role => authorization.Roles?.Contains(role) == true))
+        if (requirement.Roles?.Length > 0 && !requirement.Roles.Any(role => authorization.Role?.Contains(role) == true))
             return false;
 
         if (requirement.Permissions?.Length > 0 && !requirement.Permissions.Any(permission => authorization.Permissions.Contains(permission)))

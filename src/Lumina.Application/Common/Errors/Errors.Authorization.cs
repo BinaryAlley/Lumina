@@ -25,5 +25,7 @@ public static partial class Errors
         public static Error PermissionIdCannotBeEmpty => Error.Validation(description: nameof(PermissionIdCannotBeEmpty));
         public static Error RoleNameCannotBeEmpty => Error.Validation(description: nameof(RoleNameCannotBeEmpty));
         public static Error RoleNameCannotBeNull => Error.Validation(description: nameof(RoleNameCannotBeNull));
+        public static Error CannotRemoveLastAdmin => Error.Forbidden(description: nameof(CannotRemoveLastAdmin));
+        public static Error UserMustHaveRoleOrDirectPermissions => Error.Forbidden(description: nameof(UserMustHaveRoleOrDirectPermissions));
     }
 }

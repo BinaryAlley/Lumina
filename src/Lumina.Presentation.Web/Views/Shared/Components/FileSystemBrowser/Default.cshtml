@@ -4,10 +4,15 @@
 @using Lumina.Presentation.Web.Common.Enums.Notifications
 @using Lumina.Presentation.Web.Common.Exceptions
 @using Lumina.Presentation.Web.Common.Models.FileSystemManagement
+@using Lumina.Presentation.Web.Common.Services
 @using Microsoft.AspNetCore.Mvc.Localization
 @using Microsoft.AspNetCore.Components
 @using System.Text.Json
 @using System.Text
+
+@{
+    var componentScriptId = ScriptIdentifierHelper.GenerateScriptId();
+}
 
 @inject IViewLocalizer _localizer
 
@@ -522,14 +527,23 @@
 </div>
 <div id="visible-selection-rectangle"></div>
 <div id="selection-rectangle"></div>
-<script defer src="~/js/file-system-browser-dialog.js" asp-append-version="true"></script>
-<script defer>
-    document.addEventListener('DOMContentLoaded', async function () {
-        await initFileSystemBrowser(
-            '@Model.ServerBasePath', 
-            '@Model.ClientBasePath', 
-            '@Model.Path.Replace(@"\", @"\\")', 
-            '@Model.ViewMode.ToString().ToLower()', 
-            '@Model.IconSize.ToString().ToLower()');
-    });
+<script defer src="~/js/file-system-browser-dialog.js" data-component-script="file-system-browser"></script>
+<script defer data-component-init="file-system-browser">
+    // this outer function executes immediately and creates a scope for the variables
+    (function() {
+        // this inner function contains the actual initialization code that needs to run
+        async function checkAndInit() {
+            if (typeof initFileSystemBrowser === 'undefined' || typeof callApiGetAsync === 'undefined') {
+                setTimeout(checkAndInit, 10);
+                return;
+            }
+            await initFileSystemBrowser(
+                '@Model.ServerBasePath',
+                '@Model.ClientBasePath',
+                '@Model.Path.Replace(@"\", @"\\")',
+                '@Model.ViewMode.ToString().ToLower()',
+                '@Model.IconSize.ToString().ToLower()');
+        }
+        checkAndInit().catch(error => console.error('Failed to initialize file system browser:', error));
+    })();
 </script>

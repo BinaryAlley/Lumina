@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -51,10 +52,11 @@ public class UserConfiguration : IEntityTypeConfiguration<UserEntity>
             .IsRequired() // a library must have a user
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasMany(user => user.UserRoles)
-            .WithOne(userRole => userRole.User)
-            .HasForeignKey(userRole => userRole.UserId)
-            .OnDelete(DeleteBehavior.Cascade); 
+        builder.HasOne(user => user.UserRole)
+           .WithOne(userRole => userRole.User)
+           .HasForeignKey<UserRoleEntity>(userRole => userRole.UserId)
+           .IsRequired()
+           .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(user => user.UserPermissions)
             .WithOne(userPermission => userPermission.User)

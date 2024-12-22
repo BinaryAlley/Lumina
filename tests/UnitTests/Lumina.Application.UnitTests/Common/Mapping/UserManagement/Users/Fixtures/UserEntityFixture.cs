@@ -48,7 +48,7 @@ public class UserEntityFixture
                 TotpSecret = default,
                 Libraries = libraries,
                 UserPermissions = [],
-                UserRoles = [],
+                UserRole = null,
                 CreatedBy = userId
             })
             .RuleFor(x => x.Username, f => f.Internet.UserName())

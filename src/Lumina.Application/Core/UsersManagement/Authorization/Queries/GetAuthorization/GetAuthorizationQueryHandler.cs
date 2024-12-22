@@ -51,7 +51,7 @@ public class GetAuthorizationQueryHandler : IRequestHandler<GetAuthorizationQuer
             if (getCurrentUserPermissionResult.IsError)
                 return getCurrentUserPermissionResult.Errors;
             // if the current user is not an Admin, and the account for whom they request the permissions list is not theirs, deny the request
-            if (!getCurrentUserPermissionResult.Value.Roles.Any(role => role == "Admin"))
+            if (getCurrentUserPermissionResult.Value.Role != "Admin")
                 return Errors.Authorization.NotAuthorized;
         }
         ErrorOr<UserAuthorizationEntity> getUserPermissionResult = await _authorizationService.GetUserAuthorizationAsync(request.UserId!.Value, cancellationToken).ConfigureAwait(false);

@@ -51,9 +51,9 @@ public class UserEntity : IStorageEntity, IAuditableEntity
     public required ICollection<LibraryEntity> Libraries { get; init; } = [];
 
     /// <summary>
-    /// Gets the collection of user roles associations that include this user.
+    /// Gets the user roles association that includes this user.
     /// </summary>
-    public required ICollection<UserRoleEntity> UserRoles { get; init; } = [];
+    public required UserRoleEntity? UserRole { get; init; }
 
     /// <summary>
     /// Gets the collection of user permission associations that include this user.
