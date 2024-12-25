@@ -351,6 +351,9 @@
   <data name="NewPasswordConfirmCannotBeEmpty" xml:space="preserve">
     <value>新密码确认不能为空！</value>
   </data>
+  <data name="Forbidden" xml:space="preserve">
+    <value>您无权查看此资源！</value>
+  </data>
   <data name="NotAuthorized" xml:space="preserve">
     <value>您无权执行此操作！</value>
   </data>

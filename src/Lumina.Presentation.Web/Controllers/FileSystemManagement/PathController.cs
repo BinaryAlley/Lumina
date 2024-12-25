@@ -33,9 +33,10 @@ public class PathController : Controller
     /// </summary>
     /// <param name="path">The path for which to get the root.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    [HttpGet("get-path-root")]
+    [HttpGet("api-get-path-root")]
     public async Task<IActionResult> GetPathRoot([FromQuery] string path, CancellationToken cancellationToken)
     {
+        // TODO: check if it's really used
         PathSegmentModel response = await _apiHttpClient.GetAsync<PathSegmentModel>($"path/get-path-root?path={Uri.EscapeDataString(path)}", cancellationToken).ConfigureAwait(false);
         return Json(new { success = true, data = new { root = response } });
     }
@@ -44,7 +45,7 @@ public class PathController : Controller
     /// Gets the path separator character of the file system.
     /// </summary>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    [HttpGet("get-path-separator")]
+    [HttpGet("api-get-path-separator")]
     public async Task<IActionResult> GetPathSeparator(CancellationToken cancellationToken)
     {
         PathSeparatorModel response = await _apiHttpClient.GetAsync<PathSeparatorModel>($"path/get-path-separator", cancellationToken).ConfigureAwait(false);
@@ -56,7 +57,7 @@ public class PathController : Controller
     /// </summary>
     /// <param name="path">The path for which to get the parent path.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    [HttpGet("get-path-parent")]
+    [HttpGet("api-get-path-parent")]
     public async Task<IActionResult> GetPathParent([FromQuery] string path, CancellationToken cancellationToken)
     {
         PathSegmentModel[] response = await _apiHttpClient.GetAsync<PathSegmentModel[]>($"path/get-path-parent?path={Uri.EscapeDataString(path)}", cancellationToken).ConfigureAwait(false);
@@ -68,7 +69,7 @@ public class PathController : Controller
     /// </summary>
     /// <param name="path">The path for which to get the path segments.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    [HttpGet("split")]
+    [HttpGet("api-split")]
     public async Task<IActionResult> SplitPath([FromQuery] string path, CancellationToken cancellationToken)
     {
         PathSegmentModel[] response = await _apiHttpClient.GetAsync<PathSegmentModel[]>($"path/split?path={Uri.EscapeDataString(path)}", cancellationToken).ConfigureAwait(false);
@@ -80,7 +81,7 @@ public class PathController : Controller
     /// </summary>
     /// <param name="path">The path to be validated.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    [HttpGet("validate")]
+    [HttpGet("api-validate")]
     public async Task<IActionResult> ValidatePath([FromQuery] string path, CancellationToken cancellationToken)
     {
         PathValidModel response = await _apiHttpClient.GetAsync<PathValidModel>($"path/validate?path={Uri.EscapeDataString(path)}", cancellationToken).ConfigureAwait(false);
@@ -93,7 +94,7 @@ public class PathController : Controller
     /// <param name="path">The path to be checked.</param>
     /// <param name="includeHiddenElements">Whether to include hidden file system elements or not.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    [HttpGet("check-path-exists")]
+    [HttpGet("api-check-path-exists")]
     public async Task<IActionResult> CheckPathExists([FromQuery] string path, [FromQuery] bool includeHiddenElements, CancellationToken cancellationToken)
     {
         PathExistsModel response = await _apiHttpClient.GetAsync<PathExistsModel>(

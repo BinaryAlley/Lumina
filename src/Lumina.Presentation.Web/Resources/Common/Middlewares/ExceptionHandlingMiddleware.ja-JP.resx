@@ -351,6 +351,9 @@
   <data name="NewPasswordConfirmCannotBeEmpty" xml:space="preserve">
     <value>新しいパスワードの確認を入力してください!</value>
   </data>
+  <data name="Forbidden" xml:space="preserve">
+    <value>このリソースを表示する権限がありません！</value>
+  </data>
   <data name="NotAuthorized" xml:space="preserve">
     <value>この操作を実行する権限がありません!</value>
   </data>

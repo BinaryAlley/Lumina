@@ -85,7 +85,7 @@
                 TotpCode: txtTotpCode.value,
                 ReturnUrl: returnUrlInput.value
             };
-            const data = await callApiPostAsync('@_urlService.GetAbsoluteUrl("Login", "Auth")', formData);
+            const data = await callApiPostAsync('@_urlService.GetAbsoluteUrl("LoginPost", "Auth")', formData);
             if (data && data.isTotpRequired === true) {
                 txtUsername.disabled = true;
                 txtPassword.disabled = true;

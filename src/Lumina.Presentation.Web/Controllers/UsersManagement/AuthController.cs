@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections.Generic;
@@ -132,8 +133,8 @@ public class AuthController : Controller
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     [AllowAnonymous]
     [ValidateAntiForgeryToken]
-    [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] RegisterRequestModel data, CancellationToken cancellationToken)
+    [HttpPost("api-register")]
+    public async Task<IActionResult> RegisterPost([FromBody] RegisterRequestModel data, CancellationToken cancellationToken)
     {
         // call different endpoints based on the view hidden field - registration for normal users, or initial application admin account setup
         string endpoint = data.RegistrationType == "Admin" ? "initialization" : "auth/register";
@@ -149,8 +150,8 @@ public class AuthController : Controller
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     [AllowAnonymous]
     [ValidateAntiForgeryToken]
-    [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginRequestModel data, CancellationToken cancellationToken)
+    [HttpPost("api-login")]
+    public async Task<IActionResult> LoginPost([FromBody] LoginRequestModel data, CancellationToken cancellationToken)
     {
         try
         {
@@ -236,8 +237,8 @@ public class AuthController : Controller
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     [AllowAnonymous]
     [ValidateAntiForgeryToken]
-    [HttpPost("recover-password")]
-    public async Task<IActionResult> RecoverPassword([FromBody] RecoverPasswordRequestModel data, CancellationToken cancellationToken)
+    [HttpPost("api-recover-password")]
+    public async Task<IActionResult> RecoverPasswordPost([FromBody] RecoverPasswordRequestModel data, CancellationToken cancellationToken)
     {
         RecoverPasswordResponseModel response = await _apiHttpClient.PostAsync<RecoverPasswordResponseModel, RecoverPasswordRequestModel>("auth/recover-password", data, cancellationToken).ConfigureAwait(false);
         return Json(new { success = true, data = response });
@@ -249,8 +250,8 @@ public class AuthController : Controller
     /// <param name="data">User credentials used for password change.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     [ValidateAntiForgeryToken]
-    [HttpPost("change-password")]
-    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestModel data, CancellationToken cancellationToken)
+    [HttpPost("api-change-password")]
+    public async Task<IActionResult> ChangePasswordPost([FromBody] ChangePasswordRequestModel data, CancellationToken cancellationToken)
     {
         data = data with { Username = User?.Identity?.Name }; // assign the currently logged in user as the user for which to change the password
         ChangePasswordResponseModel response = await _apiHttpClient.PostAsync<ChangePasswordResponseModel, ChangePasswordRequestModel>("auth/change-password", data, cancellationToken).ConfigureAwait(false);

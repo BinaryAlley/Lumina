@@ -62,7 +62,7 @@ public class AdminController : Controller
     /// </summary>
     /// <param name="roleId">The Id of the role for which to get the list of permissions.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    [HttpGet("get-permissions-by-role-id/{roleId}")]
+    [HttpGet("api-get-permissions-by-role-id/{roleId}")]
     public async Task<IActionResult> GetPermissionsByRoleId(Guid roleId, CancellationToken cancellationToken)
     {
         RolePermissionsModel response = await _apiHttpClient.GetAsync<RolePermissionsModel>($"roles/{roleId}/permissions", cancellationToken).ConfigureAwait(false);
@@ -74,7 +74,7 @@ public class AdminController : Controller
     /// </summary>
     /// <param name="userId">The Id of the user for whom to get the list of permissions.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    [HttpGet("get-permissions-by-user-id/{userId}")]
+    [HttpGet("api-get-permissions-by-user-id/{userId}")]
     public async Task<IActionResult> GetPermissionsByUserId(Guid userId, CancellationToken cancellationToken)
     {
         PermissionModel[] response = await _apiHttpClient.GetAsync<PermissionModel[]>($"auth/users/{userId}/permissions", cancellationToken).ConfigureAwait(false);
@@ -86,7 +86,7 @@ public class AdminController : Controller
     /// </summary>
     /// <param name="userId">The Id of the user for whom to get the role.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    [HttpGet("get-role-by-user-id/{userId}")]
+    [HttpGet("api-get-role-by-user-id/{userId}")]
     public async Task<IActionResult> GetRoleByUserId(Guid userId, CancellationToken cancellationToken)
     {
         RoleModel? response = await _apiHttpClient.GetAsync<RoleModel?>($"auth/users/{userId}/role", cancellationToken).ConfigureAwait(false);
@@ -97,7 +97,7 @@ public class AdminController : Controller
     /// Gets the collection of authorization roles.
     /// </summary>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    [HttpGet("get-roles")]
+    [HttpGet("api-get-roles")]
     public async Task<IActionResult> GetRoles(CancellationToken cancellationToken)
     {
         RoleModel[] response = await _apiHttpClient.GetAsync<RoleModel[]>($"roles/", cancellationToken).ConfigureAwait(false);
@@ -109,7 +109,7 @@ public class AdminController : Controller
     /// </summary>
     /// <param name="model">The model containing the data of the role to be created.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    [HttpPost("create-role")]
+    [HttpPost("api-create-role")]
     public async Task<IActionResult> CreateRole([FromBody] AddRoleRequestModel model, CancellationToken cancellationToken)
     {
         RolePermissionsModel response = await _apiHttpClient.PostAsync<RolePermissionsModel, AddRoleRequestModel>($"roles/", model, cancellationToken).ConfigureAwait(false);
@@ -121,7 +121,7 @@ public class AdminController : Controller
     /// </summary>
     /// <param name="model">The model containing the data of the role to be updated.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    [HttpPut("update-role")]
+    [HttpPut("api-update-role")]
     public async Task<IActionResult> UpdateRole([FromBody] UpdateRoleRequestModel model, CancellationToken cancellationToken)
     {
         RolePermissionsModel response = await _apiHttpClient.PutAsync<RolePermissionsModel, UpdateRoleRequestModel>($"roles/", model, cancellationToken).ConfigureAwait(false);
@@ -133,7 +133,7 @@ public class AdminController : Controller
     /// </summary>
     /// <param name="roleId">The Id of the role to be deleted.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    [HttpDelete("delete-role/{roleId}")]
+    [HttpDelete("api-delete-role/{roleId}")]
     public async Task<IActionResult> DeleteRole(Guid roleId, CancellationToken cancellationToken)
     {
         await _apiHttpClient.DeleteAsync($"roles/{roleId}", cancellationToken).ConfigureAwait(false);
@@ -145,7 +145,7 @@ public class AdminController : Controller
     /// </summary>
     /// <param name="model">The model containing the data of the role to be updated.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    [HttpPut("update-user-authorization")]
+    [HttpPut("api-update-user-authorization")]
     public async Task<IActionResult> UpdateUserAuthorization([FromBody] UpdateUserRoleAndPermissionsRequestModel model, CancellationToken cancellationToken)
     {
         GetAuthorizationResponse response = await _apiHttpClient.PutAsync<GetAuthorizationResponse, UpdateUserRoleAndPermissionsRequestModel>($"auth/users/{model.UserId}/role-and-permissions", model, cancellationToken).ConfigureAwait(false);

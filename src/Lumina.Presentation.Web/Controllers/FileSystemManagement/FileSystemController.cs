@@ -31,7 +31,7 @@ public class FileSystemController : Controller
     /// Gets the type of the file system.
     /// </summary>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    [HttpGet("get-type")]
+    [HttpGet("api-get-type")]
     public async Task<IActionResult> GetType(CancellationToken cancellationToken)
     {
         FileSystemTypeModel response = await _apiHttpClient.GetAsync<FileSystemTypeModel>($"file-system/get-type", cancellationToken).ConfigureAwait(false);

@@ -4,8 +4,6 @@ using Lumina.Presentation.Web.Common.Http;
 using Lumina.Presentation.Web.Common.Models.UsersManagement;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Caching.Memory;
-using System;
 using System.Threading.Tasks;
 #endregion
 
@@ -17,17 +15,14 @@ namespace Lumina.Presentation.Web.Common.Authorization;
 public class InitializationHandler : AuthorizationHandler<InitializationRequirement>
 {
     private readonly IApiHttpClient _apiHttpClient;
-    private readonly IMemoryCache _cache;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="InitializationHandler"/> class.
     /// </summary>
     /// <param name="apiHttpClient">Injected HTTP typed client for interactions with the API.</param>
-    /// <param name="cache">Cache for storing the initialization status.</param>
-    public InitializationHandler(IApiHttpClient apiHttpClient, IMemoryCache cache)
+    public InitializationHandler(IApiHttpClient apiHttpClient)
     {
         _apiHttpClient = apiHttpClient;
-        _cache = cache;
     }
 
     /// <summary>

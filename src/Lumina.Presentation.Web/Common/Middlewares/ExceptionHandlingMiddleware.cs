@@ -80,6 +80,20 @@ public class ExceptionHandlingMiddleware
         // handle unauthorized errors by prompting the user to re-login
         if (apiException.HttpStatusCode == HttpStatusCode.Unauthorized) // HTTP 401 Unauthorized actually means lack of valid authentication credentials (not logged in)
             await HandleUnauthorizedAsync(context);
+        else if (apiException.HttpStatusCode == HttpStatusCode.Forbidden)
+        {
+            if (IsApiRequest(context))
+            {
+                string errorMessage = BuildErrorMessage(apiException);
+                await WriteJsonResponseAsync(context, new
+                {
+                    success = false,
+                    errorMessage
+                });
+            }
+            else
+                await context.ForbidAsync();
+        }
         else
         {
             string errorMessage = BuildErrorMessage(apiException);
@@ -97,7 +111,7 @@ public class ExceptionHandlingMiddleware
     private async Task HandleUnauthorizedAsync(HttpContext context)
     {
         // when API JWT tokens expire, the client app is still logged in, so, sign out the user and delete the authentication cookie and token
-        await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme).ConfigureAwait(false);
         context.Response.Cookies.Delete("Token");
 
         if (IsApiRequest(context))

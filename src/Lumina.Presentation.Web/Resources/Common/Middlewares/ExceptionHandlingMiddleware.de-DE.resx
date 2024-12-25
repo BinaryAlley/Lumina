@@ -351,6 +351,9 @@
   <data name="NewPasswordConfirmCannotBeEmpty" xml:space="preserve">
     <value>Neue Passwortbestätigung darf nicht leer sein!</value>
   </data>
+  <data name="Forbidden" xml:space="preserve">
+    <value>Sie sind nicht berechtigt, diese Ressource anzusehen!</value>
+  </data>
   <data name="NotAuthorized" xml:space="preserve">
     <value>Sie sind nicht berechtigt, diesen Vorgang auszuführen!</value>
   </data>

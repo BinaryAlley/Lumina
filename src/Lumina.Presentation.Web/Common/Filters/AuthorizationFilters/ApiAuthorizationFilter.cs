@@ -41,12 +41,13 @@ public class ApiAuthorizationFilter : IAsyncAuthorizationFilter
             if (!await _authorizationService.EvaluateAuthorizationAsync(_requirement))
                 context.Result = new ForbidResult();
         }
-        catch (ApiException ex)
+        catch (ApiException ex) // TODO: check if it should really catch exceptions here
         {
             if (ex.HttpStatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
-                await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme).ConfigureAwait(false);
                 context.HttpContext.Response.Cookies.Delete("Token");
+                throw;
             }
         }
     }
