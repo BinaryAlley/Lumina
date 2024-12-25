@@ -66,8 +66,6 @@ public class UrlService : IUrlService
             foreach (PropertyInfo prop in additionalRouteValues.GetType().GetProperties())
                 routeValues.Add(prop.Name, prop.GetValue(additionalRouteValues));
 
-        // create route values based on whether the controller is localized
-        object values = needsCulture ? new { culture, action } : new { action };
-        return _linkGenerator.GetUriByAction(httpContext: httpContext, action: action, controller: controller, values: routeValues, scheme: scheme); 
+        return _linkGenerator.GetUriByAction(httpContext: httpContext, action: action, controller: controller, values: routeValues, scheme: scheme);
     }
 }

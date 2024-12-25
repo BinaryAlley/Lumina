@@ -351,6 +351,9 @@
   <data name="NewPasswordConfirmCannotBeEmpty" xml:space="preserve">
     <value>Confirmarea noii parole nu poate fi goală!</value>
   </data>
+  <data name="Forbidden" xml:space="preserve">
+    <value>Nu aveți autorizația necesară pentru vizualizarea aceastei resurse!</value>
+  </data>
   <data name="NotAuthorized" xml:space="preserve">
     <value>Nu sunteți autorizat să efectuați această operațiune!</value>
   </data>

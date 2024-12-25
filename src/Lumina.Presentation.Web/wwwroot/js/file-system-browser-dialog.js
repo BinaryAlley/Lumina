@@ -233,11 +233,11 @@
      */
     async function getFileSystemPropertiesAsync() {
         // call the API to get the file system type (platform type)
-        const fileSystemTypeResponse = await callApiGetAsync(`${clientBasePath}file-system/get-type`);
+        const fileSystemTypeResponse = await callApiGetAsync(`${clientBasePath}file-system/api-get-type`);
         if (fileSystemTypeResponse !== undefined)
             platformType = fileSystemTypeResponse.platformType;
         // call the API to get the path separator for the file system
-        const pathSeparatorResponse = await callApiGetAsync(`${clientBasePath}path/get-path-separator`);
+        const pathSeparatorResponse = await callApiGetAsync(`${clientBasePath}path/api-get-path-separator`);
         if (pathSeparatorResponse !== undefined)
             pathSeparator = pathSeparatorResponse.pathSeparator;
     }
@@ -248,7 +248,7 @@
      * @returns {Promise<boolean>} A promise that resolves to whether the path is valid and exists, or not.
      */
     async function checkPathAsync(path) {
-        const pathValidResponse = await callApiGetAsync(`${clientBasePath}path/validate?path=${encodeURIComponent(path)}`);
+        const pathValidResponse = await callApiGetAsync(`${clientBasePath}path/api-validate?path=${encodeURIComponent(path)}`);
         if (pathValidResponse !== undefined) {
             if (!pathValidResponse.isValid) {
                 notificationService.show("Specified path is not valid!", NotificationType.ERROR); // TODO: should ask error message from server when translation is implemented
@@ -256,7 +256,7 @@
                 if (addressBarInput.value !== null && !addressBarInput.value.endsWith(pathSeparator))
                     addressBarInput.value += pathSeparator;
             } else {
-                const pathExistsResponse = await callApiGetAsync(`${clientBasePath}path/check-path-exists?path=${encodeURIComponent(path)}&includeHiddenElements=${showHiddenElements}`);
+                const pathExistsResponse = await callApiGetAsync(`${clientBasePath}path/api-check-path-exists?path=${encodeURIComponent(path)}&includeHiddenElements=${showHiddenElements}`);
                 if (pathExistsResponse !== undefined && !pathExistsResponse.exists) {
                     notificationService.show("Specified path does not exist!", NotificationType.ERROR); // TODO: should ask error message from server when translation is implemented
                     return false;
@@ -338,7 +338,7 @@
     async function navigateUpAsync() {
         if (addressBarInput.value !== null) {
             // ask the API for the parent path
-            const parentLocationResponse = await callApiGetAsync(`${clientBasePath}path/get-path-parent?path=${encodeURIComponent(addressBarInput.value)}`);
+            const parentLocationResponse = await callApiGetAsync(`${clientBasePath}path/api-get-path-parent?path=${encodeURIComponent(addressBarInput.value)}`);
             if (parentLocationResponse !== undefined && parentLocationResponse.pathSegments !== null) {
                 // if the answer was valid, and we can navigate up, reconstruct the provided path from its segments, and navigate to it
                 platformType = parentLocationResponse.pathSegments;
@@ -362,7 +362,7 @@
      * @param {any} path The path for which to get the navigator path segments.
      */
     async function getNavigatorPathAsync(path) {
-        const pathSplitResponse = await callApiGetAsync(`${clientBasePath}path/split?path=${encodeURIComponent(path)}`);
+        const pathSplitResponse = await callApiGetAsync(`${clientBasePath}path/api-split?path=${encodeURIComponent(path)}`);
         if (pathSplitResponse !== undefined) 
             renderAddressBar(pathSplitResponse.pathSegments);
     }
@@ -589,7 +589,7 @@
      * @returns {Promise<Array<Object>|undefined>} A promise that resolves to an array of drive objects, or undefined if the API call fails.
      */
     async function getFileSystemDrivesAsync() {
-        const getDrivesResponse = await callApiGetAsync(`${clientBasePath}drives/get-drives`);
+        const getDrivesResponse = await callApiGetAsync(`${clientBasePath}drives/api-get-drives`);
         if (getDrivesResponse !== undefined)
             return getDrivesResponse.drives;
     }
@@ -716,7 +716,7 @@
      * @param {Function} callback - Function to call for each directory received.
      */
     async function fetchFileSystemDirectoriesAsync(path, callback) {
-        await fetchJsonDataAsync(`${clientBasePath}directories/get-directories?path=${encodeURIComponent(path)}&includeHiddenElements=${showHiddenElements}`, callback, 'Directory');
+        await fetchJsonDataAsync(`${clientBasePath}directories/api-get-directories?path=${encodeURIComponent(path)}&includeHiddenElements=${showHiddenElements}`, callback, 'Directory');
     }
 
     /**
@@ -725,7 +725,7 @@
      * @param {Function} callback - Function to call for each file received.
      */
     async function fetchFileSystemFilesAsync(path, callback) {
-        await fetchJsonDataAsync(`${clientBasePath}files/get-tree-files?path=${encodeURIComponent(path)}&includeHiddenElements=${showHiddenElements}`, callback, 'File');
+        await fetchJsonDataAsync(`${clientBasePath}files/api-get-tree-files?path=${encodeURIComponent(path)}&includeHiddenElements=${showHiddenElements}`, callback, 'File');
     }
 
     /**

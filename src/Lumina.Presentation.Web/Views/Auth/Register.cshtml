@@ -123,7 +123,7 @@
                 Use2fa: chkUse2FA.checked,
                 RegistrationType: form.querySelector('[name="RegistrationType"]').value
             };
-            const data = await callApiPostAsync('@_urlService.GetAbsoluteUrl("Register", "Auth")', formData);
+            const data = await callApiPostAsync('@_urlService.GetAbsoluteUrl("RegisterPost", "Auth")', formData);
             if (data) {
                 txtUsername.value = '';
                 txtPassword.value = '';

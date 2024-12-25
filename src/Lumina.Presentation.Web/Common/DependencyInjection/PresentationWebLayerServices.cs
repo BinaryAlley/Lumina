@@ -3,7 +3,9 @@ using FluentValidation;
 using Lumina.Presentation.Web.Common.Api;
 using Lumina.Presentation.Web.Common.Authorization;
 using Lumina.Presentation.Web.Common.Exceptions;
+using Lumina.Presentation.Web.Common.Filters.ActionFilters;
 using Lumina.Presentation.Web.Common.Filters.AuthorizationFilters;
+using Lumina.Presentation.Web.Common.Http;
 using Lumina.Presentation.Web.Common.MiddlewareFilters;
 using Lumina.Presentation.Web.Common.Models.Authorization;
 using Lumina.Presentation.Web.Common.Security;
@@ -25,6 +27,7 @@ using Polly.Wrap;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json.Serialization;
@@ -48,8 +51,8 @@ public static class PresentationWebLayerServices
     {
         services.AddControllersWithViews(mvcOptions =>
         {
-            //mvcOptions.Filters.Add<ApiExceptionFilter>();
             mvcOptions.Filters.Add(new MiddlewareFilterAttribute(typeof(LocalizationPipeline))); // add localization middleware filter
+            mvcOptions.Filters.Add<StoreLastViewFilter>();
         })
         .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
         .AddDataAnnotationsLocalization()
@@ -129,34 +132,59 @@ public static class PresentationWebLayerServices
                     // handle redirects to work with different base paths
                     OnRedirectToLogin = redirectContext =>
                     {
-                        string culture = redirectContext.HttpContext.Request.RouteValues["culture"]?.ToString()?.ToLower() ?? "en-us";
-                        // preserve any base path or subdirectory and add return URL
-                        string redirectPath = redirectContext.RedirectUri;
-                        // insert culture into the path
-                        redirectPath = redirectPath.Replace("/auth/login", $"/{culture}/auth/login");
-                        if (redirectContext.Request.PathBase.HasValue)
-                            redirectPath = redirectContext.Request.PathBase + cookieAuthenticationOptions.LoginPath + new QueryString("?returnUrl=") + Uri.EscapeDataString(redirectContext.Request.PathBase + redirectContext.Request.Path);
-                        redirectContext.Response.Redirect(redirectPath);
+                        HttpContext httpContext = redirectContext.HttpContext;
+                        string culture = httpContext.Request.RouteValues["culture"]?.ToString()?.ToLower() ?? "en-us";
+                        string? lastDisplayedView = httpContext.Session.GetString(HttpContextItemKeys.LAST_DISPLAYED_VIEW);
+
+                        // build the login path considering reverse proxy and subfolder scenarios
+                        string? originalHost = httpContext.Request.Headers["X-Forwarded-Host"].FirstOrDefault() ?? httpContext.Request.Host.Value;
+                        string? originalScheme = httpContext.Request.Headers["X-Forwarded-Proto"].FirstOrDefault() ?? httpContext.Request.Scheme;
+                        string? originalPathBase = httpContext.Request.Headers["X-Forwarded-Prefix"].FirstOrDefault() ?? httpContext.Request.PathBase.Value;
+
+                        string baseUrl = $"{originalScheme}://{originalHost}{originalPathBase}";
+                        string loginPath = $"{baseUrl}/{culture}/auth/login";
+
+                        if (!string.IsNullOrEmpty(lastDisplayedView))
+                        {
+                            string returnUrl = Uri.EscapeDataString(lastDisplayedView);
+                            redirectContext.RedirectUri = $"{loginPath}?returnUrl={returnUrl}";
+                        }
+                        else
+                            redirectContext.RedirectUri = loginPath;
+
+                        httpContext.Response.Redirect(redirectContext.RedirectUri);
                         return Task.CompletedTask;
                     },
                     OnRedirectToLogout = redirectContext =>
                     {
-                        string culture = redirectContext.HttpContext.Request.RouteValues["culture"]?.ToString()?.ToLower() ?? "en-us";
-                        string redirectPath = redirectContext.RedirectUri;
-                        redirectPath = redirectPath.Replace("/auth/logout", $"/{culture}/auth/logout");
-                        if (redirectContext.Request.PathBase.HasValue)
-                            redirectPath = redirectContext.Request.PathBase + cookieAuthenticationOptions.LogoutPath;
-                        redirectContext.Response.Redirect(redirectPath);
+                        HttpContext httpContext = redirectContext.HttpContext;
+                        string culture = httpContext.Request.RouteValues["culture"]?.ToString()?.ToLower() ?? "en-us";
+
+                        string? originalHost = httpContext.Request.Headers["X-Forwarded-Host"].FirstOrDefault() ?? httpContext.Request.Host.Value;
+                        string? originalScheme = httpContext.Request.Headers["X-Forwarded-Proto"].FirstOrDefault() ?? httpContext.Request.Scheme;
+                        string? originalPathBase = httpContext.Request.Headers["X-Forwarded-Prefix"].FirstOrDefault() ?? httpContext.Request.PathBase.Value;
+
+                        string baseUrl = $"{originalScheme}://{originalHost}{originalPathBase}";
+                        string logoutPath = $"{baseUrl}/{culture}/auth/logout";
+
+                        redirectContext.RedirectUri = logoutPath;
+                        httpContext.Response.Redirect(redirectContext.RedirectUri);
                         return Task.CompletedTask;
                     },
                     OnRedirectToAccessDenied = redirectContext =>
                     {
-                        string culture = redirectContext.HttpContext.Request.RouteValues["culture"]?.ToString()?.ToLower() ?? "en-us";
-                        string redirectPath = redirectContext.RedirectUri;
-                        redirectPath = redirectPath.Replace("/auth/access-denied", $"/{culture}/auth/access-denied");
-                        if (redirectContext.Request.PathBase.HasValue)
-                            redirectPath = redirectContext.Request.PathBase + cookieAuthenticationOptions.AccessDeniedPath;
-                        redirectContext.Response.Redirect(redirectPath);
+                        HttpContext httpContext = redirectContext.HttpContext;
+                        string culture = httpContext.Request.RouteValues["culture"]?.ToString()?.ToLower() ?? "en-us";
+
+                        string? originalHost = httpContext.Request.Headers["X-Forwarded-Host"].FirstOrDefault() ?? httpContext.Request.Host.Value;
+                        string? originalScheme = httpContext.Request.Headers["X-Forwarded-Proto"].FirstOrDefault() ?? httpContext.Request.Scheme;
+                        string? originalPathBase = httpContext.Request.Headers["X-Forwarded-Prefix"].FirstOrDefault() ?? httpContext.Request.PathBase.Value;
+
+                        string baseUrl = $"{originalScheme}://{originalHost}{originalPathBase}";
+                        string accessDeniedPath = $"{baseUrl}/{culture}/auth/access-denied";
+
+                        redirectContext.RedirectUri = accessDeniedPath;
+                        httpContext.Response.Redirect(redirectContext.RedirectUri);
                         return Task.CompletedTask;
                     }
                 };

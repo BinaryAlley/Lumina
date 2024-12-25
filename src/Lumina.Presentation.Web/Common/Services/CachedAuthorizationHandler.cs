@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Common.Models.Common;
 using Microsoft.Extensions.Caching.Hybrid;
-using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Net;
 using System.Net.Http;
@@ -41,15 +40,15 @@ public class CachedAuthorizationHandler : DelegatingHandler
         string requestPath = request.RequestUri!.AbsolutePath;
         // if it's any endpoint other than the one for the authorization request, fire it away towards the original API service
         if (!requestPath.EndsWith(AUTHORIZATION_ENDPOINT, StringComparison.OrdinalIgnoreCase))
-            return await base.SendAsync(request, cancellationToken);
+            return await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
         // otherwise, check the hybrid cache to see if there is a cached authorization
         CachedResponseModel response = await _hybridCache.GetOrCreateAsync(
             AUTHORIZATION_ENDPOINT,
             async (cancellationToken) =>
             {
                 // perform the actual API call if cache is empty or expired
-                HttpResponseMessage result = await base.SendAsync(request, cancellationToken);
-                string content = await result.Content.ReadAsStringAsync(cancellationToken);
+                HttpResponseMessage result = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
+                string content = await result.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
                 // cache both status code and content
                 return new CachedResponseModel
                 {
@@ -63,6 +62,10 @@ public class CachedAuthorizationHandler : DelegatingHandler
             },
             cancellationToken: cancellationToken
         );
+        // if the API returned 401 Unauthorized (i.e. token expired), DO NOT cache this response - it will be used for authorization endpoints even after successful login,
+        // resulting in incorrect login redirection cycles!
+        if (response.StatusCode == HttpStatusCode.Unauthorized)
+            await _hybridCache.RemoveAsync(AUTHORIZATION_ENDPOINT, cancellationToken).ConfigureAwait(false);
         return new HttpResponseMessage(response.StatusCode)
         {
             Content = new StringContent(response.Content)

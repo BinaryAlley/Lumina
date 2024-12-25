@@ -31,7 +31,7 @@ public class DrivesController : Controller
     /// Controller action for getting the list of all file system drives.
     /// </summary>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    [HttpGet("get-drives")]
+    [HttpGet("api-get-drives")]
     public async Task<IActionResult> GetDrives(CancellationToken cancellationToken)
     {
         FileSystemTreeNodeModel[] response = await _apiHttpClient.GetAsync<FileSystemTreeNodeModel[]>($"drives/get-drives", cancellationToken).ConfigureAwait(false);

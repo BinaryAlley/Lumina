@@ -1,7 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.Attributes;
-using Lumina.Presentation.Web.Common.Enums.Authorization;
 using Lumina.Presentation.Web.Common.Models.Libraries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -56,7 +54,7 @@ public class LibraryManagementController : Controller
     /// <param name="data">The model containing the new library data.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     [ValidateAntiForgeryToken]
-    [HttpPost("item")]
+    [HttpPost("api-item")]
     public async Task<IActionResult> SaveLibrary([FromBody] LibraryModel data, CancellationToken cancellationToken)
     {
         // call different API endpoints based on whether this is a new library or an existing one

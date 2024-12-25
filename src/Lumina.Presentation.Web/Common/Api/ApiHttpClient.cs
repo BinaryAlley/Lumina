@@ -8,7 +8,6 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
@@ -43,6 +42,8 @@ public class ApiHttpClient : IApiHttpClient
         // read the API server configuration values from the configuration, and assign them to the injected client
         ServerConfigurationModel serverConfigurationModel = serverConfigurationOptions.Value;
         httpClient.BaseAddress = new Uri($"{serverConfigurationModel.BaseAddress}:{serverConfigurationModel.Port}/api/v{serverConfigurationModel.ApiVersion}/");
+
+        httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
         _jsonOptions = new JsonSerializerOptions
         {

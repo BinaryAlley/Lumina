@@ -35,8 +35,8 @@ public class UpdateUserRoleAndPermissionsEndpointSummary : Summary<UpdateUserRol
         );
 
         RequestParam(r => r.UserId, "The Id of the user. Required.");
-        RequestParam(r => r.RoleId, "The Id of the role. Required.");
-        RequestParam(r => r.Permissions, "The collection of Ids of the permissions of the role. Required.");
+        RequestParam(r => r.RoleId, "The Id of the role. Optional.");
+        RequestParam(r => r.Permissions, "The collection of Ids of the permissions of the role. Optional.");
 
         ResponseParam<AuthorizationResponse>(r => r.UserId, "The id of the user whose role and permissions were updated.");
         ResponseParam<AuthorizationResponse>(r => r.Role, "The authorization role entity.");
