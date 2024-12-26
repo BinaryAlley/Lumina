@@ -393,11 +393,21 @@ async function updateContentAsync(url, addToHistory) {
                 const state = { url, content, title };
                 history.pushState(state, title, url);
             }
+            updateLanguageUrls();
         }
     } catch (error) {
         notificationService.show(jsLocalizedMessages.navigationFailed, NotificationType.ERROR);
         console.error('Navigation failed:', error);
     }
+}
+
+// Update language switcher links with the current URL
+function updateLanguageUrls() {
+    document.querySelectorAll('a.lang-set').forEach(link => {
+        const url = new URL(link.href);
+        url.searchParams.set('returnUrl', window.location.pathname + window.location.search);
+        link.href = url.toString();
+    });
 }
 
 //+======================================================================================+
