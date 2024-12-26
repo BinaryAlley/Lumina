@@ -14,18 +14,18 @@ namespace Lumina.Presentation.Web.Common.Filters.ActionFilters;
 public class StoreLastViewFilter : IActionFilter
 {
     /// <summary>
-    /// Executes before the action method is called
+    /// Executes before the action method is called.
     /// </summary>
-    /// <param name="context">The action executing context</param>
+    /// <param name="context">The action executing context.</param>
     public void OnActionExecuting(ActionExecutingContext context)
     {
         // no action needed before execution
     }
 
     /// <summary>
-    /// Executes after the action method is called
+    /// Executes after the action method is called.
     /// </summary>
-    /// <param name="context">The action executed context containing the action result</param>
+    /// <param name="context">The action executed context containing the action result.</param>
     public void OnActionExecuted(ActionExecutedContext context)
     {
         if (context.Result is ViewResult)

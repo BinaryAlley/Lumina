@@ -80,15 +80,15 @@
                 @_localizer["Language"]
             </div>
             <ul>
-                <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=zh-cn&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)"><span>简体中文</span></a></li><!--CN-->
-                <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=de-de&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)"><span>Deutsch</span></a></li><!--DE-->
-                <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=en-us&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)"><span>English</span></a></li><!--EN-->
-                <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=es-es&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)"><span>Español</span></a></li><!--ES-->
-                <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=fr-fr&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)"><span>Français</span></a></li><!--FR-->
-                <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=it-it&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)"><span>Italiano</span></a></li><!--IT-->
-                <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=ja-jp&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)"><span>日本語</span></a></li><!--JP-->
-                <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=ro-ro&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)"><span>Română</span></a></li><!--RO-->
-                <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=ru-ru&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)"><span>Русский</span></a></li><!--RU-->
+                <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=zh-cn&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set"><span>简体中文</span></a></li><!--CN-->
+                <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=de-de&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set"><span>Deutsch</span></a></li><!--DE-->
+                <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=en-us&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set"><span>English</span></a></li><!--EN-->
+                <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=es-es&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set"><span>Español</span></a></li><!--ES-->
+                <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=fr-fr&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set"><span>Français</span></a></li><!--FR-->
+                <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=it-it&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set"><span>Italiano</span></a></li><!--IT-->
+                <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=ja-jp&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set"><span>日本語</span></a></li><!--JP-->
+                <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=ro-ro&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set"><span>Română</span></a></li><!--RO-->
+                <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=ru-ru&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set"><span>Русский</span></a></li><!--RU-->
             </ul>
             @if (User?.Identity?.IsAuthenticated == true)
             {
@@ -183,15 +183,15 @@
                 <li class="has-submenu" tabindex="0">
                     <label>@_localizer["Language"]</label>
                     <ul>
-                        <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=zh-cn&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)">简体中文</a></li><!--CN-->
-                        <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=de-de&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)">Deutsch</a></li><!--DE-->
-                        <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=en-us&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)">English</a></li><!--EN-->
-                        <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=es-es&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)">Español</a></li><!--ES-->
-                        <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=fr-fr&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)">Français</a></li><!--FR-->
-                        <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=it-it&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)">Italiano</a></li><!--IT-->
-                        <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=ja-jp&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)">日本語</a></li><!--JP-->
-                        <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=ro-ro&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)">Română</a></li><!--RO-->
-                        <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=ru-ru&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)">Русский</a></li><!--RU-->
+                        <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=zh-cn&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set">简体中文</a></li><!--CN-->
+                        <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=de-de&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set">Deutsch</a></li><!--DE-->
+                        <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=en-us&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set">English</a></li><!--EN-->
+                        <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=es-es&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set">Español</a></li><!--ES-->
+                        <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=fr-fr&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set">Français</a></li><!--FR-->
+                        <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=it-it&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set">Italiano</a></li><!--IT-->
+                        <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=ja-jp&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set">日本語</a></li><!--JP-->
+                        <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=ro-ro&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set">Română</a></li><!--RO-->
+                        <li><a href="@_urlService.GetAbsoluteUrl("SetLanguage", "Language")?newCulture=ru-ru&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set">Русский</a></li><!--RU-->
                     </ul>
                 </li>
                 @if (User?.Identity?.IsAuthenticated == true)
