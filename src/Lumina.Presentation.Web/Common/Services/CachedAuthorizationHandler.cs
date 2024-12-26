@@ -17,6 +17,7 @@ public class CachedAuthorizationHandler : DelegatingHandler
 {
     private readonly HybridCache _hybridCache;
     private const string AUTHORIZATION_ENDPOINT = "/auth/get-authorization";
+    private const string LOGIN_ENDPOINT = "/api/v1/auth/login";
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CachedAuthorizationHandler"/> class with the specified hybrid cache.
@@ -40,7 +41,11 @@ public class CachedAuthorizationHandler : DelegatingHandler
         string requestPath = request.RequestUri!.AbsolutePath;
         // if it's any endpoint other than the one for the authorization request, fire it away towards the original API service
         if (!requestPath.EndsWith(AUTHORIZATION_ENDPOINT, StringComparison.OrdinalIgnoreCase))
+        {
+            if (requestPath.EndsWith(LOGIN_ENDPOINT)) // if login endpoint was hit, a new user is now present, delete previous cached permissions
+                await _hybridCache.RemoveAsync(AUTHORIZATION_ENDPOINT, cancellationToken).ConfigureAwait(false);
             return await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
+        }
         // otherwise, check the hybrid cache to see if there is a cached authorization
         CachedResponseModel response = await _hybridCache.GetOrCreateAsync(
             AUTHORIZATION_ENDPOINT,
