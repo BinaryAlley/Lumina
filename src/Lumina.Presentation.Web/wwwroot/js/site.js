@@ -26,7 +26,8 @@ async function callApiGetAsync(url) {
         // call the API
         const response = await fetch(url, {
             headers: {
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
             }
         });
         if (response.redirected) // if a redirect is requested, perform it
@@ -65,6 +66,8 @@ async function callApiPostAsync(url, data, options = {}) {
         // prepare headers
         const headers = {
             'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
             ...finalOptions.headers
         };
         // add anti-forgery token if enabled
@@ -118,6 +121,8 @@ async function callApiPutAsync(url, data, options = {}) {
         // prepare headers
         const headers = {
             'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
             ...finalOptions.headers
         };
         // add anti-forgery token if enabled
@@ -170,6 +175,8 @@ async function callApiDeleteAsync(url, options = {}) {
         // prepare headers
         const headers = {
             'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
             ...finalOptions.headers
         };
         // add anti-forgery token if enabled
