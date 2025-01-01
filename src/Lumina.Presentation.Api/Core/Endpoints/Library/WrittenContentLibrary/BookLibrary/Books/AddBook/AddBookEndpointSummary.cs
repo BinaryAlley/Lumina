@@ -169,8 +169,8 @@ public class AddLibraryEndpointSummary : Summary<AddBookEndpoint, AddBookRequest
         RequestParam(r => r.Ratings, "The list of ratings for this book. Required.");
 
         ResponseParam<BookResponse>(r => r.Id, "The unique identifier of the entity.");
-        ResponseParam<BookResponse>(r => r.Created, "The date and time when the entity was created.");
-        ResponseParam<BookResponse>(r => r.Updated, "The date and time when the entity was last updated.");
+        ResponseParam<BookResponse>(r => r.CreatedOnUtc, "The date and time when the entity was created.");
+        ResponseParam<BookResponse>(r => r.UpdatedOnUtc, "The date and time when the entity was last updated.");
         ResponseParam<BookResponse>(r => r.Metadata, "The written content metadata of the book.");
         ResponseParam<BookResponse>(r => r.Metadata.Title, "The title of the media item.");
         ResponseParam<BookResponse>(r => r.Metadata.OriginalTitle, "The original title of the media item.");
@@ -276,8 +276,8 @@ public class AddLibraryEndpointSummary : Summary<AddBookEndpoint, AddBookRequest
                         VoteCount: 87654
                     )
                 ],
-                Created: DateTime.UtcNow,
-                Updated: default
+                CreatedOnUtc: DateTime.UtcNow,
+                UpdatedOnUtc: default
             )
         );
 

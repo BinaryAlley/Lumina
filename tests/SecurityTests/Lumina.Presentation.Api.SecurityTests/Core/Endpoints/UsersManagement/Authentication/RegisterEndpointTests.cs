@@ -21,7 +21,7 @@ namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.UsersManagement.A
 /// Contains security tests for the <c>/auth/register</c> route.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class AuthRegisterTests : IClassFixture<LuminaApiFactory>, IDisposable
+public class RegisterEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
 {
     private readonly HashService _hashService;
     private readonly LuminaApiFactory _apiFactory;
@@ -33,7 +33,7 @@ public class AuthRegisterTests : IClassFixture<LuminaApiFactory>, IDisposable
     };
     private readonly string _testUsername;
 
-    public AuthRegisterTests(LuminaApiFactory apiFactory)
+    public RegisterEndpointTests(LuminaApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();

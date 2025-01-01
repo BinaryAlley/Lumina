@@ -22,7 +22,7 @@ namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.UsersManagement.A
 /// Contains security tests for the <c>/auth/change-password</c> route.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class AuthChangePasswordTests : IClassFixture<LuminaApiFactory>, IDisposable
+public class ChangePasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
 {
     private readonly LuminaApiFactory _apiFactory;
     private readonly HttpClient _client;
@@ -34,10 +34,10 @@ public class AuthChangePasswordTests : IClassFixture<LuminaApiFactory>, IDisposa
     };
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="AuthLoginTests"/> class.
+    /// Initializes a new instance of the <see cref="LoginEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public AuthChangePasswordTests(LuminaApiFactory apiFactory)
+    public ChangePasswordEndpointTests(LuminaApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
@@ -48,7 +48,7 @@ public class AuthChangePasswordTests : IClassFixture<LuminaApiFactory>, IDisposa
     }
 
     [Fact]
-    public async Task ChangePassword_WithoutAuthentication_ShouldReturn401()
+    public async Task ChangePassword_WithoutAuthentication_ShouldReturnUnauthorizedResult()
     {
         // Arrange
         ChangePasswordRequest request = new(
@@ -106,7 +106,7 @@ public class AuthChangePasswordTests : IClassFixture<LuminaApiFactory>, IDisposa
         stdDev.Should().BeLessThan(200);
     }
 
-    private double CalculateStandardDeviation(List<long> values)
+    private static double CalculateStandardDeviation(List<long> values)
     {
         double average = values.Average();
         double sumOfSquaresOfDifferences = values.Select(value => (value - average) * (value - average)).Sum();

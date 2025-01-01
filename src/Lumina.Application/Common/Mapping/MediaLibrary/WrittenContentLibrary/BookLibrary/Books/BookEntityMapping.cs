@@ -124,8 +124,8 @@ public static class BookEntityMapping
             Optional<string>.FromNullable(repositoryEntity.GoogleBooksId),
             Optional<string>.FromNullable(repositoryEntity.BarnesAndNobleId),
             Optional<string>.FromNullable(repositoryEntity.AppleBooksId),
-            repositoryEntity.Created,
-            Optional<DateTime>.FromNullable(repositoryEntity.Updated),
+            repositoryEntity.CreatedOnUtc,
+            Optional<DateTime>.FromNullable(repositoryEntity.UpdatedOnUtc),
             isbnsResult.Select(isbn => isbn.Value).ToList(),
             [],
             bookRatingsResult.Select(bookRating => bookRating.Value).ToList());
@@ -207,8 +207,8 @@ public static class BookEntityMapping
             [.. repositoryEntity.ISBNs.ToResponses()],
             null,
             [.. repositoryEntity.Ratings.ToResponses()],
-            repositoryEntity.Created,
-            repositoryEntity.Updated
+            repositoryEntity.CreatedOnUtc,
+            repositoryEntity.UpdatedOnUtc
         );
     }
 

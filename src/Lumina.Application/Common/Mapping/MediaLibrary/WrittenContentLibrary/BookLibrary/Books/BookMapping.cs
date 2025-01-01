@@ -3,6 +3,7 @@ using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentL
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
+using System;
 using System.Linq;
 #endregion
 
@@ -56,8 +57,10 @@ public static class BookMapping
             AppleBooksId = domainEntity.AppleBooksId.HasValue ? domainEntity.AppleBooksId.Value : null,
             ISBNs = domainEntity.ISBNs.ToRepositoryEntities().ToList(),
             Ratings = domainEntity.Ratings.ToRepositoryEntities().ToList(),
-            Created = domainEntity.Created,
-            Updated = domainEntity.Updated.HasValue ? domainEntity.Updated : null
+            CreatedOnUtc = domainEntity.CreatedOnUtc,
+            CreatedBy = Guid.NewGuid(),
+            UpdatedOnUtc = domainEntity.UpdatedOnUtc.HasValue ? domainEntity.UpdatedOnUtc : null,
+            UpdatedBy = domainEntity.UpdatedOnUtc.HasValue ? Guid.NewGuid() : null,
         };
     }
 }

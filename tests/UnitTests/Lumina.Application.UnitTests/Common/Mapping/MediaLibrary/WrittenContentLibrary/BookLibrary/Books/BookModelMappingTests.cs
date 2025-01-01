@@ -248,15 +248,15 @@ public class BookEntityMappingTests
         else
             result.Value.AppleBooksId.HasValue.Should().BeFalse();
 
-        result.Value.Created.Should().Be(bookEntity.Created);
+        result.Value.CreatedOnUtc.Should().Be(bookEntity.CreatedOnUtc);
 
-        if (bookEntity.Updated.HasValue)
+        if (bookEntity.UpdatedOnUtc.HasValue)
         {
-            result.Value.Updated.HasValue.Should().BeTrue();
-            result.Value.Updated!.Value.Should().Be(bookEntity.Updated.Value);
+            result.Value.UpdatedOnUtc.HasValue.Should().BeTrue();
+            result.Value.UpdatedOnUtc!.Value.Should().Be(bookEntity.UpdatedOnUtc.Value);
         }
         else
-            result.Value.Updated.HasValue.Should().BeFalse();
+            result.Value.UpdatedOnUtc.HasValue.Should().BeFalse();
     }
 
     [Fact]
@@ -304,8 +304,8 @@ public class BookEntityMappingTests
         result.AppleBooksId.Should().Be(bookEntity.AppleBooksId);
         result.ISBNs.Should().BeEquivalentTo(bookEntity.ISBNs);
         result.Ratings.Should().BeEquivalentTo(bookEntity.Ratings);
-        result.Created.Should().Be(bookEntity.Created);
-        result.Updated.Should().Be(bookEntity.Updated);
+        result.CreatedOnUtc.Should().Be(bookEntity.CreatedOnUtc);
+        result.UpdatedOnUtc.Should().Be(bookEntity.UpdatedOnUtc);
     }
 
     [Fact]

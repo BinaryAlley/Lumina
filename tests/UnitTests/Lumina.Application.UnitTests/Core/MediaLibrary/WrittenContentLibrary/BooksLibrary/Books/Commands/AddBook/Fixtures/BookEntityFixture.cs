@@ -138,8 +138,10 @@ public class BookEntityFixture
             AppleBooksId = $"id{_random.Next(1, 999999)}",
             ISBNs = isbn.Generate(_faker.Random.Number(1, 5)),
             Ratings = rating.Generate(_faker.Random.Number(1, 5)),
-            Created = DateTime.UtcNow,
-            Updated = _faker.Random.Bool() ? DateTime.UtcNow.AddDays(-_random.Next(1, 100)) : null
+            CreatedOnUtc = DateTime.UtcNow,
+            CreatedBy = Guid.NewGuid(),
+            UpdatedOnUtc = _faker.Random.Bool() ? DateTime.UtcNow.AddDays(-_random.Next(1, 100)) : null,
+            UpdatedBy = Guid.NewGuid()
         };
     }
 }

@@ -139,7 +139,7 @@ public class ChangePasswordEndpointTests : IClassFixture<AuthenticatedLuminaApiF
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCurrentPasswordIsIncorrect_ShouldReturnForbidden()
+    public async Task ExecuteAsync_WhenCurrentPasswordIsIncorrect_ShouldReturnForbiddenResult()
     {
         // Arrange
         ChangePasswordRequest request = new(

@@ -72,7 +72,7 @@ public class BookMappingTests
         result.AppleBooksId.Should().Be(book.AppleBooksId.HasValue ? book.AppleBooksId.Value : null);
         result.ISBNs.Should().BeEquivalentTo(book.ISBNs.ToRepositoryEntities());
         result.Ratings.Should().BeEquivalentTo(book.Ratings.ToRepositoryEntities());
-        result.Created.Should().Be(book.Created);
-        result.Updated.Should().Be(book.Updated.HasValue ? book.Updated.Value : null);
+        result.CreatedOnUtc.Should().Be(book.CreatedOnUtc);
+        result.UpdatedOnUtc.Should().Be(book.UpdatedOnUtc.HasValue ? book.UpdatedOnUtc.Value : null);
     }
 }

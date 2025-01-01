@@ -245,7 +245,10 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnOrder(0);
 
-                    b.Property<DateTime>("Created")
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOnUtc")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("LibraryType")
@@ -259,7 +262,10 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnOrder(1);
 
-                    b.Property<DateTime?>("Updated")
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("UpdatedOnUtc")
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("UserId")
@@ -292,7 +298,10 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnOrder(28);
 
-                    b.Property<DateTime>("Created")
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOnUtc")
                         .HasColumnType("TEXT")
                         .HasColumnOrder(30);
 
@@ -405,7 +414,10 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnOrder(1);
 
-                    b.Property<DateTime?>("Updated")
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("UpdatedOnUtc")
                         .HasColumnType("TEXT")
                         .HasColumnOrder(31);
 
@@ -686,8 +698,7 @@ namespace Lumina.DataAccess.Common.Migrations
 
                     b.Navigation("UserPermissions");
 
-                    b.Navigation("UserRole")
-                        .IsRequired();
+                    b.Navigation("UserRole");
                 });
 #pragma warning restore 612, 618
         }

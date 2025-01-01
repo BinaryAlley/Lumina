@@ -32,8 +32,10 @@ public class LibraryEntityMappingTests
                 new() { Path = "C:/Books" },
                 new() { Path = "D:/Media/Books" }
             ],
-            Created = DateTime.UtcNow,
-            Updated = null
+            CreatedOnUtc = DateTime.UtcNow,
+            CreatedBy = Guid.NewGuid(),
+            UpdatedOnUtc = null,
+            UpdatedBy = null
         };
 
         // Act
@@ -46,8 +48,8 @@ public class LibraryEntityMappingTests
         result.Title.Should().Be(entity.Title);
         result.LibraryType.Should().Be(entity.LibraryType);
         result.ContentLocations.Should().BeEquivalentTo(entity.ContentLocations.Select(l => l.Path));
-        result.Created.Should().Be(entity.Created);
-        result.Updated.Should().Be(entity.Updated);
+        result.CreatedOnUtc.Should().Be(entity.CreatedOnUtc);
+        result.UpdatedOnUtc.Should().Be(entity.UpdatedOnUtc);
     }
 
     [Theory]
@@ -65,8 +67,10 @@ public class LibraryEntityMappingTests
             Title = "My Library",
             LibraryType = libraryType,
             ContentLocations = [new() { Path = "C:/Media" }],
-            Created = DateTime.UtcNow,
-            Updated = null
+            CreatedOnUtc = DateTime.UtcNow,
+            CreatedBy = Guid.NewGuid(),
+            UpdatedOnUtc = null,
+            UpdatedBy = null
         };
 
         // Act
@@ -94,8 +98,10 @@ public class LibraryEntityMappingTests
                 new() { Path = "E:/Digital Library/Books" },
                 new() { Path = "F:/Reading Material" }
             ],
-            Created = DateTime.UtcNow,
-            Updated = null
+            CreatedOnUtc = DateTime.UtcNow,
+            CreatedBy = Guid.NewGuid(),
+            UpdatedOnUtc = null,
+            UpdatedBy = null
         };
 
         // Act
@@ -118,8 +124,10 @@ public class LibraryEntityMappingTests
             Title = "My Library",
             LibraryType = LibraryType.Book,
             ContentLocations = [new() { Path = "C:/Books" }],
-            Created = DateTime.UtcNow,
-            Updated = updated
+            CreatedOnUtc = DateTime.UtcNow,
+            CreatedBy = Guid.NewGuid(),
+            UpdatedOnUtc = updated,
+            UpdatedBy = Guid.NewGuid()
         };
 
         // Act
@@ -127,6 +135,6 @@ public class LibraryEntityMappingTests
 
         // Assert
         result.Should().NotBeNull();
-        result.Updated.Should().Be(updated);
+        result.UpdatedOnUtc.Should().Be(updated);
     }
 }

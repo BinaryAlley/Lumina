@@ -35,8 +35,8 @@ public class GetLibraryEndpointSummary : Summary<GetLibraryEndpoint, GetLibraryR
         ResponseParam<LibraryResponse>(r => r.Title, "The title of the media library.");
         ResponseParam<LibraryResponse>(r => r.LibraryType, "The type of the media library.");
         ResponseParam<LibraryResponse>(r => r.ContentLocations, "The file system paths of the directories where the media library elements are located.");
-        ResponseParam<LibraryResponse>(r => r.Created, "The date and time when the entity was created.");
-        ResponseParam<LibraryResponse>(r => r.Updated, "The date and time when the entity was last updated.");
+        ResponseParam<LibraryResponse>(r => r.CreatedOnUtc, "The date and time when the entity was created.");
+        ResponseParam<LibraryResponse>(r => r.UpdatedOnUtc, "The date and time when the entity was last updated.");
 
         Response(200, "The media library is returned.", example: new LibraryResponse(
             Id: Guid.NewGuid(),
@@ -44,8 +44,8 @@ public class GetLibraryEndpointSummary : Summary<GetLibraryEndpoint, GetLibraryR
             Title: "TV Shows",
             LibraryType: LibraryType.TvShow,
             ContentLocations: ["/media/tv shows/drama/", "/media/tv shows/SCI-FI/"],
-            Created: DateTime.UtcNow,
-            Updated: default
+            CreatedOnUtc: DateTime.UtcNow,
+            UpdatedOnUtc: default
         ));
 
 

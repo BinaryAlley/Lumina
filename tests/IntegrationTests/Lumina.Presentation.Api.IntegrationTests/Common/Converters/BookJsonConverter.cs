@@ -36,7 +36,7 @@ public class BookJsonConverter : JsonConverter<Book>
             JsonElement root = doc.RootElement;
 
             Guid id = root.GetProperty("id").GetGuid();
-            DateTime created = root.GetProperty("created").GetDateTime();
+            DateTime createdOnUtc = root.GetProperty("createdOnUtc").GetDateTime();
             WrittenContentMetadata metadata = DeserializeMetadata(root.GetProperty("metadata"));
             BookFormat? format = null;
             if (root.TryGetProperty("format", out JsonElement formatElement))
@@ -80,7 +80,7 @@ public class BookJsonConverter : JsonConverter<Book>
                 Optional<string>.FromNullable(googleBooksId),
                 Optional<string>.FromNullable(barnesAndNobleId),
                 Optional<string>.FromNullable(appleBooksId),
-                created,
+                createdOnUtc,
                 default,
                 isbns,
                 contributorIds,

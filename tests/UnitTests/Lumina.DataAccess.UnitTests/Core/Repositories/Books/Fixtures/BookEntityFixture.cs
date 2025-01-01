@@ -81,8 +81,8 @@ public class BookEntityFixture
             .RuleFor(x => x.AppleBooksId, f => $"id{f.Random.Number(1, 999999)}")
             .RuleFor(x => x.ISBNs, f => CreateIsbns(f.Random.Number(1, 5)))
             .RuleFor(x => x.Ratings, f => CreateBookRatings(f.Random.Number(1, 5)))
-            .RuleFor(x => x.Created, f => f.Date.Past())
-            .RuleFor(x => x.Updated, f => f.Date.Recent())
+            .RuleFor(x => x.CreatedOnUtc, f => f.Date.Past())
+            .RuleFor(x => x.UpdatedOnUtc, f => f.Date.Recent())
             .Generate();
     }
 

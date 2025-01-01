@@ -44,8 +44,8 @@ public class LibraryMappingTests
         result.LibraryType.Should().Be(library.LibraryType);
         result.ContentLocations.Select(l => l.Path)
             .Should().BeEquivalentTo(library.ContentLocations.Select(l => l.Path));
-        result.Created.Should().Be(library.Created);
-        result.Updated.Should().Be(library.Updated.HasValue ? library.Updated : null);
+        result.CreatedOnUtc.Should().Be(library.CreatedOnUtc);
+        result.UpdatedOnUtc.Should().Be(library.UpdatedOnUtc.HasValue ? library.UpdatedOnUtc : null);
     }
 
     [Fact]

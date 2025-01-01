@@ -19,7 +19,7 @@ namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.UsersManagement.A
 /// Contains security tests for the <c>/auth/recover-password</c> route.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class AuthRecoverPasswordTests : IClassFixture<LuminaApiFactory>, IDisposable
+public class RecoverPasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
 {
     private readonly LuminaApiFactory _apiFactory;
     private readonly HttpClient _client;
@@ -31,10 +31,10 @@ public class AuthRecoverPasswordTests : IClassFixture<LuminaApiFactory>, IDispos
     private readonly string _testUsername;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="AuthRecoverPasswordTests"/> class.
+    /// Initializes a new instance of the <see cref="RecoverPasswordEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public AuthRecoverPasswordTests(LuminaApiFactory apiFactory)
+    public RecoverPasswordEndpointTests(LuminaApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();

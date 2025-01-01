@@ -6,8 +6,8 @@ using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookL
 using Lumina.Application.Common.Mapping.UsersManagement.Users;
 using Lumina.Application.UnitTests.Common.Mapping.UserManagement.Users.Fixtures;
 using Lumina.Contracts.Responses.UsersManagement.Users;
-using Lumina.Domain.Common.Enums.MediaLibrary;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -19,16 +19,6 @@ namespace Lumina.Application.UnitTests.Common.Mapping.UserManagement.Users;
 [ExcludeFromCodeCoverage]
 public class UserEntityMappingTests
 {
-    private readonly UserEntityFixture _fixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="UserEntityMappingTests"/> class.
-    /// </summary>
-    public UserEntityMappingTests()
-    {
-        _fixture = new UserEntityFixture();
-    }
-
     [Fact]
     public void ToResponse_WhenMappingValidUserEntity_ShouldMapCorrectly()
     {
@@ -42,8 +32,8 @@ public class UserEntityMappingTests
         result.Should().NotBeNull();
         result.Id.Should().Be(entity.Id);
         result.Username.Should().Be(entity.Username);
-        result.Created.Should().Be(entity.CreatedOnUtc);
-        result.Updated.Should().Be(entity.UpdatedOnUtc);
+        result.CreatedOnUtc.Should().Be(entity.CreatedOnUtc);
+        result.UpdatedOnUtc.Should().Be(entity.UpdatedOnUtc);
     }
 
     [Theory]
@@ -77,7 +67,7 @@ public class UserEntityMappingTests
 
         // Assert
         result.Should().NotBeNull();
-        result.Updated.Should().Be(entity.UpdatedOnUtc);
+        result.UpdatedOnUtc.Should().Be(entity.UpdatedOnUtc);
     }
 
     [Fact]
@@ -93,7 +83,53 @@ public class UserEntityMappingTests
         result.Should().NotBeNull();
         result.Id.Should().Be(entity.Id);
         result.Username.Should().Be(entity.Username);
-        result.Created.Should().Be(entity.CreatedOnUtc);
-        result.Updated.Should().Be(entity.UpdatedOnUtc);
+        result.CreatedOnUtc.Should().Be(entity.CreatedOnUtc);
+        result.UpdatedOnUtc.Should().Be(entity.UpdatedOnUtc);
+    }
+
+    [Fact]
+    public void ToResponses_WhenMappingMultipleEntities_ShouldMapCorrectly()
+    {
+        // Arrange
+        List<UserEntity> entities = UserEntityFixture.CreateMany(3);
+
+        // Act
+        IEnumerable<UserResponse> results = entities.ToResponses();
+
+        // Assert
+        results.Should().NotBeNull();
+        results.Should().HaveCount(3);
+        results.Should().BeEquivalentTo(entities, options => options
+            .Including(x => x.Id)
+            .Including(x => x.Username));
+    }
+
+    [Fact]
+    public void ToResponses_WhenMappingEmptyCollection_ShouldReturnEmptyCollection()
+    {
+        // Arrange
+        List<UserEntity> entities = [];
+
+        // Act
+        IEnumerable<UserResponse> results = entities.ToResponses();
+
+        // Assert
+        results.Should().NotBeNull();
+        results.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void ToResponse_WhenMappingWithoutUpdatedDateTime_ShouldMapCorrectly()
+    {
+        // Arrange
+        UserEntity entity = UserEntityFixture.CreateUserEntity();
+        entity.UpdatedOnUtc = null;
+
+        // Act
+        UserResponse result = entity.ToResponse();
+
+        // Assert
+        result.Should().NotBeNull();
+        result.UpdatedOnUtc.Should().BeNull();
     }
 }

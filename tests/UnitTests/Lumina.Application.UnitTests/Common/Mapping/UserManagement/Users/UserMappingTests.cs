@@ -117,8 +117,10 @@ public class UserMappingTests
                 Title = "Library 1",
                 LibraryType = LibraryType.Book,
                 ContentLocations = [],
-                Created = DateTime.UtcNow,
-                Updated = null
+                CreatedOnUtc = DateTime.UtcNow,
+                CreatedBy = Guid.NewGuid(),
+                UpdatedOnUtc = null,
+                UpdatedBy = null
             },
             new()
             {
@@ -127,8 +129,10 @@ public class UserMappingTests
                 Title = "Library 2",
                 LibraryType = LibraryType.Movie,
                 ContentLocations = [],
-                Created = DateTime.UtcNow,
-                Updated = null
+                CreatedOnUtc = DateTime.UtcNow,
+                CreatedBy = Guid.NewGuid(),
+                UpdatedOnUtc = null,
+                UpdatedBy = null
             }
         ];
 

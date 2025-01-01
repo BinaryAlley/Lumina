@@ -25,7 +25,7 @@ namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.UsersManagement.A
 /// Contains security tests for the <c>/auth/login</c> route.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class AuthLoginTests : IClassFixture<LuminaApiFactory>, IDisposable
+public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
 {
     private readonly HashService _hashService;
     private readonly ICryptographyService _cryptographyService;
@@ -40,10 +40,10 @@ public class AuthLoginTests : IClassFixture<LuminaApiFactory>, IDisposable
     private readonly string _testUsername;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="AuthLoginTests"/> class.
+    /// Initializes a new instance of the <see cref="LoginEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public AuthLoginTests(LuminaApiFactory apiFactory)
+    public LoginEndpointTests(LuminaApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();

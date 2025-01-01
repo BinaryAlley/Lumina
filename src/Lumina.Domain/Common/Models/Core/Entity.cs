@@ -18,12 +18,12 @@ public abstract class Entity<TId> : IEquatable<Entity<TId>> where TId : notnull
     /// <summary>
     /// Gets the date and time when the entity was created.
     /// </summary>
-    public DateTime Created { get; set; }
+    public DateTime CreatedOnUtc { get; set; }
 
     /// <summary>
     /// Gets the date and time when the entity was last updated.
     /// </summary>
-    public DateTime? Updated { get; set; }
+    public DateTime? UpdatedOnUtc { get; set; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Entity{TId}"/> class.

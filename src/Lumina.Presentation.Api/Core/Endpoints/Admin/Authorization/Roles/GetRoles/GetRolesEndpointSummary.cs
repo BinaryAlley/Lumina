@@ -11,12 +11,12 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Admin.Authorization.Roles.GetRo
 /// Class used for providing a textual description for the <see cref="GetRolesEndpoint"/> API endpoint, for OpenAPI.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetPermissionsEndpointSummary : Summary<GetRolesEndpoint, EmptyRequest>
+public class GetRolesEndpointSummary : Summary<GetRolesEndpoint, EmptyRequest>
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="GetPermissionsEndpointSummary"/> class.
+    /// Initializes a new instance of the <see cref="GetRolesEndpointSummary"/> class.
     /// </summary>
-    public GetPermissionsEndpointSummary()
+    public GetRolesEndpointSummary()
     {
         Summary = "Gets the collection of authorization roles.";
         Description = "Gets the entire list of authorization roles.";
