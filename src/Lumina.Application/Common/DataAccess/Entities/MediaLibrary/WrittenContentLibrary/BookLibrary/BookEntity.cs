@@ -12,7 +12,7 @@ namespace Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenCont
 /// Repository entity for a book.
 /// </summary>
 [DebuggerDisplay("Title: {Title}")]
-public class BookEntity : IStorageEntity
+public class BookEntity : IStorageEntity, IAuditableEntity
 {
     /// <summary>
     /// Gets the Id of the media item.
@@ -198,10 +198,20 @@ public class BookEntity : IStorageEntity
     /// <summary>
     /// Gets or sets the time and date when the entity was added.
     /// </summary>
-    public required DateTime Created { get; set; }
+    public required DateTime CreatedOnUtc { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Id of the user that created the entity.
+    /// </summary>
+    public required Guid CreatedBy { get; set; }
 
     /// <summary>
     /// Gets or sets the optional time and date when the entity was updated.
     /// </summary>
-    public DateTime? Updated { get; set; }
+    public DateTime? UpdatedOnUtc { get; set; }
+
+    /// <summary>
+    /// Gets or sets the optional Id of the user that updated the entity.
+    /// </summary>
+    public required Guid? UpdatedBy { get; set; }
 }

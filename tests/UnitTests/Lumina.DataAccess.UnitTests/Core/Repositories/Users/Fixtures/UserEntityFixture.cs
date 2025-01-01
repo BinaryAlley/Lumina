@@ -69,8 +69,10 @@ public class UserEntityFixture
                 Title = f.Random.String2(f.Random.Number(1, 50)),
                 LibraryType = f.PickRandom<LibraryType>(),
                 ContentLocations = CreateContentLocations(f.Random.Number(1, 3)),
-                Created = f.Date.Past(),
-                Updated = f.Random.Bool() ? f.Date.Recent() : null
+                CreatedOnUtc = f.Date.Past(),
+                CreatedBy = userId,
+                UpdatedOnUtc = f.Random.Bool() ? f.Date.Recent() : null,
+                UpdatedBy = f.Random.Bool() ? userId : null,
             })
             .Generate(count);
     }
@@ -102,8 +104,10 @@ public class UserEntityFixture
             Title = _fixture.Create<string>(),
             LibraryType = _fixture.Create<LibraryType>(),
             ContentLocations = [],
-            Created = _fixture.Create<DateTime>(),
-            Updated = _fixture.Create<DateTime>()
+            CreatedOnUtc = _fixture.Create<DateTime>(),
+            CreatedBy = _fixture.Create<Guid>(),
+            UpdatedOnUtc = _fixture.Create<DateTime>(),
+            UpdatedBy = _fixture.Create<Guid>()
         });
 
         _fixture.Register(() => new LibraryContentLocationEntity

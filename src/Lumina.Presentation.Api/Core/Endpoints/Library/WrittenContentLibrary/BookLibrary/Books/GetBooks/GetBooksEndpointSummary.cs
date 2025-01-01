@@ -128,8 +128,8 @@ public class GetBooksEndpointSummary : Summary<GetBooksEndpoint>
                             VoteCount: 87654
                         )
                     ],
-                    Created: DateTime.UtcNow,
-                    Updated: default
+                    CreatedOnUtc: DateTime.UtcNow,
+                    UpdatedOnUtc: default
                 ),
                 new(
                     Id: Guid.NewGuid(),
@@ -229,8 +229,8 @@ public class GetBooksEndpointSummary : Summary<GetBooksEndpoint>
                             VoteCount: 90000
                         )
                     ],
-                    Created: DateTime.UtcNow,
-                    Updated: default
+                    CreatedOnUtc: DateTime.UtcNow,
+                    UpdatedOnUtc: default
                 )
             }
         );

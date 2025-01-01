@@ -41,7 +41,7 @@ public class DeleteRoleEndpointSummary : Summary<DeleteRoleEndpoint, DeleteRoleR
                     status = 401,
                     title = "Unauthorized",
                     detail = "You are not authorized",
-                    instance = "/api/v1/roles"
+                    instance = "/api/v1/roles/{roleId}"
                 },
                 new
                 {
@@ -49,7 +49,7 @@ public class DeleteRoleEndpointSummary : Summary<DeleteRoleEndpoint, DeleteRoleR
                     status = 401,
                     title = "Unauthorized",
                     detail = "Invalid token: The token expired at '01/01/2024 01:00:00'",
-                    instance = "/api/v1/roles"
+                    instance = "/api/v1/roles/{roleId}"
                 },
                 new
                 {
@@ -57,7 +57,7 @@ public class DeleteRoleEndpointSummary : Summary<DeleteRoleEndpoint, DeleteRoleR
                     status = 401,
                     title = "Unauthorized",
                     detail = "The token is invalid",
-                    instance = "/api/v1/roles"
+                    instance = "/api/v1/roles/{roleId}"
                 }
             }
         );
@@ -71,7 +71,7 @@ public class DeleteRoleEndpointSummary : Summary<DeleteRoleEndpoint, DeleteRoleR
                     title = "General.Failure",
                     status = 403,
                     detail = "AdminRoleCannotBeDeleted",
-                    instance = "/api/v1/roles",
+                    instance = "/api/v1/roles/{roleId}",
                     traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
                 },
                 new
@@ -80,7 +80,7 @@ public class DeleteRoleEndpointSummary : Summary<DeleteRoleEndpoint, DeleteRoleR
                     title = "General.Failure",
                     status = 403,
                     detail = "NotAuthorized",
-                    instance = "/api/v1/roles",
+                    instance = "/api/v1/roles/{roleId}",
                     traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
                 }
             }
@@ -93,7 +93,7 @@ public class DeleteRoleEndpointSummary : Summary<DeleteRoleEndpoint, DeleteRoleR
                 title = "General.NotFound",
                 status = 404,
                 detail = "RoleNotFound",
-                instance = "/api/v1/roles",
+                instance = "/api/v1/roles/{roleId}",
                 traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
             }
         );
@@ -105,7 +105,7 @@ public class DeleteRoleEndpointSummary : Summary<DeleteRoleEndpoint, DeleteRoleR
                 title = "General.Validation",
                 status = 422,
                 detail = "OneOrMoreValidationErrorsOccurred",
-                instance = "/api/v1/roles",
+                instance = "/api/v1/roles/{roleId}",
                 errors = new Dictionary<string, string[]>
                 {
                     {

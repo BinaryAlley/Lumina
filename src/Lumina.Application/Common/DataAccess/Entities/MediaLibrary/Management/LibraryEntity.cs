@@ -13,7 +13,7 @@ namespace Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 /// Repository entity for a media library.
 /// </summary>
 [DebuggerDisplay("Title: {Title}")]
-public class LibraryEntity : IStorageEntity
+public class LibraryEntity : IStorageEntity, IAuditableEntity
 {
     /// <summary>
     /// Gets the Id of the media library.
@@ -48,10 +48,20 @@ public class LibraryEntity : IStorageEntity
     /// <summary>
     /// Gets or sets the time and date when the entity was added.
     /// </summary>
-    public required DateTime Created { get; set; }
+    public required DateTime CreatedOnUtc { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Id of the user that created the entity.
+    /// </summary>
+    public required Guid CreatedBy { get; set; }
 
     /// <summary>
     /// Gets or sets the optional time and date when the entity was updated.
     /// </summary>
-    public DateTime? Updated { get; set; }
+    public DateTime? UpdatedOnUtc { get; set; }
+
+    /// <summary>
+    /// Gets or sets the optional Id of the user that updated the entity.
+    /// </summary>
+    public required Guid? UpdatedBy { get; set; }
 }

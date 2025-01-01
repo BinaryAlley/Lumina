@@ -31,8 +31,8 @@ namespace Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibr
 /// <param name="ISBNs">The list of ISBN (International Standard Book Number) of the book.</param>
 /// <param name="Contributors">The list of media contributors (actors, directors, etc) starring in this book.</param>
 /// <param name="Ratings">The list of ratings for this book.</param>
-/// <param name="Created">The date and time when the book was created.</param>
-/// <param name="Updated">The optional date and time when the book was updated.</param>
+/// <param name="CreatedOnUtc">The date and time when the book was created.</param>
+/// <param name="UpdatedOnUtc">The optional date and time when the book was updated.</param>
 [DebuggerDisplay("Title: {Metadata.Title}")]
 public record BookResponse(
     Guid Id,
@@ -53,6 +53,6 @@ public record BookResponse(
     List<IsbnDto>? ISBNs,
     List<MediaContributorDto>? Contributors,
     List<BookRatingDto>? Ratings,
-    DateTime Created,
-    DateTime? Updated
+    DateTime CreatedOnUtc,
+    DateTime? UpdatedOnUtc
 );

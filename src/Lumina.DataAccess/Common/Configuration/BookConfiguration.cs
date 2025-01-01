@@ -130,9 +130,9 @@ public class BookConfiguration : IEntityTypeConfiguration<BookEntity>
             .HasColumnOrder(28);
         builder.Property(book => book.AppleBooksId)
             .HasColumnOrder(29);
-        builder.Property(book => book.Created)
+        builder.Property(book => book.CreatedOnUtc)
             .HasColumnOrder(30);
-        builder.Property(book => book.Updated)
+        builder.Property(book => book.UpdatedOnUtc)
             .HasColumnOrder(31);
 
         //builder.HasMany<ContributorIdModel>()

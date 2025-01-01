@@ -24,8 +24,8 @@ public static class LibraryEntityMapping
             repositoryEntity.Title,
             repositoryEntity.LibraryType,
             repositoryEntity.ContentLocations.Select(location => location.Path).ToList(),
-            repositoryEntity.Created,
-            repositoryEntity.Updated
+            repositoryEntity.CreatedOnUtc,
+            repositoryEntity.UpdatedOnUtc
         );
     }
 }

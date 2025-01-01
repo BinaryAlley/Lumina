@@ -31,6 +31,7 @@ public class StoreLastViewFilter : IActionFilter
         if (context.Result is ViewResult)
         {
             HttpContext httpContext = context.HttpContext;
+            // ignore the login endpoint, because it is incorrect to be redirected to the login URL, with the login URL as the return URL
             if (httpContext.Request.Path != "/en-us/auth/login")
                 httpContext.Session.SetString(HttpContextItemKeys.LAST_DISPLAYED_VIEW, $"{httpContext.Request.PathBase}{httpContext.Request.Path}{httpContext.Request.QueryString}");
         }

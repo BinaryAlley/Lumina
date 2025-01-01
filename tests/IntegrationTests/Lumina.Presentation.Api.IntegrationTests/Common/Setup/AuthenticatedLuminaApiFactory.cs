@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Application.Common.DataAccess.Seed;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.DataAccess.Core.UoW;
@@ -12,6 +13,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
@@ -85,6 +87,74 @@ public class AuthenticatedLuminaApiFactory : LuminaApiFactory, IDisposable
 
         dbContext.Users.Add(user);
         await dbContext.SaveChangesAsync();
+
+        // authenticate user
+        LoginRequest loginRequest = new(
+            Username: user.Username,
+            Password: "TestPass123!"
+        );
+
+        HttpResponseMessage loginResponse = await client.PostAsJsonAsync("/api/v1/auth/login", loginRequest);
+        string content = await loginResponse.Content.ReadAsStringAsync();
+        LoginResponse? result = JsonSerializer.Deserialize<LoginResponse>(content, _jsonOptions);
+
+        // set auth header for subsequent requests
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result!.Token);
+
+        return user;
+    }
+
+    /// <summary>
+    /// Creates an HTTP client with authentication headers and an admin test user with all permissions
+    /// </summary>
+    /// <returns>An HTTP client configured with admin auth headers</returns>
+    public async Task<HttpClient> CreateAuthenticatedAdminClientAsync()
+    {
+        HttpClient client = CreateClient();
+        TestUsername = $"testuser_{Guid.NewGuid()}";
+
+        // add the X-Forwarded-For header
+        client.DefaultRequestHeaders.Add("X-Forwarded-For",
+            $"192.{Random.Shared.Next(0, 255)}.{Random.Shared.Next(0, 255)}.{Random.Shared.Next(0, 255)}");
+
+        // create and authenticate admin user
+        await CreateAndAuthenticateAdminUser(client);
+
+        return client;
+    }
+
+    /// <summary>
+    /// Creates and authenticates an admin test user with all permissions.
+    /// </summary>
+    /// <param name="client">The HTTP client to configure with auth.</param>
+    /// <returns>The created user entity.</returns>
+    private async Task<UserEntity> CreateAndAuthenticateAdminUser(HttpClient client)
+    {
+        using IServiceScope scope = Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        IDataSeedService dataSeedService = scope.ServiceProvider.GetRequiredService<IDataSeedService>();
+
+        // create test user
+        UserEntity user = new()
+        {
+            Id = Guid.NewGuid(),
+            Username = TestUsername!,
+            Password = _hashService.HashString("TestPass123!"),
+            Libraries = [],
+            UserPermissions = [],
+            UserRole = null,
+            CreatedBy = Guid.NewGuid(),
+            CreatedOnUtc = DateTime.UtcNow
+        };
+
+        dbContext.Users.Add(user);
+        await dbContext.SaveChangesAsync();
+
+        // set up admin permissions and roles
+        await dataSeedService.SetDefaultAuthorizationPermissionsAsync(user.Id, CancellationToken.None);
+        await dataSeedService.SetDefaultAuthorizationRolesAsync(user.Id, CancellationToken.None);
+        await dataSeedService.SetAdminRolePermissionsAsync(user.Id, CancellationToken.None);
+        await dataSeedService.SetAdminRoleToAdministratorAccount(user.Id, CancellationToken.None);
 
         // authenticate user
         LoginRequest loginRequest = new(

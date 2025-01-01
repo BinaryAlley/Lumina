@@ -98,7 +98,7 @@ public class GetAuthorizationEndpointTests : IClassFixture<AuthenticatedLuminaAp
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenUserDoesNotExist_ShouldReturnForbidden()
+    public async Task ExecuteAsync_WhenUserDoesNotExist_ShouldReturnForbiddenResult()
     {
         // Arrange
         GetAuthorizationRequest request = new(Guid.NewGuid());

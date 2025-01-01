@@ -33,8 +33,10 @@ public class UserEntityFixture
                 Title = f.Commerce.ProductName(),
                 LibraryType = f.PickRandom<LibraryType>(),
                 ContentLocations = [],
-                Created = f.Date.Past(),
-                Updated = null
+                CreatedOnUtc = f.Date.Past(),
+                CreatedBy = userId,
+                UpdatedOnUtc = null,
+                UpdatedBy = null
             })
             .Generate(libraryCount)];
 

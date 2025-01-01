@@ -142,7 +142,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenInvalidTotpCode_ShouldReturnForbidden()
+    public async Task ExecuteAsync_WhenInvalidTotpCode_ShouldReturnForbiddenResult()
     {
         // Arrange
         UserEntity user = await CreateUserWithTotp();
@@ -198,7 +198,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenUserDoesNotUseTotpAndTriesToRecover_ShouldReturnForbidden()
+    public async Task ExecuteAsync_WhenUserDoesNotUseTotpAndTriesToRecover_ShouldReturnForbiddenResult()
     {
         // Arrange
         UserEntity user = await CreateUserWithoutTotp();
@@ -229,7 +229,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenUserDoesNotUseTotpAndTriesToRecoverWithoutCode_ShouldReturnForbidden()
+    public async Task ExecuteAsync_WhenUserDoesNotUseTotpAndTriesToRecoverWithoutCode_ShouldReturnForbiddenResult()
     {
         // Arrange
         // Setup user without TOTP
@@ -327,6 +327,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
 
         UserEntity user = new()
         {
+            Id = Guid.NewGuid(),
             Username = _testUsername,
             Password = _hashService.HashString("OldPass123!"),
             TotpSecret = null,

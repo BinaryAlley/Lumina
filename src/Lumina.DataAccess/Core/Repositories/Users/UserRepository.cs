@@ -8,7 +8,6 @@ using Lumina.Domain.Common.Errors;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -130,7 +129,6 @@ internal sealed class UserRepository : IUserRepository
         }
         return Result.Updated;
     }
-
 
     /// <summary>
     /// Gets a <see cref="UserEntity"/> identified by <paramref name="id"/> from the storage medium.
