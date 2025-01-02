@@ -126,8 +126,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "directories", "directories", "{FBD8915E-DFE2-4C16-8B47-64383AB0719D}"
 	ProjectSection(SolutionItems) = preProject
 		..\docs\technical\requests\file-system-management\directories\GetDirectories.http = ..\docs\technical\requests\file-system-management\directories\GetDirectories.http
-		..\docs\technical\requests\file-system-management\directories\GetDirectoryTree.http = ..\docs\technical\requests\file-system-management\directories\GetDirectoryTree.http
-		..\docs\technical\requests\file-system-management\directories\GetTreeDirectories.http = ..\docs\technical\requests\file-system-management\directories\GetTreeDirectories.http
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "drives", "drives", "{DB498346-5F46-49FC-B2E9-8239C56791FF}"
