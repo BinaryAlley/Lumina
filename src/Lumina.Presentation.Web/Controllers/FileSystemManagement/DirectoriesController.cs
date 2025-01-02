@@ -42,34 +42,4 @@ public class DirectoriesController : Controller
             $"directories/get-directories?path={Uri.EscapeDataString(path)}&includeHiddenElements={includeHiddenElements}", cancellationToken).ConfigureAwait(false);
         return Json(new { success = true, data = response });
     }
-
-    /// <summary>
-    /// Gets the directories of <paramref name="path"/>.
-    /// </summary>
-    /// <param name="path">The path for which to get the directories.</param>
-    /// <param name="includeHiddenElements">Whether to include hidden file system elements or not.</param>
-    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    [HttpGet("api-get-tree-directories")]
-    public async Task<IActionResult> GetTreeDirectories([FromQuery] string path, [FromQuery] bool includeHiddenElements, CancellationToken cancellationToken)
-    {
-        // TODO: check if it's really used
-        IEnumerable<FileSystemTreeNodeModel> response = await _apiHttpClient.GetAsync<FileSystemTreeNodeModel[]>(
-            $"directories/get-tree-directories?path={Uri.EscapeDataString(path)}&includeHiddenElements={includeHiddenElements}", cancellationToken).ConfigureAwait(false);
-        return Json(new { success = true, data = response });
-    }
-
-    /// <summary>
-    /// Gets the tree of expanded directories leading up to <paramref name="path"/>, with the additional list of drives, and children of the last child directory.
-    /// </summary>
-    /// <param name="path">The path for which to get the directory tree.</param>
-    /// <param name="includeHiddenElements">Whether to include hidden file system elements or not.</param>
-    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    [HttpGet("api-get-directory-tree")]
-    public async Task<IActionResult> GetDirectoryTree([FromQuery] string path, [FromQuery] bool includeFiles, [FromQuery] bool includeHiddenElements, CancellationToken cancellationToken)
-    {
-        // TODO: check if it's really used
-        FileSystemTreeNodeModel[] response = await _apiHttpClient.GetAsync<FileSystemTreeNodeModel[]>(
-            $"directories/get-directory-tree?path={Uri.EscapeDataString(path)}&includeFiles={includeFiles}&includeHiddenElements={includeHiddenElements}", cancellationToken).ConfigureAwait(false);
-        return Json(new { success = true, data = response });
-    }
 }
