@@ -65,7 +65,7 @@ public class GetRolePermissionsEndpointTests : IClassFixture<AuthenticatedLumina
         role.Should().NotBeNull("Admin role should exist");
 
         // Act
-        HttpResponseMessage response = await _client.GetAsync($"/api/v1/roles/{role!.Id}/permissions");
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/auth/roles/{role!.Id}/permissions");
 
         // Assert
         response.EnsureSuccessStatusCode();
@@ -96,7 +96,7 @@ public class GetRolePermissionsEndpointTests : IClassFixture<AuthenticatedLumina
         role.Should().NotBeNull("Admin role should exist");
 
         // Act
-        HttpResponseMessage response = await _client.GetAsync($"/api/v1/roles/{role!.Id}/permissions");
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/auth/roles/{role!.Id}/permissions");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
@@ -108,7 +108,7 @@ public class GetRolePermissionsEndpointTests : IClassFixture<AuthenticatedLumina
         problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.4");
         problemDetails["title"].GetString().Should().Be("General.Unauthorized");
         problemDetails["detail"].GetString().Should().Be("NotAuthorized");
-        problemDetails["instance"].GetString().Should().Be($"/api/v1/roles/{role.Id}/permissions");
+        problemDetails["instance"].GetString().Should().Be($"/api/v1/auth/roles/{role.Id}/permissions");
         problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
     }
 
@@ -117,7 +117,7 @@ public class GetRolePermissionsEndpointTests : IClassFixture<AuthenticatedLumina
     {
         // Act
         Guid invalidRoleId = Guid.NewGuid();
-        HttpResponseMessage response = await _client.GetAsync($"/api/v1/roles/{invalidRoleId}/permissions");
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/auth/roles/{invalidRoleId}/permissions");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -129,7 +129,7 @@ public class GetRolePermissionsEndpointTests : IClassFixture<AuthenticatedLumina
         problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.5");
         problemDetails["title"].GetString().Should().Be("General.NotFound");
         problemDetails["detail"].GetString().Should().Be("RoleNotFound");
-        problemDetails["instance"].GetString().Should().Be($"/api/v1/roles/{invalidRoleId}/permissions");
+        problemDetails["instance"].GetString().Should().Be($"/api/v1/auth/roles/{invalidRoleId}/permissions");
         problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
     }
 
@@ -147,7 +147,7 @@ public class GetRolePermissionsEndpointTests : IClassFixture<AuthenticatedLumina
         Func<Task> act = async () =>
         {
             cts.Cancel();
-            await _client.GetAsync($"/api/v1/roles/{role!.Id}/permissions", cts.Token);
+            await _client.GetAsync($"/api/v1/auth/roles/{role!.Id}/permissions", cts.Token);
         };
 
         // Assert

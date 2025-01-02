@@ -71,7 +71,7 @@ public class AddRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
         );
 
         // Act
-        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/roles", request);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/auth/roles", request);
 
         // Assert
         response.EnsureSuccessStatusCode();
@@ -101,7 +101,7 @@ public class AddRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
         );
 
         // Act
-        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/roles", request);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/auth/roles", request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
@@ -113,7 +113,7 @@ public class AddRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
         problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.4");
         problemDetails["title"].GetString().Should().Be("General.Unauthorized");
         problemDetails["detail"].GetString().Should().Be("NotAuthorized");
-        problemDetails["instance"].GetString().Should().Be("/api/v1/roles");
+        problemDetails["instance"].GetString().Should().Be("/api/v1/auth/roles");
         problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
     }
 
@@ -127,7 +127,7 @@ public class AddRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
         );
 
         // Act
-        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/roles", request);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/auth/roles", request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Conflict);
@@ -139,7 +139,7 @@ public class AddRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
         problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.10");
         problemDetails["title"].GetString().Should().Be("General.Conflict");
         problemDetails["detail"].GetString().Should().Be("RoleAlreadyExists");
-        problemDetails["instance"].GetString().Should().Be("/api/v1/roles");
+        problemDetails["instance"].GetString().Should().Be("/api/v1/auth/roles");
         problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
     }
 
@@ -157,7 +157,7 @@ public class AddRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
         Func<Task> act = async () =>
         {
             cts.Cancel();
-            await _client.PostAsJsonAsync("/api/v1/roles", request, cts.Token);
+            await _client.PostAsJsonAsync("/api/v1/auth/roles", request, cts.Token);
         };
 
         // Assert

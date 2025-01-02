@@ -40,7 +40,7 @@
 #### Get Permissions Request
 
 ```js
-GET api/v1/permissions
+GET api/v1/auth/permissions
 ```
 
 #### Get Permissions Response
@@ -73,7 +73,7 @@ GET api/v1/permissions
 #### Get Roles Request
 
 ```js
-GET api/v1/roles
+GET api/v1/auth/roles
 ```
 
 #### Get Roles Response
@@ -96,7 +96,7 @@ GET api/v1/roles
 #### Get Role Permissions Request
 
 ```js
-GET api/v1/roles/{roleId}/permissions
+GET api/v1/auth/roles/{roleId}/permissions
 ```
 
 #### Get Role Permissions Response
@@ -127,7 +127,7 @@ GET api/v1/roles/{roleId}/permissions
 #### Add Role Request
 
 ```js
-POST api/v1/roles
+POST api/v1/auth/roles
 ```
 
 #### Add Role Response
@@ -160,7 +160,7 @@ POST api/v1/roles
 #### Update Role Request
 
 ```js
-PUT api/v1/roles
+PUT api/v1/auth/roles
 ```
 
 ```json
@@ -204,7 +204,7 @@ PUT api/v1/roles
 #### Delete Role Request
 
 ```js
-DELETE api/v1/roles/{roleId}
+DELETE api/v1/auth/roles/{roleId}
 ```
 
 #### Delete Role Response

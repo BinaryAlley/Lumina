@@ -35,7 +35,7 @@ public class GetRolesEndpointSummary : Summary<GetRolesEndpoint, EmptyRequest>
                     status = 401,
                     title = "Unauthorized",
                     detail = "You are not authorized",
-                    instance = "/api/v1/roles"
+                    instance = "/api/v1/auth/roles"
                 },
                 new
                 {
@@ -43,7 +43,7 @@ public class GetRolesEndpointSummary : Summary<GetRolesEndpoint, EmptyRequest>
                     status = 401,
                     title = "Unauthorized",
                     detail = "Invalid token: The token expired at '01/01/2024 01:00:00'",
-                    instance = "/api/v1/roles"
+                    instance = "/api/v1/auth/roles"
                 },
                 new
                 {
@@ -51,7 +51,7 @@ public class GetRolesEndpointSummary : Summary<GetRolesEndpoint, EmptyRequest>
                     status = 401,
                     title = "Unauthorized",
                     detail = "The token is invalid",
-                    instance = "/api/v1/roles"
+                    instance = "/api/v1/auth/roles"
                 }
             }
         );
@@ -63,7 +63,7 @@ public class GetRolesEndpointSummary : Summary<GetRolesEndpoint, EmptyRequest>
                 title = "General.Failure",
                 status = 403,
                 detail = "NotAuthorized",
-                instance = "/api/v1/roles",
+                instance = "/api/v1/auth/roles",
                 traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
             }
         );

@@ -1,2 +1,2 @@
-GET {{host}}/api/v1/roles/{{$guid}}/permissions
+GET {{host}}/api/v1/auth/roles/{{$guid}}/permissions
 Authorization: Bearer {{ACCESS_TOKEN}}

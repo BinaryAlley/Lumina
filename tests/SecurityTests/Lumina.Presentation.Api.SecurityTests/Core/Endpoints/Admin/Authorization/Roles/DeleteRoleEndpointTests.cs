@@ -10,7 +10,7 @@ using System.Text.Json;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Admin.Authorization.Roles;
 
 /// <summary>
-/// Contains security tests for the <c>/roles/{roleId}</c> route.
+/// Contains security tests for the <c>/auth/roles/{roleId}</c> route.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class DeleteRoleEndpointTests : IClassFixture<LuminaApiFactory>
@@ -35,7 +35,7 @@ public class DeleteRoleEndpointTests : IClassFixture<LuminaApiFactory>
     {
         // Arrange
         Guid roleId = Guid.NewGuid();
-        string url = $"/api/v1/roles/{roleId}";
+        string url = $"/api/v1/auth/roles/{roleId}";
 
         // Act
         HttpResponseMessage response = await _client.DeleteAsync(url);

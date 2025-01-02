@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.Core.Endpoints.Admin.Authorization.Roles.UpdateRole;
 
 /// <summary>
-/// API endpoint for the <c>/roles</c> route.
+/// API endpoint for the <c>/auth/roles</c> route.
 /// </summary>
 public class UpdateRoleEndpoint : BaseEndpoint<UpdateRoleRequest, IResult>
 {

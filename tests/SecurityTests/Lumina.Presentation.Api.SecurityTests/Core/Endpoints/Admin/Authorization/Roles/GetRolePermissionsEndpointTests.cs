@@ -10,7 +10,7 @@ using System.Text.Json;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Admin.Authorization.Roles;
 
 /// <summary>
-/// Contains security tests for the <c>/roles/{roleId}/permissions</c> route.
+/// Contains security tests for the <c>/auth/roles/{roleId}/permissions</c> route.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class GetRolePermissionsEndpointTests : IClassFixture<LuminaApiFactory>
@@ -35,7 +35,7 @@ public class GetRolePermissionsEndpointTests : IClassFixture<LuminaApiFactory>
     {
         // Arrange
         Guid roleId = Guid.NewGuid();
-        string url = $"/api/v1/roles/{roleId}/permissions";
+        string url = $"/api/v1/auth/roles/{roleId}/permissions";
 
         // Act
         HttpResponseMessage response = await _client.GetAsync(url);

@@ -82,7 +82,7 @@ public class UpdateRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         );
 
         // Act
-        HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/roles", request);
+        HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/auth/roles", request);
 
         // Assert
         response.EnsureSuccessStatusCode();
@@ -114,7 +114,7 @@ public class UpdateRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         );
 
         // Act
-        HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/roles", request);
+        HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/auth/roles", request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
@@ -126,7 +126,7 @@ public class UpdateRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.4");
         problemDetails["title"].GetString().Should().Be("General.Unauthorized");
         problemDetails["detail"].GetString().Should().Be("NotAuthorized");
-        problemDetails["instance"].GetString().Should().Be("/api/v1/roles");
+        problemDetails["instance"].GetString().Should().Be("/api/v1/auth/roles");
         problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
     }
 
@@ -142,7 +142,7 @@ public class UpdateRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         );
 
         // Act
-        HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/roles", request);
+        HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/auth/roles", request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -154,7 +154,7 @@ public class UpdateRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.5");
         problemDetails["title"].GetString().Should().Be("General.NotFound");
         problemDetails["detail"].GetString().Should().Be("RoleNotFound");
-        problemDetails["instance"].GetString().Should().Be("/api/v1/roles");
+        problemDetails["instance"].GetString().Should().Be("/api/v1/auth/roles");
         problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
     }
 
@@ -173,7 +173,7 @@ public class UpdateRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         Func<Task> act = async () =>
         {
             cts.Cancel();
-            await _client.PutAsJsonAsync($"/api/v1/roles", request, cts.Token);
+            await _client.PutAsJsonAsync($"/api/v1/auth/roles", request, cts.Token);
         };
 
         // Assert

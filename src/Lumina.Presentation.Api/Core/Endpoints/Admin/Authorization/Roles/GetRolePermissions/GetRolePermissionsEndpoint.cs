@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.Core.Endpoints.Admin.Authorization.Roles.GetRolePermissions;
 
 /// <summary>
-/// API endpoint for the <c>/roles/{roleId}/permissions</c> route.
+/// API endpoint for the <c>/auth/roles/{roleId}/permissions</c> route.
 /// </summary>
 public class GetRolePermissionsEndpoint : BaseEndpoint<GetRolePermissionsRequest, IResult>
 {

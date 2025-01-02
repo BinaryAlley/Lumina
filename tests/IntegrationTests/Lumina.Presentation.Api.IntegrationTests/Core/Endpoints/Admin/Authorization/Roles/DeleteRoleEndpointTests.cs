@@ -72,7 +72,7 @@ public class DeleteRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         await dbContext.SaveChangesAsync();
 
         // Act
-        HttpResponseMessage response = await _client.DeleteAsync($"/api/v1/roles/{role.Id}");
+        HttpResponseMessage response = await _client.DeleteAsync($"/api/v1/auth/roles/{role.Id}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
@@ -90,7 +90,7 @@ public class DeleteRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         Guid roleId = Guid.NewGuid();
 
         // Act
-        HttpResponseMessage response = await _client.DeleteAsync($"/api/v1/roles/{roleId}");
+        HttpResponseMessage response = await _client.DeleteAsync($"/api/v1/auth/roles/{roleId}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
@@ -102,7 +102,7 @@ public class DeleteRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.4");
         problemDetails["title"].GetString().Should().Be("General.Unauthorized");
         problemDetails["detail"].GetString().Should().Be("NotAuthorized");
-        problemDetails["instance"].GetString().Should().Be($"/api/v1/roles/{roleId}");
+        problemDetails["instance"].GetString().Should().Be($"/api/v1/auth/roles/{roleId}");
         problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
     }
 
@@ -116,7 +116,7 @@ public class DeleteRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         adminRole.Should().NotBeNull("Admin role should exist");
 
         // Act
-        HttpResponseMessage response = await _client.DeleteAsync($"/api/v1/roles/{adminRole!.Id}");
+        HttpResponseMessage response = await _client.DeleteAsync($"/api/v1/auth/roles/{adminRole!.Id}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
@@ -128,7 +128,7 @@ public class DeleteRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.4");
         problemDetails["title"].GetString().Should().Be("General.Forbidden");
         problemDetails["detail"].GetString().Should().Be("AdminRoleCannotBeDeleted");
-        problemDetails["instance"].GetString().Should().Be($"/api/v1/roles/{adminRole!.Id}");
+        problemDetails["instance"].GetString().Should().Be($"/api/v1/auth/roles/{adminRole!.Id}");
         problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
     }
 
@@ -139,7 +139,7 @@ public class DeleteRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         Guid nonExistentRoleId = Guid.NewGuid();
 
         // Act
-        HttpResponseMessage response = await _client.DeleteAsync($"/api/v1/roles/{nonExistentRoleId}");
+        HttpResponseMessage response = await _client.DeleteAsync($"/api/v1/auth/roles/{nonExistentRoleId}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -151,7 +151,7 @@ public class DeleteRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.5");
         problemDetails["title"].GetString().Should().Be("General.NotFound");
         problemDetails["detail"].GetString().Should().Be("RoleNotFound");
-        problemDetails["instance"].GetString().Should().Be($"/api/v1/roles/{nonExistentRoleId}");
+        problemDetails["instance"].GetString().Should().Be($"/api/v1/auth/roles/{nonExistentRoleId}");
         problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
     }
 
@@ -166,7 +166,7 @@ public class DeleteRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         Func<Task> act = async () =>
         {
             cts.Cancel();
-            await _client.DeleteAsync($"/api/v1/roles/{roleId}", cts.Token);
+            await _client.DeleteAsync($"/api/v1/auth/roles/{roleId}", cts.Token);
         };
 
         // Assert

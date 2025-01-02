@@ -11,7 +11,7 @@ using System.Text.Json;
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Admin.Authorization.Roles;
 
 /// <summary>
-/// Contains security tests for the <c>/roles</c> route.
+/// Contains security tests for the <c>/auth/roles</c> route.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class AddRoleEndpointTests : IClassFixture<LuminaApiFactory>
@@ -43,7 +43,7 @@ public class AddRoleEndpointTests : IClassFixture<LuminaApiFactory>
         StringContent content = new(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await _client.PostAsync("/api/v1/roles", content);
+        HttpResponseMessage response = await _client.PostAsync("/api/v1/auth/roles", content);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -55,7 +55,7 @@ public class AddRoleEndpointTests : IClassFixture<LuminaApiFactory>
         problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status401Unauthorized);
         problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc7235#section-3.1");
         problemDetails["title"].GetString().Should().Be("Unauthorized");
-        problemDetails["instance"].GetProperty("value").GetString().Should().Be("/api/v1/roles");
+        problemDetails["instance"].GetProperty("value").GetString().Should().Be("/api/v1/auth/roles");
         problemDetails["detail"].GetString().Should().Be("Authentication failed");
     }
 }
