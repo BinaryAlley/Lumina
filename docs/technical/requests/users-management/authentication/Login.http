@@ -1,0 +1,8 @@
+POST {{host}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "Username": "a",
+  "Password": "Abcd123$",
+  "TotpCode": "123456"
+}

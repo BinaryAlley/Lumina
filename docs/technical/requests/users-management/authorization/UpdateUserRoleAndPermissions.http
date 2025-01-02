@@ -1,0 +1,11 @@
+PUT {{host}}/api/v1/auth/users/{{$guid}}/role-and-permissions
+Authorization: Bearer {{ACCESS_TOKEN}}
+Content-Type: application/json
+
+{
+  "RoleId": "92e996fd-645e-4e2f-96fe-30c27e4c6423",
+  "Permissions": [
+    "5957ea98-3deb-4ebe-a5b9-1aafa1480558",
+    "5b9cedf5-9fc5-44d9-bc7e-1164409dc952"
+  ]
+}
