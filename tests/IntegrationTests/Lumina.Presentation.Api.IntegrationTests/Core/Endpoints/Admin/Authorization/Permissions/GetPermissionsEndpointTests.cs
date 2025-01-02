@@ -59,7 +59,7 @@ public class GetPermissionsEndpointTests : IClassFixture<AuthenticatedLuminaApiF
     public async Task ExecuteAsync_WhenCalledWithValidRequest_ShouldReturnPermissions()
     {
         // Act
-        HttpResponseMessage response = await _client.GetAsync("/api/v1/permissions");
+        HttpResponseMessage response = await _client.GetAsync("/api/v1/auth/permissions");
 
         // Assert
         response.EnsureSuccessStatusCode();
@@ -82,7 +82,7 @@ public class GetPermissionsEndpointTests : IClassFixture<AuthenticatedLuminaApiF
     {
         // Act
         _client = await _apiFactory.CreateAuthenticatedClientAsync(); // authenticated user, but not admin
-        HttpResponseMessage response = await _client.GetAsync("/api/v1/permissions");
+        HttpResponseMessage response = await _client.GetAsync("/api/v1/auth/permissions");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
@@ -95,7 +95,7 @@ public class GetPermissionsEndpointTests : IClassFixture<AuthenticatedLuminaApiF
         problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.4");
         problemDetails["title"].GetString().Should().Be("General.Unauthorized");
         problemDetails["detail"].GetString().Should().Be("NotAuthorized");
-        problemDetails["instance"].GetString().Should().Be("/api/v1/permissions");
+        problemDetails["instance"].GetString().Should().Be("/api/v1/auth/permissions");
         problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
     }
 
@@ -109,7 +109,7 @@ public class GetPermissionsEndpointTests : IClassFixture<AuthenticatedLuminaApiF
         Func<Task> act = async () =>
         {
             cts.Cancel();
-            await _client.GetAsync("/api/v1/permissions", cts.Token);
+            await _client.GetAsync("/api/v1/auth/permissions", cts.Token);
         };
 
         // Assert

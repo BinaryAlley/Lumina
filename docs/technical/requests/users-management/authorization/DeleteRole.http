@@ -1,2 +1,2 @@
-DELETE {{host}}/api/v1/roles/{{$guid}}
+DELETE {{host}}/api/v1/auth/roles/{{$guid}}
 Authorization: Bearer {{ACCESS_TOKEN}}

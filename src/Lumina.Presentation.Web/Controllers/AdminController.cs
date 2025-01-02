@@ -39,8 +39,8 @@ public class AdminController : Controller
     public async Task<IActionResult> ManageRoles(CancellationToken cancellationToken)
     {
         // get the list of roles and permissions from the API
-        ViewData["roles"] = await _apiHttpClient.GetAsync<RoleModel[]>($"roles/", cancellationToken).ConfigureAwait(false);
-        ViewData["permissions"] = await _apiHttpClient.GetAsync<PermissionModel[]>($"permissions/", cancellationToken).ConfigureAwait(false);
+        ViewData["roles"] = await _apiHttpClient.GetAsync<RoleModel[]>($"auth/roles/", cancellationToken).ConfigureAwait(false);
+        ViewData["permissions"] = await _apiHttpClient.GetAsync<PermissionModel[]>($"auth/permissions/", cancellationToken).ConfigureAwait(false);
         return View();
     }
 
@@ -52,8 +52,8 @@ public class AdminController : Controller
     public async Task<IActionResult> ManagePermissions(CancellationToken cancellationToken)
     {
         ViewData["users"] = await _apiHttpClient.GetAsync<UserModel[]>($"auth/users", cancellationToken).ConfigureAwait(false);
-        ViewData["roles"] = await _apiHttpClient.GetAsync<RoleModel[]>($"roles/", cancellationToken).ConfigureAwait(false);
-        ViewData["permissions"] = await _apiHttpClient.GetAsync<PermissionModel[]>($"permissions/", cancellationToken).ConfigureAwait(false);
+        ViewData["roles"] = await _apiHttpClient.GetAsync<RoleModel[]>($"auth/roles/", cancellationToken).ConfigureAwait(false);
+        ViewData["permissions"] = await _apiHttpClient.GetAsync<PermissionModel[]>($"auth/permissions/", cancellationToken).ConfigureAwait(false);
         return View();
     }
 
@@ -65,7 +65,7 @@ public class AdminController : Controller
     [HttpGet("api-get-permissions-by-role-id/{roleId}")]
     public async Task<IActionResult> GetPermissionsByRoleId(Guid roleId, CancellationToken cancellationToken)
     {
-        RolePermissionsModel response = await _apiHttpClient.GetAsync<RolePermissionsModel>($"roles/{roleId}/permissions", cancellationToken).ConfigureAwait(false);
+        RolePermissionsModel response = await _apiHttpClient.GetAsync<RolePermissionsModel>($"auth/roles/{roleId}/permissions", cancellationToken).ConfigureAwait(false);
         return Json(new { success = true, data = response });
     }
 
@@ -100,7 +100,7 @@ public class AdminController : Controller
     [HttpGet("api-get-roles")]
     public async Task<IActionResult> GetRoles(CancellationToken cancellationToken)
     {
-        RoleModel[] response = await _apiHttpClient.GetAsync<RoleModel[]>($"roles/", cancellationToken).ConfigureAwait(false);
+        RoleModel[] response = await _apiHttpClient.GetAsync<RoleModel[]>($"auth/roles/", cancellationToken).ConfigureAwait(false);
         return Json(new { success = true, data = response });
     }
 
@@ -112,7 +112,7 @@ public class AdminController : Controller
     [HttpPost("api-create-role")]
     public async Task<IActionResult> CreateRole([FromBody] AddRoleRequestModel model, CancellationToken cancellationToken)
     {
-        RolePermissionsModel response = await _apiHttpClient.PostAsync<RolePermissionsModel, AddRoleRequestModel>($"roles/", model, cancellationToken).ConfigureAwait(false);
+        RolePermissionsModel response = await _apiHttpClient.PostAsync<RolePermissionsModel, AddRoleRequestModel>($"auth/roles/", model, cancellationToken).ConfigureAwait(false);
         return Json(new { success = true, data = response });
     }
 
@@ -124,7 +124,7 @@ public class AdminController : Controller
     [HttpPut("api-update-role")]
     public async Task<IActionResult> UpdateRole([FromBody] UpdateRoleRequestModel model, CancellationToken cancellationToken)
     {
-        RolePermissionsModel response = await _apiHttpClient.PutAsync<RolePermissionsModel, UpdateRoleRequestModel>($"roles/", model, cancellationToken).ConfigureAwait(false);
+        RolePermissionsModel response = await _apiHttpClient.PutAsync<RolePermissionsModel, UpdateRoleRequestModel>($"auth/roles/", model, cancellationToken).ConfigureAwait(false);
         return Json(new { success = true, data = response });
     }
 
@@ -136,7 +136,7 @@ public class AdminController : Controller
     [HttpDelete("api-delete-role/{roleId}")]
     public async Task<IActionResult> DeleteRole(Guid roleId, CancellationToken cancellationToken)
     {
-        await _apiHttpClient.DeleteAsync($"roles/{roleId}", cancellationToken).ConfigureAwait(false);
+        await _apiHttpClient.DeleteAsync($"auth/roles/{roleId}", cancellationToken).ConfigureAwait(false);
         return Json(new { success = true });
     }
 

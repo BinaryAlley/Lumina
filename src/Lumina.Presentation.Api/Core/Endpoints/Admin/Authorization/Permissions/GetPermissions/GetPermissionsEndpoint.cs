@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.Core.Endpoints.Admin.Authorization.Permissions.GetPermissions;
 
 /// <summary>
-/// API endpoint for the <c>/permissions</c> route.
+/// API endpoint for the <c>/auth/permissions</c> route.
 /// </summary>
 public class GetPermissionsEndpoint : BaseEndpoint<EmptyRequest, IResult>
 {

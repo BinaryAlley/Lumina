@@ -1,4 +1,4 @@
-PUT {{host}}/api/v1/roles
+PUT {{host}}/api/v1/auth/roles
 Authorization: Bearer {{ACCESS_TOKEN}}
 Content-Type: application/json
 

@@ -10,6 +10,6 @@ public static partial class ApiRoutes
     /// </summary>
     public static class Permissions
     {
-        public const string GET_PERMISSIONS = "/permissions";
+        public const string GET_PERMISSIONS = "/auth/permissions";
     }
 }

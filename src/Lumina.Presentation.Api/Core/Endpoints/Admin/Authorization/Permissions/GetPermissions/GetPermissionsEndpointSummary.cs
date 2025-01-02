@@ -40,7 +40,7 @@ public class GetPermissionsEndpointSummary : Summary<GetPermissionsEndpoint, Emp
                     status = 401,
                     title = "Unauthorized",
                     detail = "You are not authorized",
-                    instance = "/api/v1/permissions"
+                    instance = "/api/v1/auth/permissions"
                 },
                 new
                 {
@@ -48,7 +48,7 @@ public class GetPermissionsEndpointSummary : Summary<GetPermissionsEndpoint, Emp
                     status = 401,
                     title = "Unauthorized",
                     detail = "Invalid token: The token expired at '01/01/2024 01:00:00'",
-                    instance = "/api/v1/permissions"
+                    instance = "/api/v1/auth/permissions"
                 },
                 new
                 {
@@ -56,7 +56,7 @@ public class GetPermissionsEndpointSummary : Summary<GetPermissionsEndpoint, Emp
                     status = 401,
                     title = "Unauthorized",
                     detail = "The token is invalid",
-                    instance = "/api/v1/permissions"
+                    instance = "/api/v1/auth/permissions"
                 }
             }
         );
@@ -68,7 +68,7 @@ public class GetPermissionsEndpointSummary : Summary<GetPermissionsEndpoint, Emp
                 title = "General.Failure",
                 status = 403,
                 detail = "NotAuthorized",
-                instance = "/api/v1/permissions",
+                instance = "/api/v1/auth/permissions",
                 traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
             }
         );

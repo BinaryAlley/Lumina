@@ -57,7 +57,7 @@ public class GetRolesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     public async Task ExecuteAsync_WhenCalledWithValidRequest_ShouldReturnRoles()
     {
         // Act
-        HttpResponseMessage response = await _client.GetAsync("/api/v1/roles");
+        HttpResponseMessage response = await _client.GetAsync("/api/v1/auth/roles");
 
         // Assert
         response.EnsureSuccessStatusCode();
@@ -81,7 +81,7 @@ public class GetRolesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         _client = await _apiFactory.CreateAuthenticatedClientAsync();
 
         // Act
-        HttpResponseMessage response = await _client.GetAsync("/api/v1/roles");
+        HttpResponseMessage response = await _client.GetAsync("/api/v1/auth/roles");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
@@ -93,7 +93,7 @@ public class GetRolesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.4");
         problemDetails["title"].GetString().Should().Be("General.Unauthorized");
         problemDetails["detail"].GetString().Should().Be("NotAuthorized");
-        problemDetails["instance"].GetString().Should().Be("/api/v1/roles");
+        problemDetails["instance"].GetString().Should().Be("/api/v1/auth/roles");
         problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
     }
 
@@ -107,7 +107,7 @@ public class GetRolesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         Func<Task> act = async () =>
         {
             cts.Cancel();
-            await _client.GetAsync("/api/v1/roles", cts.Token);
+            await _client.GetAsync("/api/v1/auth/roles", cts.Token);
         };
 
         // Assert

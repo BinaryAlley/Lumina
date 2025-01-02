@@ -55,7 +55,7 @@ public class AddRoleEndpointSummary : Summary<AddRoleEndpoint, AddRoleRequest>
                     status = 401,
                     title = "Unauthorized",
                     detail = "You are not authorized",
-                    instance = "/api/v1/roles"
+                    instance = "/api/v1/auth/roles"
                 },
                 new
                 {
@@ -63,7 +63,7 @@ public class AddRoleEndpointSummary : Summary<AddRoleEndpoint, AddRoleRequest>
                     status = 401,
                     title = "Unauthorized",
                     detail = "Invalid token: The token expired at '01/01/2024 01:00:00'",
-                    instance = "/api/v1/roles"
+                    instance = "/api/v1/auth/roles"
                 },
                 new
                 {
@@ -71,7 +71,7 @@ public class AddRoleEndpointSummary : Summary<AddRoleEndpoint, AddRoleRequest>
                     status = 401,
                     title = "Unauthorized",
                     detail = "The token is invalid",
-                    instance = "/api/v1/roles"
+                    instance = "/api/v1/auth/roles"
                 }
             }
         );
@@ -83,7 +83,7 @@ public class AddRoleEndpointSummary : Summary<AddRoleEndpoint, AddRoleRequest>
                 title = "General.Failure",
                 status = 403,
                 detail = "NotAuthorized",
-                instance = "/api/v1/roles",
+                instance = "/api/v1/auth/roles",
                 traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
             }
         );
@@ -95,7 +95,7 @@ public class AddRoleEndpointSummary : Summary<AddRoleEndpoint, AddRoleRequest>
                 title = "General.Conflict",
                 status = 409,
                 detail = "RoleAlreadyExists",
-                instance = "/api/v1/roles",
+                instance = "/api/v1/auth/roles",
                 traceId = "00-f8784de7cb2d70b81b2529893068bee7-4779e0404fe5f554-00"
             }
         );
@@ -107,7 +107,7 @@ public class AddRoleEndpointSummary : Summary<AddRoleEndpoint, AddRoleRequest>
                 title = "General.Validation",
                 status = 422,
                 detail = "OneOrMoreValidationErrorsOccurred",
-                instance = "/api/v1/roles",
+                instance = "/api/v1/auth/roles",
                 errors = new Dictionary<string, string[]>
                 {
                     {
