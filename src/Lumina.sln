@@ -57,6 +57,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "domain", "domain", "{4F8D14
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "requests", "requests", "{C17A1188-FA69-42BC-92E6-4F91D31B3A58}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\requests\http-client.env.json = ..\docs\technical\requests\http-client.env.json
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "books", "books", "{FAFD9E43-508B-4F20-8AA2-8CADA697ED2D}"
 	ProjectSection(SolutionItems) = preProject
@@ -87,6 +90,87 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SecurityTests", "SecurityTests", "{8B06B1D2-80B9-490C-9A36-C7748F58B705}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lumina.Presentation.Api.SecurityTests", "..\tests\SecurityTests\Lumina.Presentation.Api.SecurityTests\Lumina.Presentation.Api.SecurityTests.csproj", "{F72DCA2D-0349-42F9-9614-92A38D4B1EA4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "users-management", "users-management", "{D1B39EFF-99E7-41B9-9DA1-12AF385FFBE8}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\api\users-management\Api.Authentication.md = ..\docs\technical\api\users-management\Api.Authentication.md
+		..\docs\technical\api\users-management\Api.Authorization.md = ..\docs\technical\api\users-management\Api.Authorization.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "users-management", "users-management", "{94C56402-0557-4941-BEB4-4AA53735CE89}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "authentication", "authentication", "{3B057D42-7179-45CE-B813-3D13A658B43C}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\requests\users-management\authentication\ChangePassword.http = ..\docs\technical\requests\users-management\authentication\ChangePassword.http
+		..\docs\technical\requests\users-management\authentication\Login.http = ..\docs\technical\requests\users-management\authentication\Login.http
+		..\docs\technical\requests\users-management\authentication\RecoverPassword.http = ..\docs\technical\requests\users-management\authentication\RecoverPassword.http
+		..\docs\technical\requests\users-management\authentication\Register.http = ..\docs\technical\requests\users-management\authentication\Register.http
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "authorization", "authorization", "{CA023F42-0264-4E00-9814-76A48A811136}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\requests\users-management\authorization\AddRole.http = ..\docs\technical\requests\users-management\authorization\AddRole.http
+		..\docs\technical\requests\users-management\authorization\DeleteRole.http = ..\docs\technical\requests\users-management\authorization\DeleteRole.http
+		..\docs\technical\requests\users-management\authorization\GetAuthorization.http = ..\docs\technical\requests\users-management\authorization\GetAuthorization.http
+		..\docs\technical\requests\users-management\authorization\GetPermissions.http = ..\docs\technical\requests\users-management\authorization\GetPermissions.http
+		..\docs\technical\requests\users-management\authorization\GetRolePermissions.http = ..\docs\technical\requests\users-management\authorization\GetRolePermissions.http
+		..\docs\technical\requests\users-management\authorization\GetRoles.http = ..\docs\technical\requests\users-management\authorization\GetRoles.http
+		..\docs\technical\requests\users-management\authorization\GetUserPermissions.http = ..\docs\technical\requests\users-management\authorization\GetUserPermissions.http
+		..\docs\technical\requests\users-management\authorization\GetUserRole.http = ..\docs\technical\requests\users-management\authorization\GetUserRole.http
+		..\docs\technical\requests\users-management\authorization\UpdateRole.http = ..\docs\technical\requests\users-management\authorization\UpdateRole.http
+		..\docs\technical\requests\users-management\authorization\UpdateUserRoleAndPermissions.http = ..\docs\technical\requests\users-management\authorization\UpdateUserRoleAndPermissions.http
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "file-system-management", "file-system-management", "{2C55920F-0BCB-4C64-A1E6-56053F080806}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "directories", "directories", "{FBD8915E-DFE2-4C16-8B47-64383AB0719D}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\requests\file-system-management\directories\GetDirectories.http = ..\docs\technical\requests\file-system-management\directories\GetDirectories.http
+		..\docs\technical\requests\file-system-management\directories\GetDirectoryTree.http = ..\docs\technical\requests\file-system-management\directories\GetDirectoryTree.http
+		..\docs\technical\requests\file-system-management\directories\GetTreeDirectories.http = ..\docs\technical\requests\file-system-management\directories\GetTreeDirectories.http
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "drives", "drives", "{DB498346-5F46-49FC-B2E9-8239C56791FF}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\requests\file-system-management\drives\GetDrives.http = ..\docs\technical\requests\file-system-management\drives\GetDrives.http
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "files", "files", "{DBBB9C44-F4E8-4A1B-8D00-5CACE81B8BE0}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\requests\file-system-management\files\GetFiles.http = ..\docs\technical\requests\file-system-management\files\GetFiles.http
+		..\docs\technical\requests\file-system-management\files\GetTreeFiles.http = ..\docs\technical\requests\file-system-management\files\GetTreeFiles.http
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "file-system", "file-system", "{42A27269-5C57-49E8-9AF0-F162807D7A95}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\requests\file-system-management\file-system\GetType.http = ..\docs\technical\requests\file-system-management\file-system\GetType.http
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "path", "path", "{7675431D-8D8A-4148-AFA1-C4C17D71891B}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\requests\file-system-management\path\CheckPathExists.http = ..\docs\technical\requests\file-system-management\path\CheckPathExists.http
+		..\docs\technical\requests\file-system-management\path\CombinePath.http = ..\docs\technical\requests\file-system-management\path\CombinePath.http
+		..\docs\technical\requests\file-system-management\path\GetPathParent.http = ..\docs\technical\requests\file-system-management\path\GetPathParent.http
+		..\docs\technical\requests\file-system-management\path\GetPathRoot.http = ..\docs\technical\requests\file-system-management\path\GetPathRoot.http
+		..\docs\technical\requests\file-system-management\path\GetPathSeparator.http = ..\docs\technical\requests\file-system-management\path\GetPathSeparator.http
+		..\docs\technical\requests\file-system-management\path\SplitPath.http = ..\docs\technical\requests\file-system-management\path\SplitPath.http
+		..\docs\technical\requests\file-system-management\path\ValidatePath.http = ..\docs\technical\requests\file-system-management\path\ValidatePath.http
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "thumbnails", "thumbnails", "{FC005908-27A7-4BDA-BD2A-B749A09727E0}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\requests\file-system-management\thumbnails\GetThumbnail.http = ..\docs\technical\requests\file-system-management\thumbnails\GetThumbnail.http
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "file-system-management", "file-system-management", "{4DC31AC0-D305-4718-8FE1-C023AF6A7CA6}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\api\file-system-management\Api.Directories.md = ..\docs\technical\api\file-system-management\Api.Directories.md
+		..\docs\technical\api\file-system-management\Api.Drives.md = ..\docs\technical\api\file-system-management\Api.Drives.md
+		..\docs\technical\api\file-system-management\Api.Files.md = ..\docs\technical\api\file-system-management\Api.Files.md
+		..\docs\technical\api\file-system-management\Api.FileSystem.md = ..\docs\technical\api\file-system-management\Api.FileSystem.md
+		..\docs\technical\api\file-system-management\Api.Path.md = ..\docs\technical\api\file-system-management\Api.Path.md
+		..\docs\technical\api\file-system-management\Api.Thumbnails.md = ..\docs\technical\api\file-system-management\Api.Thumbnails.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -182,6 +266,18 @@ Global
 		{613C74E8-720C-4205-8BA7-85B23D2E7881} = {3C316ABB-08D5-4450-9A4E-91059DB54254}
 		{8B06B1D2-80B9-490C-9A36-C7748F58B705} = {16E590D3-DD9F-4B45-BF19-C6E317A57D11}
 		{F72DCA2D-0349-42F9-9614-92A38D4B1EA4} = {8B06B1D2-80B9-490C-9A36-C7748F58B705}
+		{D1B39EFF-99E7-41B9-9DA1-12AF385FFBE8} = {B045C2EC-3ACB-47D3-BE62-7AC334B023D9}
+		{94C56402-0557-4941-BEB4-4AA53735CE89} = {C17A1188-FA69-42BC-92E6-4F91D31B3A58}
+		{3B057D42-7179-45CE-B813-3D13A658B43C} = {94C56402-0557-4941-BEB4-4AA53735CE89}
+		{CA023F42-0264-4E00-9814-76A48A811136} = {94C56402-0557-4941-BEB4-4AA53735CE89}
+		{2C55920F-0BCB-4C64-A1E6-56053F080806} = {C17A1188-FA69-42BC-92E6-4F91D31B3A58}
+		{FBD8915E-DFE2-4C16-8B47-64383AB0719D} = {2C55920F-0BCB-4C64-A1E6-56053F080806}
+		{DB498346-5F46-49FC-B2E9-8239C56791FF} = {2C55920F-0BCB-4C64-A1E6-56053F080806}
+		{DBBB9C44-F4E8-4A1B-8D00-5CACE81B8BE0} = {2C55920F-0BCB-4C64-A1E6-56053F080806}
+		{42A27269-5C57-49E8-9AF0-F162807D7A95} = {2C55920F-0BCB-4C64-A1E6-56053F080806}
+		{7675431D-8D8A-4148-AFA1-C4C17D71891B} = {2C55920F-0BCB-4C64-A1E6-56053F080806}
+		{FC005908-27A7-4BDA-BD2A-B749A09727E0} = {2C55920F-0BCB-4C64-A1E6-56053F080806}
+		{4DC31AC0-D305-4718-8FE1-C023AF6A7CA6} = {B045C2EC-3ACB-47D3-BE62-7AC334B023D9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4A55A28E-C657-4A0B-95EA-2931AE66004E}

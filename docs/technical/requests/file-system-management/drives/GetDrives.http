@@ -1,0 +1,2 @@
+GET {{host}}/api/v1/drives/get-drives
+Authorization: Bearer {{ACCESS_TOKEN}}
