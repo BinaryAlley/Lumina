@@ -411,6 +411,109 @@ function updateLanguageUrls() {
 }
 
 //+======================================================================================+
+//|                                   Website menu                                       |
+//+======================================================================================+
+/**
+ * Handles the navigation through the website desktop menu bar
+ */
+function handleWebsiteDesktopMenu() {
+    const menuBar = document.querySelector('.menubar');
+    const topLevelItems = menuBar.querySelectorAll('.menubar > ul > li');
+    const hasSubmenuItems = menuBar.querySelectorAll('.has-submenu');
+    const submenuNavigationItems = menuBar.querySelectorAll('li:not(.has-submenu):not(.top-level-menuitem)');
+
+    function closeAllDropdowns() { // close all top level or submenu dropdowns
+        topLevelItems.forEach(item => {
+            item.classList.remove('open');
+            item.classList.remove('hovered');
+        });
+        hasSubmenuItems.forEach(submenu => {
+            submenu.classList.remove('open');
+        });
+    }
+
+    // handle clicks on top-level menu items
+    topLevelItems.forEach(item => {
+        const labelOrAnchor = item.querySelector('label, a');
+        labelOrAnchor.addEventListener('click', function (event) {
+            event.stopPropagation();
+            // close all menu drop down
+            const isOpen = item.classList.contains('open');
+            closeAllDropdowns();
+            // if the item was not already opened, toggle it (mark it as opened)
+            if (!isOpen) {
+                item.classList.add('open');
+                // immediately add 'hovered' class on click to maintain visual feedback
+                item.classList.add('hovered');
+            }
+        });
+
+        // Handle hover on top-level menu items
+        item.addEventListener('mouseenter', function () {
+            if (Array.from(topLevelItems).some(li => li.classList.contains('open') && li !== this)) {
+                closeAllDropdowns();
+                this.classList.add('open');
+                this.classList.add('hovered');
+            }
+        });
+
+        item.addEventListener('mouseleave', function () {
+            // Remove 'hovered' only if the dropdown is not open
+            if (!this.classList.contains('open')) {
+                this.classList.remove('hovered');
+            }
+        });
+    });
+
+    // handle hover on submenu items
+    hasSubmenuItems.forEach(item => {
+        item.addEventListener('mouseenter', function () {
+            const parentUl = this.closest('ul');
+            if (parentUl) {
+                // if the current menu item has multiple items with subemnus, close them if they are not the hovered one 
+                const otherSubmenus = parentUl.querySelectorAll('.has-submenu.open');
+                otherSubmenus.forEach(submenu => {
+                    if (submenu !== this && !this.contains(submenu)) 
+                        submenu.classList.remove('open');
+                });
+            }
+            this.classList.add('open'); // show the current menu item as opened
+        });
+
+        item.addEventListener('mouseleave', function (event) {
+            // on mouse exit, simplu close menu items
+            if (!this.contains(event.relatedTarget)) 
+                this.classList.remove('open');
+        });
+    });
+
+    submenuNavigationItems.forEach(item => {        
+        item.addEventListener('click', function (event) {
+            if (!item.classList.contains('has-submenu'))
+                closeAllDropdowns();
+        });
+    });
+    // close all menus when clicking outside the menubar
+    document.addEventListener('click', function (event) {
+        if (!menuBar.contains(event.target)) 
+            closeAllDropdowns();
+    });
+
+    // keep the 'hovered' class on the open menu item, if no other item is hovered
+    menuBar.addEventListener('mouseleave', function(event) {
+        if (!menuBar.contains(event.relatedTarget)) {
+            // if there is an item with a visible drop down, mark it as opened, but not if its the last hovered item
+            topLevelItems.forEach(item => {
+                if (item.classList.contains('open')) 
+                    item.classList.add('hovered');
+                else  
+                    item.classList.remove('hovered');
+            });
+        }
+    });
+}
+
+//+======================================================================================+
 //|                             Common Helper Functions                                  |
 //+======================================================================================+ 
 
@@ -728,3 +831,4 @@ document.addEventListener('click', function (e) {
 });
 
 document.addEventListener('DOMContentLoaded', initializeNavigation);
+document.addEventListener('DOMContentLoaded', handleWebsiteDesktopMenu);
