@@ -1,0 +1,2 @@
+GET {{host}}/api/v1/directories/get-tree-directories?path=C%3A%5CUsers%5C&includeHiddenElements=true
+Authorization: Bearer {{ACCESS_TOKEN}}

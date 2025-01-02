@@ -1,0 +1,2 @@
+GET {{host}}/api/v1/path/validate?path=C%3A%5CUsers%5C
+Authorization: Bearer {{ACCESS_TOKEN}}
