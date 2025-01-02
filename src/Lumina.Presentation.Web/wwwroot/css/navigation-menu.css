@@ -190,6 +190,10 @@
     z-index: 900;
 }
 
+    .menubar li.open > ul {
+        display: block; /* show submenu when parent has 'open' class */
+    }
+
     .menubar ul {
         list-style-type: none;
         margin: 0;
@@ -223,7 +227,7 @@
         color: #FFFFFF;
     }
 
-    .menubar input[type="radio"] {
+    .menubar input[type="checkbox"] {
         display: none;
     }
 
@@ -250,6 +254,11 @@
             position: relative;
         }
 
+            /* show submenus on hover */
+            .menubar ul ul li.open > ul {
+                display: block;
+            }
+
             .menubar ul ul li:first-child {
                 border-top: 1px solid #000000;
             }
@@ -272,13 +281,8 @@
             top: 0;
         }
 
-    .menubar li:focus-within > ul {
-        display: block;
-        outline: none;
-    }
-
-    .menubar > ul > li:focus-within > label,
-    .menubar > ul > li:focus-within > a {
+    .menubar > ul > li.hovered > label,
+    .menubar > ul > li.hovered > a {
         background-color: #28292B;
         background: radial-gradient( 115% 115% at 68% 70%, #30303088 0%, #20202044 50%, #101010 100% );
         border: 1px solid #777777;
@@ -299,7 +303,9 @@
     }
 
     .menubar .has-submenu:focus-within > label,
-    .menubar .has-submenu:focus-within > a {
+    .menubar .has-submenu:focus-within,
+    .menubar .has-submenu:hover > label,
+    .menubar .has-submenu:hover > a {
         background: linear-gradient( to bottom, #505050 0%, #464646 35%, #404040 55%, #363636 100% );
         border: 1px solid #777777;
         border-right-color: #000000;
@@ -307,14 +313,18 @@
     }
 
         .menubar .has-submenu:focus-within > label::after,
-        .menubar .has-submenu:focus-within > a::after {
+        .menubar .has-submenu:focus-within > a::after,
+        .menubar .has-submenu:hover > label::after,
+        .menubar .has-submenu:hover > a::after {
             content: " ▼";
             color: #FF0000;
             transform: translateY(-50%) rotate(0deg);
         }
 
     .menubar .has-submenu:focus-within > label,
-    .menubar .has-submenu:focus-within > a {
+    .menubar .has-submenu:focus-within > a,
+    .menubar .has-submenu:hover > label,
+    .menubar .has-submenu:hover > a {
         color: #7CACF8;
     }
 
