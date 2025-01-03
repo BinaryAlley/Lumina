@@ -123,6 +123,9 @@
   <data name="AddDirectory" xml:space="preserve">
     <value>ディレクトリを追加</value>
   </data>
+  <data name="AddImage" xml:space="preserve">
+    <value>画像を追加</value>
+  </data>
   <data name="AddNewLibrary" xml:space="preserve">
     <value>新しい ライブラリ 追加</value>
   </data>
@@ -155,6 +158,12 @@
   </data>
   <data name="Cover" xml:space="preserve">
     <value>カバー曲</value>
+  </data>
+  <data name="CoverImage" xml:space="preserve">
+    <value>カバー画像</value>
+  </data>
+  <data name="DescriptionCover" xml:space="preserve">
+    <value>このライブラリのカバーとして使用する画像ファイルを選択してください</value>
   </data>
   <data name="DescriptionDirectories" xml:space="preserve">
     <value>このライブラリのメディアファイルを含むフォルダを選択してください</value>

@@ -123,6 +123,9 @@
   <data name="AddDirectory" xml:space="preserve">
     <value>Add directory</value>
   </data>
+  <data name="AddImage" xml:space="preserve">
+    <value>Add image</value>
+  </data>
   <data name="AddNewLibrary" xml:space="preserve">
     <value>Add New Library</value>
   </data>
@@ -155,6 +158,12 @@
   </data>
   <data name="Cover" xml:space="preserve">
     <value>Cover</value>
+  </data>
+  <data name="CoverImage" xml:space="preserve">
+    <value>Cover Image</value>
+  </data>
+  <data name="DescriptionCover" xml:space="preserve">
+    <value>Select the image file that will be used as the cover for this library</value>
   </data>
   <data name="DescriptionDirectories" xml:space="preserve">
     <value>Select the folders containing the media files of this library</value>

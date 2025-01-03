@@ -15,17 +15,16 @@ public static class UpdateLibraryRequestMapping
     /// Converts <paramref name="request"/> to <see cref="UpdateLibraryCommand"/>.
     /// </summary>
     /// <param name="request">The request to be converted.</param>
-    /// <param name="userId">The Id of the user making the request to update the media library.</param>
     /// <returns>The converted command.</returns>
-    public static UpdateLibraryCommand ToCommand(this UpdateLibraryRequest request, Guid userId)
+    public static UpdateLibraryCommand ToCommand(this UpdateLibraryRequest request)
     {
         return new UpdateLibraryCommand(
             request.Id,
             request.UserId,
-            userId,
             request.Title,
             request.LibraryType,
-            request.ContentLocations
+            request.ContentLocations,
+            request.CoverImage
         );
     }
 }

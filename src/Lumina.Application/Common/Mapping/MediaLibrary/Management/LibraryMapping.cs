@@ -26,6 +26,7 @@ public static class LibraryMapping
             LibraryType = domainEntity.LibraryType,
             UserId = domainEntity.UserId.Value,
             ContentLocations = domainEntity.ContentLocations.Select(path => new LibraryContentLocationEntity() { Path = path.Path }).ToList(),
+            CoverImage = domainEntity.CoverImage,
             CreatedOnUtc = domainEntity.CreatedOnUtc,
             CreatedBy = Guid.Empty,
             UpdatedOnUtc = domainEntity.UpdatedOnUtc.HasValue ? domainEntity.UpdatedOnUtc : null,

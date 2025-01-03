@@ -123,6 +123,9 @@
   <data name="AddDirectory" xml:space="preserve">
     <value>Добавить директорию</value>
   </data>
+  <data name="AddImage" xml:space="preserve">
+    <value>Добавить изображение</value>
+  </data>
   <data name="AddNewLibrary" xml:space="preserve">
     <value>Добавить Новую Библиотеку</value>
   </data>
@@ -155,6 +158,12 @@
   </data>
   <data name="Cover" xml:space="preserve">
     <value>Кавер</value>
+  </data>
+  <data name="CoverImage" xml:space="preserve">
+    <value>Обложка</value>
+  </data>
+  <data name="DescriptionCover" xml:space="preserve">
+    <value>Выберите файл изображения, который будет использоваться в качестве обложки для этой библиотеки</value>
   </data>
   <data name="DescriptionDirectories" xml:space="preserve">
     <value>Выберите папки, содержащие медиафайлы этой библиотеки</value>

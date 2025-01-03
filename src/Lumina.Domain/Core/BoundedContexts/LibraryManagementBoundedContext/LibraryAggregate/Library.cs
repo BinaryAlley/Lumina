@@ -36,6 +36,11 @@ public class Library : AggregateRoot<LibraryId>
     public string Title { get; private set; }
 
     /// <summary>
+    /// Gets the path of the image file used as the cover for the library.
+    /// </summary>
+    public string? CoverImage { get; private set; }
+
+    /// <summary>
     /// Gets the list of file system paths that make up the media library.
     /// </summary>
     public IReadOnlyCollection<FileSystemPathId> ContentLocations => _contentLocations.AsReadOnly();
@@ -48,17 +53,20 @@ public class Library : AggregateRoot<LibraryId>
     /// <param name="title">The title of the media library.</param>
     /// <param name="libraryType">The type of the media library (e.g., Book, TvShow).</param>
     /// <param name="contentLocations">The list of file system paths that make up the media library.</param>
+    /// <param name="coverImage">The path of the image file used as the cover for the library.</param>
     private Library(
         LibraryId id,
         UserId userId,
         string title,
         LibraryType libraryType,
-        List<FileSystemPathId> contentLocations) : base(id)
+        List<FileSystemPathId> contentLocations,
+        string? coverImage) : base(id)
     {
         UserId = userId;
         Title = title;
         LibraryType = libraryType;
         _contentLocations = contentLocations;
+        CoverImage = coverImage;
     }
 
     /// <summary>
@@ -68,6 +76,7 @@ public class Library : AggregateRoot<LibraryId>
     /// <param name="title">The title of the media library.</param>
     /// <param name="libraryType">The type of the media library (e.g., Book, TvShow).</param>
     /// <param name="contentLocations">The list of file system paths that make up the media library.</param>
+    /// <param name="coverImage">The path of the image file used as the cover for the library.</param>
     /// <returns>
     /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="Library"/>, or an error message.
     /// </returns>
@@ -75,7 +84,8 @@ public class Library : AggregateRoot<LibraryId>
         Guid userId,
         string title,
         LibraryType libraryType,
-        IEnumerable<string> contentLocations)
+        IEnumerable<string> contentLocations,
+        string? coverImage)
     {
         List<FileSystemPathId> tempContentLocations = [];
         // go through all the file system paths that make up the media library and create domain objects from them
@@ -91,7 +101,8 @@ public class Library : AggregateRoot<LibraryId>
             UserId.Create(userId),
             title,
             libraryType,
-            tempContentLocations
+            tempContentLocations,
+            coverImage
         );
     }
 
@@ -103,6 +114,7 @@ public class Library : AggregateRoot<LibraryId>
     /// <param name="title">The title of the media library.</param>
     /// <param name="libraryType">The type of the media library (e.g., Book, TvShow).</param>
     /// <param name="contentLocations">The list of file system paths that make up the media library.</param>
+    /// <param name="coverImage">The path of the image file used as the cover for the library.</param>
     /// <returns>
     /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="Library"/>, or an error message.
     /// </returns>
@@ -111,7 +123,8 @@ public class Library : AggregateRoot<LibraryId>
         Guid userId,
         string title,
         LibraryType libraryType,
-        IEnumerable<string> contentLocations)
+        IEnumerable<string> contentLocations,
+        string? coverImage)
     {
         List<FileSystemPathId> tempContentLocations = [];
         // go through all the file system paths that make up the media library and create domain objects from them
@@ -127,7 +140,8 @@ public class Library : AggregateRoot<LibraryId>
             UserId.Create(userId),
             title,
             libraryType,
-            tempContentLocations
+            tempContentLocations,
+            coverImage
         );
     }
 }

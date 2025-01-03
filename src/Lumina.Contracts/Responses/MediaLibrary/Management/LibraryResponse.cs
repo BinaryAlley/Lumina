@@ -15,6 +15,7 @@ namespace Lumina.Contracts.Responses.MediaLibrary.Management;
 /// <param name="Title">The title of the media library.</param>
 /// <param name="LibraryType">The type of the media library.</param>
 /// <param name="ContentLocations">The file system paths of the directories where the media library elements are located.</param>
+/// <param name="CoverImage">The path of the image file used as the cover for the library.</param>
 /// <param name="CreatedOnUtc">The date and time when the library was created.</param>
 /// <param name="UpdatedOnUtc">The optional date and time when the library was updated.</param>
 [DebuggerDisplay("Title: {Title}")]
@@ -24,6 +25,7 @@ public record LibraryResponse(
     string Title,
     LibraryType LibraryType,
     List<string> ContentLocations,
+    string? CoverImage,
     DateTime CreatedOnUtc,
     DateTime? UpdatedOnUtc
 );

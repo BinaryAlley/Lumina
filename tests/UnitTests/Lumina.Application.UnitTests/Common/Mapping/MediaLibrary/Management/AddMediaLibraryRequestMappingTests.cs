@@ -4,7 +4,6 @@ using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Application.Core.MediaLibrary.Management.Commands.AddLibrary;
 using Lumina.Contracts.Requests.MediaLibrary.Management;
 using Lumina.Domain.Common.Enums.MediaLibrary;
-using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -20,22 +19,22 @@ public class AddMediaLibraryRequestMappingTests
     public void ToCommand_WhenMappingValidRequest_ShouldMapCorrectly()
     {
         // Arrange
-        Guid userId = Guid.NewGuid();
         AddLibraryRequest request = new(
             "My Library",
             "Book",
-            ["C:/Books", "D:/Media/Books"]
+            ["C:/Books", "D:/Media/Books"],
+            "D:/poster.jpg"
         );
 
         // Act
-        AddLibraryCommand result = request.ToCommand(userId);
+        AddLibraryCommand result = request.ToCommand();
 
         // Assert
         result.Should().NotBeNull();
-        result.UserId.Should().Be(userId);
         result.Title.Should().Be(request.Title);
         result.LibraryType.Should().Be(request.LibraryType);
         result.ContentLocations.Should().BeEquivalentTo(request.ContentLocations);
+        result.CoverImage.Should().BeEquivalentTo(request.CoverImage);
     }
 
     [Theory]
@@ -46,22 +45,22 @@ public class AddMediaLibraryRequestMappingTests
     public void ToCommand_WhenMappingDifferentLibraryTypes_ShouldMapCorrectly(LibraryType libraryType)
     {
         // Arrange
-        Guid userId = Guid.NewGuid();
         AddLibraryRequest request = new(
             "My Library",
             libraryType.ToString(),
-            ["C:/Media"]
+            ["C:/Media"],
+            "D:/poster.jpg"
         );
 
         // Act
-        AddLibraryCommand result = request.ToCommand(userId);
+        AddLibraryCommand result = request.ToCommand();
 
         // Assert
         result.Should().NotBeNull();
-        result.UserId.Should().Be(userId);
         result.Title.Should().Be(request.Title);
         result.LibraryType.Should().Be(libraryType.ToString());
         result.ContentLocations.Should().BeEquivalentTo(request.ContentLocations);
+        result.CoverImage.Should().BeEquivalentTo(request.CoverImage);
     }
 
     [Fact]
@@ -76,18 +75,43 @@ public class AddMediaLibraryRequestMappingTests
             "F:/Reading Material"
         ];
 
-        Guid userId = Guid.NewGuid();
         AddLibraryRequest request = new(
             "My Library",
             "Book",
-            contentLocations
+            contentLocations,
+            "D:/poster.jpg"
         );
 
         // Act
-        AddLibraryCommand result = request.ToCommand(userId);
+        AddLibraryCommand result = request.ToCommand();
 
         // Assert
         result.Should().NotBeNull();
         result.ContentLocations.Should().BeEquivalentTo(contentLocations);
+    }
+
+    [Fact]
+    public void ToCommand_WhenMappingWithNullCover_ShouldMapCorrectly()
+    {
+        // Arrange
+        string[] contentLocations =
+        [
+            "C:/Media/Books",
+            "D:/Books"
+        ];
+
+        AddLibraryRequest request = new(
+            "My Library",
+            "Book",
+            contentLocations,
+            null
+        );
+
+        // Act
+        AddLibraryCommand result = request.ToCommand();
+
+        // Assert
+        result.Should().NotBeNull();
+        result.CoverImage.Should().BeNull();
     }
 }

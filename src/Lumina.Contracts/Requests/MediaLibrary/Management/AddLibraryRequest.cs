@@ -10,9 +10,11 @@ namespace Lumina.Contracts.Requests.MediaLibrary.Management;
 /// <param name="Title">The title of the media library. Required.</param>
 /// <param name="LibraryType">The type of the media library. Required.</param>
 /// <param name="ContentLocations">The file system paths of the directories where the media library elements are located. Required.</param>
+/// <param name="CoverImage">The path of the image file used as the cover for the library. Optional.</param>
 [DebuggerDisplay("Title: {Title}")]
 public record AddLibraryRequest(
     string? Title,
     string? LibraryType,
-    string[]? ContentLocations
+    string[]? ContentLocations,
+    string? CoverImage
 );

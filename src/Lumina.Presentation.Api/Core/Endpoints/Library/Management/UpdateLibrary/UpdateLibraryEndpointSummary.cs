@@ -32,7 +32,8 @@ public class UpdateLibraryEndpointSummary : Summary<UpdateLibraryEndpoint, Updat
             ContentLocations: [
                 "/media/tv shows/drama/",
                 "/media/tv shows/SCI-FI/",
-            ]
+            ],
+            CoverImage: "/media/posters/myPoster.jpg"
         );
 
         RequestParam(r => r.Id, "The Id of the media library. Required.");
@@ -40,12 +41,14 @@ public class UpdateLibraryEndpointSummary : Summary<UpdateLibraryEndpoint, Updat
         RequestParam(r => r.Title, "The title of the media library. Required.");
         RequestParam(r => r.LibraryType, "The type of the media library. Required.");
         RequestParam(r => r.ContentLocations, ">The file system paths of the directories where the media library elements are located. Required.");
+        RequestParam(r => r.CoverImage, "The path of the image file used as the cover for the library. Optional.");
 
         ResponseParam<LibraryResponse>(r => r.Id, "The unique identifier of the entity.");
         ResponseParam<LibraryResponse>(r => r.UserId, "The Id of the user owning the media library.");
         ResponseParam<LibraryResponse>(r => r.Title, "The title of the media library.");
         ResponseParam<LibraryResponse>(r => r.LibraryType, "The type of the media library.");
         ResponseParam<LibraryResponse>(r => r.ContentLocations, "The file system paths of the directories where the media library elements are located.");
+        ResponseParam<LibraryResponse>(r => r.CoverImage, "The path of the image file used as the cover for the library.");
         ResponseParam<LibraryResponse>(r => r.CreatedOnUtc, "The date and time when the entity was created.");
         ResponseParam<LibraryResponse>(r => r.UpdatedOnUtc, "The date and time when the entity was last updated.");
 
@@ -57,6 +60,7 @@ public class UpdateLibraryEndpointSummary : Summary<UpdateLibraryEndpoint, Updat
                 Title: "TV Shows",
                 LibraryType: LibraryType.TvShow,
                 ContentLocations: ["/media/tv shows/drama/", "/media/tv shows/SCI-FI/"],
+                "/media/myPoster.jpg",
                 CreatedOnUtc: DateTime.UtcNow,
                 UpdatedOnUtc: default
             ));

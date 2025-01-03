@@ -4,6 +4,7 @@ using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Errors;
+using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
 using Lumina.Domain.Common.Enums.MediaLibrary;
@@ -22,14 +23,17 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Commands.AddLibrary;
 public class AddLibraryCommandHandler : IRequestHandler<AddLibraryCommand, ErrorOr<LibraryResponse>>
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ICurrentUserService _currentUserService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AddLibraryCommandHandler"/> class.
     /// </summary>
     /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
-    public AddLibraryCommandHandler(IUnitOfWork unitOfWork)
+    /// <param name="currentUserService">Injected service to retrieve the current user information.</param>
+    public AddLibraryCommandHandler(IUnitOfWork unitOfWork, ICurrentUserService currentUserService)
     {
         _unitOfWork = unitOfWork;
+        _currentUserService = currentUserService;
     }
 
     /// <summary>
@@ -44,10 +48,11 @@ public class AddLibraryCommandHandler : IRequestHandler<AddLibraryCommand, Error
     {
         // create a domain library object
         ErrorOr<Library> createLibraryResult = Library.Create(
-            request.UserId,
+            _currentUserService.UserId!.Value,
             request.Title!,
             Enum.Parse<LibraryType>(request.LibraryType!),
-            request.ContentLocations!
+            request.ContentLocations!,
+            request.CoverImage
         );
 
         if (createLibraryResult.IsError)

@@ -123,6 +123,9 @@
   <data name="AddDirectory" xml:space="preserve">
     <value>添加目录</value>
   </data>
+  <data name="AddImage" xml:space="preserve">
+    <value>添加图片</value>
+  </data>
   <data name="AddNewLibrary" xml:space="preserve">
     <value>添加 新库</value>
   </data>
@@ -155,6 +158,12 @@
   </data>
   <data name="Cover" xml:space="preserve">
     <value>翻唱</value>
+  </data>
+  <data name="CoverImage" xml:space="preserve">
+    <value>封面图片</value>
+  </data>
+  <data name="DescriptionCover" xml:space="preserve">
+    <value>选择将用作此库封面的图片文件</value>
   </data>
   <data name="DescriptionDirectories" xml:space="preserve">
     <value>选择包含该图书馆媒体文件的文件夹</value>

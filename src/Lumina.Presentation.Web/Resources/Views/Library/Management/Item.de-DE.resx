@@ -123,6 +123,9 @@
   <data name="AddDirectory" xml:space="preserve">
     <value>Verzeichnis hinzufügen</value>
   </data>
+  <data name="AddImage" xml:space="preserve">
+    <value>Bild hinzufügen</value>
+  </data>
   <data name="AddNewLibrary" xml:space="preserve">
     <value>Neue Bibliothek Hinzufügen</value>
   </data>
@@ -155,6 +158,12 @@
   </data>
   <data name="Cover" xml:space="preserve">
     <value>Coverversion</value>
+  </data>
+  <data name="CoverImage" xml:space="preserve">
+    <value>Titelbild</value>
+  </data>
+  <data name="DescriptionCover" xml:space="preserve">
+    <value>Wählen Sie die Bilddatei aus, die als Cover für diese Bibliothek verwendet wird</value>
   </data>
   <data name="DescriptionDirectories" xml:space="preserve">
     <value>Wählen Sie die Ordner mit den Mediendateien dieser Bibliothek aus</value>

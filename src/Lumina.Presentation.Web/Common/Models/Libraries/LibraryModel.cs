@@ -34,6 +34,11 @@ public class LibraryModel
     public string? LibraryType { get; set; }
 
     /// <summary>
+    /// Gets or sets the path of the image file used as the cover for the library.
+    /// </summary>
+    public string? CoverImage { get; set; }
+
+    /// <summary>
     /// Gets or sets the collection of directories that contain the library files.
     /// </summary>
     public List<string> ContentLocations { get; set; } = [];

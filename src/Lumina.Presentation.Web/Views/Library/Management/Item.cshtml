@@ -103,6 +103,25 @@
                     </div>
                     <small class="form-label text-disabled form-description">@_localizer["DescriptionLibraryType"]</small>
                 </div>
+                <!-- Cover -->
+                <div class="form-row mt-10">
+                    <div class="form-label">
+                        <label asp-for="CoverImage">@_localizer["CoverImage"]</label>:
+                        <img src="~/images/ui/add-file.svg" alt="@_localizer["AddImage"]" id="add-media-cover" title="@_localizer["AddImage"]" class="add-form-table-row-icon ml-5" />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div id="add-media-cover-form-table" class="form-table w-100">
+                        @if (Model.CoverImage is not null)
+                        {
+                        <div class="form-table-row">
+                            <span title="@Model.CoverImage">@Model.CoverImage</span>
+                            <img src="~/images/ui/delete.svg" alt="@_localizer["Remove"]" title="@_localizer["Remove"]" class="remove-form-table-row-icon" />
+                        </div>
+                        }
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionCover"]</small>
+                </div>
                 <!-- Directories -->
                 <div class="form-row mt-10">
                     <div class="form-label">
@@ -112,7 +131,7 @@
                     </div>
                 </div>
                 <div class="form-row">
-                    <div class="form-table w-100">
+                    <div id="add-media-directory-form-table" class="form-table w-100">
                         @for (int i = 0; i < Model.ContentLocations.Count; i++)
                         {
                             <div class="form-table-row">
@@ -131,8 +150,8 @@
         <!-- section success -->
         <div class="text-center w-100">
             <p id="save-success" class="text-light-one w-100 hidden">@_localizer["LibrarySaved"]</p>
-            <button id="btn-back-to-libraries" type="button" class="abort-button h-22px w-150px mx-auto mt-10 hidden">@_localizer["BackToLibraries"]</button>
-            <button id="btn-add-new-library" type="button" class="confirm-button h-22px w-150px mx-auto mt-10 hidden">@_localizer["AddNewLibrary"]</button>
+            <button id="btn-back-to-libraries" type="button" class="abort-button h-22px w-180px mx-auto mt-10 hidden">@_localizer["BackToLibraries"]</button>
+            <button id="btn-add-new-library" type="button" class="confirm-button h-22px w-180px mx-auto mt-10 hidden">@_localizer["AddNewLibrary"]</button>
         </div>
     </div>
 </div>
@@ -146,7 +165,9 @@
         const btnAddNewLibrary = document.getElementById('btn-add-new-library');
         const form = document.getElementById('add-media-library-form');
         const imgAddMediaDirectory = document.getElementById('add-media-directory');
-        const formTable = document.querySelector('.form-table');
+        const imgAddCover = document.getElementById('add-media-cover');
+        const mediaCoverFormTable = document.getElementById('add-media-cover-form-table');
+        const mediaDirectoriesFormTable = document.getElementById('add-media-directory-form-table');
 
         // create new or update existing media library
         async function handleAddMediaLibraryAsync() {
@@ -155,8 +176,13 @@
                 UserId: form.querySelector('[name="UserId"]').value || null,
                 Title: form.querySelector('[name="Title"]').value,
                 LibraryType: form.querySelector('#library-selected-item').getAttribute('data-value'),
-                ContentLocations: Array.from(form.querySelectorAll('.form-table-row span'))
-                    .map(span => span.textContent)
+                ContentLocations: Array.from(mediaDirectoriesFormTable.querySelectorAll('.form-table-row span'))
+                    .map(span => span.textContent),
+                CoverImage: (() => {
+                    // get the first (and only) span in the mediaCoverFormTable, if it exists
+                    const coverSpan = mediaCoverFormTable.querySelector('.form-table-row span');
+                    return coverSpan ? coverSpan.textContent : null; // return null if no cover image is selected
+                })()
             };
             const data = await callApiPostAsync('@_urlService.GetAbsoluteUrl("SaveLibrary", "LibraryManagement")', formData);
             if (data) {
@@ -167,25 +193,44 @@
             }
         }
 
-        function addNewFileSystemPaths(selectedPaths) {
-            // get the form table where the new paths will be added
-            const formTable = document.querySelector('.form-table');
-            // process the selected paths
+        function addMediaLibraryDirectories(selectedPaths) {
+            // process the selected paths (remove quotes and split by comma)
             const paths = selectedPaths.slice(1, -1).split('","');
             // add each path as a new row
             paths.forEach(path => {
-                // check if path already exists
-                const existingPath = formTable.querySelector(`span[title="${path}"]`);
-                if (!existingPath) {
-                    formTable.insertAdjacentHTML('beforeend', `
+                // normalize the path for comparison
+                const normalizedPath = path.replace(/\\\\/g, '\\');
+                // use querySelectorAll and compare explicitly, so that duplicates are not permitted 
+                const existingPaths = Array.from(mediaDirectoriesFormTable.querySelectorAll('span[title]'));
+                const isDuplicate = existingPaths.some(span => span.getAttribute('title') === normalizedPath);
+                if (!isDuplicate) {
+                    mediaDirectoriesFormTable.insertAdjacentHTML('beforeend', `
                         <div class="form-table-row">
-                            <span title="${path}">${path}</span>
+                            <span title="${normalizedPath}">${normalizedPath}</span>
                             <img src="/images/ui/delete.svg" alt="@_localizer["Remove"]" title="@_localizer["Remove"]" class="remove-form-table-row-icon" onclick="this.closest('.form-table-row').remove();" />
                         </div>
                     `);
                 }
             });
         }
+
+        function addMediaLibraryCoverImage(selectedPaths) {
+            // process the selected paths
+            const paths = selectedPaths.slice(1, -1).split('","');
+            // ensure only one row is allowed by first clearing all previous rows
+            mediaCoverFormTable.innerHTML = ''; 
+            // add the first valid path (if any) as a new row
+            if (paths.length > 0) {
+                const path = paths[0]; // only use the first path
+                mediaCoverFormTable.insertAdjacentHTML('beforeend', `
+                    <div class="form-table-row">
+                        <span title="${path}">${path}</span>
+                        <img src="/images/ui/delete.svg" alt="@_localizer["Remove"]" title="@_localizer["Remove"]" class="remove-form-table-row-icon" onclick="this.closest('.form-table-row').remove();" />
+                    </div>
+                `);
+            }
+        }
+
 
         // on Enter key pressed
         const handleEnterKey = async function(e) {
@@ -213,7 +258,12 @@
 
         // on add media directory image click
         const handleImgAddMediaDirectoryClick = async function() {
-            await showFileSystemBrowserDialogAsync('C:\\Users\\', true, false, addNewFileSystemPaths); // TODO: take path and include hidden elements from settings
+            await showFileSystemBrowserDialogAsync('C:\\Users\\', true, false, addMediaLibraryDirectories); // TODO: take path and include hidden elements from settings
+        };
+
+        // on add cover image click
+        const handleImgAddCoverClick = async function() {
+            await showFileSystemBrowserDialogAsync('C:\\Users\\', true, true, addMediaLibraryCoverImage); // TODO: take path and include hidden elements from settings
         };
 
         // on remove row icon click
@@ -228,7 +278,9 @@
         btnBackToLibraries.addEventListener('click', handleBtnBackToLibrariesClick);
         btnAddNewLibrary.addEventListener('click', handleBtnAddNewLibraryClick);
         imgAddMediaDirectory.addEventListener('click', handleImgAddMediaDirectoryClick);
-        formTable.addEventListener('click', handleRowRemoval);
+        imgAddCover.addEventListener('click', handleImgAddCoverClick);
+        mediaCoverFormTable.addEventListener('click', handleRowRemoval);
+        mediaDirectoriesFormTable.addEventListener('click', handleRowRemoval);
 
         // register cleanup for these listeners
         cleanupFunctions.push(() => {
@@ -237,7 +289,9 @@
             btnBackToLibraries.removeEventListener('click', handleBtnBackToLibrariesClick);
             btnAddNewLibrary.removeEventListener('click', handleBtnAddNewLibraryClick);
             imgAddMediaDirectory.removeEventListener('click', handleImgAddMediaDirectoryClick);
-            formTable.removeEventListener('click', handleRowRemoval);
+            imgAddCover.removeEventListener('click', handleImgAddCoverClick);
+            mediaCoverFormTable.removeEventListener('click', handleRowRemoval);
+            mediaDirectoriesFormTable.removeEventListener('click', handleRowRemoval);
         });
 
         // store all cleanups for this view on window object using the scriptId

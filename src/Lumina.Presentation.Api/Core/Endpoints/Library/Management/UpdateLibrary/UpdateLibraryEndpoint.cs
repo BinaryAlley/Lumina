@@ -8,8 +8,6 @@ using Lumina.Presentation.Api.Common.Routes.Library.Management;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
 using Mediator;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -50,9 +48,7 @@ public class UpdateLibraryEndpoint : BaseEndpoint<UpdateLibraryRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(UpdateLibraryRequest request, CancellationToken cancellationToken)
     {
-        // retrieve the currently authenticated user, and send it with the request
-        string? user = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        ErrorOr<LibraryResponse> result = await _sender.Send(request.ToCommand(Guid.Parse(user!)), cancellationToken).ConfigureAwait(false);
+        ErrorOr<LibraryResponse> result = await _sender.Send(request.ToCommand(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }
