@@ -28,11 +28,16 @@ public class LibraryConfiguration : IEntityTypeConfiguration<LibraryEntity>
             .IsRequired()
             .HasMaxLength(255)
             .HasColumnOrder(1);
-
+        
         builder.Property(library => library.LibraryType)
             .IsRequired()
             .HasConversion<string>()
             .HasColumnOrder(2);
+
+        builder.Property(library => library.CoverImage)
+            .HasMaxLength(255)
+            .HasDefaultValue(null)
+            .HasColumnOrder(3);
 
         // one user with many libraries
         builder.HasOne(library => library.User)

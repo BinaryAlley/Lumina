@@ -35,6 +35,7 @@ public class GetLibraryEndpointSummary : Summary<GetLibraryEndpoint, GetLibraryR
         ResponseParam<LibraryResponse>(r => r.Title, "The title of the media library.");
         ResponseParam<LibraryResponse>(r => r.LibraryType, "The type of the media library.");
         ResponseParam<LibraryResponse>(r => r.ContentLocations, "The file system paths of the directories where the media library elements are located.");
+        ResponseParam<LibraryResponse>(r => r.CoverImage, "The path of the image file used as the cover for the library.");
         ResponseParam<LibraryResponse>(r => r.CreatedOnUtc, "The date and time when the entity was created.");
         ResponseParam<LibraryResponse>(r => r.UpdatedOnUtc, "The date and time when the entity was last updated.");
 
@@ -44,6 +45,7 @@ public class GetLibraryEndpointSummary : Summary<GetLibraryEndpoint, GetLibraryR
             Title: "TV Shows",
             LibraryType: LibraryType.TvShow,
             ContentLocations: ["/media/tv shows/drama/", "/media/tv shows/SCI-FI/"],
+            CoverImage: "/media/myPoster.jpg",
             CreatedOnUtc: DateTime.UtcNow,
             UpdatedOnUtc: default
         ));
@@ -124,6 +126,5 @@ public class GetLibraryEndpointSummary : Summary<GetLibraryEndpoint, GetLibraryR
                 traceId = "00-2470be4248a2a5a0c6f70579975a6954-b9c3ba9544a03500-00"
             }
         );
-
     }
 }

@@ -31,6 +31,11 @@ public class LibraryEntity : IStorageEntity, IAuditableEntity
     public required string Title { get; set; }
 
     /// <summary>
+    /// Gets or sets the path of the image file used as the cover for the library.
+    /// </summary>
+    public string? CoverImage { get; set; }
+
+    /// <summary>
     /// Gets or sets the type of the media library.
     /// </summary>
     public required LibraryType LibraryType { get; set; }

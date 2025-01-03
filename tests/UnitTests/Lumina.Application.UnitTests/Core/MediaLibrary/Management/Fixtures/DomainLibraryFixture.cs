@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
 using ErrorOr;
-using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.Common.Enums.MediaLibrary;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
@@ -48,7 +47,8 @@ public class DomainLibraryFixture
             Guid.NewGuid(),
             _faker.Random.String2(_faker.Random.Number(1, 50)),
             _faker.PickRandom<LibraryType>(),
-            validPaths.Take(_random.Next(1, validPaths.Count))
+            validPaths.Take(_random.Next(1, validPaths.Count)),
+            _faker.System.FilePath()
         );
 
         return library.Value;
@@ -59,21 +59,24 @@ public class DomainLibraryFixture
         Guid? userId = null,
         string? title = null,
         LibraryType? libraryType = null,
-        IEnumerable<string>? contentLocations = null)
+        IEnumerable<string>? contentLocations = null,
+        string? coverImage = null)
     {
         ErrorOr<Library> library = id is null ?
             Library.Create(
                 userId ?? Guid.NewGuid(),
                 title ?? _faker.Random.String2(_faker.Random.Number(1, 50)),
                 libraryType ?? LibraryType.Book,
-                contentLocations ?? ["C:/Media"]
+                contentLocations ?? ["C:/Media"],
+                coverImage
             ) :
             Library.Create(
                 LibraryId.Create(id.Value),
                 userId ?? Guid.NewGuid(),
                 title ?? _faker.Random.String2(_faker.Random.Number(1, 50)),
                 libraryType ?? LibraryType.Book,
-                contentLocations ?? ["C:/Media"]
+                contentLocations ?? ["C:/Media"],
+                coverImage
             );
 
         return library.Value;

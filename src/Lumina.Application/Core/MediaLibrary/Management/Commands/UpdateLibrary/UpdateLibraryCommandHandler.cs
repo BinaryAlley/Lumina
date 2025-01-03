@@ -3,6 +3,8 @@ using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.Infrastructure.Authentication;
+using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
 using Lumina.Domain.Common.Enums.MediaLibrary;
@@ -24,13 +26,19 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Commands.UpdateLibrary
 public class UpdateLibraryCommandHandler : IRequestHandler<UpdateLibraryCommand, ErrorOr<LibraryResponse>>
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ICurrentUserService _currentUserService;
+    private readonly IAuthorizationService _authorizationService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UpdateLibraryCommandHandler"/> class.
     /// </summary>
+    /// <param name="authorizationService">Injected service for authorization related functionality.</param>
+    /// <param name="currentUserService">Injected service to retrieve the current user information.</param>
     /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
-    public UpdateLibraryCommandHandler(IUnitOfWork unitOfWork)
+    public UpdateLibraryCommandHandler(IAuthorizationService authorizationService, ICurrentUserService currentUserService, IUnitOfWork unitOfWork)
     {
+        _authorizationService = authorizationService;
+        _currentUserService = currentUserService;
         _unitOfWork = unitOfWork;
     }
 
@@ -52,7 +60,7 @@ public class UpdateLibraryCommandHandler : IRequestHandler<UpdateLibraryCommand,
         else if (getLibraryResult.Value is null)
             return DomainErrors.Library.LibraryNotFound;
         // if the user that made the request is not an Admin or is not the owner of the library, they do not have the right to update it
-        if (getLibraryResult.Value.UserId != request.CurrentUserId) // TODO: after implementing the Admin role, add that permission check here too
+        if (getLibraryResult.Value.UserId != _currentUserService.UserId || !await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken))
             return ApplicationErrors.Authorization.NotAuthorized;
 
         // create a domain library object
@@ -61,7 +69,8 @@ public class UpdateLibraryCommandHandler : IRequestHandler<UpdateLibraryCommand,
             request.OwnerId,
             request.Title!,
             Enum.Parse<LibraryType>(request.LibraryType!),
-            request.ContentLocations!
+            request.ContentLocations!,
+            request.CoverImage
         );
         if (createLibraryResult.IsError)
             return createLibraryResult.Errors;

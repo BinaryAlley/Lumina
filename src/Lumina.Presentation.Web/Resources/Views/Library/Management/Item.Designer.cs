@@ -79,6 +79,15 @@ namespace Lumina.Presentation.Web.Resources.Views.Library.Management {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add image.
+        /// </summary>
+        public static string AddImage {
+            get {
+                return ResourceManager.GetString("AddImage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Add New Library.
         /// </summary>
         public static string AddNewLibrary {
@@ -174,6 +183,24 @@ namespace Lumina.Presentation.Web.Resources.Views.Library.Management {
         public static string Cover {
             get {
                 return ResourceManager.GetString("Cover", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cover Image.
+        /// </summary>
+        public static string CoverImage {
+            get {
+                return ResourceManager.GetString("CoverImage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select the image file that will be used as the cover for this library.
+        /// </summary>
+        public static string DescriptionCover {
+            get {
+                return ResourceManager.GetString("DescriptionCover", resourceCulture);
             }
         }
         

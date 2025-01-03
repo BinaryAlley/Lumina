@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg fill="#4AA747" width="800px" height="800px" viewBox="0 0 24 24" id="add-file-8" data-name="Flat Line" xmlns="http://www.w3.org/2000/svg" class="icon flat-line">
+  <!-- Define a mask to cut out the plus sign -->
+  <mask id="cut-out-plus">
+    <!-- Make everything visible by default -->
+    <rect width="24" height="24" fill="white"/>
+    <!-- Cut out the longer plus sign (sharp corners) -->
+    <path d="M8,12h8M12,8v8" style="stroke: black; stroke-width: 2; fill: none;"></path>
+  </mask>
+
+  <!-- File shape with green fill and stroke, plus transparent cross -->
+  <path 
+    d="M18,21a1,1,0,0,0,1-1V4a1,1,0,0,0-1-1H9L5,7V20a1,1,0,0,0,1,1Z"
+    style="fill: #4AA747; stroke: #4AA747; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;"
+    mask="url(#cut-out-plus)">
+  </path>
+</svg>

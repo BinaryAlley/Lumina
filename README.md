@@ -36,9 +36,10 @@ Most icons were taken from [Lyra Icon Theme](https://github.com/yeyushengfan258/
 
 Several icons used in this project were adapted from icons sourced from [svgrepo](https://www.svgrepo.com/).
 
-- [`toggle-thumbnails.svg`](https://www.svgrepo.com/svg/370469/page-image) (Public Domain license)
+- [`toggle-thumbnails.svg`](https://www.svgrepo.com/svg/370469/page-image) (Public Domain License)
 - [`toggle-hidden.svg`](https://www.svgrepo.com/svg/470389/hidden) (MIT License)
 - [`delete.svg`](https://www.svgrepo.com/svg/488148/delete) (MIT License)
+- [`add-file.svg`](https://www.svgrepo.com/svg/467914/add-file-8) (Public Domain License)
 - [`add-directory.svg`](https://www.svgrepo.com/svg/488040/add-folder) (MIT License)
 - [`information.svg`](https://www.svgrepo.com/svg/403685/information) (MIT License)
 - [`question.svg`](https://www.svgrepo.com/svg/486470/question-filled) (MIT License)

@@ -24,6 +24,7 @@ public static class LibraryEntityMapping
             repositoryEntity.Title,
             repositoryEntity.LibraryType,
             repositoryEntity.ContentLocations.Select(location => location.Path).ToList(),
+            repositoryEntity.CoverImage,
             repositoryEntity.CreatedOnUtc,
             repositoryEntity.UpdatedOnUtc
         );

@@ -29,7 +29,8 @@ public class LibraryMappingTests
             Guid.NewGuid(),
             "Test Library",
             LibraryType.Book,
-            ["C:/Books", "D:/Media/Books"]
+            ["C:/Books", "D:/Media/Books"],
+            "D:/myPoster.jpg"
         );
         Library library = libraryResult.Value;
 
@@ -44,6 +45,7 @@ public class LibraryMappingTests
         result.LibraryType.Should().Be(library.LibraryType);
         result.ContentLocations.Select(l => l.Path)
             .Should().BeEquivalentTo(library.ContentLocations.Select(l => l.Path));
+        result.CoverImage.Should().BeEquivalentTo(library.CoverImage);
         result.CreatedOnUtc.Should().Be(library.CreatedOnUtc);
         result.UpdatedOnUtc.Should().Be(library.UpdatedOnUtc.HasValue ? library.UpdatedOnUtc : null);
     }
@@ -56,7 +58,8 @@ public class LibraryMappingTests
             Guid.NewGuid(),
             "Empty Library",
             LibraryType.Book,
-            []
+            [],
+            "D:/myPoster.jpg"
         );
         Library library = libraryResult.Value;
 
@@ -66,6 +69,7 @@ public class LibraryMappingTests
         // Assert
         result.Should().NotBeNull();
         result.ContentLocations.Should().BeEmpty();
+        result.CoverImage.Should().BeEquivalentTo(library.CoverImage);
     }
 
     [Theory]
@@ -80,7 +84,8 @@ public class LibraryMappingTests
             Guid.NewGuid(),
             "Test Library",
             libraryType,
-            ["C:/Media"]
+            ["C:/Media"],
+            "D:/myPoster.jpg"
         );
         Library library = libraryResult.Value;
 
@@ -90,6 +95,7 @@ public class LibraryMappingTests
         // Assert
         result.Should().NotBeNull();
         result.LibraryType.Should().Be(libraryType);
+        result.CoverImage.Should().BeEquivalentTo(library.CoverImage);
     }
 
     [Fact]
@@ -108,7 +114,8 @@ public class LibraryMappingTests
             Guid.NewGuid(),
             "Test Library",
             LibraryType.Book,
-            contentLocations
+            contentLocations,
+            "D:/myPoster.jpg"
         );
         Library library = libraryResult.Value;
 
@@ -119,5 +126,35 @@ public class LibraryMappingTests
         result.Should().NotBeNull();
         result.ContentLocations.Select(l => l.Path)
             .Should().BeEquivalentTo(library.ContentLocations.Select(l => l.Path));
+        result.CoverImage.Should().BeEquivalentTo(library.CoverImage);
+    }
+
+    [Fact]
+    public void ToRepositoryEntity_WhenMappingNullCoverimage_ShouldMapCorrectly()
+    {
+        // Arrange
+        List<string> contentLocations =
+        [
+            "C:/Media/Books",
+            "D:/Books"
+        ];
+
+        ErrorOr<Library> libraryResult = Library.Create(
+            Guid.NewGuid(),
+            "Test Library",
+            LibraryType.Book,
+            contentLocations,
+            null
+        );
+        Library library = libraryResult.Value;
+
+        // Act
+        LibraryEntity result = library.ToRepositoryEntity();
+
+        // Assert
+        result.Should().NotBeNull();
+        result.ContentLocations.Select(l => l.Path)
+            .Should().BeEquivalentTo(library.ContentLocations.Select(l => l.Path));
+        result.CoverImage.Should().BeNull();
     }
 }

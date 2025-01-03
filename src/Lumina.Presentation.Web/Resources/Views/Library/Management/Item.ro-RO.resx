@@ -123,6 +123,9 @@
   <data name="AddDirectory" xml:space="preserve">
     <value>Adaugă dosar</value>
   </data>
+  <data name="AddImage" xml:space="preserve">
+    <value>Adaugă imagine</value>
+  </data>
   <data name="AddNewLibrary" xml:space="preserve">
     <value>Adaugă Bibliotecă Nouă</value>
   </data>
@@ -155,6 +158,12 @@
   </data>
   <data name="Cover" xml:space="preserve">
     <value>Preluare</value>
+  </data>
+  <data name="CoverImage" xml:space="preserve">
+    <value>Imagine Copertă</value>
+  </data>
+  <data name="DescriptionCover" xml:space="preserve">
+    <value>Selectează fișierul imagine care va fi folosit ca și copertă pentru această bibliotecă</value>
   </data>
   <data name="DescriptionDirectories" xml:space="preserve">
     <value>Selectează dosarele care conțin fișierele media ale acestei biblioteci</value>

@@ -17,15 +17,14 @@ public static class AddMediaLibraryRequestMapping
     /// Converts <paramref name="request"/> to <see cref="AddLibraryCommand"/>.
     /// </summary>
     /// <param name="request">The request to be converted.</param>
-    /// <param name="userId">The Id of the user owning the media library.</param>
     /// <returns>The converted command.</returns>
-    public static AddLibraryCommand ToCommand(this AddLibraryRequest request, Guid userId)
+    public static AddLibraryCommand ToCommand(this AddLibraryRequest request)
     {
         return new AddLibraryCommand(
-            userId,
             request.Title,
             request.LibraryType,
-            request.ContentLocations
+            request.ContentLocations,
+            request.CoverImage
         );
     }
 }

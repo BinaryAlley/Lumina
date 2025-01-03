@@ -32,6 +32,7 @@ public class LibraryEntityMappingTests
                 new() { Path = "C:/Books" },
                 new() { Path = "D:/Media/Books" }
             ],
+            CoverImage = "D:/myPoster.jpg",
             CreatedOnUtc = DateTime.UtcNow,
             CreatedBy = Guid.NewGuid(),
             UpdatedOnUtc = null,
@@ -48,6 +49,7 @@ public class LibraryEntityMappingTests
         result.Title.Should().Be(entity.Title);
         result.LibraryType.Should().Be(entity.LibraryType);
         result.ContentLocations.Should().BeEquivalentTo(entity.ContentLocations.Select(l => l.Path));
+        result.CoverImage.Should().Be(entity.CoverImage);
         result.CreatedOnUtc.Should().Be(entity.CreatedOnUtc);
         result.UpdatedOnUtc.Should().Be(entity.UpdatedOnUtc);
     }
@@ -67,6 +69,7 @@ public class LibraryEntityMappingTests
             Title = "My Library",
             LibraryType = libraryType,
             ContentLocations = [new() { Path = "C:/Media" }],
+            CoverImage = "D:/myPoster.jpg",
             CreatedOnUtc = DateTime.UtcNow,
             CreatedBy = Guid.NewGuid(),
             UpdatedOnUtc = null,
@@ -98,6 +101,7 @@ public class LibraryEntityMappingTests
                 new() { Path = "E:/Digital Library/Books" },
                 new() { Path = "F:/Reading Material" }
             ],
+            CoverImage = "D:/myPoster.jpg",
             CreatedOnUtc = DateTime.UtcNow,
             CreatedBy = Guid.NewGuid(),
             UpdatedOnUtc = null,
@@ -124,6 +128,7 @@ public class LibraryEntityMappingTests
             Title = "My Library",
             LibraryType = LibraryType.Book,
             ContentLocations = [new() { Path = "C:/Books" }],
+            CoverImage = "D:/myPoster.jpg",
             CreatedOnUtc = DateTime.UtcNow,
             CreatedBy = Guid.NewGuid(),
             UpdatedOnUtc = updated,
@@ -136,5 +141,32 @@ public class LibraryEntityMappingTests
         // Assert
         result.Should().NotBeNull();
         result.UpdatedOnUtc.Should().Be(updated);
+    }
+
+    [Fact]
+    public void ToResponse_WhenMappingWithNullCoverImage_ShouldMapCorrectly()
+    {
+        // Arrange
+        DateTime updated = DateTime.UtcNow.AddDays(-1);
+        LibraryEntity entity = new()
+        {
+            Id = Guid.NewGuid(),
+            UserId = Guid.NewGuid(),
+            Title = "My Library",
+            LibraryType = LibraryType.Book,
+            ContentLocations = [new() { Path = "C:/Books" }],
+            CoverImage = null,
+            CreatedOnUtc = DateTime.UtcNow,
+            CreatedBy = Guid.NewGuid(),
+            UpdatedOnUtc = updated,
+            UpdatedBy = Guid.NewGuid()
+        };
+
+        // Act
+        LibraryResponse result = entity.ToResponse();
+
+        // Assert
+        result.Should().NotBeNull();
+        result.CoverImage.Should().BeNull();
     }
 }
