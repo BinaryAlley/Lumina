@@ -3,9 +3,7 @@ using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Domain.Common.Events;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 #endregion
 
 namespace Lumina.DataAccess.Core.UoW;
@@ -41,8 +39,7 @@ public class LuminaDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // find all the entity configurations in the assembly and apply them
-        modelBuilder.Ignore<List<IDomainEvent>>()
-                    .ApplyConfigurationsFromAssembly(typeof(LuminaDbContext).Assembly);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(LuminaDbContext).Assembly);
 
         base.OnModelCreating(modelBuilder);
     }
