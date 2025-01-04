@@ -40,6 +40,7 @@ public static class DomainLayerServices
         services.AddScoped<IUnixPathStrategy, UnixPathStrategy>();
         services.AddScoped<IWindowsPathStrategy, WindowsPathStrategy>();
         services.AddScoped<IOperatingSystemInfo, OperatingSystemInfo>();
+        services.AddScoped<IFileSystemStructureSeedService, FileSystemStructureSeedService>();
         services.AddSingleton<IFileSystem, FileSystem>();
         return services;
     }
