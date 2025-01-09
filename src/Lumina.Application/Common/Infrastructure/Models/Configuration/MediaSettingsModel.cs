@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Infrastructure.Common.Models.Configuration;
+namespace Lumina.Application.Common.Infrastructure.Models.Configuration;
 
 /// <summary>
 /// Model for deserializing media settings.
@@ -16,4 +16,9 @@ public class MediaSettingsModel
     /// Gets or sets the root directory where media files are stored.
     /// </summary>
     public required string RootDirectory { get; init; }
+
+    /// <summary>
+    /// Gets or sets the directory where media library files are stored.
+    /// </summary>
+    public required string LibrariesDirectory { get; init; }
 }

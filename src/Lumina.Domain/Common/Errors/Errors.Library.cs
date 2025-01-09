@@ -15,6 +15,7 @@ public static partial class Errors
         public static Error LibraryAlreadyExists => Error.Conflict(description: nameof(LibraryAlreadyExists));
         public static Error LibraryNotFound => Error.NotFound(description: nameof(LibraryNotFound));
         public static Error LibraryTypeCannotBeNull => Error.Validation(description: nameof(LibraryTypeCannotBeNull));
+        public static Error CoverFileMustBeAnImage => Error.Validation(description: nameof(CoverFileMustBeAnImage));
         public static Error UnknownLibraryType => Error.Unexpected(description: nameof(UnknownLibraryType));
         public static Error PathsListCannotBeNull => Error.Validation(description: nameof(PathsListCannotBeNull));
         public static Error PathsListCannotBeEmpty => Error.Validation(description: nameof(PathsListCannotBeEmpty));

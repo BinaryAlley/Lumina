@@ -35,16 +35,24 @@ public class LibraryManagementController : Controller
     }
 
     /// <summary>
-    /// Displays the view for adding or editing a media library.
+    /// Displays the view for adding a media library.
     /// </summary>
-    /// <param name="id">The optional id of the media library to edit.</param>
-    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    [HttpGet("item/{id?}")]
-    public async Task<IActionResult> EditLibrary(Guid? id = null, CancellationToken cancellationToken = default)
+    [HttpGet("item")]
+    public IActionResult AddLibrary()
     {
         LibraryModel libraryModel = new();
-        if (id is not null)
-            libraryModel = await _apiHttpClient.GetAsync<LibraryModel>($"libraries/{id}", cancellationToken).ConfigureAwait(false);
+        return View("/Views/Library/Management/Item.cshtml", libraryModel);
+    }
+
+    /// <summary>
+    /// Displays the view for editing a media library.
+    /// </summary>
+    /// <param name="id">The id of the media library to edit.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    [HttpGet("item/{id}")]
+    public async Task<IActionResult> EditLibrary(Guid id, CancellationToken cancellationToken = default)
+    {
+        LibraryModel libraryModel = await _apiHttpClient.GetAsync<LibraryModel>($"libraries/{id}", cancellationToken).ConfigureAwait(false);
         return View("/Views/Library/Management/Item.cshtml", libraryModel);
     }
 

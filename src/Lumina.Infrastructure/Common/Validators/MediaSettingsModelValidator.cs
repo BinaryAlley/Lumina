@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using FluentValidation;
-using Lumina.Infrastructure.Common.Models.Configuration;
+using Lumina.Application.Common.Infrastructure.Models.Configuration;
 #endregion
 
 namespace Lumina.Infrastructure.Common.Validators;
@@ -16,5 +16,6 @@ public class MediaSettingsModelValidator : AbstractValidator<MediaSettingsModel>
     public MediaSettingsModelValidator()
     {
         RuleFor(x => x.RootDirectory).NotEmpty().WithMessage(Errors.Errors.Configuration.MediaRootDirectoryCannotBeEmpty.Description);
+        RuleFor(x => x.LibrariesDirectory).NotEmpty().WithMessage(Errors.Errors.Configuration.MediaLibrariesDirectoryCannotBeEmpty.Description);
     }
 }

@@ -540,4 +540,7 @@
   <data name="VolumeNumberMustBeGreaterThanZero" xml:space="preserve">
     <value>Номер тома должен быть больше нуля!</value>
   </data>
+  <data name="CoverFileMustBeAnImage" xml:space="preserve">
+    <value>Файл обложки должен быть изображением!</value>
+  </data>
 </root>

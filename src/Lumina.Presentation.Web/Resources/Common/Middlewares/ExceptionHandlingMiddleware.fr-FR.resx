@@ -540,4 +540,7 @@
   <data name="VolumeNumberMustBeGreaterThanZero" xml:space="preserve">
     <value>Le numéro de volume doit être supérieur à zéro !</value>
   </data>
+  <data name="CoverFileMustBeAnImage" xml:space="preserve">
+    <value>Le fichier de couverture doit être une image!</value>
+  </data>
 </root>

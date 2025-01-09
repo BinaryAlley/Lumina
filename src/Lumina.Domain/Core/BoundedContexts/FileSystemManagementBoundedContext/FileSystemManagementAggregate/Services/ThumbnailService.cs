@@ -26,7 +26,7 @@ public class ThumbnailService : IThumbnailService
     /// <summary>
     /// Initializes a new instance of the <see cref="ThumbnailService"/> class.
     /// </summary>
-    /// <param name="environmentContext">Injected environment context.</param>
+    /// <param name="environmentContext">Injected facade service for environment contextual services.</param>
     public ThumbnailService(IEnvironmentContext environmentContext)
     {
         _environmentContext = environmentContext;

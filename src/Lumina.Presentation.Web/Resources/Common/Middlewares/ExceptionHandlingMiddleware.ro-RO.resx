@@ -540,4 +540,7 @@
   <data name="VolumeNumberMustBeGreaterThanZero" xml:space="preserve">
     <value>Numărul volumului trebuie să fie mai mare decât zero!</value>
   </data>
+  <data name="CoverFileMustBeAnImage" xml:space="preserve">
+    <value>Fișierul copertă trebuie să fie o imagine!</value>
+  </data>
 </root>

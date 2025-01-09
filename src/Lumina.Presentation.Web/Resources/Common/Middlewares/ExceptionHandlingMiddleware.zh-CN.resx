@@ -540,4 +540,7 @@
   <data name="VolumeNumberMustBeGreaterThanZero" xml:space="preserve">
     <value>卷号必须大于零！</value>
   </data>
+  <data name="CoverFileMustBeAnImage" xml:space="preserve">
+    <value>封面文件必须是图片！</value>
+  </data>
 </root>
