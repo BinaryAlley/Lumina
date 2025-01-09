@@ -540,4 +540,7 @@
   <data name="VolumeNumberMustBeGreaterThanZero" xml:space="preserve">
     <value>巻数は0より大きくなければなりません！</value>
   </data>
+  <data name="CoverFileMustBeAnImage" xml:space="preserve">
+    <value>カバーファイルは画像である必要があります！</value>
+  </data>
 </root>

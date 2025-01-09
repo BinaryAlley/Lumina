@@ -540,4 +540,7 @@
   <data name="VolumeNumberMustBeGreaterThanZero" xml:space="preserve">
     <value>Bandnummer muss größer als null sein!</value>
   </data>
+  <data name="CoverFileMustBeAnImage" xml:space="preserve">
+    <value>Die Coverdatei muss ein Bild sein!</value>
+  </data>
 </root>

@@ -3,6 +3,7 @@ using ErrorOr;
 using Lumina.Domain.Common.Enums.MediaLibrary;
 using Lumina.Domain.Common.Models.Core;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
 using System;
@@ -41,6 +42,11 @@ public class Library : AggregateRoot<LibraryId>
     public string? CoverImage { get; private set; }
 
     /// <summary>
+    /// Gets the path of the image file chosen by the user to be used as the cover for the library.
+    /// </summary>
+    public string? CoverImageSourcePath { get; private set; }
+
+    /// <summary>
     /// Gets the list of file system paths that make up the media library.
     /// </summary>
     public IReadOnlyCollection<FileSystemPathId> ContentLocations => _contentLocations.AsReadOnly();
@@ -67,6 +73,8 @@ public class Library : AggregateRoot<LibraryId>
         LibraryType = libraryType;
         _contentLocations = contentLocations;
         CoverImage = coverImage;
+
+        _domainEvents.Add(new LibrarySavedDomainEvent(Guid.NewGuid(), this, DateTime.UtcNow));
     }
 
     /// <summary>
@@ -76,7 +84,7 @@ public class Library : AggregateRoot<LibraryId>
     /// <param name="title">The title of the media library.</param>
     /// <param name="libraryType">The type of the media library (e.g., Book, TvShow).</param>
     /// <param name="contentLocations">The list of file system paths that make up the media library.</param>
-    /// <param name="coverImage">The path of the image file used as the cover for the library.</param>
+    /// <param name="coverImageSourcePath">The path of the image file chosen by the user to be used as the cover for the library.</param>
     /// <returns>
     /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="Library"/>, or an error message.
     /// </returns>
@@ -85,7 +93,7 @@ public class Library : AggregateRoot<LibraryId>
         string title,
         LibraryType libraryType,
         IEnumerable<string> contentLocations,
-        string? coverImage)
+        string? coverImageSourcePath)
     {
         List<FileSystemPathId> tempContentLocations = [];
         // go through all the file system paths that make up the media library and create domain objects from them
@@ -102,7 +110,7 @@ public class Library : AggregateRoot<LibraryId>
             title,
             libraryType,
             tempContentLocations,
-            coverImage
+            coverImageSourcePath
         );
     }
 
@@ -114,7 +122,7 @@ public class Library : AggregateRoot<LibraryId>
     /// <param name="title">The title of the media library.</param>
     /// <param name="libraryType">The type of the media library (e.g., Book, TvShow).</param>
     /// <param name="contentLocations">The list of file system paths that make up the media library.</param>
-    /// <param name="coverImage">The path of the image file used as the cover for the library.</param>
+    /// <param name="coverImageSourcePath">The path of the image file chosen by the user to be used as the cover for the library.</param>
     /// <returns>
     /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="Library"/>, or an error message.
     /// </returns>
@@ -124,7 +132,7 @@ public class Library : AggregateRoot<LibraryId>
         string title,
         LibraryType libraryType,
         IEnumerable<string> contentLocations,
-        string? coverImage)
+        string? coverImageSourcePath)
     {
         List<FileSystemPathId> tempContentLocations = [];
         // go through all the file system paths that make up the media library and create domain objects from them
@@ -141,7 +149,16 @@ public class Library : AggregateRoot<LibraryId>
             title,
             libraryType,
             tempContentLocations,
-            coverImage
+            coverImageSourcePath
         );
+    }
+
+    /// <summary>
+    /// Sets the file system path where the cover image was copied to from where it was located when the user selected it, to the internal library.
+    /// </summary>
+    /// <param name="path">The internal libray path location of the cover image file.</param>
+    public void SetInternalLibraryCoverImagePath(string path)
+    {
+        CoverImage = path;
     }
 }
