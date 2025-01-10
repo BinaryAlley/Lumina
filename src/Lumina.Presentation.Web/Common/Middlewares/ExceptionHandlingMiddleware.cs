@@ -80,6 +80,8 @@ public class ExceptionHandlingMiddleware
         // handle unauthorized errors by prompting the user to re-login
         if (apiException.HttpStatusCode == HttpStatusCode.Unauthorized) // HTTP 401 Unauthorized actually means lack of valid authentication credentials (not logged in)
             await HandleUnauthorizedAsync(context);
+        else if (apiException.HttpStatusCode == HttpStatusCode.NotFound) // 
+            await HandleNotFoundAsync(context);
         else if (apiException.HttpStatusCode == HttpStatusCode.Forbidden)
         {
             if (IsApiRequest(context))
@@ -102,6 +104,31 @@ public class ExceptionHandlingMiddleware
                 success = false,
                 errorMessage
             });
+        }
+    }
+
+    /// <summary>
+    /// Handles not found exceptions.
+    /// </summary>
+    private async Task HandleNotFoundAsync(HttpContext context)
+    {      
+        if (IsApiRequest(context))
+        {
+            context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+            await WriteJsonResponseAsync(context, new
+            {
+                success = false,
+                errorMessage = "NotFound"
+            });
+        }
+        else
+        {
+            context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+
+            string culture = context.Request.RouteValues["culture"]?.ToString()?.ToLower() ?? "en-us";
+            string notFoundUrl = $"/{culture}/not-found";
+            _logger.LogInformation("Redirecting user to NotFound url");
+            context.Response.Redirect(notFoundUrl); // force an entire refresh of the current location, so that header and footer are re-rendered too
         }
     }
 
