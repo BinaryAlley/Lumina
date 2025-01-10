@@ -8,6 +8,7 @@ using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
+using Lumina.Domain.Common.Enums.Authorization;
 using Lumina.Domain.Common.Enums.MediaLibrary;
 using Lumina.Domain.Common.Enums.PhotoLibrary;
 using Lumina.Domain.Common.Events;
@@ -90,7 +91,9 @@ public class UpdateLibraryCommandHandler : IRequestHandler<UpdateLibraryCommand,
         else if (getLibraryResult.Value is null)
             return DomainErrors.Library.LibraryNotFound;
         // if the user that made the request is not an Admin or is not the owner of the library, they do not have the right to update it
-        if (getLibraryResult.Value.UserId != _currentUserService.UserId || !await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false))
+        if (getLibraryResult.Value.UserId != _currentUserService.UserId || 
+            (!await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false) &&
+             !await _authorizationService.HasPermissionAsync(_currentUserService.UserId!.Value, AuthorizationPermission.canCreateLibraries, cancellationToken)))
             return ApplicationErrors.Authorization.NotAuthorized;
 
         // create a domain library object

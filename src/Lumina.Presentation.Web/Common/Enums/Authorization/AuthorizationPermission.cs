@@ -6,7 +6,8 @@ namespace Lumina.Presentation.Web.Common.Enums.Authorization;
 public enum AuthorizationPermission
 {
     None = 0,
-    CanViewUsers = 1,
-    CanDeleteUsers = 2,
-    CanRegisterUsers = 3
+    CanViewUsers,
+    CanDeleteUsers,
+    CanRegisterUsers,
+    canCreateLibraries
 }

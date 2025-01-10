@@ -32,7 +32,6 @@ public class DataSeedServiceTests
     private readonly IPermissionRepository _mockPermissionRepository;
     private readonly DataSeedService _sut;
     private readonly DateTime _fixedUtcNow;
-    private readonly UserEntityFixture _userEntityFixture;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DataSeedServiceTests"/> class.
@@ -48,7 +47,6 @@ public class DataSeedServiceTests
         _mockUnitOfWork.GetRepository<IPermissionRepository>().Returns(_mockPermissionRepository);
 
         _sut = new DataSeedService(_mockUnitOfWork, _mockDateTimeProvider);
-        _userEntityFixture = new UserEntityFixture();
     }
 
     [Fact]
@@ -68,16 +66,14 @@ public class DataSeedServiceTests
         result.Value.Should().Be(Result.Created);
 
         await _mockPermissionRepository
-            .Received(3)
+            .Received(4)
             .InsertAsync(
                 Arg.Is<PermissionEntity>(p =>
                     p.CreatedBy == adminId &&
                     p.CreatedOnUtc == _fixedUtcNow),
                 Arg.Any<CancellationToken>());
 
-        await _mockUnitOfWork
-            .Received(1)
-            .SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -97,9 +93,7 @@ public class DataSeedServiceTests
         result.IsError.Should().BeTrue();
         result.FirstError.Should().Be(expectedError);
 
-        await _mockUnitOfWork
-            .DidNotReceive()
-            .SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -118,12 +112,13 @@ public class DataSeedServiceTests
         await _sut.SetDefaultAuthorizationPermissionsAsync(adminId, CancellationToken.None);
 
         // Assert
-        capturedPermissions.Should().BeEquivalentTo(new[]
-        {
+        capturedPermissions.Should().BeEquivalentTo(
+        [
             AuthorizationPermission.CanViewUsers,
             AuthorizationPermission.CanDeleteUsers,
-            AuthorizationPermission.CanRegisterUsers
-        });
+            AuthorizationPermission.CanRegisterUsers,
+            AuthorizationPermission.canCreateLibraries
+        ]);
     }
 
     [Fact]
@@ -153,9 +148,7 @@ public class DataSeedServiceTests
                     r.RoleName == "Admin"),
                 Arg.Any<CancellationToken>());
 
-        await _mockUnitOfWork
-            .Received(1)
-            .SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -178,9 +171,7 @@ public class DataSeedServiceTests
         result.IsError.Should().BeTrue();
         result.FirstError.Should().Be(expectedError);
 
-        await _mockUnitOfWork
-            .DidNotReceive()
-            .SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -202,7 +193,7 @@ public class DataSeedServiceTests
         await _sut.SetDefaultAuthorizationRolesAsync(userId, CancellationToken.None);
 
         // Assert
-        capturedRoleNames.Should().BeEquivalentTo(new[] { "Admin" });
+        capturedRoleNames.Should().BeEquivalentTo(["Admin"]);
     }
 
     [Fact]
@@ -240,8 +231,8 @@ public class DataSeedServiceTests
         List<PermissionEntity> permissions =
         [
             new() { Id = Guid.NewGuid(), PermissionName = AuthorizationPermission.CanViewUsers },
-        new() { Id = Guid.NewGuid(), PermissionName = AuthorizationPermission.CanDeleteUsers },
-        new() { Id = Guid.NewGuid(), PermissionName = AuthorizationPermission.CanRegisterUsers }
+            new() { Id = Guid.NewGuid(), PermissionName = AuthorizationPermission.CanDeleteUsers },
+            new() { Id = Guid.NewGuid(), PermissionName = AuthorizationPermission.CanRegisterUsers }
         ];
 
         IRoleRepository mockRoleRepository = Substitute.For<IRoleRepository>();
@@ -272,9 +263,7 @@ public class DataSeedServiceTests
                     rp.CreatedOnUtc == _fixedUtcNow),
                 Arg.Any<CancellationToken>());
 
-        await _mockUnitOfWork
-            .Received(1)
-            .SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -296,9 +285,7 @@ public class DataSeedServiceTests
         result.IsError.Should().BeTrue();
         result.FirstError.Should().Be(Errors.Authorization.AdminAccountNotFound);
 
-        await _mockUnitOfWork
-            .DidNotReceive()
-            .SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -325,9 +312,7 @@ public class DataSeedServiceTests
         result.IsError.Should().BeTrue();
         result.FirstError.Should().Be(expectedError);
 
-        await _mockUnitOfWork
-            .DidNotReceive()
-            .SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -358,9 +343,7 @@ public class DataSeedServiceTests
         result.IsError.Should().BeTrue();
         result.FirstError.Should().Be(expectedError);
 
-        await _mockUnitOfWork
-            .DidNotReceive()
-            .SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -384,9 +367,7 @@ public class DataSeedServiceTests
         result.IsError.Should().BeTrue();
         result.FirstError.Should().Be(expectedError);
 
-        await _mockUnitOfWork
-            .DidNotReceive()
-            .SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -429,9 +410,7 @@ public class DataSeedServiceTests
                     ur.CreatedOnUtc == _fixedUtcNow),
                 Arg.Any<CancellationToken>());
 
-        await _mockUnitOfWork
-            .Received(1)
-            .SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -453,9 +432,7 @@ public class DataSeedServiceTests
         result.IsError.Should().BeTrue();
         result.FirstError.Should().Be(Errors.Authorization.AdminRoleNotFound);
 
-        await _mockUnitOfWork
-            .DidNotReceive()
-            .SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -481,9 +458,7 @@ public class DataSeedServiceTests
         result.IsError.Should().BeTrue();
         result.FirstError.Should().Be(Errors.Authorization.AdminAccountNotFound);
 
-        await _mockUnitOfWork
-            .DidNotReceive()
-            .SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -515,9 +490,7 @@ public class DataSeedServiceTests
         result.IsError.Should().BeTrue();
         result.FirstError.Should().Be(expectedError);
 
-        await _mockUnitOfWork
-            .DidNotReceive()
-            .SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -541,9 +514,7 @@ public class DataSeedServiceTests
         result.IsError.Should().BeTrue();
         result.FirstError.Should().Be(expectedError);
 
-        await _mockUnitOfWork
-            .DidNotReceive()
-            .SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -570,8 +541,6 @@ public class DataSeedServiceTests
         result.IsError.Should().BeTrue();
         result.FirstError.Should().Be(expectedError);
 
-        await _mockUnitOfWork
-            .DidNotReceive()
-            .SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 }

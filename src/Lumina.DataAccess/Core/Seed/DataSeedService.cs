@@ -50,7 +50,8 @@ public class DataSeedService : IDataSeedService
         [
             new() { PermissionName = AuthorizationPermission.CanViewUsers, CreatedBy = adminId, CreatedOnUtc = _dateTimeProvider.UtcNow },
             new() { PermissionName = AuthorizationPermission.CanDeleteUsers, CreatedBy = adminId, CreatedOnUtc = _dateTimeProvider.UtcNow },
-            new() { PermissionName = AuthorizationPermission.CanRegisterUsers, CreatedBy = adminId, CreatedOnUtc = _dateTimeProvider.UtcNow }
+            new() { PermissionName = AuthorizationPermission.CanRegisterUsers, CreatedBy = adminId, CreatedOnUtc = _dateTimeProvider.UtcNow },
+            new() { PermissionName = AuthorizationPermission.canCreateLibraries, CreatedBy = adminId, CreatedOnUtc = _dateTimeProvider.UtcNow }
         ];
         foreach (PermissionEntity permission in defaultPermissions)
         {
