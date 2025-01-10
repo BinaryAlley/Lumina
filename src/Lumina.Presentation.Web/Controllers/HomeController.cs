@@ -12,7 +12,7 @@ namespace Lumina.Presentation.Web.Controllers;
 /// Controller for home page.
 /// </summary>
 [Authorize]
-[Route("")]  // randle root path - this is needed because app.UseCultureRedirect will redirect to the correct route
+[Route("")]  // handle root path - this is needed because app.UseCultureRedirect will redirect to the correct route
 [Route("{culture}")] // culture-specific routes
 public class HomeController : Controller
 {
@@ -53,5 +53,14 @@ public class HomeController : Controller
     public IActionResult Error()
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+    }
+
+    /// <summary>
+    /// Displays the view for errors.
+    /// </summary>
+    [HttpGet("not-found")]
+    public IActionResult NotFoundView()
+    {
+        return View("/Views/Shared/NotFound.cshtml");
     }
 }
