@@ -8,6 +8,7 @@ using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
+using Lumina.Domain.Common.Enums.Authorization;
 using Lumina.Domain.Common.Enums.MediaLibrary;
 using Lumina.Domain.Common.Enums.PhotoLibrary;
 using Lumina.Domain.Common.Events;
@@ -90,8 +91,9 @@ public class AddLibraryCommandHandler : IRequestHandler<AddLibraryCommand, Error
             request.CoverImage
         );
 
-        // if the user that made the request is not an Admin, they do not have the right to create it
-        if (!await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false))
+        // if the user that made the request is not an Admin or they don't have the permission to manage media libraries, they do not have the right to create it
+        if (!await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false) &&
+            !await _authorizationService.HasPermissionAsync(_currentUserService.UserId!.Value, AuthorizationPermission.canCreateLibraries, cancellationToken).ConfigureAwait(false))
             return ApplicationErrors.Authorization.NotAuthorized;
 
         if (createLibraryResult.IsError)
