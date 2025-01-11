@@ -43,7 +43,7 @@ public class UpdateUserRoleAndPermissionsEndpointSummary : Summary<UpdateUserRol
         ResponseParam<AuthorizationResponse>(r => r.Permissions, "The list of permissions of the user.");
 
 
-        Response(200, "The authorization role and permissions of the user were successfully updated.", example:
+        Response(200, "The authorization role and permissions of the user were successfuly updated.", example:
             new AuthorizationResponse(
                 UserId: Guid.NewGuid(),
                 Role: "Editor",

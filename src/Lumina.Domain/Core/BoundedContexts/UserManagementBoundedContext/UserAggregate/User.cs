@@ -35,7 +35,7 @@ public sealed class User : AggregateRoot<UserId>
     /// </summary>
     /// <param name="username">The username of the user.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="User"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly created <see cref="User"/>, or an error message.
     /// </returns>
     public static ErrorOr<User> Create(
         string username)
@@ -51,7 +51,7 @@ public sealed class User : AggregateRoot<UserId>
     /// <param name="id">The object representing the id of the user.</param>
     /// <param name="username">The username of the user.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="User"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly created <see cref="User"/>, or an error message.
     /// </returns>
     public static ErrorOr<User> Create(
         UserId id,

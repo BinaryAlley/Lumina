@@ -16,6 +16,12 @@
     <nav id="mobile-menu">
         <div id="mobile-menu-content">
             <div class="mobile-menu-heading">
+                Lumina
+            </div>
+            <ul>                
+                <li><a href="@_urlService.GetAbsoluteUrl("Index", "Home")"><span>@_localizer["Home"]</span></a></li>
+            </ul>
+            <div class="mobile-menu-heading">
                 @_localizer["Account"]
             </div>
             <ul>
@@ -52,7 +58,7 @@
                 </div>
                 <ul>
                     <li><a href="@_urlService.GetAbsoluteUrl("Index", "LibraryManagement")" class="nav-link"><span>@_localizer["ManageLibraries"]</span></a></li>
-                    @if (await _auth.IsInRoleAsync("Admin", CancellationToken.None) || await _auth.HasPermissionAsync(AuthorizationPermission.canCreateLibraries, CancellationToken.None))
+                    @if (await _auth.IsInRoleAsync("Admin", CancellationToken.None) || await _auth.HasPermissionAsync(AuthorizationPermission.CanCreateLibraries, CancellationToken.None))
                     {
                         <li><a href="@_urlService.GetAbsoluteUrl("AddLibrary", "LibraryManagement")" class="nav-link"><span>@_localizer["AddNewLibrary"]</span></a></li>
                     }
@@ -115,6 +121,12 @@
 <nav class="menubar">
     <ul>
         <li tabindex="0" class="top-level-menuitem">
+            <label for="account-menu">Lumina</label>
+            <ul>
+                <li><a href="@_urlService.GetAbsoluteUrl("Index", "Home")">@_localizer["Home"]</a></li>
+            </ul>
+        </li>
+        <li tabindex="0" class="top-level-menuitem">
             <label for="account-menu">@_localizer["Account"]</label>
             <ul>
                 @if (User?.Identity?.IsAuthenticated == false)
@@ -150,7 +162,7 @@
                 <label for="library-menu">@_localizer["Library"]</label>
                 <ul>
                     <li tabindex="0"><a href="@_urlService.GetAbsoluteUrl("Index", "LibraryManagement")" class="nav-link">@_localizer["ManageLibraries"]</a></li>
-                    @if (await _auth.IsInRoleAsync("Admin", CancellationToken.None) || await _auth.HasPermissionAsync(AuthorizationPermission.canCreateLibraries, CancellationToken.None))
+                    @if (await _auth.IsInRoleAsync("Admin", CancellationToken.None) || await _auth.HasPermissionAsync(AuthorizationPermission.CanCreateLibraries, CancellationToken.None))
                     {
                         <li tabindex="0"><a href="@_urlService.GetAbsoluteUrl("AddLibrary", "LibraryManagement")" class="nav-link">@_localizer["AddNewLibrary"]</a></li>
                     }

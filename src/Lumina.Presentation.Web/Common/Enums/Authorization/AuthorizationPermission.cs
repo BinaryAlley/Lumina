@@ -9,5 +9,5 @@ public enum AuthorizationPermission
     CanViewUsers,
     CanDeleteUsers,
     CanRegisterUsers,
-    canCreateLibraries
+    CanCreateLibraries
 }

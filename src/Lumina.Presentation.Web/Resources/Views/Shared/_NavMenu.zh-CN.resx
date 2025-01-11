@@ -207,4 +207,7 @@
   <data name="ManageRoles" xml:space="preserve">
     <value>管理角色</value>
   </data>
+  <data name="Home" xml:space="preserve">
+    <value>首页</value>
+  </data>
 </root>

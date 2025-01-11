@@ -18,6 +18,6 @@ public interface IUpdateRepositoryAction<TModel> where TModel : IStorageEntity
     /// </summary>
     /// <param name="data">The element that will be updated.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successfull operation, or an error.</returns>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
     Task<ErrorOr<Updated>> UpdateAsync(TModel data, CancellationToken cancellationToken);
 }

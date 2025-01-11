@@ -48,7 +48,7 @@ public class UpdateUserRoleAndPermissionsCommandHandler : IRequestHandler<Update
     /// <param name="request">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully updated <see cref="RoleResponse"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly updated <see cref="RoleResponse"/>, or an error message.
     /// </returns>
     public async ValueTask<ErrorOr<AuthorizationResponse>> Handle(UpdateUserRoleAndPermissionsCommand request, CancellationToken cancellationToken)
     {

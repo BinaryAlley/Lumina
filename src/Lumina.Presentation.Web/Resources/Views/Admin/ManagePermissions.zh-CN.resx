@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="CanCreateLibraries" xml:space="preserve">
+    <value>可以创建媒体库</value>
+  </data>
   <data name="CanDeleteUsers" xml:space="preserve">
     <value>可以删除用户</value>
   </data>

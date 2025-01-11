@@ -21,7 +21,7 @@
 
 <div style="display: grid; grid-template-rows: auto 1fr;"><!--container with two rows, one fixed, one filling remaining space-->
     <div style="min-height: 1rem;"></div><!--the first row is a dummy row for "margin", because setting a margin on the next row would offset the parent's position-->
-    <div class="enlightenment-panel shadow-effect p-2 mx-auto panel w-50 mb-10" style="min-width: 320px;">
+    <div class="enlightenment-panel shadow-effect mx-auto panel w-50 mb-10" style="min-width: 320px;">
         <div class="shine-effect"></div>
         <form method="post" id="add-media-library-form" class="inline">
             @Html.AntiForgeryToken()
@@ -230,7 +230,6 @@
                 `);
             }
         }
-
 
         // on Enter key pressed
         const handleEnterKey = async function(e) {

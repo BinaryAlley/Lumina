@@ -55,7 +55,7 @@ public sealed class Directory : FileSystemItem
     /// <param name="dateModified">The date and time the directory was last modified. Can be optional if unknown.</param>
     /// <param name="status">The status of the file system item.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="Directory"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly created <see cref="Directory"/>, or an error message.
     /// </returns>
     public static ErrorOr<Directory> Create(
         string path,
@@ -87,7 +87,7 @@ public sealed class Directory : FileSystemItem
     /// <param name="dateModified">The date and time the directory was last modified. Can be optional if unknown.</param>
     /// <param name="status">The status of the file system item.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="Directory"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly created <see cref="Directory"/>, or an error message.
     /// </returns>
     public static ErrorOr<Directory> Create(
         FileSystemPathId id,
@@ -112,7 +112,7 @@ public sealed class Directory : FileSystemItem
     /// Updates the last modified date of the file system item.
     /// </summary>
     /// <param name="date">The new date and time of last modification.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successfull operation, or an error.</returns>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
     public ErrorOr<Updated> UpdateLastModified(DateTime date)
     {
         DateModified = date;
@@ -123,7 +123,7 @@ public sealed class Directory : FileSystemItem
     /// Adds a file system item to the directory.
     /// </summary>
     /// <param name="item">The file system item to add.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successfull operation, or an error.</returns>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
     public ErrorOr<Updated> AddItem(FileSystemItem item)
     {
         _items.Add(item);
@@ -134,7 +134,7 @@ public sealed class Directory : FileSystemItem
     /// Removes a file system item from the directory.
     /// </summary>
     /// <param name="item">The file system item to remove.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successfull operation, or an error.</returns>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
     public ErrorOr<Updated> RemoveItem(FileSystemItem item)
     {
         _items.Remove(item);

@@ -42,7 +42,7 @@ public class BookRating : Rating
     /// <param name="source">The optional source of the rating.</param>
     /// <param name="voteCount">The optional number of votes or reviews.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="Rating"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly created <see cref="Rating"/>, or an error message.
     /// </returns>
     public static ErrorOr<BookRating> Create(decimal value, decimal maxValue, Optional<BookRatingSource> source, Optional<int> voteCount)
     {

@@ -52,7 +52,7 @@ public abstract class FileSystemItem : AggregateRoot<FileSystemPathId>
     /// Sets the status of the filesystem item.
     /// </summary>
     /// <param name="status">The status to be set.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successfull operation, or an error.</returns>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
     public ErrorOr<Updated> SetStatus(FileSystemItemStatus status)
     {
         Status = status;
@@ -63,7 +63,7 @@ public abstract class FileSystemItem : AggregateRoot<FileSystemPathId>
     /// Sets the parent of the filesystem item.
     /// </summary>
     /// <param name="parent">The file system item to be set as parent.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successfull operation, or an error.</returns>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
     public ErrorOr<Updated> SetParent(FileSystemItem parent)
     {
         if (parent is not null)

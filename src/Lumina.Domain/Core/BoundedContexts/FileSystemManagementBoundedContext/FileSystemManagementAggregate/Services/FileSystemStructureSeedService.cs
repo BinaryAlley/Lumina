@@ -30,7 +30,7 @@ internal class FileSystemStructureSeedService : IFileSystemStructureSeedService
     /// Sets up the default file system directories needed by the application.
     /// </summary>
     /// <param name="rootPath">The base path where the directories will be created relative to.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successfull operation, or an error.</returns>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
     public ErrorOr<Created> SetDefaultDirectories(string rootPath)
     {
         // make sure the root path exists

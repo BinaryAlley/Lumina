@@ -41,7 +41,7 @@ public class DataSeedService : IDataSeedService
     /// </summary>
     /// <param name="adminId">The Id of the admin admin user who will own these permissions.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successfull operation, or an error.</returns>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<ErrorOr<Created>> SetDefaultAuthorizationPermissionsAsync(Guid adminId, CancellationToken cancellationToken)
     {
         IPermissionRepository permissionRepository = _unitOfWork.GetRepository<IPermissionRepository>();
@@ -51,7 +51,7 @@ public class DataSeedService : IDataSeedService
             new() { PermissionName = AuthorizationPermission.CanViewUsers, CreatedBy = adminId, CreatedOnUtc = _dateTimeProvider.UtcNow },
             new() { PermissionName = AuthorizationPermission.CanDeleteUsers, CreatedBy = adminId, CreatedOnUtc = _dateTimeProvider.UtcNow },
             new() { PermissionName = AuthorizationPermission.CanRegisterUsers, CreatedBy = adminId, CreatedOnUtc = _dateTimeProvider.UtcNow },
-            new() { PermissionName = AuthorizationPermission.canCreateLibraries, CreatedBy = adminId, CreatedOnUtc = _dateTimeProvider.UtcNow }
+            new() { PermissionName = AuthorizationPermission.CanCreateLibraries, CreatedBy = adminId, CreatedOnUtc = _dateTimeProvider.UtcNow }
         ];
         foreach (PermissionEntity permission in defaultPermissions)
         {
@@ -68,7 +68,7 @@ public class DataSeedService : IDataSeedService
     /// </summary>
     /// <param name="userId">The Id of the admin user for whom roles will be set.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successfull operation, or an error.</returns>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<ErrorOr<Created>> SetDefaultAuthorizationRolesAsync(Guid userId, CancellationToken cancellationToken)
     {
         IRoleRepository roleRepository = _unitOfWork.GetRepository<IRoleRepository>();
@@ -93,7 +93,7 @@ public class DataSeedService : IDataSeedService
     /// </summary>
     /// <param name="userId">The Id of the admin user to receive admin role permissions.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successfull operation, or an error.</returns>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<ErrorOr<Created>> SetAdminRolePermissionsAsync(Guid userId, CancellationToken cancellationToken)
     {
         IRolePermissionRepository rolePermissionRepository = _unitOfWork.GetRepository<IRolePermissionRepository>();
@@ -138,7 +138,7 @@ public class DataSeedService : IDataSeedService
     /// </summary>
     /// <param name="userId">The Id of the admin user to receive the admin role.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successfull operation, or an error.</returns>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<ErrorOr<Created>> SetAdminRoleToAdministratorAccount(Guid userId, CancellationToken cancellationToken)
     {
         IUserRoleRepository userRoleRepository = _unitOfWork.GetRepository<IUserRoleRepository>();

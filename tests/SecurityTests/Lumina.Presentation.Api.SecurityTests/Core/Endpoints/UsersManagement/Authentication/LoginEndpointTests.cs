@@ -59,7 +59,7 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
     }
 
     [Fact]
-    public async Task Login_WithValidCredentials_ShouldAuthenticateSuccessfully()
+    public async Task Login_WithValidCredentials_ShouldAuthenticatesuccessfuly()
     {
         // Arrange
         UserEntity user = await CreateTestUser();

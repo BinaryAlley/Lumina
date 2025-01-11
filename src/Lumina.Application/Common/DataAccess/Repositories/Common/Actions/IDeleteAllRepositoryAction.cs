@@ -13,6 +13,6 @@ public interface IDeleteAllRepositoryAction
     /// <summary>
     /// Deletes all entities from the storage medium.
     /// </summary>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successfull operation, or an error.</returns>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
     Task<ErrorOr<Deleted>> DeleteAllAsync();
 }

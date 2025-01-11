@@ -96,7 +96,7 @@ public class VideoMetadata : BaseMetadata
     /// <param name="genres">The genres of the video.</param>
     /// <param name="tags">The tags associated with the video.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="VideoMetadata"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly created <see cref="VideoMetadata"/>, or an error message.
     /// </returns>
     public static ErrorOr<VideoMetadata> Create(
         string title,

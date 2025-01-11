@@ -69,7 +69,7 @@ public class WrittenContentMetadata : BaseMetadata
     /// <param name="publisher">The publisher of the written content, if applicable.</param>
     /// <param name="pageCount">The number of pages in the written content, if applicable.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="WrittenContentMetadata"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly created <see cref="WrittenContentMetadata"/>, or an error message.
     /// </returns>
     public static ErrorOr<WrittenContentMetadata> Create(
         string title,

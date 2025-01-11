@@ -28,7 +28,7 @@ public class SplitPathEndpointSummary : Summary<SplitPathEndpoint, SplitPathRequ
 
         RequestParam(r => r.Path, "The file system path for which to get the path segments. Required.");
 
-        Response(200, "Successfully split the path into segments.",
+        Response(200, "successfuly split the path into segments.",
             example: new PathSegmentResponse[2] {
                 new(Path: "media"),
                 new(Path: "movies")

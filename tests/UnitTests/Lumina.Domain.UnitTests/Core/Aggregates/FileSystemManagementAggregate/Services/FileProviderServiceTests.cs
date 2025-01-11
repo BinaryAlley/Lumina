@@ -733,7 +733,7 @@ public class FileProviderServiceTests
     }
 
     [Fact]
-    public void RenameFile_WhenParentDirectoryIsWritable_ShouldRenameSuccessfully()
+    public void RenameFile_WhenParentDirectoryIsWritable_ShouldRenamesuccessfuly()
     {
         // Arrange
         FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId(
@@ -890,7 +890,7 @@ public class FileProviderServiceTests
     }
 
     [Fact]
-    public void DeleteFile_WhenFileExistsAndHasDeletePermission_ShouldDeleteSuccessfully()
+    public void DeleteFile_WhenFileExistsAndHasDeletePermission_ShouldDeletesuccessfuly()
     {
         // Arrange
         FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId(

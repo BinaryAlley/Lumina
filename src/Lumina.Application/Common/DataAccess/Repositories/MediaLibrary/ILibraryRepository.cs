@@ -12,7 +12,9 @@ namespace Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 /// </summary>
 public interface ILibraryRepository : IRepository<LibraryEntity>,
                                       IGetByIdRepositoryAction<LibraryEntity, Guid>,
+                                      IGetAllRepositoryAction<LibraryEntity>,
                                       IInsertRepositoryAction<LibraryEntity>,
-                                      IUpdateRepositoryAction<LibraryEntity>
+                                      IUpdateRepositoryAction<LibraryEntity>,
+                                      IDeleteByIdRepositoryAction<Guid>
 {
 }

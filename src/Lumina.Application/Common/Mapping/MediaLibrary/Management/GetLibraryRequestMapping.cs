@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.MediaLibrary.Management.Queries;
+using Lumina.Application.Core.MediaLibrary.Management.Queries.GetLibrary;
 using Lumina.Contracts.Requests.MediaLibrary.Management;
 using System;
 #endregion
@@ -15,13 +15,11 @@ public static class GetLibraryRequestMapping
     /// Converts <paramref name="request"/> to <see cref="GetLibraryQuery"/>.
     /// </summary>
     /// <param name="request">The request to be converted.</param>
-    /// <param name="userId">The Id of the user requesting the media library.</param>
     /// <returns>The converted query.</returns>
-    public static GetLibraryQuery ToQuery(this GetLibraryRequest request, Guid userId)
+    public static GetLibraryQuery ToQuery(this GetLibraryRequest request)
     {
         return new GetLibraryQuery(
-            request.Id,
-            userId
+            request.Id
         );
     }
 }

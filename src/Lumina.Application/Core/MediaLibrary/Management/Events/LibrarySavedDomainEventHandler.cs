@@ -33,7 +33,7 @@ public class LibrarySavedDomainEventHandler : INotificationHandler<LibrarySavedD
     private readonly MediaSettingsModel _mediaSettingsModel;
 
     /// <summary>
-    /// 
+    /// Initializes a new instance of the <see cref="LibrarySavedDomainEventHandler"/> class.
     /// </summary>
     /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
     /// <param name="environmentContext">Injected facade service for environment contextual services.</param>
@@ -192,7 +192,7 @@ public class LibrarySavedDomainEventHandler : INotificationHandler<LibrarySavedD
         if (renameFileResult.IsError)
             return renameFileResult.Errors;
 
-        return renameFileResult.Value.Path;
+        return $"cover.{imageCheckResult.Value.ToString().ToLower()}";
     }
 
     /// <summary>

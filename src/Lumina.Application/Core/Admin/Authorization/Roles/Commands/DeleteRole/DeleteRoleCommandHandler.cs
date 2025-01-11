@@ -46,7 +46,7 @@ public class DeleteRoleCommandHandler : IRequestHandler<DeleteRoleCommand, Error
     /// <param name="request">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully deleted <see cref="RoleResponse"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly deleted <see cref="RoleResponse"/>, or an error message.
     /// </returns>
     public async ValueTask<ErrorOr<Deleted>> Handle(DeleteRoleCommand request, CancellationToken cancellationToken)
     {

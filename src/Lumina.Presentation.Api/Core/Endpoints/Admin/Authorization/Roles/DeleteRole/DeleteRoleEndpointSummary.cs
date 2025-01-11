@@ -30,7 +30,7 @@ public class DeleteRoleEndpointSummary : Summary<DeleteRoleEndpoint, DeleteRoleR
 
         RequestParam(r => r.RoleId, "The Id of the role. Required.");
 
-        Response(204, "The authorization role was successfully deleted.");
+        Response(204, "The authorization role was successfuly deleted.");
 
         Response(401, "Authentication required.", "application/problem+json",
             example: new[]

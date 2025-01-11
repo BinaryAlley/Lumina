@@ -117,7 +117,7 @@ public class DataSeedServiceTests
             AuthorizationPermission.CanViewUsers,
             AuthorizationPermission.CanDeleteUsers,
             AuthorizationPermission.CanRegisterUsers,
-            AuthorizationPermission.canCreateLibraries
+            AuthorizationPermission.CanCreateLibraries
         ]);
     }
 

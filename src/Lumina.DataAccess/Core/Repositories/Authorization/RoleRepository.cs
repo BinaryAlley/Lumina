@@ -34,7 +34,7 @@ internal sealed class RoleRepository : IRoleRepository
     /// </summary>
     /// <param name="role">The authorization role to add.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successfull operation, or an error.</returns>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<ErrorOr<Created>> InsertAsync(RoleEntity role, CancellationToken cancellationToken)
     {
         bool roleExists = await _luminaDbContext.Roles.AnyAsync(repositoryRole => repositoryRole.Id == role.Id || repositoryRole.RoleName == role.RoleName, cancellationToken).ConfigureAwait(false);
@@ -90,7 +90,7 @@ internal sealed class RoleRepository : IRoleRepository
     /// </summary>
     /// <param name="data">The role to update.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successfull operation, or an error.</returns>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<ErrorOr<Updated>> UpdateAsync(RoleEntity data, CancellationToken cancellationToken)
     {
         // check if a role with the requested Id exists, and retrieve it
@@ -114,7 +114,7 @@ internal sealed class RoleRepository : IRoleRepository
     /// </summary>
     /// <param name="id">The id of the role to be deleted.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successfull operation, or an error.</returns>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<ErrorOr<Deleted>> DeleteByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         // check if a role with the requested Id exists, and retrieve it

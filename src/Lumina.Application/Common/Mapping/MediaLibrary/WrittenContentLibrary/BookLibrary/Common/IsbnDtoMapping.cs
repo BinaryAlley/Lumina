@@ -19,7 +19,7 @@ public static class IsbnDtoMapping
     /// </summary>
     /// <param name="dto">The DTO to be converted.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully converted <see cref="Isbn"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly converted <see cref="Isbn"/>, or an error message.
     /// </returns>
     public static ErrorOr<Isbn> ToDomainEntity(this IsbnDto dto)
     {

@@ -39,7 +39,7 @@ public sealed class FileSystemPathId : ValueObject
     /// </summary>
     /// <param name="path">The path of the file system item.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="FileSystemPathId"/> or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly created <see cref="FileSystemPathId"/> or an error message.
     /// </returns>
     public static ErrorOr<FileSystemPathId> Create(string path)
     {

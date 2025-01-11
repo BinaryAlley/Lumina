@@ -53,7 +53,7 @@ public class UpdateLibraryEndpointSummary : Summary<UpdateLibraryEndpoint, Updat
         ResponseParam<LibraryResponse>(r => r.UpdatedOnUtc, "The date and time when the entity was last updated.");
 
 
-        Response(200, "The media library was successfully updated.", example:
+        Response(200, "The media library was successfuly updated.", example:
             new LibraryResponse(
                 Id: Guid.NewGuid(),
                 UserId: Guid.NewGuid(),

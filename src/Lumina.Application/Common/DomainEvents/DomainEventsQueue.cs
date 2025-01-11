@@ -26,7 +26,7 @@ public class DomainEventsQueue : IDomainEventsQueue
     /// </summary>
     /// <param name="domainEvent">When this method returns, contains the domain event removed from the queue, or the default value of <see cref="IDomainEvent"/> if the queue is empty.
     /// </param>
-    /// <returns><see langword="true"/> if a domain event was successfully dequeued, <see langword="false"/> otherwise.</returns>
+    /// <returns><see langword="true"/> if a domain event was successfuly dequeued, <see langword="false"/> otherwise.</returns>
     public bool TryDequeue(out IDomainEvent domainEvent)
     {
         return _queue.TryDequeue(out domainEvent!);

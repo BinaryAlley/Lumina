@@ -37,7 +37,7 @@ public sealed class UnixRootItem : FileSystemItem
     /// </summary>
     /// <param name="status">The status of the file system root item.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="UnixRootItem"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly created <see cref="UnixRootItem"/>, or an error message.
     /// </returns>
     public static ErrorOr<UnixRootItem> Create(FileSystemItemStatus status = FileSystemItemStatus.Accessible)
     {

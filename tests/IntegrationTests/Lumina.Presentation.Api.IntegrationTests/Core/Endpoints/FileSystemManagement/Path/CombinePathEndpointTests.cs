@@ -98,7 +98,7 @@ public class CombinePathEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithCancellationToken_ShouldCompleteSuccessfully()
+    public async Task ExecuteAsync_WhenCalledWithCancellationToken_ShouldCompletesuccessfuly()
     {
         // Arrange
         string originalPath = "/home/user";

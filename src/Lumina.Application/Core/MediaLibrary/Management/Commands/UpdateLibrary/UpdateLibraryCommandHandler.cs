@@ -65,7 +65,7 @@ public class UpdateLibraryCommandHandler : IRequestHandler<UpdateLibraryCommand,
     /// <param name="request">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully updated <see cref="LibraryResponse"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly updated <see cref="LibraryResponse"/>, or an error message.
     /// </returns>
     public async ValueTask<ErrorOr<LibraryResponse>> Handle(UpdateLibraryCommand request, CancellationToken cancellationToken)
     {
@@ -93,7 +93,7 @@ public class UpdateLibraryCommandHandler : IRequestHandler<UpdateLibraryCommand,
         // if the user that made the request is not an Admin or is not the owner of the library, they do not have the right to update it
         if (getLibraryResult.Value.UserId != _currentUserService.UserId || 
             (!await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false) &&
-             !await _authorizationService.HasPermissionAsync(_currentUserService.UserId!.Value, AuthorizationPermission.canCreateLibraries, cancellationToken)))
+             !await _authorizationService.HasPermissionAsync(_currentUserService.UserId!.Value, AuthorizationPermission.CanCreateLibraries, cancellationToken)))
             return ApplicationErrors.Authorization.NotAuthorized;
 
         // create a domain library object
