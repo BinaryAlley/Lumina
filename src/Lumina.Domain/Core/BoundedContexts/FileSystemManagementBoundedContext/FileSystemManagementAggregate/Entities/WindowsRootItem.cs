@@ -38,7 +38,7 @@ public sealed class WindowsRootItem : FileSystemItem
     /// <param name="name">The name of the file system root item.</param>
     /// <param name="status">The status of the file system root item.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="WindowsRootItem"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly created <see cref="WindowsRootItem"/>, or an error message.
     /// </returns>
     public static ErrorOr<WindowsRootItem> Create(
         string path,
@@ -65,7 +65,7 @@ public sealed class WindowsRootItem : FileSystemItem
     /// <param name="name">The name of the file system root item.</param>
     /// <param name="status">The status of the file system root item.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="WindowsRootItem"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly created <see cref="WindowsRootItem"/>, or an error message.
     /// </returns>
     public static ErrorOr<WindowsRootItem> Create(
         FileSystemPathId id,

@@ -332,6 +332,7 @@
 @media only screen and (max-width: 768px) {
     .menubar {
         visibility: hidden;
+        max-height: 0px;
     }
 
     #hamburger-menu {

@@ -207,4 +207,7 @@
   <data name="ManageRoles" xml:space="preserve">
     <value>ロールを管理する</value>
   </data>
+  <data name="Home" xml:space="preserve">
+    <value>ホーム</value>
+  </data>
 </root>

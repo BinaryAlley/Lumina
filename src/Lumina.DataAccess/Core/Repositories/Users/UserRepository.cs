@@ -35,7 +35,7 @@ internal sealed class UserRepository : IUserRepository
     /// </summary>
     /// <param name="user">The user to add.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successfull operation, or an error.</returns>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<ErrorOr<Created>> InsertAsync(UserEntity user, CancellationToken cancellationToken)
     {
         bool userExists = await _luminaDbContext.Users.AnyAsync(repositoryUser => repositoryUser.Id == user.Id, cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -80,7 +80,7 @@ internal sealed class UserRepository : IUserRepository
     /// </summary>
     /// <param name="data">Ther user to update.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successfull operation, or an error.</returns>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<ErrorOr<Updated>> UpdateAsync(UserEntity data, CancellationToken cancellationToken)
     {
         UserEntity? foundUser = await _luminaDbContext.Users

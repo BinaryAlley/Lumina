@@ -84,7 +84,7 @@ public class GetPathSeparatorQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WithCancellationToken_ShouldCompleteSuccessfully()
+    public async Task Handle_WithCancellationToken_ShouldCompletesuccessfuly()
     {
         // Arrange
         GetPathSeparatorQuery query = new();

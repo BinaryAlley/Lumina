@@ -252,7 +252,10 @@ function bindNavigationLinks() {
  */
 async function handleNavigationAsync(e) {
     e.preventDefault();
-    const url = e.target.href;
+    const anchor = e.target.closest('a');
+    if (!anchor)
+        return;
+    const url = anchor.href;
     await updateContentAsync(url, true);
 }
 
@@ -372,13 +375,16 @@ async function updateContentAsync(url, addToHistory) {
                 } else {
                     // wrap inline scripts in a safety check
                     newScript.textContent = `
-                    (function() {
+                    (async function() {
                         const safeGetElement = (id) => document.getElementById(id);
                         const safeAddEventListener = (element, e, handler) => {
                             if (element) 
                                 element.addEventListener(e, handler);
                         };
                         ${script.textContent}
+                        // call Initialize function, if defined in this script's scope
+                        if (typeof InitializeAsync === 'function') 
+                            await InitializeAsync();
                     })();
                 `;
                 }
@@ -401,7 +407,9 @@ async function updateContentAsync(url, addToHistory) {
     }
 }
 
-// Update language switcher links with the current URL
+/**
+ * Update language switcher links with the current URL
+ */
 function updateLanguageUrls() {
     document.querySelectorAll('a.lang-set').forEach(link => {
         const url = new URL(link.href);

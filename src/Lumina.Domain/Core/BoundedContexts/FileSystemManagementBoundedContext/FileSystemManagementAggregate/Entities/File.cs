@@ -56,7 +56,7 @@ public sealed class File : FileSystemItem
     /// <param name="size">The size of the file in bytes.</param>
     /// <param name="status">The status of the file system item.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="File"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly created <see cref="File"/>, or an error message.
     /// </returns>
     public static ErrorOr<File> Create(
         string path,
@@ -92,7 +92,7 @@ public sealed class File : FileSystemItem
     /// <param name="size">The size of the file in bytes.</param>
     /// <param name="status">The status of the file system item.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="File"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly created <see cref="File"/>, or an error message.
     /// </returns>
     public static ErrorOr<File> Create(
         FileSystemPathId id,
@@ -119,7 +119,7 @@ public sealed class File : FileSystemItem
     /// Updates the last modified date of the file system item.
     /// </summary>
     /// <param name="date">The new date and time of last modification.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successfull operation, or an error.</returns>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
     public ErrorOr<Updated> UpdateLastModified(DateTime date)
     {
         DateModified = date;
@@ -130,7 +130,7 @@ public sealed class File : FileSystemItem
     /// Updates the size of the file.
     /// </summary>
     /// <param name="newSize">The new size, in bytes.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successfull operation, or an error.</returns>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
     public ErrorOr<Updated> UpdateSize(long newSize)
     {
         Size = newSize;
@@ -141,7 +141,7 @@ public sealed class File : FileSystemItem
     /// Renames the file system item to the specified new name.
     /// </summary>
     /// <param name="newName">The new name for the file system item.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successfull operation, or an error.</returns>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
     public ErrorOr<Updated> Rename(string newName)
     {
         if (string.IsNullOrWhiteSpace(newName))

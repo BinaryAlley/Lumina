@@ -32,7 +32,7 @@ public class Tag : ValueObject
     /// </summary>
     /// <param name="name">The value of the tag.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="Tag"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly created <see cref="Tag"/>, or an error message.
     /// </returns>
     public static ErrorOr<Tag> Create(string? name)
     {

@@ -42,7 +42,7 @@ public class UpdateRoleEndpointSummary : Summary<UpdateRoleEndpoint, UpdateRoleR
         ResponseParam<RolePermissionsResponse>(r => r.Permissions, "The list of permissions of the role entity.");
 
 
-        Response(200, "The authorization role was successfully updated.", example:
+        Response(200, "The authorization role was successfuly updated.", example:
             new RolePermissionsResponse(
                 Role: new RoleDto(Id: Guid.NewGuid(), "Editor"),
                 Permissions: [new PermissionDto(Guid.NewGuid(), AuthorizationPermission.CanDeleteUsers), new PermissionDto(Guid.NewGuid(), AuthorizationPermission.CanViewUsers)]

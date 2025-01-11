@@ -56,7 +56,7 @@ public sealed class BookSeries : Entity<BookSeriesId>
     /// <param name="isComplete">The current status of the book series.</param>
     /// <param name="books">The books of the book series.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="BookSeries"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly created <see cref="BookSeries"/>, or an error message.
     /// </returns>
     public static ErrorOr<BookSeries> Create(
         BookSeriesId id,
@@ -80,7 +80,7 @@ public sealed class BookSeries : Entity<BookSeriesId>
     /// <param name="isComplete">The current status of the book series.</param>
     /// <param name="books">The books of the book series.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="BookSeries"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly created <see cref="BookSeries"/>, or an error message.
     /// </returns>
     public static ErrorOr<BookSeries> Create(
         WrittenContentMetadata metadata,

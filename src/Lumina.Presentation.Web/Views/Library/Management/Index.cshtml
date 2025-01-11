@@ -1,4 +1,113 @@
 @*
 /library/manage
 *@
-<p>libraries</p>
+
+@using Lumina.Presentation.Web.Common.Models.Libraries
+@using Lumina.Presentation.Web.Common.Services
+@using Microsoft.AspNetCore.Mvc.Localization
+
+@{
+    // generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler
+    var scriptId = ScriptIdentifierHelper.GenerateScriptId();
+}
+
+@inject IUrlService _urlService
+@inject IViewLocalizer _localizer
+
+<div style="display: grid; grid-template-rows: auto 1fr;"><!--container with two rows, one fixed, one filling remaining space-->
+    <div style="min-height: 1rem;"></div><!--the first row is a dummy row for "margin", because setting a margin on the next row would offset the parent's position-->
+    <div class="enlightenment-panel shadow-effect mx-auto panel w-75 mb-10" style="min-width: 320px;">
+        <div class="shine-effect"></div>
+        <div class="form-row">
+            <h1 class="text-light-two w-100 text-center pt-0 pb-0 engraved-title">
+                @(_localizer["Libraries"])
+            </h1>
+        </div>
+         <div id="libraries-content">
+            <div class="form-row">
+                <div id="add-media-directory-form-table" class="form-table w-100">
+                    <!-- libraries will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script type="text/javascript" data-form="@scriptId" defer>
+        // create cleanup registry for this view
+        const cleanupFunctions = [];
+        let isInitialized = false;
+    
+        // on view load
+        const loadLibrariesAsync = async function() {
+            const response = await callApiGetAsync('@_urlService.GetAbsoluteUrl("GetLibraries", "LibraryManagement")');
+            const table = document.getElementById('add-media-directory-form-table');
+            const container = document.getElementById('libraries-content');
+            
+            if (response && response.length > 0) {
+                table.innerHTML = response.map(library => {
+                    const editUrl = '@_urlService.GetAbsoluteUrl("EditLibrary", "LibraryManagement", new { id = default(Guid) })'
+                        .replace('/@(default(Guid))', `/${library.id}`);
+            
+                    return `
+                        <div class="form-table-row">
+                            <span title="${library.title}">${library.title}</span>
+                            <a href="${editUrl}">
+                                <img src="/images/ui/edit.svg" alt="@_localizer["Edit"]" title="@_localizer["Edit"]" class="remove-form-table-row-icon" />
+                            </a>
+                            <img src="/images/ui/delete.svg" alt="@_localizer["Remove"]" title="@_localizer["Remove"]" class="remove-form-table-row-icon" />
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                container.innerHTML = '<p class="text-center">@_localizer["NoLibraries"]</p>';
+            }
+        };
+
+        // on delete library icon click
+        const handleDeleteLibraryClick = async function(e) {
+            if (e.target.matches('img[src*="delete.svg"]')) {
+                const row = e.target.closest('.form-table-row');
+                const libraryTitle = row.querySelector('span').textContent;
+        
+                if (await dialogService.show('@_localizer["DeleteLibraryConfirm"]'.replace('{0}', libraryTitle), 
+                    jsLocalizedDialogs.confirmation, DialogButtons.YES_NO, DialogIcon.QUESTION) === DialogButton.YES) {
+                    const libraryId = row.querySelector('a').href.split('id=')[1];
+                    const url = '@_urlService.GetAbsoluteUrl("DeleteLibrary", "LibraryManagement", new { id = default(Guid) })';
+                    const success = await callApiDeleteAsync(url.replace('/@(default(Guid))', `/${libraryId}`));
+            
+                    if (success) {
+                        await loadLibrariesAsync(); // Reload the entire library list
+                        notificationService.show('@_localizer["LibraryDeleted"]', NotificationType.SUCCESS);
+                    }
+                }
+            }
+        };
+
+        // add listeners
+        document.addEventListener('click', handleDeleteLibraryClick);
+        document.addEventListener('DOMContentLoaded', InitializeAsync);
+
+        // register cleanup for these listeners
+        cleanupFunctions.push(() => {
+            document.removeEventListener('click', handleDeleteLibraryClick);
+            document.removeEventListener('DOMContentLoaded', InitializeAsync);
+        });
+
+        // store all cleanups for this view on window object using the scriptId
+        window.viewCleanups = window.viewCleanups || {};
+        window.viewCleanups['@scriptId'] = () => {
+            cleanupFunctions.forEach(cleanup => cleanup());
+            console.log(`Unloaded @scriptId`);
+        };
+
+        async function InitializeAsync() {
+            if (isInitialized)
+                return;
+            isInitialized = true;
+            await loadLibrariesAsync();
+        }
+
+        console.log(`Loaded @scriptId`);
+    </script>
+}

@@ -98,7 +98,7 @@ public class StreamInfo : ValueObject
     /// <param name="sampleRate">The sample rate of the stream (for audio).</param>
     /// <param name="channels">The number of channels (for audio).</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="StreamInfo"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly created <see cref="StreamInfo"/>, or an error message.
     /// </returns>
     public static ErrorOr<StreamInfo> Create(
         string streamId,

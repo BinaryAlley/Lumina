@@ -65,7 +65,7 @@ public class GetBooksEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         bookResponse.Should().NotBeNull();
     }
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithCancellationToken_ShouldCompleteSuccessfully()
+    public async Task ExecuteAsync_WhenCalledWithCancellationToken_ShouldCompletesuccessfuly()
     {
         // Arrange
         using CancellationTokenSource cts = new(TimeSpan.FromSeconds(5));

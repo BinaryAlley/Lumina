@@ -30,7 +30,7 @@ public static class BookEntityMapping
     /// </summary>
     /// <param name="repositoryEntity">The repository entity to be converted.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully converted <see cref="Book"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly converted <see cref="Book"/>, or an error message.
     /// </returns>
     public static ErrorOr<Book> ToDomainEntity(this BookEntity repositoryEntity)
     {
@@ -137,7 +137,7 @@ public static class BookEntityMapping
     /// <param name="repositoryEntities">The repository entities to be converted.</param>
     /// <returns>The converted domain entities.</returns>
     /// <returns>
-    /// An colection of <see cref="ErrorOr{TValue}"/> containing either successfully converted <see cref="Book"/>, or error messages.
+    /// An colection of <see cref="ErrorOr{TValue}"/> containing either successfuly converted <see cref="Book"/>, or error messages.
     /// </returns>
     public static IEnumerable<ErrorOr<Book>> ToDomainEntities(this IEnumerable<BookEntity> repositoryEntities)
     {

@@ -49,7 +49,7 @@ public class AddLibraryEndpointSummary : Summary<AddLibraryEndpoint, AddLibraryR
         ResponseParam<LibraryResponse>(r => r.UpdatedOnUtc, "The date and time when the entity was last updated.");
 
 
-        Response(201, "The media library was successfully created.", example:
+        Response(201, "The media library was successfuly created.", example:
             new LibraryResponse(
                 Id: Guid.NewGuid(),
                 UserId: Guid.NewGuid(),

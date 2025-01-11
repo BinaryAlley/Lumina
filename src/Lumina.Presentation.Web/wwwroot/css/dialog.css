@@ -104,7 +104,6 @@
 .dialog-message {
     overflow-wrap: break-word;
     word-break: break-word;
-    hyphens: auto;
     white-space: pre-wrap;
 }
 

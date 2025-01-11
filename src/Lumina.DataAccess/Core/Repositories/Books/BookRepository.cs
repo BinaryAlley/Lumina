@@ -35,7 +35,7 @@ internal sealed class BookRepository : IBookRepository
     /// </summary>
     /// <param name="book">The book to add.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successfull operation, or an error.</returns>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<ErrorOr<Created>> InsertAsync(BookEntity book, CancellationToken cancellationToken)
     {
         bool bookExists = await _luminaDbContext.Books.AnyAsync(repositoryBook => repositoryBook.Id == book.Id, cancellationToken: cancellationToken).ConfigureAwait(false);

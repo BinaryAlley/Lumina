@@ -9,6 +9,7 @@ using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggreg
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 #endregion
 
 namespace Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
@@ -86,7 +87,7 @@ public class Library : AggregateRoot<LibraryId>
     /// <param name="contentLocations">The list of file system paths that make up the media library.</param>
     /// <param name="coverImageSourcePath">The path of the image file chosen by the user to be used as the cover for the library.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="Library"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly created <see cref="Library"/>, or an error message.
     /// </returns>
     public static ErrorOr<Library> Create(
         Guid userId,
@@ -124,7 +125,7 @@ public class Library : AggregateRoot<LibraryId>
     /// <param name="contentLocations">The list of file system paths that make up the media library.</param>
     /// <param name="coverImageSourcePath">The path of the image file chosen by the user to be used as the cover for the library.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="Library"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly created <see cref="Library"/>, or an error message.
     /// </returns>
     public static ErrorOr<Library> Create(
         LibraryId id,
@@ -160,5 +161,21 @@ public class Library : AggregateRoot<LibraryId>
     public void SetInternalLibraryCoverImagePath(string path)
     {
         CoverImage = path;
+    }
+
+    /// <summary>
+    /// Marks the current library as deleted.
+    /// </summary>
+    public ErrorOr<Deleted> Delete()
+    {
+        // clear all existing events since they become irrelevant when the entity is deleted, and they dont need to be processed
+        _domainEvents.Clear();
+        
+        // only add the delete event if it hasn't been added already
+        if (!_domainEvents.Any(e => e is LibraryDeletedDomainEvent))
+            _domainEvents.Add(new LibraryDeletedDomainEvent(Guid.NewGuid(), this, DateTime.UtcNow));
+
+        // TODO: perhaps trigger events for removing contents related to the removed library (media metadata, etc)?
+        return Result.Deleted;
     }
 }

@@ -12,8 +12,11 @@ using System.Threading.Tasks;
 
 namespace Lumina.Presentation.Web.Controllers.Library.Management;
 
+/// <summary>
+/// Controller for media libraries related operations.
+/// </summary>
 [Authorize]
-[Route("{culture}/library/manage")]
+[Route("{culture}/libraries/manage")]
 public class LibraryManagementController : Controller
 {
     private readonly IApiHttpClient _apiHttpClient;
@@ -30,6 +33,7 @@ public class LibraryManagementController : Controller
     /// <summary>
     /// Displays the view for displaying the list of media libraries.
     /// </summary>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     [HttpGet("")]
     public IActionResult Index()
     {
@@ -42,8 +46,8 @@ public class LibraryManagementController : Controller
     [HttpGet("item")]
     public IActionResult AddLibrary()
     {
-        LibraryModel libraryModel = new();
-        return View("/Views/Library/Management/Item.cshtml", libraryModel);
+        LibraryModel library = new();
+        return View("/Views/Library/Management/Item.cshtml", library);
     }
 
     /// <summary>
@@ -54,8 +58,19 @@ public class LibraryManagementController : Controller
     [HttpGet("item/{id}")]
     public async Task<IActionResult> EditLibrary(Guid id, CancellationToken cancellationToken = default)
     {
-        LibraryModel libraryModel = await _apiHttpClient.GetAsync<LibraryModel>($"libraries/{id}", cancellationToken).ConfigureAwait(false);
-        return View("/Views/Library/Management/Item.cshtml", libraryModel);
+        LibraryModel response = await _apiHttpClient.GetAsync<LibraryModel>($"libraries/{id}", cancellationToken).ConfigureAwait(false);
+        return View("/Views/Library/Management/Item.cshtml", response);
+    }
+
+    /// <summary>
+    /// Gets the list of media libraries.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    [HttpGet("api-get-libraries")]
+    public async Task<IActionResult> GetLibraries(CancellationToken cancellationToken = default)
+    {
+        LibraryModel[] response = await _apiHttpClient.GetAsync<LibraryModel[]>($"libraries/", cancellationToken).ConfigureAwait(false);
+        return Json(new { success = true, data = response });
     }
 
     /// <summary>
@@ -65,7 +80,7 @@ public class LibraryManagementController : Controller
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     [ValidateAntiForgeryToken]
     [HttpPost("api-item")]
-    [RequirePermission(AuthorizationPermission.canCreateLibraries)]
+    [RequirePermission(AuthorizationPermission.CanCreateLibraries)]
     public async Task<IActionResult> SaveLibrary([FromBody] LibraryModel data, CancellationToken cancellationToken)
     {
         // call different API endpoints based on whether this is a new library or an existing one
@@ -73,5 +88,17 @@ public class LibraryManagementController : Controller
             ? await _apiHttpClient.PutAsync<LibraryModel, LibraryModel>($"libraries/{data.Id}", data, cancellationToken).ConfigureAwait(false)
             : await _apiHttpClient.PostAsync<LibraryModel, LibraryModel>("libraries", data, cancellationToken).ConfigureAwait(false);
         return Json(new { success = true, data = response });
+    }
+
+    /// <summary>
+    /// Deletes a media library.
+    /// </summary>
+    /// <param name="id">The id of the media library to delete.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    [HttpDelete("api-item/{id}")]
+    public async Task<IActionResult> DeleteLibrary(Guid id, CancellationToken cancellationToken = default)
+    {
+        await _apiHttpClient.DeleteAsync($"libraries/{id}", cancellationToken).ConfigureAwait(false);
+        return Json(new { success = true });
     }
 }

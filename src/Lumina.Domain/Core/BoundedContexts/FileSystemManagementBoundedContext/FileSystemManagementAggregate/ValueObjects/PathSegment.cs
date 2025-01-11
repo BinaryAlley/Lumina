@@ -49,7 +49,7 @@ public class PathSegment : ValueObject
     /// <param name="isDirectory">Value indicating if the current path segment is a file system directory or not.</param>
     /// <param name="isDrive">Value indicating if the current path segment is a file system drive or not.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="PathSegment"/> or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly created <see cref="PathSegment"/> or an error message.
     /// </returns>
     public static ErrorOr<PathSegment> Create(string name, bool isDirectory, bool isDrive)
     {

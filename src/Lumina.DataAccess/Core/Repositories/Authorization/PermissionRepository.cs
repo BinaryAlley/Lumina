@@ -35,7 +35,7 @@ internal sealed class PermissionRepository : IPermissionRepository
     /// </summary>
     /// <param name="permission">The authorization permission to add.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successfull operation, or an error.</returns>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<ErrorOr<Created>> InsertAsync(PermissionEntity permission, CancellationToken cancellationToken)
     {
         bool permissionExists = await _luminaDbContext.Permissions.AnyAsync(repositoryPermission => repositoryPermission.Id == permission.Id, cancellationToken).ConfigureAwait(false);

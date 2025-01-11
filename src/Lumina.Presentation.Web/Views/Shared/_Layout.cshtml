@@ -1,6 +1,9 @@
+@using Lumina.Presentation.Web.Common.Models.Configuration
 @using Microsoft.AspNetCore.Mvc.Localization
+@using Microsoft.Extensions.Options
 
 @inject IViewLocalizer _localizer
+@inject IOptions<ServerConfigurationModel> _serverConfigurationModel
 
 <!DOCTYPE html>
 <html lang="en">
@@ -50,6 +53,10 @@
     <div id="modal-background-menu"></div>
 
     <script>
+        var globalConfiguration = {
+            serverBasePath: '@(_serverConfigurationModel.Value.BaseAddress):@(_serverConfigurationModel.Value.Port)',
+            apiBasePath: '@(_serverConfigurationModel.Value.BaseAddress):@(_serverConfigurationModel.Value.Port)/api/v@(_serverConfigurationModel.Value.ApiVersion)',
+        };
         var jsLocalizedMessages = {
             navigationFailed: '@_localizer["NavigationFailed"]',
         };

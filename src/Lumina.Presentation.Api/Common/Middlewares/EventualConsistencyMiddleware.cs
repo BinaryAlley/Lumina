@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.Common.Middlewares;
 
 /// <summary>
-/// Middleware that ensures eventual consistency by handling domain events and publishing them after the request has completed successfully.
+/// Middleware that ensures eventual consistency by handling domain events and publishing them after the request has completed successfuly.
 /// </summary>
 public class EventualConsistencyMiddleware
 {
@@ -24,6 +24,7 @@ public class EventualConsistencyMiddleware
     /// Initializes a new instance of the <see cref="EventualConsistencyMiddleware"/> class.
     /// </summary>
     /// <param name="next">The next middleware in the HTTP request pipeline.</param>
+    /// <param name="logger">Injected service for logging.</param>
     public EventualConsistencyMiddleware(RequestDelegate next, ILogger<EventualConsistencyMiddleware> logger)
     {
         _next = next;

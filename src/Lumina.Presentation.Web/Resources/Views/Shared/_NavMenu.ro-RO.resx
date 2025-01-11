@@ -207,4 +207,7 @@
   <data name="ManageRoles" xml:space="preserve">
     <value>Gestionare roluri</value>
   </data>
+  <data name="Home" xml:space="preserve">
+    <value>Acasă</value>
+  </data>
 </root>

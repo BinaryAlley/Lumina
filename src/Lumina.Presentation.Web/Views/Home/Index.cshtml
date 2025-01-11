@@ -1,1 +1,75 @@
-@await Component.InvokeAsync("FileSystemBrowser")
+@*
+/
+*@
+
+@using Lumina.Presentation.Web.Common.Models.Libraries
+@using Lumina.Presentation.Web.Common.Services
+@using Microsoft.AspNetCore.Mvc.Localization
+
+@{
+    // generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler
+    var scriptId = ScriptIdentifierHelper.GenerateScriptId();
+}
+
+@inject IViewLocalizer _localizer
+@inject IUrlService _urlService
+
+<div class="cotton-candy">
+    <div style="display: grid; grid-template-rows: auto 1fr;">
+        <!--container with two rows, one fixed, one filling remaining space-->
+        <div style="min-height: 1rem;"></div><!--the first row is a dummy row for "margin", because setting a margin on the next row would offset the parent's position-->
+        <div id="libraries-container" class="cards-container justify-start pl-10 pr-10 w-100 h-100">
+            <p id="no-libraries" class="hidden">@_localizer["NoLibraries"]</p>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script type="text/javascript" data-form="@scriptId" defer>
+        // create cleanup registry for this view
+        const cleanupFunctions = [];
+
+        const librariesContainer = document.getElementById('libraries-container');
+        const noLibrariesMessage = document.getElementById('no-libraries');
+
+        const documentLoaded = async function () {
+            // get the media libraries 
+            // TODO: add setting check whether the user desires this feature or not
+            const data = await callApiGetAsync('@_urlService.GetAbsoluteUrl("GetLibraries", "LibraryManagement")');
+            if (data && data.length > 0) {
+                noLibrariesMessage.classList.replace('block', 'hidden');
+                librariesContainer.classList.replace('justify-center', 'justify-start');
+                // populate media library items
+                data.forEach((library) => {
+                    const libraryDiv = document.createElement('div');
+                    libraryDiv.className = 'media-panel';
+
+                    libraryDiv.innerHTML = `
+                        <img src="${globalConfiguration.serverBasePath}/media/libraries/${library.id}/${library.coverImage}" />
+                        <span class="text-light-two"><strong>${library.title}</strong></span>
+                    `;
+
+                    librariesContainer.appendChild(libraryDiv);
+                });
+            } else {
+                 noLibrariesMessage.classList.replace('hidden', 'block');
+                 librariesContainer.classList.replace('justify-start', 'justify-center');
+            }
+        };
+
+        // add listeners
+        document.addEventListener('DOMContentLoaded', documentLoaded);
+
+        // register cleanup for these listeners
+        cleanupFunctions.push(() => {
+            document.removeEventListener('click', documentLoaded);
+        });
+
+        // store all cleanups for this view on window object using the scriptId
+        window.viewCleanups = window.viewCleanups || {};
+        window.viewCleanups['@scriptId'] = () => {
+            cleanupFunctions.forEach(cleanup => cleanup());
+            console.log(`Unloaded @scriptId`);
+        };
+        console.log(`Loaded @scriptId`);
+    </script>
+}
