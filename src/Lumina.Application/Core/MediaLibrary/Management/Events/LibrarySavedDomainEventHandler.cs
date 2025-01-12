@@ -192,7 +192,11 @@ public class LibrarySavedDomainEventHandler : INotificationHandler<LibrarySavedD
         if (renameFileResult.IsError)
             return renameFileResult.Errors;
 
-        return $"cover.{imageCheckResult.Value.ToString().ToLower()}";
+        // get the internal relative path for the copied file
+        string relativePath = renameFileResult.Value.Path[AppContext.BaseDirectory.Length..];
+        if (!relativePath.StartsWith(_pathService.PathSeparator))
+            relativePath = $"{_pathService.PathSeparator}{relativePath}";
+        return relativePath;
     }
 
     /// <summary>
