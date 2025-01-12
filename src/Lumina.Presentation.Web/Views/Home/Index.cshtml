@@ -44,7 +44,7 @@
                     libraryDiv.className = 'media-panel';
 
                     libraryDiv.innerHTML = `
-                        <img src="${globalConfiguration.serverBasePath}/media/libraries/${library.id}/${library.coverImage}" />
+                        <img src="${globalConfiguration.serverBasePath}/media/libraries/${library.id}/${library.coverImage.substring(library.coverImage.lastIndexOf('cover.'))}" />
                         <span class="text-light-two"><strong>${library.title}</strong></span>
                     `;
 

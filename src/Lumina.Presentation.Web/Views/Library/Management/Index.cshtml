@@ -72,7 +72,7 @@
         
                 if (await dialogService.show('@_localizer["DeleteLibraryConfirm"]'.replace('{0}', libraryTitle), 
                     jsLocalizedDialogs.confirmation, DialogButtons.YES_NO, DialogIcon.QUESTION) === DialogButton.YES) {
-                    const libraryId = row.querySelector('a').href.split('id=')[1];
+                    const libraryId = row.querySelector('a').href.split('/').pop();
                     const url = '@_urlService.GetAbsoluteUrl("DeleteLibrary", "LibraryManagement", new { id = default(Guid) })';
                     const success = await callApiDeleteAsync(url.replace('/@(default(Guid))', `/${libraryId}`));
             
