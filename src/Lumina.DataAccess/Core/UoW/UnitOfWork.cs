@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Repositories.Common.Base;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.DataAccess.Core.Repositories.Common.Factory;
