@@ -2,6 +2,11 @@
 using FluentValidation;
 using Lumina.Application.Common.Behaviors;
 using Lumina.Application.Common.DomainEvents;
+using Lumina.Application.Core.MediaLibrary.Management.Services.Scanning;
+using Lumina.Application.Core.MediaLibrary.Management.Services.Scanning.Jobs.Common;
+using Lumina.Application.Core.MediaLibrary.Management.Services.Scanning.Jobs.WrittenContent.Books;
+using Lumina.Application.Core.MediaLibrary.Management.Services.Scanning.Scanners.Common;
+using Lumina.Application.Core.MediaLibrary.Management.Services.Scanning.Scanners.WrittenContent;
 using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics.CodeAnalysis;
@@ -35,6 +40,18 @@ public static class ApplicationLayerServices
         services.AddValidatorsFromAssembly(typeof(ApplicationLayerServices).Assembly);
 
         services.AddScoped<IDomainEventsQueue, DomainEventsQueue>();
+
+        services.AddScoped<IBookLibraryTypeScanner, BookLibraryTypeScanner>();
+        services.AddScoped<ILibraryScanningService, LibraryScanningService>();
+        services.AddSingleton<IMediaScanQueue, MediaScanQueue>();
+        services.AddScoped<ILibraryScannerFactory, LibraryScannerFactory>();
+        services.AddScoped<IMediaScanJobFactory, MediaScanJobFactory>();
+        services.AddHostedService<MediaScanJobProcessorJob>();
+
+        services.AddTransient<FileSystemDiscoveryJob>();
+        services.AddTransient<RepositoryMetadataDiscoveryJob>();
+        services.AddTransient<HashComparerJob>();
+        services.AddTransient<GoodReadsMetadataScrapJob>();
 
         return services;
     }
