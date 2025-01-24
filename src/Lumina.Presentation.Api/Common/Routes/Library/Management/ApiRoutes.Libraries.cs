@@ -15,5 +15,6 @@ public static partial class ApiRoutes
         public const string ADD_LIBRARY = "/libraries";
         public const string UPDATE_LIBRARY = "/libraries/{id}";
         public const string DELETE_LIBRARY = "/libraries/{id}";
+        public const string SCAN_LIBRARIES = "/libraries/scan";
     }
 }

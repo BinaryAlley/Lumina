@@ -46,7 +46,6 @@ public class GetLibrariesEndpointSummary : Summary<GetLibrariesEndpoint, EmptyRe
             )
         });
 
-
         Response(401, "Authentication required.", "application/problem+json",
             example: new[]
             {

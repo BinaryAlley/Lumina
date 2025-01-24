@@ -4,6 +4,7 @@ using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
+using System.Collections.Generic;
 using System.Linq;
 #endregion
 
@@ -48,5 +49,15 @@ public static class LibraryEntityMapping
             repositoryEntity.ContentLocations.Select(contentLocation => contentLocation.Path),
             repositoryEntity.CoverImage
         );
+    }
+
+    /// <summary>
+    /// Converts <paramref name="repositoryEntities"/> to a collection of <see cref="Library"/>.
+    /// </summary>
+    /// <param name="repositoryEntities">The repository entities to be converted.</param>
+    /// <returns>The converted responses.</returns>
+    public static IEnumerable<ErrorOr<Library>> ToDomainEntities(this IEnumerable<LibraryEntity> repositoryEntities)
+    {
+        return repositoryEntities.Select(library => library.ToDomainEntity());
     }
 }
