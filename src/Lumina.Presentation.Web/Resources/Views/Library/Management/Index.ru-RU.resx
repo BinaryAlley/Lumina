@@ -132,4 +132,7 @@
   <data name="NoLibraries" xml:space="preserve">
     <value>Нет библиотек</value>
   </data>
+  <data name="Remove" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
 </root>

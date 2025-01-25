@@ -142,6 +142,56 @@
                     </div>
                     <small class="form-label text-disabled form-description">@_localizer["DescriptionDirectories"]</small>
                 </div>
+
+                <h3 class="text-light-two">@_localizer["AdvancedSettings"]</h3>
+                <div class="form-row">
+                    <div class="form-label">
+                        <label asp-for="IsEnabled">@_localizer["Enabled"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <label class="enlightenment-checkbox-label">
+                            <input type="checkbox" asp-for="IsEnabled" class="enlightenment-checkbox-hidden" />
+                            <span class="enlightenment-checkbox"></span>
+                        </label>
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionEnabled"]</small>
+                </div>
+                <div class="form-row">
+                    <div class="form-label">
+                        <label asp-for="IsLocked">@_localizer["Locked"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <label class="enlightenment-checkbox-label">
+                            <input type="checkbox" asp-for="IsLocked" class="enlightenment-checkbox-hidden" />
+                            <span class="enlightenment-checkbox"></span>
+                        </label>
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionLocked"]</small>
+                </div>
+                <div class="form-row">
+                    <div class="form-label">
+                        <label asp-for="DownloadMedatadaFromWeb">@_localizer["DownloadMetadataFromWeb"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <label class="enlightenment-checkbox-label">
+                            <input type="checkbox" asp-for="DownloadMedatadaFromWeb" class="enlightenment-checkbox-hidden"/>
+                            <span class="enlightenment-checkbox"></span>
+                        </label>
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionDownloadMetadataFromWeb"]</small>
+                </div>
+                <div class="form-row">
+                    <div class="form-label">
+                        <label asp-for="SaveMetadataInMediaDirectories">@_localizer["SaveMetadataInMediaDirectories"]:</label>
+                    </div>
+                    <div class="form-field">
+                        <label class="enlightenment-checkbox-label">
+                            <input type="checkbox" asp-for="SaveMetadataInMediaDirectories" class="enlightenment-checkbox-hidden" />
+                            <span class="enlightenment-checkbox"></span>
+                        </label>
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionSaveMetadataInMediaDirectories"]</small>
+                </div>
                 <div class="form-row">
                     <button type="submit" class="confirm-button w-100px">@_localizer["Save"]</button>
                 </div>
@@ -168,6 +218,10 @@
         const imgAddCover = document.getElementById('add-media-cover');
         const mediaCoverFormTable = document.getElementById('add-media-cover-form-table');
         const mediaDirectoriesFormTable = document.getElementById('add-media-directory-form-table');
+        const chkIsEnabled = form.querySelector('[name="IsEnabled"]');
+        const chkIsLocked = form.querySelector('[name="IsLocked"]');
+        const chkDownloadMedatadaFromWeb = form.querySelector('[name="DownloadMedatadaFromWeb"]');
+        const chkSaveMetadataInMediaDirectories = form.querySelector('[name="SaveMetadataInMediaDirectories"]');
 
         // create new or update existing media library
         async function handleAddMediaLibraryAsync() {
@@ -182,7 +236,11 @@
                     // get the first (and only) span in the mediaCoverFormTable, if it exists
                     const coverSpan = mediaCoverFormTable.querySelector('.form-table-row span');
                     return coverSpan ? coverSpan.textContent : null; // return null if no cover image is selected
-                })()
+                })(),
+                IsEnabled: chkIsEnabled.checked,
+                IsLocked: chkIsLocked.checked,
+                DownloadMedatadaFromWeb: chkDownloadMedatadaFromWeb.checked,
+                SaveMetadataInMediaDirectories: chkSaveMetadataInMediaDirectories.checked
             };
             const data = await callApiPostAsync('@_urlService.GetAbsoluteUrl("SaveLibrary", "LibraryManagement")', formData);
             if (data) {

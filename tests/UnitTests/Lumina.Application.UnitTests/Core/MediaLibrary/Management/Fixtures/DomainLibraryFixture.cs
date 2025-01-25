@@ -48,7 +48,11 @@ public class DomainLibraryFixture
             _faker.Random.String2(_faker.Random.Number(1, 50)),
             _faker.PickRandom<LibraryType>(),
             validPaths.Take(_random.Next(1, validPaths.Count)),
-            _faker.System.FilePath()
+            _faker.System.FilePath(),
+            _faker.Random.Bool(),
+            _faker.Random.Bool(),
+            _faker.Random.Bool(),
+            _faker.Random.Bool()
         );
 
         return library.Value;
@@ -60,7 +64,11 @@ public class DomainLibraryFixture
         string? title = null,
         LibraryType? libraryType = null,
         IEnumerable<string>? contentLocations = null,
-        string? coverImage = null)
+        string? coverImage = null,
+        bool isEnabled = true,
+        bool isLocked = false,
+        bool downloadMedatadaFromWeb = true,
+        bool saveMetadataInMediaDirectories = false)
     {
         ErrorOr<Library> library = id is null ?
             Library.Create(
@@ -68,7 +76,11 @@ public class DomainLibraryFixture
                 title ?? _faker.Random.String2(_faker.Random.Number(1, 50)),
                 libraryType ?? LibraryType.Book,
                 contentLocations ?? ["C:/Media"],
-                coverImage
+                coverImage,
+                isEnabled, 
+                isLocked, 
+                downloadMedatadaFromWeb, 
+                saveMetadataInMediaDirectories
             ) :
             Library.Create(
                 LibraryId.Create(id.Value),
@@ -76,7 +88,11 @@ public class DomainLibraryFixture
                 title ?? _faker.Random.String2(_faker.Random.Number(1, 50)),
                 libraryType ?? LibraryType.Book,
                 contentLocations ?? ["C:/Media"],
-                coverImage
+                coverImage,
+                isEnabled,
+                isLocked,
+                downloadMedatadaFromWeb,
+                saveMetadataInMediaDirectories
             );
 
         return library.Value;

@@ -34,7 +34,7 @@
         const documentLoaded = async function () {
             // get the media libraries 
             // TODO: add setting check whether the user desires this feature or not
-            const data = await callApiGetAsync('@_urlService.GetAbsoluteUrl("GetLibraries", "LibraryManagement")');
+            const data = await callApiGetAsync('@_urlService.GetAbsoluteUrl("GetEnabledLibraries", "LibraryManagement")');
             if (data && data.length > 0) {
                 noLibrariesMessage.classList.replace('block', 'hidden');
                 librariesContainer.classList.replace('justify-center', 'justify-start');

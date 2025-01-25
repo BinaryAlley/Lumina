@@ -36,6 +36,10 @@ public class GetLibraryEndpointSummary : Summary<GetLibraryEndpoint, GetLibraryR
         ResponseParam<LibraryResponse>(r => r.LibraryType, "The type of the media library.");
         ResponseParam<LibraryResponse>(r => r.ContentLocations, "The file system paths of the directories where the media library elements are located.");
         ResponseParam<LibraryResponse>(r => r.CoverImage, "The path of the image file used as the cover for the library.");
+        ResponseParam<LibraryResponse>(r => r.IsEnabled, "Whether this media library is enabled or not. A disabled media library is never shown or changed.");
+        ResponseParam<LibraryResponse>(r => r.IsLocked, "Whether this media library is locked or not. A locked media library is displayed, but is never changed or updated.");
+        ResponseParam<LibraryResponse>(r => r.DownloadMedatadaFromWeb, "Whether this media library should update the metadata of its elements from the web, or not.");
+        ResponseParam<LibraryResponse>(r => r.SaveMetadataInMediaDirectories, "Whether this media library should copy the downloaded metadata into the media library content locations, or not.");
         ResponseParam<LibraryResponse>(r => r.CreatedOnUtc, "The date and time when the entity was created.");
         ResponseParam<LibraryResponse>(r => r.UpdatedOnUtc, "The date and time when the entity was last updated.");
 
@@ -46,6 +50,10 @@ public class GetLibraryEndpointSummary : Summary<GetLibraryEndpoint, GetLibraryR
             LibraryType: LibraryType.TvShow,
             ContentLocations: ["/media/tv shows/drama/", "/media/tv shows/SCI-FI/"],
             CoverImage: "/media/myPoster.jpg",
+            IsEnabled: true,
+            IsLocked: false,
+            DownloadMedatadaFromWeb: true,
+            SaveMetadataInMediaDirectories: false,
             CreatedOnUtc: DateTime.UtcNow,
             UpdatedOnUtc: default
         ));

@@ -68,6 +68,12 @@ public class AddLibraryCommandHandler : IRequestHandler<AddLibraryCommand, Error
     /// </returns>
     public async ValueTask<ErrorOr<LibraryResponse>> Handle(AddLibraryCommand request, CancellationToken cancellationToken)
     {
+
+        // if the user that made the request is not an Admin or they don't have the permission to manage media libraries, they do not have the right to create it
+        if (!await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false) &&
+            !await _authorizationService.HasPermissionAsync(_currentUserService.UserId!.Value, AuthorizationPermission.CanCreateLibraries, cancellationToken).ConfigureAwait(false))
+            return ApplicationErrors.Authorization.NotAuthorized;
+
         // make sure the file is an actual supported image
         if (request.CoverImage is not null)
         {
@@ -88,13 +94,12 @@ public class AddLibraryCommandHandler : IRequestHandler<AddLibraryCommand, Error
             request.Title!,
             Enum.Parse<LibraryType>(request.LibraryType!),
             request.ContentLocations!,
-            request.CoverImage
+            request.CoverImage,
+            request.IsEnabled,
+            request.IsLocked,
+            request.DownloadMedatadaFromWeb,
+            request.SaveMetadataInMediaDirectories
         );
-
-        // if the user that made the request is not an Admin or they don't have the permission to manage media libraries, they do not have the right to create it
-        if (!await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false) &&
-            !await _authorizationService.HasPermissionAsync(_currentUserService.UserId!.Value, AuthorizationPermission.CanCreateLibraries, cancellationToken).ConfigureAwait(false))
-            return ApplicationErrors.Authorization.NotAuthorized;
 
         if (createLibraryResult.IsError)
             return createLibraryResult.Errors;

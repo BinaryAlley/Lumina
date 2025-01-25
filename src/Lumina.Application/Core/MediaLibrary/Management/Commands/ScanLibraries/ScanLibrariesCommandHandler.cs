@@ -58,9 +58,9 @@ public class ScanLibrariesCommandHandler : IRequestHandler<ScanLibrariesCommand,
         if (!await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false))
             return Errors.Authorization.NotAuthorized;
 
-        // get all media libraries from the persistence medium
+        // get all media libraries that are enabled and unlocked from the persistence medium
         ILibraryRepository libraryRepository = _unitOfWork.GetRepository<ILibraryRepository>();
-        ErrorOr<IEnumerable<LibraryEntity>> getLibrariesResult = await libraryRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+        ErrorOr<IEnumerable<LibraryEntity>> getLibrariesResult = await libraryRepository.GetAllEnabledAndUnlockedAsync(cancellationToken).ConfigureAwait(false);
         if (getLibrariesResult.IsError)
             return getLibrariesResult.Errors;
 

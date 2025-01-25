@@ -30,7 +30,11 @@ public class LibraryMappingTests
             "Test Library",
             LibraryType.Book,
             ["C:/Books", "D:/Media/Books"],
-            "D:/myPoster.jpg"
+            "D:/myPoster.jpg",
+            true,
+            false,
+            true,
+            false
         );
         Library library = libraryResult.Value;
 
@@ -48,6 +52,10 @@ public class LibraryMappingTests
         result.CoverImage.Should().BeEquivalentTo(library.CoverImage);
         result.CreatedOnUtc.Should().Be(library.CreatedOnUtc);
         result.UpdatedOnUtc.Should().Be(library.UpdatedOnUtc.HasValue ? library.UpdatedOnUtc : null);
+        result.IsEnabled.Should().BeTrue();
+        result.IsLocked.Should().BeFalse();
+        result.DownloadMedatadaFromWeb.Should().BeTrue();
+        result.SaveMetadataInMediaDirectories.Should().BeFalse();
     }
 
     [Fact]
@@ -59,7 +67,11 @@ public class LibraryMappingTests
             "Empty Library",
             LibraryType.Book,
             [],
-            "D:/myPoster.jpg"
+            "D:/myPoster.jpg",
+            true,
+            false,
+            true,
+            false
         );
         Library library = libraryResult.Value;
 
@@ -85,7 +97,11 @@ public class LibraryMappingTests
             "Test Library",
             libraryType,
             ["C:/Media"],
-            "D:/myPoster.jpg"
+            "D:/myPoster.jpg",
+            true,
+            false,
+            true,
+            false
         );
         Library library = libraryResult.Value;
 
@@ -96,6 +112,10 @@ public class LibraryMappingTests
         result.Should().NotBeNull();
         result.LibraryType.Should().Be(libraryType);
         result.CoverImage.Should().BeEquivalentTo(library.CoverImage);
+        result.IsEnabled.Should().BeTrue();
+        result.IsLocked.Should().BeFalse();
+        result.DownloadMedatadaFromWeb.Should().BeTrue();
+        result.SaveMetadataInMediaDirectories.Should().BeFalse();
     }
 
     [Fact]
@@ -115,7 +135,11 @@ public class LibraryMappingTests
             "Test Library",
             LibraryType.Book,
             contentLocations,
-            "D:/myPoster.jpg"
+            "D:/myPoster.jpg",
+            true,
+            false,
+            true,
+            false
         );
         Library library = libraryResult.Value;
 
@@ -144,7 +168,11 @@ public class LibraryMappingTests
             "Test Library",
             LibraryType.Book,
             contentLocations,
-            null
+            null,
+            true,
+            false,
+            true,
+            false
         );
         Library library = libraryResult.Value;
 

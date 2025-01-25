@@ -42,4 +42,24 @@ public class LibraryModel
     /// Gets or sets the collection of directories that contain the library files.
     /// </summary>
     public List<string> ContentLocations { get; set; } = [];
+
+    /// <summary>
+    /// Gets or sets whether this media library is enabled or not. A disabled media library is never shown or changed.
+    /// </summary>
+    public bool IsEnabled { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets whether this media library is locked or not. A locked media library is displayed, but is never changed or updated.
+    /// </summary>
+    public bool IsLocked { get; set; } = false;
+
+    /// <summary>
+    /// Gets or sets whether this media library should update the metadata of its elements from the web, or not.
+    /// </summary>
+    public bool DownloadMedatadaFromWeb { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets whether this media library should copy the downloaded metadata into the media library content locations, or not.
+    /// </summary>
+    public bool SaveMetadataInMediaDirectories { get; set; } = false;
 }

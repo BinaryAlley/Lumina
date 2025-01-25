@@ -132,4 +132,7 @@
   <data name="NoLibraries" xml:space="preserve">
     <value>ライブラリがありません</value>
   </data>
+  <data name="Remove" xml:space="preserve">
+    <value>削除</value>
+  </data>
 </root>

@@ -24,7 +24,11 @@ public static class UpdateLibraryRequestMapping
             request.Title,
             request.LibraryType,
             request.ContentLocations,
-            request.CoverImage
+            request.CoverImage,
+            request.IsEnabled,
+            request.IsLocked,
+            request.DownloadMedatadaFromWeb,
+            request.SaveMetadataInMediaDirectories
         );
     }
 }

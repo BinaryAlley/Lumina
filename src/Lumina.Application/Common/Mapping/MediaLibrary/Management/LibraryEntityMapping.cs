@@ -29,6 +29,10 @@ public static class LibraryEntityMapping
             repositoryEntity.LibraryType,
             repositoryEntity.ContentLocations.Select(location => location.Path).ToList(),
             repositoryEntity.CoverImage,
+            repositoryEntity.IsEnabled,
+            repositoryEntity.IsLocked,
+            repositoryEntity.DownloadMedatadaFromWeb,
+            repositoryEntity.SaveMetadataInMediaDirectories,
             repositoryEntity.CreatedOnUtc,
             repositoryEntity.UpdatedOnUtc
         );
@@ -47,7 +51,11 @@ public static class LibraryEntityMapping
             repositoryEntity.Title,
             repositoryEntity.LibraryType,
             repositoryEntity.ContentLocations.Select(contentLocation => contentLocation.Path),
-            repositoryEntity.CoverImage
+            repositoryEntity.CoverImage,
+            repositoryEntity.IsEnabled,
+            repositoryEntity.IsLocked,
+            repositoryEntity.DownloadMedatadaFromWeb,
+            repositoryEntity.SaveMetadataInMediaDirectories
         );
     }
 

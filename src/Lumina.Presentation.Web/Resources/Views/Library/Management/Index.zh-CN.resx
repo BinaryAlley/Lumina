@@ -132,4 +132,7 @@
   <data name="NoLibraries" xml:space="preserve">
     <value>无库</value>
   </data>
+  <data name="Remove" xml:space="preserve">
+    <value>删除</value>
+  </data>
 </root>

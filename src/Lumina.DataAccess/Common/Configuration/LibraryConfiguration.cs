@@ -39,6 +39,20 @@ public class LibraryConfiguration : IEntityTypeConfiguration<LibraryEntity>
             .HasDefaultValue(null)
             .HasColumnOrder(3);
 
+        builder.Property(library => library.IsEnabled)
+            .HasDefaultValue(true)
+            .HasColumnOrder(4);
+
+        builder.Property(library => library.IsLocked)
+            .HasColumnOrder(5);
+
+        builder.Property(library => library.DownloadMedatadaFromWeb)
+            .HasDefaultValue(true)
+            .HasColumnOrder(6);
+
+        builder.Property(library => library.SaveMetadataInMediaDirectories)
+            .HasColumnOrder(7);
+
         // one user with many libraries
         builder.HasOne(library => library.User)
             .WithMany(user => user.Libraries)

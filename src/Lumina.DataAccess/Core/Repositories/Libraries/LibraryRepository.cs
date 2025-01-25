@@ -7,6 +7,7 @@ using Lumina.Domain.Common.Errors;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -56,6 +57,32 @@ internal sealed class LibraryRepository : ILibraryRepository
         return await _luminaDbContext.Libraries
             .Include(library => library.ContentLocations)
             .FirstOrDefaultAsync(library => library.Id == id, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Gets all media libraries that are marked as enabled, from the storage medium.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of <see cref="LibraryEntity"/>, or an error.</returns>
+    public async Task<ErrorOr<IEnumerable<LibraryEntity>>> GetAllEnabledAsync(CancellationToken cancellationToken)
+    {
+        return await _luminaDbContext.Libraries
+            .Include(library => library.ContentLocations)
+            .Where(library => library.IsEnabled)
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Gets all media libraries that are marked as enabled and unlocked, from the storage medium.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of <see cref="LibraryEntity"/>, or an error.</returns>
+    public async Task<ErrorOr<IEnumerable<LibraryEntity>>> GetAllEnabledAndUnlockedAsync(CancellationToken cancellationToken)
+    {
+        return await _luminaDbContext.Libraries
+            .Include(library => library.ContentLocations)
+            .Where(library => library.IsEnabled && !library.IsLocked)
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
