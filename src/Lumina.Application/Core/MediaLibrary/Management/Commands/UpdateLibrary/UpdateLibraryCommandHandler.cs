@@ -103,7 +103,11 @@ public class UpdateLibraryCommandHandler : IRequestHandler<UpdateLibraryCommand,
             request.Title!,
             Enum.Parse<LibraryType>(request.LibraryType!),
             request.ContentLocations!,
-            request.CoverImage
+            request.CoverImage,
+            request.IsEnabled,
+            request.IsLocked,
+            request.DownloadMedatadaFromWeb,
+            request.SaveMetadataInMediaDirectories
         );
         if (createLibraryResult.IsError)
             return createLibraryResult.Errors;

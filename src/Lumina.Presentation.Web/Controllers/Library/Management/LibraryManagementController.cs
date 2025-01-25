@@ -74,6 +74,17 @@ public class LibraryManagementController : Controller
     }
 
     /// <summary>
+    /// Gets the list of enabled media libraries.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    [HttpGet("api-get-enabled-libraries")]
+    public async Task<IActionResult> GetEnabledLibraries(CancellationToken cancellationToken = default)
+    {
+        LibraryModel[] response = await _apiHttpClient.GetAsync<LibraryModel[]>($"libraries/enabled/", cancellationToken).ConfigureAwait(false);
+        return Json(new { success = true, data = response });
+    }
+
+    /// <summary>
     /// Adds a new media library, or updates an existing one.
     /// </summary>
     /// <param name="data">The model containing the new library data.</param>

@@ -6,23 +6,23 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Library.Management.GetLibraries;
+namespace Lumina.Presentation.Api.Core.Endpoints.Library.Management.GetEnabledLibraries;
 
 /// <summary>
-/// Class used for providing a textual description for the <see cref="GetLibrariesEndpoint"/> API endpoint, for OpenAPI.
+/// Class used for providing a textual description for the <see cref="GetEnabledLibrariesEndpoint"/> API endpoint, for OpenAPI.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetLibrariesEndpointSummary : Summary<GetLibrariesEndpoint, EmptyRequest>
+public class GetEnabledLibrariesEndpointSummary : Summary<GetEnabledLibrariesEndpoint, EmptyRequest>
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="GetLibrariesEndpointSummary"/> class.
+    /// Initializes a new instance of the <see cref="GetEnabledLibrariesEndpointSummary"/> class.
     /// </summary>
-    public GetLibrariesEndpointSummary()
+    public GetEnabledLibrariesEndpointSummary()
     {
-        Summary = "Retrieves the list of media libraries.";
-        Description = "Retrieves the entire list of media libraries, if the user making the request is an Admin, or just the library owned by them, for regular users.";
+        Summary = "Retrieves the list of enabled media libraries.";
+        Description = "Retrieves the entire list of media libraries that are marked as enabled, if the user making the request is an Admin, or just the library owned by them, for regular users.";
 
-        Response(200, "The media libraries are returned.", 
+        Response(200, "The media libraries are returned.",
             example: new LibraryResponse[] {
             new (
                 Id: Guid.NewGuid(),
@@ -63,7 +63,7 @@ public class GetLibrariesEndpointSummary : Summary<GetLibrariesEndpoint, EmptyRe
                     status = 401,
                     title = "Unauthorized",
                     detail = "You are not authorized",
-                    instance = "/api/v1/libraries"
+                    instance = "/api/v1/libraries/enabled"
                 },
                 new
                 {
@@ -71,7 +71,7 @@ public class GetLibrariesEndpointSummary : Summary<GetLibrariesEndpoint, EmptyRe
                     status = 401,
                     title = "Unauthorized",
                     detail = "Invalid token: The token expired at '01/01/2024 01:00:00'",
-                    instance = "/api/v1/libraries"
+                    instance = "/api/v1/libraries/enabled"
                 },
                 new
                 {
@@ -79,7 +79,7 @@ public class GetLibrariesEndpointSummary : Summary<GetLibrariesEndpoint, EmptyRe
                     status = 401,
                     title = "Unauthorized",
                     detail = "The token is invalid",
-                    instance = "/api/v1/libraries"
+                    instance = "/api/v1/libraries/enabled"
                 }
             }
         );

@@ -48,6 +48,26 @@ public class Library : AggregateRoot<LibraryId>
     public string? CoverImageSourcePath { get; private set; }
 
     /// <summary>
+    /// Gets whether this media library is enabled or not. A disabled media library is never shown or changed.
+    /// </summary>
+    public bool IsEnabled { get; private set; } = true;
+
+    /// <summary>
+    /// Gets whether this media library is locked or not. A locked media library is displayed, but is never changed or updated.
+    /// </summary>
+    public bool IsLocked { get; private set; }
+
+    /// <summary>
+    /// Gets whether this media library should update the metadata of its elements from the web, or not.
+    /// </summary>
+    public bool DownloadMedatadaFromWeb { get; private set; } = true;
+
+    /// <summary>
+    /// Gets whether this media library should copy the downloaded metadata into the media library content locations, or not.
+    /// </summary>
+    public bool SaveMetadataInMediaDirectories { get; private set; }
+
+    /// <summary>
     /// Gets the list of file system paths that make up the media library.
     /// </summary>
     public IReadOnlyCollection<FileSystemPathId> ContentLocations => _contentLocations.AsReadOnly();
@@ -61,20 +81,31 @@ public class Library : AggregateRoot<LibraryId>
     /// <param name="libraryType">The type of the media library (e.g., Book, TvShow).</param>
     /// <param name="contentLocations">The list of file system paths that make up the media library.</param>
     /// <param name="coverImage">The path of the image file used as the cover for the library.</param>
+    /// <param name="isEnabled">Whether this media library is enabled or not. A disabled media library is never shown or changed.</param>
+    /// <param name="isLocked">Whether this media library is locked or not. A locked media library is displayed, but is never changed or updated.</param>
+    /// <param name="downloadMedatadaFromWeb">Whether this media library should update the metadata of its elements from the web, or not.</param>
+    /// <param name="saveMetadataInMediaDirectories">Whether this media library should copy the downloaded metadata into the media library content locations, or not.</param>
     private Library(
         LibraryId id,
         UserId userId,
         string title,
         LibraryType libraryType,
         List<FileSystemPathId> contentLocations,
-        string? coverImage) : base(id)
+        string? coverImage,
+        bool isEnabled,
+        bool isLocked,
+        bool downloadMedatadaFromWeb,
+        bool saveMetadataInMediaDirectories) : base(id)
     {
         UserId = userId;
         Title = title;
         LibraryType = libraryType;
         _contentLocations = contentLocations;
         CoverImage = coverImage;
-
+        IsEnabled = isEnabled;
+        IsLocked = isLocked;
+        DownloadMedatadaFromWeb = downloadMedatadaFromWeb;
+        SaveMetadataInMediaDirectories = saveMetadataInMediaDirectories;
         _domainEvents.Add(new LibrarySavedDomainEvent(Guid.NewGuid(), this, DateTime.UtcNow));
     }
 
@@ -86,6 +117,10 @@ public class Library : AggregateRoot<LibraryId>
     /// <param name="libraryType">The type of the media library (e.g., Book, TvShow).</param>
     /// <param name="contentLocations">The list of file system paths that make up the media library.</param>
     /// <param name="coverImageSourcePath">The path of the image file chosen by the user to be used as the cover for the library.</param>
+    /// <param name="isEnabled">Whether this media library is enabled or not. A disabled media library is never shown or changed.</param>
+    /// <param name="isLocked">Whether this media library is locked or not. A locked media library is displayed, but is never changed or updated.</param>
+    /// <param name="downloadMedatadaFromWeb">Whether this media library should update the metadata of its elements from the web, or not.</param>
+    /// <param name="saveMetadataInMediaDirectories">Whether this media library should copy the downloaded metadata into the media library content locations, or not.</param>
     /// <returns>
     /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly created <see cref="Library"/>, or an error message.
     /// </returns>
@@ -94,7 +129,11 @@ public class Library : AggregateRoot<LibraryId>
         string title,
         LibraryType libraryType,
         IEnumerable<string> contentLocations,
-        string? coverImageSourcePath)
+        string? coverImageSourcePath,
+        bool isEnabled,
+        bool isLocked,
+        bool downloadMedatadaFromWeb,
+        bool saveMetadataInMediaDirectories)
     {
         List<FileSystemPathId> tempContentLocations = [];
         // go through all the file system paths that make up the media library and create domain objects from them
@@ -111,7 +150,11 @@ public class Library : AggregateRoot<LibraryId>
             title,
             libraryType,
             tempContentLocations,
-            coverImageSourcePath
+            coverImageSourcePath,
+            isEnabled,
+            isLocked,
+            downloadMedatadaFromWeb,
+            saveMetadataInMediaDirectories
         );
     }
 
@@ -124,6 +167,10 @@ public class Library : AggregateRoot<LibraryId>
     /// <param name="libraryType">The type of the media library (e.g., Book, TvShow).</param>
     /// <param name="contentLocations">The list of file system paths that make up the media library.</param>
     /// <param name="coverImageSourcePath">The path of the image file chosen by the user to be used as the cover for the library.</param>
+    /// <param name="isEnabled">Whether this media library is enabled or not. A disabled media library is never shown or changed.</param>
+    /// <param name="isLocked">Whether this media library is locked or not. A locked media library is displayed, but is never changed or updated.</param>
+    /// <param name="downloadMedatadaFromWeb">Whether this media library should update the metadata of its elements from the web, or not.</param>
+    /// <param name="saveMetadataInMediaDirectories">Whether this media library should copy the downloaded metadata into the media library content locations, or not.</param>
     /// <returns>
     /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly created <see cref="Library"/>, or an error message.
     /// </returns>
@@ -133,7 +180,11 @@ public class Library : AggregateRoot<LibraryId>
         string title,
         LibraryType libraryType,
         IEnumerable<string> contentLocations,
-        string? coverImageSourcePath)
+        string? coverImageSourcePath,
+        bool isEnabled,
+        bool isLocked,
+        bool downloadMedatadaFromWeb,
+        bool saveMetadataInMediaDirectories)
     {
         List<FileSystemPathId> tempContentLocations = [];
         // go through all the file system paths that make up the media library and create domain objects from them
@@ -150,7 +201,11 @@ public class Library : AggregateRoot<LibraryId>
             title,
             libraryType,
             tempContentLocations,
-            coverImageSourcePath
+            coverImageSourcePath,
+            isEnabled,
+            isLocked,
+            downloadMedatadaFromWeb,
+            saveMetadataInMediaDirectories
         );
     }
 

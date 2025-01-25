@@ -132,4 +132,7 @@
   <data name="NoLibraries" xml:space="preserve">
     <value>Nicio bibliotecă</value>
   </data>
+  <data name="Remove" xml:space="preserve">
+    <value>Șterge</value>
+  </data>
 </root>

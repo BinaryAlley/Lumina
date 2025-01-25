@@ -42,9 +42,12 @@ internal class BookLibraryTypeScanner : IBookLibraryTypeScanner
 
         hashComparerJob.AddParent(fileSystemDiscoveryJob);
         hashComparerJob.AddParent(repositoryMetadataDiscoveryJob);
-        hashComparerJob.AddChild(goodReadsMetadataScrapJob);
 
-        goodReadsMetadataScrapJob.AddParent(hashComparerJob);
+        if (library.DownloadMedatadaFromWeb)
+        {
+            hashComparerJob.AddChild(goodReadsMetadataScrapJob);
+            goodReadsMetadataScrapJob.AddParent(hashComparerJob);
+        }
 
         // return the top level jobs that will be triggered when the scan will be started
         yield return fileSystemDiscoveryJob;

@@ -31,13 +31,21 @@ public class AddLibraryEndpointSummary : Summary<AddLibraryEndpoint, AddLibraryR
                 "/media/tv shows/drama/",
                 "/media/tv shows/SCI-FI/",
             ],
-            CoverImage: "/media/posters/myPoster.jpg"
+            CoverImage: "/media/posters/myPoster.jpg",
+            IsEnabled: true,
+            IsLocked: false,
+            DownloadMedatadaFromWeb: true,
+            SaveMetadataInMediaDirectories: false
         );
 
         RequestParam(r => r.Title, "The title of the media library. Required.");
         RequestParam(r => r.LibraryType, "The type of the media library. Required.");
         RequestParam(r => r.ContentLocations, "The file system paths of the directories where the media library elements are located. Required.");
         RequestParam(r => r.CoverImage, "The path of the image file used as the cover for the library. Optional.");
+        RequestParam(r => r.IsEnabled, "Whether this media library is enabled or not. A disabled media library is never shown or changed. Optional.");
+        RequestParam(r => r.IsLocked, "Whether this media library is locked or not. A locked media library is displayed, but is never changed or updated. Optional.");
+        RequestParam(r => r.DownloadMedatadaFromWeb, "Whether this media library should update the metadata of its elements from the web, or not. Optional.");
+        RequestParam(r => r.SaveMetadataInMediaDirectories, "Whether this media library should copy the downloaded metadata into the media library content locations, or not. Optional.");
 
         ResponseParam<LibraryResponse>(r => r.Id, "The unique identifier of the entity.");
         ResponseParam<LibraryResponse>(r => r.UserId, "The Id of the user owning the media library.");
@@ -45,9 +53,12 @@ public class AddLibraryEndpointSummary : Summary<AddLibraryEndpoint, AddLibraryR
         ResponseParam<LibraryResponse>(r => r.LibraryType, "The type of the media library.");
         ResponseParam<LibraryResponse>(r => r.ContentLocations, "The file system paths of the directories where the media library elements are located.");
         ResponseParam<LibraryResponse>(r => r.CoverImage, "The path of the image file used as the cover for the library.");
+        ResponseParam<LibraryResponse>(r => r.IsEnabled, "Whether this media library is enabled or not. A disabled media library is never shown or changed.");
+        ResponseParam<LibraryResponse>(r => r.IsLocked, "Whether this media library is locked or not. A locked media library is displayed, but is never changed or updated.");
+        ResponseParam<LibraryResponse>(r => r.DownloadMedatadaFromWeb, "Whether this media library should update the metadata of its elements from the web, or not.");
+        ResponseParam<LibraryResponse>(r => r.SaveMetadataInMediaDirectories, "Whether this media library should copy the downloaded metadata into the media library content locations, or not.");
         ResponseParam<LibraryResponse>(r => r.CreatedOnUtc, "The date and time when the entity was created.");
         ResponseParam<LibraryResponse>(r => r.UpdatedOnUtc, "The date and time when the entity was last updated.");
-
 
         Response(201, "The media library was successfuly created.", example:
             new LibraryResponse(
@@ -57,10 +68,13 @@ public class AddLibraryEndpointSummary : Summary<AddLibraryEndpoint, AddLibraryR
                 LibraryType: LibraryType.TvShow,
                 ContentLocations: ["/media/tv shows/drama/", "/media/tv shows/SCI-FI/"],
                 CoverImage: "/media/myPoster.jpg",
+                IsEnabled: true,
+                IsLocked: false,
+                DownloadMedatadaFromWeb: true,
+                SaveMetadataInMediaDirectories: false,
                 CreatedOnUtc: DateTime.UtcNow,
                 UpdatedOnUtc: default
             ));
-
 
         Response(401, "Authentication required.", "application/problem+json",
             example: new[]

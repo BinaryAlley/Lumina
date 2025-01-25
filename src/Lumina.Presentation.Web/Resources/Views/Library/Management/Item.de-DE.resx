@@ -129,6 +129,9 @@
   <data name="AddNewLibrary" xml:space="preserve">
     <value>Neue Bibliothek Hinzufügen</value>
   </data>
+  <data name="AdvancedSettings" xml:space="preserve">
+    <value>Erweiterte Einstellungen</value>
+  </data>
   <data name="Anime" xml:space="preserve">
     <value>Anime</value>
   </data>
@@ -168,8 +171,20 @@
   <data name="DescriptionDirectories" xml:space="preserve">
     <value>Wählen Sie die Ordner mit den Mediendateien dieser Bibliothek aus</value>
   </data>
+  <data name="DescriptionDownloadMetadataFromWeb" xml:space="preserve">
+    <value>Ob diese Medienbibliothek die Metadaten ihrer Elemente aus dem Internet herunterladen soll oder nicht.</value>
+  </data>
+  <data name="DescriptionEnabled" xml:space="preserve">
+    <value>Ob diese Medienbibliothek deaktiviert ist oder nicht. Eine deaktivierte Bibliothek wird den Benutzern nicht angezeigt, nicht gescannt, nicht aktualisiert, usw.</value>
+  </data>
   <data name="DescriptionLibraryType" xml:space="preserve">
     <value>Wählen Sie die Art der Medieninhalte aus, die diese Bibliothek enthalten soll</value>
+  </data>
+  <data name="DescriptionLocked" xml:space="preserve">
+    <value>Ob diese Medienbibliothek gesperrt ist oder nicht. Eine gesperrte Bibliothek wird den Benutzern angezeigt, wird aber nie gescannt, aktualisiert, verändert, usw.</value>
+  </data>
+  <data name="DescriptionSaveMetadataInMediaDirectories" xml:space="preserve">
+    <value>Ob eine Kopie der heruntergeladenen Metadaten in den Verzeichnissen der Medienbibliothek gespeichert werden soll oder nicht. Dies hat nur eine Auswirkung, wenn das Herunterladen von Metadaten aus dem Web aktiv ist.</value>
   </data>
   <data name="DescriptionTitle" xml:space="preserve">
     <value>Eine Bezeichnung für diese Bibliothek</value>
@@ -180,11 +195,17 @@
   <data name="Documentary" xml:space="preserve">
     <value>Dokumentarfilm</value>
   </data>
+  <data name="DownloadMetadataFromWeb" xml:space="preserve">
+    <value>Metadaten Aus Dem Web Herunterladen</value>
+  </data>
   <data name="EBook" xml:space="preserve">
     <value>E-Buch</value>
   </data>
   <data name="EditLibrary" xml:space="preserve">
     <value>Bibliothek Bearbeiten</value>
+  </data>
+  <data name="Enabled" xml:space="preserve">
+    <value>Aktiviert</value>
   </data>
   <data name="FilmFranchise" xml:space="preserve">
     <value>Filmfranchise</value>
@@ -209,6 +230,9 @@
   </data>
   <data name="LivePerformance" xml:space="preserve">
     <value>Live-Auftritt</value>
+  </data>
+  <data name="Locked" xml:space="preserve">
+    <value>Gesperrt</value>
   </data>
   <data name="Magazine" xml:space="preserve">
     <value>Zeitschrift</value>
@@ -248,6 +272,9 @@
   </data>
   <data name="Save" xml:space="preserve">
     <value>Speichern</value>
+  </data>
+  <data name="SaveMetadataInMediaDirectories" xml:space="preserve">
+    <value>Metadaten In Medienverzeichnissen Speichern</value>
   </data>
   <data name="Screenplay" xml:space="preserve">
     <value>Drehbuch</value>

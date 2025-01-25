@@ -46,6 +46,26 @@ public class LibraryEntity : IStorageEntity, IAuditableEntity
     public required ICollection<LibraryContentLocationEntity> ContentLocations { get; init; } = [];
 
     /// <summary>
+    /// Gets whether this media library is enabled or not. A disabled media library is never shown or changed.
+    /// </summary>
+    public bool IsEnabled { get; init; } 
+
+    /// <summary>
+    /// Gets whether this media library is locked or not. A locked media library is displayed, but is never changed or updated.
+    /// </summary>
+    public bool IsLocked { get; init; }
+
+    /// <summary>
+    /// Gets whether this media library should update the metadata of its elements from the web, or not.
+    /// </summary>
+    public bool DownloadMedatadaFromWeb { get; init; }
+
+    /// <summary>
+    /// Gets whether this media library should copy the downloaded metadata into the media library content locations, or not.
+    /// </summary>
+    public bool SaveMetadataInMediaDirectories { get; init; }
+
+    /// <summary>
     /// Gets the user that owns the media library.
     /// </summary>
     public UserEntity User { get; init; } = null!;

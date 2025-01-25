@@ -97,6 +97,15 @@ namespace Lumina.Presentation.Web.Resources.Views.Library.Management {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Advanced Settings.
+        /// </summary>
+        public static string AdvancedSettings {
+            get {
+                return ResourceManager.GetString("AdvancedSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Anime.
         /// </summary>
         public static string Anime {
@@ -214,11 +223,47 @@ namespace Lumina.Presentation.Web.Resources.Views.Library.Management {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Whether this media library should get the metadata of it elements by downloading it from the Internet, or not..
+        /// </summary>
+        public static string DescriptionDownloadMetadataFromWeb {
+            get {
+                return ResourceManager.GetString("DescriptionDownloadMetadataFromWeb", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Whether this media library is disabled or not. A disabled library is not displayed to the users, scanned, updated, etc..
+        /// </summary>
+        public static string DescriptionEnabled {
+            get {
+                return ResourceManager.GetString("DescriptionEnabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select the type of media content this library will contain.
         /// </summary>
         public static string DescriptionLibraryType {
             get {
                 return ResourceManager.GetString("DescriptionLibraryType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Whether this media library is locked or not. A locked library is displayed to the users, but it is never scanned, updated, modified, etc..
+        /// </summary>
+        public static string DescriptionLocked {
+            get {
+                return ResourceManager.GetString("DescriptionLocked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Whether to save a copy of the downloaded metadata in the media library content locations directories, or not. This only has an effect if downloading metadata from the web is active..
+        /// </summary>
+        public static string DescriptionSaveMetadataInMediaDirectories {
+            get {
+                return ResourceManager.GetString("DescriptionSaveMetadataInMediaDirectories", resourceCulture);
             }
         }
         
@@ -250,6 +295,15 @@ namespace Lumina.Presentation.Web.Resources.Views.Library.Management {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Download Metadata From The Web.
+        /// </summary>
+        public static string DownloadMetadataFromWeb {
+            get {
+                return ResourceManager.GetString("DownloadMetadataFromWeb", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to E Book.
         /// </summary>
         public static string EBook {
@@ -264,6 +318,15 @@ namespace Lumina.Presentation.Web.Resources.Views.Library.Management {
         public static string EditLibrary {
             get {
                 return ResourceManager.GetString("EditLibrary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enabled.
+        /// </summary>
+        public static string Enabled {
+            get {
+                return ResourceManager.GetString("Enabled", resourceCulture);
             }
         }
         
@@ -336,6 +399,15 @@ namespace Lumina.Presentation.Web.Resources.Views.Library.Management {
         public static string LivePerformance {
             get {
                 return ResourceManager.GetString("LivePerformance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Locked.
+        /// </summary>
+        public static string Locked {
+            get {
+                return ResourceManager.GetString("Locked", resourceCulture);
             }
         }
         
@@ -453,6 +525,15 @@ namespace Lumina.Presentation.Web.Resources.Views.Library.Management {
         public static string Save {
             get {
                 return ResourceManager.GetString("Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save Metadata In Media Directories.
+        /// </summary>
+        public static string SaveMetadataInMediaDirectories {
+            get {
+                return ResourceManager.GetString("SaveMetadataInMediaDirectories", resourceCulture);
             }
         }
         

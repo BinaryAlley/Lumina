@@ -26,6 +26,10 @@ public record LibraryResponse(
     LibraryType LibraryType,
     List<string> ContentLocations,
     string? CoverImage,
+    bool IsEnabled,
+    bool IsLocked,
+    bool DownloadMedatadaFromWeb,
+    bool SaveMetadataInMediaDirectories,
     DateTime CreatedOnUtc,
     DateTime? UpdatedOnUtc
 );

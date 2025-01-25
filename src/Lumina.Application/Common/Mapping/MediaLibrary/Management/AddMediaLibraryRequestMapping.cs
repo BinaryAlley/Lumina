@@ -24,7 +24,11 @@ public static class AddMediaLibraryRequestMapping
             request.Title,
             request.LibraryType,
             request.ContentLocations,
-            request.CoverImage
+            request.CoverImage,
+            request.IsEnabled,
+            request.IsLocked,
+            request.DownloadMedatadaFromWeb,
+            request.SaveMetadataInMediaDirectories
         );
     }
 }

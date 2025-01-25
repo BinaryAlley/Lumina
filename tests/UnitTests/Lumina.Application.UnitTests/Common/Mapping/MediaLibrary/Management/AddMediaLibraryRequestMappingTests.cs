@@ -23,7 +23,11 @@ public class AddMediaLibraryRequestMappingTests
             "My Library",
             "Book",
             ["C:/Books", "D:/Media/Books"],
-            "D:/poster.jpg"
+            "D:/poster.jpg",
+            true,
+            false,
+            true,
+            false
         );
 
         // Act
@@ -35,6 +39,10 @@ public class AddMediaLibraryRequestMappingTests
         result.LibraryType.Should().Be(request.LibraryType);
         result.ContentLocations.Should().BeEquivalentTo(request.ContentLocations);
         result.CoverImage.Should().BeEquivalentTo(request.CoverImage);
+        result.IsEnabled.Should().Be(request.IsEnabled);
+        result.IsLocked.Should().Be(request.IsLocked);
+        result.DownloadMedatadaFromWeb.Should().Be(request.DownloadMedatadaFromWeb);
+        result.SaveMetadataInMediaDirectories.Should().Be(request.SaveMetadataInMediaDirectories);
     }
 
     [Theory]
@@ -49,7 +57,11 @@ public class AddMediaLibraryRequestMappingTests
             "My Library",
             libraryType.ToString(),
             ["C:/Media"],
-            "D:/poster.jpg"
+            "D:/poster.jpg",
+            true,
+            false,
+            true,
+            false
         );
 
         // Act
@@ -61,6 +73,10 @@ public class AddMediaLibraryRequestMappingTests
         result.LibraryType.Should().Be(libraryType.ToString());
         result.ContentLocations.Should().BeEquivalentTo(request.ContentLocations);
         result.CoverImage.Should().BeEquivalentTo(request.CoverImage);
+        result.IsEnabled.Should().Be(request.IsEnabled);
+        result.IsLocked.Should().Be(request.IsLocked);
+        result.DownloadMedatadaFromWeb.Should().Be(request.DownloadMedatadaFromWeb);
+        result.SaveMetadataInMediaDirectories.Should().Be(request.SaveMetadataInMediaDirectories);
     }
 
     [Fact]
@@ -79,7 +95,11 @@ public class AddMediaLibraryRequestMappingTests
             "My Library",
             "Book",
             contentLocations,
-            "D:/poster.jpg"
+            "D:/poster.jpg",
+            true,
+            false,
+            true,
+            false
         );
 
         // Act
@@ -104,7 +124,11 @@ public class AddMediaLibraryRequestMappingTests
             "My Library",
             "Book",
             contentLocations,
-            null
+            null,
+            true,
+            false,
+            true,
+            false
         );
 
         // Act

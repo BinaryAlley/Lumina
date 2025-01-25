@@ -132,4 +132,7 @@
   <data name="NoLibraries" xml:space="preserve">
     <value>Sin bibliotecas</value>
   </data>
+  <data name="Remove" xml:space="preserve">
+    <value>Eliminar</value>
+  </data>
 </root>
