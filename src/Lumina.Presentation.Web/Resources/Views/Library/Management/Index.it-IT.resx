@@ -117,11 +117,65 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AcademicPaper" xml:space="preserve">
+    <value>Articolo Accademico</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>Azioni</value>
+  </data>
+  <data name="Anime" xml:space="preserve">
+    <value>Anime</value>
+  </data>
+  <data name="AudioBook" xml:space="preserve">
+    <value>Audiolibro</value>
+  </data>
+  <data name="Book" xml:space="preserve">
+    <value>Libro</value>
+  </data>
+  <data name="BookSeries" xml:space="preserve">
+    <value>Serie di Libri</value>
+  </data>
+  <data name="CancelScan" xml:space="preserve">
+    <value>Annulla Scansione</value>
+  </data>
+  <data name="ComicBook" xml:space="preserve">
+    <value>Fumetto</value>
+  </data>
+  <data name="ComicSeries" xml:space="preserve">
+    <value>Serie di Fumetti</value>
+  </data>
+  <data name="Concert" xml:space="preserve">
+    <value>Concerto</value>
+  </data>
+  <data name="Cover" xml:space="preserve">
+    <value>Reinterpretazione</value>
+  </data>
   <data name="DeleteLibraryConfirm" xml:space="preserve">
     <value>È sicuro di voler eliminare la libreria specificata?</value>
   </data>
+  <data name="Documentary" xml:space="preserve">
+    <value>Documentario</value>
+  </data>
+  <data name="EBook" xml:space="preserve">
+    <value>E-Book</value>
+  </data>
   <data name="Edit" xml:space="preserve">
     <value>Modifica</value>
+  </data>
+  <data name="Enabled" xml:space="preserve">
+    <value>Attivato</value>
+  </data>
+  <data name="FilmFranchise" xml:space="preserve">
+    <value>Franchise Cinematografico</value>
+  </data>
+  <data name="FilmSeries" xml:space="preserve">
+    <value>Saga Cinematografica</value>
+  </data>
+  <data name="GraphicNovel" xml:space="preserve">
+    <value>Romanzo Grafico</value>
+  </data>
+  <data name="Interview" xml:space="preserve">
+    <value>Intervista</value>
   </data>
   <data name="Libraries" xml:space="preserve">
     <value>Librerie</value>
@@ -129,10 +183,82 @@
   <data name="LibraryDeleted" xml:space="preserve">
     <value>La libreria è stata eliminata!</value>
   </data>
+  <data name="LibraryType" xml:space="preserve">
+    <value>Tipo di Libreria</value>
+  </data>
+  <data name="LivePerformance" xml:space="preserve">
+    <value>Esibizione dal Vivo</value>
+  </data>
+  <data name="Locked" xml:space="preserve">
+    <value>Bloccato</value>
+  </data>
+  <data name="Magazine" xml:space="preserve">
+    <value>Rivista</value>
+  </data>
+  <data name="Manga" xml:space="preserve">
+    <value>Manga</value>
+  </data>
+  <data name="Movie" xml:space="preserve">
+    <value>Film</value>
+  </data>
+  <data name="Music" xml:space="preserve">
+    <value>Musica</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>No</value>
+  </data>
   <data name="NoLibraries" xml:space="preserve">
     <value>Nessuna libreria</value>
   </data>
+  <data name="Other" xml:space="preserve">
+    <value>Altro</value>
+  </data>
+  <data name="Personal" xml:space="preserve">
+    <value>Personale</value>
+  </data>
+  <data name="PhotoAlbum" xml:space="preserve">
+    <value>Album Fotografico</value>
+  </data>
+  <data name="Podcast" xml:space="preserve">
+    <value>Podcast</value>
+  </data>
+  <data name="RadioShow" xml:space="preserve">
+    <value>Programma Radiofonico</value>
+  </data>
+  <data name="Remix" xml:space="preserve">
+    <value>Remissaggio</value>
+  </data>
   <data name="Remove" xml:space="preserve">
     <value>Rimuovere</value>
+  </data>
+  <data name="ScanAllLibraries" xml:space="preserve">
+    <value>Scansiona Tutte Le Librerie</value>
+  </data>
+  <data name="Screenplay" xml:space="preserve">
+    <value>Sceneggiatura</value>
+  </data>
+  <data name="SheetMusic" xml:space="preserve">
+    <value>Spartito Musicale</value>
+  </data>
+  <data name="Soundeffect" xml:space="preserve">
+    <value>Effetto Sonoro</value>
+  </data>
+  <data name="Title" xml:space="preserve">
+    <value>Titolo</value>
+  </data>
+  <data name="Tutorial" xml:space="preserve">
+    <value>Tutorial</value>
+  </data>
+  <data name="TvShow" xml:space="preserve">
+    <value>Serie Televisiva</value>
+  </data>
+  <data name="Videoclip" xml:space="preserve">
+    <value>Videoclip</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>Sì</value>
+  </data>
+  <data name="YouTube" xml:space="preserve">
+    <value>YouTube</value>
   </data>
 </root>

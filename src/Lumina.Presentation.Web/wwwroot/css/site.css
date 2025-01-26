@@ -355,6 +355,27 @@ main {
     cursor: pointer;
 }
 
+table {
+    border-spacing: 0px;
+    width: 100%;
+}
+
+th, td {
+    border-top: 1px solid var(--border-color-light);
+    border-left: 1px solid var(--border-color-light);
+    border-bottom: 1px solid var(--border-color-dark);
+    border-right: 1px solid var(--border-color-dark);
+    padding: 3px 8px;
+}
+
+    tr:nth-child(even) {
+        background-color: var(--dark-row-background);
+    }
+
+    tr:nth-child(odd) {
+        background-color: var(--light-row-background);
+    }
+
 /* Margins */
 .mt-0 {
     margin-top: 0px;

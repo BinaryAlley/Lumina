@@ -117,11 +117,65 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AcademicPaper" xml:space="preserve">
+    <value>学术论文</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>操作</value>
+  </data>
+  <data name="Anime" xml:space="preserve">
+    <value>动画</value>
+  </data>
+  <data name="AudioBook" xml:space="preserve">
+    <value>有声书</value>
+  </data>
+  <data name="Book" xml:space="preserve">
+    <value>书</value>
+  </data>
+  <data name="BookSeries" xml:space="preserve">
+    <value>丛书</value>
+  </data>
+  <data name="CancelScan" xml:space="preserve">
+    <value>取消扫描</value>
+  </data>
+  <data name="ComicBook" xml:space="preserve">
+    <value>漫画</value>
+  </data>
+  <data name="ComicSeries" xml:space="preserve">
+    <value>漫画系列</value>
+  </data>
+  <data name="Concert" xml:space="preserve">
+    <value>音乐会</value>
+  </data>
+  <data name="Cover" xml:space="preserve">
+    <value>翻唱</value>
+  </data>
   <data name="DeleteLibraryConfirm" xml:space="preserve">
     <value>您确定要删除指定的库吗？</value>
   </data>
+  <data name="Documentary" xml:space="preserve">
+    <value>纪录片</value>
+  </data>
+  <data name="EBook" xml:space="preserve">
+    <value>电子书</value>
+  </data>
   <data name="Edit" xml:space="preserve">
     <value>编辑</value>
+  </data>
+  <data name="Enabled" xml:space="preserve">
+    <value>已启用</value>
+  </data>
+  <data name="FilmFranchise" xml:space="preserve">
+    <value>电影系列品牌</value>
+  </data>
+  <data name="FilmSeries" xml:space="preserve">
+    <value>电影系列</value>
+  </data>
+  <data name="GraphicNovel" xml:space="preserve">
+    <value>图像小说</value>
+  </data>
+  <data name="Interview" xml:space="preserve">
+    <value>访谈</value>
   </data>
   <data name="Libraries" xml:space="preserve">
     <value>库</value>
@@ -129,10 +183,82 @@
   <data name="LibraryDeleted" xml:space="preserve">
     <value>库已删除！</value>
   </data>
+  <data name="LibraryType" xml:space="preserve">
+    <value>库类型</value>
+  </data>
+  <data name="LivePerformance" xml:space="preserve">
+    <value>现场表演</value>
+  </data>
+  <data name="Locked" xml:space="preserve">
+    <value>已锁定</value>
+  </data>
+  <data name="Magazine" xml:space="preserve">
+    <value>杂志</value>
+  </data>
+  <data name="Manga" xml:space="preserve">
+    <value>漫画</value>
+  </data>
+  <data name="Movie" xml:space="preserve">
+    <value>电影</value>
+  </data>
+  <data name="Music" xml:space="preserve">
+    <value>音乐</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>否</value>
+  </data>
   <data name="NoLibraries" xml:space="preserve">
     <value>无库</value>
   </data>
+  <data name="Other" xml:space="preserve">
+    <value>其他</value>
+  </data>
+  <data name="Personal" xml:space="preserve">
+    <value>个人的</value>
+  </data>
+  <data name="PhotoAlbum" xml:space="preserve">
+    <value>相册</value>
+  </data>
+  <data name="Podcast" xml:space="preserve">
+    <value>播客</value>
+  </data>
+  <data name="RadioShow" xml:space="preserve">
+    <value>广播节目</value>
+  </data>
+  <data name="Remix" xml:space="preserve">
+    <value>混音版</value>
+  </data>
   <data name="Remove" xml:space="preserve">
     <value>删除</value>
+  </data>
+  <data name="ScanAllLibraries" xml:space="preserve">
+    <value>扫描所有库</value>
+  </data>
+  <data name="Screenplay" xml:space="preserve">
+    <value>剧本</value>
+  </data>
+  <data name="SheetMusic" xml:space="preserve">
+    <value>乐谱</value>
+  </data>
+  <data name="Soundeffect" xml:space="preserve">
+    <value>音效</value>
+  </data>
+  <data name="Title" xml:space="preserve">
+    <value>标题</value>
+  </data>
+  <data name="Tutorial" xml:space="preserve">
+    <value>教程</value>
+  </data>
+  <data name="TvShow" xml:space="preserve">
+    <value>电视连续剧</value>
+  </data>
+  <data name="Videoclip" xml:space="preserve">
+    <value>视频短片</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>是</value>
+  </data>
+  <data name="YouTube" xml:space="preserve">
+    <value>油管</value>
   </data>
 </root>
