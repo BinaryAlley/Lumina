@@ -2,6 +2,7 @@
 using Lumina.Presentation.Web.Common.Api;
 using Lumina.Presentation.Web.Common.Attributes;
 using Lumina.Presentation.Web.Common.Enums.Authorization;
+using Lumina.Presentation.Web.Common.Models.Common;
 using Lumina.Presentation.Web.Common.Models.Libraries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -111,5 +112,16 @@ public class LibraryManagementController : Controller
     {
         await _apiHttpClient.DeleteAsync($"libraries/{id}", cancellationToken).ConfigureAwait(false);
         return Json(new { success = true });
+    }
+
+    /// <summary>
+    /// Initiates the scan of all media libraries.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    [HttpPost("api-scan-libraries")]
+    public async Task<IActionResult> ScanAllLibraries(CancellationToken cancellationToken = default)
+    {
+        await _apiHttpClient.PostAsync<EmptyModel, EmptyModel>($"libraries/scan", new EmptyModel(), cancellationToken).ConfigureAwait(false);
+        return Json(new { success = true, data = true });
     }
 }

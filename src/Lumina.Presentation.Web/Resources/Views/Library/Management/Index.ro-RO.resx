@@ -117,11 +117,65 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AcademicPaper" xml:space="preserve">
+    <value>Lucrare Academică</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>Acțiuni</value>
+  </data>
+  <data name="Anime" xml:space="preserve">
+    <value>Anime</value>
+  </data>
+  <data name="AudioBook" xml:space="preserve">
+    <value>Carte Audio</value>
+  </data>
+  <data name="Book" xml:space="preserve">
+    <value>Carte</value>
+  </data>
+  <data name="BookSeries" xml:space="preserve">
+    <value>Serie de Cărți</value>
+  </data>
+  <data name="CancelScan" xml:space="preserve">
+    <value>Anulează Scanarea</value>
+  </data>
+  <data name="ComicBook" xml:space="preserve">
+    <value>Bandă Desenată</value>
+  </data>
+  <data name="ComicSeries" xml:space="preserve">
+    <value>Serie de Benzi Desenate</value>
+  </data>
+  <data name="Concert" xml:space="preserve">
+    <value>Concert</value>
+  </data>
+  <data name="Cover" xml:space="preserve">
+    <value>Preluare</value>
+  </data>
   <data name="DeleteLibraryConfirm" xml:space="preserve">
     <value>Sunteți sigur că doriți să ștergeți biblioteca specificată?</value>
   </data>
+  <data name="Documentary" xml:space="preserve">
+    <value>Documentar</value>
+  </data>
+  <data name="EBook" xml:space="preserve">
+    <value>Carte Electronică</value>
+  </data>
   <data name="Edit" xml:space="preserve">
     <value>Editează</value>
+  </data>
+  <data name="Enabled" xml:space="preserve">
+    <value>Activat</value>
+  </data>
+  <data name="FilmFranchise" xml:space="preserve">
+    <value>Franciză de Film</value>
+  </data>
+  <data name="FilmSeries" xml:space="preserve">
+    <value>Serie de Filme</value>
+  </data>
+  <data name="GraphicNovel" xml:space="preserve">
+    <value>Roman Grafic</value>
+  </data>
+  <data name="Interview" xml:space="preserve">
+    <value>Interviu</value>
   </data>
   <data name="Libraries" xml:space="preserve">
     <value>Biblioteci</value>
@@ -129,10 +183,82 @@
   <data name="LibraryDeleted" xml:space="preserve">
     <value>Biblioteca a fost ștearsă!</value>
   </data>
+  <data name="LibraryType" xml:space="preserve">
+    <value>Tip Bibliotecă</value>
+  </data>
+  <data name="LivePerformance" xml:space="preserve">
+    <value>Spectacol Live</value>
+  </data>
+  <data name="Locked" xml:space="preserve">
+    <value>Blocat</value>
+  </data>
+  <data name="Magazine" xml:space="preserve">
+    <value>Revistă</value>
+  </data>
+  <data name="Manga" xml:space="preserve">
+    <value>Manga</value>
+  </data>
+  <data name="Movie" xml:space="preserve">
+    <value>Film</value>
+  </data>
+  <data name="Music" xml:space="preserve">
+    <value>Muzică</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>Nu</value>
+  </data>
   <data name="NoLibraries" xml:space="preserve">
     <value>Nicio bibliotecă</value>
   </data>
+  <data name="Other" xml:space="preserve">
+    <value>Altceva</value>
+  </data>
+  <data name="Personal" xml:space="preserve">
+    <value>Personal</value>
+  </data>
+  <data name="PhotoAlbum" xml:space="preserve">
+    <value>Album Foto</value>
+  </data>
+  <data name="Podcast" xml:space="preserve">
+    <value>Podcast</value>
+  </data>
+  <data name="RadioShow" xml:space="preserve">
+    <value>Emisiune Radio</value>
+  </data>
+  <data name="Remix" xml:space="preserve">
+    <value>Remix</value>
+  </data>
   <data name="Remove" xml:space="preserve">
     <value>Șterge</value>
+  </data>
+  <data name="ScanAllLibraries" xml:space="preserve">
+    <value>Scanează Toate Bibliotecile</value>
+  </data>
+  <data name="Screenplay" xml:space="preserve">
+    <value>Scenariu</value>
+  </data>
+  <data name="SheetMusic" xml:space="preserve">
+    <value>Partitură Muzicală</value>
+  </data>
+  <data name="Soundeffect" xml:space="preserve">
+    <value>Efect Sonor</value>
+  </data>
+  <data name="Title" xml:space="preserve">
+    <value>Titlu</value>
+  </data>
+  <data name="Tutorial" xml:space="preserve">
+    <value>Tutorial</value>
+  </data>
+  <data name="TvShow" xml:space="preserve">
+    <value>Serial TV</value>
+  </data>
+  <data name="Videoclip" xml:space="preserve">
+    <value>Videoclip</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>Da</value>
+  </data>
+  <data name="YouTube" xml:space="preserve">
+    <value>YouTube</value>
   </data>
 </root>

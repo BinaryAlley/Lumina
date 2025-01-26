@@ -20,16 +20,28 @@
         <div class="shine-effect"></div>
         <div class="form-row">
             <h1 class="text-light-two w-100 text-center pt-0 pb-0 engraved-title">
-                @(_localizer["Libraries"])
+                @_localizer["Libraries"]
             </h1>
         </div>
-         <div id="libraries-content">
-            <div class="form-row">
-                <div id="add-media-directory-form-table" class="form-table w-100">
-                    <!-- libraries will be populated here -->
-                </div>
-            </div>
+        <table id="media-libraries-table" style="display: none;">
+            <thead class="text-light-two">
+                <tr>
+                    <th class="w-30">@_localizer["Title"]</th>
+                    <th class="w-30">@_localizer["LibraryType"]</th>
+                    <th class="w-10">@_localizer["Enabled"]</th>
+                    <th class="w-10">@_localizer["Locked"]</th>
+                    <th class="w-20">@_localizer["Actions"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- libraries will be populated here -->
+            </tbody>
+        </table>
+        <div class="form-row pt-10">
+            <button id="btn-scan-all-libraries" style="display: none;" type="button" class="confirm-button w-250px">@_localizer["ScanAllLibraries"]</button>
+            <button id="btn-cancel-libraries-scan" style="display: none;" type="button" class="abort-button w-180px">@_localizer["CancelScan"]</button>
         </div>
+        <p id="no-media-libaries" class="text-center">@_localizer["NoLibraries"]</p>
     </div>
 </div>
 @section Scripts {
@@ -37,30 +49,77 @@
         // create cleanup registry for this view
         const cleanupFunctions = [];
         let isInitialized = false;
-    
+        const jsLocalizedLibraryTypes = {
+            Book: '@_localizer["Book"]',
+            EBook: '@_localizer["EBook"]',
+            BookSeries: '@_localizer["BookSeries"]',
+            ComicBook: '@_localizer["ComicBook"]',
+            ComicSeries: '@_localizer["ComicSeries"]',
+            Magazine: '@_localizer["Magazine"]',
+            Manga: '@_localizer["Manga"]',
+            GraphicNovel: '@_localizer["GraphicNovel"]',
+            AcademicPaper: '@_localizer["AcademicPaper"]',
+            SheetMusic: '@_localizer["SheetMusic"]',
+            Screenplay: '@_localizer["Screenplay"]',
+            TvShow: '@_localizer["TvShow"]',
+            Movie: '@_localizer["Movie"]',
+            FilmSeries: '@_localizer["FilmSeries"]',
+            FilmFranchise: '@_localizer["FilmFranchise"]',
+            Concert: '@_localizer["Concert"]',
+            Documentary: '@_localizer["Documentary"]',
+            Tutorial: '@_localizer["Tutorial"]',
+            Personal: '@_localizer["Personal"]',
+            Anime: '@_localizer["Anime"]',
+            Youtube: '@_localizer["Youtube"]',
+            Videoclip: '@_localizer["Videoclip"]',
+            Music: '@_localizer["Music"]',
+            AudioBook: '@_localizer["AudioBook"]',
+            LivePerformance: '@_localizer["LivePerformance"]',
+            Interview: '@_localizer["Interview"]',
+            Cover: '@_localizer["Cover"]',
+            Remix: '@_localizer["Remix"]',
+            Soundeffect: '@_localizer["Soundeffect"]',
+            Podcast: '@_localizer["Podcast"]',
+            RadioShow: '@_localizer["RadioShow"]',
+            PhotoAlbum: '@_localizer["PhotoAlbum"]',
+            Other: '@_localizer["Other"]'
+        };
+        const btnScanAllLibraries = document.getElementById('btn-scan-all-libraries');
+        const btnCancelLibrariesScan = document.getElementById('btn-cancel-libraries-scan');
+
         // on view load
         const loadLibrariesAsync = async function() {
             const response = await callApiGetAsync('@_urlService.GetAbsoluteUrl("GetLibraries", "LibraryManagement")');
-            const table = document.getElementById('add-media-directory-form-table');
-            const container = document.getElementById('libraries-content');
+            const table = document.getElementById('media-libraries-table');
+            const tbody = table.querySelector('tbody') || table.appendChild(document.createElement('tbody'));
+            const noMediaLibrary = document.getElementById('no-media-libaries');
             
             if (response && response.length > 0) {
-                table.innerHTML = response.map(library => {
+                table.style.display = 'table';
+                noMediaLibrary.style.display = 'none';
+                btnScanAllLibraries.style.display = 'block';
+                tbody.innerHTML = response.map(library => {
                     const editUrl = '@_urlService.GetAbsoluteUrl("EditLibrary", "LibraryManagement", new { id = default(Guid) })'
                         .replace('/@(default(Guid))', `/${library.id}`);
-            
                     return `
-                        <div class="form-table-row">
-                            <span title="${library.title}">${library.title}</span>
-                            <a href="${editUrl}">
-                                <img src="/images/ui/edit.svg" alt="@_localizer["Edit"]" title="@_localizer["Edit"]" class="remove-form-table-row-icon" />
-                            </a>
-                            <img src="/images/ui/delete.svg" alt="@_localizer["Remove"]" title="@_localizer["Remove"]" class="remove-form-table-row-icon" />
-                        </div>
+                        <tr>
+                            <td title="${library.title}">${library.title}</td>
+                            <td>${jsLocalizedLibraryTypes[library.libraryType]}</td>
+                            <td class="text-center">${library.isEnabled === true ? `@_localizer["Yes"]` : `@_localizer["No"]`}</td>
+                            <td class="text-center">${library.isLocked === true ? `@_localizer["Yes"]` : `@_localizer["No"]`}</td>
+                            <td class="text-end">
+                                <a href="${editUrl}">
+                                    <img src="/images/ui/edit.svg" alt="@_localizer["Edit"]" title="@_localizer["Edit"]" class="remove-form-table-row-icon" />
+                                </a>
+                                <img src="/images/ui/delete.svg" alt="@_localizer["Remove"]" title="@_localizer["Remove"]" class="remove-form-table-row-icon" />
+                            </td>
+                        </tr>
                     `;
                 }).join('');
             } else {
-                container.innerHTML = '<p class="text-center">@_localizer["NoLibraries"]</p>';
+                btnScanAllLibraries.style.display = 'none';
+                table.style.display = 'none';
+                noMediaLibrary.style.display = 'block';
             }
         };
 
@@ -84,12 +143,31 @@
             }
         };
 
+        // on scan all libraries button click
+        const handleScanAllLibrariesClick = async function(e) {
+            const data = await callApiPostAsync('@_urlService.GetAbsoluteUrl("ScanAllLibraries", "LibraryManagement")', {});
+            if (data) {                
+                btnScanAllLibraries.style.display = 'none';
+                btnCancelLibrariesScan.style.display = 'block';
+            }
+        };
+
+        // on cancel all libraries scan button click
+        const handleCancelLibrariesScanClick = async function(e) {
+            btnCancelLibrariesScan.style.display = 'none';
+            btnScanAllLibraries.style.display = 'block';
+        };
+
         // add listeners
+        btnScanAllLibraries.addEventListener('click', handleScanAllLibrariesClick);
+        btnCancelLibrariesScan.addEventListener('click', handleCancelLibrariesScanClick);
         document.addEventListener('click', handleDeleteLibraryClick);
         document.addEventListener('DOMContentLoaded', InitializeAsync);
 
         // register cleanup for these listeners
         cleanupFunctions.push(() => {
+            btnScanAllLibraries.removeEventListener('click', handleScanAllLibrariesClick);
+            btnCancelLibrariesScan.removeEventListener('click', handleCancelLibrariesScanClick);
             document.removeEventListener('click', handleDeleteLibraryClick);
             document.removeEventListener('DOMContentLoaded', InitializeAsync);
         });
