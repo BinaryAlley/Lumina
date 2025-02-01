@@ -543,4 +543,10 @@
   <data name="CoverFileMustBeAnImage" xml:space="preserve">
     <value>カバーファイルは画像である必要があります！</value>
   </data>
+  <data name="CannotScanDisabledLibrary" xml:space="preserve">
+    <value>無効化されたライブラリはスキャンできません！</value>
+  </data>
+  <data name="CannotScanLockedLibrary" xml:space="preserve">
+    <value>ロックされたライブラリはスキャンできません！</value>
+  </data>
 </root>

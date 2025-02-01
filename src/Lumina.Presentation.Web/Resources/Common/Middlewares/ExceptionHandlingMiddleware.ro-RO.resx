@@ -543,4 +543,10 @@
   <data name="CoverFileMustBeAnImage" xml:space="preserve">
     <value>Fișierul copertă trebuie să fie o imagine!</value>
   </data>
+  <data name="CannotScanDisabledLibrary" xml:space="preserve">
+    <value>Nu se poate scana o bibliotecă dezactivată!</value>
+  </data>
+  <data name="CannotScanLockedLibrary" xml:space="preserve">
+    <value>Nu se poate scana o bibliotecă blocată!</value>
+  </data>
 </root>

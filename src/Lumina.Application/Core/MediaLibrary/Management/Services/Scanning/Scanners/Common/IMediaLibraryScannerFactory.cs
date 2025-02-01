@@ -7,7 +7,7 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Services.Scanning.Scan
 /// <summary>
 /// Interface defining a factory for creating media library scanners.
 /// </summary>
-internal interface ILibraryScannerFactory
+internal interface IMediaLibraryScannerFactory
 {
     /// <summary>
     /// Creates a media library scanner based on the provided library type.

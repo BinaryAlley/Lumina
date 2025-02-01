@@ -12,19 +12,29 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Services.Scanning.Jobs
 /// <summary>
 /// Abstract class defining a media library scan job.
 /// </summary>
-internal abstract class MediaScanJob
+internal abstract class MediaLibraryScanJob
 {
     internal int parentsPayloadsExecuted;
+    
+    /// <summary>
+    /// Gets or sets the Id of the media library scan that this job is part of.
+    /// </summary>
+    public Guid ScanId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Id of the user that initiated the media library scan that this job is part of.
+    /// </summary>
+    public Guid UserId { get; set; }
 
     /// <summary>
     /// Gets or sets the list of child media scan jobs that will be triggered when this job's payload completes execution.
     /// </summary>
-    public List<MediaScanJob> Children { get; protected set; } = [];
+    public List<MediaLibraryScanJob> Children { get; protected set; } = [];
 
     /// <summary>
     /// Gets or sets the list of parent media scan jobs that will trigger this job when their payload will complete execution.
     /// </summary>
-    public List<MediaScanJob> Parents { get; protected set; } = [];
+    public List<MediaLibraryScanJob> Parents { get; protected set; } = [];
 
     /// <summary>
     /// Gets or sets the media library upon which the scan is performed.
@@ -40,7 +50,7 @@ internal abstract class MediaScanJob
     /// Adds a media library scan job to the list of child media library scan jobs that will be triggered when this job's payload completes execution.
     /// </summary>
     /// <param name="job">The child media library scan job to be added.</param>
-    public void AddChild(MediaScanJob job)
+    public void AddChild(MediaLibraryScanJob job)
     {
         if (!Children.Contains(job) && !Parents.Contains(job))
             Children.Add(job);
@@ -50,7 +60,7 @@ internal abstract class MediaScanJob
     /// Adds a media library scan job to the list of parent media library scan jobs that will trigger this job when their payload will complete execution.
     /// </summary>
     /// <param name="job">The child media library scan job to be added.</param>
-    public void AddParent(MediaScanJob job)
+    public void AddParent(MediaLibraryScanJob job)
     {
         if (!Parents.Contains(job) && !Children.Contains(job))
             Parents.Add(job);

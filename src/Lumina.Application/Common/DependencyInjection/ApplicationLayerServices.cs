@@ -5,8 +5,10 @@ using Lumina.Application.Common.DomainEvents;
 using Lumina.Application.Core.MediaLibrary.Management.Services.Scanning;
 using Lumina.Application.Core.MediaLibrary.Management.Services.Scanning.Jobs.Common;
 using Lumina.Application.Core.MediaLibrary.Management.Services.Scanning.Jobs.WrittenContent.Books;
+using Lumina.Application.Core.MediaLibrary.Management.Services.Scanning.Queue;
 using Lumina.Application.Core.MediaLibrary.Management.Services.Scanning.Scanners.Common;
 using Lumina.Application.Core.MediaLibrary.Management.Services.Scanning.Scanners.WrittenContent;
+using Lumina.Application.Core.MediaLibrary.Management.Services.Scanning.Tracking;
 using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics.CodeAnalysis;
@@ -41,12 +43,13 @@ public static class ApplicationLayerServices
 
         services.AddScoped<IDomainEventsQueue, DomainEventsQueue>();
 
+        services.AddSingleton<IMediaLibrariesScanQueue, MediaLibrariesScanQueue>();
+        services.AddSingleton<IMediaLibrariesScanTracker, MediaLibrariesScanTracker>();
         services.AddScoped<IBookLibraryTypeScanner, BookLibraryTypeScanner>();
-        services.AddScoped<ILibraryScanningService, LibraryScanningService>();
-        services.AddSingleton<IMediaScanQueue, MediaScanQueue>();
-        services.AddScoped<ILibraryScannerFactory, LibraryScannerFactory>();
-        services.AddScoped<IMediaScanJobFactory, MediaScanJobFactory>();
-        services.AddHostedService<MediaScanJobProcessorJob>();
+        services.AddScoped<IMediaLibraryScanningService, MediaLibraryScanningService>();
+        services.AddScoped<IMediaLibraryScannerFactory, MediaLibraryScannerFactory>();
+        services.AddScoped<IMediaLibraryScanJobFactory, MediaLibraryScanJobFactory>();
+        services.AddHostedService<MediaLibraryScanJobProcessorJob>();
 
         services.AddTransient<FileSystemDiscoveryJob>();
         services.AddTransient<RepositoryMetadataDiscoveryJob>();

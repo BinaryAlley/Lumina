@@ -18,7 +18,7 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Services.Scanning.Jobs
 /// <summary>
 /// Media library scan job for discovering file system items.
 /// </summary>
-internal class FileSystemDiscoveryJob : MediaScanJob
+internal class FileSystemDiscoveryJob : MediaLibraryScanJob
 {
     private readonly IDirectoryService _directoryService;
     private readonly IFileService _fileService;
@@ -37,28 +37,37 @@ internal class FileSystemDiscoveryJob : MediaScanJob
     /// <inheritdoc/>
     public override async Task ExecuteAsync<TInput>(Guid id, TInput input, CancellationToken cancellationToken)
     {
-        parentsPayloadsExecuted++; // increment the number of parents that finished their execution and called this job
-        // only execute this job's payload when it has no parents, or when all the parents finished their execution
-        if (Parents.Count == 0 || parentsPayloadsExecuted == Parents.Count)
+        try
         {
-            Status = LibraryScanJobStatus.Running;
-            // recursively get the file system tree for each of the media library content locations
-            List<FileSystemTreeNode> contentLocationTrees = [];
-            foreach (FileSystemPathId contentLocation in Library.ContentLocations)
+            parentsPayloadsExecuted++; // increment the number of parents that finished their execution and called this job
+            // only execute this job's payload when it has no parents, or when all the parents finished their execution
+            if (Parents.Count == 0 || parentsPayloadsExecuted == Parents.Count)
             {
-                ErrorOr<FileSystemTreeNode> treeResult = BuildTree(contentLocation, includeHiddenElements: true);
-                if (treeResult.IsError)
+                Status = LibraryScanJobStatus.Running;
+                // recursively get the file system tree for each of the media library content locations
+                List<FileSystemTreeNode> contentLocationTrees = [];
+                foreach (FileSystemPathId contentLocation in Library.ContentLocations)
                 {
-                    // handle errors, maybe:
-                    // Status = LibraryScanJobStatus.Failed;
+                    cancellationToken.ThrowIfCancellationRequested();
+                    ErrorOr<FileSystemTreeNode> treeResult = BuildTree(contentLocation, includeHiddenElements: true, cancellationToken);
+                    if (treeResult.IsError)
+                    {
+                        // handle errors, maybe:
+                        // Status = LibraryScanJobStatus.Failed;
+                    }
+                    else
+                        contentLocationTrees.Add(treeResult.Value);
                 }
-                else
-                    contentLocationTrees.Add(treeResult.Value);
+                Status = LibraryScanJobStatus.Completed;
+                // call each linked child with the obtained payload
+                foreach (MediaLibraryScanJob children in Children)
+                    await children.ExecuteAsync(id, contentLocationTrees, cancellationToken).ConfigureAwait(false);
             }
-            Status = LibraryScanJobStatus.Completed;
-            // call each linked child with the obtained payload
-            foreach (MediaScanJob children in Children)
-                await children.ExecuteAsync(id, contentLocationTrees, cancellationToken).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            Status = LibraryScanJobStatus.Cancelled;
+            throw;
         }
     }
 
@@ -68,7 +77,7 @@ internal class FileSystemDiscoveryJob : MediaScanJob
     /// <param name="path">The identifier of the root path from which to build the tree.</param>
     /// <param name="includeHiddenElements">Specifies whether hidden files and directories should be included in the tree.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a <see cref="FileSystemTreeNode"/>, or an error.</returns>
-    public ErrorOr<FileSystemTreeNode> BuildTree(FileSystemPathId path, bool includeHiddenElements = false)
+    public ErrorOr<FileSystemTreeNode> BuildTree(FileSystemPathId path, bool includeHiddenElements = false, CancellationToken cancellationToken = default)
     {
         // validate the path and get the root directory node
         ErrorOr<Directory> rootDirectoryResult = Directory.Create(path, path.Path, Optional<DateTime>.None(), Optional<DateTime>.None());
@@ -76,7 +85,7 @@ internal class FileSystemDiscoveryJob : MediaScanJob
             return rootDirectoryResult.Errors;
 
         // build the tree starting from the root directory
-        return BuildNodeRecursive(rootDirectoryResult.Value, includeHiddenElements);
+        return BuildNodeRecursive(rootDirectoryResult.Value, includeHiddenElements, cancellationToken);
     }
 
     /// <summary>
@@ -85,7 +94,7 @@ internal class FileSystemDiscoveryJob : MediaScanJob
     /// <param name="directory">The directory for which to build a tree node.</param>
     /// <param name="includeHiddenElements">Specifies whether hidden files and directories should be included in the node's children.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a <see cref="FileSystemTreeNode"/>, or an error.</returns>
-    private ErrorOr<FileSystemTreeNode> BuildNodeRecursive(Directory directory, bool includeHiddenElements)
+    private ErrorOr<FileSystemTreeNode> BuildNodeRecursive(Directory directory, bool includeHiddenElements, CancellationToken cancellationToken)
     {
         FileSystemTreeNode node = new()
         {
@@ -102,7 +111,8 @@ internal class FileSystemDiscoveryJob : MediaScanJob
 
         foreach (Directory subdirectory in subdirectoriesResult.Value)
         {
-            ErrorOr<FileSystemTreeNode> subNodeResult = BuildNodeRecursive(subdirectory, includeHiddenElements);
+            cancellationToken.ThrowIfCancellationRequested();
+            ErrorOr<FileSystemTreeNode> subNodeResult = BuildNodeRecursive(subdirectory, includeHiddenElements, cancellationToken);
             if (subNodeResult.IsError)
                 return subNodeResult.Errors;
 
@@ -116,6 +126,7 @@ internal class FileSystemDiscoveryJob : MediaScanJob
 
         foreach (File file in filesResult.Value)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             node.Children.Add(new FileSystemTreeNode
             {
                 Path = file.Id.Path,

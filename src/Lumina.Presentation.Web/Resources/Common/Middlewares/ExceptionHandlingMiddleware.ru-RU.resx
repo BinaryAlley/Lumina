@@ -543,4 +543,10 @@
   <data name="CoverFileMustBeAnImage" xml:space="preserve">
     <value>Файл обложки должен быть изображением!</value>
   </data>
+  <data name="CannotScanDisabledLibrary" xml:space="preserve">
+    <value>Невозможно сканировать отключенную библиотеку!</value>
+  </data>
+  <data name="CannotScanLockedLibrary" xml:space="preserve">
+    <value>Невозможно сканировать заблокированную библиотеку!</value>
+  </data>
 </root>

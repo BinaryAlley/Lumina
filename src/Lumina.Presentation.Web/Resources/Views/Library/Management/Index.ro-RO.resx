@@ -231,6 +231,9 @@
   <data name="Remove" xml:space="preserve">
     <value>Șterge</value>
   </data>
+  <data name="Scan" xml:space="preserve">
+    <value>Scanează</value>
+  </data>
   <data name="ScanAllLibraries" xml:space="preserve">
     <value>Scanează Toate Bibliotecile</value>
   </data>

@@ -543,4 +543,10 @@
   <data name="CoverFileMustBeAnImage" xml:space="preserve">
     <value>Cover file must be an image!</value>
   </data>
+  <data name="CannotScanDisabledLibrary" xml:space="preserve">
+    <value>Cannot scan a disabled library!</value>
+  </data>
+  <data name="CannotScanLockedLibrary" xml:space="preserve">
+    <value>Cannot scan a locked library!</value>
+  </data>
 </root>

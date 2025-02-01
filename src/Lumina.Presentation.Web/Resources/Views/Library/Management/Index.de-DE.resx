@@ -231,6 +231,9 @@
   <data name="Remove" xml:space="preserve">
     <value>Entfernen</value>
   </data>
+  <data name="Scan" xml:space="preserve">
+    <value>Scannen</value>
+  </data>
   <data name="ScanAllLibraries" xml:space="preserve">
     <value>Alle Bibliotheken Scannen</value>
   </data>

@@ -21,6 +21,11 @@ public enum LibraryScanJobStatus
     Completed,
 
     /// <summary>
+    /// Job has been cancelled.
+    /// </summary>
+    Cancelled,
+
+    /// <summary>
     /// Job has failed.
     /// </summary>
     Failed
