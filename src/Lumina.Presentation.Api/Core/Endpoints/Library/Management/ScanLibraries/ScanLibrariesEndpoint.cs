@@ -2,10 +2,12 @@
 using ErrorOr;
 using FastEndpoints;
 using Lumina.Application.Core.MediaLibrary.Management.Commands.ScanLibraries;
+using Lumina.Contracts.Responses.MediaLibrary.Management;
 using Lumina.Presentation.Api.Common.Routes.Library.Management;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
 using Mediator;
 using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -45,7 +47,7 @@ public class ScanLibrariesEndpoint : BaseEndpoint<EmptyRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(EmptyRequest _, CancellationToken cancellationToken)
     {
-        ErrorOr<Success> result = await _sender.Send(new ScanLibrariesCommand(), cancellationToken).ConfigureAwait(false);
-        return result.Match(success => TypedResults.NoContent(), Problem);
+        ErrorOr<IEnumerable<ScanLibraryResponse>> result = await _sender.Send(new ScanLibrariesCommand(), cancellationToken).ConfigureAwait(false);
+        return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

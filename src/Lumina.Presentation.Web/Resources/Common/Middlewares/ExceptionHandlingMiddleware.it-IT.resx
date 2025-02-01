@@ -543,4 +543,10 @@
   <data name="CoverFileMustBeAnImage" xml:space="preserve">
     <value>Il file di copertina deve essere un'immagine!</value>
   </data>
+  <data name="CannotScanDisabledLibrary" xml:space="preserve">
+    <value>Impossibile scansionare una libreria disabilitata!</value>
+  </data>
+  <data name="CannotScanLockedLibrary" xml:space="preserve">
+    <value>Impossibile scansionare una libreria bloccata!</value>
+  </data>
 </root>

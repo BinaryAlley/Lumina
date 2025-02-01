@@ -15,7 +15,8 @@ public static class TaskUtilities
     /// Extends Task by providing exception handling when a task is invoked on a void method (not awaited).
     /// </summary>
     /// <param name="task">The task to be awaited.</param>
-    public static async void FireAndForgetSafeAsync(this Task task)
+    /// <param name="onComplete">Optional continuation when <paramref name="task"/> finishes.</param>
+    public static async void FireAndForgetSafeAsync(this Task task, Action? onComplete = null)
     {
         try
         {
@@ -24,6 +25,10 @@ public static class TaskUtilities
         catch (Exception ex)
         {
             Debug.WriteLine(ex);
+        }
+        finally
+        {
+            onComplete?.Invoke();
         }
     }
 }

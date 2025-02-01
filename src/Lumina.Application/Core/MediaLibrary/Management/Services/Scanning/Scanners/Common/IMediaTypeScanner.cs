@@ -22,5 +22,5 @@ internal interface IMediaTypeScanner
     /// </summary>
     /// <param name="library">The media library for which to create the media library scan jobs.</param>
     /// <returns>A collection of media library scan jobs.</returns>
-    IEnumerable<MediaScanJob> CreateScanJobsForLibrary(Library library);
+    IEnumerable<MediaLibraryScanJob> CreateScanJobsForLibrary(Library library);
 }

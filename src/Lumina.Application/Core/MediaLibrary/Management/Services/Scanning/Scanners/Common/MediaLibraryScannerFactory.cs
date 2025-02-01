@@ -10,15 +10,15 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Services.Scanning.Scan
 /// <summary>
 /// Defines a factory for creating media library scanners.
 /// </summary>
-internal class LibraryScannerFactory : ILibraryScannerFactory
+internal class MediaLibraryScannerFactory : IMediaLibraryScannerFactory
 {
     private readonly IServiceProvider _serviceProvider;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="LibraryScannerFactory"/> class.
+    /// Initializes a new instance of the <see cref="MediaLibraryScannerFactory"/> class.
     /// </summary>
     /// <param name="serviceProvider">The service provider.</param>
-    public LibraryScannerFactory(IServiceProvider serviceProvider)
+    public MediaLibraryScannerFactory(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
     }

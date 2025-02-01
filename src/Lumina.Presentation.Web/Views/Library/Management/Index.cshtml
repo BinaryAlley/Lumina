@@ -102,12 +102,14 @@
                     const editUrl = '@_urlService.GetAbsoluteUrl("EditLibrary", "LibraryManagement", new { id = default(Guid) })'
                         .replace('/@(default(Guid))', `/${library.id}`);
                     return `
-                        <tr>
+                        <tr data-library-id="${library.id}">
                             <td title="${library.title}">${library.title}</td>
                             <td>${jsLocalizedLibraryTypes[library.libraryType]}</td>
                             <td class="text-center">${library.isEnabled === true ? `@_localizer["Yes"]` : `@_localizer["No"]`}</td>
                             <td class="text-center">${library.isLocked === true ? `@_localizer["Yes"]` : `@_localizer["No"]`}</td>
                             <td class="text-end">
+                                <img src="/images/ui/stop.svg" alt="@_localizer["CancelScan"]" title="@_localizer["Scan"]" class="hidden remove-form-table-row-icon" />
+                                <img src="/images/ui/trigger.svg" alt="@_localizer["Scan"]" title="@_localizer["Scan"]" class="remove-form-table-row-icon" />
                                 <a href="${editUrl}">
                                     <img src="/images/ui/edit.svg" alt="@_localizer["Edit"]" title="@_localizer["Edit"]" class="remove-form-table-row-icon" />
                                 </a>
@@ -126,17 +128,15 @@
         // on delete library icon click
         const handleDeleteLibraryClick = async function(e) {
             if (e.target.matches('img[src*="delete.svg"]')) {
-                const row = e.target.closest('.form-table-row');
-                const libraryTitle = row.querySelector('span').textContent;
-        
-                if (await dialogService.show('@_localizer["DeleteLibraryConfirm"]'.replace('{0}', libraryTitle), 
-                    jsLocalizedDialogs.confirmation, DialogButtons.YES_NO, DialogIcon.QUESTION) === DialogButton.YES) {
-                    const libraryId = row.querySelector('a').href.split('/').pop();
+                const row = e.target.closest('tr');
+                
+                if (await dialogService.show('@_localizer["DeleteLibraryConfirm"]', jsLocalizedDialogs.confirmation, DialogButtons.YES_NO, DialogIcon.QUESTION) === DialogButton.YES) {
+                    const libraryId = row.getAttribute('data-library-id');
                     const url = '@_urlService.GetAbsoluteUrl("DeleteLibrary", "LibraryManagement", new { id = default(Guid) })';
                     const success = await callApiDeleteAsync(url.replace('/@(default(Guid))', `/${libraryId}`));
             
                     if (success) {
-                        await loadLibrariesAsync(); // Reload the entire library list
+                        await loadLibrariesAsync(); // reload the entire library list
                         notificationService.show('@_localizer["LibraryDeleted"]', NotificationType.SUCCESS);
                     }
                 }
@@ -149,19 +149,82 @@
             if (data) {                
                 btnScanAllLibraries.style.display = 'none';
                 btnCancelLibrariesScan.style.display = 'block';
+
+                // toggle icons only for libraries that had their scan started
+                const tbody = document.querySelector('tbody');
+                data.forEach(scan => {
+                    const row = tbody.querySelector(`tr[data-library-id="${scan.libraryId}"]`);
+                    if (row) {
+                        const scanIcon = row.querySelector('img[src*="trigger.svg"]');
+                        const cancelScanIcon = row.querySelector('img[src*="stop.svg"]');
+
+                        scanIcon.classList.add('hidden');
+                        cancelScanIcon.classList.remove('hidden');
+                    }
+                });
+            }
+        };
+
+        // on scan library icon click
+        const handleScanLibraryClick = async function(e) {
+            if (e.target.matches('img[src*="trigger.svg"]')) {
+                const row = e.target.closest('tr');
+               
+                const libraryId = row.getAttribute('data-library-id');
+                const url = '@_urlService.GetAbsoluteUrl("ScanLibrary", "LibraryManagement", new { id = default(Guid) })';
+                const success = await callApiPostAsync(url.replace('/@(default(Guid))', `/${libraryId}`));
+
+                if (success) {
+                    const scanIcon = e.target;
+                    const cancelScanIcon = row.querySelector('img[src*="stop.svg"]');
+
+                    scanIcon.classList.add('hidden');
+                    cancelScanIcon.classList.remove('hidden');
+                }
             }
         };
 
         // on cancel all libraries scan button click
         const handleCancelLibrariesScanClick = async function(e) {
+            await callApiPostAsync('@_urlService.GetAbsoluteUrl("CancelLibrariesScan", "LibraryManagement")', {});
             btnCancelLibrariesScan.style.display = 'none';
             btnScanAllLibraries.style.display = 'block';
+
+            // toggle icons for all rows
+            const tbody = document.querySelector('tbody');
+            const allRows = tbody.querySelectorAll('tr');
+
+            allRows.forEach(row => {
+                const scanIcon = row.querySelector('img[src*="trigger.svg"]');
+                const cancelScanIcon = row.querySelector('img[src*="stop.svg"]');
+
+                scanIcon.classList.remove('hidden');
+                cancelScanIcon.classList.add('hidden');
+            });
+        };
+
+        // on cancel library scan icon click
+        const handleCancelLibraryScanClick = async function(e) {
+            if (e.target.matches('img[src*="stop.svg"]')) {
+                const row = e.target.closest('tr');
+
+                const libraryId = row.getAttribute('data-library-id');
+                const url = '@_urlService.GetAbsoluteUrl("CancelLibraryScan", "LibraryManagement", new { id = default(Guid) })';
+                await callApiPostAsync(url.replace('/@(default(Guid))', `/${libraryId}`));
+                const scanIcon = row.querySelector('img[src*="trigger.svg"]');
+                const cancelScanIcon = row.querySelector('img[src*="stop.svg"]');
+
+                scanIcon.classList.remove('hidden');
+                cancelScanIcon.classList.add('hidden');
+            }
         };
 
         // add listeners
         btnScanAllLibraries.addEventListener('click', handleScanAllLibrariesClick);
         btnCancelLibrariesScan.addEventListener('click', handleCancelLibrariesScanClick);
         document.addEventListener('click', handleDeleteLibraryClick);
+        document.addEventListener('click', handleScanLibraryClick);
+        document.addEventListener('click', handleCancelLibraryScanClick);
         document.addEventListener('DOMContentLoaded', InitializeAsync);
 
         // register cleanup for these listeners
@@ -169,6 +232,8 @@
             btnScanAllLibraries.removeEventListener('click', handleScanAllLibrariesClick);
             btnCancelLibrariesScan.removeEventListener('click', handleCancelLibrariesScanClick);
             document.removeEventListener('click', handleDeleteLibraryClick);
+            document.removeEventListener('click', handleScanLibraryClick);
+            document.removeEventListener('click', handleCancelLibraryScanClick);
             document.removeEventListener('DOMContentLoaded', InitializeAsync);
         });
 

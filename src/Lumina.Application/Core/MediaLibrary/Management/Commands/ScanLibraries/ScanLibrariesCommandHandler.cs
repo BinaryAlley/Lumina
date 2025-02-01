@@ -7,12 +7,14 @@ using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Application.Core.MediaLibrary.Management.Services.Scanning;
+using Lumina.Contracts.Responses.MediaLibrary.Management;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
 using Mediator;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Lumina.Application.Common.Errors;
 #endregion
 
 namespace Lumina.Application.Core.MediaLibrary.Management.Commands.ScanLibraries;
@@ -20,11 +22,11 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Commands.ScanLibraries
 /// <summary>
 /// Handler for the command for initiating the scan of all media libraries.
 /// </summary>
-public class ScanLibrariesCommandHandler : IRequestHandler<ScanLibrariesCommand, ErrorOr<Success>>
+public class ScanLibrariesCommandHandler : IRequestHandler<ScanLibrariesCommand, ErrorOr<IEnumerable<ScanLibraryResponse>>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUserService;
-    private readonly ILibraryScanningService _libraryScanningService;
+    private readonly IMediaLibraryScanningService _libraryScanningService;
     private readonly IAuthorizationService _authorizationService;
 
     /// <summary>
@@ -37,7 +39,7 @@ public class ScanLibrariesCommandHandler : IRequestHandler<ScanLibrariesCommand,
     public ScanLibrariesCommandHandler(
         IAuthorizationService authorizationService,
         ICurrentUserService currentUserService,
-        ILibraryScanningService libraryScanningService,
+        IMediaLibraryScanningService libraryScanningService,
         IUnitOfWork unitOfWork)
     {
         _authorizationService = authorizationService;
@@ -52,26 +54,30 @@ public class ScanLibrariesCommandHandler : IRequestHandler<ScanLibrariesCommand,
     /// <param name="request">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async ValueTask<ErrorOr<Success>> Handle(ScanLibrariesCommand request, CancellationToken cancellationToken)
+    public async ValueTask<ErrorOr<IEnumerable<ScanLibraryResponse>>> Handle(ScanLibrariesCommand request, CancellationToken cancellationToken)
     {
-        // if the user that made the request is not an Admin, they do not have the right to perform scans
-        if (!await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false))
-            return Errors.Authorization.NotAuthorized;
-
         // get all media libraries that are enabled and unlocked from the persistence medium
         ILibraryRepository libraryRepository = _unitOfWork.GetRepository<ILibraryRepository>();
         ErrorOr<IEnumerable<LibraryEntity>> getLibrariesResult = await libraryRepository.GetAllEnabledAndUnlockedAsync(cancellationToken).ConfigureAwait(false);
         if (getLibrariesResult.IsError)
             return getLibrariesResult.Errors;
 
-        // convert persistence libraries to domain entities, and start scanning them
+        // convert persistence libraries to domain entities
         IEnumerable<ErrorOr<Library>> domainEntitiesResult = getLibrariesResult.Value.ToDomainEntities();
+
+        // if the current user is not an admin, they can only scan the libraries that belong to them
+        if (!await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false))
+            domainEntitiesResult = domainEntitiesResult.Where(libraryResult => libraryResult.Value.UserId.Value == _currentUserService.UserId!.Value);
+
+        List<ScanLibraryResponse> responses = [];
+        // for each library, start the scan
         foreach (ErrorOr<Library> domainLibraryResult in domainEntitiesResult)
         {
             if (domainLibraryResult.IsError)
                 return domainLibraryResult.Errors;
-            await _libraryScanningService.StartScanAsync(domainLibraryResult.Value, cancellationToken).ConfigureAwait(false);
+            Guid scanId = await _libraryScanningService.StartScanAsync(domainLibraryResult.Value, cancellationToken).ConfigureAwait(false);
+            responses.Add(new ScanLibraryResponse(scanId, domainLibraryResult.Value.Id.Value));
         }
-        return Result.Success;
+        return responses;
     }
 }

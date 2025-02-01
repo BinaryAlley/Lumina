@@ -8,7 +8,7 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Services.Scanning.Jobs
 /// <summary>
 /// Interface for the media library scan jobs factory.
 /// </summary>
-internal interface IMediaScanJobFactory
+internal interface IMediaLibraryScanJobFactory
 {
     /// <summary>
     /// Creates a new media library scan job of type <typeparamref name="TJob"/>.
@@ -16,5 +16,5 @@ internal interface IMediaScanJobFactory
     /// <typeparam name="TJob">The type of media library scan job to create.</typeparam>
     /// <returns>A media library scan job of type <typeparamref name="TJob"/>.</returns>
     /// <exception cref="ArgumentException">Thrown when the type of the requested media library scan job has not been registered.</exception>
-    TJob CreateJob<TJob>(Library library) where TJob : MediaScanJob;
+    TJob CreateJob<TJob>(Library library) where TJob : MediaLibraryScanJob;
 }

@@ -231,6 +231,9 @@
   <data name="Remove" xml:space="preserve">
     <value>删除</value>
   </data>
+  <data name="Scan" xml:space="preserve">
+    <value>扫描</value>
+  </data>
   <data name="ScanAllLibraries" xml:space="preserve">
     <value>扫描所有库</value>
   </data>

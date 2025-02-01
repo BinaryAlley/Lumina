@@ -1,5 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
+using Lumina.Contracts.Responses.MediaLibrary.Management;
+using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -17,9 +19,19 @@ public class ScanLibrariesEndpointSummary : Summary<ScanLibrariesEndpoint, Empty
     public ScanLibrariesEndpointSummary()
     {
         Summary = "Triggers the scan of all media libraries.";
-        Description = "Starts the scanning process of all media libraries, if the user making the request is an Admin.";
+        Description = "Starts the scanning process of all media libraries of a user, or all libraries, if the user is an Admin.";
 
-        Response(204, "The media libraries scan was successfully started.");
+        Response(200, "The media libraries scan was successfully started.",
+            example: new ScanLibraryResponse[] {
+            new (
+                ScanId: Guid.NewGuid(),
+                LibraryId: Guid.NewGuid()
+            ),
+            new (
+                ScanId: Guid.NewGuid(),
+                LibraryId: Guid.NewGuid()
+            )
+        });
 
         Response(401, "Authentication required.", "application/problem+json",
             example: new[]
@@ -48,18 +60,6 @@ public class ScanLibrariesEndpointSummary : Summary<ScanLibrariesEndpoint, Empty
                     detail = "The token is invalid",
                     instance = "/api/v1/libraries/scan"
                 }
-            }
-        );
-
-        Response(403, "The request failed because the user making the request is not an Admin.", "application/problem+json",
-            example: new
-            {
-                type = "https://tools.ietf.org/html/rfc9110#section-15.5.4",
-                title = "General.Failure",
-                status = 403,
-                detail = "NotAuthorized",
-                instance = "/api/v1//libraries/scan",
-                traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
             }
         );
     }

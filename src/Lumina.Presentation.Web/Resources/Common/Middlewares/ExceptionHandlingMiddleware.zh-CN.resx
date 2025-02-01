@@ -543,4 +543,10 @@
   <data name="CoverFileMustBeAnImage" xml:space="preserve">
     <value>封面文件必须是图片！</value>
   </data>
+  <data name="CannotScanDisabledLibrary" xml:space="preserve">
+    <value>无法扫描已禁用的库！</value>
+  </data>
+  <data name="CannotScanLockedLibrary" xml:space="preserve">
+    <value>无法扫描已锁定的库！</value>
+  </data>
 </root>

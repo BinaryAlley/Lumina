@@ -121,7 +121,42 @@ public class LibraryManagementController : Controller
     [HttpPost("api-scan-libraries")]
     public async Task<IActionResult> ScanAllLibraries(CancellationToken cancellationToken = default)
     {
-        await _apiHttpClient.PostAsync<EmptyModel, EmptyModel>($"libraries/scan", new EmptyModel(), cancellationToken).ConfigureAwait(false);
-        return Json(new { success = true, data = true });
+        ScanLibraryModel[] response = await _apiHttpClient.PostAsync<ScanLibraryModel[], EmptyModel>($"libraries/scan", new EmptyModel(), cancellationToken).ConfigureAwait(false);
+        return Json(new { success = true, data = response });
+    }
+
+    /// <summary>
+    /// Initiates the scan of a media library.
+    /// </summary>
+    /// <param name="id">The id of the media library whose scan is started.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    [HttpPost("api-scan-library/{id}")]
+    public async Task<IActionResult> ScanLibrary(Guid id, CancellationToken cancellationToken = default)
+    {
+        ScanLibraryModel response = await _apiHttpClient.PostAsync<ScanLibraryModel, EmptyModel>($"libraries/{id}/scan", new EmptyModel(), cancellationToken).ConfigureAwait(false);
+        return Json(new { success = true, data = response });
+    }
+
+    /// <summary>
+    /// Cancells the previously started scan of all media libraries.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    [HttpPost("api-cancel-libraries-scan")]
+    public async Task<IActionResult> CancelLibrariesScan(CancellationToken cancellationToken = default)
+    {
+        await _apiHttpClient.PostAsync<EmptyModel, EmptyModel>($"libraries/cancel-scan", new EmptyModel(), cancellationToken).ConfigureAwait(false);
+        return Json(new { success = true });
+    }
+
+    /// <summary>
+    /// Cancells the previously started scan of a media library.
+    /// </summary>
+    /// <param name="id">The id of the media library whose scan is cancelled.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    [HttpPost("api-cancel-library-scan/{id}")]
+    public async Task<IActionResult> CancelLibraryScan(Guid id, CancellationToken cancellationToken = default)
+    {
+        await _apiHttpClient.PostAsync<EmptyModel, EmptyModel>($"libraries/{id}/cancel-scan", new EmptyModel(), cancellationToken).ConfigureAwait(false);
+        return Json(new { success = true });
     }
 }

@@ -13,7 +13,7 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Services.Scanning.Scan
 /// </summary>
 internal class BookLibraryTypeScanner : IBookLibraryTypeScanner
 {
-    private readonly IMediaScanJobFactory _mediaScanJobFactory;
+    private readonly IMediaLibraryScanJobFactory _mediaScanJobFactory;
 
     /// <inheritdoc/>
     public LibraryType SupportedType { get; } = LibraryType.Book;
@@ -22,13 +22,13 @@ internal class BookLibraryTypeScanner : IBookLibraryTypeScanner
     /// Initializes a new instance of the <see cref="LibraryScannerFactory"/> class.
     /// </summary>
     /// <param name="mediaScanJobFactory">Injected factory for creating media library scan jobs.</param>
-    public BookLibraryTypeScanner(IMediaScanJobFactory mediaScanJobFactory)
+    public BookLibraryTypeScanner(IMediaLibraryScanJobFactory mediaScanJobFactory)
     {
         _mediaScanJobFactory = mediaScanJobFactory;
     }
 
     /// <inheritdoc/>
-    public IEnumerable<MediaScanJob> CreateScanJobsForLibrary(Library library)
+    public IEnumerable<MediaLibraryScanJob> CreateScanJobsForLibrary(Library library)
     {
         // declare the list of jobs that this scanner requires
         FileSystemDiscoveryJob fileSystemDiscoveryJob = _mediaScanJobFactory.CreateJob<FileSystemDiscoveryJob>(library); 

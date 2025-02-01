@@ -45,6 +45,8 @@ Several icons used in this project were adapted from icons sourced from [svgrepo
 - [`question.svg`](https://www.svgrepo.com/svg/486470/question-filled) (MIT License)
 - [`warning.svg`](https://www.svgrepo.com/svg/454067/warning) (MIT License)
 - [`error.svg`](https://www.svgrepo.com/svg/486408/error-filled) (MIT License)
+- [`trigger.svg`](https://www.svgrepo.com/svg/489497/lightning-1) (Public Domain License)
+- [`stop.svg`](https://www.svgrepo.com/svg/521862/stop) (CC Attribution License)
 
 ## License
 
