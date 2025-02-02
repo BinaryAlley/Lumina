@@ -2,9 +2,7 @@
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Application.Core.FileSystemManagement.Thumbnails.Queries.GetThumbnail;
-using Lumina.Application.UnitTests.Core.FileSystemManagement.Thumbnails.Fixtures;
 using Lumina.Contracts.Responses.FileSystemManagement.Thumbnails;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
@@ -47,10 +45,10 @@ public class GetThumbnailQueryHandlerTests
         ErrorOr<ThumbnailResponse> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().NotBeNull();
-        result.Value.Type.Should().Be(thumbnail.Type);
-        result.Value.Bytes.Should().BeEquivalentTo(thumbnail.Bytes);
+        Assert.False(result.IsError);
+        Assert.NotNull(result.Value);
+        Assert.Equal(thumbnail.Type, result.Value.Type);
+        Assert.Equal(thumbnail.Bytes, result.Value.Bytes);
         await _mockThumbnailService.Received(1).GetThumbnailAsync(query.Path!, query.Quality, Arg.Any<CancellationToken>());
     }
 
@@ -67,8 +65,8 @@ public class GetThumbnailQueryHandlerTests
         ErrorOr<ThumbnailResponse> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(error);
+        Assert.True(result.IsError);
+        Assert.Equal(error, result.FirstError);
         await _mockThumbnailService.Received(1).GetThumbnailAsync(query.Path!, query.Quality, Arg.Any<CancellationToken>());
     }
 

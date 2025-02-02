@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
 using Lumina.Application.Common.Behaviors;
@@ -46,8 +45,8 @@ public class ValidationBehaviorTests
         ErrorOr<ValidationBehaviorTestResponse> result = await behavior.Handle(request, _nextDelegate, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().Be(expectedResponse);
+        Assert.False(result.IsError);
+        Assert.Equal(expectedResponse, result.Value);
         await _nextDelegate.Received(1).Invoke(request, Arg.Any<CancellationToken>());
     }
 
@@ -65,8 +64,8 @@ public class ValidationBehaviorTests
         ErrorOr<ValidationBehaviorTestResponse> result = await behavior.Handle(request, _nextDelegate, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().Be(expectedResponse);
+        Assert.False(result.IsError);
+        Assert.Equal(expectedResponse, result.Value);
         await _mockValidator.Received(1).ValidateAsync(request, Arg.Any<CancellationToken>());
         await _nextDelegate.Received(1).Invoke(request, Arg.Any<CancellationToken>());
     }
@@ -88,12 +87,12 @@ public class ValidationBehaviorTests
         ErrorOr<ValidationBehaviorTestResponse> result = await behavior.Handle(request, _nextDelegate, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.Errors.Should().HaveCount(2);
-        result.Errors[0].Type.Should().Be(ErrorType.Validation);
-        result.Errors[0].Description.Should().Be("Error message 1");
-        result.Errors[1].Type.Should().Be(ErrorType.Validation);
-        result.Errors[1].Description.Should().Be("Error message 2");
+        Assert.True(result.IsError);
+        Assert.Equal(2, result.Errors.Count);
+        Assert.Equal(ErrorType.Validation, result.Errors[0].Type);
+        Assert.Equal("Error message 1", result.Errors[0].Description);
+        Assert.Equal(ErrorType.Validation, result.Errors[1].Type);
+        Assert.Equal("Error message 2", result.Errors[1].Description);
         await _mockValidator.Received(1).ValidateAsync(request, Arg.Any<CancellationToken>());
         await _nextDelegate.DidNotReceive().Invoke(request, Arg.Any<CancellationToken>());
     }

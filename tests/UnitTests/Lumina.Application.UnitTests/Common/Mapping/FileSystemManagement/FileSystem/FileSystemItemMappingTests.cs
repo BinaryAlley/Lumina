@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.Mapping.FileSystemManagement.FileSystem;
 using Lumina.Application.UnitTests.Common.Mapping.FileSystemManagement.FileSystem.Fixtures;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Directories.Fixtures;
@@ -59,11 +58,11 @@ public class FileSystemItemMappingTests
         FileSystemItemDto result = domainModel.ToFileSystemItemDto();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Path.Should().Be(domainModel.Id.Path);
-        result.Name.Should().Be(domainModel.Name);
-        result.DateCreated.Should().BeCloseTo(DateTime.Now, TimeSpan.FromSeconds(1));
-        result.DateModified.Should().BeCloseTo(DateTime.Now, TimeSpan.FromSeconds(1));
+        Assert.NotNull(result);
+        Assert.Equal(domainModel.Id.Path, result.Path);
+        Assert.Equal(domainModel.Name, result.Name);
+        Assert.True((DateTime.Now - result.DateCreated) < TimeSpan.FromSeconds(1));
+        Assert.True((DateTime.Now - result.DateModified) < TimeSpan.FromSeconds(1));
     }
 
     [Fact]
@@ -76,10 +75,10 @@ public class FileSystemItemMappingTests
         FileSystemTreeNodeResponse result = directory.ToTreeNodeResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Name.Should().Be(directory.Name);
-        result.Path.Should().Be(directory.Id.Path);
-        result.ItemType.Should().Be(directory.Type);
+        Assert.NotNull(result);
+        Assert.Equal(directory.Name, result.Name);
+        Assert.Equal(directory.Id.Path, result.Path);
+        Assert.Equal(directory.Type, result.ItemType);
     }
 
     [Fact]
@@ -92,10 +91,10 @@ public class FileSystemItemMappingTests
         FileSystemTreeNodeResponse result = file.ToTreeNodeResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Name.Should().Be(file.Name);
-        result.Path.Should().Be(file.Id.Path);
-        result.ItemType.Should().Be(file.Type);
+        Assert.NotNull(result);
+        Assert.Equal(file.Name, result.Name);
+        Assert.Equal(file.Id.Path, result.Path);
+        Assert.Equal(file.Type, result.ItemType);
     }
 
     [Fact]
@@ -108,13 +107,13 @@ public class FileSystemItemMappingTests
         FileSystemTreeNodeResponse result = windowsRootItem.ToTreeNodeResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Name.Should().Be(windowsRootItem.Name);
-        result.Path.Should().Be(windowsRootItem.Id.Path);
-        result.ItemType.Should().Be(windowsRootItem.Type);
-        result.IsExpanded.Should().BeFalse();
-        result.ChildrenLoaded.Should().BeFalse();
-        result.Children.Should().BeEmpty();
+        Assert.NotNull(result);
+        Assert.Equal(windowsRootItem.Name, result.Name);
+        Assert.Equal(windowsRootItem.Id.Path, result.Path);
+        Assert.Equal(windowsRootItem.Type, result.ItemType);
+        Assert.False(result.IsExpanded);
+        Assert.False(result.ChildrenLoaded);
+        Assert.Empty(result.Children);
     }
 
     [Fact]
@@ -127,13 +126,13 @@ public class FileSystemItemMappingTests
         FileSystemTreeNodeResponse result = unixRootItem.ToTreeNodeResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Name.Should().Be(unixRootItem.Name);
-        result.Path.Should().Be(unixRootItem.Id.Path);
-        result.ItemType.Should().Be(unixRootItem.Type);
-        result.IsExpanded.Should().BeFalse();
-        result.ChildrenLoaded.Should().BeFalse();
-        result.Children.Should().BeEmpty();
+        Assert.NotNull(result);
+        Assert.Equal(unixRootItem.Name, result.Name);
+        Assert.Equal(unixRootItem.Id.Path, result.Path);
+        Assert.Equal(unixRootItem.Type, result.ItemType);
+        Assert.False(result.IsExpanded);
+        Assert.False(result.ChildrenLoaded);
+        Assert.Empty(result.Children);
     }
 
     [Theory]
@@ -149,11 +148,11 @@ public class FileSystemItemMappingTests
         FileSystemItemDto result = domainModel.ToFileSystemItemDto();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Path.Should().Be(domainModel.Id.Path);
-        result.Name.Should().Be(domainModel.Name);
-        result.DateCreated.Should().BeCloseTo(DateTime.Now, TimeSpan.FromSeconds(1));
-        result.DateModified.Should().BeCloseTo(DateTime.Now, TimeSpan.FromSeconds(1));
+        Assert.NotNull(result);
+        Assert.Equal(domainModel.Id.Path, result.Path);
+        Assert.Equal(domainModel.Name, result.Name);
+        Assert.True((DateTime.Now - result.DateCreated) < TimeSpan.FromSeconds(1));
+        Assert.True((DateTime.Now - result.DateModified) < TimeSpan.FromSeconds(1));
     }
 
     [Fact]
@@ -163,26 +162,26 @@ public class FileSystemItemMappingTests
         List<FileSystemItem> domainModels =
         [
             _directoryFixture.CreateDirectory(),
-        _fileFixture.CreateFile(),
-        _windowsRootItemFixture.Create(),
-        _unixRootItemFixture.Create()
+            _fileFixture.CreateFile(),
+            _windowsRootItemFixture.Create(),
+            _unixRootItemFixture.Create()
         ];
 
         // Act
         IEnumerable<FileSystemTreeNodeResponse> result = domainModels.ToTreeNodeResponses();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Should().HaveCount(domainModels.Count);
+        Assert.NotNull(result);
+        Assert.Equal(domainModels.Count, result.Count());
 
         List<FileSystemTreeNodeResponse> resultList = result.ToList();
         for (int i = 0; i < resultList.Count; i++)
         {
-            resultList[i].Name.Should().Be(domainModels[i].Name);
-            resultList[i].Path.Should().Be(domainModels[i].Id.Path);
-            resultList[i].ItemType.Should().Be(domainModels[i].Type);
-            resultList[i].IsExpanded.Should().BeFalse();
-            resultList[i].ChildrenLoaded.Should().BeFalse();
+            Assert.Equal(domainModels[i].Name, resultList[i].Name);
+            Assert.Equal(domainModels[i].Id.Path, resultList[i].Path);
+            Assert.Equal(domainModels[i].Type, resultList[i].ItemType);
+            Assert.False(resultList[i].IsExpanded);
+            Assert.False(resultList[i].ChildrenLoaded);
         }
     }
 
@@ -196,9 +195,8 @@ public class FileSystemItemMappingTests
         FileSystemItemFixture invalidItem = new(id, name, type);
 
         // Act & Assert
-        invalidItem.Invoking(item => item.ToTreeNodeResponse())
-            .Should().Throw<ArgumentException>()
-            .WithMessage("Invalid FileSystemItem");
+        ArgumentException exception = Assert.Throws<ArgumentException>(() => invalidItem.ToTreeNodeResponse());
+        Assert.Equal("Invalid FileSystemItem", exception.Message);
     }
 
     [Fact]
@@ -211,19 +209,19 @@ public class FileSystemItemMappingTests
         IEnumerable<FileSystemTreeNodeResponse> result = domainModels.ToTreeNodeResponses();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Should().HaveCount(domainModels.Count());
+        Assert.NotNull(result);
+        Assert.Equal(domainModels.Count(), result.Count());
 
         List<FileSystemTreeNodeResponse> resultList = result.ToList();
         List<FileSystemItem> domainModelsList = domainModels.ToList();
         for (int i = 0; i < resultList.Count; i++)
         {
-            resultList[i].Name.Should().Be(domainModelsList[i].Name);
-            resultList[i].Path.Should().Be(domainModelsList[i].Id.Path);
-            resultList[i].ItemType.Should().Be(domainModelsList[i].Type);
-            resultList[i].IsExpanded.Should().BeFalse();
-            resultList[i].ChildrenLoaded.Should().BeFalse();
-            resultList[i].Children.Should().BeEmpty();
+            Assert.Equal(domainModelsList[i].Name, resultList[i].Name);
+            Assert.Equal(domainModelsList[i].Id.Path, resultList[i].Path);
+            Assert.Equal(domainModelsList[i].Type, resultList[i].ItemType);
+            Assert.False(resultList[i].IsExpanded);
+            Assert.False(resultList[i].ChildrenLoaded);
+            Assert.Empty(resultList[i].Children);
         }
     }
 }

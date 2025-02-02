@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using FluentAssertions;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Thumbnails;
 using Lumina.Application.Core.FileSystemManagement.Thumbnails.Queries.GetThumbnail;
 using Lumina.Contracts.Requests.FileSystemManagement.Thumbnails;
@@ -38,9 +37,9 @@ public class GetThumbnailRequestMappingTests
         GetThumbnailQuery result = request.ToQuery();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Path.Should().Be(request.Path);
-        result.Quality.Should().Be(request.Quality);
+        Assert.NotNull(result);
+        Assert.Equal(request.Path, result.Path);
+        Assert.Equal(request.Quality, result.Quality);
     }
 
     [Theory]
@@ -56,9 +55,9 @@ public class GetThumbnailRequestMappingTests
         GetThumbnailQuery result = request.ToQuery();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Path.Should().Be(path);
-        result.Quality.Should().Be(quality);
+        Assert.NotNull(result);
+        Assert.Equal(path, result.Path);
+        Assert.Equal(quality, result.Quality);
     }
 
     [Fact]
@@ -71,12 +70,12 @@ public class GetThumbnailRequestMappingTests
         List<GetThumbnailQuery> results = requests.Select(r => r.ToQuery()).ToList();
 
         // Assert
-        results.Should().NotBeNull();
-        results.Should().HaveCount(requests.Count);
+        Assert.NotNull(results);
+        Assert.Equal(requests.Count, results.Count);
         for (int i = 0; i < requests.Count; i++)
         {
-            results[i].Path.Should().Be(requests[i].Path);
-            results[i].Quality.Should().Be(requests[i].Quality);
+            Assert.Equal(requests[i].Path, results[i].Path);
+            Assert.Equal(requests[i].Quality, results[i].Quality);
         }
     }
 }

@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using FastEndpoints;
-using FluentAssertions;
 using Lumina.Presentation.Api.UnitTests.Core.Endpoints.Common.Fixtures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -34,7 +33,7 @@ public class BaseEndpointTests
         IResult result = _sut.TestProblem([]);
 
         // Assert
-        result.Should().BeOfType<ProblemHttpResult>();
+        Assert.IsType<ProblemHttpResult>(result);
     }
 
     [Fact]
@@ -50,19 +49,17 @@ public class BaseEndpointTests
         IResult result = _sut.TestProblem(errors);
 
         // Assert
-        result.Should().BeOfType<ProblemHttpResult>();
-        ProblemHttpResult problemDetails = (ProblemHttpResult)result;
-        problemDetails.StatusCode.Should().Be(StatusCodes.Status422UnprocessableEntity);
-        problemDetails.ContentType.Should().Be("application/problem+json");
-        problemDetails.ProblemDetails.Should().BeOfType<HttpValidationProblemDetails>();
-        HttpValidationProblemDetails validationProblemDetails = (HttpValidationProblemDetails)problemDetails.ProblemDetails;
-        validationProblemDetails.Status.Should().Be(StatusCodes.Status422UnprocessableEntity);
-        validationProblemDetails.Title.Should().Be("General.Validation");
-        validationProblemDetails.Detail.Should().Be("OneOrMoreValidationErrorsOccurred");
-        validationProblemDetails.Type.Should().Be("https://tools.ietf.org/html/rfc4918#section-11.2");
-        validationProblemDetails.Errors.Should().HaveCount(2);
-        validationProblemDetails.Errors["Code1"].Should().BeEquivalentTo(["Description1"]);
-        validationProblemDetails.Errors["Code2"].Should().BeEquivalentTo(["Description2"]);
+        ProblemHttpResult problemDetails = Assert.IsType<ProblemHttpResult>(result);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, problemDetails.StatusCode);
+        Assert.Equal("application/problem+json", problemDetails.ContentType);
+        HttpValidationProblemDetails validationProblemDetails = Assert.IsType<HttpValidationProblemDetails>(problemDetails.ProblemDetails);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, validationProblemDetails.Status);
+        Assert.Equal("General.Validation", validationProblemDetails.Title);
+        Assert.Equal("OneOrMoreValidationErrorsOccurred", validationProblemDetails.Detail);
+        Assert.Equal("https://tools.ietf.org/html/rfc4918#section-11.2", validationProblemDetails.Type);
+        Assert.Equal(2, validationProblemDetails.Errors.Count);
+        Assert.Equal(new[] { "Description1" }, validationProblemDetails.Errors["Code1"]);
+        Assert.Equal(new[] { "Description2" }, validationProblemDetails.Errors["Code2"]);
     }
 
     [Theory]
@@ -87,14 +84,13 @@ public class BaseEndpointTests
         IResult result = _sut.TestProblem(errors);
 
         // Assert
-        result.Should().BeOfType<ProblemHttpResult>();
-        ProblemHttpResult problemResult = (ProblemHttpResult)result;
-        problemResult.StatusCode.Should().Be(expectedStatusCode);
-        problemResult.ProblemDetails.Status.Should().Be(expectedStatusCode);
-        problemResult.ProblemDetails.Title.Should().Be("ErrorCode");
-        problemResult.ProblemDetails.Detail.Should().Be("ErrorDescription");
-        problemResult.ProblemDetails.Instance.Should().NotBeNull();
-        problemResult.ProblemDetails.Extensions.Should().ContainKey("traceId");
+        ProblemHttpResult problemResult = Assert.IsType<ProblemHttpResult>(result);
+        Assert.Equal(expectedStatusCode, problemResult.StatusCode);
+        Assert.Equal(expectedStatusCode, problemResult.ProblemDetails.Status);
+        Assert.Equal("ErrorCode", problemResult.ProblemDetails.Title);
+        Assert.Equal("ErrorDescription", problemResult.ProblemDetails.Detail);
+        Assert.NotNull(problemResult.ProblemDetails.Instance);
+        Assert.Contains("traceId", problemResult.ProblemDetails.Extensions.Keys);
     }
 
     [Fact]
@@ -108,14 +104,13 @@ public class BaseEndpointTests
         IResult result = _sut.TestProblem(errors);
 
         // Assert
-        result.Should().BeOfType<ProblemHttpResult>();
-        ProblemHttpResult problemResult = (ProblemHttpResult)result;
-        problemResult.StatusCode.Should().Be(422);
-        problemResult.ProblemDetails.Status.Should().Be(StatusCodes.Status422UnprocessableEntity);
-        problemResult.ProblemDetails.Title.Should().Be("General.Validation");
-        problemResult.ProblemDetails.Detail.Should().Be("OneOrMoreValidationErrorsOccurred");
-        problemResult.ProblemDetails.Instance.Should().NotBeNull();
-        problemResult.ProblemDetails.Extensions.Should().ContainKey("traceId");
+        ProblemHttpResult problemResult = Assert.IsType<ProblemHttpResult>(result);
+        Assert.Equal(422, problemResult.StatusCode);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, problemResult.ProblemDetails.Status);
+        Assert.Equal("General.Validation", problemResult.ProblemDetails.Title);
+        Assert.Equal("OneOrMoreValidationErrorsOccurred", problemResult.ProblemDetails.Detail);
+        Assert.NotNull(problemResult.ProblemDetails.Instance);
+        Assert.Contains("traceId", problemResult.ProblemDetails.Extensions.Keys);
     }
 
     [Fact]
@@ -131,12 +126,12 @@ public class BaseEndpointTests
         IResult result = _sut.TestProblem(errors);
 
         // Assert
-        result.Should().BeOfType<ProblemHttpResult>();
-        ProblemHttpResult problemResult = (ProblemHttpResult)result;
-        problemResult.StatusCode.Should().BeOneOf(StatusCodes.Status404NotFound, StatusCodes.Status400BadRequest);
-        problemResult.ProblemDetails.Status.Should().BeOneOf(StatusCodes.Status404NotFound, StatusCodes.Status400BadRequest);
-        problemResult.ProblemDetails.Title.Should().Be("FailureCode");
-        problemResult.ProblemDetails.Detail.Should().Be("Failure Error");
+        ProblemHttpResult problemResult = Assert.IsType<ProblemHttpResult>(result);
+        Assert.Contains(problemResult.StatusCode, new[] { StatusCodes.Status404NotFound, StatusCodes.Status400BadRequest });
+        int?[] allowedStatusCodes = [StatusCodes.Status404NotFound, StatusCodes.Status400BadRequest];
+        Assert.Contains(problemResult.ProblemDetails.Status, allowedStatusCodes);
+        Assert.Equal("FailureCode", problemResult.ProblemDetails.Title);
+        Assert.Equal("Failure Error", problemResult.ProblemDetails.Detail);
     }
 
     [Fact]
@@ -152,19 +147,17 @@ public class BaseEndpointTests
         IResult result = _sut.TestValidationProblem(errors);
 
         // Assert
-        result.Should().BeOfType<ProblemHttpResult>();
-        ProblemHttpResult problemDetails = (ProblemHttpResult)result;
-        problemDetails.StatusCode.Should().Be(StatusCodes.Status422UnprocessableEntity);
-        problemDetails.ContentType.Should().Be("application/problem+json");
-        problemDetails.ProblemDetails.Should().BeOfType<HttpValidationProblemDetails>();
-        HttpValidationProblemDetails validationProblemDetails = (HttpValidationProblemDetails)problemDetails.ProblemDetails;
-        validationProblemDetails.Status.Should().Be(StatusCodes.Status422UnprocessableEntity);
-        validationProblemDetails.Title.Should().Be("General.Validation");
-        validationProblemDetails.Detail.Should().Be("OneOrMoreValidationErrorsOccurred");
-        validationProblemDetails.Type.Should().Be("https://tools.ietf.org/html/rfc4918#section-11.2");
-        validationProblemDetails.Errors.Should().HaveCount(2);
-        validationProblemDetails.Errors["Code1"].Should().BeEquivalentTo(["Description1"]);
-        validationProblemDetails.Errors["Code2"].Should().BeEquivalentTo(["Description2"]);
+        ProblemHttpResult problemDetails = Assert.IsType<ProblemHttpResult>(result);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, problemDetails.StatusCode);
+        Assert.Equal("application/problem+json", problemDetails.ContentType);
+        HttpValidationProblemDetails validationProblemDetails = Assert.IsType<HttpValidationProblemDetails>(problemDetails.ProblemDetails);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, validationProblemDetails.Status);
+        Assert.Equal("General.Validation", validationProblemDetails.Title);
+        Assert.Equal("OneOrMoreValidationErrorsOccurred", validationProblemDetails.Detail);
+        Assert.Equal("https://tools.ietf.org/html/rfc4918#section-11.2", validationProblemDetails.Type);
+        Assert.Equal(2, validationProblemDetails.Errors.Count);
+        Assert.Equal(new[] { "Description1" }, validationProblemDetails.Errors["Code1"]);
+        Assert.Equal(new[] { "Description2" }, validationProblemDetails.Errors["Code2"]);
     }
 
     [Fact]
@@ -181,11 +174,11 @@ public class BaseEndpointTests
         IResult result = _sut.TestValidationProblem(errors);
 
         // Assert
-        result.Should().BeOfType<ProblemHttpResult>();
-        ProblemHttpResult problemDetails = (ProblemHttpResult)result;
-        HttpValidationProblemDetails validationProblemDetails = (HttpValidationProblemDetails)problemDetails.ProblemDetails;
-        validationProblemDetails.Errors.Should().ContainKeys("Code1", "Code2");
-        validationProblemDetails.Errors["Code1"].Should().BeEquivalentTo(["Description1", "Description2"]);
-        validationProblemDetails.Errors["Code2"].Should().BeEquivalentTo(["Description3"]);
+        ProblemHttpResult problemDetails = Assert.IsType<ProblemHttpResult>(result);
+        HttpValidationProblemDetails validationProblemDetails = Assert.IsType<HttpValidationProblemDetails>(problemDetails.ProblemDetails);
+        Assert.Contains("Code1", validationProblemDetails.Errors.Keys);
+        Assert.Contains("Code2", validationProblemDetails.Errors.Keys);
+        Assert.Equal(new[] { "Description1", "Description2" }, validationProblemDetails.Errors["Code1"]);
+        Assert.Equal(new[] { "Description3" }, validationProblemDetails.Errors["Code2"]);
     }
 }

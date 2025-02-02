@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.DataAccess.Core.UoW;
@@ -60,20 +59,20 @@ public class RecoverPasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDi
 
         // Assert
         HttpResponseMessage lastResponse = responses.Last();
-        lastResponse.StatusCode.Should().Be(HttpStatusCode.TooManyRequests);
+        Assert.Equal(HttpStatusCode.TooManyRequests, lastResponse.StatusCode);
         string content = await lastResponse.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
-        problemDetails.Should().NotBeNull();
-        problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status429TooManyRequests);
-        problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc7231#section-6.5.29");
-        problemDetails["title"].GetString().Should().Be("TooManyRequests");
-        problemDetails["detail"].GetString().Should().Be("TooManyRequests");
-        problemDetails["retryAfter"].GetString().Should().Be("900");
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status429TooManyRequests, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc7231#section-6.5.29", problemDetails["type"].GetString());
+        Assert.Equal("TooManyRequests", problemDetails["title"].GetString());
+        Assert.Equal("TooManyRequests", problemDetails["detail"].GetString());
+        Assert.Equal("900", problemDetails["retryAfter"].GetString());
 
-        lastResponse.Headers.Should().ContainKey("X-RateLimit-Limit");
-        lastResponse.Headers.Should().ContainKey("X-RateLimit-Reset");
-        lastResponse.Headers.Should().ContainKey("X-RateLimit-Remaining");
+        Assert.True(lastResponse.Headers.Contains("X-RateLimit-Limit"));
+        Assert.True(lastResponse.Headers.Contains("X-RateLimit-Reset"));
+        Assert.True(lastResponse.Headers.Contains("X-RateLimit-Remaining"));
     }
 
     public void Dispose()

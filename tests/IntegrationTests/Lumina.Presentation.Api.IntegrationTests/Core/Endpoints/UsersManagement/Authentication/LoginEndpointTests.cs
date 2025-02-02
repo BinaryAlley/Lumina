@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.Infrastructure.Security;
 using Lumina.Contracts.Requests.Authentication;
@@ -83,15 +82,16 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
 
         // Assert
         response.EnsureSuccessStatusCode();
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         string content = await response.Content.ReadAsStringAsync();
         LoginResponse? result = JsonSerializer.Deserialize<LoginResponse>(content, _jsonOptions);
 
-        result.Should().NotBeNull();
-        result!.Username.Should().Be(user.Username);
-        result.UsesTotp.Should().BeFalse();
-        result.Token.Should().NotBeNullOrEmpty();
+        Assert.NotNull(result);
+        Assert.Equal(user.Username, result!.Username);
+        Assert.False(result.UsesTotp);
+        Assert.NotNull(result.Token);
+        Assert.NotEmpty(result.Token);
     }
 
     [Fact]
@@ -114,15 +114,16 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
 
         // Assert
         response.EnsureSuccessStatusCode();
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         string content = await response.Content.ReadAsStringAsync();
         LoginResponse? result = JsonSerializer.Deserialize<LoginResponse>(content, _jsonOptions);
 
-        result.Should().NotBeNull();
-        result!.Username.Should().Be(user.Username);
-        result.UsesTotp.Should().BeTrue();
-        result.Token.Should().NotBeNullOrEmpty();
+        Assert.NotNull(result);
+        Assert.Equal(user.Username, result!.Username);
+        Assert.True(result.UsesTotp);
+        Assert.NotNull(result.Token);
+        Assert.NotEmpty(result.Token);
     }
 
     [Fact]
@@ -140,14 +141,15 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
 
         // Assert
         response.EnsureSuccessStatusCode();
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         string content = await response.Content.ReadAsStringAsync();
         LoginResponse? result = JsonSerializer.Deserialize<LoginResponse>(content, _jsonOptions);
 
-        result.Should().NotBeNull();
-        result!.Username.Should().Be(user.Username);
-        result.Token.Should().NotBeNullOrEmpty();
+        Assert.NotNull(result);
+        Assert.Equal(user.Username, result!.Username);
+        Assert.NotNull(result.Token);
+        Assert.NotEmpty(result.Token);
     }
 
     [Fact]
@@ -164,17 +166,18 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
         HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/auth/login", request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
-        problemDetails.Should().NotBeNull();
-        problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status403Forbidden);
-        problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.4");
-        problemDetails["title"].GetString().Should().Be("General.Failure");
-        problemDetails["detail"].GetString().Should().Be("TempPasswordExpired");
-        problemDetails["instance"].GetString().Should().Be("/api/v1/auth/login");
-        problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status403Forbidden, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.4", problemDetails["type"].GetString());
+        Assert.Equal("General.Failure", problemDetails["title"].GetString());
+        Assert.Equal("TempPasswordExpired", problemDetails["detail"].GetString());
+        Assert.Equal("/api/v1/auth/login", problemDetails["instance"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString());
     }
 
     [Fact]
@@ -191,17 +194,18 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
         HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/auth/login", request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
-        problemDetails.Should().NotBeNull();
-        problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status403Forbidden);
-        problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.4");
-        problemDetails["title"].GetString().Should().Be("General.Failure");
-        problemDetails["detail"].GetString().Should().Be("InvalidUsernameOrPassword");
-        problemDetails["instance"].GetString().Should().Be("/api/v1/auth/login");
-        problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status403Forbidden, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.4", problemDetails["type"].GetString());
+        Assert.Equal("General.Failure", problemDetails["title"].GetString());
+        Assert.Equal("InvalidUsernameOrPassword", problemDetails["detail"].GetString());
+        Assert.Equal("/api/v1/auth/login", problemDetails["instance"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString());
     }
 
     [Fact]
@@ -219,20 +223,23 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
         HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/auth/login", request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.UnprocessableEntity);
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
-        problemDetails.Should().NotBeNull();
-        problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status422UnprocessableEntity);
-        problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc4918#section-11.2");
-        problemDetails["title"].GetString().Should().Be("General.Validation");
-        problemDetails["detail"].GetString().Should().Be("OneOrMoreValidationErrorsOccurred");
-        problemDetails["instance"].GetString().Should().Be("/api/v1/auth/login");
-        problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc4918#section-11.2", problemDetails["type"].GetString());
+        Assert.Equal("General.Validation", problemDetails["title"].GetString());
+        Assert.Equal("OneOrMoreValidationErrorsOccurred", problemDetails["detail"].GetString());
+        Assert.Equal("/api/v1/auth/login", problemDetails["instance"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString());
 
         Dictionary<string, string[]>? errors = problemDetails["errors"].Deserialize<Dictionary<string, string[]>>(_jsonOptions);
-        errors.Should().ContainKey("General.Validation").WhoseValue.Should().Contain(["InvalidTotpCode"]);
+        Assert.NotNull(errors);
+        Assert.Contains("General.Validation", errors.Keys);
+        Assert.Contains("InvalidTotpCode", errors["General.Validation"]);
     }
    
     private async Task<UserEntity> CreateTestUser()

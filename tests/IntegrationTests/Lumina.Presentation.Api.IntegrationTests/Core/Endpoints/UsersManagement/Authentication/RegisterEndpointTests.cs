@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
@@ -72,17 +71,17 @@ public class RegisterEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/auth/register", request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
         RegistrationResponse? result = JsonSerializer.Deserialize<RegistrationResponse>(content, _jsonOptions);
 
-        result.Should().NotBeNull();
-        result!.Username.Should().Be(_testUsername);
-        result.Id.Should().NotBe(Guid.Empty);
-        result.TotpSecret.Should().BeNull();
+        Assert.NotNull(result);
+        Assert.Equal(_testUsername, result!.Username);
+        Assert.NotEqual(Guid.Empty, result.Id);
+        Assert.Null(result.TotpSecret);
 
-        response.Headers.Location.Should().NotBeNull();
-        response.Headers.Location!.ToString().Should().Be($"http://localhost/api/v1/users/{result.Id}");
+        Assert.NotNull(response.Headers.Location);
+        Assert.Equal($"http://localhost/api/v1/users/{result.Id}", response.Headers.Location.ToString());
     }
 
     [Fact]
@@ -100,15 +99,16 @@ public class RegisterEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/auth/register", request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
         RegistrationResponse? result = JsonSerializer.Deserialize<RegistrationResponse>(content, _jsonOptions);
 
-        result.Should().NotBeNull();
-        result!.Username.Should().Be(_testUsername);
-        result.Id.Should().NotBe(Guid.Empty);
-        result.TotpSecret.Should().NotBeNullOrEmpty();
-        result.TotpSecret.Should().StartWith("data:image/png;base64,");
+        Assert.NotNull(result);
+        Assert.Equal(_testUsername, result!.Username);
+        Assert.NotEqual(Guid.Empty, result.Id);
+        Assert.NotNull(result.TotpSecret);
+        Assert.NotEmpty(result.TotpSecret);
+        Assert.StartsWith("data:image/png;base64,", result.TotpSecret);
     }
 
     [Fact]
@@ -127,14 +127,14 @@ public class RegisterEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/auth/register", request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
-        problemDetails.Should().NotBeNull();
-        problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status409Conflict);
-        problemDetails["title"].GetString().Should().Be("General.Conflict");
-        problemDetails["detail"].GetString().Should().Be("UsernameAlreadyExists");
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status409Conflict, problemDetails!["status"].GetInt32());
+        Assert.Equal("General.Conflict", problemDetails["title"].GetString());
+        Assert.Equal("UsernameAlreadyExists", problemDetails["detail"].GetString());
     }
 
     [Fact]
@@ -152,13 +152,15 @@ public class RegisterEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/auth/register", request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.UnprocessableContent);
+        Assert.Equal(HttpStatusCode.UnprocessableContent, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
-        problemDetails.Should().NotBeNull();
+        Assert.NotNull(problemDetails);
         Dictionary<string, string[]>? errors = problemDetails!["errors"].Deserialize<Dictionary<string, string[]>>(_jsonOptions);
-        errors.Should().ContainKey("General.Validation").WhoseValue.Should().Contain("PasswordsNotMatch");
+        Assert.NotNull(errors);
+        Assert.Contains("General.Validation", errors.Keys);
+        Assert.Contains("PasswordsNotMatch", errors["General.Validation"]);
     }
 
     [Fact]
@@ -171,14 +173,17 @@ public class RegisterEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/auth/register", request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.UnprocessableContent);
+        Assert.Equal(HttpStatusCode.UnprocessableContent, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
-        problemDetails.Should().NotBeNull();
+        Assert.NotNull(problemDetails);
         Dictionary<string, string[]>? errors = problemDetails!["errors"].Deserialize<Dictionary<string, string[]>>(_jsonOptions);
-        errors.Should().ContainKey("General.Validation")
-            .WhoseValue.Should().Contain(["UsernameCannotBeEmpty", "PasswordCannotBeEmpty", "PasswordConfirmCannotBeEmpty"]);
+        Assert.NotNull(errors);
+        Assert.Contains("General.Validation", errors.Keys);
+        Assert.Contains("UsernameCannotBeEmpty", errors["General.Validation"]);
+        Assert.Contains("PasswordCannotBeEmpty", errors["General.Validation"]);
+        Assert.Contains("PasswordConfirmCannotBeEmpty", errors["General.Validation"]);
     }
 
     private async Task<UserEntity> CreateTestUser()

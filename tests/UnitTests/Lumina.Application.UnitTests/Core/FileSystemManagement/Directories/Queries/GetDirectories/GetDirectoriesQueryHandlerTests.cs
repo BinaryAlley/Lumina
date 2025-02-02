@@ -2,7 +2,6 @@
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Application.Core.FileSystemManagement.Directories.Queries.GetDirectories;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Directories.Fixtures;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Directories.Queries.GetDirectories.Fixtures;
@@ -57,20 +56,20 @@ public class GetDirectoriesQueryHandlerTests
         ErrorOr<IEnumerable<DirectoryResponse>> result = await _sut.Handle(getDirectoriesQuery, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().BeAssignableTo<IEnumerable<DirectoryResponse>>();
-        result.Value.Should().HaveCount(directories.Count());
+        Assert.False(result.IsError);
+        Assert.IsAssignableFrom<IEnumerable<DirectoryResponse>>(result.Value);
+        Assert.Equal(directories.Count(), result.Value.Count());
 
         List<DirectoryResponse> resultList = result.Value.ToList();
         List<Directory> directoriesList = directories.ToList();
 
         for (int i = 0; i < resultList.Count; i++)
         {
-            resultList[i].Path.Should().Be(directoriesList[i].Id.Path);
-            resultList[i].Name.Should().Be(directoriesList[i].Name);
-            resultList[i].DateCreated.Should().Be(directoriesList[i].DateCreated.Value);
-            resultList[i].DateModified.Should().Be(directoriesList[i].DateModified.Value);
-            resultList[i].Items.Should().BeEmpty(); // since files are not included
+            Assert.Equal(directoriesList[i].Id.Path, resultList[i].Path);
+            Assert.Equal(directoriesList[i].Name, resultList[i].Name);
+            Assert.Equal(directoriesList[i].DateCreated.Value, resultList[i].DateCreated);
+            Assert.Equal(directoriesList[i].DateModified.Value, resultList[i].DateModified);
+            Assert.Empty(resultList[i].Items); // since files are not included
         }
 
         _mockDirectoryService.Received(1).GetSubdirectories(getDirectoriesQuery.Path!, getDirectoriesQuery.IncludeHiddenElements);
@@ -91,20 +90,20 @@ public class GetDirectoriesQueryHandlerTests
         ErrorOr<IEnumerable<DirectoryResponse>> result = await _sut.Handle(getDirectoriesQuery, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().BeAssignableTo<IEnumerable<DirectoryResponse>>();
-        result.Value.Should().HaveCount(directories.Count());
+        Assert.False(result.IsError);
+        Assert.IsAssignableFrom<IEnumerable<DirectoryResponse>>(result.Value);
+        Assert.Equal(directories.Count(), result.Value.Count());
 
         List<DirectoryResponse> resultList = result.Value.ToList();
         List<Directory> directoriesList = directories.ToList();
 
         for (int i = 0; i < resultList.Count; i++)
         {
-            resultList[i].Path.Should().Be(directoriesList[i].Id.Path);
-            resultList[i].Name.Should().Be(directoriesList[i].Name);
-            resultList[i].DateCreated.Should().Be(directoriesList[i].DateCreated.Value);
-            resultList[i].DateModified.Should().Be(directoriesList[i].DateModified.Value);
-            resultList[i].Items.Should().HaveCount(directoriesList[i].Items.Count);
+            Assert.Equal(directoriesList[i].Id.Path, resultList[i].Path);
+            Assert.Equal(directoriesList[i].Name, resultList[i].Name);
+            Assert.Equal(directoriesList[i].DateCreated.Value, resultList[i].DateCreated);
+            Assert.Equal(directoriesList[i].DateModified.Value, resultList[i].DateModified);
+            Assert.Equal(directoriesList[i].Items.Count, resultList[i].Items.Count);
         }
 
         _mockDirectoryService.Received(1).GetSubdirectories(getDirectoriesQuery.Path!, getDirectoriesQuery.IncludeHiddenElements);
@@ -123,8 +122,8 @@ public class GetDirectoriesQueryHandlerTests
         ErrorOr<IEnumerable<DirectoryResponse>> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(error);
+        Assert.True(result.IsError);
+        Assert.Equal(error, result.FirstError);
         _mockDirectoryService.Received(1).GetSubdirectories(query.Path!, query.IncludeHiddenElements);
     }
 
@@ -141,8 +140,8 @@ public class GetDirectoriesQueryHandlerTests
         ErrorOr<IEnumerable<DirectoryResponse>> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().BeEmpty();
+        Assert.False(result.IsError);
+        Assert.Empty(result.Value);
         _mockDirectoryService.Received(1).GetSubdirectories(query.Path!, query.IncludeHiddenElements);
     }
 }

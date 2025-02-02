@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Repositories.Books;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Authentication;
@@ -59,7 +58,7 @@ public class UnitOfWorkTests
         unitOfWork.ResetRepositories();
 
         // Assert
-        unitOfWork.Repositories.Count.Should().Be(0);
+        Assert.Equal(0, unitOfWork.Repositories.Count);
     }
 
     [Fact]
@@ -79,8 +78,8 @@ public class UnitOfWorkTests
         unitOfWork.AddRepositories();
 
         // Assert
-        unitOfWork.Repositories.Count.Should().BeGreaterThan(0);
-        unitOfWork.Repositories.Count.Should().Be(initialCount);
+        Assert.True(unitOfWork.Repositories.Count > 0);
+        Assert.Equal(initialCount, unitOfWork.Repositories.Count);
     }
 
     [Fact]
@@ -94,7 +93,7 @@ public class UnitOfWorkTests
         UnitOfWork unitOfWork = new(repositoryFactory, dbContext);
 
         // Assert
-        unitOfWork.Repositories.Count.Should().BeGreaterThan(0);
+        Assert.True(unitOfWork.Repositories.Count > 0);
     }
 
     [Fact]
@@ -113,7 +112,7 @@ public class UnitOfWorkTests
         IBookRepository result = unitOfWork.GetRepository<IBookRepository>();
 
         // Assert
-        result.Should().BeNull();
+        Assert.Null(result);
     }
 
     [Fact]
@@ -128,7 +127,7 @@ public class UnitOfWorkTests
         UnitOfWork unitOfWork = (UnitOfWork)serviceProvider.GetRequiredService<IUnitOfWork>();
 
         // Act & Assert
-        unitOfWork.GetRepository<IBookRepository>().Should().NotBeNull();
+        Assert.NotNull(unitOfWork.GetRepository<IBookRepository>());
     }
 
     [Fact]

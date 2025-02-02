@@ -2,7 +2,6 @@
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Application.Core.FileSystemManagement.Files.Queries.GetFiles;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Files.Fixtures;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Files.Queries.GetFiles.Fixtures;
@@ -57,20 +56,20 @@ public class GetFilesQueryHandlerTests
         ErrorOr<IEnumerable<FileResponse>> result = await _sut.Handle(getFilesQuery, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().BeAssignableTo<IEnumerable<FileResponse>>();
-        result.Value.Should().HaveCount(files.Count());
+        Assert.False(result.IsError);
+        Assert.IsAssignableFrom<IEnumerable<FileResponse>>(result.Value);
+        Assert.Equal(files.Count(), result.Value.Count());
 
         List<FileResponse> resultList = result.Value.ToList();
         List<File> filesList = files.ToList();
 
         for (int i = 0; i < resultList.Count; i++)
         {
-            resultList[i].Path.Should().Be(filesList[i].Id.Path);
-            resultList[i].Name.Should().Be(filesList[i].Name);
-            resultList[i].DateCreated.Should().Be(filesList[i].DateCreated.Value);
-            resultList[i].DateModified.Should().Be(filesList[i].DateModified.Value);
-            resultList[i].Size.Should().Be(filesList[i].Size);
+            Assert.Equal(filesList[i].Id.Path, resultList[i].Path);
+            Assert.Equal(filesList[i].Name, resultList[i].Name);
+            Assert.Equal(filesList[i].DateCreated.Value, resultList[i].DateCreated);
+            Assert.Equal(filesList[i].DateModified.Value, resultList[i].DateModified);
+            Assert.Equal(filesList[i].Size, resultList[i].Size);
         }
 
         _mockFileService.Received(1).GetFiles(getFilesQuery.Path!, getFilesQuery.IncludeHiddenElements);
@@ -91,20 +90,20 @@ public class GetFilesQueryHandlerTests
         ErrorOr<IEnumerable<FileResponse>> result = await _sut.Handle(getFilesQuery, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().BeAssignableTo<IEnumerable<FileResponse>>();
-        result.Value.Should().HaveCount(files.Count());
+        Assert.False(result.IsError);
+        Assert.IsAssignableFrom<IEnumerable<FileResponse>>(result.Value);
+        Assert.Equal(files.Count(), result.Value.Count());
 
         List<FileResponse> resultList = result.Value.ToList();
         List<File> filesList = files.ToList();
 
         for (int i = 0; i < resultList.Count; i++)
         {
-            resultList[i].Path.Should().Be(filesList[i].Id.Path);
-            resultList[i].Name.Should().Be(filesList[i].Name);
-            resultList[i].DateCreated.Should().Be(filesList[i].DateCreated.Value);
-            resultList[i].DateModified.Should().Be(filesList[i].DateModified.Value);
-            resultList[i].Size.Should().Be(filesList[i].Size);
+            Assert.Equal(filesList[i].Id.Path, resultList[i].Path);
+            Assert.Equal(filesList[i].Name, resultList[i].Name);
+            Assert.Equal(filesList[i].DateCreated.Value, resultList[i].DateCreated);
+            Assert.Equal(filesList[i].DateModified.Value, resultList[i].DateModified);
+            Assert.Equal(filesList[i].Size, resultList[i].Size);
         }
 
         _mockFileService.Received(1).GetFiles(getFilesQuery.Path!, getFilesQuery.IncludeHiddenElements);
@@ -123,8 +122,8 @@ public class GetFilesQueryHandlerTests
         ErrorOr<IEnumerable<FileResponse>> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(error);
+        Assert.True(result.IsError);
+        Assert.Equal(error, result.FirstError);
         _mockFileService.Received(1).GetFiles(query.Path!, query.IncludeHiddenElements);
     }
 
@@ -141,8 +140,8 @@ public class GetFilesQueryHandlerTests
         ErrorOr<IEnumerable<FileResponse>> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().BeEmpty();
+        Assert.False(result.IsError);
+        Assert.Empty(result.Value);
         _mockFileService.Received(1).GetFiles(query.Path!, query.IncludeHiddenElements);
     }
 }

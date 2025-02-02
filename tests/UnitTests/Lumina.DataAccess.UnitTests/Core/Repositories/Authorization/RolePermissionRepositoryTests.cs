@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using EntityFrameworkCore.Testing.NSubstitute;
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.DataAccess.Core.Repositories.Authorization;
 using Lumina.DataAccess.Core.UoW;
@@ -46,12 +45,12 @@ public class RolePermissionRepositoryTests
         ErrorOr<Created> result = await _sut.InsertAsync(rolePermissionModel, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().Be(Result.Created);
+        Assert.False(result.IsError);
+        Assert.Equal(Result.Created, result.Value);
 
         // check if the role permission was added to the context's ChangeTracker
         EntityEntry<RolePermissionEntity>? addedRolePermission = _mockContext.ChangeTracker.Entries<RolePermissionEntity>()
-            .FirstOrDefault(e => e.State == EntityState.Added && e.Entity.Id == rolePermissionModel.Id);
-        addedRolePermission.Should().NotBeNull();
+        .FirstOrDefault(e => e.State == EntityState.Added && e.Entity.Id == rolePermissionModel.Id);
+        Assert.NotNull(addedRolePermission);
     }
 }

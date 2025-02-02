@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook;
 using Lumina.Application.UnitTests.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook.Fixtures;
@@ -38,24 +37,24 @@ public class AddBookRequestMappingTests
         AddBookCommand result = request.ToCommand();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Metadata.Should().BeEquivalentTo(request.Metadata);
-        result.Format.Should().Be(request.Format);
-        result.Edition.Should().Be(request.Edition);
-        result.VolumeNumber.Should().Be(request.VolumeNumber);
-        result.Series.Should().BeEquivalentTo(request.Series);
-        result.ASIN.Should().Be(request.ASIN);
-        result.GoodreadsId.Should().Be(request.GoodreadsId);
-        result.LCCN.Should().Be(request.LCCN);
-        result.OCLCNumber.Should().Be(request.OCLCNumber);
-        result.OpenLibraryId.Should().Be(request.OpenLibraryId);
-        result.LibraryThingId.Should().Be(request.LibraryThingId);
-        result.GoogleBooksId.Should().Be(request.GoogleBooksId);
-        result.BarnesAndNobleId.Should().Be(request.BarnesAndNobleId);
-        result.AppleBooksId.Should().Be(request.AppleBooksId);
-        result.ISBNs.Should().BeEquivalentTo(request.ISBNs);
-        result.Contributors.Should().BeEquivalentTo(request.Contributors);
-        result.Ratings.Should().BeEquivalentTo(request.Ratings);
+        Assert.NotNull(result);
+        Assert.Equal(request.Metadata, result.Metadata);
+        Assert.Equal(request.Format, result.Format);
+        Assert.Equal(request.Edition, result.Edition);
+        Assert.Equal(request.VolumeNumber, result.VolumeNumber);
+        Assert.Equal(request.Series, result.Series);
+        Assert.Equal(request.ASIN, result.ASIN);
+        Assert.Equal(request.GoodreadsId, result.GoodreadsId);
+        Assert.Equal(request.LCCN, result.LCCN);
+        Assert.Equal(request.OCLCNumber, result.OCLCNumber);
+        Assert.Equal(request.OpenLibraryId, result.OpenLibraryId);
+        Assert.Equal(request.LibraryThingId, result.LibraryThingId);
+        Assert.Equal(request.GoogleBooksId, result.GoogleBooksId);
+        Assert.Equal(request.BarnesAndNobleId, result.BarnesAndNobleId);
+        Assert.Equal(request.AppleBooksId, result.AppleBooksId);
+        Assert.Equal(request.ISBNs, result.ISBNs);
+        Assert.Equal(request.Contributors, result.Contributors);
+        Assert.Equal(request.Ratings, result.Ratings);
     }
 
     [Fact]
@@ -95,24 +94,24 @@ public class AddBookRequestMappingTests
         AddBookCommand result = request.ToCommand();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Metadata.Should().BeEquivalentTo(request.Metadata);
-        result.Format.Should().BeNull();
-        result.Edition.Should().BeNull();
-        result.VolumeNumber.Should().BeNull();
-        result.Series.Should().BeNull();
-        result.ASIN.Should().BeNull();
-        result.GoodreadsId.Should().BeNull();
-        result.LCCN.Should().BeNull();
-        result.OCLCNumber.Should().BeNull();
-        result.OpenLibraryId.Should().BeNull();
-        result.LibraryThingId.Should().BeNull();
-        result.GoogleBooksId.Should().BeNull();
-        result.BarnesAndNobleId.Should().BeNull();
-        result.AppleBooksId.Should().BeNull();
-        result.ISBNs.Should().BeNull();
-        result.Contributors.Should().BeNull();
-        result.Ratings.Should().BeNull();
+        Assert.NotNull(result);
+        Assert.Equal(request.Metadata, result.Metadata);
+        Assert.Null(result.Format);
+        Assert.Null(result.Edition);
+        Assert.Null(result.VolumeNumber);
+        Assert.Null(result.Series);
+        Assert.Null(result.ASIN);
+        Assert.Null(result.GoodreadsId);
+        Assert.Null(result.LCCN);
+        Assert.Null(result.OCLCNumber);
+        Assert.Null(result.OpenLibraryId);
+        Assert.Null(result.LibraryThingId);
+        Assert.Null(result.GoogleBooksId);
+        Assert.Null(result.BarnesAndNobleId);
+        Assert.Null(result.AppleBooksId);
+        Assert.Null(result.ISBNs);
+        Assert.Null(result.Contributors);
+        Assert.Null(result.Ratings);
     }
 
     [Fact]
@@ -158,9 +157,9 @@ public class AddBookRequestMappingTests
         AddBookCommand result = request.ToCommand();
 
         // Assert
-        result.Should().NotBeNull();
-        result.ISBNs.Should().BeEquivalentTo(request.ISBNs);
-        result.Contributors.Should().BeEquivalentTo(request.Contributors);
-        result.Ratings.Should().BeEquivalentTo(request.Ratings);
+        Assert.NotNull(result);
+        Assert.Equal(request.ISBNs, result.ISBNs);
+        Assert.Equal(request.Contributors, result.Contributors);
+        Assert.Equal(request.Ratings, result.Ratings);
     }
 }

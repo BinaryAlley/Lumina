@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Repositories.Authorization;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -14,6 +13,7 @@ using NSubstitute;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -66,8 +66,8 @@ public class GetRolesQueryHandlerTests
         ErrorOr<IEnumerable<RoleResponse>> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Authorization.NotAuthorized);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Authorization.NotAuthorized, result.FirstError);
         await _mockRoleRepository.DidNotReceive().GetAllAsync(Arg.Any<CancellationToken>());
     }
 
@@ -87,8 +87,8 @@ public class GetRolesQueryHandlerTests
         ErrorOr<IEnumerable<RoleResponse>> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(error);
+        Assert.True(result.IsError);
+        Assert.Equal(error, result.FirstError);
     }
 
     [Fact]
@@ -111,7 +111,7 @@ public class GetRolesQueryHandlerTests
         ErrorOr<IEnumerable<RoleResponse>> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().HaveCount(2);
+        Assert.False(result.IsError);
+        Assert.Equal(2, result.Value.Count());
     }
 }

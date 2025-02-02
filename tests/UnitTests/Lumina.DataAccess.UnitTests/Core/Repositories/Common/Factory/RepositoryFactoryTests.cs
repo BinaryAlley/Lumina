@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Repositories.Books;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Time;
@@ -36,8 +35,8 @@ public class RepositoryFactoryTests
         IBookRepository result = repositoryFactory.CreateRepository<IBookRepository>();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Should().BeAssignableTo<IBookRepository>();
+        Assert.NotNull(result);
+        Assert.IsAssignableFrom<IBookRepository>(result);
     }
 
     [Fact]
@@ -50,7 +49,10 @@ public class RepositoryFactoryTests
         RepositoryFactory repositoryFactory = new(serviceProvider);
 
         // Act & Assert
-        Action act = () => repositoryFactory.CreateRepository<IUnregisteredRepository>();
-        act.Should().Throw<InvalidOperationException>().WithMessage("No service for type 'Lumina.DataAccess.UnitTests.Core.Repositories.Common.Factory.Fixtures.IUnregisteredRepository' has been registered.");
+        InvalidOperationException exception = Assert.Throws<InvalidOperationException>(
+        () => repositoryFactory.CreateRepository<IUnregisteredRepository>());
+        Assert.Equal(
+            "No service for type 'Lumina.DataAccess.UnitTests.Core.Repositories.Common.Factory.Fixtures.IUnregisteredRepository' has been registered.",
+            exception.Message);
     }
 }

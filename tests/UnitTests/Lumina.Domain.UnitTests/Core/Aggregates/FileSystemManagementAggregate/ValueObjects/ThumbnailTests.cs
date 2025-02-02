@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Domain.Common.Enums.PhotoLibrary;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.ValueObjects.Fixtures;
@@ -28,7 +27,7 @@ public class ThumbnailTests
     }
 
     [Fact]
-    public void Constructor_ShouldSetPropertiesCorrectly()
+    public void Constructor_WhenCalled_ShouldSetPropertiesCorrectly()
     {
         // Arrange
         ImageType type = ImageType.PNG;
@@ -38,8 +37,8 @@ public class ThumbnailTests
         Thumbnail thumbnail = new(type, bytes);
 
         // Assert
-        thumbnail.Type.Should().Be(type);
-        thumbnail.Bytes.Should().BeEquivalentTo(bytes);
+        Assert.Equal(type, thumbnail.Type);
+        Assert.Equal(bytes, thumbnail.Bytes);
     }
 
     [Fact]
@@ -53,7 +52,7 @@ public class ThumbnailTests
         bool result = thumbnail1.Equals(thumbnail2);
 
         // Assert
-        result.Should().BeTrue();
+        Assert.True(result);
     }
 
     [Fact]
@@ -67,7 +66,7 @@ public class ThumbnailTests
         bool result = thumbnail1.Equals(thumbnail2);
 
         // Assert
-        result.Should().BeFalse();
+        Assert.False(result);
     }
 
     [Fact]
@@ -81,7 +80,7 @@ public class ThumbnailTests
         bool result = thumbnail1.Equals(thumbnail2);
 
         // Assert
-        result.Should().BeFalse();
+        Assert.False(result);
     }
 
     [Fact]
@@ -96,7 +95,7 @@ public class ThumbnailTests
         int hashCode2 = thumbnail2.GetHashCode();
 
         // Assert
-        hashCode1.Should().Be(hashCode2);
+        Assert.Equal(hashCode1, hashCode2);
     }
 
     [Fact]
@@ -111,7 +110,7 @@ public class ThumbnailTests
         int hashCode2 = thumbnail2.GetHashCode();
 
         // Assert
-        hashCode1.Should().NotBe(hashCode2);
+        Assert.NotEqual(hashCode1, hashCode2);
     }
 
     [Fact]
@@ -124,8 +123,8 @@ public class ThumbnailTests
         List<object> components = thumbnail.GetEqualityComponents().ToList();
 
         // Assert
-        components.Should().HaveCount(2);
-        components[0].Should().Be(thumbnail.Type);
-        components[1].Should().BeEquivalentTo(thumbnail.Bytes);
+        Assert.Equal(2, components.Count);
+        Assert.Equal(thumbnail.Type, components[0]);
+        Assert.Equal(thumbnail.Bytes, components[1]);
     }
 }

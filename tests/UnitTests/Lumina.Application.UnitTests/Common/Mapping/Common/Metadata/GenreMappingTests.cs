@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Domain.Common.ValueObjects.Metadata;
@@ -22,15 +21,15 @@ public class GenreMappingTests
     {
         // Arrange
         ErrorOr<Genre> createResult = Genre.Create("Rock");
-        createResult.IsError.Should().BeFalse();
+        Assert.False(createResult.IsError);
         Genre genre = createResult.Value;
 
         // Act
         GenreEntity result = genre.ToRepositoryEntity();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Name.Should().Be(genre.Name);
+        Assert.NotNull(result);
+        Assert.Equal(genre.Name, result.Name);
     }
 
     [Theory]
@@ -42,15 +41,15 @@ public class GenreMappingTests
     {
         // Arrange
         ErrorOr<Genre> createResult = Genre.Create(name);
-        createResult.IsError.Should().BeFalse();
+        Assert.False(createResult.IsError);
         Genre genre = createResult.Value;
 
         // Act
         GenreEntity result = genre.ToRepositoryEntity();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Name.Should().Be(genre.Name);
+        Assert.NotNull(result);
+        Assert.Equal(genre.Name, result.Name);
     }
 
     [Fact]
@@ -69,10 +68,10 @@ public class GenreMappingTests
         IEnumerable<GenreEntity> results = genres.ToRepositoryEntities();
 
         // Assert
-        results.Should().NotBeNull();
-        results.Should().HaveCount(genres.Count);
+        Assert.NotNull(results);
+        Assert.Equal(genres.Count, results.Count());
         List<GenreEntity> resultList = results.ToList();
         for (int i = 0; i < genres.Count; i++)
-            resultList[i].Name.Should().Be(genres[i].Name);
+            Assert.Equal(genres[i].Name, resultList[i].Name);
     }
 }

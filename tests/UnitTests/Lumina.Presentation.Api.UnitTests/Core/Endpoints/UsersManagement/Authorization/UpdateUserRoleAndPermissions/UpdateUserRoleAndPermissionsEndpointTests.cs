@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using FastEndpoints;
-using FluentAssertions;
 using Lumina.Application.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
 using Lumina.Contracts.Requests.Authorization;
 using Lumina.Contracts.Responses.Authorization;
@@ -61,8 +60,8 @@ public class UpdateUserRoleAndPermissionsEndpointTests
         IResult result = await _sut.ExecuteAsync(request, cancellationToken);
 
         // Assert
-        Ok<AuthorizationResponse> okResult = result.Should().BeOfType<Ok<AuthorizationResponse>>().Subject;
-        okResult.Value.Should().BeEquivalentTo(expectedResponse);
+        Ok<AuthorizationResponse> okResult = Assert.IsType<Ok<AuthorizationResponse>>(result);
+        Assert.Equal(expectedResponse, okResult.Value);
     }
 
     [Fact]
@@ -83,16 +82,16 @@ public class UpdateUserRoleAndPermissionsEndpointTests
         IResult result = await _sut.ExecuteAsync(request, cancellationToken);
 
         // Assert
-        ProblemHttpResult problemResult = result.Should().BeOfType<ProblemHttpResult>().Subject;
-        problemResult.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
-        problemResult.ContentType.Should().Be("application/problem+json");
-        problemResult.ProblemDetails.Should().BeOfType<Microsoft.AspNetCore.Mvc.ProblemDetails>();
+        ProblemHttpResult problemResult = Assert.IsType<ProblemHttpResult>(result);
+        Assert.Equal(StatusCodes.Status403Forbidden, problemResult.StatusCode);
+        Assert.Equal("application/problem+json", problemResult.ContentType);
+        Assert.IsType<Microsoft.AspNetCore.Mvc.ProblemDetails>(problemResult.ProblemDetails);
 
-        problemResult.ProblemDetails.Title.Should().Be("Authorization.Update.Failed");
-        problemResult.ProblemDetails.Detail.Should().Be("Failed to update user role and permissions.");
-        problemResult.ProblemDetails.Status.Should().Be(StatusCodes.Status403Forbidden);
-        problemResult.ProblemDetails.Type.Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.4");
-        problemResult.ProblemDetails.Extensions["traceId"].Should().NotBeNull();
+        Assert.Equal("Authorization.Update.Failed", problemResult.ProblemDetails.Title);
+        Assert.Equal("Failed to update user role and permissions.", problemResult.ProblemDetails.Detail);
+        Assert.Equal(StatusCodes.Status403Forbidden, problemResult.ProblemDetails.Status);
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.4", problemResult.ProblemDetails.Type);
+        Assert.NotNull(problemResult.ProblemDetails.Extensions["traceId"]);
     }
 
     [Fact]

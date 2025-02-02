@@ -1,7 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FluentAssertions;
-using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -70,8 +68,8 @@ public class GetUserPermissionsQueryHandlerTests
         ErrorOr<IEnumerable<PermissionResponse>> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Authorization.NotAuthorized);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Authorization.NotAuthorized, result.FirstError);
         await _mockUserRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
     }
 
@@ -91,8 +89,8 @@ public class GetUserPermissionsQueryHandlerTests
         ErrorOr<IEnumerable<PermissionResponse>> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(error);
+        Assert.True(result.IsError);
+        Assert.Equal(error, result.FirstError);
     }
 
     [Fact]
@@ -110,8 +108,8 @@ public class GetUserPermissionsQueryHandlerTests
         ErrorOr<IEnumerable<PermissionResponse>> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Authentication.UsernameDoesNotExist);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Authentication.UsernameDoesNotExist, result.FirstError);
     }
 
     [Fact]
@@ -149,8 +147,8 @@ public class GetUserPermissionsQueryHandlerTests
         ErrorOr<IEnumerable<PermissionResponse>> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().HaveCount(1);
-        result.Value.First().PermissionName.Should().Be(AuthorizationPermission.CanViewUsers);
+        Assert.False(result.IsError);
+        Assert.Single(result.Value);
+        Assert.Equal(AuthorizationPermission.CanViewUsers, result.Value.First().PermissionName);
     }
 }

@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using FastEndpoints;
-using FluentAssertions;
 using Lumina.Application.Core.FileSystemManagement.Paths.Queries.CheckPathExists;
 using Lumina.Contracts.Requests.FileSystemManagement.Path;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
@@ -53,8 +52,8 @@ public class CheckPathExistsEndpointTests
         IResult result = await _sut.ExecuteAsync(request, cancellationToken);
 
         // Assert
-        PathExistsResponse actualResponse = result.Should().BeOfType<Ok<PathExistsResponse>>().Subject.Value!;
-        actualResponse.Should().BeEquivalentTo(expectedResponse);
+        Ok<PathExistsResponse> okResult = Assert.IsType<Ok<PathExistsResponse>>(result);
+        Assert.Equal(expectedResponse, okResult.Value);
     }
 
     [Fact]

@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.Mapping.Authorization;
 using Lumina.Application.Core.Admin.Authorization.Roles.Commands.DeleteRole;
 using Lumina.Contracts.Requests.Authorization;
@@ -26,8 +25,8 @@ public class DeleteRoleRequestMappingTests
         DeleteRoleCommand result = request.ToCommand();
 
         // Assert
-        result.Should().NotBeNull();
-        result.RoleId.Should().Be(request.RoleId!.Value);
+        Assert.NotNull(result);
+        Assert.Equal(request.RoleId!.Value, result.RoleId);
     }
 
     [Theory]
@@ -44,8 +43,8 @@ public class DeleteRoleRequestMappingTests
         DeleteRoleCommand result = request.ToCommand();
 
         // Assert
-        result.Should().NotBeNull();
-        result.RoleId.Should().Be(roleId);
+        Assert.NotNull(result);
+        Assert.Equal(roleId, result.RoleId);
     }
 
     [Fact]
@@ -54,11 +53,8 @@ public class DeleteRoleRequestMappingTests
         // Arrange
         DeleteRoleRequest request = new(null);
 
-        // Act
-        Action act = () => request.ToCommand();
-
-        // Assert
-        act.Should().Throw<InvalidOperationException>();
+        // Act & Assert
+        Assert.Throws<InvalidOperationException>(() => request.ToCommand());
     }
 
     [Fact]
@@ -71,7 +67,7 @@ public class DeleteRoleRequestMappingTests
         DeleteRoleCommand result = request.ToCommand();
 
         // Assert
-        result.Should().NotBeNull();
-        result.RoleId.Should().Be(Guid.Empty);
+        Assert.NotNull(result);
+        Assert.Equal(Guid.Empty, result.RoleId);
     }
 }

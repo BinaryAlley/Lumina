@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.ValueObjects.Fixtures;
@@ -37,10 +36,10 @@ public class PathSegmentTests
         ErrorOr<PathSegment> result = PathSegment.Create(name, isDirectory, isDrive);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Name.Should().Be(name);
-        result.Value.IsDirectory.Should().Be(isDirectory);
-        result.Value.IsDrive.Should().Be(isDrive);
+        Assert.False(result.IsError);
+        Assert.Equal(name, result.Value.Name);
+        Assert.Equal(isDirectory, result.Value.IsDirectory);
+        Assert.Equal(isDrive, result.Value.IsDrive);
     }
 
     [Theory]
@@ -53,8 +52,8 @@ public class PathSegmentTests
         ErrorOr<PathSegment> result = PathSegment.Create(invalidName!, true, false);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.FileSystemManagement.NameCannotBeEmpty);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.FileSystemManagement.NameCannotBeEmpty, result.FirstError);
     }
 
     [Fact]
@@ -68,7 +67,7 @@ public class PathSegmentTests
         bool result = segment1.Equals(segment2);
 
         // Assert
-        result.Should().BeTrue();
+        Assert.True(result);
     }
 
     [Fact]
@@ -82,7 +81,7 @@ public class PathSegmentTests
         bool result = segment1.Equals(segment2);
 
         // Assert
-        result.Should().BeFalse();
+        Assert.False(result);
     }
 
     [Fact]
@@ -97,7 +96,7 @@ public class PathSegmentTests
         int hashCode2 = segment2.GetHashCode();
 
         // Assert
-        hashCode1.Should().Be(hashCode2);
+        Assert.Equal(hashCode1, hashCode2);
     }
 
     [Fact]
@@ -112,7 +111,7 @@ public class PathSegmentTests
         int hashCode2 = segment2.GetHashCode();
 
         // Assert
-        hashCode1.Should().NotBe(hashCode2);
+        Assert.NotEqual(hashCode1, hashCode2);
     }
 
     [Fact]
@@ -126,7 +125,7 @@ public class PathSegmentTests
         bool result = segment1 == segment2;
 
         // Assert
-        result.Should().BeTrue();
+        Assert.True(result);
     }
 
     [Fact]
@@ -140,6 +139,6 @@ public class PathSegmentTests
         bool result = segment1 != segment2;
 
         // Assert
-        result.Should().BeTrue();
+        Assert.True(result);
     }
 }

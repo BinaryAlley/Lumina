@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -67,8 +66,8 @@ public class GetUserRoleQueryHandlerTests
         ErrorOr<RoleResponse?> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Authorization.NotAuthorized);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Authorization.NotAuthorized, result.FirstError);
         await _mockUserRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
     }
 
@@ -88,8 +87,8 @@ public class GetUserRoleQueryHandlerTests
         ErrorOr<RoleResponse?> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(error);
+        Assert.True(result.IsError);
+        Assert.Equal(error, result.FirstError);
     }
 
     [Fact]
@@ -107,8 +106,8 @@ public class GetUserRoleQueryHandlerTests
         ErrorOr<RoleResponse?> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Authentication.UsernameDoesNotExist);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Authentication.UsernameDoesNotExist, result.FirstError);
     }
 
     [Fact]
@@ -127,8 +126,8 @@ public class GetUserRoleQueryHandlerTests
         ErrorOr<RoleResponse?> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().BeNull();
+        Assert.False(result.IsError);
+        Assert.Null(result.Value);
     }
 
     [Fact]
@@ -163,8 +162,8 @@ public class GetUserRoleQueryHandlerTests
         ErrorOr<RoleResponse?> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().NotBeNull();
-        result.Value!.RoleName.Should().Be("TestRole");
+        Assert.False(result.IsError);
+        Assert.NotNull(result.Value);
+        Assert.Contains("TestRole", result.Value!.RoleName);
     }
 }

@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
@@ -63,11 +62,11 @@ public class CombinePathEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         HttpResponseMessage response = await _client.GetAsync($"/api/v1/path/combine?originalPath={Uri.EscapeDataString(originalPath)}&newPath={Uri.EscapeDataString(newPath)}");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
         PathSegmentResponse? result = JsonSerializer.Deserialize<PathSegmentResponse>(content, _jsonOptions);
-        result.Should().NotBeNull();
-        result!.Path.Should().Be(expectedPath);
+        Assert.NotNull(result);
+        Assert.Equal(expectedPath, result!.Path);
     }
 
     [Fact]
@@ -81,20 +80,23 @@ public class CombinePathEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         HttpResponseMessage response = await _client.GetAsync($"/api/v1/path/combine?originalPath={Uri.EscapeDataString(originalPath)}&newPath={Uri.EscapeDataString(newPath)}");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.UnprocessableContent);
-        response.Content.Headers.ContentType?.MediaType.Should().Be("application/problem+json");
+        Assert.Equal(HttpStatusCode.UnprocessableContent, response.StatusCode);
+        Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
         string content = await response.Content.ReadAsStringAsync();
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
-        problemDetails.Should().NotBeNull();
-        problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status422UnprocessableEntity);
-        problemDetails["title"].GetString().Should().Be("General.Validation");
-        problemDetails["instance"].GetString().Should().Be("/api/v1/path/combine");
-        problemDetails["detail"].GetString().Should().Be("OneOrMoreValidationErrorsOccurred");
-        problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc4918#section-11.2");
-        problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, problemDetails!["status"].GetInt32());
+        Assert.Equal("General.Validation", problemDetails["title"].GetString());
+        Assert.Equal("/api/v1/path/combine", problemDetails["instance"].GetString());
+        Assert.Equal("OneOrMoreValidationErrorsOccurred", problemDetails["detail"].GetString());
+        Assert.Equal("https://tools.ietf.org/html/rfc4918#section-11.2", problemDetails["type"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString());
 
         Dictionary<string, string[]>? errors = problemDetails["errors"].Deserialize<Dictionary<string, string[]>>(_jsonOptions);
-        errors.Should().ContainKey("General.Validation").WhoseValue.Should().BeEquivalentTo(["PathCannotBeEmpty"]);
+        Assert.NotNull(errors);
+        Assert.Contains("General.Validation", errors.Keys);
+        Assert.Contains("PathCannotBeEmpty", errors["General.Validation"]);
     }
 
     [Fact]
@@ -105,11 +107,11 @@ public class CombinePathEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         string newPath = "documents";
         using CancellationTokenSource cts = new(TimeSpan.FromSeconds(5));
 
-        // Act
-        Func<Task> act = async () => await _client.GetAsync($"/api/v1/path/combine?originalPath={Uri.EscapeDataString(originalPath)}&newPath={Uri.EscapeDataString(newPath)}", cts.Token);
-
-        // Assert
-        await act.Should().NotThrowAsync();
+        // Act & Assert
+        Exception? exception = await Record.ExceptionAsync(async () =>
+            await _client.GetAsync($"/api/v1/path/combine?originalPath={Uri.EscapeDataString(originalPath)}&newPath={Uri.EscapeDataString(newPath)}", cts.Token)
+        );
+        Assert.Null(exception);
     }
 
     [Fact]
@@ -120,15 +122,13 @@ public class CombinePathEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         string newPath = "testFile.txt";
         using CancellationTokenSource cts = new();
 
-        // Act
-        Func<Task> act = async () =>
+        // Act & Assert
+        Exception? exception = await Record.ExceptionAsync(async () =>
         {
-            cts.Cancel(); // Cancel the token immediately
+            cts.Cancel();
             await _client.GetAsync($"/api/v1/path/combine?originalPath={Uri.EscapeDataString(originalPath)}&newPath={Uri.EscapeDataString(newPath)}", cts.Token);
-        };
-
-        // Assert
-        await act.Should().ThrowAsync<TaskCanceledException>();
+        });
+        Assert.IsType<TaskCanceledException>(exception);
     }
 
     /// <summary>

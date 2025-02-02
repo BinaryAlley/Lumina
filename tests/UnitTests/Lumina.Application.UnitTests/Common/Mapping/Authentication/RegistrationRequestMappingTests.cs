@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.Mapping.Authentication;
 using Lumina.Application.Core.Maintenance.ApplicationSetup.Commands.SetupApplication;
 using Lumina.Application.Core.UsersManagement.Authentication.Commands.RegisterUser;
@@ -36,11 +35,11 @@ public class RegistrationRequestMappingTests
         SetupApplicationCommand result = request.ToSetupCommand();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Username.Should().Be(request.Username);
-        result.Password.Should().Be(request.Password);
-        result.PasswordConfirm.Should().Be(request.PasswordConfirm);
-        result.Use2fa.Should().Be(request.Use2fa);
+        Assert.NotNull(result);
+        Assert.Equal(request.Username, result.Username);
+        Assert.Equal(request.Password, result.Password);
+        Assert.Equal(request.PasswordConfirm, result.PasswordConfirm);
+        Assert.Equal(request.Use2fa, result.Use2fa);
     }
 
     [Fact]
@@ -53,11 +52,11 @@ public class RegistrationRequestMappingTests
         RegisterUserCommand result = request.ToCommand();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Username.Should().Be(request.Username);
-        result.Password.Should().Be(request.Password);
-        result.PasswordConfirm.Should().Be(request.PasswordConfirm);
-        result.Use2fa.Should().Be(request.Use2fa);
+        Assert.NotNull(result);
+        Assert.Equal(request.Username, result.Username);
+        Assert.Equal(request.Password, result.Password);
+        Assert.Equal(request.PasswordConfirm, result.PasswordConfirm);
+        Assert.Equal(request.Use2fa, result.Use2fa);
     }
 
     [Fact]
@@ -70,11 +69,11 @@ public class RegistrationRequestMappingTests
         SetupApplicationCommand result = request.ToSetupCommand();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Username.Should().BeNull();
-        result.Password.Should().BeNull();
-        result.PasswordConfirm.Should().BeNull();
-        result.Use2fa.Should().BeTrue();
+        Assert.NotNull(result);
+        Assert.Null(result.Username);
+        Assert.Null(result.Password);
+        Assert.Null(result.PasswordConfirm);
+        Assert.True(result.Use2fa);
     }
 
     [Fact]
@@ -87,11 +86,11 @@ public class RegistrationRequestMappingTests
         RegisterUserCommand result = request.ToCommand();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Username.Should().BeNull();
-        result.Password.Should().BeNull();
-        result.PasswordConfirm.Should().BeNull();
-        result.Use2fa.Should().BeTrue();
+        Assert.NotNull(result);
+        Assert.Null(result.Username);
+        Assert.Null(result.Password);
+        Assert.Null(result.PasswordConfirm);
+        Assert.True(result.Use2fa);
     }
 
     [Theory]
@@ -112,11 +111,11 @@ public class RegistrationRequestMappingTests
         SetupApplicationCommand result = request.ToSetupCommand();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Username.Should().Be(username);
-        result.Password.Should().Be(password);
-        result.PasswordConfirm.Should().Be(passwordConfirm);
-        result.Use2fa.Should().Be(use2fa);
+        Assert.NotNull(result);
+        Assert.Equal(username, result.Username);
+        Assert.Equal(password, result.Password);
+        Assert.Equal(passwordConfirm, result.PasswordConfirm);
+        Assert.Equal(use2fa, result.Use2fa);
     }
 
     [Theory]
@@ -137,10 +136,10 @@ public class RegistrationRequestMappingTests
         RegisterUserCommand result = request.ToCommand();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Username.Should().Be(username);
-        result.Password.Should().Be(password);
-        result.PasswordConfirm.Should().Be(passwordConfirm);
-        result.Use2fa.Should().Be(use2fa);
+        Assert.NotNull(result);
+        Assert.Equal(username, result.Username);
+        Assert.Equal(password, result.Password);
+        Assert.Equal(passwordConfirm, result.PasswordConfirm);
+        Assert.Equal(use2fa, result.Use2fa);
     }
 }

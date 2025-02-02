@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.Mapping.Authorization;
 using Lumina.Contracts.Responses.Authorization;
@@ -7,6 +6,7 @@ using Lumina.Domain.Common.Enums.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 #endregion
 
 namespace Lumina.Application.UnitTests.Common.Mapping.Authorization;
@@ -31,9 +31,9 @@ public class PermissionEntityMappingTests
         PermissionResponse result = entity.ToResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Id.Should().Be(entity.Id);
-        result.PermissionName.Should().Be(entity.PermissionName);
+        Assert.NotNull(result);
+        Assert.Equal(entity.Id, result.Id);
+        Assert.Equal(entity.PermissionName, result.PermissionName);
     }
 
     [Theory]
@@ -54,9 +54,9 @@ public class PermissionEntityMappingTests
         PermissionResponse result = entity.ToResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Id.Should().Be(entity.Id);
-        result.PermissionName.Should().Be(permission);
+        Assert.NotNull(result);
+        Assert.Equal(entity.Id, result.Id);
+        Assert.Equal(permission, result.PermissionName);
     }
 
     [Fact]
@@ -74,11 +74,10 @@ public class PermissionEntityMappingTests
         IEnumerable<PermissionResponse> results = entities.ToResponses();
 
         // Assert
-        results.Should().NotBeNull();
-        results.Should().HaveCount(3);
-        results.Should().BeEquivalentTo(entities, options => options
-            .Including(x => x.Id)
-            .Including(x => x.PermissionName));
+        Assert.NotNull(results);
+        Assert.Equal(3, results.Count());
+        Assert.Equal(entities.Select(e => e.Id), results.Select(r => r.Id));
+        Assert.Equal(entities.Select(e => e.PermissionName), results.Select(r => r.PermissionName));
     }
 
     [Fact]
@@ -91,8 +90,8 @@ public class PermissionEntityMappingTests
         IEnumerable<PermissionResponse> results = entities.ToResponses();
 
         // Assert
-        results.Should().NotBeNull();
-        results.Should().BeEmpty();
+        Assert.NotNull(results);
+        Assert.Empty(results);
     }
 
     [Theory]
@@ -112,8 +111,8 @@ public class PermissionEntityMappingTests
         PermissionResponse result = entity.ToResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Id.Should().Be(entity.Id);
-        result.PermissionName.Should().Be(entity.PermissionName);
+        Assert.NotNull(result);
+        Assert.Equal(entity.Id, result.Id);
+        Assert.Equal(entity.PermissionName, result.PermissionName);
     }
 }

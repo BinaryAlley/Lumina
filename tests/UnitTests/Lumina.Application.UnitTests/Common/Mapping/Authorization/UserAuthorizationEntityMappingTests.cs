@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.Mapping.Authorization;
 using Lumina.Contracts.Responses.Authorization;
@@ -32,10 +31,10 @@ public class UserAuthorizationEntityMappingTests
         AuthorizationResponse result = entity.ToResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.UserId.Should().Be(entity.UserId);
-        result.Role.Should().BeEquivalentTo(entity.Role);
-        result.Permissions.Should().BeEquivalentTo(entity.Permissions);
+        Assert.NotNull(result);
+        Assert.Equal(entity.UserId, result.UserId);
+        Assert.Equal(entity.Role, result.Role);
+        Assert.Equal(entity.Permissions, result.Permissions);
     }
 
     [Fact]
@@ -53,10 +52,10 @@ public class UserAuthorizationEntityMappingTests
         AuthorizationResponse result = entity.ToResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.UserId.Should().Be(entity.UserId);
-        result.Role.Should().BeEmpty();
-        result.Permissions.Should().BeEmpty();
+        Assert.NotNull(result);
+        Assert.Equal(entity.UserId, result.UserId);
+        Assert.Empty(result.Role!);
+        Assert.Empty(result.Permissions);
     }
 
     [Fact]
@@ -79,10 +78,10 @@ public class UserAuthorizationEntityMappingTests
         AuthorizationResponse result = entity.ToResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.UserId.Should().Be(entity.UserId);
-        result.Role.Should().BeEquivalentTo(entity.Role);
-        result.Permissions.Should().BeEquivalentTo(entity.Permissions);
+        Assert.NotNull(result);
+        Assert.Equal(entity.UserId, result.UserId);
+        Assert.Equal(entity.Role, result.Role);
+        Assert.Equal(entity.Permissions, result.Permissions);
     }
 
     [Theory]
@@ -103,9 +102,9 @@ public class UserAuthorizationEntityMappingTests
         AuthorizationResponse result = entity.ToResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.UserId.Should().Be(entity.UserId);
-        result.Role.Should().BeEquivalentTo(entity.Role);
-        result.Permissions.Should().BeEquivalentTo(entity.Permissions);
+        Assert.NotNull(result);
+        Assert.Equal(entity.UserId, result.UserId);
+        Assert.Equal(entity.Role, result.Role);
+        Assert.Equal(entity.Permissions, result.Permissions);
     }
 }

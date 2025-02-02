@@ -1,14 +1,15 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Application.UnitTests.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook.Fixtures;
+using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 #endregion
 
 namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
@@ -39,224 +40,224 @@ public class BookEntityMappingTests
         ErrorOr<Book> result = bookEntity.ToDomainEntity();
 
         // Assert
-        // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().NotBeNull();
-        result.Value.Id.Value.Should().Be(bookEntity.Id);
-        result.Value.Metadata.Title.Should().Be(bookEntity.Title);
+        Assert.False(result.IsError);
+        Assert.NotNull(result.Value);
+        Assert.Equal(bookEntity.Id, result.Value.Id.Value);
+        Assert.Equal(bookEntity.Title, result.Value.Metadata.Title);
 
         if (bookEntity.OriginalTitle is not null)
         {
-            result.Value.Metadata.OriginalTitle.HasValue.Should().BeTrue();
-            result.Value.Metadata.OriginalTitle.Value.Should().Be(bookEntity.OriginalTitle);
+            Assert.True(result.Value.Metadata.OriginalTitle.HasValue);
+            Assert.Equal(bookEntity.OriginalTitle, result.Value.Metadata.OriginalTitle.Value);
         }
         else
-            result.Value.Metadata.OriginalTitle.HasValue.Should().BeFalse();
+            Assert.False(result.Value.Metadata.OriginalTitle.HasValue);
 
         if (bookEntity.Description is not null)
         {
-            result.Value.Metadata.Description.HasValue.Should().BeTrue();
-            result.Value.Metadata.Description.Value.Should().Be(bookEntity.Description);
+            Assert.True(result.Value.Metadata.Description.HasValue);
+            Assert.Equal(bookEntity.Description, result.Value.Metadata.Description.Value);
         }
         else
-            result.Value.Metadata.Description.HasValue.Should().BeFalse();
+            Assert.False(result.Value.Metadata.Description.HasValue);
+
         if (bookEntity.OriginalReleaseDate.HasValue)
         {
-            result.Value.Metadata.ReleaseInfo.OriginalReleaseDate.HasValue.Should().BeTrue();
-            result.Value.Metadata.ReleaseInfo.OriginalReleaseDate.Value.Should().Be(bookEntity.OriginalReleaseDate.Value);
+            Assert.True(result.Value.Metadata.ReleaseInfo.OriginalReleaseDate.HasValue);
+            Assert.Equal(bookEntity.OriginalReleaseDate.Value, result.Value.Metadata.ReleaseInfo.OriginalReleaseDate.Value);
         }
         else
-            result.Value.Metadata.ReleaseInfo.OriginalReleaseDate.HasValue.Should().BeFalse();
+            Assert.False(result.Value.Metadata.ReleaseInfo.OriginalReleaseDate.HasValue);
 
         if (bookEntity.OriginalReleaseYear.HasValue)
         {
-            result.Value.Metadata.ReleaseInfo.OriginalReleaseYear.HasValue.Should().BeTrue();
-            result.Value.Metadata.ReleaseInfo.OriginalReleaseYear.Value.Should().Be(bookEntity.OriginalReleaseYear.Value);
+            Assert.True(result.Value.Metadata.ReleaseInfo.OriginalReleaseYear.HasValue);
+            Assert.Equal(bookEntity.OriginalReleaseYear.Value, result.Value.Metadata.ReleaseInfo.OriginalReleaseYear.Value);
         }
         else
-            result.Value.Metadata.ReleaseInfo.OriginalReleaseYear.HasValue.Should().BeFalse();
+            Assert.False(result.Value.Metadata.ReleaseInfo.OriginalReleaseYear.HasValue);
 
         if (bookEntity.ReReleaseDate.HasValue)
         {
-            result.Value.Metadata.ReleaseInfo.ReReleaseDate.HasValue.Should().BeTrue();
-            result.Value.Metadata.ReleaseInfo.ReReleaseDate.Value.Should().Be(bookEntity.ReReleaseDate.Value);
+            Assert.True(result.Value.Metadata.ReleaseInfo.ReReleaseDate.HasValue);
+            Assert.Equal(bookEntity.ReReleaseDate.Value, result.Value.Metadata.ReleaseInfo.ReReleaseDate.Value);
         }
         else
-            result.Value.Metadata.ReleaseInfo.ReReleaseDate.HasValue.Should().BeFalse();
+            Assert.False(result.Value.Metadata.ReleaseInfo.ReReleaseDate.HasValue);
 
         if (bookEntity.ReReleaseYear.HasValue)
         {
-            result.Value.Metadata.ReleaseInfo.ReReleaseYear.HasValue.Should().BeTrue();
-            result.Value.Metadata.ReleaseInfo.ReReleaseYear.Value.Should().Be(bookEntity.ReReleaseYear.Value);
+            Assert.True(result.Value.Metadata.ReleaseInfo.ReReleaseYear.HasValue);
+            Assert.Equal(bookEntity.ReReleaseYear.Value, result.Value.Metadata.ReleaseInfo.ReReleaseYear.Value);
         }
         else
-            result.Value.Metadata.ReleaseInfo.ReReleaseYear.HasValue.Should().BeFalse();
+            Assert.False(result.Value.Metadata.ReleaseInfo.ReReleaseYear.HasValue);
 
         if (bookEntity.ReleaseCountry is not null)
         {
-            result.Value.Metadata.ReleaseInfo.ReleaseCountry.HasValue.Should().BeTrue();
-            result.Value.Metadata.ReleaseInfo.ReleaseCountry.Value.Should().Be(bookEntity.ReleaseCountry);
+            Assert.True(result.Value.Metadata.ReleaseInfo.ReleaseCountry.HasValue);
+            Assert.Equal(bookEntity.ReleaseCountry, result.Value.Metadata.ReleaseInfo.ReleaseCountry.Value);
         }
         else
-            result.Value.Metadata.ReleaseInfo.ReleaseCountry.HasValue.Should().BeFalse();
+            Assert.False(result.Value.Metadata.ReleaseInfo.ReleaseCountry.HasValue);
 
         if (bookEntity.ReleaseVersion is not null)
         {
-            result.Value.Metadata.ReleaseInfo.ReleaseVersion.HasValue.Should().BeTrue();
-            result.Value.Metadata.ReleaseInfo.ReleaseVersion.Value.Should().Be(bookEntity.ReleaseVersion);
+            Assert.True(result.Value.Metadata.ReleaseInfo.ReleaseVersion.HasValue);
+            Assert.Equal(bookEntity.ReleaseVersion, result.Value.Metadata.ReleaseInfo.ReleaseVersion.Value);
         }
         else
-            result.Value.Metadata.ReleaseInfo.ReleaseVersion.HasValue.Should().BeFalse();
+            Assert.False(result.Value.Metadata.ReleaseInfo.ReleaseVersion.HasValue);
 
         if (bookEntity.LanguageCode is not null)
         {
-            result.Value.Metadata.Language.HasValue.Should().BeTrue();
-            result.Value.Metadata.Language.Value.LanguageCode.Should().Be(bookEntity.LanguageCode);
-            result.Value.Metadata.Language.Value.LanguageName.Should().Be(bookEntity.LanguageName);
+            Assert.True(result.Value.Metadata.Language.HasValue);
+            Assert.Equal(bookEntity.LanguageCode, result.Value.Metadata.Language.Value.LanguageCode);
+            Assert.Equal(bookEntity.LanguageName, result.Value.Metadata.Language.Value.LanguageName);
 
             if (bookEntity.LanguageNativeName is not null)
             {
-                result.Value.Metadata.Language.Value.NativeName.HasValue.Should().BeTrue();
-                result.Value.Metadata.Language.Value.NativeName.Value.Should().Be(bookEntity.LanguageNativeName);
+                Assert.True(result.Value.Metadata.Language.Value.NativeName.HasValue);
+                Assert.Equal(bookEntity.LanguageNativeName, result.Value.Metadata.Language.Value.NativeName.Value);
             }
             else
-                result.Value.Metadata.Language.Value.NativeName.HasValue.Should().BeFalse();
+                Assert.False(result.Value.Metadata.Language.Value.NativeName.HasValue);
         }
         else
-            result.Value.Metadata.Language.HasValue.Should().BeFalse();
+            Assert.False(result.Value.Metadata.Language.HasValue);
 
         if (bookEntity.OriginalLanguageCode is not null)
         {
-            result.Value.Metadata.OriginalLanguage.HasValue.Should().BeTrue();
-            result.Value.Metadata.OriginalLanguage.Value.LanguageCode.Should().Be(bookEntity.OriginalLanguageCode);
-            result.Value.Metadata.OriginalLanguage.Value.LanguageName.Should().Be(bookEntity.OriginalLanguageName);
+            Assert.True(result.Value.Metadata.OriginalLanguage.HasValue);
+            Assert.Equal(bookEntity.OriginalLanguageCode, result.Value.Metadata.OriginalLanguage.Value.LanguageCode);
+            Assert.Equal(bookEntity.OriginalLanguageName, result.Value.Metadata.OriginalLanguage.Value.LanguageName);
 
             if (bookEntity.OriginalLanguageNativeName is not null)
             {
-                result.Value.Metadata.OriginalLanguage.Value.NativeName.HasValue.Should().BeTrue();
-                result.Value.Metadata.OriginalLanguage.Value.NativeName.Value.Should().Be(bookEntity.OriginalLanguageNativeName);
+                Assert.True(result.Value.Metadata.OriginalLanguage.Value.NativeName.HasValue);
+                Assert.Equal(bookEntity.OriginalLanguageNativeName, result.Value.Metadata.OriginalLanguage.Value.NativeName.Value);
             }
             else
-                result.Value.Metadata.OriginalLanguage.Value.NativeName.HasValue.Should().BeFalse();
+                Assert.False(result.Value.Metadata.OriginalLanguage.Value.NativeName.HasValue);
         }
         else
-            result.Value.Metadata.OriginalLanguage.HasValue.Should().BeFalse();
+            Assert.False(result.Value.Metadata.OriginalLanguage.HasValue);
 
         if (bookEntity.Publisher is not null)
         {
-            result.Value.Metadata.Publisher.HasValue.Should().BeTrue();
-            result.Value.Metadata.Publisher.Value.Should().Be(bookEntity.Publisher);
+            Assert.True(result.Value.Metadata.Publisher.HasValue);
+            Assert.Equal(bookEntity.Publisher, result.Value.Metadata.Publisher.Value);
         }
         else
-            result.Value.Metadata.Publisher.HasValue.Should().BeFalse();
+            Assert.False(result.Value.Metadata.Publisher.HasValue);
 
         if (bookEntity.PageCount.HasValue)
         {
-            result.Value.Metadata.PageCount.HasValue.Should().BeTrue();
-            result.Value.Metadata.PageCount.Value.Should().Be(bookEntity.PageCount.Value);
+            Assert.True(result.Value.Metadata.PageCount.HasValue);
+            Assert.Equal(bookEntity.PageCount.Value, result.Value.Metadata.PageCount.Value);
         }
         else
-            result.Value.Metadata.PageCount.HasValue.Should().BeFalse();
+            Assert.False(result.Value.Metadata.PageCount.HasValue);
 
-        result.Value.Format.Value.Should().Be(bookEntity.Format);
+        Assert.Equal(bookEntity.Format, result.Value.Format.Value);
 
         if (bookEntity.Edition is not null)
         {
-            result.Value.Edition.HasValue.Should().BeTrue();
-            result.Value.Edition.Value.Should().Be(bookEntity.Edition);
+            Assert.True(result.Value.Edition.HasValue);
+            Assert.Equal(bookEntity.Edition, result.Value.Edition.Value);
         }
         else
-            result.Value.Edition.HasValue.Should().BeFalse();
+            Assert.False(result.Value.Edition.HasValue);
 
         if (bookEntity.VolumeNumber.HasValue)
         {
-            result.Value.VolumeNumber.HasValue.Should().BeTrue();
-            result.Value.VolumeNumber.Value.Should().Be(bookEntity.VolumeNumber.Value);
+            Assert.True(result.Value.VolumeNumber.HasValue);
+            Assert.Equal(bookEntity.VolumeNumber.Value, result.Value.VolumeNumber.Value);
         }
         else
-            result.Value.VolumeNumber.HasValue.Should().BeFalse();
+            Assert.False(result.Value.VolumeNumber.HasValue);
 
         if (bookEntity.ASIN is not null)
         {
-            result.Value.ASIN.HasValue.Should().BeTrue();
-            result.Value.ASIN.Value.Should().Be(bookEntity.ASIN);
+            Assert.True(result.Value.ASIN.HasValue);
+            Assert.Equal(bookEntity.ASIN, result.Value.ASIN.Value);
         }
         else
-            result.Value.ASIN.HasValue.Should().BeFalse();
+            Assert.False(result.Value.ASIN.HasValue);
 
         if (bookEntity.GoodreadsId is not null)
         {
-            result.Value.GoodreadsId.HasValue.Should().BeTrue();
-            result.Value.GoodreadsId.Value.Should().Be(bookEntity.GoodreadsId);
+            Assert.True(result.Value.GoodreadsId.HasValue);
+            Assert.Equal(bookEntity.GoodreadsId, result.Value.GoodreadsId.Value);
         }
         else
-            result.Value.GoodreadsId.HasValue.Should().BeFalse();
+            Assert.False(result.Value.GoodreadsId.HasValue);
 
         if (bookEntity.LCCN is not null)
         {
-            result.Value.LCCN.HasValue.Should().BeTrue();
-            result.Value.LCCN.Value.Should().Be(bookEntity.LCCN);
+            Assert.True(result.Value.LCCN.HasValue);
+            Assert.Equal(bookEntity.LCCN, result.Value.LCCN.Value);
         }
         else
-            result.Value.LCCN.HasValue.Should().BeFalse();
+            Assert.False(result.Value.LCCN.HasValue);
 
         if (bookEntity.OCLCNumber is not null)
         {
-            result.Value.OCLCNumber.HasValue.Should().BeTrue();
-            result.Value.OCLCNumber.Value.Should().Be(bookEntity.OCLCNumber);
+            Assert.True(result.Value.OCLCNumber.HasValue);
+            Assert.Equal(bookEntity.OCLCNumber, result.Value.OCLCNumber.Value);
         }
         else
-            result.Value.OCLCNumber.HasValue.Should().BeFalse();
+            Assert.False(result.Value.OCLCNumber.HasValue);
 
         if (bookEntity.OpenLibraryId is not null)
         {
-            result.Value.OpenLibraryId.HasValue.Should().BeTrue();
-            result.Value.OpenLibraryId.Value.Should().Be(bookEntity.OpenLibraryId);
+            Assert.True(result.Value.OpenLibraryId.HasValue);
+            Assert.Equal(bookEntity.OpenLibraryId, result.Value.OpenLibraryId.Value);
         }
         else
-            result.Value.OpenLibraryId.HasValue.Should().BeFalse();
+            Assert.False(result.Value.OpenLibraryId.HasValue);
 
         if (bookEntity.LibraryThingId is not null)
         {
-            result.Value.LibraryThingId.HasValue.Should().BeTrue();
-            result.Value.LibraryThingId.Value.Should().Be(bookEntity.LibraryThingId);
+            Assert.True(result.Value.LibraryThingId.HasValue);
+            Assert.Equal(bookEntity.LibraryThingId, result.Value.LibraryThingId.Value);
         }
         else
-            result.Value.LibraryThingId.HasValue.Should().BeFalse();
+            Assert.False(result.Value.LibraryThingId.HasValue);
 
         if (bookEntity.GoogleBooksId is not null)
         {
-            result.Value.GoogleBooksId.HasValue.Should().BeTrue();
-            result.Value.GoogleBooksId.Value.Should().Be(bookEntity.GoogleBooksId);
+            Assert.True(result.Value.GoogleBooksId.HasValue);
+            Assert.Equal(bookEntity.GoogleBooksId, result.Value.GoogleBooksId.Value);
         }
         else
-            result.Value.GoogleBooksId.HasValue.Should().BeFalse();
+            Assert.False(result.Value.GoogleBooksId.HasValue);
 
         if (bookEntity.BarnesAndNobleId is not null)
         {
-            result.Value.BarnesAndNobleId.HasValue.Should().BeTrue();
-            result.Value.BarnesAndNobleId.Value.Should().Be(bookEntity.BarnesAndNobleId);
+            Assert.True(result.Value.BarnesAndNobleId.HasValue);
+            Assert.Equal(bookEntity.BarnesAndNobleId, result.Value.BarnesAndNobleId.Value);
         }
         else
-            result.Value.BarnesAndNobleId.HasValue.Should().BeFalse();
+            Assert.False(result.Value.BarnesAndNobleId.HasValue);
 
         if (bookEntity.AppleBooksId is not null)
         {
-            result.Value.AppleBooksId.HasValue.Should().BeTrue();
-            result.Value.AppleBooksId.Value.Should().Be(bookEntity.AppleBooksId);
+            Assert.True(result.Value.AppleBooksId.HasValue);
+            Assert.Equal(bookEntity.AppleBooksId, result.Value.AppleBooksId.Value);
         }
         else
-            result.Value.AppleBooksId.HasValue.Should().BeFalse();
+            Assert.False(result.Value.AppleBooksId.HasValue);
 
-        result.Value.CreatedOnUtc.Should().Be(bookEntity.CreatedOnUtc);
+        Assert.Equal(bookEntity.CreatedOnUtc, result.Value.CreatedOnUtc);
 
         if (bookEntity.UpdatedOnUtc.HasValue)
         {
-            result.Value.UpdatedOnUtc.HasValue.Should().BeTrue();
-            result.Value.UpdatedOnUtc!.Value.Should().Be(bookEntity.UpdatedOnUtc.Value);
+            Assert.True(result.Value.UpdatedOnUtc.HasValue);
+            Assert.Equal(bookEntity.UpdatedOnUtc.Value, result.Value.UpdatedOnUtc!.Value);
         }
         else
-            result.Value.UpdatedOnUtc.HasValue.Should().BeFalse();
+            Assert.False(result.Value.UpdatedOnUtc.HasValue);
     }
 
     [Fact]
@@ -269,43 +270,48 @@ public class BookEntityMappingTests
         BookResponse result = bookEntity.ToResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Id.Should().Be(bookEntity.Id);
-        result.Metadata.Title.Should().Be(bookEntity.Title);
-        result.Metadata.OriginalTitle.Should().Be(bookEntity.OriginalTitle);
-        result.Metadata.Description.Should().Be(bookEntity.Description);
-        result.Metadata.ReleaseInfo!.OriginalReleaseDate.Should().Be(bookEntity.OriginalReleaseDate);
-        result.Metadata.ReleaseInfo.OriginalReleaseYear.Should().Be(bookEntity.OriginalReleaseYear);
-        result.Metadata.ReleaseInfo.ReReleaseDate.Should().Be(bookEntity.ReReleaseDate);
-        result.Metadata.ReleaseInfo.ReReleaseYear.Should().Be(bookEntity.ReReleaseYear);
-        result.Metadata.ReleaseInfo.ReleaseCountry.Should().Be(bookEntity.ReleaseCountry);
-        result.Metadata.ReleaseInfo.ReleaseVersion.Should().Be(bookEntity.ReleaseVersion);
-        result.Metadata.Language.Should().NotBeNull();
-        result.Metadata.Language!.LanguageCode.Should().Be(bookEntity.LanguageCode);
-        result.Metadata.Language.LanguageName.Should().Be(bookEntity.LanguageName);
-        result.Metadata.Language.NativeName.Should().Be(bookEntity.LanguageNativeName);
-        result.Metadata.OriginalLanguage.Should().NotBeNull();
-        result.Metadata.OriginalLanguage!.LanguageCode.Should().Be(bookEntity.OriginalLanguageCode);
-        result.Metadata.OriginalLanguage.LanguageName.Should().Be(bookEntity.OriginalLanguageName);
-        result.Metadata.OriginalLanguage.NativeName.Should().Be(bookEntity.OriginalLanguageNativeName);
-        result.Metadata.Publisher.Should().Be(bookEntity.Publisher);
-        result.Metadata.PageCount.Should().Be(bookEntity.PageCount);
-        result.Format.Should().Be(bookEntity.Format);
-        result.Edition.Should().Be(bookEntity.Edition);
-        result.VolumeNumber.Should().Be(bookEntity.VolumeNumber);
-        result.ASIN.Should().Be(bookEntity.ASIN);
-        result.GoodreadsId.Should().Be(bookEntity.GoodreadsId);
-        result.LCCN.Should().Be(bookEntity.LCCN);
-        result.OCLCNumber.Should().Be(bookEntity.OCLCNumber);
-        result.OpenLibraryId.Should().Be(bookEntity.OpenLibraryId);
-        result.LibraryThingId.Should().Be(bookEntity.LibraryThingId);
-        result.GoogleBooksId.Should().Be(bookEntity.GoogleBooksId);
-        result.BarnesAndNobleId.Should().Be(bookEntity.BarnesAndNobleId);
-        result.AppleBooksId.Should().Be(bookEntity.AppleBooksId);
-        result.ISBNs.Should().BeEquivalentTo(bookEntity.ISBNs);
-        result.Ratings.Should().BeEquivalentTo(bookEntity.Ratings);
-        result.CreatedOnUtc.Should().Be(bookEntity.CreatedOnUtc);
-        result.UpdatedOnUtc.Should().Be(bookEntity.UpdatedOnUtc);
+        Assert.NotNull(result);
+        Assert.Equal(bookEntity.Id, result.Id);
+        Assert.Equal(bookEntity.Title, result.Metadata.Title);
+        Assert.Equal(bookEntity.OriginalTitle, result.Metadata.OriginalTitle);
+        Assert.Equal(bookEntity.Description, result.Metadata.Description);
+        Assert.Equal(bookEntity.OriginalReleaseDate, result.Metadata.ReleaseInfo!.OriginalReleaseDate);
+        Assert.Equal(bookEntity.OriginalReleaseYear, result.Metadata.ReleaseInfo.OriginalReleaseYear);
+        Assert.Equal(bookEntity.ReReleaseDate, result.Metadata.ReleaseInfo.ReReleaseDate);
+        Assert.Equal(bookEntity.ReReleaseYear, result.Metadata.ReleaseInfo.ReReleaseYear);
+        Assert.Equal(bookEntity.ReleaseCountry, result.Metadata.ReleaseInfo.ReleaseCountry);
+        Assert.Equal(bookEntity.ReleaseVersion, result.Metadata.ReleaseInfo.ReleaseVersion);
+        Assert.NotNull(result.Metadata.Language);
+        Assert.Equal(bookEntity.LanguageCode, result.Metadata.Language!.LanguageCode);
+        Assert.Equal(bookEntity.LanguageName, result.Metadata.Language.LanguageName);
+        Assert.Equal(bookEntity.LanguageNativeName, result.Metadata.Language.NativeName);
+        Assert.NotNull(result.Metadata.OriginalLanguage);
+        Assert.Equal(bookEntity.OriginalLanguageCode, result.Metadata.OriginalLanguage!.LanguageCode);
+        Assert.Equal(bookEntity.OriginalLanguageName, result.Metadata.OriginalLanguage.LanguageName);
+        Assert.Equal(bookEntity.OriginalLanguageNativeName, result.Metadata.OriginalLanguage.NativeName);
+        Assert.Equal(bookEntity.Publisher, result.Metadata.Publisher);
+        Assert.Equal(bookEntity.PageCount, result.Metadata.PageCount);
+        Assert.Equal(bookEntity.Format, result.Format);
+        Assert.Equal(bookEntity.Edition, result.Edition);
+        Assert.Equal(bookEntity.VolumeNumber, result.VolumeNumber);
+        Assert.Equal(bookEntity.ASIN, result.ASIN);
+        Assert.Equal(bookEntity.GoodreadsId, result.GoodreadsId);
+        Assert.Equal(bookEntity.LCCN, result.LCCN);
+        Assert.Equal(bookEntity.OCLCNumber, result.OCLCNumber);
+        Assert.Equal(bookEntity.OpenLibraryId, result.OpenLibraryId);
+        Assert.Equal(bookEntity.LibraryThingId, result.LibraryThingId);
+        Assert.Equal(bookEntity.GoogleBooksId, result.GoogleBooksId);
+        Assert.Equal(bookEntity.BarnesAndNobleId, result.BarnesAndNobleId);
+        Assert.Equal(bookEntity.AppleBooksId, result.AppleBooksId);
+        Assert.Equal(bookEntity.ISBNs.Select(i => new IsbnDto(i.Value, i.Format)), result.ISBNs);
+        Assert.Equal(bookEntity.Ratings.Select(r => new BookRatingDto(
+            r.Value,
+            r.MaxValue,
+            r.Source,
+            r.VoteCount
+        )), result.Ratings);
+        Assert.Equal(bookEntity.CreatedOnUtc, result.CreatedOnUtc);
+        Assert.Equal(bookEntity.UpdatedOnUtc, result.UpdatedOnUtc);
     }
 
     [Fact]
@@ -322,9 +328,9 @@ public class BookEntityMappingTests
         IEnumerable<ErrorOr<Book>> results = bookEntities.ToDomainEntities();
 
         // Assert
-        results.Should().NotBeNull();
-        results.Should().HaveCount(bookEntities.Count);
-        results.Should().AllSatisfy(result => result.IsError.Should().BeFalse());
+        Assert.NotNull(results);
+        Assert.Equal(bookEntities.Count, results.Count());
+        Assert.All(results, result => Assert.False(result.IsError));
     }
 
     [Fact]
@@ -341,7 +347,7 @@ public class BookEntityMappingTests
         IEnumerable<BookResponse> results = bookEntities.ToResponses();
 
         // Assert
-        results.Should().NotBeNull();
-        results.Should().HaveCount(bookEntities.Count);
+        Assert.NotNull(results);
+        Assert.Equal(bookEntities.Count, results.Count());
     }
 }

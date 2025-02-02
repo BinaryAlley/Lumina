@@ -2,7 +2,6 @@
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Application.Core.FileSystemManagement.Files.Queries.GetTreeFiles;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Files.Fixtures;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Files.Queries.GetTreeFiles.Fixtures;
@@ -57,21 +56,21 @@ public class GetTreeFilesQueryHandlerTests
         ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.Handle(getFilesQuery, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().BeAssignableTo<IEnumerable<FileSystemTreeNodeResponse>>();
-        result.Value.Should().HaveCount(files.Count());
+        Assert.False(result.IsError);
+        Assert.IsAssignableFrom<IEnumerable<FileSystemTreeNodeResponse>>(result.Value);
+        Assert.Equal(files.Count(), result.Value.Count());
 
         List<FileSystemTreeNodeResponse> resultList = result.Value.ToList();
         List<File> filesList = files.ToList();
 
         for (int i = 0; i < resultList.Count; i++)
         {
-            resultList[i].Path.Should().Be(filesList[i].Id.Path);
-            resultList[i].Name.Should().Be(filesList[i].Name);
-            resultList[i].ItemType.Should().Be(FileSystemItemType.File);
-            resultList[i].IsExpanded.Should().BeFalse();
-            resultList[i].ChildrenLoaded.Should().BeFalse();
-            resultList[i].Children.Should().BeEmpty();
+            Assert.Equal(filesList[i].Id.Path, resultList[i].Path);
+            Assert.Equal(filesList[i].Name, resultList[i].Name);
+            Assert.Equal(FileSystemItemType.File, resultList[i].ItemType);
+            Assert.False(resultList[i].IsExpanded);
+            Assert.False(resultList[i].ChildrenLoaded);
+            Assert.Empty(resultList[i].Children);
         }
 
         _mockFileService.Received(1).GetFiles(getFilesQuery.Path!, getFilesQuery.IncludeHiddenElements);
@@ -92,21 +91,21 @@ public class GetTreeFilesQueryHandlerTests
         ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.Handle(getFilesQuery, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().BeAssignableTo<IEnumerable<FileSystemTreeNodeResponse>>();
-        result.Value.Should().HaveCount(files.Count());
+        Assert.False(result.IsError);
+        Assert.IsAssignableFrom<IEnumerable<FileSystemTreeNodeResponse>>(result.Value);
+        Assert.Equal(files.Count(), result.Value.Count());
 
         List<FileSystemTreeNodeResponse> resultList = result.Value.ToList();
         List<File> filesList = files.ToList();
 
         for (int i = 0; i < resultList.Count; i++)
         {
-            resultList[i].Path.Should().Be(filesList[i].Id.Path);
-            resultList[i].Name.Should().Be(filesList[i].Name);
-            resultList[i].ItemType.Should().Be(FileSystemItemType.File);
-            resultList[i].IsExpanded.Should().BeFalse();
-            resultList[i].ChildrenLoaded.Should().BeFalse();
-            resultList[i].Children.Should().BeEmpty();
+            Assert.Equal(filesList[i].Id.Path, resultList[i].Path);
+            Assert.Equal(filesList[i].Name, resultList[i].Name);
+            Assert.Equal(FileSystemItemType.File, resultList[i].ItemType);
+            Assert.False(resultList[i].IsExpanded);
+            Assert.False(resultList[i].ChildrenLoaded);
+            Assert.Empty(resultList[i].Children);
         }
 
         _mockFileService.Received(1).GetFiles(getFilesQuery.Path!, getFilesQuery.IncludeHiddenElements);
@@ -125,8 +124,8 @@ public class GetTreeFilesQueryHandlerTests
         ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(error);
+        Assert.True(result.IsError);
+        Assert.Equal(error, result.FirstError);
         _mockFileService.Received(1).GetFiles(query.Path!, query.IncludeHiddenElements);
     }
 
@@ -143,8 +142,8 @@ public class GetTreeFilesQueryHandlerTests
         ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().BeEmpty();
+        Assert.False(result.IsError);
+        Assert.Empty(result.Value);
         _mockFileService.Received(1).GetFiles(query.Path!, query.IncludeHiddenElements);
     }
 }

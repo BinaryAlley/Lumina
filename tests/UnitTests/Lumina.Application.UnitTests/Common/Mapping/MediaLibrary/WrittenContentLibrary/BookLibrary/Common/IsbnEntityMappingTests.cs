@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
@@ -30,9 +29,9 @@ public class IsbnEntityMappingTests
         IsbnDto result = entity.ToResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Value.Should().Be(entity.Value);
-        result.Format.Should().Be(entity.Format);
+        Assert.NotNull(result);
+        Assert.Equal(entity.Value, result.Value);
+        Assert.Equal(entity.Format, result.Format);
     }
 
     [Theory]
@@ -47,9 +46,9 @@ public class IsbnEntityMappingTests
         IsbnDto result = entity.ToResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Value.Should().Be(value);
-        result.Format.Should().Be(format);
+        Assert.NotNull(result);
+        Assert.Equal(value, result.Value);
+        Assert.Equal(format, result.Format);
     }
 
     [Theory]
@@ -65,8 +64,8 @@ public class IsbnEntityMappingTests
         IsbnDto result = entity.ToResponse();
 
         // Assert
-        result.Value.Should().Be(value);
-        result.Format.Should().Be(format);
+        Assert.Equal(value, result.Value);
+        Assert.Equal(format, result.Format);
     }
 
     [Fact]
@@ -79,10 +78,10 @@ public class IsbnEntityMappingTests
         ErrorOr<Isbn> result = entity.ToDomainEntity();
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().NotBeNull();
-        result.Value.Value.Should().Be(entity.Value);
-        result.Value.Format.Should().Be(entity.Format);
+        Assert.False(result.IsError);
+        Assert.NotNull(result.Value);
+        Assert.Equal(entity.Value, result.Value.Value);
+        Assert.Equal(entity.Format, result.Value.Format);
     }
 
     [Theory]
@@ -98,7 +97,7 @@ public class IsbnEntityMappingTests
         ErrorOr<Isbn> result = entity.ToDomainEntity();
 
         // Assert
-        result.IsError.Should().BeTrue();
+        Assert.True(result.IsError);
     }
 
     [Fact]
@@ -115,15 +114,15 @@ public class IsbnEntityMappingTests
         IEnumerable<ErrorOr<Isbn>> results = entities.ToDomainEntities();
 
         // Assert
-        results.Should().NotBeNull();
-        results.Should().HaveCount(entities.Count);
+        Assert.NotNull(results);
+        Assert.Equal(entities.Count, results.Count());
 
         List<ErrorOr<Isbn>> resultList = results.ToList();
         for (int i = 0; i < entities.Count; i++)
         {
-            resultList[i].IsError.Should().BeFalse();
-            resultList[i].Value.Value.Should().Be(entities[i].Value);
-            resultList[i].Value.Format.Should().Be(entities[i].Format);
+            Assert.False(resultList[i].IsError);
+            Assert.Equal(entities[i].Value, resultList[i].Value.Value);
+            Assert.Equal(entities[i].Format, resultList[i].Value.Format);
         }
     }
 
@@ -141,14 +140,14 @@ public class IsbnEntityMappingTests
         IEnumerable<IsbnDto> results = entities.ToResponses();
 
         // Assert
-        results.Should().NotBeNull();
-        results.Should().HaveCount(entities.Count);
+        Assert.NotNull(results);
+        Assert.Equal(entities.Count, results.Count());
 
         List<IsbnDto> resultList = results.ToList();
         for (int i = 0; i < entities.Count; i++)
         {
-            resultList[i].Value.Should().Be(entities[i].Value);
-            resultList[i].Format.Should().Be(entities[i].Format);
+            Assert.Equal(entities[i].Value, resultList[i].Value);
+            Assert.Equal(entities[i].Format, resultList[i].Format);
         }
     }
 }

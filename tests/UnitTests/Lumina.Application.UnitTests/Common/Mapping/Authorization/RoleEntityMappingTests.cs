@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.Mapping.Authorization;
 using Lumina.Contracts.Responses.Authorization;
@@ -7,6 +6,7 @@ using Lumina.Domain.Common.Enums.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 #endregion
 
 namespace Lumina.Application.UnitTests.Common.Mapping.Authorization;
@@ -31,9 +31,9 @@ public class RoleEntityMappingTests
         RoleResponse result = entity.ToResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Id.Should().Be(entity.Id);
-        result.RoleName.Should().Be(entity.RoleName);
+        Assert.NotNull(result);
+        Assert.Equal(entity.Id, result.Id);
+        Assert.Equal(entity.RoleName, result.RoleName);
     }
 
     [Fact]
@@ -77,10 +77,10 @@ public class RoleEntityMappingTests
         RolePermissionsResponse result = role.ToRolePermissionsResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Role.Id.Should().Be(role.Id);
-        result.Role.RoleName.Should().Be(role.RoleName);
-        result.Permissions.Should().HaveCount(2);
+        Assert.NotNull(result);
+        Assert.Equal(role.Id, result.Role.Id);
+        Assert.Equal(role.RoleName, result.Role.RoleName);
+        Assert.Equal(2, result.Permissions.Length);
     }
 
     [Fact]
@@ -98,11 +98,14 @@ public class RoleEntityMappingTests
         IEnumerable<RoleResponse> results = entities.ToResponses();
 
         // Assert
-        results.Should().NotBeNull();
-        results.Should().HaveCount(3);
-        results.Should().BeEquivalentTo(entities, options => options
-            .Including(x => x.Id)
-            .Including(x => x.RoleName));
+        Assert.NotNull(results);
+        Assert.Equal(3, results.Count());
+        List<RoleResponse> resultList = results.ToList();
+        for (int i = 0; i < entities.Count; i++)
+        {
+            Assert.Equal(entities[i].Id, resultList[i].Id);
+            Assert.Equal(entities[i].RoleName, resultList[i].RoleName);
+        }
     }
 
     [Fact]
@@ -115,8 +118,8 @@ public class RoleEntityMappingTests
         IEnumerable<RoleResponse> results = entities.ToResponses();
 
         // Assert
-        results.Should().NotBeNull();
-        results.Should().BeEmpty();
+        Assert.NotNull(results);
+        Assert.Empty(results);
     }
 
     [Theory]
@@ -136,9 +139,9 @@ public class RoleEntityMappingTests
         RoleResponse result = entity.ToResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Id.Should().Be(entity.Id);
-        result.RoleName.Should().Be(roleName);
+        Assert.NotNull(result);
+        Assert.Equal(entity.Id, result.Id);
+        Assert.Equal(roleName, result.RoleName);
     }
 
     [Theory]
@@ -158,8 +161,8 @@ public class RoleEntityMappingTests
         RoleResponse result = entity.ToResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Id.Should().Be(entity.Id);
-        result.RoleName.Should().Be(entity.RoleName);
+        Assert.NotNull(result);
+        Assert.Equal(entity.Id, result.Id);
+        Assert.Equal(entity.RoleName, result.RoleName);
     }
 }

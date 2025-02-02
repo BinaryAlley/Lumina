@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using FastEndpoints;
-using FluentAssertions;
 using Lumina.Application.Core.FileSystemManagement.Drives.Queries.GetDrives;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
 using Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Drives.GetDrives;
@@ -53,8 +52,8 @@ public class GetDrivesEndpointTests
         IResult result = await _sut.ExecuteAsync(new EmptyRequest(), cancellationToken);
 
         // Assert
-        IEnumerable<FileSystemTreeNodeResponse> actualResponses = result.Should().BeOfType<Ok<IEnumerable<FileSystemTreeNodeResponse>>>().Subject.Value!;
-        actualResponses.Should().BeEquivalentTo(expectedResponses);
+        Ok<IEnumerable<FileSystemTreeNodeResponse>> okResult = Assert.IsType<Ok<IEnumerable<FileSystemTreeNodeResponse>>>(result);
+        Assert.Equal(expectedResponses, okResult.Value);
     }
 
     [Fact]
@@ -70,17 +69,16 @@ public class GetDrivesEndpointTests
         IResult result = await _sut.ExecuteAsync(new EmptyRequest(), cancellationToken);
 
         // Assert
-        result.Should().BeOfType<ProblemHttpResult>();
-        ProblemHttpResult problemDetails = (ProblemHttpResult)result;
-        problemDetails.StatusCode.Should().Be(StatusCodes.Status404NotFound);
-        problemDetails.ContentType.Should().Be("application/problem+json");
-        problemDetails.ProblemDetails.Should().BeOfType<Microsoft.AspNetCore.Mvc.ProblemDetails>();
+        ProblemHttpResult problemDetails = Assert.IsType<ProblemHttpResult>(result);
+        Assert.Equal(StatusCodes.Status404NotFound, problemDetails.StatusCode);
+        Assert.Equal("application/problem+json", problemDetails.ContentType);
+        Assert.IsType<Microsoft.AspNetCore.Mvc.ProblemDetails>(problemDetails.ProblemDetails);
 
-        problemDetails.ProblemDetails.Title.Should().Be("Drive.NotFound");
-        problemDetails.ProblemDetails.Detail.Should().Be("The requested drive was not found.");
-        problemDetails.ProblemDetails.Status.Should().Be(StatusCodes.Status404NotFound);
-        problemDetails.ProblemDetails.Type.Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.5");
-        problemDetails.ProblemDetails.Extensions["traceId"].Should().NotBeNull();
+        Assert.Equal("Drive.NotFound", problemDetails.ProblemDetails.Title);
+        Assert.Equal("The requested drive was not found.", problemDetails.ProblemDetails.Detail);
+        Assert.Equal(StatusCodes.Status404NotFound, problemDetails.ProblemDetails.Status);
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.5", problemDetails.ProblemDetails.Type);
+        Assert.NotNull(problemDetails.ProblemDetails.Extensions["traceId"]);
     }
 
     [Fact]

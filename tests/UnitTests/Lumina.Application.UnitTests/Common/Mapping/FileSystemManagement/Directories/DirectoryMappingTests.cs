@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Directories;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Directories.Fixtures;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
@@ -46,20 +45,20 @@ public class DirectoryMappingTests
         FileSystemTreeNodeResponse result = directory.ToFileSystemTreeNodeResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Name.Should().Be(directory.Name);
-        result.Path.Should().Be(directory.Id.Path);
-        result.ItemType.Should().Be(directory.Type);
-        result.IsExpanded.Should().BeFalse();
-        result.ChildrenLoaded.Should().BeFalse();
-        result.Children.Should().NotBeNull();
-        result.Children.Should().HaveCount(childItems.Count);
+        Assert.NotNull(result);
+        Assert.Equal(directory.Name, result.Name);
+        Assert.Equal(directory.Id.Path, result.Path);
+        Assert.Equal(directory.Type, result.ItemType);
+        Assert.False(result.IsExpanded);
+        Assert.False(result.ChildrenLoaded);
+        Assert.NotNull(result.Children);
+        Assert.Equal(childItems.Count, result.Children.Count);
 
         for (int i = 0; i < childItems.Count; i++)
         {
-            result.Children[i].Name.Should().Be(childItems[i].Name);
-            result.Children[i].Path.Should().Be(childItems[i].Id.Path);
-            result.Children[i].ItemType.Should().Be(childItems[i].Type);
+            Assert.Equal(childItems[i].Name, result.Children[i].Name);
+            Assert.Equal(childItems[i].Id.Path, result.Children[i].Path);
+            Assert.Equal(childItems[i].Type, result.Children[i].ItemType);
         }
     }
 
@@ -73,15 +72,15 @@ public class DirectoryMappingTests
         IEnumerable<FileSystemTreeNodeResponse> result = directories.ToFileSystemTreeNodeResponses();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Should().HaveCount(directories.Count);
+        Assert.NotNull(result);
+        Assert.Equal(directories.Count, result.Count());
 
         List<FileSystemTreeNodeResponse> resultList = result.ToList();
         for (int i = 0; i < directories.Count; i++)
         {
-            resultList[i].Name.Should().Be(directories[i].Name);
-            resultList[i].Path.Should().Be(directories[i].Id.Path);
-            resultList[i].ItemType.Should().Be(directories[i].Type);
+            Assert.Equal(directories[i].Name, resultList[i].Name);
+            Assert.Equal(directories[i].Id.Path, resultList[i].Path);
+            Assert.Equal(directories[i].Type, resultList[i].ItemType);
         }
     }
 
@@ -102,18 +101,18 @@ public class DirectoryMappingTests
         DirectoryResponse result = directory.ToResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Path.Should().Be(directory.Id.Path);
-        result.Name.Should().Be(directory.Name);
-        result.DateCreated.Should().Be(directory.DateCreated.Value);
-        result.DateModified.Should().Be(directory.DateModified.Value);
-        result.Items.Should().NotBeNull();
-        result.Items.Should().HaveCount(childItems.Count);
+        Assert.NotNull(result);
+        Assert.Equal(directory.Id.Path, result.Path);
+        Assert.Equal(directory.Name, result.Name);
+        Assert.Equal(directory.DateCreated.Value, result.DateCreated);
+        Assert.Equal(directory.DateModified.Value, result.DateModified);
+        Assert.NotNull(result.Items);
+        Assert.Equal(childItems.Count, result.Items.Count);
 
         for (int i = 0; i < childItems.Count; i++)
         {
-            result.Items[i].Name.Should().Be(childItems[i].Name);
-            result.Items[i].Path.Should().Be(childItems[i].Id.Path);
+            Assert.Equal(childItems[i].Name, result.Items[i].Name);
+            Assert.Equal(childItems[i].Id.Path, result.Items[i].Path);
         }
     }
 
@@ -127,16 +126,16 @@ public class DirectoryMappingTests
         IEnumerable<DirectoryResponse> result = directories.ToResponses();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Should().HaveCount(directories.Count);
+        Assert.NotNull(result);
+        Assert.Equal(directories.Count, result.Count());
 
         List<DirectoryResponse> resultList = result.ToList();
         for (int i = 0; i < directories.Count; i++)
         {
-            resultList[i].Path.Should().Be(directories[i].Id.Path);
-            resultList[i].Name.Should().Be(directories[i].Name);
-            resultList[i].DateCreated.Should().Be(directories[i].DateCreated.Value);
-            resultList[i].DateModified.Should().Be(directories[i].DateModified.Value);
+            Assert.Equal(directories[i].Id.Path, resultList[i].Path);
+            Assert.Equal(directories[i].Name, resultList[i].Name);
+            Assert.Equal(directories[i].DateCreated.Value, resultList[i].DateCreated);
+            Assert.Equal(directories[i].DateModified.Value, resultList[i].DateModified);
         }
     }
 }

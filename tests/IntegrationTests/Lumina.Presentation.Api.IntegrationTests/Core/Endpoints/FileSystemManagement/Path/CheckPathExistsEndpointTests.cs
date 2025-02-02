@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
@@ -59,11 +58,11 @@ public class CheckPathExistsEndpointTests : IClassFixture<AuthenticatedLuminaApi
         HttpResponseMessage response = await _client.GetAsync($"/api/v1/path/check-path-exists?path={Uri.EscapeDataString(tempPath)}&includeHiddenElements=false");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
         PathExistsResponse? result = JsonSerializer.Deserialize<PathExistsResponse>(content, _jsonOptions);
-        result.Should().NotBeNull();
-        result!.Exists.Should().BeTrue();
+        Assert.NotNull(result);
+        Assert.True(result!.Exists);
     }
 
     [Fact]
@@ -76,11 +75,11 @@ public class CheckPathExistsEndpointTests : IClassFixture<AuthenticatedLuminaApi
         HttpResponseMessage response = await _client.GetAsync($"/api/v1/path/check-path-exists?path={Uri.EscapeDataString(nonExistingPath)}&includeHiddenElements=false");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
         PathExistsResponse? result = JsonSerializer.Deserialize<PathExistsResponse>(content, _jsonOptions);
-        result.Should().NotBeNull();
-        result!.Exists.Should().BeFalse();
+        Assert.NotNull(result);
+        Assert.False(result!.Exists);
     }
 
     [Fact]
@@ -93,20 +92,22 @@ public class CheckPathExistsEndpointTests : IClassFixture<AuthenticatedLuminaApi
         HttpResponseMessage response = await _client.GetAsync($"/api/v1/path/check-path-exists?path={Uri.EscapeDataString(path)}&includeHiddenElements=false");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.UnprocessableContent);
-        response.Content.Headers.ContentType?.MediaType.Should().Be("application/problem+json");
+        Assert.Equal(HttpStatusCode.UnprocessableContent, response.StatusCode);
+        Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
         string content = await response.Content.ReadAsStringAsync();
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
-        problemDetails.Should().NotBeNull();
-        problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status422UnprocessableEntity);
-        problemDetails["title"].GetString().Should().Be("General.Validation");
-        problemDetails["instance"].GetString().Should().Be("/api/v1/path/check-path-exists");
-        problemDetails["detail"].GetString().Should().Be("OneOrMoreValidationErrorsOccurred");
-        problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc4918#section-11.2");
-        problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
-
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, problemDetails!["status"].GetInt32());
+        Assert.Equal("General.Validation", problemDetails["title"].GetString());
+        Assert.Equal("/api/v1/path/check-path-exists", problemDetails["instance"].GetString());
+        Assert.Equal("OneOrMoreValidationErrorsOccurred", problemDetails["detail"].GetString());
+        Assert.Equal("https://tools.ietf.org/html/rfc4918#section-11.2", problemDetails["type"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString());
         Dictionary<string, string[]>? errors = problemDetails["errors"].Deserialize<Dictionary<string, string[]>>(_jsonOptions);
-        errors.Should().ContainKey("General.Validation").WhoseValue.Should().BeEquivalentTo(["PathCannotBeEmpty"]);
+        Assert.NotNull(errors);
+        Assert.Contains("General.Validation", errors.Keys);
+        Assert.Contains("PathCannotBeEmpty", errors["General.Validation"]);
     }
 
     [Fact]
@@ -119,11 +120,11 @@ public class CheckPathExistsEndpointTests : IClassFixture<AuthenticatedLuminaApi
         HttpResponseMessage response = await _client.GetAsync($"/api/v1/path/check-path-exists?path={Uri.EscapeDataString(invalidPath)}&includeHiddenElements=false");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
         PathExistsResponse? result = JsonSerializer.Deserialize<PathExistsResponse>(content, _jsonOptions);
-        result.Should().NotBeNull();
-        result!.Exists.Should().BeFalse();
+        Assert.NotNull(result);
+        Assert.False(result!.Exists);
     }
 
     [Fact]
@@ -134,15 +135,13 @@ public class CheckPathExistsEndpointTests : IClassFixture<AuthenticatedLuminaApi
         string encodedPath = Uri.EscapeDataString(testPath);
         using CancellationTokenSource cts = new();
 
-        // Act
-        Func<Task> act = async () =>
+        // Act & Assert
+        Exception? exception = await Record.ExceptionAsync(async () =>
         {
-            cts.Cancel(); // Cancel the token immediately
+            cts.Cancel();
             await _client.GetAsync($"/api/v1/path/check-path-exists?path={encodedPath}&includeHiddenElements=false", cts.Token);
-        };
-
-        // Assert
-        await act.Should().ThrowAsync<TaskCanceledException>();
+        });
+        Assert.IsType<TaskCanceledException>(exception);
     }
 
     /// <summary>

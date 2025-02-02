@@ -2,7 +2,6 @@
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Domain.Common.Enums.FileSystem;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
@@ -45,11 +44,11 @@ public class FileSystemItemTests
         FileSystemItemFixture item = new(id, name, type);
 
         // Assert
-        item.Id.Should().Be(id);
-        item.Name.Should().Be(name);
-        item.Type.Should().Be(type);
-        item.Status.Should().Be(FileSystemItemStatus.Accessible);
-        item.Parent.Should().Be(Optional<FileSystemItem>.None());
+        Assert.Equal(id, item.Id);
+        Assert.Equal(name, item.Name);
+        Assert.Equal(type, item.Type);
+        Assert.Equal(FileSystemItemStatus.Accessible, item.Status);
+        Assert.Equal(Optional<FileSystemItem>.None(), item.Parent);
     }
 
     [Fact]
@@ -63,9 +62,9 @@ public class FileSystemItemTests
         ErrorOr<Updated> result = item.SetStatus(newStatus);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().Be(Result.Updated);
-        item.Status.Should().Be(newStatus);
+        Assert.False(result.IsError);
+        Assert.Equal(Result.Updated, result.Value);
+        Assert.Equal(newStatus, item.Status);
     }
 
     [Fact]
@@ -79,9 +78,9 @@ public class FileSystemItemTests
         ErrorOr<Updated> result = item.SetParent(parent);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().Be(Result.Updated);
-        item.Parent.Should().Be(Optional<FileSystemItem>.Some(parent));
+        Assert.False(result.IsError);
+        Assert.Equal(Result.Updated, result.Value);
+        Assert.Equal(Optional<FileSystemItem>.Some(parent), item.Parent);
     }
 
     [Fact]
@@ -94,9 +93,9 @@ public class FileSystemItemTests
         ErrorOr<Updated> result = item.SetParent(null!);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.FileSystemManagement.ParentNodeCannotBeNull);
-        item.Parent.Should().Be(Optional<FileSystemItem>.None());
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.FileSystemManagement.ParentNodeCannotBeNull, result.FirstError);
+        Assert.Equal(Optional<FileSystemItem>.None(), item.Parent);
     }
 
     [Fact]
@@ -111,7 +110,7 @@ public class FileSystemItemTests
         bool result = item1.Equals(item2);
 
         // Assert
-        result.Should().BeTrue();
+        Assert.True(result);
     }
 
     [Fact]
@@ -125,7 +124,7 @@ public class FileSystemItemTests
         bool result = item1.Equals(item2);
 
         // Assert
-        result.Should().BeFalse();
+        Assert.False(result);
     }
 
     [Fact]
@@ -141,7 +140,7 @@ public class FileSystemItemTests
         int hashCode2 = item2.GetHashCode();
 
         // Assert
-        hashCode1.Should().Be(hashCode2);
+        Assert.Equal(hashCode1, hashCode2);
     }
 
     [Fact]
@@ -156,7 +155,7 @@ public class FileSystemItemTests
         int hashCode2 = item2.GetHashCode();
 
         // Assert
-        hashCode1.Should().NotBe(hashCode2);
+        Assert.NotEqual(hashCode1, hashCode2);
     }
 
     private FileSystemItemFixture CreateFileSystemItemFixture(FileSystemPathId? id = null)

@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Files;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Files.Fixtures;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
@@ -40,12 +39,12 @@ public class FileMappingTests
         FileSystemTreeNodeResponse result = domainModel.ToFileSystemTreeNodeResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Name.Should().Be(domainModel.Name);
-        result.Path.Should().Be(domainModel.Id.Path);
-        result.ItemType.Should().Be(domainModel.Type);
-        result.IsExpanded.Should().BeFalse();
-        result.ChildrenLoaded.Should().BeFalse();
+        Assert.NotNull(result);
+        Assert.Equal(domainModel.Name, result.Name);
+        Assert.Equal(domainModel.Id.Path, result.Path);
+        Assert.Equal(domainModel.Type, result.ItemType);
+        Assert.False(result.IsExpanded);
+        Assert.False(result.ChildrenLoaded);
     }
 
     [Fact]
@@ -58,19 +57,19 @@ public class FileMappingTests
         IEnumerable<FileSystemTreeNodeResponse> result = domainModels.ToFileSystemTreeNodeResponses();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Should().HaveCount(domainModels.Count());
+        Assert.NotNull(result);
+        Assert.Equal(domainModels.Count(), result.Count());
 
         List<FileSystemTreeNodeResponse> resultList = result.ToList();
         List<File> domainModelsList = domainModels.ToList();
         for (int i = 0; i < resultList.Count; i++)
         {
-            resultList[i].Name.Should().Be(domainModelsList[i].Name);
-            resultList[i].Path.Should().Be(domainModelsList[i].Id.Path);
-            resultList[i].ItemType.Should().Be(domainModelsList[i].Type);
-            resultList[i].IsExpanded.Should().BeFalse();
-            resultList[i].ChildrenLoaded.Should().BeFalse();
-            resultList[i].Children.Should().BeEmpty();
+            Assert.Equal(domainModelsList[i].Name, resultList[i].Name);
+            Assert.Equal(domainModelsList[i].Id.Path, resultList[i].Path);
+            Assert.Equal(domainModelsList[i].Type, resultList[i].ItemType);
+            Assert.False(resultList[i].IsExpanded);
+            Assert.False(resultList[i].ChildrenLoaded);
+            Assert.Empty(resultList[i].Children);
         }
     }
 
@@ -84,12 +83,12 @@ public class FileMappingTests
         FileResponse result = domainModel.ToResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Path.Should().Be(domainModel.Id.Path);
-        result.Name.Should().Be(domainModel.Name);
-        result.DateCreated.Should().Be(domainModel.DateCreated.Value);
-        result.DateModified.Should().Be(domainModel.DateModified.Value);
-        result.Size.Should().Be(domainModel.Size);
+        Assert.NotNull(result);
+        Assert.Equal(domainModel.Id.Path, result.Path);
+        Assert.Equal(domainModel.Name, result.Name);
+        Assert.Equal(domainModel.DateCreated.Value, result.DateCreated);
+        Assert.Equal(domainModel.DateModified.Value, result.DateModified);
+        Assert.Equal(domainModel.Size, result.Size);
     }
 
     [Fact]
@@ -102,18 +101,18 @@ public class FileMappingTests
         IEnumerable<FileResponse> result = domainModels.ToResponses();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Should().HaveCount(domainModels.Count());
+        Assert.NotNull(result);
+        Assert.Equal(domainModels.Count(), result.Count());
 
         List<FileResponse> resultList = result.ToList();
         List<File> domainModelsList = domainModels.ToList();
         for (int i = 0; i < resultList.Count; i++)
         {
-            resultList[i].Name.Should().Be(domainModelsList[i].Name);
-            resultList[i].Path.Should().Be(domainModelsList[i].Id.Path);
-            resultList[i].Size.Should().Be(domainModelsList[i].Size);
-            resultList[i].DateCreated.Should().Be(domainModelsList[i].DateCreated.Value);
-            resultList[i].DateModified.Should().Be(domainModelsList[i].DateModified.Value);
+            Assert.Equal(domainModelsList[i].Name, resultList[i].Name);
+            Assert.Equal(domainModelsList[i].Id.Path, resultList[i].Path);
+            Assert.Equal(domainModelsList[i].Size, resultList[i].Size);
+            Assert.Equal(domainModelsList[i].DateCreated.Value, resultList[i].DateCreated);
+            Assert.Equal(domainModelsList[i].DateModified.Value, resultList[i].DateModified);
         }
     }
 }

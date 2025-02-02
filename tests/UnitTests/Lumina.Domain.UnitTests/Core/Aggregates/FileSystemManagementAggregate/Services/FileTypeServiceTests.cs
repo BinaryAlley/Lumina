@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Domain.Common.Enums.FileSystem;
 using Lumina.Domain.Common.Enums.PhotoLibrary;
 using Lumina.Domain.Common.Errors;
@@ -59,8 +58,8 @@ public class FileTypeServiceTests
         ErrorOr<ImageType> result = await sut.GetImageTypeAsync(file, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().Be(ImageType.PNG);
+        Assert.False(result.IsError);
+        Assert.Equal(ImageType.PNG, result.Value);
     }
 
     [Fact]
@@ -78,8 +77,8 @@ public class FileTypeServiceTests
         ErrorOr<ImageType> result = await sut.GetImageTypeAsync(file, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Permission.UnauthorizedAccess);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
     }
 
     [Fact]
@@ -97,8 +96,8 @@ public class FileTypeServiceTests
         ErrorOr<ImageType> result = await sut.GetImageTypeAsync(pathId, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().Be(ImageType.None);
+        Assert.False(result.IsError);
+        Assert.Equal(ImageType.None, result.Value);
     }
 
     [Fact]
@@ -117,8 +116,8 @@ public class FileTypeServiceTests
         ErrorOr<ImageType> result = await sut.GetImageTypeAsync(pathId, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().Be(ImageType.SVG);
+        Assert.False(result.IsError);
+        Assert.Equal(ImageType.SVG, result.Value);
     }
 
     [Fact]
@@ -139,8 +138,8 @@ public class FileTypeServiceTests
         ErrorOr<ImageType> result = await sut.GetImageTypeAsync(pathId, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().Be(ImageType.TGA);
+        Assert.False(result.IsError);
+        Assert.Equal(ImageType.TGA, result.Value);
     }
 
     [Fact]
@@ -158,8 +157,8 @@ public class FileTypeServiceTests
         ErrorOr<ImageType> result = await sut.GetImageTypeAsync(pathId, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().Be(ImageType.None);
+        Assert.False(result.IsError);
+        Assert.Equal(ImageType.None, result.Value);
     }
 
     private void SetupMockFileSystem(FileSystemPathId pathId, byte[] fileContent)
@@ -189,8 +188,8 @@ public class FileTypeServiceTests
         ErrorOr<ImageType> result = await sut.GetImageTypeAsync(pathId, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().Be(ImageType.SVG);
+        Assert.False(result.IsError);
+        Assert.Equal(ImageType.SVG, result.Value);
     }
 
     [Theory]
@@ -225,7 +224,7 @@ public class FileTypeServiceTests
         ErrorOr<ImageType> result = await sut.GetImageTypeAsync(pathId, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().Be(expectedType, because: $"the file header matches {testName}");
+        Assert.False(result.IsError);
+        Assert.Equal(expectedType, result.Value);
     }
 }

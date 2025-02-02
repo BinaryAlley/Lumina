@@ -3,7 +3,6 @@ using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using ErrorOr;
 using FastEndpoints;
-using FluentAssertions;
 using Lumina.Application.Core.FileSystemManagement.Directories.Queries.GetDirectories;
 using Lumina.Contracts.Requests.FileSystemManagement.Directories;
 using Lumina.Contracts.Responses.FileSystemManagement.Directories;
@@ -56,8 +55,8 @@ public class GetDirectoriesEndpointTests
         IResult result = await _sut.ExecuteAsync(request, cancellationToken);
 
         // Assert
-        IEnumerable<DirectoryResponse> actualResponses = result.Should().BeOfType<Ok<IEnumerable<DirectoryResponse>>>().Subject.Value!;
-        actualResponses.Should().BeEquivalentTo(expectedResponses);
+        Ok<IEnumerable<DirectoryResponse>> okResult = Assert.IsType<Ok<IEnumerable<DirectoryResponse>>>(result);
+        Assert.Equal(expectedResponses, okResult.Value);
     }
 
     [Fact]
@@ -74,17 +73,16 @@ public class GetDirectoriesEndpointTests
         IResult result = await _sut.ExecuteAsync(request, cancellationToken);
 
         // Assert
-        result.Should().BeOfType<ProblemHttpResult>();
-        ProblemHttpResult problemDetails = (ProblemHttpResult)result;
-        problemDetails.StatusCode.Should().Be(StatusCodes.Status404NotFound);
-        problemDetails.ContentType.Should().Be("application/problem+json");
-        problemDetails.ProblemDetails.Should().BeOfType<Microsoft.AspNetCore.Mvc.ProblemDetails>();
-        
-        problemDetails.ProblemDetails.Title.Should().Be("Directory.NotFound");
-        problemDetails.ProblemDetails.Detail.Should().Be("The requested directory was not found.");
-        problemDetails.ProblemDetails.Status.Should().Be(StatusCodes.Status404NotFound);
-        problemDetails.ProblemDetails.Type.Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.5");
-        problemDetails.ProblemDetails.Extensions["traceId"].Should().NotBeNull();
+        ProblemHttpResult problemDetails = Assert.IsType<ProblemHttpResult>(result);
+        Assert.Equal(StatusCodes.Status404NotFound, problemDetails.StatusCode);
+        Assert.Equal("application/problem+json", problemDetails.ContentType);
+        Assert.IsType<Microsoft.AspNetCore.Mvc.ProblemDetails>(problemDetails.ProblemDetails);
+
+        Assert.Equal("Directory.NotFound", problemDetails.ProblemDetails.Title);
+        Assert.Equal("The requested directory was not found.", problemDetails.ProblemDetails.Detail);
+        Assert.Equal(StatusCodes.Status404NotFound, problemDetails.ProblemDetails.Status);
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.5", problemDetails.ProblemDetails.Type);
+        Assert.NotNull(problemDetails.ProblemDetails.Extensions["traceId"]);
     }
 
     [Fact]
@@ -101,22 +99,16 @@ public class GetDirectoriesEndpointTests
         IResult result = await _sut.ExecuteAsync(request, cancellationToken);
 
         // Assert
-        result.Should().BeOfType<ProblemHttpResult>();
-        ProblemHttpResult problemDetails = (ProblemHttpResult)result;
-        problemDetails.StatusCode.Should().Be(StatusCodes.Status422UnprocessableEntity);
-        problemDetails.ContentType.Should().Be("application/problem+json");
-        problemDetails.ProblemDetails.Should().BeOfType<HttpValidationProblemDetails>();
-        HttpValidationProblemDetails validationProblemDetails = (HttpValidationProblemDetails)problemDetails.ProblemDetails;
-        validationProblemDetails.Status.Should().Be(StatusCodes.Status422UnprocessableEntity);
-        validationProblemDetails.Title.Should().Be("General.Validation");
-        validationProblemDetails.Detail.Should().Be("OneOrMoreValidationErrorsOccurred");
-        validationProblemDetails.Type.Should().Be("https://tools.ietf.org/html/rfc4918#section-11.2");
-        validationProblemDetails.Errors.Should().ContainSingle()
-            .Which.Should().BeEquivalentTo(new
-            {
-                Key = "Path.Invalid",
-                Value = new[] { "The provided path is invalid." }
-            });
+        ProblemHttpResult problemDetails = Assert.IsType<ProblemHttpResult>(result);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, problemDetails.StatusCode);
+        Assert.Equal("application/problem+json", problemDetails.ContentType);
+        HttpValidationProblemDetails validationProblemDetails = Assert.IsType<HttpValidationProblemDetails>(problemDetails.ProblemDetails);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, validationProblemDetails.Status);
+        Assert.Equal("General.Validation", validationProblemDetails.Title);
+        Assert.Equal("OneOrMoreValidationErrorsOccurred", validationProblemDetails.Detail);
+        Assert.Equal("https://tools.ietf.org/html/rfc4918#section-11.2", validationProblemDetails.Type);
+        Assert.Single(validationProblemDetails.Errors);
+        Assert.Equal(new[] { "The provided path is invalid." }, validationProblemDetails.Errors["Path.Invalid"]);
     }
 
     [Fact]

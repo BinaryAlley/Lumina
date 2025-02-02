@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Contracts.Responses.Authorization;
@@ -12,7 +11,6 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
@@ -63,18 +61,18 @@ public class GetPermissionsEndpointTests : IClassFixture<AuthenticatedLuminaApiF
 
         // Assert
         response.EnsureSuccessStatusCode();
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         string content = await response.Content.ReadAsStringAsync();
         IEnumerable<PermissionResponse>? result = JsonSerializer.Deserialize<IEnumerable<PermissionResponse>>(content, _jsonOptions);
 
-        result.Should().NotBeNull();
-        result.Should().NotBeEmpty();
-        result!.Should().AllSatisfy(permission =>
+        Assert.NotNull(result);
+        Assert.NotEmpty(result);
+        foreach (PermissionResponse permission in result!)
         {
-            permission.Id.Should().NotBe(Guid.Empty);
-            permission.PermissionName.Should().NotBe(AuthorizationPermission.None);
-        });
+            Assert.NotEqual(Guid.Empty, permission.Id);
+            Assert.NotEqual(AuthorizationPermission.None, permission.PermissionName);
+        }
     }
 
     [Fact]
@@ -85,18 +83,19 @@ public class GetPermissionsEndpointTests : IClassFixture<AuthenticatedLuminaApiF
         HttpResponseMessage response = await _client.GetAsync("/api/v1/auth/permissions");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
 
         string content = await response.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
-        problemDetails.Should().NotBeNull();
-        problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status403Forbidden);
-        problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.4");
-        problemDetails["title"].GetString().Should().Be("General.Unauthorized");
-        problemDetails["detail"].GetString().Should().Be("NotAuthorized");
-        problemDetails["instance"].GetString().Should().Be("/api/v1/auth/permissions");
-        problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status403Forbidden, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.4", problemDetails["type"].GetString());
+        Assert.Equal("General.Unauthorized", problemDetails["title"].GetString());
+        Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
+        Assert.Equal("/api/v1/auth/permissions", problemDetails["instance"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString());
     }
 
     [Fact]
@@ -105,15 +104,12 @@ public class GetPermissionsEndpointTests : IClassFixture<AuthenticatedLuminaApiF
         // Arrange
         using CancellationTokenSource cts = new();
 
-        // Act
-        Func<Task> act = async () =>
+        // Act & Assert
+        await Assert.ThrowsAsync<TaskCanceledException>(async () =>
         {
             cts.Cancel();
             await _client.GetAsync("/api/v1/auth/permissions", cts.Token);
-        };
-
-        // Assert
-        await act.Should().ThrowAsync<TaskCanceledException>();
+        });
     }
 
     /// <summary>

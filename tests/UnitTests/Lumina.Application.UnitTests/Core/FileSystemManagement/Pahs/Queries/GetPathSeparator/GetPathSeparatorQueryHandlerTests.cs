@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Core.FileSystemManagement.Paths.Queries.GetPathSeparator;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
@@ -42,8 +41,8 @@ public class GetPathSeparatorQueryHandlerTests
         PathSeparatorResponse result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.Should().NotBeNull();
-        result.Separator.Should().Be(expectedSeparator.ToString());
+        Assert.NotNull(result);
+        Assert.Equal(expectedSeparator.ToString(), result.Separator);
 
         _mockPathService.Received(1);
     }
@@ -61,8 +60,8 @@ public class GetPathSeparatorQueryHandlerTests
         PathSeparatorResponse result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.Should().NotBeNull();
-        result.Separator.Should().Be(separator.ToString());
+        Assert.NotNull(result);
+        Assert.Equal(separator.ToString(), result.Separator);
         _mockPathService.Received(1);
     }
 
@@ -79,7 +78,7 @@ public class GetPathSeparatorQueryHandlerTests
         PathSeparatorResponse result2 = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result1.Should().BeEquivalentTo(result2);
+        Assert.Equal(result1, result2);
         _mockPathService.Received(2);
     }
 
@@ -91,9 +90,11 @@ public class GetPathSeparatorQueryHandlerTests
         using CancellationTokenSource cts = new();
 
         // Act
-        Func<Task> act = async () => await _sut.Handle(query, cts.Token);
+        Exception? exception = await Record.ExceptionAsync(
+            async () => await _sut.Handle(query, cts.Token)
+        );
 
         // Assert
-        await act.Should().NotThrowAsync();
+        Assert.Null(exception);
     }
 }

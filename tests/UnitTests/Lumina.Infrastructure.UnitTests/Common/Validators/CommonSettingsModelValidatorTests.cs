@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using FluentAssertions;
 using Lumina.Infrastructure.Common.Errors;
 using Lumina.Infrastructure.Common.Models.Configuration;
 using Lumina.Infrastructure.Common.Validators;
@@ -40,8 +39,8 @@ public class CommonSettingsModelValidatorTests
         FluentValidation.Results.ValidationResult result = _validator.Validate(model);
 
         // Assert
-        result.IsValid.Should().BeTrue();
-        result.Errors.Should().BeEmpty();
+        Assert.True(result.IsValid);
+        Assert.Empty(result.Errors);
     }
 
     [Fact]
@@ -56,8 +55,8 @@ public class CommonSettingsModelValidatorTests
         FluentValidation.Results.ValidationResult result = _validator.Validate(model);
 
         // Assert
-        result.IsValid.Should().BeFalse();
-        result.Errors.Should().ContainSingle()
-            .Which.ErrorMessage.Should().Be(Errors.Configuration.ApplicationThemeCannotBeEmpty.Description);
+        Assert.False(result.IsValid);
+        Assert.Single(result.Errors);
+        Assert.Equal(Errors.Configuration.ApplicationThemeCannotBeEmpty.Description, result.Errors[0].ErrorMessage);
     }
 }

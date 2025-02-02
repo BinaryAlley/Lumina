@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
 using Lumina.Application.UnitTests.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Common.Fixtures;
@@ -40,10 +39,10 @@ public class IsbnDtoMappingTests
         ErrorOr<Isbn> result = dto.ToDomainEntity();
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().NotBeNull();
-        result.Value.Value.Should().Be(dto.Value);
-        result.Value.Format.Should().Be(dto.Format!.Value);
+        Assert.False(result.IsError);
+        Assert.NotNull(result.Value);
+        Assert.Equal(dto.Value, result.Value.Value);
+        Assert.Equal(dto.Format!.Value, result.Value.Format);
     }
 
     [Fact]
@@ -56,10 +55,10 @@ public class IsbnDtoMappingTests
         ErrorOr<Isbn> result = dto.ToDomainEntity();
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().NotBeNull();
-        result.Value.Value.Should().Be(dto.Value);
-        result.Value.Format.Should().Be(dto.Format!.Value);
+        Assert.False(result.IsError);
+        Assert.NotNull(result.Value);
+        Assert.Equal(dto.Value, result.Value.Value);
+        Assert.Equal(dto.Format!.Value, result.Value.Format);
     }
 
     [Fact]
@@ -72,10 +71,10 @@ public class IsbnDtoMappingTests
         ErrorOr<Isbn> result = dto.ToDomainEntity();
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().NotBeNull();
-        result.Value.Value.Should().Be(dto.Value);
-        result.Value.Format.Should().Be(IsbnFormat.Isbn13); // Default format
+        Assert.False(result.IsError);
+        Assert.NotNull(result.Value);
+        Assert.Equal(dto.Value, result.Value.Value);
+        Assert.Equal(IsbnFormat.Isbn13, result.Value.Format); // default format
     }
 
     [Fact]
@@ -88,7 +87,7 @@ public class IsbnDtoMappingTests
         ErrorOr<Isbn> result = dto.ToDomainEntity();
 
         // Assert
-        result.IsError.Should().BeTrue();
+        Assert.True(result.IsError);
     }
 
     [Fact]
@@ -106,20 +105,20 @@ public class IsbnDtoMappingTests
         IEnumerable<ErrorOr<Isbn>> results = dtos.ToDomainEntities();
 
         // Assert
-        results.Should().NotBeNull();
-        results.Should().HaveCount(dtos.Count);
+        Assert.NotNull(results);
+        Assert.Equal(dtos.Count, results.Count());
 
         List<ErrorOr<Isbn>> resultList = results.ToList();
-        resultList.Should().AllSatisfy(result => result.IsError.Should().BeFalse());
+        Assert.All(resultList, result => Assert.False(result.IsError));
 
-        resultList[0].Value.Value.Should().Be(dtos[0].Value);
-        resultList[0].Value.Format.Should().Be(dtos[0].Format!.Value);
+        Assert.Equal(dtos[0].Value, resultList[0].Value.Value);
+        Assert.Equal(dtos[0].Format!.Value, resultList[0].Value.Format);
 
-        resultList[1].Value.Value.Should().Be(dtos[1].Value);
-        resultList[1].Value.Format.Should().Be(dtos[1].Format!.Value);
+        Assert.Equal(dtos[1].Value, resultList[1].Value.Value);
+        Assert.Equal(dtos[1].Format!.Value, resultList[1].Value.Format);
 
-        resultList[2].Value.Value.Should().Be(dtos[2].Value);
-        resultList[2].Value.Format.Should().Be(IsbnFormat.Isbn13); // Default format
+        Assert.Equal(dtos[2].Value, resultList[2].Value.Value);
+        Assert.Equal(IsbnFormat.Isbn13, resultList[2].Value.Format); // default format
     }
 
     [Fact]
@@ -137,17 +136,17 @@ public class IsbnDtoMappingTests
         IEnumerable<ErrorOr<Isbn>> results = dtos.ToDomainEntities();
 
         // Assert
-        results.Should().NotBeNull();
-        results.Should().HaveCount(dtos.Count);
+        Assert.NotNull(results);
+        Assert.Equal(dtos.Count, results.Count());
 
         List<ErrorOr<Isbn>> resultList = results.ToList();
 
-        resultList[0].IsError.Should().BeFalse();
-        resultList[0].Value.Value.Should().Be(dtos[0].Value);
+        Assert.False(resultList[0].IsError);
+        Assert.Equal(dtos[0].Value, resultList[0].Value.Value);
 
-        resultList[1].IsError.Should().BeTrue();
+        Assert.True(resultList[1].IsError);
 
-        resultList[2].IsError.Should().BeFalse();
-        resultList[2].Value.Value.Should().Be(dtos[2].Value);
+        Assert.False(resultList[2].IsError);
+        Assert.Equal(dtos[2].Value, resultList[2].Value.Value);
     }
 }

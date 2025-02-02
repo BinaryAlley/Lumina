@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using FluentAssertions;
 using Lumina.Application.Core.FileSystemManagement.Paths.Queries.GetPathSeparator;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
 using Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.GetPathSeparator;
@@ -50,8 +49,8 @@ public class GetPathSeparatorEndpointTests
         IResult result = await _sut.ExecuteAsync(cancellationToken);
 
         // Assert
-        PathSeparatorResponse actualResponse = result.Should().BeOfType<Ok<PathSeparatorResponse>>().Subject.Value!;
-        actualResponse.Should().BeEquivalentTo(expectedResponse);
+        Ok<PathSeparatorResponse> okResult = Assert.IsType<Ok<PathSeparatorResponse>>(result);
+        Assert.Equal(expectedResponse, okResult.Value);
     }
 
     [Fact]

@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Infrastructure.Core.Authentication;
 using System.Diagnostics.CodeAnalysis;
 #endregion
@@ -29,7 +28,8 @@ public class TokenGeneratorTests
         string token = _sut.GenerateToken();
 
         // Assert
-        token.Should().NotBeNullOrEmpty();
+        Assert.NotNull(token);
+        Assert.NotEmpty(token);
     }
 
     [Fact]
@@ -39,9 +39,9 @@ public class TokenGeneratorTests
         string token = _sut.GenerateToken();
 
         // Assert
-        token.Should().NotContain("+", "Token should not contain '+'");
-        token.Should().NotContain("/", "Token should not contain '/'");
-        token.Should().NotContain("=", "Token should not contain '='");
+        Assert.DoesNotContain("+", token);
+        Assert.DoesNotContain("/", token);
+        Assert.DoesNotContain("=", token);
     }
 
     [Fact]
@@ -53,9 +53,9 @@ public class TokenGeneratorTests
         string token3 = _sut.GenerateToken();
 
         // Assert
-        token1.Should().NotBe(token2);
-        token1.Should().NotBe(token3);
-        token2.Should().NotBe(token3);
+        Assert.NotEqual(token1, token2);
+        Assert.NotEqual(token1, token3);
+        Assert.NotEqual(token2, token3);
     }
 
     [Fact]
@@ -66,6 +66,6 @@ public class TokenGeneratorTests
 
         // Assert
         // 32 bytes in Base64 without padding should be 43 characters
-        token.Length.Should().Be(43);
+        Assert.Equal(43, token.Length);
     }
 }

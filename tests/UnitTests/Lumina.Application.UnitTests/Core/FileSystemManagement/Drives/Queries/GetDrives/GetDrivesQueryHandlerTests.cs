@@ -2,7 +2,6 @@
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Application.Core.FileSystemManagement.Drives.Queries.GetDrives;
 using Lumina.Domain.Common.Enums.FileSystem;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
@@ -58,9 +57,9 @@ public class GetDrivesQueryHandlerTests
         ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.Handle(getDrivesQuery, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().BeAssignableTo<IEnumerable<FileSystemTreeNodeResponse>>();
-        result.Value.Should().HaveCount(drives.Count());
+        Assert.False(result.IsError);
+        Assert.IsAssignableFrom<IEnumerable<FileSystemTreeNodeResponse>>(result.Value);
+        Assert.Equal(drives.Count(), result.Value.Count());
 
         List<FileSystemTreeNodeResponse> resultList = result.Value.ToList();
         List<FileSystemItem> drivesList = drives.ToList();
@@ -70,12 +69,12 @@ public class GetDrivesQueryHandlerTests
             FileSystemTreeNodeResponse response = resultList[i];
             WindowsRootItem drive = (WindowsRootItem)drivesList[i];
 
-            response.Path.Should().Be(drive.Id.Path);
-            response.Name.Should().Be(drive.Name);
-            response.ItemType.Should().Be(FileSystemItemType.Root);
-            response.IsExpanded.Should().BeFalse();
-            response.ChildrenLoaded.Should().BeFalse();
-            response.Children.Should().BeEmpty();
+            Assert.Equal(drive.Id.Path, response.Path);
+            Assert.Equal(drive.Name, response.Name);
+            Assert.Equal(FileSystemItemType.Root, response.ItemType);
+            Assert.False(response.IsExpanded);
+            Assert.False(response.ChildrenLoaded);
+            Assert.Empty(response.Children);
         }
 
         _mockDriveService.Received(1).GetDrives();
@@ -94,8 +93,8 @@ public class GetDrivesQueryHandlerTests
         ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(error);
+        Assert.True(result.IsError);
+        Assert.Equal(error, result.FirstError);
         _mockDriveService.Received(1).GetDrives();
     }
 
@@ -112,8 +111,8 @@ public class GetDrivesQueryHandlerTests
         ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().BeEmpty();
+        Assert.False(result.IsError);
+        Assert.Empty(result.Value);
         _mockDriveService.Received(1).GetDrives();
     }
 }

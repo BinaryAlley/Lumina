@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Contracts.Requests.Authentication;
@@ -76,18 +75,19 @@ public class SetupApplicationEndpointTests : IClassFixture<AuthenticatedLuminaAp
         HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/initialization", request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
         RegistrationResponse? result = JsonSerializer.Deserialize<RegistrationResponse>(content, _jsonOptions);
 
-        result.Should().NotBeNull();
-        result!.Username.Should().Be(_testUsername);
-        result.Id.Should().NotBe(Guid.Empty);
-        result.TotpSecret.Should().NotBeNullOrEmpty();
-        result.TotpSecret.Should().StartWith("data:image/png;base64,");
+        Assert.NotNull(result);
+        Assert.Equal(_testUsername, result!.Username);
+        Assert.NotEqual(Guid.Empty, result.Id);
+        Assert.NotNull(result.TotpSecret);
+        Assert.NotEmpty(result.TotpSecret);
+        Assert.StartsWith("data:image/png;base64,", result.TotpSecret);
 
-        response.Headers.Location.Should().NotBeNull();
-        response.Headers.Location!.ToString().Should().Be($"http://localhost/api/v1/users/{result.Id}");
+        Assert.NotNull(response.Headers.Location);
+        Assert.Equal($"http://localhost/api/v1/users/{result.Id}", response.Headers.Location.ToString());
 
         // verify default permissions, roles, and role permissions are set
         await VerifyDefaultSetup(result.Id);
@@ -109,17 +109,17 @@ public class SetupApplicationEndpointTests : IClassFixture<AuthenticatedLuminaAp
         HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/initialization", request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
         RegistrationResponse? result = JsonSerializer.Deserialize<RegistrationResponse>(content, _jsonOptions);
 
-        result.Should().NotBeNull();
-        result!.Username.Should().Be(_testUsername);
-        result.Id.Should().NotBe(Guid.Empty);
-        result.TotpSecret.Should().BeNull();
+        Assert.NotNull(result);
+        Assert.Equal(_testUsername, result!.Username);
+        Assert.NotEqual(Guid.Empty, result.Id);
+        Assert.Null(result.TotpSecret);
 
-        response.Headers.Location.Should().NotBeNull();
-        response.Headers.Location!.ToString().Should().Be($"http://localhost/api/v1/users/{result.Id}");
+        Assert.NotNull(response.Headers.Location);
+        Assert.Equal($"http://localhost/api/v1/users/{result.Id}", response.Headers.Location.ToString());
 
         // verify default permissions, roles, and role permissions are set
         await VerifyDefaultSetup(result.Id);
@@ -141,17 +141,18 @@ public class SetupApplicationEndpointTests : IClassFixture<AuthenticatedLuminaAp
         HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/initialization", request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
-        problemDetails.Should().NotBeNull();
-        problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status409Conflict);
-        problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.10");
-        problemDetails["title"].GetString().Should().Be("General.Conflict");
-        problemDetails["detail"].GetString().Should().Be("AdminAccountAlreadyCreated");
-        problemDetails["instance"].GetString().Should().Be("/api/v1/initialization");
-        problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status409Conflict, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.10", problemDetails["type"].GetString());
+        Assert.Equal("General.Conflict", problemDetails["title"].GetString());
+        Assert.Equal("AdminAccountAlreadyCreated", problemDetails["detail"].GetString());
+        Assert.Equal("/api/v1/initialization", problemDetails["instance"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString());
     }
 
     [Fact]
@@ -164,14 +165,17 @@ public class SetupApplicationEndpointTests : IClassFixture<AuthenticatedLuminaAp
         HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/initialization", request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.UnprocessableContent);
+        Assert.Equal(HttpStatusCode.UnprocessableContent, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
-        problemDetails.Should().NotBeNull();
+        Assert.NotNull(problemDetails);
         Dictionary<string, string[]>? errors = problemDetails!["errors"].Deserialize<Dictionary<string, string[]>>(_jsonOptions);
-        errors.Should().ContainKey("General.Validation")
-            .WhoseValue.Should().Contain(["UsernameCannotBeEmpty", "PasswordCannotBeEmpty", "PasswordConfirmCannotBeEmpty"]);
+        Assert.NotNull(errors);
+        Assert.Contains("General.Validation", errors.Keys);
+        Assert.Contains("UsernameCannotBeEmpty", errors["General.Validation"]);
+        Assert.Contains("PasswordCannotBeEmpty", errors["General.Validation"]);
+        Assert.Contains("PasswordConfirmCannotBeEmpty", errors["General.Validation"]);
     }
 
     private async Task VerifyDefaultSetup(Guid userId)
@@ -182,25 +186,25 @@ public class SetupApplicationEndpointTests : IClassFixture<AuthenticatedLuminaAp
         // TODO: update list when defaults change
         // verify default permissions
         List<PermissionEntity> permissions = await dbContext.Permissions.ToListAsync();
-        permissions.Should().Contain(p => p.PermissionName == AuthorizationPermission.CanViewUsers);
-        permissions.Should().Contain(p => p.PermissionName == AuthorizationPermission.CanDeleteUsers);
-        permissions.Should().Contain(p => p.PermissionName == AuthorizationPermission.CanRegisterUsers);
+        Assert.Contains(permissions, p => p.PermissionName == AuthorizationPermission.CanViewUsers);
+        Assert.Contains(permissions, p => p.PermissionName == AuthorizationPermission.CanDeleteUsers);
+        Assert.Contains(permissions, p => p.PermissionName == AuthorizationPermission.CanRegisterUsers);
 
         // verify default roles
         List<RoleEntity> roles = await dbContext.Roles.ToListAsync();
         RoleEntity? adminRole = roles.FirstOrDefault(r => r.RoleName == "Admin");
-        adminRole.Should().NotBeNull();
+        Assert.NotNull(adminRole);
 
         // verify admin role permissions
         List<RolePermissionEntity> rolePermissions = await dbContext.RolePermissions
             .Where(rp => rp.RoleId == adminRole!.Id)
             .ToListAsync();
-        rolePermissions.Should().NotBeEmpty();
-        rolePermissions.Should().Contain(rp => permissions.Any(p => p.Id == rp.PermissionId));
+        Assert.NotEmpty(rolePermissions);
+        Assert.Contains(rolePermissions, rp => permissions.Any(p => p.Id == rp.PermissionId));
 
         // verify user has admin role
         UserRoleEntity? userRole = await dbContext.UserRoles.FirstOrDefaultAsync(ur => ur.UserId == userId && ur.RoleId == adminRole!.Id);
-        userRole.Should().NotBeNull();
+        Assert.NotNull(userRole);
     }
 
     private async Task<UserEntity> CreateTestUser()

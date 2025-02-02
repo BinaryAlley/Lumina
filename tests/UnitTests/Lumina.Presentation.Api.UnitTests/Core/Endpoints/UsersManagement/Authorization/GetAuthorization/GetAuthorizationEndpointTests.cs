@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using FastEndpoints;
-using FluentAssertions;
 using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetAuthorization;
 using Lumina.Contracts.Requests.Authorization;
 using Lumina.Contracts.Responses.Authorization;
@@ -58,8 +57,8 @@ public class GetAuthorizationEndpointTests
         IResult result = await _sut.ExecuteAsync(request, cancellationToken);
 
         // Assert
-        AuthorizationResponse actualResponse = result.Should().BeOfType<Ok<AuthorizationResponse>>().Subject.Value!;
-        actualResponse.Should().BeEquivalentTo(expectedResponse);
+        Ok<AuthorizationResponse> okResult = Assert.IsType<Ok<AuthorizationResponse>>(result);
+        Assert.Equal(expectedResponse, okResult.Value);
     }
 
     [Fact]
@@ -77,16 +76,16 @@ public class GetAuthorizationEndpointTests
         IResult result = await _sut.ExecuteAsync(request, cancellationToken);
 
         // Assert
-        ProblemHttpResult problemDetails = result.Should().BeOfType<ProblemHttpResult>().Subject;
-        problemDetails.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
-        problemDetails.ContentType.Should().Be("application/problem+json");
-        problemDetails.ProblemDetails.Should().BeOfType<Microsoft.AspNetCore.Mvc.ProblemDetails>();
+        ProblemHttpResult problemDetails = Assert.IsType<ProblemHttpResult>(result);
+        Assert.Equal(StatusCodes.Status403Forbidden, problemDetails.StatusCode);
+        Assert.Equal("application/problem+json", problemDetails.ContentType);
+        Assert.IsType<Microsoft.AspNetCore.Mvc.ProblemDetails>(problemDetails.ProblemDetails);
 
-        problemDetails.ProblemDetails.Title.Should().Be("Authorization.Failed");
-        problemDetails.ProblemDetails.Detail.Should().Be("User is not authorized.");
-        problemDetails.ProblemDetails.Status.Should().Be(StatusCodes.Status403Forbidden);
-        problemDetails.ProblemDetails.Type.Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.4");
-        problemDetails.ProblemDetails.Extensions["traceId"].Should().NotBeNull();
+        Assert.Equal("Authorization.Failed", problemDetails.ProblemDetails.Title);
+        Assert.Equal("User is not authorized.", problemDetails.ProblemDetails.Detail);
+        Assert.Equal(StatusCodes.Status403Forbidden, problemDetails.ProblemDetails.Status);
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.4", problemDetails.ProblemDetails.Type);
+        Assert.NotNull(problemDetails.ProblemDetails.Extensions["traceId"]);
     }
 
     [Fact]

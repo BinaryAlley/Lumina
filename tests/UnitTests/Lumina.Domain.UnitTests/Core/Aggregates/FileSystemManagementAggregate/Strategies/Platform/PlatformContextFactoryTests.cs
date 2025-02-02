@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Path;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Platform;
 using Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.Strategies.Platform.Fixtures;
@@ -42,8 +41,8 @@ public class PlatformContextFactoryTests
         IWindowsPlatformContext result = _sut.CreateStrategy<IWindowsPlatformContext>();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Should().BeOfType<WindowsPlatformContext>();
+        Assert.NotNull(result);
+        Assert.IsType<WindowsPlatformContext>(result);
     }
 
     [Fact]
@@ -53,8 +52,8 @@ public class PlatformContextFactoryTests
         IUnixPlatformContext result = _sut.CreateStrategy<IUnixPlatformContext>();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Should().BeOfType<UnixPlatformContext>();
+        Assert.NotNull(result);
+        Assert.IsType<UnixPlatformContext>(result);
     }
 
     [Fact]

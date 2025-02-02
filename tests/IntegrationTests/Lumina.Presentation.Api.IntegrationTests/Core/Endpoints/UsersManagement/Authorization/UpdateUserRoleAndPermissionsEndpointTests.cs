@@ -1,11 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Contracts.Requests.Authorization;
-using Lumina.Contracts.Responses.Authorization;
 using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Enums.Authorization;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -104,15 +101,15 @@ public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<Authentic
 
         // Assert
         response.EnsureSuccessStatusCode();
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         string content = await response.Content.ReadAsStringAsync();
         JsonNode? jsonNode = JsonNode.Parse(content);
 
-        jsonNode.Should().NotBeNull();
-        Guid.Parse(jsonNode!["userId"]!.ToString()).Should().Be(user.Id);
-        jsonNode["role"]!.ToString().Should().Be("Editor");
-        jsonNode["permissions"]!.AsArray().Count.Should().BeGreaterThan(0);
+        Assert.NotNull(jsonNode);
+        Assert.Equal(user.Id, Guid.Parse(jsonNode!["userId"]!.ToString()));
+        Assert.Equal("Editor", jsonNode["role"]!.ToString());
+        Assert.True(jsonNode["permissions"]!.AsArray().Count > 0);
     }
 
 
@@ -131,17 +128,18 @@ public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<Authentic
         HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/auth/users/{request.UserId}/role-and-permissions", request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
-        problemDetails.Should().NotBeNull();
-        problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status403Forbidden);
-        problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.4");
-        problemDetails["title"].GetString().Should().Be("General.Unauthorized");
-        problemDetails["detail"].GetString().Should().Be("NotAuthorized");
-        problemDetails["instance"].GetString().Should().Be($"/api/v1/auth/users/{request.UserId}/role-and-permissions");
-        problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status403Forbidden, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.4", problemDetails["type"].GetString());
+        Assert.Equal("General.Unauthorized", problemDetails["title"].GetString());
+        Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
+        Assert.Equal($"/api/v1/auth/users/{request.UserId}/role-and-permissions", problemDetails["instance"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString());
     }
 
     [Fact]
@@ -164,8 +162,7 @@ public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<Authentic
 
         // get the admin user that was created by CreateAuthenticatedAdminClientAsync
         UserEntity? adminUser = dbContext.Users.FirstOrDefault(u => u.UserRole!.Role.RoleName == "Admin");
-        adminUser.Should().NotBeNull("Admin user should exist");
-
+        Assert.NotNull(adminUser);
         UpdateUserRoleAndPermissionsRequest request = new(
             UserId: adminUser!.Id,
             RoleId: editorRole.Id,
@@ -176,17 +173,18 @@ public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<Authentic
         HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/auth/users/{request.UserId}/role-and-permissions", request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
-        problemDetails.Should().NotBeNull();
-        problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status403Forbidden);
-        problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.4");
-        problemDetails["title"].GetString().Should().Be("General.Forbidden");
-        problemDetails["detail"].GetString().Should().Be("CannotRemoveLastAdmin");
-        problemDetails["instance"].GetString().Should().Be($"/api/v1/auth/users/{request.UserId}/role-and-permissions");
-        problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status403Forbidden, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.4", problemDetails["type"].GetString());
+        Assert.Equal("General.Forbidden", problemDetails["title"].GetString());
+        Assert.Equal("CannotRemoveLastAdmin", problemDetails["detail"].GetString());
+        Assert.Equal($"/api/v1/auth/users/{request.UserId}/role-and-permissions", problemDetails["instance"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString());
     }
 
     [Fact]
@@ -204,17 +202,18 @@ public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<Authentic
         HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/auth/users/{nonExistentUserId}/role-and-permissions", request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
-        problemDetails.Should().NotBeNull();
-        problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status404NotFound);
-        problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.5");
-        problemDetails["title"].GetString().Should().Be("General.NotFound");
-        problemDetails["detail"].GetString().Should().Be("UserDoesNotExist");
-        problemDetails["instance"].GetString().Should().Be($"/api/v1/auth/users/{nonExistentUserId}/role-and-permissions");
-        problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status404NotFound, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.5", problemDetails["type"].GetString());
+        Assert.Equal("General.NotFound", problemDetails["title"].GetString());
+        Assert.Equal("UserDoesNotExist", problemDetails["detail"].GetString());
+        Assert.Equal($"/api/v1/auth/users/{nonExistentUserId}/role-and-permissions", problemDetails["instance"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString());
     }
 
     [Fact]
@@ -228,15 +227,13 @@ public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<Authentic
             Permissions: [Guid.NewGuid()]
         );
 
-        // Act
-        Func<Task> act = async () =>
+        // Act & Assert
+        Exception? exception = await Record.ExceptionAsync(async () =>
         {
             cts.Cancel();
             await _client.PutAsJsonAsync($"/api/v1/auth/users/{request.UserId}/role-and-permissions", request, cts.Token);
-        };
-
-        // Assert
-        await act.Should().ThrowAsync<TaskCanceledException>();
+        });
+        Assert.IsType<TaskCanceledException>(exception);
     }
 
     /// <summary>

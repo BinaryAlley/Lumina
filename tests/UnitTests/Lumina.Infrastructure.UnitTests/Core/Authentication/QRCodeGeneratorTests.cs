@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using FluentAssertions;
 using Lumina.Infrastructure.Common.Errors;
 using Lumina.Infrastructure.Common.Models.Configuration;
 using Lumina.Infrastructure.Common.Validators;
@@ -39,8 +38,8 @@ public class QRCodeGeneratorTests
         string result = _sut.GenerateQrCodeDataUri(username, secret);
 
         // Assert
-        result.Should().StartWith("data:image/png;base64,");
-        result.Should().Match(uri => IsBase64String(uri.Substring(22))); // Skip "data:image/png;base64,"
+        Assert.StartsWith("data:image/png;base64,", result);
+        Assert.True(IsBase64String(result[22..])); // skip "data:image/png;base64,"
     }
 
     [Fact]
@@ -54,8 +53,8 @@ public class QRCodeGeneratorTests
         string result = _sut.GenerateQrCodeDataUri(username, secret);
 
         // Assert
-        result.Should().StartWith("data:image/png;base64,");
-        result.Should().Match(uri => IsBase64String(uri.Substring(22)));
+        Assert.StartsWith("data:image/png;base64,", result);
+        Assert.True(IsBase64String(result[22..]));
     }
 
     [Fact]
@@ -70,7 +69,7 @@ public class QRCodeGeneratorTests
         string result2 = _sut.GenerateQrCodeDataUri(username2, secret);
 
         // Assert
-        result1.Should().NotBe(result2);
+        Assert.NotEqual(result1, result2);
     }
 
     [Fact]
@@ -84,7 +83,7 @@ public class QRCodeGeneratorTests
         string result2 = _sut.GenerateQrCodeDataUri(username, secret);
 
         // Assert
-        result1.Should().Be(result2);
+        Assert.Equal(result1, result2);
     }
 
     [Theory]
@@ -99,8 +98,8 @@ public class QRCodeGeneratorTests
         string result = _sut.GenerateQrCodeDataUri(invalidUsername!, secret);
 
         // Assert
-        result.Should().StartWith("data:image/png;base64,");
-        result.Should().Match(uri => IsBase64String(uri.Substring(22)));
+        Assert.StartsWith("data:image/png;base64,", result);
+        Assert.True(IsBase64String(result[22..]));
     }
 
     [Theory]
@@ -117,8 +116,8 @@ public class QRCodeGeneratorTests
         string result = _sut.GenerateQrCodeDataUri(username, secret);
 
         // Assert
-        result.Should().StartWith("data:image/png;base64,");
-        result.Should().Match(uri => IsBase64String(uri.Substring(22)));
+        Assert.StartsWith("data:image/png;base64,", result);
+        Assert.True(IsBase64String(result[22..]));
     }
 
     [Fact]
@@ -132,8 +131,8 @@ public class QRCodeGeneratorTests
         string result = _sut.GenerateQrCodeDataUri(username, shortSecret);
 
         // Assert
-        result.Should().StartWith("data:image/png;base64,");
-        result.Should().Match(uri => IsBase64String(uri.Substring(22)));
+        Assert.StartsWith("data:image/png;base64,", result);
+        Assert.True(IsBase64String(result[22..]));
     }
 
     private static bool IsBase64String(string base64)

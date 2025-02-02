@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
@@ -43,15 +42,15 @@ public class LibraryEntityMappingTests
         LibraryResponse result = entity.ToResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Id.Should().Be(entity.Id);
-        result.UserId.Should().Be(entity.UserId);
-        result.Title.Should().Be(entity.Title);
-        result.LibraryType.Should().Be(entity.LibraryType);
-        result.ContentLocations.Should().BeEquivalentTo(entity.ContentLocations.Select(l => l.Path));
-        result.CoverImage.Should().Be(entity.CoverImage);
-        result.CreatedOnUtc.Should().Be(entity.CreatedOnUtc);
-        result.UpdatedOnUtc.Should().Be(entity.UpdatedOnUtc);
+        Assert.NotNull(result);
+        Assert.Equal(entity.Id, result.Id);
+        Assert.Equal(entity.UserId, result.UserId);
+        Assert.Equal(entity.Title, result.Title);
+        Assert.Equal(entity.LibraryType, result.LibraryType);
+        Assert.Equal(entity.ContentLocations.Select(l => l.Path), result.ContentLocations);
+        Assert.Equal(entity.CoverImage, result.CoverImage);
+        Assert.Equal(entity.CreatedOnUtc, result.CreatedOnUtc);
+        Assert.Equal(entity.UpdatedOnUtc, result.UpdatedOnUtc);
     }
 
     [Theory]
@@ -80,8 +79,8 @@ public class LibraryEntityMappingTests
         LibraryResponse result = entity.ToResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.LibraryType.Should().Be(libraryType);
+        Assert.NotNull(result);
+        Assert.Equal(libraryType, result.LibraryType);
     }
 
     [Fact]
@@ -112,8 +111,8 @@ public class LibraryEntityMappingTests
         LibraryResponse result = entity.ToResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.ContentLocations.Should().BeEquivalentTo(entity.ContentLocations.Select(l => l.Path));
+        Assert.NotNull(result);
+        Assert.Equal(entity.ContentLocations.Select(l => l.Path), result.ContentLocations);
     }
 
     [Fact]
@@ -139,8 +138,8 @@ public class LibraryEntityMappingTests
         LibraryResponse result = entity.ToResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.UpdatedOnUtc.Should().Be(updated);
+        Assert.NotNull(result);
+        Assert.Equal(updated, result.UpdatedOnUtc);
     }
 
     [Fact]
@@ -166,7 +165,7 @@ public class LibraryEntityMappingTests
         LibraryResponse result = entity.ToResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.CoverImage.Should().BeNull();
+        Assert.NotNull(result);
+        Assert.Null(result.CoverImage);
     }
 }

@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Contracts.Requests.Authorization;
 using Lumina.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
@@ -52,16 +51,16 @@ public class UpdateRoleEndpointTests : IClassFixture<LuminaApiFactory>
         HttpResponseMessage response = await _client.PutAsync("/api/v1/auth/roles", content);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
 
         string responseContent = await response.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(responseContent, _jsonOptions);
-        problemDetails.Should().NotBeNull();
-        problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status401Unauthorized);
-        problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc7235#section-3.1");
-        problemDetails["title"].GetString().Should().Be("Unauthorized");
-        problemDetails["instance"].GetProperty("value").GetString().Should().Be("/api/v1/auth/roles");
-        problemDetails["detail"].GetString().Should().Be("Authentication failed");
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status401Unauthorized, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc7235#section-3.1", problemDetails["type"].GetString());
+        Assert.Equal("Unauthorized", problemDetails["title"].GetString());
+        Assert.Equal("/api/v1/auth/roles", problemDetails["instance"].GetProperty("value").GetString());
+        Assert.Equal("Authentication failed", problemDetails["detail"].GetString());
     }
 }

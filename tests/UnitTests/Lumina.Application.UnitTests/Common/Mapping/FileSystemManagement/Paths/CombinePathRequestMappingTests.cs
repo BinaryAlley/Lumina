@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using FluentAssertions;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Paths;
 using Lumina.Application.Core.FileSystemManagement.Paths.Commands.CombinePath;
 using Lumina.Contracts.Requests.FileSystemManagement.Path;
@@ -38,9 +37,9 @@ public class CombinePathRequestMappingTests
         CombinePathCommand result = request.ToCommand();
 
         // Assert
-        result.Should().NotBeNull();
-        result.OriginalPath.Should().Be(request.OriginalPath);
-        result.NewPath.Should().Be(request.NewPath);
+        Assert.NotNull(result);
+        Assert.Equal(request.OriginalPath, result.OriginalPath);
+        Assert.Equal(request.NewPath, result.NewPath);
     }
 
     [Theory]
@@ -56,9 +55,9 @@ public class CombinePathRequestMappingTests
         CombinePathCommand result = request.ToCommand();
 
         // Assert
-        result.Should().NotBeNull();
-        result.OriginalPath.Should().Be(originalPath);
-        result.NewPath.Should().Be(newPath);
+        Assert.NotNull(result);
+        Assert.Equal(originalPath, result.OriginalPath);
+        Assert.Equal(newPath, result.NewPath);
     }
 
     [Fact]
@@ -71,12 +70,12 @@ public class CombinePathRequestMappingTests
         List<CombinePathCommand> results = requests.Select(r => r.ToCommand()).ToList();
 
         // Assert
-        results.Should().NotBeNull();
-        results.Should().HaveCount(requests.Count);
+        Assert.NotNull(results);
+        Assert.Equal(requests.Count, results.Count);
         for (int i = 0; i < requests.Count; i++)
         {
-            results[i].OriginalPath.Should().Be(requests[i].OriginalPath);
-            results[i].NewPath.Should().Be(requests[i].NewPath);
+            Assert.Equal(requests[i].OriginalPath, results[i].OriginalPath);
+            Assert.Equal(requests[i].NewPath, results[i].NewPath);
         }
     }
 }

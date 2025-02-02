@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
@@ -62,17 +61,17 @@ public class ChangePasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDis
         HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/auth/change-password", request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
 
         string content = await response.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
-        problemDetails.Should().NotBeNull();
-        problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status401Unauthorized);
-        problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc7235#section-3.1");
-        problemDetails["title"].GetString().Should().Be("Unauthorized");
-        problemDetails["instance"].GetProperty("value").GetString().Should().Be("/api/v1/auth/change-password");
-        problemDetails["detail"].GetString().Should().Be("Authentication failed");
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status401Unauthorized, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc7235#section-3.1", problemDetails["type"].GetString());
+        Assert.Equal("Unauthorized", problemDetails["title"].GetString());
+        Assert.Equal("/api/v1/auth/change-password", problemDetails["instance"].GetProperty("value").GetString());
+        Assert.Equal("Authentication failed", problemDetails["detail"].GetString());
     }
 
     [Fact]
@@ -103,7 +102,7 @@ public class ChangePasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDis
 
         // Assert
         double stdDev = CalculateStandardDeviation(timings);
-        stdDev.Should().BeLessThan(200);
+        Assert.True(stdDev < 200);
     }
 
     private static double CalculateStandardDeviation(List<long> values)

@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using FluentAssertions;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Paths;
 using Lumina.Application.Core.FileSystemManagement.Paths.Queries.GetPathRoot;
 using Lumina.Contracts.Requests.FileSystemManagement.Path;
@@ -38,8 +37,8 @@ public class GetPathRootRequestMappingTests
         GetPathRootQuery result = request.ToQuery();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Path.Should().Be(request.Path);
+        Assert.NotNull(result);
+        Assert.Equal(request.Path, result.Path);
     }
 
     [Theory]
@@ -56,8 +55,8 @@ public class GetPathRootRequestMappingTests
         GetPathRootQuery result = request.ToQuery();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Path.Should().Be(path);
+        Assert.NotNull(result);
+        Assert.Equal(path, result.Path);
     }
 
     [Fact]
@@ -70,11 +69,11 @@ public class GetPathRootRequestMappingTests
         List<GetPathRootQuery> results = requests.Select(r => r.ToQuery()).ToList();
 
         // Assert
-        results.Should().NotBeNull();
-        results.Should().HaveCount(requests.Count);
+        Assert.NotNull(results);
+        Assert.Equal(requests.Count, results.Count);
         for (int i = 0; i < requests.Count; i++)
         {
-            results[i].Path.Should().Be(requests[i].Path);
+            Assert.Equal(requests[i].Path, results[i].Path);
         }
     }
 }

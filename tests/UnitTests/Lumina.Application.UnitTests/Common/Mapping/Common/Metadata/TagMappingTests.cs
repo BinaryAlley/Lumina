@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Domain.Common.ValueObjects.Metadata;
@@ -22,15 +21,15 @@ public class TagMappingTests
     {
         // Arrange
         ErrorOr<Tag> createResult = Tag.Create("indie");
-        createResult.IsError.Should().BeFalse();
+        Assert.False(createResult.IsError);
         Tag tag = createResult.Value;
 
         // Act
         TagEntity result = tag.ToRepositoryEntity();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Name.Should().Be(tag.Name);
+        Assert.NotNull(result);
+        Assert.Equal(tag.Name, result.Name);
     }
 
     [Theory]
@@ -43,15 +42,15 @@ public class TagMappingTests
     {
         // Arrange
         ErrorOr<Tag> createResult = Tag.Create(name);
-        createResult.IsError.Should().BeFalse();
+        Assert.False(createResult.IsError);
         Tag tag = createResult.Value;
 
         // Act
         TagEntity result = tag.ToRepositoryEntity();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Name.Should().Be(tag.Name);
+        Assert.NotNull(result);
+        Assert.Equal(tag.Name, result.Name);
     }
 
     [Fact]
@@ -71,10 +70,10 @@ public class TagMappingTests
         IEnumerable<TagEntity> results = tags.ToRepositoryEntities();
 
         // Assert
-        results.Should().NotBeNull();
-        results.Should().HaveCount(tags.Count);
+        Assert.NotNull(results);
+        Assert.Equal(tags.Count, results.Count());
         List<TagEntity> resultList = results.ToList();
         for (int i = 0; i < tags.Count; i++)
-            resultList[i].Name.Should().Be(tags[i].Name);
+            Assert.Equal(tags[i].Name, resultList[i].Name);
     }
 }

@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Infrastructure.Core.Security;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -33,8 +32,9 @@ public class HashServiceTests
         string result = _sut.HashString(password);
 
         // Assert
-        result.Should().NotBeNullOrEmpty();
-        result.Should().NotBe(password);
+        Assert.NotNull(result);
+        Assert.NotEmpty(result);
+        Assert.NotEqual(password, result);
     }
 
     [Fact]
@@ -48,7 +48,7 @@ public class HashServiceTests
         string hash2 = _sut.HashString(password);
 
         // Assert
-        hash1.Should().NotBe(hash2);
+        Assert.NotEqual(hash1, hash2);
     }
 
     [Theory]
@@ -63,10 +63,10 @@ public class HashServiceTests
         string hash = _sut.HashString(input);
 
         // Assert
-        hash.Should().NotBeNullOrEmpty();
+        Assert.NotNull(hash);
+        Assert.NotEmpty(hash);
         // verify it's a valid Base64 string
-        Action decode = () => Convert.FromBase64String(hash);
-        decode.Should().NotThrow();
+        Assert.NotNull(Convert.FromBase64String(hash));
     }
 
     [Fact]
@@ -80,7 +80,7 @@ public class HashServiceTests
         bool result = _sut.CheckStringAgainstHash(password, hash);
 
         // Assert
-        result.Should().BeTrue();
+        Assert.True(result);
     }
 
     [Fact]
@@ -95,7 +95,7 @@ public class HashServiceTests
         bool result = _sut.CheckStringAgainstHash(wrongPassword, hash);
 
         // Assert
-        result.Should().BeFalse();
+        Assert.False(result);
     }
 
     [Theory]
@@ -111,7 +111,7 @@ public class HashServiceTests
         bool result = _sut.CheckStringAgainstHash(password, invalidHash);
 
         // Assert
-        result.Should().BeFalse();
+        Assert.False(result);
     }
 
     [Fact]
@@ -125,7 +125,7 @@ public class HashServiceTests
         Action act = () => _sut.CheckStringAgainstHash(password, invalidHash);
 
         // Assert
-        act.Should().Throw<FormatException>();
+        Assert.Throws<FormatException>(() => _sut.CheckStringAgainstHash(password, invalidHash));
     }
 
     [Theory]
@@ -136,7 +136,7 @@ public class HashServiceTests
         Action act = () => _sut.HashString(nullPassword!);
 
         // Assert
-        act.Should().Throw<ArgumentNullException>();
+        Assert.Throws<ArgumentNullException>(() => _sut.HashString(nullPassword!));
     }
 
     [Theory]
@@ -150,7 +150,7 @@ public class HashServiceTests
         Action act = () => _sut.CheckStringAgainstHash(nullPassword!, hash);
 
         // Assert
-        act.Should().Throw<ArgumentNullException>();
+        Assert.Throws<ArgumentNullException>(() => _sut.CheckStringAgainstHash(nullPassword!, hash));
     }
 
     [Fact]
@@ -160,6 +160,6 @@ public class HashServiceTests
         Action act = () => _sut.CheckStringAgainstHash("password", null!);
 
         // Assert
-        act.Should().Throw<ArgumentNullException>();
+        Assert.Throws<ArgumentNullException>(() => _sut.CheckStringAgainstHash("password", null!));
     }
 }

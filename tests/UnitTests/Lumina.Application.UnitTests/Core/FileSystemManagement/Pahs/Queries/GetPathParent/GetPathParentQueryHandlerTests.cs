@@ -2,7 +2,6 @@
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Application.Core.FileSystemManagement.Paths.Queries.GetPathParent;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Pahs.Fixtures;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Pahs.Queries.GetPathParent.Fixtures;
@@ -56,9 +55,9 @@ public class GetPathParentQueryHandlerTests
         ErrorOr<IEnumerable<PathSegmentResponse>> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().BeAssignableTo<IEnumerable<PathSegmentResponse>>();
-        result.Value.Should().BeEquivalentTo(pathSegmentResponses);
+        Assert.False(result.IsError);
+        Assert.IsAssignableFrom<IEnumerable<PathSegmentResponse>>(result.Value);
+        Assert.Equal(pathSegmentResponses, result.Value);
         _mockPathService.Received(1).GoUpOneLevel(query.Path!);
     }
 
@@ -75,8 +74,8 @@ public class GetPathParentQueryHandlerTests
         ErrorOr<IEnumerable<PathSegmentResponse>> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(error);
+        Assert.True(result.IsError);
+        Assert.Equal(error, result.FirstError);
         _mockPathService.Received(1).GoUpOneLevel(query.Path!);
     }
 
@@ -93,8 +92,8 @@ public class GetPathParentQueryHandlerTests
         ErrorOr<IEnumerable<PathSegmentResponse>> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().BeEmpty();
+        Assert.False(result.IsError);
+        Assert.Empty(result.Value);
         _mockPathService.Received(1).GoUpOneLevel(query.Path!);
     }
 }

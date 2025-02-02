@@ -1,15 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Contracts.Responses.UsersManagement;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Infrastructure.Core.Security;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
@@ -63,13 +60,13 @@ public class CheckInitializationEndpointTests : IClassFixture<AuthenticatedLumin
 
         // Assert
         response.EnsureSuccessStatusCode();
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         string content = await response.Content.ReadAsStringAsync();
         InitializationResponse? result = JsonSerializer.Deserialize<InitializationResponse>(content, _jsonOptions);
 
-        result.Should().NotBeNull();
-        result!.IsInitialized.Should().BeFalse();
+        Assert.NotNull(result);
+        Assert.False(result!.IsInitialized);
     }
 
     [Fact]
@@ -83,13 +80,13 @@ public class CheckInitializationEndpointTests : IClassFixture<AuthenticatedLumin
 
         // Assert
         response.EnsureSuccessStatusCode();
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         string content = await response.Content.ReadAsStringAsync();
         InitializationResponse? result = JsonSerializer.Deserialize<InitializationResponse>(content, _jsonOptions);
 
-        result.Should().NotBeNull();
-        result!.IsInitialized.Should().BeTrue();
+        Assert.NotNull(result);
+        Assert.True(result!.IsInitialized);
     }
 
     [Fact]
@@ -98,15 +95,13 @@ public class CheckInitializationEndpointTests : IClassFixture<AuthenticatedLumin
         // Arrange
         using CancellationTokenSource cts = new();
 
-        // Act
-        Func<Task> act = async () =>
+        // Act & Assert
+        Exception? exception = await Record.ExceptionAsync(async () =>
         {
             cts.Cancel();
             await _client.GetAsync("/api/v1/initialization", cts.Token);
-        };
-
-        // Assert
-        await act.Should().ThrowAsync<TaskCanceledException>();
+        });
+        Assert.IsType<TaskCanceledException>(exception);
     }
 
     private async Task<UserEntity> CreateTestUser()

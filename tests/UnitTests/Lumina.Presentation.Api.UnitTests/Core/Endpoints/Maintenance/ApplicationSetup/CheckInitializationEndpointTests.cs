@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using FluentAssertions;
 using Lumina.Application.Core.Maintenance.ApplicationSetup.Queries.CheckInitialization;
 using Lumina.Contracts.Responses.UsersManagement;
 using Lumina.Presentation.Api.Core.Endpoints.Maintenance.ApplicationSetup;
@@ -47,8 +46,8 @@ public class CheckInitializationEndpointTests
         IResult result = await _sut.ExecuteAsync(new EmptyRequest(), cancellationToken);
 
         // Assert
-        InitializationResponse actualResponse = result.Should().BeOfType<Ok<InitializationResponse>>().Subject.Value!;
-        actualResponse.Should().BeEquivalentTo(expectedResponse);
+        Ok<InitializationResponse> okResult = Assert.IsType<Ok<InitializationResponse>>(result);
+        Assert.Equal(expectedResponse, okResult.Value);
     }
 
     [Fact]

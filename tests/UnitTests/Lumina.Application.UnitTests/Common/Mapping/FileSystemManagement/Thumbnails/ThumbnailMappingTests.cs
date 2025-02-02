@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using FluentAssertions;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Thumbnails;
 using Lumina.Domain.Common.Enums.PhotoLibrary;
 using Lumina.Contracts.Responses.FileSystemManagement.Thumbnails;
@@ -39,9 +38,9 @@ public class ThumbnailMappingTests
         ThumbnailResponse result = domainModel.ToResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Type.Should().Be(domainModel.Type);
-        result.Bytes.Should().BeEquivalentTo(domainModel.Bytes);
+        Assert.NotNull(result);
+        Assert.Equal(domainModel.Type, result.Type);
+        Assert.Equal(domainModel.Bytes, result.Bytes);
     }
 
     [Theory]
@@ -58,9 +57,9 @@ public class ThumbnailMappingTests
         ThumbnailResponse result = domainModel.ToResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Type.Should().Be(imageType);
-        result.Bytes.Should().BeEquivalentTo(bytes);
+        Assert.NotNull(result);
+        Assert.Equal(imageType, result.Type);
+        Assert.Equal(bytes, result.Bytes);
     }
 
     [Fact]
@@ -75,9 +74,9 @@ public class ThumbnailMappingTests
         ThumbnailResponse result = domainModel.ToResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Type.Should().Be(imageType);
-        result.Bytes.Should().BeEmpty();
+        Assert.NotNull(result);
+        Assert.Equal(imageType, result.Type);
+        Assert.Empty(result.Bytes);
     }
 
     [Fact]
@@ -90,12 +89,12 @@ public class ThumbnailMappingTests
         List<ThumbnailResponse> results = thumbnails.Select(t => t.ToResponse()).ToList();
 
         // Assert
-        results.Should().NotBeNull();
-        results.Should().HaveCount(thumbnails.Count);
+        Assert.NotNull(results);
+        Assert.Equal(thumbnails.Count, results.Count);
         for (int i = 0; i < thumbnails.Count; i++)
         {
-            results[i].Type.Should().Be(thumbnails[i].Type);
-            results[i].Bytes.Should().BeEquivalentTo(thumbnails[i].Bytes);
+            Assert.Equal(thumbnails[i].Type, results[i].Type);
+            Assert.Equal(thumbnails[i].Bytes, results[i].Bytes);
         }
     }
 }
