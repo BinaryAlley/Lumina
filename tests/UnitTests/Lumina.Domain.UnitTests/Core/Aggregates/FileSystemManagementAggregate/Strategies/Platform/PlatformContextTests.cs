@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Domain.Common.Enums.FileSystem;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Path;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Platform;
@@ -25,8 +24,8 @@ public class PlatformContextTests
         WindowsPlatformContext windowsPlatformContext = new(mockWindowsPathStrategy);
 
         // Assert
-        windowsPlatformContext.Platform.Should().Be(PlatformType.Windows);
-        windowsPlatformContext.PathStrategy.Should().Be(mockWindowsPathStrategy);
+        Assert.Equal(PlatformType.Windows, windowsPlatformContext.Platform);
+        Assert.Equal(mockWindowsPathStrategy, windowsPlatformContext.PathStrategy);
     }
 
     [Fact]
@@ -39,8 +38,8 @@ public class PlatformContextTests
         UnixPlatformContext unixPlatformContext = new(mockUnixPathStrategy);
 
         // Assert
-        unixPlatformContext.Platform.Should().Be(PlatformType.Unix);
-        unixPlatformContext.PathStrategy.Should().Be(mockUnixPathStrategy);
+        Assert.Equal(PlatformType.Unix, unixPlatformContext.Platform);
+        Assert.Equal(mockUnixPathStrategy, unixPlatformContext.PathStrategy);
     }
 
     [Fact]
@@ -53,7 +52,7 @@ public class PlatformContextTests
         WindowsPlatformContext windowsPlatformContext = new(mockWindowsPathStrategy);
 
         // Assert
-        windowsPlatformContext.Should().BeAssignableTo<IWindowsPlatformContext>();
+        Assert.IsAssignableFrom<IWindowsPlatformContext>(windowsPlatformContext);
     }
 
     [Fact]
@@ -66,7 +65,7 @@ public class PlatformContextTests
         UnixPlatformContext unixPlatformContext = new(mockUnixPathStrategy);
 
         // Assert
-        unixPlatformContext.Should().BeAssignableTo<IUnixPlatformContext>();
+        Assert.IsAssignableFrom<IUnixPlatformContext>(unixPlatformContext);
     }
 
     [Fact]
@@ -77,8 +76,7 @@ public class PlatformContextTests
         WindowsPlatformContext windowsPlatformContext = new(mockWindowsPathStrategy);
 
         // Act & Assert
-        windowsPlatformContext.GetType().GetProperty(nameof(WindowsPlatformContext.PathStrategy))!
-            .SetMethod.Should().BeNull();
+        Assert.Null(windowsPlatformContext.GetType().GetProperty(nameof(WindowsPlatformContext.PathStrategy))!.SetMethod);
     }
 
     [Fact]
@@ -89,8 +87,7 @@ public class PlatformContextTests
         UnixPlatformContext unixPlatformContext = new(mockUnixPathStrategy);
 
         // Act & Assert
-        unixPlatformContext.GetType().GetProperty(nameof(UnixPlatformContext.PathStrategy))!
-            .SetMethod.Should().BeNull();
+        Assert.Null(unixPlatformContext.GetType().GetProperty(nameof(UnixPlatformContext.PathStrategy))!.SetMethod);
     }
 
     [Fact]
@@ -101,8 +98,7 @@ public class PlatformContextTests
         WindowsPlatformContext windowsPlatformContext = new(mockWindowsPathStrategy);
 
         // Act & Assert
-        windowsPlatformContext.GetType().GetProperty(nameof(WindowsPlatformContext.Platform))!
-            .SetMethod.Should().BeNull();
+        Assert.Null(windowsPlatformContext.GetType().GetProperty(nameof(WindowsPlatformContext.Platform))!.SetMethod);
     }
 
     [Fact]
@@ -113,7 +109,6 @@ public class PlatformContextTests
         UnixPlatformContext unixPlatformContext = new(mockUnixPathStrategy);
 
         // Act & Assert
-        unixPlatformContext.GetType().GetProperty(nameof(UnixPlatformContext.Platform))!
-            .SetMethod.Should().BeNull();
+        Assert.Null(unixPlatformContext.GetType().GetProperty(nameof(UnixPlatformContext.Platform))!.SetMethod);
     }
 }

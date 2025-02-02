@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
@@ -9,6 +8,7 @@ using Lumina.Contracts.Responses.UsersManagement.Users;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 #endregion
 
 namespace Lumina.Application.UnitTests.Common.Mapping.UserManagement.Users;
@@ -29,11 +29,11 @@ public class UserEntityMappingTests
         UserResponse result = entity.ToResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Id.Should().Be(entity.Id);
-        result.Username.Should().Be(entity.Username);
-        result.CreatedOnUtc.Should().Be(entity.CreatedOnUtc);
-        result.UpdatedOnUtc.Should().Be(entity.UpdatedOnUtc);
+        Assert.NotNull(result);
+        Assert.Equal(entity.Id, result.Id);
+        Assert.Equal(entity.Username, result.Username);
+        Assert.Equal(entity.CreatedOnUtc, result.CreatedOnUtc);
+        Assert.Equal(entity.UpdatedOnUtc, result.UpdatedOnUtc);
     }
 
     [Theory]
@@ -51,8 +51,8 @@ public class UserEntityMappingTests
         UserResponse result = entity.ToResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Username.Should().Be(username);
+        Assert.NotNull(result);
+        Assert.Equal(username, result.Username);
     }
 
     [Fact]
@@ -66,8 +66,8 @@ public class UserEntityMappingTests
         UserResponse result = entity.ToResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.UpdatedOnUtc.Should().Be(entity.UpdatedOnUtc);
+        Assert.NotNull(result);
+        Assert.Equal(entity.UpdatedOnUtc, result.UpdatedOnUtc);
     }
 
     [Fact]
@@ -80,11 +80,11 @@ public class UserEntityMappingTests
         UserResponse result = entity.ToResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Id.Should().Be(entity.Id);
-        result.Username.Should().Be(entity.Username);
-        result.CreatedOnUtc.Should().Be(entity.CreatedOnUtc);
-        result.UpdatedOnUtc.Should().Be(entity.UpdatedOnUtc);
+        Assert.NotNull(result);
+        Assert.Equal(entity.Id, result.Id);
+        Assert.Equal(entity.Username, result.Username);
+        Assert.Equal(entity.CreatedOnUtc, result.CreatedOnUtc);
+        Assert.Equal(entity.UpdatedOnUtc, result.UpdatedOnUtc);
     }
 
     [Fact]
@@ -97,11 +97,16 @@ public class UserEntityMappingTests
         IEnumerable<UserResponse> results = entities.ToResponses();
 
         // Assert
-        results.Should().NotBeNull();
-        results.Should().HaveCount(3);
-        results.Should().BeEquivalentTo(entities, options => options
-            .Including(x => x.Id)
-            .Including(x => x.Username));
+        Assert.NotNull(results);
+        Assert.Equal(3, results.Count());
+        List<UserResponse> resultsList = [..results];
+        List<UserEntity> entitiesList = [.. entities];
+
+        for (int i = 0; i < resultsList.Count; i++)
+        {
+            Assert.Equal(entitiesList[i].Id, resultsList[i].Id);
+            Assert.Equal(entitiesList[i].Username, resultsList[i].Username);
+        }
     }
 
     [Fact]
@@ -114,8 +119,8 @@ public class UserEntityMappingTests
         IEnumerable<UserResponse> results = entities.ToResponses();
 
         // Assert
-        results.Should().NotBeNull();
-        results.Should().BeEmpty();
+        Assert.NotNull(results);
+        Assert.Empty(results);
     }
 
     [Fact]
@@ -129,7 +134,7 @@ public class UserEntityMappingTests
         UserResponse result = entity.ToResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.UpdatedOnUtc.Should().BeNull();
+        Assert.NotNull(result);
+        Assert.Null(result.UpdatedOnUtc);
     }
 }

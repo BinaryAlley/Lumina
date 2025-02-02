@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Domain.Common.Enums.FileSystem;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
@@ -48,10 +47,10 @@ public class DriveServiceTests
         ErrorOr<IEnumerable<FileSystemItem>> result = _sut.GetDrives();
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().HaveCount(1);
-        result.Value.First().Should().BeOfType<UnixRootItem>();
-        result.Value.First().Status.Should().Be(FileSystemItemStatus.Accessible);
+        Assert.False(result.IsError);
+        Assert.Single(result.Value);
+        Assert.IsType<UnixRootItem>(result.Value.First());
+        Assert.Equal(FileSystemItemStatus.Accessible, result.Value.First().Status);
     }
 
     [Fact]
@@ -71,10 +70,10 @@ public class DriveServiceTests
         ErrorOr<IEnumerable<FileSystemItem>> result = _sut.GetDrives();
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().HaveCount(2); // Only ready drives
-        result.Value.Should().AllBeOfType<WindowsRootItem>();
-        result.Value.Select(d => d.Name).Should().BeEquivalentTo("C:\\", "D:\\");
+        Assert.False(result.IsError);
+        Assert.Equal(2, result.Value.Count()); // Only ready drives
+        Assert.All(result.Value, item => Assert.IsType<WindowsRootItem>(item));
+        Assert.Equal(["C:\\", "D:\\"], result.Value.Select(d => d.Name));
     }
 
     private static IDriveInfo CreateMockDriveInfo(string name, bool isReady)

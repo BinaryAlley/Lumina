@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using EntityFrameworkCore.Testing.NSubstitute;
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.Errors;
 using Lumina.DataAccess.Core.Repositories.Authorization;
@@ -50,12 +49,12 @@ public class UserRoleRepositoryTests
         ErrorOr<Created> result = await _sut.InsertAsync(userRole, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().Be(Result.Created);
+        Assert.False(result.IsError);
+        Assert.Equal(Result.Created, result.Value);
 
         EntityEntry<UserRoleEntity>? addedUserRole = _mockContext.ChangeTracker.Entries<UserRoleEntity>()
             .FirstOrDefault(e => e.State == EntityState.Added && e.Entity.Id == userRole.Id);
-        addedUserRole.Should().NotBeNull();
-        addedUserRole!.State.Should().Be(EntityState.Added);
+        Assert.NotNull(addedUserRole);
+        Assert.Equal(EntityState.Added, addedUserRole!.State);
     }
 }

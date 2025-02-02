@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using FastEndpoints;
-using FluentAssertions;
 using Lumina.Application.Core.UsersManagement.Authentication.Commands.RegisterUser;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
@@ -53,9 +52,9 @@ public class RegisterEndpointTests
         IResult result = await _sut.ExecuteAsync(request, cancellationToken);
 
         // Assert
-        Created<RegistrationResponse> createdResult = result.Should().BeOfType<Created<RegistrationResponse>>().Subject;
-        createdResult.Value.Should().BeEquivalentTo(expectedResponse);
-        createdResult.Location.Should().EndWith(expectedResponse.Id.ToString());
+        Created<RegistrationResponse> createdResult = Assert.IsType<Created<RegistrationResponse>>(result);
+        Assert.Equal(expectedResponse, createdResult.Value);
+        Assert.EndsWith(expectedResponse.Id.ToString(), createdResult.Location);
     }
 
     [Fact]
@@ -72,21 +71,15 @@ public class RegisterEndpointTests
         IResult result = await _sut. ExecuteAsync(request, cancellationToken);
 
         // Assert
-        result.Should().BeOfType<ProblemHttpResult>();
-        ProblemHttpResult problemDetails = (ProblemHttpResult)result;
-        problemDetails.StatusCode.Should().Be(StatusCodes.Status422UnprocessableEntity);
-        problemDetails.ContentType.Should().Be("application/problem+json");
-        problemDetails.ProblemDetails.Should().BeOfType<HttpValidationProblemDetails>();
-        HttpValidationProblemDetails validationProblemDetails = (HttpValidationProblemDetails)problemDetails.ProblemDetails;
-        validationProblemDetails.Status.Should().Be(StatusCodes.Status422UnprocessableEntity);
-        validationProblemDetails.Title.Should().Be("General.Validation");
-        validationProblemDetails.Type.Should().Be("https://tools.ietf.org/html/rfc4918#section-11.2");
-        validationProblemDetails.Errors.Should().ContainSingle()
-            .Which.Should().BeEquivalentTo(new
-            {
-                Key = "Registration.Failed",
-                Value = new[] { "Username is already taken." }
-            });
+        ProblemHttpResult problemDetails = Assert.IsType<ProblemHttpResult>(result);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, problemDetails.StatusCode);
+        Assert.Equal("application/problem+json", problemDetails.ContentType);
+        HttpValidationProblemDetails validationProblemDetails = Assert.IsType<HttpValidationProblemDetails>(problemDetails.ProblemDetails);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, validationProblemDetails.Status);
+        Assert.Equal("General.Validation", validationProblemDetails.Title);
+        Assert.Equal("https://tools.ietf.org/html/rfc4918#section-11.2", validationProblemDetails.Type);
+        Assert.Single(validationProblemDetails.Errors);
+        Assert.Equal(new[] { "Username is already taken." }, validationProblemDetails.Errors["Registration.Failed"]);
     }
 
     [Fact]

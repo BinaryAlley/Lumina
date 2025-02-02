@@ -2,7 +2,6 @@
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Application.Core.FileSystemManagement.Paths.Commands.CombinePath;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Pahs.Commands.CombinePath.Fixtures;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
@@ -49,9 +48,9 @@ public class CombinePathCommandHandlerTests
         ErrorOr<PathSegmentResponse> result = await _sut.Handle(combinePathCommand, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().BeOfType<PathSegmentResponse>();
-        result.Value.Path.Should().Be(combinedPath);
+        Assert.False(result.IsError);
+        Assert.IsType<PathSegmentResponse>(result.Value);
+        Assert.Equal(combinedPath, result.Value.Path);
         _mockPathService.Received(1).CombinePath(combinePathCommand.OriginalPath!, combinePathCommand.NewPath!);
     }
 
@@ -68,8 +67,8 @@ public class CombinePathCommandHandlerTests
         ErrorOr<PathSegmentResponse> result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(error);
+        Assert.True(result.IsError);
+        Assert.Equal(error, result.FirstError);
         _mockPathService.Received(1).CombinePath(command.OriginalPath!, command.NewPath!);
     }
 
@@ -85,9 +84,9 @@ public class CombinePathCommandHandlerTests
         ErrorOr<PathSegmentResponse> result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().BeOfType<PathSegmentResponse>();
-        result.Value.Path.Should().BeEmpty();
+        Assert.False(result.IsError);
+        Assert.IsType<PathSegmentResponse>(result.Value);
+        Assert.Empty(result.Value.Path);
         _mockPathService.Received(1).CombinePath(command.OriginalPath!, command.NewPath!);
     }
 }

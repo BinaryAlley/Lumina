@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
 using Lumina.Infrastructure.Common.Validation;
@@ -45,8 +44,8 @@ public class FluentValidationOptionsTests
         ValidateOptionsResult result = sut.Validate(name, options);
 
         // Assert
-        result.Should().BeOfType<ValidateOptionsResult>();
-        result.Failed.Should().BeFalse();
+        Assert.IsType<ValidateOptionsResult>(result);
+        Assert.False(result.Failed);
         validator.Received(1).Validate(options);
     }
 
@@ -64,7 +63,7 @@ public class FluentValidationOptionsTests
         ValidateOptionsResult result = sut.Validate(differentName, options);
 
         // Assert
-        result.Should().Be(ValidateOptionsResult.Skip);
+        Assert.Equal(ValidateOptionsResult.Skip, result);
         validator.DidNotReceive().Validate(options);
     }
 
@@ -81,8 +80,8 @@ public class FluentValidationOptionsTests
         ValidateOptionsResult result = sut.Validate(_fixture.Create<string>(), options);
 
         // Assert
-        result.Should().BeOfType<ValidateOptionsResult>();
-        result.Failed.Should().BeFalse();
+        Assert.IsType<ValidateOptionsResult>(result);
+        Assert.False(result.Failed);
         validator.Received(1).Validate(options);
     }
 
@@ -98,7 +97,7 @@ public class FluentValidationOptionsTests
         Action act = () => sut.Validate(name, null!);
 
         // Assert
-        act.Should().Throw<ArgumentNullException>();
+        Assert.Throws<ArgumentNullException>(() => sut.Validate(name, null!));
     }
 
     [Fact]
@@ -119,10 +118,9 @@ public class FluentValidationOptionsTests
         ValidateOptionsResult result = sut.Validate(name, options);
 
         // Assert
-        result.Should().BeOfType<ValidateOptionsResult>();
-        result.Failed.Should().BeTrue();
-        result.Failures.Should().ContainSingle()
-            .Which.Should().Contain("Options validation failed for 'PropertyName' with error: 'Error Message'");
-
+        Assert.IsType<ValidateOptionsResult>(result);
+        Assert.True(result.Failed);
+        Assert.Single(result.Failures);
+        Assert.Contains("Options validation failed for 'PropertyName' with error: 'Error Message'", result.Failures);
     }
 }

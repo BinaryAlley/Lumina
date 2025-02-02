@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Domain.Common.Primitives;
 using System.Diagnostics.CodeAnalysis;
 #endregion
@@ -22,8 +21,8 @@ public class OptionalTests
         Optional<int> optional = Optional<int>.Some(value);
 
         // Assert
-        optional.HasValue.Should().BeTrue();
-        optional.Value.Should().Be(value);
+        Assert.True(optional.HasValue);
+        Assert.Equal(value, optional.Value);
     }
 
     [Fact]
@@ -33,8 +32,8 @@ public class OptionalTests
         Optional<int> optional = Optional<int>.None();
 
         // Assert
-        optional.HasValue.Should().BeFalse();
-        optional.Value.Should().Be(default);
+        Assert.False(optional.HasValue);
+        Assert.Equal(default, optional.Value);
     }
 
     [Fact]
@@ -47,8 +46,8 @@ public class OptionalTests
         Optional<string> optional = value;
 
         // Assert
-        optional.HasValue.Should().BeTrue();
-        optional.Value.Should().Be(value);
+        Assert.True(optional.HasValue);
+        Assert.Equal(value, optional.Value);
     }
 
     [Fact]
@@ -61,8 +60,8 @@ public class OptionalTests
         Optional<string> optional = Optional<string>.FromNullable(nullableValue);
 
         // Assert
-        optional.HasValue.Should().BeTrue();
-        optional.Value.Should().Be(nullableValue);
+        Assert.True(optional.HasValue);
+        Assert.Equal(nullableValue, optional.Value);
     }
 
     [Fact]
@@ -75,8 +74,8 @@ public class OptionalTests
         Optional<string> optional = Optional<string>.FromNullable(nullableValue);
 
         // Assert
-        optional.HasValue.Should().BeFalse();
-        optional.Value.Should().BeNull();
+        Assert.False(optional.HasValue);
+        Assert.Null(optional.Value);
     }
 
     [Fact]
@@ -89,8 +88,8 @@ public class OptionalTests
         Optional<int> optional = Optional<int>.FromNullable(nullableValue);
 
         // Assert
-        optional.HasValue.Should().BeTrue();
-        optional.Value.Should().Be(nullableValue.Value);
+        Assert.True(optional.HasValue);
+        Assert.Equal(nullableValue.Value, optional.Value);
     }
 
     [Fact]
@@ -103,8 +102,8 @@ public class OptionalTests
         Optional<int> optional = Optional<int>.FromNullable(nullableValue);
 
         // Assert
-        optional.HasValue.Should().BeFalse();
-        optional.Value.Should().Be(default);
+        Assert.False(optional.HasValue);
+        Assert.Equal(default, optional.Value);
     }
 
     [Fact]
@@ -117,7 +116,7 @@ public class OptionalTests
         string result = optional.ToString();
 
         // Assert
-        result.Should().Be("42");
+        Assert.Equal("42", result);
     }
 
     [Fact]
@@ -130,6 +129,6 @@ public class OptionalTests
         string result = optional.ToString();
 
         // Assert
-        result.Should().BeEmpty();
+        Assert.Empty(result);
     }
 }

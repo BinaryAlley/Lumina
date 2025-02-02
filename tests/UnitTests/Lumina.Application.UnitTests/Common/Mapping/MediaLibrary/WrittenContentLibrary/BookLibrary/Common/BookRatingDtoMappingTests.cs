@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
 using Lumina.Application.UnitTests.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Common.Fixtures;
@@ -39,26 +38,26 @@ public class BookRatingDtoMappingTests
         ErrorOr<BookRating> result = dto.ToDomainEntity();
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().NotBeNull();
-        result.Value.Value.Should().Be(dto.Value!.Value);
-        result.Value.MaxValue.Should().Be(dto.MaxValue!.Value);
+        Assert.False(result.IsError);
+        Assert.NotNull(result.Value);
+        Assert.Equal(dto.Value!.Value, result.Value.Value);
+        Assert.Equal(dto.MaxValue!.Value, result.Value.MaxValue);
 
         if (dto.Source.HasValue)
         {
-            result.Value.Source.HasValue.Should().BeTrue();
-            result.Value.Source.Value.Should().Be(dto.Source.Value);
+            Assert.True(result.Value.Source.HasValue);
+            Assert.Equal(dto.Source.Value, result.Value.Source.Value);
         }
         else
-            result.Value.Source.HasValue.Should().BeFalse();
+            Assert.False(result.Value.Source.HasValue);
 
         if (dto.VoteCount.HasValue)
         {
-            result.Value.VoteCount.HasValue.Should().BeTrue();
-            result.Value.VoteCount.Value.Should().Be(dto.VoteCount.Value);
+            Assert.True(result.Value.VoteCount.HasValue);
+            Assert.Equal(dto.VoteCount.Value, result.Value.VoteCount.Value);
         }
         else
-            result.Value.VoteCount.HasValue.Should().BeFalse();
+            Assert.False(result.Value.VoteCount.HasValue);
     }
 
     [Fact]
@@ -71,12 +70,12 @@ public class BookRatingDtoMappingTests
         ErrorOr<BookRating> result = dto.ToDomainEntity();
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().NotBeNull();
-        result.Value.Value.Should().Be(dto.Value!.Value);
-        result.Value.MaxValue.Should().Be(dto.MaxValue!.Value);
-        result.Value.Source.HasValue.Should().BeFalse();
-        result.Value.VoteCount.HasValue.Should().BeFalse();
+        Assert.False(result.IsError);
+        Assert.NotNull(result.Value);
+        Assert.Equal(dto.Value!.Value, result.Value.Value);
+        Assert.Equal(dto.MaxValue!.Value, result.Value.MaxValue);
+        Assert.False(result.Value.Source.HasValue);
+        Assert.False(result.Value.VoteCount.HasValue);
     }
 
     [Fact]
@@ -89,7 +88,7 @@ public class BookRatingDtoMappingTests
         ErrorOr<BookRating> result = dto.ToDomainEntity();
 
         // Assert
-        result.IsError.Should().BeTrue();
+        Assert.True(result.IsError);
     }
 
     [Fact]
@@ -106,23 +105,24 @@ public class BookRatingDtoMappingTests
         IEnumerable<ErrorOr<BookRating>> results = dtos.ToDomainEntities();
 
         // Assert
-        results.Should().NotBeNull();
-        results.Should().HaveCount(dtos.Count);
+        Assert.NotNull(results);
+        Assert.Equal(dtos.Count, results.Count());
 
         List<ErrorOr<BookRating>> resultList = results.ToList();
-        resultList.Should().AllSatisfy(result => result.IsError.Should().BeFalse());
+        foreach (ErrorOr<BookRating> result in resultList)
+            Assert.False(result.IsError);
 
-        // Complete rating
-        resultList[0].Value.Value.Should().Be(dtos[0].Value!.Value);
-        resultList[0].Value.MaxValue.Should().Be(dtos[0].MaxValue!.Value);
-        resultList[0].Value.Source.Value.Should().Be(dtos[0].Source!.Value);
-        resultList[0].Value.VoteCount.Value.Should().Be(dtos[0].VoteCount!.Value);
+        // complete rating
+        Assert.Equal(dtos[0].Value!.Value, resultList[0].Value.Value);
+        Assert.Equal(dtos[0].MaxValue!.Value, resultList[0].Value.MaxValue);
+        Assert.Equal(dtos[0].Source!.Value, resultList[0].Value.Source.Value);
+        Assert.Equal(dtos[0].VoteCount!.Value, resultList[0].Value.VoteCount.Value);
 
-        // Minimal rating
-        resultList[1].Value.Value.Should().Be(dtos[1].Value!.Value);
-        resultList[1].Value.MaxValue.Should().Be(dtos[1].MaxValue!.Value);
-        resultList[1].Value.Source.HasValue.Should().BeFalse();
-        resultList[1].Value.VoteCount.HasValue.Should().BeFalse();
+        // minimal rating
+        Assert.Equal(dtos[1].Value!.Value, resultList[1].Value.Value);
+        Assert.Equal(dtos[1].MaxValue!.Value, resultList[1].Value.MaxValue);
+        Assert.False(resultList[1].Value.Source.HasValue);
+        Assert.False(resultList[1].Value.VoteCount.HasValue);
     }
 
     [Fact]
@@ -140,13 +140,13 @@ public class BookRatingDtoMappingTests
         IEnumerable<ErrorOr<BookRating>> results = dtos.ToDomainEntities();
 
         // Assert
-        results.Should().NotBeNull();
-        results.Should().HaveCount(dtos.Count);
+        Assert.NotNull(results);
+        Assert.Equal(dtos.Count, results.Count());
 
         List<ErrorOr<BookRating>> resultList = results.ToList();
 
-        resultList[0].IsError.Should().BeFalse();
-        resultList[1].IsError.Should().BeTrue();
-        resultList[2].IsError.Should().BeFalse();
+        Assert.False(resultList[0].IsError);
+        Assert.True(resultList[1].IsError);
+        Assert.False(resultList[2].IsError);
     }
 }

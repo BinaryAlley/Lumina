@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using FluentAssertions;
 using Lumina.Application.Core.FileSystemManagement.Paths.Queries.ValidatePath;
 using Lumina.Contracts.Requests.FileSystemManagement.Path;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
@@ -52,8 +51,8 @@ public class ValidatePathEndpointTests
         IResult result = await _sut.ExecuteAsync(request, cancellationToken);
 
         // Assert
-        PathValidResponse actualResponse = result.Should().BeOfType<Ok<PathValidResponse>>().Subject.Value!;
-        actualResponse.Should().BeEquivalentTo(expectedResponse);
+        Ok<PathValidResponse> okResult = Assert.IsType<Ok<PathValidResponse>>(result);
+        Assert.Equal(expectedResponse, okResult.Value);
     }
 
     [Fact]

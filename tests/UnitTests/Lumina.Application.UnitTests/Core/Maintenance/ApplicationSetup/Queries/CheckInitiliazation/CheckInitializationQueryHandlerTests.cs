@@ -1,8 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using AutoFixture;
-using AutoFixture.AutoNSubstitute;
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -54,7 +51,7 @@ public class CheckInitializationQueryHandlerTests
         InitializationResponse result = await _sut.Handle(new CheckInitializationQuery(), CancellationToken.None);
 
         // Assert
-        result.IsInitialized.Should().BeTrue();
+        Assert.True(result.IsInitialized);
         await _mockUserRepository.Received(1).GetAllAsync(Arg.Any<CancellationToken>());
     }
 
@@ -69,7 +66,7 @@ public class CheckInitializationQueryHandlerTests
         InitializationResponse result = await _sut.Handle(new CheckInitializationQuery(), CancellationToken.None);
 
         // Assert
-        result.IsInitialized.Should().BeFalse();
+        Assert.False(result.IsInitialized);
         await _mockUserRepository.Received(1).GetAllAsync(Arg.Any<CancellationToken>());
     }
 
@@ -85,7 +82,7 @@ public class CheckInitializationQueryHandlerTests
         InitializationResponse result = await _sut.Handle(new CheckInitializationQuery(), CancellationToken.None);
 
         // Assert
-        result.IsInitialized.Should().BeFalse();
+        Assert.False(result.IsInitialized);
         await _mockUserRepository.Received(1).GetAllAsync(Arg.Any<CancellationToken>());
     }
 }

@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Application.Core.FileSystemManagement.Paths.Queries.CheckPathExists;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Pahs.Queries.CheckPathExists.Fixtures;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
@@ -42,8 +41,8 @@ public class CheckPathExistsQueryHandlerTests
         ErrorOr<PathExistsResponse> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Exists.Should().BeTrue();
+        Assert.False(result.IsError);
+        Assert.True(result.Value.Exists);
         _mockPathService.Received(1).Exists(query.Path!);
     }
 
@@ -58,8 +57,8 @@ public class CheckPathExistsQueryHandlerTests
         ErrorOr<PathExistsResponse> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Exists.Should().BeTrue();
+        Assert.False(result.IsError);
+        Assert.True(result.Value.Exists);
         _mockPathService.Received(1).Exists(query.Path!);
     }
 
@@ -74,8 +73,8 @@ public class CheckPathExistsQueryHandlerTests
         ErrorOr<PathExistsResponse> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Exists.Should().BeFalse();
+        Assert.False(result.IsError);
+        Assert.False(result.Value.Exists);
         _mockPathService.Received(1).Exists(query.Path!, false);
     }
 
@@ -90,8 +89,8 @@ public class CheckPathExistsQueryHandlerTests
         ErrorOr<PathExistsResponse> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Exists.Should().BeFalse();
+        Assert.False(result.IsError);
+        Assert.False(result.Value.Exists);
         _mockPathService.Received(1).Exists(query.Path!);
     }
 
@@ -106,8 +105,8 @@ public class CheckPathExistsQueryHandlerTests
         ErrorOr<PathExistsResponse> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Exists.Should().BeFalse();
+        Assert.False(result.IsError);
+        Assert.False(result.Value.Exists);
         _mockPathService.Received(1).Exists(Arg.Any<string>(), Arg.Any<bool>());
     }
 
@@ -123,8 +122,8 @@ public class CheckPathExistsQueryHandlerTests
         ErrorOr<PathExistsResponse> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Exists.Should().BeTrue();
+        Assert.False(result.IsError);
+        Assert.True(result.Value.Exists);
         _mockPathService.Received(1).Exists(query.Path!);
     }
 }

@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Contracts.DTO.Common;
@@ -29,8 +28,8 @@ public class GenreEntityMappingTests
         GenreDto result = entity.ToResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Name.Should().Be(entity.Name);
+        Assert.NotNull(result);
+        Assert.Equal(entity.Name, result.Name);
     }
 
     [Theory]
@@ -47,8 +46,8 @@ public class GenreEntityMappingTests
         GenreDto result = entity.ToResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Name.Should().Be(entity.Name);
+        Assert.NotNull(result);
+        Assert.Equal(entity.Name, result.Name);
     }
 
     [Theory]
@@ -64,7 +63,7 @@ public class GenreEntityMappingTests
         GenreDto result = entity.ToResponse();
 
         // Assert
-        result.Name.Should().Be(invalidName);
+        Assert.Equal(invalidName, result.Name);
     }
 
     [Fact]
@@ -77,9 +76,9 @@ public class GenreEntityMappingTests
         ErrorOr<Genre> result = entity.ToDomainEntity();
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().NotBeNull();
-        result.Value.Name.Should().Be(entity.Name);
+        Assert.False(result.IsError);
+        Assert.NotNull(result.Value);
+        Assert.Equal(entity.Name, result.Value.Name);
     }
 
     [Theory]
@@ -95,8 +94,8 @@ public class GenreEntityMappingTests
         ErrorOr<Genre> result = entity.ToDomainEntity();
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Metadata.GenreNameCannotBeEmpty);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Metadata.GenreNameCannotBeEmpty, result.FirstError);
     }
 
     [Fact]
@@ -115,14 +114,14 @@ public class GenreEntityMappingTests
         IEnumerable<ErrorOr<Genre>> results = entities.ToDomainEntities();
 
         // Assert
-        results.Should().NotBeNull();
-        results.Should().HaveCount(entities.Count);
+        Assert.NotNull(results);
+        Assert.Equal(entities.Count, results.Count());
 
         List<ErrorOr<Genre>> resultList = results.ToList();
         for (int i = 0; i < entities.Count; i++)
         {
-            resultList[i].IsError.Should().BeFalse();
-            resultList[i].Value.Name.Should().Be(entities[i].Name);
+            Assert.False(resultList[i].IsError);
+            Assert.Equal(entities[i].Name, resultList[i].Value.Name);
         }
     }
 
@@ -142,13 +141,13 @@ public class GenreEntityMappingTests
         IEnumerable<GenreDto> results = entities.ToResponses();
 
         // Assert
-        results.Should().NotBeNull();
-        results.Should().HaveCount(entities.Count);
+        Assert.NotNull(results);
+        Assert.Equal(entities.Count, results.Count());
 
         List<GenreDto> resultList = results.ToList();
         for (int i = 0; i < entities.Count; i++)
         {
-            resultList[i].Name.Should().Be(entities[i].Name);
+            Assert.Equal(entities[i].Name, resultList[i].Name);
         }
     }
 }

@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using FluentAssertions;
 using Lumina.Application.Core.FileSystemManagement.FileSystem.Queries.GetFileSystem;
 using Lumina.Domain.Common.Enums.FileSystem;
 using Lumina.Contracts.Responses.FileSystemManagement.FileSystem;
@@ -48,8 +47,8 @@ public class GetFileSystemTypeEndpointTests
         IResult result = await _sut.ExecuteAsync(new EmptyRequest(), cancellationToken);
 
         // Assert
-        Ok<FileSystemTypeResponse> okResult = result.Should().BeOfType<Ok<FileSystemTypeResponse>>().Subject;
-        okResult.Value.Should().BeEquivalentTo(expectedResponse);
+        Ok<FileSystemTypeResponse> okResult = Assert.IsType<Ok<FileSystemTypeResponse>>(result);
+        Assert.Equal(expectedResponse, okResult.Value);
     }
 
     [Theory]
@@ -67,8 +66,8 @@ public class GetFileSystemTypeEndpointTests
         IResult result = await _sut.ExecuteAsync(new EmptyRequest(), cancellationToken);
 
         // Assert
-        Ok<FileSystemTypeResponse> okResult = result.Should().BeOfType<Ok<FileSystemTypeResponse>>().Subject;
-        okResult.Value!.PlatformType.Should().Be(platformType);
+        Ok<FileSystemTypeResponse> okResult = Assert.IsType<Ok<FileSystemTypeResponse>>(result);
+        Assert.Equal(platformType, okResult.Value!.PlatformType);
     }
 
     [Fact]

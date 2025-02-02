@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using FluentAssertions;
 using Lumina.Application.Core.FileSystemManagement.FileSystem.Queries.GetFileSystem;
 using Lumina.Domain.Common.Enums.FileSystem;
 using Lumina.Contracts.Responses.FileSystemManagement.FileSystem;
@@ -51,8 +50,8 @@ public class GetFileSystemQueryHandlerTests
         FileSystemTypeResponse result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.Should().NotBeNull();
-        result.PlatformType.Should().Be(platformType);
+        Assert.NotNull(result);
+        Assert.Equal(platformType, result.PlatformType);
         _mockPlatformContextManager.Received(1).GetCurrentContext();
     }
 
@@ -67,10 +66,10 @@ public class GetFileSystemQueryHandlerTests
         ValueTask<FileSystemTypeResponse> resultTask = _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        resultTask.IsCompleted.Should().BeTrue();
+        Assert.True(resultTask.IsCompleted);
         FileSystemTypeResponse result = await resultTask;
-        result.Should().NotBeNull();
-        result.PlatformType.Should().Be(PlatformType.Unix);
+        Assert.NotNull(result);
+        Assert.Equal(PlatformType.Unix, result.PlatformType);
     }
 
     [Fact]
@@ -86,7 +85,7 @@ public class GetFileSystemQueryHandlerTests
         FileSystemTypeResponse result2 = await _sut.Handle(query2, CancellationToken.None);
 
         // Assert
-        result1.Should().BeEquivalentTo(result2);
+        Assert.Equal(result1.PlatformType, result2.PlatformType);
         _mockPlatformContextManager.Received(1).GetCurrentContext();
     }
 
@@ -98,11 +97,10 @@ public class GetFileSystemQueryHandlerTests
         _mockPlatformContext.Platform.Returns(PlatformType.Unix);
         CancellationToken cancellationToken = new(true);
 
-        // Act
-        Func<Task> act = async () => await _sut.Handle(query, cancellationToken);
-
-        // Assert
-        await act.Should().NotThrowAsync();
+        // Act & Assert
+        Exception? exception = await Record.ExceptionAsync(async () =>
+            await _sut.Handle(query, cancellationToken));
+        Assert.Null(exception);
         _mockPlatformContextManager.Received(1).GetCurrentContext();
     }
 }

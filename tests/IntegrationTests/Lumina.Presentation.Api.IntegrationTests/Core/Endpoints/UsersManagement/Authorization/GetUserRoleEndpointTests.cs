@@ -1,10 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Enums.Authorization;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -62,21 +60,21 @@ public class GetUserRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
         UserEntity? user = dbContext.Users.FirstOrDefault();
-        user.Should().NotBeNull("Test user should exist");
+        Assert.NotNull(user);
 
         // Act
         HttpResponseMessage response = await _client.GetAsync($"/api/v1/auth/users/{user!.Id}/role");
 
         // Assert
         response.EnsureSuccessStatusCode();
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         string content = await response.Content.ReadAsStringAsync();
         RoleResponse? result = JsonSerializer.Deserialize<RoleResponse>(content, _jsonOptions);
 
-        result.Should().NotBeNull();
-        result!.Id.Should().NotBe(Guid.Empty);
-        result.RoleName.Should().Be("Admin");
+        Assert.NotNull(result);
+        Assert.NotEqual(Guid.Empty, result!.Id);
+        Assert.Equal("Admin", result.RoleName);
     }
 
     [Fact]
@@ -87,23 +85,24 @@ public class GetUserRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
         UserEntity? user = dbContext.Users.FirstOrDefault();
-        user.Should().NotBeNull("Test user should exist");
+        Assert.NotNull(user);
 
         // Act
         HttpResponseMessage response = await _client.GetAsync($"/api/v1/auth/users/{user!.Id}/role");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
-        problemDetails.Should().NotBeNull();
-        problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status403Forbidden);
-        problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.4");
-        problemDetails["title"].GetString().Should().Be("General.Unauthorized");
-        problemDetails["detail"].GetString().Should().Be("NotAuthorized");
-        problemDetails["instance"].GetString().Should().Be($"/api/v1/auth/users/{user.Id}/role");
-        problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status403Forbidden, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.4", problemDetails["type"].GetString());
+        Assert.Equal("General.Unauthorized", problemDetails["title"].GetString());
+        Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
+        Assert.Equal($"/api/v1/auth/users/{user!.Id}/role", problemDetails["instance"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString());
     }
 
     [Fact]
@@ -116,17 +115,18 @@ public class GetUserRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         HttpResponseMessage response = await _client.GetAsync($"/api/v1/auth/users/{nonExistentUserId}/role");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
-        problemDetails.Should().NotBeNull();
-        problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status404NotFound);
-        problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.5");
-        problemDetails["title"].GetString().Should().Be("General.NotFound");
-        problemDetails["detail"].GetString().Should().Be("UsernameDoesNotExist");
-        problemDetails["instance"].GetString().Should().Be($"/api/v1/auth/users/{nonExistentUserId}/role");
-        problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status404NotFound, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.5", problemDetails["type"].GetString());
+        Assert.Equal("General.NotFound", problemDetails["title"].GetString());
+        Assert.Equal("UsernameDoesNotExist", problemDetails["detail"].GetString());
+        Assert.Equal($"/api/v1/auth/users/{nonExistentUserId}/role", problemDetails["instance"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString());
     }
 
     [Fact]
@@ -137,17 +137,15 @@ public class GetUserRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
         UserEntity? user = dbContext.Users.FirstOrDefault();
-        user.Should().NotBeNull("Test user should exist");
+        Assert.NotNull(user);
 
-        // Act
-        Func<Task> act = async () =>
+        // Act & Assert
+        Exception? exception = await Record.ExceptionAsync(async () =>
         {
             cts.Cancel();
             await _client.GetAsync($"/api/v1/auth/users/{user!.Id}/role", cts.Token);
-        };
-
-        // Assert
-        await act.Should().ThrowAsync<TaskCanceledException>();
+        });
+        Assert.IsType<TaskCanceledException>(exception);
     }
 
     /// <summary>

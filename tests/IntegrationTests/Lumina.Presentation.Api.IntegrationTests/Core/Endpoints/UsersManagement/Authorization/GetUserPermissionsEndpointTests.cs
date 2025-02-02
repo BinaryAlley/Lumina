@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Contracts.Responses.Authorization;
@@ -62,7 +61,7 @@ public class GetUserPermissionsEndpointTests : IClassFixture<AuthenticatedLumina
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
         UserEntity? user = dbContext.Users.FirstOrDefault();
-        user.Should().NotBeNull("Test user should exist");
+        Assert.NotNull(user);
 
         // Add a direct user permission
         PermissionEntity permission = dbContext.Permissions.First();
@@ -83,18 +82,18 @@ public class GetUserPermissionsEndpointTests : IClassFixture<AuthenticatedLumina
 
         // Assert
         response.EnsureSuccessStatusCode();
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         string content = await response.Content.ReadAsStringAsync();
         IEnumerable<PermissionResponse>? result = JsonSerializer.Deserialize<IEnumerable<PermissionResponse>>(content, _jsonOptions);
 
-        result.Should().NotBeNull();
-        result.Should().NotBeEmpty();
-        result!.Should().AllSatisfy(permission =>
+        Assert.NotNull(result);
+        Assert.NotEmpty(result);
+        foreach (PermissionResponse perm in result!)
         {
-            permission.Id.Should().NotBe(Guid.Empty);
-            permission.PermissionName.Should().NotBe(AuthorizationPermission.None);
-        });
+            Assert.NotEqual(Guid.Empty, perm.Id);
+            Assert.NotEqual(AuthorizationPermission.None, perm.PermissionName);
+        }
     }
 
     [Fact]
@@ -105,23 +104,24 @@ public class GetUserPermissionsEndpointTests : IClassFixture<AuthenticatedLumina
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
         UserEntity? user = dbContext.Users.FirstOrDefault();
-        user.Should().NotBeNull("Test user should exist");
+        Assert.NotNull(user);
 
         // Act
         HttpResponseMessage response = await _client.GetAsync($"/api/v1/auth/users/{user!.Id}/permissions");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
-        problemDetails.Should().NotBeNull();
-        problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status403Forbidden);
-        problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.4");
-        problemDetails["title"].GetString().Should().Be("General.Unauthorized");
-        problemDetails["detail"].GetString().Should().Be("NotAuthorized");
-        problemDetails["instance"].GetString().Should().Be($"/api/v1/auth/users/{user.Id}/permissions");
-        problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status403Forbidden, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.4", problemDetails["type"].GetString());
+        Assert.Equal("General.Unauthorized", problemDetails["title"].GetString());
+        Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
+        Assert.Equal($"/api/v1/auth/users/{user!.Id}/permissions", problemDetails["instance"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString());
     }
 
     [Fact]
@@ -134,17 +134,18 @@ public class GetUserPermissionsEndpointTests : IClassFixture<AuthenticatedLumina
         HttpResponseMessage response = await _client.GetAsync($"/api/v1/auth/users/{nonExistentUserId}/permissions");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
-        problemDetails.Should().NotBeNull();
-        problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status404NotFound);
-        problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.5");
-        problemDetails["title"].GetString().Should().Be("General.NotFound");
-        problemDetails["detail"].GetString().Should().Be("UsernameDoesNotExist");
-        problemDetails["instance"].GetString().Should().Be($"/api/v1/auth/users/{nonExistentUserId}/permissions");
-        problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status404NotFound, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.5", problemDetails["type"].GetString());
+        Assert.Equal("General.NotFound", problemDetails["title"].GetString());
+        Assert.Equal("UsernameDoesNotExist", problemDetails["detail"].GetString());
+        Assert.Equal($"/api/v1/auth/users/{nonExistentUserId}/permissions", problemDetails["instance"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString());
     }
 
     [Fact]
@@ -155,17 +156,15 @@ public class GetUserPermissionsEndpointTests : IClassFixture<AuthenticatedLumina
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
         UserEntity? user = dbContext.Users.FirstOrDefault();
-        user.Should().NotBeNull("Test user should exist");
+        Assert.NotNull(user);
 
-        // Act
-        Func<Task> act = async () =>
+        // Act & Assert
+        Exception? exception = await Record.ExceptionAsync(async () =>
         {
             cts.Cancel();
             await _client.GetAsync($"/api/v1/auth/users/{user!.Id}/permissions", cts.Token);
-        };
-
-        // Assert
-        await act.Should().ThrowAsync<TaskCanceledException>();
+        });
+        Assert.IsType<TaskCanceledException>(exception);
     }
 
     /// <summary>

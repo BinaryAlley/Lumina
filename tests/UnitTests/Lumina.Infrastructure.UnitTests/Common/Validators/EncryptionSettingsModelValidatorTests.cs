@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using FluentAssertions;
 using Lumina.Infrastructure.Common.Errors;
 using Lumina.Infrastructure.Common.Models.Configuration;
 using Lumina.Infrastructure.Common.Validators;
@@ -40,8 +39,8 @@ public class EncryptionSettingsModelValidatorTests
         FluentValidation.Results.ValidationResult result = _validator.Validate(model);
 
         // Assert
-        result.IsValid.Should().BeTrue();
-        result.Errors.Should().BeEmpty();
+        Assert.True(result.IsValid);
+        Assert.Empty(result.Errors);
     }
 
     [Fact]
@@ -56,9 +55,9 @@ public class EncryptionSettingsModelValidatorTests
         FluentValidation.Results.ValidationResult result = _validator.Validate(model);
 
         // Assert
-        result.IsValid.Should().BeFalse();
-        result.Errors.Should().ContainSingle()
-            .Which.ErrorMessage.Should().Be(Errors.Configuration.EncryptionSecretKeyCannotBeEmpty.Description);
+        Assert.False(result.IsValid);
+        Assert.Single(result.Errors);
+        Assert.Equal(Errors.Configuration.EncryptionSecretKeyCannotBeEmpty.Description, result.Errors[0].ErrorMessage);
     }
 
     [Theory]
@@ -76,8 +75,8 @@ public class EncryptionSettingsModelValidatorTests
         FluentValidation.Results.ValidationResult result = _validator.Validate(model);
 
         // Assert
-        result.IsValid.Should().BeFalse();
-        result.Errors.Should().ContainSingle()
-            .Which.ErrorMessage.Should().Be(Errors.Configuration.EncryptionSecretKeyMustBeABase64String.Description);
+        Assert.False(result.IsValid);
+        Assert.Single(result.Errors);
+        Assert.Equal(Errors.Configuration.EncryptionSecretKeyMustBeABase64String.Description, result.Errors[0].ErrorMessage);
     }
 }

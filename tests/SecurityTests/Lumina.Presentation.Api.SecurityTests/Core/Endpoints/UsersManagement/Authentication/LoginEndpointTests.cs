@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.Infrastructure.Security;
 using Lumina.Contracts.Requests.Authentication;
@@ -89,18 +88,18 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
         TimeSpan actualDifference = tokenExpiration - beforeRequest;
         TimeSpan expectedDifference = TimeSpan.FromMinutes(15);
 
-        actualDifference.Should().BeCloseTo(expectedDifference, precision: allowedVariance);
+        Assert.True(Math.Abs((actualDifference - expectedDifference).TotalSeconds) < allowedVariance.TotalSeconds);
 
-        token.Header.Alg.Should().Be("HS256");
-        token.Claims.Should().Contain(c => c.Type == "sub" && c.Value == user.Id.ToString());
-        token.Claims.Should().Contain(c => c.Type == "unique_name" && c.Value == user.Username);
-        token.Claims.Should().Contain(c => c.Type == "jti");
-        token.Claims.Should().Contain(c => c.Type == "iss" && c.Value == "Lumina");
-        token.Claims.Should().Contain(c => c.Type == "aud" && c.Value == "Lumina");
+        Assert.Equal("HS256", token.Header.Alg);
+        Assert.Contains(token.Claims, c => c.Type == "sub" && c.Value == user.Id.ToString());
+        Assert.Contains(token.Claims, c => c.Type == "unique_name" && c.Value == user.Username);
+        Assert.Contains(token.Claims, c => c.Type == "jti");
+        Assert.Contains(token.Claims, c => c.Type == "iss" && c.Value == "Lumina");
+        Assert.Contains(token.Claims, c => c.Type == "aud" && c.Value == "Lumina");
 
-        content.Should().NotContain("password");
-        content.Should().NotContain("hash");
-        content.Should().NotContain("salt");
+        Assert.DoesNotContain("password", content);
+        Assert.DoesNotContain("hash", content);
+        Assert.DoesNotContain("salt", content);
 
         // TODO: implement more strict security checks:
         //    // check security headers
@@ -142,7 +141,7 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
         // Assert
         // check for timing consistency to prevent timing attacks
         double stdDev = CalculateStandardDeviation(timings);
-        stdDev.Should().BeLessThan(200);
+        Assert.True(stdDev < 200);
     }
 
     [Fact]
@@ -164,20 +163,20 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
 
         // Assert
         HttpResponseMessage lastResponse = responses.Last();
-        lastResponse.StatusCode.Should().Be(HttpStatusCode.TooManyRequests);
+        Assert.Equal(HttpStatusCode.TooManyRequests, lastResponse.StatusCode);
         string content = await lastResponse.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
-        problemDetails.Should().NotBeNull();
-        problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status429TooManyRequests);
-        problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc7231#section-6.5.29");
-        problemDetails["title"].GetString().Should().Be("TooManyRequests");
-        problemDetails["detail"].GetString().Should().Be("TooManyRequests");
-        problemDetails["retryAfter"].GetString().Should().Be("900");
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status429TooManyRequests, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc7231#section-6.5.29", problemDetails["type"].GetString());
+        Assert.Equal("TooManyRequests", problemDetails["title"].GetString());
+        Assert.Equal("TooManyRequests", problemDetails["detail"].GetString());
+        Assert.Equal("900", problemDetails["retryAfter"].GetString());
 
-        lastResponse.Headers.Should().ContainKey("X-RateLimit-Limit");
-        lastResponse.Headers.Should().ContainKey("X-RateLimit-Reset");
-        lastResponse.Headers.Should().ContainKey("X-RateLimit-Remaining");
+        Assert.True(lastResponse.Headers.Contains("X-RateLimit-Limit"));
+        Assert.True(lastResponse.Headers.Contains("X-RateLimit-Reset"));
+        Assert.True(lastResponse.Headers.Contains("X-RateLimit-Remaining"));
     }
 
     [Theory]
@@ -200,11 +199,11 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
         string content = await response.Content.ReadAsStringAsync();
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
-        content.Should().NotContain("SQL");
-        content.Should().NotContain("Exception");
-        content.Should().NotContain(legitimateUser.Username); // shouldn't expose other usernames
-        content.Should().NotContain(legitimateUser.Password); // shouldn't expose password hashes
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        Assert.DoesNotContain("SQL", content);
+        Assert.DoesNotContain("Exception", content);
+        Assert.DoesNotContain(legitimateUser.Username, content); // shouldn't expose other usernames
+        Assert.DoesNotContain(legitimateUser.Password, content); // shouldn't expose password hashes
     }
 
     [Fact]
@@ -224,9 +223,9 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
         string content = await response.Content.ReadAsStringAsync();
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
-        content.Should().NotContain("SQL");
-        content.Should().NotContain("Exception");
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        Assert.DoesNotContain("SQL", content);
+        Assert.DoesNotContain("Exception", content);
     }
 
     [Fact]
@@ -245,9 +244,9 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
         string content = await response.Content.ReadAsStringAsync();
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.UnprocessableContent);
-        content.Should().NotContain("SQL");
-        content.Should().NotContain("Exception");
+        Assert.Equal(HttpStatusCode.UnprocessableContent, response.StatusCode);
+        Assert.DoesNotContain("SQL", content);
+        Assert.DoesNotContain("Exception", content);
     }
 
     private double CalculateStandardDeviation(List<long> values)

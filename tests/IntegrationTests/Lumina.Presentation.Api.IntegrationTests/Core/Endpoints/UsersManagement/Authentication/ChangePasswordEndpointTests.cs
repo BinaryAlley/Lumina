@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
@@ -71,12 +70,12 @@ public class ChangePasswordEndpointTests : IClassFixture<AuthenticatedLuminaApiF
         // Assert
         string content = await response.Content.ReadAsStringAsync();
         response.EnsureSuccessStatusCode();
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         ChangePasswordResponse? result = JsonSerializer.Deserialize<ChangePasswordResponse>(content, _jsonOptions);
 
-        result.Should().NotBeNull();
-        result!.IsPasswordChanged.Should().BeTrue();
+        Assert.NotNull(result);
+        Assert.True(result!.IsPasswordChanged);
     }
 
     [Fact]
@@ -94,20 +93,23 @@ public class ChangePasswordEndpointTests : IClassFixture<AuthenticatedLuminaApiF
         HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/auth/change-password", request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.UnprocessableContent);
+        Assert.Equal(HttpStatusCode.UnprocessableContent, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
-        problemDetails.Should().NotBeNull();
-        problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status422UnprocessableEntity);
-        problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc4918#section-11.2");
-        problemDetails["title"].GetString().Should().Be("General.Validation");
-        problemDetails["detail"].GetString().Should().Be("OneOrMoreValidationErrorsOccurred");
-        problemDetails["instance"].GetString().Should().Be("/api/v1/auth/change-password");
-        problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc4918#section-11.2", problemDetails["type"].GetString());
+        Assert.Equal("General.Validation", problemDetails["title"].GetString());
+        Assert.Equal("OneOrMoreValidationErrorsOccurred", problemDetails["detail"].GetString());
+        Assert.Equal("/api/v1/auth/change-password", problemDetails["instance"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString());
 
         Dictionary<string, string[]>? errors = problemDetails["errors"].Deserialize<Dictionary<string, string[]>>(_jsonOptions);
-        errors.Should().ContainKey("General.Validation").WhoseValue.Should().Contain("PasswordsNotMatch");
+        Assert.NotNull(errors);
+        Assert.Contains("General.Validation", errors.Keys);
+        Assert.Contains("PasswordsNotMatch", errors["General.Validation"]);
     }
 
     [Fact]
@@ -125,17 +127,18 @@ public class ChangePasswordEndpointTests : IClassFixture<AuthenticatedLuminaApiF
         HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/auth/change-password", request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
-        problemDetails.Should().NotBeNull();
-        problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status404NotFound);
-        problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.5");
-        problemDetails["title"].GetString().Should().Be("General.NotFound");
-        problemDetails["detail"].GetString().Should().Be("UsernameDoesNotExist");
-        problemDetails["instance"].GetString().Should().Be("/api/v1/auth/change-password");
-        problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status404NotFound, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.5", problemDetails["type"].GetString());
+        Assert.Equal("General.NotFound", problemDetails["title"].GetString());
+        Assert.Equal("UsernameDoesNotExist", problemDetails["detail"].GetString());
+        Assert.Equal("/api/v1/auth/change-password", problemDetails["instance"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString());
     }
 
     [Fact]
@@ -153,17 +156,18 @@ public class ChangePasswordEndpointTests : IClassFixture<AuthenticatedLuminaApiF
         HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/auth/change-password", request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
-        problemDetails.Should().NotBeNull();
-        problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status403Forbidden);
-        problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.4");
-        problemDetails["title"].GetString().Should().Be("General.Failure");
-        problemDetails["detail"].GetString().Should().Be("InvalidCurrentPassword");
-        problemDetails["instance"].GetString().Should().Be("/api/v1/auth/change-password");
-        problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status403Forbidden, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.4", problemDetails["type"].GetString());
+        Assert.Equal("General.Failure", problemDetails["title"].GetString());
+        Assert.Equal("InvalidCurrentPassword", problemDetails["detail"].GetString());
+        Assert.Equal("/api/v1/auth/change-password", problemDetails["instance"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString());
     }
 
     [Fact]
@@ -176,20 +180,26 @@ public class ChangePasswordEndpointTests : IClassFixture<AuthenticatedLuminaApiF
         HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/auth/change-password", request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.UnprocessableContent);
+        Assert.Equal(HttpStatusCode.UnprocessableContent, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
-        problemDetails.Should().NotBeNull();
-        problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status422UnprocessableEntity);
-        problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc4918#section-11.2");
-        problemDetails["title"].GetString().Should().Be("General.Validation");
-        problemDetails["detail"].GetString().Should().Be("OneOrMoreValidationErrorsOccurred");
-        problemDetails["instance"].GetString().Should().Be("/api/v1/auth/change-password");
-        problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc4918#section-11.2", problemDetails["type"].GetString());
+        Assert.Equal("General.Validation", problemDetails["title"].GetString());
+        Assert.Equal("OneOrMoreValidationErrorsOccurred", problemDetails["detail"].GetString());
+        Assert.Equal("/api/v1/auth/change-password", problemDetails["instance"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString());
 
         Dictionary<string, string[]>? errors = problemDetails["errors"].Deserialize<Dictionary<string, string[]>>(_jsonOptions);
-        errors.Should().ContainKey("General.Validation").WhoseValue.Should().Contain(["UsernameCannotBeEmpty", "CurrentPasswordCannotBeEmpty", "NewPasswordCannotBeEmpty", "NewPasswordConfirmCannotBeEmpty"]);
+        Assert.NotNull(errors);
+        Assert.Contains("General.Validation", errors.Keys);
+        Assert.Contains("UsernameCannotBeEmpty", errors["General.Validation"]);
+        Assert.Contains("CurrentPasswordCannotBeEmpty", errors["General.Validation"]);
+        Assert.Contains("NewPasswordCannotBeEmpty", errors["General.Validation"]);
+        Assert.Contains("NewPasswordConfirmCannotBeEmpty", errors["General.Validation"]);
     }
 
     [Fact]
@@ -204,15 +214,13 @@ public class ChangePasswordEndpointTests : IClassFixture<AuthenticatedLuminaApiF
         );
         using CancellationTokenSource cts = new();
 
-        // Act
-        Func<Task> act = async () =>
+        // Act &  Assert
+        Exception? exception = await Record.ExceptionAsync(async () =>
         {
             cts.Cancel();
             await _client.PostAsJsonAsync("/api/v1/auth/change-password", request, cts.Token);
-        };
-
-        // Assert
-        await act.Should().ThrowAsync<TaskCanceledException>();
+        });
+        Assert.IsType<TaskCanceledException>(exception);
     }
 
     /// <summary>

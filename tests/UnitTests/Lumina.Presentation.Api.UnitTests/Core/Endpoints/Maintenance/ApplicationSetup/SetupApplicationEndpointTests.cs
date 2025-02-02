@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using FastEndpoints;
-using FluentAssertions;
 using Lumina.Application.Core.Maintenance.ApplicationSetup.Commands.SetupApplication;
 using Lumina.Application.Core.Maintenance.ApplicationSetup.Queries.CheckInitialization;
 using Lumina.Contracts.Requests.Authentication;
@@ -55,9 +54,9 @@ public class SetupApplicationEndpointTests
         IResult result = await _sut.ExecuteAsync(request, cancellationToken);
 
         // Assert
-        Created<RegistrationResponse> createdResult = result.Should().BeOfType<Created<RegistrationResponse>>().Subject;
-        createdResult.Value.Should().BeEquivalentTo(expectedResponse);
-        createdResult.Location.Should().EndWith(expectedResponse.Id.ToString());
+        Created<RegistrationResponse> createdResult = Assert.IsType<Created<RegistrationResponse>>(result);
+        Assert.Equal(expectedResponse, createdResult.Value);
+        Assert.EndsWith(expectedResponse.Id.ToString(), createdResult.Location);
     }
 
     [Fact]
@@ -74,17 +73,16 @@ public class SetupApplicationEndpointTests
         IResult result = await _sut.ExecuteAsync(request, cancellationToken);
 
         // Assert
-        result.Should().BeOfType<ProblemHttpResult>();
-        ProblemHttpResult problemDetails = (ProblemHttpResult)result;
-        problemDetails.StatusCode.Should().Be(StatusCodes.Status409Conflict);
-        problemDetails.ContentType.Should().Be("application/problem+json");
-        problemDetails.ProblemDetails.Should().BeOfType<Microsoft.AspNetCore.Mvc.ProblemDetails>();
+        ProblemHttpResult problemDetails = Assert.IsType<ProblemHttpResult>(result);
+        Assert.Equal(StatusCodes.Status409Conflict, problemDetails.StatusCode);
+        Assert.Equal("application/problem+json", problemDetails.ContentType);
+        Assert.IsType<Microsoft.AspNetCore.Mvc.ProblemDetails>(problemDetails.ProblemDetails);
 
-        problemDetails.ProblemDetails.Title.Should().Be("Registration.Failed");
-        problemDetails.ProblemDetails.Detail.Should().Be("The application is already initialized.");
-        problemDetails.ProblemDetails.Status.Should().Be(StatusCodes.Status409Conflict);
-        problemDetails.ProblemDetails.Type.Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.10");
-        problemDetails.ProblemDetails.Extensions["traceId"].Should().NotBeNull();
+        Assert.Equal("Registration.Failed", problemDetails.ProblemDetails.Title);
+        Assert.Equal("The application is already initialized.", problemDetails.ProblemDetails.Detail);
+        Assert.Equal(StatusCodes.Status409Conflict, problemDetails.ProblemDetails.Status);
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.10", problemDetails.ProblemDetails.Type);
+        Assert.NotNull(problemDetails.ProblemDetails.Extensions["traceId"]);
     }
 
     [Fact]

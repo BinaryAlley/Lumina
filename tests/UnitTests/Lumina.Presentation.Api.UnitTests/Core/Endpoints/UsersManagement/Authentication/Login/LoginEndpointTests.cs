@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using FastEndpoints;
-using FluentAssertions;
 using Lumina.Application.Core.UsersManagement.Authentication.Queries.LoginUser;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
@@ -53,8 +52,8 @@ public class LoginEndpointTests
         IResult result = await _sut.ExecuteAsync(request, cancellationToken);
 
         // Assert
-        Ok<LoginResponse> okResult = result.Should().BeOfType<Ok<LoginResponse>>().Subject;
-        okResult.Value.Should().BeEquivalentTo(expectedResponse);
+        Ok<LoginResponse> okResult = Assert.IsType<Ok<LoginResponse>>(result);
+        Assert.Equal(expectedResponse, okResult.Value);
     }
 
     [Fact]
@@ -71,21 +70,15 @@ public class LoginEndpointTests
         IResult result = await _sut.ExecuteAsync(request, cancellationToken);
 
         // Assert
-        result.Should().BeOfType<ProblemHttpResult>();
-        ProblemHttpResult problemDetails = (ProblemHttpResult)result;
-        problemDetails.StatusCode.Should().Be(StatusCodes.Status422UnprocessableEntity);
-        problemDetails.ContentType.Should().Be("application/problem+json");
-        problemDetails.ProblemDetails.Should().BeOfType<HttpValidationProblemDetails>();
-        HttpValidationProblemDetails validationProblemDetails = (HttpValidationProblemDetails)problemDetails.ProblemDetails;
-        validationProblemDetails.Status.Should().Be(StatusCodes.Status422UnprocessableEntity);
-        validationProblemDetails.Title.Should().Be("General.Validation");
-        validationProblemDetails.Type.Should().Be("https://tools.ietf.org/html/rfc4918#section-11.2");
-        validationProblemDetails.Errors.Should().ContainSingle()
-            .Which.Should().BeEquivalentTo(new
-            {
-                Key = "Login.Failed",
-                Value = new[] { "Invalid username or password." }
-            });
+        ProblemHttpResult problemDetails = Assert.IsType<ProblemHttpResult>(result);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, problemDetails.StatusCode);
+        Assert.Equal("application/problem+json", problemDetails.ContentType);
+        HttpValidationProblemDetails validationProblemDetails = Assert.IsType<HttpValidationProblemDetails>(problemDetails.ProblemDetails);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, validationProblemDetails.Status);
+        Assert.Equal("General.Validation", validationProblemDetails.Title);
+        Assert.Equal("https://tools.ietf.org/html/rfc4918#section-11.2", validationProblemDetails.Type);
+        Assert.Single(validationProblemDetails.Errors);
+        Assert.Equal(new[] { "Invalid username or password." }, validationProblemDetails.Errors["Login.Failed"]);
     }
 
     [Fact]

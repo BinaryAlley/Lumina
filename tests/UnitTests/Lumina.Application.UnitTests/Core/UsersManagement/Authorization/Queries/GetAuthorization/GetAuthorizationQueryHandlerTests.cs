@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
@@ -53,10 +52,10 @@ public class GetAuthorizationQueryHandlerTests
         ErrorOr<AuthorizationResponse> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.UserId.Should().Be(userId);
-        result.Value.Role.Should().BeEquivalentTo(authEntity.Role);
-        result.Value.Permissions.Should().BeEquivalentTo(authEntity.Permissions);
+        Assert.False(result.IsError);
+        Assert.Equal(userId, result.Value.UserId);
+        Assert.Equal(authEntity.Role, result.Value.Role);
+        Assert.Equal(authEntity.Permissions, result.Value.Permissions);
     }
 
     [Fact]
@@ -79,10 +78,10 @@ public class GetAuthorizationQueryHandlerTests
         ErrorOr<AuthorizationResponse> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.UserId.Should().Be(targetUserId);
-        result.Value.Role.Should().BeEquivalentTo(targetAuthEntity.Role);
-        result.Value.Permissions.Should().BeEquivalentTo(targetAuthEntity.Permissions);
+        Assert.False(result.IsError);
+        Assert.Equal(targetUserId, result.Value.UserId);
+        Assert.Equal(targetAuthEntity.Role, result.Value.Role);
+        Assert.Equal(targetAuthEntity.Permissions, result.Value.Permissions);
     }
 
     [Fact]
@@ -102,8 +101,8 @@ public class GetAuthorizationQueryHandlerTests
         ErrorOr<AuthorizationResponse> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Authorization.NotAuthorized);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Authorization.NotAuthorized, result.FirstError);
     }
 
     [Fact]
@@ -123,8 +122,8 @@ public class GetAuthorizationQueryHandlerTests
         ErrorOr<AuthorizationResponse> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(error);
+        Assert.True(result.IsError);
+        Assert.Equal(error, result.FirstError);
     }
 
     [Fact]
@@ -147,7 +146,7 @@ public class GetAuthorizationQueryHandlerTests
         ErrorOr<AuthorizationResponse> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(error);
+        Assert.True(result.IsError);
+        Assert.Equal(error, result.FirstError);
     }
 }

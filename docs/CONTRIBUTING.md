@@ -608,10 +608,9 @@ public void Add_WhenCalledWithTwoNumbers_ShouldReturnTheirSum()
 3. **[AutoFixture.AutoNSubstitute](https://github.com/AutoFixture/AutoFixture/tree/master/Src/AutoNSubstitute)**
 4. **[AutoFixture.Xunit2](https://github.com/AutoFixture/AutoFixture/tree/master/Src/AutoFixture.xUnit2)**
 5. **[Bogus](https://github.com/bchavez/Bogus)**
-6. **[FluentAssertions](https://github.com/fluentassertions/fluentassertions)**
-7. **[Microsoft.EntityFrameworkCore.InMemory](https://github.com/dotnet/efcore/tree/main/src/EFCore.InMemory)**
-8. **[Microsoft.Extensions.DependencyInjection](https://github.com/dotnet/runtime/tree/main/src/libraries/Microsoft.Extensions.DependencyInjection)**
-9. **[EntityFrameworkCore.Testing.NSubstitute](https://github.com/rgvlee/EntityFrameworkCore.Testing)**
+6. **[Microsoft.EntityFrameworkCore.InMemory](https://github.com/dotnet/efcore/tree/main/src/EFCore.InMemory)**
+7. **[Microsoft.Extensions.DependencyInjection](https://github.com/dotnet/runtime/tree/main/src/libraries/Microsoft.Extensions.DependencyInjection)**
+8. **[EntityFrameworkCore.Testing.NSubstitute](https://github.com/rgvlee/EntityFrameworkCore.Testing)**
 
 ### Types of Tests
 #### Unit Tests
@@ -638,7 +637,7 @@ public void CreateRepository_WhenUnregisteredTypeRequested_ShouldThrowException(
 - Group fixtures in directories called `Fixture` for each class of tests
 ### Assertions
 - Use specific assertions rather than general ones (e.g., Assert.Equal instead of Assert.True)
-- Use fluent style of assertions
+- Do not use fluent style of assertions, use default xUnit assertions
 
 ### Test Data
 - Use meaningful test data that covers various scenarios. For parameterized tests, use a variety of inputs:

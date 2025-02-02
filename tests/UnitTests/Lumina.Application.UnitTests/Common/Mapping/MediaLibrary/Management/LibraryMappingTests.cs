@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
@@ -42,20 +41,19 @@ public class LibraryMappingTests
         LibraryEntity result = library.ToRepositoryEntity();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Id.Should().Be(library.Id.Value);
-        result.UserId.Should().Be(library.UserId.Value);
-        result.Title.Should().Be(library.Title);
-        result.LibraryType.Should().Be(library.LibraryType);
-        result.ContentLocations.Select(l => l.Path)
-            .Should().BeEquivalentTo(library.ContentLocations.Select(l => l.Path));
-        result.CoverImage.Should().BeEquivalentTo(library.CoverImage);
-        result.CreatedOnUtc.Should().Be(library.CreatedOnUtc);
-        result.UpdatedOnUtc.Should().Be(library.UpdatedOnUtc.HasValue ? library.UpdatedOnUtc : null);
-        result.IsEnabled.Should().BeTrue();
-        result.IsLocked.Should().BeFalse();
-        result.DownloadMedatadaFromWeb.Should().BeTrue();
-        result.SaveMetadataInMediaDirectories.Should().BeFalse();
+        Assert.NotNull(result);
+        Assert.Equal(library.Id.Value, result.Id);
+        Assert.Equal(library.UserId.Value, result.UserId);
+        Assert.Equal(library.Title, result.Title);
+        Assert.Equal(library.LibraryType, result.LibraryType);
+        Assert.Equal(library.ContentLocations.Select(l => l.Path), result.ContentLocations.Select(l => l.Path));
+        Assert.Equal(library.CoverImage, result.CoverImage);
+        Assert.Equal(library.CreatedOnUtc, result.CreatedOnUtc);
+        Assert.Equal(library.UpdatedOnUtc, result.UpdatedOnUtc);
+        Assert.True(result.IsEnabled);
+        Assert.False(result.IsLocked);
+        Assert.True(result.DownloadMedatadaFromWeb);
+        Assert.False(result.SaveMetadataInMediaDirectories);
     }
 
     [Fact]
@@ -79,9 +77,9 @@ public class LibraryMappingTests
         LibraryEntity result = library.ToRepositoryEntity();
 
         // Assert
-        result.Should().NotBeNull();
-        result.ContentLocations.Should().BeEmpty();
-        result.CoverImage.Should().BeEquivalentTo(library.CoverImage);
+        Assert.NotNull(result);
+        Assert.Empty(result.ContentLocations);
+        Assert.Equal(library.CoverImage, result.CoverImage);
     }
 
     [Theory]
@@ -109,13 +107,13 @@ public class LibraryMappingTests
         LibraryEntity result = library.ToRepositoryEntity();
 
         // Assert
-        result.Should().NotBeNull();
-        result.LibraryType.Should().Be(libraryType);
-        result.CoverImage.Should().BeEquivalentTo(library.CoverImage);
-        result.IsEnabled.Should().BeTrue();
-        result.IsLocked.Should().BeFalse();
-        result.DownloadMedatadaFromWeb.Should().BeTrue();
-        result.SaveMetadataInMediaDirectories.Should().BeFalse();
+        Assert.NotNull(result);
+        Assert.Equal(libraryType, result.LibraryType);
+        Assert.Equal(library.CoverImage, result.CoverImage);
+        Assert.True(result.IsEnabled);
+        Assert.False(result.IsLocked);
+        Assert.True(result.DownloadMedatadaFromWeb);
+        Assert.False(result.SaveMetadataInMediaDirectories);
     }
 
     [Fact]
@@ -147,10 +145,9 @@ public class LibraryMappingTests
         LibraryEntity result = library.ToRepositoryEntity();
 
         // Assert
-        result.Should().NotBeNull();
-        result.ContentLocations.Select(l => l.Path)
-            .Should().BeEquivalentTo(library.ContentLocations.Select(l => l.Path));
-        result.CoverImage.Should().BeEquivalentTo(library.CoverImage);
+        Assert.NotNull(result);
+        Assert.Equal(library.ContentLocations.Select(l => l.Path), result.ContentLocations.Select(l => l.Path));
+        Assert.Equal(library.CoverImage, result.CoverImage);
     }
 
     [Fact]
@@ -180,9 +177,8 @@ public class LibraryMappingTests
         LibraryEntity result = library.ToRepositoryEntity();
 
         // Assert
-        result.Should().NotBeNull();
-        result.ContentLocations.Select(l => l.Path)
-            .Should().BeEquivalentTo(library.ContentLocations.Select(l => l.Path));
-        result.CoverImage.Should().BeNull();
+        Assert.NotNull(result);
+        Assert.Equal(library.ContentLocations.Select(l => l.Path), result.ContentLocations.Select(l => l.Path));
+        Assert.Null(result.CoverImage);
     }
 }

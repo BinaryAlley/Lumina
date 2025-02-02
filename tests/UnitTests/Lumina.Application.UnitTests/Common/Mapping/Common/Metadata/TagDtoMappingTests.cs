@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Contracts.DTO.Common;
 using Lumina.Domain.Common.ValueObjects.Metadata;
@@ -27,9 +26,9 @@ public class TagDtoMappingTests
         ErrorOr<Tag> result = tagDto.ToDomainEntity();
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().NotBeNull();
-        result.Value.Name.Should().Be(tagDto.Name);
+        Assert.False(result.IsError);
+        Assert.NotNull(result.Value);
+        Assert.Equal(tagDto.Name, result.Value.Name);
     }
 
     [Theory]
@@ -47,9 +46,9 @@ public class TagDtoMappingTests
         ErrorOr<Tag> result = tagDto.ToDomainEntity();
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().NotBeNull();
-        result.Value.Name.Should().Be(tagDto.Name);
+        Assert.False(result.IsError);
+        Assert.NotNull(result.Value);
+        Assert.Equal(tagDto.Name, result.Value.Name);
     }
 
     [Theory]
@@ -65,7 +64,7 @@ public class TagDtoMappingTests
         ErrorOr<Tag> result = tagDto.ToDomainEntity();
 
         // Assert
-        result.IsError.Should().BeTrue();
+        Assert.True(result.IsError);
     }
 
     [Fact]
@@ -84,14 +83,14 @@ public class TagDtoMappingTests
         IEnumerable<ErrorOr<Tag>> results = tagDtos.ToDomainEntities();
 
         // Assert
-        results.Should().NotBeNull();
-        results.Should().HaveCount(tagDtos.Count);
+        Assert.NotNull(results);
+        Assert.Equal(tagDtos.Count, results.Count());
 
         List<ErrorOr<Tag>> resultList = results.ToList();
         for (int i = 0; i < tagDtos.Count; i++)
         {
-            resultList[i].IsError.Should().BeFalse();
-            resultList[i].Value.Name.Should().Be(tagDtos[i].Name);
+            Assert.False(resultList[i].IsError);
+            Assert.Equal(tagDtos[i].Name, resultList[i].Value.Name);
         }
     }
 
@@ -111,18 +110,18 @@ public class TagDtoMappingTests
         IEnumerable<ErrorOr<Tag>> results = tagDtos.ToDomainEntities();
 
         // Assert
-        results.Should().NotBeNull();
-        results.Should().HaveCount(tagDtos.Count);
+        Assert.NotNull(results);
+        Assert.Equal(tagDtos.Count, results.Count());
 
         List<ErrorOr<Tag>> resultList = results.ToList();
-        resultList[0].IsError.Should().BeFalse();
-        resultList[0].Value.Name.Should().Be("indie");
+        Assert.False(resultList[0].IsError);
+        Assert.Equal("indie", resultList[0].Value.Name);
 
-        resultList[1].IsError.Should().BeTrue();
+        Assert.True(resultList[1].IsError);
 
-        resultList[2].IsError.Should().BeFalse();
-        resultList[2].Value.Name.Should().Be("electronic");
+        Assert.False(resultList[2].IsError);
+        Assert.Equal("electronic", resultList[2].Value.Name);
 
-        resultList[3].IsError.Should().BeTrue();
+        Assert.True(resultList[3].IsError);
     }
 }

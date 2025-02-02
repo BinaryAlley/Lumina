@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.Seed;
@@ -86,10 +85,10 @@ public class SetupApplicationCommandHandlerTests
         ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().NotBeNull();
-        result.Value.Username.Should().Be(command.Username);
-        result.Value.TotpSecret.Should().BeNull();
+        Assert.False(result.IsError);
+        Assert.NotNull(result.Value);
+        Assert.Equal(command.Username, result.Value.Username);
+        Assert.Null(result.Value.TotpSecret);
 
         await _mockUserRepository.Received(1).GetAllAsync(Arg.Any<CancellationToken>());
         await _mockUserRepository.Received(1).InsertAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>());
@@ -123,10 +122,10 @@ public class SetupApplicationCommandHandlerTests
         ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().NotBeNull();
-        result.Value.Username.Should().Be(command.Username);
-        result.Value.TotpSecret.Should().Be(qrCodeUri);
+        Assert.False(result.IsError);
+        Assert.NotNull(result.Value);
+        Assert.Equal(command.Username, result.Value.Username);
+        Assert.Equal(qrCodeUri, result.Value.TotpSecret);
 
         await _mockUserRepository.Received(1).GetAllAsync(Arg.Any<CancellationToken>());
         await _mockUserRepository.Received(1).InsertAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>());
@@ -147,8 +146,8 @@ public class SetupApplicationCommandHandlerTests
         ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Authorization.AdminAccountAlreadyCreated);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Authorization.AdminAccountAlreadyCreated, result.FirstError);
 
         await _mockUserRepository.Received(1).GetAllAsync(Arg.Any<CancellationToken>());
         await _mockUserRepository.DidNotReceive().InsertAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>());
@@ -169,8 +168,8 @@ public class SetupApplicationCommandHandlerTests
         ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(error);
+        Assert.True(result.IsError);
+        Assert.Equal(error, result.FirstError);
 
         await _mockUserRepository.Received(1).GetAllAsync(Arg.Any<CancellationToken>());
         await _mockUserRepository.DidNotReceive().InsertAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>());
@@ -193,8 +192,8 @@ public class SetupApplicationCommandHandlerTests
         ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(error);
+        Assert.True(result.IsError);
+        Assert.Equal(error, result.FirstError);
 
         await _mockUserRepository.Received(1).GetAllAsync(Arg.Any<CancellationToken>());
         await _mockUserRepository.Received(1).InsertAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>());
@@ -219,8 +218,8 @@ public class SetupApplicationCommandHandlerTests
         ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(error);
+        Assert.True(result.IsError);
+        Assert.Equal(error, result.FirstError);
 
         await _mockDataSeedService.Received(1).SetDefaultAuthorizationPermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockDataSeedService.DidNotReceive().SetDefaultAuthorizationRolesAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
@@ -246,8 +245,8 @@ public class SetupApplicationCommandHandlerTests
         ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(error);
+        Assert.True(result.IsError);
+        Assert.Equal(error, result.FirstError);
 
         await _mockDataSeedService.Received(1).SetDefaultAuthorizationPermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockDataSeedService.Received(1).SetDefaultAuthorizationRolesAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
@@ -276,8 +275,8 @@ public class SetupApplicationCommandHandlerTests
         ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(error);
+        Assert.True(result.IsError);
+        Assert.Equal(error, result.FirstError);
 
         await _mockDataSeedService.Received(1).SetDefaultAuthorizationPermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockDataSeedService.Received(1).SetDefaultAuthorizationRolesAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
@@ -309,8 +308,8 @@ public class SetupApplicationCommandHandlerTests
         ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(error);
+        Assert.True(result.IsError);
+        Assert.Equal(error, result.FirstError);
 
         await _mockDataSeedService.Received(1).SetDefaultAuthorizationPermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockDataSeedService.Received(1).SetDefaultAuthorizationRolesAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
@@ -341,9 +340,9 @@ public class SetupApplicationCommandHandlerTests
         ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().NotBeNull();
-        result.Value.Username.Should().Be(command.Username);
+        Assert.False(result.IsError);
+        Assert.NotNull(result.Value);
+        Assert.Equal(command.Username, result.Value.Username);
 
         await _mockDataSeedService.Received(1).SetDefaultAuthorizationPermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockDataSeedService.Received(1).SetDefaultAuthorizationRolesAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());

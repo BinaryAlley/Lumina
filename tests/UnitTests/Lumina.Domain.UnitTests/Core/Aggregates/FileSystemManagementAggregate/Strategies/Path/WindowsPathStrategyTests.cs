@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Path;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
@@ -51,7 +50,7 @@ public class WindowsPathStrategyTests
         bool result = _sut.IsValidPath(pathId);
 
         // Assert
-        result.Should().BeTrue();
+        Assert.True(result);
     }
 
     [Theory]
@@ -69,7 +68,7 @@ public class WindowsPathStrategyTests
         bool result = _sut.IsValidPath(pathId);
 
         // Assert
-        result.Should().BeFalse();
+        Assert.False(result);
     }
 
     [Fact]
@@ -83,7 +82,7 @@ public class WindowsPathStrategyTests
         bool result = _sut.IsValidPath(pathId);
 
         // Assert
-        result.Should().BeFalse();
+        Assert.False(result);
     }
 
     [Theory]
@@ -101,7 +100,7 @@ public class WindowsPathStrategyTests
         bool result = _sut.IsValidPath(pathId);
 
         // Assert
-        result.Should().BeTrue();
+        Assert.True(result);
     }
 
     [Fact]
@@ -115,7 +114,7 @@ public class WindowsPathStrategyTests
         bool result = _sut.IsValidPath(pathId);
 
         // Assert
-        result.Should().BeTrue();
+        Assert.True(result);
     }
 
     [Theory]
@@ -131,7 +130,7 @@ public class WindowsPathStrategyTests
         bool result = _sut.IsValidPath(pathId);
 
         // Assert
-        result.Should().BeTrue();
+        Assert.True(result);
     }
 
     [Theory]
@@ -147,7 +146,7 @@ public class WindowsPathStrategyTests
         bool result = _sut.IsValidPath(pathId);
 
         // Assert
-        result.Should().BeFalse();
+        Assert.False(result);
     }
 
     [Fact]
@@ -163,7 +162,7 @@ public class WindowsPathStrategyTests
         bool result = _sut.Exists(pathId, true);
 
         // Assert
-        result.Should().BeTrue();
+        Assert.True(result);
         _mockFileSystem.Path.Received(1).Exists(existingPath);
     }
 
@@ -183,7 +182,7 @@ public class WindowsPathStrategyTests
         bool result = _sut.Exists(pathId, false);
 
         // Assert
-        result.Should().BeFalse();
+        Assert.False(result);
         _mockFileSystem.Path.Received(1).Exists(existingPath);
     }
 
@@ -199,7 +198,7 @@ public class WindowsPathStrategyTests
         bool result = _sut.Exists(pathId);
 
         // Assert
-        result.Should().BeFalse();
+        Assert.False(result);
         _mockFileSystem.Path.Received(1).Exists(nonExistingPath);
     }
 
@@ -215,7 +214,7 @@ public class WindowsPathStrategyTests
         bool result = _sut.Exists(pathId);
 
         // Assert
-        result.Should().BeTrue();
+        Assert.True(result);
         _mockFileSystem.Path.Received(1).Exists(rootPath);
     }
 
@@ -232,7 +231,7 @@ public class WindowsPathStrategyTests
         bool result = _sut.Exists(pathId, true);
 
         // Assert
-        result.Should().BeTrue();
+        Assert.True(result);
         _mockFileSystem.Path.Received(1).Exists(directoryPath);
     }
 
@@ -249,7 +248,7 @@ public class WindowsPathStrategyTests
         bool result = _sut.Exists(pathId, true);
 
         // Assert
-        result.Should().BeTrue();
+        Assert.True(result);
         _mockFileSystem.Path.Received(1).Exists(filePath);
     }
 
@@ -265,7 +264,7 @@ public class WindowsPathStrategyTests
         bool result = _sut.Exists(pathId, true);
 
         // Assert
-        result.Should().BeTrue();
+        Assert.True(result);
         _mockFileSystem.Path.Received(1).Exists(uncPath);
     }
 
@@ -280,8 +279,8 @@ public class WindowsPathStrategyTests
         ErrorOr<FileSystemPathId> result = _sut.CombinePath(path, name);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Path.Should().Be(@"C:\Users\User\Documents\");
+        Assert.False(result.IsError);
+        Assert.Equal(@"C:\Users\User\Documents\", result.Value.Path);
     }
 
     [Fact]
@@ -295,8 +294,8 @@ public class WindowsPathStrategyTests
         ErrorOr<FileSystemPathId> result = _sut.CombinePath(path, name);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Path.Should().Be(@"C:\Users\User\Documents\");
+        Assert.False(result.IsError);
+        Assert.Equal(@"C:\Users\User\Documents\", result.Value.Path);
     }
 
     [Fact]
@@ -310,8 +309,8 @@ public class WindowsPathStrategyTests
         ErrorOr<FileSystemPathId> result = _sut.CombinePath(path, name);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Path.Should().Be(@"C:\Users\User\Documents\");
+        Assert.False(result.IsError);
+        Assert.Equal(@"C:\Users\User\Documents\", result.Value.Path);
     }
 
     [Fact]
@@ -325,8 +324,8 @@ public class WindowsPathStrategyTests
         ErrorOr<FileSystemPathId> result = _sut.CombinePath(path, name);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.FileSystemManagement.NameCannotBeEmpty);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.FileSystemManagement.NameCannotBeEmpty, result.FirstError);
     }
 
     [Fact]
@@ -340,8 +339,8 @@ public class WindowsPathStrategyTests
         ErrorOr<FileSystemPathId> result = _sut.CombinePath(path, name);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Path.Should().Be(@"C:\Users\");
+        Assert.False(result.IsError);
+        Assert.Equal(@"C:\Users\", result.Value.Path);
     }
 
     [Fact]
@@ -355,8 +354,8 @@ public class WindowsPathStrategyTests
         ErrorOr<FileSystemPathId> result = _sut.CombinePath(path, name);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Path.Should().Be(@"\\server\share\folder\");
+        Assert.False(result.IsError);
+        Assert.Equal(@"\\server\share\folder\", result.Value.Path);
     }
 
     [Fact]
@@ -369,13 +368,13 @@ public class WindowsPathStrategyTests
         ErrorOr<IEnumerable<PathSegment>> result = _sut.ParsePath(path);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().HaveCount(5);
-        result.Value.ElementAt(0).Should().BeEquivalentTo(_pathSegmentFixture.CreatePathSegment("C:", false, true));
-        result.Value.ElementAt(1).Should().BeEquivalentTo(_pathSegmentFixture.CreatePathSegment("Users", true, false));
-        result.Value.ElementAt(2).Should().BeEquivalentTo(_pathSegmentFixture.CreatePathSegment("User", true, false));
-        result.Value.ElementAt(3).Should().BeEquivalentTo(_pathSegmentFixture.CreatePathSegment("Documents", true, false));
-        result.Value.ElementAt(4).Should().BeEquivalentTo(_pathSegmentFixture.CreatePathSegment("file.txt", false, false));
+        Assert.False(result.IsError);
+        Assert.Equal(5, result.Value.Count());
+        Assert.Equivalent(_pathSegmentFixture.CreatePathSegment("C:", false, true), result.Value.ElementAt(0));
+        Assert.Equivalent(_pathSegmentFixture.CreatePathSegment("Users", true, false), result.Value.ElementAt(1));
+        Assert.Equivalent(_pathSegmentFixture.CreatePathSegment("User", true, false), result.Value.ElementAt(2));
+        Assert.Equivalent(_pathSegmentFixture.CreatePathSegment("Documents", true, false), result.Value.ElementAt(3));
+        Assert.Equivalent(_pathSegmentFixture.CreatePathSegment("file.txt", false, false), result.Value.ElementAt(4));
     }
 
     [Fact]
@@ -388,9 +387,9 @@ public class WindowsPathStrategyTests
         ErrorOr<IEnumerable<PathSegment>> result = _sut.ParsePath(path);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().HaveCount(1);
-        result.Value.Single().Should().BeEquivalentTo(_pathSegmentFixture.CreatePathSegment("C:", false, true));
+        Assert.False(result.IsError);
+        Assert.Single(result.Value);
+        Assert.Equivalent(_pathSegmentFixture.CreatePathSegment("C:", false, true), result.Value.Single());
     }
 
     [Fact]
@@ -403,9 +402,9 @@ public class WindowsPathStrategyTests
         ErrorOr<IEnumerable<PathSegment>> result = _sut.ParsePath(path);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().HaveCount(4);
-        result.Value.Last().Should().BeEquivalentTo(_pathSegmentFixture.CreatePathSegment("Documents", true, false));
+        Assert.False(result.IsError);
+        Assert.Equal(4, result.Value.Count());
+        Assert.Equivalent(_pathSegmentFixture.CreatePathSegment("Documents", true, false), result.Value.Last());
     }
 
     [Fact]
@@ -418,8 +417,8 @@ public class WindowsPathStrategyTests
         ErrorOr<IEnumerable<PathSegment>> result = _sut.ParsePath(path);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.FileSystemManagement.InvalidPath);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
     }
 
     [Fact]
@@ -432,9 +431,9 @@ public class WindowsPathStrategyTests
         ErrorOr<IEnumerable<PathSegment>> result = _sut.ParsePath(path);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().HaveCount(4);
-        result.Value.Last().Should().BeEquivalentTo(_pathSegmentFixture.CreatePathSegment("file.with.dots.txt", false, false));
+        Assert.False(result.IsError);
+        Assert.Equal(4, result.Value.Count());
+        Assert.Equivalent(_pathSegmentFixture.CreatePathSegment("file.with.dots.txt", false, false), result.Value.Last());
     }
 
     [Fact]
@@ -447,13 +446,13 @@ public class WindowsPathStrategyTests
         ErrorOr<IEnumerable<PathSegment>> result = _sut.ParsePath(path);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().HaveCount(5);
-        result.Value.ElementAt(0).Should().BeEquivalentTo(_pathSegmentFixture.CreatePathSegment(@"\\", false, true));
-        result.Value.ElementAt(1).Should().BeEquivalentTo(_pathSegmentFixture.CreatePathSegment("server", true, false));
-        result.Value.ElementAt(2).Should().BeEquivalentTo(_pathSegmentFixture.CreatePathSegment("share", true, false));
-        result.Value.ElementAt(3).Should().BeEquivalentTo(_pathSegmentFixture.CreatePathSegment("folder", true, false));
-        result.Value.ElementAt(4).Should().BeEquivalentTo(_pathSegmentFixture.CreatePathSegment("file.txt", false, false));
+        Assert.False(result.IsError);
+        Assert.Equal(5, result.Value.Count());
+        Assert.Equivalent(_pathSegmentFixture.CreatePathSegment(@"\\", false, true), result.Value.ElementAt(0));
+        Assert.Equivalent(_pathSegmentFixture.CreatePathSegment("server", true, false), result.Value.ElementAt(1));
+        Assert.Equivalent(_pathSegmentFixture.CreatePathSegment("share", true, false), result.Value.ElementAt(2));
+        Assert.Equivalent(_pathSegmentFixture.CreatePathSegment("folder", true, false), result.Value.ElementAt(3));
+        Assert.Equivalent(_pathSegmentFixture.CreatePathSegment("file.txt", false, false), result.Value.ElementAt(4));
     }
 
     [Fact]
@@ -466,11 +465,11 @@ public class WindowsPathStrategyTests
         ErrorOr<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(path);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().HaveCount(3);
-        result.Value.ElementAt(0).Should().BeEquivalentTo(_pathSegmentFixture.CreatePathSegment("C:", false, true));
-        result.Value.ElementAt(1).Should().BeEquivalentTo(_pathSegmentFixture.CreatePathSegment("Users", true, false));
-        result.Value.ElementAt(2).Should().BeEquivalentTo(_pathSegmentFixture.CreatePathSegment("User", true, false));
+        Assert.False(result.IsError);
+        Assert.Equal(3, result.Value.Count());
+        Assert.Equivalent(_pathSegmentFixture.CreatePathSegment("C:", false, true), result.Value.ElementAt(0));
+        Assert.Equivalent(_pathSegmentFixture.CreatePathSegment("Users", true, false), result.Value.ElementAt(1));
+        Assert.Equivalent(_pathSegmentFixture.CreatePathSegment("User", true, false), result.Value.ElementAt(2));
     }
 
     [Fact]
@@ -483,8 +482,8 @@ public class WindowsPathStrategyTests
         ErrorOr<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(path);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.FileSystemManagement.CannotNavigateUp);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.FileSystemManagement.CannotNavigateUp, result.FirstError);
     }
 
     [Fact]
@@ -497,10 +496,10 @@ public class WindowsPathStrategyTests
         ErrorOr<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(path);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().HaveCount(2);
-        result.Value.ElementAt(0).Should().BeEquivalentTo(_pathSegmentFixture.CreatePathSegment("C:", false, true));
-        result.Value.ElementAt(1).Should().BeEquivalentTo(_pathSegmentFixture.CreatePathSegment("Users", true, false));
+        Assert.False(result.IsError);
+        Assert.Equal(2, result.Value.Count());
+        Assert.Equivalent(_pathSegmentFixture.CreatePathSegment("C:", false, true), result.Value.ElementAt(0));
+        Assert.Equivalent(_pathSegmentFixture.CreatePathSegment("Users", true, false), result.Value.ElementAt(1));
     }
 
     [Fact]
@@ -513,8 +512,8 @@ public class WindowsPathStrategyTests
         ErrorOr<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(path);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.FileSystemManagement.InvalidPath);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
     }
 
     [Fact]
@@ -527,9 +526,9 @@ public class WindowsPathStrategyTests
         ErrorOr<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(path);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().HaveCount(1);
-        result.Value.Single().Should().BeEquivalentTo(_pathSegmentFixture.CreatePathSegment("C:", false, true));
+        Assert.False(result.IsError);
+        Assert.Single(result.Value);
+        Assert.Equivalent(_pathSegmentFixture.CreatePathSegment("C:", false, true), result.Value.Single());
     }
 
     [Fact]
@@ -542,12 +541,12 @@ public class WindowsPathStrategyTests
         ErrorOr<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(path);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().HaveCount(4);
-        result.Value.ElementAt(0).Should().BeEquivalentTo(_pathSegmentFixture.CreatePathSegment(@"\\", false, true));
-        result.Value.ElementAt(1).Should().BeEquivalentTo(_pathSegmentFixture.CreatePathSegment("server", true, false));
-        result.Value.ElementAt(2).Should().BeEquivalentTo(_pathSegmentFixture.CreatePathSegment("share", true, false));
-        result.Value.ElementAt(3).Should().BeEquivalentTo(_pathSegmentFixture.CreatePathSegment("folder", true, false));
+        Assert.False(result.IsError);
+        Assert.Equal(4, result.Value.Count());
+        Assert.Equivalent(_pathSegmentFixture.CreatePathSegment(@"\\", false, true), result.Value.ElementAt(0));
+        Assert.Equivalent(_pathSegmentFixture.CreatePathSegment("server", true, false), result.Value.ElementAt(1));
+        Assert.Equivalent(_pathSegmentFixture.CreatePathSegment("share", true, false), result.Value.ElementAt(2));
+        Assert.Equivalent(_pathSegmentFixture.CreatePathSegment("folder", true, false), result.Value.ElementAt(3));
     }
 
     [Fact]
@@ -560,8 +559,8 @@ public class WindowsPathStrategyTests
         ErrorOr<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(path);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.FileSystemManagement.CannotNavigateUp);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.FileSystemManagement.CannotNavigateUp, result.FirstError);
     }
 
     [Fact]
@@ -574,11 +573,11 @@ public class WindowsPathStrategyTests
         ErrorOr<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(path);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().HaveCount(3);
-        result.Value.ElementAt(0).Should().BeEquivalentTo(_pathSegmentFixture.CreatePathSegment(@"\\", false, true));
-        result.Value.ElementAt(1).Should().BeEquivalentTo(_pathSegmentFixture.CreatePathSegment("server", true, false));
-        result.Value.ElementAt(2).Should().BeEquivalentTo(_pathSegmentFixture.CreatePathSegment("share", true, false));
+        Assert.False(result.IsError);
+        Assert.Equal(3, result.Value.Count());
+        Assert.Equivalent(_pathSegmentFixture.CreatePathSegment(@"\\", false, true), result.Value.ElementAt(0));
+        Assert.Equivalent(_pathSegmentFixture.CreatePathSegment("server", true, false), result.Value.ElementAt(1));
+        Assert.Equivalent(_pathSegmentFixture.CreatePathSegment("share", true, false), result.Value.ElementAt(2));
     }
 
     [Fact]
@@ -591,8 +590,8 @@ public class WindowsPathStrategyTests
         ErrorOr<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(path);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.FileSystemManagement.CannotNavigateUp);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.FileSystemManagement.CannotNavigateUp, result.FirstError);
     }
 
     [Fact]
@@ -602,7 +601,7 @@ public class WindowsPathStrategyTests
         char[] result = _sut.GetInvalidPathCharsForPlatform();
 
         // Assert
-        result.Should().BeEquivalentTo(['<', '>', '"', '/', '|', '?', '*']);
+        Assert.Equal(['<', '>', '"', '/', '|', '?', '*'], result);
     }
 
     [Fact]
@@ -612,9 +611,9 @@ public class WindowsPathStrategyTests
         char[] result = _sut.GetInvalidPathCharsForPlatform();
 
         // Assert
-        result.Should().NotContain('\\');
-        result.Should().NotContain(':');
-        result.Should().NotContain('\0');
+        Assert.DoesNotContain('\\', result);
+        Assert.DoesNotContain(':', result);
+        Assert.DoesNotContain('\0', result);
     }
 
     [Fact]
@@ -625,7 +624,7 @@ public class WindowsPathStrategyTests
         char[] result2 = _sut.GetInvalidPathCharsForPlatform();
 
         // Assert
-        result1.Should().BeEquivalentTo(result2);
+        Assert.Equal(result1, result2);
     }
 
     [Fact]
@@ -638,8 +637,8 @@ public class WindowsPathStrategyTests
         ErrorOr<PathSegment> result = _sut.GetPathRoot(path);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().BeEquivalentTo(_pathSegmentFixture.CreatePathSegment("C:\\", true, true));
+        Assert.False(result.IsError);
+        Assert.Equivalent(_pathSegmentFixture.CreatePathSegment("C:\\", true, true), result.Value);
     }
 
     [Fact]
@@ -652,8 +651,8 @@ public class WindowsPathStrategyTests
         ErrorOr<PathSegment> result = _sut.GetPathRoot(path);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().BeEquivalentTo(_pathSegmentFixture.CreatePathSegment("C:\\", true, true));
+        Assert.False(result.IsError);
+        Assert.Equivalent(_pathSegmentFixture.CreatePathSegment("C:\\", true, true), result.Value);
     }
 
     [Fact]
@@ -666,8 +665,8 @@ public class WindowsPathStrategyTests
         ErrorOr<PathSegment> result = _sut.GetPathRoot(path);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.FileSystemManagement.InvalidPath);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
     }
 
     [Fact]
@@ -680,8 +679,8 @@ public class WindowsPathStrategyTests
         ErrorOr<PathSegment> result = _sut.GetPathRoot(path);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().BeEquivalentTo(_pathSegmentFixture.CreatePathSegment(@"\\server\share\", true, false));
+        Assert.False(result.IsError);
+        Assert.Equivalent(_pathSegmentFixture.CreatePathSegment(@"\\server\share\", true, false), result.Value);
     }
 
     [Fact]
@@ -694,8 +693,8 @@ public class WindowsPathStrategyTests
         ErrorOr<PathSegment> result = _sut.GetPathRoot(path);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.FileSystemManagement.InvalidPath);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
     }
 
     [Fact]
@@ -708,8 +707,8 @@ public class WindowsPathStrategyTests
         ErrorOr<PathSegment> result = _sut.GetPathRoot(path);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.FileSystemManagement.InvalidPath);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
     }
 
     [Fact]
@@ -722,8 +721,8 @@ public class WindowsPathStrategyTests
         ErrorOr<PathSegment> result = _sut.GetPathRoot(path);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.FileSystemManagement.InvalidPath);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
     }
 
     [Fact]
@@ -736,8 +735,8 @@ public class WindowsPathStrategyTests
         ErrorOr<PathSegment> result = _sut.GetPathRoot(path);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.FileSystemManagement.InvalidPath);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
     }
 
     [Fact]
@@ -750,8 +749,8 @@ public class WindowsPathStrategyTests
         ErrorOr<PathSegment> result = _sut.GetPathRoot(path);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().BeEquivalentTo(_pathSegmentFixture.CreatePathSegment(@"\\server\share\", true, false));
+        Assert.False(result.IsError);
+        Assert.Equivalent(_pathSegmentFixture.CreatePathSegment(@"\\server\share\", true, false), result.Value);
     }
 
     [Fact]
@@ -764,7 +763,7 @@ public class WindowsPathStrategyTests
         ErrorOr<PathSegment> result = _sut.GetPathRoot(path);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.FileSystemManagement.InvalidPath);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
     }
 }

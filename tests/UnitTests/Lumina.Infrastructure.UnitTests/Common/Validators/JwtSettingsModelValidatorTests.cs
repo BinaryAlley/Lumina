@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using FluentAssertions;
 using Lumina.Infrastructure.Common.Errors;
 using Lumina.Infrastructure.Common.Models.Configuration;
 using Lumina.Infrastructure.Common.Validators;
@@ -44,8 +43,8 @@ public class JwtSettingsModelValidatorTests
         FluentValidation.Results.ValidationResult result = _validator.Validate(model);
 
         // Assert
-        result.IsValid.Should().BeTrue();
-        result.Errors.Should().BeEmpty();
+        Assert.True(result.IsValid);
+        Assert.Empty(result.Errors);
     }
 
     [Fact]
@@ -63,13 +62,10 @@ public class JwtSettingsModelValidatorTests
         FluentValidation.Results.ValidationResult result = _validator.Validate(model);
 
         // Assert
-        result.IsValid.Should().BeFalse();
-        result.Errors.Should().HaveCount(2);
-        result.Errors.Select(e => e.ErrorMessage).Should().Contain(new[]
-        {
-            Errors.Configuration.JwtSecretKeyCannotBeEmpty.Description,
-            Errors.Configuration.JwtSecretKeyTooShort.Description
-        });
+        Assert.False(result.IsValid);
+        Assert.Equal(2, result.Errors.Count);
+        Assert.Contains(Errors.Configuration.JwtSecretKeyCannotBeEmpty.Description, result.Errors.Select(e => e.ErrorMessage));
+        Assert.Contains(Errors.Configuration.JwtSecretKeyTooShort.Description, result.Errors.Select(e => e.ErrorMessage));
     }
 
     [Fact]
@@ -87,9 +83,9 @@ public class JwtSettingsModelValidatorTests
         FluentValidation.Results.ValidationResult result = _validator.Validate(model);
 
         // Assert
-        result.IsValid.Should().BeFalse();
-        result.Errors.Should().ContainSingle()
-            .Which.ErrorMessage.Should().Be(Errors.Configuration.JwtSecretKeyTooShort.Description);
+        Assert.False(result.IsValid);
+        Assert.Single(result.Errors);
+        Assert.Equal(Errors.Configuration.JwtSecretKeyTooShort.Description, result.Errors[0].ErrorMessage);
     }
 
     [Theory]
@@ -110,9 +106,9 @@ public class JwtSettingsModelValidatorTests
         FluentValidation.Results.ValidationResult result = _validator.Validate(model);
 
         // Assert
-        result.IsValid.Should().BeFalse();
-        result.Errors.Should().ContainSingle()
-            .Which.ErrorMessage.Should().Be(Errors.Configuration.JwtExpiryMinutesMustBePositive.Description);
+        Assert.False(result.IsValid);
+        Assert.Single(result.Errors);
+        Assert.Equal(Errors.Configuration.JwtExpiryMinutesMustBePositive.Description, result.Errors[0].ErrorMessage);
     }
 
     [Fact]
@@ -130,9 +126,9 @@ public class JwtSettingsModelValidatorTests
         FluentValidation.Results.ValidationResult result = _validator.Validate(model);
 
         // Assert
-        result.IsValid.Should().BeFalse();
-        result.Errors.Should().ContainSingle()
-            .Which.ErrorMessage.Should().Be(Errors.Configuration.JwtIssuerCannotBeEmpty.Description);
+        Assert.False(result.IsValid);
+        Assert.Single(result.Errors);
+        Assert.Equal(Errors.Configuration.JwtIssuerCannotBeEmpty.Description, result.Errors[0].ErrorMessage);
     }
 
     [Fact]
@@ -150,8 +146,8 @@ public class JwtSettingsModelValidatorTests
         FluentValidation.Results.ValidationResult result = _validator.Validate(model);
 
         // Assert
-        result.IsValid.Should().BeFalse();
-        result.Errors.Should().ContainSingle()
-            .Which.ErrorMessage.Should().Be(Errors.Configuration.JwtAudienceCannotBeEmpty.Description);
+        Assert.False(result.IsValid);
+        Assert.Single(result.Errors);
+        Assert.Equal(Errors.Configuration.JwtAudienceCannotBeEmpty.Description, result.Errors[0].ErrorMessage);
     }
 }

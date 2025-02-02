@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using FastEndpoints;
-using FluentAssertions;
 using Lumina.Application.Core.Admin.Authorization.Roles.Queries.GetRoles;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.Presentation.Api.Core.Endpoints.Admin.Authorization.Roles.GetRoles;
@@ -52,8 +51,8 @@ public class GetRolesEndpointTests
         IResult result = await _sut.ExecuteAsync(new EmptyRequest(), cancellationToken);
 
         // Assert
-        Ok<IEnumerable<RoleResponse>> okResult = result.Should().BeOfType<Ok<IEnumerable<RoleResponse>>>().Subject;
-        okResult.Value.Should().BeEquivalentTo(expectedResponse);
+        Ok<IEnumerable<RoleResponse>> okResult = Assert.IsType<Ok<IEnumerable<RoleResponse>>>(result);
+        Assert.Equal(expectedResponse, okResult.Value);
     }
 
     [Fact]
@@ -69,16 +68,16 @@ public class GetRolesEndpointTests
         IResult result = await _sut.ExecuteAsync(new EmptyRequest(), cancellationToken);
 
         // Assert
-        ProblemHttpResult problemResult = result.Should().BeOfType<ProblemHttpResult>().Subject;
-        problemResult.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
-        problemResult.ContentType.Should().Be("application/problem+json");
-        problemResult.ProblemDetails.Should().BeOfType<Microsoft.AspNetCore.Mvc.ProblemDetails>();
+        ProblemHttpResult problemResult = Assert.IsType<ProblemHttpResult>(result);
+        Assert.Equal(StatusCodes.Status403Forbidden, problemResult.StatusCode);
+        Assert.Equal("application/problem+json", problemResult.ContentType);
+        Assert.IsType<Microsoft.AspNetCore.Mvc.ProblemDetails>(problemResult.ProblemDetails);
 
-        problemResult.ProblemDetails.Title.Should().Be("Roles.NotFound");
-        problemResult.ProblemDetails.Detail.Should().Be("No roles found.");
-        problemResult.ProblemDetails.Status.Should().Be(StatusCodes.Status403Forbidden);
-        problemResult.ProblemDetails.Type.Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.4");
-        problemResult.ProblemDetails.Extensions["traceId"].Should().NotBeNull();
+        Assert.Equal("Roles.NotFound", problemResult.ProblemDetails.Title);
+        Assert.Equal("No roles found.", problemResult.ProblemDetails.Detail);
+        Assert.Equal(StatusCodes.Status403Forbidden, problemResult.ProblemDetails.Status);
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.4", problemResult.ProblemDetails.Type);
+        Assert.NotNull(problemResult.ProblemDetails.Extensions["traceId"]);
     }
 
     [Fact]

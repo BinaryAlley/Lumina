@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using EntityFrameworkCore.Testing.NSubstitute;
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.DataAccess.Core.Repositories.Books;
@@ -50,13 +49,13 @@ public class BookRepositoryTests
         ErrorOr<Created> result = await _sut.InsertAsync(bookModel, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().Be(Result.Created);
+        Assert.False(result.IsError);
+        Assert.Equal(Result.Created, result.Value);
 
-        // Check if the book was added to the context's ChangeTracker
+        // check if the book was added to the context's ChangeTracker
         EntityEntry<BookEntity>? addedBook = _mockContext.ChangeTracker.Entries<BookEntity>()
-            .FirstOrDefault(e => e.State == EntityState.Added && e.Entity.Id == bookModel.Id);
-        addedBook.Should().NotBeNull();
+        .FirstOrDefault(e => e.State == EntityState.Added && e.Entity.Id == bookModel.Id);
+        Assert.NotNull(addedBook);
     }
 
     [Fact]
@@ -72,9 +71,9 @@ public class BookRepositoryTests
         ErrorOr<Created> result = await _sut.InsertAsync(bookModel, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.WrittenContent.BookAlreadyExists);
-        _mockContext.ChangeTracker.Entries<BookEntity>().Should().HaveCount(1); // Only the existing book should be in the context}
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.WrittenContent.BookAlreadyExists, result.FirstError);
+        Assert.Single(_mockContext.ChangeTracker.Entries<BookEntity>()); // only the existing book should be in the context
     }
 
     [Fact]
@@ -92,16 +91,16 @@ public class BookRepositoryTests
         ErrorOr<Created> result = await _sut.InsertAsync(bookModel, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().Be(Result.Created);
+        Assert.False(result.IsError);
+        Assert.Equal(Result.Created, result.Value);
 
         EntityEntry<BookEntity>? addedBook = _mockContext.ChangeTracker.Entries<BookEntity>()
             .FirstOrDefault(e => e.State == EntityState.Added && e.Entity.Id == bookModel.Id);
-        addedBook.Should().NotBeNull();
+        Assert.NotNull(addedBook);
         BookEntity addedBookEntity = addedBook!.Entity;
-        addedBookEntity.Tags.Should().HaveCount(2);
-        addedBookEntity.Tags.Should().Contain(t => t.Name == "Existing" && t == existingTag);
-        addedBookEntity.Tags.Should().Contain(t => t.Name == "New" && t != existingTag);
+        Assert.Equal(2, addedBookEntity.Tags.Count);
+        Assert.Contains(addedBookEntity.Tags, t => t.Name == "Existing" && t == existingTag);
+        Assert.Contains(addedBookEntity.Tags, t => t.Name == "New" && t != existingTag);
     }
 
     [Fact]
@@ -119,16 +118,16 @@ public class BookRepositoryTests
         ErrorOr<Created> result = await _sut.InsertAsync(bookModel, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().Be(Result.Created);
+        Assert.False(result.IsError);
+        Assert.Equal(Result.Created, result.Value);
 
         EntityEntry<BookEntity>? addedBook = _mockContext.ChangeTracker.Entries<BookEntity>()
             .FirstOrDefault(e => e.State == EntityState.Added && e.Entity.Id == bookModel.Id);
-        addedBook.Should().NotBeNull();
+        Assert.NotNull(addedBook);
         BookEntity addedBookEntity = addedBook!.Entity;
-        addedBookEntity.Genres.Should().HaveCount(2);
-        addedBookEntity.Genres.Should().Contain(g => g.Name == "Existing" && g == existingGenre);
-        addedBookEntity.Genres.Should().Contain(g => g.Name == "New" && g != existingGenre);
+        Assert.Equal(2, addedBookEntity.Genres.Count);
+        Assert.Contains(addedBookEntity.Genres, g => g.Name == "Existing" && g == existingGenre);
+        Assert.Contains(addedBookEntity.Genres, g => g.Name == "New" && g != existingGenre);
     }
 
     [Fact]
@@ -148,10 +147,10 @@ public class BookRepositoryTests
         ErrorOr<IEnumerable<BookEntity>> result = await _sut.GetAllAsync(CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().NotBeNull();
-        result.Value.Should().HaveCount(3);
-        result.Value.Should().BeEquivalentTo(books);
+        Assert.False(result.IsError);
+        Assert.NotNull(result.Value);
+        Assert.Equal(3, result.Value.Count());
+        Assert.Equal(books, result.Value);
     }
 
     [Fact]
@@ -161,9 +160,9 @@ public class BookRepositoryTests
         ErrorOr<IEnumerable<BookEntity>> result = await _sut.GetAllAsync(CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().NotBeNull();
-        result.Value.Should().BeEmpty();
+        Assert.False(result.IsError);
+        Assert.NotNull(result.Value);
+        Assert.Empty(result.Value);
     }
 
     [Fact]
@@ -181,12 +180,12 @@ public class BookRepositoryTests
         ErrorOr<IEnumerable<BookEntity>> result = await _sut.GetAllAsync(CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().NotBeNull();
-        result.Value.Should().HaveCount(1);
+        Assert.False(result.IsError);
+        Assert.NotNull(result.Value);
+        Assert.Single(result.Value);
         BookEntity retrievedBook = result.Value.First();
-        retrievedBook.Tags.Should().HaveCount(2);
-        retrievedBook.Genres.Should().HaveCount(2);
-        retrievedBook.ISBNs.Should().HaveCount(2);
+        Assert.Equal(2, retrievedBook.Tags.Count);
+        Assert.Equal(2, retrievedBook.Genres.Count);
+        Assert.Equal(2, retrievedBook.ISBNs.Count);
     }
 }

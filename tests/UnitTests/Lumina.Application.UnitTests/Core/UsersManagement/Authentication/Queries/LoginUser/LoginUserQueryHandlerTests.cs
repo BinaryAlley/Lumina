@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -85,11 +84,11 @@ public class LoginUserQueryHandlerTests
         ErrorOr<LoginResponse> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Id.Should().Be(user.Id);
-        result.Value.Username.Should().Be(user.Username);
-        result.Value.Token.Should().Be(jwtToken);
-        result.Value.UsesTotp.Should().BeFalse();
+        Assert.False(result.IsError);
+        Assert.Equal(user.Id, result.Value.Id);
+        Assert.Equal(user.Username, result.Value.Username);
+        Assert.Equal(jwtToken, result.Value.Token);
+        Assert.False(result.Value.UsesTotp);
     }
 
     [Fact]
@@ -124,11 +123,11 @@ public class LoginUserQueryHandlerTests
         ErrorOr<LoginResponse> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Id.Should().Be(user.Id);
-        result.Value.Username.Should().Be(user.Username);
-        result.Value.Token.Should().Be(jwtToken);
-        result.Value.UsesTotp.Should().BeTrue();
+        Assert.False(result.IsError);
+        Assert.Equal(user.Id, result.Value.Id);
+        Assert.Equal(user.Username, result.Value.Username);
+        Assert.Equal(jwtToken, result.Value.Token);
+        Assert.True(result.Value.UsesTotp);
     }
 
     [Fact]
@@ -144,8 +143,8 @@ public class LoginUserQueryHandlerTests
         ErrorOr<LoginResponse> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Authentication.InvalidUsernameOrPassword);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Authentication.InvalidUsernameOrPassword, result.FirstError);
     }
 
     [Fact]
@@ -170,8 +169,8 @@ public class LoginUserQueryHandlerTests
         ErrorOr<LoginResponse> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Authentication.InvalidUsernameOrPassword);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Authentication.InvalidUsernameOrPassword, result.FirstError);
     }
 
     [Fact]
@@ -200,8 +199,8 @@ public class LoginUserQueryHandlerTests
         ErrorOr<LoginResponse> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Authentication.TempPasswordExpired);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Authentication.TempPasswordExpired, result.FirstError);
 
         await _mockUserRepository.Received(1).UpdateAsync(Arg.Is<UserEntity>(u =>
             u.TempPassword == null && u.TempPasswordCreated == null),
@@ -240,11 +239,11 @@ public class LoginUserQueryHandlerTests
         ErrorOr<LoginResponse> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Id.Should().Be(user.Id);
-        result.Value.Username.Should().Be(user.Username);
-        result.Value.Token.Should().Be(jwtToken);
-        result.Value.UsesTotp.Should().BeFalse();
+        Assert.False(result.IsError);
+        Assert.Equal(user.Id, result.Value.Id);
+        Assert.Equal(user.Username, result.Value.Username);
+        Assert.Equal(jwtToken, result.Value.Token);
+        Assert.False(result.Value.UsesTotp);
     }
 
     [Fact]
@@ -270,8 +269,8 @@ public class LoginUserQueryHandlerTests
         ErrorOr<LoginResponse> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Authentication.InvalidTotpCode);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Authentication.InvalidTotpCode, result.FirstError);
     }
 
     [Fact]
@@ -303,8 +302,8 @@ public class LoginUserQueryHandlerTests
         ErrorOr<LoginResponse> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Authentication.InvalidTotpCode);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Authentication.InvalidTotpCode, result.FirstError);
     }
 
     [Fact]
@@ -321,8 +320,8 @@ public class LoginUserQueryHandlerTests
         ErrorOr<LoginResponse> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(error);
+        Assert.True(result.IsError);
+        Assert.Equal(error, result.FirstError);
     }
 
     [Fact]
@@ -351,8 +350,8 @@ public class LoginUserQueryHandlerTests
         ErrorOr<LoginResponse> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Authentication.InvalidUsernameOrPassword);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Authentication.InvalidUsernameOrPassword, result.FirstError);
 
         _mockHashService.Received(1).CheckStringAgainstHash(password, hashedPassword);
         _mockHashService.Received(1).CheckStringAgainstHash(password, hashedTempPassword);

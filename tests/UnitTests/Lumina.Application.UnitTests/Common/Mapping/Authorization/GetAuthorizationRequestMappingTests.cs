@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.Mapping.Authorization;
 using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetAuthorization;
 using Lumina.Contracts.Requests.Authorization;
@@ -26,8 +25,8 @@ public class GetAuthorizationRequestMappingTests
         GetAuthorizationQuery result = request.ToQuery();
 
         // Assert
-        result.Should().NotBeNull();
-        result.UserId.Should().Be(request.UserId);
+        Assert.NotNull(result);
+        Assert.Equal(request.UserId, result.UserId);
     }
 
     [Fact]
@@ -40,8 +39,8 @@ public class GetAuthorizationRequestMappingTests
         GetAuthorizationQuery result = request.ToQuery();
 
         // Assert
-        result.Should().NotBeNull();
-        result.UserId.Should().BeNull();
+        Assert.NotNull(result);
+        Assert.Null(result.UserId);
     }
 
     [Theory]
@@ -58,7 +57,7 @@ public class GetAuthorizationRequestMappingTests
         GetAuthorizationQuery result = request.ToQuery();
 
         // Assert
-        result.Should().NotBeNull();
-        result.UserId.Should().Be(request.UserId);
+        Assert.NotNull(result);
+        Assert.Equal(request.UserId, result.UserId);
     }
 }

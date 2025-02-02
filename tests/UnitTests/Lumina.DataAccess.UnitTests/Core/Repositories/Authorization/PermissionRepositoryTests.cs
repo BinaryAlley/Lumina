@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using EntityFrameworkCore.Testing.NSubstitute;
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.Errors;
 using Lumina.DataAccess.Core.Repositories.Authorization;
@@ -49,13 +48,13 @@ public class PermissionRepositoryTests
         ErrorOr<Created> result = await _sut.InsertAsync(permissionModel, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().Be(Result.Created);
+        Assert.False(result.IsError);
+        Assert.Equal(Result.Created, result.Value);
 
-        // Check if the permission was added to the context's ChangeTracker
+        // check if the permission was added to the context's ChangeTracker
         EntityEntry<PermissionEntity>? addedPermission = _mockContext.ChangeTracker.Entries<PermissionEntity>()
-            .FirstOrDefault(e => e.State == EntityState.Added && e.Entity.Id == permissionModel.Id);
-        addedPermission.Should().NotBeNull();
+        .FirstOrDefault(e => e.State == EntityState.Added && e.Entity.Id == permissionModel.Id);
+        Assert.NotNull(addedPermission);
     }
 
     [Fact]
@@ -71,9 +70,9 @@ public class PermissionRepositoryTests
         ErrorOr<Created> result = await _sut.InsertAsync(permissionModel, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Authorization.PermissionAlreadyExists);
-        _mockContext.ChangeTracker.Entries<PermissionEntity>().Should().HaveCount(1);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Authorization.PermissionAlreadyExists, result.FirstError);
+        Assert.Single(_mockContext.ChangeTracker.Entries<PermissionEntity>());
     }
 
     [Fact]
@@ -93,10 +92,10 @@ public class PermissionRepositoryTests
         ErrorOr<IEnumerable<PermissionEntity>> result = await _sut.GetAllAsync(CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().NotBeNull();
-        result.Value.Should().HaveCount(3);
-        result.Value.Should().BeEquivalentTo(permissions);
+        Assert.False(result.IsError);
+        Assert.NotNull(result.Value);
+        Assert.Equal(3, result.Value.Count());
+        Assert.Equal(permissions, result.Value);
     }
 
     [Fact]
@@ -106,9 +105,9 @@ public class PermissionRepositoryTests
         ErrorOr<IEnumerable<PermissionEntity>> result = await _sut.GetAllAsync(CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().NotBeNull();
-        result.Value.Should().BeEmpty();
+        Assert.False(result.IsError);
+        Assert.NotNull(result.Value);
+        Assert.Empty(result.Value);
     }
 
     [Fact]
@@ -130,10 +129,10 @@ public class PermissionRepositoryTests
         ErrorOr<IEnumerable<PermissionEntity>> result = await _sut.GetByIdsAsync(requestedIds, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().NotBeNull();
-        result.Value.Should().HaveCount(2);
-        result.Value.Select(p => p.Id).Should().BeEquivalentTo(requestedIds);
+        Assert.False(result.IsError);
+        Assert.NotNull(result.Value);
+        Assert.Equal(2, result.Value.Count());
+        Assert.Equal(requestedIds, result.Value.Select(p => p.Id).ToList());
     }
 
     [Fact]
@@ -146,8 +145,8 @@ public class PermissionRepositoryTests
         ErrorOr<IEnumerable<PermissionEntity>> result = await _sut.GetByIdsAsync(requestedIds, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().NotBeNull();
-        result.Value.Should().BeEmpty();
+        Assert.False(result.IsError);
+        Assert.NotNull(result.Value);
+        Assert.Empty(result.Value);
     }
 }

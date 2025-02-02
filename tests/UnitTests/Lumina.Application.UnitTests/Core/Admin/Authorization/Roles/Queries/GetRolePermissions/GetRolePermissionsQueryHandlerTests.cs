@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Repositories.Authorization;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -67,8 +66,8 @@ public class GetRolePermissionsQueryHandlerTests
         ErrorOr<RolePermissionsResponse> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Authorization.NotAuthorized);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Authorization.NotAuthorized, result.FirstError);
         await _mockRoleRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
     }
 
@@ -88,8 +87,8 @@ public class GetRolePermissionsQueryHandlerTests
         ErrorOr<RolePermissionsResponse> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(error);
+        Assert.True(result.IsError);
+        Assert.Equal(error, result.FirstError);
     }
 
     [Fact]
@@ -107,8 +106,8 @@ public class GetRolePermissionsQueryHandlerTests
         ErrorOr<RolePermissionsResponse> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Authorization.RoleNotFound);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Authorization.RoleNotFound, result.FirstError);
     }
 
     [Fact]
@@ -145,8 +144,8 @@ public class GetRolePermissionsQueryHandlerTests
         ErrorOr<RolePermissionsResponse> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Role.RoleName.Should().Be(role.RoleName);
-        result.Value.Permissions.Should().HaveCount(1);
+        Assert.False(result.IsError);
+        Assert.Equal(role.RoleName, result.Value.Role.RoleName);
+        Assert.Single(result.Value.Permissions);
     }
 }

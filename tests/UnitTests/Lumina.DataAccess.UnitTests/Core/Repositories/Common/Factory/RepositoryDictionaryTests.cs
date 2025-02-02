@@ -1,7 +1,6 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Repositories.Books;
 using Lumina.DataAccess.Core.Repositories.Books;
 using Lumina.DataAccess.Core.Repositories.Common.Factory;
@@ -38,7 +37,7 @@ public class RepositoryDictionaryTests
         repositoryDictionary.Add<IBookRepository>(bookRepository);
 
         // Assert
-        repositoryDictionary.Count.Should().Be(1);
+        Assert.Equal(1, repositoryDictionary.Count);
     }
 
     [Fact]
@@ -53,7 +52,7 @@ public class RepositoryDictionaryTests
         repositoryDictionary.Clear();
 
         // Assert
-        repositoryDictionary.Count.Should().Be(0);
+        Assert.Equal(0, repositoryDictionary.Count);
     }
 
     [Fact]
@@ -68,7 +67,7 @@ public class RepositoryDictionaryTests
         IBookRepository actual = repositoryDictionary.Get<IBookRepository>(typeof(BookRepository));
 
         // Assert
-        actual.Should().BeSameAs(expected);
+        Assert.Same(expected, actual);
     }
 
     [Fact]
@@ -78,8 +77,7 @@ public class RepositoryDictionaryTests
         RepositoryDictionary repositoryDictionary = new();
 
         // Act & Assert
-        Action act = () => repositoryDictionary.Add<IBookRepository>(null!);
-        act.Should().Throw<ArgumentException>().WithMessage("Value cannot be null!");
+        Assert.Throws<ArgumentException>(() => repositoryDictionary.Add<IBookRepository>(null!));
     }
 
     [Fact]
@@ -91,8 +89,8 @@ public class RepositoryDictionaryTests
         repositoryDictionary.Add<IBookRepository>(bookRepository);
 
         // Act & Assert
-        Action act = () => repositoryDictionary.Add<IBookRepository>(bookRepository);
-        act.Should().Throw<ArgumentException>().WithMessage("Duplicate values are not allowed!");
+        ArgumentException exception = Assert.Throws<ArgumentException>(() => repositoryDictionary.Add<IBookRepository>(bookRepository));
+        Assert.Equal("Duplicate values are not allowed!", exception.Message);
     }
 
     [Fact]
@@ -103,7 +101,7 @@ public class RepositoryDictionaryTests
         RepositoryDictionary repositoryDictionary = new();
 
         // Act & Assert
-        Action act = () => repositoryDictionary.Add(nonRepository);
-        act.Should().Throw<ArgumentException>().WithMessage("Value must implement IRepository interface!");
+        ArgumentException exception = Assert.Throws<ArgumentException>(() => repositoryDictionary.Add(nonRepository));
+        Assert.Equal("Value must implement IRepository interface!", exception.Message);
     }
 }

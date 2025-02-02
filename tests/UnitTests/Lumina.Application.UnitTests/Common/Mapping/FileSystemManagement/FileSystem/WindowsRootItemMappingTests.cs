@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Application.Common.Mapping.FileSystemManagement.FileSystem;
 using Lumina.Domain.Common.Enums.FileSystem;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
@@ -23,20 +22,20 @@ public class WindowsRootItemMappingTests
         string path = "C:\\";
         string name = "C:";
         ErrorOr<WindowsRootItem> createResult = WindowsRootItem.Create(path, name);
-        createResult.IsError.Should().BeFalse();
+        Assert.False(createResult.IsError);
         WindowsRootItem domainModel = createResult.Value;
 
         // Act
         FileSystemTreeNodeResponse result = domainModel.ToTreeNodeResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Path.Should().Be(domainModel.Id.Path);
-        result.Name.Should().Be(domainModel.Name);
-        result.ItemType.Should().Be(FileSystemItemType.Root);
-        result.IsExpanded.Should().BeFalse();
-        result.ChildrenLoaded.Should().BeFalse();
-        result.Children.Should().BeEmpty();
+        Assert.NotNull(result);
+        Assert.Equal(domainModel.Id.Path, result.Path);
+        Assert.Equal(domainModel.Name, result.Name);
+        Assert.Equal(FileSystemItemType.Root, result.ItemType);
+        Assert.False(result.IsExpanded);
+        Assert.False(result.ChildrenLoaded);
+        Assert.Empty(result.Children);
     }
 
     [Fact]
@@ -47,19 +46,19 @@ public class WindowsRootItemMappingTests
         string name = "D:";
         FileSystemItemStatus customStatus = FileSystemItemStatus.Inaccessible;
         ErrorOr<WindowsRootItem> createResult = WindowsRootItem.Create(path, name, customStatus);
-        createResult.IsError.Should().BeFalse();
+        Assert.False(createResult.IsError);
         WindowsRootItem domainModel = createResult.Value;
 
         // Act
         FileSystemTreeNodeResponse result = domainModel.ToTreeNodeResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Path.Should().Be(domainModel.Id.Path);
-        result.Name.Should().Be(domainModel.Name);
-        result.ItemType.Should().Be(FileSystemItemType.Root);
-        result.IsExpanded.Should().BeFalse();
-        result.ChildrenLoaded.Should().BeFalse();
-        result.Children.Should().BeEmpty();
+        Assert.NotNull(result);
+        Assert.Equal(domainModel.Id.Path, result.Path);
+        Assert.Equal(domainModel.Name, result.Name);
+        Assert.Equal(FileSystemItemType.Root, result.ItemType);
+        Assert.False(result.IsExpanded);
+        Assert.False(result.ChildrenLoaded);
+        Assert.Empty(result.Children);
     }
 }

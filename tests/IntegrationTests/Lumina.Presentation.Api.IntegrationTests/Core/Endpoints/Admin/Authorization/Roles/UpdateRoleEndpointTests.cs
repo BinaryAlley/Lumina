@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Contracts.DTO.Authentication;
 using Lumina.Contracts.Requests.Authorization;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.DataAccess.Core.UoW;
@@ -86,20 +86,20 @@ public class UpdateRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
 
         // Assert
         response.EnsureSuccessStatusCode();
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         string content = await response.Content.ReadAsStringAsync();
         RolePermissionsResponse? result = JsonSerializer.Deserialize<RolePermissionsResponse>(content, _jsonOptions);
 
-        result.Should().NotBeNull();
-        result!.Role.Id.Should().Be(role.Id);
-        result.Role.RoleName.Should().Be("UpdatedRole");
-        result.Permissions.Should().HaveCount(2);
-        result.Permissions.Should().AllSatisfy(permission =>
+        Assert.NotNull(result);
+        Assert.Equal(role.Id, result!.Role.Id);
+        Assert.Equal("UpdatedRole", result.Role.RoleName);
+        Assert.Equal(2, result.Permissions.Length);
+        foreach (PermissionDto permission in result.Permissions)
         {
-            permission.Id.Should().NotBe(Guid.Empty);
-            permission.PermissionName.Should().NotBe(AuthorizationPermission.None);
-        });
+            Assert.NotEqual(Guid.Empty, permission.Id);
+            Assert.NotEqual(AuthorizationPermission.None, permission.PermissionName);
+        }
     }
 
     [Fact]
@@ -117,17 +117,18 @@ public class UpdateRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/auth/roles", request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
-        problemDetails.Should().NotBeNull();
-        problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status403Forbidden);
-        problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.4");
-        problemDetails["title"].GetString().Should().Be("General.Unauthorized");
-        problemDetails["detail"].GetString().Should().Be("NotAuthorized");
-        problemDetails["instance"].GetString().Should().Be("/api/v1/auth/roles");
-        problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status403Forbidden, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.4", problemDetails["type"].GetString());
+        Assert.Equal("General.Unauthorized", problemDetails["title"].GetString());
+        Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
+        Assert.Equal("/api/v1/auth/roles", problemDetails["instance"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString());
     }
 
     [Fact]
@@ -145,17 +146,18 @@ public class UpdateRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/auth/roles", request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
-        problemDetails.Should().NotBeNull();
-        problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status404NotFound);
-        problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.5");
-        problemDetails["title"].GetString().Should().Be("General.NotFound");
-        problemDetails["detail"].GetString().Should().Be("RoleNotFound");
-        problemDetails["instance"].GetString().Should().Be("/api/v1/auth/roles");
-        problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status404NotFound, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.5", problemDetails["type"].GetString());
+        Assert.Equal("General.NotFound", problemDetails["title"].GetString());
+        Assert.Equal("RoleNotFound", problemDetails["detail"].GetString());
+        Assert.Equal("/api/v1/auth/roles", problemDetails["instance"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString());
     }
 
     [Fact]
@@ -169,15 +171,12 @@ public class UpdateRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
             Permissions: [Guid.NewGuid()]
         );
 
-        // Act
-        Func<Task> act = async () =>
+        // Act & Assert
+        await Assert.ThrowsAsync<TaskCanceledException>(async () =>
         {
             cts.Cancel();
             await _client.PutAsJsonAsync($"/api/v1/auth/roles", request, cts.Token);
-        };
-
-        // Assert
-        await act.Should().ThrowAsync<TaskCanceledException>();
+        });
     }
 
     /// <summary>

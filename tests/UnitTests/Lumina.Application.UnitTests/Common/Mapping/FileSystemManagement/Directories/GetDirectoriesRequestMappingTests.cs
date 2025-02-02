@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using FluentAssertions;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Directories;
 using Lumina.Application.Core.FileSystemManagement.Directories.Queries.GetDirectories;
 using Lumina.Contracts.Requests.FileSystemManagement.Directories;
@@ -36,8 +35,8 @@ public class GetDirectoriesRequestMappingTests
         GetDirectoriesQuery result = request.ToQuery();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Path.Should().Be(request.Path);
-        result.IncludeHiddenElements.Should().Be(request.IncludeHiddenElements);
+        Assert.NotNull(result);
+        Assert.Equal(request.Path, result.Path);
+        Assert.Equal(request.IncludeHiddenElements, result.IncludeHiddenElements);
     }
 }

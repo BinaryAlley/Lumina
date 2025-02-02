@@ -2,7 +2,6 @@
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Application.Core.FileSystemManagement.Paths.Commands.SplitPath;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Pahs.Commands.SplitPath.Fixtures;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Pahs.Fixtures;
@@ -57,15 +56,15 @@ public class SplitPathCommandHandlerTests
         ErrorOr<IEnumerable<PathSegmentResponse>> result = await _sut.Handle(splitPathCommand, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().BeAssignableTo<IEnumerable<PathSegmentResponse>>();
-        result.Value.Should().HaveCount(pathSegments.Count());
+        Assert.False(result.IsError);
+        Assert.IsAssignableFrom<IEnumerable<PathSegmentResponse>>(result.Value);
+        Assert.Equal(pathSegments.Count(), result.Value.Count());
 
         List<PathSegmentResponse> resultList = result.Value.ToList();
         List<PathSegment> segmentsList = pathSegments.ToList();
 
         for (int i = 0; i < resultList.Count; i++)
-            resultList[i].Path.Should().Be(segmentsList[i].Name);
+            Assert.Equal(segmentsList[i].Name, resultList[i].Path);
         _mockPathService.Received(1).ParsePath(splitPathCommand.Path!);
     }
 
@@ -82,8 +81,8 @@ public class SplitPathCommandHandlerTests
         ErrorOr<IEnumerable<PathSegmentResponse>> result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(error);
+        Assert.True(result.IsError);
+        Assert.Equal(error, result.FirstError);
         _mockPathService.Received(1).ParsePath(command.Path!);
     }
 
@@ -100,8 +99,8 @@ public class SplitPathCommandHandlerTests
         ErrorOr<IEnumerable<PathSegmentResponse>> result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().BeEmpty();
+        Assert.False(result.IsError);
+        Assert.Empty(result.Value);
         _mockPathService.Received(1).ParsePath(command.Path!);
     }
 }

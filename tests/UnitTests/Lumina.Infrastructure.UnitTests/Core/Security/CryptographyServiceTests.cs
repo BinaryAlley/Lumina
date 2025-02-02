@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Infrastructure.Common.Models.Configuration;
 using Lumina.Infrastructure.Core.Security;
 using Lumina.Infrastructure.UnitTests.Core.Security.Fixtures;
@@ -39,8 +38,9 @@ public class CryptographyServiceTests
         string result = _sut.Encrypt(plaintext);
 
         // Assert
-        result.Should().NotBeNullOrEmpty();
-        result.Should().NotBe(plaintext);
+        Assert.NotNull(result);
+        Assert.NotEmpty(result);
+        Assert.NotEqual(plaintext, result);
     }
 
     [Fact]
@@ -54,7 +54,7 @@ public class CryptographyServiceTests
         string result2 = _sut.Encrypt(plaintext);
 
         // Assert
-        result1.Should().NotBe(result2);
+        Assert.NotEqual(result1, result2);
     }
 
     [Theory]
@@ -66,9 +66,9 @@ public class CryptographyServiceTests
         Action act = () => _sut.Encrypt(invalidInput!);
 
         // Assert
-        act.Should().Throw<ArgumentException>()
-            .WithParameterName("plaintext")
-            .WithMessage("Value cannot be null or empty*");
+        ArgumentException exception = Assert.Throws<ArgumentException>(() => _sut.Encrypt(invalidInput!));
+        Assert.Equal("plaintext", exception.ParamName);
+        Assert.StartsWith("Value cannot be null or empty", exception.Message);
     }
 
     [Fact]
@@ -82,7 +82,7 @@ public class CryptographyServiceTests
         string decrypted = _sut.Decrypt(encrypted);
 
         // Assert
-        decrypted.Should().Be(originalText);
+        Assert.Equal(originalText, decrypted);
     }
 
     [Theory]
@@ -94,9 +94,9 @@ public class CryptographyServiceTests
         Action act = () => _sut.Decrypt(invalidInput!);
 
         // Assert
-        act.Should().Throw<ArgumentException>()
-            .WithParameterName("ciphertext")
-            .WithMessage("Value cannot be null or empty*");
+        ArgumentException exception = Assert.Throws<ArgumentException>(() => _sut.Decrypt(invalidInput!));
+        Assert.Equal("ciphertext", exception.ParamName);
+        Assert.StartsWith("Value cannot be null or empty", exception.Message);
     }
 
     [Theory]
@@ -108,7 +108,7 @@ public class CryptographyServiceTests
         Action act = () => _sut.Decrypt(invalidInput);
 
         // Assert
-        act.Should().Throw<FormatException>();
+        Assert.Throws<FormatException>(() => _sut.Decrypt(invalidInput));
     }
 
     [Fact]
@@ -121,8 +121,8 @@ public class CryptographyServiceTests
         Action act = () => _sut.Decrypt(shortCiphertext);
 
         // Assert
-        act.Should().Throw<ArgumentException>()
-            .WithMessage("Invalid ciphertext");
+        ArgumentException exception = Assert.Throws<ArgumentException>(() => _sut.Decrypt(shortCiphertext));
+        Assert.Equal("Invalid ciphertext", exception.Message);
     }
 
     [Fact]
@@ -141,7 +141,7 @@ public class CryptographyServiceTests
         Action act = () => _sut.Decrypt(corrupted);
 
         // Assert
-        act.Should().Throw<CryptographicException>();
+        Assert.Throws<CryptographicException>(() => _sut.Decrypt(corrupted));
     }
 
     [Fact]
@@ -155,7 +155,6 @@ public class CryptographyServiceTests
         _sut.Dispose();
 
         // Assert
-        Action act = () => _sut.Decrypt(encrypted);
-        act.Should().Throw<CryptographicException>();
+        Assert.Throws<CryptographicException>(() => _sut.Decrypt(encrypted));
     }
 }

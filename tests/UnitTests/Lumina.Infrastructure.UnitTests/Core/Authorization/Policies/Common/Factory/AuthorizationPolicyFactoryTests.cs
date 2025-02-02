@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.Common.Base;
 using Lumina.Infrastructure.Core.Authorization.Policies.Common.Factory;
 using Lumina.Infrastructure.UnitTests.Core.Authorization.Policies.Common.Factory.Fixtures;
@@ -32,9 +31,9 @@ public class AuthorizationPolicyFactoryTests
         TestAuthorizationPolicy result = policyFactory.CreatePolicy<TestAuthorizationPolicy>();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Should().BeAssignableTo<IAuthorizationPolicy>();
-        result.Should().BeOfType<TestAuthorizationPolicy>();
+        Assert.NotNull(result);
+        Assert.IsAssignableFrom<IAuthorizationPolicy>(result);
+        Assert.IsType<TestAuthorizationPolicy>(result);
     }
 
     [Fact]
@@ -47,8 +46,10 @@ public class AuthorizationPolicyFactoryTests
 
         // Act & Assert
         Action act = () => policyFactory.CreatePolicy<IUnregisteredPolicy>();
-        act.Should().Throw<InvalidOperationException>()
-            .WithMessage("No service for type 'Lumina.Infrastructure.UnitTests.Core.Authorization.Policies.Common.Factory.Fixtures.IUnregisteredPolicy' has been registered.");
+        InvalidOperationException exception = Assert.Throws<InvalidOperationException>(() =>
+          policyFactory.CreatePolicy<IUnregisteredPolicy>());
+        Assert.Equal("No service for type 'Lumina.Infrastructure.UnitTests.Core.Authorization.Policies.Common.Factory.Fixtures.IUnregisteredPolicy' has been registered.",
+            exception.Message);
     }
 
     [Fact]
@@ -61,7 +62,6 @@ public class AuthorizationPolicyFactoryTests
         AuthorizationPolicyFactory policyFactory = new(mockServiceProvider);
 
         // Act & Assert
-        Action act = () => policyFactory.CreatePolicy<TestAuthorizationPolicy>();
-        act.Should().Throw<InvalidOperationException>();
+        Assert.Throws<InvalidOperationException>(() => policyFactory.CreatePolicy<TestAuthorizationPolicy>());
     }
 }

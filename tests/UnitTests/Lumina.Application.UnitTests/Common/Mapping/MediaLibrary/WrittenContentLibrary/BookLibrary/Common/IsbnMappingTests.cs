@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
@@ -39,9 +38,9 @@ public class IsbnMappingTests
         IsbnEntity result = isbn.ToRepositoryEntity();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Value.Should().Be(isbn.Value);
-        result.Format.Should().Be(IsbnFormat.Isbn10);
+        Assert.NotNull(result);
+        Assert.Equal(isbn.Value, result.Value);
+        Assert.Equal(IsbnFormat.Isbn10, result.Format);
     }
 
     [Fact]
@@ -54,9 +53,9 @@ public class IsbnMappingTests
         IsbnEntity result = isbn.ToRepositoryEntity();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Value.Should().Be(isbn.Value);
-        result.Format.Should().Be(IsbnFormat.Isbn13);
+        Assert.NotNull(result);
+        Assert.Equal(isbn.Value, result.Value);
+        Assert.Equal(IsbnFormat.Isbn13, result.Format);
     }
 
     [Fact]
@@ -74,14 +73,14 @@ public class IsbnMappingTests
         IEnumerable<IsbnEntity> results = isbns.ToRepositoryEntities();
 
         // Assert
-        results.Should().NotBeNull();
-        results.Should().HaveCount(isbns.Count);
+        Assert.NotNull(results);
+        Assert.Equal(isbns.Count, results.Count());
 
         List<IsbnEntity> resultList = results.ToList();
         for (int i = 0; i < isbns.Count; i++)
         {
-            resultList[i].Value.Should().Be(isbns[i].Value);
-            resultList[i].Format.Should().Be(isbns[i].Format);
+            Assert.Equal(isbns[i].Value, resultList[i].Value);
+            Assert.Equal(isbns[i].Format, resultList[i].Format);
         }
     }
 
@@ -95,7 +94,7 @@ public class IsbnMappingTests
         IEnumerable<IsbnEntity> results = isbns.ToRepositoryEntities();
 
         // Assert
-        results.Should().NotBeNull();
-        results.Should().BeEmpty();
+        Assert.NotNull(results);
+        Assert.Empty(results);
     }
 }

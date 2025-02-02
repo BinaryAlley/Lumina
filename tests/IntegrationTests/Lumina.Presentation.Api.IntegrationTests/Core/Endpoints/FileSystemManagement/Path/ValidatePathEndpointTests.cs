@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 using System;
@@ -58,11 +57,11 @@ public class ValidatePathEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         HttpResponseMessage response = await _client.GetAsync($"/api/v1/path/validate?path={Uri.EscapeDataString(testPath)}");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
         PathValidResponse? result = JsonSerializer.Deserialize<PathValidResponse>(content, _jsonOptions);
-        result.Should().NotBeNull();
-        result!.IsValid.Should().BeTrue();
+        Assert.NotNull(result);
+        Assert.True(result!.IsValid);
     }
 
     [Fact]
@@ -75,11 +74,11 @@ public class ValidatePathEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         HttpResponseMessage response = await _client.GetAsync($"/api/v1/path/validate?path={Uri.EscapeDataString(invalidPath)}");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
         PathValidResponse? result = JsonSerializer.Deserialize<PathValidResponse>(content, _jsonOptions);
-        result.Should().NotBeNull();
-        result!.IsValid.Should().BeFalse();
+        Assert.NotNull(result);
+        Assert.False(result!.IsValid);
     }
 
     [Fact]
@@ -92,11 +91,11 @@ public class ValidatePathEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         HttpResponseMessage response = await _client.GetAsync($"/api/v1/path/validate?path={Uri.EscapeDataString(path)}");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
         PathValidResponse? result = JsonSerializer.Deserialize<PathValidResponse>(content, _jsonOptions);
-        result.Should().NotBeNull();
-        result!.IsValid.Should().BeFalse();
+        Assert.NotNull(result);
+        Assert.False(result!.IsValid);
     }
 
     [Fact]
@@ -107,15 +106,13 @@ public class ValidatePathEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         string encodedPath = Uri.EscapeDataString(testPath);
         using CancellationTokenSource cts = new();
 
-        // Act
-        Func<Task> act = async () =>
+        // Act & Assert
+        Exception? exception = await Record.ExceptionAsync(async () =>
         {
-            cts.Cancel(); // Cancel the token immediately
+            cts.Cancel();
             await _client.GetAsync($"/api/v1/path/validate?path={encodedPath}", cts.Token);
-        };
-
-        // Assert
-        await act.Should().ThrowAsync<TaskCanceledException>();
+        });
+        Assert.IsType<TaskCanceledException>(exception);
     }
 
     /// <summary>

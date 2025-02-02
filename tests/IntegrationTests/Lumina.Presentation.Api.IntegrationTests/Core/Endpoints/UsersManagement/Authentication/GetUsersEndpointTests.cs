@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Contracts.Responses.UsersManagement.Users;
@@ -61,19 +60,20 @@ public class GetUsersEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
 
         // Assert
         response.EnsureSuccessStatusCode();
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         string content = await response.Content.ReadAsStringAsync();
         IEnumerable<UserResponse>? result = JsonSerializer.Deserialize<IEnumerable<UserResponse>>(content, _jsonOptions);
 
-        result.Should().NotBeNull();
-        result.Should().NotBeEmpty();
-        result!.Should().AllSatisfy(user =>
+        Assert.NotNull(result);
+        Assert.NotEmpty(result);
+        foreach (UserResponse user in result!)
         {
-            user.Id.Should().NotBe(Guid.Empty);
-            user.Username.Should().NotBeNullOrEmpty();
-            user.CreatedOnUtc.Should().NotBe(default);
-        });
+            Assert.NotEqual(Guid.Empty, user.Id);
+            Assert.NotNull(user.Username);
+            Assert.NotEmpty(user.Username);
+            Assert.NotEqual(default, user.CreatedOnUtc);
+        }
     }
 
     [Fact]
@@ -86,17 +86,18 @@ public class GetUsersEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         HttpResponseMessage response = await _client.GetAsync("/api/v1/auth/users");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
-        problemDetails.Should().NotBeNull();
-        problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status403Forbidden);
-        problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.4");
-        problemDetails["title"].GetString().Should().Be("General.Unauthorized");
-        problemDetails["detail"].GetString().Should().Be("NotAuthorized");
-        problemDetails["instance"].GetString().Should().Be("/api/v1/auth/users");
-        problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status403Forbidden, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.4", problemDetails["type"].GetString());
+        Assert.Equal("General.Unauthorized", problemDetails["title"].GetString());
+        Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
+        Assert.Equal("/api/v1/auth/users", problemDetails["instance"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString());
     }
 
     [Fact]
@@ -105,15 +106,13 @@ public class GetUsersEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         // Arrange
         using CancellationTokenSource cts = new();
 
-        // Act
-        Func<Task> act = async () =>
+        // Act & Assert
+        Exception? exception = await Record.ExceptionAsync(async () =>
         {
             cts.Cancel();
             await _client.GetAsync("/api/v1/auth/users", cts.Token);
-        };
-
-        // Assert
-        await act.Should().ThrowAsync<TaskCanceledException>();
+        });
+        Assert.IsType<TaskCanceledException>(exception);
     }
 
     /// <summary>

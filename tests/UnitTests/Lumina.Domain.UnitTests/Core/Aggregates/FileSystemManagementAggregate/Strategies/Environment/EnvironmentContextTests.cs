@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
 using NSubstitute;
@@ -38,9 +37,9 @@ public class EnvironmentContextTests
             _mockFileTypeService);
 
         // Assert
-        environmentContext.DirectoryProviderService.Should().Be(_mockDirectoryProviderService);
-        environmentContext.FileProviderService.Should().Be(_mockFileProviderService);
-        environmentContext.FileTypeService.Should().Be(_mockFileTypeService);
+        Assert.Same(_mockDirectoryProviderService, environmentContext.DirectoryProviderService);
+        Assert.Same(_mockFileProviderService, environmentContext.FileProviderService);
+        Assert.Same(_mockFileTypeService, environmentContext.FileTypeService);
     }
 
     [Fact]
@@ -56,7 +55,7 @@ public class EnvironmentContextTests
         IFileTypeService result = environmentContext.FileTypeService;
 
         // Assert
-        result.Should().Be(_mockFileTypeService);
+        Assert.Same(_mockFileTypeService, result);
     }
 
     [Fact]
@@ -72,7 +71,7 @@ public class EnvironmentContextTests
         IFileProviderService result = environmentContext.FileProviderService;
 
         // Assert
-        result.Should().Be(_mockFileProviderService);
+        Assert.Same(_mockFileProviderService, result);
     }
 
     [Fact]
@@ -88,6 +87,6 @@ public class EnvironmentContextTests
         IDirectoryProviderService result = environmentContext.DirectoryProviderService;
 
         // Assert
-        result.Should().Be(_mockDirectoryProviderService);
+        Assert.Same(_mockDirectoryProviderService, result);
     }
 }

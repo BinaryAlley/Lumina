@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.DataAccess.Core.UoW;
@@ -75,11 +74,11 @@ public class DeleteRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         HttpResponseMessage response = await _client.DeleteAsync($"/api/v1/auth/roles/{role.Id}");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-        // Verify role was deleted
+        // verify role was deleted
         RoleEntity? deletedRole = await dbContext.Roles.FirstOrDefaultAsync(r => r.Id == role.Id);
-        deletedRole.Should().BeNull();
+        Assert.Null(deletedRole);
     }
 
     [Fact]
@@ -93,17 +92,18 @@ public class DeleteRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         HttpResponseMessage response = await _client.DeleteAsync($"/api/v1/auth/roles/{roleId}");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
-        problemDetails.Should().NotBeNull();
-        problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status403Forbidden);
-        problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.4");
-        problemDetails["title"].GetString().Should().Be("General.Unauthorized");
-        problemDetails["detail"].GetString().Should().Be("NotAuthorized");
-        problemDetails["instance"].GetString().Should().Be($"/api/v1/auth/roles/{roleId}");
-        problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status403Forbidden, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.4", problemDetails["type"].GetString());
+        Assert.Equal("General.Unauthorized", problemDetails["title"].GetString());
+        Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
+        Assert.Equal($"/api/v1/auth/roles/{roleId}", problemDetails["instance"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString());
     }
 
     [Fact]
@@ -113,23 +113,24 @@ public class DeleteRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
         RoleEntity? adminRole = dbContext.Roles.FirstOrDefault(r => r.RoleName == "Admin");
-        adminRole.Should().NotBeNull("Admin role should exist");
+        Assert.NotNull(adminRole);
 
         // Act
         HttpResponseMessage response = await _client.DeleteAsync($"/api/v1/auth/roles/{adminRole!.Id}");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
-        problemDetails.Should().NotBeNull();
-        problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status403Forbidden);
-        problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.4");
-        problemDetails["title"].GetString().Should().Be("General.Forbidden");
-        problemDetails["detail"].GetString().Should().Be("AdminRoleCannotBeDeleted");
-        problemDetails["instance"].GetString().Should().Be($"/api/v1/auth/roles/{adminRole!.Id}");
-        problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status403Forbidden, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.4", problemDetails["type"].GetString());
+        Assert.Equal("General.Forbidden", problemDetails["title"].GetString());
+        Assert.Equal("AdminRoleCannotBeDeleted", problemDetails["detail"].GetString());
+        Assert.Equal($"/api/v1/auth/roles/{adminRole!.Id}", problemDetails["instance"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString());
     }
 
     [Fact]
@@ -142,17 +143,18 @@ public class DeleteRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         HttpResponseMessage response = await _client.DeleteAsync($"/api/v1/auth/roles/{nonExistentRoleId}");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
-        problemDetails.Should().NotBeNull();
-        problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status404NotFound);
-        problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.5");
-        problemDetails["title"].GetString().Should().Be("General.NotFound");
-        problemDetails["detail"].GetString().Should().Be("RoleNotFound");
-        problemDetails["instance"].GetString().Should().Be($"/api/v1/auth/roles/{nonExistentRoleId}");
-        problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status404NotFound, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.5", problemDetails["type"].GetString());
+        Assert.Equal("General.NotFound", problemDetails["title"].GetString());
+        Assert.Equal("RoleNotFound", problemDetails["detail"].GetString());
+        Assert.Equal($"/api/v1/auth/roles/{nonExistentRoleId}", problemDetails["instance"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString());
     }
 
     [Fact]
@@ -162,15 +164,13 @@ public class DeleteRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         using CancellationTokenSource cts = new();
         Guid roleId = Guid.NewGuid();
 
-        // Act
-        Func<Task> act = async () =>
+        // Act & Assert
+        Exception? exception = await Record.ExceptionAsync(async () =>
         {
             cts.Cancel();
             await _client.DeleteAsync($"/api/v1/auth/roles/{roleId}", cts.Token);
-        };
-
-        // Assert
-        await act.Should().ThrowAsync<TaskCanceledException>();
+        });
+        Assert.IsType<TaskCanceledException>(exception);
     }
 
     /// <summary>

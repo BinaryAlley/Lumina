@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.ValueObjects.Fixtures;
@@ -35,8 +34,8 @@ public class FileSystemPathIdTests
         ErrorOr<FileSystemPathId> result = FileSystemPathId.Create(validPath);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Path.Should().Be(validPath);
+        Assert.False(result.IsError);
+        Assert.Equal(validPath, result.Value.Path);
     }
 
     [Theory]
@@ -49,8 +48,8 @@ public class FileSystemPathIdTests
         ErrorOr<FileSystemPathId> result = FileSystemPathId.Create(invalidPath!);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.FileSystemManagement.InvalidPath);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
     }
 
     [Fact]
@@ -65,7 +64,7 @@ public class FileSystemPathIdTests
         bool result = id1.Equals(id2);
 
         // Assert
-        result.Should().BeTrue();
+        Assert.True(result);
     }
 
     [Fact]
@@ -79,7 +78,7 @@ public class FileSystemPathIdTests
         bool result = id1.Equals(id2);
 
         // Assert
-        result.Should().BeFalse();
+        Assert.False(result);
     }
 
     [Fact]
@@ -95,7 +94,7 @@ public class FileSystemPathIdTests
         int hashCode2 = id2.GetHashCode();
 
         // Assert
-        hashCode1.Should().Be(hashCode2);
+        Assert.Equal(hashCode1, hashCode2);
     }
 
     [Fact]
@@ -110,7 +109,7 @@ public class FileSystemPathIdTests
         int hashCode2 = id2.GetHashCode();
 
         // Assert
-        hashCode1.Should().NotBe(hashCode2);
+        Assert.NotEqual(hashCode1, hashCode2);
     }
 
     [Fact]
@@ -125,7 +124,7 @@ public class FileSystemPathIdTests
         bool result = id1 == id2;
 
         // Assert
-        result.Should().BeTrue();
+        Assert.True(result);
     }
 
     [Fact]
@@ -139,6 +138,6 @@ public class FileSystemPathIdTests
         bool result = id1 != id2;
 
         // Assert
-        result.Should().BeTrue();
+        Assert.True(result);
     }
 }

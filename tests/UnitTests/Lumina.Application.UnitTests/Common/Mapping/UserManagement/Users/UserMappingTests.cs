@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.Mapping.Common.Metadata;
@@ -48,21 +47,21 @@ public class UserMappingTests
         UserEntity result = domainEntity.ToRepositoryEntity(repositoryEntity);
 
         // Assert
-        result.Should().NotBeNull();
-        result.Should().BeSameAs(repositoryEntity); // Should modify the same instance
-        result.Username.Should().Be(domainEntity.Username); // Only username should be updated
+        Assert.NotNull(result);
+        Assert.Same(repositoryEntity, result); // should modify the same instance
+        Assert.Equal(domainEntity.Username, result.Username); // only username should be updated
 
-        // Verify other properties remain unchanged
-        result.Id.Should().Be(repositoryEntity.Id);
-        result.Password.Should().Be(repositoryEntity.Password);
-        result.TotpSecret.Should().Be(repositoryEntity.TotpSecret);
-        result.Libraries.Should().BeSameAs(repositoryEntity.Libraries);
-        result.UserPermissions.Should().BeSameAs(repositoryEntity.UserPermissions);
-        result.UserRole.Should().BeSameAs(repositoryEntity.UserRole);
-        result.CreatedOnUtc.Should().Be(repositoryEntity.CreatedOnUtc);
-        result.CreatedBy.Should().Be(repositoryEntity.CreatedBy);
-        result.UpdatedOnUtc.Should().Be(repositoryEntity.UpdatedOnUtc);
-        result.UpdatedBy.Should().Be(repositoryEntity.UpdatedBy);
+        // verify other properties remain unchanged
+        Assert.Equal(repositoryEntity.Id, result.Id);
+        Assert.Equal(repositoryEntity.Password, result.Password);
+        Assert.Equal(repositoryEntity.TotpSecret, result.TotpSecret);
+        Assert.Same(repositoryEntity.Libraries, result.Libraries);
+        Assert.Same(repositoryEntity.UserPermissions, result.UserPermissions);
+        Assert.Same(repositoryEntity.UserRole, result.UserRole);
+        Assert.Equal(repositoryEntity.CreatedOnUtc, result.CreatedOnUtc);
+        Assert.Equal(repositoryEntity.CreatedBy, result.CreatedBy);
+        Assert.Equal(repositoryEntity.UpdatedOnUtc, result.UpdatedOnUtc);
+        Assert.Equal(repositoryEntity.UpdatedBy, result.UpdatedBy);
     }
 
     [Theory]
@@ -95,8 +94,8 @@ public class UserMappingTests
         UserEntity result = domainEntity.ToRepositoryEntity(repositoryEntity);
 
         // Assert
-        result.Should().NotBeNull();
-        result.Username.Should().Be(newUsername);
+        Assert.NotNull(result);
+        Assert.Equal(newUsername, result.Username);
     }
 
     [Fact]
@@ -153,8 +152,8 @@ public class UserMappingTests
         UserEntity result = domainEntity.ToRepositoryEntity(repositoryEntity);
 
         // Assert
-        result.Should().NotBeNull();
-        result.Libraries.Should().BeSameAs(libraries);
-        result.Libraries.Should().HaveCount(2);
+        Assert.NotNull(result);
+        Assert.Same(libraries, result.Libraries);
+        Assert.Equal(2, result.Libraries.Count);
     }
 }

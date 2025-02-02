@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Contracts.Responses.FileSystemManagement.Files;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 using Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.FileSystemManagement.Fixtures;
@@ -68,21 +67,21 @@ public class GetFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
 
             // Assert
             response.EnsureSuccessStatusCode();
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             string content = await response.Content.ReadAsStringAsync();
             List<FileResponse>? files = JsonSerializer.Deserialize<List<FileResponse>>(content, _jsonOptions);
 
-            files.Should().NotBeNull();
-            files!.Should().NotBeEmpty();
+            Assert.NotNull(files);
+            Assert.NotEmpty(files);
 
             string[] pathSegments = testPath.Split(System.IO.Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
 
 
             FileResponse firstDirectory = files!.First();
-            firstDirectory.Name.Should().Be("TestFile_2.txt");
-            firstDirectory.Path.Should().Be(System.IO.Path.Combine(testPath, "TestFile_2.txt"));
-            files!.Count.Should().Be(1); // only files
+            Assert.Equal("TestFile_2.txt", firstDirectory.Name);
+            Assert.Equal(System.IO.Path.Combine(testPath, "TestFile_2.txt"), firstDirectory.Path);
+            Assert.Single(files); // only files
         }
         finally
         {
@@ -106,15 +105,15 @@ public class GetFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
 
             // Assert
             response.EnsureSuccessStatusCode();
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             string content = await response.Content.ReadAsStringAsync();
             List<FileResponse>? files = JsonSerializer.Deserialize<List<FileResponse>>(content, _jsonOptions);
 
-            files.Should().NotBeNull();
+            Assert.NotNull(files);
             FileResponse firstDirectory = files!.First();
-            firstDirectory.Name.Should().Be("TestFile_2.txt");
-            firstDirectory.Path.Should().Be(System.IO.Path.Combine(testPath, "TestFile_2.txt"));
+            Assert.Equal("TestFile_2.txt", firstDirectory.Name);
+            Assert.Equal(System.IO.Path.Combine(testPath, "TestFile_2.txt"), firstDirectory.Path);
         }
         finally
         {
@@ -138,23 +137,24 @@ public class GetFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
 
             // Assert
             response.EnsureSuccessStatusCode();
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             string content = await response.Content.ReadAsStringAsync();
             List<FileResponse>? files = JsonSerializer.Deserialize<List<FileResponse>>(content, _jsonOptions);
 
-            files.Should().NotBeNull();
-            files!.Should().NotBeEmpty();
+            Assert.NotNull(files);
+            Assert.NotEmpty(files);
 
             string[] pathSegments = testPath.Split(System.IO.Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
 
             FileResponse firstDirectory = files!.First();
-            firstDirectory.Name.Should().Be((s_isUnix ? "." : string.Empty) + "TestFile_1.txt");
-            firstDirectory.Path.Should().Be(System.IO.Path.Combine(testPath, (s_isUnix ? "." : string.Empty) + "TestFile_1.txt"));
+            Assert.Equal((s_isUnix ? "." : string.Empty) + "TestFile_1.txt", firstDirectory.Name);
+            Assert.Equal(System.IO.Path.Combine(testPath, (s_isUnix ? "." : string.Empty) + "TestFile_1.txt"), firstDirectory.Path);
+
             FileResponse secondDirectory = files!.Last();
-            secondDirectory.Name.Should().Be("TestFile_2.txt");
-            secondDirectory.Path.Should().Be(System.IO.Path.Combine(testPath, "TestFile_2.txt"));
-            files!.Count.Should().Be(2);
+            Assert.Equal("TestFile_2.txt", secondDirectory.Name);
+            Assert.Equal(System.IO.Path.Combine(testPath, "TestFile_2.txt"), secondDirectory.Path);
+            Assert.Equal(2, files.Count);
         }
         finally
         {
@@ -174,17 +174,18 @@ public class GetFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         HttpResponseMessage response = await _client.GetAsync($"/api/v1/files/get-files?path={encodedPath}&includeHiddenElements={includeHiddenElements}");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
-        problemDetails.Should().NotBeNull();
-        problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status403Forbidden);
-        problemDetails["title"].GetString().Should().Be("General.Failure");
-        problemDetails["instance"].GetString().Should().Be("/api/v1/files/get-files");
-        problemDetails["detail"].GetString().Should().Be("UnauthorizedAccess");
-        problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.4");
-        problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status403Forbidden, problemDetails!["status"].GetInt32());
+        Assert.Equal("General.Failure", problemDetails["title"].GetString());
+        Assert.Equal("/api/v1/files/get-files", problemDetails["instance"].GetString());
+        Assert.Equal("UnauthorizedAccess", problemDetails["detail"].GetString());
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.4", problemDetails["type"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString());
     }
 
     [Fact]
@@ -199,20 +200,23 @@ public class GetFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         HttpResponseMessage response = await _client.GetAsync($"/api/v1/files/get-files?path={encodedPath}&includeHiddenElements={includeHiddenElements}");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.UnprocessableContent);
-        response.Content.Headers.ContentType?.MediaType.Should().Be("application/problem+json");
+        Assert.Equal(HttpStatusCode.UnprocessableContent, response.StatusCode);
+        Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
         string content = await response.Content.ReadAsStringAsync();
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
-        problemDetails.Should().NotBeNull();
-        problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status422UnprocessableEntity);
-        problemDetails["title"].GetString().Should().Be("General.Validation");
-        problemDetails["instance"].GetString().Should().Be("/api/v1/files/get-files");
-        problemDetails["detail"].GetString().Should().Be("OneOrMoreValidationErrorsOccurred");
-        problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc4918#section-11.2");
-        problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, problemDetails!["status"].GetInt32());
+        Assert.Equal("General.Validation", problemDetails["title"].GetString());
+        Assert.Equal("/api/v1/files/get-files", problemDetails["instance"].GetString());
+        Assert.Equal("OneOrMoreValidationErrorsOccurred", problemDetails["detail"].GetString());
+        Assert.Equal("https://tools.ietf.org/html/rfc4918#section-11.2", problemDetails["type"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString());
 
         Dictionary<string, string[]>? errors = problemDetails["errors"].Deserialize<Dictionary<string, string[]>>(_jsonOptions);
-        errors.Should().ContainKey("General.Validation").WhoseValue.Should().BeEquivalentTo(["PathCannotBeEmpty"]);
+        Assert.NotNull(errors);
+        Assert.Contains("General.Validation", errors.Keys);
+        Assert.Contains("PathCannotBeEmpty", errors["General.Validation"]);
     }
 
     [Fact]
@@ -224,11 +228,11 @@ public class GetFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         bool includeHiddenElements = true;
         using CancellationTokenSource cts = new(TimeSpan.FromSeconds(5));
 
-        // Act
-        Func<Task> act = async () => await _client.GetAsync($"/api/v1/files/get-files?path={encodedPath}&includeHiddenElements={includeHiddenElements}", cts.Token);
-
-        // Assert
-        await act.Should().NotThrowAsync();
+        // Act & Assert
+        Exception? exception = await Record.ExceptionAsync(async () =>
+            await _client.GetAsync($"/api/v1/files/get-files?path={encodedPath}&includeHiddenElements={includeHiddenElements}", cts.Token)
+        );
+        Assert.Null(exception);
     }
 
     [Fact]
@@ -240,15 +244,13 @@ public class GetFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         bool includeHiddenElements = true;
         using CancellationTokenSource cts = new();
 
-        // Act
-        Func<Task> act = async () =>
+        // Act & Assert
+        Exception? exception = await Record.ExceptionAsync(async () =>
         {
-            cts.Cancel(); // Cancel the token immediately
+            cts.Cancel();
             await _client.GetAsync($"/api/v1/files/get-files?path={encodedPath}&includeHiddenElements={includeHiddenElements}", cts.Token);
-        };
-
-        // Assert
-        await act.Should().ThrowAsync<TaskCanceledException>();
+        });
+        Assert.IsType<TaskCanceledException>(exception);
     }
 
     /// <summary>

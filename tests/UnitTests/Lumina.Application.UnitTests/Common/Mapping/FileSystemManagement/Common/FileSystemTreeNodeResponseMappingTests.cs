@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Common;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Directories.Fixtures;
 using Lumina.Domain.Common.Enums.FileSystem;
@@ -37,11 +36,11 @@ public class FileSystemTreeNodeResponseMappingTests
         ErrorOr<WindowsRootItem> result = response.ToWindowsRootItem();
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().NotBeNull();
-        result.Value.Id.Path.Should().Be(response.Path);
-        result.Value.Name.Should().Be(response.Name);
-        result.Value.Status.Should().Be(FileSystemItemStatus.Accessible);
+        Assert.False(result.IsError);
+        Assert.NotNull(result.Value);
+        Assert.Equal(response.Path, result.Value.Id.Path);
+        Assert.Equal(response.Name, result.Value.Name);
+        Assert.Equal(FileSystemItemStatus.Accessible, result.Value.Status);
     }
 
     [Fact]
@@ -54,8 +53,8 @@ public class FileSystemTreeNodeResponseMappingTests
         ErrorOr<UnixRootItem> result = response.ToUnixRootItem();
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().NotBeNull();
-        result.Value.Status.Should().Be(FileSystemItemStatus.Accessible);
+        Assert.False(result.IsError);
+        Assert.NotNull(result.Value);
+        Assert.Equal(FileSystemItemStatus.Accessible, result.Value.Status);
     }
 }

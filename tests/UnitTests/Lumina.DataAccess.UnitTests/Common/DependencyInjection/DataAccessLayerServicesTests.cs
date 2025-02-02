@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Repositories.Books;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Authentication;
@@ -35,10 +34,10 @@ public class DataAccessLayerServicesTests
         DataAccessLayerServices.AddDataAccessLayerServices(services);
 
         // Assert
-        services.Should().Contain(sd => sd.ServiceType == typeof(LuminaDbContext));
-        services.Should().Contain(sd => sd.ServiceType == typeof(IUnitOfWork) && sd.ImplementationType == typeof(UnitOfWork));
-        services.Should().Contain(sd => sd.ServiceType == typeof(IRepositoryFactory) && sd.ImplementationType == typeof(RepositoryFactory));
-        services.Should().Contain(sd => sd.ServiceType == typeof(IBookRepository) && sd.ImplementationType == typeof(BookRepository));
+        Assert.Contains(services, sd => sd.ServiceType == typeof(LuminaDbContext));
+        Assert.Contains(services, sd => sd.ServiceType == typeof(IUnitOfWork) && sd.ImplementationType == typeof(UnitOfWork));
+        Assert.Contains(services, sd => sd.ServiceType == typeof(IRepositoryFactory) && sd.ImplementationType == typeof(RepositoryFactory));
+        Assert.Contains(services, sd => sd.ServiceType == typeof(IBookRepository) && sd.ImplementationType == typeof(BookRepository));
     }
 
     [Fact]
@@ -54,12 +53,12 @@ public class DataAccessLayerServicesTests
 
         // Assert
         ServiceDescriptor? descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<LuminaDbContext>));
-        descriptor.Should().NotBeNull();
+        Assert.NotNull(descriptor);
         ServiceProvider serviceProvider = services.BuildServiceProvider();
         LuminaDbContext? context = serviceProvider.GetService<LuminaDbContext>();
 
-        context.Should().NotBeNull();
-        context!.Database.GetDbConnection().ConnectionString.Should().Contain("Lumina.db");
+        Assert.NotNull(context);
+        Assert.Contains("Lumina.db", context.Database.GetDbConnection().ConnectionString);
     }
 
     [Fact]
@@ -78,6 +77,6 @@ public class DataAccessLayerServicesTests
 
         // Assert
         IBookRepository? repository = serviceProvider.GetService<IBookRepository>();
-        repository.Should().NotBeNull();
+        Assert.NotNull(repository);
     }
 }

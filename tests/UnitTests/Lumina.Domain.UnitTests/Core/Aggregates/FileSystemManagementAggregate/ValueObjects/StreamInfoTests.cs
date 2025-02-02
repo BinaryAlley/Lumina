@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
@@ -44,15 +43,15 @@ public class StreamInfoTests
         ErrorOr<StreamInfo> result = StreamInfo.Create(streamId, mimeType, bitrate, codec, resolution, frameRate, sampleRate, channels);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.StreamId.Should().Be(streamId);
-        result.Value.MimeType.Should().Be(mimeType);
-        result.Value.Bitrate.Should().Be(bitrate);
-        result.Value.Codec.Should().Be(codec);
-        result.Value.Resolution.Should().Be(resolution);
-        result.Value.FrameRate.Should().Be(frameRate);
-        result.Value.SampleRate.Should().Be(sampleRate);
-        result.Value.Channels.Should().Be(channels);
+        Assert.False(result.IsError);
+        Assert.Equal(streamId, result.Value.StreamId);
+        Assert.Equal(mimeType, result.Value.MimeType);
+        Assert.Equal(bitrate, result.Value.Bitrate);
+        Assert.Equal(codec, result.Value.Codec);
+        Assert.Equal(resolution, result.Value.Resolution);
+        Assert.Equal(frameRate, result.Value.FrameRate);
+        Assert.Equal(sampleRate, result.Value.SampleRate);
+        Assert.Equal(channels, result.Value.Channels);
     }
 
     [Fact]
@@ -68,8 +67,8 @@ public class StreamInfoTests
         ErrorOr<StreamInfo> result = StreamInfo.Create(streamId!, mimeType, bitrate, codec, Optional<string>.None(), Optional<float>.None(), Optional<int>.None(), Optional<int>.None());
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.FileSystemManagement.StreamIdCannotBeEmpty);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.FileSystemManagement.StreamIdCannotBeEmpty, result.FirstError);
     }
 
     [Fact]
@@ -85,8 +84,8 @@ public class StreamInfoTests
         ErrorOr<StreamInfo> result = StreamInfo.Create(streamId, mimeType, bitrate, codec!, Optional<string>.None(), Optional<float>.None(), Optional<int>.None(), Optional<int>.None());
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.FileSystemManagement.CodecCannotBeEmpty);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.FileSystemManagement.CodecCannotBeEmpty, result.FirstError);
     }
 
     [Fact]
@@ -102,8 +101,8 @@ public class StreamInfoTests
         ErrorOr<StreamInfo> result = StreamInfo.Create(streamId, mimeType, bitrate, codec, Optional<string>.None(), Optional<float>.None(), Optional<int>.None(), Optional<int>.None());
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.FileSystemManagement.BitrateMustBeAPositiveNumber);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.FileSystemManagement.BitrateMustBeAPositiveNumber, result.FirstError);
     }
 
     [Fact]
@@ -119,7 +118,7 @@ public class StreamInfoTests
         bool result = info1.Equals(info2);
 
         // Assert
-        result.Should().BeTrue();
+        Assert.True(result);
     }
 
     [Fact]
@@ -133,7 +132,7 @@ public class StreamInfoTests
         bool result = info1.Equals(info2);
 
         // Assert
-        result.Should().BeFalse();
+        Assert.False(result);
     }
 
     [Fact]
@@ -150,7 +149,7 @@ public class StreamInfoTests
         int hashCode2 = info2.GetHashCode();
 
         // Assert
-        hashCode1.Should().Be(hashCode2);
+        Assert.Equal(hashCode1, hashCode2);
     }
 
     [Fact]
@@ -165,6 +164,6 @@ public class StreamInfoTests
         int hashCode2 = info2.GetHashCode();
 
         // Assert
-        hashCode1.Should().NotBe(hashCode2);
+        Assert.NotEqual(hashCode1, hashCode2);
     }
 }

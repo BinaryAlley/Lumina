@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Infrastructure.Core.Authentication;
 using OtpNet;
 using System.Diagnostics.CodeAnalysis;
@@ -30,7 +29,7 @@ public class TotpTokenGeneratorTests
         byte[] secret = _sut.GenerateSecret();
 
         // Assert
-        secret.Should().NotBeEmpty();
+        Assert.NotEmpty(secret);
     }
 
     [Fact]
@@ -42,9 +41,9 @@ public class TotpTokenGeneratorTests
         byte[] secret3 = _sut.GenerateSecret();
 
         // Assert
-        secret1.Should().NotBeEquivalentTo(secret2);
-        secret1.Should().NotBeEquivalentTo(secret3);
-        secret2.Should().NotBeEquivalentTo(secret3);
+        Assert.NotEqual(secret1, secret2);
+        Assert.NotEqual(secret1, secret3);
+        Assert.NotEqual(secret2, secret3);
     }
 
     [Fact]
@@ -59,7 +58,7 @@ public class TotpTokenGeneratorTests
         bool result = _sut.ValidateToken(secret, validToken);
 
         // Assert
-        result.Should().BeTrue();
+        Assert.True(result);
     }
 
     [Theory]
@@ -78,7 +77,7 @@ public class TotpTokenGeneratorTests
         bool result = _sut.ValidateToken(secret, invalidToken);
 
         // Assert
-        result.Should().BeFalse();
+        Assert.False(result);
     }
 
     [Fact]
@@ -94,7 +93,7 @@ public class TotpTokenGeneratorTests
         bool result = _sut.ValidateToken(secret2, token);
 
         // Assert
-        result.Should().BeFalse();
+        Assert.False(result);
     }
 
     [Fact]
@@ -104,6 +103,6 @@ public class TotpTokenGeneratorTests
         byte[] secret = _sut.GenerateSecret();
 
         // Assert
-        secret.Length.Should().Be(20); // Standard TOTP secret length
+        Assert.Equal(20, secret.Length); // standard TOTP secret length
     }
 }

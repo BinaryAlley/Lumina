@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.Infrastructure.Common.Models.Configuration;
 using Lumina.Infrastructure.Core.Authentication;
@@ -55,19 +54,20 @@ public class JwtTokenGeneratorTests
         string token = _sut.GenerateToken(userId, username);
 
         // Assert
-        token.Should().NotBeNullOrEmpty();
+        Assert.NotNull(token);
+        Assert.NotEmpty(token);
 
         JwtSecurityToken jwtToken = tokenHandler.ReadJwtToken(token);
 
         // verify token properties
-        jwtToken.Issuer.Should().Be(_jwtSettings.Issuer);
-        jwtToken.Audiences.Should().ContainSingle().Which.Should().Be(_jwtSettings.Audience);
-        jwtToken.ValidTo.Should().Be(_fixedUtcNow.AddMinutes(_jwtSettings.ExpiryMinutes));
+        Assert.Equal(_jwtSettings.Issuer, jwtToken.Issuer);
+        Assert.Single(jwtToken.Audiences, _jwtSettings.Audience);
+        Assert.Equal(_fixedUtcNow.AddMinutes(_jwtSettings.ExpiryMinutes), jwtToken.ValidTo);
 
         // verify claims
-        jwtToken.Claims.Should().Contain(c => c.Type == JwtRegisteredClaimNames.Sub && c.Value == userId);
-        jwtToken.Claims.Should().Contain(c => c.Type == JwtRegisteredClaimNames.UniqueName && c.Value == username);
-        jwtToken.Claims.Should().Contain(c => c.Type == JwtRegisteredClaimNames.Jti && c.Value == userId);
+        Assert.Contains(jwtToken.Claims, c => c.Type == JwtRegisteredClaimNames.Sub && c.Value == userId);
+        Assert.Contains(jwtToken.Claims, c => c.Type == JwtRegisteredClaimNames.UniqueName && c.Value == username);
+        Assert.Contains(jwtToken.Claims, c => c.Type == JwtRegisteredClaimNames.Jti && c.Value == userId);
 
         // verify the token is actually valid
         TokenValidationParameters validationParameters = new()
@@ -86,8 +86,8 @@ public class JwtTokenGeneratorTests
 
         ClaimsPrincipal principal = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
 
-        principal.Should().NotBeNull();
-        validatedToken.Should().NotBeNull();
+        Assert.NotNull(principal);
+        Assert.NotNull(validatedToken);
     }
 
     [Fact]
@@ -102,7 +102,7 @@ public class JwtTokenGeneratorTests
         JwtSecurityToken jwtToken = tokenHandler.ReadJwtToken(token);
 
         // Assert
-        jwtToken.ValidTo.Should().Be(_fixedUtcNow.AddMinutes(_jwtSettings.ExpiryMinutes));
+        Assert.Equal(_fixedUtcNow.AddMinutes(_jwtSettings.ExpiryMinutes), jwtToken.ValidTo);
         _ = _mockDateTimeProvider.Received(1).UtcNow;
     }
 
@@ -118,7 +118,7 @@ public class JwtTokenGeneratorTests
         string token2 = _sut.GenerateToken(userId2, username2);
 
         // Assert
-        token1.Should().NotBe(token2);
+        Assert.NotEqual(token1, token2);
     }
 
     [Fact]
@@ -132,6 +132,6 @@ public class JwtTokenGeneratorTests
         string token2 = _sut.GenerateToken(userId, username);
 
         // Assert
-        token1.Should().Be(token2);
+        Assert.Equal(token1, token2);
     }
 }

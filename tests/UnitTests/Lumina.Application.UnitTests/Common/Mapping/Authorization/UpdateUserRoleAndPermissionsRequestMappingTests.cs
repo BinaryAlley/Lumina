@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.Mapping.Authorization;
 using Lumina.Application.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
 using Lumina.Contracts.Requests.Authorization;
@@ -31,10 +30,10 @@ public class UpdateUserRoleAndPermissionsRequestMappingTests
         UpdateUserRoleAndPermissionsCommand result = request.ToCommand();
 
         // Assert
-        result.Should().NotBeNull();
-        result.UserId.Should().Be(request.UserId!.Value);
-        result.RoleId.Should().Be(request.RoleId);
-        result.Permissions.Should().BeEquivalentTo(request.Permissions);
+        Assert.NotNull(result);
+        Assert.Equal(request.UserId!.Value, result.UserId);
+        Assert.Equal(request.RoleId, result.RoleId);
+        Assert.Equal(request.Permissions, result.Permissions);
     }
 
     [Fact]
@@ -52,10 +51,10 @@ public class UpdateUserRoleAndPermissionsRequestMappingTests
         UpdateUserRoleAndPermissionsCommand result = request.ToCommand();
 
         // Assert
-        result.Should().NotBeNull();
-        result.UserId.Should().Be(request.UserId!.Value);
-        result.RoleId.Should().BeNull();
-        result.Permissions.Should().BeEquivalentTo(request.Permissions);
+        Assert.NotNull(result);
+        Assert.Equal(request.UserId!.Value, result.UserId);
+        Assert.Null(result.RoleId);
+        Assert.Equal(request.Permissions, result.Permissions);
     }
 
     [Theory]
@@ -75,8 +74,8 @@ public class UpdateUserRoleAndPermissionsRequestMappingTests
         UpdateUserRoleAndPermissionsCommand result = request.ToCommand();
 
         // Assert
-        result.Should().NotBeNull();
-        result.UserId.Should().Be(request.UserId!.Value);
+        Assert.NotNull(result);
+        Assert.Equal(request.UserId!.Value, result.UserId);
     }
 
     [Fact]
@@ -99,8 +98,8 @@ public class UpdateUserRoleAndPermissionsRequestMappingTests
         UpdateUserRoleAndPermissionsCommand result = request.ToCommand();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Permissions.Should().BeEquivalentTo(permissions);
-        result.Permissions.Should().HaveCount(3);
+        Assert.NotNull(result);
+        Assert.Equal(permissions, result.Permissions);
+        Assert.Equal(3, result.Permissions.Count);
     }
 }

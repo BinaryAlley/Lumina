@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -82,8 +81,8 @@ public class RecoverPasswordCommandHandlerTests
         ErrorOr<RecoverPasswordResponse> result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.IsPasswordReset.Should().BeTrue();
+        Assert.False(result.IsError);
+        Assert.True(result.Value.IsPasswordReset);
 
         await _mockUserRepository.Received(1).GetByUsernameAsync(user.Username, Arg.Any<CancellationToken>());
         _mockTotpTokenGenerator.Received(1).ValidateToken(Arg.Any<byte[]>(), totpCode);
@@ -105,8 +104,8 @@ public class RecoverPasswordCommandHandlerTests
         ErrorOr<RecoverPasswordResponse> result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Authentication.UsernameDoesNotExist);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Authentication.UsernameDoesNotExist, result.FirstError);
 
         await _mockUserRepository.Received(1).GetByUsernameAsync(command.Username!, Arg.Any<CancellationToken>());
         await _mockUserRepository.DidNotReceive().UpdateAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>());
@@ -130,8 +129,8 @@ public class RecoverPasswordCommandHandlerTests
         ErrorOr<RecoverPasswordResponse> result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Authentication.PasswordResetAlreadyRequested);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Authentication.PasswordResetAlreadyRequested, result.FirstError);
 
         await _mockUserRepository.Received(1).GetByUsernameAsync(user.Username, Arg.Any<CancellationToken>());
         await _mockUserRepository.DidNotReceive().UpdateAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>());
@@ -154,8 +153,8 @@ public class RecoverPasswordCommandHandlerTests
         ErrorOr<RecoverPasswordResponse> result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Authentication.InvalidTotpCode);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Authentication.InvalidTotpCode, result.FirstError);
 
         await _mockUserRepository.Received(1).GetByUsernameAsync(user.Username, Arg.Any<CancellationToken>());
         await _mockUserRepository.DidNotReceive().UpdateAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>());
@@ -186,8 +185,8 @@ public class RecoverPasswordCommandHandlerTests
         ErrorOr<RecoverPasswordResponse> result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Authentication.InvalidTotpCode);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Authentication.InvalidTotpCode, result.FirstError);
 
         await _mockUserRepository.Received(1).GetByUsernameAsync(user.Username, Arg.Any<CancellationToken>());
         _mockTotpTokenGenerator.Received(1).ValidateToken(Arg.Any<byte[]>(), totpCode);
@@ -222,8 +221,8 @@ public class RecoverPasswordCommandHandlerTests
         ErrorOr<RecoverPasswordResponse> result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(error);
+        Assert.True(result.IsError);
+        Assert.Equal(error, result.FirstError);
 
         await _mockUserRepository.Received(1).GetByUsernameAsync(user.Username, Arg.Any<CancellationToken>());
         _mockTotpTokenGenerator.Received(1).ValidateToken(Arg.Any<byte[]>(), totpCode);
@@ -251,8 +250,8 @@ public class RecoverPasswordCommandHandlerTests
         ErrorOr<RecoverPasswordResponse> result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(error);
+        Assert.True(result.IsError);
+        Assert.Equal(error, result.FirstError);
 
         await _mockUserRepository.Received(1).GetByUsernameAsync(command.Username!, Arg.Any<CancellationToken>());
         await _mockUserRepository.DidNotReceive().InsertAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>());
@@ -277,8 +276,8 @@ public class RecoverPasswordCommandHandlerTests
         ErrorOr<RecoverPasswordResponse> result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Authentication.InvalidTotpCode);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Authentication.InvalidTotpCode, result.FirstError);
 
         await _mockUserRepository.Received(1).GetByUsernameAsync(user.Username, Arg.Any<CancellationToken>());
         _mockTotpTokenGenerator.DidNotReceive().ValidateToken(Arg.Any<byte[]>(), Arg.Any<string>());

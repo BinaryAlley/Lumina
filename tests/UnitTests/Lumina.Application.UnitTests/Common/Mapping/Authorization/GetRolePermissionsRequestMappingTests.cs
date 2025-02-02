@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.Mapping.Authorization;
 using Lumina.Application.Core.Admin.Authorization.Roles.Queries.GetRolePermissions;
 using Lumina.Contracts.Requests.Authorization;
@@ -26,8 +25,8 @@ public class GetRolePermissionsRequestMappingTests
         GetRolePermissionsQuery result = request.ToQuery();
 
         // Assert
-        result.Should().NotBeNull();
-        result.RoleId.Should().Be(request.RoleId);
+        Assert.NotNull(result);
+        Assert.Equal(request.RoleId, result.RoleId);
     }
 
     [Theory]
@@ -44,8 +43,8 @@ public class GetRolePermissionsRequestMappingTests
         GetRolePermissionsQuery result = request.ToQuery();
 
         // Assert
-        result.Should().NotBeNull();
-        result.RoleId.Should().Be(roleId);
+        Assert.NotNull(result);
+        Assert.Equal(roleId, result.RoleId);
     }
 
     [Fact]
@@ -58,7 +57,7 @@ public class GetRolePermissionsRequestMappingTests
         GetRolePermissionsQuery result = request.ToQuery();
 
         // Assert
-        result.Should().NotBeNull();
-        result.RoleId.Should().Be(Guid.Empty);
+        Assert.NotNull(result);
+        Assert.Equal(Guid.Empty, result.RoleId);
     }
 }

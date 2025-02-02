@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.Mapping.Authorization;
 using Lumina.Application.Core.Admin.Authorization.Roles.Commands.UpdateRole;
 using Lumina.Contracts.Requests.Authorization;
@@ -31,10 +30,10 @@ public class UpdateRoleRequestMappingTests
         UpdateRoleCommand result = request.ToCommand();
 
         // Assert
-        result.Should().NotBeNull();
-        result.RoleId.Should().Be(request.RoleId!.Value);
-        result.RoleName.Should().Be(request.RoleName);
-        result.Permissions.Should().BeEquivalentTo(request.Permissions);
+        Assert.NotNull(result);
+        Assert.Equal(request.RoleId!.Value, result.RoleId);
+        Assert.Equal(request.RoleName, result.RoleName);
+        Assert.Equal(request.Permissions, result.Permissions);
     }
 
     [Theory]
@@ -54,8 +53,8 @@ public class UpdateRoleRequestMappingTests
         UpdateRoleCommand result = request.ToCommand();
 
         // Assert
-        result.Should().NotBeNull();
-        result.RoleName.Should().Be(roleName);
+        Assert.NotNull(result);
+        Assert.Equal(roleName, result.RoleName);
     }
 
     [Theory]
@@ -75,8 +74,8 @@ public class UpdateRoleRequestMappingTests
         UpdateRoleCommand result = request.ToCommand();
 
         // Assert
-        result.Should().NotBeNull();
-        result.RoleId.Should().Be(request.RoleId!.Value);
+        Assert.NotNull(result);
+        Assert.Equal(request.RoleId!.Value, result.RoleId);
     }
 
     [Fact]
@@ -95,8 +94,8 @@ public class UpdateRoleRequestMappingTests
         UpdateRoleCommand result = request.ToCommand();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Permissions.Should().BeEquivalentTo(permissions);
-        result.Permissions.Should().HaveCount(3);
+        Assert.NotNull(result);
+        Assert.Equal(permissions, result.Permissions);
+        Assert.Equal(3, result.Permissions.Count);
     }
 }

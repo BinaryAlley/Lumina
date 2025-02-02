@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
@@ -60,21 +59,22 @@ public class GetBooksEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
 
         // Assert
         response.EnsureSuccessStatusCode();
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Book[]? bookResponse = await response.Content.ReadFromJsonAsync<Book[]>(_jsonOptions);
-        bookResponse.Should().NotBeNull();
+        Assert.NotNull(bookResponse);
     }
+
     [Fact]
     public async Task ExecuteAsync_WhenCalledWithCancellationToken_ShouldCompletesuccessfuly()
     {
         // Arrange
         using CancellationTokenSource cts = new(TimeSpan.FromSeconds(5));
 
-        // Act
-        Func<Task> act = async () => await _client.GetAsync($"/api/v1/books", cts.Token);
-
-        // Assert
-        await act.Should().NotThrowAsync();
+        // Act & Assert
+        Exception? exception = await Record.ExceptionAsync(async () =>
+            await _client.GetAsync($"/api/v1/books", cts.Token)
+        );
+        Assert.Null(exception);
     }
 
     [Fact]
@@ -83,15 +83,13 @@ public class GetBooksEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         // Arrange
         using CancellationTokenSource cts = new();
 
-        // Act
-        Func<Task> act = async () =>
+        // Act & Assert
+        Exception? exception = await Record.ExceptionAsync(async () =>
         {
-            cts.Cancel(); // Cancel the token immediately
+            cts.Cancel();
             await _client.GetAsync($"/api/v1/books", cts.Token);
-        };
-
-        // Assert
-        await act.Should().ThrowAsync<TaskCanceledException>();
+        });
+        Assert.IsType<TaskCanceledException>(exception);
     }
 
     /// <summary>

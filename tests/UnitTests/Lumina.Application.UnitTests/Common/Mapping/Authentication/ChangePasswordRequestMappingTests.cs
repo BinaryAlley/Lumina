@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Core.UsersManagement.Authentication.Commands.ChangePassword;
 using Lumina.Application.UnitTests.Core.UsersManagement.Authentication.Commands.ChangePassword.Fixtures;
 using Lumina.Contracts.Requests.Authentication;
@@ -35,11 +34,11 @@ public class ChangePasswordRequestMappingTests
         ChangePasswordCommand result = request.ToCommand();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Username.Should().Be(request.Username);
-        result.CurrentPassword.Should().Be(request.CurrentPassword);
-        result.NewPassword.Should().Be(request.NewPassword);
-        result.NewPasswordConfirm.Should().Be(request.NewPasswordConfirm);
+        Assert.NotNull(result);
+        Assert.Equal(request.Username, result.Username);
+        Assert.Equal(request.CurrentPassword, result.CurrentPassword);
+        Assert.Equal(request.NewPassword, result.NewPassword);
+        Assert.Equal(request.NewPasswordConfirm, result.NewPasswordConfirm);
     }
 
     [Fact]
@@ -52,11 +51,11 @@ public class ChangePasswordRequestMappingTests
         ChangePasswordCommand result = request.ToCommand();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Username.Should().BeNull();
-        result.CurrentPassword.Should().BeNull();
-        result.NewPassword.Should().BeNull();
-        result.NewPasswordConfirm.Should().BeNull();
+        Assert.NotNull(result);
+        Assert.Null(result.Username);
+        Assert.Null(result.CurrentPassword);
+        Assert.Null(result.NewPassword);
+        Assert.Null(result.NewPasswordConfirm);
     }
 
     [Theory]
@@ -76,10 +75,10 @@ public class ChangePasswordRequestMappingTests
         ChangePasswordCommand result = request.ToCommand();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Username.Should().Be(username);
-        result.CurrentPassword.Should().Be(currentPassword);
-        result.NewPassword.Should().Be(newPassword);
-        result.NewPasswordConfirm.Should().Be(newPasswordConfirm);
+        Assert.NotNull(result);
+        Assert.Equal(username, result.Username);
+        Assert.Equal(currentPassword, result.CurrentPassword);
+        Assert.Equal(newPassword, result.NewPassword);
+        Assert.Equal(newPasswordConfirm, result.NewPasswordConfirm);
     }
 }

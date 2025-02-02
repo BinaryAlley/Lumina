@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
-using Lumina.Domain.Common.Enums.FileSystem;
 using Lumina.Contracts.Responses.FileSystemManagement.FileSystem;
+using Lumina.Domain.Common.Enums.FileSystem;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -55,11 +54,11 @@ public class GetTypeEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
         HttpResponseMessage response = await _client.GetAsync("/api/v1/file-system/get-type");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
         FileSystemTypeResponse? result = JsonSerializer.Deserialize<FileSystemTypeResponse>(content, _jsonOptions);
-        result.Should().NotBeNull();
-        result!.PlatformType.Should().BeOneOf(PlatformType.Unix, PlatformType.Windows);
+        Assert.NotNull(result);
+        Assert.True(result!.PlatformType == PlatformType.Unix || result.PlatformType == PlatformType.Windows);
     }
 
     [Fact]
@@ -70,8 +69,8 @@ public class GetTypeEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
         HttpResponseMessage response2 = await _client.GetAsync("/api/v1/file-system/get-type");
 
         // Assert
-        response1.StatusCode.Should().Be(HttpStatusCode.OK);
-        response2.StatusCode.Should().Be(HttpStatusCode.OK);
+        Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
 
         string content1 = await response1.Content.ReadAsStringAsync();
         string content2 = await response2.Content.ReadAsStringAsync();
@@ -79,9 +78,9 @@ public class GetTypeEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
         FileSystemTypeResponse? result1 = JsonSerializer.Deserialize<FileSystemTypeResponse>(content1, _jsonOptions);
         FileSystemTypeResponse? result2 = JsonSerializer.Deserialize<FileSystemTypeResponse>(content2, _jsonOptions);
 
-        result1.Should().NotBeNull();
-        result2.Should().NotBeNull();
-        result1.Should().BeEquivalentTo(result2);
+        Assert.NotNull(result1);
+        Assert.NotNull(result2);
+        Assert.Equal(result1.PlatformType, result2.PlatformType);
     }
 
     [Fact]
@@ -90,11 +89,11 @@ public class GetTypeEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
         // Arrange
         using CancellationTokenSource cts = new(TimeSpan.FromSeconds(5));
 
-        // Act
-        Func<Task> act = async () => await _client.GetAsync("/api/v1/file-system/get-type", cts.Token);
-
-        // Assert
-        await act.Should().NotThrowAsync();
+        // Act & Assert
+        Exception? exception = await Record.ExceptionAsync(async () =>
+            await _client.GetAsync("/api/v1/file-system/get-type", cts.Token)
+        );
+        Assert.Null(exception);
     }
 
     /// <summary>

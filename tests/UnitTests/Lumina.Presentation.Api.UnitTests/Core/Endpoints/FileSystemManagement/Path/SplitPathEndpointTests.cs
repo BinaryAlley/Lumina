@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using FastEndpoints;
-using FluentAssertions;
 using Lumina.Application.Core.FileSystemManagement.Paths.Commands.SplitPath;
 using Lumina.Contracts.Requests.FileSystemManagement.Path;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
@@ -57,8 +56,8 @@ public class SplitPathEndpointTests
         IResult result = await _sut.ExecuteAsync(request, cancellationToken);
 
         // Assert
-        IEnumerable<PathSegmentResponse> actualResponse = result.Should().BeOfType<Ok<IEnumerable<PathSegmentResponse>>>().Subject.Value!;
-        actualResponse.Should().BeEquivalentTo(expectedResponse);
+        Ok<IEnumerable<PathSegmentResponse>> okResult = Assert.IsType<Ok<IEnumerable<PathSegmentResponse>>>(result);
+        Assert.Equal(expectedResponse, okResult.Value);
     }
 
     [Fact]
@@ -75,22 +74,17 @@ public class SplitPathEndpointTests
         IResult result = await _sut.ExecuteAsync(request, cancellationToken);
 
         // Assert
-        result.Should().BeOfType<ProblemHttpResult>();
-        ProblemHttpResult problemDetails = (ProblemHttpResult)result;
-        problemDetails.StatusCode.Should().Be(StatusCodes.Status422UnprocessableEntity);
-        problemDetails.ContentType.Should().Be("application/problem+json");
-        problemDetails.ProblemDetails.Should().BeOfType<HttpValidationProblemDetails>();
-        HttpValidationProblemDetails validationProblemDetails = (HttpValidationProblemDetails)problemDetails.ProblemDetails;
-        validationProblemDetails.Status.Should().Be(StatusCodes.Status422UnprocessableEntity);
-        validationProblemDetails.Title.Should().Be("General.Validation");
-        validationProblemDetails.Detail.Should().Be("OneOrMoreValidationErrorsOccurred");
-        validationProblemDetails.Type.Should().Be("https://tools.ietf.org/html/rfc4918#section-11.2");
-        validationProblemDetails.Errors.Should().ContainSingle()
-            .Which.Should().BeEquivalentTo(new
-            {
-                Key = "Path.Invalid",
-                Value = new[] { "The provided path is invalid." }
-            });
+        ProblemHttpResult problemDetails = Assert.IsType<ProblemHttpResult>(result);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, problemDetails.StatusCode);
+        Assert.Equal("application/problem+json", problemDetails.ContentType);
+        HttpValidationProblemDetails validationProblemDetails = Assert.IsType<HttpValidationProblemDetails>(problemDetails.ProblemDetails);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, validationProblemDetails.Status);
+        Assert.Equal("General.Validation", validationProblemDetails.Title);
+        Assert.Equal("OneOrMoreValidationErrorsOccurred", validationProblemDetails.Detail);
+        Assert.Equal("https://tools.ietf.org/html/rfc4918#section-11.2", validationProblemDetails.Type);
+        Assert.Single(validationProblemDetails.Errors);
+        Assert.Equal(new[] { "The provided path is invalid." }, validationProblemDetails.Errors["Path.Invalid"]);
+        Assert.NotNull(problemDetails.ProblemDetails.Extensions["traceId"]);
     }
 
     [Fact]

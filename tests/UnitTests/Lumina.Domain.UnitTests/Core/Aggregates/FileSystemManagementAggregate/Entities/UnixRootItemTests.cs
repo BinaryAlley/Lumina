@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Domain.Common.Enums.FileSystem;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
@@ -24,13 +23,13 @@ public class UnixRootItemTests
         ErrorOr<UnixRootItem> result = UnixRootItem.Create();
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().NotBeNull();
-        result.Value.Name.Should().Be("/");
-        result.Value.Id.Path.Should().Be("/");
-        result.Value.Type.Should().Be(FileSystemItemType.Root);
-        result.Value.Status.Should().Be(FileSystemItemStatus.Accessible);
-        result.Value.Items.Should().BeEmpty();
+        Assert.False(result.IsError);
+        Assert.NotNull(result.Value);
+        Assert.Equal("/", result.Value.Name);
+        Assert.Equal("/", result.Value.Id.Path);
+        Assert.Equal(FileSystemItemType.Root, result.Value.Type);
+        Assert.Equal(FileSystemItemStatus.Accessible, result.Value.Status);
+        Assert.Empty(result.Value.Items);
     }
 
     [Fact]
@@ -43,13 +42,13 @@ public class UnixRootItemTests
         ErrorOr<UnixRootItem> result = UnixRootItem.Create(customStatus);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().NotBeNull();
-        result.Value.Name.Should().Be("/");
-        result.Value.Id.Path.Should().Be("/");
-        result.Value.Type.Should().Be(FileSystemItemType.Root);
-        result.Value.Status.Should().Be(customStatus);
-        result.Value.Items.Should().BeEmpty();
+        Assert.False(result.IsError);
+        Assert.NotNull(result.Value);
+        Assert.Equal("/", result.Value.Name);
+        Assert.Equal("/", result.Value.Id.Path);
+        Assert.Equal(FileSystemItemType.Root, result.Value.Type);
+        Assert.Equal(customStatus, result.Value.Status);
+        Assert.Empty(result.Value.Items);
     }
 
     [Fact]
@@ -57,15 +56,15 @@ public class UnixRootItemTests
     {
         // Arrange
         ErrorOr<UnixRootItem> createResult = UnixRootItem.Create();
-        createResult.IsError.Should().BeFalse();
+        Assert.False(createResult.IsError);
         UnixRootItem unixRootItem = createResult.Value;
 
         // Act
         IReadOnlyCollection<FileSystemItem> items = unixRootItem.Items;
 
         // Assert
-        items.Should().BeEmpty();
-        items.Should().BeAssignableTo<IReadOnlyCollection<FileSystemItem>>();
+        Assert.Empty(items);
+        Assert.IsAssignableFrom<IReadOnlyCollection<FileSystemItem>>(items);
     }
 
     [Fact]
@@ -73,7 +72,7 @@ public class UnixRootItemTests
     {
         // Arrange
         ErrorOr<UnixRootItem> createResult = UnixRootItem.Create();
-        createResult.IsError.Should().BeFalse();
+        Assert.False(createResult.IsError);
         UnixRootItem unixRootItem = createResult.Value;
         FileSystemItemStatus newStatus = FileSystemItemStatus.Accessible;
 
@@ -81,8 +80,8 @@ public class UnixRootItemTests
         ErrorOr<Updated> result = unixRootItem.SetStatus(newStatus);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        unixRootItem.Status.Should().Be(newStatus);
+        Assert.False(result.IsError);
+        Assert.Equal(newStatus, unixRootItem.Status);
     }
 
     [Fact]
@@ -90,15 +89,15 @@ public class UnixRootItemTests
     {
         // Arrange
         ErrorOr<UnixRootItem> createResult = UnixRootItem.Create();
-        createResult.IsError.Should().BeFalse();
+        Assert.False(createResult.IsError);
         UnixRootItem unixRootItem = createResult.Value;
 
         // Act
         ErrorOr<Updated> result = unixRootItem.SetParent(null!);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.FileSystemManagement.ParentNodeCannotBeNull);
-        unixRootItem.Parent.HasValue.Should().BeFalse();
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.FileSystemManagement.ParentNodeCannotBeNull, result.FirstError);
+        Assert.False(unixRootItem.Parent.HasValue);
     }
 }

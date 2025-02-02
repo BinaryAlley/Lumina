@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Paths;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
@@ -22,15 +21,15 @@ public class PathSegmentMappingTests
     {
         // Arrange
         ErrorOr<PathSegment> createResult = PathSegment.Create("TestSegment", true, false);
-        createResult.IsError.Should().BeFalse();
+        Assert.False(createResult.IsError);
         PathSegment pathSegment = createResult.Value;
 
         // Act
         PathSegmentResponse result = pathSegment.ToResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Path.Should().Be(pathSegment.Name);
+        Assert.NotNull(result);
+        Assert.Equal(pathSegment.Name, result.Path);
     }
 
     [Theory]
@@ -41,15 +40,15 @@ public class PathSegmentMappingTests
     {
         // Arrange
         ErrorOr<PathSegment> createResult = PathSegment.Create(name, isDirectory, isDrive);
-        createResult.IsError.Should().BeFalse();
+        Assert.False(createResult.IsError);
         PathSegment pathSegment = createResult.Value;
 
         // Act
         PathSegmentResponse result = pathSegment.ToResponse();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Path.Should().Be(pathSegment.Name);
+        Assert.NotNull(result);
+        Assert.Equal(pathSegment.Name, result.Path);
     }
 
     [Fact]
@@ -68,10 +67,10 @@ public class PathSegmentMappingTests
         IEnumerable<PathSegmentResponse> results = pathSegments.ToResponses();
 
         // Assert
-        results.Should().NotBeNull();
-        results.Should().HaveCount(pathSegments.Count);
+        Assert.NotNull(results);
+        Assert.Equal(pathSegments.Count, results.Count());
         List<PathSegmentResponse> resultList = results.ToList();
         for (int i = 0; i < pathSegments.Count; i++)
-            resultList[i].Path.Should().Be(pathSegments[i].Name);
+            Assert.Equal(pathSegments[i].Name, resultList[i].Path);
     }
 }

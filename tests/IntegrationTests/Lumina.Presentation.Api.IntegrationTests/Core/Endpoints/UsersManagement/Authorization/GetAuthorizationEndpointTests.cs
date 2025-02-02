@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Contracts.Requests.Authorization;
@@ -86,15 +85,15 @@ public class GetAuthorizationEndpointTests : IClassFixture<AuthenticatedLuminaAp
 
         // Assert
         response.EnsureSuccessStatusCode();
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         string content = await response.Content.ReadAsStringAsync();
         AuthorizationResponse? result = JsonSerializer.Deserialize<AuthorizationResponse>(content, _jsonOptions);
 
-        result.Should().NotBeNull();
-        result!.UserId.Should().Be(user.Id);
-        result.Role.Should().Contain("Admin");
-        result.Permissions.Should().Contain(AuthorizationPermission.CanViewUsers);
+        Assert.NotNull(result);
+        Assert.Equal(user.Id, result!.UserId);
+        Assert.Contains("Admin", result.Role);
+        Assert.Contains(AuthorizationPermission.CanViewUsers, result.Permissions);
     }
 
     [Fact]
@@ -107,17 +106,18 @@ public class GetAuthorizationEndpointTests : IClassFixture<AuthenticatedLuminaAp
         HttpResponseMessage response = await _client.GetAsync($"/api/v1/auth/get-authorization?userId={request.UserId}");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
-        problemDetails.Should().NotBeNull();
-        problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status403Forbidden);
-        problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.4");
-        problemDetails["title"].GetString().Should().Be("General.Unauthorized");
-        problemDetails["detail"].GetString().Should().Be("NotAuthorized");
-        problemDetails["instance"].GetString().Should().Be("/api/v1/auth/get-authorization");
-        problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status403Forbidden, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.4", problemDetails["type"].GetString());
+        Assert.Equal("General.Unauthorized", problemDetails["title"].GetString());
+        Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
+        Assert.Equal("/api/v1/auth/get-authorization", problemDetails["instance"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString());
     }
 
     [Fact]
@@ -130,20 +130,23 @@ public class GetAuthorizationEndpointTests : IClassFixture<AuthenticatedLuminaAp
         HttpResponseMessage response = await _client.GetAsync($"/api/v1/auth/get-authorization?userId={request.UserId}");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.UnprocessableEntity);
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
-        problemDetails.Should().NotBeNull();
-        problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status422UnprocessableEntity);
-        problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc4918#section-11.2");
-        problemDetails["title"].GetString().Should().Be("General.Validation");
-        problemDetails["detail"].GetString().Should().Be("OneOrMoreValidationErrorsOccurred");
-        problemDetails["instance"].GetString().Should().Be("/api/v1/auth/get-authorization");
-        problemDetails["traceId"].GetString().Should().NotBeNullOrWhiteSpace();
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc4918#section-11.2", problemDetails["type"].GetString());
+        Assert.Equal("General.Validation", problemDetails["title"].GetString());
+        Assert.Equal("OneOrMoreValidationErrorsOccurred", problemDetails["detail"].GetString());
+        Assert.Equal("/api/v1/auth/get-authorization", problemDetails["instance"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString());
 
         Dictionary<string, string[]>? errors = problemDetails["errors"].Deserialize<Dictionary<string, string[]>>(_jsonOptions);
-        errors.Should().ContainKey("General.Validation").WhoseValue.Should().Contain("UserIdCannotBeEmpty");
+        Assert.NotNull(errors);
+        Assert.Contains("General.Validation", errors.Keys);
+        Assert.Contains("UserIdCannotBeEmpty", errors["General.Validation"]);
     }
 
     [Fact]
@@ -153,15 +156,13 @@ public class GetAuthorizationEndpointTests : IClassFixture<AuthenticatedLuminaAp
         GetAuthorizationRequest request = new(Guid.NewGuid());
         CancellationTokenSource cts = new();
 
-        // Act
-        Func<Task> act = async () =>
+        // Act & Assert
+        Exception? exception = await Record.ExceptionAsync(async () =>
         {
             cts.Cancel();
             await _client.GetAsync($"/api/v1/auth/get-authorization?userId={request.UserId}", cts.Token);
-        };
-
-        // Assert
-        await act.Should().ThrowAsync<TaskCanceledException>();
+        });
+        Assert.IsType<TaskCanceledException>(exception);
     }
 
     private static async Task<UserEntity> AddRolesAndPermissionsToUser(UserEntity existingUser, LuminaDbContext dbContext)

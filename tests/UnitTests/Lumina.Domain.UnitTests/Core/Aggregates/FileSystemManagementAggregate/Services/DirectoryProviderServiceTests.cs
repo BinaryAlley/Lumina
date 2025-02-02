@@ -2,7 +2,6 @@
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Domain.Common.Enums.FileSystem;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
@@ -80,8 +79,8 @@ public class DirectoryProviderServiceTests
         ErrorOr<IEnumerable<FileSystemPathId>> result = _sut.GetSubdirectoryPaths(path, false);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Permission.UnauthorizedAccess);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
     }
 
     [Fact]
@@ -98,9 +97,12 @@ public class DirectoryProviderServiceTests
         ErrorOr<IEnumerable<FileSystemPathId>> result = _sut.GetSubdirectoryPaths(path, false);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().HaveCount(3);
-        result.Value.Select(x => x.Path).Should().BeEquivalentTo(subdirectories.Select(x => x + _dirSeparator));
+        Assert.False(result.IsError);
+        Assert.Equal(3, result.Value.Count());
+        Assert.Equal(
+            subdirectories.Select(x => x + _dirSeparator).OrderBy(x => x),
+            result.Value.Select(x => x.Path).OrderBy(x => x)
+        );
     }
 
     [Fact]
@@ -119,9 +121,9 @@ public class DirectoryProviderServiceTests
         ErrorOr<IEnumerable<FileSystemPathId>> result = _sut.GetSubdirectoryPaths(path, false);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().HaveCount(1);
-        result.Value.First().Path.Should().Be(_pathVisible2);
+        Assert.False(result.IsError);
+        Assert.Single(result.Value);
+        Assert.Equal(_pathVisible2, result.Value.First().Path);
     }
 
     [Fact]
@@ -140,9 +142,12 @@ public class DirectoryProviderServiceTests
         ErrorOr<IEnumerable<FileSystemPathId>> result = _sut.GetSubdirectoryPaths(path, true);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().HaveCount(2);
-        result.Value.Select(x => x.Path).Should().BeEquivalentTo([_pathVisible2, _pathHidden2]);
+        Assert.False(result.IsError);
+        Assert.Equal(2, result.Value.Count());
+        Assert.Equal(
+            new[] { _pathVisible2, _pathHidden2 }.OrderBy(p => p),
+            result.Value.Select(x => x.Path).OrderBy(p => p)
+        );
     }
 
     [Fact]
@@ -161,14 +166,14 @@ public class DirectoryProviderServiceTests
         ErrorOr<IEnumerable<FileSystemPathId>> result = _sut.GetSubdirectoryPaths(path, false);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().HaveCount(2);
-        result.Value.First().Path.Should().Be(_pathInvalid2);
-        result.Value.Last().Path.Should().Be(_pathValid2);
+        Assert.False(result.IsError);
+        Assert.Equal(2, result.Value.Count());
+        Assert.Equal(_pathInvalid2, result.Value.First().Path);
+        Assert.Equal(_pathValid2, result.Value.Last().Path);
     }
 
     [Fact]
-    public void GetSubdirectoryPaths_ShouldOrderDirectoriesAlphabetically()
+    public void GetSubdirectoryPaths_WhenCalled_ShouldOrderDirectoriesAlphabetically()
     {
         // Arrange
         FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId();
@@ -187,8 +192,8 @@ public class DirectoryProviderServiceTests
         ErrorOr<IEnumerable<FileSystemPathId>> result = _sut.GetSubdirectoryPaths(path, false);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Select(x => x.Path).Should().BeEquivalentTo(expectedPaths, options => options.WithStrictOrdering());
+        Assert.False(result.IsError);
+        Assert.Equal(expectedPaths, result.Value.Select(x => x.Path));
     }
 
     [Fact]
@@ -203,8 +208,8 @@ public class DirectoryProviderServiceTests
         ErrorOr<IEnumerable<FileSystemPathId>> result = _sut.GetSubdirectoryPaths(path, false);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().BeEmpty();
+        Assert.False(result.IsError);
+        Assert.Empty(result.Value);
     }
 
     [Fact]
@@ -218,8 +223,8 @@ public class DirectoryProviderServiceTests
         ErrorOr<bool> result = _sut.DirectoryExists(path);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().BeTrue();
+        Assert.False(result.IsError);
+        Assert.True(result.Value);
     }
 
     [Fact]
@@ -233,8 +238,8 @@ public class DirectoryProviderServiceTests
         ErrorOr<bool> result = _sut.DirectoryExists(path);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().BeFalse();
+        Assert.False(result.IsError);
+        Assert.False(result.Value);
     }
 
     [Fact]
@@ -251,8 +256,8 @@ public class DirectoryProviderServiceTests
         ErrorOr<string> result = _sut.GetFileName(path);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().Be("file.txt");
+        Assert.False(result.IsError);
+        Assert.Equal("file.txt", result.Value);
     }
 
     [Fact]
@@ -270,8 +275,8 @@ public class DirectoryProviderServiceTests
         ErrorOr<string> result = _sut.GetFileName(path);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().Be("subfolder");
+        Assert.False(result.IsError);
+        Assert.Equal("subfolder", result.Value);
     }
 
     [Fact]
@@ -289,8 +294,8 @@ public class DirectoryProviderServiceTests
         ErrorOr<string> result = _sut.GetFileName(path);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().BeEmpty();
+        Assert.False(result.IsError);
+        Assert.Empty(result.Value);
     }
 
     [Fact]
@@ -306,9 +311,9 @@ public class DirectoryProviderServiceTests
         ErrorOr<Optional<DateTime>> result = _sut.GetLastWriteTime(path);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.HasValue.Should().BeTrue();
-        result.Value.Value.Should().Be(expectedDateTime);
+        Assert.False(result.IsError);
+        Assert.True(result.Value.HasValue);
+        Assert.Equal(expectedDateTime, result.Value.Value);
     }
 
     [Fact]
@@ -322,8 +327,8 @@ public class DirectoryProviderServiceTests
         ErrorOr<Optional<DateTime>> result = _sut.GetLastWriteTime(path);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Permission.UnauthorizedAccess);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
     }
 
     [Fact]
@@ -339,9 +344,9 @@ public class DirectoryProviderServiceTests
         ErrorOr<Optional<DateTime>> result = _sut.GetCreationTime(path);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.HasValue.Should().BeTrue();
-        result.Value.Value.Should().Be(expectedDateTime);
+        Assert.False(result.IsError);
+        Assert.True(result.Value.HasValue);
+        Assert.Equal(expectedDateTime, result.Value.Value);
     }
 
     [Fact]
@@ -355,8 +360,8 @@ public class DirectoryProviderServiceTests
         ErrorOr<Optional<DateTime>> result = _sut.GetCreationTime(path);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Permission.UnauthorizedAccess);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
     }
 
     [Fact]
@@ -380,8 +385,8 @@ public class DirectoryProviderServiceTests
         ErrorOr<FileSystemPathId> result = _sut.CreateDirectory(parentPath, directoryName);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Path.Should().Be(fullPath);
+        Assert.False(result.IsError);
+        Assert.Equal(fullPath, result.Value.Path);
         _mockFileSystem.Directory.Received(1).CreateDirectory(fullPath);
     }
 
@@ -398,8 +403,8 @@ public class DirectoryProviderServiceTests
         ErrorOr<FileSystemPathId> result = _sut.CreateDirectory(parentPath, directoryName);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Permission.UnauthorizedAccess);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
         _mockFileSystem.Directory.DidNotReceive().CreateDirectory(Arg.Any<string>());
     }
 
@@ -414,8 +419,8 @@ public class DirectoryProviderServiceTests
         ErrorOr<FileSystemPathId> result = _sut.CreateDirectory(parentPath, directoryName);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Type.Should().Be(ErrorType.Failure);
+        Assert.True(result.IsError);
+        Assert.Equal(ErrorType.Failure, result.FirstError.Type);
     }
 
     [Fact]
@@ -434,8 +439,8 @@ public class DirectoryProviderServiceTests
         ErrorOr<FileSystemPathId> result = _sut.CreateDirectory(parentPath, directoryName);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Type.Should().Be(ErrorType.Validation);
+        Assert.True(result.IsError);
+        Assert.Equal(ErrorType.Validation, result.FirstError.Type);
     }
 
     [Fact]
@@ -462,8 +467,8 @@ public class DirectoryProviderServiceTests
         ErrorOr<FileSystemPathId> result = _sut.CopyDirectory(sourcePath, destinationPath, overrideExisting);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Path.Should().Be(destinationPath.Path);
+        Assert.False(result.IsError);
+        Assert.Equal(destinationPath.Path, result.Value.Path);
         _mockFileSystem.Directory.Received(1).CreateDirectory(destinationPath.Path);
     }
 
@@ -481,8 +486,8 @@ public class DirectoryProviderServiceTests
         ErrorOr<FileSystemPathId> result = _sut.CopyDirectory(sourcePath, destinationPath, overrideExisting);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.FileSystemManagement.DirectoryNotFound);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.FileSystemManagement.DirectoryNotFound, result.FirstError);
     }
 
     [Fact]
@@ -514,8 +519,8 @@ public class DirectoryProviderServiceTests
         ErrorOr<FileSystemPathId> result = _sut.CopyDirectory(sourcePath, destinationPath, overrideExisting);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Path.Should().Be(expectedNewDirectoryPath);
+        Assert.False(result.IsError);
+        Assert.Equal(expectedNewDirectoryPath, result.Value.Path);
         _mockFileSystem.Directory.Received(1).CreateDirectory(expectedNewDirectoryPath);
     }
 
@@ -566,8 +571,8 @@ public class DirectoryProviderServiceTests
         ErrorOr<FileSystemPathId> result = _sut.CopyDirectory(sourcePath, destinationPath, overrideExisting);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Path.Should().Be(_pathDestination);
+        Assert.False(result.IsError);
+        Assert.Equal(_pathDestination, result.Value.Path);
         _mockFileSystem.Directory.Received(1).CreateDirectory(_pathDestination);
         _mockFileSystem.Directory.Received(1).CreateDirectory(_pathDestinationSubDir);
         mockFile.Received(1).CopyTo(_pathDestinationFile, overrideExisting);
@@ -589,8 +594,8 @@ public class DirectoryProviderServiceTests
         ErrorOr<FileSystemPathId> result = _sut.CopyDirectory(sourcePath, destinationPath, overrideExisting);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.FileSystemManagement.DirectoryCopyError);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.FileSystemManagement.DirectoryCopyError, result.FirstError);
     }
 
     [Fact]
@@ -609,8 +614,8 @@ public class DirectoryProviderServiceTests
         ErrorOr<FileSystemPathId> result = _sut.MoveDirectory(sourcePath, destinationPath, overrideExisting);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.FileSystemManagement.DirectoryNotFound);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.FileSystemManagement.DirectoryNotFound, result.FirstError);
     }
 
     [Fact]
@@ -628,8 +633,8 @@ public class DirectoryProviderServiceTests
         ErrorOr<FileSystemPathId> result = _sut.MoveDirectory(sourcePath, destinationPath, overrideExisting);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Path.Should().Be(destinationPath.Path);
+        Assert.False(result.IsError);
+        Assert.Equal(destinationPath.Path, result.Value.Path);
         _mockFileSystem.Directory.Received(1).Move(sourcePath.Path, destinationPath.Path);
     }
 
@@ -662,8 +667,8 @@ public class DirectoryProviderServiceTests
         ErrorOr<FileSystemPathId> result = _sut.MoveDirectory(sourcePath, destinationPath, overrideExisting);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Path.Should().Be(destinationPath.Path);
+        Assert.False(result.IsError);
+        Assert.Equal(destinationPath.Path, result.Value.Path);
         _mockFileSystem.File.Received(1).Move(_pathSourceFile1, _pathDestinationFile1);
         _mockFileSystem.Directory.Received(1).Move(
             _pathSourceSubDir,
@@ -689,8 +694,8 @@ public class DirectoryProviderServiceTests
         ErrorOr<FileSystemPathId> result = _sut.MoveDirectory(sourcePath, destinationPath, overrideExisting);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.FileSystemManagement.DirectoryMoveError);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.FileSystemManagement.DirectoryMoveError, result.FirstError);
     }
 
     [Fact]
@@ -727,8 +732,8 @@ public class DirectoryProviderServiceTests
         ErrorOr<FileSystemPathId> result = _sut.MoveDirectory(sourcePath, destPath, overwrite);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().Be(destPath);
+        Assert.False(result.IsError);
+        Assert.Equal(destPath, result.Value);
         _mockFileSystem.File.Received(1).Delete(_pathDestinationFile1);
         _mockFileSystem.File.Received(1).Move(_pathSourceFile1, _pathDestinationFile1);
         _mockFileSystem.File.Received(1).Move(_pathSourceFile2, _pathDestinationFile2);
@@ -765,8 +770,8 @@ public class DirectoryProviderServiceTests
         ErrorOr<FileSystemPathId> result = _sut.MoveDirectory(sourcePath, destPath, overwrite);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().Be(destPath);
+        Assert.False(result.IsError);
+        Assert.Equal(destPath, result.Value);
         _mockFileSystem.File.DidNotReceive().Delete(Arg.Any<string>());
         _mockFileSystem.File.DidNotReceive().Move(_pathSourceFile1, _pathDestinationFile1);
         _mockFileSystem.File.Received(1).Move(_pathSourceFile2, _pathDestinationFile2);
@@ -831,8 +836,8 @@ public class DirectoryProviderServiceTests
         ErrorOr<FileSystemPathId> result = _sut.MoveDirectory(sourcePath, destPath, overwrite);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().Be(destPath);
+        Assert.False(result.IsError);
+        Assert.Equal(destPath, result.Value);
         _mockFileSystem.File.Received(1).Move(
             s_isUnix ? "/Source/SubDir/file.txt" : @"C:\Source\SubDir\file.txt",
             s_isUnix ? "/Destination/SubDir/file.txt" : @"C:\Destination\SubDir\file.txt"
@@ -863,8 +868,8 @@ public class DirectoryProviderServiceTests
         ErrorOr<FileSystemPathId> result = _sut.RenameDirectory(path, newName);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Path.Should().Be(newPath);
+        Assert.False(result.IsError);
+        Assert.Equal(newPath, result.Value.Path);
         _mockFileSystem.Directory.Received(1).Move(path.Path, newPath);
     }
 
@@ -889,8 +894,8 @@ public class DirectoryProviderServiceTests
         ErrorOr<FileSystemPathId> result = _sut.RenameDirectory(path, newName);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Permission.UnauthorizedAccess);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
         _mockFileSystem.Directory.DidNotReceive().Move(Arg.Any<string>(), Arg.Any<string>());
     }
 
@@ -916,8 +921,8 @@ public class DirectoryProviderServiceTests
         ErrorOr<FileSystemPathId> result = _sut.RenameDirectory(path, newName);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Permission.UnauthorizedAccess);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
         _mockFileSystem.Directory.DidNotReceive().Move(Arg.Any<string>(), Arg.Any<string>());
     }
 
@@ -936,8 +941,8 @@ public class DirectoryProviderServiceTests
         ErrorOr<FileSystemPathId> result = _sut.RenameDirectory(path, newName);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.FileSystemManagement.InvalidPath);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
         _mockFileSystem.Directory.DidNotReceive().Move(Arg.Any<string>(), Arg.Any<string>());
     }
 
@@ -960,8 +965,8 @@ public class DirectoryProviderServiceTests
         ErrorOr<FileSystemPathId> result = _sut.RenameDirectory(path, newName);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.FileSystemManagement.InvalidPath);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
         _mockFileSystem.Directory.DidNotReceive().Move(Arg.Any<string>(), Arg.Any<string>());
     }
 
@@ -980,8 +985,8 @@ public class DirectoryProviderServiceTests
         ErrorOr<Deleted> result = _sut.DeleteDirectory(path);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().Be(Result.Deleted);
+        Assert.False(result.IsError);
+        Assert.Equal(Result.Deleted, result.Value);
         mockDirectoryInfo.Received(1).Delete(true);
     }
 
@@ -998,8 +1003,8 @@ public class DirectoryProviderServiceTests
         ErrorOr<Deleted> result = _sut.DeleteDirectory(path);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Permission.UnauthorizedAccess);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
         _mockFileSystem.DirectoryInfo.DidNotReceive().New(Arg.Any<string>());
     }
 }

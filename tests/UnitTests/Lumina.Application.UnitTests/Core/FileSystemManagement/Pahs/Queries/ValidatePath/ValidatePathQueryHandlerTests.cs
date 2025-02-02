@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Core.FileSystemManagement.Paths.Queries.ValidatePath;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Pahs.Queries.ValidatePath.Fixtures;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
@@ -41,7 +40,7 @@ public class ValidatePathQueryHandlerTests
         PathValidResponse result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsValid.Should().BeTrue();
+        Assert.True(result.IsValid);
         _mockPathService.Received(1).IsValidPath(query.Path!);
     }
 
@@ -56,7 +55,7 @@ public class ValidatePathQueryHandlerTests
         PathValidResponse result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsValid.Should().BeFalse();
+        Assert.False(result.IsValid);
         _mockPathService.Received(1).IsValidPath(query.Path!);
     }
 
@@ -71,7 +70,7 @@ public class ValidatePathQueryHandlerTests
         PathValidResponse result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsValid.Should().BeFalse();
+        Assert.False(result.IsValid);
         _mockPathService.Received(1).IsValidPath(Arg.Any<string>());
     }
 
@@ -86,7 +85,7 @@ public class ValidatePathQueryHandlerTests
         PathValidResponse result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsValid.Should().BeFalse();
+        Assert.False(result.IsValid);
         _mockPathService.Received(1).IsValidPath(Arg.Any<string>());
     }
 }

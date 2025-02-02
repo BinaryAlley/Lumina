@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Domain.Common.Enums.FileSystem;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Platform;
 using NSubstitute;
@@ -41,7 +40,7 @@ public class PlatformContextManagerTests
         IPlatformContext result = sut.GetCurrentContext();
 
         // Assert
-        result.Should().Be(mockWindowsContext);
+        Assert.Same(mockWindowsContext, result);
         _mockPlatformContextFactory.Received(1).CreateStrategy<IWindowsPlatformContext>();
     }
 
@@ -59,7 +58,7 @@ public class PlatformContextManagerTests
         IPlatformContext result = sut.GetCurrentContext();
 
         // Assert
-        result.Should().Be(mockUnixContext);
+        Assert.Same(mockUnixContext, result);
         _mockPlatformContextFactory.Received(1).CreateStrategy<IUnixPlatformContext>();
     }
 
@@ -78,7 +77,7 @@ public class PlatformContextManagerTests
         IPlatformContext result = sut.GetCurrentContext();
 
         // Assert
-        result.Should().Be(mockUnixContext);
+        Assert.Same(mockUnixContext, result);
         _mockPlatformContextFactory.Received(1).CreateStrategy<IUnixPlatformContext>();
     }
 
@@ -97,7 +96,7 @@ public class PlatformContextManagerTests
         IPlatformContext result = sut.GetCurrentContext();
 
         // Assert
-        result.Should().Be(mockWindowsContext);
+        Assert.Same(mockWindowsContext, result);
         _mockPlatformContextFactory.Received(1).CreateStrategy<IWindowsPlatformContext>();
     }
 
@@ -110,9 +109,7 @@ public class PlatformContextManagerTests
         sut = new(_mockPlatformContextFactory, mockOsInfo);
 
         // Act & Assert
-        Action act = () => sut.SetCurrentPlatform(unsupportedPlatform);
-        act.Should().Throw<ArgumentException>()
-           .WithMessage($"Unsupported platform type: {unsupportedPlatform}");
+        Assert.Throws<ArgumentException>(() => sut.SetCurrentPlatform(unsupportedPlatform));
     }
 
     [Fact]
@@ -129,7 +126,7 @@ public class PlatformContextManagerTests
         IPlatformContext result = sut.GetCurrentContext();
 
         // Assert
-        result.Should().Be(mockUnixContext);
+        Assert.Same(mockUnixContext, result);
         _mockPlatformContextFactory.Received(1).CreateStrategy<IUnixPlatformContext>();
     }
 
@@ -147,7 +144,7 @@ public class PlatformContextManagerTests
         IPlatformContext result = sut.GetCurrentContext();
 
         // Assert
-        result.Should().Be(mockWindowsContext);
+        Assert.Same(mockWindowsContext, result);
         _mockPlatformContextFactory.Received(1).CreateStrategy<IWindowsPlatformContext>();
     }
 }

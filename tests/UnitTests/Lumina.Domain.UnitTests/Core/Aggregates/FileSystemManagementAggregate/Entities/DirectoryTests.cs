@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Domain.Common.Enums.FileSystem;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
@@ -33,12 +32,12 @@ public class DirectoryTests
         ErrorOr<Directory> result = Directory.Create(path, name, dateCreated, dateModified);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().NotBeNull();
-        result.Value.Name.Should().Be(name);
-        result.Value.DateCreated.Should().Be(dateCreated);
-        result.Value.DateModified.Should().Be(dateModified);
-        result.Value.Status.Should().Be(FileSystemItemStatus.Accessible);
+        Assert.False(result.IsError);
+        Assert.NotNull(result.Value);
+        Assert.Equal(name, result.Value.Name);
+        Assert.Equal(dateCreated, result.Value.DateCreated);
+        Assert.Equal(dateModified, result.Value.DateModified);
+        Assert.Equal(FileSystemItemStatus.Accessible, result.Value.Status);
     }
 
     [Fact]
@@ -54,8 +53,8 @@ public class DirectoryTests
         ErrorOr<Directory> result = Directory.Create(invalidPath, name, dateCreated, dateModified);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.FileSystemManagement.InvalidPath);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
     }
 
     [Fact]
@@ -63,7 +62,7 @@ public class DirectoryTests
     {
         // Arrange
         ErrorOr<FileSystemPathId> pathIdResult = FileSystemPathId.Create("/valid/path");
-        pathIdResult.IsError.Should().BeFalse();
+        Assert.False(pathIdResult.IsError);
         FileSystemPathId pathId = pathIdResult.Value;
         string name = "TestDirectory";
         Optional<DateTime> dateCreated = DateTime.Now;
@@ -73,13 +72,13 @@ public class DirectoryTests
         ErrorOr<Directory> result = Directory.Create(pathId, name, dateCreated, dateModified);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().NotBeNull();
-        result.Value.Id.Should().Be(pathId);
-        result.Value.Name.Should().Be(name);
-        result.Value.DateCreated.Should().Be(dateCreated);
-        result.Value.DateModified.Should().Be(dateModified);
-        result.Value.Status.Should().Be(FileSystemItemStatus.Accessible);
+        Assert.False(result.IsError);
+        Assert.NotNull(result.Value);
+        Assert.Equal(pathId, result.Value.Id);
+        Assert.Equal(name, result.Value.Name);
+        Assert.Equal(dateCreated, result.Value.DateCreated);
+        Assert.Equal(dateModified, result.Value.DateModified);
+        Assert.Equal(FileSystemItemStatus.Accessible, result.Value.Status);
     }
 
     [Fact]
@@ -87,7 +86,7 @@ public class DirectoryTests
     {
         // Arrange
         ErrorOr<Directory> directoryResult = Directory.Create("/valid/path", "TestDirectory", Optional<DateTime>.None(), Optional<DateTime>.None());
-        directoryResult.IsError.Should().BeFalse();
+        Assert.False(directoryResult.IsError);
         Directory directory = directoryResult.Value;
         DateTime newDate = DateTime.Now;
 
@@ -95,8 +94,8 @@ public class DirectoryTests
         ErrorOr<Updated> result = directory.UpdateLastModified(newDate);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        directory.DateModified.Value.Should().Be(newDate);
+        Assert.False(result.IsError);
+        Assert.Equal(newDate, directory.DateModified.Value);
     }
 
     [Fact]
@@ -104,7 +103,7 @@ public class DirectoryTests
     {
         // Arrange
         ErrorOr<Directory> directoryResult = Directory.Create("/valid/path", "TestDirectory", Optional<DateTime>.None(), Optional<DateTime>.None());
-        directoryResult.IsError.Should().BeFalse();
+        Assert.False(directoryResult.IsError);
         Directory directory = directoryResult.Value;
         FileSystemItem item = new FileSystemItemFixture(FileSystemPathId.Create("/mock/path").Value, "MockItem", FileSystemItemType.File);
 
@@ -112,8 +111,8 @@ public class DirectoryTests
         ErrorOr<Updated> result = directory.AddItem(item);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        directory.Items.Should().Contain(item);
+        Assert.False(result.IsError);
+        Assert.Contains(item, directory.Items);
     }
 
     [Fact]
@@ -121,7 +120,7 @@ public class DirectoryTests
     {
         // Arrange
         ErrorOr<Directory> directoryResult = Directory.Create("/valid/path", "TestDirectory", Optional<DateTime>.None(), Optional<DateTime>.None());
-        directoryResult.IsError.Should().BeFalse();
+        Assert.False(directoryResult.IsError);
         Directory directory = directoryResult.Value;
         FileSystemItem item = new FileSystemItemFixture(FileSystemPathId.Create("/mock/path").Value, "MockItem", FileSystemItemType.File);
         directory.AddItem(item);
@@ -130,7 +129,7 @@ public class DirectoryTests
         ErrorOr<Updated> result = directory.RemoveItem(item);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        directory.Items.Should().NotContain(item);
+        Assert.False(result.IsError);
+        Assert.DoesNotContain(item, directory.Items);
     }
 }

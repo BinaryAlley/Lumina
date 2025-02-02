@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.Mapping.Authentication;
 using Lumina.Application.Core.UsersManagement.Authentication.Commands.RecoverPassword;
 using Lumina.Application.UnitTests.Core.UsersManagement.Authentication.Commands.RecoverPassword.Fixtures;
@@ -35,9 +34,9 @@ public class RecoverPasswordRequestMappingTests
         RecoverPasswordCommand result = request.ToCommand();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Username.Should().Be(request.Username);
-        result.TotpCode.Should().Be(request.TotpCode);
+        Assert.NotNull(result);
+        Assert.Equal(request.Username, result.Username);
+        Assert.Equal(request.TotpCode, result.TotpCode);
     }
 
     [Fact]
@@ -50,9 +49,9 @@ public class RecoverPasswordRequestMappingTests
         RecoverPasswordCommand result = request.ToCommand();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Username.Should().BeNull();
-        result.TotpCode.Should().BeNull();
+        Assert.NotNull(result);
+        Assert.Null(result.Username);
+        Assert.Null(result.TotpCode);
     }
 
     [Theory]
@@ -71,8 +70,8 @@ public class RecoverPasswordRequestMappingTests
         RecoverPasswordCommand result = request.ToCommand();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Username.Should().Be(username);
-        result.TotpCode.Should().Be(totpCode);
+        Assert.NotNull(result);
+        Assert.Equal(username, result.Username);
+        Assert.Equal(totpCode, result.TotpCode);
     }
 }

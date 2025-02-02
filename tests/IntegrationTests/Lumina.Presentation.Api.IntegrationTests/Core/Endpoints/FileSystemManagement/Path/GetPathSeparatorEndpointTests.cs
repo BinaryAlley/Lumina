@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 using System;
@@ -54,11 +53,11 @@ public class GetPathSeparatorEndpointTests : IClassFixture<AuthenticatedLuminaAp
         HttpResponseMessage response = await _client.GetAsync("/api/v1/path/get-path-separator");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
         PathSeparatorResponse? result = JsonSerializer.Deserialize<PathSeparatorResponse>(content, _jsonOptions);
-        result.Should().NotBeNull();
-        result!.Separator.Should().BeOneOf("/", "\\");
+        Assert.NotNull(result);
+        Assert.True(result!.Separator == "/" || result.Separator == "\\");
     }
 
     [Fact]
@@ -69,8 +68,8 @@ public class GetPathSeparatorEndpointTests : IClassFixture<AuthenticatedLuminaAp
         HttpResponseMessage response2 = await _client.GetAsync("/api/v1/path/get-path-separator");
 
         // Assert
-        response1.StatusCode.Should().Be(HttpStatusCode.OK);
-        response2.StatusCode.Should().Be(HttpStatusCode.OK);
+        Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
 
         string content1 = await response1.Content.ReadAsStringAsync();
         string content2 = await response2.Content.ReadAsStringAsync();
@@ -78,9 +77,9 @@ public class GetPathSeparatorEndpointTests : IClassFixture<AuthenticatedLuminaAp
         PathSeparatorResponse? result1 = JsonSerializer.Deserialize<PathSeparatorResponse>(content1, _jsonOptions);
         PathSeparatorResponse? result2 = JsonSerializer.Deserialize<PathSeparatorResponse>(content2, _jsonOptions);
 
-        result1.Should().NotBeNull();
-        result2.Should().NotBeNull();
-        result1.Should().BeEquivalentTo(result2);
+        Assert.NotNull(result1);
+        Assert.NotNull(result2);
+        Assert.Equal(result1, result2);
     }
 
     [Fact]
@@ -89,11 +88,11 @@ public class GetPathSeparatorEndpointTests : IClassFixture<AuthenticatedLuminaAp
         // Arrange
         using CancellationTokenSource cts = new(TimeSpan.FromSeconds(5));
 
-        // Act
-        Func<Task> act = async () => await _client.GetAsync("/api/v1/path/get-path-separator", cts.Token);
-
-        // Assert
-        await act.Should().NotThrowAsync();
+        // Act & Assert
+        Exception? exception = await Record.ExceptionAsync(async () =>
+            await _client.GetAsync("/api/v1/path/get-path-separator", cts.Token)
+        );
+        Assert.Null(exception);
     }
 
     [Fact]
@@ -102,15 +101,13 @@ public class GetPathSeparatorEndpointTests : IClassFixture<AuthenticatedLuminaAp
         // Arrange
         using CancellationTokenSource cts = new();
 
-        // Act
-        Func<Task> act = async () =>
+        // Act & Assert
+        Exception? exception = await Record.ExceptionAsync(async () =>
         {
-            cts.Cancel(); // Cancel the token immediately
+            cts.Cancel();
             await _client.GetAsync("/api/v1/path/get-path-separator", cts.Token);
-        };
-
-        // Assert
-        await act.Should().ThrowAsync<TaskCanceledException>();
+        });
+        Assert.IsType<TaskCanceledException>(exception);
     }
 
     /// <summary>

@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Contracts.DTO.Common;
 using Lumina.Domain.Common.ValueObjects.Metadata;
@@ -27,9 +26,9 @@ public class GenreDtoMappingTests
         ErrorOr<Genre> result = genreDto.ToDomainEntity();
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().NotBeNull();
-        result.Value.Name.Should().Be(genreDto.Name);
+        Assert.False(result.IsError);
+        Assert.NotNull(result.Value);
+        Assert.Equal(genreDto.Name, result.Value.Name);
     }
 
     [Theory]
@@ -46,9 +45,9 @@ public class GenreDtoMappingTests
         ErrorOr<Genre> result = genreDto.ToDomainEntity();
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().NotBeNull();
-        result.Value.Name.Should().Be(genreDto.Name);
+        Assert.False(result.IsError);
+        Assert.NotNull(result.Value);
+        Assert.Equal(genreDto.Name, result.Value.Name);
     }
 
     [Theory]
@@ -64,7 +63,7 @@ public class GenreDtoMappingTests
         ErrorOr<Genre> result = genreDto.ToDomainEntity();
 
         // Assert
-        result.IsError.Should().BeTrue();
+        Assert.True(result.IsError);
     }
 
     [Fact]
@@ -83,14 +82,14 @@ public class GenreDtoMappingTests
         IEnumerable<ErrorOr<Genre>> results = genreDtos.ToDomainEntities();
 
         // Assert
-        results.Should().NotBeNull();
-        results.Should().HaveCount(genreDtos.Count);
+        Assert.NotNull(results);
+        Assert.Equal(genreDtos.Count, results.Count());
 
         List<ErrorOr<Genre>> resultList = results.ToList();
         for (int i = 0; i < genreDtos.Count; i++)
         {
-            resultList[i].IsError.Should().BeFalse();
-            resultList[i].Value.Name.Should().Be(genreDtos[i].Name);
+            Assert.False(resultList[i].IsError);
+            Assert.Equal(genreDtos[i].Name, resultList[i].Value.Name);
         }
     }
 
@@ -110,18 +109,18 @@ public class GenreDtoMappingTests
         IEnumerable<ErrorOr<Genre>> results = genreDtos.ToDomainEntities();
 
         // Assert
-        results.Should().NotBeNull();
-        results.Should().HaveCount(genreDtos.Count);
+        Assert.NotNull(results);
+        Assert.Equal(genreDtos.Count, results.Count());
 
         List<ErrorOr<Genre>> resultList = results.ToList();
-        resultList[0].IsError.Should().BeFalse();
-        resultList[0].Value.Name.Should().Be("Rock");
+        Assert.False(resultList[0].IsError);
+        Assert.Equal("Rock", resultList[0].Value.Name);
 
-        resultList[1].IsError.Should().BeTrue();
+        Assert.True(resultList[1].IsError);
 
-        resultList[2].IsError.Should().BeFalse();
-        resultList[2].Value.Name.Should().Be("Jazz");
+        Assert.False(resultList[2].IsError);
+        Assert.Equal("Jazz", resultList[2].Value.Name);
 
-        resultList[3].IsError.Should().BeTrue();
+        Assert.True(resultList[3].IsError);
     }
 }

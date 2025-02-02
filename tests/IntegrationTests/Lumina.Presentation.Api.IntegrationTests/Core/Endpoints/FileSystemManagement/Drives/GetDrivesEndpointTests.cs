@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
 using Lumina.Domain.Common.Enums.FileSystem;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
@@ -67,18 +66,18 @@ public class GetDrivesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactor
 
         // Assert
         response.EnsureSuccessStatusCode();
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         string content = await response.Content.ReadAsStringAsync();
         List<FileSystemTreeNodeResponse>? drives = JsonSerializer.Deserialize<List<FileSystemTreeNodeResponse>>(content, _jsonOptions);
 
-        drives.Should().NotBeNull();
-        drives.Should().NotBeEmpty();
+        Assert.NotNull(drives);
+        Assert.NotEmpty(drives);
 
         FileSystemTreeNodeResponse firstDrive = drives!.First();
-        firstDrive.Name.Should().Be(s_isUnix ? "/" : "C:\\");
-        firstDrive.Path.Should().Be(s_isUnix ? "/" : "C:\\");
-        firstDrive.ItemType.Should().Be(FileSystemItemType.Root);
-        drives!.Count.Should().BeGreaterThanOrEqualTo(1);
+        Assert.Equal(s_isUnix ? "/" : "C:\\", firstDrive.Name);
+        Assert.Equal(s_isUnix ? "/" : "C:\\", firstDrive.Path);
+        Assert.Equal(FileSystemItemType.Root, firstDrive.ItemType);
+        Assert.True(drives.Count >= 1);
     }
 }

@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using FastEndpoints;
-using FluentAssertions;
 using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetUserPermissions;
 using Lumina.Contracts.Requests.Authorization;
 using Lumina.Contracts.Responses.Authorization;
@@ -56,8 +55,8 @@ public class GetUserPermissionsEndpointTests
         IResult result = await _sut.ExecuteAsync(request, cancellationToken);
 
         // Assert
-        Ok<IEnumerable<PermissionResponse>> okResult = result.Should().BeOfType<Ok<IEnumerable<PermissionResponse>>>().Subject;
-        okResult.Value.Should().BeEquivalentTo(expectedResponse);
+        Ok<IEnumerable<PermissionResponse>> okResult = Assert.IsType<Ok<IEnumerable<PermissionResponse>>>(result);
+        Assert.Equal(expectedResponse, okResult.Value);
     }
 
     [Fact]
@@ -74,16 +73,16 @@ public class GetUserPermissionsEndpointTests
         IResult result = await _sut.ExecuteAsync(request, cancellationToken);
 
         // Assert
-        ProblemHttpResult problemResult = result.Should().BeOfType<ProblemHttpResult>().Subject;
-        problemResult.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
-        problemResult.ContentType.Should().Be("application/problem+json");
-        problemResult.ProblemDetails.Should().BeOfType<Microsoft.AspNetCore.Mvc.ProblemDetails>();
+        ProblemHttpResult problemResult = Assert.IsType<ProblemHttpResult>(result);
+        Assert.Equal(StatusCodes.Status403Forbidden, problemResult.StatusCode);
+        Assert.Equal("application/problem+json", problemResult.ContentType);
+        Assert.IsType<Microsoft.AspNetCore.Mvc.ProblemDetails>(problemResult.ProblemDetails);
 
-        problemResult.ProblemDetails.Title.Should().Be("User.Permissions.NotFound");
-        problemResult.ProblemDetails.Detail.Should().Be("User permissions not found.");
-        problemResult.ProblemDetails.Status.Should().Be(StatusCodes.Status403Forbidden);
-        problemResult.ProblemDetails.Type.Should().Be("https://tools.ietf.org/html/rfc9110#section-15.5.4");
-        problemResult.ProblemDetails.Extensions["traceId"].Should().NotBeNull();
+        Assert.Equal("User.Permissions.NotFound", problemResult.ProblemDetails.Title);
+        Assert.Equal("User permissions not found.", problemResult.ProblemDetails.Detail);
+        Assert.Equal(StatusCodes.Status403Forbidden, problemResult.ProblemDetails.Status);
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.4", problemResult.ProblemDetails.Type);
+        Assert.NotNull(problemResult.ProblemDetails.Extensions["traceId"]);
     }
 
     [Fact]

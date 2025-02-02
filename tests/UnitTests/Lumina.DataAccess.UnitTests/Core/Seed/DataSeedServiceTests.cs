@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Authorization;
@@ -62,8 +61,8 @@ public class DataSeedServiceTests
         ErrorOr<Created> result = await _sut.SetDefaultAuthorizationPermissionsAsync(adminId, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().Be(Result.Created);
+        Assert.False(result.IsError);
+        Assert.Equal(Result.Created, result.Value);
 
         await _mockPermissionRepository
             .Received(4)
@@ -90,8 +89,8 @@ public class DataSeedServiceTests
         ErrorOr<Created> result = await _sut.SetDefaultAuthorizationPermissionsAsync(adminId, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(expectedError);
+        Assert.True(result.IsError);
+        Assert.Equal(expectedError, result.FirstError);
 
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
@@ -112,13 +111,13 @@ public class DataSeedServiceTests
         await _sut.SetDefaultAuthorizationPermissionsAsync(adminId, CancellationToken.None);
 
         // Assert
-        capturedPermissions.Should().BeEquivalentTo(
-        [
+        Assert.Equal(new[]
+        {
             AuthorizationPermission.CanViewUsers,
             AuthorizationPermission.CanDeleteUsers,
             AuthorizationPermission.CanRegisterUsers,
             AuthorizationPermission.CanCreateLibraries
-        ]);
+        }, capturedPermissions);
     }
 
     [Fact]
@@ -136,8 +135,8 @@ public class DataSeedServiceTests
         ErrorOr<Created> result = await _sut.SetDefaultAuthorizationRolesAsync(userId, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().Be(Result.Created);
+        Assert.False(result.IsError);
+        Assert.Equal(Result.Created, result.Value);
 
         await mockRoleRepository
             .Received(1)
@@ -168,14 +167,14 @@ public class DataSeedServiceTests
         ErrorOr<Created> result = await _sut.SetDefaultAuthorizationRolesAsync(userId, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(expectedError);
+        Assert.True(result.IsError);
+        Assert.Equal(expectedError, result.FirstError);
 
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
-    public async Task SetDefaultAuthorizationRolesAsync_ShouldCreateDefaultAdminRole()
+    public async Task SetDefaultAuthorizationRolesAsync_WhenCalled_ShouldCreateDefaultAdminRole()
     {
         // Arrange
         Guid userId = Guid.NewGuid();
@@ -193,11 +192,11 @@ public class DataSeedServiceTests
         await _sut.SetDefaultAuthorizationRolesAsync(userId, CancellationToken.None);
 
         // Assert
-        capturedRoleNames.Should().BeEquivalentTo(["Admin"]);
+        Assert.Equal(new[] { "Admin" }, capturedRoleNames);
     }
 
     [Fact]
-    public async Task SetDefaultAuthorizationRolesAsync_ShouldSetCorrectAuditProperties()
+    public async Task SetDefaultAuthorizationRolesAsync_WhenCalled_ShouldSetCorrectAuditProperties()
     {
         // Arrange
         Guid userId = Guid.NewGuid();
@@ -215,11 +214,11 @@ public class DataSeedServiceTests
         await _sut.SetDefaultAuthorizationRolesAsync(userId, CancellationToken.None);
 
         // Assert
-        capturedRole.Should().NotBeNull();
-        capturedRole!.CreatedBy.Should().Be(userId);
-        capturedRole.CreatedOnUtc.Should().Be(_fixedUtcNow);
-        capturedRole.UpdatedBy.Should().BeNull();
-        capturedRole.UpdatedOnUtc.Should().BeNull();
+        Assert.NotNull(capturedRole);
+        Assert.Equal(userId, capturedRole!.CreatedBy);
+        Assert.Equal(_fixedUtcNow, capturedRole.CreatedOnUtc);
+        Assert.Null(capturedRole.UpdatedBy);
+        Assert.Null(capturedRole.UpdatedOnUtc);
     }
 
     [Fact]
@@ -251,8 +250,8 @@ public class DataSeedServiceTests
         ErrorOr<Created> result = await _sut.SetAdminRolePermissionsAsync(userId, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().Be(Result.Created);
+        Assert.False(result.IsError);
+        Assert.Equal(Result.Created, result.Value);
 
         await mockRolePermissionRepository
             .Received(3)
@@ -282,9 +281,8 @@ public class DataSeedServiceTests
         ErrorOr<Created> result = await _sut.SetAdminRolePermissionsAsync(userId, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Authorization.AdminAccountNotFound);
-
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Authorization.AdminAccountNotFound, result.FirstError);
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -309,8 +307,8 @@ public class DataSeedServiceTests
         ErrorOr<Created> result = await _sut.SetAdminRolePermissionsAsync(userId, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(expectedError);
+        Assert.True(result.IsError);
+        Assert.Equal(expectedError, result.FirstError);
 
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
@@ -340,8 +338,8 @@ public class DataSeedServiceTests
         ErrorOr<Created> result = await _sut.SetAdminRolePermissionsAsync(userId, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(expectedError);
+        Assert.True(result.IsError);
+        Assert.Equal(expectedError, result.FirstError);
 
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
@@ -364,8 +362,8 @@ public class DataSeedServiceTests
         ErrorOr<Created> result = await _sut.SetAdminRolePermissionsAsync(userId, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(expectedError);
+        Assert.True(result.IsError);
+        Assert.Equal(expectedError, result.FirstError);
 
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
@@ -397,8 +395,8 @@ public class DataSeedServiceTests
         ErrorOr<Created> result = await _sut.SetAdminRoleToAdministratorAccount(userId, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().Be(Result.Created);
+        Assert.False(result.IsError);
+        Assert.Equal(Result.Created, result.Value);
 
         await mockUserRoleRepository
             .Received(1)
@@ -429,9 +427,8 @@ public class DataSeedServiceTests
         ErrorOr<Created> result = await _sut.SetAdminRoleToAdministratorAccount(userId, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Authorization.AdminRoleNotFound);
-
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Authorization.AdminRoleNotFound, result.FirstError);
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -455,8 +452,8 @@ public class DataSeedServiceTests
         ErrorOr<Created> result = await _sut.SetAdminRoleToAdministratorAccount(userId, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Authorization.AdminAccountNotFound);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Authorization.AdminAccountNotFound, result.FirstError);
 
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
@@ -487,8 +484,8 @@ public class DataSeedServiceTests
         ErrorOr<Created> result = await _sut.SetAdminRoleToAdministratorAccount(userId, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(expectedError);
+        Assert.True(result.IsError);
+        Assert.Equal(expectedError, result.FirstError);
 
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
@@ -511,8 +508,8 @@ public class DataSeedServiceTests
         ErrorOr<Created> result = await _sut.SetAdminRoleToAdministratorAccount(userId, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(expectedError);
+        Assert.True(result.IsError);
+        Assert.Equal(expectedError, result.FirstError);
 
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
@@ -538,8 +535,8 @@ public class DataSeedServiceTests
         ErrorOr<Created> result = await _sut.SetAdminRoleToAdministratorAccount(userId, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(expectedError);
+        Assert.True(result.IsError);
+        Assert.Equal(expectedError, result.FirstError);
 
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }

@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Domain.Common.Enums.PhotoLibrary;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
@@ -66,9 +65,9 @@ public class ThumbnailServiceTests
         ErrorOr<Thumbnail> result = await _sut.GetThumbnailAsync(path, quality, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Type.Should().Be(ImageType.JPEG);
-        result.Value.Bytes.Should().NotBeEmpty();
+        Assert.False(result.IsError);
+        Assert.Equal(ImageType.JPEG, result.Value.Type);
+        Assert.NotEmpty(result.Value.Bytes);
     }
 
     [Fact]
@@ -82,8 +81,8 @@ public class ThumbnailServiceTests
         ErrorOr<Thumbnail> result = await _sut.GetThumbnailAsync(invalidPath, quality, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.FileSystemManagement.InvalidPath);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
     }
 
     [Fact]
@@ -100,8 +99,8 @@ public class ThumbnailServiceTests
         ErrorOr<Thumbnail> result = await _sut.GetThumbnailAsync(pathId, quality, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Permission.UnauthorizedAccess);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
     }
 
     [Fact]
@@ -118,8 +117,8 @@ public class ThumbnailServiceTests
         ErrorOr<Thumbnail> result = await _sut.GetThumbnailAsync(pathId, quality, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Thumbnails.NoThumbnail);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Thumbnails.NoThumbnail, result.FirstError);
     }
 
     [Fact]
@@ -138,8 +137,8 @@ public class ThumbnailServiceTests
         ErrorOr<Thumbnail> result = await _sut.GetThumbnailAsync(pathId, quality, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Permission.UnauthorizedAccess);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
     }
 
     [Theory]
@@ -159,14 +158,14 @@ public class ThumbnailServiceTests
         ErrorOr<Thumbnail> result = await _sut.GetThumbnailAsync(pathId, quality, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Type.Should().Be(imageType);
-        result.Value.Bytes.Should().NotBeEmpty();
+        Assert.False(result.IsError);
+        Assert.Equal(imageType, result.Value.Type);
+        Assert.NotEmpty(result.Value.Bytes);
 
         using (MemoryStream ms = new(result.Value.Bytes))
         {
             Image loadedImage = Image.Load(ms);
-            loadedImage.Should().NotBeNull();
+            Assert.NotNull(loadedImage);
         }
     }
 

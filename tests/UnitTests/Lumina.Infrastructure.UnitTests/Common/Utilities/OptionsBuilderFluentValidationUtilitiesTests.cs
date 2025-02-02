@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using FluentAssertions;
 using FluentValidation;
 using Lumina.Infrastructure.Common.Utilities;
 using Lumina.Infrastructure.Common.Validation;
@@ -44,7 +43,7 @@ public class OptionsBuilderFluentValidationUtilitiesTests
         OptionsBuilder<OptionsBuilderFluentValidationUtilitiesFixture> result = optionsBuilder.ValidateFluently();
 
         // Assert
-        result.Should().BeSameAs(optionsBuilder);
+        Assert.Same(optionsBuilder, result);
         services.Received(1).Add(Arg.Is<ServiceDescriptor>(sd =>
             sd.ServiceType == typeof(IValidateOptions<OptionsBuilderFluentValidationUtilitiesFixture>) &&
             sd.Lifetime == ServiceLifetime.Singleton &&
@@ -68,10 +67,10 @@ public class OptionsBuilderFluentValidationUtilitiesTests
             sd.Lifetime == ServiceLifetime.Singleton &&
             sd.ImplementationFactory != null);
 
-        serviceDescriptor.Should().NotBeNull();
+        Assert.NotNull(serviceDescriptor);
 
         Func<IServiceProvider, object>? implementationFactory = serviceDescriptor!.ImplementationFactory;
-        implementationFactory.Should().NotBeNull();
+        Assert.NotNull(implementationFactory);
 
         IServiceProvider serviceProvider = Substitute.For<IServiceProvider>();
         IValidator<OptionsBuilderFluentValidationUtilitiesFixture> mockValidator = Substitute.For<IValidator<OptionsBuilderFluentValidationUtilitiesFixture>>();
@@ -79,7 +78,7 @@ public class OptionsBuilderFluentValidationUtilitiesTests
             .Returns(mockValidator);
 
         FluentValidationOptions<OptionsBuilderFluentValidationUtilitiesFixture>? fluentValidationOptions = implementationFactory!(serviceProvider) as FluentValidationOptions<OptionsBuilderFluentValidationUtilitiesFixture>;
-        fluentValidationOptions.Should().NotBeNull();
-        fluentValidationOptions!.Name.Should().Be(name);
+        Assert.NotNull(fluentValidationOptions);
+        Assert.Equal(name, fluentValidationOptions.Name);
     }
 }

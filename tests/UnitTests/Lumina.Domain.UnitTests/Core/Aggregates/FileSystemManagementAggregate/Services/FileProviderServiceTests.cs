@@ -2,7 +2,6 @@
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Domain.Common.Enums.FileSystem;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
@@ -18,7 +17,6 @@ using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Runtime.InteropServices;
-
 #endregion
 
 namespace Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.Services;
@@ -67,8 +65,8 @@ public class FileProviderServiceTests
         ErrorOr<IEnumerable<FileSystemPathId>> result = _sut.GetFilePaths(path, false);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Permission.UnauthorizedAccess);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
     }
 
     [Fact]
@@ -84,9 +82,12 @@ public class FileProviderServiceTests
         ErrorOr<IEnumerable<FileSystemPathId>> result = _sut.GetFilePaths(path, false);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().HaveCount(3);
-        result.Value.Select(x => x.Path).Should().BeEquivalentTo(files);
+        Assert.False(result.IsError);
+        Assert.Equal(3, result.Value.Count());
+        Assert.Equal(
+            files.OrderBy(f => f),
+            result.Value.Select(x => x.Path).OrderBy(f => f)
+        );
     }
 
     [Fact]
@@ -104,9 +105,9 @@ public class FileProviderServiceTests
         ErrorOr<IEnumerable<FileSystemPathId>> result = _sut.GetFilePaths(path, false);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().HaveCount(1);
-        result.Value.First().Path.Should().Be(_pathVisible1);
+        Assert.False(result.IsError);
+        Assert.Single(result.Value);
+        Assert.Equal(_pathVisible1, result.Value.First().Path);
     }
 
     [Fact]
@@ -124,9 +125,12 @@ public class FileProviderServiceTests
         ErrorOr<IEnumerable<FileSystemPathId>> result = _sut.GetFilePaths(path, true);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().HaveCount(2);
-        result.Value.Select(x => x.Path).Should().BeEquivalentTo([_pathVisible1, _pathHidden1]);
+        Assert.False(result.IsError);
+        Assert.Equal(2, result.Value.Count());
+        Assert.Equal(
+            new[] { _pathVisible1, _pathHidden1 }.OrderBy(p => p),
+            result.Value.Select(x => x.Path).OrderBy(p => p)
+        );
     }
 
     [Fact]
@@ -144,9 +148,9 @@ public class FileProviderServiceTests
         ErrorOr<IEnumerable<FileSystemPathId>> result = _sut.GetFilePaths(path, false);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().HaveCount(2);
-        result.Value.Select(x => x.Path).Should().BeEquivalentTo([_pathInvalid1, _pathValid1]);
+        Assert.False(result.IsError);
+        Assert.Equal(2, result.Value.Count());
+        Assert.Equal([_pathInvalid1, _pathValid1], result.Value.Select(x => x.Path));
     }
 
     [Fact]
@@ -168,8 +172,8 @@ public class FileProviderServiceTests
         ErrorOr<IEnumerable<FileSystemPathId>> result = _sut.GetFilePaths(path, false);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Select(x => x.Path).Should().BeEquivalentTo(expectedFiles, options => options.WithStrictOrdering());
+        Assert.False(result.IsError);
+        Assert.Equal(expectedFiles, result.Value.Select(x => x.Path));
     }
 
     [Fact]
@@ -184,8 +188,8 @@ public class FileProviderServiceTests
         ErrorOr<IEnumerable<FileSystemPathId>> result = _sut.GetFilePaths(path, false);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().BeEmpty();
+        Assert.False(result.IsError);
+        Assert.Empty(result.Value);
     }
 
     [Fact]
@@ -199,8 +203,8 @@ public class FileProviderServiceTests
         ErrorOr<bool> result = _sut.FileExists(path);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().BeTrue();
+        Assert.False(result.IsError);
+        Assert.True(result.Value);
     }
 
     [Fact]
@@ -214,8 +218,8 @@ public class FileProviderServiceTests
         ErrorOr<bool> result = _sut.FileExists(path);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().BeFalse();
+        Assert.False(result.IsError);
+        Assert.False(result.Value);
     }
 
     [Fact]
@@ -230,8 +234,8 @@ public class FileProviderServiceTests
         ErrorOr<string> result = _sut.GetFileName(path);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().Be(expectedFileName);
+        Assert.False(result.IsError);
+        Assert.Equal(expectedFileName, result.Value);
     }
 
     [Fact]
@@ -245,8 +249,8 @@ public class FileProviderServiceTests
         ErrorOr<string> result = _sut.GetFileName(path);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().BeEmpty();
+        Assert.False(result.IsError);
+        Assert.Empty(result.Value);
     }
 
     [Fact]
@@ -269,12 +273,12 @@ public class FileProviderServiceTests
             ErrorOr<byte[]> result = _sut.GetFileAsync(path);
 
             // Assert
-            result.IsError.Should().BeFalse();
-            result.Value.Should().BeEquivalentTo(expectedContents);
+            Assert.False(result.IsError);
+            Assert.Equal(expectedContents, result.Value);
         }
         finally
         {
-            // Clean up
+            // clean up
             File.Delete(tempFilePath);
         }
     }
@@ -290,8 +294,8 @@ public class FileProviderServiceTests
         ErrorOr<byte[]> result = _sut.GetFileAsync(path);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Permission.UnauthorizedAccess);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
     }
 
     [Fact]
@@ -308,12 +312,12 @@ public class FileProviderServiceTests
             ErrorOr<byte[]> result = _sut.GetFileAsync(path);
 
             // Assert
-            result.IsError.Should().BeFalse();
-            result.Value.Should().BeEmpty();
+            Assert.False(result.IsError);
+            Assert.Empty(result.Value);
         }
         finally
         {
-            // Clean up
+            // clean up
             File.Delete(tempFilePath);
         }
     }
@@ -336,9 +340,9 @@ public class FileProviderServiceTests
             ErrorOr<Optional<DateTime>> result = _sut.GetLastWriteTime(path);
 
             // Assert
-            result.IsError.Should().BeFalse();
-            result.Value.HasValue.Should().BeTrue();
-            result.Value.Value.Should().BeCloseTo(expectedDateTime, TimeSpan.FromSeconds(1));
+            Assert.False(result.IsError);
+            Assert.True(result.Value.HasValue);
+            Assert.Equal(expectedDateTime, result.Value.Value, TimeSpan.FromSeconds(1));
         }
         finally
         {
@@ -357,8 +361,8 @@ public class FileProviderServiceTests
         ErrorOr<Optional<DateTime>> result = _sut.GetLastWriteTime(path);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Permission.UnauthorizedAccess);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
     }
 
     [Fact]
@@ -379,9 +383,9 @@ public class FileProviderServiceTests
             ErrorOr<Optional<DateTime>> result = _sut.GetCreationTime(path);
 
             // Assert
-            result.IsError.Should().BeFalse();
-            result.Value.HasValue.Should().BeTrue();
-            result.Value.Value.Should().BeCloseTo(expectedDateTime, TimeSpan.FromSeconds(1));
+            Assert.False(result.IsError);
+            Assert.True(result.Value.HasValue);
+            Assert.Equal(expectedDateTime, result.Value.Value, TimeSpan.FromSeconds(1));
         }
         finally
         {
@@ -400,8 +404,8 @@ public class FileProviderServiceTests
         ErrorOr<Optional<DateTime>> result = _sut.GetCreationTime(path);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Permission.UnauthorizedAccess);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
     }
 
     [Fact]
@@ -423,9 +427,9 @@ public class FileProviderServiceTests
             ErrorOr<long?> result = _sut.GetSize(path);
 
             // Assert
-            result.IsError.Should().BeFalse();
-            result.Value.Should().NotBeNull();
-            result.Value.Should().Be(expectedSize);
+            Assert.False(result.IsError);
+            Assert.NotNull(result.Value);
+            Assert.Equal(expectedSize, result.Value);
         }
         finally
         {
@@ -444,8 +448,8 @@ public class FileProviderServiceTests
         ErrorOr<long?> result = _sut.GetSize(path);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Permission.UnauthorizedAccess);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
     }
 
     [Fact]
@@ -462,8 +466,8 @@ public class FileProviderServiceTests
         ErrorOr<long?> result = _sut.GetSize(path);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().Be(0);
+        Assert.False(result.IsError);
+        Assert.Equal(0, result.Value);
     }
 
     [Fact]
@@ -484,8 +488,8 @@ public class FileProviderServiceTests
         ErrorOr<FileSystemPathId> result = _sut.CopyFile(sourcePath, destinationPath, overrideExisting);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Path.Should().Be(_pathDestinationFile);
+        Assert.False(result.IsError);
+        Assert.Equal(_pathDestinationFile, result.Value.Path);
         _mockFileSystem.File.Received(1).Copy(sourcePath.Path, _pathDestinationFile, overrideExisting);
     }
 
@@ -503,8 +507,8 @@ public class FileProviderServiceTests
         ErrorOr<FileSystemPathId> result = _sut.CopyFile(sourcePath, destinationPath, overrideExisting);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.FileSystemManagement.FileNotFound);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.FileSystemManagement.FileNotFound, result.FirstError);
     }
 
     [Fact]
@@ -529,8 +533,8 @@ public class FileProviderServiceTests
         ErrorOr<FileSystemPathId> result = _sut.CopyFile(sourcePath, destinationPath, overrideExisting);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.FileSystemManagement.FileAlreadyExists);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.FileSystemManagement.FileAlreadyExists, result.FirstError);
         _mockFileSystem.File.DidNotReceive().Copy(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>());
     }
 
@@ -552,8 +556,8 @@ public class FileProviderServiceTests
         ErrorOr<FileSystemPathId> result = _sut.CopyFile(sourcePath, destinationPath, overrideExisting);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Path.Should().Be(_pathDestinationFile);
+        Assert.False(result.IsError);
+        Assert.Equal(_pathDestinationFile, result.Value.Path);
         _mockFileSystem.File.Received(1).Copy(sourcePath.Path, _pathDestinationFile, overrideExisting);
     }
 
@@ -573,8 +577,8 @@ public class FileProviderServiceTests
         ErrorOr<FileSystemPathId> result = _sut.CopyFile(sourcePath, destinationPath, overrideExisting);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.FileSystemManagement.FileCopyError);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.FileSystemManagement.FileCopyError, result.FirstError);
     }
 
     [Fact]
@@ -615,8 +619,8 @@ public class FileProviderServiceTests
         ErrorOr<FileSystemPathId> result = _sut.CopyFile(sourcePath, destinationPath, overrideExisting);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Path.Should().Be(expectedNewFilePath);
+        Assert.False(result.IsError);
+        Assert.Equal(expectedNewFilePath, result.Value.Path);
         _mockFileSystem.File.Received(1).Copy(sourcePath.Path, expectedNewFilePath, overrideExisting);
     }
 
@@ -636,8 +640,8 @@ public class FileProviderServiceTests
         ErrorOr<FileSystemPathId> result = _sut.MoveFile(sourcePath, destinationPath, overrideExisting);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.FileSystemManagement.FileNotFound);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.FileSystemManagement.FileNotFound, result.FirstError);
     }
 
     [Fact]
@@ -658,8 +662,8 @@ public class FileProviderServiceTests
         ErrorOr<FileSystemPathId> result = _sut.MoveFile(sourcePath, destinationPath, overrideExisting);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Path.Should().Be(destinationFilePath);
+        Assert.False(result.IsError);
+        Assert.Equal(destinationFilePath, result.Value.Path);
         _mockFileSystem.File.Received(1).Move(sourcePath.Path, destinationFilePath);
     }
 
@@ -681,8 +685,8 @@ public class FileProviderServiceTests
         ErrorOr<FileSystemPathId> result = _sut.MoveFile(sourcePath, destinationPath, overrideExisting);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Path.Should().Be(destinationFilePath);
+        Assert.False(result.IsError);
+        Assert.Equal(destinationFilePath, result.Value.Path);
         _mockFileSystem.File.Received(1).Move(sourcePath.Path, destinationFilePath, overrideExisting);
     }
 
@@ -704,8 +708,8 @@ public class FileProviderServiceTests
         ErrorOr<FileSystemPathId> result = _sut.MoveFile(sourcePath, destinationPath, overrideExisting);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.FileSystemManagement.FileAlreadyExists);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.FileSystemManagement.FileAlreadyExists, result.FirstError);
     }
 
     [Fact]
@@ -728,8 +732,8 @@ public class FileProviderServiceTests
         ErrorOr<FileSystemPathId> result = _sut.MoveFile(sourcePath, destinationPath, overrideExisting);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.FileSystemManagement.FileMoveError);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.FileSystemManagement.FileMoveError, result.FirstError);
     }
 
     [Fact]
@@ -754,8 +758,8 @@ public class FileProviderServiceTests
         ErrorOr<FileSystemPathId> result = _sut.RenameFile(path, newName);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Path.Should().Be(newPath);
+        Assert.False(result.IsError);
+        Assert.Equal(newPath, result.Value.Path);
         _mockFileSystem.File.Received(1).Move(path.Path, newPath);
     }
 
@@ -780,8 +784,8 @@ public class FileProviderServiceTests
         ErrorOr<FileSystemPathId> result = _sut.RenameFile(path, newName);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Permission.UnauthorizedAccess);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
         _mockFileSystem.File.DidNotReceive().Move(Arg.Any<string>(), Arg.Any<string>());
     }
 
@@ -807,8 +811,8 @@ public class FileProviderServiceTests
         ErrorOr<FileSystemPathId> result = _sut.RenameFile(path, newName);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Permission.UnauthorizedAccess);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
         _mockFileSystem.File.DidNotReceive().Move(Arg.Any<string>(), Arg.Any<string>());
     }
 
@@ -827,8 +831,8 @@ public class FileProviderServiceTests
         ErrorOr<FileSystemPathId> result = _sut.RenameFile(path, newName);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.FileSystemManagement.CannotNavigateUp);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.FileSystemManagement.CannotNavigateUp, result.FirstError);
         _mockFileSystem.File.DidNotReceive().Move(Arg.Any<string>(), Arg.Any<string>());
     }
 
@@ -851,8 +855,8 @@ public class FileProviderServiceTests
         ErrorOr<FileSystemPathId> result = _sut.RenameFile(path, newName);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.FileSystemManagement.InvalidPath);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
         _mockFileSystem.File.DidNotReceive().Move(Arg.Any<string>(), Arg.Any<string>());
     }
 
@@ -884,8 +888,8 @@ public class FileProviderServiceTests
         ErrorOr<FileSystemPathId> result = _sut.RenameFile(path, newName);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Permission.UnauthorizedAccess);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
         _mockFileSystem.File.DidNotReceive().Move(Arg.Any<string>(), Arg.Any<string>());
     }
 
@@ -903,8 +907,8 @@ public class FileProviderServiceTests
         ErrorOr<Deleted> result = _sut.DeleteFile(path);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().Be(Result.Deleted);
+        Assert.False(result.IsError);
+        Assert.Equal(Result.Deleted, result.Value);
         _mockFileSystem.File.Received(1).Delete(path.Path);
     }
 
@@ -921,8 +925,8 @@ public class FileProviderServiceTests
         ErrorOr<Deleted> result = _sut.DeleteFile(path);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.Permission.UnauthorizedAccess);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
         _mockFileSystem.File.DidNotReceive().Delete(Arg.Any<string>());
     }
 }

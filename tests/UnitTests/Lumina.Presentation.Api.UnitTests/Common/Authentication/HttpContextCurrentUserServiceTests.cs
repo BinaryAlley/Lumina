@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Presentation.Api.Common.Authentication;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
@@ -38,7 +37,7 @@ public class HttpContextCurrentUserServiceTests
         Guid? result = _sut.UserId;
 
         // Assert
-        result.Should().BeNull();
+        Assert.Null(result);
     }
 
     [Fact]
@@ -52,7 +51,7 @@ public class HttpContextCurrentUserServiceTests
         Guid? result = _sut.UserId;
 
         // Assert
-        result.Should().BeNull();
+        Assert.Null(result);
     }
 
     [Fact]
@@ -71,7 +70,7 @@ public class HttpContextCurrentUserServiceTests
         Guid? result = _sut.UserId;
 
         // Assert
-        result.Should().BeNull();
+        Assert.Null(result);
     }
 
     [Fact]
@@ -90,7 +89,7 @@ public class HttpContextCurrentUserServiceTests
         Guid? result = _sut.UserId;
 
         // Assert
-        result.Should().BeNull();
+        Assert.Null(result);
     }
 
     [Fact]
@@ -110,7 +109,7 @@ public class HttpContextCurrentUserServiceTests
         Guid? result = _sut.UserId;
 
         // Assert
-        result.Should().Be(expectedUserId);
+        Assert.Equal(expectedUserId, result);
     }
 
     [Fact]
@@ -131,6 +130,6 @@ public class HttpContextCurrentUserServiceTests
         Guid? result = _sut.UserId;
 
         // Assert
-        result.Should().Be(expectedUserId);
+        Assert.Equal(expectedUserId, result);
     }
 }

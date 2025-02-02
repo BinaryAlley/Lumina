@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Application.Core.FileSystemManagement.Paths.Queries.GetPathRoot;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Pahs.Fixtures;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Pahs.Queries.GetPathRoot.Fixtures;
@@ -49,9 +48,9 @@ public class GetPathRootQueryHandlerTests
         ErrorOr<PathSegmentResponse> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().NotBeNull();
-        result.Value.Path.Should().Be(pathSegment.Name);
+        Assert.False(result.IsError);
+        Assert.NotNull(result.Value);
+        Assert.Equal(pathSegment.Name, result.Value.Path);
         _mockPathService.Received(1).GetPathRoot(query.Path!);
     }
 
@@ -68,8 +67,8 @@ public class GetPathRootQueryHandlerTests
         ErrorOr<PathSegmentResponse> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(error);
+        Assert.True(result.IsError);
+        Assert.Equal(error, result.FirstError);
         _mockPathService.Received(1).GetPathRoot(query.Path!);
     }
 
@@ -87,9 +86,9 @@ public class GetPathRootQueryHandlerTests
         ErrorOr<PathSegmentResponse> result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().NotBeNull();
-        result.Value.Path.Should().Be("/");
+        Assert.False(result.IsError);
+        Assert.NotNull(result.Value);
+        Assert.Equal("/", result.Value.Path);
         _mockPathService.Received(1).GetPathRoot(query.Path!);
     }
 }

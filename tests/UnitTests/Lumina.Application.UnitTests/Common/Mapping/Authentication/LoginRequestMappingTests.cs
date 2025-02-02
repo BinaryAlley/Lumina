@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.Mapping.Authentication;
 using Lumina.Application.Core.UsersManagement.Authentication.Queries.LoginUser;
 using Lumina.Application.UnitTests.Core.UsersManagement.Authentication.Queries.LoginUser.Fixtures;
@@ -35,10 +34,10 @@ public class LoginRequestMappingTests
         LoginUserQuery result = request.ToQuery();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Username.Should().Be(request.Username);
-        result.Password.Should().Be(request.Password);
-        result.TotpCode.Should().Be(request.TotpCode);
+        Assert.NotNull(result);
+        Assert.Equal(request.Username, result.Username);
+        Assert.Equal(request.Password, result.Password);
+        Assert.Equal(request.TotpCode, result.TotpCode);
     }
 
     [Fact]
@@ -51,10 +50,10 @@ public class LoginRequestMappingTests
         LoginUserQuery result = request.ToQuery();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Username.Should().BeNull();
-        result.Password.Should().BeNull();
-        result.TotpCode.Should().BeNull();
+        Assert.NotNull(result);
+        Assert.Null(result.Username);
+        Assert.Null(result.Password);
+        Assert.Null(result.TotpCode);
     }
 
     [Theory]
@@ -74,9 +73,9 @@ public class LoginRequestMappingTests
         LoginUserQuery result = request.ToQuery();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Username.Should().Be(username);
-        result.Password.Should().Be(password);
-        result.TotpCode.Should().Be(totpCode);
+        Assert.NotNull(result);
+        Assert.Equal(username, result.Username);
+        Assert.Equal(password, result.Password);
+        Assert.Equal(totpCode, result.TotpCode);
     }
 }

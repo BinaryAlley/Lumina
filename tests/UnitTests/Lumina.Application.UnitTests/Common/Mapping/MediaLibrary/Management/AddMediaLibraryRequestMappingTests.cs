@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Application.Core.MediaLibrary.Management.Commands.AddLibrary;
 using Lumina.Contracts.Requests.MediaLibrary.Management;
@@ -34,15 +33,15 @@ public class AddMediaLibraryRequestMappingTests
         AddLibraryCommand result = request.ToCommand();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Title.Should().Be(request.Title);
-        result.LibraryType.Should().Be(request.LibraryType);
-        result.ContentLocations.Should().BeEquivalentTo(request.ContentLocations);
-        result.CoverImage.Should().BeEquivalentTo(request.CoverImage);
-        result.IsEnabled.Should().Be(request.IsEnabled);
-        result.IsLocked.Should().Be(request.IsLocked);
-        result.DownloadMedatadaFromWeb.Should().Be(request.DownloadMedatadaFromWeb);
-        result.SaveMetadataInMediaDirectories.Should().Be(request.SaveMetadataInMediaDirectories);
+        Assert.NotNull(result);
+        Assert.Equal(request.Title, result.Title);
+        Assert.Equal(request.LibraryType, result.LibraryType);
+        Assert.Equal(request.ContentLocations, result.ContentLocations);
+        Assert.Equal(request.CoverImage, result.CoverImage);
+        Assert.Equal(request.IsEnabled, result.IsEnabled);
+        Assert.Equal(request.IsLocked, result.IsLocked);
+        Assert.Equal(request.DownloadMedatadaFromWeb, result.DownloadMedatadaFromWeb);
+        Assert.Equal(request.SaveMetadataInMediaDirectories, result.SaveMetadataInMediaDirectories);
     }
 
     [Theory]
@@ -68,15 +67,15 @@ public class AddMediaLibraryRequestMappingTests
         AddLibraryCommand result = request.ToCommand();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Title.Should().Be(request.Title);
-        result.LibraryType.Should().Be(libraryType.ToString());
-        result.ContentLocations.Should().BeEquivalentTo(request.ContentLocations);
-        result.CoverImage.Should().BeEquivalentTo(request.CoverImage);
-        result.IsEnabled.Should().Be(request.IsEnabled);
-        result.IsLocked.Should().Be(request.IsLocked);
-        result.DownloadMedatadaFromWeb.Should().Be(request.DownloadMedatadaFromWeb);
-        result.SaveMetadataInMediaDirectories.Should().Be(request.SaveMetadataInMediaDirectories);
+        Assert.NotNull(result);
+        Assert.Equal(request.Title, result.Title);
+        Assert.Equal(libraryType.ToString(), result.LibraryType);
+        Assert.Equal(request.ContentLocations, result.ContentLocations);
+        Assert.Equal(request.CoverImage, result.CoverImage);
+        Assert.Equal(request.IsEnabled, result.IsEnabled);
+        Assert.Equal(request.IsLocked, result.IsLocked);
+        Assert.Equal(request.DownloadMedatadaFromWeb, result.DownloadMedatadaFromWeb);
+        Assert.Equal(request.SaveMetadataInMediaDirectories, result.SaveMetadataInMediaDirectories);
     }
 
     [Fact]
@@ -106,8 +105,8 @@ public class AddMediaLibraryRequestMappingTests
         AddLibraryCommand result = request.ToCommand();
 
         // Assert
-        result.Should().NotBeNull();
-        result.ContentLocations.Should().BeEquivalentTo(contentLocations);
+        Assert.NotNull(result);
+        Assert.Equal(contentLocations, result.ContentLocations);
     }
 
     [Fact]
@@ -135,7 +134,7 @@ public class AddMediaLibraryRequestMappingTests
         AddLibraryCommand result = request.ToCommand();
 
         // Assert
-        result.Should().NotBeNull();
-        result.CoverImage.Should().BeNull();
+        Assert.NotNull(result);
+        Assert.Null(result.CoverImage);
     }
 }

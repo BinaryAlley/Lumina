@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentAssertions;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.DataAccess.Core.UoW;
@@ -71,7 +70,7 @@ public class RegisterEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
 
         // Assert
         double stdDev = CalculateStandardDeviation(timings);
-        stdDev.Should().BeLessThan(200);
+        Assert.True(stdDev < 200);
     }
 
     [Fact]
@@ -93,20 +92,20 @@ public class RegisterEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
 
         // Assert
         HttpResponseMessage lastResponse = responses.Last();
-        lastResponse.StatusCode.Should().Be(HttpStatusCode.TooManyRequests);
+        Assert.Equal(HttpStatusCode.TooManyRequests, lastResponse.StatusCode);
         string content = await lastResponse.Content.ReadAsStringAsync();
 
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
-        problemDetails.Should().NotBeNull();
-        problemDetails!["status"].GetInt32().Should().Be(StatusCodes.Status429TooManyRequests);
-        problemDetails["type"].GetString().Should().Be("https://tools.ietf.org/html/rfc7231#section-6.5.29");
-        problemDetails["title"].GetString().Should().Be("TooManyRequests");
-        problemDetails["detail"].GetString().Should().Be("TooManyRequests");
-        problemDetails["retryAfter"].GetString().Should().Be("900");
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status429TooManyRequests, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc7231#section-6.5.29", problemDetails["type"].GetString());
+        Assert.Equal("TooManyRequests", problemDetails["title"].GetString());
+        Assert.Equal("TooManyRequests", problemDetails["detail"].GetString());
+        Assert.Equal("900", problemDetails["retryAfter"].GetString());
 
-        lastResponse.Headers.Should().ContainKey("X-RateLimit-Limit");
-        lastResponse.Headers.Should().ContainKey("X-RateLimit-Reset");
-        lastResponse.Headers.Should().ContainKey("X-RateLimit-Remaining");
+        Assert.True(lastResponse.Headers.Contains("X-RateLimit-Limit"));
+        Assert.True(lastResponse.Headers.Contains("X-RateLimit-Reset"));
+        Assert.True(lastResponse.Headers.Contains("X-RateLimit-Remaining"));
     }
 
     [Theory]
@@ -129,12 +128,12 @@ public class RegisterEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
         string content = await response.Content.ReadAsStringAsync();
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.UnprocessableContent);
-        content.Should().NotContain("SQL");
-        content.Should().NotContain("Exception");
-        content.Should().NotContain("password");
-        content.Should().NotContain("hash");
-        content.Should().NotContain("salt");
+        Assert.Equal(HttpStatusCode.UnprocessableContent, response.StatusCode);
+        Assert.DoesNotContain("SQL", content);
+        Assert.DoesNotContain("Exception", content);
+        Assert.DoesNotContain("password", content);
+        Assert.DoesNotContain("hash", content);
+        Assert.DoesNotContain("salt", content);
     }
 
     [Theory]
@@ -158,8 +157,8 @@ public class RegisterEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
         string content = await response.Content.ReadAsStringAsync();
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.UnprocessableContent);
-        content.Should().NotContain(weakPassword); // shouldn't leak the actual password
+        Assert.Equal(HttpStatusCode.UnprocessableContent, response.StatusCode);
+        Assert.DoesNotContain(weakPassword, content); // shouldn't leak the actual password
     }
 
     [Theory]
@@ -178,7 +177,7 @@ public class RegisterEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
         HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/auth/register", request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
     }
 
     [Fact]
@@ -199,11 +198,10 @@ public class RegisterEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
         string content = await response.Content.ReadAsStringAsync();
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
-        content.Should().NotContain(_testUsername);
-        content.Should().NotContain("password");
-        content.Should().NotContain("hash");
-        content.Should().NotContain("salt");
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+        Assert.DoesNotContain("password", content);
+        Assert.DoesNotContain("hash", content);
+        Assert.DoesNotContain("salt", content);
     }
 
     private double CalculateStandardDeviation(List<long> values)

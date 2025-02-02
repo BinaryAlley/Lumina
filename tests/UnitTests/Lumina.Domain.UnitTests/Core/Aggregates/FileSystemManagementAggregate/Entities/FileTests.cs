@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FluentAssertions;
 using Lumina.Domain.Common.Enums.FileSystem;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
@@ -32,13 +31,13 @@ public class FileTests
         ErrorOr<File> result = File.Create(path, name, dateCreated, dateModified, size);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().NotBeNull();
-        result.Value.Name.Should().Be(name);
-        result.Value.DateCreated.Should().Be(dateCreated);
-        result.Value.DateModified.Should().Be(dateModified);
-        result.Value.Size.Should().Be(size);
-        result.Value.Status.Should().Be(FileSystemItemStatus.Accessible);
+        Assert.False(result.IsError);
+        Assert.NotNull(result.Value);
+        Assert.Equal(name, result.Value.Name);
+        Assert.Equal(dateCreated, result.Value.DateCreated);
+        Assert.Equal(dateModified, result.Value.DateModified);
+        Assert.Equal(size, result.Value.Size);
+        Assert.Equal(FileSystemItemStatus.Accessible, result.Value.Status);
     }
 
     [Fact]
@@ -55,8 +54,8 @@ public class FileTests
         ErrorOr<File> result = File.Create(invalidPath, name, dateCreated, dateModified, size);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.FileSystemManagement.InvalidPath);
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
     }
 
     [Fact]
@@ -64,7 +63,7 @@ public class FileTests
     {
         // Arrange
         ErrorOr<FileSystemPathId> pathIdResult = FileSystemPathId.Create("/valid/path/file.txt");
-        pathIdResult.IsError.Should().BeFalse();
+        Assert.False(pathIdResult.IsError);
         FileSystemPathId pathId = pathIdResult.Value;
         string name = "file.txt";
         Optional<DateTime> dateCreated = DateTime.Now;
@@ -75,14 +74,14 @@ public class FileTests
         ErrorOr<File> result = File.Create(pathId, name, dateCreated, dateModified, size);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        result.Value.Should().NotBeNull();
-        result.Value.Id.Should().Be(pathId);
-        result.Value.Name.Should().Be(name);
-        result.Value.DateCreated.Should().Be(dateCreated);
-        result.Value.DateModified.Should().Be(dateModified);
-        result.Value.Size.Should().Be(size);
-        result.Value.Status.Should().Be(FileSystemItemStatus.Accessible);
+        Assert.False(result.IsError);
+        Assert.NotNull(result.Value);
+        Assert.Equal(pathId, result.Value.Id);
+        Assert.Equal(name, result.Value.Name);
+        Assert.Equal(dateCreated, result.Value.DateCreated);
+        Assert.Equal(dateModified, result.Value.DateModified);
+        Assert.Equal(size, result.Value.Size);
+        Assert.Equal(FileSystemItemStatus.Accessible, result.Value.Status);
     }
 
     [Fact]
@@ -90,7 +89,7 @@ public class FileTests
     {
         // Arrange
         ErrorOr<File> fileResult = File.Create("/valid/path/file.txt", "file.txt", Optional<DateTime>.None(), Optional<DateTime>.None(), 1024);
-        fileResult.IsError.Should().BeFalse();
+        Assert.False(fileResult.IsError);
         File file = fileResult.Value;
         DateTime newDate = DateTime.Now;
 
@@ -98,8 +97,8 @@ public class FileTests
         ErrorOr<Updated> result = file.UpdateLastModified(newDate);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        file.DateModified.Value.Should().Be(newDate);
+        Assert.False(result.IsError);
+        Assert.Equal(newDate, file.DateModified.Value);
     }
 
     [Fact]
@@ -107,7 +106,7 @@ public class FileTests
     {
         // Arrange
         ErrorOr<File> fileResult = File.Create("/valid/path/file.txt", "file.txt", Optional<DateTime>.None(), Optional<DateTime>.None(), 1024);
-        fileResult.IsError.Should().BeFalse();
+        Assert.False(fileResult.IsError);
         File file = fileResult.Value;
         long newSize = 2048;
 
@@ -115,8 +114,8 @@ public class FileTests
         ErrorOr<Updated> result = file.UpdateSize(newSize);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        file.Size.Should().Be(newSize);
+        Assert.False(result.IsError);
+        Assert.Equal(newSize, file.Size);
     }
 
     [Fact]
@@ -124,7 +123,7 @@ public class FileTests
     {
         // Arrange
         ErrorOr<File> fileResult = File.Create("/valid/path/file.txt", "file.txt", Optional<DateTime>.None(), Optional<DateTime>.None(), 1024);
-        fileResult.IsError.Should().BeFalse();
+        Assert.False(fileResult.IsError);
         File file = fileResult.Value;
         string newName = "newfile.txt";
 
@@ -132,8 +131,8 @@ public class FileTests
         ErrorOr<Updated> result = file.Rename(newName);
 
         // Assert
-        result.IsError.Should().BeFalse();
-        file.Name.Should().Be(newName);
+        Assert.False(result.IsError);
+        Assert.Equal(newName, file.Name);
     }
 
     [Fact]
@@ -141,7 +140,7 @@ public class FileTests
     {
         // Arrange
         ErrorOr<File> fileResult = File.Create("/valid/path/file.txt", "file.txt", Optional<DateTime>.None(), Optional<DateTime>.None(), 1024);
-        fileResult.IsError.Should().BeFalse();
+        Assert.False(fileResult.IsError);
         File file = fileResult.Value;
         string emptyName = "";
 
@@ -149,8 +148,8 @@ public class FileTests
         ErrorOr<Updated> result = file.Rename(emptyName);
 
         // Assert
-        result.IsError.Should().BeTrue();
-        result.FirstError.Should().Be(Errors.FileSystemManagement.NameCannotBeEmpty);
-        file.Name.Should().Be("file.txt");
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.FileSystemManagement.NameCannotBeEmpty, result.FirstError);
+        Assert.Equal("file.txt", file.Name);
     }
 }

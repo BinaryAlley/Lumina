@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using FluentAssertions;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Paths;
 using Lumina.Application.Core.FileSystemManagement.Paths.Queries.CheckPathExists;
 using Lumina.Contracts.Requests.FileSystemManagement.Path;
@@ -38,9 +37,9 @@ public class CheckPathExistsRequestMappingTests
         CheckPathExistsQuery result = request.ToQuery();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Path.Should().Be(request.Path);
-        result.IncludeHiddenElements.Should().Be(request.IncludeHiddenElements);
+        Assert.NotNull(result);
+        Assert.Equal(request.Path, result.Path);
+        Assert.Equal(request.IncludeHiddenElements, result.IncludeHiddenElements);
     }
 
     [Theory]
@@ -56,9 +55,9 @@ public class CheckPathExistsRequestMappingTests
         CheckPathExistsQuery result = request.ToQuery();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Path.Should().Be(path);
-        result.IncludeHiddenElements.Should().Be(includeHiddenElements);
+        Assert.NotNull(result);
+        Assert.Equal(path, result.Path);
+        Assert.Equal(includeHiddenElements, result.IncludeHiddenElements);
     }
 
     [Fact]
@@ -71,12 +70,12 @@ public class CheckPathExistsRequestMappingTests
         List<CheckPathExistsQuery> results = requests.Select(r => r.ToQuery()).ToList();
 
         // Assert
-        results.Should().NotBeNull();
-        results.Should().HaveCount(requests.Count);
+        Assert.NotNull(results);
+        Assert.Equal(requests.Count, results.Count);
         for (int i = 0; i < requests.Count; i++)
         {
-            results[i].Path.Should().Be(requests[i].Path);
-            results[i].IncludeHiddenElements.Should().Be(requests[i].IncludeHiddenElements);
+            Assert.Equal(requests[i].Path, results[i].Path);
+            Assert.Equal(requests[i].IncludeHiddenElements, results[i].IncludeHiddenElements);
         }
     }
 }
