@@ -1,0 +1,41 @@
+@startuml Lumina API Server Components
+!include <C4/C4_Component>
+
+LAYOUT_WITH_LEGEND()
+title Component diagram for Lumina API Server
+
+Container_Ext(webapp, "Web Application Client", "Lumina.Presentation.Web", "Provides the user interface")
+
+Container_Boundary(api, "API Application") {
+    Component(endpoints, "API Endpoints", "FastEndpoints", "Provides REST API endpoints for media management and streaming")
+    
+    Component(mediaManagement, "Media Library Management", "Domain Services", "Handles media libraries operations and metadata management")
+    
+    Component(userManagement, "User Management", "Domain Services", "Handles user authentication and authorization")
+    
+    Component(fileSystem, "File System Management", "Domain Services", "Manages file system operations and media access")
+    
+    Component(backgroundServices, "Background Services", ".NET Worker Services", "Handles media scanning, metadata synchronization and other maintenance tasks")
+    
+    Component(repositories, "Repositories", "EF Core", "Provides data access abstraction for domain entities")
+}
+
+ContainerDb(db, "Database", "SQLite", "Stores user data, media metadata, and system configuration")
+
+System_Ext(metadataServices, "External Metadata Services", "Provides media information (TMDB, TVDB, GoodReads, MusicBrainz, etc)")
+
+Rel(webapp, endpoints, "Makes API calls to", "JSON/HTTPS")
+Rel(endpoints, mediaManagement, "Uses")
+Rel(endpoints, userManagement, "Uses")
+Rel(endpoints, fileSystem, "Uses")
+Rel(mediaManagement, repositories, "Uses")
+Rel(userManagement, repositories, "Uses")
+Rel(fileSystem, repositories, "Uses")
+Rel(backgroundServices, mediaManagement, "Uses")
+Rel(repositories, db, "Reads from and writes to", "SQL")
+Rel(mediaManagement, metadataServices, "Retrieves metadata from", "HTTPS")
+
+caption [Component] Lumina - API Server (Lumina.Presentation.Api)
+
+footer The component diagram for the Lumina API Server - created with PlantUML
+@enduml

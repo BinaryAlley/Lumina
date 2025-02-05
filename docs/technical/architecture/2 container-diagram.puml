@@ -1,0 +1,32 @@
+@startuml Lumina Container Diagram
+!include <C4/C4_Container>
+
+LAYOUT_WITH_LEGEND()
+title Container diagram for Lumina Media Library Manager
+
+Person(user, "Home User", "A person who wants to manage and stream their personal media collection")
+Person(admin, "Administrator", "A person who manages the media library system")
+
+System_Boundary(c1, "Lumina") {
+    Container(webapp, "Web Application Client", "ASP.NET Core MVC", "Delivers server-rendered views with dynamic client-side functionality for media management and playback")
+    
+    Container(api, "API Server", "ASP.NET Core", "Provides media management functionality via a REST API, processes media tasks, and manages metadata synchronization")
+    
+    ContainerDb(db, "Database", "SQLite", "Stores user data, media metadata, library configuration, automated jobs information, etc")
+    
+    Container(filestore, "Media Store", "File System", "Stores the actual media files")
+}
+
+System_Ext(metadata, "Media Information Services", "External services like TMDB, TVDB, GoodReads, MusicBrainz, that provide media metadata")
+
+Rel(user, webapp, "Uses", "HTTPS")
+Rel(admin, webapp, "Manages media library and system settings", "HTTPS")
+Rel(webapp, api, "Makes API calls to", "JSON/HTTPS")
+Rel(api, db, "Reads from and writes to", "SQL")
+Rel(api, filestore, "Reads from and writes to")
+Rel(api, metadata, "Retrieves metadata from", "HTTPS")
+
+caption [Container] Lumina
+
+footer The container diagram for the Lumina Media Library Manager - created with PlantUML
+@enduml

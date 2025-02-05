@@ -1,0 +1,22 @@
+@startuml test
+!include <C4/C4_Context>
+
+LAYOUT_WITH_LEGEND()
+title System Context diagram for Lumina Media Library Manager
+
+Person(user, "Home User", "A person who wants to manage and stream their personal media collection")
+Person(admin, "Administrator", "A person who manages the media library system")
+
+System(lumina, "Lumina", "Allows users to organize, manage and stream their personal media content")
+
+System_Ext(metadataProvider, "Media Metadata Services", "External services that provide media information and metadata (TMDB, TVDB, GoodReads, MusicBrainz, etc)")
+
+Rel(user, lumina, "Views and streams media content")
+Rel(admin, lumina, "Manages media library and system settings")
+Rel(lumina, metadataProvider, "Retrieves media metadata and artwork")
+
+caption [System Context] Lumina
+
+footer The system context diagram for the Lumina Media Library Manager - created with PlantUML
+
+@enduml

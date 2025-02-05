@@ -1,0 +1,36 @@
+@startuml Lumina Web Application Components
+!include <C4/C4_Component>
+
+LAYOUT_WITH_LEGEND()
+title Component diagram for Lumina Web Application Client
+
+Container_Ext(api, "API Server", "Lumina.Presentation.Api", "Provides media management functionality via JSON/HTTPS API")
+
+Container_Boundary(wb, "Web Application") {
+    Component(fileSystem, "File System Management", "ASP.NET MVC Controllers", "Handles file system operations including drives, directories, and files browsing")
+    
+    Component(library, "Library Management", "ASP.NET MVC Controllers", "Manages media libraries and their content (books, etc)")
+    
+    Component(admin, "Administration", "ASP.NET MVC Controllers", "Handles system administration and configuration")
+    
+    Component(users, "User Management", "ASP.NET MVC Controllers", "Handles authentication and user management")
+    
+    Component(clientJs, "Client-Side Logic", "JavaScript", "Handles dynamic page updates and persistent media playback")
+    
+    Component(httpClient, "API HTTP Client", "C# TypedHttpClient", "Handles communication with the API server")
+}
+
+Rel(fileSystem, httpClient, "Uses")
+Rel(library, httpClient, "Uses")
+Rel(admin, httpClient, "Uses")
+Rel(users, httpClient, "Uses")
+Rel(httpClient, api, "Makes API calls to", "JSON/HTTPS")
+Rel(clientJs, fileSystem, "Makes AJAX calls to")
+Rel(clientJs, library, "Makes AJAX calls to")
+Rel(clientJs, admin, "Makes AJAX calls to")
+Rel(clientJs, users, "Makes AJAX calls to")
+
+caption [Component] Lumina - Web Application (Lumina.Presentation.Web)
+
+footer The component diagram for the Lumina Web Application Client - created with PlantUML
+@enduml
