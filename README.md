@@ -16,6 +16,19 @@ Stay tuned as we build something amazing together. Lumina is about to light up y
 
 P.S. This README is just a spark. Watch it grow into a supernova! ✨
 
+## Documentation
+
+For those with technical curiosities, here are some goodies to browse through:
+- This application was written following Clean Architecture and Domain Driven Design. Although you've probably seen it countless times before, here is the diagram of how the structure looks like.
+- A tree-like schematic of the Lumina's Server Domain layer can be seen [here](./docs/technical/domain/Domain.md).
+- The Ubiquitous Language used by Lumina's Server Domain layer can be read [here](./docs/technical/domain/UbiquitousLanguage.md).
+- For Software Architects, the architecture documents of Lumina were designed using the [C4 model](https://c4model.com/), therefor, you can visualize:
+1. [1 System Context diagram](./docs/technical/architecture/1%20system-context-diagram.svg)
+2. [2 Container diagram](./docs/technical/architecture/2%20container-diagram.svg)
+3. [3.1 Component Web Client diagram](./docs/technical/architecture/3.1%20component-web-client-diagram.svg)
+4. [3.2 Component API Server diagram](./docs/technical/architecture/3.2%20component-api-server-diagram.svg)
+5. [4.1 Code media library scanning diagram](./docs/technical/architecture/4.1%20code-media-library-scanning-diagram.svg)
+
 ## Contributing
 
 Lumina welcomes community contributions. All forms of input, be it code, bug reports, or feature suggestions, are appreciated. Be sure to read the [guidelines](./docs/CONTRIBUTING.md) for contributing first!

@@ -1,0 +1,137 @@
+@startuml Media Library Scanning System Code
+!include <C4/C4_Component>
+
+LAYOUT_WITH_LEGEND()
+title Code diagram for Background Services 3.2.1
+
+skinparam class {
+    BackgroundColor White
+    BorderColor Black
+}
+
+abstract class MediaLibraryScanJob {
+    + ScanId: Guid
+    + UserId: Guid
+    + Library: Library
+    + Status: LibraryScanJobStatus
+    # parentsPayloadsExecuted: int
+    + Children: List<MediaLibraryScanJob>
+    + Parents: List<MediaLibraryScanJob>
+    + AddChild(job: MediaLibraryScanJob)
+    + AddParent(job: MediaLibraryScanJob)
+    + {abstract} ExecuteAsync<TInput>(id: Guid, input: TInput, token: CancellationToken): Task
+}
+
+note right of MediaLibraryScanJob
+  Base class for all scan jobs that defines the parent-child
+  relationship and execution pattern
+end note
+
+class HashComparerJob {
+    + ExecuteAsync<TInput>(id: Guid, input: TInput, token: CancellationToken): Task
+}
+
+class FileSystemDiscoveryJob {
+    ExecuteAsync<TInput>(id: Guid, input: TInput, token: CancellationToken): Task
+}
+
+class RepositoryMetadataDiscoveryJob {
+    ExecuteAsync<TInput>(id: Guid, input: TInput, token: CancellationToken): Task
+}
+
+class GoodReadsMetadataScrapJob {
+    ExecuteAsync<TInput>(id: Guid, input: TInput, token: CancellationToken): Task
+}
+
+interface IMediaTypeScanner {
+    + SupportedType: LibraryType
+    + CreateScanJobsForLibrary(library: Library): IEnumerable<MediaLibraryScanJob>
+}
+
+note top of IMediaTypeScanner
+  Determine the library type (audio, video, etc) and create a scanner for that particular type
+end note
+
+interface IBookLibraryTypeScanner {
+}
+
+class BookLibraryTypeScanner {
+    - _mediaScanJobFactory: IMediaLibraryScanJobFactory
+    + SupportedType: LibraryType
+    + CreateScanJobsForLibrary(library: Library): IEnumerable<MediaLibraryScanJob>
+}
+
+class MediaLibraryScanningService {
+    - _mediaScanQueue: IMediaLibrariesScanQueue
+    - _libraryScannerFactory: IMediaLibraryScannerFactory
+    - _librariesScanTracker: IMediaLibrariesScanTracker
+    - _currentUserService: ICurrentUserService
+    + StartScanAsync(library: Library, token: CancellationToken): Task<Guid>
+    + CancelScan(scanId: Guid)
+}
+
+note top of MediaLibraryScanningService
+  Central service for managing execution and cancellation of media library scans
+end note
+
+class MediaLibrariesScanQueue {
+    - _channel: Channel<MediaLibraryScanJob>
+    + Writer: ChannelWriter<MediaLibraryScanJob>
+    + Reader: ChannelReader<MediaLibraryScanJob>
+}
+
+note bottom of MediaLibrariesScanQueue
+  In-memory queue of media library scan jobs
+end note
+
+class MediaLibraryScanJobProcessorJob {
+    - _mediaScanQueue: IMediaLibrariesScanQueue
+    - _librariesScanTracker: IMediaLibrariesScanTracker
+    # ExecuteAsync(token: CancellationToken): Task
+}
+
+note top of MediaLibraryScanJobProcessorJob
+  Launch the payload execution of scan jobs that arrive on the in-memory queue
+end note
+
+class MediaLibrariesScanTracker {
+    - _runningScans: ConcurrentDictionary<MediaScanTrackerModel, CancellationTokenSource>
+    + RegisterScan(scanId: Guid, userId: Guid)
+    + GetTokenForScan(scanId: Guid, userId: Guid): CancellationToken
+    + CancelScan(scanId: Guid, userId: Guid)
+    + CancelUserScans(userId: Guid)
+    + Dispose()
+}
+
+note bottom of MediaLibrariesScanTracker
+  Track the state of each running scan job and allow for cancelling at any time
+end note
+
+MediaLibraryScanJob <|-- HashComparerJob : inherits
+MediaLibraryScanJob <|-- FileSystemDiscoveryJob : inherits
+MediaLibraryScanJob <|-- RepositoryMetadataDiscoveryJob : inherits
+MediaLibraryScanJob <|-- GoodReadsMetadataScrapJob : inherits
+
+FileSystemDiscoveryJob ..> HashComparerJob : triggers
+RepositoryMetadataDiscoveryJob ..> HashComparerJob : triggers
+HashComparerJob ..> GoodReadsMetadataScrapJob : triggers
+
+IMediaTypeScanner <|-- IBookLibraryTypeScanner
+IBookLibraryTypeScanner <|.. BookLibraryTypeScanner
+
+MediaLibraryScanningService --> IMediaTypeScanner : uses
+MediaLibraryScanningService --> MediaLibrariesScanQueue : writes to
+MediaLibraryScanningService --> MediaLibrariesScanTracker : uses
+
+MediaLibraryScanJobProcessorJob --> MediaLibrariesScanQueue : reads from
+MediaLibraryScanJobProcessorJob --> MediaLibrariesScanTracker : uses
+
+BookLibraryTypeScanner ..> MediaLibraryScanJob : creates
+
+MediaLibraryScanJobProcessorJob ..> FileSystemDiscoveryJob : triggers
+MediaLibraryScanJobProcessorJob ..> RepositoryMetadataDiscoveryJob : triggers
+
+caption [Code] Lumina - Background Services 3.2.1
+
+footer The code diagram for the Background Services 3.2.1 - created with PlantUML
+@enduml
