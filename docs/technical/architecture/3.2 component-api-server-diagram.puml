@@ -2,11 +2,11 @@
 !include <C4/C4_Component>
 
 LAYOUT_WITH_LEGEND()
-title Component diagram for Lumina API Server
+title Component diagram for Lumina API Server 2.2
 
-Container_Ext(webapp, "Web Application Client", "Lumina.Presentation.Web", "Provides the user interface")
+Container_Ext(webapp, "Web Application Client 2.1", "Lumina.Presentation.Web", "Provides the user interface [detailed in '3.1 component-web-client-diagram.puml']")
 
-Container_Boundary(api, "API Application") {
+Container_Boundary(api, "API Server 2.2") {
     Component(endpoints, "API Endpoints", "FastEndpoints", "Provides REST API endpoints for media management and streaming")
     
     Component(mediaManagement, "Media Library Management", "Domain Services", "Handles media libraries operations and metadata management")
@@ -15,7 +15,7 @@ Container_Boundary(api, "API Application") {
     
     Component(fileSystem, "File System Management", "Domain Services", "Manages file system operations and media access")
     
-    Component(backgroundServices, "Background Services", ".NET Worker Services", "Handles media scanning, metadata synchronization and other maintenance tasks")
+    Component(backgroundServices, "Background Services 3.2.1", ".NET Worker Services", "Handles media scanning, metadata synchronization and other maintenance tasks [detailed in '4.1 code-media-library-scanning-diagram.puml']")
     
     Component(repositories, "Repositories", "EF Core", "Provides data access abstraction for domain entities")
 }
@@ -35,7 +35,7 @@ Rel(backgroundServices, mediaManagement, "Uses")
 Rel(repositories, db, "Reads from and writes to", "SQL")
 Rel(mediaManagement, metadataServices, "Retrieves metadata from", "HTTPS")
 
-caption [Component] Lumina - API Server (Lumina.Presentation.Api)
+caption [Component] Lumina - API Server 2.2 (Lumina.Presentation.Api)
 
-footer The component diagram for the Lumina API Server - created with PlantUML
+footer The component diagram for the Lumina API Server 2.2 - created with PlantUML
 @enduml

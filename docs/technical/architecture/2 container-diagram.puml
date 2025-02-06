@@ -2,15 +2,15 @@
 !include <C4/C4_Container>
 
 LAYOUT_WITH_LEGEND()
-title Container diagram for Lumina Media Library Manager
+title Container diagram for Lumina 1.1
 
 Person(user, "Home User", "A person who wants to manage and stream their personal media collection")
 Person(admin, "Administrator", "A person who manages the media library system")
 
-System_Boundary(c1, "Lumina") {
-    Container(webapp, "Web Application Client", "ASP.NET Core MVC", "Delivers server-rendered views with dynamic client-side functionality for media management and playback")
+System_Boundary(c1, "Lumina 1.1") {
+    Container(webapp, "Web Application Client 2.1", "ASP.NET Core MVC", "Delivers server-rendered views with dynamic client-side functionality for media management and playback [detailed in '3.1 component-web-client-diagram.puml']")
     
-    Container(api, "API Server", "ASP.NET Core", "Provides media management functionality via a REST API, processes media tasks, and manages metadata synchronization")
+    Container(api, "API Server 2.2", "ASP.NET Core", "Provides media management functionality via a REST API, processes media tasks, and manages metadata synchronization [detailed in '3.2 component-api-server-diagram.puml']")
     
     ContainerDb(db, "Database", "SQLite", "Stores user data, media metadata, library configuration, automated jobs information, etc")
     
@@ -26,7 +26,7 @@ Rel(api, db, "Reads from and writes to", "SQL")
 Rel(api, filestore, "Reads from and writes to")
 Rel(api, metadata, "Retrieves metadata from", "HTTPS")
 
-caption [Container] Lumina
+caption [Container] Lumina 1.1
 
-footer The container diagram for the Lumina Media Library Manager - created with PlantUML
+footer The container diagram for the Lumina 1.1 - created with PlantUML
 @enduml

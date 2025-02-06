@@ -1,4 +1,4 @@
-@startuml test
+@startuml Lumina System Context Diagram
 !include <C4/C4_Context>
 
 LAYOUT_WITH_LEGEND()
@@ -7,7 +7,7 @@ title System Context diagram for Lumina Media Library Manager
 Person(user, "Home User", "A person who wants to manage and stream their personal media collection")
 Person(admin, "Administrator", "A person who manages the media library system")
 
-System(lumina, "Lumina", "Allows users to organize, manage and stream their personal media content")
+System(lumina, "Lumina 1.1", "Allows users to organize, manage and stream their personal media content [detailed in '2 container-diagram.puml']")
 
 System_Ext(metadataProvider, "Media Metadata Services", "External services that provide media information and metadata (TMDB, TVDB, GoodReads, MusicBrainz, etc)")
 
