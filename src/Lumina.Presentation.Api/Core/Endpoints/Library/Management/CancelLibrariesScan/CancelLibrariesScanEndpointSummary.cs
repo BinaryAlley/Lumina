@@ -21,7 +21,7 @@ public class CancelLibrariesScanEndpointSummary : Summary<CancelLibrariesScanEnd
         Summary = "Cancells the previously started scan of all media libraries.";
         Description = "Cancells the scanning process of all media libraries of a user, or all libraries, if the user making the request is an Admin.";
 
-        Response(204, "The media libraries scan was successfully cancelled.");
+        Response(204, "The media libraries scan was successfully canceled.");
 
         Response(401, "Authentication required.", "application/problem+json",
             example: new[]
@@ -32,7 +32,7 @@ public class CancelLibrariesScanEndpointSummary : Summary<CancelLibrariesScanEnd
                     status = 401,
                     title = "Unauthorized",
                     detail = "You are not authorized",
-                    instance = "/api/v1/libraries/cancel-scan"
+                    instance = "/api/v1/libraries/scans/cancel"
                 },
                 new
                 {
@@ -40,7 +40,7 @@ public class CancelLibrariesScanEndpointSummary : Summary<CancelLibrariesScanEnd
                     status = 401,
                     title = "Unauthorized",
                     detail = "Invalid token: The token expired at '01/01/2024 01:00:00'",
-                    instance = "/api/v1/libraries/cancel-scan"
+                    instance = "/api/v1/libraries/scans/cancel"
                 },
                 new
                 {
@@ -48,7 +48,7 @@ public class CancelLibrariesScanEndpointSummary : Summary<CancelLibrariesScanEnd
                     status = 401,
                     title = "Unauthorized",
                     detail = "The token is invalid",
-                    instance = "/api/v1/libraries/cancel-scan"
+                    instance = "/api/v1/libraries/scans/cancel"
                 }
             }
         );

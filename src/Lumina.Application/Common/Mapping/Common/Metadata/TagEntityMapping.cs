@@ -40,7 +40,9 @@ public static class TagEntityMapping
     /// Converts <paramref name="repositoryEntity"/> to <see cref="Tag"/>.
     /// </summary>
     /// <param name="repositoryEntity">The repository entity to be converted.</param>
-    /// <returns>The converted domain entity.</returns>
+    /// <returns>
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly converted <see cref="Tag"/>, or an error message.
+    /// </returns>
     public static ErrorOr<Tag> ToDomainEntity(this TagEntity repositoryEntity)
     {
         return Tag.Create(
@@ -52,7 +54,9 @@ public static class TagEntityMapping
     /// Converts <paramref name="repositoryEntities"/> to a collection of <see cref="Tag"/>.
     /// </summary>
     /// <param name="repositoryEntities">The repository entities to be converted.</param>
-    /// <returns>The converted domain entities.</returns>
+    /// <returns>
+    /// An <see cref="ErrorOr{TValue}"/> containing either a collection of converted <see cref="Tag"/>, or an error message.
+    /// </returns>
     public static IEnumerable<ErrorOr<Tag>> ToDomainEntities(this IEnumerable<TagEntity> repositoryEntities)
     {
         return repositoryEntities.Select(domainEntity => domainEntity.ToDomainEntity());

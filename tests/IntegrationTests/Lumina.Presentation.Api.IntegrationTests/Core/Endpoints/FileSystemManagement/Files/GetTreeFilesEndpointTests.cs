@@ -236,7 +236,7 @@ public class GetTreeFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCancellationTokenIsCancelled_ShouldThrowTaskCanceledException()
+    public async Task ExecuteAsync_WhenCancellationTokenIsCanceled_ShouldThrowTaskCanceledException()
     {
         // Arrange
         string testPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "testDirectory");

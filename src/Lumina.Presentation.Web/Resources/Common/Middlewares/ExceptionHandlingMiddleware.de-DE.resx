@@ -549,4 +549,28 @@
   <data name="CannotScanLockedLibrary" xml:space="preserve">
     <value>Eine gesperrte Bibliothek kann nicht gescannt werden!</value>
   </data>
+  <data name="CanOnlyStartPendingScans" xml:space="preserve">
+    <value>Nur ausstehende Scans können gestartet werden!</value>
+  </data>
+  <data name="CanOnlyCancelRunningScans" xml:space="preserve">
+    <value>Nur laufende Scans können abgebrochen werden!</value>
+  </data>
+  <data name="ScanIdCannotBeEmpty" xml:space="preserve">
+    <value>Scan-ID darf nicht leer sein!</value>
+  </data>
+  <data name="LibraryAlreadyBeingScanned" xml:space="preserve">
+    <value>Die Bibliothek wird bereits gescannt!</value>
+  </data>
+  <data name="TotalScanJobItemsCountMustBePositive" xml:space="preserve">
+    <value>Gesamtanzahl der Scan-Aufträge muss positiv sein!</value>
+  </data>
+  <data name="CompletedScanJobItemsCountMustBePositive" xml:space="preserve">
+    <value>Anzahl der abgeschlossenen Scan-Aufträge muss positiv sein!</value>
+  </data>
+  <data name="CompletedScanJobItemsCountCantExceedTotalScanJobItemsCount" xml:space="preserve">
+    <value>Die Anzahl der abgeschlossenen Scan-Aufträge darf die Gesamtanzahl der Scan-Aufträge nicht überschreiten!</value>
+  </data>
+  <data name="ScanJobCurrentOperationCannotBeEmpty" xml:space="preserve">
+    <value>Aktuelle Scan-Operation darf nicht leer sein!</value>
+  </data>
 </root>

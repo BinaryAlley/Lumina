@@ -699,7 +699,7 @@ function removeHorizontalScrolling(idOrElement) {
 
 /**
  * Gets the position and size of an element relative to the viewport.
- * @param {string} id - The Id of the element to get the offset for.
+ * @param {string} id - The unique identifier of the element to get the offset for.
  * @returns {Object} An object with the top, left, width, and height of the element.
  */
 function getElementOffset(id) {

@@ -54,7 +54,7 @@ public class MediaContributor : AggregateRoot<MediaContributorId>
         MediaContributorName name,
         MediaContributorRole role,
         Optional<DateOnly> dateOfBirth,
-        Optional<DateOnly> dateOfDeath)
+        Optional<DateOnly> dateOfDeath) : base(id)
     {
         Id = id;
         Name = name;

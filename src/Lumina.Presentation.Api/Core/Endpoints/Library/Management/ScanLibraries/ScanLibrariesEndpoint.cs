@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.Core.Endpoints.Library.Management.ScanLibraries;
 
 /// <summary>
-/// API endpoint for the <c>/libraries/scan</c> route.
+/// API endpoint for the <c>/libraries/scans</c> route.
 /// </summary>
 public class ScanLibrariesEndpoint : BaseEndpoint<EmptyRequest, IResult>
 {

@@ -40,7 +40,9 @@ public static class GenreEntityMapping
     /// Converts <paramref name="repositoryEntity"/> to <see cref="Genre"/>.
     /// </summary>
     /// <param name="repositoryEntity">The repository entity to be converted.</param>
-    /// <returns>The converted domain entity.</returns>
+    /// <returns>
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly converted <see cref="Genre"/>, or an error message.
+    /// </returns>
     public static ErrorOr<Genre> ToDomainEntity(this GenreEntity repositoryEntity)
     {
         return Genre.Create(
@@ -52,7 +54,9 @@ public static class GenreEntityMapping
     /// Converts <paramref name="repositoryEntities"/> to a collection of <see cref="Genre"/>.
     /// </summary>
     /// <param name="repositoryEntities">The repository entities to be converted.</param>
-    /// <returns>The converted domain entities.</returns>
+    /// <returns>
+    /// An <see cref="ErrorOr{TValue}"/> containing either a collection of converted <see cref="Genre"/>, or an error message.
+    /// </returns>
     public static IEnumerable<ErrorOr<Genre>> ToDomainEntities(this IEnumerable<GenreEntity> repositoryEntities)
     {
         return repositoryEntities.Select(domainEntity => domainEntity.ToDomainEntity());

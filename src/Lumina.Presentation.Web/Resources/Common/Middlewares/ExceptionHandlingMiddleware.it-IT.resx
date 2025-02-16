@@ -549,4 +549,28 @@
   <data name="CannotScanLockedLibrary" xml:space="preserve">
     <value>Impossibile scansionare una libreria bloccata!</value>
   </data>
+  <data name="CanOnlyStartPendingScans" xml:space="preserve">
+    <value>È possibile avviare solo le scansioni in sospeso!</value>
+  </data>
+  <data name="CanOnlyCancelRunningScans" xml:space="preserve">
+    <value>È possibile annullare solo le scansioni in esecuzione!</value>
+  </data>
+  <data name="ScanIdCannotBeEmpty" xml:space="preserve">
+    <value>L'ID della scansione non può essere vuoto!</value>
+  </data>
+  <data name="LibraryAlreadyBeingScanned" xml:space="preserve">
+    <value>La libreria è già in fase di scansione!</value>
+  </data>
+  <data name="TotalScanJobItemsCountMustBePositive" xml:space="preserve">
+    <value>Il numero totale degli elementi da scansionare deve essere positivo!</value>
+  </data>
+  <data name="CompletedScanJobItemsCountMustBePositive" xml:space="preserve">
+    <value>Il numero di elementi scansionati completati deve essere positivo!</value>
+  </data>
+  <data name="CompletedScanJobItemsCountCantExceedTotalScanJobItemsCount" xml:space="preserve">
+    <value>Il numero di elementi scansionati completati non può superare il numero totale di elementi da scansionare!</value>
+  </data>
+  <data name="ScanJobCurrentOperationCannotBeEmpty" xml:space="preserve">
+    <value>L'operazione corrente della scansione non può essere vuota!</value>
+  </data>
 </root>

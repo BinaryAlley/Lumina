@@ -41,7 +41,9 @@ public static class IsbnEntityMapping
     /// Converts <paramref name="repositoryEntity"/> to <see cref="Isbn"/>.
     /// </summary>
     /// <param name="repositoryEntity">The repository entity to be converted.</param>
-    /// <returns>The converted domain entity.</returns>
+    /// <returns>
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly converted <see cref="Isbn"/>, or an error message.
+    /// </returns>
     public static ErrorOr<Isbn> ToDomainEntity(this IsbnEntity repositoryEntity)
     {
         return Isbn.Create(
@@ -54,7 +56,9 @@ public static class IsbnEntityMapping
     /// Converts <paramref name="repositoryEntities"/> to a collection of <see cref="Isbn"/>.
     /// </summary>
     /// <param name="repositoryEntities">The repository entities to be converted.</param>
-    /// <returns>The converted domain entities.</returns>
+    /// <returns>
+    /// An <see cref="ErrorOr{TValue}"/> containing either a collection of converted <see cref="Isbn"/>, or an error message.
+    /// </returns>
     public static IEnumerable<ErrorOr<Isbn>> ToDomainEntities(this IEnumerable<IsbnEntity> repositoryEntities)
     {
         return repositoryEntities.Select(domainEntity => domainEntity.ToDomainEntity());

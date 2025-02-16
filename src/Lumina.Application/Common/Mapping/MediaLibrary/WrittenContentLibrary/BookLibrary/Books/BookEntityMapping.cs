@@ -137,7 +137,7 @@ public static class BookEntityMapping
     /// <param name="repositoryEntities">The repository entities to be converted.</param>
     /// <returns>The converted domain entities.</returns>
     /// <returns>
-    /// An colection of <see cref="ErrorOr{TValue}"/> containing either successfuly converted <see cref="Book"/>, or error messages.
+    /// An colection of <see cref="ErrorOr{TValue}"/> containing either a collection of converted <see cref="Book"/>, or error messages.
     /// </returns>
     public static IEnumerable<ErrorOr<Book>> ToDomainEntities(this IEnumerable<BookEntity> repositoryEntities)
     {

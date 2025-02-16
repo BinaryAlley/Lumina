@@ -42,7 +42,7 @@ public class ScanLibrariesEndpointSummary : Summary<ScanLibrariesEndpoint, Empty
                     status = 401,
                     title = "Unauthorized",
                     detail = "You are not authorized",
-                    instance = "/api/v1/libraries/scan"
+                    instance = "/api/v1/libraries/scans"
                 },
                 new
                 {
@@ -50,7 +50,7 @@ public class ScanLibrariesEndpointSummary : Summary<ScanLibrariesEndpoint, Empty
                     status = 401,
                     title = "Unauthorized",
                     detail = "Invalid token: The token expired at '01/01/2024 01:00:00'",
-                    instance = "/api/v1/libraries/scan"
+                    instance = "/api/v1/libraries/scans"
                 },
                 new
                 {
@@ -58,7 +58,7 @@ public class ScanLibrariesEndpointSummary : Summary<ScanLibrariesEndpoint, Empty
                     status = 401,
                     title = "Unauthorized",
                     detail = "The token is invalid",
-                    instance = "/api/v1/libraries/scan"
+                    instance = "/api/v1/libraries/scans"
                 }
             }
         );

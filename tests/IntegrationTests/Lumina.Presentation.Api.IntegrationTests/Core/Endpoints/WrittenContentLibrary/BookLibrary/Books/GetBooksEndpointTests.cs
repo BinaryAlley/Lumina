@@ -78,7 +78,7 @@ public class GetBooksEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCancellationTokenIsCancelled_ShouldThrowTaskCanceledException()
+    public async Task ExecuteAsync_WhenCancellationTokenIsCanceled_ShouldThrowTaskCanceledException()
     {
         // Arrange
         using CancellationTokenSource cts = new();

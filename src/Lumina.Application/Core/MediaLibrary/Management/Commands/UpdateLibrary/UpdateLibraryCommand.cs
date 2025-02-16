@@ -11,8 +11,8 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Commands.UpdateLibrary
 /// <summary>
 /// Command for updating a media library.
 /// </summary>
-/// <param name="Id">The Id of the media library.</param>
-/// <param name="OwnerId">The Id of the user owning the media library.</param>
+/// <param name="Id">The unique identifier of the media library.</param>
+/// <param name="OwnerId">The unique identifier of the user owning the media library.</param>
 /// <param name="Title">The title of the media library.</param>
 /// <param name="LibraryType">The type of the media library.</param>
 /// <param name="ContentLocations">The file system paths of the directories where the media library elements are located.</param>

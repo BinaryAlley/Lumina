@@ -125,7 +125,8 @@ public class UpdateUserRoleAndPermissionsCommandHandler : IRequestHandler<Update
                 PermissionId = permissionId,
                 Permission = getPermissionsResult.Value.First(permission => permission.Id == permissionId),
                 User = userToUpdate
-            }).ToList()
+            }).ToList(),
+            LibraryScans = userToUpdate.LibraryScans
         };
 
         // save changes and return result

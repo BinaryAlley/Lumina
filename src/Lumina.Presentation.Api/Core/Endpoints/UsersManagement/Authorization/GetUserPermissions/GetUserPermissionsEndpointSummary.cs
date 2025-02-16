@@ -28,7 +28,7 @@ public class GetUserPermissionsEndpointSummary : Summary<GetUserPermissionsEndpo
             UserId: Guid.NewGuid()
         );
 
-        RequestParam(r => r.UserId, "The Id of the user for whom to get the authorization permissions. Required.");
+        RequestParam(r => r.UserId, "The unique identifier of the user for whom to get the authorization permissions. Required.");
 
         Response(200, "The authorization permissions of the user are returned.",
             example: new[] {

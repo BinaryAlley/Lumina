@@ -202,6 +202,23 @@ public class BookConfiguration : IEntityTypeConfiguration<BookEntity>
                 .HasMaxLength(6)
                 .IsRequired();
         });
+
+        // audit
+        builder.Property(permission => permission.CreatedOnUtc)
+            .IsRequired()
+            .HasColumnOrder(32);
+
+        builder.Property(permission => permission.CreatedBy)
+            .IsRequired()
+            .HasColumnOrder(33);
+
+        builder.Property(permission => permission.UpdatedOnUtc)
+            .HasDefaultValue(null)
+            .HasColumnOrder(34);
+
+        builder.Property(permission => permission.UpdatedBy)
+            .HasDefaultValue(null)
+            .HasColumnOrder(35);
     }
 }
 

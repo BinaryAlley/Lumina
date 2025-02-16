@@ -12,8 +12,8 @@ namespace Lumina.Application.Core.UsersManagement.Authorization.Commands.UpdateU
 /// <summary>
 /// Command for updating the authorization role and permissions of a user.
 /// </summary>
-/// <param name="UserId">The Id of the user.</param>
-/// <param name="RoleId">The Id of the role.</param>
+/// <param name="UserId">The unique identifier of the user.</param>
+/// <param name="RoleId">The unique identifier of the role.</param>
 /// <param name="Permissions">The collection of Ids of the permissions of the user.</param>
 [DebuggerDisplay("UserId: {UserId}")]
 public record UpdateUserRoleAndPermissionsCommand(

@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.MediaLibrary.Management.Services.Scanning.Scanners.WrittenContent;
 using Lumina.Domain.Common.Enums.MediaLibrary;
+using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Services.Scanners;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 #endregion
 
-namespace Lumina.Application.Core.MediaLibrary.Management.Services.Scanning.Scanners.Common;
+namespace Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Scanners.Common;
 
 /// <summary>
 /// Defines a factory for creating media library scanners.

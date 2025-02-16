@@ -115,7 +115,7 @@ public class CombinePathEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCancellationTokenIsCancelled_ShouldThrowTaskCanceledException()
+    public async Task ExecuteAsync_WhenCancellationTokenIsCanceled_ShouldThrowTaskCanceledException()
     {
         // Arrange
         string originalPath = System.IO.Path.GetTempPath();

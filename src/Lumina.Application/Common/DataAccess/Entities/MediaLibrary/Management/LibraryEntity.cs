@@ -41,9 +41,14 @@ public class LibraryEntity : IStorageEntity, IAuditableEntity
     public required LibraryType LibraryType { get; set; }
 
     /// <summary>
-    /// Gets or sets the list of file system paths that make up the media library.
+    /// Gets the list of file system paths that make up the media library.
     /// </summary>
     public required ICollection<LibraryContentLocationEntity> ContentLocations { get; init; } = [];
+
+    /// <summary>
+    /// Gets the list of scans of the media library.
+    /// </summary>
+    public ICollection<LibraryScanEntity> LibraryScans { get; init; } = [];
 
     /// <summary>
     /// Gets whether this media library is enabled or not. A disabled media library is never shown or changed.

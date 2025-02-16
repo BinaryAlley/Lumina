@@ -10,7 +10,7 @@ namespace Lumina.Application.Core.Admin.Authorization.Roles.Commands.DeleteRole;
 /// <summary>
 /// Command for deleting an authorization role.
 /// </summary>
-/// <param name="RoleId">The Id of the role.</param>
+/// <param name="RoleId">The unique identifier of the role.</param>
 [DebuggerDisplay("RoleId: {RoleId}")]
 public record DeleteRoleCommand(
     Guid RoleId

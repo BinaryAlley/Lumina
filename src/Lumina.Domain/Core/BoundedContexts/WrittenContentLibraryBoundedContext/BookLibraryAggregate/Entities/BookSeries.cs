@@ -35,7 +35,7 @@ public sealed class BookSeries : Entity<BookSeriesId>
     /// <summary>
     /// Initializes a new instance of the <see cref="BookSeries"/> class.
     /// </summary>
-    /// <param name="id">The identifier of the book series.</param>
+    /// <param name="id">The object representing the unique identifier of the book series.</param>
     /// <param name="metadata">The metadata of the book series.</param>
     /// <param name="isComplete">The current status of the book series.</param>
     /// <param name="books">The books of the book series.</param>
@@ -51,7 +51,7 @@ public sealed class BookSeries : Entity<BookSeriesId>
     /// <summary>
     /// Creates a new instance of the <see cref="BookSeries"/> class.
     /// </summary>
-    /// <param name="id">The identifier of the book series.</param>
+    /// <param name="id">The object representing the unique identifier of the book series.</param>
     /// <param name="metadata">The metadata of the book series.</param>
     /// <param name="isComplete">The current status of the book series.</param>
     /// <param name="books">The books of the book series.</param>

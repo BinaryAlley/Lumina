@@ -153,6 +153,9 @@
   <data name="DeleteLibraryConfirm" xml:space="preserve">
     <value>Sunteți sigur că doriți să ștergeți biblioteca specificată?</value>
   </data>
+  <data name="DiscoveringFiles" xml:space="preserve">
+    <value>Se descoperă fișierele...</value>
+  </data>
   <data name="Documentary" xml:space="preserve">
     <value>Documentar</value>
   </data>

@@ -1,4 +1,4 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using System;
 #endregion
 
@@ -33,16 +33,6 @@ public abstract class Entity<TId> : IEquatable<Entity<TId>> where TId : notnull
     {
         Id = id;
     }
-
-#pragma warning disable CS8618
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Entity{TId}"/> class.
-    /// </summary>
-    protected Entity() // only needed during reflection
-    {
-
-    }
-#pragma warning restore CS8618
 
     /// <summary>
     /// Indicates whether the current object is equal to another object of the same type.

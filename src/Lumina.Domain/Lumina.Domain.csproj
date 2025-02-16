@@ -22,4 +22,8 @@
         <PackageReference Include="Mediator.Abstractions" Version="3.0.0-preview.27" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Core\BoundedContexts\LibraryManagementBoundedContext\LibraryScanAggregate\Services\Progress\" />
+    </ItemGroup>
+
 </Project>

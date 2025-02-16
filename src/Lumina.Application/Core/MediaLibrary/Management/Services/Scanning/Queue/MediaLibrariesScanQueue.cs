@@ -1,30 +1,30 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.MediaLibrary.Management.Services.Scanning.Jobs.Common;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Queue;
 using System.Threading.Channels;
 #endregion
 
 namespace Lumina.Application.Core.MediaLibrary.Management.Services.Scanning.Queue;
 
 /// <summary>
-/// Provides an in-memory message queue for handling <see cref="MediaLibraryScanJob"/> instances.
+/// Provides an in-memory message queue for handling <see cref="IMediaLibraryScanJob"/> instances.
 /// </summary>
 internal class MediaLibrariesScanQueue : IMediaLibrariesScanQueue
 {
-    private readonly Channel<MediaLibraryScanJob> _channel = Channel.CreateUnbounded<MediaLibraryScanJob>();
+    private readonly Channel<IMediaLibraryScanJob> _channel = Channel.CreateUnbounded<IMediaLibraryScanJob>(new UnboundedChannelOptions
+    {
+        SingleWriter = false,
+        SingleReader = false,
+        AllowSynchronousContinuations = true
+    });
 
     /// <summary>
-    /// Gets the writer for the queue, allowing producers to enqueue <see cref="MediaLibraryScanJob"/> instances.
+    /// Gets the writer for the queue, allowing producers to enqueue <see cref="IMediaLibraryScanJob"/> instances.
     /// </summary>
-    public ChannelWriter<MediaLibraryScanJob> Writer
-    {
-        get { return _channel.Writer; }
-    }
+    public ChannelWriter<IMediaLibraryScanJob> Writer => _channel.Writer;
 
     /// <summary>
-    /// Gets the reader for the queue, allowing consumers to dequeue <see cref="MediaLibraryScanJob"/> instances.
+    /// Gets the reader for the queue, allowing consumers to dequeue <see cref="IMediaLibraryScanJob"/> instances.
     /// </summary>
-    public ChannelReader<MediaLibraryScanJob> Reader
-    {
-        get { return _channel.Reader; }
-    }
+    public ChannelReader<IMediaLibraryScanJob> Reader => _channel.Reader;
 }

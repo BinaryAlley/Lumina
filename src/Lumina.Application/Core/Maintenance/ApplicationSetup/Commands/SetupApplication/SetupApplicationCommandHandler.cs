@@ -89,7 +89,8 @@ public class SetupApplicationCommandHandler : IRequestHandler<SetupApplicationCo
             Libraries = [],
             UserPermissions = [],
             UserRole = null,
-            CreatedBy = id
+            CreatedBy = id,
+            LibraryScans = [],
         };
         // if the user enabled two factor auth, include a QR with the totp secret
         if (request.Use2fa)

@@ -59,6 +59,12 @@ public class LibraryConfiguration : IEntityTypeConfiguration<LibraryEntity>
             .HasForeignKey(library => library.UserId)
             .IsRequired();
 
+        // one library with many scans
+        builder.HasMany(library => library.LibraryScans)
+              .WithOne(libraryScan => libraryScan.Library)
+              .HasForeignKey(libraryScan => libraryScan.LibraryId)
+              .OnDelete(DeleteBehavior.Cascade); // deleting a library deletes library scans
+
         // using OwnsMany because paths are domain Value Objects, thus they have no independent identity, and their lifecycle is bound to the Library
         builder.OwnsMany(library => library.ContentLocations, contentLocationBuilder =>
         {
@@ -75,5 +81,22 @@ public class LibraryConfiguration : IEntityTypeConfiguration<LibraryEntity>
                  .HasMaxLength(260)
                  .IsRequired();
         });
+
+        // audit
+        builder.Property(permission => permission.CreatedOnUtc)
+            .IsRequired()
+            .HasColumnOrder(8);
+
+        builder.Property(permission => permission.CreatedBy)
+            .IsRequired()
+            .HasColumnOrder(9);
+
+        builder.Property(permission => permission.UpdatedOnUtc)
+            .HasDefaultValue(null)
+            .HasColumnOrder(10);
+
+        builder.Property(permission => permission.UpdatedBy)
+            .HasDefaultValue(null)
+            .HasColumnOrder(11);
     }
 }

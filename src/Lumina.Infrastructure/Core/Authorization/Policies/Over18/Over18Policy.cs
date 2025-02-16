@@ -34,7 +34,7 @@ public class Over18Policy : IOver18Policy
     /// <summary>
     /// Evaluates the policy for the user identified by <paramref name="userId"/>.
     /// </summary>
-    /// <param name="userId">The Id of the user for which to evaluate the policy.</param>
+    /// <param name="userId">The unique identifier of the user for which to evaluate the policy.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns><see langword="true"/> if the policy evaluation succeeds, <see langword="false"/> otherwise.</returns>
     public async Task<bool> EvaluateAsync(Guid userId, CancellationToken cancellationToken)

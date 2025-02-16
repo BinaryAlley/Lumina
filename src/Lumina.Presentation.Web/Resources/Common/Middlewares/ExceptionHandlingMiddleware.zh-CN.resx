@@ -549,4 +549,28 @@
   <data name="CannotScanLockedLibrary" xml:space="preserve">
     <value>无法扫描已锁定的库！</value>
   </data>
+  <data name="CanOnlyStartPendingScans" xml:space="preserve">
+    <value>只能启动待处理的扫描！</value>
+  </data>
+  <data name="CanOnlyCancelRunningScans" xml:space="preserve">
+    <value>只能取消正在运行的扫描！</value>
+  </data>
+  <data name="ScanIdCannotBeEmpty" xml:space="preserve">
+    <value>扫描ID不能为空！</value>
+  </data>
+  <data name="LibraryAlreadyBeingScanned" xml:space="preserve">
+    <value>库已在扫描中！</value>
+  </data>
+  <data name="TotalScanJobItemsCountMustBePositive" xml:space="preserve">
+    <value>扫描任务项目总数必须为正数！</value>
+  </data>
+  <data name="CompletedScanJobItemsCountMustBePositive" xml:space="preserve">
+    <value>已完成扫描项目数量必须为正数！</value>
+  </data>
+  <data name="CompletedScanJobItemsCountCantExceedTotalScanJobItemsCount" xml:space="preserve">
+    <value>已完成扫描项目数量不能超过扫描项目总数！</value>
+  </data>
+  <data name="ScanJobCurrentOperationCannotBeEmpty" xml:space="preserve">
+    <value>扫描任务当前操作不能为空！</value>
+  </data>
 </root>

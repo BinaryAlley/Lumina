@@ -28,7 +28,7 @@ public class DeleteRoleEndpointSummary : Summary<DeleteRoleEndpoint, DeleteRoleR
             RoleId: Guid.NewGuid()
         );
 
-        RequestParam(r => r.RoleId, "The Id of the role. Required.");
+        RequestParam(r => r.RoleId, "The unique identifier of the role. Required.");
 
         Response(204, "The authorization role was successfuly deleted.");
 

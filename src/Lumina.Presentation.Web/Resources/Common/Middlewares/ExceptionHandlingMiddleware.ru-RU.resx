@@ -549,4 +549,28 @@
   <data name="CannotScanLockedLibrary" xml:space="preserve">
     <value>Невозможно сканировать заблокированную библиотеку!</value>
   </data>
+  <data name="CanOnlyStartPendingScans" xml:space="preserve">
+    <value>Можно запускать только ожидающие сканирования!</value>
+  </data>
+  <data name="CanOnlyCancelRunningScans" xml:space="preserve">
+    <value>Можно отменить только запущенные сканирования!</value>
+  </data>
+  <data name="ScanIdCannotBeEmpty" xml:space="preserve">
+    <value>Идентификатор сканирования не может быть пустым!</value>
+  </data>
+  <data name="LibraryAlreadyBeingScanned" xml:space="preserve">
+    <value>Библиотека уже сканируется!</value>
+  </data>
+  <data name="TotalScanJobItemsCountMustBePositive" xml:space="preserve">
+    <value>Общее количество элементов для сканирования должно быть положительным!</value>
+  </data>
+  <data name="CompletedScanJobItemsCountMustBePositive" xml:space="preserve">
+    <value>Количество завершенных отсканированных элементов должно быть положительным!</value>
+  </data>
+  <data name="CompletedScanJobItemsCountCantExceedTotalScanJobItemsCount" xml:space="preserve">
+    <value>Количество завершенных отсканированных элементов не может превышать общее количество элементов для сканирования!</value>
+  </data>
+  <data name="ScanJobCurrentOperationCannotBeEmpty" xml:space="preserve">
+    <value>Текущая операция сканирования не может быть пустой!</value>
+  </data>
 </root>

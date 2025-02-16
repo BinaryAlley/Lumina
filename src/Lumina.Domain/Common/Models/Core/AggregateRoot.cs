@@ -23,18 +23,10 @@ public abstract class AggregateRoot<TId> : Entity<TId> where TId : notnull
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="AggregateRoot{TId}"/> class.
-    /// </summary>
-    protected AggregateRoot() // only needed during reflection
-    {
-
-    }
-
-    /// <summary>
     /// Retrieves and clears all domain events associated with this aggregate root.
     /// </summary>
     /// <returns>A list of all domain events that were raised by this aggregate root.</returns>
-    public List<IDomainEvent> PopDomainEvents()
+    public List<IDomainEvent> GetDomainEvents()
     {
         List<IDomainEvent> domainEventsCopy = [.. _domainEvents];
         _domainEvents.Clear();

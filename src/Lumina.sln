@@ -178,6 +178,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "architecture", "architectur
 		..\docs\technical\architecture\3.2 component-server-diagram.puml = ..\docs\technical\architecture\3.2 component-server-diagram.puml
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "architecture-knowledge-management", "architecture-knowledge-management", "{70B56088-6D3A-481E-9459-79AC6B16FEC1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "architecture-decision-log", "architecture-decision-log", "{788FADE4-342D-4919-8E5C-10CA8EDBE954}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\architecture\architecture-knowledge-management\architecture-decision-log\architecture-decission-record-0001.md = ..\docs\technical\architecture\architecture-knowledge-management\architecture-decision-log\architecture-decission-record-0001.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -285,6 +292,8 @@ Global
 		{FC005908-27A7-4BDA-BD2A-B749A09727E0} = {2C55920F-0BCB-4C64-A1E6-56053F080806}
 		{4DC31AC0-D305-4718-8FE1-C023AF6A7CA6} = {B045C2EC-3ACB-47D3-BE62-7AC334B023D9}
 		{D93CA337-37D5-4A42-86B5-0A2410594A7A} = {0C0E5A56-AD29-4D0B-AB87-E865F8B933E2}
+		{70B56088-6D3A-481E-9459-79AC6B16FEC1} = {D93CA337-37D5-4A42-86B5-0A2410594A7A}
+		{788FADE4-342D-4919-8E5C-10CA8EDBE954} = {70B56088-6D3A-481E-9459-79AC6B16FEC1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4A55A28E-C657-4A0B-95EA-2931AE66004E}

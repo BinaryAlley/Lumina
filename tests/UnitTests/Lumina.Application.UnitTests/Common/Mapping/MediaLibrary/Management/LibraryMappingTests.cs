@@ -6,7 +6,8 @@ using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
 using Lumina.Domain.Common.Enums.MediaLibrary;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
-using System;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
+using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -25,7 +26,7 @@ public class LibraryMappingTests
     {
         // Arrange
         ErrorOr<Library> libraryResult = Library.Create(
-            Guid.NewGuid(),
+            UserId.CreateUnique(),
             "Test Library",
             LibraryType.Book,
             ["C:/Books", "D:/Media/Books"],
@@ -33,7 +34,8 @@ public class LibraryMappingTests
             true,
             false,
             true,
-            false
+            false,
+            [ScanId.CreateUnique()]
         );
         Library library = libraryResult.Value;
 
@@ -54,6 +56,7 @@ public class LibraryMappingTests
         Assert.False(result.IsLocked);
         Assert.True(result.DownloadMedatadaFromWeb);
         Assert.False(result.SaveMetadataInMediaDirectories);
+        Assert.Equal(library.ScanIds.Select(scanId => scanId.Value), result.LibraryScans.Select(libraryScan => libraryScan.Id));
     }
 
     [Fact]
@@ -61,7 +64,7 @@ public class LibraryMappingTests
     {
         // Arrange
         ErrorOr<Library> libraryResult = Library.Create(
-            Guid.NewGuid(),
+            UserId.CreateUnique(),
             "Empty Library",
             LibraryType.Book,
             [],
@@ -69,7 +72,8 @@ public class LibraryMappingTests
             true,
             false,
             true,
-            false
+            false,
+            [ScanId.CreateUnique()]
         );
         Library library = libraryResult.Value;
 
@@ -91,7 +95,7 @@ public class LibraryMappingTests
     {
         // Arrange
         ErrorOr<Library> libraryResult = Library.Create(
-            Guid.NewGuid(),
+            UserId.CreateUnique(),
             "Test Library",
             libraryType,
             ["C:/Media"],
@@ -99,7 +103,8 @@ public class LibraryMappingTests
             true,
             false,
             true,
-            false
+            false,
+            [ScanId.CreateUnique()]
         );
         Library library = libraryResult.Value;
 
@@ -129,7 +134,7 @@ public class LibraryMappingTests
         ];
 
         ErrorOr<Library> libraryResult = Library.Create(
-            Guid.NewGuid(),
+            UserId.CreateUnique(),
             "Test Library",
             LibraryType.Book,
             contentLocations,
@@ -137,7 +142,8 @@ public class LibraryMappingTests
             true,
             false,
             true,
-            false
+            false,
+            [ScanId.CreateUnique()]
         );
         Library library = libraryResult.Value;
 
@@ -161,7 +167,7 @@ public class LibraryMappingTests
         ];
 
         ErrorOr<Library> libraryResult = Library.Create(
-            Guid.NewGuid(),
+            UserId.CreateUnique(),
             "Test Library",
             LibraryType.Book,
             contentLocations,
@@ -169,7 +175,8 @@ public class LibraryMappingTests
             true,
             false,
             true,
-            false
+            false,
+            [ScanId.CreateUnique()]
         );
         Library library = libraryResult.Value;
 
@@ -180,5 +187,38 @@ public class LibraryMappingTests
         Assert.NotNull(result);
         Assert.Equal(library.ContentLocations.Select(l => l.Path), result.ContentLocations.Select(l => l.Path));
         Assert.Null(result.CoverImage);
+    }
+
+    [Fact]
+    public void ToRepositoryEntity_WhenMappingEmptyScanList_ShouldMapCorrectly()
+    {
+        // Arrange
+        List<string> contentLocations =
+        [
+            "C:/Media/Books",
+            "D:/Books"
+        ];
+
+        ErrorOr<Library> libraryResult = Library.Create(
+            UserId.CreateUnique(),
+            "Test Library",
+            LibraryType.Book,
+            contentLocations,
+            null,
+            true,
+            false,
+            true,
+            false,
+            []
+        );
+        Library library = libraryResult.Value;
+
+        // Act
+        LibraryEntity result = library.ToRepositoryEntity();
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.NotNull(library.ScanIds);
+        Assert.NotNull(result.LibraryScans);
     }
 }

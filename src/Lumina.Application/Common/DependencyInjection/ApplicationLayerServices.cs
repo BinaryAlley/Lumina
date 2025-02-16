@@ -2,13 +2,14 @@
 using FluentValidation;
 using Lumina.Application.Common.Behaviors;
 using Lumina.Application.Common.DomainEvents;
-using Lumina.Application.Core.MediaLibrary.Management.Services.Scanning;
+using Lumina.Application.Core.MediaLibrary.Management.Services.Scanning.Cancellation;
 using Lumina.Application.Core.MediaLibrary.Management.Services.Scanning.Jobs.Common;
 using Lumina.Application.Core.MediaLibrary.Management.Services.Scanning.Jobs.WrittenContent.Books;
 using Lumina.Application.Core.MediaLibrary.Management.Services.Scanning.Queue;
-using Lumina.Application.Core.MediaLibrary.Management.Services.Scanning.Scanners.Common;
-using Lumina.Application.Core.MediaLibrary.Management.Services.Scanning.Scanners.WrittenContent;
-using Lumina.Application.Core.MediaLibrary.Management.Services.Scanning.Tracking;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Cancellation;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Queue;
+using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Services.Jobs;
 using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics.CodeAnalysis;
@@ -44,17 +45,13 @@ public static class ApplicationLayerServices
         services.AddScoped<IDomainEventsQueue, DomainEventsQueue>();
 
         services.AddSingleton<IMediaLibrariesScanQueue, MediaLibrariesScanQueue>();
-        services.AddSingleton<IMediaLibrariesScanTracker, MediaLibrariesScanTracker>();
-        services.AddScoped<IBookLibraryTypeScanner, BookLibraryTypeScanner>();
-        services.AddScoped<IMediaLibraryScanningService, MediaLibraryScanningService>();
-        services.AddScoped<IMediaLibraryScannerFactory, MediaLibraryScannerFactory>();
-        services.AddScoped<IMediaLibraryScanJobFactory, MediaLibraryScanJobFactory>();
+        services.AddSingleton<IMediaLibrariesScanCancellationTracker, MediaLibrariesScanCancellationTracker>();
         services.AddHostedService<MediaLibraryScanJobProcessorJob>();
 
-        services.AddTransient<FileSystemDiscoveryJob>();
-        services.AddTransient<RepositoryMetadataDiscoveryJob>();
-        services.AddTransient<HashComparerJob>();
-        services.AddTransient<GoodReadsMetadataScrapJob>();
+        services.AddTransient<IFileSystemDiscoveryJob, FileSystemDiscoveryJob>();
+        services.AddTransient<IRepositoryMetadataDiscoveryJob, RepositoryMetadataDiscoveryJob>();
+        services.AddTransient<IHashComparerJob, HashComparerJob>();
+        services.AddTransient<IGoodReadsMetadataScrapJob, GoodReadsMetadataScrapJob>();
 
         return services;
     }

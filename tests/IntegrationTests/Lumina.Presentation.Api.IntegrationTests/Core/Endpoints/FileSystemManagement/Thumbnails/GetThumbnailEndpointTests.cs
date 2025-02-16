@@ -152,7 +152,7 @@ public class GetThumbnailEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCancellationTokenIsCancelled_ShouldThrowTaskCanceledException()
+    public async Task ExecuteAsync_WhenCancellationTokenIsCanceled_ShouldThrowTaskCanceledException()
     {
         // Arrange
         int quality = 80;

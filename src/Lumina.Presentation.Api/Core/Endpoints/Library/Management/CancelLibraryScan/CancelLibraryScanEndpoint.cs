@@ -1,7 +1,9 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using FastEndpoints;
+using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Application.Core.MediaLibrary.Management.Commands.CancelLibrariesScan;
+using Lumina.Application.Core.MediaLibrary.Management.Commands.CancelLibraryScan;
 using Lumina.Contracts.Requests.MediaLibrary.Management;
 using Lumina.Presentation.Api.Common.Routes.Library.Management;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
@@ -14,7 +16,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.Core.Endpoints.Library.Management.CancelLibraryScan;
 
 /// <summary>
-/// API endpoint for the <c>/libraries/{id}/cancel-scan</c> route.
+/// API endpoint for the <c>/libraries/{libraryId}/scans/{scanId}/cancel</c> route.
 /// </summary>
 public class CancelLibraryScanEndpoint : BaseEndpoint<CancelLibraryScanRequest, IResult>
 {
@@ -46,7 +48,7 @@ public class CancelLibraryScanEndpoint : BaseEndpoint<CancelLibraryScanRequest, 
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(CancelLibraryScanRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<Success> result = await _sender.Send(new CancelLibrariesScanCommand(), cancellationToken).ConfigureAwait(false);
+        ErrorOr<Success> result = await _sender.Send(request.ToCommand(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.NoContent(), Problem);
     }
 }

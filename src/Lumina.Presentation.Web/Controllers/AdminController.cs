@@ -60,7 +60,7 @@ public class AdminController : Controller
     /// <summary>
     /// Gets the authorization permissions of a role identified by <paramref name="roleId"/>.
     /// </summary>
-    /// <param name="roleId">The Id of the role for which to get the list of permissions.</param>
+    /// <param name="roleId">The unique identifier of the role for which to get the list of permissions.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     [HttpGet("api-get-permissions-by-role-id/{roleId}")]
     public async Task<IActionResult> GetPermissionsByRoleId(Guid roleId, CancellationToken cancellationToken)
@@ -72,7 +72,7 @@ public class AdminController : Controller
     /// <summary>
     /// Gets the authorization permissions of a user identified by <paramref name="userId"/>.
     /// </summary>
-    /// <param name="userId">The Id of the user for whom to get the list of permissions.</param>
+    /// <param name="userId">The unique identifier of the user for whom to get the list of permissions.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     [HttpGet("api-get-permissions-by-user-id/{userId}")]
     public async Task<IActionResult> GetPermissionsByUserId(Guid userId, CancellationToken cancellationToken)
@@ -84,7 +84,7 @@ public class AdminController : Controller
     /// <summary>
     /// Gets the authorization role of a user identified by <paramref name="userId"/>.
     /// </summary>
-    /// <param name="userId">The Id of the user for whom to get the role.</param>
+    /// <param name="userId">The unique identifier of the user for whom to get the role.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     [HttpGet("api-get-role-by-user-id/{userId}")]
     public async Task<IActionResult> GetRoleByUserId(Guid userId, CancellationToken cancellationToken)
@@ -131,7 +131,7 @@ public class AdminController : Controller
     /// <summary>
     /// Deletes an authorization role.
     /// </summary>
-    /// <param name="roleId">The Id of the role to be deleted.</param>
+    /// <param name="roleId">The unique identifier of the role to be deleted.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     [HttpDelete("api-delete-role/{roleId}")]
     public async Task<IActionResult> DeleteRole(Guid roleId, CancellationToken cancellationToken)

@@ -7,7 +7,6 @@ using Lumina.Application.Common.DomainEvents;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
-using Lumina.Contracts.Responses.MediaLibrary.Management;
 using Lumina.Domain.Common.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
 using Mediator;
@@ -53,9 +52,7 @@ public class DeleteLibraryCommandHandler : IRequestHandler<DeleteLibraryCommand,
     /// </summary>
     /// <param name="request">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly created <see cref="LibraryResponse"/>, or an error message.
-    /// </returns>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
     public async ValueTask<ErrorOr<Deleted>> Handle(DeleteLibraryCommand request, CancellationToken cancellationToken)
     {
         // get the library with the specified id from the repository
@@ -82,7 +79,7 @@ public class DeleteLibraryCommandHandler : IRequestHandler<DeleteLibraryCommand,
             return deleteDomainLibraryResult.Errors;
 
         // queue any domain events
-        foreach (IDomainEvent domainEvent in createLibraryResult.Value.PopDomainEvents())
+        foreach (IDomainEvent domainEvent in createLibraryResult.Value.GetDomainEvents())
             _domainEventsQueue.Enqueue(domainEvent);
 
         // perform the deletion

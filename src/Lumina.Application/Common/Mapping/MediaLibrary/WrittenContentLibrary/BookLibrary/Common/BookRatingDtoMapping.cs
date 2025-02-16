@@ -19,7 +19,9 @@ public static class BookRatingDtoMapping
     /// Converts <paramref name="dto"/> to <see cref="BookRating"/>.
     /// </summary>
     /// <param name="dto">The DTO to be converted.</param>
-    /// <returns>The converted domain entity.</returns>
+    /// <returns>
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly converted <see cref="BookRating"/>, or an error message.
+    /// </returns>
     public static ErrorOr<BookRating> ToDomainEntity(this BookRatingDto dto)
     {
         return BookRating.Create(
@@ -34,7 +36,9 @@ public static class BookRatingDtoMapping
     /// Converts <paramref name="dtos"/> to a collection of <see cref="BookRating"/>.
     /// </summary>
     /// <param name="dtos">The DTOs to be converted.</param>
-    /// <returns>The converted domain entities.</returns>
+    /// <returns>
+    /// An <see cref="ErrorOr{TValue}"/> containing either a collection of converted <see cref="BookRating"/>, or an error message.
+    /// </returns>
     public static IEnumerable<ErrorOr<BookRating>> ToDomainEntities(this IEnumerable<BookRatingDto> dtos)
     {
         return dtos.Select(domainEntity => domainEntity.ToDomainEntity());

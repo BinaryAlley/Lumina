@@ -31,6 +31,18 @@ public static class LibraryMapping
             IsLocked = domainEntity.IsLocked,
             DownloadMedatadaFromWeb = domainEntity.DownloadMedatadaFromWeb,
             SaveMetadataInMediaDirectories = domainEntity.SaveMetadataInMediaDirectories,
+            LibraryScans = domainEntity.ScanIds.Select(scanId => new LibraryScanEntity()
+            {
+                Id = scanId.Value,
+                LibraryId = domainEntity.Id.Value,
+                UserId = domainEntity.UserId.Value, // rest of properties will be populated by EF Core
+                Status = default,
+                User = null!,
+                Library = null!,
+                CreatedBy = default,
+                CreatedOnUtc = default,
+                UpdatedBy = default,
+            }).ToList(),
             CreatedOnUtc = domainEntity.CreatedOnUtc,
             CreatedBy = Guid.Empty,
             UpdatedOnUtc = domainEntity.UpdatedOnUtc.HasValue ? domainEntity.UpdatedOnUtc : null,

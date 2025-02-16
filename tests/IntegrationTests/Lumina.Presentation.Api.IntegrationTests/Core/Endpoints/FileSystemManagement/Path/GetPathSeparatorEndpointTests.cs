@@ -96,7 +96,7 @@ public class GetPathSeparatorEndpointTests : IClassFixture<AuthenticatedLuminaAp
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCancellationTokenIsCancelled_ShouldThrowTaskCanceledException()
+    public async Task ExecuteAsync_WhenCancellationTokenIsCanceled_ShouldThrowTaskCanceledException()
     {
         // Arrange
         using CancellationTokenSource cts = new();

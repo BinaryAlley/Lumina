@@ -153,6 +153,9 @@
   <data name="DeleteLibraryConfirm" xml:space="preserve">
     <value>您确定要删除指定的库吗？</value>
   </data>
+  <data name="DiscoveringFiles" xml:space="preserve">
+    <value>正在发现文件...</value>
+  </data>
   <data name="Documentary" xml:space="preserve">
     <value>纪录片</value>
   </data>

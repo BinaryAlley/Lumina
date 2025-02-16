@@ -3,6 +3,7 @@ using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
 using Lumina.Domain.Common.Enums.MediaLibrary;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -35,7 +36,8 @@ public class LibraryEntityMappingTests
             CreatedOnUtc = DateTime.UtcNow,
             CreatedBy = Guid.NewGuid(),
             UpdatedOnUtc = null,
-            UpdatedBy = null
+            UpdatedBy = null,
+            LibraryScans = []
         };
 
         // Act

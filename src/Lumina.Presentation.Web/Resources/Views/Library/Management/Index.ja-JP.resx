@@ -153,6 +153,9 @@
   <data name="DeleteLibraryConfirm" xml:space="preserve">
     <value>指定されたライブラリを削除してもよろしいですか？</value>
   </data>
+  <data name="DiscoveringFiles" xml:space="preserve">
+    <value>ファイルを検出中...</value>
+  </data>
   <data name="Documentary" xml:space="preserve">
     <value>ドキュメンタリー</value>
   </data>

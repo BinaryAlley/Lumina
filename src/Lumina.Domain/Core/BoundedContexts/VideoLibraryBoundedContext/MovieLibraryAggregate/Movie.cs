@@ -49,16 +49,6 @@ public sealed class Movie : Entity<MovieId>
         _ratings = ratings;
     }
 
-#pragma warning disable CS8618
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Movie"/> class.
-    /// </summary>
-    private Movie() // only needed during reflection
-    {
-
-    }
-#pragma warning restore CS8618
-
     /// <summary>
     /// Creates a new instance of the <see cref="Movie"/> class.
     /// </summary>

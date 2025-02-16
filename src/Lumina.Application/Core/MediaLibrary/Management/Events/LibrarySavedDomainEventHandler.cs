@@ -111,7 +111,7 @@ public class LibrarySavedDomainEventHandler : INotificationHandler<LibrarySavedD
     /// <summary>
     /// Saves the cover image of a media library to the internal media directory.
     /// </summary>
-    /// <param name="libraryId">The Id of the library for which to save the cover image.</param>
+    /// <param name="libraryId">The unique identifier of the library for which to save the cover image.</param>
     /// <param name="imagePath">The file path of the image file that will be copied to the media directory.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
@@ -200,14 +200,10 @@ public class LibrarySavedDomainEventHandler : INotificationHandler<LibrarySavedD
     }
 
     /// <summary>
-    /// Saves the cover image of a media library to the internal media directory.
+    /// Deletes the cover image from the media directory.
     /// </summary>
-    /// <param name="libraryId">The Id of the library for which to save the cover image.</param>
-    /// <param name="imagePath">The file path of the image file that will be copied to the media directory.</param>
-    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either the location of the new cover image, or an error message.
-    /// </returns>
+    /// <param name="libraryPath">The path where the library content is located.</param>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
     private ErrorOr<Deleted> DeleteCoverImageFromMediaDirectory(string libraryPath)
     {
 
