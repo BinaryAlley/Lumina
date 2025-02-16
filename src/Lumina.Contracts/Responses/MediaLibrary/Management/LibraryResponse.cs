@@ -10,8 +10,8 @@ namespace Lumina.Contracts.Responses.MediaLibrary.Management;
 /// <summary>
 /// Represents a media library response.
 /// </summary>
-/// <param name="Id">The Id of the media library.</param>
-/// <param name="UserId">The Id of the user owning the media library.</param>
+/// <param name="Id">The unique identifier of the media library.</param>
+/// <param name="UserId">The unique identifier of the user owning the media library.</param>
 /// <param name="Title">The title of the media library.</param>
 /// <param name="LibraryType">The type of the media library.</param>
 /// <param name="ContentLocations">The file system paths of the directories where the media library elements are located.</param>

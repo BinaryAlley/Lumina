@@ -45,9 +45,7 @@ public class DeleteRoleCommandHandler : IRequestHandler<DeleteRoleCommand, Error
     /// </summary>
     /// <param name="request">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly deleted <see cref="RoleResponse"/>, or an error message.
-    /// </returns>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
     public async ValueTask<ErrorOr<Deleted>> Handle(DeleteRoleCommand request, CancellationToken cancellationToken)
     {
         // only admins can delete authorization roles

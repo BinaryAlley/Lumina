@@ -15,14 +15,14 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.Core.Endpoints.Library.Management.ScanLibrary;
 
 /// <summary>
-/// API endpoint for the <c>/libraries/{id}/scan</c> route.
+/// API endpoint for the <c>/libraries/{id}/scans</c> route.
 /// </summary>
 public class ScanLibraryEndpoint : BaseEndpoint<ScanLibraryRequest, IResult>
 {
     private readonly ISender _sender;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ScanLibrariesEndpoint"/> class.
+    /// Initializes a new instance of the <see cref="ScanLibraryEndpoint"/> class.
     /// </summary>
     /// <param name="sender">Injected service for mediating commands and queries.</param>
     public ScanLibraryEndpoint(ISender sender)

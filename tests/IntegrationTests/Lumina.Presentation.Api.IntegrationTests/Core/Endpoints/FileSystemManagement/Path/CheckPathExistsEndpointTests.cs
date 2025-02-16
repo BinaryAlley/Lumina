@@ -128,7 +128,7 @@ public class CheckPathExistsEndpointTests : IClassFixture<AuthenticatedLuminaApi
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCancellationTokenIsCancelled_ShouldThrowTaskCanceledException()
+    public async Task ExecuteAsync_WhenCancellationTokenIsCanceled_ShouldThrowTaskCanceledException()
     {
         // Arrange
         string testPath = System.IO.Path.GetTempPath();

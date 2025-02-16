@@ -3,6 +3,10 @@ using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.File
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Path;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Platform;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Scanners.Common;
+using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Services.Scanners;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
@@ -41,6 +45,10 @@ public static class DomainLayerServices
         services.AddScoped<IWindowsPathStrategy, WindowsPathStrategy>();
         services.AddScoped<IOperatingSystemInfo, OperatingSystemInfo>();
         services.AddScoped<IFileSystemStructureSeedService, FileSystemStructureSeedService>();
+        services.AddScoped<IMediaLibraryScanJobFactory, MediaLibraryScanJobFactory>();
+        services.AddScoped<IMediaLibraryScanningService, MediaLibraryScanningService>();
+        services.AddScoped<IBookLibraryTypeScanner, BookLibraryTypeScanner>();
+        services.AddScoped<IMediaLibraryScannerFactory, MediaLibraryScannerFactory>();
         services.AddSingleton<IFileSystem, FileSystem>();
         return services;
     }

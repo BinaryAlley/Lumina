@@ -12,5 +12,7 @@ namespace Lumina.Domain.Core.BoundedContexts.VideoLibraryBoundedContext.TvShowLi
 [DebuggerDisplay("{Id}: {Title}")]
 public sealed class Season : Entity<SeasonId>
 {
-
+    public Season(SeasonId id) : base(id)
+    {
+    }
 }

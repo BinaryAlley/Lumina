@@ -82,7 +82,7 @@ public sealed class UpdateAuditableEntitiesInterceptor : SaveChangesInterceptor
     /// Sets the creation audit properties for a newly added entity.
     /// </summary>
     /// <param name="entity">The entity being created.</param>
-    /// <param name="userId">The Id of the user creating the entity.</param>
+    /// <param name="userId">The unique identifier of the user creating the entity.</param>
     /// <param name="utcNow">The current UTC timestamp.</param>
     private static void SetCreationProperties(IAuditableEntity entity, Guid? userId, DateTime utcNow)
     {
@@ -96,7 +96,7 @@ public sealed class UpdateAuditableEntitiesInterceptor : SaveChangesInterceptor
     /// Sets the modification audit properties for an updated entity while protecting creation properties.
     /// </summary>
     /// <param name="entry">The entity entry being modified.</param>
-    /// <param name="userId">The Id of the user modifying the entity.</param>
+    /// <param name="userId">The unique identifier of the user modifying the entity.</param>
     /// <param name="utcNow">The current UTC timestamp.</param>
     private static void SetModificationProperties(EntityEntry<IAuditableEntity> entry, Guid? userId, DateTime utcNow)
     {

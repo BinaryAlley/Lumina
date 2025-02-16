@@ -18,7 +18,8 @@ public static class CancelLibraryScanRequestMapping
     public static CancelLibraryScanCommand ToCommand(this CancelLibraryScanRequest request)
     {
         return new CancelLibraryScanCommand(
-            request.Id
+            request.LibraryId,
+            request.ScanId
         );
     }
 }

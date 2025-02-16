@@ -549,4 +549,28 @@
   <data name="CannotScanLockedLibrary" xml:space="preserve">
     <value>ロックされたライブラリはスキャンできません！</value>
   </data>
+  <data name="CanOnlyStartPendingScans" xml:space="preserve">
+    <value>保留中のスキャンのみ開始できます！</value>
+  </data>
+  <data name="CanOnlyCancelRunningScans" xml:space="preserve">
+    <value>実行中のスキャンのみキャンセル可能です！</value>
+  </data>
+  <data name="ScanIdCannotBeEmpty" xml:space="preserve">
+    <value>スキャンIDを空にすることはできません！</value>
+  </data>
+  <data name="LibraryAlreadyBeingScanned" xml:space="preserve">
+    <value>ライブラリは既にスキャン中です！</value>
+  </data>
+  <data name="TotalScanJobItemsCountMustBePositive" xml:space="preserve">
+    <value>スキャン項目の合計数は正の値でなければなりません！</value>
+  </data>
+  <data name="CompletedScanJobItemsCountMustBePositive" xml:space="preserve">
+    <value>完了したスキャン項目数は正の値でなければなりません！</value>
+  </data>
+  <data name="CompletedScanJobItemsCountCantExceedTotalScanJobItemsCount" xml:space="preserve">
+    <value>完了したスキャン項目数は合計スキャン項目数を超えることはできません！</value>
+  </data>
+  <data name="ScanJobCurrentOperationCannotBeEmpty" xml:space="preserve">
+    <value>スキャンの現在の操作を空にすることはできません！</value>
+  </data>
 </root>

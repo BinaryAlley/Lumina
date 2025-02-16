@@ -37,7 +37,7 @@ public class ScanLibraryEndpointSummary : Summary<ScanLibraryEndpoint, EmptyRequ
                     status = 401,
                     title = "Unauthorized",
                     detail = "You are not authorized",
-                    instance = "/api/v1/libraries/{id}/scan"
+                    instance = "/api/v1/libraries/{id}/scans"
                 },
                 new
                 {
@@ -45,7 +45,7 @@ public class ScanLibraryEndpointSummary : Summary<ScanLibraryEndpoint, EmptyRequ
                     status = 401,
                     title = "Unauthorized",
                     detail = "Invalid token: The token expired at '01/01/2024 01:00:00'",
-                    instance = "/api/v1/libraries/{id}/scan"
+                    instance = "/api/v1/libraries/{id}/scans"
                 },
                 new
                 {
@@ -53,7 +53,7 @@ public class ScanLibraryEndpointSummary : Summary<ScanLibraryEndpoint, EmptyRequ
                     status = 401,
                     title = "Unauthorized",
                     detail = "The token is invalid",
-                    instance = "/api/v1/libraries/{id}/scan"
+                    instance = "/api/v1/libraries/{id}/scans"
                 }
             }
         );
@@ -67,7 +67,7 @@ public class ScanLibraryEndpointSummary : Summary<ScanLibraryEndpoint, EmptyRequ
                     title = "General.Failure",
                     status = 403,
                     detail = "CannotScanDisabledLibrary",
-                    instance = "/api/v1/libraries/{id}/scan",
+                    instance = "/api/v1/libraries/{id}/scans",
                     traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
                 },
                 new
@@ -76,7 +76,7 @@ public class ScanLibraryEndpointSummary : Summary<ScanLibraryEndpoint, EmptyRequ
                     title = "General.Failure",
                     status = 403,
                     detail = "CannotScanLockedLibrary",
-                    instance = "/api/v1/libraries/{id}/scan",
+                    instance = "/api/v1/libraries/{id}/scans",
                     traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
                 },
                 new
@@ -85,7 +85,7 @@ public class ScanLibraryEndpointSummary : Summary<ScanLibraryEndpoint, EmptyRequ
                     title = "General.Failure",
                     status = 403,
                     detail = "NotAuthorized",
-                    instance = "/api/v1/libraries/{id}/scan",
+                    instance = "/api/v1/libraries/{id}/scans",
                     traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
                 }
             }
@@ -98,7 +98,7 @@ public class ScanLibraryEndpointSummary : Summary<ScanLibraryEndpoint, EmptyRequ
                 title = "General.NotFound",
                 status = 404,
                 detail = "LibraryNotFound",
-                instance = "/api/v1/libraries/{id}/scan",
+                instance = "/api/v1/libraries/{id}/scans",
                 traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
             }
         );
@@ -110,7 +110,7 @@ public class ScanLibraryEndpointSummary : Summary<ScanLibraryEndpoint, EmptyRequ
                 title = "General.Validation",
                 status = 422,
                 detail = "OneOrMoreValidationErrorsOccurred",
-                instance = "/api/v1/libraries/{id}/scan",
+                instance = "/api/v1/libraries/{id}/scans",
                 errors = new Dictionary<string, string[]>
                 {
                     {

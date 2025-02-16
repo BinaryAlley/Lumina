@@ -40,8 +40,8 @@ public class UpdateLibraryEndpointSummary : Summary<UpdateLibraryEndpoint, Updat
             SaveMetadataInMediaDirectories: false
         );
 
-        RequestParam(r => r.Id, "The Id of the media library. Required.");
-        RequestParam(r => r.UserId, "The Id of the user owning the media library. Required.");
+        RequestParam(r => r.Id, "The unique identifier of the media library. Required.");
+        RequestParam(r => r.UserId, "The unique identifier of the user owning the media library. Required.");
         RequestParam(r => r.Title, "The title of the media library. Required.");
         RequestParam(r => r.LibraryType, "The type of the media library. Required.");
         RequestParam(r => r.ContentLocations, ">The file system paths of the directories where the media library elements are located. Required.");
@@ -52,7 +52,7 @@ public class UpdateLibraryEndpointSummary : Summary<UpdateLibraryEndpoint, Updat
         RequestParam(r => r.SaveMetadataInMediaDirectories, "Whether this media library should copy the downloaded metadata into the media library content locations, or not. Optional.");
 
         ResponseParam<LibraryResponse>(r => r.Id, "The unique identifier of the entity.");
-        ResponseParam<LibraryResponse>(r => r.UserId, "The Id of the user owning the media library.");
+        ResponseParam<LibraryResponse>(r => r.UserId, "The unique identifier of the user owning the media library.");
         ResponseParam<LibraryResponse>(r => r.Title, "The title of the media library.");
         ResponseParam<LibraryResponse>(r => r.LibraryType, "The type of the media library.");
         ResponseParam<LibraryResponse>(r => r.ContentLocations, "The file system paths of the directories where the media library elements are located.");

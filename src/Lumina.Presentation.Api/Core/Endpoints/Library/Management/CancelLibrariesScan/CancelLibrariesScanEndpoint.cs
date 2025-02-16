@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.Core.Endpoints.Library.Management.CancelLibrariesScan;
 
 /// <summary>
-/// API endpoint for the <c>/libraries/cancel-scan</c> route.
+/// API endpoint for the <c>/libraries/scans/cancel</c> route.
 /// </summary>
 public class CancelLibrariesScanEndpoint : BaseEndpoint<EmptyRequest, IResult>
 {

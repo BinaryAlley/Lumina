@@ -8,7 +8,7 @@ namespace Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibra
 /// <summary>
 /// Represents a request to get a book by the specified Id.
 /// </summary>
-/// <param name="Id">The Id of the book to retrieve.</param>
+/// <param name="Id">The unique identifier of the book to retrieve.</param>
 [DebuggerDisplay("Id: {Id}")]
 public record GetBookRequest(
     string? Id

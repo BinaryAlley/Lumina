@@ -153,6 +153,9 @@
   <data name="DeleteLibraryConfirm" xml:space="preserve">
     <value>Sind Sie sicher, dass Sie die ausgewählte Bibliothek löschen möchten?</value>
   </data>
+  <data name="DiscoveringFiles" xml:space="preserve">
+    <value>Dateien werden erkannt...</value>
+  </data>
   <data name="Documentary" xml:space="preserve">
     <value>Dokumentarfilm</value>
   </data>

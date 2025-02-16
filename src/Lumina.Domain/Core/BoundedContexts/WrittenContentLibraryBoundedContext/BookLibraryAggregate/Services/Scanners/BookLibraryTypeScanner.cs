@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.MediaLibrary.Management.Services.Scanning.Jobs.Common;
-using Lumina.Application.Core.MediaLibrary.Management.Services.Scanning.Jobs.WrittenContent.Books;
 using Lumina.Domain.Common.Enums.MediaLibrary;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
+using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Services.Jobs;
 using System.Collections.Generic;
 #endregion
 
-namespace Lumina.Application.Core.MediaLibrary.Management.Services.Scanning.Scanners.WrittenContent;
+namespace Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Services.Scanners;
 
 /// <summary>
 /// Media library scanner for a books media library type.
@@ -19,7 +19,7 @@ internal class BookLibraryTypeScanner : IBookLibraryTypeScanner
     public LibraryType SupportedType { get; } = LibraryType.Book;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="LibraryScannerFactory"/> class.
+    /// Initializes a new instance of the <see cref="BookLibraryTypeScanner"/> class.
     /// </summary>
     /// <param name="mediaScanJobFactory">Injected factory for creating media library scan jobs.</param>
     public BookLibraryTypeScanner(IMediaLibraryScanJobFactory mediaScanJobFactory)
@@ -28,13 +28,13 @@ internal class BookLibraryTypeScanner : IBookLibraryTypeScanner
     }
 
     /// <inheritdoc/>
-    public IEnumerable<MediaLibraryScanJob> CreateScanJobsForLibrary(Library library)
+    public IEnumerable<IMediaLibraryScanJob> CreateScanJobsForLibrary(LibraryId libraryId, bool downloadMedatadaFromWeb)
     {
         // declare the list of jobs that this scanner requires
-        FileSystemDiscoveryJob fileSystemDiscoveryJob = _mediaScanJobFactory.CreateJob<FileSystemDiscoveryJob>(library); 
-        RepositoryMetadataDiscoveryJob repositoryMetadataDiscoveryJob = _mediaScanJobFactory.CreateJob<RepositoryMetadataDiscoveryJob>(library);
-        HashComparerJob hashComparerJob = _mediaScanJobFactory.CreateJob<HashComparerJob>(library);
-        GoodReadsMetadataScrapJob goodReadsMetadataScrapJob = _mediaScanJobFactory.CreateJob<GoodReadsMetadataScrapJob>(library);
+        IFileSystemDiscoveryJob fileSystemDiscoveryJob = _mediaScanJobFactory.CreateJob<IFileSystemDiscoveryJob>(libraryId);
+        IRepositoryMetadataDiscoveryJob repositoryMetadataDiscoveryJob = _mediaScanJobFactory.CreateJob<IRepositoryMetadataDiscoveryJob>(libraryId);
+        IHashComparerJob hashComparerJob = _mediaScanJobFactory.CreateJob<IHashComparerJob>(libraryId);
+        IGoodReadsMetadataScrapJob goodReadsMetadataScrapJob = _mediaScanJobFactory.CreateJob<IGoodReadsMetadataScrapJob>(libraryId);
 
         // establish the hierarchical relationships between jobs
         fileSystemDiscoveryJob.AddChild(hashComparerJob);
@@ -43,7 +43,7 @@ internal class BookLibraryTypeScanner : IBookLibraryTypeScanner
         hashComparerJob.AddParent(fileSystemDiscoveryJob);
         hashComparerJob.AddParent(repositoryMetadataDiscoveryJob);
 
-        if (library.DownloadMedatadaFromWeb)
+        if (downloadMedatadaFromWeb)
         {
             hashComparerJob.AddChild(goodReadsMetadataScrapJob);
             goodReadsMetadataScrapJob.AddParent(hashComparerJob);

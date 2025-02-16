@@ -16,8 +16,11 @@ using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.File
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
+using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
 using Mediator;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
@@ -83,13 +86,14 @@ public class UpdateLibraryCommandHandler : IRequestHandler<UpdateLibraryCommand,
                 return DomainErrors.Library.CoverFileMustBeAnImage;
         }
 
-        // get a library repository
+        // get a library repository and retrieve the library to update
         ILibraryRepository libraryRepository = _unitOfWork.GetRepository<ILibraryRepository>();
         ErrorOr<LibraryEntity?> getLibraryResult = await libraryRepository.GetByIdAsync(request.Id, cancellationToken).ConfigureAwait(false);
         if (getLibraryResult.IsError)
             return getLibraryResult.Errors;
         else if (getLibraryResult.Value is null)
             return DomainErrors.Library.LibraryNotFound;
+
         // if the user that made the request is not an Admin or is not the owner of the library, they do not have the right to update it
         if (getLibraryResult.Value.UserId != _currentUserService.UserId || 
             (!await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false) &&
@@ -99,7 +103,7 @@ public class UpdateLibraryCommandHandler : IRequestHandler<UpdateLibraryCommand,
         // create a domain library object
         ErrorOr<Library> createLibraryResult = Library.Create(
             LibraryId.Create(request.Id),
-            request.OwnerId,
+            UserId.Create(request.OwnerId),
             request.Title!,
             Enum.Parse<LibraryType>(request.LibraryType!),
             request.ContentLocations!,
@@ -107,7 +111,8 @@ public class UpdateLibraryCommandHandler : IRequestHandler<UpdateLibraryCommand,
             request.IsEnabled,
             request.IsLocked,
             request.DownloadMedatadaFromWeb,
-            request.SaveMetadataInMediaDirectories
+            request.SaveMetadataInMediaDirectories,
+            getLibraryResult.Value.LibraryScans.Select(libraryScan => ScanId.Create(libraryScan.Id)).ToList()
         );
         if (createLibraryResult.IsError)
             return createLibraryResult.Errors;
@@ -120,16 +125,20 @@ public class UpdateLibraryCommandHandler : IRequestHandler<UpdateLibraryCommand,
             return updateLibraryResult.Errors;
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
-        // queue any domain events
-        foreach (IDomainEvent domainEvent in createLibraryResult.Value.PopDomainEvents())
-            _domainEventsQueue.Enqueue(domainEvent);
-
         // retrieve the updated media library from the persistence medium and return it
         ErrorOr<LibraryEntity?> getCreatedLibraryResult = await libraryRepository.GetByIdAsync(createLibraryResult.Value.Id.Value, cancellationToken).ConfigureAwait(false);
         if (getCreatedLibraryResult.IsError)
             return getCreatedLibraryResult.Errors;
         if (getCreatedLibraryResult.Value is null)
             return ApplicationErrors.Persistence.ErrorPersistingMediaLibrary;
+
+        // mark the media library as saved
+        createLibraryResult.Value.Save();
+
+        // queue any domain events
+        foreach (IDomainEvent domainEvent in createLibraryResult.Value.GetDomainEvents())
+            _domainEventsQueue.Enqueue(domainEvent);
+
         return getCreatedLibraryResult.Value.ToResponse();
     }
 }

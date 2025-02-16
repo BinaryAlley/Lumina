@@ -16,8 +16,11 @@ public class CancelLibraryScanCommandValidator : AbstractValidator<CancelLibrary
     /// </summary>
     public CancelLibraryScanCommandValidator()
     {
-        RuleFor(x => x.Id)
+        RuleFor(x => x.LibraryId)
             .NotEmpty().WithMessage(Errors.Library.LibraryIdCannotBeEmpty.Description)
             .Must(id => id != Guid.Empty).WithMessage(Errors.Library.LibraryIdCannotBeEmpty.Description);
+        RuleFor(x => x.ScanId)
+            .NotEmpty().WithMessage(Errors.LibraryScanning.ScanIdCannotBeEmpty.Description)
+            .Must(id => id != Guid.Empty).WithMessage(Errors.LibraryScanning.ScanIdCannotBeEmpty.Description);
     }
 }

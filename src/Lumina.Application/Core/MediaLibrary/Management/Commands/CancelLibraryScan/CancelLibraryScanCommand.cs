@@ -8,10 +8,12 @@ using System.Diagnostics;
 namespace Lumina.Application.Core.MediaLibrary.Management.Commands.CancelLibraryScan;
 
 /// <summary>
-/// Command for cancelling the scan of a media library by its Id.
+/// Command for canceling the scan of a media library.
 /// </summary>
-/// <param name="Id">The Id of the media library whose scan is cancelled.</param>
-[DebuggerDisplay("Id: {Id}")]
+/// <param name="LibraryId">The unique identifier of the media library whose scan is cancelled.</param>
+/// <param name="ScanId">The unique identifier of the scan to cancel.</param>
+[DebuggerDisplay("LibraryId: {LibraryId}; ScanId: {ScanId}")]
 public record CancelLibraryScanCommand(
-    Guid Id
+    Guid LibraryId,
+    Guid ScanId
 ) : IRequest<ErrorOr<Success>>;

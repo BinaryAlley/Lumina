@@ -57,7 +57,7 @@ public class UserEntityFixture
     /// Creates a valid collection of user libraries.
     /// </summary>
     /// <param name="count">The number of user libraries to create.</param>
-    /// <param name="userId">The Id of the user for whom to create the libraries.</param>
+    /// <param name="userId">The unique identifier of the user for whom to create the libraries.</param>
     /// <returns>A collection of <see cref="LibraryEntity"/>.</returns>
     private static List<LibraryEntity> CreateLibraries(int count, Guid userId)
     {

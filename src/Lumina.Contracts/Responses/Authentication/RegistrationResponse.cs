@@ -8,7 +8,7 @@ namespace Lumina.Contracts.Responses.Authentication;
 /// <summary>
 /// Represents the response model for user registration.
 /// </summary>
-/// <param name="Id">The Id of the user.</param>
+/// <param name="Id">The unique identifier of the user.</param>
 /// <param name="Username">The username of the user.</param>
 /// <param name="TotpSecret">The TOTP (Time-Based One-Time Password) secret used for two-factor authentication.</param>
 [DebuggerDisplay("Username: {Username}")]

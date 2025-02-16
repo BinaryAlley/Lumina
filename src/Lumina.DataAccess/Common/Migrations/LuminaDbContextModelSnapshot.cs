@@ -251,10 +251,12 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnOrder(3);
 
                     b.Property<Guid>("CreatedBy")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(9);
 
                     b.Property<DateTime>("CreatedOnUtc")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(8);
 
                     b.Property<bool>("DownloadMedatadaFromWeb")
                         .ValueGeneratedOnAdd()
@@ -288,10 +290,12 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnOrder(1);
 
                     b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(11);
 
                     b.Property<DateTime?>("UpdatedOnUtc")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(10);
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("TEXT");
@@ -301,6 +305,48 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Libraries", (string)null);
+                });
+
+            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management.LibraryScanEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(0);
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(3);
+
+                    b.Property<DateTime>("CreatedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(2);
+
+                    b.Property<Guid>("LibraryId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(1);
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(5);
+
+                    b.Property<DateTime?>("UpdatedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(4);
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LibraryId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("LibraryScans", (string)null);
                 });
 
             modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary.BookEntity", b =>
@@ -324,11 +370,12 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnOrder(28);
 
                     b.Property<Guid>("CreatedBy")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(33);
 
                     b.Property<DateTime>("CreatedOnUtc")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(30);
+                        .HasColumnOrder(32);
 
                     b.Property<string>("Description")
                         .HasMaxLength(2000)
@@ -440,11 +487,12 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnOrder(1);
 
                     b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(35);
 
                     b.Property<DateTime?>("UpdatedOnUtc")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(31);
+                        .HasColumnOrder(34);
 
                     b.Property<int?>("VolumeNumber")
                         .HasColumnType("INTEGER")
@@ -633,6 +681,25 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management.LibraryScanEntity", b =>
+                {
+                    b.HasOne("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management.LibraryEntity", "Library")
+                        .WithMany("LibraryScans")
+                        .HasForeignKey("LibraryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Lumina.Application.Common.DataAccess.Entities.UsersManagement.UserEntity", "User")
+                        .WithMany("LibraryScans")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Library");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary.BookEntity", b =>
                 {
                     b.OwnsMany("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary.BookRatingEntity", "Ratings", b1 =>
@@ -717,9 +784,16 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.Navigation("UserRoles");
                 });
 
+            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management.LibraryEntity", b =>
+                {
+                    b.Navigation("LibraryScans");
+                });
+
             modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.UsersManagement.UserEntity", b =>
                 {
                     b.Navigation("Libraries");
+
+                    b.Navigation("LibraryScans");
 
                     b.Navigation("UserPermissions");
 

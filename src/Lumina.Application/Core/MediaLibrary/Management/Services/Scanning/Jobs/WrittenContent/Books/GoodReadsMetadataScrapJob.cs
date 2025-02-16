@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.MediaLibrary.Management.Services.Scanning.Jobs.Common;
 using Lumina.Domain.Common.Enums.MediaLibrary;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
+using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Services.Jobs;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -12,7 +13,7 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Services.Scanning.Jobs
 /// <summary>
 /// Media library scan job for retrieving written content metadata from GoodReads.
 /// </summary>
-internal class GoodReadsMetadataScrapJob : MediaLibraryScanJob
+internal sealed class GoodReadsMetadataScrapJob : MediaLibraryScanJob, IGoodReadsMetadataScrapJob
 {
     /// <inheritdoc/>
     public override async Task ExecuteAsync<TInput>(Guid id, TInput input, CancellationToken cancellationToken)
@@ -24,16 +25,18 @@ internal class GoodReadsMetadataScrapJob : MediaLibraryScanJob
             if (Parents.Count == 0 || parentsPayloadsExecuted == Parents.Count)
             {
                 Status = LibraryScanJobStatus.Running;
+                Console.WriteLine("started goodreads metadata");
                 List<int> ints = [1, 2, 3];
                 Status = LibraryScanJobStatus.Completed;
+                Console.WriteLine("ended goodreads metadata");
                 // call each linked child with the obtained payload
-                foreach (MediaLibraryScanJob children in Children)
+                foreach (IMediaLibraryScanJob children in Children)
                     await children.ExecuteAsync(id, ints, cancellationToken).ConfigureAwait(false);
             }
         }
         catch (OperationCanceledException)
         {
-            Status = LibraryScanJobStatus.Cancelled;
+            Status = LibraryScanJobStatus.Canceled;
             throw;
         }
     }

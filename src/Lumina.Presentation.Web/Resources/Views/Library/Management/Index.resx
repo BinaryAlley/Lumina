@@ -153,6 +153,9 @@
   <data name="DeleteLibraryConfirm" xml:space="preserve">
     <value>Are you sure you want to delete the specified library?</value>
   </data>
+  <data name="DiscoveringFiles" xml:space="preserve">
+    <value>Discovering files...</value>
+  </data>
   <data name="Documentary" xml:space="preserve">
     <value>Documentary</value>
   </data>

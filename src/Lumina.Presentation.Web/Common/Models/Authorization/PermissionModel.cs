@@ -8,7 +8,7 @@ namespace Lumina.Presentation.Web.Common.Models.Authorization;
 /// <summary>
 /// Represents a model for an authorization permission.
 /// </summary>
-/// <param name="Id">The Id of the authorization permission.</param>
+/// <param name="Id">The unique identifier of the authorization permission.</param>
 /// <param name="PermissionName">The authorization permission.</param>
 public record PermissionModel(
     Guid Id,

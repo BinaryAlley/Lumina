@@ -108,7 +108,7 @@
                             <td class="text-center">${library.isEnabled === true ? `@_localizer["Yes"]` : `@_localizer["No"]`}</td>
                             <td class="text-center">${library.isLocked === true ? `@_localizer["Yes"]` : `@_localizer["No"]`}</td>
                             <td class="text-end">
-                                <img src="/images/ui/stop.svg" alt="@_localizer["CancelScan"]" title="@_localizer["Scan"]" class="hidden remove-form-table-row-icon" />
+                                <img src="/images/ui/stop.svg" alt="@_localizer["CancelScan"]" title="@_localizer["CancelScan"]" class="hidden remove-form-table-row-icon" />
                                 <img src="/images/ui/trigger.svg" alt="@_localizer["Scan"]" title="@_localizer["Scan"]" class="remove-form-table-row-icon" />
                                 <a href="${editUrl}">
                                     <img src="/images/ui/edit.svg" alt="@_localizer["Edit"]" title="@_localizer["Edit"]" class="remove-form-table-row-icon" />
@@ -155,6 +155,7 @@
                 data.forEach(scan => {
                     const row = tbody.querySelector(`tr[data-library-id="${scan.libraryId}"]`);
                     if (row) {
+                        row.setAttribute('data-scan-id', scan.scanId);
                         const scanIcon = row.querySelector('img[src*="trigger.svg"]');
                         const cancelScanIcon = row.querySelector('img[src*="stop.svg"]');
 
@@ -175,6 +176,7 @@
                 const success = await callApiPostAsync(url.replace('/@(default(Guid))', `/${libraryId}`));
 
                 if (success) {
+                    row.setAttribute('data-scan-id', success.scanId);
                     const scanIcon = e.target;
                     const cancelScanIcon = row.querySelector('img[src*="stop.svg"]');
 
@@ -208,9 +210,24 @@
             if (e.target.matches('img[src*="stop.svg"]')) {
                 const row = e.target.closest('tr');
 
-                const libraryId = row.getAttribute('data-library-id');
-                const url = '@_urlService.GetAbsoluteUrl("CancelLibraryScan", "LibraryManagement", new { id = default(Guid) })';
-                await callApiPostAsync(url.replace('/@(default(Guid))', `/${libraryId}`));
+                const url = '@_urlService.GetAbsoluteUrl("CancelLibraryScan", "LibraryManagement", new { libraryId = default(Guid), scanId = default(Guid) })';
+
+                // make a list of values from DOM that are needed as URL query params (they need to be in the order they appear in the URL!)
+                const params = [
+                    row.getAttribute('data-library-id'),
+                    row.getAttribute('data-scan-id')
+                ];
+                // split URL into segments for precise replacement
+                const segments = url.split('/');
+                let paramIndex = 0;
+                // replace each default GUID sequentially with the values of the query params list, in the order they were added
+                const finalUrl = segments.map(segment =>
+                    segment === '00000000-0000-0000-0000-000000000000'
+                        ? params[paramIndex++]
+                        : segment
+                ).join('/');
+
+                await callApiPostAsync(finalUrl);
                 const scanIcon = row.querySelector('img[src*="trigger.svg"]');
                 const cancelScanIcon = row.querySelector('img[src*="stop.svg"]');
 

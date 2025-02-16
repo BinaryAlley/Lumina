@@ -48,7 +48,12 @@ public class UserEntity : IStorageEntity, IAuditableEntity
     /// <summary>
     /// Gets the collection of libraries owned by this user.
     /// </summary>
-    public required ICollection<LibraryEntity> Libraries { get; init; } = [];
+    public ICollection<LibraryEntity> Libraries { get; init; } = [];
+
+    /// <summary>
+    /// Gets the collection of library scans initiated by this user.
+    /// </summary>
+    public ICollection<LibraryScanEntity> LibraryScans { get; init; } = [];
 
     /// <summary>
     /// Gets the user roles association that includes this user.

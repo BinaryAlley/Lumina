@@ -9,7 +9,7 @@ namespace Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.Lib
 /// <summary>
 /// Domain event raised when a libary is deleted.
 /// </summary>
-/// <param name="Id">The Id of the domain event.</param>
+/// <param name="Id">The unique identifier of the domain event.</param>
 /// <param name="Library">The library that was deleted.</param>
 /// <param name="OccurredOnUtc">The date and time when the domain event occurred.</param>
 [DebuggerDisplay("Id: {Library.Id} Title: {Library.Title}")]

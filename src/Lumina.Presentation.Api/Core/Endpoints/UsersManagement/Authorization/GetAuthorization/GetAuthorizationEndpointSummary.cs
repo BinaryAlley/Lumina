@@ -28,7 +28,7 @@ public class GetAuthorizationEndpointSummary : Summary<GetAuthorizationEndpoint,
             UserId: Guid.NewGuid()
         );
 
-        RequestParam(r => r.UserId, "The Id of the user for whom to get the authorization. Required.");
+        RequestParam(r => r.UserId, "The unique identifier of the user for whom to get the authorization. Required.");
 
         Response(200, "The authorization role and permissions of the account are returned.",
             example: new AuthorizationResponse(

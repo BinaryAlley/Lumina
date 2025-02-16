@@ -2,7 +2,7 @@
 using Lumina.Domain.Common.Enums.MediaLibrary;
 #endregion
 
-namespace Lumina.Application.Core.MediaLibrary.Management.Services.Scanning.Scanners.Common;
+namespace Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Scanners.Common;
 
 /// <summary>
 /// Interface defining a factory for creating media library scanners.

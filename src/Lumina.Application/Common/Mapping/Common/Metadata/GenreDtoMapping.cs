@@ -17,7 +17,9 @@ public static class GenreDtoMapping
     /// Converts <paramref name="dto"/> to <see cref="GenreDto"/>.
     /// </summary>
     /// <param name="dto">The DTO to be converted.</param>
-    /// <returns>The converted domain entity.</returns>
+    /// <returns>
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly converted <see cref="Genre"/>, or an error message.
+    /// </returns>
     public static ErrorOr<Genre> ToDomainEntity(this GenreDto dto)
     {
         return Genre.Create(
@@ -29,7 +31,9 @@ public static class GenreDtoMapping
     /// Converts <paramref name="dtos"/> to a collection of <see cref="Genre"/>.
     /// </summary>
     /// <param name="dtos">The DTOs to be converted.</param>
-    /// <returns>The converted domain entities.</returns>
+    /// <returns>
+    /// An <see cref="ErrorOr{TValue}"/> containing either a collection of converted <see cref="Genre"/>, or an error message.
+    /// </returns>
     public static IEnumerable<ErrorOr<Genre>> ToDomainEntities(this IEnumerable<GenreDto> dtos)
     {
         return dtos.Select(repositoryEntity => repositoryEntity.ToDomainEntity());

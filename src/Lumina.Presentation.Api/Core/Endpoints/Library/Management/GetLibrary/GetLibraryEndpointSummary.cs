@@ -28,10 +28,10 @@ public class GetLibraryEndpointSummary : Summary<GetLibraryEndpoint, GetLibraryR
             Id: Guid.NewGuid()
         );
 
-        RequestParam(r => r.Id, "The Id of the media library. Required.");
+        RequestParam(r => r.Id, "The unique identifier of the media library. Required.");
 
         ResponseParam<LibraryResponse>(r => r.Id, "The unique identifier of the entity.");
-        ResponseParam<LibraryResponse>(r => r.UserId, "The Id of the user owning the media library.");
+        ResponseParam<LibraryResponse>(r => r.UserId, "The unique identifier of the user owning the media library.");
         ResponseParam<LibraryResponse>(r => r.Title, "The title of the media library.");
         ResponseParam<LibraryResponse>(r => r.LibraryType, "The type of the media library.");
         ResponseParam<LibraryResponse>(r => r.ContentLocations, "The file system paths of the directories where the media library elements are located.");

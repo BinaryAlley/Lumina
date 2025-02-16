@@ -99,7 +99,7 @@ public sealed class Book : AggregateRoot<BookId>
     public IReadOnlyCollection<Isbn> ISBNs => _isbns.AsReadOnly();
 
     /// <summary>
-    /// Gets the list of media contributors (actors, directors, etc) starring in this book.
+    /// Gets the list of objects representing the unique identifiers of the media contributors (actors, directors, etc) starring in this book.
     /// </summary>
     public IReadOnlyCollection<MediaContributorId> Contributors => _contributors.AsReadOnly();
 
@@ -111,7 +111,7 @@ public sealed class Book : AggregateRoot<BookId>
     /// <summary>
     /// Initializes a new instance of the <see cref="Book"/> class.
     /// </summary>
-    /// <param name="id">The unique identifier of the book.</param>
+    /// <param name="id">The object representing the unique identifier of the book.</param>
     /// <param name="metadata">The metadata of the book.</param>
     /// <param name="format">The optional format of the book (e.g., Hardcover, Paperback).</param>
     /// <param name="edition">The optional edition of the book.</param>
@@ -129,7 +129,7 @@ public sealed class Book : AggregateRoot<BookId>
     /// <param name="createdOnUtc">The date and time when the entity was created.</param>
     /// <param name="updatedOnUtc">The date and time when the entity was last updated.</param>
     /// <param name="isbns">The list of ISBNs of the book.</param>
-    /// <param name="contributors">The list of media contributors of the book.</param>
+    /// <param name="contributors">The list of objects representing the unique identifiers of the media contributors of the book.</param>
     /// <param name="ratings">The list of ratings for the book.</param>
     private Book(
         BookId id,
@@ -175,16 +175,6 @@ public sealed class Book : AggregateRoot<BookId>
         _ratings = ratings;
     }
 
-#pragma warning disable CS8618
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Book"/> class.
-    /// </summary>
-    private Book() // only needed during reflection
-    {
-
-    }
-#pragma warning restore CS8618
-
     /// <summary>
     /// Creates a new instance of the <see cref="Book"/> class.
     /// </summary>
@@ -203,7 +193,7 @@ public sealed class Book : AggregateRoot<BookId>
     /// <param name="barnesAndNobleId">The optional Barnes & Noble ID of the book.</param>
     /// <param name="appleBooksId">The optional Apple Books ID of the book.</param>
     /// <param name="isbns">The list of ISBNs of the book.</param>
-    /// <param name="contributors">The list of media contributors of the book.</param>
+    /// <param name="contributors">The list of objects representing the unique identifiers of the media contributors of the book.</param>
     /// <param name="ratings">The list of ratings for the book.</param>
     /// <returns>
     /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly created <see cref="Book"/>, or an error message.
@@ -255,7 +245,7 @@ public sealed class Book : AggregateRoot<BookId>
     /// <summary>
     /// Creates a new instance of the <see cref="Book"/>, with a pre-existing <paramref name="id"/>.
     /// </summary>
-    /// <param name="id">The object representing the id of the book.</param>
+    /// <param name="id">The object representing the unique identifier of the book.</param>
     /// <param name="metadata">The metadata of the book.</param>
     /// <param name="format">The optional format of the book (e.g., Hardcover, Paperback).</param>
     /// <param name="edition">The optional edition of the book.</param>
@@ -273,7 +263,7 @@ public sealed class Book : AggregateRoot<BookId>
     /// <param name="createdOnUtc">The date and time when the entity was created.</param>
     /// <param name="updatedOnUtc">The date and time when the entity was last updated.</param>
     /// <param name="isbns">The list of ISBNs of the book.</param>
-    /// <param name="contributors">The list of media contributors of the book.</param>
+    /// <param name="contributors">The list of objects representing the unique identifiers of the media contributors of the book.</param>
     /// <param name="ratings">The list of ratings for the book.</param>
     /// <returns>
     /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly created <see cref="Book"/>, or an error message.

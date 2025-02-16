@@ -11,7 +11,7 @@ namespace Lumina.Application.Core.UsersManagement.Authorization.Queries.GetAutho
 /// <summary>
 /// Query for retrieving the authorization roles and permissions of an account.
 /// </summary>
-/// <param name="UserId">The Id of the user for whom to get the authorization.</param>
+/// <param name="UserId">The unique identifier of the user for whom to get the authorization.</param>
 [DebuggerDisplay("UserId: {UserId}")]
 public record GetAuthorizationQuery(
     Guid? UserId

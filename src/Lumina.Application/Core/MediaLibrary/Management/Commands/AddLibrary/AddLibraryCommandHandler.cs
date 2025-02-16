@@ -15,6 +15,7 @@ using Lumina.Domain.Common.Events;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
+using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
 using Mediator;
 using System;
 using System.Threading;
@@ -90,7 +91,7 @@ public class AddLibraryCommandHandler : IRequestHandler<AddLibraryCommand, Error
 
         // create a domain library object
         ErrorOr<Library> createLibraryResult = Library.Create(
-            _currentUserService.UserId!.Value,
+            UserId.Create(_currentUserService.UserId!.Value),
             request.Title!,
             Enum.Parse<LibraryType>(request.LibraryType!),
             request.ContentLocations!,
@@ -98,7 +99,8 @@ public class AddLibraryCommandHandler : IRequestHandler<AddLibraryCommand, Error
             request.IsEnabled,
             request.IsLocked,
             request.DownloadMedatadaFromWeb,
-            request.SaveMetadataInMediaDirectories
+            request.SaveMetadataInMediaDirectories,
+            []
         );
 
         if (createLibraryResult.IsError)
@@ -115,22 +117,19 @@ public class AddLibraryCommandHandler : IRequestHandler<AddLibraryCommand, Error
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         // retrieve the newly saved media library from the persistence medium and return it
-        ErrorOr<LibraryEntity?> getLibraryResult = await libraryRepository.GetByIdAsync(createLibraryResult.Value.Id.Value, cancellationToken).ConfigureAwait(false);
-        if (getLibraryResult.IsError)
-            return getLibraryResult.Errors;
-        if (getLibraryResult.Value is null)
-            return ApplicationErrors.Persistence.ErrorPersistingMediaLibrary;
-        
-        // queue any domain events
-        foreach (IDomainEvent domainEvent in createLibraryResult.Value.PopDomainEvents())
-            _domainEventsQueue.Enqueue(domainEvent);
-
-        // retrieve the updated media library from the persistence medium and return it
         ErrorOr<LibraryEntity?> getCreatedLibraryResult = await libraryRepository.GetByIdAsync(createLibraryResult.Value.Id.Value, cancellationToken).ConfigureAwait(false);
         if (getCreatedLibraryResult.IsError)
             return getCreatedLibraryResult.Errors;
         if (getCreatedLibraryResult.Value is null)
             return ApplicationErrors.Persistence.ErrorPersistingMediaLibrary;
+
+        // mark the media library as saved
+        createLibraryResult.Value.Save();
+        
+        // queue any domain events
+        foreach (IDomainEvent domainEvent in createLibraryResult.Value.GetDomainEvents())
+            _domainEventsQueue.Enqueue(domainEvent);
+
         return getCreatedLibraryResult.Value.ToResponse();
     }
 }

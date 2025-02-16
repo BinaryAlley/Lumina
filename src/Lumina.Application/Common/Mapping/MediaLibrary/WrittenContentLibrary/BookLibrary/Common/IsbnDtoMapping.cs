@@ -33,7 +33,9 @@ public static class IsbnDtoMapping
     /// Converts <paramref name="dtos"/> to a collection of <see cref="Isbn"/>.
     /// </summary>
     /// <param name="dtos">The DTOs to be converted.</param>
-    /// <returns>The converted domain entities.</returns>
+    /// <returns>
+    /// An <see cref="ErrorOr{TValue}"/> containing either a collection of converted <see cref="Isbn"/>, or an error message.
+    /// </returns>
     public static IEnumerable<ErrorOr<Isbn>> ToDomainEntities(this IEnumerable<IsbnDto> dtos)
     {
         return dtos.Select(domainEntity => domainEntity.ToDomainEntity());

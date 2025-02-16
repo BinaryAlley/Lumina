@@ -6,6 +6,6 @@ using Mediator;
 namespace Lumina.Application.Core.MediaLibrary.Management.Commands.CancelLibrariesScan;
 
 /// <summary>
-/// Command for cancelling the previously started scan of all media libraries.
+/// Command for canceling the previously started scan of all media libraries.
 /// </summary>
 public record CancelLibrariesScanCommand : IRequest<ErrorOr<Success>>;
