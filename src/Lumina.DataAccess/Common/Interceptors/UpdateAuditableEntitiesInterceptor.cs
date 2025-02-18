@@ -106,6 +106,6 @@ public sealed class UpdateAuditableEntitiesInterceptor : SaveChangesInterceptor
 
         // set modification properties
         entry.Entity.UpdatedOnUtc = utcNow;
-        entry.Entity.UpdatedBy = userId;
+        entry.Entity.UpdatedBy = userId ?? Guid.Parse("11111111-1111-1111-1111-111111111111"); // "SYSTEM" user Id
     }
 }

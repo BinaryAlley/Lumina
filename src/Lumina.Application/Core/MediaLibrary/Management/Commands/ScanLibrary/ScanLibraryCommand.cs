@@ -13,4 +13,4 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Commands.ScanLibrary;
 /// <param name="Id">The unique identifier of the library to scan.</param>
 public record ScanLibraryCommand(
     Guid Id    
-) : IRequest<ErrorOr<ScanLibraryResponse>>;
+) : IRequest<ErrorOr<MediaLibraryScanResponse>>;

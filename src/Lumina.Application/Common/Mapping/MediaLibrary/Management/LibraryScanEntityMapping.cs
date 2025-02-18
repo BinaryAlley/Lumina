@@ -23,7 +23,7 @@ public static class LibraryScanEntityMapping
     /// </summary>
     /// <param name="repositoryEntity">The repository entity to be converted.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a collection of converted <see cref="LibraryScan"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a converted <see cref="LibraryScan"/>, or an error message.
     /// </returns>
     public static ErrorOr<LibraryScan> ToDomainEntity(this LibraryScanEntity repositoryEntity)
     {

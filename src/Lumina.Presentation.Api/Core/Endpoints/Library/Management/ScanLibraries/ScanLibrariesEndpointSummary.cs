@@ -22,7 +22,7 @@ public class ScanLibrariesEndpointSummary : Summary<ScanLibrariesEndpoint, Empty
         Description = "Starts the scanning process of all media libraries of a user, or all libraries, if the user is an Admin.";
 
         Response(200, "The media libraries scan was successfully started.",
-            example: new ScanLibraryResponse[] {
+            example: new MediaLibraryScanResponse[] {
             new (
                 ScanId: Guid.NewGuid(),
                 LibraryId: Guid.NewGuid()

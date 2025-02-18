@@ -144,6 +144,9 @@
   <data name="ComicSeries" xml:space="preserve">
     <value>Serie de Cómics</value>
   </data>
+  <data name="ComparingFileHashes" xml:space="preserve">
+    <value>Se están comparando hashes de archivos...</value>
+  </data>
   <data name="Concert" xml:space="preserve">
     <value>Concierto</value>
   </data>
@@ -173,6 +176,9 @@
   </data>
   <data name="FilmSeries" xml:space="preserve">
     <value>Saga Cinematográfica</value>
+  </data>
+  <data name="GoodReadsMetadataDownload" xml:space="preserve">
+    <value>Descargando metadatos de GoodReads...</value>
   </data>
   <data name="GraphicNovel" xml:space="preserve">
     <value>Novela Gráfica</value>
@@ -233,6 +239,12 @@
   </data>
   <data name="Remove" xml:space="preserve">
     <value>Eliminar</value>
+  </data>
+  <data name="RetrievingPastScanData" xml:space="preserve">
+    <value>Recuperando datos de escaneos anteriores...</value>
+  </data>
+  <data name="SavingScanData" xml:space="preserve">
+    <value>Guardando datos del escaneo...</value>
   </data>
   <data name="Scan" xml:space="preserve">
     <value>Escanear</value>

@@ -35,6 +35,7 @@ internal class BookLibraryTypeScanner : IBookLibraryTypeScanner
         IRepositoryMetadataDiscoveryJob repositoryMetadataDiscoveryJob = _mediaScanJobFactory.CreateJob<IRepositoryMetadataDiscoveryJob>(libraryId);
         IHashComparerJob hashComparerJob = _mediaScanJobFactory.CreateJob<IHashComparerJob>(libraryId);
         IGoodReadsMetadataScrapJob goodReadsMetadataScrapJob = _mediaScanJobFactory.CreateJob<IGoodReadsMetadataScrapJob>(libraryId);
+        IRepositoryMetadataSaveJob repositoryMetadataSaveJob = _mediaScanJobFactory.CreateJob<IRepositoryMetadataSaveJob>(libraryId);
 
         // establish the hierarchical relationships between jobs
         fileSystemDiscoveryJob.AddChild(hashComparerJob);
@@ -46,7 +47,16 @@ internal class BookLibraryTypeScanner : IBookLibraryTypeScanner
         if (downloadMedatadaFromWeb)
         {
             hashComparerJob.AddChild(goodReadsMetadataScrapJob);
+            goodReadsMetadataScrapJob.AddChild(repositoryMetadataSaveJob);
+
             goodReadsMetadataScrapJob.AddParent(hashComparerJob);
+            repositoryMetadataSaveJob.AddParent(goodReadsMetadataScrapJob);
+        }
+        else // TODO: perform some action with local files?
+        {
+            hashComparerJob.AddChild(repositoryMetadataSaveJob);
+
+            repositoryMetadataSaveJob.AddParent(hashComparerJob);
         }
 
         // return the top level jobs that will be triggered when the scan will be started

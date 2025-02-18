@@ -62,8 +62,7 @@ public class GetLibraryQueryHandler : IRequestHandler<GetLibraryQuery, ErrorOr<L
 
         // if the user that requested the library is not an Admin or is not the owner of the library, they do not have the right to view it
         if (getLibraryResult.Value.UserId != _currentUserService.UserId ||
-            (!await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false) &&
-             !await _authorizationService.HasPermissionAsync(_currentUserService.UserId!.Value, AuthorizationPermission.CanCreateLibraries, cancellationToken)))
+            !await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false))
             return ApplicationErrors.Authorization.NotAuthorized;
 
         return getLibraryResult.Value.ToResponse();

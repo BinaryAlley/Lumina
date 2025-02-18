@@ -573,4 +573,16 @@
   <data name="ScanJobCurrentOperationCannotBeEmpty" xml:space="preserve">
     <value>L'opération actuelle du scan ne peut pas être vide !</value>
   </data>
+  <data name="LibraryScanIdCannotBeEmpty" xml:space="preserve">
+    <value>L'ID de scan de la bibliothèque ne peut pas être vide!</value>
+  </data>
+  <data name="TotalScanJobsCountMustBePositive" xml:space="preserve">
+    <value>Le nombre total de tâches de scan doit être positif !</value>
+  </data>
+  <data name="CompletedScanJobsCountMustBePositive" xml:space="preserve">
+    <value>Le nombre de tâches de scan terminées doit être positif !</value>
+  </data>
+  <data name="CompletedScanJobsCountCantExceedTotalScanJobsCount" xml:space="preserve">
+    <value>Le nombre de tâches de scan terminées ne peut pas dépasser le nombre total de tâches de scan !</value>
+  </data>
 </root>

@@ -173,9 +173,15 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "architecture", "architecture", "{D93CA337-37D5-4A42-86B5-0A2410594A7A}"
 	ProjectSection(SolutionItems) = preProject
 		..\docs\technical\architecture\1 system-context-diagram.puml = ..\docs\technical\architecture\1 system-context-diagram.puml
+		..\docs\technical\architecture\1 system-context-diagram.svg = ..\docs\technical\architecture\1 system-context-diagram.svg
 		..\docs\technical\architecture\2 container-diagram.puml = ..\docs\technical\architecture\2 container-diagram.puml
+		..\docs\technical\architecture\2 container-diagram.svg = ..\docs\technical\architecture\2 container-diagram.svg
 		..\docs\technical\architecture\3.1 component-web-client-diagram.puml = ..\docs\technical\architecture\3.1 component-web-client-diagram.puml
-		..\docs\technical\architecture\3.2 component-server-diagram.puml = ..\docs\technical\architecture\3.2 component-server-diagram.puml
+		..\docs\technical\architecture\3.1 component-web-client-diagram.svg = ..\docs\technical\architecture\3.1 component-web-client-diagram.svg
+		..\docs\technical\architecture\3.2 component-api-server-diagram.puml = ..\docs\technical\architecture\3.2 component-api-server-diagram.puml
+		..\docs\technical\architecture\3.2 component-api-server-diagram.svg = ..\docs\technical\architecture\3.2 component-api-server-diagram.svg
+		..\docs\technical\architecture\4.1 code-media-library-scanning-diagram.puml = ..\docs\technical\architecture\4.1 code-media-library-scanning-diagram.puml
+		..\docs\technical\architecture\4.1 code-media-library-scanning-diagram.svg = ..\docs\technical\architecture\4.1 code-media-library-scanning-diagram.svg
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "architecture-knowledge-management", "architecture-knowledge-management", "{70B56088-6D3A-481E-9459-79AC6B16FEC1}"
@@ -183,6 +189,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "architecture-decision-log", "architecture-decision-log", "{788FADE4-342D-4919-8E5C-10CA8EDBE954}"
 	ProjectSection(SolutionItems) = preProject
 		..\docs\technical\architecture\architecture-knowledge-management\architecture-decision-log\architecture-decission-record-0001.md = ..\docs\technical\architecture\architecture-knowledge-management\architecture-decision-log\architecture-decission-record-0001.md
+		..\docs\technical\architecture\architecture-knowledge-management\architecture-decision-log\architecture-decission-record-0002.md = ..\docs\technical\architecture\architecture-knowledge-management\architecture-decision-log\architecture-decission-record-0002.md
 	EndProjectSection
 EndProject
 Global

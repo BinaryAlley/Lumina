@@ -144,6 +144,9 @@
   <data name="ComicSeries" xml:space="preserve">
     <value>漫画系列</value>
   </data>
+  <data name="ComparingFileHashes" xml:space="preserve">
+    <value>正在比较文件哈希值...</value>
+  </data>
   <data name="Concert" xml:space="preserve">
     <value>音乐会</value>
   </data>
@@ -173,6 +176,9 @@
   </data>
   <data name="FilmSeries" xml:space="preserve">
     <value>电影系列</value>
+  </data>
+  <data name="GoodReadsMetadataDownload" xml:space="preserve">
+    <value>正在从GoodReads下载元数据...</value>
   </data>
   <data name="GraphicNovel" xml:space="preserve">
     <value>图像小说</value>
@@ -233,6 +239,12 @@
   </data>
   <data name="Remove" xml:space="preserve">
     <value>删除</value>
+  </data>
+  <data name="RetrievingPastScanData" xml:space="preserve">
+    <value>正在检索过去的扫描数据...</value>
+  </data>
+  <data name="SavingScanData" xml:space="preserve">
+    <value>正在保存扫描数据...</value>
   </data>
   <data name="Scan" xml:space="preserve">
     <value>扫描</value>

@@ -50,12 +50,16 @@ public class EventualConsistencyMiddleware
                 // only proceed if the response status code indicates success
                 if (context.Response.StatusCode >= 200 && context.Response.StatusCode < 300)
                 {
+                    // commit the transaction: because some domain events trigger jobs that end up being processed in background hosted services, and those are
+                    // singletons that require their own DI scope to be created, any changes made on the DbContext in this HTTP scope would not be seen on the
+                    // DbContext created in the background service scope, because the transaction is not yet commited here; therefor, the transaction needs to be
+                    // commited first, before any domain events are fired
+                    // see docs/technical/achitecture/architecture-knowledge-management/architecture-decision-log/architecture-decission-record-0002.md for details:
+                    await transaction.CommitAsync().ConfigureAwait(false);
+
                     // check if domain events exist in the channel queue and publish them
                     while (domainEventQueue.TryDequeue(out IDomainEvent? nextEvent))
                         await publisher.Publish(nextEvent);
-
-                    // commit the transaction
-                    await transaction.CommitAsync().ConfigureAwait(false);
                 }
             }
             catch (EventualConsistencyException ex)

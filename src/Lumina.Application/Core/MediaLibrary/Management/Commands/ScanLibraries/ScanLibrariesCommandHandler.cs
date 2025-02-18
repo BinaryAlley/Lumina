@@ -25,7 +25,7 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Commands.ScanLibraries
 /// <summary>
 /// Handler for the command for initiating the scan of all media libraries.
 /// </summary>
-public class ScanLibrariesCommandHandler : IRequestHandler<ScanLibrariesCommand, ErrorOr<IEnumerable<ScanLibraryResponse>>>
+public class ScanLibrariesCommandHandler : IRequestHandler<ScanLibrariesCommand, ErrorOr<IEnumerable<MediaLibraryScanResponse>>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUserService;
@@ -57,7 +57,7 @@ public class ScanLibrariesCommandHandler : IRequestHandler<ScanLibrariesCommand,
     /// <param name="request">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async ValueTask<ErrorOr<IEnumerable<ScanLibraryResponse>>> Handle(ScanLibrariesCommand request, CancellationToken cancellationToken)
+    public async ValueTask<ErrorOr<IEnumerable<MediaLibraryScanResponse>>> Handle(ScanLibrariesCommand request, CancellationToken cancellationToken)
     {
         ILibraryRepository libraryRepository = _unitOfWork.GetRepository<ILibraryRepository>();
         ILibraryScanRepository libraryScanRepository = _unitOfWork.GetRepository<ILibraryScanRepository>();
@@ -74,7 +74,7 @@ public class ScanLibrariesCommandHandler : IRequestHandler<ScanLibrariesCommand,
         if (!await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false))
             domainEntitiesResult = domainEntitiesResult.Where(libraryResult => libraryResult.Value.UserId.Value == _currentUserService.UserId!.Value);
 
-        List<ScanLibraryResponse> responses = [];
+        List<MediaLibraryScanResponse> responses = [];
         List<IDomainEvent> domainEvents = [];
 
         // for each library, start the scan
@@ -118,7 +118,7 @@ public class ScanLibrariesCommandHandler : IRequestHandler<ScanLibrariesCommand,
             // collect all the domain events created during this library scan start
             domainEvents.AddRange(libraryScanResult.Value.GetDomainEvents());
            
-            responses.Add(new ScanLibraryResponse(libraryScanResult.Value.Id.Value, domainLibraryResult.Value.Id.Value));
+            responses.Add(new MediaLibraryScanResponse(libraryScanResult.Value.Id.Value, domainLibraryResult.Value.Id.Value));
         }
 
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
