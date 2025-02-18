@@ -17,7 +17,6 @@ namespace Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.Lib
 public abstract class MediaLibraryScanJob : IMediaLibraryScanJob
 {
     protected int parentsPayloadsExecuted;
-    protected ScanJobProgress? _jobProgress;
 
     /// <summary>
     /// Gets or sets the Id of the media library scan that this job is part of.

@@ -144,6 +144,9 @@
   <data name="ComicSeries" xml:space="preserve">
     <value>Serie de Benzi Desenate</value>
   </data>
+  <data name="ComparingFileHashes" xml:space="preserve">
+    <value>Se compară hash-urile fișierelor...</value>
+  </data>
   <data name="Concert" xml:space="preserve">
     <value>Concert</value>
   </data>
@@ -173,6 +176,9 @@
   </data>
   <data name="FilmSeries" xml:space="preserve">
     <value>Serie de Filme</value>
+  </data>
+  <data name="GoodReadsMetadataDownload" xml:space="preserve">
+    <value>Se descarcă metadate de pe GoodReads...</value>
   </data>
   <data name="GraphicNovel" xml:space="preserve">
     <value>Roman Grafic</value>
@@ -233,6 +239,12 @@
   </data>
   <data name="Remove" xml:space="preserve">
     <value>Șterge</value>
+  </data>
+  <data name="RetrievingPastScanData" xml:space="preserve">
+    <value>Se preiau datele de scanare anterioare...</value>
+  </data>
+  <data name="SavingScanData" xml:space="preserve">
+    <value>Se salvează datele de scanare...</value>
   </data>
   <data name="Scan" xml:space="preserve">
     <value>Scanează</value>

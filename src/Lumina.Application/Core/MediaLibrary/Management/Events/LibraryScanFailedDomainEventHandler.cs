@@ -54,7 +54,7 @@ public class LibraryScanFailedDomainEventHandler : INotificationHandler<LibraryS
 
         // mark the media library scan as failed
         ErrorOr<Success> failScanResult = libraryScanDomainResult.Value.FailScan();
-        // we're going to ignore errors in this point, because scan jobs run in parallel, and two concurrent jobs might trigger this domain event,
+        // we're going to ignore errors in this point, because scan jobs run in parallel, and two concurrent jobs of the same scan might trigger this domain event,
         // trying to set as failed a scan that has already been marked as failed by a concurrent job
         if (!failScanResult.IsError)
         {

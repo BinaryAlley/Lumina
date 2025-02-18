@@ -573,4 +573,16 @@
   <data name="ScanJobCurrentOperationCannotBeEmpty" xml:space="preserve">
     <value>Operația curentă de scanare nu poate fi goală!</value>
   </data>
+  <data name="LibraryScanIdCannotBeEmpty" xml:space="preserve">
+    <value>ID-ul de scanare al bibliotecii nu poate fi gol!</value>
+  </data>
+  <data name="TotalScanJobsCountMustBePositive" xml:space="preserve">
+    <value>Numărul total de job-uri de scanare trebuie să fie pozitiv!</value>
+  </data>
+  <data name="CompletedScanJobsCountMustBePositive" xml:space="preserve">
+    <value>Numărul de job-uri de scanare completate trebuie să fie pozitiv!</value>
+  </data>
+  <data name="CompletedScanJobsCountCantExceedTotalScanJobsCount" xml:space="preserve">
+    <value>Numărul de job-uri de scanare completate nu poate depăși numărul total de job-uri de scanare!</value>
+  </data>
 </root>

@@ -120,6 +120,20 @@ public class LibraryScan : AggregateRoot<ScanId>
     }
 
     /// <summary>
+    /// Finishes the media library scan.
+    /// </summary>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
+    public ErrorOr<Success> FinishScan()
+    {
+        if (Status == LibraryScanJobStatus.Running)
+            Status = LibraryScanJobStatus.Completed;
+        else
+            return Errors.LibraryScanning.CanOnlyCompleteRunningScans;
+
+        return Result.Success;
+    }
+
+    /// <summary>
     /// Cancels the media library scan.
     /// </summary>
     /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>

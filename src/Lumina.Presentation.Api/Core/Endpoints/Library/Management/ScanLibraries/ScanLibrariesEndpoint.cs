@@ -47,7 +47,7 @@ public class ScanLibrariesEndpoint : BaseEndpoint<EmptyRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(EmptyRequest _, CancellationToken cancellationToken)
     {
-        ErrorOr<IEnumerable<ScanLibraryResponse>> result = await _sender.Send(new ScanLibrariesCommand(), cancellationToken).ConfigureAwait(false);
+        ErrorOr<IEnumerable<MediaLibraryScanResponse>> result = await _sender.Send(new ScanLibrariesCommand(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

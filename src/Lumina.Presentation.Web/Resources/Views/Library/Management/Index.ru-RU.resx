@@ -144,6 +144,9 @@
   <data name="ComicSeries" xml:space="preserve">
     <value>Серия Комиксов</value>
   </data>
+  <data name="ComparingFileHashes" xml:space="preserve">
+    <value>Сравнение хешей файлов...</value>
+  </data>
   <data name="Concert" xml:space="preserve">
     <value>Концерт</value>
   </data>
@@ -173,6 +176,9 @@
   </data>
   <data name="FilmSeries" xml:space="preserve">
     <value>Киносерия</value>
+  </data>
+  <data name="GoodReadsMetadataDownload" xml:space="preserve">
+    <value>Загрузка метаданных из GoodReads...</value>
   </data>
   <data name="GraphicNovel" xml:space="preserve">
     <value>Графический Роман</value>
@@ -233,6 +239,12 @@
   </data>
   <data name="Remove" xml:space="preserve">
     <value>Удалить</value>
+  </data>
+  <data name="RetrievingPastScanData" xml:space="preserve">
+    <value>Получение данных прошлых сканирований...</value>
+  </data>
+  <data name="SavingScanData" xml:space="preserve">
+    <value>Сохранение данных сканирования...</value>
   </data>
   <data name="Scan" xml:space="preserve">
     <value>Сканировать</value>

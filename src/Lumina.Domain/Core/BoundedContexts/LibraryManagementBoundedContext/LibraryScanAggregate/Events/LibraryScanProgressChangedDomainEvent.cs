@@ -2,6 +2,7 @@
 using Lumina.Domain.Common.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
+using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
 using System;
 using System.Diagnostics;
 #endregion
@@ -12,13 +13,13 @@ namespace Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.Lib
 /// Domain event raised when a libary's scan progress changes.
 /// </summary>
 /// <param name="Id">The unique identifier of the domain event.</param>
-/// <param name="ScanId">The unique identifier of the failed media library scan.</param>
-/// <param name="LibraryId">The unique identifier of the library whose scan progress changes.</param>
+/// <param name="ScanId">The object representing the unique identifier of the media library scan.</param>
+/// <param name="UserId">The object representing the unique identifier of the user that started the library scan whose progress changes.</param>
 /// <param name="OccurredOnUtc">The date and time when the domain event occurred.</param>
-[DebuggerDisplay("Id: {Id}")]
+[DebuggerDisplay("ScanId: {ScanId}; UserId: {UserId}")]
 public record LibraryScanProgressChangedDomainEvent(
     Guid Id,
     ScanId ScanId,
-    LibraryId LibraryId,
+    UserId UserId,
     DateTime OccurredOnUtc
 ) : IDomainEvent;

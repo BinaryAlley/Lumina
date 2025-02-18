@@ -573,4 +573,16 @@
   <data name="ScanJobCurrentOperationCannotBeEmpty" xml:space="preserve">
     <value>スキャンの現在の操作を空にすることはできません！</value>
   </data>
+  <data name="LibraryScanIdCannotBeEmpty" xml:space="preserve">
+    <value>ライブラリスキャンIDを空にすることはできません！</value>
+  </data>
+  <data name="TotalScanJobsCountMustBePositive" xml:space="preserve">
+    <value>スキャンジョブの合計数は正の値でなければなりません！</value>
+  </data>
+  <data name="CompletedScanJobsCountMustBePositive" xml:space="preserve">
+    <value>完了したスキャンジョブ数は正の値でなければなりません！</value>
+  </data>
+  <data name="CompletedScanJobsCountCantExceedTotalScanJobsCount" xml:space="preserve">
+    <value>完了したスキャンジョブ数は合計スキャンジョブ数を超えることはできません！</value>
+  </data>
 </root>

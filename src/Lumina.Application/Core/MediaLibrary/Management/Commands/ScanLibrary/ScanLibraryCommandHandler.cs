@@ -28,7 +28,7 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Commands.ScanLibrary;
 /// <summary>
 /// Handler for the command for initiating the scan of a media library.
 /// </summary>
-public class ScanLibraryCommandHandler : IRequestHandler<ScanLibraryCommand, ErrorOr<ScanLibraryResponse>>
+public class ScanLibraryCommandHandler : IRequestHandler<ScanLibraryCommand, ErrorOr<MediaLibraryScanResponse>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUserService;
@@ -60,7 +60,7 @@ public class ScanLibraryCommandHandler : IRequestHandler<ScanLibraryCommand, Err
     /// <param name="request">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async ValueTask<ErrorOr<ScanLibraryResponse>> Handle(ScanLibraryCommand request, CancellationToken cancellationToken)
+    public async ValueTask<ErrorOr<MediaLibraryScanResponse>> Handle(ScanLibraryCommand request, CancellationToken cancellationToken)
     {
         ILibraryRepository libraryRepository = _unitOfWork.GetRepository<ILibraryRepository>();
         ILibraryScanRepository libraryScanRepository = _unitOfWork.GetRepository<ILibraryScanRepository>();
@@ -125,6 +125,6 @@ public class ScanLibraryCommandHandler : IRequestHandler<ScanLibraryCommand, Err
         foreach (IDomainEvent domainEvent in libraryScanResult.Value.GetDomainEvents())
             _domainEventsQueue.Enqueue(domainEvent);
 
-        return new ScanLibraryResponse(libraryScanResult.Value.Id.Value, domainLibraryResult.Value.Id.Value);
+        return new MediaLibraryScanResponse(libraryScanResult.Value.Id.Value, domainLibraryResult.Value.Id.Value);
     }
 }

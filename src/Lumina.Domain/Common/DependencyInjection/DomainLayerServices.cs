@@ -5,7 +5,8 @@ using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.File
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Platform;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Scanners.Common;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Progress;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Scanners;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Services.Scanners;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics.CodeAnalysis;
@@ -49,7 +50,9 @@ public static class DomainLayerServices
         services.AddScoped<IMediaLibraryScanningService, MediaLibraryScanningService>();
         services.AddScoped<IBookLibraryTypeScanner, BookLibraryTypeScanner>();
         services.AddScoped<IMediaLibraryScannerFactory, MediaLibraryScannerFactory>();
+
         services.AddSingleton<IFileSystem, FileSystem>();
+        services.AddSingleton<IMediaLibrariesScanProgressTracker, MediaLibrariesScanProgressTracker>();
         return services;
     }
 }
