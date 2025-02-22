@@ -43,9 +43,10 @@ internal sealed class RepositoryMetadataDiscoveryJob : MediaLibraryScanJob, IRep
     {
         try
         {
-            parentsPayloadsExecuted++; // increment the number of parents that finished their execution and called this job
+            // increment the number of parents that finished their execution and called this job (beware race conditions, jobs run in parallel)
+            int parentsCompleted = Interlocked.Increment(ref parentsPayloadsExecuted);
             // only execute this job's payload when it has no parents, or when all the parents finished their execution
-            if (Parents.Count == 0 || parentsPayloadsExecuted == Parents.Count)
+            if (Parents.Count == 0 || parentsCompleted == Parents.Count)
             {
                 // this needs to be wrapped in a task because even though this job is processed in a "fire and forget" async manner, it still does synchronous
                 // file system processing that takes time, and would block the processing of scan jobs in the in-memory queue 

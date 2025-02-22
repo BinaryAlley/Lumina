@@ -44,9 +44,10 @@ internal sealed class HashComparerJob : MediaLibraryScanJob, IHashComparerJob
     {
         try
         {
-            parentsPayloadsExecuted++; // increment the number of parents that finished their execution and called this job
+            // increment the number of parents that finished their execution and called this job (beware race conditions, jobs run in parallel)
+            int parentsCompleted = Interlocked.Increment(ref parentsPayloadsExecuted);
             // only execute this job's payload when it has no parents, or when all the parents finished their execution
-            if (Parents.Count == 0 || parentsPayloadsExecuted == Parents.Count)
+            if (Parents.Count == 0 || parentsCompleted == Parents.Count)
             {
                 Status = LibraryScanJobStatus.Running;
                 Console.WriteLine("started file hashing");

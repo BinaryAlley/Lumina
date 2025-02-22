@@ -4,7 +4,7 @@ using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.Library
 using System.Threading.Channels;
 #endregion
 
-namespace Lumina.Application.Core.MediaLibrary.Management.Services.Scanning.Queue;
+namespace Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Queue;
 
 /// <summary>
 /// Provides an in-memory message queue for handling <see cref="IMediaLibraryScanJob"/> instances.
