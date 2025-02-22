@@ -28,7 +28,7 @@ For those with technical curiosities, here are some goodies to browse through:
 3. [3.1 Component Web Client diagram](./docs/technical/architecture/3.1%20component-web-client-diagram.svg)
 4. [3.2 Component API Server diagram](./docs/technical/architecture/3.2%20component-api-server-diagram.svg)
 5. [4.1 Code media library scanning diagram](./docs/technical/architecture/4.1%20code-media-library-scanning-diagram.svg)
-
+- Also for Software Architects, you might want to take a look at the Architecture Decision Log, where you may find important stories from the past of Lumina's development, like [this one](./docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decission-record-0001.md), and others like it.
 ## Contributing
 
 Lumina welcomes community contributions. All forms of input, be it code, bug reports, or feature suggestions, are appreciated. Be sure to read the [guidelines](./docs/CONTRIBUTING.md) for contributing first!
