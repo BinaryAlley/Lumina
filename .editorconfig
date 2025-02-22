@@ -284,7 +284,7 @@ dotnet_naming_rule.readonly_instance_fields_should_be_underscore_camel_case.styl
 dotnet_naming_rule.readonly_instance_fields_should_be_underscore_camel_case.severity = warning
 
 # readonly instance fields are camelCase and begin with underscore
-dotnet_naming_rule.instance_fields_should_be_camel_case.severity = warning
+dotnet_naming_rule.instance_fields_should_be_camel_case.severity = none
 dotnet_naming_rule.instance_fields_should_be_camel_case.symbols = instance_fields
 dotnet_naming_rule.instance_fields_should_be_camel_case.style = instance_field_style
 
