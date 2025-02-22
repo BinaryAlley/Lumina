@@ -10,7 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Core.MediaLibrary.Management.Services.Scanning.Queue;
+namespace Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Queue;
 
 /// <summary>
 /// Background service for processing media library scan jobs from an in-memory message queue.
