@@ -10,7 +10,7 @@ namespace Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.Lib
 /// <summary>
 /// Value Object for the composite unique identifier of a media library scan.
 /// </summary>
-[DebuggerDisplay("ScanId: {ScanId}; UserId: {UserId}")]
+[DebuggerDisplay("ScanId: {ScanId.Value}; UserId: {UserId.Value}")]
 public sealed class MediaLibraryScanCompositeId : ValueObject
 {
     /// <summary>
@@ -50,5 +50,14 @@ public sealed class MediaLibraryScanCompositeId : ValueObject
     {
         yield return ScanId;
         yield return UserId;
+    }
+
+    /// <summary>
+    /// Customized ToString() method.
+    /// </summary>
+    /// <returns>Custom string value showing relevant data for current class.</returns>
+    public override string ToString()
+    {
+        return $"{ScanId}-{UserId}";
     }
 }

@@ -585,4 +585,10 @@
   <data name="CompletedScanJobsCountCantExceedTotalScanJobsCount" xml:space="preserve">
     <value>Numărul de job-uri de scanare completate nu poate depăși numărul total de job-uri de scanare!</value>
   </data>
+  <data name="CorsOriginsCannotBeEmpty" xml:space="preserve">
+    <value>Originile CORS nu pot fi goale!</value>
+  </data>
+  <data name="CorsOriginIsInvalid" xml:space="preserve">
+    <value>Origine CORS invalidă!</value>
+  </data>
 </root>

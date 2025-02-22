@@ -135,6 +135,9 @@
   <data name="BookSeries" xml:space="preserve">
     <value>丛书</value>
   </data>
+  <data name="Canceled" xml:space="preserve">
+    <value>已取消</value>
+  </data>
   <data name="CancelScan" xml:space="preserve">
     <value>取消扫描</value>
   </data>
@@ -146,6 +149,9 @@
   </data>
   <data name="ComparingFileHashes" xml:space="preserve">
     <value>正在比较文件哈希值...</value>
+  </data>
+  <data name="Completed" xml:space="preserve">
+    <value>已完成</value>
   </data>
   <data name="Concert" xml:space="preserve">
     <value>音乐会</value>
@@ -170,6 +176,9 @@
   </data>
   <data name="Enabled" xml:space="preserve">
     <value>已启用</value>
+  </data>
+  <data name="Failed" xml:space="preserve">
+    <value>失败</value>
   </data>
   <data name="FilmFranchise" xml:space="preserve">
     <value>电影系列品牌</value>

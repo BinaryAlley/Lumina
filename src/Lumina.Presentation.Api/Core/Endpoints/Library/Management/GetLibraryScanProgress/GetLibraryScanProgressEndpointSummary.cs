@@ -32,6 +32,9 @@ public class GetLibraryScanProgressEndpointSummary : Summary<GetLibraryScanProgr
         RequestParam(r => r.LibraryId, "The Id of the media library whose scan progress is requested. Required.");
         RequestParam(r => r.ScanId, "The Id of the media library scan whose progress is requested. Required.");
 
+        ResponseParam<MediaLibraryScanProgressResponse>(r => r.ScanId, "The object representing the unique identifier of the media library scan.");
+        ResponseParam<MediaLibraryScanProgressResponse>(r => r.UserId, "The object representing the unique identifier of the user initiating this media library scan.");
+        ResponseParam<MediaLibraryScanProgressResponse>(r => r.LibraryId, "The object representing the unique identifier of the media library that is scanned.");
         ResponseParam<MediaLibraryScanProgressResponse>(r => r.TotalJobs, "The total number of jobs to be processed by the scan.");
         ResponseParam<MediaLibraryScanProgressResponse>(r => r.CompletedJobs, "The number of jobs that have been processed.");
         ResponseParam<MediaLibraryScanProgressResponse>(r => r.CurrentJobProgress, "The progress of the currently processing job.");
@@ -39,6 +42,9 @@ public class GetLibraryScanProgressEndpointSummary : Summary<GetLibraryScanProgr
         ResponseParam<MediaLibraryScanProgressResponse>(r => r.OverallProgressPercentage, "The ratio between the number of processed jobs and the total number of jobs to process, as percentage.");
 
         Response(200, "The progress of the media library scan is returned.", example: new MediaLibraryScanProgressResponse(
+            ScanId: Guid.NewGuid(),
+            UserId: Guid.NewGuid(),
+            LibraryId: Guid.NewGuid(),
             TotalJobs: 10,
             CompletedJobs: 4,
             CurrentJobProgress: new MediaLibraryScanJobProgressResponse(
@@ -47,7 +53,7 @@ public class GetLibraryScanProgressEndpointSummary : Summary<GetLibraryScanProgr
                 CurrentOperation: "Comparing file hashes",
                 ProgressPercentage: 50
             ),
-            Status: LibraryScanJobStatus.Running,
+            Status: LibraryScanJobStatus.Running.ToString(),
             OverallProgressPercentage: 40
         ));
 

@@ -4,6 +4,7 @@ using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
+using Lumina.Application.Core.MediaLibrary.Management.Progress;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Exceptions;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate;
@@ -20,14 +21,17 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Events;
 /// </summary>
 public class LibraryScanFailedDomainEventHandler : INotificationHandler<LibraryScanFailedDomainEvent>
 {
+    private readonly IMediaLibraryScanProgressNotifier _debouncedLibraryScanProgressNotifier;
     private readonly IUnitOfWork _unitOfWork;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LibraryScanCancelledDomainEventHandler"/> class.
     /// </summary>
     /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
-    public LibraryScanFailedDomainEventHandler(IUnitOfWork unitOfWork)
+    /// <param name="debouncedLibraryScanProgressNotifier">Injected service for notifying media libraries scan progress changes to third parties.</param>
+    public LibraryScanFailedDomainEventHandler(IMediaLibraryScanProgressNotifier debouncedLibraryScanProgressNotifier, IUnitOfWork unitOfWork)
     {
+        _debouncedLibraryScanProgressNotifier = debouncedLibraryScanProgressNotifier;
         _unitOfWork = unitOfWork;
     }
 
@@ -41,7 +45,8 @@ public class LibraryScanFailedDomainEventHandler : INotificationHandler<LibraryS
         ILibraryScanRepository libraryScanRepository = _unitOfWork.GetRepository<ILibraryScanRepository>();
 
         // get the library scan from the repository
-        ErrorOr<LibraryScanEntity?> getLibraryScansResult = await libraryScanRepository.GetByIdAsync(domainEvent.ScanId.Value, cancellationToken).ConfigureAwait(false);
+        ErrorOr<LibraryScanEntity?> getLibraryScansResult = await libraryScanRepository.GetByIdAsync(
+            domainEvent.MediaLibraryScanCompositeId.ScanId.Value, cancellationToken).ConfigureAwait(false);
         if (getLibraryScansResult.IsError)
             throw new EventualConsistencyException(getLibraryScansResult.FirstError, getLibraryScansResult.Errors);
         if (getLibraryScansResult.Value is null)
@@ -64,6 +69,8 @@ public class LibraryScanFailedDomainEventHandler : INotificationHandler<LibraryS
                 throw new EventualConsistencyException(updateLibraryScanResult.FirstError, updateLibraryScanResult.Errors);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            // notify SignalR clients that the library scan failed
+            await _debouncedLibraryScanProgressNotifier.SendLibraryScanFailedEventAsync(domainEvent.MediaLibraryScanCompositeId, cancellationToken).ConfigureAwait(false);
         }
     }
 }

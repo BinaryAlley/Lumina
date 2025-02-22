@@ -585,4 +585,10 @@
   <data name="CompletedScanJobsCountCantExceedTotalScanJobsCount" xml:space="preserve">
     <value>完了したスキャンジョブ数は合計スキャンジョブ数を超えることはできません！</value>
   </data>
+  <data name="CorsOriginsCannotBeEmpty" xml:space="preserve">
+    <value>CORSオリジンは空ではいけません！</value>
+  </data>
+  <data name="CorsOriginIsInvalid" xml:space="preserve">
+    <value>CORSオリジンが無効です！</value>
+  </data>
 </root>

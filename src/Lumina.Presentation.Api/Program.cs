@@ -7,6 +7,7 @@ using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.DependencyInjection;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Infrastructure.Common.DependencyInjection;
+using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Progress;
 using Lumina.Presentation.Api.Common.DependencyInjection;
 using Lumina.Presentation.Api.Common.Middlewares;
 using Microsoft.AspNetCore.Builder;
@@ -93,12 +94,14 @@ public class Program
             }
         }
 
-        app.UseCors("AllowAll");
+        app.UseRouting();
+        app.UseCors("SecurePolicy");
 
         //app.UseExceptionHandler("/error"); // uses a middleware which re-executes the request to the error path
 
         //app.UseHttpsRedirection();
 
+        app.UseAuthentication();
         app.UseAuthorization();
         app.UseRateLimiter();
 
@@ -123,8 +126,8 @@ public class Program
                 .WithDotNetFlag(true);
         });
 
-        // add the middleware that fires domain events and ensures eventual transactional consistency
-        app.UseMiddleware<EventualConsistencyMiddleware>();
+        // add the middleware that fires domain events and ensures eventual transactional consistency, but NOT for long-polling/WebSockets stuff like SignalR, which would keep the db locked
+        app.UseWhen(ctx => !ctx.Request.Path.StartsWithSegments("/scanProgressHub"), app => app.UseMiddleware<EventualConsistencyMiddleware>());
 
         // create a directory relative to the application's startup directory, and use it to store static files that are served at the /media route on the API
         string mediaRootDirectoryPathSetting = app.Configuration.GetValue<string>("MediaSettings:RootDirectory") ?? string.Empty;
@@ -148,6 +151,8 @@ public class Program
             FileProvider = new PhysicalFileProvider(mediaRootPath),
             RequestPath = "/media"
         });
+
+        app.MapHub<MediaLibraryScanProgressHub>("/scanProgressHub");
 
         await app.RunAsync().ConfigureAwait(false);
     }

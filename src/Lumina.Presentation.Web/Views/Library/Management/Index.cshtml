@@ -5,6 +5,7 @@
 @using Lumina.Presentation.Web.Common.Models.Libraries
 @using Lumina.Presentation.Web.Common.Services
 @using Microsoft.AspNetCore.Mvc.Localization
+@using System.Security.Claims
 
 @{
     // generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler
@@ -13,6 +14,90 @@
 
 @inject IUrlService _urlService
 @inject IViewLocalizer _localizer
+
+<style>
+    /* main container */
+    .td-scan {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        padding: 4px 0;
+        min-height: 50px;
+    }
+
+    /* text label */
+    .scan-job-status {
+        flex: 1;
+        padding: 0 10px;
+        min-width: 0;
+    }
+
+    /* progress bar container */
+    .scan-progress {
+        flex: 0 0 80px;
+        height: 20px;
+        display: flex;
+        flex-direction: column;
+        margin: 10px;
+        gap: 2px;
+    }
+
+    /* progress bars */
+    .scan-progress-total,
+    .scan-progress-job {
+        height: 50%;
+        background: #ddd;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .scan-progress-total > div,
+        .scan-progress-job > div {
+            height: 100%;
+            background: #4CAF50;
+            transition: width 0.3s ease;
+        }
+
+    .icon-groups {
+        flex: 0 0 auto; /* prevent shrinking */
+        display: flex;
+        gap: 10px;
+        margin-left: auto; /* push to right */
+    }
+
+    /* status icons subgroup */
+    .status-icons {
+        display: flex;
+        gap: 5px;
+        flex-shrink: 0;
+    }
+
+    /* action icons subgroup */
+    .action-icons {
+        display: flex;
+        gap: 5px;
+        flex-shrink: 0;
+    }
+
+    /* icon groups */
+    /* status icons (right margin group) */
+    img[src*="green.png"],
+    img[src*="red.png"],
+    img[src*="yellow.png"] {
+        width: 20px;
+        height: 20px;
+    }
+
+    /* action icons (fixed size group) */
+    img[src*="stop.svg"],
+    img[src*="trigger.svg"],
+    img[src*="delete.svg"],
+    a > img[src*="edit.svg"] {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+</style>
 
 <div style="display: grid; grid-template-rows: auto 1fr;"><!--container with two rows, one fixed, one filling remaining space-->
     <div style="min-height: 1rem;"></div><!--the first row is a dummy row for "margin", because setting a margin on the next row would offset the parent's position-->
@@ -27,10 +112,10 @@
             <thead class="text-light-two">
                 <tr>
                     <th class="w-30">@_localizer["Title"]</th>
-                    <th class="w-30">@_localizer["LibraryType"]</th>
+                    <th class="w-15">@_localizer["LibraryType"]</th>
                     <th class="w-10">@_localizer["Enabled"]</th>
                     <th class="w-10">@_localizer["Locked"]</th>
-                    <th class="w-20">@_localizer["Actions"]</th>
+                    <th class="w-35">@_localizer["Actions"]</th>
                 </tr>
             </thead>
             <tbody>
@@ -49,6 +134,18 @@
         // create cleanup registry for this view
         const cleanupFunctions = [];
         let isInitialized = false;
+        const jsLocalizedLibraryScanStatuses = {
+            Completed: '@_localizer["Completed"]',
+            Failed: '@_localizer["Failed"]',
+            Canceled: '@_localizer["Canceled"]'
+        };
+        const jsLocalizedLibraryScanJobsStatuses = {
+            DiscoveringFiles: '@_localizer["DiscoveringFiles"]',
+            RetrievingPastScanData: '@_localizer["RetrievingPastScanData"]',
+            ComparingFileHashes: '@_localizer["ComparingFileHashes"]',
+            GoodReadsMetadataDownload: '@_localizer["GoodReadsMetadataDownload"]',
+            SavingScanData: '@_localizer["SavingScanData"]'
+        };
         const jsLocalizedLibraryTypes = {
             Book: '@_localizer["Book"]',
             EBook: '@_localizer["EBook"]',
@@ -87,7 +184,17 @@
         const btnScanAllLibraries = document.getElementById('btn-scan-all-libraries');
         const btnCancelLibrariesScan = document.getElementById('btn-cancel-libraries-scan');
 
-        // on view load
+        // SignalR
+        const signalRConnection = new signalR.HubConnectionBuilder()
+            .withUrl('http://localhost:5214/scanProgressHub')
+            .withAutomaticReconnect({
+                nextRetryDelayInMilliseconds: retryContext =>
+                    Math.min(retryContext.elapsedMilliseconds * 2, 10000)
+            })
+            .configureLogging(signalR.LogLevel.Warning)
+            .build();
+
+        // get media libraries
         const loadLibrariesAsync = async function() {
             const response = await callApiGetAsync('@_urlService.GetAbsoluteUrl("GetLibraries", "LibraryManagement")');
             const table = document.getElementById('media-libraries-table');
@@ -107,13 +214,29 @@
                             <td>${jsLocalizedLibraryTypes[library.libraryType]}</td>
                             <td class="text-center">${library.isEnabled === true ? `@_localizer["Yes"]` : `@_localizer["No"]`}</td>
                             <td class="text-center">${library.isLocked === true ? `@_localizer["Yes"]` : `@_localizer["No"]`}</td>
-                            <td class="text-end">
-                                <img src="/images/ui/stop.svg" alt="@_localizer["CancelScan"]" title="@_localizer["CancelScan"]" class="hidden remove-form-table-row-icon" />
-                                <img src="/images/ui/trigger.svg" alt="@_localizer["Scan"]" title="@_localizer["Scan"]" class="remove-form-table-row-icon" />
-                                <a href="${editUrl}">
-                                    <img src="/images/ui/edit.svg" alt="@_localizer["Edit"]" title="@_localizer["Edit"]" class="remove-form-table-row-icon" />
-                                </a>
-                                <img src="/images/ui/delete.svg" alt="@_localizer["Remove"]" title="@_localizer["Remove"]" class="remove-form-table-row-icon" />
+                            <td class="td-scan">
+                                <span class="scan-job-status hidden">Downloading metadata</span>
+                                <div class="scan-progress hidden">
+                                    <div class="scan-progress-total"><div></div></div>
+                                    <div class="scan-progress-job"><div></div></div>
+                                </div>
+
+                                <div class="icon-groups">
+                                    <div class="status-icons">
+                                        <img src="/images/ui/green.png" alt="@_localizer["Completed"]" title="@_localizer["Completed"]" class="hidden status-icon" />
+                                        <img src="/images/ui/red.png" alt="@_localizer["Failed"]" title="@_localizer["Failed"]" class="hidden status-icon" />
+                                        <img src="/images/ui/yellow.png" alt="@_localizer["Canceled"]" title="@_localizer["Canceled"]" class="hidden status-icon" />
+                                    </div>
+
+                                    <div class="action-icons">
+                                        <img src="/images/ui/stop.svg" alt="@_localizer["CancelScan"]" title="@_localizer["CancelScan"]" class="hidden action-icon" />
+                                        <img src="/images/ui/trigger.svg" alt="@_localizer["Scan"]" title="@_localizer["Scan"]" class="action-icon" />
+                                        <a href="${editUrl}">
+                                            <img src="/images/ui/edit.svg" alt="@_localizer["Edit"]" title="@_localizer["Edit"]" class="action-icon" />
+                                        </a>
+                                        <img src="/images/ui/delete.svg" alt="@_localizer["Remove"]" title="@_localizer["Remove"]" class="mr-5 action-icon" />
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                     `;
@@ -122,6 +245,40 @@
                 btnScanAllLibraries.style.display = 'none';
                 table.style.display = 'none';
                 noMediaLibrary.style.display = 'block';
+            }
+        };
+
+        // get which libraries have active scans
+        const getRunningLibraryScansAsync = async function() {
+            const response = await callApiGetAsync('@_urlService.GetAbsoluteUrl("GetRunningLibraryScans", "LibraryManagement")');
+            if (response && response.length > 0) {
+                await Promise.all(response.map(async scan => {
+                    const row = document.querySelector(`tr[data-library-id="${scan.libraryId}"]`);
+                    if (row) {
+                        // restore UI state
+                        const scanProgress = row.querySelector('.scan-progress');
+                        const totalProgressDiv = row.querySelector('.scan-progress-total > div');
+                        const jobProgressDiv = row.querySelector('.scan-progress-job > div');
+                        const statusSpan = row.querySelector('.scan-job-status');
+                        const scanIcon = row.querySelector('img[src*="trigger.svg"]');
+                        const cancelScanIcon = row.querySelector('img[src*="stop.svg"]');
+
+                        row.setAttribute('data-scan-id', scan.scanId);
+
+                        statusSpan.textContent = jsLocalizedLibraryScanJobsStatuses[scan.currentJobProgress.currentOperation];
+                        statusSpan.classList.remove('hidden');
+
+                        scanProgress.classList.remove('hidden');
+                        totalProgressDiv.style.width = `${scan.overallProgressPercentage}%`;
+                        jobProgressDiv.style.width = `${scan.currentJobProgress.progressPercentage}%`;
+
+                        scanIcon.classList.add('hidden');
+                        cancelScanIcon.classList.remove('hidden');
+
+                        // re-subscribe to SignalR
+                        await signalRConnection.invoke('SubscribeToScan', scan.scanId, '@User.FindFirst(ClaimTypes.NameIdentifier)?.Value');
+                    }
+                }));
             }
         };
 
@@ -152,15 +309,27 @@
 
                 // toggle icons only for libraries that had their scan started
                 const tbody = document.querySelector('tbody');
-                data.forEach(scan => {
+                data.forEach(async scan => {
                     const row = tbody.querySelector(`tr[data-library-id="${scan.libraryId}"]`);
                     if (row) {
                         row.setAttribute('data-scan-id', scan.scanId);
                         const scanIcon = row.querySelector('img[src*="trigger.svg"]');
                         const cancelScanIcon = row.querySelector('img[src*="stop.svg"]');
+                        const completedIdon = row.querySelector('img[src*="green.png"]');
+                        const failedIdon = row.querySelector('img[src*="red.png"]');
+                        const canceledIdon = row.querySelector('img[src*="yellow.png"]');
 
+                        // hide scan status icons
+                        completedIdon.classList.add('hidden');
+                        failedIdon.classList.add('hidden');
+                        canceledIdon.classList.add('hidden');
+                        // toggle visibility on scan action icons
                         scanIcon.classList.add('hidden');
                         cancelScanIcon.classList.remove('hidden');
+
+                        const scanId = scan.scanId;
+                        const userId = '@User.FindFirst(ClaimTypes.NameIdentifier)?.Value';
+                        await signalRConnection.invoke('SubscribeToScan', scanId, userId);
                     }
                 });
             }
@@ -179,9 +348,21 @@
                     row.setAttribute('data-scan-id', success.scanId);
                     const scanIcon = e.target;
                     const cancelScanIcon = row.querySelector('img[src*="stop.svg"]');
+                    const completedIdon = row.querySelector('img[src*="green.png"]');
+                    const failedIdon = row.querySelector('img[src*="red.png"]');
+                    const canceledIdon = row.querySelector('img[src*="yellow.png"]');
 
+                    // hide scan status icons
+                    completedIdon.classList.add('hidden');
+                    failedIdon.classList.add('hidden');
+                    canceledIdon.classList.add('hidden');
+                    // toggle visibility on scan action icons
                     scanIcon.classList.add('hidden');
                     cancelScanIcon.classList.remove('hidden');
+
+                    const scanId = success.scanId;
+                    const userId = '@User.FindFirst(ClaimTypes.NameIdentifier)?.Value';
+                    await signalRConnection.invoke('SubscribeToScan', scanId, userId);
                 }
             }
         };
@@ -192,14 +373,25 @@
             btnCancelLibrariesScan.style.display = 'none';
             btnScanAllLibraries.style.display = 'block';
 
-            // toggle icons for all rows
-            const tbody = document.querySelector('tbody');
-            const allRows = tbody.querySelectorAll('tr');
+            // toggle icons for all active scan rows
+            const rows = document.querySelectorAll('tr[data-scan-id]');
 
-            allRows.forEach(row => {
+            rows.forEach(row => {
+                // remove the scan Id, its no longer being scanned
+                row.removeAttribute('data-scan-id');
+
+                const statusSpan = row.querySelector('.scan-job-status');
+                statusSpan.textContent = `${jsLocalizedLibraryScanStatuses['Canceled']}.`;
+                const scanProgress = row.querySelector('.scan-progress');
+                scanProgress.classList.add('hidden');
+
+                // show scan status icon
+                const completedIdon = row.querySelector('img[src*="yellow.png"]');
+                completedIdon.classList.remove('hidden');
+
+                // toggle scan action icons
                 const scanIcon = row.querySelector('img[src*="trigger.svg"]');
                 const cancelScanIcon = row.querySelector('img[src*="stop.svg"]');
-
                 scanIcon.classList.remove('hidden');
                 cancelScanIcon.classList.add('hidden');
             });
@@ -228,13 +420,139 @@
                 ).join('/');
 
                 await callApiPostAsync(finalUrl);
+                
+                // remove the scan Id, its no longer being scanned
+                row.removeAttribute('data-scan-id');
+
+                const statusSpan = row.querySelector('.scan-job-status');
+                statusSpan.textContent = `${jsLocalizedLibraryScanStatuses['Canceled']}.`;
+                const scanProgress = row.querySelector('.scan-progress');
+                scanProgress.classList.add('hidden');
+
+                // show scan status icon
+                const completedIdon = row.querySelector('img[src*="yellow.png"]');
+                completedIdon.classList.remove('hidden');
+
+                // toggle scan action icons
                 const scanIcon = row.querySelector('img[src*="trigger.svg"]');
                 const cancelScanIcon = row.querySelector('img[src*="stop.svg"]');
-
                 scanIcon.classList.remove('hidden');
                 cancelScanIcon.classList.add('hidden');
+
+                // toggle scan action buttons
+                const hasActiveScans = document.querySelectorAll('tr[data-scan-id]').length > 0;
+                btnCancelLibrariesScan.style.display = hasActiveScans ? 'block' : 'none';
+                btnScanAllLibraries.style.display = hasActiveScans ? 'none' : 'block';
             }
         };
+
+        // handle all SignalR stuff
+        function setupSignalRHandlers() {
+            const onReconnecting = error => {
+                console.log(error ? `SignalR reconnected with error: ${error}` : "SignalR reconnecting...");
+            };
+            const onReconnected = connectionId => {
+                console.log('SignalR reconnected:', connectionId);
+            };
+            const onClose = error => {
+                console.log(error ? `SignalR connection closed with error: ${error}` : "SignalR connection closed");
+            };
+            // progress update handler
+            const progressHandler = (progress) => {
+                const rows = document.querySelectorAll(`tr[data-scan-id="${progress.scanId}"]`);
+                rows.forEach(row => {
+                    // update status text
+                    const statusSpan = row.querySelector('.scan-job-status');
+                    statusSpan.textContent = jsLocalizedLibraryScanJobsStatuses[progress.currentJobProgress.currentOperation];
+                    statusSpan.classList.remove('hidden');
+
+                    // update progress bars
+                    const scanProgress = row.querySelector('.scan-progress');
+                    const totalProgressDiv = row.querySelector('.scan-progress-total > div');
+                    const jobProgressDiv = row.querySelector('.scan-progress-job > div');
+                    scanProgress.classList.remove('hidden');
+                    totalProgressDiv.style.width = `${progress.overallProgressPercentage}%`;
+                    jobProgressDiv.style.width = `${progress.currentJobProgress.progressPercentage}%`;
+
+                    // toggle scan action icons
+                    const scanIcon = row.querySelector('img[src*="trigger.svg"]');
+                    const cancelScanIcon = row.querySelector('img[src*="stop.svg"]');
+                    scanIcon.classList.add('hidden');
+                    cancelScanIcon.classList.remove('hidden');
+                });
+            };
+
+            // scan completion handler
+            const completionHandler = (progress) => {
+                const rows = document.querySelectorAll(`tr[data-scan-id="${progress.scanId}"]`);
+                rows.forEach(row => {
+                    // remove the scan Id, its no longer being scanned
+                    row.removeAttribute('data-scan-id');
+
+                    const statusSpan = row.querySelector('.scan-job-status');
+                    statusSpan.textContent = `${jsLocalizedLibraryScanStatuses[progress.status]}.`;
+                    const scanProgress = row.querySelector('.scan-progress');
+                    scanProgress.classList.add('hidden');
+
+                    // show scan status icon
+                    const completedIdon = row.querySelector('img[src*="green.png"]');
+                    completedIdon.classList.remove('hidden');
+
+                    // toggle scan action icons
+                    const scanIcon = row.querySelector('img[src*="trigger.svg"]');
+                    const cancelScanIcon = row.querySelector('img[src*="stop.svg"]');
+                    scanIcon.classList.remove('hidden');
+                    cancelScanIcon.classList.add('hidden');
+                });
+                const hasActiveScans = document.querySelectorAll('tr[data-scan-id]').length > 0;
+                btnCancelLibrariesScan.style.display = hasActiveScans ? 'block' : 'none';
+                btnScanAllLibraries.style.display = hasActiveScans ? 'none' : 'block';
+            };
+
+            // scan failure handler
+            const failureHandler = (progress) => {
+                const rows = document.querySelectorAll(`tr[data-scan-id="${progress.scanId}"]`);
+                rows.forEach(row => {
+                    // remove the scan Id, its no longer being scanned
+                    row.removeAttribute('data-scan-id');
+                    
+                    const statusSpan = row.querySelector('.scan-job-status');
+                    statusSpan.textContent = `${jsLocalizedLibraryScanStatuses[progress.status]}.`;
+                    const scanProgress = row.querySelector('.scan-progress');
+                    scanProgress.classList.add('hidden');
+
+                    // show scan status icon
+                    const completedIdon = row.querySelector('img[src*="red.png"]');
+                    completedIdon.classList.remove('hidden');
+
+                    // toggle scan action icons
+                    const scanIcon = row.querySelector('img[src*="trigger.svg"]');
+                    const cancelScanIcon = row.querySelector('img[src*="stop.svg"]');
+                    scanIcon.classList.remove('hidden');
+                    cancelScanIcon.classList.add('hidden');
+                });
+                const hasActiveScans = document.querySelectorAll('tr[data-scan-id]').length > 0;
+                btnCancelLibrariesScan.style.display = hasActiveScans ? 'block' : 'none';
+                btnScanAllLibraries.style.display = hasActiveScans ? 'none' : 'block';
+            };
+
+            // subscribe to events
+            signalRConnection.on("libraryScanProgressUpdateEvent", progressHandler);
+            signalRConnection.on("libraryScanFinishedEvent", completionHandler);
+            signalRConnection.on("libraryScanFailedEvent", failureHandler);
+            signalRConnection.onclose(onClose);
+            signalRConnection.onreconnecting(onReconnecting);
+            signalRConnection.onreconnected(onReconnected);
+            // add to cleanup
+            cleanupFunctions.push(() => {
+                signalRConnection.off("libraryScanProgressUpdateEvent", progressHandler);
+                signalRConnection.off("libraryScanFinishedEvent", completionHandler);
+                signalRConnection.off("libraryScanFailedEvent", failureHandler);
+                signalRConnection.off("close", onClose);
+                signalRConnection.off("reconnecting", onReconnecting);
+                signalRConnection.off("reconnected", onReconnected);
+            });
+        }
 
         // add listeners
         btnScanAllLibraries.addEventListener('click', handleScanAllLibrariesClick);
@@ -245,7 +563,11 @@
         document.addEventListener('DOMContentLoaded', InitializeAsync);
 
         // register cleanup for these listeners
-        cleanupFunctions.push(() => {
+        cleanupFunctions.push(() => {            
+            // proper connection stop
+            if (signalRConnection.state === 'Connected') 
+                signalRConnection.stop().then(() => console.log('SignalR connection stopped'));
+
             btnScanAllLibraries.removeEventListener('click', handleScanAllLibrariesClick);
             btnCancelLibrariesScan.removeEventListener('click', handleCancelLibrariesScanClick);
             document.removeEventListener('click', handleDeleteLibraryClick);
@@ -265,7 +587,14 @@
             if (isInitialized)
                 return;
             isInitialized = true;
-            await loadLibrariesAsync();
+            try {
+                await loadLibrariesAsync();
+                await signalRConnection.start();
+                setupSignalRHandlers();
+                await getRunningLibraryScansAsync();
+            } catch (err) {
+                console.error('SignalR connection failed:', err);
+            }
         }
 
         console.log(`Loaded @scriptId`);

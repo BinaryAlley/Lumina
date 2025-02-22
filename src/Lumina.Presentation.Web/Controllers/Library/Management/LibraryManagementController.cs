@@ -115,6 +115,17 @@ public class LibraryManagementController : Controller
     }
 
     /// <summary>
+    /// Gets the list of ongoing media library scans.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    [HttpGet("api-get-running-library-scans")]
+    public async Task<IActionResult> GetRunningLibraryScans(CancellationToken cancellationToken = default)
+    {
+        LibraryScanProgressModel[] response = await _apiHttpClient.GetAsync<LibraryScanProgressModel[]>($"libraries/scans/running/", cancellationToken).ConfigureAwait(false);
+        return Json(new { success = true, data = response });
+    }
+
+    /// <summary>
     /// Initiates the scan of all media libraries.
     /// </summary>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
