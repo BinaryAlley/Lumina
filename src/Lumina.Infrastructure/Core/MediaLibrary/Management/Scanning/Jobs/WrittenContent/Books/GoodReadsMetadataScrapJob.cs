@@ -14,6 +14,7 @@ using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -55,12 +56,13 @@ internal sealed class GoodReadsMetadataScrapJob : MediaLibraryScanJob, IGoodRead
                 IUnitOfWork? unitOfWork = asyncServiceScope.ServiceProvider.GetService<IUnitOfWork>();
                 IPublisher? publisher = asyncServiceScope.ServiceProvider.GetService<IPublisher>();
                 ILibraryRepository libraryRepository = unitOfWork!.GetRepository<ILibraryRepository>();
+                MediaLibraryScanCompositeId compositeKey = MediaLibraryScanCompositeId.Create(ScanId, UserId);
 
                 // get the library from the repository
                 ErrorOr<LibraryEntity?> getLibraryResult = await libraryRepository.GetByIdAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
                 if (getLibraryResult.IsError || getLibraryResult.Value is null)
                 {
-                    await publisher!.Publish(new LibraryScanFailedDomainEvent(Guid.NewGuid(), ScanId, LibraryId, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                    await publisher!.Publish(new LibraryScanFailedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
                     return;
                 }
 
@@ -68,38 +70,41 @@ internal sealed class GoodReadsMetadataScrapJob : MediaLibraryScanJob, IGoodRead
                 ErrorOr<Library> domainLibraryResult = getLibraryResult.Value.ToDomainEntity();
                 if (domainLibraryResult.IsError)
                 {
-                    await publisher!.Publish(new LibraryScanFailedDomainEvent(Guid.NewGuid(), ScanId, LibraryId, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                    await publisher!.Publish(new LibraryScanFailedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
                     return;
                 }
 
                 // set the initial progress of the scan job
-                ErrorOr<MediaLibraryScanJobProgress> scanJobProgressResult = MediaLibraryScanJobProgress.Create(0, domainLibraryResult.Value.ContentLocations.Count, "GoodReadsDownload");
+                ErrorOr<MediaLibraryScanJobProgress> scanJobProgressResult = MediaLibraryScanJobProgress.Create(0, 20, "GoodReadsMetadataDownload");
+                //ErrorOr<MediaLibraryScanJobProgress> scanJobProgressResult = MediaLibraryScanJobProgress.Create(0, domainLibraryResult.Value.ContentLocations.Count, "GoodReadsMetadataDownload");
                 if (scanJobProgressResult.IsError)
                 {
-                    await publisher!.Publish(new LibraryScanFailedDomainEvent(Guid.NewGuid(), ScanId, LibraryId, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                    await publisher!.Publish(new LibraryScanFailedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
                     return;
                 }
 
                 await publisher!.Publish(new LibraryScanJobProgressChangedDomainEvent(
-                    Guid.NewGuid(), ScanId, UserId, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                    Guid.NewGuid(), LibraryId, compositeKey, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
 
-                List<int> ints = [1, 2, 3];
+                List<int> ints = Enumerable.Range(0, 20).ToList();
                 foreach (int nr in ints)
                 {
-                    await Task.Delay(5400);
+                    await Task.Delay(100);
                     // increment the number of processed elements progress
                     scanJobProgressResult = MediaLibraryScanJobProgress.Create(
-                        scanJobProgressResult.Value.CompletedItems + 1, domainLibraryResult.Value.ContentLocations.Count, "GoodReadsMetadataDownload");
+                        nr, 20, "GoodReadsMetadataDownload");
+                        //scanJobProgressResult.Value.CompletedItems + 1, domainLibraryResult.Value.ContentLocations.Count, "GoodReadsMetadataDownload");
                     if (scanJobProgressResult.IsError)
                     {
-                        await publisher!.Publish(new LibraryScanFailedDomainEvent(Guid.NewGuid(), ScanId, LibraryId, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                        await publisher!.Publish(new LibraryScanFailedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
                         return;
                     }
                     await publisher!.Publish(new LibraryScanJobProgressChangedDomainEvent(
-                        Guid.NewGuid(), ScanId, UserId, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                        Guid.NewGuid(), LibraryId, compositeKey, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
                 }
                 // this job finished, increment the number of processed jobs progress
-                await publisher!.Publish(new LibraryScanProgressChangedDomainEvent(Guid.NewGuid(), ScanId, UserId, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                await publisher!.Publish(new LibraryScanProgressChangedDomainEvent(
+                    Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
                 Status = LibraryScanJobStatus.Completed;
                 Console.WriteLine("ended goodreads metadata");
                 // call each linked child with the obtained payload

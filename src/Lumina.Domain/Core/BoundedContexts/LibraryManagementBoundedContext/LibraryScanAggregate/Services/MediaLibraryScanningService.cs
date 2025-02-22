@@ -86,7 +86,7 @@ internal class MediaLibraryScanningService : IMediaLibraryScanningService
 
             // count total jobs in the chain by traversing the job graph
             int totalJobs = CountTotalJobs(jobs);
-            _mediaLibrariesScanProgressTracker.InitializeScanProgress(MediaLibraryScanCompositeId.Create(scan.Id, scan.UserId), totalJobs);
+            _mediaLibrariesScanProgressTracker.InitializeScanProgress(scan.LibraryId, MediaLibraryScanCompositeId.Create(scan.Id, scan.UserId), totalJobs);
 
             // enqueue the jobs on the channel from where they will be processed
             foreach (IMediaLibraryScanJob job in jobs)

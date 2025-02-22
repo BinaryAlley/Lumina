@@ -135,6 +135,9 @@
   <data name="BookSeries" xml:space="preserve">
     <value>Serie di Libri</value>
   </data>
+  <data name="Canceled" xml:space="preserve">
+    <value>Annullato</value>
+  </data>
   <data name="CancelScan" xml:space="preserve">
     <value>Annulla Scansione</value>
   </data>
@@ -146,6 +149,9 @@
   </data>
   <data name="ComparingFileHashes" xml:space="preserve">
     <value>Si stanno confrontando gli hash dei file...</value>
+  </data>
+  <data name="Completed" xml:space="preserve">
+    <value>Completato</value>
   </data>
   <data name="Concert" xml:space="preserve">
     <value>Concerto</value>
@@ -170,6 +176,9 @@
   </data>
   <data name="Enabled" xml:space="preserve">
     <value>Attivato</value>
+  </data>
+  <data name="Failed" xml:space="preserve">
+    <value>Fallito</value>
   </data>
   <data name="FilmFranchise" xml:space="preserve">
     <value>Franchise Cinematografico</value>

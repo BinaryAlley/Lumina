@@ -18,10 +18,13 @@ public static class MediaLibraryScanProgressMapping
     public static MediaLibraryScanProgressResponse ToResponse(this MediaLibraryScanProgress domainValueObject)
     {
         return new MediaLibraryScanProgressResponse(
+            domainValueObject.ScanId.Value,
+            domainValueObject.UserId.Value,
+            domainValueObject.LibraryId.Value,
             domainValueObject.TotalJobs,
             domainValueObject.CompletedJobs,
             domainValueObject.CurrentJobProgress.Value?.ToResponse(),
-            domainValueObject.Status,
+            domainValueObject.Status.ToString(),
             domainValueObject.OverallProgressPercentage
         );
     }

@@ -22,5 +22,7 @@ public static partial class Errors
         public static Error JwtExpiryMinutesMustBePositive => Error.Validation(description: nameof(JwtExpiryMinutesMustBePositive));
         public static Error JwtIssuerCannotBeEmpty => Error.Validation(description: nameof(JwtIssuerCannotBeEmpty));
         public static Error JwtAudienceCannotBeEmpty => Error.Validation(description: nameof(JwtAudienceCannotBeEmpty));
+        public static Error CorsOriginsCannotBeEmpty => Error.Validation(description: nameof(CorsOriginsCannotBeEmpty));
+        public static Error CorsOriginIsInvalid => Error.Validation(description: nameof(CorsOriginIsInvalid));
     }
 }

@@ -135,6 +135,9 @@
   <data name="BookSeries" xml:space="preserve">
     <value>Serie de Cărți</value>
   </data>
+  <data name="Canceled" xml:space="preserve">
+    <value>Anulat</value>
+  </data>
   <data name="CancelScan" xml:space="preserve">
     <value>Anulează Scanarea</value>
   </data>
@@ -146,6 +149,9 @@
   </data>
   <data name="ComparingFileHashes" xml:space="preserve">
     <value>Se compară hash-urile fișierelor...</value>
+  </data>
+  <data name="Completed" xml:space="preserve">
+    <value>Finalizat</value>
   </data>
   <data name="Concert" xml:space="preserve">
     <value>Concert</value>
@@ -170,6 +176,9 @@
   </data>
   <data name="Enabled" xml:space="preserve">
     <value>Activat</value>
+  </data>
+  <data name="Failed" xml:space="preserve">
+    <value>Eșuat</value>
   </data>
   <data name="FilmFranchise" xml:space="preserve">
     <value>Franciză de Film</value>

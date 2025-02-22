@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Application.Core.MediaLibrary.Management.Progress;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Progress;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Mediator;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,14 +15,19 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Events;
 public class LibraryScanJobProgressChangedDomainEventHandler : INotificationHandler<LibraryScanJobProgressChangedDomainEvent>
 {
     private readonly IMediaLibrariesScanProgressTracker _mediaLibrariesScanProgressTracker;
+    private readonly IMediaLibraryScanProgressNotifier _debouncedLibraryScanProgressNotifier;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LibraryScanJobProgressChangedDomainEventHandler"/> class.
     /// </summary>
     /// <param name="mediaLibrariesScanProgressTracker">Injected tracker used for media library scans progress.</param>
-    public LibraryScanJobProgressChangedDomainEventHandler(IMediaLibrariesScanProgressTracker mediaLibrariesScanProgressTracker)
+    /// <param name="debouncedLibraryScanProgressNotifier">Injected service for notifying media libraries scan progress changes to third parties.</param>
+    public LibraryScanJobProgressChangedDomainEventHandler(
+        IMediaLibrariesScanProgressTracker mediaLibrariesScanProgressTracker,
+        IMediaLibraryScanProgressNotifier debouncedLibraryScanProgressNotifier)
     {
         _mediaLibrariesScanProgressTracker = mediaLibrariesScanProgressTracker;
+        _debouncedLibraryScanProgressNotifier = debouncedLibraryScanProgressNotifier;
     }
 
     /// <summary>
@@ -32,7 +37,8 @@ public class LibraryScanJobProgressChangedDomainEventHandler : INotificationHand
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public async ValueTask Handle(LibraryScanJobProgressChangedDomainEvent domainEvent, CancellationToken cancellationToken)
     {
-        _mediaLibrariesScanProgressTracker.UpdateScanJobProgress(MediaLibraryScanCompositeId.Create(domainEvent.ScanId, domainEvent.UserId), domainEvent.Progress);
-        await Task.CompletedTask;
+        _mediaLibrariesScanProgressTracker.UpdateScanJobProgress(domainEvent.LibraryId, domainEvent.MediaLibraryScanCompositeId, domainEvent.Progress);
+        // notify SignalR clients that the library scan progress changed
+        await _debouncedLibraryScanProgressNotifier.SendLibraryProgressUpdateEventAsync(domainEvent.MediaLibraryScanCompositeId, cancellationToken).ConfigureAwait(false);
     }
 }

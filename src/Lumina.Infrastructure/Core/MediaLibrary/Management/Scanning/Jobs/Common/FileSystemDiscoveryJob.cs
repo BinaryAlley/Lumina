@@ -58,24 +58,25 @@ internal sealed class FileSystemDiscoveryJob : MediaLibraryScanJob, IFileSystemD
             parentsPayloadsExecuted++; // increment the number of parents that finished their execution and called this job
             // only execute this job's payload when it has no parents, or when all the parents finished their execution
             if (Parents.Count == 0 || parentsPayloadsExecuted == Parents.Count)
+            {
                 // this needs to be wrapped in a task because even though this job is processed in a "fire and forget" async manner, it still does synchronous
                 // file system processing that takes time, and would block the processing of scan jobs in the in-memory queue 
                 await Task.Run(async () =>
                 {
                     Status = LibraryScanJobStatus.Running;
-                    await Task.Delay(25000);
                     Console.WriteLine("started file discovering");
                     // see docs/technical/achitecture/architecture-knowledge-management/architecture-decision-log/architecture-decission-record-0001.md for details:
                     await using AsyncServiceScope asyncServiceScope = _serviceScopeFactory.CreateAsyncScope();
                     IUnitOfWork? unitOfWork = asyncServiceScope.ServiceProvider.GetService<IUnitOfWork>();
                     IPublisher? publisher = asyncServiceScope.ServiceProvider.GetService<IPublisher>();
                     ILibraryRepository libraryRepository = unitOfWork!.GetRepository<ILibraryRepository>();
+                    MediaLibraryScanCompositeId compositeKey = MediaLibraryScanCompositeId.Create(ScanId, UserId);
 
                     // get the library from the repository
                     ErrorOr<LibraryEntity?> getLibraryResult = await libraryRepository.GetByIdAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
                     if (getLibraryResult.IsError || getLibraryResult.Value is null)
                     {
-                        await publisher!.Publish(new LibraryScanFailedDomainEvent(Guid.NewGuid(), ScanId, LibraryId, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                        await publisher!.Publish(new LibraryScanFailedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
                         return;
                     }
 
@@ -83,7 +84,7 @@ internal sealed class FileSystemDiscoveryJob : MediaLibraryScanJob, IFileSystemD
                     ErrorOr<Library> domainLibraryResult = getLibraryResult.Value.ToDomainEntity();
                     if (domainLibraryResult.IsError)
                     {
-                        await publisher!.Publish(new LibraryScanFailedDomainEvent(Guid.NewGuid(), ScanId, LibraryId, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                        await publisher!.Publish(new LibraryScanFailedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
                         return;
                     }
 
@@ -91,18 +92,18 @@ internal sealed class FileSystemDiscoveryJob : MediaLibraryScanJob, IFileSystemD
                     ErrorOr<MediaLibraryScanJobProgress> scanJobProgressResult = MediaLibraryScanJobProgress.Create(0, domainLibraryResult.Value.ContentLocations.Count, "DiscoveringFiles");
                     if (scanJobProgressResult.IsError)
                     {
-                        await publisher!.Publish(new LibraryScanFailedDomainEvent(Guid.NewGuid(), ScanId, LibraryId, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                        await publisher!.Publish(new LibraryScanFailedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
                         return;
                     }
 
                     await publisher!.Publish(new LibraryScanJobProgressChangedDomainEvent(
-                        Guid.NewGuid(), ScanId, UserId, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                        Guid.NewGuid(), LibraryId, compositeKey, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
 
                     // recursively get the file system tree for each of the media library content locations
                     List<FileSystemTreeNode> contentLocationTrees = [];
                     foreach (FileSystemPathId contentLocation in domainLibraryResult.Value.ContentLocations)
                     {
-                        await Task.Delay(5000);
+                        await Task.Delay(1000);
                         cancellationToken.ThrowIfCancellationRequested();
                         ErrorOr<FileSystemTreeNode> treeResult = BuildTree(contentLocation, includeHiddenElements: true, cancellationToken);
                         if (treeResult.IsError)
@@ -118,14 +119,16 @@ internal sealed class FileSystemDiscoveryJob : MediaLibraryScanJob, IFileSystemD
                             scanJobProgressResult.Value.CompletedItems + 1, domainLibraryResult.Value.ContentLocations.Count, "DiscoveringFiles");
                         if (scanJobProgressResult.IsError)
                         {
-                            await publisher!.Publish(new LibraryScanFailedDomainEvent(Guid.NewGuid(), ScanId, LibraryId, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                            await publisher!.Publish(new LibraryScanFailedDomainEvent(
+                                Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
                             return;
                         }
                         await publisher!.Publish(new LibraryScanJobProgressChangedDomainEvent(
-                            Guid.NewGuid(), ScanId, UserId, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                            Guid.NewGuid(), LibraryId, compositeKey, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
                     }
                     // this job finished, increment the number of processed jobs progress
-                    await publisher!.Publish(new LibraryScanProgressChangedDomainEvent(Guid.NewGuid(), ScanId, UserId, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                    await publisher!.Publish(new LibraryScanProgressChangedDomainEvent(
+                        Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
                     Console.WriteLine("ended file discovering");
                     Status = LibraryScanJobStatus.Completed;
 
@@ -133,6 +136,7 @@ internal sealed class FileSystemDiscoveryJob : MediaLibraryScanJob, IFileSystemD
                     foreach (IMediaLibraryScanJob children in Children)
                         await children.ExecuteAsync(id, contentLocationTrees, cancellationToken).ConfigureAwait(false);
                 }, cancellationToken).ConfigureAwait(false);
+            }
         }
         catch (OperationCanceledException)
         {

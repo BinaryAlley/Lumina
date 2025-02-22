@@ -34,13 +34,12 @@ public static class SharedConfiguration
         configuration.AddJsonFile("appsettings.shared.Development.json", optional: true, reloadOnChange: true);
         configuration.AddEnvironmentVariables(); // environment variables should override the configuration files
 
-        // bind the common settings section
+        // bind the appsettings sections
         services.AddOptions<CommonSettingsModel>()
                 .Bind(configuration.GetRequiredSection(CommonSettingsModel.SECTION_NAME))
                 .ValidateFluently()
                 .ValidateOnStart();
 
-        // bind the database connection string section
         services.AddOptions<DatabaseSettingsModel>()
                 .Bind(configuration.GetRequiredSection(DatabaseSettingsModel.SECTION_NAME))
                 .ValidateFluently()
@@ -53,6 +52,11 @@ public static class SharedConfiguration
 
         services.AddOptions<JwtSettingsModel>()
                 .Bind(configuration.GetRequiredSection(JwtSettingsModel.SECTION_NAME))
+                .ValidateFluently()
+                .ValidateOnStart();
+
+        services.AddOptions<CorsSettingsModel>()
+                .Bind(configuration.GetRequiredSection(CorsSettingsModel.SECTION_NAME))
                 .ValidateFluently()
                 .ValidateOnStart();
 

@@ -585,4 +585,10 @@
   <data name="CompletedScanJobsCountCantExceedTotalScanJobsCount" xml:space="preserve">
     <value>Il numero dei lavori di scansione completati non può superare il numero totale dei lavori di scansione!</value>
   </data>
+  <data name="CorsOriginsCannotBeEmpty" xml:space="preserve">
+    <value>Le origini CORS non possono essere vuote!</value>
+  </data>
+  <data name="CorsOriginIsInvalid" xml:space="preserve">
+    <value>Origine CORS non valida!</value>
+  </data>
 </root>

@@ -5,6 +5,7 @@ using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.Over18;
 using Lumina.Application.Common.Infrastructure.Security;
 using Lumina.Application.Common.Infrastructure.Time;
+using Lumina.Application.Core.MediaLibrary.Management.Progress;
 using Lumina.Application.Core.MediaLibrary.Management.Services.Scanning.Queue;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Cancellation;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
@@ -17,6 +18,7 @@ using Lumina.Infrastructure.Core.Authorization.Policies.Over18;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Cancellation;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Common;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.WrittenContent.Books;
+using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Progress;
 using Lumina.Infrastructure.Core.Security;
 using Lumina.Infrastructure.Core.Time;
 using Microsoft.Extensions.DependencyInjection;
@@ -65,6 +67,8 @@ public static class InfrastructureLayerServices
         services.AddTransient<IHashComparerJob, HashComparerJob>();
         services.AddTransient<IGoodReadsMetadataScrapJob, GoodReadsMetadataScrapJob>();
         services.AddTransient<IRepositoryMetadataSaveJob, RepositoryMetadataSaveJob>();
+
+        services.AddSingleton<IMediaLibraryScanProgressNotifier, DebouncedMediaLibraryScanProgressNotifier>();
         return services;
     }
 }

@@ -3,6 +3,7 @@ using FastEndpoints;
 using FastEndpoints.Swagger;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Presentation.Api.Common.Authentication;
+using MessagePack;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -201,13 +202,18 @@ public static class PresentationApiLayerServices
 
         services.AddCors(corsOptions =>
         {
-            corsOptions.AddPolicy("AllowAll",
-                 corsPolicyBuilder => corsPolicyBuilder
-                     .AllowAnyOrigin()
-                     .AllowAnyMethod()
-                     .AllowAnyHeader());
+            corsOptions.AddPolicy("SecurePolicy", 
+                corsPolicyBuilder => corsPolicyBuilder
+                    .WithOrigins(configuration.GetValue<string[]>("CorsSettings:AllowedOrigins") ?? [])
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials());
         });
 
+        services.AddSignalR()
+            .AddMessagePackProtocol(messagePackHubProtocolOptions => 
+            messagePackHubProtocolOptions.SerializerOptions = MessagePackSerializerOptions.Standard.WithSecurity(MessagePackSecurity.UntrustedData));
+        
         services.AddScoped<ICurrentUserService, HttpContextCurrentUserService>();
 
         return services;
