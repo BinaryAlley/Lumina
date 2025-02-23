@@ -81,7 +81,8 @@ internal class MediaLibraryScanningService : IMediaLibraryScanningService
 
             // get a media library scanner for the provided media library type
             IMediaTypeScanner scanner = _mediaLibraryScannerFactory.CreateLibraryScanner(libraryType);
-            // get the list of scan jobs for the retrieved scanner
+            // get the list of scan jobs for the retrieved scanner. It is impotant to enumerate them here, because deferred execuction would destroy any graph relationships
+            // and properties we might set before putting the jobs on the in-memory queue.
             List<IMediaLibraryScanJob> jobs = scanner.CreateScanJobsForLibrary(scan.LibraryId, downloadMedatadaFromWeb).ToList();
 
             // count total jobs in the chain by traversing the job graph

@@ -65,10 +65,10 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, E
     {
         // check if any users already exists (admin account is only set once!)
         IUserRepository userRepository = _unitOfWork.GetRepository<IUserRepository>();
-        ErrorOr<UserEntity?> getUserRResult = await userRepository.GetByUsernameAsync(request.Username!, cancellationToken).ConfigureAwait(false);
-        if (getUserRResult.IsError)
-            return getUserRResult.Errors;
-        else if (getUserRResult.Value is not null)
+        ErrorOr<UserEntity?> getUserResult = await userRepository.GetByUsernameAsync(request.Username!, cancellationToken).ConfigureAwait(false);
+        if (getUserResult.IsError)
+            return getUserResult.Errors;
+        else if (getUserResult.Value is not null)
             return Errors.Authentication.UsernameAlreadyExists;
         string? totpSecret = null;
         Guid id = Guid.NewGuid();
