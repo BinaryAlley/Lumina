@@ -57,7 +57,7 @@ public class Program
             logPath = Environment.GetEnvironmentVariable("LOG_PATH") ?? "/logs"; // use docker volume path
             builder.WebHost.ConfigureKestrel(options =>
             {
-                options.ListenAnyIP(5214); // HTTP only
+                options.ListenAnyIP(5214); // HTTP only; also, the port is also the same port exposed in the Dockerfile
             });
         }
         else
