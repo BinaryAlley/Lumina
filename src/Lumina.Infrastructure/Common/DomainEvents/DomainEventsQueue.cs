@@ -1,9 +1,10 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Application.Common.DomainEvents;
 using Lumina.Domain.Common.Events;
 using System.Collections.Concurrent;
 #endregion
 
-namespace Lumina.Application.Common.DomainEvents;
+namespace Lumina.Infrastructure.Common.DomainEvents;
 
 /// <summary>
 /// Represents a thread-safe queue for managing domain events.
