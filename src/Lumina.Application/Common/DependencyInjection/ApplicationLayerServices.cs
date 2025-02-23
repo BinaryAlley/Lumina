@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using FluentValidation;
 using Lumina.Application.Common.Behaviors;
-using Lumina.Application.Common.DomainEvents;
 using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics.CodeAnalysis;
@@ -34,8 +33,6 @@ public static class ApplicationLayerServices
         // register fluent validators
         services.AddValidatorsFromAssembly(typeof(ApplicationLayerServices).Assembly);
 
-        services.AddScoped<IDomainEventsQueue, DomainEventsQueue>();
-                
         return services;
     }
 }
