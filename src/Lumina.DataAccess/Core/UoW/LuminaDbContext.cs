@@ -19,6 +19,7 @@ public class LuminaDbContext : DbContext
     public virtual DbSet<UserEntity> Users { get; set; } = null!;
     public virtual DbSet<LibraryEntity> Libraries { get; set; } = null!;
     public virtual DbSet<LibraryScanEntity> LibraryScans { get; set; } = null!;
+    public virtual DbSet<LibraryScanResultEntity> LibraryScanResults { get; set; } = null!;
     public virtual DbSet<RoleEntity> Roles { get; set; } = null!;
     public virtual DbSet<UserRoleEntity> UserRoles { get; set; } = null!;
     public virtual DbSet<PermissionEntity> Permissions { get; set; } = null!;
