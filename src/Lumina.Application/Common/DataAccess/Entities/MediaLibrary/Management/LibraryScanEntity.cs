@@ -3,19 +3,20 @@ using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Domain.Common.Enums.MediaLibrary;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
 namespace Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 
 /// <summary>
-/// Repository entity for a media library.
+/// Repository entity for a media library scan.
 /// </summary>
 [DebuggerDisplay("Id: {Id}; Status: {Status}")]
 public class LibraryScanEntity : IStorageEntity, IAuditableEntity
 {
     /// <summary>
-    /// Gets the Id of the media library.
+    /// Gets the Id of the media library scan.
     /// </summary>
     public required Guid Id { get; init; }
 
@@ -43,6 +44,11 @@ public class LibraryScanEntity : IStorageEntity, IAuditableEntity
     /// Gets the user that initiated the media library scan.
     /// </summary>
     public required UserEntity User { get; init; } = null!;
+
+    /// <summary>
+    /// Gets the collection of library scan results of this library scan.
+    /// </summary>
+    public ICollection<LibraryScanResultEntity> LibraryScanResults { get; init; } = [];
 
     /// <summary>
     /// Gets or sets the time and date when the entity was added.
