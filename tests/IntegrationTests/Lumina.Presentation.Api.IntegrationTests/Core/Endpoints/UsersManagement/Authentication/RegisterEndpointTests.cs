@@ -194,7 +194,7 @@ public class RegisterEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         UserEntity user = new()
         {
             Username = _testUsername,
-            Password = new HashService().HashString("TestPass123!"),
+            Password = new PasswordHashService().HashString("TestPass123!"),
             Libraries = [],
             UserPermissions = [],
             UserRole = null,

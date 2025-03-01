@@ -186,6 +186,9 @@
   <data name="FilmSeries" xml:space="preserve">
     <value>Saga Cinématographique</value>
   </data>
+  <data name="FilteringBookFiles" xml:space="preserve">
+    <value>Filtrage des fichiers de livres...</value>
+  </data>
   <data name="GoodReadsMetadataDownload" xml:space="preserve">
     <value>Téléchargement des métadonnées depuis GoodReads...</value>
   </data>

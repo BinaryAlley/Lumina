@@ -186,6 +186,9 @@
   <data name="FilmSeries" xml:space="preserve">
     <value>Serie de Filme</value>
   </data>
+  <data name="FilteringBookFiles" xml:space="preserve">
+    <value>Se filtrează fișierele de tip carte...</value>
+  </data>
   <data name="GoodReadsMetadataDownload" xml:space="preserve">
     <value>Se descarcă metadate de pe GoodReads...</value>
   </data>

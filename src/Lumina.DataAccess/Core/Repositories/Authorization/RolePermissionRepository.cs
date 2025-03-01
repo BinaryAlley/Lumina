@@ -31,9 +31,9 @@ internal sealed class RolePermissionRepository : IRolePermissionRepository
     /// <param name="rolePermission">The authorization role permission to add.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<ErrorOr<Created>> InsertAsync(RolePermissionEntity rolePermission, CancellationToken cancellationToken)
+    public Task<ErrorOr<Created>> InsertAsync(RolePermissionEntity rolePermission, CancellationToken cancellationToken)
     {
         _luminaDbContext.RolePermissions.Add(rolePermission);
-        return await Task.FromResult(Result.Created);
+        return Task.FromResult(ErrorOrFactory.From(Result.Created));
     }
 }

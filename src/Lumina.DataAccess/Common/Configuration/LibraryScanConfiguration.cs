@@ -42,19 +42,19 @@ public class LibraryScanConfiguration : IEntityTypeConfiguration<LibraryScanEnti
             .HasColumnOrder(1);
 
         // audit
-        builder.Property(permission => permission.CreatedOnUtc)
+        builder.Property(libraryScan => libraryScan.CreatedOnUtc)
             .IsRequired()
             .HasColumnOrder(2);
 
-        builder.Property(permission => permission.CreatedBy)
+        builder.Property(libraryScan => libraryScan.CreatedBy)
             .IsRequired()
             .HasColumnOrder(3);
 
-        builder.Property(permission => permission.UpdatedOnUtc)
+        builder.Property(libraryScan => libraryScan.UpdatedOnUtc)
             .HasDefaultValue(null)
             .HasColumnOrder(4);
 
-        builder.Property(permission => permission.UpdatedBy)
+        builder.Property(libraryScan => libraryScan.UpdatedBy)
             .HasDefaultValue(null)
             .HasColumnOrder(5);
     }

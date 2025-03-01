@@ -4,21 +4,20 @@ using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
-using Lumina.Domain.Common.Enums.FileSystem;
 using Lumina.Domain.Common.Enums.MediaLibrary;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
-using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Payloads;
+using Lumina.Infrastructure.Common.Errors;
 using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -30,23 +29,17 @@ namespace Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Commo
 /// </summary>
 internal sealed class FileSystemDiscoveryJob : MediaLibraryScanJob, IFileSystemDiscoveryJob
 {
-    private readonly IDirectoryService _directoryService;
-    private readonly IFileService _fileService;
     private readonly IServiceScopeFactory _serviceScopeFactory;
-
+    
     /// <summary>
     /// Initializes a new instance of the <see cref="FileSystemDiscoveryJob"/> class.
     /// </summary>
-    /// <param name="directoryService">Injected service for handling directories.</param>
-    /// <param name="fileService">Injected service for handling files.</param>
     /// <param name="serviceScopeFactory">
     /// Injected factory for creating scopes in which services are requested. 
     /// See docs/technical/achitecture/architecture-knowledge-management/architecture-decision-log/architecture-decission-record-0001.md for details.
     /// </param>
-    public FileSystemDiscoveryJob(IDirectoryService directoryService, IFileService fileService, IServiceScopeFactory serviceScopeFactory)
+    public FileSystemDiscoveryJob(IServiceScopeFactory serviceScopeFactory)
     {
-        _directoryService = directoryService;
-        _fileService = fileService;
         _serviceScopeFactory = serviceScopeFactory;
     }
 
@@ -65,19 +58,20 @@ internal sealed class FileSystemDiscoveryJob : MediaLibraryScanJob, IFileSystemD
                 await Task.Run(async () =>
                 {
                     Status = LibraryScanJobStatus.Running;
-                    Console.WriteLine("started file discovering");
+                    Stopwatch sw = Stopwatch.StartNew();
+                    Console.WriteLine("Started file system discovery scan job...");
                     // see docs/technical/achitecture/architecture-knowledge-management/architecture-decision-log/architecture-decission-record-0001.md for details:
                     await using AsyncServiceScope asyncServiceScope = _serviceScopeFactory.CreateAsyncScope();
-                    IUnitOfWork? unitOfWork = asyncServiceScope.ServiceProvider.GetService<IUnitOfWork>();
-                    IPublisher? publisher = asyncServiceScope.ServiceProvider.GetService<IPublisher>();
-                    ILibraryRepository libraryRepository = unitOfWork!.GetRepository<ILibraryRepository>();
+                    IUnitOfWork unitOfWork = asyncServiceScope.ServiceProvider.GetService<IUnitOfWork>()!;
+                    IPublisher publisher = asyncServiceScope.ServiceProvider.GetService<IPublisher>()!;
+                    ILibraryRepository libraryRepository = unitOfWork.GetRepository<ILibraryRepository>()!;
                     MediaLibraryScanCompositeId compositeKey = MediaLibraryScanCompositeId.Create(ScanId, UserId);
 
                     // get the library from the repository
                     ErrorOr<LibraryEntity?> getLibraryResult = await libraryRepository.GetByIdAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
                     if (getLibraryResult.IsError || getLibraryResult.Value is null)
                     {
-                        await publisher!.Publish(new LibraryScanFailedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                        await publisher.Publish(new LibraryScanFailedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
                         return;
                     }
 
@@ -85,57 +79,58 @@ internal sealed class FileSystemDiscoveryJob : MediaLibraryScanJob, IFileSystemD
                     ErrorOr<Library> domainLibraryResult = getLibraryResult.Value.ToDomainEntity();
                     if (domainLibraryResult.IsError)
                     {
-                        await publisher!.Publish(new LibraryScanFailedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                        await publisher.Publish(new LibraryScanFailedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
                         return;
                     }
 
                     // set the initial progress of the scan job
-                    ErrorOr<MediaLibraryScanJobProgress> scanJobProgressResult = MediaLibraryScanJobProgress.Create(0, domainLibraryResult.Value.ContentLocations.Count, "DiscoveringFiles");
-                    if (scanJobProgressResult.IsError)
-                    {
-                        await publisher!.Publish(new LibraryScanFailedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                    ErrorOr<Success> publishJobProgressResult = await PublishJobProgress(publisher, compositeKey, 0, domainLibraryResult.Value.ContentLocations.Count, cancellationToken).ConfigureAwait(false);
+                    if (publishJobProgressResult.IsError) 
                         return;
-                    }
 
-                    await publisher!.Publish(new LibraryScanJobProgressChangedDomainEvent(
-                        Guid.NewGuid(), LibraryId, compositeKey, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                    TimeSpan heartbeatInterval = TimeSpan.FromSeconds(1);
+                    DateTime lastHeartbeat = DateTime.UtcNow;
+                    long processedFiles = 0L;
+                    int processedContentLocations = 0;
 
-                    // recursively get the file system tree for each of the media library content locations
-                    List<FileSystemTreeNode> contentLocationTrees = [];
+                    // get the files for each of the media library content locations
+                    List<FileInfo> discoveredFiles = [];
                     foreach (FileSystemPathId contentLocation in domainLibraryResult.Value.ContentLocations)
                     {
-                        await Task.Delay(1000);
                         cancellationToken.ThrowIfCancellationRequested();
-                        ErrorOr<FileSystemTreeNode> treeResult = BuildTree(contentLocation, includeHiddenElements: true, cancellationToken);
-                        if (treeResult.IsError)
-                        {
-                            // handle errors, maybe:
-                            // Status = LibraryScanJobStatus.Failed;
-                        }
-                        else
-                            contentLocationTrees.Add(treeResult.Value);
 
-                        // increment the number of processed elements progress
-                        scanJobProgressResult = MediaLibraryScanJobProgress.Create(
-                            scanJobProgressResult.Value.CompletedItems + 1, domainLibraryResult.Value.ContentLocations.Count, "DiscoveringFiles");
-                        if (scanJobProgressResult.IsError)
+                        foreach (FileInfo file in GetFiles(contentLocation.Path, true, cancellationToken))
                         {
-                            await publisher!.Publish(new LibraryScanFailedDomainEvent(
-                                Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
-                            return;
+                            discoveredFiles.Add(file);
+                            processedFiles++;
+
+                            // increment the number of processed elements progress in a high-frequency counter with low overhead check
+                            if (processedFiles % 1000 == 0)
+                            {
+                                DateTime now = DateTime.UtcNow;
+                                if (now - lastHeartbeat >= heartbeatInterval)
+                                {
+                                    publishJobProgressResult = await PublishJobProgress(
+                                        publisher, compositeKey, processedContentLocations, domainLibraryResult.Value.ContentLocations.Count, cancellationToken).ConfigureAwait(false);
+                                    if (publishJobProgressResult.IsError)
+                                        return;
+                                    lastHeartbeat = now;
+                                }
+                            }
                         }
-                        await publisher!.Publish(new LibraryScanJobProgressChangedDomainEvent(
-                            Guid.NewGuid(), LibraryId, compositeKey, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                        processedContentLocations++;
                     }
                     // this job finished, increment the number of processed jobs progress
-                    await publisher!.Publish(new LibraryScanProgressChangedDomainEvent(
+                    await publisher.Publish(new LibraryScanProgressChangedDomainEvent(
                         Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
-                    Console.WriteLine("ended file discovering");
+                    sw.Stop();
+                    Console.WriteLine($"Ended file system discovery scan job in {sw.ElapsedMilliseconds}ms, discovered {discoveredFiles.Count} files.");
+                    
                     Status = LibraryScanJobStatus.Completed;
 
                     // call each linked child with the obtained payload
-                    foreach (IMediaLibraryScanJob children in Children)
-                        await children.ExecuteAsync(id, contentLocationTrees, cancellationToken).ConfigureAwait(false);
+                    foreach (IMediaLibraryScanJob child in Children)
+                        await child.ExecuteAsync(id, discoveredFiles, cancellationToken).ConfigureAwait(false);
                 }, cancellationToken).ConfigureAwait(false);
             }
         }
@@ -147,69 +142,97 @@ internal sealed class FileSystemDiscoveryJob : MediaLibraryScanJob, IFileSystemD
     }
 
     /// <summary>
-    /// Builds a hierarchical tree structure representing the file system starting from the specified path.
+    /// Gets all files under the specified directory.
     /// </summary>
-    /// <param name="path">The identifier of the root path from which to build the tree.</param>
-    /// <param name="includeHiddenElements">Specifies whether hidden files and directories should be included in the tree.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a <see cref="FileSystemTreeNode"/>, or an error.</returns>
-    private ErrorOr<FileSystemTreeNode> BuildTree(FileSystemPathId path, bool includeHiddenElements = false, CancellationToken cancellationToken = default)
+    /// <param name="rootDirectoryPath">The path of the root directory from which to start collecting files.</param>
+    /// <param name="includeHiddenElements">Specifies whether hidden files and directories should be included.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <remarks>
+    /// See docs/technical/achitecture/architecture-knowledge-management/architecture-decision-log/architecture-decission-record-0003.md for details.
+    /// </remarks>
+    /// <returns>The discovered collection of files.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    private static IEnumerable<FileInfo> GetFiles(string rootDirectoryPath, bool includeHiddenElements, CancellationToken cancellationToken)
     {
-        // validate the path and get the root directory node
-        ErrorOr<Directory> rootDirectoryResult = Directory.Create(path, path.Path, Optional<DateTime>.None(), Optional<DateTime>.None());
-        if (rootDirectoryResult.IsError)
-            return rootDirectoryResult.Errors;
+        Queue<DirectoryInfo> directoryStack = new();
+        directoryStack.Enqueue(new DirectoryInfo(rootDirectoryPath));
 
-        // build the tree starting from the root directory
-        return BuildNodeRecursive(rootDirectoryResult.Value, includeHiddenElements, cancellationToken);
+        EnumerationOptions enumerationOptions = new()
+        {
+            AttributesToSkip = includeHiddenElements ? FileAttributes.None : FileAttributes.Hidden,
+            IgnoreInaccessible = true,
+            RecurseSubdirectories = false
+        };
+        // use a breadth-first traversal iterative approach, instead of recursion, which is heavier on call frames and memory
+        // and could result in stack overflow on deeply nested directories
+        while (directoryStack.Count > 0)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            DirectoryInfo currentDirectory = directoryStack.Dequeue();
+
+            // process files first
+            IEnumerable<FileInfo>? files = null;
+            try
+            {
+                files = currentDirectory.EnumerateFiles("*", enumerationOptions);
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            if (files is not null)
+            {
+                foreach (FileInfo file in files)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    yield return file;
+                }
+            }
+
+            // process subdirectories - each new subdirectory is added to the same stack queue, for later processing
+            IEnumerable<DirectoryInfo>? subdirs = null;
+            try
+            {
+                subdirs = currentDirectory.EnumerateDirectories("*", enumerationOptions);
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            if (subdirs is not null)
+            {
+                foreach (DirectoryInfo subdir in subdirs)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    directoryStack.Enqueue(subdir);
+                }
+            }
+        }
     }
 
     /// <summary>
-    /// Recursively builds a tree node for a given directory, including its subdirectories and files.
+    /// Publishes a job progress update.
     /// </summary>
-    /// <param name="directory">The directory for which to build a tree node.</param>
-    /// <param name="includeHiddenElements">Specifies whether hidden files and directories should be included in the node's children.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a <see cref="FileSystemTreeNode"/>, or an error.</returns>
-    private ErrorOr<FileSystemTreeNode> BuildNodeRecursive(Directory directory, bool includeHiddenElements, CancellationToken cancellationToken)
+    /// <param name="publisher">The service used to publish the progress update.</param>
+    /// <param name="compositeKey">The composite unique identifier of a media library scan.</param>
+    /// <param name="currentProgress">The current job progress.</param>
+    /// <param name="totalProgress">The total job progress.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
+    private async Task<ErrorOr<Success>> PublishJobProgress(IPublisher publisher, MediaLibraryScanCompositeId compositeKey, int currentProgress, int totalProgress, CancellationToken cancellationToken)
     {
-        FileSystemTreeNode node = new()
+        ErrorOr<MediaLibraryScanJobProgress> scanJobProgressResult = MediaLibraryScanJobProgress.Create(currentProgress, totalProgress, "DiscoveringFiles");
+        if (scanJobProgressResult.IsError)
         {
-            Path = directory.Id.Path,
-            Name = directory.Name,
-            ItemType = FileSystemItemType.Directory,
-            Children = []
-        };
-
-        // fetch and add subdirectories
-        ErrorOr<IEnumerable<Directory>> subdirectoriesResult = _directoryService.GetSubdirectories(directory, includeHiddenElements);
-        if (subdirectoriesResult.IsError)
-            return subdirectoriesResult.Errors;
-
-        foreach (Directory subdirectory in subdirectoriesResult.Value)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            ErrorOr<FileSystemTreeNode> subNodeResult = BuildNodeRecursive(subdirectory, includeHiddenElements, cancellationToken);
-            if (subNodeResult.IsError)
-                return subNodeResult.Errors;
-
-            node.Children.Add(subNodeResult.Value);
+            await publisher.Publish(new LibraryScanFailedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+            return Errors.LibraryScanning.FailedToCreateScanJobProgress;
         }
 
-        // fetch and add files
-        ErrorOr<IEnumerable<File>> filesResult = _fileService.GetFiles(directory.Id, includeHiddenElements);
-        if (filesResult.IsError)
-            return filesResult.Errors;
+        await publisher.Publish(new LibraryScanJobProgressChangedDomainEvent(
+            Guid.NewGuid(), LibraryId, compositeKey, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
 
-        foreach (File file in filesResult.Value)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            node.Children.Add(new FileSystemTreeNode
-            {
-                Path = file.Id.Path,
-                Name = file.Name,
-                ItemType = FileSystemItemType.File,
-                Children = [] // files have no children
-            });
-        }
-        return node;
+        return Result.Success;
     }
 }

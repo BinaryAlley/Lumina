@@ -31,9 +31,9 @@ internal sealed class UserRoleRepository : IUserRoleRepository
     /// <param name="userRole">The authorization user role to add.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<ErrorOr<Created>> InsertAsync(UserRoleEntity userRole, CancellationToken cancellationToken)
+    public Task<ErrorOr<Created>> InsertAsync(UserRoleEntity userRole, CancellationToken cancellationToken)
     {
         _luminaDbContext.UserRoles.Add(userRole);
-        return await Task.FromResult(Result.Created);
+        return Task.FromResult(ErrorOrFactory.From(Result.Created));
     }
 }

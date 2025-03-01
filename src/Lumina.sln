@@ -190,6 +190,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "architecture-decision-log",
 	ProjectSection(SolutionItems) = preProject
 		..\docs\technical\architecture\architecture-knowledge-management\architecture-decision-log\architecture-decission-record-0001.md = ..\docs\technical\architecture\architecture-knowledge-management\architecture-decision-log\architecture-decission-record-0001.md
 		..\docs\technical\architecture\architecture-knowledge-management\architecture-decision-log\architecture-decission-record-0002.md = ..\docs\technical\architecture\architecture-knowledge-management\architecture-decision-log\architecture-decission-record-0002.md
+		..\docs\technical\architecture\architecture-knowledge-management\architecture-decision-log\architecture-decission-record-0003.md = ..\docs\technical\architecture\architecture-knowledge-management\architecture-decision-log\architecture-decission-record-0003.md
 	EndProjectSection
 EndProject
 Global

@@ -204,19 +204,19 @@ public class BookConfiguration : IEntityTypeConfiguration<BookEntity>
         });
 
         // audit
-        builder.Property(permission => permission.CreatedOnUtc)
+        builder.Property(book => book.CreatedOnUtc)
             .IsRequired()
             .HasColumnOrder(32);
 
-        builder.Property(permission => permission.CreatedBy)
+        builder.Property(book => book.CreatedBy)
             .IsRequired()
             .HasColumnOrder(33);
 
-        builder.Property(permission => permission.UpdatedOnUtc)
+        builder.Property(book => book.UpdatedOnUtc)
             .HasDefaultValue(null)
             .HasColumnOrder(34);
 
-        builder.Property(permission => permission.UpdatedBy)
+        builder.Property(book => book.UpdatedBy)
             .HasDefaultValue(null)
             .HasColumnOrder(35);
     }

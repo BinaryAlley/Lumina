@@ -22,7 +22,7 @@ namespace Lumina.Application.Core.UsersManagement.Authentication.Queries.LoginUs
 public class LoginUserQueryHandler : IRequestHandler<LoginUserQuery, ErrorOr<LoginResponse>>
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IHashService _hashService;
+    private readonly IPasswordHashService _hashService;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
     private readonly ITotpTokenGenerator _totpTokenGenerator;
     private readonly ICryptographyService _cryptographyService;
@@ -39,7 +39,7 @@ public class LoginUserQueryHandler : IRequestHandler<LoginUserQuery, ErrorOr<Log
     /// <param name="dateTimeProvider">Injected service for time related concerns.</param>
     public LoginUserQueryHandler(
         IUnitOfWork unitOfWork, 
-        IHashService hashService, 
+        IPasswordHashService hashService, 
         IJwtTokenGenerator jwtTokenGenerator, 
         ITotpTokenGenerator totpTokenGenerator, 
         ICryptographyService cryptographyService,

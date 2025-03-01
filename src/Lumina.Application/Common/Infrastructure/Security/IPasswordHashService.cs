@@ -3,7 +3,7 @@ namespace Lumina.Application.Common.Infrastructure.Security;
 /// <summary>
 /// Interface for the service for hashing passwords.
 /// </summary>
-public interface IHashService
+public interface IPasswordHashService
 {
     /// <summary>
     /// Creates a hash from a string.

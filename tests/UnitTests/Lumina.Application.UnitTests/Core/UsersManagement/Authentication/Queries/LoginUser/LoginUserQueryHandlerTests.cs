@@ -26,7 +26,7 @@ namespace Lumina.Application.UnitTests.Core.UsersManagement.Authentication.Queri
 public class LoginUserQueryHandlerTests
 {
     private readonly IUnitOfWork _mockUnitOfWork;
-    private readonly IHashService _mockHashService;
+    private readonly IPasswordHashService _mockHashService;
     private readonly IJwtTokenGenerator _mockJwtTokenGenerator;
     private readonly ITotpTokenGenerator _mockTotpTokenGenerator;
     private readonly ICryptographyService _mockCryptographyService;
@@ -40,7 +40,7 @@ public class LoginUserQueryHandlerTests
     public LoginUserQueryHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
-        _mockHashService = Substitute.For<IHashService>();
+        _mockHashService = Substitute.For<IPasswordHashService>();
         _mockJwtTokenGenerator = Substitute.For<IJwtTokenGenerator>();
         _mockTotpTokenGenerator = Substitute.For<ITotpTokenGenerator>();
         _mockCryptographyService = Substitute.For<ICryptographyService>();

@@ -46,7 +46,8 @@ public static class InfrastructureLayerServices
         // scan the current assembly for validators and add them to the DI container
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly(), ServiceLifetime.Singleton);
 
-        services.AddSingleton<IHashService, HashService>();
+        services.AddSingleton<IFileHashService, FileHashService>();
+        services.AddSingleton<IPasswordHashService, PasswordHashService>();
         services.AddSingleton<ICryptographyService, CryptographyService>();
         services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
         services.AddSingleton<IQRCodeGenerator, QRCodeGenerator>();
@@ -68,9 +69,11 @@ public static class InfrastructureLayerServices
 
         services.AddTransient<IFileSystemDiscoveryJob, FileSystemDiscoveryJob>();
         services.AddTransient<IRepositoryMetadataDiscoveryJob, RepositoryMetadataDiscoveryJob>();
+        services.AddTransient<IBooksFileExtensionsFilterJob, BooksFileExtensionsFilterJob>();
         services.AddTransient<IHashComparerJob, HashComparerJob>();
         services.AddTransient<IGoodReadsMetadataScrapJob, GoodReadsMetadataScrapJob>();
         services.AddTransient<IRepositoryMetadataSaveJob, RepositoryMetadataSaveJob>();
+
 
         services.AddSingleton<IMediaLibraryScanProgressNotifier, DebouncedMediaLibraryScanProgressNotifier>();
         return services;

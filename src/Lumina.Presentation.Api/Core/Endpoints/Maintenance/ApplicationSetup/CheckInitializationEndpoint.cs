@@ -47,6 +47,6 @@ public class CheckInitializationEndpoint : BaseEndpoint<EmptyRequest, IResult>
     public override async Task<IResult> ExecuteAsync(EmptyRequest _, CancellationToken cancellationToken)
     {
         InitializationResponse result = await _sender.Send(new CheckInitializationQuery(), cancellationToken).ConfigureAwait(false);
-        return await Task.FromResult(TypedResults.Ok(result));
+        return TypedResults.Ok(result);
     }
 }

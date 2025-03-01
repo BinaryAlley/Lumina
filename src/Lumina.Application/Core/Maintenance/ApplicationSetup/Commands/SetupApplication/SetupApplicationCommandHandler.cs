@@ -25,7 +25,7 @@ namespace Lumina.Application.Core.Maintenance.ApplicationSetup.Commands.SetupApp
 public class SetupApplicationCommandHandler : IRequestHandler<SetupApplicationCommand, ErrorOr<RegistrationResponse>>
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IHashService _hashService;
+    private readonly IPasswordHashService _hashService;
     private readonly ICryptographyService _cryptographyService;
     private readonly ITotpTokenGenerator _totpTokenGenerator;
     private readonly IQRCodeGenerator _qRCodeGenerator;
@@ -44,7 +44,7 @@ public class SetupApplicationCommandHandler : IRequestHandler<SetupApplicationCo
     /// <param name="dataSeedService">Injected service for the initial persistence medium data seed.</param>
     public SetupApplicationCommandHandler(
         IUnitOfWork unitOfWork,
-        IHashService hashService,
+        IPasswordHashService hashService,
         ICryptographyService cryptographyService,
         ITotpTokenGenerator totpTokenGenerator,
         IQRCodeGenerator qRCodeGenerator,

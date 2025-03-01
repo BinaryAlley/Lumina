@@ -21,7 +21,7 @@ namespace Lumina.Application.Core.UsersManagement.Authentication.Commands.Recove
 public class RecoverPasswordCommandHandler : IRequestHandler<RecoverPasswordCommand, ErrorOr<RecoverPasswordResponse>>
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IHashService _hashService;
+    private readonly IPasswordHashService _hashService;
     private readonly ITotpTokenGenerator _totpTokenGenerator;
     private readonly ICryptographyService _cryptographyService;
 
@@ -34,7 +34,7 @@ public class RecoverPasswordCommandHandler : IRequestHandler<RecoverPasswordComm
     /// <param name="cryptographyService">Injected service for cryptographic functionality.</param>
     public RecoverPasswordCommandHandler(
         IUnitOfWork unitOfWork,
-        IHashService hashService,
+        IPasswordHashService hashService,
         ITotpTokenGenerator totpTokenGenerator,
         ICryptographyService cryptographyService)
     {
