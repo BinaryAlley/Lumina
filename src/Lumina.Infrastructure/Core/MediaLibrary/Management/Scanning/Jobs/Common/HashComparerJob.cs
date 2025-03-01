@@ -134,8 +134,8 @@ internal sealed class HashComparerJob : MediaLibraryScanJob, IHashComparerJob
                             lastUpdateTime = now;
                         }
                     }
-                    int processedFiles = 0;
-                    List<ChangedFileSystemFile> processed = fileHashService.HashFiles(filesToHash, libraryScanResultEntities,
+                    int processedFilesCount = 0;
+                    List<ChangedFileSystemFile> processedFiles = await fileHashService.HashFilesAsync(filesToHash, libraryScanResultEntities,
                         async () =>
                         {
                             // check if enough time has passed since last update
@@ -144,7 +144,7 @@ internal sealed class HashComparerJob : MediaLibraryScanJob, IHashComparerJob
                             {
                                 // increment the number of processed elements progress
                                 publishJobProgressResult = await PublishJobProgress(
-                                    publisher, compositeKey, Interlocked.Increment(ref processedFiles), files.Count, cancellationToken).ConfigureAwait(false);
+                                    publisher, compositeKey, Interlocked.Increment(ref processedFilesCount), files.Count, cancellationToken).ConfigureAwait(false);
                                 if (publishJobProgressResult.IsError)
                                     return;
                                     // update the last update time
@@ -156,11 +156,11 @@ internal sealed class HashComparerJob : MediaLibraryScanJob, IHashComparerJob
                     await publisher!.Publish(new LibraryScanProgressChangedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
                     Status = LibraryScanJobStatus.Completed;
                     sw.Stop();
-                    Console.WriteLine($"Ended file hashing in {sw.ElapsedMilliseconds}ms, hashed {processed.Count} files.");
+                    Console.WriteLine($"Ended file hashing in {sw.ElapsedMilliseconds}ms, hashed {processedFiles.Count} files.");
 
                     // call each linked child with the obtained payload
                     foreach (IMediaLibraryScanJob child in Children)
-                        await child.ExecuteAsync(id, files, cancellationToken).ConfigureAwait(false);
+                        await child.ExecuteAsync(id, processedFiles, cancellationToken).ConfigureAwait(false);
                 }, cancellationToken).ConfigureAwait(false);
             }
         }

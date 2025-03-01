@@ -23,7 +23,7 @@ public interface IFileHashService
     /// <param name="callback">Callback to invoke during processing of elements.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>A collection of files that changed since last library scan, along with their hashes.</returns>
-    List<ChangedFileSystemFile> HashFiles(
+    Task<List<ChangedFileSystemFile>> HashFilesAsync(
         List<FileInfo> files,
         Dictionary<string, LibraryScanResultEntity> previousScanResults,
         Func<Task> callback,
