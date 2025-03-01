@@ -50,12 +50,6 @@ public class LibraryScanResultConfiguration : IEntityTypeConfiguration<LibrarySc
             .IsRequired()
             .HasColumnOrder(4);
 
-        builder.Property(libraryScanResult => libraryScanResult.Status)
-            .IsRequired()
-            .HasConversion<string>()
-            .HasMaxLength(10)
-            .HasColumnOrder(5);
-
         // Indexes
         builder.HasIndex(libraryScanResult => new { libraryScanResult.ContentHash, libraryScanResult.FileSize, libraryScanResult.Path })
             .IsUnique();

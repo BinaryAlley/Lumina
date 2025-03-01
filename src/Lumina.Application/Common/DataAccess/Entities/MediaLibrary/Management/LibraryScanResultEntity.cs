@@ -24,11 +24,6 @@ public class LibraryScanResultEntity : IStorageEntity
     public required Guid LibraryScanId { get; init; }
 
     /// <summary>
-    /// Gets the status of the media library scan file.
-    /// </summary>
-    public required LibraryScanFileStatus Status { get; init; }
-
-    /// <summary>
     /// Gets the path of the media library scan file.
     /// </summary>
     public required string Path { get; init; }
