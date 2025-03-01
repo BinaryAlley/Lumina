@@ -26,7 +26,7 @@ namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.UsersManagement.A
 [ExcludeFromCodeCoverage]
 public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
 {
-    private readonly HashService _hashService;
+    private readonly PasswordHashService _hashService;
     private readonly ICryptographyService _cryptographyService;
     private readonly TotpTokenGenerator _totpTokenGenerator;
     private readonly LuminaApiFactory _apiFactory;
@@ -49,7 +49,7 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
         // set a fake IP for this test instance
         _client.DefaultRequestHeaders.Clear();
         _client.DefaultRequestHeaders.Add("X-Forwarded-For", $"192.168.1.1");
-        _hashService = new HashService();
+        _hashService = new PasswordHashService();
         _totpTokenGenerator = new TotpTokenGenerator();
         _testUsername = $"testuser_{Guid.NewGuid()}";
 

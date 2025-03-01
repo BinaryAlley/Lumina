@@ -22,7 +22,7 @@ namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.UsersManagement.A
 [ExcludeFromCodeCoverage]
 public class RegisterEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
 {
-    private readonly HashService _hashService;
+    private readonly PasswordHashService _hashService;
     private readonly LuminaApiFactory _apiFactory;
     private readonly HttpClient _client;
     private readonly JsonSerializerOptions _jsonOptions = new()
@@ -38,7 +38,7 @@ public class RegisterEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
         _client = apiFactory.CreateClient();
         _client.DefaultRequestHeaders.Clear();
         _client.DefaultRequestHeaders.Add("X-Forwarded-For", $"192.168.1.5");
-        _hashService = new HashService();
+        _hashService = new PasswordHashService();
         _testUsername = $"testuser_{Guid.NewGuid()}";
     }
 

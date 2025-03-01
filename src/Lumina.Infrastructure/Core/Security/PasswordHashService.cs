@@ -11,7 +11,7 @@ namespace Lumina.Infrastructure.Core.Security;
 /// <summary>
 /// Service for hashing passwords.
 /// </summary>
-public sealed class HashService : IHashService
+public sealed class PasswordHashService : IPasswordHashService
 {
     // OWASP recommended parameters for Argon2id
     private const int MEMORY_SIZE = 19456; // 19 MiB (19 * 1024 = 19456)

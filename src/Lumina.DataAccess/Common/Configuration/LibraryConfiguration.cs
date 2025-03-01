@@ -83,19 +83,19 @@ public class LibraryConfiguration : IEntityTypeConfiguration<LibraryEntity>
         });
 
         // audit
-        builder.Property(permission => permission.CreatedOnUtc)
+        builder.Property(library => library.CreatedOnUtc)
             .IsRequired()
             .HasColumnOrder(8);
 
-        builder.Property(permission => permission.CreatedBy)
+        builder.Property(library => library.CreatedBy)
             .IsRequired()
             .HasColumnOrder(9);
 
-        builder.Property(permission => permission.UpdatedOnUtc)
+        builder.Property(library => library.UpdatedOnUtc)
             .HasDefaultValue(null)
             .HasColumnOrder(10);
 
-        builder.Property(permission => permission.UpdatedBy)
+        builder.Property(library => library.UpdatedBy)
             .HasDefaultValue(null)
             .HasColumnOrder(11);
     }

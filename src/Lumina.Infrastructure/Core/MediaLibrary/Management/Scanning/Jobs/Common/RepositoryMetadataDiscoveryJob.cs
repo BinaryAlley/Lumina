@@ -9,10 +9,13 @@ using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.Library
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
+using Lumina.Infrastructure.Common.Errors;
 using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -49,23 +52,26 @@ internal sealed class RepositoryMetadataDiscoveryJob : MediaLibraryScanJob, IRep
             if (Parents.Count == 0 || parentsCompleted == Parents.Count)
             {
                 // this needs to be wrapped in a task because even though this job is processed in a "fire and forget" async manner, it still does synchronous
-                // file system processing that takes time, and would block the processing of scan jobs in the in-memory queue 
+                // processing that takes time, and would block the processing of scan jobs in the in-memory queue 
                 await Task.Run(async () =>
                 {
                     Status = LibraryScanJobStatus.Running;
-                    Console.WriteLine("started repo discovering");
+                    Stopwatch sw = Stopwatch.StartNew();
+                    Console.WriteLine("Started repo discovering...");
                     // see docs/technical/achitecture/architecture-knowledge-management/architecture-decision-log/architecture-decission-record-0001.md for details:
                     await using AsyncServiceScope asyncServiceScope = _serviceScopeFactory.CreateAsyncScope();
-                    IUnitOfWork? unitOfWork = asyncServiceScope.ServiceProvider.GetService<IUnitOfWork>();
-                    IPublisher? publisher = asyncServiceScope.ServiceProvider.GetService<IPublisher>();
-                    ILibraryRepository libraryRepository = unitOfWork!.GetRepository<ILibraryRepository>();
+                    IUnitOfWork unitOfWork = asyncServiceScope.ServiceProvider.GetService<IUnitOfWork>()!;
+                    IPublisher publisher = asyncServiceScope.ServiceProvider.GetService<IPublisher>()!;
+                    ILibraryRepository libraryRepository = unitOfWork.GetRepository<ILibraryRepository>();
+                    ILibraryScanResultRepository libraryScanResultRepository = unitOfWork.GetRepository<ILibraryScanResultRepository>();
+
                     MediaLibraryScanCompositeId compositeKey = MediaLibraryScanCompositeId.Create(ScanId, UserId);
 
                     // get the library from the repository
                     ErrorOr<LibraryEntity?> getLibraryResult = await libraryRepository.GetByIdAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
                     if (getLibraryResult.IsError || getLibraryResult.Value is null)
                     {
-                        await publisher!.Publish(new LibraryScanFailedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                        await publisher.Publish(new LibraryScanFailedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
                         return;
                     }
 
@@ -73,45 +79,35 @@ internal sealed class RepositoryMetadataDiscoveryJob : MediaLibraryScanJob, IRep
                     ErrorOr<Library> domainLibraryResult = getLibraryResult.Value.ToDomainEntity();
                     if (domainLibraryResult.IsError)
                     {
-                        await publisher!.Publish(new LibraryScanFailedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                        await publisher.Publish(new LibraryScanFailedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
                         return;
                     }
 
-                    // set the initial progress of the scan job
-                    ErrorOr<MediaLibraryScanJobProgress> scanJobProgressResult = MediaLibraryScanJobProgress.Create(0, domainLibraryResult.Value.ContentLocations.Count, "RetrievingPastScanData");
-                    if (scanJobProgressResult.IsError)
-                    {
-                        await publisher!.Publish(new LibraryScanFailedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                    // set the initial progress of the scan job, it's a 1 step job - retrieving stuff from repository
+                    ErrorOr<Success> publishJobProgressResult = await PublishJobProgress(publisher, compositeKey, 0, 1, cancellationToken).ConfigureAwait(false);
+                    if (publishJobProgressResult.IsError)
                         return;
-                    }
 
-                    await publisher!.Publish(new LibraryScanJobProgressChangedDomainEvent(
-                        Guid.NewGuid(), LibraryId, compositeKey, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                    // get the results of the last scan of the media library
+                    ErrorOr<Dictionary<string, LibraryScanResultEntity>> getScanResultsResult = 
+                        await libraryScanResultRepository.GetPathMappedByLibraryIdAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
+                    if (getScanResultsResult.IsError)
+                        return;
 
-                    List<int> ints = [1, 2, 3];
-                    foreach (int nr in ints)
-                    {
-                        await Task.Delay(1000);
-                        // increment the number of processed elements progress
-                        scanJobProgressResult = MediaLibraryScanJobProgress.Create(
-                            scanJobProgressResult.Value.CompletedItems + 1, domainLibraryResult.Value.ContentLocations.Count, "RetrievingPastScanData");
-                        if (scanJobProgressResult.IsError)
-                        {
-                            await publisher!.Publish(
-                                new LibraryScanFailedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
-                            return;
-                        }
-                        await publisher!.Publish(new LibraryScanJobProgressChangedDomainEvent(
-                            Guid.NewGuid(), LibraryId, compositeKey, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
-                    }
+                    // increment the number of processed elements progress
+                    publishJobProgressResult = await PublishJobProgress(publisher, compositeKey, 1, 1, cancellationToken).ConfigureAwait(false);
+                    if (publishJobProgressResult.IsError)
+                        return;
+
                     // this job finished, increment the number of processed jobs progress
-                    await publisher!.Publish(new LibraryScanProgressChangedDomainEvent(
+                    await publisher.Publish(new LibraryScanProgressChangedDomainEvent(
                         Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
                     Status = LibraryScanJobStatus.Completed;
-                    Console.WriteLine("ended repo discovering");
+                    sw.Stop();
+                    Console.WriteLine($"Ended repository discovery scan job in {sw.ElapsedMilliseconds}ms, discovered {getScanResultsResult.Value.Count} items.");
                     // call each linked child with the obtained payload
-                    foreach (IMediaLibraryScanJob children in Children)
-                        await children.ExecuteAsync(id, ints, cancellationToken).ConfigureAwait(false);
+                    foreach (IMediaLibraryScanJob child in Children)
+                        await child.ExecuteAsync(id, getScanResultsResult.Value, cancellationToken).ConfigureAwait(false);
                 }, cancellationToken).ConfigureAwait(false);
             }
         }
@@ -120,5 +116,29 @@ internal sealed class RepositoryMetadataDiscoveryJob : MediaLibraryScanJob, IRep
             Status = LibraryScanJobStatus.Canceled;
             throw;
         }
+    }
+
+    /// <summary>
+    /// Publishes a job progress update.
+    /// </summary>
+    /// <param name="publisher">The service used to publish the progress update.</param>
+    /// <param name="compositeKey">The composite unique identifier of a media library scan.</param>
+    /// <param name="currentProgress">The current job progress.</param>
+    /// <param name="totalProgress">The total job progress.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
+    private async Task<ErrorOr<Success>> PublishJobProgress(IPublisher publisher, MediaLibraryScanCompositeId compositeKey, int currentProgress, int totalProgress, CancellationToken cancellationToken)
+    {
+        ErrorOr<MediaLibraryScanJobProgress> scanJobProgressResult = MediaLibraryScanJobProgress.Create(currentProgress, totalProgress, "RetrievingPastScanData");
+        if (scanJobProgressResult.IsError)
+        {
+            await publisher.Publish(new LibraryScanFailedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+            return Errors.LibraryScanning.FailedToCreateScanJobProgress;
+        }
+
+        await publisher.Publish(new LibraryScanJobProgressChangedDomainEvent(
+            Guid.NewGuid(), LibraryId, compositeKey, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+
+        return Result.Success;
     }
 }

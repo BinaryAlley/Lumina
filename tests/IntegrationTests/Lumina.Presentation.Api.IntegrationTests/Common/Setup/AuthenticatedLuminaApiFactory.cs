@@ -25,7 +25,7 @@ namespace Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 [ExcludeFromCodeCoverage]
 public class AuthenticatedLuminaApiFactory : LuminaApiFactory, IDisposable
 {
-    private readonly HashService _hashService;
+    private readonly PasswordHashService _hashService;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
@@ -41,7 +41,7 @@ public class AuthenticatedLuminaApiFactory : LuminaApiFactory, IDisposable
     /// </summary>
     public AuthenticatedLuminaApiFactory()
     {
-        _hashService = new HashService();
+        _hashService = new PasswordHashService();
     }
 
     /// <summary>

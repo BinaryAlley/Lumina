@@ -7,19 +7,19 @@ using System.Diagnostics.CodeAnalysis;
 namespace Lumina.Infrastructure.UnitTests.Core.Security;
 
 /// <summary>
-/// Contains unit tests for the <see cref="HashService"/> class.
+/// Contains unit tests for the <see cref="PasswordHashService"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class HashServiceTests
 {
-    private readonly HashService _sut;
+    private readonly PasswordHashService _sut;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="HashServiceTests"/> class.
     /// </summary>
     public HashServiceTests()
     {
-        _sut = new HashService();
+        _sut = new PasswordHashService();
     }
 
     [Fact]

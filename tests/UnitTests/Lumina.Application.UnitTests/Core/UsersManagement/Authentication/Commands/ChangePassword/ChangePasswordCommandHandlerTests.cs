@@ -24,7 +24,7 @@ namespace Lumina.Application.UnitTests.Core.UsersManagement.Authentication.Comma
 public class ChangePasswordCommandHandlerTests
 {
     private readonly IUnitOfWork _mockUnitOfWork;
-    private readonly IHashService _mockHashService;
+    private readonly IPasswordHashService _mockHashService;
     private readonly IUserRepository _mockUserRepository;
     private readonly ChangePasswordCommandHandler _sut;
 
@@ -34,7 +34,7 @@ public class ChangePasswordCommandHandlerTests
     public ChangePasswordCommandHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
-        _mockHashService = Substitute.For<IHashService>();
+        _mockHashService = Substitute.For<IPasswordHashService>();
         _mockUserRepository = Substitute.For<IUserRepository>();
 
         _mockUnitOfWork.GetRepository<IUserRepository>().Returns(_mockUserRepository);

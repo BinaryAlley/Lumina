@@ -25,7 +25,7 @@ public class ChangePasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDis
 {
     private readonly LuminaApiFactory _apiFactory;
     private readonly HttpClient _client;
-    private readonly HashService _hashService;
+    private readonly PasswordHashService _hashService;
     private readonly string _testUsername;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -42,7 +42,7 @@ public class ChangePasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDis
         _client = apiFactory.CreateClient();
         _client.DefaultRequestHeaders.Clear();
         _client.DefaultRequestHeaders.Add("X-Forwarded-For", $"192.168.1.12");
-        _hashService = new HashService();
+        _hashService = new PasswordHashService();
         _testUsername = $"testuser_{Guid.NewGuid()}";
     }
 

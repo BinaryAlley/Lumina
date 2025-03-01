@@ -22,7 +22,7 @@ namespace Lumina.Application.Core.UsersManagement.Authentication.Commands.Regist
 public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, ErrorOr<RegistrationResponse>>
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IHashService _hashService;
+    private readonly IPasswordHashService _hashService;
     private readonly ICryptographyService _cryptographyService;
     private readonly ITotpTokenGenerator _totpTokenGenerator;
     private readonly IQRCodeGenerator _qRCodeGenerator;
@@ -39,7 +39,7 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, E
     /// <param name="dateTimeProvider">Injected service for time related concerns.</param>
     public RegisterUserCommandHandler(
         IUnitOfWork unitOfWork,
-        IHashService hashService,
+        IPasswordHashService hashService,
         ICryptographyService cryptographyService,
         ITotpTokenGenerator totpTokenGenerator,
         IQRCodeGenerator qRCodeGenerator,

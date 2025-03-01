@@ -25,7 +25,7 @@ namespace Lumina.Application.UnitTests.Core.UsersManagement.Authentication.Comma
 public class RecoverPasswordCommandHandlerTests
 {
     private readonly IUnitOfWork _mockUnitOfWork;
-    private readonly IHashService _mockHashService;
+    private readonly IPasswordHashService _mockHashService;
     private readonly ITotpTokenGenerator _mockTotpTokenGenerator;
     private readonly ICryptographyService _mockCryptographyService;
     private readonly IUserRepository _mockUserRepository;
@@ -37,7 +37,7 @@ public class RecoverPasswordCommandHandlerTests
     public RecoverPasswordCommandHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
-        _mockHashService = Substitute.For<IHashService>();
+        _mockHashService = Substitute.For<IPasswordHashService>();
         _mockTotpTokenGenerator = Substitute.For<ITotpTokenGenerator>();
         _mockCryptographyService = Substitute.For<ICryptographyService>();
         _mockUserRepository = Substitute.For<IUserRepository>();

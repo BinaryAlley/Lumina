@@ -36,7 +36,7 @@ public class LibraryScanResultEntity : IStorageEntity
     /// <summary>
     /// Gets the hash calculated for the media library scan file.
     /// </summary>
-    public required string ContentHash { get; init; }
+    public required ulong ContentHash { get; init; }
 
     /// <summary>
     /// Gets the size of the media library scan file.

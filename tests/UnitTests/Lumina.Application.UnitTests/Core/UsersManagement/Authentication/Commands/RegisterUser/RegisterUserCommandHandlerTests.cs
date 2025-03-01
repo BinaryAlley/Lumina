@@ -27,7 +27,7 @@ namespace Lumina.Application.UnitTests.Core.UsersManagement.Authentication.Comma
 public class RegisterUserCommandHandlerTests
 {
     private readonly IUnitOfWork _mockUnitOfWork;
-    private readonly IHashService _mockHashService;
+    private readonly IPasswordHashService _mockHashService;
     private readonly ICryptographyService _mockCryptographyService;
     private readonly ITotpTokenGenerator _mockTotpTokenGenerator;
     private readonly IQRCodeGenerator _mockQRCodeGenerator;
@@ -41,7 +41,7 @@ public class RegisterUserCommandHandlerTests
     public RegisterUserCommandHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
-        _mockHashService = Substitute.For<IHashService>();
+        _mockHashService = Substitute.For<IPasswordHashService>();
         _mockCryptographyService = Substitute.For<ICryptographyService>();
         _mockTotpTokenGenerator = Substitute.For<ITotpTokenGenerator>();
         _mockQRCodeGenerator = Substitute.For<IQRCodeGenerator>();

@@ -109,8 +109,8 @@ internal sealed class GoodReadsMetadataScrapJob : MediaLibraryScanJob, IGoodRead
                 Status = LibraryScanJobStatus.Completed;
                 Console.WriteLine("ended goodreads metadata");
                 // call each linked child with the obtained payload
-                foreach (IMediaLibraryScanJob children in Children)
-                    await children.ExecuteAsync(id, ints, cancellationToken).ConfigureAwait(false);
+                foreach (IMediaLibraryScanJob child in Children)
+                    await child.ExecuteAsync(id, ints, cancellationToken).ConfigureAwait(false);
             }
         }
         catch (OperationCanceledException)

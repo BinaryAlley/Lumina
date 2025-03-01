@@ -186,6 +186,9 @@
   <data name="FilmSeries" xml:space="preserve">
     <value>电影系列</value>
   </data>
+  <data name="FilteringBookFiles" xml:space="preserve">
+    <value>正在过滤书籍文件...</value>
+  </data>
   <data name="GoodReadsMetadataDownload" xml:space="preserve">
     <value>正在从GoodReads下载元数据...</value>
   </data>

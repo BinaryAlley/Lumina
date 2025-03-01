@@ -34,7 +34,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
 {
     private HttpClient _client;
     private readonly AuthenticatedLuminaApiFactory _apiFactory;
-    private readonly HashService _hashService;
+    private readonly PasswordHashService _hashService;
     private readonly ICryptographyService _cryptographyService;
     private readonly TotpTokenGenerator _totpTokenGenerator;
     private readonly JsonSerializerOptions _jsonOptions = new()
@@ -52,7 +52,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;
-        _hashService = new HashService();
+        _hashService = new PasswordHashService();
         _totpTokenGenerator = new TotpTokenGenerator();
         _testUsername = $"testuser_{Guid.NewGuid()}";
 

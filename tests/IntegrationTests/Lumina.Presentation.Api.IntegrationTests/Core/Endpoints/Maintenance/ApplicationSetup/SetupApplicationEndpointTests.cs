@@ -215,7 +215,7 @@ public class SetupApplicationEndpointTests : IClassFixture<AuthenticatedLuminaAp
         UserEntity user = new()
         {
             Username = _testUsername,
-            Password = new HashService().HashString("TestPass123!"),
+            Password = new PasswordHashService().HashString("TestPass123!"),
             Libraries = [],
             UserPermissions = [],
             UserRole = null, // TODO: test default role and permissions?

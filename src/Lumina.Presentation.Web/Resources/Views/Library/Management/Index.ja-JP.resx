@@ -186,6 +186,9 @@
   <data name="FilmSeries" xml:space="preserve">
     <value>映画シリーズ</value>
   </data>
+  <data name="FilteringBookFiles" xml:space="preserve">
+    <value>書籍ファイルをフィルタリング中...</value>
+  </data>
   <data name="GoodReadsMetadataDownload" xml:space="preserve">
     <value>GoodReadsからメタデータをダウンロード中...</value>
   </data>

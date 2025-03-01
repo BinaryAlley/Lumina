@@ -20,7 +20,7 @@ namespace Lumina.Application.Core.UsersManagement.Authentication.Commands.Change
 public class ChangePasswordCommandHandler : IRequestHandler<ChangePasswordCommand, ErrorOr<ChangePasswordResponse>>
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IHashService _hashService;
+    private readonly IPasswordHashService _hashService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ChangePasswordCommandHandler"/> class.
@@ -29,7 +29,7 @@ public class ChangePasswordCommandHandler : IRequestHandler<ChangePasswordComman
     /// <param name="hashService">Injected service for password hashing functionality.</param>
     public ChangePasswordCommandHandler(
         IUnitOfWork unitOfWork,
-        IHashService hashService)
+        IPasswordHashService hashService)
     {
         _unitOfWork = unitOfWork;
         _hashService = hashService;
