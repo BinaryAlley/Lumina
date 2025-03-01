@@ -3,6 +3,7 @@ using System;
 using Lumina.DataAccess.Core.UoW;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Lumina.DataAccess.Common.Migrations
 {
     [DbContext(typeof(LuminaDbContext))]
-    partial class LuminaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250301192527_RemovesLibraryScanFileStatusColumn")]
+    partial class RemovesLibraryScanFileStatusColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
