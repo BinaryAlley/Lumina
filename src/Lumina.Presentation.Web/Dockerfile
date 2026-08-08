@@ -1,5 +1,5 @@
 # This stage is used when running from VS in fast mode (Default for Debug configuration)
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
 RUN mkdir /logs && chown -R app:app /logs
 USER app
 WORKDIR /app
@@ -7,7 +7,7 @@ EXPOSE 5012
 
 
 # ==== Stage 1: Build stage
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 
 ARG BUILD_CONFIGURATION=Release
 
@@ -34,7 +34,7 @@ ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./Lumina.Presentation.Web.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false /p:BaseOutputPath=/app/publish/
 
 # ==== Stage 3: Run stage
-#FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+#FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 FROM base AS final
 
 WORKDIR /app
