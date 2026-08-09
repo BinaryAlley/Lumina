@@ -3,6 +3,7 @@ using System;
 using Lumina.DataAccess.Core.UoW;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Lumina.DataAccess.Common.Migrations
 {
     [DbContext(typeof(LuminaDbContext))]
-    partial class LuminaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260808191805_RemovesLibraryScanResultsShadowForeignKey")]
+    partial class RemovesLibraryScanResultsShadowForeignKey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.0");
@@ -283,7 +286,7 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnOrder(9);
 
-                    b.Property<bool>("DownloadMetadataFromWeb")
+                    b.Property<bool>("DownloadMedatadaFromWeb")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER")
                         .HasDefaultValue(true)
@@ -304,11 +307,11 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnOrder(2);
 
-                    b.Property<bool>("ShouldSaveMetadataInMediaDirectories")
+                    b.Property<bool>("SaveMetadataInMediaDirectories")
                         .HasColumnType("INTEGER")
                         .HasColumnOrder(7);
 
-                    b.Property<bool>("ShouldSkipUnchangedDirectoriesDuringScan")
+                    b.Property<bool>("SkipUnchangedDirectoriesDuringScan")
                         .HasColumnType("INTEGER")
                         .HasColumnOrder(8);
 

@@ -24,6 +24,11 @@ public class LibraryScanResultEntity : IStorageEntity
     public required Guid LibraryScanId { get; init; }
 
     /// <summary>
+    /// Gets the status of the media library scan file.
+    /// </summary>
+    public required LibraryScanFileStatus Status { get; init; }
+
+    /// <summary>
     /// Gets the path of the media library scan file.
     /// </summary>
     public required string Path { get; init; }
@@ -39,9 +44,9 @@ public class LibraryScanResultEntity : IStorageEntity
     public required long FileSize { get; init; }
 
     /// <summary>
-    /// Gets the modification date of the media library scan file.
+    /// Gets the time and date when the file system file was last modified, stored in ticks.
     /// </summary>
-    public required DateTime LastModified { get; init; }
+    public required long Ticks { get; init; }
 
     /// <summary>
     /// Gets the media library scan that this scan result belongs to.

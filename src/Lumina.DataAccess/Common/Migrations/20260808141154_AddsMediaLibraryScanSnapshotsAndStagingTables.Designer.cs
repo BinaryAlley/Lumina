@@ -3,6 +3,7 @@ using System;
 using Lumina.DataAccess.Core.UoW;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Lumina.DataAccess.Common.Migrations
 {
     [DbContext(typeof(LuminaDbContext))]
-    partial class LuminaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260808141154_AddsMediaLibraryScanSnapshotsAndStagingTables")]
+    partial class AddsMediaLibraryScanSnapshotsAndStagingTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.0");
@@ -283,7 +286,7 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnOrder(9);
 
-                    b.Property<bool>("DownloadMetadataFromWeb")
+                    b.Property<bool>("DownloadMedatadaFromWeb")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER")
                         .HasDefaultValue(true)
@@ -304,11 +307,11 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnOrder(2);
 
-                    b.Property<bool>("ShouldSaveMetadataInMediaDirectories")
+                    b.Property<bool>("SaveMetadataInMediaDirectories")
                         .HasColumnType("INTEGER")
                         .HasColumnOrder(7);
 
-                    b.Property<bool>("ShouldSkipUnchangedDirectoriesDuringScan")
+                    b.Property<bool>("SkipUnchangedDirectoriesDuringScan")
                         .HasColumnType("INTEGER")
                         .HasColumnOrder(8);
 
@@ -402,6 +405,9 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnOrder(0);
 
+                    b.Property<Guid?>("LibraryScanEntityId")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(10)
@@ -413,6 +419,8 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnOrder(4);
 
                     b.HasKey("LibraryScanId", "Path");
+
+                    b.HasIndex("LibraryScanEntityId");
 
                     b.HasIndex("Path");
 
@@ -877,8 +885,12 @@ namespace Lumina.DataAccess.Common.Migrations
 
             modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management.LibraryScanResultEntity", b =>
                 {
-                    b.HasOne("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management.LibraryScanEntity", "LibraryScan")
+                    b.HasOne("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management.LibraryScanEntity", null)
                         .WithMany("LibraryScanResults")
+                        .HasForeignKey("LibraryScanEntityId");
+
+                    b.HasOne("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management.LibraryScanEntity", "LibraryScan")
+                        .WithMany()
                         .HasForeignKey("LibraryScanId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

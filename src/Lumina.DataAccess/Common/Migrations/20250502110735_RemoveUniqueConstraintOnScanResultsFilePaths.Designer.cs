@@ -3,6 +3,7 @@ using System;
 using Lumina.DataAccess.Core.UoW;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,12 +11,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Lumina.DataAccess.Common.Migrations
 {
     [DbContext(typeof(LuminaDbContext))]
-    partial class LuminaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250502110735_RemoveUniqueConstraintOnScanResultsFilePaths")]
+    partial class RemoveUniqueConstraintOnScanResultsFilePaths
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "10.0.0");
+            modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
 
             modelBuilder.Entity("BookGenres", b =>
                 {
@@ -239,31 +242,6 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.ToTable("Tags", (string)null);
                 });
 
-            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management.DirectoryScanFingerprintEntity", b =>
-                {
-                    b.Property<Guid>("LibraryId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Path")
-                        .HasMaxLength(1024)
-                        .HasColumnType("TEXT")
-                        .HasColumnOrder(1);
-
-                    b.Property<Guid>("Id")
-                        .HasColumnType("TEXT")
-                        .HasColumnOrder(0);
-
-                    b.Property<DateTime>("LastWriteTimeUtc")
-                        .HasColumnType("TEXT")
-                        .HasColumnOrder(2);
-
-                    b.HasKey("LibraryId", "Path");
-
-                    b.HasIndex("LibraryId");
-
-                    b.ToTable("DirectoryScanFingerprints", (string)null);
-                });
-
             modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management.LibraryEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -277,13 +255,13 @@ namespace Lumina.DataAccess.Common.Migrations
 
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(10);
+                        .HasColumnOrder(9);
 
                     b.Property<DateTime>("CreatedOnUtc")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(9);
+                        .HasColumnOrder(8);
 
-                    b.Property<bool>("DownloadMetadataFromWeb")
+                    b.Property<bool>("DownloadMedatadaFromWeb")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER")
                         .HasDefaultValue(true)
@@ -304,13 +282,9 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnOrder(2);
 
-                    b.Property<bool>("ShouldSaveMetadataInMediaDirectories")
+                    b.Property<bool>("SaveMetadataInMediaDirectories")
                         .HasColumnType("INTEGER")
                         .HasColumnOrder(7);
-
-                    b.Property<bool>("ShouldSkipUnchangedDirectoriesDuringScan")
-                        .HasColumnType("INTEGER")
-                        .HasColumnOrder(8);
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -320,11 +294,11 @@ namespace Lumina.DataAccess.Common.Migrations
 
                     b.Property<Guid?>("UpdatedBy")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(12);
+                        .HasColumnOrder(11);
 
                     b.Property<DateTime?>("UpdatedOnUtc")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(11);
+                        .HasColumnOrder(10);
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("TEXT");
@@ -371,10 +345,9 @@ namespace Lumina.DataAccess.Common.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("LibraryId");
 
-                    b.HasIndex("LibraryId", "Status", "CreatedOnUtc")
-                        .IsDescending(true, false, true);
+                    b.HasIndex("UserId");
 
                     b.ToTable("LibraryScans", (string)null);
                 });
@@ -402,6 +375,9 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnOrder(0);
 
+                    b.Property<Guid?>("LibraryScanEntityId")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(10)
@@ -414,105 +390,13 @@ namespace Lumina.DataAccess.Common.Migrations
 
                     b.HasKey("LibraryScanId", "Path");
 
+                    b.HasIndex("LibraryScanEntityId");
+
                     b.HasIndex("Path");
 
                     b.HasIndex("ContentHash", "FileSize", "Path");
 
                     b.ToTable("LibraryScanResults", (string)null);
-                });
-
-            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management.LibraryScanSnapshotEntity", b =>
-                {
-                    b.Property<Guid>("LibraryId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Path")
-                        .HasMaxLength(1024)
-                        .HasColumnType("TEXT")
-                        .HasColumnOrder(1);
-
-                    b.Property<ulong>("ContentHash")
-                        .HasColumnType("INTEGER")
-                        .HasColumnOrder(2);
-
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("TEXT")
-                        .HasColumnOrder(6);
-
-                    b.Property<DateTime>("CreatedOnUtc")
-                        .HasColumnType("TEXT")
-                        .HasColumnOrder(5);
-
-                    b.Property<long>("FileSize")
-                        .HasColumnType("INTEGER")
-                        .HasColumnOrder(3);
-
-                    b.Property<Guid>("Id")
-                        .HasColumnType("TEXT")
-                        .HasColumnOrder(0);
-
-                    b.Property<long>("Ticks")
-                        .HasColumnType("INTEGER")
-                        .HasColumnOrder(4);
-
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("TEXT")
-                        .HasColumnOrder(8);
-
-                    b.Property<DateTime?>("UpdatedOnUtc")
-                        .HasColumnType("TEXT")
-                        .HasColumnOrder(7);
-
-                    b.HasKey("LibraryId", "Path");
-
-                    b.HasIndex("LibraryId");
-
-                    b.ToTable("LibraryScanSnapshots", (string)null);
-                });
-
-            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management.LibraryScanStagingResultsEntity", b =>
-                {
-                    b.Property<Guid>("LibraryScanId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Path")
-                        .HasMaxLength(1024)
-                        .HasColumnType("TEXT")
-                        .HasColumnOrder(1);
-
-                    b.Property<ulong>("ContentHash")
-                        .HasColumnType("INTEGER")
-                        .HasColumnOrder(4);
-
-                    b.Property<Guid>("Id")
-                        .HasColumnType("TEXT")
-                        .HasColumnOrder(0);
-
-                    b.Property<bool>("IsNew")
-                        .HasColumnType("INTEGER")
-                        .HasColumnOrder(7);
-
-                    b.Property<bool>("NeedsRehash")
-                        .HasColumnType("INTEGER")
-                        .HasColumnOrder(6);
-
-                    b.Property<ulong>("PreviousContentHash")
-                        .HasColumnType("INTEGER")
-                        .HasColumnOrder(5);
-
-                    b.Property<long>("Size")
-                        .HasColumnType("INTEGER")
-                        .HasColumnOrder(2);
-
-                    b.Property<long>("Ticks")
-                        .HasColumnType("INTEGER")
-                        .HasColumnOrder(3);
-
-                    b.HasKey("LibraryScanId", "Path");
-
-                    b.HasIndex("LibraryScanId", "NeedsRehash");
-
-                    b.ToTable("LibraryScanStagingResults", (string)null);
                 });
 
             modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary.BookEntity", b =>
@@ -809,15 +693,6 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management.DirectoryScanFingerprintEntity", b =>
-                {
-                    b.HasOne("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management.LibraryEntity", null)
-                        .WithMany()
-                        .HasForeignKey("LibraryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management.LibraryEntity", b =>
                 {
                     b.HasOne("Lumina.Application.Common.DataAccess.Entities.UsersManagement.UserEntity", "User")
@@ -877,33 +752,17 @@ namespace Lumina.DataAccess.Common.Migrations
 
             modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management.LibraryScanResultEntity", b =>
                 {
-                    b.HasOne("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management.LibraryScanEntity", "LibraryScan")
+                    b.HasOne("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management.LibraryScanEntity", null)
                         .WithMany("LibraryScanResults")
+                        .HasForeignKey("LibraryScanEntityId");
+
+                    b.HasOne("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management.LibraryScanEntity", "LibraryScan")
+                        .WithMany()
                         .HasForeignKey("LibraryScanId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("LibraryScan");
-                });
-
-            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management.LibraryScanSnapshotEntity", b =>
-                {
-                    b.HasOne("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management.LibraryEntity", "Library")
-                        .WithMany()
-                        .HasForeignKey("LibraryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Library");
-                });
-
-            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management.LibraryScanStagingResultsEntity", b =>
-                {
-                    b.HasOne("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management.LibraryScanEntity", null)
-                        .WithMany()
-                        .HasForeignKey("LibraryScanId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary.BookEntity", b =>
