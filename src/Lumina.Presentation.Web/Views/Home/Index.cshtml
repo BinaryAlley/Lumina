@@ -43,8 +43,13 @@
                     const libraryDiv = document.createElement('div');
                     libraryDiv.className = 'media-panel';
 
+                    // the cover image is optional, so it is only rendered when the library has one
+                    const coverImageHtml = library.coverImage
+                        ? `<img src="${globalConfiguration.serverBasePath}/media/libraries/${library.id}/${library.coverImage.substring(library.coverImage.lastIndexOf('cover.'))}" />`
+                        : '';
+
                     libraryDiv.innerHTML = `
-                        <img src="${globalConfiguration.serverBasePath}/media/libraries/${library.id}/${library.coverImage.substring(library.coverImage.lastIndexOf('cover.'))}" />
+                        ${coverImageHtml}
                         <span class="text-light-two"><strong>${library.title}</strong></span>
                     `;
 
