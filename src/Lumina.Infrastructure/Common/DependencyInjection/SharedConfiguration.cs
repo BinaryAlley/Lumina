@@ -31,7 +31,7 @@ public static class SharedConfiguration
             throw new DirectoryNotFoundException($"The base path '{basePath}' does not exist.");
         configuration.SetBasePath(basePath);
         configuration.AddJsonFile("appsettings.shared.json", optional: false, reloadOnChange: true);
-        configuration.AddJsonFile("appsettings.shared.Development.json", optional: true, reloadOnChange: true);
+        configuration.AddJsonFile("appsettings.shared.development.json", optional: true, reloadOnChange: true);
         configuration.AddEnvironmentVariables(); // environment variables should override the configuration files
 
         // bind the appsettings sections

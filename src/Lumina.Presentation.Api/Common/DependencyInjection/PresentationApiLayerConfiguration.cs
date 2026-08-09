@@ -28,7 +28,7 @@ internal static class PresentationApiLayerConfiguration
             throw new DirectoryNotFoundException($"The base path '{basePath}' does not exist.");
         configuration.SetBasePath(basePath);
         configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-        configuration.AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
+        configuration.AddJsonFile("appsettings.development.json", optional: true, reloadOnChange: true);
 
         return services;
     }
