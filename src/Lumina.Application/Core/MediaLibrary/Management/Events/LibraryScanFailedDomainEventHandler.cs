@@ -9,6 +9,8 @@ using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Exceptions;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Cancellation;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Progress;
 using Mediator;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,16 +24,26 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Events;
 public class LibraryScanFailedDomainEventHandler : INotificationHandler<LibraryScanFailedDomainEvent>
 {
     private readonly IMediaLibraryScanProgressNotifier _debouncedLibraryScanProgressNotifier;
+    private readonly IMediaLibrariesScanCancellationTracker _mediaLibrariesScanCancellationTracker;
+    private readonly IMediaLibrariesScanProgressTracker _mediaLibrariesScanProgressTracker;
     private readonly IUnitOfWork _unitOfWork;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="LibraryScanCancelledDomainEventHandler"/> class.
+    /// Initializes a new instance of the <see cref="LibraryScanFailedDomainEventHandler"/> class.
     /// </summary>
     /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
+    /// <param name="mediaLibrariesScanCancellationTracker">Injected tracker used for canceling media library scans.</param>
+    /// <param name="mediaLibrariesScanProgressTracker">Injected tracker used for media library scans progress.</param>
     /// <param name="debouncedLibraryScanProgressNotifier">Injected service for notifying media libraries scan progress changes to third parties.</param>
-    public LibraryScanFailedDomainEventHandler(IMediaLibraryScanProgressNotifier debouncedLibraryScanProgressNotifier, IUnitOfWork unitOfWork)
+    public LibraryScanFailedDomainEventHandler(
+        IMediaLibraryScanProgressNotifier debouncedLibraryScanProgressNotifier,
+        IMediaLibrariesScanCancellationTracker mediaLibrariesScanCancellationTracker,
+        IMediaLibrariesScanProgressTracker mediaLibrariesScanProgressTracker,
+        IUnitOfWork unitOfWork)
     {
         _debouncedLibraryScanProgressNotifier = debouncedLibraryScanProgressNotifier;
+        _mediaLibrariesScanCancellationTracker = mediaLibrariesScanCancellationTracker;
+        _mediaLibrariesScanProgressTracker = mediaLibrariesScanProgressTracker;
         _unitOfWork = unitOfWork;
     }
 
@@ -43,6 +55,7 @@ public class LibraryScanFailedDomainEventHandler : INotificationHandler<LibraryS
     public async ValueTask Handle(LibraryScanFailedDomainEvent domainEvent, CancellationToken cancellationToken)
     {
         ILibraryScanRepository libraryScanRepository = _unitOfWork.GetRepository<ILibraryScanRepository>();
+        ILibraryScanStagingResultsRepository stagingResultsRepository = _unitOfWork.GetRepository<ILibraryScanStagingResultsRepository>();
 
         // get the library scan from the repository
         ErrorOr<LibraryScanEntity?> getLibraryScansResult = await libraryScanRepository.GetByIdAsync(
@@ -69,8 +82,16 @@ public class LibraryScanFailedDomainEventHandler : INotificationHandler<LibraryS
                 throw new EventualConsistencyException(updateLibraryScanResult.FirstError, updateLibraryScanResult.Errors);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-            // notify SignalR clients that the library scan failed
-            await _debouncedLibraryScanProgressNotifier.SendLibraryScanFailedEventAsync(domainEvent.MediaLibraryScanCompositeId, cancellationToken).ConfigureAwait(false);
         }
+
+        // release the scan processing resources, regardless of whether the scan was already marked as failed by a concurrent job
+        _mediaLibrariesScanCancellationTracker.RemoveScan(domainEvent.MediaLibraryScanCompositeId);
+        _mediaLibrariesScanProgressTracker.RemoveScanProgress(domainEvent.MediaLibraryScanCompositeId);
+        ErrorOr<Success> clearStagingResult = await stagingResultsRepository.ClearForScanAsync(domainEvent.MediaLibraryScanCompositeId.ScanId.Value, cancellationToken).ConfigureAwait(false);
+        if (clearStagingResult.IsError)
+            throw new EventualConsistencyException(clearStagingResult.FirstError, clearStagingResult.Errors);
+
+        // notify SignalR clients that the library scan failed
+        await _debouncedLibraryScanProgressNotifier.SendLibraryScanFailedEventAsync(domainEvent.MediaLibraryScanCompositeId, cancellationToken).ConfigureAwait(false);
     }
 }
