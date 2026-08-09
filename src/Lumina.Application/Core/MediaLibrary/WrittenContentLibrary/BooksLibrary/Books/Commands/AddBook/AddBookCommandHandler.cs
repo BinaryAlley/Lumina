@@ -45,7 +45,7 @@ public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<Boo
     /// <param name="request">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly created <see cref="BookResponse"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="BookResponse"/>, or an error message.
     /// </returns>
     public async ValueTask<ErrorOr<BookResponse>> Handle(AddBookCommand request, CancellationToken cancellationToken)
     {
@@ -67,29 +67,29 @@ public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<Boo
                 Optional<BookRatingSource>.FromNullable(rating.Source.HasValue ? (BookRatingSource)(int)rating.Source : (BookRatingSource?)null),
                 Optional<int>.FromNullable(rating.VoteCount)));
         // check if any of the results contain errors
-        List<Error> errors = domainRatingsResult.Where(ratingResult => ratingResult.IsError).SelectMany(ratingResult => ratingResult.Errors).ToList();
+        List<Error> errors = [.. domainRatingsResult.Where(ratingResult => ratingResult.IsError).SelectMany(ratingResult => ratingResult.Errors)];
         if (errors.Count != 0) // if there are errors, return them            
             return errors;
 
-        List<BookRating> domainRatings = domainRatingsResult.Select(rating => rating.Value).ToList();
+        List<BookRating> domainRatings = [.. domainRatingsResult.Select(rating => rating.Value)];
 
         List<ErrorOr<Genre>> domainGenresResult = request.Metadata!.Genres!.ConvertAll(genre => Genre.Create(genre.Name!));
-        errors = domainGenresResult.Where(genreResult => genreResult.IsError).SelectMany(genreResult => genreResult.Errors).ToList();
+        errors = [.. domainGenresResult.Where(genreResult => genreResult.IsError).SelectMany(genreResult => genreResult.Errors)];
         if (errors.Count != 0)
             return errors;
-        List<Genre> domainGenres = domainGenresResult.Select(genre => genre.Value).ToList();
+        List<Genre> domainGenres = [.. domainGenresResult.Select(genre => genre.Value)];
 
         List<ErrorOr<Tag>> domainTagsResult = request.Metadata.Tags!.ConvertAll(tag => Tag.Create(tag.Name!));
-        errors = domainTagsResult.Where(tagResult => tagResult.IsError).SelectMany(tagResult => tagResult.Errors).ToList();
+        errors = [.. domainTagsResult.Where(tagResult => tagResult.IsError).SelectMany(tagResult => tagResult.Errors)];
         if (errors.Count != 0)
             return errors;
-        List<Tag> domainTags = domainTagsResult.Select(tag => tag.Value).ToList();
+        List<Tag> domainTags = [.. domainTagsResult.Select(tag => tag.Value)];
 
         List<ErrorOr<Isbn>> domainIsbnsResult = request.ISBNs!.ConvertAll(isbn => Isbn.Create(isbn.Value!, (IsbnFormat)(int)isbn.Format!));
-        errors = domainIsbnsResult.Where(isbnResult => isbnResult.IsError).SelectMany(isbnResult => isbnResult.Errors).ToList();
+        errors = [.. domainIsbnsResult.Where(isbnResult => isbnResult.IsError).SelectMany(isbnResult => isbnResult.Errors)];
         if (errors.Count != 0)
             return errors;
-        List<Isbn> domainIsbns = domainIsbnsResult.Select(isbn => isbn.Value).ToList();
+        List<Isbn> domainIsbns = [.. domainIsbnsResult.Select(isbn => isbn.Value)];
 
         ErrorOr<ReleaseInfo> releaseInfoResult = ReleaseInfo.Create(
             Optional<DateOnly>.FromNullable(request.Metadata.ReleaseInfo!.OriginalReleaseDate),

@@ -54,7 +54,7 @@ public class GetRunningLibraryScansQueryHandler : IRequestHandler<GetRunningLibr
     /// <param name="request">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly created <see cref="MediaLibraryScanProgress"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="MediaLibraryScanProgress"/>, or an error message.
     /// </returns>
     public async ValueTask<ErrorOr<IEnumerable<MediaLibraryScanProgressResponse>>> Handle(GetRunningLibraryScansQuery request, CancellationToken cancellationToken)
     {
@@ -68,7 +68,7 @@ public class GetRunningLibraryScansQueryHandler : IRequestHandler<GetRunningLibr
         LibraryScanEntity[] userRunningRepositoryLibraryScans = [];
         // admins can see all libraries
         if (!await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false))
-            userRunningRepositoryLibraryScans = getRunningScansResult.Value.ToArray();
+            userRunningRepositoryLibraryScans = [.. getRunningScansResult.Value];
         else // for regular users, only take the libraries that belong to them
             userRunningRepositoryLibraryScans = getRunningScansResult.Value
                 .Where(libraryScan => libraryScan.UserId == _currentUserService.UserId).ToArray();

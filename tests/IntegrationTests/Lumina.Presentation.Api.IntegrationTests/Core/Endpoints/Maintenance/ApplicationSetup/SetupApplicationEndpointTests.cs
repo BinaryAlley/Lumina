@@ -60,7 +60,7 @@ public class SetupApplicationEndpointTests : IClassFixture<AuthenticatedLuminaAp
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithValidRequestAnd2FA_ShouldSetupApplicationsuccessfuly()
+    public async Task ExecuteAsync_WhenCalledWithValidRequestAnd2FA_ShouldSetupApplicationSuccessfully()
     {
         // Arrange
         RegistrationRequest request = new(
@@ -94,7 +94,7 @@ public class SetupApplicationEndpointTests : IClassFixture<AuthenticatedLuminaAp
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithValidRequestWithout2FA_ShouldSetupApplicationsuccessfuly()
+    public async Task ExecuteAsync_WhenCalledWithValidRequestWithout2FA_ShouldSetupApplicationSuccessfully()
     {
         // Arrange
         RegistrationRequest request = new(

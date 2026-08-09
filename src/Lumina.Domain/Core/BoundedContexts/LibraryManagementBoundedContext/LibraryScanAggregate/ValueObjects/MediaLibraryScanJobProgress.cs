@@ -54,7 +54,7 @@ public sealed class MediaLibraryScanJobProgress : ValueObject
     /// <param name="totalItems">The total number of items of the media library scan job.</param>
     /// <param name="currentOperation">The current operation being performed by the media library scan job.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly created <see cref="MediaLibraryScanJobProgress"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="MediaLibraryScanJobProgress"/>, or an error message.
     /// </returns>
     public static ErrorOr<MediaLibraryScanJobProgress> Create(int completedItems, int totalItems, string currentOperation)
     {

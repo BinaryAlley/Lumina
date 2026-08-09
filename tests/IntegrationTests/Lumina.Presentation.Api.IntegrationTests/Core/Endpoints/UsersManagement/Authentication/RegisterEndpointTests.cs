@@ -57,7 +57,7 @@ public class RegisterEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithValidRequest_ShouldRegisterUsersuccessfuly()
+    public async Task ExecuteAsync_WhenCalledWithValidRequest_ShouldRegisterUserSuccessfully()
     {
         // Arrange
         RegistrationRequest request = new(

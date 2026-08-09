@@ -54,7 +54,7 @@ public class ChangePasswordEndpointTests : IClassFixture<AuthenticatedLuminaApiF
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithValidRequest_ShouldChangePasswordsuccessfuly()
+    public async Task ExecuteAsync_WhenCalledWithValidRequest_ShouldChangePasswordSuccessfully()
     {
         // Arrange
         ChangePasswordRequest request = new(

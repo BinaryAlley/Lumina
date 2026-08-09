@@ -30,7 +30,7 @@ public static class BookEntityMapping
     /// </summary>
     /// <param name="repositoryEntity">The repository entity to be converted.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly converted <see cref="Book"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully converted <see cref="Book"/>, or an error message.
     /// </returns>
     public static ErrorOr<Book> ToDomainEntity(this BookEntity repositoryEntity)
     {

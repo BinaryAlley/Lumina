@@ -49,7 +49,7 @@ internal sealed class LibraryRepository : ILibraryRepository
     /// <summary>
     /// Gets a <see cref="LibraryEntity"/> identified by <paramref name="id"/> from the storage medium.
     /// </summary>
-    /// <param name="id">The id of the library to get.</param>
+    /// <param name="id">The Id of the library to get.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a <see cref="LibraryEntity"/> identified by <paramref name="id"/>, or an error.</returns>
     public async Task<ErrorOr<LibraryEntity?>> GetByIdAsync(Guid id, CancellationToken cancellationToken)
@@ -120,9 +120,9 @@ internal sealed class LibraryRepository : ILibraryRepository
     }
 
     /// <summary>
-    /// Deletes a library by its ID.
+    /// Deletes a library by its Id.
     /// </summary>
-    /// <param name="id">The ID of the library to delete.</param>
+    /// <param name="id">The Id of the library to delete.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<ErrorOr<Deleted>> DeleteByIdAsync(Guid id, CancellationToken cancellationToken)

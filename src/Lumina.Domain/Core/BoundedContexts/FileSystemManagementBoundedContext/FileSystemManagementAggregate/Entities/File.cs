@@ -56,7 +56,7 @@ public sealed class File : FileSystemItem
     /// <param name="size">The size of the file in bytes.</param>
     /// <param name="status">The status of the file system item.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly created <see cref="File"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="File"/>, or an error message.
     /// </returns>
     public static ErrorOr<File> Create(
         string path,
@@ -92,7 +92,7 @@ public sealed class File : FileSystemItem
     /// <param name="size">The size of the file in bytes.</param>
     /// <param name="status">The status of the file system item.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly created <see cref="File"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="File"/>, or an error message.
     /// </returns>
     public static ErrorOr<File> Create(
         FileSystemPathId id,

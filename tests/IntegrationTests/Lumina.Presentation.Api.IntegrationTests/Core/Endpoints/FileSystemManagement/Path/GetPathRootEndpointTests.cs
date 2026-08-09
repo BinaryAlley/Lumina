@@ -128,7 +128,7 @@ public class GetPathRootEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithCancellationToken_ShouldCompletesuccessfuly()
+    public async Task ExecuteAsync_WhenCalledWithCancellationToken_ShouldCompleteSuccessfully()
     {
         // Arrange
         string testPath = System.IO.Path.GetTempPath();

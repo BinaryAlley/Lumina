@@ -220,7 +220,7 @@ public class GetTreeFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithCancellationToken_ShouldCompletesuccessfuly()
+    public async Task ExecuteAsync_WhenCalledWithCancellationToken_ShouldCompleteSuccessfully()
     {
         // Arrange
         string testPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "testDirectory");

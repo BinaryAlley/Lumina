@@ -83,7 +83,7 @@ public class GetPathSeparatorEndpointTests : IClassFixture<AuthenticatedLuminaAp
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithCancellationToken_ShouldCompletesuccessfuly()
+    public async Task ExecuteAsync_WhenCalledWithCancellationToken_ShouldCompleteSuccessfully()
     {
         // Arrange
         using CancellationTokenSource cts = new(TimeSpan.FromSeconds(5));
