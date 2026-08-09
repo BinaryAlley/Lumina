@@ -183,8 +183,11 @@
   <data name="DescriptionLocked" xml:space="preserve">
     <value>Whether this media library is locked or not. A locked library is displayed to the users, but it is never scanned, updated, modified, etc.</value>
   </data>
-  <data name="DescriptionSaveMetadataInMediaDirectories" xml:space="preserve">
+  <data name="DescriptionShouldSaveMetadataInMediaDirectories" xml:space="preserve">
     <value>Whether to save a copy of the downloaded metadata in the media library content locations directories, or not. This only has an effect if downloading metadata from the web is active.</value>
+  </data>
+  <data name="DescriptionShouldSkipUnchangedDirectoriesDuringScan" xml:space="preserve">
+    <value>When enabled, this option uses directory metadata to skip directories that have not changed since the last scan. This can _significantly_ speed up scans, but be aware that directories metadata _does not_ change/update when editing existing files, it does so only when adding new files or deleting existing ones. Only enable this if you don't modify existing files.</value>
   </data>
   <data name="DescriptionTitle" xml:space="preserve">
     <value>A name to identify this library</value>
@@ -273,8 +276,11 @@
   <data name="Save" xml:space="preserve">
     <value>Save</value>
   </data>
-  <data name="SaveMetadataInMediaDirectories" xml:space="preserve">
+  <data name="ShouldSaveMetadataInMediaDirectories" xml:space="preserve">
     <value>Save Metadata In Media Directories</value>
+  </data>
+  <data name="ShouldSkipUnchangedDirectoriesDuringScan" xml:space="preserve">
+    <value>Skip Unchanged Directories During Scan</value>
   </data>
   <data name="Screenplay" xml:space="preserve">
     <value>Screenplay</value>

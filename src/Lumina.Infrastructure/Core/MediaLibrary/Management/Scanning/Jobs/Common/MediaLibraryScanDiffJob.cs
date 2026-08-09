@@ -1,21 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Domain.Common.Enums.MediaLibrary;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
-using Lumina.Infrastructure.Common.Errors;
 using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -23,25 +16,31 @@ using System.Threading.Tasks;
 namespace Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Common;
 
 /// <summary>
-/// Media library scan job for retrieving persistence data from any eventual previous scans.
+/// Media library scan job for computing the differences between the files on disk and the media library scan snapshot of the previous scan.
 /// </summary>
-internal sealed class RepositoryMetadataDiscoveryJob : MediaLibraryScanJob, IRepositoryMetadataDiscoveryJob
+internal sealed class MediaLibraryScanDiffJob : MediaLibraryScanJob, IMediaLibraryScanDiffJob
 {
     private readonly IServiceScopeFactory _serviceScopeFactory;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="RepositoryMetadataDiscoveryJob"/> class.
+    /// Initializes a new instance of the <see cref="MediaLibraryScanDiffJob"/> class.
     /// </summary>
     /// <param name="serviceScopeFactory">
-    /// Injected factory for creating scopes in which services are requested. 
-    /// See docs/technical/achitecture/architecture-knowledge-management/architecture-decision-log/architecture-decission-record-0001.md for details.
+    /// Injected factory for creating scopes in which services are requested.
+    /// See docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0001.md for details.
     /// </param>
-    public RepositoryMetadataDiscoveryJob(IServiceScopeFactory serviceScopeFactory)
+    public MediaLibraryScanDiffJob(IServiceScopeFactory serviceScopeFactory)
     {
         _serviceScopeFactory = serviceScopeFactory;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Executes the payload of the media library scan job.
+    /// </summary>
+    /// <typeparam name="TInput">The type of the input parameter representing the data to be processed by this payload.</typeparam>
+    /// <param name="id">The unique identifier of the media library scan job.</param>
+    /// <param name="input">The input data to be processed by this payload.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task ExecuteAsync<TInput>(Guid id, TInput input, CancellationToken cancellationToken)
     {
         try
@@ -52,62 +51,40 @@ internal sealed class RepositoryMetadataDiscoveryJob : MediaLibraryScanJob, IRep
             if (Parents.Count == 0 || parentsCompleted == Parents.Count)
             {
                 // this needs to be wrapped in a task because even though this job is processed in a "fire and forget" async manner, it still does synchronous
-                // processing that takes time, and would block the processing of scan jobs in the in-memory queue 
+                // processing that takes time, and would block the processing of scan jobs in the in-memory queue
                 await Task.Run(async () =>
                 {
                     Status = LibraryScanJobStatus.Running;
-                    Stopwatch sw = Stopwatch.StartNew();
-                    Console.WriteLine("Started repo discovering...");
-                    // see docs/technical/achitecture/architecture-knowledge-management/architecture-decision-log/architecture-decission-record-0001.md for details:
+                    // see docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0001.md for details:
                     await using AsyncServiceScope asyncServiceScope = _serviceScopeFactory.CreateAsyncScope();
                     IUnitOfWork unitOfWork = asyncServiceScope.ServiceProvider.GetService<IUnitOfWork>()!;
                     IPublisher publisher = asyncServiceScope.ServiceProvider.GetService<IPublisher>()!;
-                    ILibraryRepository libraryRepository = unitOfWork.GetRepository<ILibraryRepository>();
-                    ILibraryScanResultRepository libraryScanResultRepository = unitOfWork.GetRepository<ILibraryScanResultRepository>();
+                    ILibraryScanStagingResultsRepository stagingResultsRepository = unitOfWork.GetRepository<ILibraryScanStagingResultsRepository>();
 
                     MediaLibraryScanCompositeId compositeKey = MediaLibraryScanCompositeId.Create(ScanId, UserId);
 
-                    // get the library from the repository
-                    ErrorOr<LibraryEntity?> getLibraryResult = await libraryRepository.GetByIdAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
-                    if (getLibraryResult.IsError || getLibraryResult.Value is null)
-                    {
-                        await publisher.Publish(new LibraryScanFailedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
-                        return;
-                    }
-
-                    // convert it to a domain object
-                    ErrorOr<Library> domainLibraryResult = getLibraryResult.Value.ToDomainEntity();
-                    if (domainLibraryResult.IsError)
-                    {
-                        await publisher.Publish(new LibraryScanFailedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
-                        return;
-                    }
-
-                    // set the initial progress of the scan job, it's a 1 step job - retrieving stuff from repository
+                    // set the initial progress of the scan job, it's a 1 step job - comparing the discovered files against the media library scan snapshot
                     ErrorOr<Success> publishJobProgressResult = await PublishJobProgress(publisher, compositeKey, 0, 1, cancellationToken).ConfigureAwait(false);
                     if (publishJobProgressResult.IsError)
-                        return;
+                        throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
 
-                    // get the results of the last scan of the media library
-                    ErrorOr<Dictionary<string, LibraryScanResultEntity>> getScanResultsResult = 
-                        await libraryScanResultRepository.GetPathMappedByLibraryIdAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
-                    if (getScanResultsResult.IsError)
-                        return;
+                    // mark the staging results against the media library scan snapshot of the previous scan
+                    ErrorOr<Updated> markChangesResult = await stagingResultsRepository.MarkChangesAgainstSnapshotAsync(ScanId.Value, LibraryId.Value, cancellationToken).ConfigureAwait(false);
+                    if (markChangesResult.IsError)
+                        throw new InvalidOperationException(markChangesResult.FirstError.Description);
 
                     // increment the number of processed elements progress
                     publishJobProgressResult = await PublishJobProgress(publisher, compositeKey, 1, 1, cancellationToken).ConfigureAwait(false);
                     if (publishJobProgressResult.IsError)
-                        return;
+                        throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
 
                     // this job finished, increment the number of processed jobs progress
-                    await publisher.Publish(new LibraryScanProgressChangedDomainEvent(
-                        Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                    await publisher.Publish(new LibraryScanProgressChangedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
                     Status = LibraryScanJobStatus.Completed;
-                    sw.Stop();
-                    Console.WriteLine($"Ended repository discovery scan job in {sw.ElapsedMilliseconds}ms, discovered {getScanResultsResult.Value.Count} items.");
+
                     // call each linked child with the obtained payload
                     foreach (IMediaLibraryScanJob child in Children)
-                        await child.ExecuteAsync(id, getScanResultsResult.Value, cancellationToken).ConfigureAwait(false);
+                        await child.ExecuteAsync(id, input, cancellationToken).ConfigureAwait(false);
                 }, cancellationToken).ConfigureAwait(false);
             }
         }
@@ -115,6 +92,11 @@ internal sealed class RepositoryMetadataDiscoveryJob : MediaLibraryScanJob, IRep
         {
             Status = LibraryScanJobStatus.Canceled;
             throw;
+        }
+        catch (Exception exception)
+        {
+            Status = LibraryScanJobStatus.Failed;
+            await ScanFailurePublisher.PublishAsync(_serviceScopeFactory, LibraryId, MediaLibraryScanCompositeId.Create(ScanId, UserId), exception, cancellationToken).ConfigureAwait(false);
         }
     }
 
@@ -129,12 +111,9 @@ internal sealed class RepositoryMetadataDiscoveryJob : MediaLibraryScanJob, IRep
     /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
     private async Task<ErrorOr<Success>> PublishJobProgress(IPublisher publisher, MediaLibraryScanCompositeId compositeKey, int currentProgress, int totalProgress, CancellationToken cancellationToken)
     {
-        ErrorOr<MediaLibraryScanJobProgress> scanJobProgressResult = MediaLibraryScanJobProgress.Create(currentProgress, totalProgress, "RetrievingPastScanData");
+        ErrorOr<MediaLibraryScanJobProgress> scanJobProgressResult = MediaLibraryScanJobProgress.Create(currentProgress, totalProgress, "ComparingFileHashes");
         if (scanJobProgressResult.IsError)
-        {
-            await publisher.Publish(new LibraryScanFailedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
-            return Errors.LibraryScanning.FailedToCreateScanJobProgress;
-        }
+            return scanJobProgressResult.Errors;
 
         await publisher.Publish(new LibraryScanJobProgressChangedDomainEvent(
             Guid.NewGuid(), LibraryId, compositeKey, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);

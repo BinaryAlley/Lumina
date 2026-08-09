@@ -1,8 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.Infrastructure.Models.MediaLibraryScanJobPayloads;
 using Lumina.Application.Common.Infrastructure.Security;
-using Microsoft.Extensions.ObjectPool;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -22,70 +20,62 @@ internal class FileHashService : IFileHashService
 {
     private const int SAMPLE_COUNT = 6; // number of sample points for hash computation
     private const ushort DEFAULT_BUFFER_SIZE = 65535; // buffer size (64KB - 1) for reading file chunks
-    private readonly ThreadLocal<byte[]> _threadLocalBuffer = new(() => new byte[DEFAULT_BUFFER_SIZE]); // thread-local buffer to minimize memory allocations during parallel processing
-    private static readonly ObjectPool<XxHash64> s_hasherPool = new DefaultObjectPool<XxHash64>(new DefaultPooledObjectPolicy<XxHash64>()); // object pool for reusing hashers, to reduce GC pressure
+    private static readonly ThreadLocal<XxHash64> s_threadLocalHasher = new(() => new XxHash64()); // thread-local hasher to avoid contention and pool management overhead during parallel processing
+    private static readonly ulong s_emptyFileHash = ComputeEmptyHash();
 
     /// <summary>
-    /// Hashes <paramref name="files"/> by sampling chunks from them.
+    /// Hashes <paramref name="inputFiles"/> by sampling chunks from them.
     /// </summary>
-    /// <param name="files">The collection of files to hash.</param>
-    /// <param name="previousScanResults">Lookup dictionary of a previous media library scan, used to determine if a file changed or not.</param>
+    /// <param name="inputFiles">The collection of files to hash.</param>
     /// <param name="callback">Callback to invoke during processing of elements.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>A collection of files that changed since last library scan, along with their hashes.</returns>
-    public async Task<List<ChangedFileSystemFile>> HashFilesAsync(
-        List<FileInfo> files, 
-        Dictionary<string, LibraryScanResultEntity> previousScanResults,
-        Func<Task> callback, 
-        CancellationToken cancellationToken)
+    /// <returns>A collection of the hashed files, along with their hashes.</returns>
+    public async Task<List<HashedFileSystemFile>> HashFilesAsync(IReadOnlyCollection<HashedFileSystemFile> inputFiles, Func<Task> callback, CancellationToken cancellationToken)
     {
-        List<ChangedFileSystemFile> changedFiles = [];
+        List<HashedFileSystemFile> outputFiles = [];
         object listLock = new();
-        int totalFiles = files.Count;
 
         // make use of all available processors
         ParallelOptions parallelOptions = new()
         {
             CancellationToken = cancellationToken,
-            MaxDegreeOfParallelism = Environment.ProcessorCount
+            MaxDegreeOfParallelism = Environment.ProcessorCount // TODO: make this configurable, such that parallelism can be turned off for mechanical hard drives
         };
-        await Parallel.ForEachAsync(files, parallelOptions, async (file, cancellationToken) =>
+        await Parallel.ForEachAsync(inputFiles, parallelOptions, async (file, cancellationToken) =>
         {
             cancellationToken.ThrowIfCancellationRequested();
             try
             {
                 // invoke the method that triggers progress reporting
                 await callback().ConfigureAwait(false);
-                // if file has no contents, it needs no hashing
-                if (file.Length == 0)
-                    return;
-                // buffer management with thread-local reuse
-                byte[] buffer = _threadLocalBuffer.Value ?? new byte[DEFAULT_BUFFER_SIZE];
-                ushort bufferSize = (ushort)Math.Min(DEFAULT_BUFFER_SIZE, file.Length);
+
+                ushort bufferSize = (ushort)Math.Min(DEFAULT_BUFFER_SIZE, file.Size);
 
                 // get the file hash and check if it differs from the one stored on previous scan
-                ulong currentHash = ComputeFileHash(file.FullName, file.Length, bufferSize, buffer);
-                bool isChanged = !previousScanResults.TryGetValue(file.FullName, out LibraryScanResultEntity? previous) || previous.ContentHash != currentHash;
+                ulong currentHash = file.Size == 0
+                    ? s_emptyFileHash // precomputed constant: XxHash64 hash of zero-length input
+                    : ComputeFileHash(file.Path, file.Size, bufferSize);
 
-                if (isChanged) // hash changed, file needs to be re-scanned
-                    lock (listLock)
-                        changedFiles.Add(new ChangedFileSystemFile(file, currentHash));
+                // the decision of whether a file changed is already made before hashing, so all files that reach this point get their hash stored
+                lock (listLock)
+                    outputFiles.Add(file with { CurrentHash = currentHash });
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error processing {file.FullName}: {ex.Message}");
+                Debug.WriteLine($"Error processing {file.Path}: {ex.Message}");
             }
         });
 
-        return changedFiles;
+        return outputFiles;
     }
 
     /// <summary>
     /// Computes content hash using memory-mapped sampling.
     /// </summary>
+    /// <param name="filePath">The path of the file to hash.</param>
+    /// <param name="fileSize">The size of the file, in bytes.</param>
     /// <param name="bufferSize">Sample window size (automatically clamped to file size).</param>
-    /// <param name="buffer">Reusable read buffer (thread-local allocation optimized).</param>
-    private unsafe ulong ComputeFileHash(string filePath, long fileSize, ushort bufferSize, byte[] buffer)
+    private static unsafe ulong ComputeFileHash(string filePath, long fileSize, ushort bufferSize)
     {
         // create a memory-mapped file for efficient access to large files
         using MemoryMappedFile memoryMappedFile = MemoryMappedFile.CreateFromFile(filePath, FileMode.Open, null, 0, MemoryMappedFileAccess.Read);
@@ -98,8 +88,11 @@ internal class FileHashService : IFileHashService
         {
             // get a direct pointer to the memory-mapped file, for faster access
             memoryMappedViewAccessor.SafeMemoryMappedViewHandle.AcquirePointer(ref memoryPointer);
-            // get a hasher from the pool to avoid allocations
-            XxHash64 hasher = s_hasherPool.Get();
+
+            // get the thread-local hasher and reset it before use; resetting at entry (rather than at exit) ensures
+            // the hasher is always in a clean state even if a previous call on this thread threw mid-computation
+            XxHash64 hasher = s_threadLocalHasher.Value!;
+            hasher.Reset();
 
             // allocate hash result buffer on the stack, to avoid heap allocation
             Span<byte> hashSpan = stackalloc byte[sizeof(ulong)];
@@ -122,7 +115,7 @@ internal class FileHashService : IFileHashService
             return BitConverter.ToUInt64(hashSpan);
         }
         finally
-        {           
+        {
             if (memoryPointer is not null) // always release the pointer, to prevent memory leaks
                 memoryMappedViewAccessor.SafeMemoryMappedViewHandle.ReleasePointer();
         }
@@ -145,7 +138,7 @@ internal class FileHashService : IFileHashService
         // for larger files, sample at strategic points:
         yield return 0; // beginning of the file
         yield return fileSize / 4; // quarter of the file
-        yield return fileSize / 2; // file of the file
+        yield return fileSize / 2; // half of the file
         yield return 3 * fileSize / 4; // three quarters of the file
         yield return Math.Max(0, fileSize - bufferSize); // end of the file (ensure we don't go past the end)
 
@@ -153,5 +146,17 @@ internal class FileHashService : IFileHashService
         long interval = fileSize / (SAMPLE_COUNT + 1);
         for (int i = 1; i <= SAMPLE_COUNT - 4; i++)
             yield return interval * i;
+    }
+
+    /// <summary>
+    /// Computes the hash for an empty file, which is a special case, since it has no content to sample.
+    /// </summary>
+    /// <returns>The hash value for an empty file.</returns>
+    private static ulong ComputeEmptyHash()
+    {
+        XxHash64 hasher = new();
+        Span<byte> hashSpan = stackalloc byte[sizeof(ulong)];
+        hasher.TryGetCurrentHash(hashSpan, out _);
+        return BitConverter.ToUInt64(hashSpan);
     }
 }

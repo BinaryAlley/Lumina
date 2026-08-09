@@ -183,8 +183,11 @@
   <data name="DescriptionLocked" xml:space="preserve">
     <value>Si cette médiathèque est verrouillée ou non. Une bibliothèque verrouillée est affichée aux utilisateurs, mais n'est jamais analysée, mise à jour, modifiée, etc.</value>
   </data>
-  <data name="DescriptionSaveMetadataInMediaDirectories" xml:space="preserve">
+  <data name="DescriptionShouldSaveMetadataInMediaDirectories" xml:space="preserve">
     <value>Si une copie des métadonnées téléchargées doit être sauvegardée dans les répertoires de contenu de la médiathèque ou non. Ceci n'a d'effet que si le téléchargement des métadonnées depuis le web est actif.</value>
+  </data>
+  <data name="DescriptionShouldSkipUnchangedDirectoriesDuringScan" xml:space="preserve">
+    <value>Lorsque cette option est activée, elle utilise les métadonnées des dossiers pour ignorer les dossiers qui n'ont pas changé depuis la dernière analyse. Cela peut accélérer _considérablement_ les analyses, mais sachez que les métadonnées des dossiers _ne_ changent/mettent _pas_ à jour lors de la modification de fichiers existants, seulement lors de l'ajout de nouveaux fichiers ou de la suppression de fichiers existants. N'activez cette option que si vous ne modifiez pas les fichiers existants.</value>
   </data>
   <data name="DescriptionTitle" xml:space="preserve">
     <value>Un nom pour identifier cette bibliothèque</value>
@@ -273,8 +276,11 @@
   <data name="Save" xml:space="preserve">
     <value>Enregistrer</value>
   </data>
-  <data name="SaveMetadataInMediaDirectories" xml:space="preserve">
+  <data name="ShouldSaveMetadataInMediaDirectories" xml:space="preserve">
     <value>Sauvegarder Les Métadonnées Dans Les Répertoires Média</value>
+  </data>
+  <data name="ShouldSkipUnchangedDirectoriesDuringScan" xml:space="preserve">
+    <value>Ignorer Les Dossiers Inchangés Lors De L'Analyse</value>
   </data>
   <data name="Screenplay" xml:space="preserve">
     <value>Scénario</value>

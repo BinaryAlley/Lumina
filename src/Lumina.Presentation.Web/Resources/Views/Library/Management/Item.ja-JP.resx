@@ -183,8 +183,11 @@
   <data name="DescriptionLocked" xml:space="preserve">
     <value>このメディアライブラリがロックされているかどうか。ロックされたライブラリはユーザーに表示されますが、スキャン、更新、変更などは一切されません。</value>
   </data>
-  <data name="DescriptionSaveMetadataInMediaDirectories" xml:space="preserve">
+  <data name="DescriptionShouldSaveMetadataInMediaDirectories" xml:space="preserve">
     <value>ダウンロードしたメタデータのコピーをメディアライブラリのコンテンツディレクトリに保存するかどうか。これはウェブからのメタデータのダウンロードが有効な場合のみ効果があります。</value>
+  </data>
+  <data name="DescriptionShouldSkipUnchangedDirectoriesDuringScan" xml:space="preserve">
+    <value>このオプションを有効にすると、ディレクトリのメタデータを使用して、前回のスキャン以降に変更されていないディレクトリをスキップします。これによりスキャンを_大幅に_高速化できますが、既存のファイルを編集してもディレクトリのメタデータは_変更/更新されない_ことに注意してください。変更されるのは、新しいファイルを追加したときや既存のファイルを削除したときだけです。既存のファイルを変更しない場合にのみ有効にしてください。</value>
   </data>
   <data name="DescriptionTitle" xml:space="preserve">
     <value>この図書館を識別するための名称</value>
@@ -273,8 +276,11 @@
   <data name="Save" xml:space="preserve">
     <value>保存</value>
   </data>
-  <data name="SaveMetadataInMediaDirectories" xml:space="preserve">
+  <data name="ShouldSaveMetadataInMediaDirectories" xml:space="preserve">
     <value>メディアディレクトリにメタデータを保存</value>
+  </data>
+  <data name="ShouldSkipUnchangedDirectoriesDuringScan" xml:space="preserve">
+    <value>スキャン中に変更のないフォルダをスキップ</value>
   </data>
   <data name="Screenplay" xml:space="preserve">
     <value>脚本</value>

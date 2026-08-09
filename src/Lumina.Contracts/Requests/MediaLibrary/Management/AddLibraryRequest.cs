@@ -13,8 +13,9 @@ namespace Lumina.Contracts.Requests.MediaLibrary.Management;
 /// <param name="CoverImage">The path of the image file used as the cover for the library. Optional.</param>
 /// <param name="IsEnabled">Whether this media library is enabled or not. A disabled media library is never shown or changed. Optional.</param>
 /// <param name="IsLocked">Whether this media library is locked or not. A locked media library is displayed, but is never changed or updated. Optional.</param>
-/// <param name="DownloadMedatadaFromWeb">Whether this media library should update the metadata of its elements from the web, or not. Optional.</param>
-/// <param name="SaveMetadataInMediaDirectories">Whether this media library should copy the downloaded metadata into the media library content locations, or not. Optional.</param>
+/// <param name="DownloadMetadataFromWeb">Whether this media library should update the metadata of its elements from the web, or not. Optional.</param>
+/// <param name="ShouldSaveMetadataInMediaDirectories">Whether this media library should copy the downloaded metadata into the media library content locations, or not. Optional.</param>
+/// <param name="ShouldSkipUnchangedDirectoriesDuringScan">Whether this media library should skip the directories whose contents have not changed since the last scan, during the scan, or not. Optional.</param>
 [DebuggerDisplay("Title: {Title}")]
 public record AddLibraryRequest(
     string? Title,
@@ -23,6 +24,7 @@ public record AddLibraryRequest(
     string? CoverImage,
     bool IsEnabled,
     bool IsLocked,
-    bool DownloadMedatadaFromWeb,
-    bool SaveMetadataInMediaDirectories
+    bool DownloadMetadataFromWeb,
+    bool ShouldSaveMetadataInMediaDirectories,
+    bool ShouldSkipUnchangedDirectoriesDuringScan
 );

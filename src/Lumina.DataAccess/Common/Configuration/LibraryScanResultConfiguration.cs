@@ -18,12 +18,12 @@ public class LibraryScanResultConfiguration : IEntityTypeConfiguration<LibrarySc
     public void Configure(EntityTypeBuilder<LibraryScanResultEntity> builder)
     {
         builder.ToTable("LibraryScanResults");
-        // composite key for efficient scan-specific lookups
+        // composite key for efficient scan-specific lookups (paths are enforced as UNIQUE within the same scan)
         builder.HasKey(libraryScanResult => new { libraryScanResult.LibraryScanId, libraryScanResult.Path });
 
         // one library scan with many library scan results
         builder.HasOne(libraryScanResult => libraryScanResult.LibraryScan)
-            .WithMany()
+            .WithMany(libraryScan => libraryScan.LibraryScanResults)
             .HasForeignKey(libraryScanResult => libraryScanResult.LibraryScanId)
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
@@ -46,15 +46,19 @@ public class LibraryScanResultConfiguration : IEntityTypeConfiguration<LibrarySc
             .IsRequired()
             .HasColumnOrder(3);
 
-        builder.Property(libraryScanResult => libraryScanResult.LastModified)
+        builder.Property(libraryScanResult => libraryScanResult.Ticks)
             .IsRequired()
             .HasColumnOrder(4);
 
-        // Indexes
-        builder.HasIndex(libraryScanResult => new { libraryScanResult.ContentHash, libraryScanResult.FileSize, libraryScanResult.Path })
-            .IsUnique();
+        builder.Property(libraryScanResult => libraryScanResult.Status)
+           .IsRequired()
+           .HasConversion<string>()
+           .HasMaxLength(10)
+           .HasColumnOrder(5);
 
-        builder.HasIndex(libraryScanResult => libraryScanResult.Path)
-            .IsUnique();
+        // Indexes
+        builder.HasIndex(libraryScanResult => new { libraryScanResult.ContentHash, libraryScanResult.FileSize, libraryScanResult.Path });
+
+        builder.HasIndex(libraryScanResult => libraryScanResult.Path);
     }
 }

@@ -63,7 +63,7 @@ public class LibraryScanQueuedDomainEventHandler : INotificationHandler<LibraryS
 
         // start the media library scan
         ErrorOr<Success> startScanResult = await _mediaLibraryScanningService.StartScanAsync(
-            libraryScanDomainResult.Value, getLibraryScanResult.Value.Library.LibraryType, getLibraryScanResult.Value.Library.DownloadMedatadaFromWeb, cancellationToken).ConfigureAwait(false);
+            libraryScanDomainResult.Value, getLibraryScanResult.Value.Library.LibraryType, getLibraryScanResult.Value.Library.DownloadMetadataFromWeb, cancellationToken).ConfigureAwait(false);
         if (startScanResult.IsError)
             throw new EventualConsistencyException(startScanResult.FirstError, startScanResult.Errors);
 

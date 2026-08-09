@@ -183,8 +183,11 @@
   <data name="DescriptionLocked" xml:space="preserve">
     <value>Si esta biblioteca multimedia está bloqueada o no. Una biblioteca bloqueada se muestra a los usuarios, pero nunca se escanea, actualiza, modifica, etc.</value>
   </data>
-  <data name="DescriptionSaveMetadataInMediaDirectories" xml:space="preserve">
+  <data name="DescriptionShouldSaveMetadataInMediaDirectories" xml:space="preserve">
     <value>Si guardar o no una copia de los metadatos descargados en los directorios de contenido de la biblioteca multimedia. Esto solo tiene efecto si la descarga de metadatos desde la web está activa.</value>
+  </data>
+  <data name="DescriptionShouldSkipUnchangedDirectoriesDuringScan" xml:space="preserve">
+    <value>Cuando esta opción está habilitada, utiliza los metadatos de los directorios para omitir los directorios que no han cambiado desde el último escaneo. Esto puede acelerar _significativamente_ los escaneos, pero tenga en cuenta que los metadatos de los directorios _no_ cambian/actualizan al editar archivos existentes, solo lo hacen al agregar archivos nuevos o eliminar archivos existentes. Habilite esta opción solo si no modifica archivos existentes.</value>
   </data>
   <data name="DescriptionTitle" xml:space="preserve">
     <value>Un nombre para identificar esta biblioteca</value>
@@ -273,8 +276,11 @@
   <data name="Save" xml:space="preserve">
     <value>Guardar</value>
   </data>
-  <data name="SaveMetadataInMediaDirectories" xml:space="preserve">
+  <data name="ShouldSaveMetadataInMediaDirectories" xml:space="preserve">
     <value>Guardar Metadatos En Los Directorios Multimedia</value>
+  </data>
+  <data name="ShouldSkipUnchangedDirectoriesDuringScan" xml:space="preserve">
+    <value>Omitir Carpetas Sin Cambios Durante El Escaneo</value>
   </data>
   <data name="Screenplay" xml:space="preserve">
     <value>Guión</value>

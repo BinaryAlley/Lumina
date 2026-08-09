@@ -29,8 +29,9 @@ public static class LibraryMapping
             CoverImage = domainEntity.CoverImage,
             IsEnabled = domainEntity.IsEnabled,
             IsLocked = domainEntity.IsLocked,
-            DownloadMedatadaFromWeb = domainEntity.DownloadMedatadaFromWeb,
-            SaveMetadataInMediaDirectories = domainEntity.SaveMetadataInMediaDirectories,
+            DownloadMetadataFromWeb = domainEntity.DownloadMetadataFromWeb,
+            ShouldSaveMetadataInMediaDirectories = domainEntity.ShouldSaveMetadataInMediaDirectories,
+            ShouldSkipUnchangedDirectoriesDuringScan = domainEntity.ShouldSkipUnchangedDirectoriesDuringScan,
             LibraryScans = domainEntity.ScanIds.Select(scanId => new LibraryScanEntity()
             {
                 Id = scanId.Value,

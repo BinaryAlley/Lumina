@@ -186,11 +186,11 @@
   <data name="FilmSeries" xml:space="preserve">
     <value>Saga Cinematografica</value>
   </data>
-  <data name="FilteringBookFiles" xml:space="preserve">
-    <value>Filtraggio dei file di libri...</value>
-  </data>
   <data name="GoodReadsMetadataDownload" xml:space="preserve">
     <value>Scaricamento dei metadati da GoodReads...</value>
+  </data>
+  <data name="HashingFileContents" xml:space="preserve">
+    <value>Calcolo degli hash dei file...</value>
   </data>
   <data name="GraphicNovel" xml:space="preserve">
     <value>Romanzo Grafico</value>
@@ -251,9 +251,6 @@
   </data>
   <data name="Remove" xml:space="preserve">
     <value>Rimuovere</value>
-  </data>
-  <data name="RetrievingPastScanData" xml:space="preserve">
-    <value>Recupero dei dati di scansione precedenti...</value>
   </data>
   <data name="SavingScanData" xml:space="preserve">
     <value>Salvataggio dei dati di scansione...</value>

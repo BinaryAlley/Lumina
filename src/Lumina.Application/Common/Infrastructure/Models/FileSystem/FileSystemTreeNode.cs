@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Common.Infrastructure.Models.MediaLibraryScanJobPayloads;
+namespace Lumina.Application.Common.Infrastructure.Models.FileSystem;
 
 /// <summary>
 /// Generic file system node.

@@ -46,12 +46,15 @@ public class LibraryConfiguration : IEntityTypeConfiguration<LibraryEntity>
         builder.Property(library => library.IsLocked)
             .HasColumnOrder(5);
 
-        builder.Property(library => library.DownloadMedatadaFromWeb)
+        builder.Property(library => library.DownloadMetadataFromWeb)
             .HasDefaultValue(true)
             .HasColumnOrder(6);
 
-        builder.Property(library => library.SaveMetadataInMediaDirectories)
+        builder.Property(library => library.ShouldSaveMetadataInMediaDirectories)
             .HasColumnOrder(7);
+
+        builder.Property(library => library.ShouldSkipUnchangedDirectoriesDuringScan)
+            .HasColumnOrder(8);
 
         // one user with many libraries
         builder.HasOne(library => library.User)
@@ -85,18 +88,18 @@ public class LibraryConfiguration : IEntityTypeConfiguration<LibraryEntity>
         // audit
         builder.Property(library => library.CreatedOnUtc)
             .IsRequired()
-            .HasColumnOrder(8);
+            .HasColumnOrder(9);
 
         builder.Property(library => library.CreatedBy)
             .IsRequired()
-            .HasColumnOrder(9);
+            .HasColumnOrder(10);
 
         builder.Property(library => library.UpdatedOnUtc)
             .HasDefaultValue(null)
-            .HasColumnOrder(10);
+            .HasColumnOrder(11);
 
         builder.Property(library => library.UpdatedBy)
             .HasDefaultValue(null)
-            .HasColumnOrder(11);
+            .HasColumnOrder(12);
     }
 }

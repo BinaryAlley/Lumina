@@ -68,7 +68,7 @@ public class UpdateLibraryCommandHandler : IRequestHandler<UpdateLibraryCommand,
     /// <param name="request">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly updated <see cref="LibraryResponse"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully updated <see cref="LibraryResponse"/>, or an error message.
     /// </returns>
     public async ValueTask<ErrorOr<LibraryResponse>> Handle(UpdateLibraryCommand request, CancellationToken cancellationToken)
     {
@@ -110,8 +110,9 @@ public class UpdateLibraryCommandHandler : IRequestHandler<UpdateLibraryCommand,
             request.CoverImage,
             request.IsEnabled,
             request.IsLocked,
-            request.DownloadMedatadaFromWeb,
-            request.SaveMetadataInMediaDirectories,
+            request.DownloadMetadataFromWeb,
+            request.ShouldSaveMetadataInMediaDirectories,
+            request.ShouldSkipUnchangedDirectoriesDuringScan,
             getLibraryResult.Value.LibraryScans.Select(libraryScan => ScanId.Create(libraryScan.Id)).ToList()
         );
         if (createLibraryResult.IsError)

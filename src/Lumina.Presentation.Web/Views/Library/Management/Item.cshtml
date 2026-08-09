@@ -170,11 +170,11 @@
                 </div>
                 <div class="form-row">
                     <div class="form-label">
-                        <label asp-for="DownloadMedatadaFromWeb">@_localizer["DownloadMetadataFromWeb"]</label>:
+                        <label asp-for="DownloadMetadataFromWeb">@_localizer["DownloadMetadataFromWeb"]</label>:
                     </div>
                     <div class="form-field">
                         <label class="enlightenment-checkbox-label">
-                            <input type="checkbox" asp-for="DownloadMedatadaFromWeb" class="enlightenment-checkbox-hidden"/>
+                            <input type="checkbox" asp-for="DownloadMetadataFromWeb" class="enlightenment-checkbox-hidden"/>
                             <span class="enlightenment-checkbox"></span>
                         </label>
                     </div>
@@ -182,15 +182,27 @@
                 </div>
                 <div class="form-row">
                     <div class="form-label">
-                        <label asp-for="SaveMetadataInMediaDirectories">@_localizer["SaveMetadataInMediaDirectories"]:</label>
+                        <label asp-for="ShouldSaveMetadataInMediaDirectories">@_localizer["ShouldSaveMetadataInMediaDirectories"]:</label>
                     </div>
                     <div class="form-field">
                         <label class="enlightenment-checkbox-label">
-                            <input type="checkbox" asp-for="SaveMetadataInMediaDirectories" class="enlightenment-checkbox-hidden" />
+                            <input type="checkbox" asp-for="ShouldSaveMetadataInMediaDirectories" class="enlightenment-checkbox-hidden" />
                             <span class="enlightenment-checkbox"></span>
                         </label>
                     </div>
-                    <small class="form-label text-disabled form-description">@_localizer["DescriptionSaveMetadataInMediaDirectories"]</small>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionShouldSaveMetadataInMediaDirectories"]</small>
+                </div>
+                <div class="form-row">
+                    <div class="form-label">
+                        <label asp-for="ShouldSkipUnchangedDirectoriesDuringScan">@_localizer["ShouldSkipUnchangedDirectoriesDuringScan"]:</label>
+                    </div>
+                    <div class="form-field">
+                        <label class="enlightenment-checkbox-label">
+                            <input type="checkbox" asp-for="ShouldSkipUnchangedDirectoriesDuringScan" class="enlightenment-checkbox-hidden" />
+                            <span class="enlightenment-checkbox"></span>
+                        </label>
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionShouldSkipUnchangedDirectoriesDuringScan"]</small>
                 </div>
                 <div class="form-row">
                     <button type="submit" class="confirm-button w-100px">@_localizer["Save"]</button>
@@ -220,8 +232,9 @@
         const mediaDirectoriesFormTable = document.getElementById('add-media-directory-form-table');
         const chkIsEnabled = form.querySelector('[name="IsEnabled"]');
         const chkIsLocked = form.querySelector('[name="IsLocked"]');
-        const chkDownloadMedatadaFromWeb = form.querySelector('[name="DownloadMedatadaFromWeb"]');
-        const chkSaveMetadataInMediaDirectories = form.querySelector('[name="SaveMetadataInMediaDirectories"]');
+        const chkDownloadMetadataFromWeb = form.querySelector('[name="DownloadMetadataFromWeb"]');
+        const chkShouldSaveMetadataInMediaDirectories = form.querySelector('[name="ShouldSaveMetadataInMediaDirectories"]');
+        const chkShouldSkipUnchangedDirectoriesDuringScan = form.querySelector('[name="ShouldSkipUnchangedDirectoriesDuringScan"]');
 
         // create new or update existing media library
         async function handleAddMediaLibraryAsync() {
@@ -239,8 +252,9 @@
                 })(),
                 IsEnabled: chkIsEnabled.checked,
                 IsLocked: chkIsLocked.checked,
-                DownloadMedatadaFromWeb: chkDownloadMedatadaFromWeb.checked,
-                SaveMetadataInMediaDirectories: chkSaveMetadataInMediaDirectories.checked
+                DownloadMetadataFromWeb: chkDownloadMetadataFromWeb.checked,
+                ShouldSaveMetadataInMediaDirectories: chkShouldSaveMetadataInMediaDirectories.checked,
+                ShouldSkipUnchangedDirectoriesDuringScan: chkShouldSkipUnchangedDirectoriesDuringScan.checked
             };
             const data = await callApiPostAsync('@_urlService.GetAbsoluteUrl("SaveLibrary", "LibraryManagement")', formData);
             if (data) {

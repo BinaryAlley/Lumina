@@ -27,8 +27,9 @@ public static class AddMediaLibraryRequestMapping
             request.CoverImage,
             request.IsEnabled,
             request.IsLocked,
-            request.DownloadMedatadaFromWeb,
-            request.SaveMetadataInMediaDirectories
+            request.DownloadMetadataFromWeb,
+            request.ShouldSaveMetadataInMediaDirectories,
+            request.ShouldSkipUnchangedDirectoriesDuringScan
         );
     }
 }

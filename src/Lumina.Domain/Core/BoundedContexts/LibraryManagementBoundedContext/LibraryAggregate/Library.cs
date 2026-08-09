@@ -63,12 +63,18 @@ public class Library : AggregateRoot<LibraryId>
     /// <summary>
     /// Gets whether this media library should update the metadata of its elements from the web, or not.
     /// </summary>
-    public bool DownloadMedatadaFromWeb { get; private set; } = true;
+    public bool DownloadMetadataFromWeb { get; private set; } = true;
 
     /// <summary>
     /// Gets whether this media library should copy the downloaded metadata into the media library content locations, or not.
     /// </summary>
-    public bool SaveMetadataInMediaDirectories { get; private set; }
+    public bool ShouldSaveMetadataInMediaDirectories { get; private set; }
+
+    /// <summary>
+    /// Gets whether this media library should skip the directories whose contents have not changed since the last scan, during the scan. This is an opt-in setting, because it relies on directory metadata,
+    /// which does not change when the contents of an existing file are edited, and such edits could be missed while this setting is enabled.
+    /// </summary>
+    public bool ShouldSkipUnchangedDirectoriesDuringScan { get; private set; }
 
     /// <summary>
     /// Gets the list of objects representing the file system paths that make up the media library.
@@ -91,8 +97,9 @@ public class Library : AggregateRoot<LibraryId>
     /// <param name="coverImage">The path of the image file used as the cover for the library.</param>
     /// <param name="isEnabled">Whether this media library is enabled or not. A disabled media library is never shown or changed.</param>
     /// <param name="isLocked">Whether this media library is locked or not. A locked media library is displayed, but is never changed or updated.</param>
-    /// <param name="downloadMedatadaFromWeb">Whether this media library should update the metadata of its elements from the web, or not.</param>
-    /// <param name="saveMetadataInMediaDirectories">Whether this media library should copy the downloaded metadata into the media library content locations, or not.</param>
+    /// <param name="downloadMetadataFromWeb">Whether this media library should update the metadata of its elements from the web, or not.</param>
+    /// <param name="shouldSaveMetadataInMediaDirectories">Whether this media library should copy the downloaded metadata into the media library content locations, or not.</param>
+    /// <param name="shouldSkipUnchangedDirectoriesDuringScan">Whether this media library should skip the directories whose contents have not changed since the last scan, during the scan, or not.</param>
     /// <param name="scanIds">The list of objects representing the unique identifier of scans of the media library.</param>
     private Library(
         LibraryId id,
@@ -103,8 +110,9 @@ public class Library : AggregateRoot<LibraryId>
         string? coverImage,
         bool isEnabled,
         bool isLocked,
-        bool downloadMedatadaFromWeb,
-        bool saveMetadataInMediaDirectories,
+        bool downloadMetadataFromWeb,
+        bool shouldSaveMetadataInMediaDirectories,
+        bool shouldSkipUnchangedDirectoriesDuringScan,
         List<ScanId> scanIds) : base(id)
     {
         UserId = userId;
@@ -114,8 +122,9 @@ public class Library : AggregateRoot<LibraryId>
         CoverImage = coverImage;
         IsEnabled = isEnabled;
         IsLocked = isLocked;
-        DownloadMedatadaFromWeb = downloadMedatadaFromWeb;
-        SaveMetadataInMediaDirectories = saveMetadataInMediaDirectories;
+        DownloadMetadataFromWeb = downloadMetadataFromWeb;
+        ShouldSaveMetadataInMediaDirectories = shouldSaveMetadataInMediaDirectories;
+        ShouldSkipUnchangedDirectoriesDuringScan = shouldSkipUnchangedDirectoriesDuringScan;
         _scanIds = scanIds;
     }
 
@@ -129,11 +138,12 @@ public class Library : AggregateRoot<LibraryId>
     /// <param name="coverImageSourcePath">The path of the image file chosen by the user to be used as the cover for the library.</param>
     /// <param name="isEnabled">Whether this media library is enabled or not. A disabled media library is never shown or changed.</param>
     /// <param name="isLocked">Whether this media library is locked or not. A locked media library is displayed, but is never changed or updated.</param>
-    /// <param name="downloadMedatadaFromWeb">Whether this media library should update the metadata of its elements from the web, or not.</param>
-    /// <param name="saveMetadataInMediaDirectories">Whether this media library should copy the downloaded metadata into the media library content locations, or not.</param>
+    /// <param name="downloadMetadataFromWeb">Whether this media library should update the metadata of its elements from the web, or not.</param>
+    /// <param name="shouldSaveMetadataInMediaDirectories">Whether this media library should copy the downloaded metadata into the media library content locations, or not.</param>
+    /// <param name="shouldSkipUnchangedDirectoriesDuringScan">Whether this media library should skip the directories whose contents have not changed since the last scan, during the scan, or not.</param>
     /// <param name="scanIds">The list of objects representing the unique identifier of scans of the media library.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly created <see cref="Library"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="Library"/>, or an error message.
     /// </returns>
     public static ErrorOr<Library> Create(
         UserId userId,
@@ -143,8 +153,9 @@ public class Library : AggregateRoot<LibraryId>
         string? coverImageSourcePath,
         bool isEnabled,
         bool isLocked,
-        bool downloadMedatadaFromWeb,
-        bool saveMetadataInMediaDirectories,
+        bool downloadMetadataFromWeb,
+        bool shouldSaveMetadataInMediaDirectories,
+        bool shouldSkipUnchangedDirectoriesDuringScan,
         List<ScanId> scanIds)
     {
         List<FileSystemPathId> tempContentLocations = [];
@@ -165,8 +176,9 @@ public class Library : AggregateRoot<LibraryId>
             coverImageSourcePath,
             isEnabled,
             isLocked,
-            downloadMedatadaFromWeb,
-            saveMetadataInMediaDirectories,
+            downloadMetadataFromWeb,
+            shouldSaveMetadataInMediaDirectories,
+            shouldSkipUnchangedDirectoriesDuringScan,
             scanIds
         );
     }
@@ -182,11 +194,12 @@ public class Library : AggregateRoot<LibraryId>
     /// <param name="coverImageSourcePath">The path of the image file chosen by the user to be used as the cover for the library.</param>
     /// <param name="isEnabled">Whether this media library is enabled or not. A disabled media library is never shown or changed.</param>
     /// <param name="isLocked">Whether this media library is locked or not. A locked media library is displayed, but is never changed or updated.</param>
-    /// <param name="downloadMedatadaFromWeb">Whether this media library should update the metadata of its elements from the web, or not.</param>
-    /// <param name="saveMetadataInMediaDirectories">Whether this media library should copy the downloaded metadata into the media library content locations, or not.</param>
+    /// <param name="downloadMetadataFromWeb">Whether this media library should update the metadata of its elements from the web, or not.</param>
+    /// <param name="shouldSaveMetadataInMediaDirectories">Whether this media library should copy the downloaded metadata into the media library content locations, or not.</param>
+    /// <param name="shouldSkipUnchangedDirectoriesDuringScan">Whether this media library should skip the directories whose contents have not changed since the last scan, during the scan, or not.</param>
     /// <param name="scanIds">The list of objects representing the unique identifier of scans of the media library.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly created <see cref="Library"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="Library"/>, or an error message.
     /// </returns>
     public static ErrorOr<Library> Create(
         LibraryId id,
@@ -197,8 +210,9 @@ public class Library : AggregateRoot<LibraryId>
         string? coverImageSourcePath,
         bool isEnabled,
         bool isLocked,
-        bool downloadMedatadaFromWeb,
-        bool saveMetadataInMediaDirectories,
+        bool downloadMetadataFromWeb,
+        bool shouldSaveMetadataInMediaDirectories,
+        bool shouldSkipUnchangedDirectoriesDuringScan,
         List<ScanId> scanIds)
     {
         List<FileSystemPathId> tempContentLocations = [];
@@ -219,8 +233,9 @@ public class Library : AggregateRoot<LibraryId>
             coverImageSourcePath,
             isEnabled,
             isLocked,
-            downloadMedatadaFromWeb,
-            saveMetadataInMediaDirectories,
+            downloadMetadataFromWeb,
+            shouldSaveMetadataInMediaDirectories,
+            shouldSkipUnchangedDirectoriesDuringScan,
             scanIds
         );
     }

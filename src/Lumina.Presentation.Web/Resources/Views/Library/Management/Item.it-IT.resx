@@ -183,8 +183,11 @@
   <data name="DescriptionLocked" xml:space="preserve">
     <value>Se questa libreria multimediale è bloccata o meno. Una libreria bloccata viene mostrata agli utenti, ma non viene mai scansionata, aggiornata, modificata, ecc.</value>
   </data>
-  <data name="DescriptionSaveMetadataInMediaDirectories" xml:space="preserve">
+  <data name="DescriptionShouldSaveMetadataInMediaDirectories" xml:space="preserve">
     <value>Se salvare o meno una copia dei metadati scaricati nelle directory dei contenuti della libreria multimediale. Questo ha effetto solo se il download dei metadati dal web è attivo.</value>
+  </data>
+  <data name="DescriptionShouldSkipUnchangedDirectoriesDuringScan" xml:space="preserve">
+    <value>Quando questa opzione è abilitata, utilizza i metadati delle cartelle per saltare le cartelle che non sono cambiate dall'ultima scansione. Questo può accelerare _significativamente_ le scansioni, ma tieni presente che i metadati delle cartelle _non_ cambiano/aggiornano quando si modificano file esistenti, lo fanno solo quando si aggiungono nuovi file o si eliminano file esistenti. Abilita questa opzione solo se non modifichi i file esistenti.</value>
   </data>
   <data name="DescriptionTitle" xml:space="preserve">
     <value>Un nome per identificare questa biblioteca</value>
@@ -273,8 +276,11 @@
   <data name="Save" xml:space="preserve">
     <value>Salva</value>
   </data>
-  <data name="SaveMetadataInMediaDirectories" xml:space="preserve">
+  <data name="ShouldSaveMetadataInMediaDirectories" xml:space="preserve">
     <value>Salvare I Metadati Nelle Directory Multimediali</value>
+  </data>
+  <data name="ShouldSkipUnchangedDirectoriesDuringScan" xml:space="preserve">
+    <value>Salta Cartelle Invariate Durante La Scansione</value>
   </data>
   <data name="Screenplay" xml:space="preserve">
     <value>Sceneggiatura</value>

@@ -12,6 +12,7 @@ using Lumina.Presentation.Api.Common.DependencyInjection;
 using Lumina.Presentation.Api.Common.Middlewares;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -86,6 +87,15 @@ public class Program
             {
                 LuminaDbContext context = services.GetRequiredService<LuminaDbContext>();
                 await context.Database.MigrateAsync();
+
+                // enable the Write-Ahead Logging journal mode and a busy timeout, so that the Entity Framework connection and the dedicated connections
+                // used by the bulk data access operations of Dapper can access the database concurrently, without database locking errors
+                SqliteConnection sqliteConnection = new(context.Database.GetDbConnection().ConnectionString);
+                sqliteConnection.Open();
+                using SqliteCommand sqliteCommand = sqliteConnection.CreateCommand();
+                sqliteCommand.CommandText = "PRAGMA journal_mode=WAL; PRAGMA busy_timeout=10000;";
+                sqliteCommand.ExecuteNonQuery();
+                sqliteConnection.Close();
             }
             catch (Exception ex)
             {

@@ -186,11 +186,11 @@
   <data name="FilmSeries" xml:space="preserve">
     <value>映画シリーズ</value>
   </data>
-  <data name="FilteringBookFiles" xml:space="preserve">
-    <value>書籍ファイルをフィルタリング中...</value>
-  </data>
   <data name="GoodReadsMetadataDownload" xml:space="preserve">
     <value>GoodReadsからメタデータをダウンロード中...</value>
+  </data>
+  <data name="HashingFileContents" xml:space="preserve">
+    <value>ファイルのハッシュを計算中...</value>
   </data>
   <data name="GraphicNovel" xml:space="preserve">
     <value>グラフィックノベル</value>
@@ -251,9 +251,6 @@
   </data>
   <data name="Remove" xml:space="preserve">
     <value>削除</value>
-  </data>
-  <data name="RetrievingPastScanData" xml:space="preserve">
-    <value>過去のスキャンデータを取得中...</value>
   </data>
   <data name="SavingScanData" xml:space="preserve">
     <value>スキャンデータを保存中...</value>

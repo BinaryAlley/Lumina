@@ -183,8 +183,11 @@
   <data name="DescriptionLocked" xml:space="preserve">
     <value>Заблокирована эта медиатека или нет. Заблокированная библиотека отображается пользователям, но никогда не сканируется, не обновляется, не изменяется и т.д.</value>
   </data>
-  <data name="DescriptionSaveMetadataInMediaDirectories" xml:space="preserve">
+  <data name="DescriptionShouldSaveMetadataInMediaDirectories" xml:space="preserve">
     <value>Сохранять копию загруженных метаданных в каталогах содержимого медиатеки или нет. Это действует только если активна загрузка метаданных из интернета.</value>
+  </data>
+  <data name="DescriptionShouldSkipUnchangedDirectoriesDuringScan" xml:space="preserve">
+    <value>При включении этой опции используются метаданные каталогов, чтобы пропускать каталоги, не изменявшиеся с момента последнего сканирования. Это может _значительно_ ускорить сканирование, но учтите, что метаданные каталогов _не_ изменяются/обновляются при редактировании существующих файлов, а только при добавлении новых или удалении существующих. Включайте эту опцию только в том случае, если вы не изменяете существующие файлы.</value>
   </data>
   <data name="DescriptionTitle" xml:space="preserve">
     <value>Название для этой библиотеки</value>
@@ -273,8 +276,11 @@
   <data name="Save" xml:space="preserve">
     <value>Сохранить</value>
   </data>
-  <data name="SaveMetadataInMediaDirectories" xml:space="preserve">
+  <data name="ShouldSaveMetadataInMediaDirectories" xml:space="preserve">
     <value>Сохранить Метаданные В Каталогах Медиафайлов</value>
+  </data>
+  <data name="ShouldSkipUnchangedDirectoriesDuringScan" xml:space="preserve">
+    <value>Пропускать Неизмененные Папки При Сканировании</value>
   </data>
   <data name="Screenplay" xml:space="preserve">
     <value>Сценарий</value>

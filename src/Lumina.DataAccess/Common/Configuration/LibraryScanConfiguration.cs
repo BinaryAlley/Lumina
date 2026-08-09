@@ -57,5 +57,11 @@ public class LibraryScanConfiguration : IEntityTypeConfiguration<LibraryScanEnti
         builder.Property(libraryScan => libraryScan.UpdatedBy)
             .HasDefaultValue(null)
             .HasColumnOrder(5);
+
+        // Indexes 
+
+        // enables fast lookup of latest non-running scans per library
+        builder.HasIndex(libraryScan => new { libraryScan.LibraryId, libraryScan.Status, libraryScan.CreatedOnUtc })
+            .IsDescending(true, false, true); // CreatedOnUtc DESC
     }
 }

@@ -35,6 +35,7 @@ public class LibraryMappingTests
             false,
             true,
             false,
+            false,
             [ScanId.CreateUnique()]
         );
         Library library = libraryResult.Value;
@@ -54,8 +55,8 @@ public class LibraryMappingTests
         Assert.Equal(library.UpdatedOnUtc, result.UpdatedOnUtc);
         Assert.True(result.IsEnabled);
         Assert.False(result.IsLocked);
-        Assert.True(result.DownloadMedatadaFromWeb);
-        Assert.False(result.SaveMetadataInMediaDirectories);
+        Assert.True(result.DownloadMetadataFromWeb);
+        Assert.False(result.ShouldSaveMetadataInMediaDirectories);
         Assert.Equal(library.ScanIds.Select(scanId => scanId.Value), result.LibraryScans.Select(libraryScan => libraryScan.Id));
     }
 
@@ -72,6 +73,7 @@ public class LibraryMappingTests
             true,
             false,
             true,
+            false,
             false,
             [ScanId.CreateUnique()]
         );
@@ -104,6 +106,7 @@ public class LibraryMappingTests
             false,
             true,
             false,
+            false,
             [ScanId.CreateUnique()]
         );
         Library library = libraryResult.Value;
@@ -117,8 +120,8 @@ public class LibraryMappingTests
         Assert.Equal(library.CoverImage, result.CoverImage);
         Assert.True(result.IsEnabled);
         Assert.False(result.IsLocked);
-        Assert.True(result.DownloadMedatadaFromWeb);
-        Assert.False(result.SaveMetadataInMediaDirectories);
+        Assert.True(result.DownloadMetadataFromWeb);
+        Assert.False(result.ShouldSaveMetadataInMediaDirectories);
     }
 
     [Fact]
@@ -142,6 +145,7 @@ public class LibraryMappingTests
             true,
             false,
             true,
+            false,
             false,
             [ScanId.CreateUnique()]
         );
@@ -176,6 +180,7 @@ public class LibraryMappingTests
             false,
             true,
             false,
+            false,
             [ScanId.CreateUnique()]
         );
         Library library = libraryResult.Value;
@@ -208,6 +213,7 @@ public class LibraryMappingTests
             true,
             false,
             true,
+            false,
             false,
             []
         );

@@ -186,11 +186,11 @@
   <data name="FilmSeries" xml:space="preserve">
     <value>Filmreihe</value>
   </data>
-  <data name="FilteringBookFiles" xml:space="preserve">
-    <value>Buchdateien werden gefiltert...</value>
-  </data>
   <data name="GoodReadsMetadataDownload" xml:space="preserve">
     <value>Metadaten werden von GoodReads heruntergeladen...</value>
+  </data>
+  <data name="HashingFileContents" xml:space="preserve">
+    <value>Berechne die Datei-Hashes...</value>
   </data>
   <data name="GraphicNovel" xml:space="preserve">
     <value>Grafischer Roman</value>
@@ -251,9 +251,6 @@
   </data>
   <data name="Remove" xml:space="preserve">
     <value>Entfernen</value>
-  </data>
-  <data name="RetrievingPastScanData" xml:space="preserve">
-    <value>Vergangene Scan-Daten werden abgerufen...</value>
   </data>
   <data name="SavingScanData" xml:space="preserve">
     <value>Scandaten werden gespeichert...</value>

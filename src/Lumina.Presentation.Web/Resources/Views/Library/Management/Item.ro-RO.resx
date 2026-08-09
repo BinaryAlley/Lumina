@@ -183,8 +183,11 @@
   <data name="DescriptionLocked" xml:space="preserve">
     <value>Dacă această bibliotecă media este blocată sau nu. O bibliotecă blocată este afișată utilizatorilor, dar nu este niciodată scanată, actualizată, modificată, etc.</value>
   </data>
-  <data name="DescriptionSaveMetadataInMediaDirectories" xml:space="preserve">
+  <data name="DescriptionShouldSaveMetadataInMediaDirectories" xml:space="preserve">
     <value>Dacă se salvează sau nu o copie a metadatelor descărcate în directoarele cu conținut ale bibliotecii media. Acest lucru are efect doar dacă descărcarea metadatelor de pe web este activă.</value>
+  </data>
+  <data name="DescriptionShouldSkipUnchangedDirectoriesDuringScan" xml:space="preserve">
+    <value>Când această opțiune este activată, folosește metadatele directorului pentru a sări peste directoarele care nu s-au schimbat de la ultima scanare. Acest lucru poate accelera _semnificativ_ scanările, dar rețineți că metadatele directoarelor _nu_ se schimbă/actualizează atunci când editați fișiere existente, se schimbă doar atunci când adăugați fișiere noi sau ștergeți fișiere existente. Activați această opțiune numai dacă nu modificați fișierele existente.</value>
   </data>
   <data name="DescriptionTitle" xml:space="preserve">
     <value>Un nume pentru identificarea acestei biblioteci</value>
@@ -273,8 +276,11 @@
   <data name="Save" xml:space="preserve">
     <value>Salvează</value>
   </data>
-  <data name="SaveMetadataInMediaDirectories" xml:space="preserve">
+  <data name="ShouldSaveMetadataInMediaDirectories" xml:space="preserve">
     <value>Salvează Metadatele În Directoarele Media</value>
+  </data>
+  <data name="ShouldSkipUnchangedDirectoriesDuringScan" xml:space="preserve">
+    <value>Sari Peste Directorarele Neschimbate În Timpul Scanării</value>
   </data>
   <data name="Screenplay" xml:space="preserve">
     <value>Scenariu</value>

@@ -55,6 +55,7 @@ public class DomainLibraryFixture
             _faker.Random.Bool(),
             _faker.Random.Bool(),
             _faker.Random.Bool(),
+            _faker.Random.Bool(),
             [ScanId.CreateUnique(), ScanId.CreateUnique()]
         );
 
@@ -70,8 +71,9 @@ public class DomainLibraryFixture
         string? coverImage = null,
         bool isEnabled = true,
         bool isLocked = false,
-        bool downloadMedatadaFromWeb = true,
-        bool saveMetadataInMediaDirectories = false,
+        bool downloadMetadataFromWeb = true,
+        bool shouldSaveMetadataInMediaDirectories = false,
+        bool shouldSkipUnchangedDirectoriesDuringScan = false,
         IEnumerable<Guid>? scanIds = null)
     {
         ErrorOr<Library> library = id is null ?
@@ -83,8 +85,9 @@ public class DomainLibraryFixture
                 coverImage,
                 isEnabled, 
                 isLocked, 
-                downloadMedatadaFromWeb, 
-                saveMetadataInMediaDirectories,
+                downloadMetadataFromWeb, 
+                shouldSaveMetadataInMediaDirectories,
+                shouldSkipUnchangedDirectoriesDuringScan,
                 scanIds?.Select(scanId => ScanId.Create(scanId)).ToList() ?? [ScanId.CreateUnique(), ScanId.CreateUnique()]
             ) :
             Library.Create(
@@ -96,8 +99,9 @@ public class DomainLibraryFixture
                 coverImage,
                 isEnabled,
                 isLocked,
-                downloadMedatadaFromWeb,
-                saveMetadataInMediaDirectories,
+                downloadMetadataFromWeb,
+                shouldSaveMetadataInMediaDirectories,
+                shouldSkipUnchangedDirectoriesDuringScan,
                 scanIds?.Select(scanId => ScanId.Create(scanId)).ToList() ?? [ScanId.CreateUnique(), ScanId.CreateUnique()]
             );
 

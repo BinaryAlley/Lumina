@@ -19,8 +19,9 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Commands.UpdateLibrary
 /// <param name="CoverImage">The path of the image file used as the cover for the library.</param>
 /// <param name="IsEnabled">Whether this media library is enabled or not. A disabled media library is never shown or changed.</param>
 /// <param name="IsLocked">Whether this media library is locked or not. A locked media library is displayed, but is never changed or updated.</param>
-/// <param name="DownloadMedatadaFromWeb">Whether this media library should update the metadata of its elements from the web, or not.</param>
-/// <param name="SaveMetadataInMediaDirectories">Whether this media library should copy the downloaded metadata into the media library content locations, or not.</param>
+/// <param name="DownloadMetadataFromWeb">Whether this media library should update the metadata of its elements from the web, or not.</param>
+/// <param name="ShouldSaveMetadataInMediaDirectories">Whether this media library should copy the downloaded metadata into the media library content locations, or not.</param>
+/// <param name="ShouldSkipUnchangedDirectoriesDuringScan">Whether this media library should skip the directories whose contents have not changed since the last scan, during the scan, or not.</param>
 [DebuggerDisplay("Title: {Title}")]
 public record UpdateLibraryCommand(
     Guid Id,
@@ -31,6 +32,7 @@ public record UpdateLibraryCommand(
     string? CoverImage,
     bool IsEnabled,
     bool IsLocked,
-    bool DownloadMedatadaFromWeb,
-    bool SaveMetadataInMediaDirectories
+    bool DownloadMetadataFromWeb,
+    bool ShouldSaveMetadataInMediaDirectories,
+    bool ShouldSkipUnchangedDirectoriesDuringScan
 ) : IRequest<ErrorOr<LibraryResponse>>;

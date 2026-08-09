@@ -15,10 +15,12 @@ namespace Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.Lib
 /// <param name="LibraryId">The unique identifier of the library whose scan has failed.</param>
 /// <param name="MediaLibraryScanCompositeId">Model for tracking media library scans.</param>
 /// <param name="OccurredOnUtc">The date and time when the domain event occurred.</param>
+/// <param name="ErrorMessage">The optional descriptive message of the failure, used for diagnostic purposes.</param>
 [DebuggerDisplay("Id: {Id}")]
 public record LibraryScanFailedDomainEvent(
     Guid Id,
     LibraryId LibraryId,
     MediaLibraryScanCompositeId MediaLibraryScanCompositeId,
-    DateTime OccurredOnUtc
+    DateTime OccurredOnUtc,
+    string? ErrorMessage = null
 ) : IDomainEvent;
