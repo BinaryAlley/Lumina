@@ -93,7 +93,7 @@ public class Program
                 SqliteConnection sqliteConnection = new(context.Database.GetDbConnection().ConnectionString);
                 sqliteConnection.Open();
                 using SqliteCommand sqliteCommand = sqliteConnection.CreateCommand();
-                sqliteCommand.CommandText = "PRAGMA journal_mode=WAL; PRAGMA busy_timeout=10000;";
+                sqliteCommand.CommandText = "PRAGMA journal_mode=WAL; PRAGMA busy_timeout=30000;";
                 sqliteCommand.ExecuteNonQuery();
                 sqliteConnection.Close();
             }
