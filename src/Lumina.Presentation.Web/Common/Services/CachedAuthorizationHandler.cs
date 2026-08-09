@@ -69,7 +69,7 @@ public class CachedAuthorizationHandler : DelegatingHandler
         );
         // if the API returned 401 Unauthorized (i.e. token expired), DO NOT cache this response - it will be used for authorization endpoints even after successful login,
         // resulting in incorrect login redirection cycles!
-        if (response.StatusCode == HttpStatusCode.Unauthorized)
+        if (response.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.NotFound)
             await _hybridCache.RemoveAsync(AUTHORIZATION_ENDPOINT, cancellationToken).ConfigureAwait(false);
         return new HttpResponseMessage(response.StatusCode)
         {

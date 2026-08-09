@@ -150,7 +150,7 @@ public class ApiHttpClient : IApiHttpClient
                 problemDetails = JsonSerializer.Deserialize<ProblemDetailsModel>(content, _jsonOptions);
             }
             catch { /* if we can't deserialize to ProblemDetails, we'll just use the status code */ }
-            throw new ApiException(problemDetails, response.StatusCode);
+            throw new ApiException(problemDetails, response.StatusCode, request.RequestUri?.AbsolutePath);
         }
     }
 
@@ -223,7 +223,7 @@ public class ApiHttpClient : IApiHttpClient
                 problemDetails = JsonSerializer.Deserialize<ProblemDetailsModel>(content, _jsonOptions);
             }
             catch { /* if we can't deserialize to ProblemDetails, we'll just use the status code */ }
-            throw new ApiException(problemDetails, response.StatusCode);
+            throw new ApiException(problemDetails, response.StatusCode, request.RequestUri?.AbsolutePath);
         }
     }
 
