@@ -17,10 +17,10 @@ public interface IMediaLibraryScanningService
     /// </summary>
     /// <param name="scan">The media library scan to start.</param>
     /// <param name="libraryType">The type of the media library to be scanned.</param>
-    /// <param name="downloadMedatadaFromWeb">Whether the library permits downloading data from the web, or not.</param>
+    /// <param name="downloadMetadataFromWeb">Whether the library permits downloading data from the web, or not.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    Task<ErrorOr<Success>> StartScanAsync(LibraryScan scan, LibraryType libraryType, bool downloadMedatadaFromWeb, CancellationToken cancellationToken);
+    Task<ErrorOr<Success>> StartScanAsync(LibraryScan scan, LibraryType libraryType, bool downloadMetadataFromWeb, CancellationToken cancellationToken);
 
     /// <summary>
     /// Cancels <paramref name="scan"/>.

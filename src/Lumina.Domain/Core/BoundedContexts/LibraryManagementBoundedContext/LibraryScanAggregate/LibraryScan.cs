@@ -61,7 +61,7 @@ public class LibraryScan : AggregateRoot<ScanId>
     /// <param name="userId">The object representing the unique identifier of the user initiating the media library scan.</param>
     /// <param name="pastScans">The list of past media library scans the library identified by <paramref name="libraryId"/> had.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly created <see cref="LibraryScan"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="LibraryScan"/>, or an error message.
     /// </returns>
     public static ErrorOr<LibraryScan> Create(LibraryId libraryId, UserId userId, List<LibraryScan> pastScans)
     {
@@ -77,7 +77,7 @@ public class LibraryScan : AggregateRoot<ScanId>
     /// <param name="status">The status of the media library scan.</param>
     /// <param name="pastScans">The list of past media library scans the library identified by <paramref name="libraryId"/> had.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly created <see cref="LibraryScan"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="LibraryScan"/>, or an error message.
     /// </returns>
     public static ErrorOr<LibraryScan> Create(ScanId id, LibraryId libraryId, UserId userId, LibraryScanJobStatus status, List<LibraryScan> pastScans)
     {

@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.Common.Middlewares;
 
 /// <summary>
-/// Middleware that ensures eventual consistency by handling domain events and publishing them after the request has completed successfuly.
+/// Middleware that ensures eventual consistency by handling domain events and publishing them after the request has completed successfully.
 /// </summary>
 public class EventualConsistencyMiddleware
 {
@@ -52,9 +52,9 @@ public class EventualConsistencyMiddleware
                 {
                     // commit the transaction: because some domain events trigger jobs that end up being processed in background hosted services, and those are
                     // singletons that require their own DI scope to be created, any changes made on the DbContext in this HTTP scope would not be seen on the
-                    // DbContext created in the background service scope, because the transaction is not yet commited here; therefor, the transaction needs to be
-                    // commited first, before any domain events are fired
-                    // see docs/technical/achitecture/architecture-knowledge-management/architecture-decision-log/architecture-decission-record-0002.md for details:
+                    // DbContext created in the background service scope, because the transaction is not yet committed here; therefor, the transaction needs to be
+                    // committed first, before any domain events are fired
+                    // see docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0002.md for details:
                     await transaction.CommitAsync().ConfigureAwait(false);
 
                     // check if domain events exist in the channel queue and publish them

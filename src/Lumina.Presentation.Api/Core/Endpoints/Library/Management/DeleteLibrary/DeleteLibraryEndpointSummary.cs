@@ -30,7 +30,7 @@ public class DeleteLibraryEndpointSummary : Summary<DeleteLibraryEndpoint, Delet
 
         RequestParam(r => r.Id, "The unique identifier of the media library to be deleted. Required.");
 
-        Response(200, "The media library was successfuly deleted.");
+        Response(200, "The media library was successfully deleted.");
 
         Response(401, "Authentication required.", "application/problem+json",
             example: new[]

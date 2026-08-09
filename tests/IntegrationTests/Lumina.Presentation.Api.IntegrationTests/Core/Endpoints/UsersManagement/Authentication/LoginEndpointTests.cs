@@ -68,7 +68,7 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithValidCredentials_ShouldLoginsuccessfuly()
+    public async Task ExecuteAsync_WhenCalledWithValidCredentials_ShouldLoginSuccessfully()
     {
         // Arrange
         UserEntity user = await CreateTestUser();
@@ -95,7 +95,7 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithValidCredentialsAndTotp_ShouldLoginsuccessfuly()
+    public async Task ExecuteAsync_WhenCalledWithValidCredentialsAndTotp_ShouldLoginSuccessfully()
     {
         // Arrange
         UserEntity user = await CreateTestUserWithTotp();
@@ -127,7 +127,7 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithTempPassword_ShouldLoginsuccessfuly()
+    public async Task ExecuteAsync_WhenCalledWithTempPassword_ShouldLoginSuccessfully()
     {
         // Arrange
         UserEntity user = await CreateTestUserWithTempPassword();

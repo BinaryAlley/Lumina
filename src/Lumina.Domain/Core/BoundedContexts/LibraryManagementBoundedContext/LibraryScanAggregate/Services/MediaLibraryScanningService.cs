@@ -12,7 +12,6 @@ using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggreg
 using Mediator;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -57,10 +56,10 @@ internal class MediaLibraryScanningService : IMediaLibraryScanningService
     /// </summary>
     /// <param name="scan">The media library scan to start.</param>
     /// <param name="libraryType">The type of the media library to be scanned.</param>
-    /// <param name="downloadMedatadaFromWeb">Whether the library permits downloading data from the web, or not.</param>
+    /// <param name="downloadMetadataFromWeb">Whether the library permits downloading data from the web, or not.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<ErrorOr<Success>> StartScanAsync(LibraryScan scan, LibraryType libraryType, bool downloadMedatadaFromWeb, CancellationToken cancellationToken)
+    public async Task<ErrorOr<Success>> StartScanAsync(LibraryScan scan, LibraryType libraryType, bool downloadMetadataFromWeb, CancellationToken cancellationToken)
     {
         // mark the scan itself as started
         ErrorOr<Success> startScanResult = scan.StartScan();
@@ -76,14 +75,14 @@ internal class MediaLibraryScanningService : IMediaLibraryScanningService
         try
         {
             // link the user's cancellation token with the scan's token
-            CancellationTokenSource linkedSource = CancellationTokenSource
+            using CancellationTokenSource linkedSource = CancellationTokenSource
                .CreateLinkedTokenSource(cancellationToken, _mediaLibrariesScanCancellationTracker.GetTokenForScan(MediaLibraryScanCompositeId.Create(scan.Id, scan.UserId)));
 
             // get a media library scanner for the provided media library type
             IMediaTypeScanner scanner = _mediaLibraryScannerFactory.CreateLibraryScanner(libraryType);
             // get the list of scan jobs for the retrieved scanner. It is impotant to enumerate them here, because deferred execuction would destroy any graph relationships
             // and properties we might set before putting the jobs on the in-memory queue.
-            List<IMediaLibraryScanJob> jobs = scanner.CreateScanJobsForLibrary(scan.LibraryId, downloadMedatadaFromWeb).ToList();
+            List<IMediaLibraryScanJob> jobs = [.. scanner.CreateScanJobsForLibrary(scan.LibraryId, downloadMetadataFromWeb)];
 
             // count total jobs in the chain by traversing the job graph
             int totalJobs = CountTotalJobs(jobs);

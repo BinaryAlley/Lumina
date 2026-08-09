@@ -42,7 +42,7 @@ public static class IsbnEntityMapping
     /// </summary>
     /// <param name="repositoryEntity">The repository entity to be converted.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly converted <see cref="Isbn"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully converted <see cref="Isbn"/>, or an error message.
     /// </returns>
     public static ErrorOr<Isbn> ToDomainEntity(this IsbnEntity repositoryEntity)
     {

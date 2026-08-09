@@ -41,7 +41,7 @@ public static class GenreEntityMapping
     /// </summary>
     /// <param name="repositoryEntity">The repository entity to be converted.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly converted <see cref="Genre"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully converted <see cref="Genre"/>, or an error message.
     /// </returns>
     public static ErrorOr<Genre> ToDomainEntity(this GenreEntity repositoryEntity)
     {

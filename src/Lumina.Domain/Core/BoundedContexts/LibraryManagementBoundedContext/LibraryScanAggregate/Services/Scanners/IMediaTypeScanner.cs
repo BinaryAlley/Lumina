@@ -21,7 +21,7 @@ public interface IMediaTypeScanner
     /// Creates the media library scan jobs for the provided media library.
     /// </summary>
     /// <param name="libraryId">The unique identifier of the media library for which to create the media library scan jobs.</param>
-    /// <param name="downloadMedatadaFromWeb">Whether the library permits downloading data from the web, or not.</param>
+    /// <param name="downloadMetadataFromWeb">Whether the library permits downloading data from the web, or not.</param>
     /// <returns>A collection of media library scan jobs.</returns>
-    IEnumerable<IMediaLibraryScanJob> CreateScanJobsForLibrary(LibraryId libraryId, bool downloadMedatadaFromWeb);
+    IEnumerable<IMediaLibraryScanJob> CreateScanJobsForLibrary(LibraryId libraryId, bool downloadMetadataFromWeb);
 }

@@ -55,7 +55,7 @@ public sealed class Directory : FileSystemItem
     /// <param name="dateModified">The date and time the directory was last modified. Can be optional if unknown.</param>
     /// <param name="status">The status of the file system item.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly created <see cref="Directory"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="Directory"/>, or an error message.
     /// </returns>
     public static ErrorOr<Directory> Create(
         string path,
@@ -87,7 +87,7 @@ public sealed class Directory : FileSystemItem
     /// <param name="dateModified">The date and time the directory was last modified. Can be optional if unknown.</param>
     /// <param name="status">The status of the file system item.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly created <see cref="Directory"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="Directory"/>, or an error message.
     /// </returns>
     public static ErrorOr<Directory> Create(
         FileSystemPathId id,

@@ -47,7 +47,7 @@ public class GetEnabledLibrariesQueryHandler : IRequestHandler<GetEnabledLibrari
     /// <param name="request">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly created <see cref="LibraryResponse"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="LibraryResponse"/>, or an error message.
     /// </returns>
     public async ValueTask<ErrorOr<LibraryResponse[]>> Handle(GetEnabledLibrariesQuery request, CancellationToken cancellationToken)
     {
@@ -63,9 +63,9 @@ public class GetEnabledLibrariesQueryHandler : IRequestHandler<GetEnabledLibrari
         else
         {
             // for regular users, only take the libraries that belong to them
-            LibraryResponse[] userEnabledLibraries = getEnabledLibrariesResult.Value
+            LibraryResponse[] userEnabledLibraries = [.. getEnabledLibrariesResult.Value
                 .Where(library => library.UserId == _currentUserService.UserId)
-                .Select(library => library.ToResponse()).ToArray();
+                .Select(library => library.ToResponse())];
 
             return ErrorOrFactory.From(userEnabledLibraries);
         }

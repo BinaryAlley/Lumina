@@ -41,7 +41,7 @@ public static class TagEntityMapping
     /// </summary>
     /// <param name="repositoryEntity">The repository entity to be converted.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly converted <see cref="Tag"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully converted <see cref="Tag"/>, or an error message.
     /// </returns>
     public static ErrorOr<Tag> ToDomainEntity(this TagEntity repositoryEntity)
     {

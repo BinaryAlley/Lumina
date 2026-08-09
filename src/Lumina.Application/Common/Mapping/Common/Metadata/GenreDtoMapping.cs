@@ -18,7 +18,7 @@ public static class GenreDtoMapping
     /// </summary>
     /// <param name="dto">The DTO to be converted.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly converted <see cref="Genre"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully converted <see cref="Genre"/>, or an error message.
     /// </returns>
     public static ErrorOr<Genre> ToDomainEntity(this GenreDto dto)
     {

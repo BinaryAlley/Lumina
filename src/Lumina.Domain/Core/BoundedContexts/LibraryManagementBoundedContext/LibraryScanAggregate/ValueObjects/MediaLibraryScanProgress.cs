@@ -97,7 +97,7 @@ public sealed class MediaLibraryScanProgress : ValueObject
     /// <param name="status">The status of the media library scan.</param>
     /// <param name="currentJobProgress">The optional current job progress of the media library scan.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly created <see cref="MediaLibraryScanProgress"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="MediaLibraryScanProgress"/>, or an error message.
     /// </returns>
     public static ErrorOr<MediaLibraryScanProgress> Create(
         ScanId scanId,
