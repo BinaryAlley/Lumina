@@ -95,6 +95,7 @@ public class LibraryManagementController : Controller
     [RequirePermission(AuthorizationPermission.CanCreateLibraries)]
     public async Task<IActionResult> SaveLibrary([FromBody] LibraryModel data, CancellationToken cancellationToken)
     {
+        // TODO: 1. this also needs to send the image files themselves to the API, since the server could be remote; for now, it assumes local paths which it can later read, which works only if the server is local too
         // call different API endpoints based on whether this is a new library or an existing one
         LibraryModel response = data.Id.HasValue
             ? await _apiHttpClient.PutAsync<LibraryModel, LibraryModel>($"libraries/{data.Id}", data, cancellationToken).ConfigureAwait(false)

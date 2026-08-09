@@ -107,7 +107,7 @@ main {
 #modal-background-article {
     display: none;
     z-index: 998;
-    position: absolute;
+    position: fixed;
     top: 0px;
     left: 0px;
     min-width: 100%;

@@ -76,6 +76,7 @@ dotnet_style_readonly_field = true:error
 
 # Parameter preferences
 dotnet_code_quality_unused_parameters = all:suggestion
+dotnet_diagnostic.CA1859.severity = none
 
 # Strings
 csharp_style_prefer_string_interpolation = true:suggestion
