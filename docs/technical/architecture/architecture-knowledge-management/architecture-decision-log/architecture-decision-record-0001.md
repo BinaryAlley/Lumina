@@ -13,7 +13,7 @@ The media library scanning system requires complex job graphs with parent-child 
 2. **Domain Integrity Constraints**: Jobs are first-class domain objects with established relationships that must persist.
 3. **Architecture Layer Boundaries**: Application layer must not reference EF Core directly.
 
-## Decission
+## Decision
 `IServiceScopeFactory` will be used in a controlled manner to create execution contexts for background jobs:
 
 ```chsarp
