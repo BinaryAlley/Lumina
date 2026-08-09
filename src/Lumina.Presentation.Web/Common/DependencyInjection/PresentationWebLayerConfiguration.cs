@@ -24,7 +24,7 @@ internal static class PresentationWebLayerConfiguration
     {
         // add the configuration sources to the configuration builder
         configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-        configuration.AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
+        configuration.AddJsonFile("appsettings.development.json", optional: true, reloadOnChange: true);
         
         serviceCollection.AddOptions<ServerConfigurationModel>()
                          .Bind(configuration.GetRequiredSection(ServerConfigurationModel.SECTION_NAME))
