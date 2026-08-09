@@ -33,8 +33,9 @@ public static class LibraryEntityMapping
             repositoryEntity.CoverImage,
             repositoryEntity.IsEnabled,
             repositoryEntity.IsLocked,
-            repositoryEntity.DownloadMedatadaFromWeb,
-            repositoryEntity.SaveMetadataInMediaDirectories,
+            repositoryEntity.DownloadMetadataFromWeb,
+            repositoryEntity.ShouldSaveMetadataInMediaDirectories,
+            repositoryEntity.ShouldSkipUnchangedDirectoriesDuringScan,
             repositoryEntity.CreatedOnUtc,
             repositoryEntity.UpdatedOnUtc
         );
@@ -45,7 +46,7 @@ public static class LibraryEntityMapping
     /// </summary>
     /// <param name="repositoryEntity">The repository entity to be converted.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfuly converted <see cref="Library"/>, or an error message.
+    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully converted <see cref="Library"/>, or an error message.
     /// </returns>
     public static ErrorOr<Library> ToDomainEntity(this LibraryEntity repositoryEntity)
     {
@@ -58,8 +59,9 @@ public static class LibraryEntityMapping
             repositoryEntity.CoverImage,
             repositoryEntity.IsEnabled,
             repositoryEntity.IsLocked,
-            repositoryEntity.DownloadMedatadaFromWeb,
-            repositoryEntity.SaveMetadataInMediaDirectories,
+            repositoryEntity.DownloadMetadataFromWeb,
+            repositoryEntity.ShouldSaveMetadataInMediaDirectories,
+            repositoryEntity.ShouldSkipUnchangedDirectoriesDuringScan,
             repositoryEntity.LibraryScans.Select(libraryScan => ScanId.Create(libraryScan.Id)).ToList()
         );
     }

@@ -183,8 +183,11 @@
   <data name="DescriptionLocked" xml:space="preserve">
     <value>此媒体库是否已锁定。锁定的库会显示给用户，但永远不会被扫描、更新、修改等。</value>
   </data>
-  <data name="DescriptionSaveMetadataInMediaDirectories" xml:space="preserve">
+  <data name="DescriptionShouldSaveMetadataInMediaDirectories" xml:space="preserve">
     <value>是否在媒体库内容位置目录中保存已下载元数据的副本。这仅在从网络下载元数据处于活动状态时才有效。</value>
+  </data>
+  <data name="DescriptionShouldSkipUnchangedDirectoriesDuringScan" xml:space="preserve">
+    <value>启用此选项后，将使用目录元数据跳过自上次扫描以来未更改的目录。这可以_显著_加快扫描速度，但请注意，编辑现有文件时目录元数据_不会_更改/更新，只有在添加新文件或删除现有文件时才会更改。仅当您不修改现有文件时才启用此选项。</value>
   </data>
   <data name="DescriptionTitle" xml:space="preserve">
     <value>给这个图书馆起个名字</value>
@@ -273,8 +276,11 @@
   <data name="Save" xml:space="preserve">
     <value>保存</value>
   </data>
-  <data name="SaveMetadataInMediaDirectories" xml:space="preserve">
+  <data name="ShouldSaveMetadataInMediaDirectories" xml:space="preserve">
     <value>在媒体目录中保存元数据</value>
+  </data>
+  <data name="ShouldSkipUnchangedDirectoriesDuringScan" xml:space="preserve">
+    <value>扫描时跳过未更改的文件夹</value>
   </data>
   <data name="Screenplay" xml:space="preserve">
     <value>剧本</value>

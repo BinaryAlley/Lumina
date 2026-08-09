@@ -28,8 +28,9 @@ public record LibraryResponse(
     string? CoverImage,
     bool IsEnabled,
     bool IsLocked,
-    bool DownloadMedatadaFromWeb,
-    bool SaveMetadataInMediaDirectories,
+    bool DownloadMetadataFromWeb,
+    bool ShouldSaveMetadataInMediaDirectories,
+    bool ShouldSkipUnchangedDirectoriesDuringScan,
     DateTime CreatedOnUtc,
     DateTime? UpdatedOnUtc
 );

@@ -183,8 +183,11 @@
   <data name="DescriptionLocked" xml:space="preserve">
     <value>Ob diese Medienbibliothek gesperrt ist oder nicht. Eine gesperrte Bibliothek wird den Benutzern angezeigt, wird aber nie gescannt, aktualisiert, verändert, usw.</value>
   </data>
-  <data name="DescriptionSaveMetadataInMediaDirectories" xml:space="preserve">
+  <data name="DescriptionShouldSaveMetadataInMediaDirectories" xml:space="preserve">
     <value>Ob eine Kopie der heruntergeladenen Metadaten in den Verzeichnissen der Medienbibliothek gespeichert werden soll oder nicht. Dies hat nur eine Auswirkung, wenn das Herunterladen von Metadaten aus dem Web aktiv ist.</value>
+  </data>
+  <data name="DescriptionShouldSkipUnchangedDirectoriesDuringScan" xml:space="preserve">
+    <value>Wenn diese Option aktiviert ist, verwendet sie Verzeichnismetadaten, um Verzeichnisse zu überspringen, die sich seit dem letzten Scan nicht geändert haben. Dies kann die Scans _erheblich_ beschleunigen, aber beachten Sie, dass sich die Metadaten von Verzeichnissen _nicht_ ändern/aktualisieren, wenn vorhandene Dateien bearbeitet werden, sondern nur, wenn neue Dateien hinzugefügt oder vorhandene gelöscht werden. Aktivieren Sie diese Option nur, wenn Sie keine vorhandenen Dateien ändern.</value>
   </data>
   <data name="DescriptionTitle" xml:space="preserve">
     <value>Eine Bezeichnung für diese Bibliothek</value>
@@ -273,8 +276,11 @@
   <data name="Save" xml:space="preserve">
     <value>Speichern</value>
   </data>
-  <data name="SaveMetadataInMediaDirectories" xml:space="preserve">
+  <data name="ShouldSaveMetadataInMediaDirectories" xml:space="preserve">
     <value>Metadaten In Medienverzeichnissen Speichern</value>
+  </data>
+  <data name="ShouldSkipUnchangedDirectoriesDuringScan" xml:space="preserve">
+    <value>Unveränderte Ordner Beim Scannen Überspringen</value>
   </data>
   <data name="Screenplay" xml:space="preserve">
     <value>Drehbuch</value>

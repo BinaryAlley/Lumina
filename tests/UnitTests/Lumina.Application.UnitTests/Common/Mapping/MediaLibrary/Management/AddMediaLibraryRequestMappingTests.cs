@@ -26,6 +26,7 @@ public class AddMediaLibraryRequestMappingTests
             true,
             false,
             true,
+            false,
             false
         );
 
@@ -40,8 +41,8 @@ public class AddMediaLibraryRequestMappingTests
         Assert.Equal(request.CoverImage, result.CoverImage);
         Assert.Equal(request.IsEnabled, result.IsEnabled);
         Assert.Equal(request.IsLocked, result.IsLocked);
-        Assert.Equal(request.DownloadMedatadaFromWeb, result.DownloadMedatadaFromWeb);
-        Assert.Equal(request.SaveMetadataInMediaDirectories, result.SaveMetadataInMediaDirectories);
+        Assert.Equal(request.DownloadMetadataFromWeb, result.DownloadMetadataFromWeb);
+        Assert.Equal(request.ShouldSaveMetadataInMediaDirectories, result.ShouldSaveMetadataInMediaDirectories);
     }
 
     [Theory]
@@ -60,6 +61,7 @@ public class AddMediaLibraryRequestMappingTests
             true,
             false,
             true,
+            false,
             false
         );
 
@@ -74,8 +76,8 @@ public class AddMediaLibraryRequestMappingTests
         Assert.Equal(request.CoverImage, result.CoverImage);
         Assert.Equal(request.IsEnabled, result.IsEnabled);
         Assert.Equal(request.IsLocked, result.IsLocked);
-        Assert.Equal(request.DownloadMedatadaFromWeb, result.DownloadMedatadaFromWeb);
-        Assert.Equal(request.SaveMetadataInMediaDirectories, result.SaveMetadataInMediaDirectories);
+        Assert.Equal(request.DownloadMetadataFromWeb, result.DownloadMetadataFromWeb);
+        Assert.Equal(request.ShouldSaveMetadataInMediaDirectories, result.ShouldSaveMetadataInMediaDirectories);
     }
 
     [Fact]
@@ -98,6 +100,7 @@ public class AddMediaLibraryRequestMappingTests
             true,
             false,
             true,
+            false,
             false
         );
 
@@ -127,6 +130,7 @@ public class AddMediaLibraryRequestMappingTests
             true,
             false,
             true,
+            false,
             false
         );
 

@@ -56,10 +56,16 @@ public class LibraryModel
     /// <summary>
     /// Gets or sets whether this media library should update the metadata of its elements from the web, or not.
     /// </summary>
-    public bool DownloadMedatadaFromWeb { get; set; } = true;
+    public bool DownloadMetadataFromWeb { get; set; } = true;
 
     /// <summary>
     /// Gets or sets whether this media library should copy the downloaded metadata into the media library content locations, or not.
     /// </summary>
-    public bool SaveMetadataInMediaDirectories { get; set; } = false;
+    public bool ShouldSaveMetadataInMediaDirectories { get; set; } = false;
+
+    /// <summary>
+    /// Gets or sets whether this media library should skip the directories whose contents have not changed since the last scan, during the scan. This is an opt-in setting, because it relies on directory metadata,
+    /// which does not change when the contents of an existing file are edited, and such edits could be missed while this setting is enabled.
+    /// </summary>
+    public bool ShouldSkipUnchangedDirectoriesDuringScan { get; set; } = false;
 }

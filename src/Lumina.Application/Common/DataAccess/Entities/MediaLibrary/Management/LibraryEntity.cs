@@ -63,12 +63,17 @@ public class LibraryEntity : IStorageEntity, IAuditableEntity
     /// <summary>
     /// Gets whether this media library should update the metadata of its elements from the web, or not.
     /// </summary>
-    public bool DownloadMedatadaFromWeb { get; init; }
+    public bool DownloadMetadataFromWeb { get; init; }
 
     /// <summary>
     /// Gets whether this media library should copy the downloaded metadata into the media library content locations, or not.
     /// </summary>
-    public bool SaveMetadataInMediaDirectories { get; init; }
+    public bool ShouldSaveMetadataInMediaDirectories { get; init; }
+
+    /// <summary>
+    /// Gets whether this media library should skip the directories whose contents have not changed since the last scan, during the scan.
+    /// </summary>
+    public bool ShouldSkipUnchangedDirectoriesDuringScan { get; init; }
 
     /// <summary>
     /// Gets the user that owns the media library.

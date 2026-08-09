@@ -33,8 +33,9 @@ public class GetLibrariesEndpointSummary : Summary<GetLibrariesEndpoint, EmptyRe
                 CoverImage: "/media/myTvShowPoster.jpg",
                 IsEnabled: true,
                 IsLocked: false,
-                DownloadMedatadaFromWeb: true,
-                SaveMetadataInMediaDirectories: false,
+                DownloadMetadataFromWeb: true,
+                ShouldSaveMetadataInMediaDirectories: false,
+                ShouldSkipUnchangedDirectoriesDuringScan: false,
                 CreatedOnUtc: DateTime.UtcNow,
                 UpdatedOnUtc: default
             ),
@@ -47,8 +48,9 @@ public class GetLibrariesEndpointSummary : Summary<GetLibrariesEndpoint, EmptyRe
                 CoverImage: "/media/myMoviePoster.jpg",
                 IsEnabled: true,
                 IsLocked: true,
-                DownloadMedatadaFromWeb: true,
-                SaveMetadataInMediaDirectories: true,
+                DownloadMetadataFromWeb: true,
+                ShouldSaveMetadataInMediaDirectories: true,
+                ShouldSkipUnchangedDirectoriesDuringScan: false,
                 CreatedOnUtc: DateTime.UtcNow,
                 UpdatedOnUtc: default
             )
