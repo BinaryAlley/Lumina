@@ -8,6 +8,7 @@ using Lumina.Application.Common.Infrastructure.Security;
 using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.Application.Core.MediaLibrary.Management.Progress;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Cancellation;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Hooks;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Queue;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Services.Jobs;
@@ -17,6 +18,7 @@ using Lumina.Infrastructure.Core.Authorization;
 using Lumina.Infrastructure.Core.Authorization.Policies.Common.Factory;
 using Lumina.Infrastructure.Core.Authorization.Policies.Over18;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Cancellation;
+using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Common;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.WrittenContent.Books;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Progress;
@@ -24,6 +26,8 @@ using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Queue;
 using Lumina.Infrastructure.Core.Security;
 using Lumina.Infrastructure.Core.Time;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 #endregion
@@ -66,13 +70,13 @@ public static class InfrastructureLayerServices
         services.AddSingleton<IMediaLibrariesScanQueue, MediaLibrariesScanQueue>();
         services.AddSingleton<IMediaLibrariesScanCancellationTracker, MediaLibrariesScanCancellationTracker>();
         services.AddHostedService<MediaLibraryScanJobProcessorJob>();
+        services.AddSingleton<IScanJobRegistry>(serviceProvider => new ScanJobRegistry(serviceProvider, new Dictionary<string, IReadOnlyList<Type>>()));
 
-        services.AddTransient<IFileSystemDiscoveryJob, FileSystemDiscoveryJob>();
-        services.AddTransient<IRepositoryMetadataDiscoveryJob, RepositoryMetadataDiscoveryJob>();
-        services.AddTransient<IBooksFileExtensionsFilterJob, BooksFileExtensionsFilterJob>();
-        services.AddTransient<IHashComparerJob, HashComparerJob>();
+        services.AddTransient<IBooksFileSystemDiscoveryJob, BooksFileSystemDiscoveryJob>();
+        services.AddTransient<IMediaLibraryScanDiffJob, MediaLibraryScanDiffJob>();
+        services.AddTransient<IMediaLibraryScanHashJob, MediaLibraryScanHashJob>();
         services.AddTransient<IGoodReadsMetadataScrapJob, GoodReadsMetadataScrapJob>();
-        services.AddTransient<IRepositoryMetadataSaveJob, RepositoryMetadataSaveJob>();
+        services.AddTransient<IMediaLibraryScanResultsSaveJob, MediaLibraryScanResultsSaveJob>();
 
 
         services.AddSingleton<IMediaLibraryScanProgressNotifier, DebouncedMediaLibraryScanProgressNotifier>();

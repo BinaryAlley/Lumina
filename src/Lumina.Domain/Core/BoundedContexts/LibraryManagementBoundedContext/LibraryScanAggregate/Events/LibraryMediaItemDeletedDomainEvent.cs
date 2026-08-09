@@ -9,18 +9,18 @@ using System.Diagnostics;
 namespace Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 
 /// <summary>
-/// Domain event raised when a libary scan has failed.
+/// Domain event raised when a media library item was present in the media library scan snapshot of a previous scan, but it is no longer present on disk.
 /// </summary>
 /// <param name="Id">The unique identifier of the domain event.</param>
-/// <param name="LibraryId">The unique identifier of the library whose scan has failed.</param>
+/// <param name="LibraryId">The unique identifier of the library to which the deleted media library item belonged.</param>
 /// <param name="MediaLibraryScanCompositeId">Model for tracking media library scans.</param>
+/// <param name="Path">The path of the media library item that was deleted.</param>
 /// <param name="OccurredOnUtc">The date and time when the domain event occurred.</param>
-/// <param name="ErrorMessage">The optional descriptive message of the failure, used for diagnostic purposes.</param>
-[DebuggerDisplay("Id: {Id}")]
-public record LibraryScanFailedDomainEvent(
+[DebuggerDisplay("Id: {Id}; Path: {Path}")]
+public record LibraryMediaItemDeletedDomainEvent(
     Guid Id,
     LibraryId LibraryId,
     MediaLibraryScanCompositeId MediaLibraryScanCompositeId,
-    DateTime OccurredOnUtc,
-    string? ErrorMessage = null
+    string Path,
+    DateTime OccurredOnUtc
 ) : IDomainEvent;

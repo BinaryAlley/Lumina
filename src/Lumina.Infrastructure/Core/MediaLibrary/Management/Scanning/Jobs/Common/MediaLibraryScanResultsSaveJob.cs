@@ -2,13 +2,10 @@
 using ErrorOr;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.Infrastructure.Models.MediaLibraryScanJobPayloads;
 using Lumina.Domain.Common.Enums.MediaLibrary;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
-using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Services.Jobs;
-using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Common;
 using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -17,24 +14,23 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.WrittenContent.Books;
+namespace Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Common;
 
 /// <summary>
-/// Media library scan job for retrieving written content metadata from GoodReads.
+/// Media library scan job for persisting the results of the current scan. This should always be the last job in the directed acyclic job graph.
 /// </summary>
-internal sealed class GoodReadsMetadataScrapJob : MediaLibraryScanJob, IGoodReadsMetadataScrapJob
+internal sealed class MediaLibraryScanResultsSaveJob : MediaLibraryScanJob, IMediaLibraryScanResultsSaveJob
 {
-    private const int ENRICHMENT_PAGE_SIZE = 1000; // the number of media library items that are enriched in a single batch, keeping the peak memory bounded regardless of the library size
     private readonly IServiceScopeFactory _serviceScopeFactory;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="GoodReadsMetadataScrapJob"/> class.
+    /// Initializes a new instance of the <see cref="MediaLibraryScanResultsSaveJob"/> class.
     /// </summary>
     /// <param name="serviceScopeFactory">
     /// Injected factory for creating scopes in which services are requested.
     /// See docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0001.md for details.
     /// </param>
-    public GoodReadsMetadataScrapJob(IServiceScopeFactory serviceScopeFactory)
+    public MediaLibraryScanResultsSaveJob(IServiceScopeFactory serviceScopeFactory)
     {
         _serviceScopeFactory = serviceScopeFactory;
     }
@@ -64,66 +60,41 @@ internal sealed class GoodReadsMetadataScrapJob : MediaLibraryScanJob, IGoodRead
                     await using AsyncServiceScope asyncServiceScope = _serviceScopeFactory.CreateAsyncScope();
                     IUnitOfWork unitOfWork = asyncServiceScope.ServiceProvider.GetService<IUnitOfWork>()!;
                     IPublisher publisher = asyncServiceScope.ServiceProvider.GetService<IPublisher>()!;
-                    ILibraryScanStagingResultsRepository stagingResultsRepository = unitOfWork.GetRepository<ILibraryScanStagingResultsRepository>();
+                    ILibraryScanSnapshotRepository libraryScanSnapshotRepository = unitOfWork.GetRepository<ILibraryScanSnapshotRepository>();
 
                     MediaLibraryScanCompositeId compositeKey = MediaLibraryScanCompositeId.Create(ScanId, UserId);
 
-                    // count the media library items that need their metadata enriched, which are the items that were new or changed in this scan
-                    ErrorOr<int> getItemsToEnrichCountResult = await stagingResultsRepository.GetFilesToHashCountAsync(ScanId.Value, cancellationToken).ConfigureAwait(false);
-                    if (getItemsToEnrichCountResult.IsError)
-                        throw new InvalidOperationException(getItemsToEnrichCountResult.FirstError.Description);
-                    int totalItemsToEnrich = getItemsToEnrichCountResult.Value;
-
-                    // set the initial progress of the scan job
-                    ErrorOr<Success> publishJobProgressResult = await PublishJobProgress(publisher, compositeKey, 0, totalItemsToEnrich, cancellationToken).ConfigureAwait(false);
+                    // set the initial progress of the scan job, it's a 1 step job - applying the scan results to the storage medium
+                    ErrorOr<Success> publishJobProgressResult = await PublishJobProgress(publisher, compositeKey, 0, 1, cancellationToken).ConfigureAwait(false);
                     if (publishJobProgressResult.IsError)
                         throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
 
-                    DateTime lastUpdateTime = DateTime.UtcNow;
-                    int minUpdateIntervalMs = 100;
-                    int processedItemsCount = 0;
-                    string? lastPath = null;
+                    // get the paths of the media library scan snapshot items that are no longer present in the current scan, so that deletion events can be raised for them
+                    ErrorOr<IReadOnlyList<string>> getDeletedPathsResult = await libraryScanSnapshotRepository.GetDeletedPathsAsync(LibraryId.Value, ScanId.Value, cancellationToken).ConfigureAwait(false);
+                    if (getDeletedPathsResult.IsError)
+                        throw new InvalidOperationException(getDeletedPathsResult.FirstError.Description);
 
-                    // process the media library items that need their metadata enriched in pages, keeping the peak memory bounded regardless of the library size
-                    while (true)
+                    // apply the results of the current scan to the storage medium, atomically replacing the media library scan snapshot of the previous scan
+                    ErrorOr<Updated> applySnapshotSwapResult = await libraryScanSnapshotRepository.ApplySnapshotSwapAsync(LibraryId.Value, ScanId.Value, UserId.Value, cancellationToken).ConfigureAwait(false);
+                    if (applySnapshotSwapResult.IsError)
+                        throw new InvalidOperationException(applySnapshotSwapResult.FirstError.Description);
+
+                    // raise a deletion event for every media library scan snapshot item that is no longer present on disk
+                    foreach (string deletedPath in getDeletedPathsResult.Value)
                     {
                         cancellationToken.ThrowIfCancellationRequested();
-
-                        ErrorOr<IReadOnlyList<HashedFileSystemFile>> getItemsToEnrichPageResult = await stagingResultsRepository.GetFilesToHashPageAsync(ScanId.Value, lastPath, ENRICHMENT_PAGE_SIZE, cancellationToken).ConfigureAwait(false);
-                        if (getItemsToEnrichPageResult.IsError)
-                            throw new InvalidOperationException(getItemsToEnrichPageResult.FirstError.Description);
-                        IReadOnlyList<HashedFileSystemFile> itemsToEnrichPage = getItemsToEnrichPageResult.Value;
-                        if (itemsToEnrichPage.Count == 0)
-                            break;
-
-                        // TODO: retrieve the metadata of each media library item from GoodReads, and store it, once the real scraping is implemented
-                        foreach (HashedFileSystemFile item in itemsToEnrichPage)
-                        {
-                            cancellationToken.ThrowIfCancellationRequested();
-
-                            // check if enough time has passed since last update
-                            DateTime now = DateTime.UtcNow;
-                            if ((now - lastUpdateTime).TotalMilliseconds >= minUpdateIntervalMs)
-                            {
-                                // increment the number of processed elements progress
-                                publishJobProgressResult = await PublishJobProgress(publisher, compositeKey, Interlocked.Increment(ref processedItemsCount), totalItemsToEnrich, cancellationToken).ConfigureAwait(false);
-                                if (publishJobProgressResult.IsError)
-                                    throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
-                                lastUpdateTime = now;
-                            }
-                        }
-
-                        lastPath = itemsToEnrichPage[^1].Path;
+                        await publisher.Publish(new LibraryMediaItemDeletedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, deletedPath, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
                     }
 
-                    // this job finished, increment the number of processed jobs progress
-                    await publisher.Publish(new LibraryScanProgressChangedDomainEvent(
-                        Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
-                    Status = LibraryScanJobStatus.Completed;
+                    // increment the number of processed elements progress
+                    publishJobProgressResult = await PublishJobProgress(publisher, compositeKey, 1, 1, cancellationToken).ConfigureAwait(false);
+                    if (publishJobProgressResult.IsError)
+                        throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
 
-                    // call each linked child with the obtained payload
-                    foreach (IMediaLibraryScanJob child in Children)
-                        await child.ExecuteAsync(id, input, cancellationToken).ConfigureAwait(false);
+                    // this job finished, and it's the last in the chain, the scan is completed
+                    Status = LibraryScanJobStatus.Completed;
+                    await publisher.Publish(new LibraryScanFinishedDomainEvent(Guid.NewGuid(), compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                    // this should always be the last job in the directed acyclic job graph, so no linked child to call further
                 }, cancellationToken).ConfigureAwait(false);
             }
         }
@@ -150,12 +121,11 @@ internal sealed class GoodReadsMetadataScrapJob : MediaLibraryScanJob, IGoodRead
     /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
     private async Task<ErrorOr<Success>> PublishJobProgress(IPublisher publisher, MediaLibraryScanCompositeId compositeKey, int currentProgress, int totalProgress, CancellationToken cancellationToken)
     {
-        ErrorOr<MediaLibraryScanJobProgress> scanJobProgressResult = MediaLibraryScanJobProgress.Create(currentProgress, totalProgress, "GoodReadsMetadataDownload");
+        ErrorOr<MediaLibraryScanJobProgress> scanJobProgressResult = MediaLibraryScanJobProgress.Create(currentProgress, totalProgress, "SavingScanData");
         if (scanJobProgressResult.IsError)
             return scanJobProgressResult.Errors;
 
-        await publisher.Publish(new LibraryScanJobProgressChangedDomainEvent(
-            Guid.NewGuid(), LibraryId, compositeKey, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+        await publisher.Publish(new LibraryScanJobProgressChangedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
 
         return Result.Success;
     }

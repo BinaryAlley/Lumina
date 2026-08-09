@@ -186,11 +186,11 @@
   <data name="FilmSeries" xml:space="preserve">
     <value>Serie de Filme</value>
   </data>
-  <data name="FilteringBookFiles" xml:space="preserve">
-    <value>Se filtrează fișierele de tip carte...</value>
-  </data>
   <data name="GoodReadsMetadataDownload" xml:space="preserve">
     <value>Se descarcă metadate de pe GoodReads...</value>
+  </data>
+  <data name="HashingFileContents" xml:space="preserve">
+    <value>Se calculează hash-urile fișierelor...</value>
   </data>
   <data name="GraphicNovel" xml:space="preserve">
     <value>Roman Grafic</value>
@@ -251,9 +251,6 @@
   </data>
   <data name="Remove" xml:space="preserve">
     <value>Șterge</value>
-  </data>
-  <data name="RetrievingPastScanData" xml:space="preserve">
-    <value>Se preiau datele de scanare anterioare...</value>
   </data>
   <data name="SavingScanData" xml:space="preserve">
     <value>Se salvează datele de scanare...</value>

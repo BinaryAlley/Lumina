@@ -1,9 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.Infrastructure.Models.MediaLibraryScanJobPayloads;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -19,13 +17,8 @@ public interface IFileHashService
     /// Hashes <paramref name="files"/> by sampling chunks from them.
     /// </summary>
     /// <param name="files">The collection of files to hash.</param>
-    /// <param name="previousScanResults">Lookup dictionary of a previous media library scan, used to determine if a file changed or not.</param>
     /// <param name="callback">Callback to invoke during processing of elements.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>A collection of files that changed since last library scan, along with their hashes.</returns>
-    Task<List<ChangedFileSystemFile>> HashFilesAsync(
-        List<FileInfo> files,
-        Dictionary<string, LibraryScanResultEntity> previousScanResults,
-        Func<Task> callback,
-        CancellationToken cancellationToken);
+    /// <returns>A collection of the hashed files, along with their hashes.</returns>
+    Task<List<HashedFileSystemFile>> HashFilesAsync(IReadOnlyCollection<HashedFileSystemFile> files, Func<Task> callback, CancellationToken cancellationToken);
 }

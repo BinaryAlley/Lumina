@@ -3,12 +3,11 @@ using ErrorOr;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Models.MediaLibraryScanJobPayloads;
+using Lumina.Application.Common.Infrastructure.Security;
 using Lumina.Domain.Common.Enums.MediaLibrary;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
-using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Services.Jobs;
-using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Common;
 using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -17,24 +16,24 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.WrittenContent.Books;
+namespace Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Common;
 
 /// <summary>
-/// Media library scan job for retrieving written content metadata from GoodReads.
+/// Media library scan job for computing the content hashes of the files that changed since the previous scan.
 /// </summary>
-internal sealed class GoodReadsMetadataScrapJob : MediaLibraryScanJob, IGoodReadsMetadataScrapJob
+internal sealed class MediaLibraryScanHashJob : MediaLibraryScanJob, IMediaLibraryScanHashJob
 {
-    private const int ENRICHMENT_PAGE_SIZE = 1000; // the number of media library items that are enriched in a single batch, keeping the peak memory bounded regardless of the library size
+    private const int HASHING_PAGE_SIZE = 1000; // the number of files that are hashed and written back in a single batch, keeping the peak memory bounded regardless of the library size
     private readonly IServiceScopeFactory _serviceScopeFactory;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="GoodReadsMetadataScrapJob"/> class.
+    /// Initializes a new instance of the <see cref="MediaLibraryScanHashJob"/> class.
     /// </summary>
     /// <param name="serviceScopeFactory">
     /// Injected factory for creating scopes in which services are requested.
     /// See docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0001.md for details.
     /// </param>
-    public GoodReadsMetadataScrapJob(IServiceScopeFactory serviceScopeFactory)
+    public MediaLibraryScanHashJob(IServiceScopeFactory serviceScopeFactory)
     {
         _serviceScopeFactory = serviceScopeFactory;
     }
@@ -65,60 +64,63 @@ internal sealed class GoodReadsMetadataScrapJob : MediaLibraryScanJob, IGoodRead
                     IUnitOfWork unitOfWork = asyncServiceScope.ServiceProvider.GetService<IUnitOfWork>()!;
                     IPublisher publisher = asyncServiceScope.ServiceProvider.GetService<IPublisher>()!;
                     ILibraryScanStagingResultsRepository stagingResultsRepository = unitOfWork.GetRepository<ILibraryScanStagingResultsRepository>();
+                    IFileHashService fileHashService = asyncServiceScope.ServiceProvider.GetService<IFileHashService>()!;
 
                     MediaLibraryScanCompositeId compositeKey = MediaLibraryScanCompositeId.Create(ScanId, UserId);
 
-                    // count the media library items that need their metadata enriched, which are the items that were new or changed in this scan
-                    ErrorOr<int> getItemsToEnrichCountResult = await stagingResultsRepository.GetFilesToHashCountAsync(ScanId.Value, cancellationToken).ConfigureAwait(false);
-                    if (getItemsToEnrichCountResult.IsError)
-                        throw new InvalidOperationException(getItemsToEnrichCountResult.FirstError.Description);
-                    int totalItemsToEnrich = getItemsToEnrichCountResult.Value;
+                    // count the files that need hashing, for progress reporting purposes
+                    ErrorOr<int> getFilesToHashCountResult = await stagingResultsRepository.GetFilesToHashCountAsync(ScanId.Value, cancellationToken).ConfigureAwait(false);
+                    if (getFilesToHashCountResult.IsError)
+                        throw new InvalidOperationException(getFilesToHashCountResult.FirstError.Description);
+                    int totalFilesToHash = getFilesToHashCountResult.Value;
 
                     // set the initial progress of the scan job
-                    ErrorOr<Success> publishJobProgressResult = await PublishJobProgress(publisher, compositeKey, 0, totalItemsToEnrich, cancellationToken).ConfigureAwait(false);
+                    ErrorOr<Success> publishJobProgressResult = await PublishJobProgress(publisher, compositeKey, 0, totalFilesToHash, cancellationToken).ConfigureAwait(false);
                     if (publishJobProgressResult.IsError)
                         throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
 
                     DateTime lastUpdateTime = DateTime.UtcNow;
                     int minUpdateIntervalMs = 100;
-                    int processedItemsCount = 0;
+                    int processedFilesCount = 0;
                     string? lastPath = null;
 
-                    // process the media library items that need their metadata enriched in pages, keeping the peak memory bounded regardless of the library size
+                    // process the files that need hashing in pages, keeping the peak memory bounded regardless of the library size
                     while (true)
                     {
                         cancellationToken.ThrowIfCancellationRequested();
 
-                        ErrorOr<IReadOnlyList<HashedFileSystemFile>> getItemsToEnrichPageResult = await stagingResultsRepository.GetFilesToHashPageAsync(ScanId.Value, lastPath, ENRICHMENT_PAGE_SIZE, cancellationToken).ConfigureAwait(false);
-                        if (getItemsToEnrichPageResult.IsError)
-                            throw new InvalidOperationException(getItemsToEnrichPageResult.FirstError.Description);
-                        IReadOnlyList<HashedFileSystemFile> itemsToEnrichPage = getItemsToEnrichPageResult.Value;
-                        if (itemsToEnrichPage.Count == 0)
+                        ErrorOr<IReadOnlyList<HashedFileSystemFile>> getFilesToHashPageResult = await stagingResultsRepository.GetFilesToHashPageAsync(ScanId.Value, lastPath, HASHING_PAGE_SIZE, cancellationToken).ConfigureAwait(false);
+                        if (getFilesToHashPageResult.IsError)
+                            throw new InvalidOperationException(getFilesToHashPageResult.FirstError.Description);
+                        IReadOnlyList<HashedFileSystemFile> filesToHashPage = getFilesToHashPageResult.Value;
+                        if (filesToHashPage.Count == 0)
                             break;
 
-                        // TODO: retrieve the metadata of each media library item from GoodReads, and store it, once the real scraping is implemented
-                        foreach (HashedFileSystemFile item in itemsToEnrichPage)
+                        // hash the files of the current page in parallel, invoking the progress callback before each file
+                        List<HashedFileSystemFile> hashedFiles = await fileHashService.HashFilesAsync(filesToHashPage, async () =>
                         {
-                            cancellationToken.ThrowIfCancellationRequested();
-
                             // check if enough time has passed since last update
                             DateTime now = DateTime.UtcNow;
                             if ((now - lastUpdateTime).TotalMilliseconds >= minUpdateIntervalMs)
                             {
                                 // increment the number of processed elements progress
-                                publishJobProgressResult = await PublishJobProgress(publisher, compositeKey, Interlocked.Increment(ref processedItemsCount), totalItemsToEnrich, cancellationToken).ConfigureAwait(false);
+                                publishJobProgressResult = await PublishJobProgress(publisher, compositeKey, Interlocked.Increment(ref processedFilesCount), totalFilesToHash, cancellationToken).ConfigureAwait(false);
                                 if (publishJobProgressResult.IsError)
                                     throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
                                 lastUpdateTime = now;
                             }
-                        }
+                        }, cancellationToken).ConfigureAwait(false);
 
-                        lastPath = itemsToEnrichPage[^1].Path;
+                        // write the computed hashes back to the staging results
+                        ErrorOr<Updated> updateHashesResult = await stagingResultsRepository.UpdateFileHashesAsync(ScanId.Value, hashedFiles, cancellationToken).ConfigureAwait(false);
+                        if (updateHashesResult.IsError)
+                            throw new InvalidOperationException(updateHashesResult.FirstError.Description);
+
+                        lastPath = filesToHashPage[^1].Path;
                     }
 
                     // this job finished, increment the number of processed jobs progress
-                    await publisher.Publish(new LibraryScanProgressChangedDomainEvent(
-                        Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                    await publisher.Publish(new LibraryScanProgressChangedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
                     Status = LibraryScanJobStatus.Completed;
 
                     // call each linked child with the obtained payload
@@ -150,7 +152,7 @@ internal sealed class GoodReadsMetadataScrapJob : MediaLibraryScanJob, IGoodRead
     /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
     private async Task<ErrorOr<Success>> PublishJobProgress(IPublisher publisher, MediaLibraryScanCompositeId compositeKey, int currentProgress, int totalProgress, CancellationToken cancellationToken)
     {
-        ErrorOr<MediaLibraryScanJobProgress> scanJobProgressResult = MediaLibraryScanJobProgress.Create(currentProgress, totalProgress, "GoodReadsMetadataDownload");
+        ErrorOr<MediaLibraryScanJobProgress> scanJobProgressResult = MediaLibraryScanJobProgress.Create(currentProgress, totalProgress, "HashingFileContents");
         if (scanJobProgressResult.IsError)
             return scanJobProgressResult.Errors;
 
