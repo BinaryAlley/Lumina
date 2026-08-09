@@ -64,3 +64,6 @@ $RECYCLE.BIN/
 *.log
 *.sql
 *.sqlite
+
+# Agent configuration
+AGENTS.md
