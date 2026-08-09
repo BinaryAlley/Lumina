@@ -81,7 +81,7 @@ public class ExceptionHandlingMiddleware
         if (apiException.HttpStatusCode == HttpStatusCode.Unauthorized) // HTTP 401 Unauthorized actually means lack of valid authentication credentials (not logged in)
             await HandleUnauthorizedAsync(context);
         else if (apiException.HttpStatusCode == HttpStatusCode.NotFound) // 
-            await HandleNotFoundAsync(context);
+            await HandleNotFoundAsync(context, apiException);
         else if (apiException.HttpStatusCode == HttpStatusCode.Forbidden)
         {
             if (IsApiRequest(context))
@@ -110,8 +110,16 @@ public class ExceptionHandlingMiddleware
     /// <summary>
     /// Handles not found exceptions.
     /// </summary>
-    private async Task HandleNotFoundAsync(HttpContext context)
-    {      
+    private async Task HandleNotFoundAsync(HttpContext context, ApiException apiException)
+    {
+        // when the API reports the currently logged-in user no longer exists (404 from the current-user authorization check),
+        // the stored session is stale: sign out and send the user to the login page instead of the not-found page
+        if (context.User?.Identity?.IsAuthenticated == true && IsCurrentUserAuthorizationCheck(apiException))
+        {
+            await HandleUnauthorizedAsync(context).ConfigureAwait(false);
+            return;
+        }
+
         if (IsApiRequest(context))
         {
             context.Response.StatusCode = (int)HttpStatusCode.NotFound;
@@ -209,5 +217,15 @@ public class ExceptionHandlingMiddleware
     {
         context.Response.ContentType = "application/json";
         await context.Response.WriteAsJsonAsync(response);
+    }
+
+    /// <summary>
+    /// Determines whether the API exception originated from the authorization check of the currently logged in user.
+    /// </summary>
+    /// <param name="apiException">The API exception to inspect.</param>
+    /// <returns><see langword="true"/> if the exception came from the current-user authorization endpoint, <see langword="false"/> otherwise.</returns>
+    private static bool IsCurrentUserAuthorizationCheck(ApiException apiException)
+    {
+        return apiException.RequestPath?.Contains("/auth/get-authorization", StringComparison.OrdinalIgnoreCase) == true;
     }
 }
