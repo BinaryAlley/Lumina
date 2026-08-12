@@ -2,13 +2,13 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Infrastructure.Common.Models.Configuration;
+namespace Lumina.Infrastructure.Common.Models.DTO.Configuration;
 
 /// <summary>
-/// Model for deserializing media settings.
+/// Data transfer object for deserializing media settings.
 /// </summary>
 [DebuggerDisplay("{SECTION_NAME}")]
-public class CorsSettingsModel
+public class CorsSettingsDto
 {
     public const string SECTION_NAME = "CorsSettings";
 

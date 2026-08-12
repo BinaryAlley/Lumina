@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Infrastructure.Common.Models.Configuration;
+using Lumina.Infrastructure.Common.Models.DTO.Configuration;
 using Microsoft.Extensions.Options;
 using NSubstitute;
 using System;
@@ -20,19 +20,19 @@ public class CryptographyServiceFixture
     /// Creates a valid encryption settings model for testing.
     /// </summary>
     /// <returns>The configured options.</returns>
-    public static IOptions<EncryptionSettingsModel> CreateEncryptionSettings()
+    public static IOptions<EncryptionSettingsDto> CreateEncryptionSettings()
     {
         // Generate a valid 256-bit (32 byte) key for AES-256
         byte[] key = new byte[32];
         RandomNumberGenerator.Fill(key);
         string base64Key = Convert.ToBase64String(key);
 
-        EncryptionSettingsModel settings = new()
+        EncryptionSettingsDto settings = new()
         {
             SecretKey = base64Key
         };
 
-        IOptions<EncryptionSettingsModel> options = Substitute.For<IOptions<EncryptionSettingsModel>>();
+        IOptions<EncryptionSettingsDto> options = Substitute.For<IOptions<EncryptionSettingsDto>>();
         options.Value.Returns(settings);
 
         return options;

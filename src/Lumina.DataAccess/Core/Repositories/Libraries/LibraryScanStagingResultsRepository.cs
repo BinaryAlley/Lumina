@@ -3,7 +3,7 @@ using Dapper;
 using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
-using Lumina.Application.Common.Infrastructure.Models.MediaLibraryScanJobPayloads;
+using Lumina.Application.Common.Infrastructure.Models.DTO.MediaLibraryScanJobPayloads;
 using Lumina.DataAccess.Core.UoW;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -126,7 +126,7 @@ internal sealed class LibraryScanStagingResultsRepository : ILibraryScanStagingR
     /// <param name="pageSize">The maximum number of staging results to retrieve.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a page of staging results that need hashing, or an error.</returns>
-    public async Task<ErrorOr<IReadOnlyList<HashedFileSystemFile>>> GetFilesToHashPageAsync(Guid scanId, string? lastPath, int pageSize, CancellationToken cancellationToken)
+    public async Task<ErrorOr<IReadOnlyList<HashedFileSystemFileDto>>> GetFilesToHashPageAsync(Guid scanId, string? lastPath, int pageSize, CancellationToken cancellationToken)
     {
         await using SqliteConnection connection = await OpenConnectionAsync(cancellationToken).ConfigureAwait(false);
         const string GET_FILES_TO_HASH_SQL = """
@@ -141,7 +141,7 @@ internal sealed class LibraryScanStagingResultsRepository : ILibraryScanStagingR
 
         CommandDefinition command = new(GET_FILES_TO_HASH_SQL, new { scanId, lastPath, pageSize }, cancellationToken: cancellationToken);
 
-        IEnumerable<HashedFileSystemFile> page = await connection.QueryAsync<HashedFileSystemFile>(command).ConfigureAwait(false);
+        IEnumerable<HashedFileSystemFileDto> page = await connection.QueryAsync<HashedFileSystemFileDto>(command).ConfigureAwait(false);
         return page.ToList();
     }
 
@@ -152,7 +152,7 @@ internal sealed class LibraryScanStagingResultsRepository : ILibraryScanStagingR
     /// <param name="hashedFiles">The file system items whose content hashes are updated.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<ErrorOr<Updated>> UpdateFileHashesAsync(Guid scanId, IReadOnlyCollection<HashedFileSystemFile> hashedFiles, CancellationToken cancellationToken)
+    public async Task<ErrorOr<Updated>> UpdateFileHashesAsync(Guid scanId, IReadOnlyCollection<HashedFileSystemFileDto> hashedFiles, CancellationToken cancellationToken)
     {
         await using SqliteConnection connection = await OpenConnectionAsync(cancellationToken).ConfigureAwait(false);
         await using DbTransaction transaction = await connection.BeginTransactionAsync(cancellationToken);
@@ -162,7 +162,7 @@ internal sealed class LibraryScanStagingResultsRepository : ILibraryScanStagingR
             WHERE LibraryScanId = @scanId
               AND Path = @path;
             """;
-        foreach (HashedFileSystemFile hashedFile in hashedFiles)
+        foreach (HashedFileSystemFileDto hashedFile in hashedFiles)
         {
             cancellationToken.ThrowIfCancellationRequested();
 

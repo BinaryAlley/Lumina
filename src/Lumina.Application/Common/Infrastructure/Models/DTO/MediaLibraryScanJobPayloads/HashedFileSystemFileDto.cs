@@ -4,14 +4,14 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 #endregion
 
-namespace Lumina.Application.Common.Infrastructure.Models.MediaLibraryScanJobPayloads;
+namespace Lumina.Application.Common.Infrastructure.Models.DTO.MediaLibraryScanJobPayloads;
 
 /// <summary>
 /// Represents an item for the payload of the file hashing media library scan job.
 /// </summary>
 [DebuggerDisplay("Path = {Path}, CurrentHash = {CurrentHash}, OldHash = {OldHash}, Ticks = {Ticks}, Size = {Size}")]
 [StructLayout(LayoutKind.Sequential)]
-public struct HashedFileSystemFile : IEquatable<HashedFileSystemFile>
+public struct HashedFileSystemFileDto : IEquatable<HashedFileSystemFileDto>
 {
     /// <summary>
     /// The path of the file system file.
@@ -39,7 +39,7 @@ public struct HashedFileSystemFile : IEquatable<HashedFileSystemFile>
     public long Ticks { get; set; }
 
     /// <inheritdoc/>
-    public readonly bool Equals(HashedFileSystemFile other)
+    public readonly bool Equals(HashedFileSystemFileDto other)
     {
         return Size == other.Size && CurrentHash == other.CurrentHash && OldHash == other.OldHash && Ticks == other.Ticks && Path == other.Path;
     }
@@ -47,17 +47,17 @@ public struct HashedFileSystemFile : IEquatable<HashedFileSystemFile>
     /// <inheritdoc/>
     public override readonly bool Equals(object? obj)
     {
-        return obj is HashedFileSystemFile item && Equals(item);
+        return obj is HashedFileSystemFileDto item && Equals(item);
     }
 
     /// <inheritdoc/>
-    public static bool operator ==(HashedFileSystemFile left, HashedFileSystemFile right)
+    public static bool operator ==(HashedFileSystemFileDto left, HashedFileSystemFileDto right)
     {
         return left.Equals(right);
     }
 
     /// <inheritdoc/>
-    public static bool operator !=(HashedFileSystemFile left, HashedFileSystemFile right)
+    public static bool operator !=(HashedFileSystemFileDto left, HashedFileSystemFileDto right)
     {
         return !(left == right);
     }

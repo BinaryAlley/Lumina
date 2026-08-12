@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using FluentValidation;
-using Lumina.Infrastructure.Common.Models.Configuration;
+using Lumina.Infrastructure.Common.Models.DTO.Configuration;
 using System;
 #endregion
 
@@ -9,12 +9,12 @@ namespace Lumina.Infrastructure.Common.Validators;
 /// <summary>
 /// Validates the needed validation rules for the JwtSettings application configuration settings section.
 /// </summary>
-public class CorsSettingsModelValidator : AbstractValidator<CorsSettingsModel>
+public class CorsSettingsDtoValidator : AbstractValidator<CorsSettingsDto>
 {
     /// <summary>
     /// Initializes validation rules for CORS configuration
     /// </summary>
-    public CorsSettingsModelValidator()
+    public CorsSettingsDtoValidator()
     {
         RuleFor(x => x.AllowedOrigins)
             .NotEmpty()

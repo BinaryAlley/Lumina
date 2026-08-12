@@ -2,13 +2,13 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Infrastructure.Common.Models.Configuration;
+namespace Lumina.Infrastructure.Common.Models.DTO.Configuration;
 
 /// <summary>
-/// Model for deserializing database configuration settings.
+/// Data transfer object for deserializing database configuration settings.
 /// </summary>
 [DebuggerDisplay("{SECTION_NAME}")]
-public class DatabaseSettingsModel
+public class DatabaseSettingsDto
 {
     public const string SECTION_NAME = "ConnectionStrings";
 

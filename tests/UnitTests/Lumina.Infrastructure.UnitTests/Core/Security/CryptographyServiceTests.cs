@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Infrastructure.Common.Models.Configuration;
+using Lumina.Infrastructure.Common.Models.DTO.Configuration;
 using Lumina.Infrastructure.Core.Security;
 using Lumina.Infrastructure.UnitTests.Core.Security.Fixtures;
 using Microsoft.Extensions.Options;
@@ -17,7 +17,7 @@ namespace Lumina.Infrastructure.UnitTests.Core.Security;
 public class CryptographyServiceTests
 {
     private readonly CryptographyService _sut;
-    private readonly IOptions<EncryptionSettingsModel> _encryptionSettings;
+    private readonly IOptions<EncryptionSettingsDto> _encryptionSettings;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CryptographyServiceTests"/> class.

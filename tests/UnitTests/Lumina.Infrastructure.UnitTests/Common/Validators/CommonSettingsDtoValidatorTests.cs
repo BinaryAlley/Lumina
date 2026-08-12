@@ -2,7 +2,7 @@
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using Lumina.Infrastructure.Common.Errors;
-using Lumina.Infrastructure.Common.Models.Configuration;
+using Lumina.Infrastructure.Common.Models.DTO.Configuration;
 using Lumina.Infrastructure.Common.Validators;
 using System.Diagnostics.CodeAnalysis;
 #endregion
@@ -10,18 +10,18 @@ using System.Diagnostics.CodeAnalysis;
 namespace Lumina.Infrastructure.UnitTests.Common.Validators;
 
 /// <summary>
-/// Contains unit tests for the <see cref="CommonSettingsModelValidator"/> class.
+/// Contains unit tests for the <see cref="CommonSettingsDtoValidator"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class CommonSettingsModelValidatorTests
+public class CommonSettingsDtoValidatorTests
 {
-    private readonly CommonSettingsModelValidator _validator;
+    private readonly CommonSettingsDtoValidator _validator;
     private readonly IFixture _fixture;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="CommonSettingsModelValidatorTests"/> class.
+    /// Initializes a new instance of the <see cref="CommonSettingsDtoValidatorTests"/> class.
     /// </summary>
-    public CommonSettingsModelValidatorTests()
+    public CommonSettingsDtoValidatorTests()
     {
         _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
         _validator = new();
@@ -31,7 +31,7 @@ public class CommonSettingsModelValidatorTests
     public void CommonSettingsModelValidator_WhenThemeProvided_ShouldNotHaveValidationError()
     {
         // Arrange
-        CommonSettingsModel model = _fixture.Build<CommonSettingsModel>()
+        CommonSettingsDto model = _fixture.Build<CommonSettingsDto>()
             .With(x => x.Theme, "Dark")
             .Create();
 
@@ -47,7 +47,7 @@ public class CommonSettingsModelValidatorTests
     public void CommonSettingsModelValidator_WhenThemeNotProvided_ShouldNotHaveValidationError()
     {
         // Arrange
-        CommonSettingsModel model = _fixture.Build<CommonSettingsModel>()
+        CommonSettingsDto model = _fixture.Build<CommonSettingsDto>()
             .With(x => x.Theme, string.Empty)
             .Create();
 

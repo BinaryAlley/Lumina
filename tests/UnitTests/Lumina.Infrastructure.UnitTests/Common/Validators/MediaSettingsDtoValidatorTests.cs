@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using Lumina.Application.Common.Infrastructure.Models.Configuration;
+using Lumina.Application.Common.Infrastructure.Models.DTO.Configuration;
 using Lumina.Infrastructure.Common.Errors;
 using Lumina.Infrastructure.Common.Validators;
 using System.Diagnostics.CodeAnalysis;
@@ -10,18 +10,18 @@ using System.Diagnostics.CodeAnalysis;
 namespace Lumina.Infrastructure.UnitTests.Common.Validators;
 
 /// <summary>
-/// Contains unit tests for the <see cref="MediaSettingsModelValidator"/> class.
+/// Contains unit tests for the <see cref="MediaSettingsDtoValidator"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class MediaSettingsModelValidatorTests
+public class MediaSettingsDtoValidatorTests
 {
-    private readonly MediaSettingsModelValidator _validator;
+    private readonly MediaSettingsDtoValidator _validator;
     private readonly IFixture _fixture;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="MediaSettingsModelValidatorTests"/> class.
+    /// Initializes a new instance of the <see cref="MediaSettingsDtoValidatorTests"/> class.
     /// </summary>
-    public MediaSettingsModelValidatorTests()
+    public MediaSettingsDtoValidatorTests()
     {
         _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
         _validator = new();
@@ -31,7 +31,7 @@ public class MediaSettingsModelValidatorTests
     public void MediaSettingsModelValidator_WhenRootDirectoryProvided_ShouldNotHaveValidationError()
     {
         // Arrange
-        MediaSettingsModel model = _fixture.Build<MediaSettingsModel>()
+        MediaSettingsDto model = _fixture.Build<MediaSettingsDto>()
             .With(x => x.RootDirectory, "/path/to/media")
             .Create();
 
@@ -47,7 +47,7 @@ public class MediaSettingsModelValidatorTests
     public void MediaSettingsModelValidator_WhenRootDirectoryIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        MediaSettingsModel model = _fixture.Build<MediaSettingsModel>()
+        MediaSettingsDto model = _fixture.Build<MediaSettingsDto>()
             .With(x => x.RootDirectory, string.Empty)
             .Create();
 
@@ -64,7 +64,7 @@ public class MediaSettingsModelValidatorTests
     public void MediaSettingsModelValidator_WhenRootDirectoryIsWhitespace_ShouldHaveValidationError()
     {
         // Arrange
-        MediaSettingsModel model = _fixture.Build<MediaSettingsModel>()
+        MediaSettingsDto model = _fixture.Build<MediaSettingsDto>()
             .With(x => x.RootDirectory, "   ")
             .Create();
 
@@ -81,7 +81,7 @@ public class MediaSettingsModelValidatorTests
     public void MediaSettingsModelValidator_WhenMediaLibrariesDirectoryIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        MediaSettingsModel model = _fixture.Build<MediaSettingsModel>()
+        MediaSettingsDto model = _fixture.Build<MediaSettingsDto>()
             .With(x => x.LibrariesDirectory, string.Empty)
             .Create();
 
@@ -98,7 +98,7 @@ public class MediaSettingsModelValidatorTests
     public void MediaSettingsModelValidator_WhenMediaLibrariesDirectoryProvided_ShouldNotHaveValidationError()
     {
         // Arrange
-        MediaSettingsModel model = _fixture.Build<MediaSettingsModel>()
+        MediaSettingsDto model = _fixture.Build<MediaSettingsDto>()
             .With(x => x.LibrariesDirectory, "/path/to/media")
             .Create();
 
@@ -114,7 +114,7 @@ public class MediaSettingsModelValidatorTests
     public void MediaSettingsModelValidator_WhenMediaLibrariesDirectoryIsWhitespace_ShouldHaveValidationError()
     {
         // Arrange
-        MediaSettingsModel model = _fixture.Build<MediaSettingsModel>()
+        MediaSettingsDto model = _fixture.Build<MediaSettingsDto>()
             .With(x => x.LibrariesDirectory, "   ")
             .Create();
 

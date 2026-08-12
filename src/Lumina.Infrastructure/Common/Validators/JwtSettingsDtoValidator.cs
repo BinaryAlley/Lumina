@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using FluentValidation;
-using Lumina.Infrastructure.Common.Models.Configuration;
+using Lumina.Infrastructure.Common.Models.DTO.Configuration;
 #endregion
 
 namespace Lumina.Infrastructure.Common.Validators;
@@ -8,12 +8,12 @@ namespace Lumina.Infrastructure.Common.Validators;
 /// <summary>
 /// Validates the needed validation rules for the JwtSettings application configuration settings section.
 /// </summary>
-public class JwtSettingsModelValidator : AbstractValidator<JwtSettingsModel>
+public class JwtSettingsDtoValidator : AbstractValidator<JwtSettingsDto>
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="JwtSettingsModelValidator"/> class.
+    /// Initializes a new instance of the <see cref="JwtSettingsDtoValidator"/> class.
     /// </summary>
-    public JwtSettingsModelValidator()
+    public JwtSettingsDtoValidator()
     {
         RuleFor(x => x.SecretKey)
             .NotEmpty()

@@ -2,7 +2,7 @@
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using Lumina.Infrastructure.Common.Errors;
-using Lumina.Infrastructure.Common.Models.Configuration;
+using Lumina.Infrastructure.Common.Models.DTO.Configuration;
 using Lumina.Infrastructure.Common.Validators;
 using System.Diagnostics.CodeAnalysis;
 #endregion
@@ -10,18 +10,18 @@ using System.Diagnostics.CodeAnalysis;
 namespace Lumina.Infrastructure.UnitTests.Common.Validators;
 
 /// <summary>
-/// Contains unit tests for the <see cref="CommonSettingsModelValidator"/> class.
+/// Contains unit tests for the <see cref="CommonSettingsDtoValidator"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class DatabaseSettingsModelValidatorTests
+public class DatabaseSettingsDtoValidatorTests
 {
-    private readonly DatabaseSettingsModelValidator _validator;
+    private readonly DatabaseSettingsDtoValidator _validator;
     private readonly IFixture _fixture;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="CommonSettingsModelValidatorTests"/> class.
+    /// Initializes a new instance of the <see cref="CommonSettingsDtoValidatorTests"/> class.
     /// </summary>
-    public DatabaseSettingsModelValidatorTests()
+    public DatabaseSettingsDtoValidatorTests()
     {
         _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
         _validator = new();
@@ -31,7 +31,7 @@ public class DatabaseSettingsModelValidatorTests
     public void DatabaseSettingsModelValidator_WhenDefaultConnectionProvided_ShouldNotHaveValidationError()
     {
         // Arrange
-        DatabaseSettingsModel model = _fixture.Build<DatabaseSettingsModel>()
+        DatabaseSettingsDto model = _fixture.Build<DatabaseSettingsDto>()
             .With(x => x.DefaultConnection, "dummy-connection-string")
             .Create();
 
@@ -47,7 +47,7 @@ public class DatabaseSettingsModelValidatorTests
     public void DatabaseSettingsModelValidator_WhenDefaultConnectionNotProvided_ShouldHaveValidationError()
     {
         // Arrange
-        DatabaseSettingsModel model = _fixture.Build<DatabaseSettingsModel>()
+        DatabaseSettingsDto model = _fixture.Build<DatabaseSettingsDto>()
             .With(x => x.DefaultConnection, string.Empty)
             .Create();
 

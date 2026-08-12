@@ -3,7 +3,7 @@ using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.Common.Actions;
 using Lumina.Application.Common.DataAccess.Repositories.Common.Base;
-using Lumina.Application.Common.Infrastructure.Models.MediaLibraryScanJobPayloads;
+using Lumina.Application.Common.Infrastructure.Models.DTO.MediaLibraryScanJobPayloads;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -44,7 +44,7 @@ public interface ILibraryScanStagingResultsRepository : IRepository<LibraryScanS
     /// <param name="pageSize">The maximum number of staging results to retrieve.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a page of staging results that need hashing, or an error.</returns>
-    Task<ErrorOr<IReadOnlyList<HashedFileSystemFile>>> GetFilesToHashPageAsync(Guid scanId, string? lastPath, int pageSize, CancellationToken cancellationToken);
+    Task<ErrorOr<IReadOnlyList<HashedFileSystemFileDto>>> GetFilesToHashPageAsync(Guid scanId, string? lastPath, int pageSize, CancellationToken cancellationToken);
 
     /// <summary>
     /// Updates the content hashes of the provided media library scan staging results.
@@ -53,7 +53,7 @@ public interface ILibraryScanStagingResultsRepository : IRepository<LibraryScanS
     /// <param name="hashedFiles">The file system items whose content hashes are updated.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    Task<ErrorOr<Updated>> UpdateFileHashesAsync(Guid scanId, IReadOnlyCollection<HashedFileSystemFile> hashedFiles, CancellationToken cancellationToken);
+    Task<ErrorOr<Updated>> UpdateFileHashesAsync(Guid scanId, IReadOnlyCollection<HashedFileSystemFileDto> hashedFiles, CancellationToken cancellationToken);
 
     /// <summary>
     /// Clears all the media library scan staging results of the provided media library scan from the storage medium.

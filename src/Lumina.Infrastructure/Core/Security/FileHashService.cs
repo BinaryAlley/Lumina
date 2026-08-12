@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Models.MediaLibraryScanJobPayloads;
+using Lumina.Application.Common.Infrastructure.Models.DTO.MediaLibraryScanJobPayloads;
 using Lumina.Application.Common.Infrastructure.Security;
 using System;
 using System.Collections.Generic;
@@ -30,9 +30,9 @@ internal class FileHashService : IFileHashService
     /// <param name="callback">Callback to invoke during processing of elements.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>A collection of the hashed files, along with their hashes.</returns>
-    public async Task<List<HashedFileSystemFile>> HashFilesAsync(IReadOnlyCollection<HashedFileSystemFile> inputFiles, Func<Task> callback, CancellationToken cancellationToken)
+    public async Task<List<HashedFileSystemFileDto>> HashFilesAsync(IReadOnlyCollection<HashedFileSystemFileDto> inputFiles, Func<Task> callback, CancellationToken cancellationToken)
     {
-        List<HashedFileSystemFile> outputFiles = [];
+        List<HashedFileSystemFileDto> outputFiles = [];
         object listLock = new();
 
         // make use of all available processors

@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using FluentValidation;
-using Lumina.Infrastructure.Common.Models.Configuration;
+using Lumina.Infrastructure.Common.Models.DTO.Configuration;
 using System;
 using System.Buffers.Text;
 #endregion
@@ -10,12 +10,12 @@ namespace Lumina.Infrastructure.Common.Validators;
 /// <summary>
 /// Validates the needed validation rules for the EncryptionSettings application configuration settings section.
 /// </summary>
-public class EncryptionSettingsModelValidator : AbstractValidator<EncryptionSettingsModel>
+public class EncryptionSettingsDtoValidator : AbstractValidator<EncryptionSettingsDto>
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="EncryptionSettingsModelValidator"/> class.
+    /// Initializes a new instance of the <see cref="EncryptionSettingsDtoValidator"/> class.
     /// </summary>
-    public EncryptionSettingsModelValidator()
+    public EncryptionSettingsDtoValidator()
     {
         RuleFor(x => x.SecretKey)
             .NotEmpty().WithMessage(Errors.Errors.Configuration.EncryptionSecretKeyCannotBeEmpty.Description)

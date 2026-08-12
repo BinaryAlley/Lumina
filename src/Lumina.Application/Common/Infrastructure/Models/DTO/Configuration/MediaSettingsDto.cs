@@ -2,13 +2,13 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Common.Infrastructure.Models.Configuration;
+namespace Lumina.Application.Common.Infrastructure.Models.DTO.Configuration;
 
 /// <summary>
-/// Model for deserializing media settings.
+/// Data transfer object for deserializing media settings.
 /// </summary>
 [DebuggerDisplay("{SECTION_NAME}")]
-public class MediaSettingsModel
+public class MediaSettingsDto
 {
     public const string SECTION_NAME = "MediaSettings";
 

@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Infrastructure.Time;
-using Lumina.Infrastructure.Common.Models.Configuration;
+using Lumina.Infrastructure.Common.Models.DTO.Configuration;
 using Lumina.Infrastructure.Core.Authentication;
 using Lumina.Infrastructure.UnitTests.Core.Authentication.Fixtures;
 using Microsoft.Extensions.Options;
@@ -22,7 +22,7 @@ namespace Lumina.Infrastructure.UnitTests.Core.Authentication;
 public class JwtTokenGeneratorTests
 {
     private readonly IDateTimeProvider _mockDateTimeProvider;
-    private readonly JwtSettingsModel _jwtSettings;
+    private readonly JwtSettingsDto _jwtSettings;
     private readonly JwtTokenGenerator _sut;
     private readonly DateTime _fixedUtcNow;
 
@@ -37,7 +37,7 @@ public class JwtTokenGeneratorTests
 
         _mockDateTimeProvider.UtcNow.Returns(_fixedUtcNow);
 
-        IOptions<JwtSettingsModel> options = Substitute.For<IOptions<JwtSettingsModel>>();
+        IOptions<JwtSettingsDto> options = Substitute.For<IOptions<JwtSettingsDto>>();
         options.Value.Returns(_jwtSettings);
 
         _sut = new JwtTokenGenerator(_mockDateTimeProvider, options);

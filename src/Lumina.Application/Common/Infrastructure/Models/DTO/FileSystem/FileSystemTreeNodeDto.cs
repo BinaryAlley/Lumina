@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Enums.FileSystem;
+using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Common.Infrastructure.Models.FileSystem;
+namespace Lumina.Application.Common.Infrastructure.Models.DTO.FileSystem;
 
 /// <summary>
 /// Generic file system node.
 /// </summary>
 [DebuggerDisplay("Path: {Path}")]
-public class FileSystemTreeNode
+public class FileSystemTreeNodeDto
 {
     /// <summary>
     /// Gets or sets the full path of the file or directory.
@@ -30,5 +30,5 @@ public class FileSystemTreeNode
     /// <summary>
     /// Gets or sets the list of child nodes.
     /// </summary>
-    public List<FileSystemTreeNode> Children { get; set; } = [];
+    public List<FileSystemTreeNodeDto> Children { get; set; } = [];
 }

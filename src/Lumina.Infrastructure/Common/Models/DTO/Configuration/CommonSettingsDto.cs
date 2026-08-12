@@ -2,13 +2,13 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Infrastructure.Common.Models.Configuration;
+namespace Lumina.Infrastructure.Common.Models.DTO.Configuration;
 
 /// <summary>
-/// Model for deserializing shared application configuration settings.
+/// Data transfer object for deserializing shared application configuration settings.
 /// </summary>
 [DebuggerDisplay("{SECTION_NAME}")]
-public class CommonSettingsModel
+public class CommonSettingsDto
 {
     public const string SECTION_NAME = "CommonSettings";
 

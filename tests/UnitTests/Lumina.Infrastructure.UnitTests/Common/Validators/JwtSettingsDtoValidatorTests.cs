@@ -2,7 +2,7 @@
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using Lumina.Infrastructure.Common.Errors;
-using Lumina.Infrastructure.Common.Models.Configuration;
+using Lumina.Infrastructure.Common.Models.DTO.Configuration;
 using Lumina.Infrastructure.Common.Validators;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -11,18 +11,18 @@ using System.Linq;
 namespace Lumina.Infrastructure.UnitTests.Common.Validators;
 
 /// <summary>
-/// Contains unit tests for the <see cref="JwtSettingsModelValidator"/> class.
+/// Contains unit tests for the <see cref="JwtSettingsDtoValidator"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class JwtSettingsModelValidatorTests
+public class JwtSettingsDtoValidatorTests
 {
-    private readonly JwtSettingsModelValidator _validator;
+    private readonly JwtSettingsDtoValidator _validator;
     private readonly IFixture _fixture;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="JwtSettingsModelValidatorTests"/> class.
+    /// Initializes a new instance of the <see cref="JwtSettingsDtoValidatorTests"/> class.
     /// </summary>
-    public JwtSettingsModelValidatorTests()
+    public JwtSettingsDtoValidatorTests()
     {
         _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
         _validator = new();
@@ -32,7 +32,7 @@ public class JwtSettingsModelValidatorTests
     public void JwtSettingsModelValidator_WhenAllPropertiesValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        JwtSettingsModel model = _fixture.Build<JwtSettingsModel>()
+        JwtSettingsDto model = _fixture.Build<JwtSettingsDto>()
             .With(x => x.SecretKey, "this-is-a-very-long-secret-key-for-testing")
             .With(x => x.ExpiryMinutes, 30)
             .With(x => x.Issuer, "test-issuer")
@@ -51,7 +51,7 @@ public class JwtSettingsModelValidatorTests
     public void JwtSettingsModelValidator_WhenSecretKeyIsEmpty_ShouldHaveValidationErrors()
     {
         // Arrange
-        JwtSettingsModel model = _fixture.Build<JwtSettingsModel>()
+        JwtSettingsDto model = _fixture.Build<JwtSettingsDto>()
             .With(x => x.SecretKey, string.Empty)
             .With(x => x.ExpiryMinutes, 30)
             .With(x => x.Issuer, "test-issuer")
@@ -72,7 +72,7 @@ public class JwtSettingsModelValidatorTests
     public void JwtSettingsModelValidator_WhenSecretKeyTooShort_ShouldHaveValidationError()
     {
         // Arrange
-        JwtSettingsModel model = _fixture.Build<JwtSettingsModel>()
+        JwtSettingsDto model = _fixture.Build<JwtSettingsDto>()
             .With(x => x.SecretKey, "short-key")
             .With(x => x.ExpiryMinutes, 30)
             .With(x => x.Issuer, "test-issuer")
@@ -95,7 +95,7 @@ public class JwtSettingsModelValidatorTests
     public void JwtSettingsModelValidator_WhenExpiryMinutesNotPositive_ShouldHaveValidationError(int minutes)
     {
         // Arrange
-        JwtSettingsModel model = _fixture.Build<JwtSettingsModel>()
+        JwtSettingsDto model = _fixture.Build<JwtSettingsDto>()
             .With(x => x.SecretKey, "this-is-a-very-long-secret-key-for-testing")
             .With(x => x.ExpiryMinutes, minutes)
             .With(x => x.Issuer, "test-issuer")
@@ -115,7 +115,7 @@ public class JwtSettingsModelValidatorTests
     public void JwtSettingsModelValidator_WhenIssuerIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        JwtSettingsModel model = _fixture.Build<JwtSettingsModel>()
+        JwtSettingsDto model = _fixture.Build<JwtSettingsDto>()
             .With(x => x.SecretKey, "this-is-a-very-long-secret-key-for-testing")
             .With(x => x.ExpiryMinutes, 30)
             .With(x => x.Issuer, string.Empty)
@@ -135,7 +135,7 @@ public class JwtSettingsModelValidatorTests
     public void JwtSettingsModelValidator_WhenAudienceIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        JwtSettingsModel model = _fixture.Build<JwtSettingsModel>()
+        JwtSettingsDto model = _fixture.Build<JwtSettingsDto>()
             .With(x => x.SecretKey, "this-is-a-very-long-secret-key-for-testing")
             .With(x => x.ExpiryMinutes, 30)
             .With(x => x.Issuer, "test-issuer")

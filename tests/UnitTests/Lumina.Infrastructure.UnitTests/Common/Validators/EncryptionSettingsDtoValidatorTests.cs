@@ -2,7 +2,7 @@
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using Lumina.Infrastructure.Common.Errors;
-using Lumina.Infrastructure.Common.Models.Configuration;
+using Lumina.Infrastructure.Common.Models.DTO.Configuration;
 using Lumina.Infrastructure.Common.Validators;
 using System.Diagnostics.CodeAnalysis;
 #endregion
@@ -10,18 +10,18 @@ using System.Diagnostics.CodeAnalysis;
 namespace Lumina.Infrastructure.UnitTests.Common.Validators;
 
 /// <summary>
-/// Contains unit tests for the <see cref="EncryptionSettingsModelValidator"/> class.
+/// Contains unit tests for the <see cref="EncryptionSettingsDtoValidator"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class EncryptionSettingsModelValidatorTests
+public class EncryptionSettingsDtoValidatorTests
 {
-    private readonly EncryptionSettingsModelValidator _validator;
+    private readonly EncryptionSettingsDtoValidator _validator;
     private readonly IFixture _fixture;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="EncryptionSettingsModelValidatorTests"/> class.
+    /// Initializes a new instance of the <see cref="EncryptionSettingsDtoValidatorTests"/> class.
     /// </summary>
-    public EncryptionSettingsModelValidatorTests()
+    public EncryptionSettingsDtoValidatorTests()
     {
         _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
         _validator = new();
@@ -31,7 +31,7 @@ public class EncryptionSettingsModelValidatorTests
     public void EncryptionSettingsModelValidator_WhenValidBase64SecretKeyProvided_ShouldNotHaveValidationError()
     {
         // Arrange
-        EncryptionSettingsModel model = _fixture.Build<EncryptionSettingsModel>()
+        EncryptionSettingsDto model = _fixture.Build<EncryptionSettingsDto>()
             .With(x => x.SecretKey, "dGhpcyBpcyBhIHZhbGlkIGJhc2U2NCBzdHJpbmc=") // "this is a valid base64 string" in base64
             .Create();
 
@@ -47,7 +47,7 @@ public class EncryptionSettingsModelValidatorTests
     public void EncryptionSettingsModelValidator_WhenSecretKeyIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        EncryptionSettingsModel model = _fixture.Build<EncryptionSettingsModel>()
+        EncryptionSettingsDto model = _fixture.Build<EncryptionSettingsDto>()
             .With(x => x.SecretKey, string.Empty)
             .Create();
 
@@ -67,7 +67,7 @@ public class EncryptionSettingsModelValidatorTests
     public void EncryptionSettingsModelValidator_WhenSecretKeyIsNotBase64_ShouldHaveValidationError(string invalidBase64)
     {
         // Arrange
-        EncryptionSettingsModel model = _fixture.Build<EncryptionSettingsModel>()
+        EncryptionSettingsDto model = _fixture.Build<EncryptionSettingsDto>()
             .With(x => x.SecretKey, invalidBase64)
             .Create();
 
