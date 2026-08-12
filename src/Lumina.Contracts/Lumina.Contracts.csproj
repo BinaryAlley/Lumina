@@ -14,6 +14,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Lumina.Domain\Lumina.Domain.csproj" />
+      <ProjectReference Include="..\Lumina.Domain.SharedKernel\Lumina.Domain.SharedKernel.csproj" />
     </ItemGroup>
 </Project>

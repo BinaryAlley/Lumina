@@ -21,4 +21,8 @@
         <PackageReference Include="Mediator.Abstractions" Version="3.0.0-preview.27" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Lumina.Domain.SharedKernel\Lumina.Domain.SharedKernel.csproj" />
+    </ItemGroup>
+
 </Project>
