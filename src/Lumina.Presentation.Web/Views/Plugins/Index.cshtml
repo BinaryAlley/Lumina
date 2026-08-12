@@ -1,0 +1,200 @@
+@*
+/plugins
+*@
+
+@using Lumina.Presentation.Web.Common.Enums.Plugins
+@using Lumina.Presentation.Web.Common.Models.Plugins
+@using Lumina.Presentation.Web.Common.Services
+@using Microsoft.AspNetCore.Mvc.Localization
+
+@model PluginModel[]
+
+@{
+    var settingsByPluginId = ViewData["pluginSettings"] as Dictionary<Guid, PluginSettingsModel> ?? new Dictionary<Guid, PluginSettingsModel>();
+    // generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler
+    var scriptId = ScriptIdentifierHelper.GenerateScriptId();
+}
+
+@inject IUrlService _urlService
+@inject IViewLocalizer _localizer
+
+<div style="display: grid; grid-template-rows: auto 1fr;"><!--container with two rows, one fixed, one filling remaining space-->
+    <div style="min-height: 1rem;"></div><!--the first row is a dummy row for "margin", because setting a margin on the next row would offset the parent's position-->
+    <div class="enlightenment-panel shadow-effect mx-auto panel w-75 mb-10" style="min-width: 320px;">
+        <div class="shine-effect"></div>
+        <div class="form-row">
+            <h1 class="text-light-two w-100 text-center pt-0 pb-0 engraved-title">
+                @_localizer["Plugins"]
+            </h1>
+        </div>
+        @if (Model.Length > 0)
+        {
+            <table class="w-100 text-light-two">
+                <thead>
+                    <tr>
+                        <th class="w-25">@_localizer["Name"]</th>
+                        <th class="w-15">@_localizer["Author"]</th>
+                        <th class="w-10">@_localizer["Version"]</th>
+                        <th class="w-30">@_localizer["Description"]</th>
+                        <th class="w-10">@_localizer["LoadStatus"]</th>
+                        <th class="w-10">@_localizer["Settings"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (PluginModel plugin in Model)
+                    {
+                        <tr data-plugin-id="@plugin.Id">
+                            <td>@plugin.Name</td>
+                            <td>@plugin.Author</td>
+                            <td>@plugin.Version</td>
+                            <td>@plugin.Description</td>
+                            <td>
+                                @if (plugin.LoadStatus == PluginLoadStatus.Loaded)
+                                {
+                                    <span class="text-light-one">@_localizer["Loaded"]</span>
+                                }
+                                else
+                                {
+                                    <span class="text-disabled">@_localizer["FailedToLoad"]</span>
+                                }
+                            </td>
+                            <td class="text-center">
+                                @if (plugin.LoadStatus == PluginLoadStatus.Loaded && settingsByPluginId.ContainsKey(plugin.Id))
+                                {
+                                    <button type="button" class="btn-plugin-settings-toggle confirm-button f-12 h-20px">@_localizer["Settings"]</button>
+                                }
+                            </td>
+                        </tr>
+                        @if (plugin.LoadStatus == PluginLoadStatus.FailedToLoad && !string.IsNullOrWhiteSpace(plugin.LoadError))
+                        {
+                            <tr>
+                                <td colspan="6" class="text-disabled">
+                                    @_localizer["LoadError"]: @plugin.LoadError
+                                </td>
+                            </tr>
+                        }
+                        @if (plugin.LoadStatus == PluginLoadStatus.Loaded && settingsByPluginId.ContainsKey(plugin.Id))
+                        {
+                            PluginSettingsModel pluginSettings = settingsByPluginId[plugin.Id];
+                            <tr class="plugin-settings-row hidden">
+                                <td colspan="6">
+                                    <div class="plugin-settings-panel w-75 mx-auto mt-5 mb-5" data-plugin-id="@plugin.Id">
+                                        @foreach (PluginSettingDescriptorModel descriptor in pluginSettings.Schema)
+                                        {
+                                            string currentValue = pluginSettings.Settings is not null && pluginSettings.Settings.ContainsKey(descriptor.Key)
+                                                ? pluginSettings.Settings[descriptor.Key]
+                                                : descriptor.DefaultValue ?? string.Empty;
+                                            <div class="form-row">
+                                                <div class="form-label">
+                                                    <label>@descriptor.Label</label>:
+                                                </div>
+                                                <div class="form-field">
+                                                    @if (descriptor.Type == PluginSettingType.Text)
+                                                    {
+                                                        <input type="text" class="enlightenment-input" name="@descriptor.Key" value="@currentValue" />
+                                                    }
+                                                    else if (descriptor.Type == PluginSettingType.Number)
+                                                    {
+                                                        <input type="number" class="enlightenment-input" name="@descriptor.Key" value="@currentValue" />
+                                                    }
+                                                    else if (descriptor.Type == PluginSettingType.Boolean)
+                                                    {
+                                                        bool isChecked = bool.TryParse(currentValue, out bool parsedChecked) && parsedChecked;
+                                                        <label class="enlightenment-checkbox-label">
+                                                            <input type="checkbox" class="enlightenment-checkbox-hidden" name="@descriptor.Key" @(isChecked ? "checked" : "") />
+                                                            <span class="enlightenment-checkbox"></span>
+                                                        </label>
+                                                    }
+                                                    else if (descriptor.Type == PluginSettingType.Select)
+                                                    {
+                                                        <select class="enlightenment-input" name="@descriptor.Key">
+                                                            @foreach (string allowedValue in descriptor.AllowedValues ?? [])
+                                                            {
+                                                                if (allowedValue == currentValue)
+                                                                {
+                                                                    <option value="@allowedValue" selected>@allowedValue</option>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <option value="@allowedValue">@allowedValue</option>
+                                                                }
+                                                            }
+                                                        </select>
+                                                    }
+                                                </div>
+                                            </div>
+                                        }
+                                        <div class="form-row text-end">
+                                            <button type="button" class="btn-save-plugin-settings confirm-button f-12 h-22px">@_localizer["Save"]</button>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p id="no-plugins" class="text-center">@_localizer["NoPlugins"]</p>
+        }
+    </div>
+</div>
+@section Scripts {
+    <script type="text/javascript" data-form="@scriptId" defer>
+        // create cleanup registry for this view
+        const cleanupFunctions = [];
+
+        // on settings toggle button click, show/hide the settings row of the plugin
+        const handleSettingsToggleClick = function(e) {
+            if (e.target.matches('.btn-plugin-settings-toggle')) {
+                const row = e.target.closest('tr');
+                const settingsRow = row.nextElementSibling;
+                if (settingsRow && settingsRow.classList.contains('plugin-settings-row')) {
+                    settingsRow.classList.toggle('hidden');
+                }
+            }
+        };
+
+        // on save plugin settings button click, collect the settings of the panel and send them to the API
+        const handleSavePluginSettingsClick = async function(e) {
+            if (e.target.matches('.btn-save-plugin-settings')) {
+                const panel = e.target.closest('.plugin-settings-panel');
+                const pluginId = panel.getAttribute('data-plugin-id');
+                const settings = {};
+                panel.querySelectorAll('input[name], select[name]').forEach(input => {
+                    if (input.type === 'checkbox') {
+                        settings[input.name] = input.checked.toString();
+                    } else {
+                        settings[input.name] = input.value;
+                    }
+                });
+
+                const url = '@_urlService.GetAbsoluteUrl("UpdatePluginSettings", "Plugins")';
+                const result = await callApiPutAsync(url, { pluginId: pluginId, settings: settings });
+                if (result.success) {
+                    notificationService.show('@_localizer["SettingsSaved"]', NotificationType.SUCCESS);
+                }
+            }
+        };
+
+        // add listeners
+        document.addEventListener('click', handleSettingsToggleClick);
+        document.addEventListener('click', handleSavePluginSettingsClick);
+
+        // register cleanup for these listeners
+        cleanupFunctions.push(() => {
+            document.removeEventListener('click', handleSettingsToggleClick);
+            document.removeEventListener('click', handleSavePluginSettingsClick);
+        });
+
+        // store all cleanups for this view on window object using the scriptId
+        window.viewCleanups = window.viewCleanups || {};
+        window.viewCleanups['@scriptId'] = () => {
+            cleanupFunctions.forEach(cleanup => cleanup());
+            console.log(`Unloaded @scriptId`);
+        };
+        console.log(`Loaded @scriptId`);
+    </script>
+}

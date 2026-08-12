@@ -204,6 +204,25 @@
                     </div>
                     <small class="form-label text-disabled form-description">@_localizer["DescriptionShouldSkipUnchangedDirectoriesDuringScan"]</small>
                 </div>
+                @if (id is not null)
+                {
+                    <h3 class="text-light-two">@_localizer["MetadataProviders"]</h3>
+                    <div class="form-row">
+                        <table id="metadata-providers-table" class="w-100">
+                            <thead>
+                                <tr>
+                                    <th class="w-50">@_localizer["Name"]</th>
+                                    <th class="w-15 text-center">@_localizer["Enabled"]</th>
+                                    <th class="w-35 text-center">@_localizer["Order"]</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- metadata providers will be populated here -->
+                            </tbody>
+                        </table>
+                        <small class="form-label text-disabled form-description">@_localizer["DescriptionMetadataProviders"]</small>
+                    </div>
+                }
                 <div class="form-row">
                     <button type="submit" class="confirm-button w-100px">@_localizer["Save"]</button>
                 </div>
@@ -343,6 +362,75 @@
                 e.target.parentElement.remove();
         };
 
+        const id = '@id';
+        const metadataProvidersTable = document.getElementById('metadata-providers-table');
+        const metadataProvidersTbody = metadataProvidersTable ? metadataProvidersTable.querySelector('tbody') : null;
+
+        // loads the metadata providers configured for the library, when editing an existing library
+        async function loadMetadataProvidersAsync() {
+            if (!id || !metadataProvidersTbody) return;
+            const url = '@_urlService.GetAbsoluteUrl("GetMetadataProviders", "LibraryManagement", new { libraryId = default(Guid) })'
+                .replace('/@(default(Guid))', `/${id}`); // libraryId needs to be replaced here, because GetAbsoluteUrl is server side, libraryId is client side
+            const response = await callApiGetAsync(url);
+            if (response && response.length > 0) {
+                metadataProvidersTbody.innerHTML = response.map((provider, index) => renderMetadataProviderRow(provider, index, response.length)).join('');
+            }
+        }
+
+        // renders a metadata provider row of the library
+        function renderMetadataProviderRow(provider, index, count) {
+            return `
+                <tr data-provider-plugin-id="${provider.pluginId}">
+                    <td>${provider.name}</td>
+                    <td class="text-center">
+                        <input type="checkbox" class="metadata-provider-enabled" ${provider.isEnabled ? 'checked' : ''} />
+                    </td>
+                    <td class="text-center">
+                        <button type="button" class="metadata-provider-move-up confirm-button f-12 h-20px" ${index === 0 ? 'disabled' : ''}>@_localizer["MoveUp"]</button>
+                        <button type="button" class="metadata-provider-move-down abort-button f-12 h-20px" ${index === count - 1 ? 'disabled' : ''}>@_localizer["MoveDown"]</button>
+                    </td>
+                </tr>`;
+        }
+
+        // on metadata provider move button click, reorders the providers and persists the new order
+        async function handleMetadataProviderReorderAsync(e) {
+            const button = e.target.closest('.metadata-provider-move-up, .metadata-provider-move-down');
+            if (!button || !metadataProvidersTbody) return;
+            const row = button.closest('tr');
+            if (button.classList.contains('metadata-provider-move-up')) {
+                const previousRow = row.previousElementSibling;
+                if (previousRow) metadataProvidersTbody.insertBefore(row, previousRow);
+            } else {
+                const nextRow = row.nextElementSibling;
+                if (nextRow) metadataProvidersTbody.insertBefore(nextRow, row);
+            }
+            await saveMetadataProviderOrderAsync();
+        }
+
+        // persists the current order of the metadata providers of the library
+        async function saveMetadataProviderOrderAsync() {
+            if (!id || !metadataProvidersTbody) return;
+            const pluginIds = Array.from(metadataProvidersTbody.querySelectorAll('tr[data-provider-plugin-id]'))
+                .map(row => row.getAttribute('data-provider-plugin-id'));
+            const result = await callApiPutAsync('@_urlService.GetAbsoluteUrl("ReorderMetadataProviders", "LibraryManagement")', { libraryId: id, pluginIds: pluginIds });
+            if (result.success) {
+                notificationService.show('@_localizer["OrderSaved"]', NotificationType.SUCCESS);
+            }
+        }
+
+        // on metadata provider enabled checkbox change, persists the new state
+        async function handleMetadataProviderEnabledChangeAsync(e) {
+            if (e.target.matches('.metadata-provider-enabled')) {
+                const row = e.target.closest('tr');
+                const pluginId = row.getAttribute('data-provider-plugin-id');
+                const isEnabled = e.target.checked;
+                const result = await callApiPutAsync('@_urlService.GetAbsoluteUrl("SetMetadataProviderEnabled", "LibraryManagement")', { libraryId: id, pluginId: pluginId, isEnabled: isEnabled });
+                if (!result.success) {
+                    e.target.checked = !isEnabled;
+                }
+            }
+        };
+
         // add listeners
         form.addEventListener('keypress', handleEnterKey);
         form.addEventListener('submit', handleSubmit);
@@ -352,6 +440,10 @@
         imgAddCover.addEventListener('click', handleImgAddCoverClick);
         mediaCoverFormTable.addEventListener('click', handleRowRemoval);
         mediaDirectoriesFormTable.addEventListener('click', handleRowRemoval);
+        if (metadataProvidersTbody) {
+            metadataProvidersTbody.addEventListener('click', handleMetadataProviderReorderAsync);
+            metadataProvidersTbody.addEventListener('change', handleMetadataProviderEnabledChangeAsync);
+        }
 
         // register cleanup for these listeners
         cleanupFunctions.push(() => {
@@ -363,7 +455,16 @@
             imgAddCover.removeEventListener('click', handleImgAddCoverClick);
             mediaCoverFormTable.removeEventListener('click', handleRowRemoval);
             mediaDirectoriesFormTable.removeEventListener('click', handleRowRemoval);
+            if (metadataProvidersTbody) {
+                metadataProvidersTbody.removeEventListener('click', handleMetadataProviderReorderAsync);
+                metadataProvidersTbody.removeEventListener('change', handleMetadataProviderEnabledChangeAsync);
+            }
         });
+
+        // load the metadata providers when editing an existing library
+        if (id) {
+            loadMetadataProvidersAsync();
+        }
 
         // store all cleanups for this view on window object using the scriptId
         window.viewCleanups = window.viewCleanups || {};

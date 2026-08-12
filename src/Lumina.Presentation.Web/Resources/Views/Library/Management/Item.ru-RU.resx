@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -314,5 +314,26 @@
   </data>
   <data name="YouTube" xml:space="preserve">
     <value>Ютуб</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Имя</value>
+  </data>
+  <data name="MetadataProviders" xml:space="preserve">
+    <value>Поставщики метаданных</value>
+  </data>
+  <data name="Order" xml:space="preserve">
+    <value>Порядок</value>
+  </data>
+  <data name="MoveUp" xml:space="preserve">
+    <value>Вверх</value>
+  </data>
+  <data name="MoveDown" xml:space="preserve">
+    <value>Вниз</value>
+  </data>
+  <data name="OrderSaved" xml:space="preserve">
+    <value>Порядок сохранен</value>
+  </data>
+  <data name="DescriptionMetadataProviders" xml:space="preserve">
+    <value>Поставщики метаданных, используемые для обогащения элементов этой библиотеки, в порядке, в котором они испытываются.</value>
   </data>
 </root>
