@@ -52,7 +52,7 @@ public class GetTreeFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         _client = await _apiFactory.CreateAuthenticatedClientAsync();
     }
 
-    [Fact]
+    [SkipWhenHiddenAttributeNotSupportedFact]
     public async Task ExecuteAsync_WhenCalledWithValidPathAndNotIncludeHiddenElements_ShouldReturnTreeFilesWithoutHiddenElements()
     {
         // Arrange
@@ -89,7 +89,7 @@ public class GetTreeFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         }
     }
 
-    [Fact]
+    [SkipWhenHiddenAttributeNotSupportedFact]
     public async Task ExecuteAsync_WhenCalledWithValidPathAndHiddenChildrenAndNotIncludeHiddenElements_ShouldReturnNoTreeFiles()
     {
         // Arrange

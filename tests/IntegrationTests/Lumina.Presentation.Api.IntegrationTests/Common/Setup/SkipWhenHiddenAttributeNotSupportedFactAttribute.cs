@@ -1,0 +1,20 @@
+#region ========================================================================= USING =====================================================================================
+using Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.FileSystemManagement.Fixtures;
+using System;
+using System.IO;
+using Xunit;
+#endregion
+
+namespace Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+
+/// <summary>
+/// Marks a test to be skipped when the file system does not support the <see cref="FileAttributes.Hidden"/> attribute.
+/// </summary>
+[AttributeUsage(AttributeTargets.Method)]
+public sealed class SkipWhenHiddenAttributeNotSupportedFactAttribute : FactAttribute
+{
+    /// <inheritdoc/>
+    public override string Skip => FileSystemStructureFixture.HiddenAttributeIsSupported
+        ? string.Empty
+        : "The file system does not support the hidden file attribute, so the hidden elements scenario cannot be set up.";
+}

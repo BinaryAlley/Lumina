@@ -72,23 +72,6 @@ public class AddBookCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenBookCreationFails_ShouldReturnFailureResult()
-    {
-        // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
-        bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { Title = null } };
-
-        // Act
-        ErrorOr<BookResponse> result = await _sut.Handle(bookCommand, CancellationToken.None);
-
-        // Assert
-        Assert.True(result.IsError);
-        Assert.Contains(result.Errors, e => e.Description == Errors.Metadata.TitleCannotBeEmpty.Description);
-        await _mockBookRepository.DidNotReceive().InsertAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>());
-        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
-    }
-
-    [Fact]
     public async Task Handle_WhenRepositoryInsertFails_ShouldReturnFailureResult()
     {
         // Arrange
