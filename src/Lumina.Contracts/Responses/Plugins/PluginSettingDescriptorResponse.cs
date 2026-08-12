@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Domain.SharedKernel.Common.Enums.Plugins;
 using System.Collections.Generic;
 #endregion
 

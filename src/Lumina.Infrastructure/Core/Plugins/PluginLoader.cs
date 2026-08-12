@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Infrastructure.Common.Models.DTO.Plugins;
 using Lumina.Plugins.Contracts.Core.Plugins;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -8,13 +9,6 @@ using System.Reflection;
 #endregion
 
 namespace Lumina.Infrastructure.Core.Plugins;
-
-/// <summary>
-/// Result of loading the plugins from the plugins directory.
-/// </summary>
-/// <param name="Plugins">The plugins that were loaded successfully.</param>
-/// <param name="Errors">The errors that occurred while loading the plugins.</param>
-internal sealed record PluginLoadResult(IReadOnlyList<IPlugin> Plugins, IReadOnlyList<string> Errors);
 
 /// <summary>
 /// Loads the plugins from the plugins directory, discovers their descriptors and registers their services.
@@ -27,13 +21,13 @@ internal static class PluginLoader
     /// <param name="pluginsDirectory">The directory where the plugin assemblies are located.</param>
     /// <param name="services">The service collection to which the plugin services are added.</param>
     /// <returns>The result of loading the plugins.</returns>
-    public static PluginLoadResult LoadPlugins(string pluginsDirectory, IServiceCollection services)
+    public static PluginLoadResultDto LoadPlugins(string pluginsDirectory, IServiceCollection services)
     {
         List<IPlugin> plugins = [];
         List<string> errors = [];
 
         if (!Directory.Exists(pluginsDirectory))
-            return new PluginLoadResult(plugins, errors);
+            return new PluginLoadResultDto(plugins, errors);
 
         foreach (string assemblyPath in Directory.EnumerateFiles(pluginsDirectory, "*.dll"))
         {
@@ -60,6 +54,6 @@ internal static class PluginLoader
             }
         }
 
-        return new PluginLoadResult(plugins, errors);
+        return new PluginLoadResultDto(plugins, errors);
     }
 }

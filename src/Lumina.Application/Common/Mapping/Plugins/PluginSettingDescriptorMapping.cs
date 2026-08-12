@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.Responses.Plugins;
 using Lumina.Plugins.Contracts.Common.Models.DTO.Settings;
-using ContractsPluginSettingType = Lumina.Contracts.Responses.Plugins.PluginSettingType;
+using Lumina.Domain.SharedKernel.Common.Enums.Plugins;
 #endregion
 
 namespace Lumina.Application.Common.Mapping.Plugins;
@@ -21,7 +21,7 @@ public static class PluginSettingDescriptorMapping
         return new PluginSettingDescriptorResponse(
             descriptor.Key,
             descriptor.Label,
-            (ContractsPluginSettingType)(int)descriptor.Type,
+            (PluginSettingType)(int)descriptor.Type,
             descriptor.DefaultValue,
             descriptor.AllowedValues
         );

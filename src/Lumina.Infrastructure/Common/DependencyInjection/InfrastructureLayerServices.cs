@@ -14,6 +14,7 @@ using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.Library
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Queue;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Services.Jobs;
 using Lumina.Infrastructure.Common.DomainEvents;
+using Lumina.Infrastructure.Common.Models.DTO.Plugins;
 using Lumina.Infrastructure.Core.Authentication;
 using Lumina.Infrastructure.Core.Authorization;
 using Lumina.Infrastructure.Core.Authorization.Policies.Common.Factory;
@@ -89,7 +90,7 @@ public static class InfrastructureLayerServices
         // plugins: load the plugin assemblies from the plugins directory, register their services and provide the plugin manager
         string pluginsDirectorySetting = configuration.GetSection(PluginsSettingsDto.SECTION_NAME)["Directory"] ?? "plugins";
         string pluginsDirectory = Path.Combine(AppContext.BaseDirectory, pluginsDirectorySetting);
-        PluginLoadResult pluginLoadResult = PluginLoader.LoadPlugins(pluginsDirectory, services);
+        PluginLoadResultDto pluginLoadResult = PluginLoader.LoadPlugins(pluginsDirectory, services);
         services.AddSingleton<IPluginManager>(new PluginManager(pluginLoadResult.Plugins));
         services.AddScoped<IPluginSettingsStore, PluginSettingsStore>();
         services.AddSingleton(serviceProvider => new PluginDetectionSyncJob(

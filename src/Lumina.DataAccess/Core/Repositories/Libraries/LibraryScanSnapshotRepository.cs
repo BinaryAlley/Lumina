@@ -18,6 +18,11 @@ namespace Lumina.DataAccess.Core.Repositories.Libraries;
 /// <summary>
 /// Repository for media library scan snapshots.
 /// </summary>
+/// <remarks>
+/// The bulk snapshot operations are executed with parameterized raw SQL through Dapper on a dedicated database connection, instead of Entity Framework Core,
+/// because the change tracker is not suited for the multi-row inserts, upserts, key-set paginated reads and bulk deletes that the media library scan pipeline performs at scale.
+/// See docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0006.md for details.
+/// </remarks>
 internal sealed class LibraryScanSnapshotRepository : ILibraryScanSnapshotRepository
 {
     private readonly LuminaDbContext _luminaDbContext;

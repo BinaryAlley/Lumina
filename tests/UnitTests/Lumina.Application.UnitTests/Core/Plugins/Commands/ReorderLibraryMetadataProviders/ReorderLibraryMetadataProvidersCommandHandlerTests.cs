@@ -4,6 +4,7 @@ using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Core.Plugins.Commands.ReorderLibraryMetadataProviders;
+using Lumina.DataAccess.UnitTests.Core.Repositories.Plugins.Fixtures;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -38,8 +39,9 @@ public class ReorderLibraryMetadataProvidersCommandHandlerTests
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
-        LibraryMetadataProviderConfigurationEntity firstProvider = CreateConfiguration(libraryId, Guid.NewGuid(), 2);
-        LibraryMetadataProviderConfigurationEntity secondProvider = CreateConfiguration(libraryId, Guid.NewGuid(), 1);
+        LibraryMetadataProviderConfigurationEntityFixture configurationFixture = new();
+        LibraryMetadataProviderConfigurationEntity firstProvider = configurationFixture.CreateConfiguration(libraryId, Guid.NewGuid(), 2);
+        LibraryMetadataProviderConfigurationEntity secondProvider = configurationFixture.CreateConfiguration(libraryId, Guid.NewGuid(), 1);
         _mockConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
             .Returns(new List<LibraryMetadataProviderConfigurationEntity> { firstProvider, secondProvider });
         _mockConfigurationRepository.UpsertAsync(Arg.Any<LibraryMetadataProviderConfigurationEntity>(), Arg.Any<CancellationToken>())
@@ -56,20 +58,5 @@ public class ReorderLibraryMetadataProvidersCommandHandlerTests
         await _mockConfigurationRepository.Received(1).UpsertAsync(
             Arg.Is<LibraryMetadataProviderConfigurationEntity>(configuration => configuration.PluginId == firstProvider.PluginId && configuration.Rank == 2),
             Arg.Any<CancellationToken>());
-    }
-
-    private static LibraryMetadataProviderConfigurationEntity CreateConfiguration(Guid libraryId, Guid pluginId, int rank)
-    {
-        return new LibraryMetadataProviderConfigurationEntity
-        {
-            Id = Guid.NewGuid(),
-            LibraryId = libraryId,
-            PluginId = pluginId,
-            IsEnabled = true,
-            Rank = rank,
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = default,
-            UpdatedBy = default
-        };
     }
 }

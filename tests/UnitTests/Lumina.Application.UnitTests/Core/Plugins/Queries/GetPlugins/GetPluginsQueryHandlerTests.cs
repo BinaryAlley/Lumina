@@ -5,7 +5,7 @@ using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Core.Plugins.Queries.GetPlugins;
 using Lumina.Contracts.Responses.Plugins;
-using Lumina.Domain.SharedKernel.Common.Enums.Plugins;
+using Lumina.DataAccess.UnitTests.Core.Repositories.Plugins.Fixtures;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -39,7 +39,8 @@ public class GetPluginsQueryHandlerTests
     public async Task Handle_WhenCalled_ShouldReturnAllDetectedPlugins()
     {
         // Arrange
-        List<PluginEntity> plugins = [CreatePluginEntity(), CreatePluginEntity()];
+        PluginEntityFixture pluginFixture = new();
+        List<PluginEntity> plugins = [pluginFixture.CreatePluginEntity(), pluginFixture.CreatePluginEntity()];
         _mockPluginRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(plugins);
 
         // Act
@@ -64,22 +65,5 @@ public class GetPluginsQueryHandlerTests
 
         // Assert
         Assert.True(result.IsError);
-    }
-
-    private static PluginEntity CreatePluginEntity()
-    {
-        return new PluginEntity
-        {
-            Id = Guid.NewGuid(),
-            Name = "Test Plugin",
-            Author = "Lumina",
-            Version = "1.0.0",
-            Description = "A test plugin.",
-            LoadStatus = PluginLoadStatus.Loaded,
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = default,
-            UpdatedOnUtc = DateTime.UtcNow,
-            UpdatedBy = default
-        };
     }
 }

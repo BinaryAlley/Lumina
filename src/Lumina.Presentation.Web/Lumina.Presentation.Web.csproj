@@ -58,11 +58,6 @@
         <AutoGen>True</AutoGen>
         <DependentUpon>Item.resx</DependentUpon>
       </Compile>
-      <Compile Update="Resources\Views\Plugins\Index.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>Index.resx</DependentUpon>
-      </Compile>
     </ItemGroup>
 
     <ItemGroup>

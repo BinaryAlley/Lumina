@@ -2,6 +2,7 @@
 using FastEndpoints;
 using Lumina.Contracts.Requests.Plugins;
 using Lumina.Contracts.Responses.Plugins;
+using Lumina.Domain.SharedKernel.Common.Enums.Plugins;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;

@@ -63,9 +63,7 @@ internal sealed class PluginRepository : IPluginRepository
         PluginEntity? existingPlugin = await _luminaDbContext.Plugins
             .FirstOrDefaultAsync(repositoryPlugin => repositoryPlugin.Id == plugin.Id, cancellationToken).ConfigureAwait(false);
         if (existingPlugin is null)
-        {
             _luminaDbContext.Plugins.Add(plugin);
-        }
         else
         {
             // update only the detection fields, preserving the stored settings and creation date

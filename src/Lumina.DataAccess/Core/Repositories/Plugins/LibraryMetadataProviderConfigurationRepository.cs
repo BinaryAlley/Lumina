@@ -66,9 +66,7 @@ internal sealed class LibraryMetadataProviderConfigurationRepository : ILibraryM
         LibraryMetadataProviderConfigurationEntity? existingConfiguration = await _luminaDbContext.LibraryMetadataProviderConfigurations
             .FirstOrDefaultAsync(repositoryConfiguration => repositoryConfiguration.LibraryId == configuration.LibraryId && repositoryConfiguration.PluginId == configuration.PluginId, cancellationToken).ConfigureAwait(false);
         if (existingConfiguration is null)
-        {
             _luminaDbContext.LibraryMetadataProviderConfigurations.Add(configuration);
-        }
         else
         {
             // update only the mutable fields, preserving the Id of the existing configuration

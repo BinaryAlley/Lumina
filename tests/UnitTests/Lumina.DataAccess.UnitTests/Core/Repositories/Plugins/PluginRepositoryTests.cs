@@ -4,7 +4,7 @@ using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.DataAccess.Core.Repositories.Plugins;
 using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.Plugins;
+using Lumina.DataAccess.UnitTests.Core.Repositories.Plugins.Fixtures;
 using Lumina.Domain.SharedKernel.Common.Errors;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -22,6 +22,7 @@ public class PluginRepositoryTests
 {
     private readonly LuminaDbContext _mockContext;
     private readonly PluginRepository _sut;
+    private readonly PluginEntityFixture _pluginFixture;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PluginRepositoryTests"/> class.
@@ -30,13 +31,14 @@ public class PluginRepositoryTests
     {
         _mockContext = Create.MockedDbContextFor<LuminaDbContext>();
         _sut = new PluginRepository(_mockContext);
+        _pluginFixture = new PluginEntityFixture();
     }
 
     [Fact]
     public async Task GetByIdAsync_WhenPluginExists_ShouldReturnIt()
     {
         // Arrange
-        PluginEntity plugin = CreatePluginEntity();
+        PluginEntity plugin = _pluginFixture.CreatePluginEntity();
         _mockContext.Plugins.Add(plugin);
         await _mockContext.SaveChangesAsync();
 
@@ -52,7 +54,7 @@ public class PluginRepositoryTests
     public async Task UpsertAsync_WhenPluginDoesNotExist_ShouldInsertIt()
     {
         // Arrange
-        PluginEntity plugin = CreatePluginEntity();
+        PluginEntity plugin = _pluginFixture.CreatePluginEntity();
 
         // Act
         ErrorOr<Updated> result = await _sut.UpsertAsync(plugin, CancellationToken.None);
@@ -67,12 +69,12 @@ public class PluginRepositoryTests
     public async Task UpsertAsync_WhenPluginExists_ShouldUpdateDetectionFieldsAndPreserveSettings()
     {
         // Arrange
-        PluginEntity plugin = CreatePluginEntity();
+        PluginEntity plugin = _pluginFixture.CreatePluginEntity();
         plugin.SettingsJson = """{"preferredLanguage":"en"}""";
         _mockContext.Plugins.Add(plugin);
         await _mockContext.SaveChangesAsync();
 
-        PluginEntity updatedPlugin = CreatePluginEntity(plugin.Id);
+        PluginEntity updatedPlugin = _pluginFixture.CreatePluginEntity(plugin.Id);
         updatedPlugin.Name = "Updated Name";
         updatedPlugin.SettingsJson = null; // the stored settings must be preserved
 
@@ -91,7 +93,7 @@ public class PluginRepositoryTests
     public async Task UpdateSettingsAsync_WhenPluginExists_ShouldUpdateItsSettings()
     {
         // Arrange
-        PluginEntity plugin = CreatePluginEntity();
+        PluginEntity plugin = _pluginFixture.CreatePluginEntity();
         _mockContext.Plugins.Add(plugin);
         await _mockContext.SaveChangesAsync();
 
@@ -113,22 +115,5 @@ public class PluginRepositoryTests
         // Assert
         Assert.True(result.IsError);
         Assert.Equal(Errors.Plugins.PluginNotFound, result.FirstError);
-    }
-
-    private static PluginEntity CreatePluginEntity(Guid? id = null)
-    {
-        return new PluginEntity
-        {
-            Id = id ?? Guid.NewGuid(),
-            Name = "Test Plugin",
-            Author = "Lumina",
-            Version = "1.0.0",
-            Description = "A test plugin.",
-            LoadStatus = PluginLoadStatus.Loaded,
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = default,
-            UpdatedOnUtc = DateTime.UtcNow,
-            UpdatedBy = default
-        };
     }
 }

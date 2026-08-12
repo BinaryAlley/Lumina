@@ -4,6 +4,7 @@ using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.DataAccess.Core.Repositories.Plugins;
 using Lumina.DataAccess.Core.UoW;
+using Lumina.DataAccess.UnitTests.Core.Repositories.Plugins.Fixtures;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
@@ -20,6 +21,7 @@ public class LibraryMetadataProviderConfigurationRepositoryTests
 {
     private readonly LuminaDbContext _mockContext;
     private readonly LibraryMetadataProviderConfigurationRepository _sut;
+    private readonly LibraryMetadataProviderConfigurationEntityFixture _configurationFixture;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LibraryMetadataProviderConfigurationRepositoryTests"/> class.
@@ -28,6 +30,7 @@ public class LibraryMetadataProviderConfigurationRepositoryTests
     {
         _mockContext = Create.MockedDbContextFor<LuminaDbContext>();
         _sut = new LibraryMetadataProviderConfigurationRepository(_mockContext);
+        _configurationFixture = new LibraryMetadataProviderConfigurationEntityFixture();
     }
 
     [Fact]
@@ -35,8 +38,8 @@ public class LibraryMetadataProviderConfigurationRepositoryTests
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
-        LibraryMetadataProviderConfigurationEntity configurationOfLibrary = CreateConfiguration(libraryId, Guid.NewGuid(), 1);
-        LibraryMetadataProviderConfigurationEntity configurationOfAnotherLibrary = CreateConfiguration(Guid.NewGuid(), Guid.NewGuid(), 1);
+        LibraryMetadataProviderConfigurationEntity configurationOfLibrary = _configurationFixture.CreateConfiguration(libraryId, Guid.NewGuid(), 1);
+        LibraryMetadataProviderConfigurationEntity configurationOfAnotherLibrary = _configurationFixture.CreateConfiguration(Guid.NewGuid(), Guid.NewGuid(), 1);
         _mockContext.LibraryMetadataProviderConfigurations.AddRange(configurationOfLibrary, configurationOfAnotherLibrary);
         await _mockContext.SaveChangesAsync();
 
@@ -53,7 +56,7 @@ public class LibraryMetadataProviderConfigurationRepositoryTests
     public async Task GetByLibraryAndPluginIdAsync_WhenConfigurationExists_ShouldReturnIt()
     {
         // Arrange
-        LibraryMetadataProviderConfigurationEntity configuration = CreateConfiguration(Guid.NewGuid(), Guid.NewGuid(), 1);
+        LibraryMetadataProviderConfigurationEntity configuration = _configurationFixture.CreateConfiguration(Guid.NewGuid(), Guid.NewGuid(), 1);
         _mockContext.LibraryMetadataProviderConfigurations.Add(configuration);
         await _mockContext.SaveChangesAsync();
 
@@ -69,7 +72,7 @@ public class LibraryMetadataProviderConfigurationRepositoryTests
     public async Task UpsertAsync_WhenConfigurationDoesNotExist_ShouldInsertIt()
     {
         // Arrange
-        LibraryMetadataProviderConfigurationEntity configuration = CreateConfiguration(Guid.NewGuid(), Guid.NewGuid(), 1);
+        LibraryMetadataProviderConfigurationEntity configuration = _configurationFixture.CreateConfiguration(Guid.NewGuid(), Guid.NewGuid(), 1);
 
         // Act
         ErrorOr<Updated> result = await _sut.UpsertAsync(configuration, CancellationToken.None);
@@ -84,11 +87,11 @@ public class LibraryMetadataProviderConfigurationRepositoryTests
     public async Task UpsertAsync_WhenConfigurationExists_ShouldUpdateIt()
     {
         // Arrange
-        LibraryMetadataProviderConfigurationEntity configuration = CreateConfiguration(Guid.NewGuid(), Guid.NewGuid(), 1);
+        LibraryMetadataProviderConfigurationEntity configuration = _configurationFixture.CreateConfiguration(Guid.NewGuid(), Guid.NewGuid(), 1);
         _mockContext.LibraryMetadataProviderConfigurations.Add(configuration);
         await _mockContext.SaveChangesAsync();
 
-        LibraryMetadataProviderConfigurationEntity updatedConfiguration = CreateConfiguration(configuration.LibraryId, configuration.PluginId, 5);
+        LibraryMetadataProviderConfigurationEntity updatedConfiguration = _configurationFixture.CreateConfiguration(configuration.LibraryId, configuration.PluginId, 5);
         updatedConfiguration.IsEnabled = true;
 
         // Act
@@ -100,20 +103,5 @@ public class LibraryMetadataProviderConfigurationRepositoryTests
         LibraryMetadataProviderConfigurationEntity retrievedConfiguration = _mockContext.LibraryMetadataProviderConfigurations.Single();
         Assert.Equal(5, retrievedConfiguration.Rank);
         Assert.True(retrievedConfiguration.IsEnabled);
-    }
-
-    private static LibraryMetadataProviderConfigurationEntity CreateConfiguration(Guid libraryId, Guid pluginId, int rank)
-    {
-        return new LibraryMetadataProviderConfigurationEntity
-        {
-            Id = Guid.NewGuid(),
-            LibraryId = libraryId,
-            PluginId = pluginId,
-            IsEnabled = false,
-            Rank = rank,
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = default,
-            UpdatedBy = default
-        };
     }
 }

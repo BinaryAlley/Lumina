@@ -138,6 +138,8 @@ public sealed class Book : AggregateRoot<BookId>
     /// Initializes a new instance of the <see cref="Book"/> class.
     /// </summary>
     /// <param name="id">The object representing the unique identifier of the book.</param>
+    /// <param name="libraryId">The Id of the media library this book belongs to.</param>
+    /// <param name="path">The file system path of the book.</param>
     /// <param name="metadata">The metadata of the book.</param>
     /// <param name="format">The optional format of the book (e.g., Hardcover, Paperback).</param>
     /// <param name="edition">The optional edition of the book.</param>
