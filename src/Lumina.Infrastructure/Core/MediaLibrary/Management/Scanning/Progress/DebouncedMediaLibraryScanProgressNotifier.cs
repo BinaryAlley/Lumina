@@ -4,7 +4,7 @@ using ErrorOr;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Application.Core.MediaLibrary.Management.Progress;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
-using Lumina.Domain.Common.Enums.MediaLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Progress;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Microsoft.AspNetCore.SignalR;
@@ -79,7 +79,8 @@ public sealed class DebouncedMediaLibraryScanProgressNotifier : IMediaLibrarySca
         if (!progressResult.IsError)
         {
             MediaLibraryScanProgressResponse progress = progressResult.Value.ToResponse();
-            await _hubContext.Clients.Group(mediaLibraryScanCompositeId.ToString()).SendAsync("libraryScanFinishedEvent", progress, cancellationToken).ConfigureAwait(false);
+            await _hubContext.Clients.Group(mediaLibraryScanCompositeId.ToString()).SendAsync(
+                "libraryScanFinishedEvent", progress with { Status = LibraryScanJobStatus.Completed.ToString() }, cancellationToken).ConfigureAwait(false);
         }
     }
 

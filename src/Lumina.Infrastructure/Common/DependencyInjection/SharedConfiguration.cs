@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Models.Configuration;
-using Lumina.Infrastructure.Common.Models.Configuration;
+using Lumina.Application.Common.Infrastructure.Models.DTO.Configuration;
+using Lumina.Infrastructure.Common.Models.DTO.Configuration;
 using Lumina.Infrastructure.Common.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,33 +35,38 @@ public static class SharedConfiguration
         configuration.AddEnvironmentVariables(); // environment variables should override the configuration files
 
         // bind the appsettings sections
-        services.AddOptions<CommonSettingsModel>()
-                .Bind(configuration.GetRequiredSection(CommonSettingsModel.SECTION_NAME))
+        services.AddOptions<CommonSettingsDto>()
+                .Bind(configuration.GetRequiredSection(CommonSettingsDto.SECTION_NAME))
                 .ValidateFluently()
                 .ValidateOnStart();
 
-        services.AddOptions<DatabaseSettingsModel>()
-                .Bind(configuration.GetRequiredSection(DatabaseSettingsModel.SECTION_NAME))
+        services.AddOptions<DatabaseSettingsDto>()
+                .Bind(configuration.GetRequiredSection(DatabaseSettingsDto.SECTION_NAME))
                 .ValidateFluently()
                 .ValidateOnStart();
 
-        services.AddOptions<MediaSettingsModel>()
-                .Bind(configuration.GetRequiredSection(MediaSettingsModel.SECTION_NAME))
+        services.AddOptions<MediaSettingsDto>()
+                .Bind(configuration.GetRequiredSection(MediaSettingsDto.SECTION_NAME))
                 .ValidateFluently()
                 .ValidateOnStart();
 
-        services.AddOptions<JwtSettingsModel>()
-                .Bind(configuration.GetRequiredSection(JwtSettingsModel.SECTION_NAME))
+        services.AddOptions<PluginsSettingsDto>()
+                .Bind(configuration.GetRequiredSection(PluginsSettingsDto.SECTION_NAME))
                 .ValidateFluently()
                 .ValidateOnStart();
 
-        services.AddOptions<CorsSettingsModel>()
-                .Bind(configuration.GetRequiredSection(CorsSettingsModel.SECTION_NAME))
+        services.AddOptions<JwtSettingsDto>()
+                .Bind(configuration.GetRequiredSection(JwtSettingsDto.SECTION_NAME))
                 .ValidateFluently()
                 .ValidateOnStart();
 
-        services.AddOptions<EncryptionSettingsModel>()
-                .Bind(configuration.GetRequiredSection(EncryptionSettingsModel.SECTION_NAME))
+        services.AddOptions<CorsSettingsDto>()
+                .Bind(configuration.GetRequiredSection(CorsSettingsDto.SECTION_NAME))
+                .ValidateFluently()
+                .ValidateOnStart();
+
+        services.AddOptions<EncryptionSettingsDto>()
+                .Bind(configuration.GetRequiredSection(EncryptionSettingsDto.SECTION_NAME))
                 .ValidateFluently()
                 .ValidateOnStart();
 

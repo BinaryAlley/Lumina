@@ -16,6 +16,7 @@
     <ItemGroup>
         <ProjectReference Include="..\Lumina.Contracts\Lumina.Contracts.csproj" />
         <ProjectReference Include="..\Lumina.Domain\Lumina.Domain.csproj" />
+        <ProjectReference Include="..\Lumina.Plugins.Contracts\Lumina.Plugins.Contracts.csproj" />
     </ItemGroup>
 
     <ItemGroup>
