@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using Lumina.Domain.Common.Enums.MediaLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Domain.Common.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Cancellation;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;

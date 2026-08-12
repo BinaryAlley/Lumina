@@ -7,12 +7,12 @@ using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
-using Lumina.Domain.Common.Enums.Authorization;
+using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using Mediator;
 using System.Threading;
 using System.Threading.Tasks;
 using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using DomainErrors = Lumina.Domain.SharedKernel.Common.Errors.Errors;
 #endregion
 
 namespace Lumina.Application.Core.MediaLibrary.Management.Queries.GetLibrary;

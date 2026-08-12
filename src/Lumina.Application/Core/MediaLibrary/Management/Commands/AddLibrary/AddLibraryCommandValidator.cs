@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using FluentValidation;
-using Lumina.Domain.Common.Enums.MediaLibrary;
-using Lumina.Domain.Common.Errors;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Lumina.Domain.SharedKernel.Common.Errors;
 using System;
 #endregion
 

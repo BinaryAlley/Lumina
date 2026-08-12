@@ -4,7 +4,7 @@ using FastEndpoints;
 using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetUserPermissions;
 using Lumina.Contracts.Requests.Authorization;
 using Lumina.Contracts.Responses.Authorization;
-using Lumina.Domain.Common.Enums.Authorization;
+using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authorization.GetUserPermissions;
 using Mediator;
 using Microsoft.AspNetCore.Http;

@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using FluentValidation.TestHelper;
 using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetUserRole;
-using Lumina.Domain.Common.Errors;
+using Lumina.Domain.SharedKernel.Common.Errors;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion

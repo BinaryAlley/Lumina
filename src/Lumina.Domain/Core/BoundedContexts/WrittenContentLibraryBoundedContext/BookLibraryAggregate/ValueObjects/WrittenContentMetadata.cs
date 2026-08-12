@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using Lumina.Domain.Common.Errors;
+using Lumina.Domain.SharedKernel.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using System.Collections.Generic;

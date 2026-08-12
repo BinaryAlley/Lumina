@@ -8,7 +8,7 @@ using Lumina.Application.Common.DataAccess.Seed;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Time;
-using Lumina.Domain.Common.Enums.Authorization;
+using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Threading;

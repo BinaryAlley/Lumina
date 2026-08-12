@@ -7,7 +7,7 @@ using Lumina.DataAccess.Core.Repositories.Users;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.DataAccess.UnitTests.Core.Repositories.Authorization.Fixtures;
 using Lumina.DataAccess.UnitTests.Core.Repositories.Users.Fixtures;
-using Lumina.Domain.Common.Errors;
+using Lumina.Domain.SharedKernel.Common.Errors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;

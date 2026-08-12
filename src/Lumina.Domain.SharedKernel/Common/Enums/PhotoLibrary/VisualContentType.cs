@@ -1,0 +1,12 @@
+namespace Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
+
+/// <summary>
+/// Enumeration for the types of visual content libraries.
+/// </summary>
+public enum VisualContentType
+{
+    /// <summary>
+    /// A collection of photographs organized together.
+    /// </summary>
+    PhotoAlbum,
+}

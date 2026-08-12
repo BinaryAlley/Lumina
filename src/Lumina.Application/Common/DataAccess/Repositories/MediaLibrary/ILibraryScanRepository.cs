@@ -3,7 +3,7 @@ using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.Common.Actions;
 using Lumina.Application.Common.DataAccess.Repositories.Common.Base;
-using Lumina.Domain.Common.Enums.MediaLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
 using System.Threading;

@@ -3,7 +3,7 @@ using FluentValidation.TestHelper;
 using Lumina.Application.Core.FileSystemManagement.Directories.Queries.GetDirectories;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Directories.Queries.GetDirectories.Fixtures;
 using System.Diagnostics.CodeAnalysis;
-using Lumina.Domain.Common.Errors;
+using Lumina.Domain.SharedKernel.Common.Errors;
 #endregion
 
 namespace Lumina.Application.UnitTests.Core.FileSystemManagement.Directories.Queries.GetDirectories;

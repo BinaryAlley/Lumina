@@ -11,8 +11,8 @@ using Lumina.Application.UnitTests.Core.MediaLibrary.WrittenContentLibrary.Books
 using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Domain.Common.Enums.BookLibrary;
-using Lumina.Domain.Common.Errors;
+using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Errors;
 using NSubstitute;
 using System;
 using System.Diagnostics.CodeAnalysis;

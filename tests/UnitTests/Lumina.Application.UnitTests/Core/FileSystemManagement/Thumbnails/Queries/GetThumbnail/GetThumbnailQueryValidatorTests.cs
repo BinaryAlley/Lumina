@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using FluentValidation.TestHelper;
 using Lumina.Application.Core.FileSystemManagement.Thumbnails.Queries.GetThumbnail;
-using Lumina.Domain.Common.Errors;
+using Lumina.Domain.SharedKernel.Common.Errors;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 

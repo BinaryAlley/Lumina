@@ -4,7 +4,7 @@ using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Errors;
+using Lumina.Domain.SharedKernel.Common.Errors;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

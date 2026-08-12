@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Domain.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
 using System.Collections.Generic;

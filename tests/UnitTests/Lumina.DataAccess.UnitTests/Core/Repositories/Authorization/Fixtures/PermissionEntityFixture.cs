@@ -2,7 +2,7 @@
 using AutoFixture;
 using Bogus;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Domain.Common.Enums.Authorization;
+using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion

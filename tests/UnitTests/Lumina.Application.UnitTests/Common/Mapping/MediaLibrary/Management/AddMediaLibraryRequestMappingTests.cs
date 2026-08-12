@@ -2,7 +2,7 @@
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Application.Core.MediaLibrary.Management.Commands.AddLibrary;
 using Lumina.Contracts.Requests.MediaLibrary.Management;
-using Lumina.Domain.Common.Enums.MediaLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 

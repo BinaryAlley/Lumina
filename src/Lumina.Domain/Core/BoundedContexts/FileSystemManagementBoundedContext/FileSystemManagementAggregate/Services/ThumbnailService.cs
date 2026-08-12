@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using Lumina.Domain.Common.Enums.PhotoLibrary;
-using Lumina.Domain.Common.Errors;
+using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
+using Lumina.Domain.SharedKernel.Common.Errors;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using SixLabors.ImageSharp;

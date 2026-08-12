@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using Lumina.Domain.Common.Enums.MediaLibrary;
-using Lumina.Domain.Common.Errors;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Lumina.Domain.SharedKernel.Common.Errors;
 using Lumina.Domain.Common.Models.Core;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;

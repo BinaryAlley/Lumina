@@ -3,7 +3,7 @@ using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentL
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
 using Lumina.Application.UnitTests.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Common.Fixtures;
-using Lumina.Domain.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;

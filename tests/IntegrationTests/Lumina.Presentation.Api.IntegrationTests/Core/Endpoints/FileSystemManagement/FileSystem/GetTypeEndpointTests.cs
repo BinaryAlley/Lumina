@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.Responses.FileSystemManagement.FileSystem;
-using Lumina.Domain.Common.Enums.FileSystem;
+using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;

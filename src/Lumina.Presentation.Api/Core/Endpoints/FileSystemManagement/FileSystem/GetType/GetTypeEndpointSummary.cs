@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
 using Lumina.Contracts.Responses.FileSystemManagement.FileSystem;
-using Lumina.Domain.Common.Enums.FileSystem;
+using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 

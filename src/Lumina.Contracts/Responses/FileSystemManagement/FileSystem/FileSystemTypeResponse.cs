@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Enums.FileSystem;
+using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using System.Diagnostics;
 #endregion
 

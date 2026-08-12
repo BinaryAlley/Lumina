@@ -2,7 +2,7 @@
 using FluentValidation.TestHelper;
 using Lumina.Application.Core.FileSystemManagement.Files.Queries.GetFiles;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Files.Queries.GetFiles.Fixtures;
-using Lumina.Domain.Common.Errors;
+using Lumina.Domain.SharedKernel.Common.Errors;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 

@@ -9,7 +9,7 @@ using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Core.Admin.Authorization.Roles.Commands.AddRole;
 using Lumina.Application.UnitTests.Core.Admin.Authorization.Roles.Commands.AddRole.Fixtures;
 using Lumina.Contracts.Responses.Authorization;
-using Lumina.Domain.Common.Enums.Authorization;
+using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using NSubstitute;
 using System;
 using System.Diagnostics.CodeAnalysis;

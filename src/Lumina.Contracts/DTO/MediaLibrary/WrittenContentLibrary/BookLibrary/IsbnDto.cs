@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using System.Diagnostics;
 #endregion
 

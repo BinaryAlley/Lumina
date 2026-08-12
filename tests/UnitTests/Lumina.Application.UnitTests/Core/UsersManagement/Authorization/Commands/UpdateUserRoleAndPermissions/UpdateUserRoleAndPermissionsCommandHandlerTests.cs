@@ -11,7 +11,7 @@ using Lumina.Application.Core.UsersManagement.Authorization.Commands.UpdateUserR
 using Lumina.Application.UnitTests.Common.Mapping.UserManagement.Users.Fixtures;
 using Lumina.Application.UnitTests.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions.Fixtures;
 using Lumina.Contracts.Responses.Authorization;
-using Lumina.Domain.Common.Enums.Authorization;
+using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -20,7 +20,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using DomainErrors = Lumina.Domain.SharedKernel.Common.Errors.Errors;
 #endregion
 
 namespace Lumina.Application.UnitTests.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;

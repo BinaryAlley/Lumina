@@ -7,7 +7,7 @@ using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetAuthoriza
 using Lumina.Contracts.DTO.Authentication;
 using Lumina.Contracts.Requests.Authorization;
 using Lumina.Contracts.Responses.Authorization;
-using Lumina.Domain.Common.Enums.Authorization;
+using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using Lumina.Presentation.Api.Core.Endpoints.Admin.Authorization.Permissions.GetPermissions;
 using Lumina.Presentation.Api.Core.Endpoints.Admin.Authorization.Roles.AddRole;
 using Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authorization.GetAuthorization;

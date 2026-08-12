@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Domain.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
