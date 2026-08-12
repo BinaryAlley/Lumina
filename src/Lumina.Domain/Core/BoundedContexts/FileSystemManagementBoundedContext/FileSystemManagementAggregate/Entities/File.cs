@@ -1,10 +1,9 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using Lumina.Domain.Common.Enums.FileSystem;
-using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
+using Lumina.Domain.SharedKernel.Common.Errors;
 using System;
 using System.Diagnostics;
 #endregion

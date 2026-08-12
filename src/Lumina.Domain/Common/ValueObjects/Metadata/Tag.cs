@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using Lumina.Domain.Common.Models.Core;
+using Lumina.Domain.SharedKernel.Common.Errors;
 using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
@@ -37,7 +38,7 @@ public class Tag : ValueObject
     public static ErrorOr<Tag> Create(string? name)
     {
         if (string.IsNullOrWhiteSpace(name))
-            return Errors.Errors.Metadata.TagNameCannotBeEmpty;
+            return Errors.Metadata.TagNameCannotBeEmpty;
         return new Tag(name);
     }
 

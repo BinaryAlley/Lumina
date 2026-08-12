@@ -12,7 +12,7 @@ namespace Lumina.Application.UnitTests.Core.FileSystemManagement.Directories.Fix
 /// Fixture class for the <see cref="FileSystemItemDto"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class FileSystemItemModelFixture
+public class FileSystemItemDtoFixture
 {
     private readonly Faker _faker = new();
 

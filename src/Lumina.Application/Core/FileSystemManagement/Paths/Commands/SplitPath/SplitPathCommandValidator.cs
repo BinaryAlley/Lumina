@@ -1,6 +1,6 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using FluentValidation;
-using Lumina.Domain.Common.Errors;
+using Lumina.Domain.SharedKernel.Common.Errors;
 #endregion
 
 namespace Lumina.Application.Core.FileSystemManagement.Paths.Commands.SplitPath;

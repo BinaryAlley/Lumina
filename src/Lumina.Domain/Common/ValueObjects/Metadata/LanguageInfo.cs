@@ -2,6 +2,7 @@
 using ErrorOr;
 using Lumina.Domain.Common.Models.Core;
 using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.SharedKernel.Common.Errors;
 using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
@@ -54,11 +55,11 @@ public class LanguageInfo : ValueObject
     public static ErrorOr<LanguageInfo> Create(string? languageCode, string? languageName, Optional<string> nativeName)
     {
         if (string.IsNullOrWhiteSpace(languageCode))
-            return Errors.Errors.Metadata.LanguageCodeCannotBeEmpty;
+            return Errors.Metadata.LanguageCodeCannotBeEmpty;
         if (string.IsNullOrWhiteSpace(languageName))
-            return Errors.Errors.Metadata.LanguageNameCannotBeEmpty;
+            return Errors.Metadata.LanguageNameCannotBeEmpty;
         if (languageCode.Length != 2)
-            return Errors.Errors.Metadata.InvalidIsoCode;
+            return Errors.Metadata.InvalidIsoCode;
         return new LanguageInfo(languageCode, languageName, nativeName);
     }
 

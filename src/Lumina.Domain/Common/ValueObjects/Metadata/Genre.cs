@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using Lumina.Domain.Common.Models.Core;
+using Lumina.Domain.SharedKernel.Common.Errors;
 using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
@@ -37,7 +38,7 @@ public class Genre : ValueObject
     public static ErrorOr<Genre> Create(string? name)
     {
         if (string.IsNullOrWhiteSpace(name))
-            return Errors.Errors.Metadata.GenreNameCannotBeEmpty;
+            return Errors.Metadata.GenreNameCannotBeEmpty;
         return new Genre(name);
     }
 
