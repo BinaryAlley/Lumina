@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Domain.SharedKernel.Common.Enums.Plugins;
+using Lumina.Plugins.Contracts.Common.Models.DTO.Settings;
 using Lumina.Plugins.Contracts.Core.Plugins;
-using Lumina.Plugins.Contracts.Core.Plugins.Settings;
 using Lumina.Plugins.OpenLibrary.Common.DependencyInjection;
 using Lumina.Plugins.OpenLibrary.Core.Settings;
 using Microsoft.Extensions.DependencyInjection;
@@ -49,25 +50,25 @@ public sealed class OpenLibraryPlugin : IPlugin, IPluginServiceRegistrator
     /// Gets the settings schema of the plugin.
     /// </summary>
     /// <returns>The settings descriptors of the plugin.</returns>
-    public IReadOnlyList<PluginSettingDescriptor> GetSettingsSchema()
+    public IReadOnlyList<PluginSettingDescriptorDto> GetSettingsSchema()
     {
         return
         [
-            new PluginSettingDescriptor(
+            new PluginSettingDescriptorDto(
                 Key: OpenLibrarySettingsKeys.CONTACT_EMAIL,
                 Label: "Contact Email",
                 Type: PluginSettingType.Text),
-            new PluginSettingDescriptor(
+            new PluginSettingDescriptorDto(
                 Key: OpenLibrarySettingsKeys.SEARCH_RESULT_LIMIT,
                 Label: "Search Result Limit",
                 Type: PluginSettingType.Number,
                 DefaultValue: "10"),
-            new PluginSettingDescriptor(
+            new PluginSettingDescriptorDto(
                 Key: OpenLibrarySettingsKeys.WORK_EDITION_LIMIT,
                 Label: "Work Edition Limit",
                 Type: PluginSettingType.Number,
                 DefaultValue: "50"),
-            new PluginSettingDescriptor(
+            new PluginSettingDescriptorDto(
                 Key: OpenLibrarySettingsKeys.MINIMUM_REQUEST_INTERVAL_SECONDS,
                 Label: "Minimum Request Interval (seconds)",
                 Type: PluginSettingType.Number,
