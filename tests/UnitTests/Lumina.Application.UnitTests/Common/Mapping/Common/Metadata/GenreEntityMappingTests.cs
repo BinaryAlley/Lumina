@@ -7,7 +7,7 @@ using Lumina.Domain.Common.ValueObjects.Metadata;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using Lumina.Domain.Common.Errors;
+using Lumina.Domain.SharedKernel.Common.Errors;
 #endregion
 
 namespace Lumina.Application.UnitTests.Common.Mapping.Common.Metadata;

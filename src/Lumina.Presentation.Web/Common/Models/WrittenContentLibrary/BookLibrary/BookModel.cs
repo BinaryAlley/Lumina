@@ -19,6 +19,16 @@ public class BookModel
     public Guid Id { get; init; }
 
     /// <summary>
+    /// Gets the Id of the media library this book belongs to.
+    /// </summary>
+    public Guid LibraryId { get; init; }
+
+    /// <summary>
+    /// Gets the file system path of the book.
+    /// </summary>
+    public string Path { get; init; } = null!;
+
+    /// <summary>
     /// Gets the title of the media item.
     /// </summary>
     public string Title { get; init; } = null!;

@@ -5,6 +5,7 @@ using Lumina.Domain.Common.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Lumina.Domain.SharedKernel.Common.Errors;
 #endregion
 
 namespace Lumina.Domain.Common.ValueObjects.Metadata;
@@ -92,13 +93,13 @@ public class ReleaseInfo : ValueObject
         Optional<string> releaseVersion)
     {
         if (originalReleaseDate.HasValue && originalReleaseYear.HasValue && originalReleaseDate.Value.Year != originalReleaseYear.Value)
-            return Errors.Errors.Metadata.OriginalReleaseDateAndYearMustMatch;
+            return Errors.Metadata.OriginalReleaseDateAndYearMustMatch;
         if (reReleaseDate.HasValue && reReleaseYear.HasValue && reReleaseDate.Value.Year != reReleaseYear.Value)
-            return Errors.Errors.Metadata.ReReleaseDateAndYearMustMatch;
+            return Errors.Metadata.ReReleaseDateAndYearMustMatch;
         if (originalReleaseDate.HasValue && reReleaseDate.HasValue && originalReleaseDate.Value > reReleaseDate.Value)
-            return Errors.Errors.Metadata.ReReleaseDateCannotBeEarlierThanOriginalReleaseDate;
+            return Errors.Metadata.ReReleaseDateCannotBeEarlierThanOriginalReleaseDate;
         if (originalReleaseYear.HasValue && reReleaseYear.HasValue && originalReleaseYear.Value > reReleaseYear.Value)
-            return Errors.Errors.Metadata.ReReleaseYearCannotBeEarlierThanOriginalReleaseYear;
+            return Errors.Metadata.ReReleaseYearCannotBeEarlierThanOriginalReleaseYear;
         return new ReleaseInfo(originalReleaseDate, originalReleaseYear, reReleaseDate, reReleaseYear, releaseCountry, releaseVersion);
     }
 

@@ -6,7 +6,7 @@ using Lumina.Application.UnitTests.Core.FileSystemManagement.Files.Fixtures;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.FileSystem.Fixtures;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Fixtures;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
-using Lumina.Domain.Common.Enums.FileSystem;
+using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;

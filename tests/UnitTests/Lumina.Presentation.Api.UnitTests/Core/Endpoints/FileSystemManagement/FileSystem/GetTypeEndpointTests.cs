@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
 using Lumina.Application.Core.FileSystemManagement.FileSystem.Queries.GetFileSystem;
-using Lumina.Domain.Common.Enums.FileSystem;
+using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using Lumina.Contracts.Responses.FileSystemManagement.FileSystem;
 using Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.FileSystem.GetType;
 using Mediator;

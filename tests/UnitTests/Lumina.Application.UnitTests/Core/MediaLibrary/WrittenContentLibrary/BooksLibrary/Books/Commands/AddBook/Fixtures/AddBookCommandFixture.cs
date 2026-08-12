@@ -7,7 +7,7 @@ using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Domain.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -191,6 +191,8 @@ public class AddBookCommandFixture
 
         return new Faker<AddBookCommand>()
             .CustomInstantiator(f => new AddBookCommand(
+                default,
+                default!,
                 default!,
                 default,
                 default,
@@ -204,11 +206,13 @@ public class AddBookCommandFixture
                 default,
                 default,
                 default,
-                default,
+                default!,
                 default!,
                 default!,
                 default!
             ))
+            .RuleFor(x => x.LibraryId, _fixture.Create<Guid>())
+            .RuleFor(x => x.Path, f => f.System.FilePath())
             .RuleFor(x => x.Metadata, metadata)
             .RuleFor(x => x.Format, _fixture.Create<BookFormat>())
             .RuleFor(x => x.Edition, f => f.Random.String2(f.Random.Number(1, 50)))

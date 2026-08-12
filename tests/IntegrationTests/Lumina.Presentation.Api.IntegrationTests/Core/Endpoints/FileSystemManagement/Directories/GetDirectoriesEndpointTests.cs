@@ -52,7 +52,7 @@ public class GetDirectoriesEndpointTests : IClassFixture<AuthenticatedLuminaApiF
         _client = await _apiFactory.CreateAuthenticatedClientAsync();
     }
 
-    [Fact]
+    [SkipWhenHiddenAttributeNotSupportedFact]
     public async Task GetDirectories_WhenCalledWithValidPathAndHiddenChildrenAndNotIncludeHiddenElements_ShouldReturnNoDirectories()
     {
         // Arrange

@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Time;
-using Lumina.Infrastructure.Common.Models.Configuration;
+using Lumina.Infrastructure.Common.Models.DTO.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -17,14 +17,14 @@ namespace Lumina.Infrastructure.Core.Authentication;
 public class JwtTokenGenerator : IJwtTokenGenerator
 {
     private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly JwtSettingsModel _jwtSettingsModel;
+    private readonly JwtSettingsDto _jwtSettingsModel;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="JwtTokenGenerator"/> class.
     /// </summary>
     /// <param name="dateTimeProvider">Injected service for time related functionality.</param>
-    /// <param name="jwtSettingsModelOptions">Injected service for retrieving <see cref="JwtSettingsModel"/>.</param>
-    public JwtTokenGenerator(IDateTimeProvider dateTimeProvider, IOptions<JwtSettingsModel> jwtSettingsModelOptions)
+    /// <param name="jwtSettingsModelOptions">Injected service for retrieving <see cref="JwtSettingsDto"/>.</param>
+    public JwtTokenGenerator(IDateTimeProvider dateTimeProvider, IOptions<JwtSettingsDto> jwtSettingsModelOptions)
     {
         _dateTimeProvider = dateTimeProvider;
         _jwtSettingsModel = jwtSettingsModelOptions.Value;

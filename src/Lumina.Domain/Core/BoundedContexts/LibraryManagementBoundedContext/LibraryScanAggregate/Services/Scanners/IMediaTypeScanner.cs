@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Enums.MediaLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
 using System.Collections.Generic;
@@ -15,7 +15,7 @@ public interface IMediaTypeScanner
     /// <summary>
     /// The media library type that this media library scanner supports.
     /// </summary>
-    LibraryType SupportedType { get; }
+    LibraryType SupportedLibraryType { get; }
 
     /// <summary>
     /// Creates the media library scan jobs for the provided media library.

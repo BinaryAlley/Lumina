@@ -5,7 +5,8 @@ using Lumina.Application.UnitTests.Core.MediaLibrary.WrittenContentLibrary.Books
 using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
 using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Domain.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -62,6 +63,8 @@ public class AddBookRequestMappingTests
     {
         // Arrange
         AddBookRequest request = new(
+            LibraryId: Guid.NewGuid(),
+            Path: "/books/test.epub",
             Metadata: new WrittenContentMetadataDto(
                 Title: "Test Book",
                 OriginalTitle: null,
@@ -119,6 +122,8 @@ public class AddBookRequestMappingTests
     {
         // Arrange
         AddBookRequest request = new(
+            LibraryId: Guid.NewGuid(),
+            Path: "/books/test.epub",
             Metadata: new WrittenContentMetadataDto(
                 Title: "Test Book",
                 OriginalTitle: null,

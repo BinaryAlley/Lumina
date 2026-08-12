@@ -4,7 +4,7 @@ using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Domain.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -31,6 +31,8 @@ public class GetBooksEndpointSummary : Summary<GetBooksEndpoint>
             example: new BookResponse[] {
                 new(
                     Id: Guid.NewGuid(),
+                    LibraryId: Guid.NewGuid(),
+                    Path: "/books/the-fellowship-of-the-ring.epub",
                     Metadata: new(
                         Title: "The Fellowship of the Ring",
                         OriginalTitle: "The Fellowship of the Ring",
@@ -128,11 +130,16 @@ public class GetBooksEndpointSummary : Summary<GetBooksEndpoint>
                             VoteCount: 87654
                         )
                     ],
+                    MetadataStatus: MetadataStatus.Pending,
+                    LastMetadataUpdateUtc: default,
+                    MetadataProvider: default,
                     CreatedOnUtc: DateTime.UtcNow,
                     UpdatedOnUtc: default
                 ),
                 new(
                     Id: Guid.NewGuid(),
+                    LibraryId: Guid.NewGuid(),
+                    Path: "/books/the-two-towers.epub",
                     Metadata: new(
                         Title: "The Two Towers",
                         OriginalTitle: "The Two Towers",
@@ -229,6 +236,9 @@ public class GetBooksEndpointSummary : Summary<GetBooksEndpoint>
                             VoteCount: 90000
                         )
                     ],
+                    MetadataStatus: MetadataStatus.Pending,
+                    LastMetadataUpdateUtc: default,
+                    MetadataProvider: default,
                     CreatedOnUtc: DateTime.UtcNow,
                     UpdatedOnUtc: default
                 )

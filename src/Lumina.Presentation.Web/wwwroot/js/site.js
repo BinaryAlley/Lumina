@@ -109,7 +109,7 @@ async function callApiPostAsync(url, data, options = {}) {
  * @param {Object} [options] - Additional options for the request.
  * @param {boolean} [options.useAntiForgery=true] - Whether to include anti-forgery token.
  * @param {Object} [options.headers] - Additional headers to include.
- * @returns {Promise<any>} The response data if successful, undefined otherwise.
+ * @returns {Promise<{success: boolean, data: any}>} The result of the request, containing the success flag and the response data.
  */
 async function callApiPutAsync(url, data, options = {}) {
     const defaultOptions = {
@@ -146,7 +146,7 @@ async function callApiPutAsync(url, data, options = {}) {
             if (jsonResponse.success) {
                 if (jsonResponse.message)
                     notificationService.show(jsonResponse.message, NotificationType.SUCCESS);
-                return jsonResponse.data;
+                return { success: jsonResponse.success === true, data: jsonResponse.data };
             }
             else
                 notificationService.show(jsonResponse.errorMessage, NotificationType.ERROR);
@@ -155,6 +155,7 @@ async function callApiPutAsync(url, data, options = {}) {
         console.error('Error:', error);
         notificationService.show(error, NotificationType.ERROR);
     }
+    return { success: false };
 }
 
 /**

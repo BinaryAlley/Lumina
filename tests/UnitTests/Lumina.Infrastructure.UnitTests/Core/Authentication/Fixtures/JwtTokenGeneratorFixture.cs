@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Infrastructure.Common.Models.Configuration;
+using Lumina.Infrastructure.Common.Models.DTO.Configuration;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
@@ -17,10 +17,10 @@ public class JwtTokenGeneratorFixture
     /// Creates a valid JWT settings model for testing.
     /// </summary>
     /// <returns>The created settings model.</returns>
-    public static JwtSettingsModel CreateJwtSettings()
+    public static JwtSettingsDto CreateJwtSettings()
     {
-        return new Faker<JwtSettingsModel>()
-            .CustomInstantiator(f => new JwtSettingsModel
+        return new Faker<JwtSettingsDto>()
+            .CustomInstantiator(f => new JwtSettingsDto
             {
                 SecretKey = "this-is-a-very-long-secret-key-for-testing-jwt-tokens",
                 ExpiryMinutes = 30,

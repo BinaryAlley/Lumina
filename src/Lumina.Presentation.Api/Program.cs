@@ -47,7 +47,7 @@ public class Program
 
         builder.Services.AddPresentationApiLayerServices(builder.Configuration);
         builder.Services.AddApplicationLayerServices();
-        builder.Services.AddInfrastructureLayerServices();
+        builder.Services.AddInfrastructureLayerServices(builder.Configuration);
         builder.Services.AddDataAccessLayerServices();
         builder.Services.AddDomainLayerServices();
 

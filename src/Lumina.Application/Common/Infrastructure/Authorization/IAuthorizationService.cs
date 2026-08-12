@@ -2,7 +2,7 @@
 using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.Common.Base;
-using Lumina.Domain.Common.Enums.Authorization;
+using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using System;
 using System.Threading;
 using System.Threading.Tasks;

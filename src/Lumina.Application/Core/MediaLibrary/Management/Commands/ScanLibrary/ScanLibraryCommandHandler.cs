@@ -20,7 +20,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using DomainErrors = Lumina.Domain.SharedKernel.Common.Errors.Errors;
 #endregion
 
 namespace Lumina.Application.Core.MediaLibrary.Management.Commands.ScanLibrary;

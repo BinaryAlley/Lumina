@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Common;
-using Lumina.Domain.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,6 +18,16 @@ public class BookEntity : IStorageEntity, IAuditableEntity
     /// Gets the Id of the media item.
     /// </summary>
     public required Guid Id { get; init; }
+
+    /// <summary>
+    /// Gets or sets the Id of the media library this book belongs to.
+    /// </summary>
+    public required Guid LibraryId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the file system path of the book.
+    /// </summary>
+    public required string Path { get; set; }
 
     /// <summary>
     /// Gets or sets the title of the media item.
@@ -194,6 +204,21 @@ public class BookEntity : IStorageEntity, IAuditableEntity
     /// Gets or sets the list of ratings for this book.
     /// </summary>
     public List<BookRatingEntity> Ratings { get; set; } = [];
+
+    /// <summary>
+    /// Gets or sets the status of the metadata enrichment of the book.
+    /// </summary>
+    public MetadataStatus MetadataStatus { get; set; }
+
+    /// <summary>
+    /// Gets or sets the date and time when the metadata of the book was last enriched.
+    /// </summary>
+    public DateTime? LastMetadataUpdateUtc { get; set; }
+
+    /// <summary>
+    /// Gets or sets the name of the plugin that enriched the metadata of the book.
+    /// </summary>
+    public string? MetadataProvider { get; set; }
 
     /// <summary>
     /// Gets or sets the time and date when the entity was added.

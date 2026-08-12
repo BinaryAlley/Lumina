@@ -11,6 +11,11 @@ public enum BookRatingSource
     User,
 
     /// <summary>
+    /// Rating sourced from Open Library.
+    /// </summary>
+    OpenLibrary,
+
+    /// <summary>
     /// Ratings sourced from Goodreads, a social network for book readers that provides book recommendations and reviews.
     /// </summary>
     Goodreads,

@@ -9,7 +9,7 @@ using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.DataAccess.Core.Seed;
 using Lumina.DataAccess.UnitTests.Core.Repositories.Users.Fixtures;
-using Lumina.Domain.Common.Enums.Authorization;
+using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using NSubstitute;
 using System;
 using System.Collections.Generic;

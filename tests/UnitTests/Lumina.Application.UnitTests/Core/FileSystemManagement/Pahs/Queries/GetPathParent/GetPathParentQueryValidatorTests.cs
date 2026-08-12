@@ -2,7 +2,7 @@
 using FluentValidation.TestHelper;
 using Lumina.Application.Core.FileSystemManagement.Paths.Queries.GetPathParent;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Pahs.Queries.GetPathParent.Fixtures;
-using Lumina.Domain.Common.Errors;
+using Lumina.Domain.SharedKernel.Common.Errors;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 

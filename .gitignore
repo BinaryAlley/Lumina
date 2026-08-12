@@ -65,5 +65,8 @@ $RECYCLE.BIN/
 *.sql
 *.sqlite
 
-# Agent configuration
-AGENTS.md
+# AI
+AGENTS.[Mm][Dd]
+agents.[Mm][Dd]
+SKILL.[Mm][Dd]
+skill.[Mm][Dd]

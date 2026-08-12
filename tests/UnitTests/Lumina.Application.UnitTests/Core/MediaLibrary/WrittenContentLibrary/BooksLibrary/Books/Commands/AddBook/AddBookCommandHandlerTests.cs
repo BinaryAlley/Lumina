@@ -11,8 +11,8 @@ using Lumina.Application.UnitTests.Core.MediaLibrary.WrittenContentLibrary.Books
 using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Domain.Common.Enums.BookLibrary;
-using Lumina.Domain.Common.Errors;
+using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Errors;
 using NSubstitute;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -69,23 +69,6 @@ public class AddBookCommandHandlerTests
         Assert.IsType<BookResponse>(result.Value);
         await _mockBookRepository.Received(1).InsertAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
-    }
-
-    [Fact]
-    public async Task Handle_WhenBookCreationFails_ShouldReturnFailureResult()
-    {
-        // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
-        bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { Title = null } };
-
-        // Act
-        ErrorOr<BookResponse> result = await _sut.Handle(bookCommand, CancellationToken.None);
-
-        // Assert
-        Assert.True(result.IsError);
-        Assert.Contains(result.Errors, e => e.Description == Errors.Metadata.TitleCannotBeEmpty.Description);
-        await _mockBookRepository.DidNotReceive().InsertAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>());
-        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]

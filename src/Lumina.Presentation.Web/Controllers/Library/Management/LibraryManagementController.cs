@@ -4,6 +4,7 @@ using Lumina.Presentation.Web.Common.Attributes;
 using Lumina.Presentation.Web.Common.Enums.Authorization;
 using Lumina.Presentation.Web.Common.Models.Common;
 using Lumina.Presentation.Web.Common.Models.Libraries;
+using Lumina.Presentation.Web.Common.Models.Plugins;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -170,6 +171,42 @@ public class LibraryManagementController : Controller
     public async Task<IActionResult> CancelLibraryScan(Guid libraryId, Guid scanId, CancellationToken cancellationToken = default)
     {
         await _apiHttpClient.PostAsync<EmptyModel, EmptyModel>($"libraries/{libraryId}/scans/{scanId}/cancel", new EmptyModel(), cancellationToken).ConfigureAwait(false);
+        return Json(new { success = true });
+    }
+
+    /// <summary>
+    /// Gets the metadata providers configured for the media library identified by <paramref name="libraryId"/>.
+    /// </summary>
+    /// <param name="libraryId">The id of the media library whose metadata providers are retrieved.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    [HttpGet("api-get-metadata-providers/{libraryId}")]
+    public async Task<IActionResult> GetMetadataProviders(Guid libraryId, CancellationToken cancellationToken = default)
+    {
+        LibraryMetadataProviderModel[] response = await _apiHttpClient.GetAsync<LibraryMetadataProviderModel[]>($"libraries/{libraryId}/metadata-providers", cancellationToken).ConfigureAwait(false);
+        return Json(new { success = true, data = response });
+    }
+
+    /// <summary>
+    /// Enables or disables the metadata provider for the media library described by <paramref name="model"/>.
+    /// </summary>
+    /// <param name="model">The model containing the Ids of the media library and of the metadata provider.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    [HttpPut("api-set-metadata-provider-enabled")]
+    public async Task<IActionResult> SetMetadataProviderEnabled([FromBody] SetLibraryMetadataProviderEnabledModel model, CancellationToken cancellationToken = default)
+    {
+        await _apiHttpClient.PutAsync<EmptyModel, SetLibraryMetadataProviderEnabledModel>($"libraries/{model.LibraryId}/metadata-providers/{model.PluginId}/enabled", model, cancellationToken).ConfigureAwait(false);
+        return Json(new { success = true });
+    }
+
+    /// <summary>
+    /// Reorders the metadata providers of the media library described by <paramref name="model"/>.
+    /// </summary>
+    /// <param name="model">The model containing the Id of the media library and the plugin Ids in the new order.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    [HttpPut("api-reorder-metadata-providers")]
+    public async Task<IActionResult> ReorderMetadataProviders([FromBody] ReorderLibraryMetadataProvidersModel model, CancellationToken cancellationToken = default)
+    {
+        await _apiHttpClient.PutAsync<EmptyModel, ReorderLibraryMetadataProvidersModel>($"libraries/{model.LibraryId}/metadata-providers/reorder", model, cancellationToken).ConfigureAwait(false);
         return Json(new { success = true });
     }
 }

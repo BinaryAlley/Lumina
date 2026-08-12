@@ -1,9 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using AutoFixture;
-using AutoFixture.AutoNSubstitute;
-using Lumina.Infrastructure.Common.Errors;
-using Lumina.Infrastructure.Common.Models.Configuration;
-using Lumina.Infrastructure.Common.Validators;
 using Lumina.Infrastructure.Core.Authentication;
 using Lumina.Infrastructure.UnitTests.Core.Authentication.Fixtures;
 using System;

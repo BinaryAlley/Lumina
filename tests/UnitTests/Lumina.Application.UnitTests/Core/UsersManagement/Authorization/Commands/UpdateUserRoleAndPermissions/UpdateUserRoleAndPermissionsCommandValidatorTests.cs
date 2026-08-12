@@ -4,7 +4,7 @@ using Lumina.Application.Core.UsersManagement.Authorization.Commands.UpdateUserR
 using System;
 using System.Diagnostics.CodeAnalysis;
 using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using DomainErrors = Lumina.Domain.SharedKernel.Common.Errors.Errors;
 #endregion
 
 namespace Lumina.Application.UnitTests.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;

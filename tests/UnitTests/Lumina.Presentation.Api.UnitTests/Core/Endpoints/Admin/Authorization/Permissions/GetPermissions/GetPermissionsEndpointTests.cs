@@ -3,7 +3,7 @@ using ErrorOr;
 using FastEndpoints;
 using Lumina.Application.Core.Admin.Authorization.Permissions.Queries.GetPermissions;
 using Lumina.Contracts.Responses.Authorization;
-using Lumina.Domain.Common.Enums.Authorization;
+using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using Lumina.Presentation.Api.Core.Endpoints.Admin.Authorization.Permissions.GetPermissions;
 using Mediator;
 using Microsoft.AspNetCore.Http;

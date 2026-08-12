@@ -9,7 +9,7 @@ using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetUserPermissions;
 using Lumina.Application.UnitTests.Core.UsersManagement.Authorization.Queries.GetUserPermissions.Fixtures;
 using Lumina.Contracts.Responses.Authorization;
-using Lumina.Domain.Common.Enums.Authorization;
+using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using NSubstitute;
 using System;
 using System.Collections.Generic;

@@ -4,7 +4,7 @@ using Lumina.Application.Common.DataAccess.Repositories.Books;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Domain.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
@@ -12,6 +12,7 @@ using Lumina.Domain.Core.BoundedContexts.MediaContributorBoundedContext.MediaCon
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
+using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.ExternalIdentifiers.LibraryManagementBoundedContext.LibraryAggregate;
 using Mediator;
 using System;
 using System.Collections.Generic;
@@ -139,6 +140,8 @@ public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<Boo
         if (metadataResult.IsError)
             return metadataResult.Errors;
         ErrorOr<Book> createBookResult = Book.Create(
+            LibraryId.Create(request.LibraryId),
+            request.Path,
             metadataResult.Value,
             Optional<BookFormat>.FromNullable(request.Format),
             Optional<string>.FromNullable(request.Edition),

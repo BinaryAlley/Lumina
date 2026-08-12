@@ -7,12 +7,13 @@ using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookL
 using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Domain.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
+using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.ExternalIdentifiers.LibraryManagementBoundedContext.LibraryAggregate;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -110,6 +111,8 @@ public static class BookEntityMapping
 
         return Book.Create(
             BookId.Create(repositoryEntity.Id),
+            LibraryId.Create(repositoryEntity.LibraryId),
+            repositoryEntity.Path,
             writtenContentMetadataResult.Value,
             bookFormat,
             Optional<string>.FromNullable(repositoryEntity.Edition),
@@ -190,6 +193,8 @@ public static class BookEntityMapping
         );
         return new BookResponse(
             repositoryEntity.Id,
+            repositoryEntity.LibraryId,
+            repositoryEntity.Path,
             metadata,
             repositoryEntity.Format,
             repositoryEntity.Edition,
@@ -207,6 +212,9 @@ public static class BookEntityMapping
             [.. repositoryEntity.ISBNs.ToResponses()],
             null,
             [.. repositoryEntity.Ratings.ToResponses()],
+            repositoryEntity.MetadataStatus,
+            repositoryEntity.LastMetadataUpdateUtc,
+            repositoryEntity.MetadataProvider,
             repositoryEntity.CreatedOnUtc,
             repositoryEntity.UpdatedOnUtc
         );

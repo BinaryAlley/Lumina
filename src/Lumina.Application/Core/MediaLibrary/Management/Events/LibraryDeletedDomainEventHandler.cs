@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using Lumina.Application.Common.Infrastructure.Models.Configuration;
+using Lumina.Application.Common.Infrastructure.Models.DTO.Configuration;
 using Lumina.Domain.Common.Exceptions;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
@@ -22,15 +22,15 @@ public class LibraryDeletedDomainEventHandler : INotificationHandler<LibraryDele
 {
     private readonly IEnvironmentContext _environmentContext;
     private readonly IPathService _pathService;
-    private readonly MediaSettingsModel _mediaSettingsModel;
+    private readonly MediaSettingsDto _mediaSettingsModel;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LibraryDeletedDomainEventHandler"/> class.
     /// </summary>
     /// <param name="environmentContext">Injected facade service for environment contextual services.</param>
     /// <param name="pathService">Injected service for handling file system paths.</param>
-    /// <param name="mediaSettingsModelOptions">Injected service for retrieving <see cref="MediaSettingsModel"/>.</param>
-    public LibraryDeletedDomainEventHandler(IEnvironmentContext environmentContext, IPathService pathService, IOptions<MediaSettingsModel> mediaSettingsModelOptions)
+    /// <param name="mediaSettingsModelOptions">Injected service for retrieving <see cref="MediaSettingsDto"/>.</param>
+    public LibraryDeletedDomainEventHandler(IEnvironmentContext environmentContext, IPathService pathService, IOptions<MediaSettingsDto> mediaSettingsModelOptions)
     {
         _environmentContext = environmentContext;
         _pathService = pathService;

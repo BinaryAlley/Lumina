@@ -1,8 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
+using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Application.Common.DataAccess.Repositories.Books;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Domain.Common.Enums.MediaLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
@@ -10,6 +13,9 @@ using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -86,15 +92,40 @@ internal sealed class MediaLibraryScanResultsSaveJob : MediaLibraryScanJob, IMed
                         await publisher.Publish(new LibraryMediaItemDeletedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, deletedPath, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
                     }
 
+                    // materialize the books of the media library from the scan snapshot, so that they are browsable even without web metadata
+                    ErrorOr<IReadOnlyList<string>> getPathsResult = await libraryScanSnapshotRepository.GetPathsAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
+                    if (getPathsResult.IsError)
+                        throw new InvalidOperationException(getPathsResult.FirstError.Description);
+                    IBookRepository bookRepository = unitOfWork.GetRepository<IBookRepository>();
+                    foreach (string path in getPathsResult.Value)
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+
+                        ErrorOr<BookEntity?> getExistingBookResult = await bookRepository.GetByPathAsync(LibraryId.Value, path, cancellationToken).ConfigureAwait(false);
+                        if (getExistingBookResult.IsError)
+                            throw new InvalidOperationException(getExistingBookResult.FirstError.Description);
+                        if (getExistingBookResult.Value is not null)
+                            continue;
+
+                        ErrorOr<Created> insertBookResult = await bookRepository.InsertAsync(CreateShellBookEntity(LibraryId.Value, path), cancellationToken).ConfigureAwait(false);
+                        if (insertBookResult.IsError)
+                            throw new InvalidOperationException(insertBookResult.FirstError.Description);
+                    }
+                    await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
                     // increment the number of processed elements progress
                     publishJobProgressResult = await PublishJobProgress(publisher, compositeKey, 1, 1, cancellationToken).ConfigureAwait(false);
                     if (publishJobProgressResult.IsError)
                         throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
 
-                    // this job finished, and it's the last in the chain, the scan is completed
                     Status = LibraryScanJobStatus.Completed;
-                    await publisher.Publish(new LibraryScanFinishedDomainEvent(Guid.NewGuid(), compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
-                    // this should always be the last job in the directed acyclic job graph, so no linked child to call further
+                    // when this job has no linked children, it's the last job in the directed acyclic job graph, and the scan is completed
+                    if (Children.Count == 0)
+                        await publisher.Publish(new LibraryScanFinishedDomainEvent(Guid.NewGuid(), compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+
+                    // call each linked child with the obtained payload
+                    foreach (IMediaLibraryScanJob child in Children)
+                        await child.ExecuteAsync(id, input, cancellationToken).ConfigureAwait(false);
                 }, cancellationToken).ConfigureAwait(false);
             }
         }
@@ -128,5 +159,39 @@ internal sealed class MediaLibraryScanResultsSaveJob : MediaLibraryScanJob, IMed
         await publisher.Publish(new LibraryScanJobProgressChangedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
 
         return Result.Success;
+    }
+
+    /// <summary>
+    /// Creates a shell book entity for the file stored at <paramref name="path"/> in the media library identified by <paramref name="libraryId"/>,
+    /// with a title derived from the file name, and no web metadata yet.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library the book belongs to.</param>
+    /// <param name="path">The file system path of the book.</param>
+    /// <returns>The created shell book entity.</returns>
+    private static BookEntity CreateShellBookEntity(Guid libraryId, string path)
+    {
+        return new BookEntity
+        {
+            Id = Guid.NewGuid(),
+            LibraryId = libraryId,
+            Path = path,
+            Title = GetTitleFromPath(path),
+            MetadataStatus = MetadataStatus.Pending,
+            CreatedOnUtc = DateTime.UtcNow,
+            CreatedBy = Guid.Empty,
+            UpdatedBy = null
+        };
+    }
+
+    /// <summary>
+    /// Derives a book title from the file name of the provided <paramref name="path"/>, by removing the extension and replacing separators with spaces.
+    /// </summary>
+    /// <param name="path">The file system path of the book.</param>
+    /// <returns>The derived title.</returns>
+    private static string GetTitleFromPath(string path)
+    {
+        string fileName = Path.GetFileNameWithoutExtension(path);
+        string title = Regex.Replace(fileName, @"[_\-\.]+", " ").Trim();
+        return title.Length > 0 ? title : fileName;
     }
 }

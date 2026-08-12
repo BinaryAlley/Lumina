@@ -13,8 +13,14 @@ namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.FileSystemMana
 [ExcludeFromCodeCoverage]
 public class FileSystemStructureFixture
 {
+    private static readonly bool s_hiddenAttributeIsSupported = DetectHiddenAttributeSupport();
     private readonly string _rootPath;
     private readonly Faker _faker = new();
+
+    /// <summary>
+    /// Gets a value indicating whether the fixture can create hidden elements on the current platform and file system.
+    /// </summary>
+    internal static bool HiddenAttributeIsSupported => s_hiddenAttributeIsSupported;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FileSystemStructureFixture"/> class.
@@ -58,9 +64,47 @@ public class FileSystemStructureFixture
     }
 
     /// <summary>
+    /// Detects whether the fixture can create hidden elements on the current platform and file system.
+    /// </summary>
+    /// <returns><see langword="true"/> when hidden elements can be created, otherwise <see langword="false"/>.</returns>
+    private static bool DetectHiddenAttributeSupport()
+    {
+        // on Unix-like systems the fixture hides elements with the dot-prefix convention, which the file system always supports
+        if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
+            return true;
+        // on Windows the fixture relies on the hidden file attribute, which some file systems (for example network drives) do not persist
+        string probePath = System.IO.Path.Combine(AppContext.BaseDirectory, "lumina_hidden_attribute_probe_" + Guid.NewGuid());
+        try
+        {
+            File.WriteAllText(probePath, string.Empty);
+            File.SetAttributes(probePath, File.GetAttributes(probePath) | FileAttributes.Hidden);
+            return (File.GetAttributes(probePath) & FileAttributes.Hidden) == FileAttributes.Hidden;
+        }
+        catch
+        {
+            return false;
+        }
+        finally
+        {
+            if (File.Exists(probePath))
+            {
+                try
+                {
+                    File.SetAttributes(probePath, FileAttributes.Normal);
+                    File.Delete(probePath);
+                }
+                catch
+                {
+                }
+            }
+        }
+    }
+
+    /// <summary>
     /// Sets the hidden attribute for a file or directory.
     /// </summary>
     /// <param name="path">The path to the file or directory.</param>
+    /// <returns>The path to the hidden file or directory.</returns>
     private static string SetHidden(string path)
     {
         if (OperatingSystem.IsWindows())

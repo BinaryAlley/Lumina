@@ -5,7 +5,7 @@ using Lumina.Application.Core.Admin.Authorization.Roles.Commands.UpdateRole;
 using Lumina.Contracts.DTO.Authentication;
 using Lumina.Contracts.Requests.Authorization;
 using Lumina.Contracts.Responses.Authorization;
-using Lumina.Domain.Common.Enums.Authorization;
+using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using Lumina.Presentation.Api.Core.Endpoints.Admin.Authorization.Roles.UpdateRole;
 using Mediator;
 using Microsoft.AspNetCore.Http;

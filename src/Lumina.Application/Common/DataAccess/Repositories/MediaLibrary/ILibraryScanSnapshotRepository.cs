@@ -25,6 +25,14 @@ public interface ILibraryScanSnapshotRepository : IRepository<LibraryScanSnapsho
     Task<ErrorOr<IReadOnlyList<string>>> GetDeletedPathsAsync(Guid libraryId, Guid scanId, CancellationToken cancellationToken);
 
     /// <summary>
+    /// Gets the paths of all the media library scan snapshot items of the media library identified by <paramref name="libraryId"/>.
+    /// </summary>
+    /// <param name="libraryId">The unique identifier of the library whose media library scan snapshot item paths are retrieved.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of media library scan snapshot item paths, or an error.</returns>
+    Task<ErrorOr<IReadOnlyList<string>>> GetPathsAsync(Guid libraryId, CancellationToken cancellationToken);
+
+    /// <summary>
     /// Atomically applies the results of the current scan to the storage medium, by replacing the media library scan snapshot of the previous scan with the snapshot of the current scan.
     /// The operation updates the changed media library scan snapshot items, deletes the ones that are no longer present on disk, adds audit entries for all changed, new and deleted items,
     /// and clears the staging results of the current scan.

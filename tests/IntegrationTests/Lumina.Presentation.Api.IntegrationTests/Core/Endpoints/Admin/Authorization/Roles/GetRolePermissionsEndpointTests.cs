@@ -4,7 +4,7 @@ using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Contracts.DTO.Authentication;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Enums.Authorization;
+using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;

@@ -2,7 +2,7 @@
 using FluentValidation.TestHelper;
 using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetAuthorization;
 using Lumina.Application.UnitTests.Core.UsersManagement.Authorization.Queries.GetAuthorization.Fixtures;
-using Lumina.Domain.Common.Errors;
+using Lumina.Domain.SharedKernel.Common.Errors;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion

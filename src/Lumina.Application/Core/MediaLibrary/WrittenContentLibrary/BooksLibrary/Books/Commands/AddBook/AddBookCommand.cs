@@ -1,8 +1,9 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using Lumina.Domain.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Mediator;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Lumina.Contracts.DTO.MediaContributors;
@@ -15,6 +16,8 @@ namespace Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrar
 /// <summary>
 /// Command for adding a book.
 /// </summary>
+/// <param name="LibraryId">The Id of the media library this book belongs to.</param>
+/// <param name="Path">The file system path of the book.</param>
 /// <param name="Metadata">Written content metadata of the book.</param>
 /// <param name="Format">The format of the book (e.g., Hardcover, Paperback), if applicable.</param>
 /// <param name="Edition">The edition of the book, if applicable.</param>
@@ -32,8 +35,10 @@ namespace Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrar
 /// <param name="ISBNs">The list of ISBN (International Standard Book Number) of the book.</param>
 /// <param name="Contributors">The list of media contributors (actors, directors, etc) starring in this book.</param>
 /// <param name="Ratings">The list of ratings for this book.</param>
-[DebuggerDisplay("Title: {Title}")]
+[DebuggerDisplay("Title: {Metadata.Title}")]
 public record AddBookCommand(
+    Guid LibraryId,
+    string Path,
     WrittenContentMetadataDto? Metadata,
     BookFormat? Format,
     string? Edition,

@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Enums.PhotoLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
 using System.Diagnostics;
 #endregion
 

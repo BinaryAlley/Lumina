@@ -15,7 +15,7 @@ namespace Lumina.Application.UnitTests.Core.FileSystemManagement.Directories.Fix
 public class DirectoryResponseFixture
 {
     private readonly Faker _faker = new();
-    private readonly FileSystemItemModelFixture _fileSystemItemModelFixture = new();
+    private readonly FileSystemItemDtoFixture _fileSystemItemModelFixture = new();
 
     /// <summary>
     /// Creates a random valid <see cref="DirectoryResponse"/>.

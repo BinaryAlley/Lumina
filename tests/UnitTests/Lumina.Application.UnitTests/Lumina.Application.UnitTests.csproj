@@ -40,5 +40,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\src\Lumina.Application\Lumina.Application.csproj" />
+        <ProjectReference Include="..\Lumina.DataAccess.UnitTests\Lumina.DataAccess.UnitTests.csproj" />
     </ItemGroup>
 </Project>

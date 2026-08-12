@@ -121,8 +121,8 @@
                     .map(checkbox => checkbox.value)
             };
 
-            const data = await callApiPutAsync('@_urlService.GetAbsoluteUrl("UpdateUserAuthorization", "Admin")', formData);
-            if (data)
+            const result = await callApiPutAsync('@_urlService.GetAbsoluteUrl("UpdateUserAuthorization", "Admin")', formData);
+            if (result.success)
                 notificationService.show('@_localizer["UserAuthorizationUpdated"]', NotificationType.SUCCESS);
         }
 

@@ -2,8 +2,8 @@
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using ErrorOr;
-using Lumina.Domain.Common.Enums.FileSystem;
-using Lumina.Domain.Common.Errors;
+using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
+using Lumina.Domain.SharedKernel.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;

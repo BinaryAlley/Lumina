@@ -6,10 +6,11 @@ using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentL
 using Lumina.DataAccess.Core.Repositories.Books;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.DataAccess.UnitTests.Core.Repositories.Books.Fixtures;
-using Lumina.Domain.Common.Enums.BookLibrary;
-using Lumina.Domain.Common.Errors;
+using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Errors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -187,5 +188,148 @@ public class BookRepositoryTests
         Assert.Equal(2, retrievedBook.Tags.Count);
         Assert.Equal(2, retrievedBook.Genres.Count);
         Assert.Equal(2, retrievedBook.ISBNs.Count);
+    }
+
+    [Fact]
+    public async Task GetByLibraryIdAsync_WhenCalled_ShouldReturnOnlyBooksOfTheLibrary()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        BookEntity bookOfLibrary = _bookEntityFixture.CreateBookModel();
+        bookOfLibrary.LibraryId = libraryId;
+        BookEntity bookOfAnotherLibrary = _bookEntityFixture.CreateBookModel();
+        bookOfAnotherLibrary.LibraryId = Guid.NewGuid();
+        _mockContext.Books.AddRange(bookOfLibrary, bookOfAnotherLibrary);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        ErrorOr<IEnumerable<BookEntity>> result = await _sut.GetByLibraryIdAsync(libraryId, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsError);
+        BookEntity retrievedBook = Assert.Single(result.Value);
+        Assert.Equal(bookOfLibrary.Id, retrievedBook.Id);
+    }
+
+    [Fact]
+    public async Task GetByPathAsync_WhenBookExists_ShouldReturnTheBook()
+    {
+        // Arrange
+        BookEntity book = _bookEntityFixture.CreateBookModel();
+        _mockContext.Books.Add(book);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        ErrorOr<BookEntity?> result = await _sut.GetByPathAsync(book.LibraryId, book.Path, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsError);
+        Assert.Equal(book.Id, result.Value!.Id);
+    }
+
+    [Fact]
+    public async Task GetByPathAsync_WhenBookDoesNotExist_ShouldReturnNull()
+    {
+        // Arrange
+        BookEntity book = _bookEntityFixture.CreateBookModel();
+        _mockContext.Books.Add(book);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        ErrorOr<BookEntity?> result = await _sut.GetByPathAsync(book.LibraryId, "/books/non-existent.epub", CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsError);
+        Assert.Null(result.Value);
+    }
+
+    [Fact]
+    public async Task GetBooksNeedingMetadataAsync_WhenCalled_ShouldReturnOnlyBooksWhoseMetadataIsNotEnriched()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        BookEntity pendingBook = _bookEntityFixture.CreateBookModel();
+        pendingBook.LibraryId = libraryId;
+        pendingBook.Path = "/books/a.epub";
+        pendingBook.MetadataStatus = MetadataStatus.Pending;
+        BookEntity enrichedBook = _bookEntityFixture.CreateBookModel();
+        enrichedBook.LibraryId = libraryId;
+        enrichedBook.Path = "/books/b.epub";
+        enrichedBook.MetadataStatus = MetadataStatus.Enriched;
+        BookEntity failedBook = _bookEntityFixture.CreateBookModel();
+        failedBook.LibraryId = libraryId;
+        failedBook.Path = "/books/c.epub";
+        failedBook.MetadataStatus = MetadataStatus.Failed;
+        BookEntity bookOfAnotherLibrary = _bookEntityFixture.CreateBookModel();
+        bookOfAnotherLibrary.LibraryId = Guid.NewGuid();
+        bookOfAnotherLibrary.MetadataStatus = MetadataStatus.Pending;
+        _mockContext.Books.AddRange(pendingBook, enrichedBook, failedBook, bookOfAnotherLibrary);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        ErrorOr<IReadOnlyList<BookEntity>> result = await _sut.GetBooksNeedingMetadataAsync(libraryId, null, 10, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsError);
+        Assert.Equal(2, result.Value.Count);
+        Assert.Contains(result.Value, book => book.Id == pendingBook.Id);
+        Assert.Contains(result.Value, book => book.Id == failedBook.Id);
+    }
+
+    [Fact]
+    public async Task GetBooksNeedingMetadataAsync_WhenLastPathProvided_ShouldReturnBooksAfterIt()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        BookEntity firstBook = _bookEntityFixture.CreateBookModel();
+        firstBook.LibraryId = libraryId;
+        firstBook.Path = "/books/a.epub";
+        BookEntity secondBook = _bookEntityFixture.CreateBookModel();
+        secondBook.LibraryId = libraryId;
+        secondBook.Path = "/books/b.epub";
+        _mockContext.Books.AddRange(firstBook, secondBook);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        ErrorOr<IReadOnlyList<BookEntity>> result = await _sut.GetBooksNeedingMetadataAsync(libraryId, firstBook.Path, 10, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsError);
+        BookEntity retrievedBook = Assert.Single(result.Value);
+        Assert.Equal(secondBook.Id, retrievedBook.Id);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_WhenBookExists_ShouldUpdateItsScalarProperties()
+    {
+        // Arrange
+        BookEntity book = _bookEntityFixture.CreateBookModel();
+        _mockContext.Books.Add(book);
+        await _mockContext.SaveChangesAsync();
+
+        book.Title = "Updated Title";
+
+        // Act
+        ErrorOr<Updated> result = await _sut.UpdateAsync(book, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsError);
+        Assert.Equal(Result.Updated, result.Value);
+        BookEntity? retrievedBook = await _mockContext.Books.FindAsync(book.Id);
+        Assert.Equal("Updated Title", retrievedBook!.Title);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_WhenBookDoesNotExist_ShouldReturnError()
+    {
+        // Arrange
+        BookEntity book = _bookEntityFixture.CreateBookModel();
+
+        // Act
+        ErrorOr<Updated> result = await _sut.UpdateAsync(book, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.WrittenContent.BookNotFound, result.FirstError);
     }
 }

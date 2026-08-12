@@ -2,7 +2,7 @@
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Thumbnails;
-using Lumina.Domain.Common.Enums.PhotoLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
 using Lumina.Contracts.Responses.FileSystemManagement.Thumbnails;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using System.Collections.Generic;

@@ -18,6 +18,11 @@ namespace Lumina.DataAccess.Core.Repositories.Libraries;
 /// <summary>
 /// Repository for media library scan snapshots.
 /// </summary>
+/// <remarks>
+/// The bulk snapshot operations are executed with parameterized raw SQL through Dapper on a dedicated database connection, instead of Entity Framework Core,
+/// because the change tracker is not suited for the multi-row inserts, upserts, key-set paginated reads and bulk deletes that the media library scan pipeline performs at scale.
+/// See docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0006.md for details.
+/// </remarks>
 internal sealed class LibraryScanSnapshotRepository : ILibraryScanSnapshotRepository
 {
     private readonly LuminaDbContext _luminaDbContext;
@@ -57,6 +62,27 @@ internal sealed class LibraryScanSnapshotRepository : ILibraryScanSnapshotReposi
 
         IEnumerable<string> deletedPaths = await connection.QueryAsync<string>(command).ConfigureAwait(false);
         return deletedPaths.ToList();
+    }
+
+    /// <summary>
+    /// Gets the paths of all the media library scan snapshot items of the media library identified by <paramref name="libraryId"/>.
+    /// </summary>
+    /// <param name="libraryId">The unique identifier of the library whose media library scan snapshot item paths are retrieved.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of media library scan snapshot item paths, or an error.</returns>
+    public async Task<ErrorOr<IReadOnlyList<string>>> GetPathsAsync(Guid libraryId, CancellationToken cancellationToken)
+    {
+        await using SqliteConnection connection = await OpenConnectionAsync(cancellationToken).ConfigureAwait(false);
+        const string GET_PATHS_SQL = """
+            SELECT snapshot.Path
+            FROM LibraryScanSnapshots AS snapshot
+            WHERE snapshot.LibraryId = @libraryId;
+            """;
+
+        CommandDefinition command = new(GET_PATHS_SQL, new { libraryId }, cancellationToken: cancellationToken);
+
+        IEnumerable<string> paths = await connection.QueryAsync<string>(command).ConfigureAwait(false);
+        return paths.ToList();
     }
 
     /// <summary>

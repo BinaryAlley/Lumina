@@ -2,9 +2,8 @@
 using ErrorOr;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.Infrastructure.Models.MediaLibraryScanJobPayloads;
 using Lumina.Application.Common.Infrastructure.Security;
-using Lumina.Domain.Common.Enums.MediaLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
@@ -14,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Lumina.Application.Common.Infrastructure.Models.DTO.MediaLibraryScanJobPayloads;
 #endregion
 
 namespace Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Common;
@@ -89,15 +89,15 @@ internal sealed class MediaLibraryScanHashJob : MediaLibraryScanJob, IMediaLibra
                     {
                         cancellationToken.ThrowIfCancellationRequested();
 
-                        ErrorOr<IReadOnlyList<HashedFileSystemFile>> getFilesToHashPageResult = await stagingResultsRepository.GetFilesToHashPageAsync(ScanId.Value, lastPath, HASHING_PAGE_SIZE, cancellationToken).ConfigureAwait(false);
+                        ErrorOr<IReadOnlyList<HashedFileSystemFileDto>> getFilesToHashPageResult = await stagingResultsRepository.GetFilesToHashPageAsync(ScanId.Value, lastPath, HASHING_PAGE_SIZE, cancellationToken).ConfigureAwait(false);
                         if (getFilesToHashPageResult.IsError)
                             throw new InvalidOperationException(getFilesToHashPageResult.FirstError.Description);
-                        IReadOnlyList<HashedFileSystemFile> filesToHashPage = getFilesToHashPageResult.Value;
+                        IReadOnlyList<HashedFileSystemFileDto> filesToHashPage = getFilesToHashPageResult.Value;
                         if (filesToHashPage.Count == 0)
                             break;
 
                         // hash the files of the current page in parallel, invoking the progress callback before each file
-                        List<HashedFileSystemFile> hashedFiles = await fileHashService.HashFilesAsync(filesToHashPage, async () =>
+                        List<HashedFileSystemFileDto> hashedFiles = await fileHashService.HashFilesAsync(filesToHashPage, async () =>
                         {
                             // check if enough time has passed since last update
                             DateTime now = DateTime.UtcNow;

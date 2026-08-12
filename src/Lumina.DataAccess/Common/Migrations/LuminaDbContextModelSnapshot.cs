@@ -582,10 +582,29 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnOrder(12);
 
+                    b.Property<DateTime?>("LastMetadataUpdateUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(39);
+
+                    b.Property<Guid>("LibraryId")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(36);
+
                     b.Property<string>("LibraryThingId")
                         .HasMaxLength(50)
                         .HasColumnType("TEXT")
                         .HasColumnOrder(26);
+
+                    b.Property<string>("MetadataProvider")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(40);
+
+                    b.Property<string>("MetadataStatus")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(38);
 
                     b.Property<string>("OCLCNumber")
                         .HasColumnType("TEXT")
@@ -624,6 +643,12 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.Property<int?>("PageCount")
                         .HasColumnType("INTEGER")
                         .HasColumnOrder(17);
+
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasMaxLength(2048)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(37);
 
                     b.Property<string>("Publisher")
                         .HasMaxLength(100)
@@ -666,7 +691,122 @@ namespace Lumina.DataAccess.Common.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("LibraryId", "MetadataStatus");
+
+                    b.HasIndex("LibraryId", "Path");
+
                     b.ToTable("Books", (string)null);
+                });
+
+            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.Plugins.LibraryMetadataProviderConfigurationEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(0);
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(6);
+
+                    b.Property<DateTime>("CreatedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(5);
+
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(3);
+
+                    b.Property<Guid>("LibraryId")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(1);
+
+                    b.Property<Guid>("PluginId")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(2);
+
+                    b.Property<int>("Rank")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(4);
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(8);
+
+                    b.Property<DateTime?>("UpdatedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(7);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LibraryId", "PluginId");
+
+                    b.ToTable("LibraryMetadataProviderConfigurations", (string)null);
+                });
+
+            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.Plugins.PluginEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(0);
+
+                    b.Property<string>("Author")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(2);
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(9);
+
+                    b.Property<DateTime>("CreatedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(8);
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(4);
+
+                    b.Property<string>("LoadError")
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(6);
+
+                    b.Property<string>("LoadStatus")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(5);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(1);
+
+                    b.Property<string>("SettingsJson")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(7);
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(11);
+
+                    b.Property<DateTime?>("UpdatedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(10);
+
+                    b.Property<string>("Version")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(3);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Plugins", (string)null);
                 });
 
             modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.UsersManagement.UserEntity", b =>

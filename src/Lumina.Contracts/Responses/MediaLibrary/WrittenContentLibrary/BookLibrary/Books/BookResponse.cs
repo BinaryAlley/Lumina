@@ -2,7 +2,7 @@
 using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Domain.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -14,6 +14,8 @@ namespace Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibr
 /// Represents a book response.
 /// </summary>
 /// <param name="Id">The id of the book.</param>
+/// <param name="LibraryId">The Id of the media library this book belongs to.</param>
+/// <param name="Path">The file system path of the book.</param>
 /// <param name="Metadata">Written content metadata of the book.</param>
 /// <param name="Format">The format of the book (e.g., Hardcover, Paperback), if applicable.</param>
 /// <param name="Edition">The edition of the book, if applicable.</param>
@@ -31,11 +33,16 @@ namespace Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibr
 /// <param name="ISBNs">The list of ISBN (International Standard Book Number) of the book.</param>
 /// <param name="Contributors">The list of media contributors (actors, directors, etc) starring in this book.</param>
 /// <param name="Ratings">The list of ratings for this book.</param>
+/// <param name="MetadataStatus">The status of the metadata enrichment of the book.</param>
+/// <param name="LastMetadataUpdateUtc">The date and time when the metadata of the book was last enriched, if applicable.</param>
+/// <param name="MetadataProvider">The name of the plugin that enriched the metadata of the book, if applicable.</param>
 /// <param name="CreatedOnUtc">The date and time when the book was created.</param>
 /// <param name="UpdatedOnUtc">The optional date and time when the book was updated.</param>
 [DebuggerDisplay("Title: {Metadata.Title}")]
 public record BookResponse(
     Guid Id,
+    Guid LibraryId,
+    string Path,
     WrittenContentMetadataDto Metadata,
     BookFormat? Format,
     string? Edition,
@@ -53,6 +60,9 @@ public record BookResponse(
     List<IsbnDto>? ISBNs,
     List<MediaContributorDto>? Contributors,
     List<BookRatingDto>? Ratings,
+    MetadataStatus MetadataStatus,
+    DateTime? LastMetadataUpdateUtc,
+    string? MetadataProvider,
     DateTime CreatedOnUtc,
     DateTime? UpdatedOnUtc
 );

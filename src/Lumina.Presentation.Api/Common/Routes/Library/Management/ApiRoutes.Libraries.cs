@@ -22,5 +22,8 @@ public static partial class ApiRoutes
         public const string GET_RUNNING_LIBRARIES_SCAN = "/libraries/scans/running";
         public const string CANCEL_LIBRARIES_SCAN = "/libraries/scans/cancel";
         public const string CANCEL_LIBRARY_SCAN = "/libraries/{libraryId}/scans/{scanId}/cancel";
+        public const string GET_LIBRARY_METADATA_PROVIDERS = "/libraries/{libraryId}/metadata-providers";
+        public const string SET_LIBRARY_METADATA_PROVIDER_ENABLED = "/libraries/{libraryId}/metadata-providers/{pluginId}/enabled";
+        public const string REORDER_LIBRARY_METADATA_PROVIDERS = "/libraries/{libraryId}/metadata-providers/reorder";
     }
 }

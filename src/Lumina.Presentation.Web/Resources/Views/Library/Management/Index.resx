@@ -186,8 +186,8 @@
   <data name="FilmSeries" xml:space="preserve">
     <value>Film Series</value>
   </data>
-  <data name="GoodReadsMetadataDownload" xml:space="preserve">
-    <value>Downloading metadata from GoodReads...</value>
+  <data name="EnrichingMetadata" xml:space="preserve">
+    <value>Enriching metadata...</value>
   </data>
   <data name="HashingFileContents" xml:space="preserve">
     <value>Hashing file contents...</value>

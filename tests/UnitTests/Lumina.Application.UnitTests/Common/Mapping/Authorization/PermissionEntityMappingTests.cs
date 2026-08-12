@@ -2,7 +2,7 @@
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.Mapping.Authorization;
 using Lumina.Contracts.Responses.Authorization;
-using Lumina.Domain.Common.Enums.Authorization;
+using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
