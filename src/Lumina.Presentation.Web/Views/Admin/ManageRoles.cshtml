@@ -103,10 +103,10 @@
 
             const isRoleSelected = formData.roleId !== '';
 
-            const data = isRoleSelected ?
+            const result = isRoleSelected ?
                     await callApiPutAsync('@_urlService.GetAbsoluteUrl("UpdateRole", "Admin")', formData) :
-                    await callApiPostAsync('@_urlService.GetAbsoluteUrl("CreateRole", "Admin")', formData);
-            if (data) {
+                    { success: (await callApiPostAsync('@_urlService.GetAbsoluteUrl("CreateRole", "Admin")', formData)) !== undefined };
+            if (result.success) {
                 await fetchRolesAsync();
                 notificationService.show(isRoleSelected ? '@_localizer["RoleUpdated"]' : '@_localizer["RoleCreated"]', NotificationType.SUCCESS);
             }
