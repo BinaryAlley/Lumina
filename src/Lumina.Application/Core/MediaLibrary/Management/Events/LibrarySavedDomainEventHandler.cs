@@ -2,10 +2,9 @@
 using ErrorOr;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.Infrastructure.Models.Configuration;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
-using Lumina.Domain.Common.Enums.PhotoLibrary;
-using Lumina.Domain.Common.Errors;
+using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
+using Lumina.Domain.SharedKernel.Common.Errors;
 using Lumina.Domain.Common.Exceptions;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
@@ -18,6 +17,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Lumina.Application.Common.Infrastructure.Models.DTO.Configuration;
 #endregion
 
 namespace Lumina.Application.Core.MediaLibrary.Management.Events;
@@ -30,7 +30,7 @@ public class LibrarySavedDomainEventHandler : INotificationHandler<LibrarySavedD
     private readonly IUnitOfWork _unitOfWork;
     private readonly IEnvironmentContext _environmentContext;
     private readonly IPathService _pathService;
-    private readonly MediaSettingsModel _mediaSettingsModel;
+    private readonly MediaSettingsDto _mediaSettingsModel;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LibrarySavedDomainEventHandler"/> class.
@@ -38,12 +38,12 @@ public class LibrarySavedDomainEventHandler : INotificationHandler<LibrarySavedD
     /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
     /// <param name="environmentContext">Injected facade service for environment contextual services.</param>
     /// <param name="pathService">Injected service for handling file system paths.</param>
-    /// <param name="mediaSettingsModelOptions">Injected service for retrieving <see cref="MediaSettingsModel"/>.</param>
+    /// <param name="mediaSettingsModelOptions">Injected service for retrieving <see cref="MediaSettingsDto"/>.</param>
     public LibrarySavedDomainEventHandler(
         IUnitOfWork unitOfWork,
         IEnvironmentContext environmentContext,
         IPathService pathService,
-        IOptions<MediaSettingsModel> mediaSettingsModelOptions)
+        IOptions<MediaSettingsDto> mediaSettingsModelOptions)
     {
         _unitOfWork = unitOfWork;
         _environmentContext = environmentContext;

@@ -19,6 +19,8 @@ public static class AddBookRequestMapping
     public static AddBookCommand ToCommand(this AddBookRequest request)
     {
         return new AddBookCommand(
+            request.LibraryId,
+            request.Path,
             request.Metadata,
             request.Format,
             request.Edition,

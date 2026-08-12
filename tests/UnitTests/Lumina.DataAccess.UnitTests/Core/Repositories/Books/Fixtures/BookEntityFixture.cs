@@ -3,7 +3,7 @@ using AutoFixture;
 using Bogus;
 using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Domain.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Lumina.DataAccess.UnitTests.Common.Setup;
 using System;
 using System.Collections.Generic;
@@ -48,6 +48,8 @@ public class BookEntityFixture
 
         return new Faker<BookEntity>()
             .RuleFor(x => x.Id, f => f.Random.Guid())
+            .RuleFor(x => x.LibraryId, f => f.Random.Guid())
+            .RuleFor(x => x.Path, f => f.System.FilePath())
             .RuleFor(x => x.Title, f => f.Random.String2(f.Random.Number(1, 255)))
             .RuleFor(x => x.OriginalTitle, f => f.Random.String2(f.Random.Number(1, 255)))
             .RuleFor(x => x.Description, f => f.Random.String2(f.Random.Number(1, 2000)))

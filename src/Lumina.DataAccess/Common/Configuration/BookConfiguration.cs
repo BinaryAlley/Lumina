@@ -130,6 +130,23 @@ public class BookConfiguration : IEntityTypeConfiguration<BookEntity>
             .HasColumnOrder(28);
         builder.Property(book => book.AppleBooksId)
             .HasColumnOrder(29);
+        builder.Property(book => book.LibraryId)
+            .IsRequired()
+            .HasColumnOrder(36);
+        builder.Property(book => book.Path)
+            .IsRequired()
+            .HasMaxLength(2048)
+            .HasColumnOrder(37);
+        builder.Property(book => book.MetadataStatus)
+            .HasConversion<string>()
+            .HasMaxLength(20)
+            .IsRequired()
+            .HasColumnOrder(38);
+        builder.Property(book => book.LastMetadataUpdateUtc)
+            .HasColumnOrder(39);
+        builder.Property(book => book.MetadataProvider)
+            .HasMaxLength(100)
+            .HasColumnOrder(40);
         builder.Property(book => book.CreatedOnUtc)
             .HasColumnOrder(30);
         builder.Property(book => book.UpdatedOnUtc)
@@ -219,6 +236,9 @@ public class BookConfiguration : IEntityTypeConfiguration<BookEntity>
         builder.Property(book => book.UpdatedBy)
             .HasDefaultValue(null)
             .HasColumnOrder(35);
+
+        builder.HasIndex(book => new { book.LibraryId, book.Path });
+        builder.HasIndex(book => new { book.LibraryId, book.MetadataStatus });
     }
 }
 

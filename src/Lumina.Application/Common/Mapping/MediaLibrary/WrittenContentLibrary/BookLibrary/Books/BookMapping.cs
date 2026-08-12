@@ -24,6 +24,8 @@ public static class BookMapping
         return new BookEntity
         {
             Id = domainEntity.Id.Value,
+            LibraryId = domainEntity.LibraryId.Value,
+            Path = domainEntity.Path,
             Title = domainEntity.Metadata.Title,
             OriginalTitle = domainEntity.Metadata.OriginalTitle.HasValue ? domainEntity.Metadata.OriginalTitle.Value : null,
             Description = domainEntity.Metadata.Description.HasValue ? domainEntity.Metadata.Description.Value : null,
@@ -57,6 +59,9 @@ public static class BookMapping
             AppleBooksId = domainEntity.AppleBooksId.HasValue ? domainEntity.AppleBooksId.Value : null,
             ISBNs = domainEntity.ISBNs.ToRepositoryEntities().ToList(),
             Ratings = domainEntity.Ratings.ToRepositoryEntities().ToList(),
+            MetadataStatus = domainEntity.MetadataStatus,
+            LastMetadataUpdateUtc = domainEntity.LastMetadataUpdateUtc.HasValue ? domainEntity.LastMetadataUpdateUtc.Value : null,
+            MetadataProvider = domainEntity.MetadataProvider.HasValue ? domainEntity.MetadataProvider.Value : null,
             CreatedOnUtc = domainEntity.CreatedOnUtc,
             CreatedBy = Guid.NewGuid(),
             UpdatedOnUtc = domainEntity.UpdatedOnUtc.HasValue ? domainEntity.UpdatedOnUtc : null,

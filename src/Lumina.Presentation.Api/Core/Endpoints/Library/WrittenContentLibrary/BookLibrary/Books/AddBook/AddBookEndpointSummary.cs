@@ -5,7 +5,7 @@ using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.
 using System.Diagnostics.CodeAnalysis;
 using System.Collections.Generic;
 using Lumina.Contracts.DTO.Common;
-using Lumina.Domain.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.DTO.MediaContributors;
 using System;
@@ -28,6 +28,8 @@ public class AddLibraryEndpointSummary : Summary<AddBookEndpoint, AddBookRequest
         Description = "Creates a new book and returns its details, including the location of the newly created resource.";
 
         ExampleRequest = new AddBookRequest(
+            LibraryId: Guid.NewGuid(),
+            Path: "/books/the-fellowship-of-the-ring.epub",
             Metadata: new(
                 Title: "The Fellowship of the Ring",
                 OriginalTitle: "The Fellowship of the Ring",
@@ -179,6 +181,8 @@ public class AddLibraryEndpointSummary : Summary<AddBookEndpoint, AddBookRequest
         Response(201, "The new book is returned.", example:
             new BookResponse(
                 Id: Guid.NewGuid(),
+                LibraryId: Guid.NewGuid(),
+                Path: "/books/the-fellowship-of-the-ring.epub",
                 Metadata: new(
                     Title: "The Fellowship of the Ring",
                     OriginalTitle: "The Fellowship of the Ring",
@@ -276,6 +280,9 @@ public class AddLibraryEndpointSummary : Summary<AddBookEndpoint, AddBookRequest
                         VoteCount: 87654
                     )
                 ],
+                MetadataStatus: MetadataStatus.Pending,
+                LastMetadataUpdateUtc: default,
+                MetadataProvider: default,
                 CreatedOnUtc: DateTime.UtcNow,
                 UpdatedOnUtc: default
             )

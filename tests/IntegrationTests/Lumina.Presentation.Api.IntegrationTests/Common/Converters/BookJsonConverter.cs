@@ -1,11 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using Lumina.Domain.Core.BoundedContexts.MediaContributorBoundedContext.MediaContributorAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
+using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.ExternalIdentifiers.LibraryManagementBoundedContext.LibraryAggregate;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -36,6 +37,8 @@ public class BookJsonConverter : JsonConverter<Book>
             JsonElement root = doc.RootElement;
 
             Guid id = root.GetProperty("id").GetGuid();
+            Guid libraryId = root.GetProperty("libraryId").GetGuid();
+            string path = root.GetProperty("path").GetString()!;
             DateTime createdOnUtc = root.GetProperty("createdOnUtc").GetDateTime();
             WrittenContentMetadata metadata = DeserializeMetadata(root.GetProperty("metadata"));
             BookFormat? format = null;
@@ -66,6 +69,8 @@ public class BookJsonConverter : JsonConverter<Book>
 
             ErrorOr.ErrorOr<Book> createBookResult = Book.Create(
                 BookId.Create(id),
+                LibraryId.Create(libraryId),
+                path,
                 metadata,
                 Optional<BookFormat>.FromNullable(format),
                 Optional<string>.FromNullable(edition),

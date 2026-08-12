@@ -4,7 +4,7 @@ using Bogus;
 using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Domain.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -105,6 +105,8 @@ public class BookEntityFixture
         return new BookEntity
         {
             Id = Guid.NewGuid(),
+            LibraryId = Guid.NewGuid(),
+            Path = _faker.System.FilePath(),
             Title = _faker.Random.String2(_faker.Random.Number(1, 255)),
             OriginalTitle = _faker.Random.Bool() ? _faker.Random.String2(_faker.Random.Number(1, 255)) : null,
             Description = _faker.Random.Bool() ? _faker.Random.String2(_faker.Random.Number(1, 2000)) : null,

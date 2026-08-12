@@ -1,13 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Domain.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using Lumina.Domain.Core.BoundedContexts.MediaContributorBoundedContext.MediaContributorAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
+using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.ExternalIdentifiers.LibraryManagementBoundedContext.LibraryAggregate;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -42,6 +43,8 @@ public class BookFixture
     public Book CreateDomainBook()
     {
         return Book.Create(
+            LibraryId.Create(_fixture.Create<Guid>()),
+            _fixture.Create<string>(),
             _fixture.Create<WrittenContentMetadata>(),
             _fixture.Create<BookFormat>(),
             _fixture.Create<Optional<string>>(),

@@ -21,6 +21,8 @@ POST api/v1/books
 
 ```json
 {
+  "libraryId": "3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a",
+  "path": "/books/the-fellowship-of-the-ring.epub",
   "metadata": {
     "title": "The Fellowship of the Ring",
     "originalTitle": "The Fellowship of the Ring",
@@ -122,6 +124,9 @@ POST api/v1/books
 
 ```json
 {
+  "id": "32b336e8-dafc-4a08-9dec-9454e66dd55d",
+  "libraryId": "3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a",
+  "path": "/books/the-fellowship-of-the-ring.epub",
   "metadata": {
     "publisher": "Houghton Mifflin",
     "pageCount": 398,
@@ -205,9 +210,9 @@ POST api/v1/books
       "voteCount": 87654
     }
   ],
-  "id": {
-    "value": "32b336e8-dafc-4a08-9dec-9454e66dd55d"
-  }
+  "metadataStatus": "Pending",
+  "lastMetadataUpdateUtc": null,
+  "metadataProvider": null
 }
 ```
 
@@ -216,7 +221,7 @@ POST api/v1/books
 #### Get Books Request
 
 ```js
-GET /books
+GET /books?libraryId=3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a
 ```
 
 #### Get Books Response

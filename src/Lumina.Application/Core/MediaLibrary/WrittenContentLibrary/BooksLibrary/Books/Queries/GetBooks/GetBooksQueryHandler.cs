@@ -41,8 +41,8 @@ public class GetBooksQueryHandler : IRequestHandler<GetBooksQuery, ErrorOr<IEnum
     {
         // get a books repository
         IBookRepository bookRepository = _unitOfWork.GetRepository<IBookRepository>();
-        // get all books from the book repository
-        ErrorOr<IEnumerable<BookEntity>> getBooksResult = await bookRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+        // get all books of the media library from the book repository
+        ErrorOr<IEnumerable<BookEntity>> getBooksResult = await bookRepository.GetByLibraryIdAsync(request.LibraryId, cancellationToken).ConfigureAwait(false);
         return getBooksResult.Match(result => ErrorOrFactory.From(getBooksResult.Value.ToResponses()), errors => errors);
     }
 }

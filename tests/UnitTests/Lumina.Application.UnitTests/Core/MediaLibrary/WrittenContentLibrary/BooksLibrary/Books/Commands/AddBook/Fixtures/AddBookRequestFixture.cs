@@ -2,7 +2,7 @@
 using AutoFixture;
 using Bogus;
 using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Domain.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -192,6 +192,8 @@ public class AddBookRequestFixture
 
         return new Faker<AddBookRequest>()
             .CustomInstantiator(f => new AddBookRequest(
+                default,
+                default!,
                 default!,
                 default,
                 default,
@@ -204,12 +206,14 @@ public class AddBookRequestFixture
                 default,
                 default,
                 default,
-                default,
-                default,
+                default!,
+                default!,
                 default!,
                 default!,
                 default!
             ))
+            .RuleFor(x => x.LibraryId, _fixture.Create<Guid>())
+            .RuleFor(x => x.Path, f => f.System.FilePath())
             .RuleFor(x => x.Metadata, metadata)
             .RuleFor(x => x.Format, _fixture.Create<BookFormat>())
             .RuleFor(x => x.Edition, f => f.Random.String2(f.Random.Number(1, 50)))

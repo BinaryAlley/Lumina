@@ -7,7 +7,7 @@ namespace Lumina.Contracts.DTO.Common;
 /// <summary>
 /// Data transfer object for a tag.
 /// </summary>
-/// <param name="Name">Gets the name of the tag.</param>
+/// <param name="Name">The name of the tag.</param>
 [DebuggerDisplay("Name: {Name}")]
 public record TagDto(
     string? Name

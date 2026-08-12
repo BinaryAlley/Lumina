@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using FluentValidation;
-using Lumina.Domain.Common.Enums.BookLibrary;
-using Lumina.Domain.Common.Errors;
+using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Errors;
 #endregion
 
 namespace Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook;
@@ -16,6 +16,10 @@ public class AddBookCommandValidator : AbstractValidator<AddBookCommand>
     /// </summary>
     public AddBookCommandValidator()
     {
+        RuleFor(x => x.LibraryId)
+            .NotEmpty().WithMessage(Errors.WrittenContent.BookLibraryCannotBeNull.Description);
+        RuleFor(x => x.Path)
+            .NotEmpty().WithMessage(Errors.WrittenContent.BookPathCannotBeEmpty.Description);
         RuleFor(x => x.Metadata)
             .NotNull().WithMessage(Errors.Metadata.MetadataCannotBeNull.Description)
             .ChildRules(metadata =>
