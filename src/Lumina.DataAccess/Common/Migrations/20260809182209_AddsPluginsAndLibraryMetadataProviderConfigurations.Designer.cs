@@ -3,6 +3,7 @@ using System;
 using Lumina.DataAccess.Core.UoW;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Lumina.DataAccess.Common.Migrations
 {
     [DbContext(typeof(LuminaDbContext))]
-    partial class LuminaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260809182209_AddsPluginsAndLibraryMetadataProviderConfigurations")]
+    partial class AddsPluginsAndLibraryMetadataProviderConfigurations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.0");
@@ -704,14 +707,6 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnOrder(0);
 
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("TEXT")
-                        .HasColumnOrder(6);
-
-                    b.Property<DateTime>("CreatedOnUtc")
-                        .HasColumnType("TEXT")
-                        .HasColumnOrder(5);
-
                     b.Property<bool>("IsEnabled")
                         .HasColumnType("INTEGER")
                         .HasColumnOrder(3);
@@ -727,14 +722,6 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.Property<int>("Rank")
                         .HasColumnType("INTEGER")
                         .HasColumnOrder(4);
-
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("TEXT")
-                        .HasColumnOrder(8);
-
-                    b.Property<DateTime?>("UpdatedOnUtc")
-                        .HasColumnType("TEXT")
-                        .HasColumnOrder(7);
 
                     b.HasKey("Id");
 
@@ -754,10 +741,6 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("TEXT")
                         .HasColumnOrder(2);
-
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("TEXT")
-                        .HasColumnOrder(9);
 
                     b.Property<DateTime>("CreatedOnUtc")
                         .HasColumnType("TEXT")
@@ -790,13 +773,9 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnOrder(7);
 
-                    b.Property<Guid?>("UpdatedBy")
+                    b.Property<DateTime>("UpdatedOnUtc")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(11);
-
-                    b.Property<DateTime?>("UpdatedOnUtc")
-                        .HasColumnType("TEXT")
-                        .HasColumnOrder(10);
+                        .HasColumnOrder(9);
 
                     b.Property<string>("Version")
                         .IsRequired()
