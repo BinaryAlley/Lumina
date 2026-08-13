@@ -46,7 +46,7 @@ public class GetFilesQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCalledWithValidQueryWithoutHiddenFiles_ShouldReturnSuccessResult()
+    public async Task HandleAsync_WhenCalledWithValidQueryWithoutHiddenFiles_ShouldReturnSuccessResult()
     {
         // Arrange
         GetFilesQuery getFilesQuery = GetFilesQueryFixture.CreateGetFilesQuery(false);
@@ -80,7 +80,7 @@ public class GetFilesQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCalledWithValidQueryWithHiddenFiles_ShouldReturnSuccessResult()
+    public async Task HandleAsync_WhenCalledWithValidQueryWithHiddenFiles_ShouldReturnSuccessResult()
     {
         // Arrange
         GetFilesQuery getFilesQuery = GetFilesQueryFixture.CreateGetFilesQuery(true);
@@ -114,7 +114,7 @@ public class GetFilesQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenFileServiceReturnsError_ShouldReturnFailureResult()
+    public async Task HandleAsync_WhenFileServiceReturnsError_ShouldReturnFailureResult()
     {
         // Arrange
         GetFilesQuery query = _fixture.Create<GetFilesQuery>();
@@ -132,7 +132,7 @@ public class GetFilesQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenFileServiceReturnsEmptyList_ShouldReturnEmptySuccessResult()
+    public async Task HandleAsync_WhenFileServiceReturnsEmptyList_ShouldReturnEmptySuccessResult()
     {
         // Arrange
         GetFilesQuery query = _fixture.Create<GetFilesQuery>();

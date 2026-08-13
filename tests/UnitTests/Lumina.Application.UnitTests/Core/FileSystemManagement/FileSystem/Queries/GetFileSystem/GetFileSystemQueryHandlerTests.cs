@@ -40,7 +40,7 @@ public class GetFileSystemQueryHandlerTests
     [Theory]
     [InlineData(PlatformType.Unix)]
     [InlineData(PlatformType.Windows)]
-    public async Task Handle_WhenCalled_ShouldReturnCorrectFileSystemTypeResponse(PlatformType platformType)
+    public async Task HandleAsync_WhenCalled_ShouldReturnCorrectFileSystemTypeResponse(PlatformType platformType)
     {
         // Arrange
         GetFileSystemQuery query = _fixture.Create<GetFileSystemQuery>();
@@ -56,7 +56,7 @@ public class GetFileSystemQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCalled_ShouldReturnValueTaskResult()
+    public async Task HandleAsync_WhenCalled_ShouldReturnValueTaskResult()
     {
         // Arrange
         GetFileSystemQuery query = _fixture.Create<GetFileSystemQuery>();
@@ -73,7 +73,7 @@ public class GetFileSystemQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCalled_ShouldNotDependOnQueryContent()
+    public async Task HandleAsync_WhenCalled_ShouldNotDependOnQueryContent()
     {
         // Arrange
         GetFileSystemQuery query1 = _fixture.Create<GetFileSystemQuery>();
@@ -90,7 +90,7 @@ public class GetFileSystemQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCalled_ShouldIgnoreCancellationToken()
+    public async Task HandleAsync_WhenCalled_ShouldIgnoreCancellationToken()
     {
         // Arrange
         GetFileSystemQuery query = _fixture.Create<GetFileSystemQuery>();

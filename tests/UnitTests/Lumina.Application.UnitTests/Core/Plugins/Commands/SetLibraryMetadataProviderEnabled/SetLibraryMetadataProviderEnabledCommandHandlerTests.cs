@@ -38,7 +38,7 @@ public class SetLibraryMetadataProviderEnabledCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenConfigurationDoesNotExist_ShouldCreateEnabledConfigurationWithNextRank()
+    public async Task HandleAsync_WhenConfigurationDoesNotExist_ShouldCreateEnabledConfigurationWithNextRank()
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
@@ -61,7 +61,7 @@ public class SetLibraryMetadataProviderEnabledCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenConfigurationExists_ShouldUpdateItsEnabledState()
+    public async Task HandleAsync_WhenConfigurationExists_ShouldUpdateItsEnabledState()
     {
         // Arrange
         LibraryMetadataProviderConfigurationEntity existingConfiguration = new()

@@ -39,7 +39,7 @@ public class GetDrivesQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCalled_ShouldReturnSuccessResult()
+    public async Task HandleAsync_WhenCalled_ShouldReturnSuccessResult()
     {
         // Arrange
         GetDrivesQuery getDrivesQuery = _fixture.Create<GetDrivesQuery>();
@@ -81,7 +81,7 @@ public class GetDrivesQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenDriveServiceReturnsError_ShouldReturnFailureResult()
+    public async Task HandleAsync_WhenDriveServiceReturnsError_ShouldReturnFailureResult()
     {
         // Arrange
         GetDrivesQuery query = _fixture.Create<GetDrivesQuery>();
@@ -99,7 +99,7 @@ public class GetDrivesQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenDriveServiceReturnsEmptyList_ShouldReturnEmptySuccessResult()
+    public async Task HandleAsync_WhenDriveServiceReturnsEmptyList_ShouldReturnEmptySuccessResult()
     {
         // Arrange
         GetDrivesQuery query = _fixture.Create<GetDrivesQuery>();

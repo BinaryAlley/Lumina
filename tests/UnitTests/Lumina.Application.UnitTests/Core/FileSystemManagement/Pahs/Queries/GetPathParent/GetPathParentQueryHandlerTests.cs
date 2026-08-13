@@ -42,7 +42,7 @@ public class GetPathParentQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCalledWithValidQuery_ShouldReturnSuccessResult()
+    public async Task HandleAsync_WhenCalledWithValidQuery_ShouldReturnSuccessResult()
     {
         // Arrange
         GetPathParentQuery query = GetPathParentQueryFixture.CreateGetPathParentQuery();
@@ -66,7 +66,7 @@ public class GetPathParentQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenPathServiceReturnsError_ShouldReturnFailureResult()
+    public async Task HandleAsync_WhenPathServiceReturnsError_ShouldReturnFailureResult()
     {
         // Arrange
         GetPathParentQuery query = _fixture.Create<GetPathParentQuery>();
@@ -84,7 +84,7 @@ public class GetPathParentQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenPathServiceReturnsEmptyList_ShouldReturnEmptySuccessResult()
+    public async Task HandleAsync_WhenPathServiceReturnsEmptyList_ShouldReturnEmptySuccessResult()
     {
         // Arrange
         GetPathParentQuery query = _fixture.Create<GetPathParentQuery>();

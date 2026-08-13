@@ -50,7 +50,7 @@ public class ChangePasswordCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenPasswordChangeIsSuccessful_ShouldUpdateUserAndReturnSuccess()
+    public async Task HandleAsync_WhenPasswordChangeIsSuccessful_ShouldUpdateUserAndReturnSuccess()
     {
         // Arrange
         string currentPassword = "currentPassword";
@@ -91,7 +91,7 @@ public class ChangePasswordCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserDoesNotExist_ShouldReturnError()
+    public async Task HandleAsync_WhenUserDoesNotExist_ShouldReturnError()
     {
         // Arrange
         ChangePasswordCommand command = new("nonexistentUser", "oldPass", "newPass", "newPass");
@@ -112,7 +112,7 @@ public class ChangePasswordCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCurrentPasswordIsIncorrect_ShouldReturnError()
+    public async Task HandleAsync_WhenCurrentPasswordIsIncorrect_ShouldReturnError()
     {
         // Arrange
         UserEntity user = UserEntityFixture.CreateUserEntity();
@@ -143,7 +143,7 @@ public class ChangePasswordCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUpdateFails_ShouldReturnError()
+    public async Task HandleAsync_WhenUpdateFails_ShouldReturnError()
     {
         // Arrange
         string currentPassword = "currentPassword";
@@ -181,7 +181,7 @@ public class ChangePasswordCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenGetByUsernameReturnsError_ShouldReturnError()
+    public async Task HandleAsync_WhenGetByUsernameReturnsError_ShouldReturnError()
     {
         // Arrange
         string currentPassword = "currentPassword";

@@ -39,7 +39,7 @@ public class CombinePathCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCalledWithValidCommand_ShouldReturnSuccessResult()
+    public async Task HandleAsync_WhenCalledWithValidCommand_ShouldReturnSuccessResult()
     {
         // Arrange
         CombinePathCommand combinePathCommand = CombinePathCommandFixture.CreateCombinePathCommand();
@@ -59,7 +59,7 @@ public class CombinePathCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenPathServiceReturnsError_ShouldReturnFailureResult()
+    public async Task HandleAsync_WhenPathServiceReturnsError_ShouldReturnFailureResult()
     {
         // Arrange
         CombinePathCommand command = _fixture.Create<CombinePathCommand>();
@@ -77,7 +77,7 @@ public class CombinePathCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenPathServiceReturnsEmptyString_ShouldReturnSuccessResultWithEmptyPath()
+    public async Task HandleAsync_WhenPathServiceReturnsEmptyString_ShouldReturnSuccessResultWithEmptyPath()
     {
         // Arrange
         CombinePathCommand command = _fixture.Create<CombinePathCommand>();

@@ -57,7 +57,7 @@ public class RecoverPasswordCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserExistsAndTotpIsValid_ShouldResetPassword()
+    public async Task HandleAsync_WhenUserExistsAndTotpIsValid_ShouldResetPassword()
     {
         // Arrange
         string totpCode = "123456";
@@ -97,7 +97,7 @@ public class RecoverPasswordCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserDoesNotExist_ShouldReturnError()
+    public async Task HandleAsync_WhenUserDoesNotExist_ShouldReturnError()
     {
         // Arrange
         RecoverPasswordCommand command = new("nonexistentUser", "123456");
@@ -118,7 +118,7 @@ public class RecoverPasswordCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenTempPasswordExists_ShouldReturnError()
+    public async Task HandleAsync_WhenTempPasswordExists_ShouldReturnError()
     {
         // Arrange
         UserEntity user = UserEntityFixture.CreateUserEntity();
@@ -143,7 +143,7 @@ public class RecoverPasswordCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserDoesNotUseTOTP_ShouldReturnError()
+    public async Task HandleAsync_WhenUserDoesNotUseTOTP_ShouldReturnError()
     {
         // Arrange
         UserEntity user = UserEntityFixture.CreateUserEntity();
@@ -167,7 +167,7 @@ public class RecoverPasswordCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenTotpCodeIsInvalid_ShouldReturnError()
+    public async Task HandleAsync_WhenTotpCodeIsInvalid_ShouldReturnError()
     {
         // Arrange
         string totpCode = "123456";
@@ -200,7 +200,7 @@ public class RecoverPasswordCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUpdateFails_ShouldReturnError()
+    public async Task HandleAsync_WhenUpdateFails_ShouldReturnError()
     {
         // Arrange
         string totpCode = "123456";
@@ -236,7 +236,7 @@ public class RecoverPasswordCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenGetByUsernameReturnsError_ShouldReturnError()
+    public async Task HandleAsync_WhenGetByUsernameReturnsError_ShouldReturnError()
     {
         // Arrange
         string totpCode = "123456";
@@ -264,7 +264,7 @@ public class RecoverPasswordCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserUsesTOTPButNoCodeProvided_ShouldReturnError()
+    public async Task HandleAsync_WhenUserUsesTOTPButNoCodeProvided_ShouldReturnError()
     {
         // Arrange
         string encryptedTotpSecret = Convert.ToBase64String(new byte[] { 1, 2, 3 });

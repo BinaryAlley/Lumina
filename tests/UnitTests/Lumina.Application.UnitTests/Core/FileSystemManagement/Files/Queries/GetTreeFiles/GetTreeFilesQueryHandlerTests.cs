@@ -46,7 +46,7 @@ public class GetTreeFilesQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCalledWithValidQueryWithoutHiddenFiles_ShouldReturnSuccessResult()
+    public async Task HandleAsync_WhenCalledWithValidQueryWithoutHiddenFiles_ShouldReturnSuccessResult()
     {
         // Arrange
         GetTreeFilesQuery getFilesQuery = GetTreeFilesQueryFixture.CreateGetFilesQuery(false);
@@ -81,7 +81,7 @@ public class GetTreeFilesQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCalledWithValidQueryWithHiddenFiles_ShouldReturnSuccessResult()
+    public async Task HandleAsync_WhenCalledWithValidQueryWithHiddenFiles_ShouldReturnSuccessResult()
     {
         // Arrange
         GetTreeFilesQuery getFilesQuery = GetTreeFilesQueryFixture.CreateGetFilesQuery(true);
@@ -116,7 +116,7 @@ public class GetTreeFilesQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenFileServiceReturnsError_ShouldReturnFailureResult()
+    public async Task HandleAsync_WhenFileServiceReturnsError_ShouldReturnFailureResult()
     {
         // Arrange
         GetTreeFilesQuery query = _fixture.Create<GetTreeFilesQuery>();
@@ -134,7 +134,7 @@ public class GetTreeFilesQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenFileServiceReturnsEmptyList_ShouldReturnEmptySuccessResult()
+    public async Task HandleAsync_WhenFileServiceReturnsEmptyList_ShouldReturnEmptySuccessResult()
     {
         // Arrange
         GetTreeFilesQuery query = _fixture.Create<GetTreeFilesQuery>();

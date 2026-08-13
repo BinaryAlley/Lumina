@@ -37,7 +37,7 @@ public class UpdatePluginSettingsCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCalled_ShouldPersistTheSettings()
+    public async Task HandleAsync_WhenCalled_ShouldPersistTheSettings()
     {
         // Arrange
         Guid pluginId = Guid.NewGuid();

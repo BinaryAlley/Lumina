@@ -41,7 +41,7 @@ public class GetAuthorizationQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenRequestingOwnAuthorization_ShouldReturnAuthorization()
+    public async Task HandleAsync_WhenRequestingOwnAuthorization_ShouldReturnAuthorization()
     {
         // Arrange
         Guid userId = Guid.NewGuid();
@@ -63,7 +63,7 @@ public class GetAuthorizationQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenAdminRequestingOtherUserAuthorization_ShouldReturnAuthorization()
+    public async Task HandleAsync_WhenAdminRequestingOtherUserAuthorization_ShouldReturnAuthorization()
     {
         // Arrange
         Guid adminUserId = Guid.NewGuid();
@@ -89,7 +89,7 @@ public class GetAuthorizationQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenNonAdminRequestingOtherUserAuthorization_ShouldReturnError()
+    public async Task HandleAsync_WhenNonAdminRequestingOtherUserAuthorization_ShouldReturnError()
     {
         // Arrange
         Guid currentUserId = Guid.NewGuid();
@@ -110,7 +110,7 @@ public class GetAuthorizationQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenGetCurrentUserAuthorizationFails_ShouldReturnError()
+    public async Task HandleAsync_WhenGetCurrentUserAuthorizationFails_ShouldReturnError()
     {
         // Arrange
         Guid currentUserId = Guid.NewGuid();
@@ -131,7 +131,7 @@ public class GetAuthorizationQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenGetTargetUserAuthorizationFails_ShouldReturnError()
+    public async Task HandleAsync_WhenGetTargetUserAuthorizationFails_ShouldReturnError()
     {
         // Arrange
         Guid adminUserId = Guid.NewGuid();

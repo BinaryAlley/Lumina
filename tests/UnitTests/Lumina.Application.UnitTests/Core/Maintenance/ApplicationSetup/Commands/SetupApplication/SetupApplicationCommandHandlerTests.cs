@@ -73,7 +73,7 @@ public class SetupApplicationCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenNoExistingUsers_ShouldCreateAdminUserWithout2FA()
+    public async Task HandleAsync_WhenNoExistingUsers_ShouldCreateAdminUserWithout2FA()
     {
         // Arrange
         SetupApplicationCommand command = _setupApplicationCommandFixture.CreateSetupApplicationCommand() with { Use2fa = false };
@@ -101,7 +101,7 @@ public class SetupApplicationCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenNoExistingUsersAndWith2FA_ShouldCreateAdminUserWithTOTP()
+    public async Task HandleAsync_WhenNoExistingUsersAndWith2FA_ShouldCreateAdminUserWithTOTP()
     {
         // Arrange
         SetupApplicationCommand command = _setupApplicationCommandFixture.CreateSetupApplicationCommand() with { Use2fa = true };
@@ -138,7 +138,7 @@ public class SetupApplicationCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserAlreadyExists_ShouldReturnError()
+    public async Task HandleAsync_WhenUserAlreadyExists_ShouldReturnError()
     {
         // Arrange
         SetupApplicationCommand command = _setupApplicationCommandFixture.CreateSetupApplicationCommand();
@@ -160,7 +160,7 @@ public class SetupApplicationCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenGetAllUsersReturnsError_ShouldReturnError()
+    public async Task HandleAsync_WhenGetAllUsersReturnsError_ShouldReturnError()
     {
         // Arrange
         SetupApplicationCommand command = _setupApplicationCommandFixture.CreateSetupApplicationCommand();
@@ -182,7 +182,7 @@ public class SetupApplicationCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenInsertUserReturnsError_ShouldReturnError()
+    public async Task HandleAsync_WhenInsertUserReturnsError_ShouldReturnError()
     {
         // Arrange
         SetupApplicationCommand command = _setupApplicationCommandFixture.CreateSetupApplicationCommand();
@@ -206,7 +206,7 @@ public class SetupApplicationCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenSetDefaultAuthorizationPermissionsFails_ShouldReturnError()
+    public async Task HandleAsync_WhenSetDefaultAuthorizationPermissionsFails_ShouldReturnError()
     {
         // Arrange
         SetupApplicationCommand command = _setupApplicationCommandFixture.CreateSetupApplicationCommand();
@@ -231,7 +231,7 @@ public class SetupApplicationCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenSetDefaultAuthorizationRolesFails_ShouldReturnError()
+    public async Task HandleAsync_WhenSetDefaultAuthorizationRolesFails_ShouldReturnError()
     {
         // Arrange
         SetupApplicationCommand command = _setupApplicationCommandFixture.CreateSetupApplicationCommand();
@@ -259,7 +259,7 @@ public class SetupApplicationCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenSetAdminRolePermissionsFails_ShouldReturnError()
+    public async Task HandleAsync_WhenSetAdminRolePermissionsFails_ShouldReturnError()
     {
         // Arrange
         SetupApplicationCommand command = _setupApplicationCommandFixture.CreateSetupApplicationCommand();
@@ -290,7 +290,7 @@ public class SetupApplicationCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenSetAdminRoleToAdministratorAccountFails_ShouldReturnError()
+    public async Task HandleAsync_WhenSetAdminRoleToAdministratorAccountFails_ShouldReturnError()
     {
         // Arrange
         SetupApplicationCommand command = _setupApplicationCommandFixture.CreateSetupApplicationCommand();
@@ -323,7 +323,7 @@ public class SetupApplicationCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenAllOperationsSucceed_ShouldReturnSuccessResponse()
+    public async Task HandleAsync_WhenAllOperationsSucceed_ShouldReturnSuccessResponse()
     {
         // Arrange
         SetupApplicationCommand command = _setupApplicationCommandFixture.CreateSetupApplicationCommand();

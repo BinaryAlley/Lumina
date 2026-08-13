@@ -46,7 +46,7 @@ public class GetDirectoriesQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCalledWithValidQueryWithoutFilesIncluded_ShouldReturnSuccessResult()
+    public async Task HandleAsync_WhenCalledWithValidQueryWithoutFilesIncluded_ShouldReturnSuccessResult()
     {
         // Arrange
         GetDirectoriesQuery getDirectoriesQuery = GetDirectoriesQueryFixture.CreateGetDirectoriesQuery(false);
@@ -80,7 +80,7 @@ public class GetDirectoriesQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCalledWithValidQueryWithFilesIncluded_ShouldReturnSuccessResult()
+    public async Task HandleAsync_WhenCalledWithValidQueryWithFilesIncluded_ShouldReturnSuccessResult()
     {
         // Arrange
         GetDirectoriesQuery getDirectoriesQuery = GetDirectoriesQueryFixture.CreateGetDirectoriesQuery(true);
@@ -114,7 +114,7 @@ public class GetDirectoriesQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenDirectoryServiceReturnsError_ShouldReturnFailureResult()
+    public async Task HandleAsync_WhenDirectoryServiceReturnsError_ShouldReturnFailureResult()
     {
         // Arrange
         GetDirectoriesQuery query = _fixture.Create<GetDirectoriesQuery>();
@@ -132,7 +132,7 @@ public class GetDirectoriesQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenDirectoryServiceReturnsEmptyList_ShouldReturnEmptySuccessResult()
+    public async Task HandleAsync_WhenDirectoryServiceReturnsEmptyList_ShouldReturnEmptySuccessResult()
     {
         // Arrange
         GetDirectoriesQuery query = _fixture.Create<GetDirectoriesQuery>();

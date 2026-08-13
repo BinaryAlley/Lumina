@@ -62,7 +62,7 @@ public class GetUserPermissionsQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserIsNotAdmin_ShouldReturnNotAuthorizedError()
+    public async Task HandleAsync_WhenUserIsNotAdmin_ShouldReturnNotAuthorizedError()
     {
         // Arrange
         GetUserPermissionsQuery query = _getUserPermissionsQueryFixture.CreateQuery();
@@ -79,7 +79,7 @@ public class GetUserPermissionsQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenGetUserByIdFails_ShouldReturnError()
+    public async Task HandleAsync_WhenGetUserByIdFails_ShouldReturnError()
     {
         // Arrange
         GetUserPermissionsQuery query = _getUserPermissionsQueryFixture.CreateQuery();
@@ -99,7 +99,7 @@ public class GetUserPermissionsQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserDoesNotExist_ShouldReturnUsernameDoesNotExistError()
+    public async Task HandleAsync_WhenUserDoesNotExist_ShouldReturnUsernameDoesNotExistError()
     {
         // Arrange
         GetUserPermissionsQuery query = _getUserPermissionsQueryFixture.CreateQuery();
@@ -118,7 +118,7 @@ public class GetUserPermissionsQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserHasPermissions_ShouldReturnPermissions()
+    public async Task HandleAsync_WhenUserHasPermissions_ShouldReturnPermissions()
     {
         // Arrange
         GetUserPermissionsQuery query = _getUserPermissionsQueryFixture.CreateQuery();

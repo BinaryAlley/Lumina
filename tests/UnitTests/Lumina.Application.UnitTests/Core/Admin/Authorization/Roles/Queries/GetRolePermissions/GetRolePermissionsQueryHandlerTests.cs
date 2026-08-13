@@ -60,7 +60,7 @@ public class GetRolePermissionsQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserIsNotAdmin_ShouldReturnNotAuthorizedError()
+    public async Task HandleAsync_WhenUserIsNotAdmin_ShouldReturnNotAuthorizedError()
     {
         // Arrange
         GetRolePermissionsQuery query = _getRolePermissionsQueryFixture.CreateQuery();
@@ -77,7 +77,7 @@ public class GetRolePermissionsQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenGetRoleByIdFails_ShouldReturnError()
+    public async Task HandleAsync_WhenGetRoleByIdFails_ShouldReturnError()
     {
         // Arrange
         GetRolePermissionsQuery query = _getRolePermissionsQueryFixture.CreateQuery();
@@ -97,7 +97,7 @@ public class GetRolePermissionsQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenRoleNotFound_ShouldReturnRoleNotFoundError()
+    public async Task HandleAsync_WhenRoleNotFound_ShouldReturnRoleNotFoundError()
     {
         // Arrange
         GetRolePermissionsQuery query = _getRolePermissionsQueryFixture.CreateQuery();
@@ -116,7 +116,7 @@ public class GetRolePermissionsQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenAllOperationsSucceed_ShouldReturnRolePermissions()
+    public async Task HandleAsync_WhenAllOperationsSucceed_ShouldReturnRolePermissions()
     {
         // Arrange
         GetRolePermissionsQuery query = _getRolePermissionsQueryFixture.CreateQuery();

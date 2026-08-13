@@ -30,7 +30,7 @@ public class ValidatePathQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCalledWithValidPath_ShouldReturnTrueResponse()
+    public async Task HandleAsync_WhenCalledWithValidPath_ShouldReturnTrueResponse()
     {
         // Arrange
         ValidatePathQuery query = ValidatePathQueryFixure.CreateValidatePathQuery();
@@ -45,7 +45,7 @@ public class ValidatePathQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCalledWithInvalidPath_ShouldReturnFalseResponse()
+    public async Task HandleAsync_WhenCalledWithInvalidPath_ShouldReturnFalseResponse()
     {
         // Arrange
         ValidatePathQuery query = ValidatePathQueryFixure.CreateValidatePathQuery();
@@ -60,7 +60,7 @@ public class ValidatePathQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCalledWithNullPath_ShouldReturnFalseResponse()
+    public async Task HandleAsync_WhenCalledWithNullPath_ShouldReturnFalseResponse()
     {
         // Arrange
         ValidatePathQuery query = new(null!);
@@ -75,7 +75,7 @@ public class ValidatePathQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCalledWithEmptyPath_ShouldReturnFalseResponse()
+    public async Task HandleAsync_WhenCalledWithEmptyPath_ShouldReturnFalseResponse()
     {
         // Arrange
         ValidatePathQuery query = new(string.Empty);

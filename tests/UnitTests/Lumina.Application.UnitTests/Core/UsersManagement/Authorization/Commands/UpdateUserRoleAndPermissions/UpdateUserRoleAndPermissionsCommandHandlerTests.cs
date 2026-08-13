@@ -72,7 +72,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserIsNotAdmin_ShouldReturnNotAuthorizedError()
+    public async Task HandleAsync_WhenUserIsNotAdmin_ShouldReturnNotAuthorizedError()
     {
         // Arrange
         UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.CreateCommand();
@@ -89,7 +89,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserDoesNotExist_ShouldReturnUserDoesNotExistError()
+    public async Task HandleAsync_WhenUserDoesNotExist_ShouldReturnUserDoesNotExistError()
     {
         // Arrange
         UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.CreateCommand();
@@ -107,7 +107,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenRoleDoesNotExist_ShouldReturnRoleNotFoundError()
+    public async Task HandleAsync_WhenRoleDoesNotExist_ShouldReturnRoleNotFoundError()
     {
         // Arrange
         UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.CreateCommand(roleId: Guid.NewGuid());
@@ -129,7 +129,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenRemovingLastAdmin_ShouldReturnCannotRemoveLastAdminError()
+    public async Task HandleAsync_WhenRemovingLastAdmin_ShouldReturnCannotRemoveLastAdminError()
     {
         // Arrange
         UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.CreateCommand(roleId: Guid.NewGuid());
@@ -175,7 +175,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUpdateFails_ShouldReturnError()
+    public async Task HandleAsync_WhenUpdateFails_ShouldReturnError()
     {
         // Arrange
         UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.CreateCommand(roleId: Guid.NewGuid());
@@ -206,7 +206,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenAllOperationsSucceed_ShouldReturnSuccessResponse()
+    public async Task HandleAsync_WhenAllOperationsSucceed_ShouldReturnSuccessResponse()
     {
         // Arrange
         UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.CreateCommand(roleId: Guid.NewGuid());
@@ -258,7 +258,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenGetAllUsersFails_ShouldReturnError()
+    public async Task HandleAsync_WhenGetAllUsersFails_ShouldReturnError()
     {
         // Arrange
         UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.CreateCommand(roleId: Guid.NewGuid());
@@ -299,7 +299,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenGetPermissionsFails_ShouldReturnError()
+    public async Task HandleAsync_WhenGetPermissionsFails_ShouldReturnError()
     {
         // Arrange
         UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.CreateCommand(roleId: Guid.NewGuid());

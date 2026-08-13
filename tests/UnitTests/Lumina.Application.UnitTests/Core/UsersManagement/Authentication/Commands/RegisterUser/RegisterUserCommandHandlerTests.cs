@@ -66,7 +66,7 @@ public class RegisterUserCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserDoesNotExistAndWith2FA_ShouldRegisterUser()
+    public async Task HandleAsync_WhenUserDoesNotExistAndWith2FA_ShouldRegisterUser()
     {
         // Arrange
         RegisterUserCommand command = RegisterUserCommandFixture.CreateRegisterCommand();
@@ -106,7 +106,7 @@ public class RegisterUserCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserDoesNotExistAndWithout2FA_ShouldRegisterUser()
+    public async Task HandleAsync_WhenUserDoesNotExistAndWithout2FA_ShouldRegisterUser()
     {
         // Arrange
         RegisterUserCommand command = RegisterUserCommandFixture.CreateRegisterCommand() with { Use2fa = false };
@@ -137,7 +137,7 @@ public class RegisterUserCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserAlreadyExists_ShouldReturnError()
+    public async Task HandleAsync_WhenUserAlreadyExists_ShouldReturnError()
     {
         // Arrange
         RegisterUserCommand command = RegisterUserCommandFixture.CreateRegisterCommand();
@@ -159,7 +159,7 @@ public class RegisterUserCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenInsertFails_ShouldReturnError()
+    public async Task HandleAsync_WhenInsertFails_ShouldReturnError()
     {
         // Arrange
         RegisterUserCommand command = RegisterUserCommandFixture.CreateRegisterCommand();
@@ -183,7 +183,7 @@ public class RegisterUserCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenGetByUsernameReturnsError_ShouldReturnError()
+    public async Task HandleAsync_WhenGetByUsernameReturnsError_ShouldReturnError()
     {
         // Arrange
         RegisterUserCommand command = RegisterUserCommandFixture.CreateRegisterCommand();

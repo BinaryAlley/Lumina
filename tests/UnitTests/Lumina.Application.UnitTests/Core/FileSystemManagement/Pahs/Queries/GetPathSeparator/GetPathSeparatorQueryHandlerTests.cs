@@ -30,7 +30,7 @@ public class GetPathSeparatorQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCalled_ShouldReturnPathSeparatorResponse()
+    public async Task HandleAsync_WhenCalled_ShouldReturnPathSeparatorResponse()
     {
         // Arrange
         GetPathSeparatorQuery query = new();
@@ -66,7 +66,7 @@ public class GetPathSeparatorQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCalledMultipleTimes_ShouldReturnSameResult()
+    public async Task HandleAsync_WhenCalledMultipleTimes_ShouldReturnSameResult()
     {
         // Arrange
         GetPathSeparatorQuery query = new();

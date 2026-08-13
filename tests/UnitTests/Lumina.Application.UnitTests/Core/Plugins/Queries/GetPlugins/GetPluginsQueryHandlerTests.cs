@@ -36,7 +36,7 @@ public class GetPluginsQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCalled_ShouldReturnAllDetectedPlugins()
+    public async Task HandleAsync_WhenCalled_ShouldReturnAllDetectedPlugins()
     {
         // Arrange
         PluginEntityFixture pluginFixture = new();
@@ -54,7 +54,7 @@ public class GetPluginsQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenRepositoryReturnsError_ShouldReturnError()
+    public async Task HandleAsync_WhenRepositoryReturnsError_ShouldReturnError()
     {
         // Arrange
         _mockPluginRepository.GetAllAsync(Arg.Any<CancellationToken>())

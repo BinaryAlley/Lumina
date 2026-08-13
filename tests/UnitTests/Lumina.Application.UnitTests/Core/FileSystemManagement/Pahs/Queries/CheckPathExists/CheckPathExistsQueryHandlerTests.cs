@@ -35,7 +35,7 @@ public class CheckPathExistsQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenPathExistsAndIsNotHidden_ShouldReturnTrueResponse()
+    public async Task HandleAsync_WhenPathExistsAndIsNotHidden_ShouldReturnTrueResponse()
     {
         // Arrange
         CheckPathExistsQuery query = CheckPathExistsQueryFixture.CreateCheckPathExistsQuery();
@@ -51,7 +51,7 @@ public class CheckPathExistsQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenPathExistsAndIsHiddenAndIncludeHiddenElementsIsTrue_ShouldReturnTrueResponse()
+    public async Task HandleAsync_WhenPathExistsAndIsHiddenAndIncludeHiddenElementsIsTrue_ShouldReturnTrueResponse()
     {
         // Arrange
         CheckPathExistsQuery query = CheckPathExistsQueryFixture.CreateCheckPathExistsQuery(true);
@@ -67,7 +67,7 @@ public class CheckPathExistsQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenPathExistsAndIsHiddenAndIncludeHiddenElementsIsFalse_ShouldReturnFalseResponse()
+    public async Task HandleAsync_WhenPathExistsAndIsHiddenAndIncludeHiddenElementsIsFalse_ShouldReturnFalseResponse()
     {
         // Arrange
         CheckPathExistsQuery query = CheckPathExistsQueryFixture.CreateCheckPathExistsQuery(false);
@@ -83,7 +83,7 @@ public class CheckPathExistsQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenPathDoesNotExist_ShouldReturnFalseResponse()
+    public async Task HandleAsync_WhenPathDoesNotExist_ShouldReturnFalseResponse()
     {
         // Arrange
         CheckPathExistsQuery query = CheckPathExistsQueryFixture.CreateCheckPathExistsQuery();
@@ -99,7 +99,7 @@ public class CheckPathExistsQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCalledWithNullPath_ShouldStillCallPathService()
+    public async Task HandleAsync_WhenCalledWithNullPath_ShouldStillCallPathService()
     {
         // Arrange
         CheckPathExistsQuery query = new(null!, false);
@@ -115,7 +115,7 @@ public class CheckPathExistsQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCancellationRequested_ShouldStillCompleteOperation()
+    public async Task HandleAsync_WhenCancellationRequested_ShouldStillCompleteOperation()
     {
         // Arrange
         CheckPathExistsQuery query = CheckPathExistsQueryFixture.CreateCheckPathExistsQuery();

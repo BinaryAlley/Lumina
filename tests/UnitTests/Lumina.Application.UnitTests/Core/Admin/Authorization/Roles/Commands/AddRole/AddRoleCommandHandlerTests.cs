@@ -61,7 +61,7 @@ public class AddRoleCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserIsNotAdmin_ShouldReturnNotAuthorizedError()
+    public async Task HandleAsync_WhenUserIsNotAdmin_ShouldReturnNotAuthorizedError()
     {
         // Arrange
         AddRoleCommand command = _addRoleCommandFixture.CreateCommand();
@@ -78,7 +78,7 @@ public class AddRoleCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenInsertRoleFails_ShouldReturnError()
+    public async Task HandleAsync_WhenInsertRoleFails_ShouldReturnError()
     {
         // Arrange
         AddRoleCommand command = _addRoleCommandFixture.CreateCommand();
@@ -99,7 +99,7 @@ public class AddRoleCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenGetRoleByNameFails_ShouldReturnError()
+    public async Task HandleAsync_WhenGetRoleByNameFails_ShouldReturnError()
     {
         // Arrange
         AddRoleCommand command = _addRoleCommandFixture.CreateCommand();
@@ -121,7 +121,7 @@ public class AddRoleCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenGetRoleByNameReturnsNull_ShouldReturnError()
+    public async Task HandleAsync_WhenGetRoleByNameReturnsNull_ShouldReturnError()
     {
         // Arrange
         AddRoleCommand command = _addRoleCommandFixture.CreateCommand();
@@ -142,7 +142,7 @@ public class AddRoleCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenAllOperationsSucceed_ShouldReturnSuccessResponse()
+    public async Task HandleAsync_WhenAllOperationsSucceed_ShouldReturnSuccessResponse()
     {
         // Arrange
         AddRoleCommand command = _addRoleCommandFixture.CreateCommand();

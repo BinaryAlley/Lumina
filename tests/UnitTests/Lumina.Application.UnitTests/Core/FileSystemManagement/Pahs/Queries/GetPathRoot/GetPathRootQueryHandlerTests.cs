@@ -39,7 +39,7 @@ public class GetPathRootQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCalledWithValidQuery_ShouldReturnSuccessResult()
+    public async Task HandleAsync_WhenCalledWithValidQuery_ShouldReturnSuccessResult()
     {
         // Arrange
         GetPathRootQuery query = GetPathRootQueryFixture.CreateGetPathRootQuery();
@@ -59,7 +59,7 @@ public class GetPathRootQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenPathServiceReturnsError_ShouldReturnFailureResult()
+    public async Task HandleAsync_WhenPathServiceReturnsError_ShouldReturnFailureResult()
     {
         // Arrange
         GetPathRootQuery query = GetPathRootQueryFixture.CreateGetPathRootQuery();
@@ -77,7 +77,7 @@ public class GetPathRootQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenPathServiceReturnsRootPathSegment_ShouldReturnRootSuccessResult()
+    public async Task HandleAsync_WhenPathServiceReturnsRootPathSegment_ShouldReturnRootSuccessResult()
     {
         // Arrange
         GetPathRootQuery query = GetPathRootQueryFixture.CreateGetPathRootQuery();

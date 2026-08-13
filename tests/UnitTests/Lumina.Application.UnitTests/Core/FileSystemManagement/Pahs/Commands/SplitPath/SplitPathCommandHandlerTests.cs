@@ -46,7 +46,7 @@ public class SplitPathCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCalledWithValidCommand_ShouldReturnSuccessResult()
+    public async Task HandleAsync_WhenCalledWithValidCommand_ShouldReturnSuccessResult()
     {
         // Arrange
         SplitPathCommand splitPathCommand = SplitPathCommandFixture.CreateSplitPathCommand();
@@ -73,7 +73,7 @@ public class SplitPathCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenPathServiceReturnsError_ShouldReturnFailureResult()
+    public async Task HandleAsync_WhenPathServiceReturnsError_ShouldReturnFailureResult()
     {
         // Arrange
         SplitPathCommand command = _fixture.Create<SplitPathCommand>();
@@ -91,7 +91,7 @@ public class SplitPathCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenPathServiceReturnsEmptyList_ShouldReturnEmptySuccessResult()
+    public async Task HandleAsync_WhenPathServiceReturnsEmptyList_ShouldReturnEmptySuccessResult()
     {
         // Arrange
         SplitPathCommand command = _fixture.Create<SplitPathCommand>();

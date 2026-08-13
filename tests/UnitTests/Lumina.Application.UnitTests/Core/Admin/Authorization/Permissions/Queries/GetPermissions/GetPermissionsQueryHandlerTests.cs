@@ -54,7 +54,7 @@ public class GetPermissionsQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserIsAdmin_ShouldReturnPermissions()
+    public async Task HandleAsync_WhenUserIsAdmin_ShouldReturnPermissions()
     {
         // Arrange
         GetPermissionsQuery query = new();
@@ -80,7 +80,7 @@ public class GetPermissionsQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserIsNotAdmin_ShouldReturnNotAuthorizedError()
+    public async Task HandleAsync_WhenUserIsNotAdmin_ShouldReturnNotAuthorizedError()
     {
         // Arrange
         GetPermissionsQuery query = new();
@@ -99,7 +99,7 @@ public class GetPermissionsQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenGetAllPermissionsReturnsError_ShouldReturnError()
+    public async Task HandleAsync_WhenGetAllPermissionsReturnsError_ShouldReturnError()
     {
         // Arrange
         GetPermissionsQuery query = new();
@@ -121,7 +121,7 @@ public class GetPermissionsQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCancellationRequested_ShouldStillCompleteOperation()
+    public async Task HandleAsync_WhenCancellationRequested_ShouldStillCompleteOperation()
     {
         // Arrange
         GetPermissionsQuery query = new();

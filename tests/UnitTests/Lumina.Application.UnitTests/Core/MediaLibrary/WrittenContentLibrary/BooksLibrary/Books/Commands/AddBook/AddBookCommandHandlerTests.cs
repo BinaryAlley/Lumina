@@ -57,7 +57,7 @@ public class AddBookCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCalledWithValidCommand_ShouldReturnSuccessResult()
+    public async Task HandleAsync_WhenCalledWithValidCommand_ShouldReturnSuccessResult()
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
@@ -76,7 +76,7 @@ public class AddBookCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenRepositoryInsertFails_ShouldReturnFailureResult()
+    public async Task HandleAsync_WhenRepositoryInsertFails_ShouldReturnFailureResult()
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
@@ -95,7 +95,7 @@ public class AddBookCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCalledWithInvalidISBN_ShouldReturnFailureResult()
+    public async Task HandleAsync_WhenCalledWithInvalidISBN_ShouldReturnFailureResult()
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
@@ -112,7 +112,7 @@ public class AddBookCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCalledWithInvalidRating_ShouldReturnFailureResult()
+    public async Task HandleAsync_WhenCalledWithInvalidRating_ShouldReturnFailureResult()
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
@@ -129,7 +129,7 @@ public class AddBookCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenGenreCreationFails_ShouldReturnFailureResult()
+    public async Task HandleAsync_WhenGenreCreationFails_ShouldReturnFailureResult()
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
@@ -152,7 +152,7 @@ public class AddBookCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenTagCreationFails_ShouldReturnFailureResult()
+    public async Task HandleAsync_WhenTagCreationFails_ShouldReturnFailureResult()
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
@@ -175,7 +175,7 @@ public class AddBookCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenReleaseInfoCreationFails_ShouldReturnFailureResult()
+    public async Task HandleAsync_WhenReleaseInfoCreationFails_ShouldReturnFailureResult()
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
@@ -205,7 +205,7 @@ public class AddBookCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenLanguageInfoCreationFails_ShouldReturnFailureResult()
+    public async Task HandleAsync_WhenLanguageInfoCreationFails_ShouldReturnFailureResult()
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
@@ -228,7 +228,7 @@ public class AddBookCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenOriginalLanguageInfoCreationFails_ShouldReturnFailureResult()
+    public async Task HandleAsync_WhenOriginalLanguageInfoCreationFails_ShouldReturnFailureResult()
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();

@@ -57,7 +57,7 @@ public class GetUsersQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserIsNotAdmin_ShouldReturnNotAuthorizedError()
+    public async Task HandleAsync_WhenUserIsNotAdmin_ShouldReturnNotAuthorizedError()
     {
         // Arrange
         GetUsersQuery query = _getUsersQueryFixture.CreateQuery();
@@ -74,7 +74,7 @@ public class GetUsersQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenGetUsersFails_ShouldReturnError()
+    public async Task HandleAsync_WhenGetUsersFails_ShouldReturnError()
     {
         // Arrange
         GetUsersQuery query = _getUsersQueryFixture.CreateQuery();
@@ -94,7 +94,7 @@ public class GetUsersQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenAllOperationsSucceed_ShouldReturnUsers()
+    public async Task HandleAsync_WhenAllOperationsSucceed_ShouldReturnUsers()
     {
         // Arrange
         GetUsersQuery query = _getUsersQueryFixture.CreateQuery();

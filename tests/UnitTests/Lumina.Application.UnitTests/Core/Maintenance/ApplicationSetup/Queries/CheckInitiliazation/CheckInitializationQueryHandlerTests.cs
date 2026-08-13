@@ -40,7 +40,7 @@ public class CheckInitializationQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUsersExist_ShouldReturnInitialized()
+    public async Task HandleAsync_WhenUsersExist_ShouldReturnInitialized()
     {
         // Arrange
         List<UserEntity> users = UserEntityFixture.CreateMany();
@@ -56,7 +56,7 @@ public class CheckInitializationQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenNoUsersExist_ShouldReturnNotInitialized()
+    public async Task HandleAsync_WhenNoUsersExist_ShouldReturnNotInitialized()
     {
         // Arrange
         _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
@@ -71,7 +71,7 @@ public class CheckInitializationQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenRepositoryReturnsError_ShouldReturnNotInitialized()
+    public async Task HandleAsync_WhenRepositoryReturnsError_ShouldReturnNotInitialized()
     {
         // Arrange
         Error error = Error.Failure("Database.Error", "Failed to retrieve users");

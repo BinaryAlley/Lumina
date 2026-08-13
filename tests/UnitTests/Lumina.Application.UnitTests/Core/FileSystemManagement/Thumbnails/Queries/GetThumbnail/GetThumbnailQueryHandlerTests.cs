@@ -36,7 +36,7 @@ public class GetThumbnailQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCalledWithValidQuery_ShouldReturnSuccessResult()
+    public async Task HandleAsync_WhenCalledWithValidQuery_ShouldReturnSuccessResult()
     {
         // Arrange
         GetThumbnailQuery query = _fixture.Create<GetThumbnailQuery>();
@@ -57,7 +57,7 @@ public class GetThumbnailQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenThumbnailServiceReturnsError_ShouldReturnFailureResult()
+    public async Task HandleAsync_WhenThumbnailServiceReturnsError_ShouldReturnFailureResult()
     {
         // Arrange
         GetThumbnailQuery query = _fixture.Create<GetThumbnailQuery>();
@@ -75,7 +75,7 @@ public class GetThumbnailQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCancellationRequested_ShouldCancelOperation()
+    public async Task HandleAsync_WhenCancellationRequested_ShouldCancelOperation()
     {
         // Arrange
         GetThumbnailQuery query = _fixture.Create<GetThumbnailQuery>();

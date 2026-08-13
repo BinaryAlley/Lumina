@@ -58,7 +58,7 @@ public class DeleteRoleCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserIsNotAdmin_ShouldReturnNotAuthorizedError()
+    public async Task HandleAsync_WhenUserIsNotAdmin_ShouldReturnNotAuthorizedError()
     {
         // Arrange
         DeleteRoleCommand command = _deleteRoleCommandFixture.CreateCommand();
@@ -75,7 +75,7 @@ public class DeleteRoleCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenRoleDoesNotExist_ShouldReturnRoleNotFoundError()
+    public async Task HandleAsync_WhenRoleDoesNotExist_ShouldReturnRoleNotFoundError()
     {
         // Arrange
         DeleteRoleCommand command = _deleteRoleCommandFixture.CreateCommand();
@@ -95,7 +95,7 @@ public class DeleteRoleCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenDeletingAdminRole_ShouldReturnAdminRoleCannotBeDeletedError()
+    public async Task HandleAsync_WhenDeletingAdminRole_ShouldReturnAdminRoleCannotBeDeletedError()
     {
         // Arrange
         DeleteRoleCommand command = _deleteRoleCommandFixture.CreateCommand();
@@ -116,7 +116,7 @@ public class DeleteRoleCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenGetRoleByIdFails_ShouldReturnError()
+    public async Task HandleAsync_WhenGetRoleByIdFails_ShouldReturnError()
     {
         // Arrange
         DeleteRoleCommand command = _deleteRoleCommandFixture.CreateCommand();
@@ -137,7 +137,7 @@ public class DeleteRoleCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenDeleteRoleFails_ShouldReturnError()
+    public async Task HandleAsync_WhenDeleteRoleFails_ShouldReturnError()
     {
         // Arrange
         DeleteRoleCommand command = _deleteRoleCommandFixture.CreateCommand();
@@ -161,7 +161,7 @@ public class DeleteRoleCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenAllOperationsSucceed_ShouldReturnSuccess()
+    public async Task HandleAsync_WhenAllOperationsSucceed_ShouldReturnSuccess()
     {
         // Arrange
         DeleteRoleCommand command = _deleteRoleCommandFixture.CreateCommand();

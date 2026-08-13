@@ -60,7 +60,7 @@ public class GetUserRoleQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserIsNotAdmin_ShouldReturnNotAuthorizedError()
+    public async Task HandleAsync_WhenUserIsNotAdmin_ShouldReturnNotAuthorizedError()
     {
         // Arrange
         GetUserRoleQuery query = _getUserRoleQueryFixture.CreateQuery();
@@ -77,7 +77,7 @@ public class GetUserRoleQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenGetUserByIdFails_ShouldReturnError()
+    public async Task HandleAsync_WhenGetUserByIdFails_ShouldReturnError()
     {
         // Arrange
         GetUserRoleQuery query = _getUserRoleQueryFixture.CreateQuery();
@@ -97,7 +97,7 @@ public class GetUserRoleQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserDoesNotExist_ShouldReturnUsernameDoesNotExistError()
+    public async Task HandleAsync_WhenUserDoesNotExist_ShouldReturnUsernameDoesNotExistError()
     {
         // Arrange
         GetUserRoleQuery query = _getUserRoleQueryFixture.CreateQuery();
@@ -116,7 +116,7 @@ public class GetUserRoleQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserHasNoRole_ShouldReturnNull()
+    public async Task HandleAsync_WhenUserHasNoRole_ShouldReturnNull()
     {
         // Arrange
         GetUserRoleQuery query = _getUserRoleQueryFixture.CreateQuery();
@@ -136,7 +136,7 @@ public class GetUserRoleQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserHasRole_ShouldReturnRole()
+    public async Task HandleAsync_WhenUserHasRole_ShouldReturnRole()
     {
         // Arrange
         GetUserRoleQuery query = _getUserRoleQueryFixture.CreateQuery();

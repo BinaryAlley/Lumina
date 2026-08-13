@@ -39,7 +39,7 @@ public class ReorderLibraryMetadataProvidersCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCalled_ShouldAssignRanksInTheProvidedOrder()
+    public async Task HandleAsync_WhenCalled_ShouldAssignRanksInTheProvidedOrder()
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
