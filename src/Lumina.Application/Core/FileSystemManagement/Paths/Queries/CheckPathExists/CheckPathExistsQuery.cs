@@ -1,7 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Contracts.Responses.FileSystemManagement.Path;
-using Mediator;
+using Lumina.Application.Common.CQRS;
 using System.Diagnostics;
 #endregion
 
@@ -16,4 +14,4 @@ namespace Lumina.Application.Core.FileSystemManagement.Paths.Queries.CheckPathEx
 public record CheckPathExistsQuery(
     string? Path,
     bool IncludeHiddenElements
-) : IRequest<ErrorOr<PathExistsResponse>>;
+) : IQuery;

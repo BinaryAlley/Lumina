@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.Maintenance.ApplicationSetup.Queries.CheckInitialization;
 using Lumina.Contracts.Responses.UsersManagement;
 using Lumina.Presentation.Api.Core.Endpoints.Maintenance.ApplicationSetup;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -21,7 +21,7 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Maintenance.Applicati
 [ExcludeFromCodeCoverage]
 public class CheckInitializationEndpointTests
 {
-    private readonly ISender _mockSender;
+    private readonly IQueryHandler<CheckInitializationQuery, InitializationResponse> _mockHandler;
     private readonly CheckInitializationEndpoint _sut;
 
     /// <summary>
@@ -29,8 +29,8 @@ public class CheckInitializationEndpointTests
     /// </summary>
     public CheckInitializationEndpointTests()
     {
-        _mockSender = Substitute.For<ISender>();
-        _sut = Factory.Create<CheckInitializationEndpoint>(_mockSender);
+        _mockHandler = Substitute.For<IQueryHandler<CheckInitializationQuery, InitializationResponse>>();
+        _sut = Factory.Create<CheckInitializationEndpoint>(_mockHandler);
     }
 
     [Fact]
@@ -39,7 +39,7 @@ public class CheckInitializationEndpointTests
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;
         InitializationResponse expectedResponse = new(IsInitialized: true);
-        _mockSender.Send(Arg.Any<CheckInitializationQuery>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<CheckInitializationQuery>(), Arg.Any<CancellationToken>())
             .Returns(expectedResponse);
 
         // Act
@@ -51,18 +51,18 @@ public class CheckInitializationEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalled_ShouldSendCheckInitializationQueryToMediator()
+    public async Task ExecuteAsync_WhenCalled_ShouldSendCheckInitializationQueryToHandler()
     {
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;
-        _mockSender.Send(Arg.Any<CheckInitializationQuery>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<CheckInitializationQuery>(), Arg.Any<CancellationToken>())
             .Returns(new InitializationResponse(IsInitialized: true));
 
         // Act
         await _sut.ExecuteAsync(new EmptyRequest(), cancellationToken);
 
         // Assert
-        await _mockSender.Received(1).Send(
+        await _mockHandler.Received(1).HandleAsync(
             Arg.Any<CheckInitializationQuery>(),
             Arg.Is(cancellationToken));
     }
@@ -75,14 +75,14 @@ public class CheckInitializationEndpointTests
         TaskCompletionSource<bool> operationStarted = new();
         TaskCompletionSource<bool> cancellationRequested = new();
 
-        _mockSender.Send(Arg.Any<CheckInitializationQuery>(), Arg.Any<CancellationToken>())
-            .Returns(callInfo => new ValueTask<InitializationResponse>(Task.Run(async () =>
+        _mockHandler.HandleAsync(Arg.Any<CheckInitializationQuery>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo => Task.Run(async () =>
             {
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
                 return new InitializationResponse(IsInitialized: true);
-            }, callInfo.Arg<CancellationToken>())));
+            }, callInfo.Arg<CancellationToken>()));
 
         // Act
         Task<IResult> operationTask = _sut.ExecuteAsync(new EmptyRequest(), cts.Token);

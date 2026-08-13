@@ -3,6 +3,7 @@ using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.Plugins.Commands.SetLibraryMetadataProviderEnabled;
 using NSubstitute;
 using System;
@@ -30,11 +31,14 @@ public class SetLibraryMetadataProviderEnabledCommandHandlerTests
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
         _mockConfigurationRepository = Substitute.For<ILibraryMetadataProviderConfigurationRepository>();
         _mockUnitOfWork.GetRepository<ILibraryMetadataProviderConfigurationRepository>().Returns(_mockConfigurationRepository);
-        _sut = new SetLibraryMetadataProviderEnabledCommandHandler(_mockUnitOfWork);
+        IValidator<SetLibraryMetadataProviderEnabledCommand> mockValidator = Substitute.For<IValidator<SetLibraryMetadataProviderEnabledCommand>>();
+        mockValidator.Validate(Arg.Any<SetLibraryMetadataProviderEnabledCommand>())
+            .Returns([]);
+        _sut = new SetLibraryMetadataProviderEnabledCommandHandler(_mockUnitOfWork, mockValidator);
     }
 
     [Fact]
-    public async Task Handle_WhenConfigurationDoesNotExist_ShouldCreateEnabledConfigurationWithNextRank()
+    public async Task HandleAsync_WhenConfigurationDoesNotExist_ShouldCreateEnabledConfigurationWithNextRank()
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
@@ -47,7 +51,7 @@ public class SetLibraryMetadataProviderEnabledCommandHandlerTests
             .Returns(Result.Updated);
 
         // Act
-        ErrorOr<Success> result = await _sut.Handle(new SetLibraryMetadataProviderEnabledCommand(libraryId, pluginId, true), CancellationToken.None);
+        ErrorOr<Success> result = await _sut.HandleAsync(new SetLibraryMetadataProviderEnabledCommand(libraryId, pluginId, true), CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -57,7 +61,7 @@ public class SetLibraryMetadataProviderEnabledCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenConfigurationExists_ShouldUpdateItsEnabledState()
+    public async Task HandleAsync_WhenConfigurationExists_ShouldUpdateItsEnabledState()
     {
         // Arrange
         LibraryMetadataProviderConfigurationEntity existingConfiguration = new()
@@ -77,7 +81,7 @@ public class SetLibraryMetadataProviderEnabledCommandHandlerTests
             .Returns(Result.Updated);
 
         // Act
-        ErrorOr<Success> result = await _sut.Handle(new SetLibraryMetadataProviderEnabledCommand(existingConfiguration.LibraryId, existingConfiguration.PluginId, true), CancellationToken.None);
+        ErrorOr<Success> result = await _sut.HandleAsync(new SetLibraryMetadataProviderEnabledCommand(existingConfiguration.LibraryId, existingConfiguration.PluginId, true), CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);

@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.FileSystemManagement.Paths.Queries.GetPathParent;
 using Lumina.Contracts.Requests.FileSystemManagement.Path;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
 using Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.GetPathParent;
 using Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.Fixtures;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -26,7 +26,7 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.
 [ExcludeFromCodeCoverage]
 public class GetPathParentEndpointTests
 {
-    private readonly ISender _mockSender;
+    private readonly IQueryHandler<GetPathParentQuery, ErrorOr<IEnumerable<PathSegmentResponse>>> _mockHandler;
     private readonly GetPathParentEndpoint _sut;
     private readonly PathSegmentResponseFixture _pathSegmentResponseFixture;
     private readonly GetPathParentRequestFixture _getPathParentRequestFixture;
@@ -36,8 +36,8 @@ public class GetPathParentEndpointTests
     /// </summary>
     public GetPathParentEndpointTests()
     {
-        _mockSender = Substitute.For<ISender>();
-        _sut = Factory.Create<GetPathParentEndpoint>(_mockSender);
+        _mockHandler = Substitute.For<IQueryHandler<GetPathParentQuery, ErrorOr<IEnumerable<PathSegmentResponse>>>>();
+        _sut = Factory.Create<GetPathParentEndpoint>(_mockHandler);
         _pathSegmentResponseFixture = new PathSegmentResponseFixture();
         _getPathParentRequestFixture = new GetPathParentRequestFixture();
     }
@@ -49,7 +49,7 @@ public class GetPathParentEndpointTests
         GetPathParentRequest request = _getPathParentRequestFixture.Create(@"C:\Users\TestUser");
         CancellationToken cancellationToken = CancellationToken.None;
         IEnumerable<PathSegmentResponse> expectedResponse = _pathSegmentResponseFixture.CreateMany();
-        _mockSender.Send(Arg.Any<GetPathParentQuery>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<GetPathParentQuery>(), Arg.Any<CancellationToken>())
             .Returns(ErrorOrFactory.From(expectedResponse));
 
         // Act
@@ -61,13 +61,13 @@ public class GetPathParentEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenMediatorReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
     {
         // Arrange
         GetPathParentRequest request = _getPathParentRequestFixture.Create(@"C:\Users\TestUser");
         CancellationToken cancellationToken = CancellationToken.None;
         Error expectedError = Error.NotFound("Path.NotFound", "The requested path was not found.");
-        _mockSender.Send(Arg.Any<GetPathParentQuery>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<GetPathParentQuery>(), Arg.Any<CancellationToken>())
            .Returns(expectedError);
 
         // Act
@@ -87,13 +87,13 @@ public class GetPathParentEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenMediatorReturnsValidationError_ShouldReturnValidationProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsValidationError_ShouldReturnValidationProblemResult()
     {
         // Arrange
         GetPathParentRequest request = _getPathParentRequestFixture.Create(@"InvalidPath");
         CancellationToken cancellationToken = CancellationToken.None;
         Error expectedError = Error.Validation("Path.Invalid", "The provided path is invalid.");
-        _mockSender.Send(Arg.Any<GetPathParentQuery>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<GetPathParentQuery>(), Arg.Any<CancellationToken>())
             .Returns(expectedError);
 
         // Act
@@ -113,19 +113,19 @@ public class GetPathParentEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalled_ShouldSendGetPathParentQueryToMediator()
+    public async Task ExecuteAsync_WhenCalled_ShouldSendGetPathParentQueryToHandler()
     {
         // Arrange
         GetPathParentRequest request = _getPathParentRequestFixture.Create(@"C:\Users\TestUser");
         CancellationToken cancellationToken = CancellationToken.None;
-        _mockSender.Send(Arg.Any<GetPathParentQuery>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<GetPathParentQuery>(), Arg.Any<CancellationToken>())
             .Returns(ErrorOrFactory.From(_pathSegmentResponseFixture.CreateMany().AsEnumerable()));
 
         // Act
         await _sut.ExecuteAsync(request, cancellationToken);
 
         // Assert
-        await _mockSender.Received(1).Send(Arg.Is<GetPathParentQuery>(q => q.Path == request.Path), Arg.Is(cancellationToken));
+        await _mockHandler.Received(1).HandleAsync(Arg.Is<GetPathParentQuery>(q => q.Path == request.Path), Arg.Is(cancellationToken));
     }
 
     [Fact]
@@ -137,14 +137,14 @@ public class GetPathParentEndpointTests
         TaskCompletionSource<bool> operationStarted = new();
         TaskCompletionSource<bool> cancellationRequested = new();
 
-        _mockSender.Send(Arg.Any<GetPathParentQuery>(), Arg.Any<CancellationToken>())
-            .Returns(callInfo => new ValueTask<ErrorOr<IEnumerable<PathSegmentResponse>>>(Task.Run(async () =>
+        _mockHandler.HandleAsync(Arg.Any<GetPathParentQuery>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo => Task.Run(async () =>
             {
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
                 return ErrorOrFactory.From(_pathSegmentResponseFixture.CreateMany().AsEnumerable());
-            }, callInfo.Arg<CancellationToken>())));
+            }, callInfo.Arg<CancellationToken>()));
 
         // Act
         Task<IResult> operationTask = _sut.ExecuteAsync(request, cts.Token);

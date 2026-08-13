@@ -1,8 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Contracts.Responses.FileSystemManagement.Directories;
-using Mediator;
-using System.Collections.Generic;
+using Lumina.Application.Common.CQRS;
 using System.Diagnostics;
 #endregion
 
@@ -17,4 +14,4 @@ namespace Lumina.Application.Core.FileSystemManagement.Directories.Queries.GetDi
 public record GetDirectoriesQuery(
     string? Path, 
     bool IncludeHiddenElements
-) : IRequest<ErrorOr<IEnumerable<DirectoryResponse>>>;
+) : IQuery;

@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.Plugins;
+using Lumina.Application.Core.Plugins.Commands.SetLibraryMetadataProviderEnabled;
 using Lumina.Contracts.Requests.Plugins;
 using Lumina.Presentation.Api.Common.Routes.Library.Management;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,15 +18,15 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Plugins.SetLibraryMetadataProvi
 /// </summary>
 public class SetLibraryMetadataProviderEnabledEndpoint : BaseEndpoint<SetLibraryMetadataProviderEnabledRequest, IResult>
 {
-    private readonly ISender _sender;
+    private readonly ICommandHandler<SetLibraryMetadataProviderEnabledCommand, ErrorOr<Success>> _setLibraryMetadataProviderEnabledCommandHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SetLibraryMetadataProviderEnabledEndpoint"/> class.
     /// </summary>
-    /// <param name="sender">Injected service for mediating commands and queries.</param>
-    public SetLibraryMetadataProviderEnabledEndpoint(ISender sender)
+    /// <param name="setLibraryMetadataProviderEnabledCommandHandler">Injected service for handling set library metadata provider enabled commands.</param>
+    public SetLibraryMetadataProviderEnabledEndpoint(ICommandHandler<SetLibraryMetadataProviderEnabledCommand, ErrorOr<Success>> setLibraryMetadataProviderEnabledCommandHandler)
     {
-        _sender = sender;
+        _setLibraryMetadataProviderEnabledCommandHandler = setLibraryMetadataProviderEnabledCommandHandler;
     }
 
     /// <summary>
@@ -34,7 +34,7 @@ public class SetLibraryMetadataProviderEnabledEndpoint : BaseEndpoint<SetLibrary
     /// </summary>
     public override void Configure()
     {
-        Verbs(Http.PUT);
+        Verbs(FastEndpoints.Http.PUT);
         Routes(ApiRoutes.Libraries.SET_LIBRARY_METADATA_PROVIDER_ENABLED);
         Version(1);
         DontCatchExceptions();
@@ -47,7 +47,7 @@ public class SetLibraryMetadataProviderEnabledEndpoint : BaseEndpoint<SetLibrary
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(SetLibraryMetadataProviderEnabledRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<Success> result = await _sender.Send(request.ToCommand(), cancellationToken).ConfigureAwait(false);
+        ErrorOr<Success> result = await _setLibraryMetadataProviderEnabledCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

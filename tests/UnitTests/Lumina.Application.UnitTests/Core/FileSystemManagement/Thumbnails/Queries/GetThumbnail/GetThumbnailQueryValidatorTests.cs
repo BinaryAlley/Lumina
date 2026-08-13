@@ -1,7 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation.TestHelper;
+using ErrorOr;
 using Lumina.Application.Core.FileSystemManagement.Thumbnails.Queries.GetThumbnail;
+using Lumina.Application.UnitTests.Common.Setup;
 using Lumina.Domain.SharedKernel.Common.Errors;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -30,10 +32,10 @@ public class GetThumbnailQueryValidatorTests
         GetThumbnailQuery query = new(null!, 1);
 
         // Act
-        TestValidationResult<GetThumbnailQuery> result = _validator.TestValidate(query);
+        List<Error> result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Path).WithErrorMessage(Errors.FileSystemManagement.PathCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.FileSystemManagement.PathCannotBeEmpty);
     }
 
     [Fact]
@@ -43,10 +45,10 @@ public class GetThumbnailQueryValidatorTests
         GetThumbnailQuery query = new(string.Empty, 1);
 
         // Act
-        TestValidationResult<GetThumbnailQuery> result = _validator.TestValidate(query);
+        List<Error> result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Path).WithErrorMessage(Errors.FileSystemManagement.PathCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.FileSystemManagement.PathCannotBeEmpty);
     }
 
     [Fact]
@@ -56,10 +58,10 @@ public class GetThumbnailQueryValidatorTests
         GetThumbnailQuery query = new("test", 1);
 
         // Act
-        TestValidationResult<GetThumbnailQuery> result = _validator.TestValidate(query);
+        List<Error> result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Path);
+        result.ShouldNotHaveValidationError(Errors.FileSystemManagement.PathCannotBeEmpty);
     }
 
     [Fact]
@@ -69,10 +71,10 @@ public class GetThumbnailQueryValidatorTests
         GetThumbnailQuery query = new("test", -1);
 
         // Act
-        TestValidationResult<GetThumbnailQuery> result = _validator.TestValidate(query);
+        List<Error> result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Quality).WithErrorMessage(Errors.Thumbnails.ImageQualityMustBeBetweenZeroAndOneHundred.Description);
+        result.ShouldHaveValidationError(Errors.Thumbnails.ImageQualityMustBeBetweenZeroAndOneHundred);
     }
 
     [Fact]
@@ -82,10 +84,10 @@ public class GetThumbnailQueryValidatorTests
         GetThumbnailQuery query = new("test", 101);
 
         // Act
-        TestValidationResult<GetThumbnailQuery> result = _validator.TestValidate(query);
+        List<Error> result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Quality).WithErrorMessage(Errors.Thumbnails.ImageQualityMustBeBetweenZeroAndOneHundred.Description);
+        result.ShouldHaveValidationError(Errors.Thumbnails.ImageQualityMustBeBetweenZeroAndOneHundred);
     }
 
     [Fact]
@@ -95,10 +97,10 @@ public class GetThumbnailQueryValidatorTests
         GetThumbnailQuery query = new("test", 1);
 
         // Act
-        TestValidationResult<GetThumbnailQuery> result = _validator.TestValidate(query);
+        List<Error> result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Quality);
+        result.ShouldNotHaveValidationError(Errors.Thumbnails.ImageQualityMustBeBetweenZeroAndOneHundred);
     }
 
 }

@@ -3,9 +3,9 @@ using ErrorOr;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
+using Lumina.Domain.Common.Events;
 using Lumina.Domain.Common.Exceptions;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
-using Mediator;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -13,9 +13,9 @@ using System.Threading.Tasks;
 namespace Lumina.Application.Core.MediaLibrary.Management.Events;
 
 /// <summary>
-/// Handler for the event raised when a media library scan is started.
+/// Handler for the domain event raised when a media library scan is started.
 /// </summary>
-public class LibraryScanStartedDomainEventHandler : INotificationHandler<LibraryScanStartedDomainEvent>
+public class LibraryScanStartedDomainEventHandler : IDomainEventHandler<LibraryScanStartedDomainEvent>
 {
     private readonly IUnitOfWork _unitOfWork;
 
@@ -33,7 +33,7 @@ public class LibraryScanStartedDomainEventHandler : INotificationHandler<Library
     /// </summary>
     /// <param name="domainEvent">The domain event to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    public async ValueTask Handle(LibraryScanStartedDomainEvent domainEvent, CancellationToken cancellationToken)
+    public async ValueTask HandleAsync(LibraryScanStartedDomainEvent domainEvent, CancellationToken cancellationToken)
     {
         ILibraryScanRepository libraryScanRepository = _unitOfWork.GetRepository<ILibraryScanRepository>();
 

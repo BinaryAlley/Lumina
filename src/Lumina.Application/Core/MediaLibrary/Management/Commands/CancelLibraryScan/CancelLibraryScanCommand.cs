@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Mediator;
+using Lumina.Application.Common.CQRS;
 using System;
 using System.Diagnostics;
 #endregion
@@ -16,4 +15,4 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Commands.CancelLibrary
 public record CancelLibraryScanCommand(
     Guid LibraryId,
     Guid ScanId
-) : IRequest<ErrorOr<Success>>;
+) : ICommand;

@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Paths;
 using Lumina.Contracts.Requests.FileSystemManagement.Directories;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Directories;
+using Lumina.Application.Core.FileSystemManagement.Directories.Queries.GetDirectories;
 using Lumina.Presentation.Api.Common.Routes.FileSystemManagement;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,15 +21,15 @@ namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Directorie
 /// </summary>
 public class GetDirectoriesEndpoint : BaseEndpoint<GetDirectoriesRequest, IResult>
 {
-    private readonly ISender _sender;
+    private readonly IQueryHandler<GetDirectoriesQuery, ErrorOr<IEnumerable<DirectoryResponse>>> _getDirectoriesQueryHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetDirectoriesEndpoint"/> class.
     /// </summary>
-    /// <param name="sender">Injected service for mediating commands and queries.</param>
-    public GetDirectoriesEndpoint(ISender sender)
+    /// <param name="getDirectoriesQueryHandler">Injected service for handling get directories queries.</param>
+    public GetDirectoriesEndpoint(IQueryHandler<GetDirectoriesQuery, ErrorOr<IEnumerable<DirectoryResponse>>> getDirectoriesQueryHandler)
     {
-        _sender = sender;
+        _getDirectoriesQueryHandler = getDirectoriesQueryHandler;
     }
 
     /// <summary>
@@ -37,7 +37,7 @@ public class GetDirectoriesEndpoint : BaseEndpoint<GetDirectoriesRequest, IResul
     /// </summary>
     public override void Configure()
     {
-        Verbs(Http.GET);
+        Verbs(FastEndpoints.Http.GET);
         Routes(ApiRoutes.Directories.GET_DIRECTORIES);
         Version(1);
         DontCatchExceptions();
@@ -50,7 +50,7 @@ public class GetDirectoriesEndpoint : BaseEndpoint<GetDirectoriesRequest, IResul
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(GetDirectoriesRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<IEnumerable<DirectoryResponse>> result = await _sender.Send(request.ToQuery(), cancellationToken).ConfigureAwait(false);
+        ErrorOr<IEnumerable<DirectoryResponse>> result = await _getDirectoriesQueryHandler.HandleAsync(request.ToQuery(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

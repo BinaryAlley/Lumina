@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Paths;
+using Lumina.Application.Core.FileSystemManagement.Paths.Queries.CheckPathExists;
 using Lumina.Contracts.Requests.FileSystemManagement.Path;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
 using Lumina.Presentation.Api.Common.Routes.FileSystemManagement;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,15 +19,15 @@ namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.Check
 /// </summary>
 public class CheckPathExistsEndpoint : BaseEndpoint<CheckPathExistsRequest, IResult>
 {
-    private readonly ISender _sender;
+    private readonly IQueryHandler<CheckPathExistsQuery, ErrorOr<PathExistsResponse>> _checkPathExistsQueryHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CheckPathExistsEndpoint"/> class.
     /// </summary>
-    /// <param name="sender">Injected service for mediating commands and queries.</param>
-    public CheckPathExistsEndpoint(ISender sender)
+    /// <param name="checkPathExistsQueryHandler">Injected service for handling check path exists queries.</param>
+    public CheckPathExistsEndpoint(IQueryHandler<CheckPathExistsQuery, ErrorOr<PathExistsResponse>> checkPathExistsQueryHandler)
     {
-        _sender = sender;
+        _checkPathExistsQueryHandler = checkPathExistsQueryHandler;
     }
 
     /// <summary>
@@ -35,7 +35,7 @@ public class CheckPathExistsEndpoint : BaseEndpoint<CheckPathExistsRequest, IRes
     /// </summary>
     public override void Configure()
     {
-        Verbs(Http.GET);
+        Verbs(FastEndpoints.Http.GET);
         Routes(ApiRoutes.Path.CHECK_PATH_EXISTS);
         Version(1);
         DontCatchExceptions();
@@ -48,7 +48,7 @@ public class CheckPathExistsEndpoint : BaseEndpoint<CheckPathExistsRequest, IRes
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(CheckPathExistsRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<PathExistsResponse> result = await _sender.Send(request.ToQuery(), cancellationToken).ConfigureAwait(false);
+        ErrorOr<PathExistsResponse> result = await _checkPathExistsQueryHandler.HandleAsync(request.ToQuery(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

@@ -1,11 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.DomainEvents;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
 using Lumina.Domain.Common.Events;
@@ -14,7 +16,6 @@ using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.Library
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
-using Mediator;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -28,12 +29,13 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Commands.ScanLibrary;
 /// <summary>
 /// Handler for the command for initiating the scan of a media library.
 /// </summary>
-public class ScanLibraryCommandHandler : IRequestHandler<ScanLibraryCommand, ErrorOr<MediaLibraryScanResponse>>
+public class ScanLibraryCommandHandler : ICommandHandler<ScanLibraryCommand, ErrorOr<MediaLibraryScanResponse>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUserService;
     private readonly IAuthorizationService _authorizationService;
     private readonly IDomainEventsQueue _domainEventsQueue;
+    private readonly IValidator<ScanLibraryCommand> _validator;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ScanLibraryCommandHandler"/> class.
@@ -42,31 +44,38 @@ public class ScanLibraryCommandHandler : IRequestHandler<ScanLibraryCommand, Err
     /// <param name="currentUserService">Injected service to retrieve the current user information.</param>
     /// <param name="domainEventsQueue">Injected service for the queue of domain events.</param>
     /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
+    /// <param name="validator">Injected validator for application validation rules.</param>
     public ScanLibraryCommandHandler(
         IAuthorizationService authorizationService,
         ICurrentUserService currentUserService,
         IDomainEventsQueue domainEventsQueue,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        IValidator<ScanLibraryCommand> validator)
     {
         _authorizationService = authorizationService;
         _currentUserService = currentUserService;
         _domainEventsQueue = domainEventsQueue;
         _unitOfWork = unitOfWork;
+        _validator = validator;
     }
 
     /// <summary>
     /// Handles the command for initiating the scan of a media library.
     /// </summary>
-    /// <param name="request">The request to be handled.</param>
+    /// <param name="command">The command to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async ValueTask<ErrorOr<MediaLibraryScanResponse>> Handle(ScanLibraryCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<MediaLibraryScanResponse>> HandleAsync(ScanLibraryCommand command, CancellationToken cancellationToken)
     {
+        List<Error> validationResult = _validator.Validate(command);
+        if (validationResult.Count > 0)
+            return validationResult;
+
         ILibraryRepository libraryRepository = _unitOfWork.GetRepository<ILibraryRepository>();
         ILibraryScanRepository libraryScanRepository = _unitOfWork.GetRepository<ILibraryScanRepository>();
 
         // get the media library from the persistence medium
-        ErrorOr<LibraryEntity?> getLibraryResult = await libraryRepository.GetByIdAsync(request.Id, cancellationToken).ConfigureAwait(false);
+        ErrorOr<LibraryEntity?> getLibraryResult = await libraryRepository.GetByIdAsync(command.Id, cancellationToken).ConfigureAwait(false);
         if (getLibraryResult.IsError)
             return getLibraryResult.Errors;
 
@@ -91,7 +100,7 @@ public class ScanLibraryCommandHandler : IRequestHandler<ScanLibraryCommand, Err
             return domainLibraryResult.Errors;
 
         // get the past month's scans for this library
-        ErrorOr<IEnumerable<LibraryScanEntity>> pastLibraryScansResult = await libraryScanRepository.GetPastMonthScansByLibraryIdAsync(request.Id, cancellationToken).ConfigureAwait(false);
+        ErrorOr<IEnumerable<LibraryScanEntity>> pastLibraryScansResult = await libraryScanRepository.GetPastMonthScansByLibraryIdAsync(command.Id, cancellationToken).ConfigureAwait(false);
         if (pastLibraryScansResult.IsError)
             return pastLibraryScansResult.Errors;
         
@@ -103,7 +112,7 @@ public class ScanLibraryCommandHandler : IRequestHandler<ScanLibraryCommand, Err
 
         // queue the media library scan
         ErrorOr<LibraryScan> libraryScanResult = LibraryScan.Create(
-            LibraryId.Create(request.Id), 
+            LibraryId.Create(command.Id), 
             UserId.Create(_currentUserService.UserId!.Value),
             [.. pastLibraryScansDomainResult.Select(pastLibraryScanDomainResult => pastLibraryScanDomainResult.Value)]
         );

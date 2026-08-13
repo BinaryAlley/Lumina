@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Core.MediaLibrary.Management.Progress;
+using Lumina.Domain.Common.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Progress;
-using Mediator;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 namespace Lumina.Application.Core.MediaLibrary.Management.Events;
 
 /// <summary>
-/// Handler for the event raised when a media library's scan progress changes.
+/// Handler for the domain event raised when a media library's scan progress changes.
 /// </summary>
-public class LibraryScanJobProgressChangedDomainEventHandler : INotificationHandler<LibraryScanJobProgressChangedDomainEvent>
+public class LibraryScanJobProgressChangedDomainEventHandler : IDomainEventHandler<LibraryScanJobProgressChangedDomainEvent>
 {
     private readonly IMediaLibrariesScanProgressTracker _mediaLibrariesScanProgressTracker;
     private readonly IMediaLibraryScanProgressNotifier _debouncedLibraryScanProgressNotifier;
@@ -35,7 +35,7 @@ public class LibraryScanJobProgressChangedDomainEventHandler : INotificationHand
     /// </summary>
     /// <param name="domainEvent">The domain event to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    public async ValueTask Handle(LibraryScanJobProgressChangedDomainEvent domainEvent, CancellationToken cancellationToken)
+    public async ValueTask HandleAsync(LibraryScanJobProgressChangedDomainEvent domainEvent, CancellationToken cancellationToken)
     {
         _mediaLibrariesScanProgressTracker.UpdateScanJobProgress(domainEvent.LibraryId, domainEvent.MediaLibraryScanCompositeId, domainEvent.Progress);
         // notify SignalR clients that the library scan progress changed

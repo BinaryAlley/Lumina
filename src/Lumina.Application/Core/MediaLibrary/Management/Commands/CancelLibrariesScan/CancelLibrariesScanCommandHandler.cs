@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -10,7 +11,6 @@ using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Domain.Common.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Cancellation;
-using Mediator;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -22,7 +22,7 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Commands.CancelLibrari
 /// <summary>
 /// Handler for the command for canceling the scan of all media libraries.
 /// </summary>
-public class CancelLibrariesScanCommandHandler : IRequestHandler<CancelLibrariesScanCommand, ErrorOr<Success>>
+public class CancelLibrariesScanCommandHandler : ICommandHandler<CancelLibrariesScanCommand, ErrorOr<Success>>
 {
     private readonly ICurrentUserService _currentUserService;
     private readonly IAuthorizationService _authorizationService;
@@ -51,10 +51,10 @@ public class CancelLibrariesScanCommandHandler : IRequestHandler<CancelLibraries
     /// <summary>
     /// Handles the command for canceling the scan of all media libraries.
     /// </summary>
-    /// <param name="request">The request to be handled.</param>
+    /// <param name="command">The command to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async ValueTask<ErrorOr<Success>> Handle(CancelLibrariesScanCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<Success>> HandleAsync(CancelLibrariesScanCommand command, CancellationToken cancellationToken)
     {
         ILibraryScanRepository libraryScanRepository = _unitOfWork.GetRepository<ILibraryScanRepository>();
 

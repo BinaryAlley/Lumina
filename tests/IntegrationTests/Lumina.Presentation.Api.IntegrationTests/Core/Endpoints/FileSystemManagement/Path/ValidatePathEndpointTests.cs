@@ -1,7 +1,9 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Microsoft.AspNetCore.Http;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http;
@@ -82,7 +84,7 @@ public class ValidatePathEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithEmptyPath_ShouldReturnOkResultWithIsValidFalse()
+    public async Task ExecuteAsync_WhenCalledWithEmptyPath_ShouldReturnValidationProblemResult()
     {
         // Arrange
         string path = "";
@@ -91,11 +93,23 @@ public class ValidatePathEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         HttpResponseMessage response = await _client.GetAsync($"/api/v1/path/validate?path={Uri.EscapeDataString(path)}");
 
         // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.UnprocessableContent, response.StatusCode);
+        Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
         string content = await response.Content.ReadAsStringAsync();
-        PathValidResponse? result = JsonSerializer.Deserialize<PathValidResponse>(content, _jsonOptions);
-        Assert.NotNull(result);
-        Assert.False(result!.IsValid);
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, problemDetails!["status"].GetInt32());
+        Assert.Equal("General.Validation", problemDetails["title"].GetString());
+        Assert.Equal("/api/v1/path/validate", problemDetails["instance"].GetString());
+        Assert.Equal("OneOrMoreValidationErrorsOccurred", problemDetails["detail"].GetString());
+        Assert.Equal("https://tools.ietf.org/html/rfc4918#section-11.2", problemDetails["type"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString());
+
+        Dictionary<string, string[]>? errors = problemDetails["errors"].Deserialize<Dictionary<string, string[]>>(_jsonOptions);
+        Assert.NotNull(errors);
+        Assert.Contains("General.Validation", errors.Keys);
+        Assert.Contains("PathCannotBeEmpty", errors["General.Validation"]);
     }
 
     [Fact]

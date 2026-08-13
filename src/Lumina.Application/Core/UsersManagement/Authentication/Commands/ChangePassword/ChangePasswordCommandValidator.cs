@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation;
 using Lumina.Application.Common.Errors;
+using Lumina.Application.Common.Infrastructure.Validation;
+using Lumina.Application.Common.Utilities;
 #endregion
 
 namespace Lumina.Application.Core.UsersManagement.Authentication.Commands.ChangePassword;
@@ -15,12 +16,28 @@ public class ChangePasswordCommandValidator : AbstractValidator<ChangePasswordCo
     /// </summary>
     public ChangePasswordCommandValidator()
     {
-        RuleFor(x => x.Username).NotEmpty().WithMessage(Errors.Authentication.UsernameCannotBeEmpty.Description);
-        RuleFor(x => x.CurrentPassword).NotEmpty().WithMessage(Errors.Authentication.CurrentPasswordCannotBeEmpty.Description)
-            .Matches("^(?=.*[A-Z])(?=.*[0-9])(?=.*[^a-zA-Z0-9]).{8,}$").WithMessage(Errors.Authentication.InvalidPassword.Description);
-        RuleFor(x => x.NewPassword).NotEmpty().WithMessage(Errors.Authentication.NewPasswordCannotBeEmpty.Description)
-            .Matches("^(?=.*[A-Z])(?=.*[0-9])(?=.*[^a-zA-Z0-9]).{8,}$").WithMessage(Errors.Authentication.InvalidPassword.Description);
-        RuleFor(x => x.NewPasswordConfirm).NotEmpty().WithMessage(Errors.Authentication.NewPasswordConfirmCannotBeEmpty.Description);
-        RuleFor(x => x.NewPassword).Equal(x => x.NewPasswordConfirm).WithMessage(Errors.Authentication.PasswordsNotMatch.Description);
+        RuleFor(command => command.Username)
+            .NotEmpty()
+            .WithError(Errors.Authentication.UsernameCannotBeEmpty);
+       
+        RuleFor(command => command.CurrentPassword)
+            .NotEmpty()
+            .WithError(Errors.Authentication.CurrentPasswordCannotBeEmpty)
+            .Matches("^(?=.*[A-Z])(?=.*[0-9])(?=.*[^a-zA-Z0-9]).{8,}$")
+            .WithError(Errors.Authentication.InvalidPassword);
+       
+        RuleFor(command => command.NewPassword)
+            .NotEmpty()
+            .WithError(Errors.Authentication.NewPasswordCannotBeEmpty)
+            .Matches("^(?=.*[A-Z])(?=.*[0-9])(?=.*[^a-zA-Z0-9]).{8,}$")
+            .WithError(Errors.Authentication.InvalidPassword);
+       
+        RuleFor(command => command.NewPasswordConfirm)
+            .NotEmpty()
+            .WithError(Errors.Authentication.NewPasswordConfirmCannotBeEmpty);
+        
+        RuleFor(command => command.NewPassword)
+            .Equal(command => command.NewPasswordConfirm)
+            .WithError(Errors.Authentication.PasswordsNotMatch);
     }
 }

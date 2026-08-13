@@ -1,8 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Contracts.Responses.Authorization;
-using Mediator;
-using System.Collections.Generic;
+using Lumina.Application.Common.CQRS;
 #endregion
 
 namespace Lumina.Application.Core.Admin.Authorization.Roles.Queries.GetRoles;
@@ -10,4 +7,4 @@ namespace Lumina.Application.Core.Admin.Authorization.Roles.Queries.GetRoles;
 /// <summary>
 /// Query for retrieving the list of authorization roles.
 /// </summary>
-public record GetRolesQuery() : IRequest<ErrorOr<IEnumerable<RoleResponse>>>;
+public record GetRolesQuery() : IQuery;

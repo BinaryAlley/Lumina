@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.FileSystemManagement.Thumbnails.Queries.GetThumbnail;
 using Lumina.Contracts.Requests.FileSystemManagement.Thumbnails;
 using Lumina.Contracts.Responses.FileSystemManagement.Thumbnails;
 using Lumina.Presentation.Api.Common.Utilities;
 using Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Thumbnails.GetThumbnail;
 using Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.Fixtures;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -25,7 +25,7 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.
 [ExcludeFromCodeCoverage]
 public class GetThumbnailEndpointTests
 {
-    private readonly ISender _mockSender;
+    private readonly IQueryHandler<GetThumbnailQuery, ErrorOr<ThumbnailResponse>> _mockHandler;
     private readonly GetThumbnailEndpoint _sut;
     private readonly GetThumbnailRequestFixture _getThumbnailRequestFixture;
 
@@ -34,8 +34,8 @@ public class GetThumbnailEndpointTests
     /// </summary>
     public GetThumbnailEndpointTests()
     {
-        _mockSender = Substitute.For<ISender>();
-        _sut = Factory.Create<GetThumbnailEndpoint>(_mockSender);
+        _mockHandler = Substitute.For<IQueryHandler<GetThumbnailQuery, ErrorOr<ThumbnailResponse>>>();
+        _sut = Factory.Create<GetThumbnailEndpoint>(_mockHandler);
         _getThumbnailRequestFixture = new GetThumbnailRequestFixture();
     }
 
@@ -46,7 +46,7 @@ public class GetThumbnailEndpointTests
         GetThumbnailRequest request = _getThumbnailRequestFixture.Create("/path/to/file.jpg", 80);
         CancellationToken cancellationToken = CancellationToken.None;
         ThumbnailResponse expectedResponse = ThumbnailResponseFixture.CreateThumbnailResponse();
-        _mockSender.Send(Arg.Any<GetThumbnailQuery>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<GetThumbnailQuery>(), Arg.Any<CancellationToken>())
             .Returns(ErrorOrFactory.From(expectedResponse));
 
         // Act
@@ -59,13 +59,13 @@ public class GetThumbnailEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenMediatorReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
     {
         // Arrange
         GetThumbnailRequest request = _getThumbnailRequestFixture.Create("/path/to/nonexistent/file.jpg", 80);
         CancellationToken cancellationToken = CancellationToken.None;
         Error expectedError = Error.NotFound("Thumbnail.NotFound", "The requested thumbnail was not found.");
-        _mockSender.Send(Arg.Any<GetThumbnailQuery>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<GetThumbnailQuery>(), Arg.Any<CancellationToken>())
             .Returns(expectedError);
 
         // Act
@@ -85,13 +85,13 @@ public class GetThumbnailEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenMediatorReturnsValidationError_ShouldReturnValidationProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsValidationError_ShouldReturnValidationProblemResult()
     {
         // Arrange
         GetThumbnailRequest request = _getThumbnailRequestFixture.Create("/path/to/nonexistent/file.jpg", 80);
         CancellationToken cancellationToken = CancellationToken.None;
         Error expectedError = Error.Validation("Path.Invalid", "The provided path is invalid.");
-        _mockSender.Send(Arg.Any<GetThumbnailQuery>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<GetThumbnailQuery>(), Arg.Any<CancellationToken>())
             .Returns(expectedError);
 
         // Act
@@ -116,14 +116,14 @@ public class GetThumbnailEndpointTests
         // Arrange
         GetThumbnailRequest request = _getThumbnailRequestFixture.Create("/path/to/file.jpg", 80);
         CancellationToken cancellationToken = CancellationToken.None;
-        _mockSender.Send(Arg.Any<GetThumbnailQuery>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<GetThumbnailQuery>(), Arg.Any<CancellationToken>())
             .Returns(ErrorOrFactory.From(ThumbnailResponseFixture.CreateThumbnailResponse()));
 
         // Act
         await _sut.ExecuteAsync(request, cancellationToken);
 
         // Assert
-        await _mockSender.Received(1).Send(Arg.Is<GetThumbnailQuery>(q => q.Path == request.Path && q.Quality == request.Quality), Arg.Is(cancellationToken));
+        await _mockHandler.Received(1).HandleAsync(Arg.Is<GetThumbnailQuery>(q => q.Path == request.Path && q.Quality == request.Quality), Arg.Is(cancellationToken));
     }
 
     [Fact]
@@ -135,14 +135,14 @@ public class GetThumbnailEndpointTests
         TaskCompletionSource<bool> operationStarted = new();
         TaskCompletionSource<bool> cancellationRequested = new();
 
-        _mockSender.Send(Arg.Any<GetThumbnailQuery>(), Arg.Any<CancellationToken>())
-            .Returns(callInfo => new ValueTask<ErrorOr<ThumbnailResponse>>(Task.Run(async () =>
+        _mockHandler.HandleAsync(Arg.Any<GetThumbnailQuery>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo => Task.Run(async () =>
             {
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
                 return ErrorOrFactory.From(ThumbnailResponseFixture.CreateThumbnailResponse());
-            }, callInfo.Arg<CancellationToken>())));
+            }, callInfo.Arg<CancellationToken>()));
 
         // Act
         Task<IResult> operationTask = _sut.ExecuteAsync(request, cts.Token);

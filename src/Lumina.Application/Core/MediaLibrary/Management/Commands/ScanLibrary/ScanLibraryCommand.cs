@@ -1,7 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Contracts.Responses.MediaLibrary.Management;
-using Mediator;
+using Lumina.Application.Common.CQRS;
 using System;
 #endregion
 
@@ -13,4 +11,4 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Commands.ScanLibrary;
 /// <param name="Id">The unique identifier of the library to scan.</param>
 public record ScanLibraryCommand(
     Guid Id    
-) : IRequest<ErrorOr<MediaLibraryScanResponse>>;
+) : ICommand;

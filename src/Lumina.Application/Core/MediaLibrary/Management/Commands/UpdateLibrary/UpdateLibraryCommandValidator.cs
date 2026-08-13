@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation;
+using Lumina.Application.Common.Infrastructure.Validation;
+using Lumina.Application.Common.Utilities;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Domain.SharedKernel.Common.Errors;
 using System;
@@ -17,29 +18,40 @@ public class UpdateLibraryCommandValidator : AbstractValidator<UpdateLibraryComm
     /// </summary>
     public UpdateLibraryCommandValidator()
     {
-        RuleFor(x => x.Id)
-            .NotEmpty().WithMessage(Errors.Library.LibraryIdCannotBeEmpty.Description)
-            .Must(id => id != Guid.Empty).WithMessage(Errors.Library.LibraryIdCannotBeEmpty.Description);
-        
-        RuleFor(x => x.OwnerId)
-            .NotEmpty().WithMessage(Errors.Users.UserIdCannotBeEmpty.Description)
-            .Must(id => id != Guid.Empty).WithMessage(Errors.Users.UserIdCannotBeEmpty.Description);
+        RuleFor(command => command.Id)
+            .NotEmpty()
+            .WithError(Errors.Library.LibraryIdCannotBeEmpty)
+            .Must(id => id != Guid.Empty)
+            .WithError(Errors.Library.LibraryIdCannotBeEmpty);
 
-        RuleFor(x => x.LibraryType)
-            .NotNull().WithMessage(Errors.Library.LibraryTypeCannotBeNull.Description)
-            .Must(x => Enum.TryParse<LibraryType>(x, out _))
-            .WithMessage(Errors.Library.UnknownLibraryType.Description);
+        RuleFor(command => command.OwnerId)
+            .NotEmpty()
+            .WithError(Errors.Users.UserIdCannotBeEmpty)
+            .Must(id => id != Guid.Empty)
+            .WithError(Errors.Users.UserIdCannotBeEmpty);
 
-        RuleFor(x => x.ContentLocations)
-            .NotNull().WithMessage(Errors.Library.PathsListCannotBeNull.Description)
-            .NotEmpty().WithMessage(Errors.Library.PathsListCannotBeEmpty.Description);
+        RuleFor(command => command.LibraryType)
+            .NotNull()
+            .WithError(Errors.Library.LibraryTypeCannotBeNull)
+            .Must(libraryType => Enum.TryParse<LibraryType>(libraryType, out _))
+            .WithError(Errors.Library.UnknownLibraryType);
 
-        RuleForEach(x => x.ContentLocations)
-            .NotEmpty().WithMessage(Errors.FileSystemManagement.PathCannotBeEmpty.Description)
-            .MaximumLength(260).WithMessage(Errors.FileSystemManagement.PathMustBeMaximum260CharactersLong.Description);
+        RuleFor(command => command.ContentLocations)
+            .NotNull()
+            .WithError(Errors.Library.PathsListCannotBeNull)
+            .NotEmpty()
+            .WithError(Errors.Library.PathsListCannotBeEmpty);
 
-        RuleFor(x => x.Title)
-            .NotEmpty().WithMessage(Errors.Library.TitleCannotBeEmpty.Description)
-            .MaximumLength(255).WithMessage(Errors.Library.TitleMustBeMaximum255CharactersLong.Description);
+        RuleForEach(command => command.ContentLocations)
+            .NotEmpty()
+            .WithError(Errors.FileSystemManagement.PathCannotBeEmpty)
+            .MaximumLength(260)
+            .WithError(Errors.FileSystemManagement.PathMustBeMaximum260CharactersLong);
+
+        RuleFor(command => command.Title)
+            .NotEmpty()
+            .WithError(Errors.Library.TitleCannotBeEmpty)
+            .MaximumLength(255)
+            .WithError(Errors.Library.TitleMustBeMaximum255CharactersLong);
     }
 }

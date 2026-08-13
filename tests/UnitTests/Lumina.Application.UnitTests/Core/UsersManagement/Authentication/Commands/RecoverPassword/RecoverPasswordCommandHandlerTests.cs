@@ -6,6 +6,7 @@ using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Security;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.UsersManagement.Authentication.Commands.RecoverPassword;
 using Lumina.Application.UnitTests.Common.Mapping.UserManagement.Users.Fixtures;
 using Lumina.Contracts.Responses.Authentication;
@@ -44,15 +45,19 @@ public class RecoverPasswordCommandHandlerTests
 
         _mockUnitOfWork.GetRepository<IUserRepository>().Returns(_mockUserRepository);
 
+        IValidator<RecoverPasswordCommand> mockValidator = Substitute.For<IValidator<RecoverPasswordCommand>>();
+        mockValidator.Validate(Arg.Any<RecoverPasswordCommand>())
+            .Returns([]);
         _sut = new RecoverPasswordCommandHandler(
             _mockUnitOfWork,
             _mockHashService,
             _mockTotpTokenGenerator,
-            _mockCryptographyService);
+            _mockCryptographyService,
+            mockValidator);
     }
 
     [Fact]
-    public async Task Handle_WhenUserExistsAndTotpIsValid_ShouldResetPassword()
+    public async Task HandleAsync_WhenUserExistsAndTotpIsValid_ShouldResetPassword()
     {
         // Arrange
         string totpCode = "123456";
@@ -78,7 +83,7 @@ public class RecoverPasswordCommandHandlerTests
             .Returns(Result.Updated);
 
         // Act
-        ErrorOr<RecoverPasswordResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RecoverPasswordResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -92,7 +97,7 @@ public class RecoverPasswordCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserDoesNotExist_ShouldReturnError()
+    public async Task HandleAsync_WhenUserDoesNotExist_ShouldReturnError()
     {
         // Arrange
         RecoverPasswordCommand command = new("nonexistentUser", "123456");
@@ -101,7 +106,7 @@ public class RecoverPasswordCommandHandlerTests
             .Returns(ErrorOrFactory.From<UserEntity?>(null));
 
         // Act
-        ErrorOr<RecoverPasswordResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RecoverPasswordResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -113,7 +118,7 @@ public class RecoverPasswordCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenTempPasswordExists_ShouldReturnError()
+    public async Task HandleAsync_WhenTempPasswordExists_ShouldReturnError()
     {
         // Arrange
         UserEntity user = UserEntityFixture.CreateUserEntity();
@@ -126,7 +131,7 @@ public class RecoverPasswordCommandHandlerTests
             .Returns(ErrorOrFactory.From<UserEntity?>(user));
 
         // Act
-        ErrorOr<RecoverPasswordResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RecoverPasswordResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -138,7 +143,7 @@ public class RecoverPasswordCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserDoesNotUseTOTP_ShouldReturnError()
+    public async Task HandleAsync_WhenUserDoesNotUseTOTP_ShouldReturnError()
     {
         // Arrange
         UserEntity user = UserEntityFixture.CreateUserEntity();
@@ -150,7 +155,7 @@ public class RecoverPasswordCommandHandlerTests
             .Returns(ErrorOrFactory.From<UserEntity?>(user));
 
         // Act
-        ErrorOr<RecoverPasswordResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RecoverPasswordResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -162,7 +167,7 @@ public class RecoverPasswordCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenTotpCodeIsInvalid_ShouldReturnError()
+    public async Task HandleAsync_WhenTotpCodeIsInvalid_ShouldReturnError()
     {
         // Arrange
         string totpCode = "123456";
@@ -182,7 +187,7 @@ public class RecoverPasswordCommandHandlerTests
             .Returns(false);
 
         // Act
-        ErrorOr<RecoverPasswordResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RecoverPasswordResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -195,7 +200,7 @@ public class RecoverPasswordCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUpdateFails_ShouldReturnError()
+    public async Task HandleAsync_WhenUpdateFails_ShouldReturnError()
     {
         // Arrange
         string totpCode = "123456";
@@ -218,7 +223,7 @@ public class RecoverPasswordCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<RecoverPasswordResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RecoverPasswordResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -231,7 +236,7 @@ public class RecoverPasswordCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenGetByUsernameReturnsError_ShouldReturnError()
+    public async Task HandleAsync_WhenGetByUsernameReturnsError_ShouldReturnError()
     {
         // Arrange
         string totpCode = "123456";
@@ -247,7 +252,7 @@ public class RecoverPasswordCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<RecoverPasswordResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RecoverPasswordResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -259,7 +264,7 @@ public class RecoverPasswordCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserUsesTOTPButNoCodeProvided_ShouldReturnError()
+    public async Task HandleAsync_WhenUserUsesTOTPButNoCodeProvided_ShouldReturnError()
     {
         // Arrange
         string encryptedTotpSecret = Convert.ToBase64String(new byte[] { 1, 2, 3 });
@@ -273,7 +278,7 @@ public class RecoverPasswordCommandHandlerTests
             .Returns(ErrorOrFactory.From<UserEntity?>(user));
 
         // Act
-        ErrorOr<RecoverPasswordResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RecoverPasswordResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);

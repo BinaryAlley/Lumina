@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Responses.FileSystemManagement.Path;
-using Mediator;
+using Lumina.Application.Common.CQRS;
 using System.Diagnostics;
 #endregion
 
@@ -13,4 +12,4 @@ namespace Lumina.Application.Core.FileSystemManagement.Paths.Queries.ValidatePat
 [DebuggerDisplay("Path: {Path}")]
 public record ValidatePathQuery(
     string? Path
-) : IRequest<PathValidResponse>;
+) : IQuery;

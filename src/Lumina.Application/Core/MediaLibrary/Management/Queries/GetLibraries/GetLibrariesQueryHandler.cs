@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -7,7 +8,6 @@ using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
-using Mediator;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -19,7 +19,7 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Queries.GetLibraries;
 /// <summary>
 /// Handler for the query to get the media libraries.
 /// </summary>
-public class GetLibrariesQueryHandler : IRequestHandler<GetLibrariesQuery, ErrorOr<LibraryResponse[]>>
+public class GetLibrariesQueryHandler : IQueryHandler<GetLibrariesQuery, ErrorOr<LibraryResponse[]>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUserService;
@@ -44,12 +44,12 @@ public class GetLibrariesQueryHandler : IRequestHandler<GetLibrariesQuery, Error
     /// <summary>
     /// Handles the query to get the media libraries.
     /// </summary>
-    /// <param name="request">The request to be handled.</param>
+    /// <param name="query">The query to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
     /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="LibraryResponse"/>, or an error message.
     /// </returns>
-    public async ValueTask<ErrorOr<LibraryResponse[]>> Handle(GetLibrariesQuery request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<LibraryResponse[]>> HandleAsync(GetLibrariesQuery query, CancellationToken cancellationToken)
     {
         // get the libraries from the repository
         ILibraryRepository libraryRepository = _unitOfWork.GetRepository<ILibraryRepository>();

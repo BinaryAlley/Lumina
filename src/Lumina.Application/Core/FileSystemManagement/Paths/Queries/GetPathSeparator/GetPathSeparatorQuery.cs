@@ -1,6 +1,5 @@
 ﻿#region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Responses.FileSystemManagement.Path;
-using Mediator;
+using Lumina.Application.Common.CQRS;
 #endregion
 
 namespace Lumina.Application.Core.FileSystemManagement.Paths.Queries.GetPathSeparator;
@@ -8,4 +7,4 @@ namespace Lumina.Application.Core.FileSystemManagement.Paths.Queries.GetPathSepa
 /// <summary>
 /// Query for retrieving the file system path separator.
 /// </summary>
-public record GetPathSeparatorQuery() : IRequest<PathSeparatorResponse>;
+public record GetPathSeparatorQuery() : IQuery;

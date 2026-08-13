@@ -7,6 +7,7 @@ using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
 using Lumina.Application.UnitTests.Common.Mapping.UserManagement.Users.Fixtures;
 using Lumina.Application.UnitTests.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions.Fixtures;
@@ -60,14 +61,18 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
         _mockUnitOfWork.GetRepository<IRoleRepository>().Returns(_mockRoleRepository);
         _mockUnitOfWork.GetRepository<IPermissionRepository>().Returns(_mockPermissionRepository);
 
+        IValidator<UpdateUserRoleAndPermissionsCommand> mockValidator = Substitute.For<IValidator<UpdateUserRoleAndPermissionsCommand>>();
+        mockValidator.Validate(Arg.Any<UpdateUserRoleAndPermissionsCommand>())
+            .Returns([]);
         _sut = new UpdateUserRoleAndPermissionsCommandHandler(
             _mockAuthorizationService,
             _mockCurrentUserService,
-            _mockUnitOfWork);
+            _mockUnitOfWork,
+            mockValidator);
     }
 
     [Fact]
-    public async Task Handle_WhenUserIsNotAdmin_ShouldReturnNotAuthorizedError()
+    public async Task HandleAsync_WhenUserIsNotAdmin_ShouldReturnNotAuthorizedError()
     {
         // Arrange
         UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.CreateCommand();
@@ -75,7 +80,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
             .Returns(false);
 
         // Act
-        ErrorOr<AuthorizationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -84,7 +89,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserDoesNotExist_ShouldReturnUserDoesNotExistError()
+    public async Task HandleAsync_WhenUserDoesNotExist_ShouldReturnUserDoesNotExistError()
     {
         // Arrange
         UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.CreateCommand();
@@ -94,7 +99,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
             .Returns((UserEntity?)null);
 
         // Act
-        ErrorOr<AuthorizationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -102,7 +107,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenRoleDoesNotExist_ShouldReturnRoleNotFoundError()
+    public async Task HandleAsync_WhenRoleDoesNotExist_ShouldReturnRoleNotFoundError()
     {
         // Arrange
         UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.CreateCommand(roleId: Guid.NewGuid());
@@ -116,7 +121,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
             .Returns((RoleEntity?)null);
 
         // Act
-        ErrorOr<AuthorizationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -124,7 +129,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenRemovingLastAdmin_ShouldReturnCannotRemoveLastAdminError()
+    public async Task HandleAsync_WhenRemovingLastAdmin_ShouldReturnCannotRemoveLastAdminError()
     {
         // Arrange
         UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.CreateCommand(roleId: Guid.NewGuid());
@@ -162,7 +167,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
             .Returns(ErrorOrFactory.From(users));
 
         // Act
-        ErrorOr<AuthorizationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -170,7 +175,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUpdateFails_ShouldReturnError()
+    public async Task HandleAsync_WhenUpdateFails_ShouldReturnError()
     {
         // Arrange
         UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.CreateCommand(roleId: Guid.NewGuid());
@@ -192,7 +197,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<AuthorizationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -201,7 +206,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenAllOperationsSucceed_ShouldReturnSuccessResponse()
+    public async Task HandleAsync_WhenAllOperationsSucceed_ShouldReturnSuccessResponse()
     {
         // Arrange
         UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.CreateCommand(roleId: Guid.NewGuid());
@@ -242,7 +247,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
             .Returns(Result.Updated);
 
         // Act
-        ErrorOr<AuthorizationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -253,7 +258,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenGetAllUsersFails_ShouldReturnError()
+    public async Task HandleAsync_WhenGetAllUsersFails_ShouldReturnError()
     {
         // Arrange
         UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.CreateCommand(roleId: Guid.NewGuid());
@@ -286,7 +291,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<AuthorizationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -294,7 +299,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenGetPermissionsFails_ShouldReturnError()
+    public async Task HandleAsync_WhenGetPermissionsFails_ShouldReturnError()
     {
         // Arrange
         UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.CreateCommand(roleId: Guid.NewGuid());
@@ -321,7 +326,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<AuthorizationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);

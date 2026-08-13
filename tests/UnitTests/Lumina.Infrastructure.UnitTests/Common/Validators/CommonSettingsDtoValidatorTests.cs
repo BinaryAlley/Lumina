@@ -1,9 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
+using ErrorOr;
 using Lumina.Infrastructure.Common.Errors;
 using Lumina.Infrastructure.Common.Models.DTO.Configuration;
 using Lumina.Infrastructure.Common.Validators;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -36,11 +38,10 @@ public class CommonSettingsDtoValidatorTests
             .Create();
 
         // Act
-        FluentValidation.Results.ValidationResult result = _validator.Validate(model);
+        List<Error> result = _validator.Validate(model);
 
         // Assert
-        Assert.True(result.IsValid);
-        Assert.Empty(result.Errors);
+        Assert.Empty(result);
     }
 
     [Fact]
@@ -52,11 +53,10 @@ public class CommonSettingsDtoValidatorTests
             .Create();
 
         // Act
-        FluentValidation.Results.ValidationResult result = _validator.Validate(model);
+        List<Error> result = _validator.Validate(model);
 
         // Assert
-        Assert.False(result.IsValid);
-        Assert.Single(result.Errors);
-        Assert.Equal(Errors.Configuration.ApplicationThemeCannotBeEmpty.Description, result.Errors[0].ErrorMessage);
+        Assert.Single(result);
+        Assert.Equal(Errors.Configuration.ApplicationThemeCannotBeEmpty.Description, result[0].Description);
     }
 }

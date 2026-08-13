@@ -8,6 +8,7 @@ using Lumina.Application.UnitTests.Core.FileSystemManagement.Files.Queries.GetFi
 using Lumina.Contracts.Responses.FileSystemManagement.Files;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Lumina.Application.Common.Infrastructure.Validation;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -37,12 +38,15 @@ public class GetFilesQueryHandlerTests
     {
         _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
         _mockFileService = Substitute.For<IFileService>();
-        _sut = new GetFilesQueryHandler(_mockFileService);
+        IValidator<GetFilesQuery> mockValidator = Substitute.For<IValidator<GetFilesQuery>>();
+        mockValidator.Validate(Arg.Any<GetFilesQuery>())
+            .Returns([]);
+        _sut = new GetFilesQueryHandler(_mockFileService, mockValidator);
         _fileFixture = new FileFixture();
     }
 
     [Fact]
-    public async Task Handle_WhenCalledWithValidQueryWithoutHiddenFiles_ShouldReturnSuccessResult()
+    public async Task HandleAsync_WhenCalledWithValidQueryWithoutHiddenFiles_ShouldReturnSuccessResult()
     {
         // Arrange
         GetFilesQuery getFilesQuery = GetFilesQueryFixture.CreateGetFilesQuery(false);
@@ -53,7 +57,7 @@ public class GetFilesQueryHandlerTests
             .Returns(ErrorOrFactory.From(files));
 
         // Act
-        ErrorOr<IEnumerable<FileResponse>> result = await _sut.Handle(getFilesQuery, CancellationToken.None);
+        ErrorOr<IEnumerable<FileResponse>> result = await _sut.HandleAsync(getFilesQuery, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -76,7 +80,7 @@ public class GetFilesQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCalledWithValidQueryWithHiddenFiles_ShouldReturnSuccessResult()
+    public async Task HandleAsync_WhenCalledWithValidQueryWithHiddenFiles_ShouldReturnSuccessResult()
     {
         // Arrange
         GetFilesQuery getFilesQuery = GetFilesQueryFixture.CreateGetFilesQuery(true);
@@ -87,7 +91,7 @@ public class GetFilesQueryHandlerTests
             .Returns(ErrorOrFactory.From(files));
 
         // Act
-        ErrorOr<IEnumerable<FileResponse>> result = await _sut.Handle(getFilesQuery, CancellationToken.None);
+        ErrorOr<IEnumerable<FileResponse>> result = await _sut.HandleAsync(getFilesQuery, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -110,7 +114,7 @@ public class GetFilesQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenFileServiceReturnsError_ShouldReturnFailureResult()
+    public async Task HandleAsync_WhenFileServiceReturnsError_ShouldReturnFailureResult()
     {
         // Arrange
         GetFilesQuery query = _fixture.Create<GetFilesQuery>();
@@ -119,7 +123,7 @@ public class GetFilesQueryHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<IEnumerable<FileResponse>> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<IEnumerable<FileResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -128,7 +132,7 @@ public class GetFilesQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenFileServiceReturnsEmptyList_ShouldReturnEmptySuccessResult()
+    public async Task HandleAsync_WhenFileServiceReturnsEmptyList_ShouldReturnEmptySuccessResult()
     {
         // Arrange
         GetFilesQuery query = _fixture.Create<GetFilesQuery>();
@@ -137,7 +141,7 @@ public class GetFilesQueryHandlerTests
             .Returns(emptyList);
 
         // Act
-        ErrorOr<IEnumerable<FileResponse>> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<IEnumerable<FileResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);

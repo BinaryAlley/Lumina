@@ -6,6 +6,7 @@ using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.Admin.Authorization.Roles.Commands.DeleteRole;
 using Lumina.Application.UnitTests.Core.Admin.Authorization.Roles.Commands.DeleteRole.Fixtures;
 using NSubstitute;
@@ -36,6 +37,9 @@ public class DeleteRoleCommandHandlerTests
     /// </summary>
     public DeleteRoleCommandHandlerTests()
     {
+        IValidator<DeleteRoleCommand> mockValidator = Substitute.For<IValidator<DeleteRoleCommand>>();
+        mockValidator.Validate(Arg.Any<DeleteRoleCommand>())
+            .Returns([]);
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
@@ -49,11 +53,12 @@ public class DeleteRoleCommandHandlerTests
         _sut = new DeleteRoleCommandHandler(
             _mockAuthorizationService,
             _mockCurrentUserService,
-            _mockUnitOfWork);
+            _mockUnitOfWork,
+            mockValidator);
     }
 
     [Fact]
-    public async Task Handle_WhenUserIsNotAdmin_ShouldReturnNotAuthorizedError()
+    public async Task HandleAsync_WhenUserIsNotAdmin_ShouldReturnNotAuthorizedError()
     {
         // Arrange
         DeleteRoleCommand command = _deleteRoleCommandFixture.CreateCommand();
@@ -61,7 +66,7 @@ public class DeleteRoleCommandHandlerTests
             .Returns(false);
 
         // Act
-        ErrorOr<Deleted> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<Deleted> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -70,7 +75,7 @@ public class DeleteRoleCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenRoleDoesNotExist_ShouldReturnRoleNotFoundError()
+    public async Task HandleAsync_WhenRoleDoesNotExist_ShouldReturnRoleNotFoundError()
     {
         // Arrange
         DeleteRoleCommand command = _deleteRoleCommandFixture.CreateCommand();
@@ -81,7 +86,7 @@ public class DeleteRoleCommandHandlerTests
             .Returns((RoleEntity?)null);
 
         // Act
-        ErrorOr<Deleted> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<Deleted> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -90,7 +95,7 @@ public class DeleteRoleCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenDeletingAdminRole_ShouldReturnAdminRoleCannotBeDeletedError()
+    public async Task HandleAsync_WhenDeletingAdminRole_ShouldReturnAdminRoleCannotBeDeletedError()
     {
         // Arrange
         DeleteRoleCommand command = _deleteRoleCommandFixture.CreateCommand();
@@ -102,7 +107,7 @@ public class DeleteRoleCommandHandlerTests
             .Returns(adminRole);
 
         // Act
-        ErrorOr<Deleted> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<Deleted> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -111,7 +116,7 @@ public class DeleteRoleCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenGetRoleByIdFails_ShouldReturnError()
+    public async Task HandleAsync_WhenGetRoleByIdFails_ShouldReturnError()
     {
         // Arrange
         DeleteRoleCommand command = _deleteRoleCommandFixture.CreateCommand();
@@ -123,7 +128,7 @@ public class DeleteRoleCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<Deleted> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<Deleted> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -132,7 +137,7 @@ public class DeleteRoleCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenDeleteRoleFails_ShouldReturnError()
+    public async Task HandleAsync_WhenDeleteRoleFails_ShouldReturnError()
     {
         // Arrange
         DeleteRoleCommand command = _deleteRoleCommandFixture.CreateCommand();
@@ -147,7 +152,7 @@ public class DeleteRoleCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<Deleted> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<Deleted> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -156,7 +161,7 @@ public class DeleteRoleCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenAllOperationsSucceed_ShouldReturnSuccess()
+    public async Task HandleAsync_WhenAllOperationsSucceed_ShouldReturnSuccess()
     {
         // Arrange
         DeleteRoleCommand command = _deleteRoleCommandFixture.CreateCommand();
@@ -170,7 +175,7 @@ public class DeleteRoleCommandHandlerTests
             .Returns(Result.Deleted);
 
         // Act
-        ErrorOr<Deleted> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<Deleted> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);

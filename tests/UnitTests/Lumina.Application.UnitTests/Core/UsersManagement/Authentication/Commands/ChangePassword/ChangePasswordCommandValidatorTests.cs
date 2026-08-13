@@ -1,8 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation.TestHelper;
+using ErrorOr;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Core.UsersManagement.Authentication.Commands.ChangePassword;
+using Lumina.Application.UnitTests.Common.Setup;
 using Lumina.Application.UnitTests.Core.UsersManagement.Authentication.Commands.ChangePassword.Fixtures;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -32,11 +34,10 @@ public class ChangePasswordCommandValidatorTests
         command = command with { Username = null! };
 
         // Act
-        TestValidationResult<ChangePasswordCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Username)
-            .WithErrorMessage(Errors.Authentication.UsernameCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.UsernameCannotBeEmpty);
     }
 
     [Fact]
@@ -47,11 +48,10 @@ public class ChangePasswordCommandValidatorTests
         command = command with { Username = string.Empty };
 
         // Act
-        TestValidationResult<ChangePasswordCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Username)
-            .WithErrorMessage(Errors.Authentication.UsernameCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.UsernameCannotBeEmpty);
     }
 
     [Fact]
@@ -62,11 +62,10 @@ public class ChangePasswordCommandValidatorTests
         command = command with { Username = "   " };
 
         // Act
-        TestValidationResult<ChangePasswordCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Username)
-            .WithErrorMessage(Errors.Authentication.UsernameCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.UsernameCannotBeEmpty);
     }
 
     [Fact]
@@ -77,11 +76,10 @@ public class ChangePasswordCommandValidatorTests
         command = command with { CurrentPassword = null! };
 
         // Act
-        TestValidationResult<ChangePasswordCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.CurrentPassword)
-            .WithErrorMessage(Errors.Authentication.CurrentPasswordCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.CurrentPasswordCannotBeEmpty);
     }
 
     [Fact]
@@ -92,11 +90,10 @@ public class ChangePasswordCommandValidatorTests
         command = command with { CurrentPassword = string.Empty };
 
         // Act
-        TestValidationResult<ChangePasswordCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.CurrentPassword)
-            .WithErrorMessage(Errors.Authentication.CurrentPasswordCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.CurrentPasswordCannotBeEmpty);
     }
 
     [Fact]
@@ -107,11 +104,10 @@ public class ChangePasswordCommandValidatorTests
         command = command with { CurrentPassword = "   " };
 
         // Act
-        TestValidationResult<ChangePasswordCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.CurrentPassword)
-            .WithErrorMessage(Errors.Authentication.CurrentPasswordCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.CurrentPasswordCannotBeEmpty);
     }
 
     [Fact]
@@ -122,11 +118,10 @@ public class ChangePasswordCommandValidatorTests
         command = command with { NewPassword = null! };
 
         // Act
-        TestValidationResult<ChangePasswordCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.NewPassword)
-            .WithErrorMessage(Errors.Authentication.NewPasswordCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.NewPasswordCannotBeEmpty);
     }
 
     [Fact]
@@ -137,11 +132,10 @@ public class ChangePasswordCommandValidatorTests
         command = command with { NewPassword = string.Empty };
 
         // Act
-        TestValidationResult<ChangePasswordCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.NewPassword)
-            .WithErrorMessage(Errors.Authentication.NewPasswordCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.NewPasswordCannotBeEmpty);
     }
 
     [Fact]
@@ -152,11 +146,10 @@ public class ChangePasswordCommandValidatorTests
         command = command with { NewPassword = "   " };
 
         // Act
-        TestValidationResult<ChangePasswordCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.NewPassword)
-            .WithErrorMessage(Errors.Authentication.NewPasswordCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.NewPasswordCannotBeEmpty);
     }
 
     [Fact]
@@ -167,11 +160,10 @@ public class ChangePasswordCommandValidatorTests
         command = command with { NewPasswordConfirm = null! };
 
         // Act
-        TestValidationResult<ChangePasswordCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.NewPasswordConfirm)
-            .WithErrorMessage(Errors.Authentication.NewPasswordConfirmCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.NewPasswordConfirmCannotBeEmpty);
     }
 
     [Fact]
@@ -182,11 +174,10 @@ public class ChangePasswordCommandValidatorTests
         command = command with { NewPasswordConfirm = string.Empty };
 
         // Act
-        TestValidationResult<ChangePasswordCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.NewPasswordConfirm)
-            .WithErrorMessage(Errors.Authentication.NewPasswordConfirmCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.NewPasswordConfirmCannotBeEmpty);
     }
 
     [Fact]
@@ -197,11 +188,10 @@ public class ChangePasswordCommandValidatorTests
         command = command with { NewPasswordConfirm = "   " };
 
         // Act
-        TestValidationResult<ChangePasswordCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.NewPasswordConfirm)
-            .WithErrorMessage(Errors.Authentication.NewPasswordConfirmCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.NewPasswordConfirmCannotBeEmpty);
     }
 
     [Fact]
@@ -212,11 +202,10 @@ public class ChangePasswordCommandValidatorTests
         command = command with { NewPasswordConfirm = "$321Bcda" };
 
         // Act
-        TestValidationResult<ChangePasswordCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.NewPassword)
-            .WithErrorMessage(Errors.Authentication.PasswordsNotMatch.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.PasswordsNotMatch);
     }
 
     [Theory]
@@ -233,11 +222,10 @@ public class ChangePasswordCommandValidatorTests
         command = command with { CurrentPassword = password };
 
         // Act
-        TestValidationResult<ChangePasswordCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.CurrentPassword)
-            .WithErrorMessage(Errors.Authentication.InvalidPassword.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.InvalidPassword);
     }
 
     [Theory]
@@ -254,11 +242,10 @@ public class ChangePasswordCommandValidatorTests
         command = command with { NewPassword = password, NewPasswordConfirm = password };
 
         // Act
-        TestValidationResult<ChangePasswordCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.NewPassword)
-            .WithErrorMessage(Errors.Authentication.InvalidPassword.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.InvalidPassword);
     }
 
     [Theory]
@@ -278,11 +265,11 @@ public class ChangePasswordCommandValidatorTests
         };
 
         // Act
-        TestValidationResult<ChangePasswordCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.CurrentPassword);
-        result.ShouldNotHaveValidationErrorFor(x => x.NewPassword);
+        result.ShouldNotHaveValidationError(Errors.Authentication.InvalidPassword);
+        result.ShouldNotHaveValidationError(Errors.Authentication.InvalidPassword);
     }
 
     [Fact]
@@ -292,12 +279,12 @@ public class ChangePasswordCommandValidatorTests
         ChangePasswordCommand command = ChangePasswordCommandFixture.CreateChangePasswordCommand();
 
         // Act
-        TestValidationResult<ChangePasswordCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Username);
-        result.ShouldNotHaveValidationErrorFor(x => x.CurrentPassword);
-        result.ShouldNotHaveValidationErrorFor(x => x.NewPassword);
-        result.ShouldNotHaveValidationErrorFor(x => x.NewPasswordConfirm);
+        result.ShouldNotHaveValidationError(Errors.Authentication.UsernameCannotBeEmpty);
+        result.ShouldNotHaveValidationError(Errors.Authentication.InvalidPassword);
+        result.ShouldNotHaveValidationError(Errors.Authentication.InvalidPassword);
+        result.ShouldNotHaveValidationError(Errors.Authentication.NewPasswordConfirmCannotBeEmpty);
     }
 }

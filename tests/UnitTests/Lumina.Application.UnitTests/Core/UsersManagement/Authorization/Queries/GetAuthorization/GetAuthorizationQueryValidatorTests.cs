@@ -1,9 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation.TestHelper;
+using ErrorOr;
 using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetAuthorization;
+using Lumina.Application.UnitTests.Common.Setup;
 using Lumina.Application.UnitTests.Core.UsersManagement.Authorization.Queries.GetAuthorization.Fixtures;
 using Lumina.Domain.SharedKernel.Common.Errors;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -33,11 +35,10 @@ public class GetAuthorizationQueryValidatorTests
         query = query with { UserId = null };
 
         // Act
-        TestValidationResult<GetAuthorizationQuery> result = _validator.TestValidate(query);
+        List<Error> result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.UserId)
-            .WithErrorMessage(Errors.Users.UserIdCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Users.UserIdCannotBeEmpty);
     }
 
     [Fact]
@@ -48,11 +49,10 @@ public class GetAuthorizationQueryValidatorTests
         query = query with { UserId = Guid.Empty };
 
         // Act
-        TestValidationResult<GetAuthorizationQuery> result = _validator.TestValidate(query);
+        List<Error> result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.UserId)
-            .WithErrorMessage(Errors.Users.UserIdCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Users.UserIdCannotBeEmpty);
     }
 
     [Fact]
@@ -62,9 +62,9 @@ public class GetAuthorizationQueryValidatorTests
         GetAuthorizationQuery query = GetAuthorizationQueryFixture.CreateGetAuthorizationQuery();
 
         // Act
-        TestValidationResult<GetAuthorizationQuery> result = _validator.TestValidate(query);
+        List<Error> result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.UserId);
+        result.ShouldNotHaveValidationError(Errors.Users.UserIdCannotBeEmpty);
     }
 }

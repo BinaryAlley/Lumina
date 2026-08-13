@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
+using Lumina.Application.Core.MediaLibrary.Management.Queries.GetLibraryScanProgress;
 using Lumina.Contracts.Requests.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
 using Lumina.Presentation.Api.Common.Routes.Library.Management;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,15 +19,15 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Library.Management.GetLibrarySc
 /// </summary>
 public class GetLibraryScanProgressEndpoint : BaseEndpoint<GetLibraryScanProgressRequest, IResult>
 {
-    private readonly ISender _sender;
+    private readonly IQueryHandler<GetLibraryScanProgressQuery, ErrorOr<MediaLibraryScanProgressResponse>> _getLibraryScanProgressQueryHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetLibraryScanProgressEndpoint"/> class.
     /// </summary>
-    /// <param name="sender">Injected service for mediating commands and queries.</param>
-    public GetLibraryScanProgressEndpoint(ISender sender)
+    /// <param name="getLibraryScanProgressQueryHandler">Injected service for handling get library scan progress queries.</param>
+    public GetLibraryScanProgressEndpoint(IQueryHandler<GetLibraryScanProgressQuery, ErrorOr<MediaLibraryScanProgressResponse>> getLibraryScanProgressQueryHandler)
     {
-        _sender = sender;
+        _getLibraryScanProgressQueryHandler = getLibraryScanProgressQueryHandler;
     }
 
     /// <summary>
@@ -35,7 +35,7 @@ public class GetLibraryScanProgressEndpoint : BaseEndpoint<GetLibraryScanProgres
     /// </summary>
     public override void Configure()
     {
-        Verbs(Http.GET);
+        Verbs(FastEndpoints.Http.GET);
         Routes(ApiRoutes.Libraries.LIBRARY_SCAN_PROGRESS);
         Version(1);
         DontCatchExceptions();
@@ -48,7 +48,7 @@ public class GetLibraryScanProgressEndpoint : BaseEndpoint<GetLibraryScanProgres
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(GetLibraryScanProgressRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<MediaLibraryScanProgressResponse> result = await _sender.Send(request.ToQuery(), cancellationToken).ConfigureAwait(false);
+        ErrorOr<MediaLibraryScanProgressResponse> result = await _getLibraryScanProgressQueryHandler.HandleAsync(request.ToQuery(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

@@ -8,6 +8,7 @@ using Lumina.Application.UnitTests.Core.FileSystemManagement.Directories.Queries
 using Lumina.Contracts.Responses.FileSystemManagement.Directories;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Lumina.Application.Common.Infrastructure.Validation;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -37,12 +38,15 @@ public class GetDirectoriesQueryHandlerTests
     {
         _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
         _mockDirectoryService = Substitute.For<IDirectoryService>();
-        _sut = new GetDirectoriesQueryHandler(_mockDirectoryService);
+        IValidator<GetDirectoriesQuery> mockValidator = Substitute.For<IValidator<GetDirectoriesQuery>>();
+        mockValidator.Validate(Arg.Any<GetDirectoriesQuery>())
+            .Returns([]);
+        _sut = new GetDirectoriesQueryHandler(_mockDirectoryService, mockValidator);
         _directoryFixture = new DirectoryFixture();
     }
 
     [Fact]
-    public async Task Handle_WhenCalledWithValidQueryWithoutFilesIncluded_ShouldReturnSuccessResult()
+    public async Task HandleAsync_WhenCalledWithValidQueryWithoutFilesIncluded_ShouldReturnSuccessResult()
     {
         // Arrange
         GetDirectoriesQuery getDirectoriesQuery = GetDirectoriesQueryFixture.CreateGetDirectoriesQuery(false);
@@ -53,7 +57,7 @@ public class GetDirectoriesQueryHandlerTests
             .Returns(ErrorOrFactory.From(directories));
 
         // Act
-        ErrorOr<IEnumerable<DirectoryResponse>> result = await _sut.Handle(getDirectoriesQuery, CancellationToken.None);
+        ErrorOr<IEnumerable<DirectoryResponse>> result = await _sut.HandleAsync(getDirectoriesQuery, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -76,7 +80,7 @@ public class GetDirectoriesQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCalledWithValidQueryWithFilesIncluded_ShouldReturnSuccessResult()
+    public async Task HandleAsync_WhenCalledWithValidQueryWithFilesIncluded_ShouldReturnSuccessResult()
     {
         // Arrange
         GetDirectoriesQuery getDirectoriesQuery = GetDirectoriesQueryFixture.CreateGetDirectoriesQuery(true);
@@ -87,7 +91,7 @@ public class GetDirectoriesQueryHandlerTests
             .Returns(ErrorOrFactory.From(directories));
 
         // Act
-        ErrorOr<IEnumerable<DirectoryResponse>> result = await _sut.Handle(getDirectoriesQuery, CancellationToken.None);
+        ErrorOr<IEnumerable<DirectoryResponse>> result = await _sut.HandleAsync(getDirectoriesQuery, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -110,7 +114,7 @@ public class GetDirectoriesQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenDirectoryServiceReturnsError_ShouldReturnFailureResult()
+    public async Task HandleAsync_WhenDirectoryServiceReturnsError_ShouldReturnFailureResult()
     {
         // Arrange
         GetDirectoriesQuery query = _fixture.Create<GetDirectoriesQuery>();
@@ -119,7 +123,7 @@ public class GetDirectoriesQueryHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<IEnumerable<DirectoryResponse>> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<IEnumerable<DirectoryResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -128,7 +132,7 @@ public class GetDirectoriesQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenDirectoryServiceReturnsEmptyList_ShouldReturnEmptySuccessResult()
+    public async Task HandleAsync_WhenDirectoryServiceReturnsEmptyList_ShouldReturnEmptySuccessResult()
     {
         // Arrange
         GetDirectoriesQuery query = _fixture.Create<GetDirectoriesQuery>();
@@ -137,7 +141,7 @@ public class GetDirectoriesQueryHandlerTests
             .Returns(emptyList);
 
         // Act
-        ErrorOr<IEnumerable<DirectoryResponse>> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<IEnumerable<DirectoryResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);

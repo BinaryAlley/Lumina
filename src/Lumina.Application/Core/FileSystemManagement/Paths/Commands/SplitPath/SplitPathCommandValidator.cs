@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation;
+using Lumina.Application.Common.Infrastructure.Validation;
+using Lumina.Application.Common.Utilities;
 using Lumina.Domain.SharedKernel.Common.Errors;
 #endregion
 
@@ -15,6 +16,8 @@ public class SplitPathCommandValidator : AbstractValidator<SplitPathCommand>
     /// </summary>
     public SplitPathCommandValidator()
     {
-        RuleFor(x => x.Path).NotEmpty().WithMessage(Errors.FileSystemManagement.PathCannotBeEmpty.Description);
+        RuleFor(command => command.Path)
+            .NotEmpty()
+            .WithError(Errors.FileSystemManagement.PathCannotBeEmpty);
     }
 }

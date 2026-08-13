@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation;
 using Lumina.Application.Common.Errors;
+using Lumina.Application.Common.Infrastructure.Validation;
+using Lumina.Application.Common.Utilities;
 #endregion
 
 namespace Lumina.Application.Core.UsersManagement.Authentication.Commands.RecoverPassword;
@@ -15,9 +16,20 @@ public class RecoverPasswordCommandValidator : AbstractValidator<RecoverPassword
     /// </summary>
     public RecoverPasswordCommandValidator()
     {
-        RuleFor(x => x.Username).NotEmpty().WithMessage(Errors.Authentication.UsernameCannotBeEmpty.Description);
-        RuleFor(x => x.TotpCode).NotEmpty().WithMessage(Errors.Authentication.TotpCannotBeEmpty.Description);
-        RuleFor(x => x.TotpCode).Length(6).WithMessage(Errors.Authentication.InvalidTotpCode.Description);
-        RuleFor(x => x.TotpCode).Matches(@"^[0-9]{6}$").WithMessage(Errors.Authentication.InvalidTotpCode.Description);
+        RuleFor(command => command.Username)
+            .NotEmpty()
+            .WithError(Errors.Authentication.UsernameCannotBeEmpty);
+        
+        RuleFor(command => command.TotpCode)
+            .NotEmpty()
+            .WithError(Errors.Authentication.TotpCannotBeEmpty);
+       
+        RuleFor(command => command.TotpCode)
+            .Length(6)
+            .WithError(Errors.Authentication.InvalidTotpCode);
+        
+        RuleFor(command => command.TotpCode)
+            .Matches(@"^[0-9]{6}$")
+            .WithError(Errors.Authentication.InvalidTotpCode);
     }
 }

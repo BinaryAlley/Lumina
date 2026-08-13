@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation;
 using Lumina.Application.Common.Errors;
+using Lumina.Application.Common.Infrastructure.Validation;
+using Lumina.Application.Common.Utilities;
 using System;
 #endregion
 
@@ -17,14 +18,15 @@ public class AddRoleCommandValidator : AbstractValidator<AddRoleCommand>
     public AddRoleCommandValidator()
     {
         RuleFor(x => x.RoleName)
-            .NotNull().WithMessage(Errors.Authorization.RoleNameCannotBeNull.Description)
-            .NotEmpty().WithMessage(Errors.Authorization.RoleNameCannotBeEmpty.Description);
+            .NotNull().WithError(Errors.Authorization.RoleNameCannotBeNull)
+            .NotEmpty().WithError(Errors.Authorization.RoleNameCannotBeEmpty);
 
         RuleFor(x => x.Permissions)
-            .NotNull().WithMessage(Errors.Authorization.PermissionsListCannotBeNull.Description)
-            .NotEmpty().WithMessage(Errors.Authorization.PermissionsListCannotBeEmpty.Description);
+            .NotNull().WithError(Errors.Authorization.PermissionsListCannotBeNull)
+            .NotEmpty().WithError(Errors.Authorization.PermissionsListCannotBeEmpty);
+
         RuleForEach(x => x.Permissions)
-            .NotEmpty().WithMessage(Errors.Authorization.PermissionIdCannotBeEmpty.Description)
-            .Must(id => id != Guid.Empty).WithMessage(Errors.Authorization.PermissionIdCannotBeEmpty.Description);
+            .NotEmpty().WithError(Errors.Authorization.PermissionIdCannotBeEmpty)
+            .Must(id => id != Guid.Empty).WithError(Errors.Authorization.PermissionIdCannotBeEmpty);
     }
 }

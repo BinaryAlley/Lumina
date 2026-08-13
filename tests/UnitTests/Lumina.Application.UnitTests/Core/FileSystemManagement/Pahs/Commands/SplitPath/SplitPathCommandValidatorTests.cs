@@ -1,8 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation.TestHelper;
+using ErrorOr;
 using Lumina.Application.Core.FileSystemManagement.Paths.Commands.SplitPath;
+using Lumina.Application.UnitTests.Common.Setup;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Pahs.Commands.SplitPath.Fixtures;
 using Lumina.Domain.SharedKernel.Common.Errors;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -32,11 +34,10 @@ public class SplitPathCommandValidatorTests
         command = command with { Path = null! };
 
         // Act
-        TestValidationResult<SplitPathCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Path)
-            .WithErrorMessage(Errors.FileSystemManagement.PathCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.FileSystemManagement.PathCannotBeEmpty);
     }
 
     [Fact]
@@ -47,11 +48,10 @@ public class SplitPathCommandValidatorTests
         command = command with { Path = string.Empty };
 
         // Act
-        TestValidationResult<SplitPathCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Path)
-            .WithErrorMessage(Errors.FileSystemManagement.PathCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.FileSystemManagement.PathCannotBeEmpty);
     }
 
     [Fact]
@@ -62,11 +62,10 @@ public class SplitPathCommandValidatorTests
         command = command with { Path = "   " };
 
         // Act
-        TestValidationResult<SplitPathCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Path)
-            .WithErrorMessage(Errors.FileSystemManagement.PathCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.FileSystemManagement.PathCannotBeEmpty);
     }
 
     [Fact]
@@ -77,9 +76,9 @@ public class SplitPathCommandValidatorTests
         command = command with { Path = "/valid/path" };
 
         // Act
-        TestValidationResult<SplitPathCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Path);
+        result.ShouldNotHaveValidationError(Errors.FileSystemManagement.PathCannotBeEmpty);
     }
 }

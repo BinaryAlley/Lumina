@@ -8,6 +8,7 @@ using Lumina.Application.UnitTests.Core.FileSystemManagement.Pahs.Queries.GetPat
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Lumina.Application.Common.Infrastructure.Validation;
 using NSubstitute;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -33,12 +34,15 @@ public class GetPathParentQueryHandlerTests
     {
         _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
         _mockPathService = Substitute.For<IPathService>();
-        _sut = new GetPathParentQueryHandler(_mockPathService);
+        IValidator<GetPathParentQuery> mockValidator = Substitute.For<IValidator<GetPathParentQuery>>();
+        mockValidator.Validate(Arg.Any<GetPathParentQuery>())
+            .Returns([]);
+        _sut = new GetPathParentQueryHandler(_mockPathService, mockValidator);
         _pathSegmentFixture = new PathSegmentFixture();
     }
 
     [Fact]
-    public async Task Handle_WhenCalledWithValidQuery_ShouldReturnSuccessResult()
+    public async Task HandleAsync_WhenCalledWithValidQuery_ShouldReturnSuccessResult()
     {
         // Arrange
         GetPathParentQuery query = GetPathParentQueryFixture.CreateGetPathParentQuery();
@@ -52,7 +56,7 @@ public class GetPathParentQueryHandlerTests
             .Returns(ErrorOrFactory.From(pathSegments));
 
         // Act
-        ErrorOr<IEnumerable<PathSegmentResponse>> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<IEnumerable<PathSegmentResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -62,7 +66,7 @@ public class GetPathParentQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenPathServiceReturnsError_ShouldReturnFailureResult()
+    public async Task HandleAsync_WhenPathServiceReturnsError_ShouldReturnFailureResult()
     {
         // Arrange
         GetPathParentQuery query = _fixture.Create<GetPathParentQuery>();
@@ -71,7 +75,7 @@ public class GetPathParentQueryHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<IEnumerable<PathSegmentResponse>> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<IEnumerable<PathSegmentResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -80,7 +84,7 @@ public class GetPathParentQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenPathServiceReturnsEmptyList_ShouldReturnEmptySuccessResult()
+    public async Task HandleAsync_WhenPathServiceReturnsEmptyList_ShouldReturnEmptySuccessResult()
     {
         // Arrange
         GetPathParentQuery query = _fixture.Create<GetPathParentQuery>();
@@ -89,7 +93,7 @@ public class GetPathParentQueryHandlerTests
             .Returns(emptyList);
 
         // Act
-        ErrorOr<IEnumerable<PathSegmentResponse>> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<IEnumerable<PathSegmentResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);

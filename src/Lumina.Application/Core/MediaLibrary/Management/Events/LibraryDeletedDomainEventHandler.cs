@@ -6,7 +6,7 @@ using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.File
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.Events;
-using Mediator;
+using Lumina.Domain.Common.Events;
 using Microsoft.Extensions.Options;
 using System;
 using System.Threading;
@@ -16,9 +16,9 @@ using System.Threading.Tasks;
 namespace Lumina.Application.Core.MediaLibrary.Management.Events;
 
 /// <summary>
-/// Handler for the event raised when a media library is deleted.
+/// Handler for the domain event raised when a media library is deleted.
 /// </summary>
-public class LibraryDeletedDomainEventHandler : INotificationHandler<LibraryDeletedDomainEvent>
+public class LibraryDeletedDomainEventHandler : IDomainEventHandler<LibraryDeletedDomainEvent>
 {
     private readonly IEnvironmentContext _environmentContext;
     private readonly IPathService _pathService;
@@ -42,7 +42,7 @@ public class LibraryDeletedDomainEventHandler : INotificationHandler<LibraryDele
     /// </summary>
     /// <param name="domainEvent">The domain event to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    public ValueTask Handle(LibraryDeletedDomainEvent domainEvent, CancellationToken cancellationToken)
+    public ValueTask HandleAsync(LibraryDeletedDomainEvent domainEvent, CancellationToken cancellationToken)
     {
         // delete the media library directory in the internal location for media library files
         ErrorOr<string> libraryPathResult = GetLibraryPath(domainEvent.Library.Id.Value);

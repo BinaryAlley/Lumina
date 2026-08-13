@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation;
+using Lumina.Application.Common.Infrastructure.Validation;
+using Lumina.Application.Common.Utilities;
 using Lumina.Domain.SharedKernel.Common.Errors;
 using System;
 #endregion
@@ -16,11 +17,16 @@ public class CancelLibraryScanCommandValidator : AbstractValidator<CancelLibrary
     /// </summary>
     public CancelLibraryScanCommandValidator()
     {
-        RuleFor(x => x.LibraryId)
-            .NotEmpty().WithMessage(Errors.Library.LibraryIdCannotBeEmpty.Description)
-            .Must(id => id != Guid.Empty).WithMessage(Errors.Library.LibraryIdCannotBeEmpty.Description);
-        RuleFor(x => x.ScanId)
-            .NotEmpty().WithMessage(Errors.LibraryScanning.ScanIdCannotBeEmpty.Description)
-            .Must(id => id != Guid.Empty).WithMessage(Errors.LibraryScanning.ScanIdCannotBeEmpty.Description);
+        RuleFor(command => command.LibraryId)
+            .NotEmpty()
+            .WithError(Errors.Library.LibraryIdCannotBeEmpty)
+            .Must(id => id != Guid.Empty)
+            .WithError(Errors.Library.LibraryIdCannotBeEmpty);
+
+        RuleFor(command => command.ScanId)
+            .NotEmpty()
+            .WithError(Errors.LibraryScanning.ScanIdCannotBeEmpty)
+            .Must(id => id != Guid.Empty)
+            .WithError(Errors.LibraryScanning.ScanIdCannotBeEmpty);
     }
 }

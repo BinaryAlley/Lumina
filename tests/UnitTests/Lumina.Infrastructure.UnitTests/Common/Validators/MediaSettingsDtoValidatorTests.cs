@@ -1,9 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
+using ErrorOr;
 using Lumina.Application.Common.Infrastructure.Models.DTO.Configuration;
 using Lumina.Infrastructure.Common.Errors;
 using Lumina.Infrastructure.Common.Validators;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -36,11 +38,10 @@ public class MediaSettingsDtoValidatorTests
             .Create();
 
         // Act
-        FluentValidation.Results.ValidationResult result = _validator.Validate(model);
+        List<Error> result = _validator.Validate(model);
 
         // Assert
-        Assert.True(result.IsValid);
-        Assert.Empty(result.Errors);
+        Assert.Empty(result);
     }
 
     [Fact]
@@ -52,12 +53,11 @@ public class MediaSettingsDtoValidatorTests
             .Create();
 
         // Act
-        FluentValidation.Results.ValidationResult result = _validator.Validate(model);
+        List<Error> result = _validator.Validate(model);
 
         // Assert
-        Assert.False(result.IsValid);
-        Assert.Single(result.Errors);
-        Assert.Equal(Errors.Configuration.MediaRootDirectoryCannotBeEmpty.Description, result.Errors[0].ErrorMessage);
+        Assert.Single(result);
+        Assert.Equal(Errors.Configuration.MediaRootDirectoryCannotBeEmpty.Description, result[0].Description);
     }
 
     [Fact]
@@ -69,12 +69,11 @@ public class MediaSettingsDtoValidatorTests
             .Create();
 
         // Act
-        FluentValidation.Results.ValidationResult result = _validator.Validate(model);
+        List<Error> result = _validator.Validate(model);
 
         // Assert
-        Assert.False(result.IsValid);
-        Assert.Single(result.Errors);
-        Assert.Equal(Errors.Configuration.MediaRootDirectoryCannotBeEmpty.Description, result.Errors[0].ErrorMessage);
+        Assert.Single(result);
+        Assert.Equal(Errors.Configuration.MediaRootDirectoryCannotBeEmpty.Description, result[0].Description);
     }
 
     [Fact]
@@ -86,12 +85,11 @@ public class MediaSettingsDtoValidatorTests
             .Create();
 
         // Act
-        FluentValidation.Results.ValidationResult result = _validator.Validate(model);
+        List<Error> result = _validator.Validate(model);
 
         // Assert
-        Assert.False(result.IsValid);
-        Assert.Single(result.Errors);
-        Assert.Equal(Errors.Configuration.MediaLibrariesDirectoryCannotBeEmpty.Description, result.Errors[0].ErrorMessage);
+        Assert.Single(result);
+        Assert.Equal(Errors.Configuration.MediaLibrariesDirectoryCannotBeEmpty.Description, result[0].Description);
     }
 
     [Fact]
@@ -103,11 +101,10 @@ public class MediaSettingsDtoValidatorTests
             .Create();
 
         // Act
-        FluentValidation.Results.ValidationResult result = _validator.Validate(model);
+        List<Error> result = _validator.Validate(model);
 
         // Assert
-        Assert.True(result.IsValid);
-        Assert.Empty(result.Errors);
+        Assert.Empty(result);
     }
 
     [Fact]
@@ -119,11 +116,10 @@ public class MediaSettingsDtoValidatorTests
             .Create();
 
         // Act
-        FluentValidation.Results.ValidationResult result = _validator.Validate(model);
+        List<Error> result = _validator.Validate(model);
 
         // Assert
-        Assert.False(result.IsValid);
-        Assert.Single(result.Errors);
-        Assert.Equal(Errors.Configuration.MediaLibrariesDirectoryCannotBeEmpty.Description, result.Errors[0].ErrorMessage);
+        Assert.Single(result);
+        Assert.Equal(Errors.Configuration.MediaLibrariesDirectoryCannotBeEmpty.Description, result[0].Description);
     }
 }

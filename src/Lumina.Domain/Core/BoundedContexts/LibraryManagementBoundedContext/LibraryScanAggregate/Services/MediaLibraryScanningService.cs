@@ -9,7 +9,6 @@ using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.Library
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Scanners;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
-using Mediator;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -27,7 +26,7 @@ internal class MediaLibraryScanningService : IMediaLibraryScanningService
     private readonly IMediaLibraryScannerFactory _mediaLibraryScannerFactory;
     private readonly IMediaLibrariesScanCancellationTracker _mediaLibrariesScanCancellationTracker;
     private readonly IMediaLibrariesScanProgressTracker _mediaLibrariesScanProgressTracker;
-    private readonly IPublisher _publisher;
+    private readonly IDomainEventPublisher _domainEventPublisher;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MediaLibraryScanningService"/> class.
@@ -36,19 +35,19 @@ internal class MediaLibraryScanningService : IMediaLibraryScanningService
     /// <param name="mediaLibraryScannerFactory">Injected factory for creating media library scanners.</param>
     /// <param name="mediaLibrariesScanCancellationTracker">Injected tracker used for canceling media library scans.</param>
     /// <param name="mediaLibrariesScanProgressTracker">Injected tracker used for media library scans progress.</param>
-    /// <param name="publisher">The domain event publisher used to publish events.</param>
+    /// <param name="domainEventPublisher">The domain event publisher used to publish events.</param>
     public MediaLibraryScanningService(
         IMediaLibrariesScanQueue mediaLibrariesScanQueue,
         IMediaLibraryScannerFactory mediaLibraryScannerFactory,
         IMediaLibrariesScanCancellationTracker mediaLibrariesScanCancellationTracker,
         IMediaLibrariesScanProgressTracker mediaLibrariesScanProgressTracker,
-        IPublisher publisher)
+        IDomainEventPublisher domainEventPublisher)
     {
         _mediaLibrariesScanQueue = mediaLibrariesScanQueue;
         _mediaLibraryScannerFactory = mediaLibraryScannerFactory;
         _mediaLibrariesScanCancellationTracker = mediaLibrariesScanCancellationTracker;
         _mediaLibrariesScanProgressTracker = mediaLibrariesScanProgressTracker;
-        _publisher = publisher;
+        _domainEventPublisher = domainEventPublisher;
     }
 
     /// <summary>
@@ -67,7 +66,7 @@ internal class MediaLibraryScanningService : IMediaLibraryScanningService
             return startScanResult.Errors;
 
         foreach (IDomainEvent domainEvent in scan.GetDomainEvents())
-            await _publisher!.Publish(domainEvent, cancellationToken).ConfigureAwait(false);
+            await _domainEventPublisher.PublishAsync(domainEvent, cancellationToken).ConfigureAwait(false);
         
         // register the scan in the tracker for cancellation tokens
         _mediaLibrariesScanCancellationTracker.RegisterScan(MediaLibraryScanCompositeId.Create(scan.Id, scan.UserId));

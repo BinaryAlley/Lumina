@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation;
+using Lumina.Application.Common.Infrastructure.Validation;
+using Lumina.Application.Common.Utilities;
 using Lumina.Domain.SharedKernel.Common.Errors;
 #endregion
 
@@ -15,6 +16,8 @@ public class GetFilesQueryValidator : AbstractValidator<GetFilesQuery>
     /// </summary>
     public GetFilesQueryValidator()
     {
-        RuleFor(x => x.Path).NotEmpty().WithMessage(Errors.FileSystemManagement.PathCannotBeEmpty.Description);
+        RuleFor(query => query.Path)
+            .NotEmpty()
+            .WithError(Errors.FileSystemManagement.PathCannotBeEmpty);
     }
 }

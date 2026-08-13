@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Application.Common.CQRS;
 using Lumina.Contracts.Responses.FileSystemManagement.FileSystem;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Platform;
-using Mediator;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -11,7 +11,7 @@ namespace Lumina.Application.Core.FileSystemManagement.FileSystem.Queries.GetFil
 /// <summary>
 /// Handler for the query to get the file system type.
 /// </summary>
-public class GetFileSystemQueryHandler : IRequestHandler<GetFileSystemQuery, FileSystemTypeResponse>
+public class GetFileSystemQueryHandler : IQueryHandler<GetFileSystemQuery, FileSystemTypeResponse>
 {
     private readonly IPlatformContext _platformContext;
 
@@ -27,11 +27,11 @@ public class GetFileSystemQueryHandler : IRequestHandler<GetFileSystemQuery, Fil
     /// <summary>
     /// Gets the type of the file system.
     /// </summary>
-    /// <param name="request">The query to be handled.</param>
+    /// <param name="query">The query to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>The type of the file system.</returns>
-    public ValueTask<FileSystemTypeResponse> Handle(GetFileSystemQuery request, CancellationToken cancellationToken)
+    public Task<FileSystemTypeResponse> HandleAsync(GetFileSystemQuery query, CancellationToken cancellationToken)
     {
-        return ValueTask.FromResult(new FileSystemTypeResponse(_platformContext.Platform));
+        return Task.FromResult(new FileSystemTypeResponse(_platformContext.Platform));
     }
 }

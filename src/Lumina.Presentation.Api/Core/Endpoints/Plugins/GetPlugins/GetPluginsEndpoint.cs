@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.Plugins.Queries.GetPlugins;
 using Lumina.Contracts.Responses.Plugins;
 using Lumina.Presentation.Api.Common.Routes.Plugins;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.Threading;
@@ -19,15 +19,15 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Plugins.GetPlugins;
 /// </summary>
 public class GetPluginsEndpoint : BaseEndpoint<EmptyRequest, IResult>
 {
-    private readonly ISender _sender;
+    private readonly IQueryHandler<GetPluginsQuery, ErrorOr<IReadOnlyList<PluginResponse>>> _getPluginsQueryHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetPluginsEndpoint"/> class.
     /// </summary>
-    /// <param name="sender">Injected service for mediating commands and queries.</param>
-    public GetPluginsEndpoint(ISender sender)
+    /// <param name="getPluginsQueryHandler">Injected service for handling get plugins queries.</param>
+    public GetPluginsEndpoint(IQueryHandler<GetPluginsQuery, ErrorOr<IReadOnlyList<PluginResponse>>> getPluginsQueryHandler)
     {
-        _sender = sender;
+        _getPluginsQueryHandler = getPluginsQueryHandler;
     }
 
     /// <summary>
@@ -35,7 +35,7 @@ public class GetPluginsEndpoint : BaseEndpoint<EmptyRequest, IResult>
     /// </summary>
     public override void Configure()
     {
-        Verbs(Http.GET);
+        Verbs(FastEndpoints.Http.GET);
         Routes(ApiRoutes.Plugins.GET_PLUGINS);
         Version(1);
         DontCatchExceptions();
@@ -47,7 +47,7 @@ public class GetPluginsEndpoint : BaseEndpoint<EmptyRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(EmptyRequest _, CancellationToken cancellationToken)
     {
-        ErrorOr<IReadOnlyList<PluginResponse>> result = await _sender.Send(new GetPluginsQuery(), cancellationToken).ConfigureAwait(false);
+        ErrorOr<IReadOnlyList<PluginResponse>> result = await _getPluginsQueryHandler.HandleAsync(new GetPluginsQuery(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

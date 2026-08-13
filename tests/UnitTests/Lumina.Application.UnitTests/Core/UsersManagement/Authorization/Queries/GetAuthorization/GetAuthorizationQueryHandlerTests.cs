@@ -4,6 +4,7 @@ using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetAuthorization;
 using Lumina.Application.UnitTests.Core.UsersManagement.Authorization.Queries.GetAuthorization.Fixtures;
 using Lumina.Contracts.Responses.Authorization;
@@ -33,11 +34,14 @@ public class GetAuthorizationQueryHandlerTests
     {
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
-        _sut = new GetAuthorizationQueryHandler(_mockAuthorizationService, _mockCurrentUserService);
+        IValidator<GetAuthorizationQuery> mockValidator = Substitute.For<IValidator<GetAuthorizationQuery>>();
+        mockValidator.Validate(Arg.Any<GetAuthorizationQuery>())
+            .Returns([]);
+        _sut = new GetAuthorizationQueryHandler(_mockAuthorizationService, _mockCurrentUserService, mockValidator);
     }
 
     [Fact]
-    public async Task Handle_WhenRequestingOwnAuthorization_ShouldReturnAuthorization()
+    public async Task HandleAsync_WhenRequestingOwnAuthorization_ShouldReturnAuthorization()
     {
         // Arrange
         Guid userId = Guid.NewGuid();
@@ -49,7 +53,7 @@ public class GetAuthorizationQueryHandlerTests
             .Returns(ErrorOrFactory.From(authEntity));
 
         // Act
-        ErrorOr<AuthorizationResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<AuthorizationResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -59,7 +63,7 @@ public class GetAuthorizationQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenAdminRequestingOtherUserAuthorization_ShouldReturnAuthorization()
+    public async Task HandleAsync_WhenAdminRequestingOtherUserAuthorization_ShouldReturnAuthorization()
     {
         // Arrange
         Guid adminUserId = Guid.NewGuid();
@@ -75,7 +79,7 @@ public class GetAuthorizationQueryHandlerTests
             .Returns(ErrorOrFactory.From(targetAuthEntity));
 
         // Act
-        ErrorOr<AuthorizationResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<AuthorizationResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -85,7 +89,7 @@ public class GetAuthorizationQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenNonAdminRequestingOtherUserAuthorization_ShouldReturnError()
+    public async Task HandleAsync_WhenNonAdminRequestingOtherUserAuthorization_ShouldReturnError()
     {
         // Arrange
         Guid currentUserId = Guid.NewGuid();
@@ -98,7 +102,7 @@ public class GetAuthorizationQueryHandlerTests
             .Returns(ErrorOrFactory.From(currentUserAuth));
 
         // Act
-        ErrorOr<AuthorizationResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<AuthorizationResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -106,7 +110,7 @@ public class GetAuthorizationQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenGetCurrentUserAuthorizationFails_ShouldReturnError()
+    public async Task HandleAsync_WhenGetCurrentUserAuthorizationFails_ShouldReturnError()
     {
         // Arrange
         Guid currentUserId = Guid.NewGuid();
@@ -119,7 +123,7 @@ public class GetAuthorizationQueryHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<AuthorizationResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<AuthorizationResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -127,7 +131,7 @@ public class GetAuthorizationQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenGetTargetUserAuthorizationFails_ShouldReturnError()
+    public async Task HandleAsync_WhenGetTargetUserAuthorizationFails_ShouldReturnError()
     {
         // Arrange
         Guid adminUserId = Guid.NewGuid();
@@ -143,7 +147,7 @@ public class GetAuthorizationQueryHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<AuthorizationResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<AuthorizationResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);

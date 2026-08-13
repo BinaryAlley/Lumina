@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Responses.UsersManagement;
-using Mediator;
+using Lumina.Application.Common.CQRS;
 #endregion
 
 namespace Lumina.Application.Core.Maintenance.ApplicationSetup.Queries.CheckInitialization;
@@ -8,4 +7,4 @@ namespace Lumina.Application.Core.Maintenance.ApplicationSetup.Queries.CheckInit
 /// <summary>
 /// Query for checking the initialization of the application.
 /// </summary>
-public record CheckInitializationQuery() : IRequest<InitializationResponse>;
+public record CheckInitializationQuery() : IQuery;

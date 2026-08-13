@@ -6,6 +6,7 @@ using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetUserPermissions;
 using Lumina.Application.UnitTests.Core.UsersManagement.Authorization.Queries.GetUserPermissions.Fixtures;
 using Lumina.Contracts.Responses.Authorization;
@@ -50,14 +51,18 @@ public class GetUserPermissionsQueryHandlerTests
         _mockCurrentUserService.UserId.Returns(_userId);
         _mockUnitOfWork.GetRepository<IUserRepository>().Returns(_mockUserRepository);
 
+        IValidator<GetUserPermissionsQuery> mockValidator = Substitute.For<IValidator<GetUserPermissionsQuery>>();
+        mockValidator.Validate(Arg.Any<GetUserPermissionsQuery>())
+            .Returns([]);
         _sut = new GetUserPermissionsQueryHandler(
             _mockAuthorizationService,
             _mockCurrentUserService,
-            _mockUnitOfWork);
+            _mockUnitOfWork,
+            mockValidator);
     }
 
     [Fact]
-    public async Task Handle_WhenUserIsNotAdmin_ShouldReturnNotAuthorizedError()
+    public async Task HandleAsync_WhenUserIsNotAdmin_ShouldReturnNotAuthorizedError()
     {
         // Arrange
         GetUserPermissionsQuery query = _getUserPermissionsQueryFixture.CreateQuery();
@@ -65,7 +70,7 @@ public class GetUserPermissionsQueryHandlerTests
             .Returns(false);
 
         // Act
-        ErrorOr<IEnumerable<PermissionResponse>> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<IEnumerable<PermissionResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -74,7 +79,7 @@ public class GetUserPermissionsQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenGetUserByIdFails_ShouldReturnError()
+    public async Task HandleAsync_WhenGetUserByIdFails_ShouldReturnError()
     {
         // Arrange
         GetUserPermissionsQuery query = _getUserPermissionsQueryFixture.CreateQuery();
@@ -86,7 +91,7 @@ public class GetUserPermissionsQueryHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<IEnumerable<PermissionResponse>> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<IEnumerable<PermissionResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -94,7 +99,7 @@ public class GetUserPermissionsQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserDoesNotExist_ShouldReturnUsernameDoesNotExistError()
+    public async Task HandleAsync_WhenUserDoesNotExist_ShouldReturnUsernameDoesNotExistError()
     {
         // Arrange
         GetUserPermissionsQuery query = _getUserPermissionsQueryFixture.CreateQuery();
@@ -105,7 +110,7 @@ public class GetUserPermissionsQueryHandlerTests
             .Returns((UserEntity?)null);
 
         // Act
-        ErrorOr<IEnumerable<PermissionResponse>> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<IEnumerable<PermissionResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -113,7 +118,7 @@ public class GetUserPermissionsQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserHasPermissions_ShouldReturnPermissions()
+    public async Task HandleAsync_WhenUserHasPermissions_ShouldReturnPermissions()
     {
         // Arrange
         GetUserPermissionsQuery query = _getUserPermissionsQueryFixture.CreateQuery();
@@ -144,7 +149,7 @@ public class GetUserPermissionsQueryHandlerTests
             .Returns(user);
 
         // Act
-        ErrorOr<IEnumerable<PermissionResponse>> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<IEnumerable<PermissionResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);

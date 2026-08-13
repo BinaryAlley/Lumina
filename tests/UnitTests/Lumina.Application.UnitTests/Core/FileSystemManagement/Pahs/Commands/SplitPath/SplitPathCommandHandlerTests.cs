@@ -8,6 +8,7 @@ using Lumina.Application.UnitTests.Core.FileSystemManagement.Pahs.Fixtures;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Lumina.Application.Common.Infrastructure.Validation;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -37,12 +38,15 @@ public class SplitPathCommandHandlerTests
     {
         _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
         _mockPathService = Substitute.For<IPathService>();
-        _sut = new SplitPathCommandHandler(_mockPathService);
+        IValidator<SplitPathCommand> mockValidator = Substitute.For<IValidator<SplitPathCommand>>();
+        mockValidator.Validate(Arg.Any<SplitPathCommand>())
+            .Returns([]);
+        _sut = new SplitPathCommandHandler(_mockPathService, mockValidator);
         _pathSegmentFixture = new PathSegmentFixture();
     }
 
     [Fact]
-    public async Task Handle_WhenCalledWithValidCommand_ShouldReturnSuccessResult()
+    public async Task HandleAsync_WhenCalledWithValidCommand_ShouldReturnSuccessResult()
     {
         // Arrange
         SplitPathCommand splitPathCommand = SplitPathCommandFixture.CreateSplitPathCommand();
@@ -53,7 +57,7 @@ public class SplitPathCommandHandlerTests
             .Returns(ErrorOrFactory.From(pathSegments));
 
         // Act
-        ErrorOr<IEnumerable<PathSegmentResponse>> result = await _sut.Handle(splitPathCommand, CancellationToken.None);
+        ErrorOr<IEnumerable<PathSegmentResponse>> result = await _sut.HandleAsync(splitPathCommand, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -69,7 +73,7 @@ public class SplitPathCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenPathServiceReturnsError_ShouldReturnFailureResult()
+    public async Task HandleAsync_WhenPathServiceReturnsError_ShouldReturnFailureResult()
     {
         // Arrange
         SplitPathCommand command = _fixture.Create<SplitPathCommand>();
@@ -78,7 +82,7 @@ public class SplitPathCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<IEnumerable<PathSegmentResponse>> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<IEnumerable<PathSegmentResponse>> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -87,7 +91,7 @@ public class SplitPathCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenPathServiceReturnsEmptyList_ShouldReturnEmptySuccessResult()
+    public async Task HandleAsync_WhenPathServiceReturnsEmptyList_ShouldReturnEmptySuccessResult()
     {
         // Arrange
         SplitPathCommand command = _fixture.Create<SplitPathCommand>();
@@ -96,7 +100,7 @@ public class SplitPathCommandHandlerTests
             .Returns(emptyList);
 
         // Act
-        ErrorOr<IEnumerable<PathSegmentResponse>> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<IEnumerable<PathSegmentResponse>> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);

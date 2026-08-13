@@ -1,6 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation;
+using Lumina.Application.Common.Infrastructure.Validation;
+using Lumina.Application.Common.Utilities;
 using Lumina.Infrastructure.Common.Models.DTO.Configuration;
+using System;
 #endregion
 
 namespace Lumina.Infrastructure.Common.Validators;
@@ -15,22 +17,22 @@ public class JwtSettingsDtoValidator : AbstractValidator<JwtSettingsDto>
     /// </summary>
     public JwtSettingsDtoValidator()
     {
-        RuleFor(x => x.SecretKey)
+        RuleFor(settings => settings.SecretKey)
             .NotEmpty()
-            .WithMessage(Errors.Errors.Configuration.JwtSecretKeyCannotBeEmpty.Description)
+            .WithError(Errors.Errors.Configuration.JwtSecretKeyCannotBeEmpty)
             .MinimumLength(32)
-            .WithMessage(Errors.Errors.Configuration.JwtSecretKeyTooShort.Description);
+            .WithError(Errors.Errors.Configuration.JwtSecretKeyTooShort);
 
-        RuleFor(x => x.ExpiryMinutes)
+        RuleFor(settings => settings.ExpiryMinutes)
             .GreaterThan(0)
-            .WithMessage(Errors.Errors.Configuration.JwtExpiryMinutesMustBePositive.Description);
+            .WithError(Errors.Errors.Configuration.JwtExpiryMinutesMustBePositive);
 
-        RuleFor(x => x.Issuer)
+        RuleFor(settings => settings.Issuer)
             .NotEmpty()
-            .WithMessage(Errors.Errors.Configuration.JwtIssuerCannotBeEmpty.Description);
+            .WithError(Errors.Errors.Configuration.JwtIssuerCannotBeEmpty);
 
-        RuleFor(x => x.Audience)
+        RuleFor(settings => settings.Audience)
             .NotEmpty()
-            .WithMessage(Errors.Errors.Configuration.JwtAudienceCannotBeEmpty.Description);
+            .WithError(Errors.Errors.Configuration.JwtAudienceCannotBeEmpty);
     }
 }

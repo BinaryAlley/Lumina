@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using FluentValidation;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Infrastructure.Common.Utilities;
 using Lumina.Infrastructure.Common.Validation;
 using Lumina.Infrastructure.UnitTests.Common.Utilities.Fixtures;
@@ -16,17 +16,17 @@ using System.Linq;
 namespace Lumina.Infrastructure.UnitTests.Common.Utilities;
 
 /// <summary>
-/// Contains unit tests for the <see cref="OptionsBuilderFluentValidationUtilities"/> class.
+/// Contains unit tests for the <see cref="OptionsBuilderValidationUtilities"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class OptionsBuilderFluentValidationUtilitiesTests
+public class OptionsBuilderValidationUtilitiesTests
 {
     private readonly IFixture _fixture;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="OptionsBuilderFluentValidationUtilitiesTests"/> class.
+    /// Initializes a new instance of the <see cref="OptionsBuilderValidationUtilitiesTests"/> class.
     /// </summary>
-    public OptionsBuilderFluentValidationUtilitiesTests()
+    public OptionsBuilderValidationUtilitiesTests()
     {
         _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
     }
@@ -37,15 +37,15 @@ public class OptionsBuilderFluentValidationUtilitiesTests
         // Arrange
         IServiceCollection services = Substitute.For<IServiceCollection>();
         string name = _fixture.Create<string>();
-        OptionsBuilder<OptionsBuilderFluentValidationUtilitiesFixture> optionsBuilder = new(services, name);
+        OptionsBuilder<OptionsBuilderValidationUtilitiesFixture> optionsBuilder = new(services, name);
 
         // Act
-        OptionsBuilder<OptionsBuilderFluentValidationUtilitiesFixture> result = optionsBuilder.ValidateFluently();
+        OptionsBuilder<OptionsBuilderValidationUtilitiesFixture> result = optionsBuilder.ValidateFluently();
 
         // Assert
         Assert.Same(optionsBuilder, result);
         services.Received(1).Add(Arg.Is<ServiceDescriptor>(sd =>
-            sd.ServiceType == typeof(IValidateOptions<OptionsBuilderFluentValidationUtilitiesFixture>) &&
+            sd.ServiceType == typeof(IValidateOptions<OptionsBuilderValidationUtilitiesFixture>) &&
             sd.Lifetime == ServiceLifetime.Singleton &&
             sd.ImplementationFactory != null));
     }
@@ -56,14 +56,14 @@ public class OptionsBuilderFluentValidationUtilitiesTests
         // Arrange
         ServiceCollection services = new();
         string name = _fixture.Create<string>();
-        OptionsBuilder<OptionsBuilderFluentValidationUtilitiesFixture> optionsBuilder = new(services, name);
+        OptionsBuilder<OptionsBuilderValidationUtilitiesFixture> optionsBuilder = new(services, name);
 
         // Act
         optionsBuilder.ValidateFluently();
 
         // Assert
         ServiceDescriptor? serviceDescriptor = services.FirstOrDefault(sd =>
-            sd.ServiceType == typeof(IValidateOptions<OptionsBuilderFluentValidationUtilitiesFixture>) &&
+            sd.ServiceType == typeof(IValidateOptions<OptionsBuilderValidationUtilitiesFixture>) &&
             sd.Lifetime == ServiceLifetime.Singleton &&
             sd.ImplementationFactory != null);
 
@@ -73,12 +73,12 @@ public class OptionsBuilderFluentValidationUtilitiesTests
         Assert.NotNull(implementationFactory);
 
         IServiceProvider serviceProvider = Substitute.For<IServiceProvider>();
-        IValidator<OptionsBuilderFluentValidationUtilitiesFixture> mockValidator = Substitute.For<IValidator<OptionsBuilderFluentValidationUtilitiesFixture>>();
-        serviceProvider.GetService(typeof(IValidator<OptionsBuilderFluentValidationUtilitiesFixture>))
+        IValidator<OptionsBuilderValidationUtilitiesFixture> mockValidator = Substitute.For<IValidator<OptionsBuilderValidationUtilitiesFixture>>();
+        serviceProvider.GetService(typeof(IValidator<OptionsBuilderValidationUtilitiesFixture>))
             .Returns(mockValidator);
 
-        FluentValidationOptions<OptionsBuilderFluentValidationUtilitiesFixture>? fluentValidationOptions = implementationFactory!(serviceProvider) as FluentValidationOptions<OptionsBuilderFluentValidationUtilitiesFixture>;
-        Assert.NotNull(fluentValidationOptions);
-        Assert.Equal(name, fluentValidationOptions.Name);
+        ValidationOptions<OptionsBuilderValidationUtilitiesFixture>? validationOptions = implementationFactory!(serviceProvider) as ValidationOptions<OptionsBuilderValidationUtilitiesFixture>;
+        Assert.NotNull(validationOptions);
+        Assert.Equal(name, validationOptions.Name);
     }
 }

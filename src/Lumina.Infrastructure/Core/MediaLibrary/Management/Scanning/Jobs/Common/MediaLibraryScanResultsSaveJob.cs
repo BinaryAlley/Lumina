@@ -6,10 +6,10 @@ using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Lumina.Domain.Common.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
-using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -65,13 +65,13 @@ internal sealed class MediaLibraryScanResultsSaveJob : MediaLibraryScanJob, IMed
                     // see docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0001.md for details:
                     await using AsyncServiceScope asyncServiceScope = _serviceScopeFactory.CreateAsyncScope();
                     IUnitOfWork unitOfWork = asyncServiceScope.ServiceProvider.GetService<IUnitOfWork>()!;
-                    IPublisher publisher = asyncServiceScope.ServiceProvider.GetService<IPublisher>()!;
+                    IDomainEventPublisher domainEventPublisher = asyncServiceScope.ServiceProvider.GetService<IDomainEventPublisher>()!;
                     ILibraryScanSnapshotRepository libraryScanSnapshotRepository = unitOfWork.GetRepository<ILibraryScanSnapshotRepository>();
 
                     MediaLibraryScanCompositeId compositeKey = MediaLibraryScanCompositeId.Create(ScanId, UserId);
 
                     // set the initial progress of the scan job, it's a 1 step job - applying the scan results to the storage medium
-                    ErrorOr<Success> publishJobProgressResult = await PublishJobProgress(publisher, compositeKey, 0, 1, cancellationToken).ConfigureAwait(false);
+                    ErrorOr<Success> publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, 0, 1, cancellationToken).ConfigureAwait(false);
                     if (publishJobProgressResult.IsError)
                         throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
 
@@ -89,7 +89,7 @@ internal sealed class MediaLibraryScanResultsSaveJob : MediaLibraryScanJob, IMed
                     foreach (string deletedPath in getDeletedPathsResult.Value)
                     {
                         cancellationToken.ThrowIfCancellationRequested();
-                        await publisher.Publish(new LibraryMediaItemDeletedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, deletedPath, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                        await domainEventPublisher.PublishAsync(new LibraryMediaItemDeletedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, deletedPath, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
                     }
 
                     // materialize the books of the media library from the scan snapshot, so that they are browsable even without web metadata
@@ -114,14 +114,14 @@ internal sealed class MediaLibraryScanResultsSaveJob : MediaLibraryScanJob, IMed
                     await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
                     // increment the number of processed elements progress
-                    publishJobProgressResult = await PublishJobProgress(publisher, compositeKey, 1, 1, cancellationToken).ConfigureAwait(false);
+                    publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, 1, 1, cancellationToken).ConfigureAwait(false);
                     if (publishJobProgressResult.IsError)
                         throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
 
                     Status = LibraryScanJobStatus.Completed;
                     // when this job has no linked children, it's the last job in the directed acyclic job graph, and the scan is completed
                     if (Children.Count == 0)
-                        await publisher.Publish(new LibraryScanFinishedDomainEvent(Guid.NewGuid(), compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                        await domainEventPublisher.PublishAsync(new LibraryScanFinishedDomainEvent(Guid.NewGuid(), compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
 
                     // call each linked child with the obtained payload
                     foreach (IMediaLibraryScanJob child in Children)
@@ -144,19 +144,19 @@ internal sealed class MediaLibraryScanResultsSaveJob : MediaLibraryScanJob, IMed
     /// <summary>
     /// Publishes a job progress update.
     /// </summary>
-    /// <param name="publisher">The service used to publish the progress update.</param>
+    /// <param name="domainEventPublisher">The service used to publish the progress update.</param>
     /// <param name="compositeKey">The composite unique identifier of a media library scan.</param>
     /// <param name="currentProgress">The current job progress.</param>
     /// <param name="totalProgress">The total job progress.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    private async Task<ErrorOr<Success>> PublishJobProgress(IPublisher publisher, MediaLibraryScanCompositeId compositeKey, int currentProgress, int totalProgress, CancellationToken cancellationToken)
+    private async Task<ErrorOr<Success>> PublishJobProgressAsync(IDomainEventPublisher domainEventPublisher, MediaLibraryScanCompositeId compositeKey, int currentProgress, int totalProgress, CancellationToken cancellationToken)
     {
         ErrorOr<MediaLibraryScanJobProgress> scanJobProgressResult = MediaLibraryScanJobProgress.Create(currentProgress, totalProgress, "SavingScanData");
         if (scanJobProgressResult.IsError)
             return scanJobProgressResult.Errors;
 
-        await publisher.Publish(new LibraryScanJobProgressChangedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+        await domainEventPublisher.PublishAsync(new LibraryScanJobProgressChangedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
 
         return Result.Success;
     }

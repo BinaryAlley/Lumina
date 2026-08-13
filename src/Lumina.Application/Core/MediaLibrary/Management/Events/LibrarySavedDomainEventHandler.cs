@@ -5,12 +5,12 @@ using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
 using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Events;
 using Lumina.Domain.Common.Exceptions;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.Events;
-using Mediator;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -23,9 +23,9 @@ using Lumina.Application.Common.Infrastructure.Models.DTO.Configuration;
 namespace Lumina.Application.Core.MediaLibrary.Management.Events;
 
 /// <summary>
-/// Handler for the event raised when a media library is created or updated.
+/// Handler for the domain event raised when a media library is created or updated.
 /// </summary>
-public class LibrarySavedDomainEventHandler : INotificationHandler<LibrarySavedDomainEvent>
+public class LibrarySavedDomainEventHandler : IDomainEventHandler<LibrarySavedDomainEvent>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IEnvironmentContext _environmentContext;
@@ -56,7 +56,7 @@ public class LibrarySavedDomainEventHandler : INotificationHandler<LibrarySavedD
     /// </summary>
     /// <param name="domainEvent">The domain event to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    public async ValueTask Handle(LibrarySavedDomainEvent domainEvent, CancellationToken cancellationToken)
+    public async ValueTask HandleAsync(LibrarySavedDomainEvent domainEvent, CancellationToken cancellationToken)
     {
         if (domainEvent.Library.CoverImage is not null)
         {

@@ -1,7 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Contracts.Responses.Authentication;
-using Mediator;
+using Lumina.Application.Common.CQRS;
 #endregion
 
 namespace Lumina.Application.Core.Maintenance.ApplicationSetup.Commands.SetupApplication;
@@ -18,4 +16,4 @@ public record SetupApplicationCommand(
     string? Password,
     string? PasswordConfirm,
     bool Use2fa
-) : IRequest<ErrorOr<RegistrationResponse>>;
+) : ICommand;

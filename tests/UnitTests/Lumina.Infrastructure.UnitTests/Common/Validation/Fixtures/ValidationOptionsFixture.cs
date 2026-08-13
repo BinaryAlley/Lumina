@@ -1,16 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Mediator;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Behaviors.Fixtures;
+namespace Lumina.Infrastructure.UnitTests.Common.Validation.Fixtures;
 
 /// <summary>
-/// Fixture class for the <see cref="ValidationBehavior"/> class.
+/// Contains unit tests for the <see cref="ValidationOptionsTests"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class ValidationBehaviorFixture : IRequest<ErrorOr<ValidationBehaviorTestResponse>>
+public class ValidationOptionsFixture
 {
-   
+
 }

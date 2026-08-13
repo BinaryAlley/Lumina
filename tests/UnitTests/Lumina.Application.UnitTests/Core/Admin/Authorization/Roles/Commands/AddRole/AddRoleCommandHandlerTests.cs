@@ -6,6 +6,7 @@ using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.Admin.Authorization.Roles.Commands.AddRole;
 using Lumina.Application.UnitTests.Core.Admin.Authorization.Roles.Commands.AddRole.Fixtures;
 using Lumina.Contracts.Responses.Authorization;
@@ -39,6 +40,9 @@ public class AddRoleCommandHandlerTests
     /// </summary>
     public AddRoleCommandHandlerTests()
     {
+        IValidator<AddRoleCommand> mockValidator = Substitute.For<IValidator<AddRoleCommand>>();
+        mockValidator.Validate(Arg.Any<AddRoleCommand>())
+            .Returns([]);
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
@@ -52,11 +56,12 @@ public class AddRoleCommandHandlerTests
         _sut = new AddRoleCommandHandler(
             _mockAuthorizationService,
             _mockCurrentUserService,
-            _mockUnitOfWork);
+            _mockUnitOfWork,
+            mockValidator);
     }
 
     [Fact]
-    public async Task Handle_WhenUserIsNotAdmin_ShouldReturnNotAuthorizedError()
+    public async Task HandleAsync_WhenUserIsNotAdmin_ShouldReturnNotAuthorizedError()
     {
         // Arrange
         AddRoleCommand command = _addRoleCommandFixture.CreateCommand();
@@ -64,7 +69,7 @@ public class AddRoleCommandHandlerTests
             .Returns(false);
 
         // Act
-        ErrorOr<RolePermissionsResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RolePermissionsResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -73,7 +78,7 @@ public class AddRoleCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenInsertRoleFails_ShouldReturnError()
+    public async Task HandleAsync_WhenInsertRoleFails_ShouldReturnError()
     {
         // Arrange
         AddRoleCommand command = _addRoleCommandFixture.CreateCommand();
@@ -85,7 +90,7 @@ public class AddRoleCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<RolePermissionsResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RolePermissionsResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -94,7 +99,7 @@ public class AddRoleCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenGetRoleByNameFails_ShouldReturnError()
+    public async Task HandleAsync_WhenGetRoleByNameFails_ShouldReturnError()
     {
         // Arrange
         AddRoleCommand command = _addRoleCommandFixture.CreateCommand();
@@ -108,7 +113,7 @@ public class AddRoleCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<RolePermissionsResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RolePermissionsResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -116,7 +121,7 @@ public class AddRoleCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenGetRoleByNameReturnsNull_ShouldReturnError()
+    public async Task HandleAsync_WhenGetRoleByNameReturnsNull_ShouldReturnError()
     {
         // Arrange
         AddRoleCommand command = _addRoleCommandFixture.CreateCommand();
@@ -129,7 +134,7 @@ public class AddRoleCommandHandlerTests
             .Returns((RoleEntity?)null);
 
         // Act
-        ErrorOr<RolePermissionsResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RolePermissionsResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -137,7 +142,7 @@ public class AddRoleCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenAllOperationsSucceed_ShouldReturnSuccessResponse()
+    public async Task HandleAsync_WhenAllOperationsSucceed_ShouldReturnSuccessResponse()
     {
         // Arrange
         AddRoleCommand command = _addRoleCommandFixture.CreateCommand();
@@ -146,7 +151,7 @@ public class AddRoleCommandHandlerTests
         {
             Id = roleId,
             RoleName = command.RoleName,
-            RolePermissions = command.Permissions.Select(p => new RolePermissionEntity
+            RolePermissions = [.. command.Permissions.Select(p => new RolePermissionEntity
             {
                 RoleId = roleId,
                 PermissionId = p,
@@ -156,7 +161,7 @@ public class AddRoleCommandHandlerTests
                     Id = p,
                     PermissionName = AuthorizationPermission.CanViewUsers
                 }
-            }).ToList()
+            })]
         };
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
@@ -167,7 +172,7 @@ public class AddRoleCommandHandlerTests
             .Returns(role);
 
         // Act
-        ErrorOr<RolePermissionsResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RolePermissionsResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);

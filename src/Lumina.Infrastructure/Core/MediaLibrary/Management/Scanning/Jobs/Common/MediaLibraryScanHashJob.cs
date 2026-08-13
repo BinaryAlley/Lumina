@@ -4,10 +4,10 @@ using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Security;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Lumina.Domain.Common.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
-using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -62,7 +62,7 @@ internal sealed class MediaLibraryScanHashJob : MediaLibraryScanJob, IMediaLibra
                     // see docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0001.md for details:
                     await using AsyncServiceScope asyncServiceScope = _serviceScopeFactory.CreateAsyncScope();
                     IUnitOfWork unitOfWork = asyncServiceScope.ServiceProvider.GetService<IUnitOfWork>()!;
-                    IPublisher publisher = asyncServiceScope.ServiceProvider.GetService<IPublisher>()!;
+                    IDomainEventPublisher domainEventPublisher = asyncServiceScope.ServiceProvider.GetService<IDomainEventPublisher>()!;
                     ILibraryScanStagingResultsRepository stagingResultsRepository = unitOfWork.GetRepository<ILibraryScanStagingResultsRepository>();
                     IFileHashService fileHashService = asyncServiceScope.ServiceProvider.GetService<IFileHashService>()!;
 
@@ -75,7 +75,7 @@ internal sealed class MediaLibraryScanHashJob : MediaLibraryScanJob, IMediaLibra
                     int totalFilesToHash = getFilesToHashCountResult.Value;
 
                     // set the initial progress of the scan job
-                    ErrorOr<Success> publishJobProgressResult = await PublishJobProgress(publisher, compositeKey, 0, totalFilesToHash, cancellationToken).ConfigureAwait(false);
+                    ErrorOr<Success> publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, 0, totalFilesToHash, cancellationToken).ConfigureAwait(false);
                     if (publishJobProgressResult.IsError)
                         throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
 
@@ -104,7 +104,7 @@ internal sealed class MediaLibraryScanHashJob : MediaLibraryScanJob, IMediaLibra
                             if ((now - lastUpdateTime).TotalMilliseconds >= minUpdateIntervalMs)
                             {
                                 // increment the number of processed elements progress
-                                publishJobProgressResult = await PublishJobProgress(publisher, compositeKey, Interlocked.Increment(ref processedFilesCount), totalFilesToHash, cancellationToken).ConfigureAwait(false);
+                                publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, Interlocked.Increment(ref processedFilesCount), totalFilesToHash, cancellationToken).ConfigureAwait(false);
                                 if (publishJobProgressResult.IsError)
                                     throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
                                 lastUpdateTime = now;
@@ -120,7 +120,7 @@ internal sealed class MediaLibraryScanHashJob : MediaLibraryScanJob, IMediaLibra
                     }
 
                     // this job finished, increment the number of processed jobs progress
-                    await publisher.Publish(new LibraryScanProgressChangedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                    await domainEventPublisher.PublishAsync(new LibraryScanProgressChangedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
                     Status = LibraryScanJobStatus.Completed;
 
                     // call each linked child with the obtained payload
@@ -144,19 +144,19 @@ internal sealed class MediaLibraryScanHashJob : MediaLibraryScanJob, IMediaLibra
     /// <summary>
     /// Publishes a job progress update.
     /// </summary>
-    /// <param name="publisher">The service used to publish the progress update.</param>
+    /// <param name="domainEventPublisher">The service used to publish the progress update.</param>
     /// <param name="compositeKey">The composite unique identifier of a media library scan.</param>
     /// <param name="currentProgress">The current job progress.</param>
     /// <param name="totalProgress">The total job progress.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    private async Task<ErrorOr<Success>> PublishJobProgress(IPublisher publisher, MediaLibraryScanCompositeId compositeKey, int currentProgress, int totalProgress, CancellationToken cancellationToken)
+    private async Task<ErrorOr<Success>> PublishJobProgressAsync(IDomainEventPublisher domainEventPublisher, MediaLibraryScanCompositeId compositeKey, int currentProgress, int totalProgress, CancellationToken cancellationToken)
     {
         ErrorOr<MediaLibraryScanJobProgress> scanJobProgressResult = MediaLibraryScanJobProgress.Create(currentProgress, totalProgress, "HashingFileContents");
         if (scanJobProgressResult.IsError)
             return scanJobProgressResult.Errors;
 
-        await publisher.Publish(new LibraryScanJobProgressChangedDomainEvent(
+        await domainEventPublisher.PublishAsync(new LibraryScanJobProgressChangedDomainEvent(
             Guid.NewGuid(), LibraryId, compositeKey, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
 
         return Result.Success;

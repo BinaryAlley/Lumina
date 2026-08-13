@@ -7,6 +7,7 @@ using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Security;
 using Lumina.Application.Common.Infrastructure.Time;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.UsersManagement.Authentication.Queries.LoginUser;
 using Lumina.Application.UnitTests.Common.Mapping.UserManagement.Users.Fixtures;
 using Lumina.Contracts.Responses.Authentication;
@@ -50,17 +51,21 @@ public class LoginUserQueryHandlerTests
         _mockUnitOfWork.GetRepository<IUserRepository>().Returns(_mockUserRepository);
         _mockDateTimeProvider.UtcNow.Returns(DateTime.UtcNow);
 
+        IValidator<LoginUserQuery> mockValidator = Substitute.For<IValidator<LoginUserQuery>>();
+        mockValidator.Validate(Arg.Any<LoginUserQuery>())
+            .Returns([]);
         _sut = new LoginUserQueryHandler(
             _mockUnitOfWork,
             _mockHashService,
             _mockJwtTokenGenerator,
             _mockTotpTokenGenerator,
             _mockCryptographyService,
-            _mockDateTimeProvider);
+            _mockDateTimeProvider,
+            mockValidator);
     }
 
     [Fact]
-    public async Task Handle_WhenValidCredentialsWithoutTOTP_ShouldReturnLoginResponse()
+    public async Task HandleAsync_WhenValidCredentialsWithoutTOTP_ShouldReturnLoginResponse()
     {
         // Arrange
         string password = "password123";
@@ -81,7 +86,7 @@ public class LoginUserQueryHandlerTests
             .Returns(jwtToken);
 
         // Act
-        ErrorOr<LoginResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -92,7 +97,7 @@ public class LoginUserQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenValidCredentialsWithTOTP_ShouldReturnLoginResponse()
+    public async Task HandleAsync_WhenValidCredentialsWithTOTP_ShouldReturnLoginResponse()
     {
         // Arrange
         string password = "password123";
@@ -120,7 +125,7 @@ public class LoginUserQueryHandlerTests
             .Returns(true);
 
         // Act
-        ErrorOr<LoginResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -131,7 +136,7 @@ public class LoginUserQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserDoesNotExist_ShouldReturnError()
+    public async Task HandleAsync_WhenUserDoesNotExist_ShouldReturnError()
     {
         // Arrange
         LoginUserQuery query = new("nonexistentUser", "password");
@@ -140,7 +145,7 @@ public class LoginUserQueryHandlerTests
             .Returns(ErrorOrFactory.From<UserEntity?>(null));
 
         // Act
-        ErrorOr<LoginResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -148,7 +153,7 @@ public class LoginUserQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenPasswordIsIncorrect_ShouldReturnError()
+    public async Task HandleAsync_WhenPasswordIsIncorrect_ShouldReturnError()
     {
         // Arrange
         string password = "wrongPassword";
@@ -166,7 +171,7 @@ public class LoginUserQueryHandlerTests
             .Returns(false);
 
         // Act
-        ErrorOr<LoginResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -174,7 +179,7 @@ public class LoginUserQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenTempPasswordIsExpired_ShouldReturnError()
+    public async Task HandleAsync_WhenTempPasswordIsExpired_ShouldReturnError()
     {
         // Arrange
         string password = "tempPassword";
@@ -196,7 +201,7 @@ public class LoginUserQueryHandlerTests
             .Returns(true);
 
         // Act
-        ErrorOr<LoginResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -209,7 +214,7 @@ public class LoginUserQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenValidTempPassword_ShouldReturnLoginResponse()
+    public async Task HandleAsync_WhenValidTempPassword_ShouldReturnLoginResponse()
     {
         // Arrange
         string password = "tempPassword";
@@ -236,7 +241,7 @@ public class LoginUserQueryHandlerTests
             .Returns(jwtToken);
 
         // Act
-        ErrorOr<LoginResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -247,7 +252,7 @@ public class LoginUserQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserHasTOTPButNoCodeProvided_ShouldReturnError()
+    public async Task HandleAsync_WhenUserHasTOTPButNoCodeProvided_ShouldReturnError()
     {
         // Arrange
         string password = "password123";
@@ -266,7 +271,7 @@ public class LoginUserQueryHandlerTests
             .Returns(true);
 
         // Act
-        ErrorOr<LoginResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -274,7 +279,7 @@ public class LoginUserQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenTOTPCodeIsInvalid_ShouldReturnError()
+    public async Task HandleAsync_WhenTOTPCodeIsInvalid_ShouldReturnError()
     {
         // Arrange
         string password = "password123";
@@ -299,7 +304,7 @@ public class LoginUserQueryHandlerTests
             .Returns(false);
 
         // Act
-        ErrorOr<LoginResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -307,7 +312,7 @@ public class LoginUserQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenGetByUsernameReturnsError_ShouldReturnError()
+    public async Task HandleAsync_WhenGetByUsernameReturnsError_ShouldReturnError()
     {
         // Arrange
         LoginUserQuery query = new("username", "password");
@@ -317,7 +322,7 @@ public class LoginUserQueryHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<LoginResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -325,7 +330,7 @@ public class LoginUserQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenBothRegularAndTempPasswordsAreIncorrect_ShouldReturnError()
+    public async Task HandleAsync_WhenBothRegularAndTempPasswordsAreIncorrect_ShouldReturnError()
     {
         // Arrange
         string password = "wrongPassword";
@@ -347,7 +352,7 @@ public class LoginUserQueryHandlerTests
             .Returns(false); // Temp password check also fails
 
         // Act
-        ErrorOr<LoginResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);

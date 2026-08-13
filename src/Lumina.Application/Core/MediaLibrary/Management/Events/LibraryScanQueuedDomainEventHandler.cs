@@ -12,7 +12,6 @@ using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.Library
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
-using Mediator;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -20,9 +19,9 @@ using System.Threading.Tasks;
 namespace Lumina.Application.Core.MediaLibrary.Management.Events;
 
 /// <summary>
-/// Handler for the event raised when a media library scan is queued.
+/// Handler for the domain event raised when a media library scan is queued.
 /// </summary>
-public class LibraryScanQueuedDomainEventHandler : INotificationHandler<LibraryScanQueuedDomainEvent>
+public class LibraryScanQueuedDomainEventHandler : IDomainEventHandler<LibraryScanQueuedDomainEvent>
 {
     private readonly IMediaLibraryScanningService _mediaLibraryScanningService;
     private readonly IDomainEventsQueue _domainEventsQueue;
@@ -47,7 +46,7 @@ public class LibraryScanQueuedDomainEventHandler : INotificationHandler<LibraryS
     /// </summary>
     /// <param name="domainEvent">The domain event to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    public async ValueTask Handle(LibraryScanQueuedDomainEvent domainEvent, CancellationToken cancellationToken)
+    public async ValueTask HandleAsync(LibraryScanQueuedDomainEvent domainEvent, CancellationToken cancellationToken)
     {
         ILibraryScanRepository libraryScanRepository = _unitOfWork.GetRepository<ILibraryScanRepository>();
         

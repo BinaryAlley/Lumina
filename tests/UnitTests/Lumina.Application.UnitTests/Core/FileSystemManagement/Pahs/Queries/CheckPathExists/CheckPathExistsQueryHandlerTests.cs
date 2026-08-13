@@ -4,6 +4,7 @@ using Lumina.Application.Core.FileSystemManagement.Paths.Queries.CheckPathExists
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Pahs.Queries.CheckPathExists.Fixtures;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Lumina.Application.Common.Infrastructure.Validation;
 using NSubstitute;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
@@ -27,18 +28,21 @@ public class CheckPathExistsQueryHandlerTests
     public CheckPathExistsQueryHandlerTests()
     {
         _mockPathService = Substitute.For<IPathService>();
-        _sut = new CheckPathExistsQueryHandler(_mockPathService);
+        IValidator<CheckPathExistsQuery> mockValidator = Substitute.For<IValidator<CheckPathExistsQuery>>();
+        mockValidator.Validate(Arg.Any<CheckPathExistsQuery>())
+            .Returns([]);
+        _sut = new CheckPathExistsQueryHandler(_mockPathService, mockValidator);
     }
 
     [Fact]
-    public async Task Handle_WhenPathExistsAndIsNotHidden_ShouldReturnTrueResponse()
+    public async Task HandleAsync_WhenPathExistsAndIsNotHidden_ShouldReturnTrueResponse()
     {
         // Arrange
         CheckPathExistsQuery query = CheckPathExistsQueryFixture.CreateCheckPathExistsQuery();
         _mockPathService.Exists(query.Path!).Returns(true);
 
         // Act
-        ErrorOr<PathExistsResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<PathExistsResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -47,14 +51,14 @@ public class CheckPathExistsQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenPathExistsAndIsHiddenAndIncludeHiddenElementsIsTrue_ShouldReturnTrueResponse()
+    public async Task HandleAsync_WhenPathExistsAndIsHiddenAndIncludeHiddenElementsIsTrue_ShouldReturnTrueResponse()
     {
         // Arrange
         CheckPathExistsQuery query = CheckPathExistsQueryFixture.CreateCheckPathExistsQuery(true);
         _mockPathService.Exists(query.Path!).Returns(true);
 
         // Act
-        ErrorOr<PathExistsResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<PathExistsResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -63,14 +67,14 @@ public class CheckPathExistsQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenPathExistsAndIsHiddenAndIncludeHiddenElementsIsFalse_ShouldReturnFalseResponse()
+    public async Task HandleAsync_WhenPathExistsAndIsHiddenAndIncludeHiddenElementsIsFalse_ShouldReturnFalseResponse()
     {
         // Arrange
         CheckPathExistsQuery query = CheckPathExistsQueryFixture.CreateCheckPathExistsQuery(false);
         _mockPathService.Exists(query.Path!, false).Returns(false);
 
         // Act
-        ErrorOr<PathExistsResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<PathExistsResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -79,14 +83,14 @@ public class CheckPathExistsQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenPathDoesNotExist_ShouldReturnFalseResponse()
+    public async Task HandleAsync_WhenPathDoesNotExist_ShouldReturnFalseResponse()
     {
         // Arrange
         CheckPathExistsQuery query = CheckPathExistsQueryFixture.CreateCheckPathExistsQuery();
         _mockPathService.Exists(query.Path!).Returns(false);
 
         // Act
-        ErrorOr<PathExistsResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<PathExistsResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -95,14 +99,14 @@ public class CheckPathExistsQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCalledWithNullPath_ShouldStillCallPathService()
+    public async Task HandleAsync_WhenCalledWithNullPath_ShouldStillCallPathService()
     {
         // Arrange
         CheckPathExistsQuery query = new(null!, false);
         _mockPathService.Exists(Arg.Any<string>(), Arg.Any<bool>()).Returns(false);
 
         // Act
-        ErrorOr<PathExistsResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<PathExistsResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -111,7 +115,7 @@ public class CheckPathExistsQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCancellationRequested_ShouldStillCompleteOperation()
+    public async Task HandleAsync_WhenCancellationRequested_ShouldStillCompleteOperation()
     {
         // Arrange
         CheckPathExistsQuery query = CheckPathExistsQueryFixture.CreateCheckPathExistsQuery();
@@ -119,7 +123,7 @@ public class CheckPathExistsQueryHandlerTests
         CancellationToken cancellationToken = new(true);
 
         // Act
-        ErrorOr<PathExistsResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<PathExistsResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);

@@ -36,7 +36,7 @@ public class GetPluginsQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCalled_ShouldReturnAllDetectedPlugins()
+    public async Task HandleAsync_WhenCalled_ShouldReturnAllDetectedPlugins()
     {
         // Arrange
         PluginEntityFixture pluginFixture = new();
@@ -44,7 +44,7 @@ public class GetPluginsQueryHandlerTests
         _mockPluginRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(plugins);
 
         // Act
-        ErrorOr<IReadOnlyList<PluginResponse>> result = await _sut.Handle(new GetPluginsQuery(), CancellationToken.None);
+        ErrorOr<IReadOnlyList<PluginResponse>> result = await _sut.HandleAsync(new GetPluginsQuery(), CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -54,14 +54,14 @@ public class GetPluginsQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenRepositoryReturnsError_ShouldReturnError()
+    public async Task HandleAsync_WhenRepositoryReturnsError_ShouldReturnError()
     {
         // Arrange
         _mockPluginRepository.GetAllAsync(Arg.Any<CancellationToken>())
             .Returns(Error.Failure(description: "Failed to get plugins"));
 
         // Act
-        ErrorOr<IReadOnlyList<PluginResponse>> result = await _sut.Handle(new GetPluginsQuery(), CancellationToken.None);
+        ErrorOr<IReadOnlyList<PluginResponse>> result = await _sut.HandleAsync(new GetPluginsQuery(), CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);

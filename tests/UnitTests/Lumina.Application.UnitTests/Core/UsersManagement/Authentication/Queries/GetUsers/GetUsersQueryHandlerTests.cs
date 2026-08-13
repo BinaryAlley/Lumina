@@ -57,7 +57,7 @@ public class GetUsersQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserIsNotAdmin_ShouldReturnNotAuthorizedError()
+    public async Task HandleAsync_WhenUserIsNotAdmin_ShouldReturnNotAuthorizedError()
     {
         // Arrange
         GetUsersQuery query = _getUsersQueryFixture.CreateQuery();
@@ -65,7 +65,7 @@ public class GetUsersQueryHandlerTests
             .Returns(false);
 
         // Act
-        ErrorOr<IEnumerable<UserResponse>> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<IEnumerable<UserResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -74,7 +74,7 @@ public class GetUsersQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenGetUsersFails_ShouldReturnError()
+    public async Task HandleAsync_WhenGetUsersFails_ShouldReturnError()
     {
         // Arrange
         GetUsersQuery query = _getUsersQueryFixture.CreateQuery();
@@ -86,7 +86,7 @@ public class GetUsersQueryHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<IEnumerable<UserResponse>> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<IEnumerable<UserResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -94,7 +94,7 @@ public class GetUsersQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenAllOperationsSucceed_ShouldReturnUsers()
+    public async Task HandleAsync_WhenAllOperationsSucceed_ShouldReturnUsers()
     {
         // Arrange
         GetUsersQuery query = _getUsersQueryFixture.CreateQuery();
@@ -107,7 +107,7 @@ public class GetUsersQueryHandlerTests
             .Returns(ErrorOrFactory.From(users));
 
         // Act
-        ErrorOr<IEnumerable<UserResponse>> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<IEnumerable<UserResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);

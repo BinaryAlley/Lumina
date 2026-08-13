@@ -6,6 +6,7 @@ using Lumina.Application.Core.FileSystemManagement.Paths.Commands.CombinePath;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Pahs.Commands.CombinePath.Fixtures;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Lumina.Application.Common.Infrastructure.Validation;
 using NSubstitute;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
@@ -31,11 +32,14 @@ public class CombinePathCommandHandlerTests
     {
         _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
         _mockPathService = Substitute.For<IPathService>();
-        _sut = new CombinePathCommandHandler(_mockPathService);
+        IValidator<CombinePathCommand> mockValidator = Substitute.For<IValidator<CombinePathCommand>>();
+        mockValidator.Validate(Arg.Any<CombinePathCommand>())
+            .Returns([]);
+        _sut = new CombinePathCommandHandler(_mockPathService, mockValidator);
     }
 
     [Fact]
-    public async Task Handle_WhenCalledWithValidCommand_ShouldReturnSuccessResult()
+    public async Task HandleAsync_WhenCalledWithValidCommand_ShouldReturnSuccessResult()
     {
         // Arrange
         CombinePathCommand combinePathCommand = CombinePathCommandFixture.CreateCombinePathCommand();
@@ -45,7 +49,7 @@ public class CombinePathCommandHandlerTests
             .Returns(ErrorOrFactory.From(combinedPath));
 
         // Act
-        ErrorOr<PathSegmentResponse> result = await _sut.Handle(combinePathCommand, CancellationToken.None);
+        ErrorOr<PathSegmentResponse> result = await _sut.HandleAsync(combinePathCommand, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -55,7 +59,7 @@ public class CombinePathCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenPathServiceReturnsError_ShouldReturnFailureResult()
+    public async Task HandleAsync_WhenPathServiceReturnsError_ShouldReturnFailureResult()
     {
         // Arrange
         CombinePathCommand command = _fixture.Create<CombinePathCommand>();
@@ -64,7 +68,7 @@ public class CombinePathCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<PathSegmentResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<PathSegmentResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -73,7 +77,7 @@ public class CombinePathCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenPathServiceReturnsEmptyString_ShouldReturnSuccessResultWithEmptyPath()
+    public async Task HandleAsync_WhenPathServiceReturnsEmptyString_ShouldReturnSuccessResultWithEmptyPath()
     {
         // Arrange
         CombinePathCommand command = _fixture.Create<CombinePathCommand>();
@@ -81,7 +85,7 @@ public class CombinePathCommandHandlerTests
             .Returns(ErrorOrFactory.From(string.Empty));
 
         // Act
-        ErrorOr<PathSegmentResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<PathSegmentResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);

@@ -1,7 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Contracts.Responses.Authorization;
-using Mediator;
+using Lumina.Application.Common.CQRS;
 using System;
 using System.Diagnostics;
 #endregion
@@ -15,4 +13,4 @@ namespace Lumina.Application.Core.Admin.Authorization.Roles.Queries.GetRolePermi
 [DebuggerDisplay("RoleId: {RoleId}")]
 public record GetRolePermissionsQuery(
     Guid RoleId
-) : IRequest<ErrorOr<RolePermissionsResponse>>;
+) : IQuery;

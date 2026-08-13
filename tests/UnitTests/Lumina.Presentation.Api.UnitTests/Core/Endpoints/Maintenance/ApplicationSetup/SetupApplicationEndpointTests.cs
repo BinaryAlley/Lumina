@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.Maintenance.ApplicationSetup.Commands.SetupApplication;
 using Lumina.Application.Core.Maintenance.ApplicationSetup.Queries.CheckInitialization;
 using Lumina.Contracts.Requests.Authentication;
@@ -8,7 +8,6 @@ using Lumina.Contracts.Responses.Authentication;
 using Lumina.Contracts.Responses.UsersManagement;
 using Lumina.Presentation.Api.Core.Endpoints.Maintenance.ApplicationSetup;
 using Lumina.Presentation.Api.UnitTests.Core.Endpoints.Maintenance.ApplicationSetup.Fixtures;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -26,7 +25,7 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Maintenance.Applicati
 [ExcludeFromCodeCoverage]
 public class SetupApplicationEndpointTests
 {
-    private readonly ISender _mockSender;
+    private readonly ICommandHandler<SetupApplicationCommand, ErrorOr<RegistrationResponse>> _mockHandler;
     private readonly SetupApplicationEndpoint _sut;
     private readonly RegistrationRequestFixture _registrationRequestFixture;
 
@@ -35,8 +34,8 @@ public class SetupApplicationEndpointTests
     /// </summary>
     public SetupApplicationEndpointTests()
     {
-        _mockSender = Substitute.For<ISender>();
-        _sut = Factory.Create<SetupApplicationEndpoint>(_mockSender);
+        _mockHandler = Substitute.For<ICommandHandler<SetupApplicationCommand, ErrorOr<RegistrationResponse>>>();
+        _sut = FastEndpoints.Factory.Create<SetupApplicationEndpoint>(_mockHandler);
         _registrationRequestFixture = new RegistrationRequestFixture();
     }
 
@@ -47,7 +46,7 @@ public class SetupApplicationEndpointTests
         RegistrationRequest request = _registrationRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
         RegistrationResponse expectedResponse = new(Guid.NewGuid(), "testUser", "TOTP123");
-        _mockSender.Send(Arg.Any<SetupApplicationCommand>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<SetupApplicationCommand>(), Arg.Any<CancellationToken>())
             .Returns(ErrorOrFactory.From(expectedResponse));
 
         // Act
@@ -60,13 +59,13 @@ public class SetupApplicationEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenMediatorReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
     {
         // Arrange
         RegistrationRequest request = _registrationRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
         Error expectedError = Error.Conflict("Registration.Failed", "The application is already initialized.");
-        _mockSender.Send(Arg.Any<SetupApplicationCommand>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<SetupApplicationCommand>(), Arg.Any<CancellationToken>())
             .Returns(expectedError);
 
         // Act
@@ -91,14 +90,14 @@ public class SetupApplicationEndpointTests
         // Arrange
         RegistrationRequest request = _registrationRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
-        _mockSender.Send(Arg.Any<SetupApplicationCommand>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<SetupApplicationCommand>(), Arg.Any<CancellationToken>())
             .Returns(ErrorOrFactory.From(new RegistrationResponse(Guid.NewGuid(), "testUser", "TOTP123")));
 
         // Act
         await _sut.ExecuteAsync(request, cancellationToken);
 
         // Assert
-        await _mockSender.Received(1).Send(
+        await _mockHandler.Received(1).HandleAsync(
             Arg.Is<SetupApplicationCommand>(cmd =>
                 cmd.Username == request.Username &&
                 cmd.Password == request.Password &&
@@ -116,14 +115,14 @@ public class SetupApplicationEndpointTests
         TaskCompletionSource<bool> operationStarted = new();
         TaskCompletionSource<bool> cancellationRequested = new();
 
-        _mockSender.Send(Arg.Any<SetupApplicationCommand>(), Arg.Any<CancellationToken>())
-            .Returns(callInfo => new ValueTask<ErrorOr<RegistrationResponse>>(Task.Run(async () =>
+        _mockHandler.HandleAsync(Arg.Any<SetupApplicationCommand>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo => Task.Run(async () =>
             {
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
                 return ErrorOrFactory.From(new RegistrationResponse(Guid.NewGuid(), "testUser", "TOTP123"));
-            }, callInfo.Arg<CancellationToken>())));
+            }, callInfo.Arg<CancellationToken>()));
 
         // Act
         Task<IResult> operationTask = _sut.ExecuteAsync(request, cts.Token);

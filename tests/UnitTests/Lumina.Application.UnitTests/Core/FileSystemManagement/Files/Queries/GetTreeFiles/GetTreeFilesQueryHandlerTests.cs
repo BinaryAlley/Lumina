@@ -9,6 +9,7 @@ using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Lumina.Application.Common.Infrastructure.Validation;
 using NSubstitute;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -37,12 +38,15 @@ public class GetTreeFilesQueryHandlerTests
     {
         _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
         _mockFileService = Substitute.For<IFileService>();
-        _sut = new GetTreeFilesQueryHandler(_mockFileService);
+        IValidator<GetTreeFilesQuery> mockValidator = Substitute.For<IValidator<GetTreeFilesQuery>>();
+        mockValidator.Validate(Arg.Any<GetTreeFilesQuery>())
+            .Returns([]);
+        _sut = new GetTreeFilesQueryHandler(_mockFileService, mockValidator);
         _fileFixture = new FileFixture();
     }
 
     [Fact]
-    public async Task Handle_WhenCalledWithValidQueryWithoutHiddenFiles_ShouldReturnSuccessResult()
+    public async Task HandleAsync_WhenCalledWithValidQueryWithoutHiddenFiles_ShouldReturnSuccessResult()
     {
         // Arrange
         GetTreeFilesQuery getFilesQuery = GetTreeFilesQueryFixture.CreateGetFilesQuery(false);
@@ -53,7 +57,7 @@ public class GetTreeFilesQueryHandlerTests
             .Returns(ErrorOrFactory.From(files));
 
         // Act
-        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.Handle(getFilesQuery, CancellationToken.None);
+        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.HandleAsync(getFilesQuery, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -77,7 +81,7 @@ public class GetTreeFilesQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCalledWithValidQueryWithHiddenFiles_ShouldReturnSuccessResult()
+    public async Task HandleAsync_WhenCalledWithValidQueryWithHiddenFiles_ShouldReturnSuccessResult()
     {
         // Arrange
         GetTreeFilesQuery getFilesQuery = GetTreeFilesQueryFixture.CreateGetFilesQuery(true);
@@ -88,7 +92,7 @@ public class GetTreeFilesQueryHandlerTests
             .Returns(ErrorOrFactory.From(files));
 
         // Act
-        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.Handle(getFilesQuery, CancellationToken.None);
+        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.HandleAsync(getFilesQuery, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -112,7 +116,7 @@ public class GetTreeFilesQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenFileServiceReturnsError_ShouldReturnFailureResult()
+    public async Task HandleAsync_WhenFileServiceReturnsError_ShouldReturnFailureResult()
     {
         // Arrange
         GetTreeFilesQuery query = _fixture.Create<GetTreeFilesQuery>();
@@ -121,7 +125,7 @@ public class GetTreeFilesQueryHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -130,7 +134,7 @@ public class GetTreeFilesQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenFileServiceReturnsEmptyList_ShouldReturnEmptySuccessResult()
+    public async Task HandleAsync_WhenFileServiceReturnsEmptyList_ShouldReturnEmptySuccessResult()
     {
         // Arrange
         GetTreeFilesQuery query = _fixture.Create<GetTreeFilesQuery>();
@@ -139,7 +143,7 @@ public class GetTreeFilesQueryHandlerTests
             .Returns(emptyList);
 
         // Act
-        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);

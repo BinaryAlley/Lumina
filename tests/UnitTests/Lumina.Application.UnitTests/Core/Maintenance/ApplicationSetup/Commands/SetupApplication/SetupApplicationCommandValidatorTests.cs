@@ -1,8 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation.TestHelper;
+using ErrorOr;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Core.Maintenance.ApplicationSetup.Commands.SetupApplication;
+using Lumina.Application.UnitTests.Common.Setup;
 using Lumina.Application.UnitTests.Core.Maintenance.ApplicationSetup.Commands.SetupApplication.Fixtures;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -34,11 +36,10 @@ public class SetupApplicationCommandValidatorTests
         command = command with { Username = null };
 
         // Act
-        TestValidationResult<SetupApplicationCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Username)
-            .WithErrorMessage(Errors.Authentication.UsernameCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.UsernameCannotBeEmpty);
     }
 
     [Fact]
@@ -49,11 +50,10 @@ public class SetupApplicationCommandValidatorTests
         command = command with { Username = string.Empty };
 
         // Act
-        TestValidationResult<SetupApplicationCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Username)
-            .WithErrorMessage(Errors.Authentication.UsernameCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.UsernameCannotBeEmpty);
     }
 
     [Fact]
@@ -64,11 +64,10 @@ public class SetupApplicationCommandValidatorTests
         command = command with { Username = "   " };
 
         // Act
-        TestValidationResult<SetupApplicationCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Username)
-            .WithErrorMessage(Errors.Authentication.UsernameCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.UsernameCannotBeEmpty);
     }
 
     [Fact]
@@ -79,11 +78,10 @@ public class SetupApplicationCommandValidatorTests
         command = command with { Password = null! };
 
         // Act
-        TestValidationResult<SetupApplicationCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Password)
-            .WithErrorMessage(Errors.Authentication.PasswordCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.PasswordCannotBeEmpty);
     }
 
     [Fact]
@@ -94,11 +92,10 @@ public class SetupApplicationCommandValidatorTests
         command = command with { Password = string.Empty };
 
         // Act
-        TestValidationResult<SetupApplicationCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Password)
-            .WithErrorMessage(Errors.Authentication.PasswordCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.PasswordCannotBeEmpty);
     }
 
     [Fact]
@@ -109,11 +106,10 @@ public class SetupApplicationCommandValidatorTests
         command = command with { Password = "   " };
 
         // Act
-        TestValidationResult<SetupApplicationCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Password)
-            .WithErrorMessage(Errors.Authentication.PasswordCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.PasswordCannotBeEmpty);
     }
 
     [Fact]
@@ -124,11 +120,10 @@ public class SetupApplicationCommandValidatorTests
         command = command with { PasswordConfirm = null! };
 
         // Act
-        TestValidationResult<SetupApplicationCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.PasswordConfirm)
-            .WithErrorMessage(Errors.Authentication.PasswordConfirmCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.PasswordConfirmCannotBeEmpty);
     }
 
     [Fact]
@@ -139,11 +134,10 @@ public class SetupApplicationCommandValidatorTests
         command = command with { PasswordConfirm = string.Empty };
 
         // Act
-        TestValidationResult<SetupApplicationCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.PasswordConfirm)
-            .WithErrorMessage(Errors.Authentication.PasswordConfirmCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.PasswordConfirmCannotBeEmpty);
     }
 
     [Fact]
@@ -154,11 +148,10 @@ public class SetupApplicationCommandValidatorTests
         command = command with { PasswordConfirm = "   " };
 
         // Act
-        TestValidationResult<SetupApplicationCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.PasswordConfirm)
-            .WithErrorMessage(Errors.Authentication.PasswordConfirmCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.PasswordConfirmCannotBeEmpty);
     }
 
     [Fact]
@@ -169,11 +162,10 @@ public class SetupApplicationCommandValidatorTests
         command = command with { PasswordConfirm = "$321Bcda" };
 
         // Act
-        TestValidationResult<SetupApplicationCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Password)
-            .WithErrorMessage(Errors.Authentication.PasswordsNotMatch.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.PasswordsNotMatch);
     }
 
     [Theory]
@@ -190,11 +182,10 @@ public class SetupApplicationCommandValidatorTests
         command = command with { Password = password, PasswordConfirm = password };
 
         // Act
-        TestValidationResult<SetupApplicationCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Password)
-            .WithErrorMessage(Errors.Authentication.InvalidPassword.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.InvalidPassword);
     }
 
     [Theory]
@@ -209,10 +200,10 @@ public class SetupApplicationCommandValidatorTests
         command = command with { Password = password, PasswordConfirm = password };
 
         // Act
-        TestValidationResult<SetupApplicationCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Password);
+        result.ShouldNotHaveValidationError(Errors.Authentication.InvalidPassword);
     }
 
     [Fact]
@@ -223,11 +214,11 @@ public class SetupApplicationCommandValidatorTests
         command = command with { Password = "$321Bcda", PasswordConfirm = "$321Bcda" };
 
         // Act
-        TestValidationResult<SetupApplicationCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Username);
-        result.ShouldNotHaveValidationErrorFor(x => x.Password);
-        result.ShouldNotHaveValidationErrorFor(x => x.PasswordConfirm);
+        result.ShouldNotHaveValidationError(Errors.Authentication.UsernameCannotBeEmpty);
+        result.ShouldNotHaveValidationError(Errors.Authentication.InvalidPassword);
+        result.ShouldNotHaveValidationError(Errors.Authentication.PasswordConfirmCannotBeEmpty);
     }
 }

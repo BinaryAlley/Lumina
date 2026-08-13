@@ -3,12 +3,12 @@ using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using ErrorOr;
 using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.FileSystemManagement.Files.Queries.GetTreeFiles;
 using Lumina.Contracts.Requests.FileSystemManagement.Files;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
 using Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Files.GetTreeFiles;
 using Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.Fixtures;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -29,7 +29,7 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.
 public class GetTreeFilesEndpointTests
 {
     private readonly IFixture _fixture;
-    private readonly ISender _mockSender;
+    private readonly IQueryHandler<GetTreeFilesQuery, ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>> _mockHandler;
     private readonly GetTreeFilesEndpoint _sut;
     private readonly FileSystemTreeNodeResponseFixture _fileSystemTreeNodeResponseFixture;
 
@@ -39,9 +39,9 @@ public class GetTreeFilesEndpointTests
     public GetTreeFilesEndpointTests()
     {
         _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
-        _mockSender = Substitute.For<ISender>();
+        _mockHandler = Substitute.For<IQueryHandler<GetTreeFilesQuery, ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>>>();
         _fileSystemTreeNodeResponseFixture = new FileSystemTreeNodeResponseFixture();
-        _sut = Factory.Create<GetTreeFilesEndpoint>(_mockSender);
+        _sut = Factory.Create<GetTreeFilesEndpoint>(_mockHandler);
     }
 
     [Fact]
@@ -51,7 +51,7 @@ public class GetTreeFilesEndpointTests
         GetTreeFilesRequest request = _fixture.Create<GetTreeFilesRequest>();
         CancellationToken cancellationToken = CancellationToken.None;
         List<FileSystemTreeNodeResponse> expectedResponses = _fileSystemTreeNodeResponseFixture.CreateMany(3, 3, 5);
-        _mockSender.Send(Arg.Any<GetTreeFilesQuery>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<GetTreeFilesQuery>(), Arg.Any<CancellationToken>())
             .Returns(ErrorOrFactory.From(expectedResponses.AsEnumerable()));
 
         // Act
@@ -63,13 +63,13 @@ public class GetTreeFilesEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenMediatorReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
     {
         // Arrange
         GetTreeFilesRequest request = _fixture.Create<GetTreeFilesRequest>();
         CancellationToken cancellationToken = CancellationToken.None;
         Error expectedError = Error.NotFound("File.NotFound", "The requested file was not found.");
-        _mockSender.Send(Arg.Any<GetTreeFilesQuery>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<GetTreeFilesQuery>(), Arg.Any<CancellationToken>())
             .Returns(expectedError);
 
         // Act
@@ -89,13 +89,13 @@ public class GetTreeFilesEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenMediatorReturnsValidationError_ShouldReturnValidationProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsValidationError_ShouldReturnValidationProblemResult()
     {
         // Arrange
         GetTreeFilesRequest request = _fixture.Create<GetTreeFilesRequest>();
         CancellationToken cancellationToken = CancellationToken.None;
         Error expectedError = Error.Validation("Path.Invalid", "The provided path is invalid.");
-        _mockSender.Send(Arg.Any<GetTreeFilesQuery>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<GetTreeFilesQuery>(), Arg.Any<CancellationToken>())
            .Returns(expectedError);
 
         // Act
@@ -120,14 +120,14 @@ public class GetTreeFilesEndpointTests
         // Arrange
         GetTreeFilesRequest request = _fixture.Create<GetTreeFilesRequest>();
         CancellationToken cancellationToken = CancellationToken.None;
-        _mockSender.Send(Arg.Any<GetTreeFilesQuery>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<GetTreeFilesQuery>(), Arg.Any<CancellationToken>())
             .Returns(ErrorOrFactory.From(Enumerable.Empty<FileSystemTreeNodeResponse>()));
 
         // Act
         await _sut.ExecuteAsync(request, cancellationToken);
 
         // Assert
-        await _mockSender.Received(1).Send(Arg.Is<GetTreeFilesQuery>(q =>
+        await _mockHandler.Received(1).HandleAsync(Arg.Is<GetTreeFilesQuery>(q =>
             q.Path == request.Path &&
             q.IncludeHiddenElements == request.IncludeHiddenElements),
             Arg.Is(cancellationToken));
@@ -142,14 +142,14 @@ public class GetTreeFilesEndpointTests
         TaskCompletionSource<bool> operationStarted = new();
         TaskCompletionSource<bool> cancellationRequested = new();
 
-        _mockSender.Send(Arg.Any<GetTreeFilesQuery>(), Arg.Any<CancellationToken>())
-            .Returns(callInfo => new ValueTask<ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>>(Task.Run(async () =>
+        _mockHandler.HandleAsync(Arg.Any<GetTreeFilesQuery>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo => Task.Run(async () =>
             {
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
                 return ErrorOrFactory.From(_fileSystemTreeNodeResponseFixture.CreateMany(3, 3, 5).AsEnumerable());
-            }, callInfo.Arg<CancellationToken>())));
+            }, callInfo.Arg<CancellationToken>()));
 
         // Act
         Task<IResult> operationTask = _sut.ExecuteAsync(request, cts.Token);

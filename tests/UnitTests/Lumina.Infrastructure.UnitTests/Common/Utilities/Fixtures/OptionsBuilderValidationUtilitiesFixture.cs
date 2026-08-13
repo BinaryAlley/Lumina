@@ -5,10 +5,10 @@ using System.Diagnostics.CodeAnalysis;
 namespace Lumina.Infrastructure.UnitTests.Common.Utilities.Fixtures;
 
 /// <summary>
-/// Contains unit tests for the <see cref="OptionsBuilderFluentValidationUtilitiesTests"/> class.
+/// Contains unit tests for the <see cref="OptionsBuilderValidationUtilitiesTests"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class OptionsBuilderFluentValidationUtilitiesFixture
+public class OptionsBuilderValidationUtilitiesFixture
 {
 
 }

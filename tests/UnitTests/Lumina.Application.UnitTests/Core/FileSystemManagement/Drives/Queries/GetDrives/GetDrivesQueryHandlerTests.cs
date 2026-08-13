@@ -39,7 +39,7 @@ public class GetDrivesQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCalled_ShouldReturnSuccessResult()
+    public async Task HandleAsync_WhenCalled_ShouldReturnSuccessResult()
     {
         // Arrange
         GetDrivesQuery getDrivesQuery = _fixture.Create<GetDrivesQuery>();
@@ -54,7 +54,7 @@ public class GetDrivesQueryHandlerTests
             .Returns(ErrorOrFactory.From(drives));
 
         // Act
-        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.Handle(getDrivesQuery, CancellationToken.None);
+        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.HandleAsync(getDrivesQuery, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -81,7 +81,7 @@ public class GetDrivesQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenDriveServiceReturnsError_ShouldReturnFailureResult()
+    public async Task HandleAsync_WhenDriveServiceReturnsError_ShouldReturnFailureResult()
     {
         // Arrange
         GetDrivesQuery query = _fixture.Create<GetDrivesQuery>();
@@ -90,7 +90,7 @@ public class GetDrivesQueryHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -99,7 +99,7 @@ public class GetDrivesQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenDriveServiceReturnsEmptyList_ShouldReturnEmptySuccessResult()
+    public async Task HandleAsync_WhenDriveServiceReturnsEmptyList_ShouldReturnEmptySuccessResult()
     {
         // Arrange
         GetDrivesQuery query = _fixture.Create<GetDrivesQuery>();
@@ -108,7 +108,7 @@ public class GetDrivesQueryHandlerTests
             .Returns(emptyList);
 
         // Act
-        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);

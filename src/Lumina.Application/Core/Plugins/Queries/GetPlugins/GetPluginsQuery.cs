@@ -1,8 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Contracts.Responses.Plugins;
-using Mediator;
-using System.Collections.Generic;
+using Lumina.Application.Common.CQRS;
 #endregion
 
 namespace Lumina.Application.Core.Plugins.Queries.GetPlugins;
@@ -10,4 +7,4 @@ namespace Lumina.Application.Core.Plugins.Queries.GetPlugins;
 /// <summary>
 /// Query for getting all the detected plugins.
 /// </summary>
-public record GetPluginsQuery() : IRequest<ErrorOr<IReadOnlyList<PluginResponse>>>;
+public record GetPluginsQuery() : IQuery;

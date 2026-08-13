@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation;
 using Lumina.Application.Common.Errors;
+using Lumina.Application.Common.Infrastructure.Validation;
+using Lumina.Application.Common.Utilities;
 #endregion
 
 namespace Lumina.Application.Core.Maintenance.ApplicationSetup.Commands.SetupApplication;
@@ -15,10 +16,22 @@ public class SetupApplicationCommandValidator : AbstractValidator<SetupApplicati
     /// </summary>
     public SetupApplicationCommandValidator()
     {
-        RuleFor(x => x.Username).NotEmpty().WithMessage(Errors.Authentication.UsernameCannotBeEmpty.Description);
-        RuleFor(x => x.Password).NotEmpty().WithMessage(Errors.Authentication.PasswordCannotBeEmpty.Description)
-            .Matches("^(?=.*[A-Z])(?=.*[0-9])(?=.*[^a-zA-Z0-9]).{8,}$").WithMessage(Errors.Authentication.InvalidPassword.Description);
-        RuleFor(x => x.PasswordConfirm).NotEmpty().WithMessage(Errors.Authentication.PasswordConfirmCannotBeEmpty.Description);
-        RuleFor(x => x.Password).Equal(x => x.PasswordConfirm).WithMessage(Errors.Authentication.PasswordsNotMatch.Description);
+        RuleFor(command => command.Username)
+            .NotEmpty()
+            .WithError(Errors.Authentication.UsernameCannotBeEmpty);
+
+        RuleFor(command => command.Password)
+            .NotEmpty()
+            .WithError(Errors.Authentication.PasswordCannotBeEmpty)
+            .Matches("^(?=.*[A-Z])(?=.*[0-9])(?=.*[^a-zA-Z0-9]).{8,}$")
+            .WithError(Errors.Authentication.InvalidPassword);
+
+        RuleFor(command => command.PasswordConfirm)
+            .NotEmpty()
+            .WithError(Errors.Authentication.PasswordConfirmCannotBeEmpty);
+
+        RuleFor(command => command.Password)
+            .Equal(command => command.PasswordConfirm)
+            .WithError(Errors.Authentication.PasswordsNotMatch);
     }
 }

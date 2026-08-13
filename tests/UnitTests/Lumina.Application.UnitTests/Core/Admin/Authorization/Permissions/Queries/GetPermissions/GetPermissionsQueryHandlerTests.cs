@@ -54,7 +54,7 @@ public class GetPermissionsQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserIsAdmin_ShouldReturnPermissions()
+    public async Task HandleAsync_WhenUserIsAdmin_ShouldReturnPermissions()
     {
         // Arrange
         GetPermissionsQuery query = new();
@@ -70,7 +70,7 @@ public class GetPermissionsQueryHandlerTests
             .Returns(ErrorOrFactory.From(permissions));
 
         // Act
-        ErrorOr<IEnumerable<PermissionResponse>> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<IEnumerable<PermissionResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -80,7 +80,7 @@ public class GetPermissionsQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserIsNotAdmin_ShouldReturnNotAuthorizedError()
+    public async Task HandleAsync_WhenUserIsNotAdmin_ShouldReturnNotAuthorizedError()
     {
         // Arrange
         GetPermissionsQuery query = new();
@@ -89,7 +89,7 @@ public class GetPermissionsQueryHandlerTests
             .Returns(false);
 
         // Act
-        ErrorOr<IEnumerable<PermissionResponse>> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<IEnumerable<PermissionResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -99,7 +99,7 @@ public class GetPermissionsQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenGetAllPermissionsReturnsError_ShouldReturnError()
+    public async Task HandleAsync_WhenGetAllPermissionsReturnsError_ShouldReturnError()
     {
         // Arrange
         GetPermissionsQuery query = new();
@@ -111,7 +111,7 @@ public class GetPermissionsQueryHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<IEnumerable<PermissionResponse>> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<IEnumerable<PermissionResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -121,7 +121,7 @@ public class GetPermissionsQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCancellationRequested_ShouldStillCompleteOperation()
+    public async Task HandleAsync_WhenCancellationRequested_ShouldStillCompleteOperation()
     {
         // Arrange
         GetPermissionsQuery query = new();
@@ -137,7 +137,7 @@ public class GetPermissionsQueryHandlerTests
             .Returns(ErrorOrFactory.From(permissions));
 
         // Act
-        ErrorOr<IEnumerable<PermissionResponse>> result = await _sut.Handle(query, cancellationToken);
+        ErrorOr<IEnumerable<PermissionResponse>> result = await _sut.HandleAsync(query, cancellationToken);
 
         // Assert
         Assert.False(result.IsError);

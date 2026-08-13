@@ -1,8 +1,5 @@
 ﻿#region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Contracts.Responses.FileSystemManagement.Common;
-using Mediator;
-using System.Collections.Generic;
+using Lumina.Application.Common.CQRS;
 #endregion
 
 namespace Lumina.Application.Core.FileSystemManagement.Drives.Queries.GetDrives;
@@ -10,4 +7,4 @@ namespace Lumina.Application.Core.FileSystemManagement.Drives.Queries.GetDrives;
 /// <summary>
 /// Query for retrieving the list of drives.
 /// </summary>
-public record GetDrivesQuery() : IRequest<ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>>;
+public record GetDrivesQuery() : IQuery;

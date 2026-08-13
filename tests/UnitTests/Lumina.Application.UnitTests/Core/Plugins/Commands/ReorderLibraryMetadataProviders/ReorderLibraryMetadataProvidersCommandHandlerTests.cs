@@ -3,6 +3,7 @@ using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.Plugins.Commands.ReorderLibraryMetadataProviders;
 using Lumina.DataAccess.UnitTests.Core.Repositories.Plugins.Fixtures;
 using NSubstitute;
@@ -31,11 +32,14 @@ public class ReorderLibraryMetadataProvidersCommandHandlerTests
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
         _mockConfigurationRepository = Substitute.For<ILibraryMetadataProviderConfigurationRepository>();
         _mockUnitOfWork.GetRepository<ILibraryMetadataProviderConfigurationRepository>().Returns(_mockConfigurationRepository);
-        _sut = new ReorderLibraryMetadataProvidersCommandHandler(_mockUnitOfWork);
+        IValidator<ReorderLibraryMetadataProvidersCommand> mockValidator = Substitute.For<IValidator<ReorderLibraryMetadataProvidersCommand>>();
+        mockValidator.Validate(Arg.Any<ReorderLibraryMetadataProvidersCommand>())
+            .Returns([]);
+        _sut = new ReorderLibraryMetadataProvidersCommandHandler(_mockUnitOfWork, mockValidator);
     }
 
     [Fact]
-    public async Task Handle_WhenCalled_ShouldAssignRanksInTheProvidedOrder()
+    public async Task HandleAsync_WhenCalled_ShouldAssignRanksInTheProvidedOrder()
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
@@ -48,7 +52,7 @@ public class ReorderLibraryMetadataProvidersCommandHandlerTests
             .Returns(Result.Updated);
 
         // Act
-        ErrorOr<Success> result = await _sut.Handle(new ReorderLibraryMetadataProvidersCommand(libraryId, [secondProvider.PluginId, firstProvider.PluginId]), CancellationToken.None);
+        ErrorOr<Success> result = await _sut.HandleAsync(new ReorderLibraryMetadataProvidersCommand(libraryId, [secondProvider.PluginId, firstProvider.PluginId]), CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);

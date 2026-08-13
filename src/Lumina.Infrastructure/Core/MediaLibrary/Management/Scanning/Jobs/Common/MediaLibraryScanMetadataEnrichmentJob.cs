@@ -8,13 +8,13 @@ using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Domain.Common.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Plugins.Contracts.Core.Metadata;
-using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
@@ -74,7 +74,7 @@ internal sealed class MediaLibraryScanMetadataEnrichmentJob : MediaLibraryScanJo
                     // see docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0001.md for details:
                     await using AsyncServiceScope asyncServiceScope = _serviceScopeFactory.CreateAsyncScope();
                     IUnitOfWork unitOfWork = asyncServiceScope.ServiceProvider.GetService<IUnitOfWork>()!;
-                    IPublisher publisher = asyncServiceScope.ServiceProvider.GetService<IPublisher>()!;
+                    IDomainEventPublisher domainEventPublisher = asyncServiceScope.ServiceProvider.GetService<IDomainEventPublisher>()!;
                     ILibraryMetadataProviderConfigurationRepository configurationRepository = unitOfWork.GetRepository<ILibraryMetadataProviderConfigurationRepository>();
                     IBookRepository bookRepository = unitOfWork.GetRepository<IBookRepository>();
 
@@ -102,7 +102,7 @@ internal sealed class MediaLibraryScanMetadataEnrichmentJob : MediaLibraryScanJo
                     int totalBooksToEnrich = getBooksToEnrichCountResult.Value;
 
                     // set the initial progress of the scan job
-                    ErrorOr<Success> publishJobProgressResult = await PublishJobProgress(publisher, compositeKey, 0, totalBooksToEnrich, cancellationToken).ConfigureAwait(false);
+                    ErrorOr<Success> publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, 0, totalBooksToEnrich, cancellationToken).ConfigureAwait(false);
                     if (publishJobProgressResult.IsError)
                         throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
 
@@ -134,7 +134,7 @@ internal sealed class MediaLibraryScanMetadataEnrichmentJob : MediaLibraryScanJo
                             if ((now - lastUpdateTime).TotalMilliseconds >= minUpdateIntervalMs)
                             {
                                 // increment the number of processed elements progress
-                                publishJobProgressResult = await PublishJobProgress(publisher, compositeKey, Interlocked.Increment(ref processedBooksCount), totalBooksToEnrich, cancellationToken).ConfigureAwait(false);
+                                publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, Interlocked.Increment(ref processedBooksCount), totalBooksToEnrich, cancellationToken).ConfigureAwait(false);
                                 if (publishJobProgressResult.IsError)
                                     throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
                                 lastUpdateTime = now;
@@ -148,7 +148,7 @@ internal sealed class MediaLibraryScanMetadataEnrichmentJob : MediaLibraryScanJo
 
                     // this job finished, and it's the last in the chain, the scan is completed
                     Status = LibraryScanJobStatus.Completed;
-                    await publisher.Publish(new LibraryScanFinishedDomainEvent(Guid.NewGuid(), compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                    await domainEventPublisher.PublishAsync(new LibraryScanFinishedDomainEvent(Guid.NewGuid(), compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
 
                     // call each linked child with the obtained payload
                     foreach (IMediaLibraryScanJob child in Children)
@@ -242,19 +242,19 @@ internal sealed class MediaLibraryScanMetadataEnrichmentJob : MediaLibraryScanJo
     /// <summary>
     /// Publishes a job progress update.
     /// </summary>
-    /// <param name="publisher">The service used to publish the progress update.</param>
+    /// <param name="domainEventPublisher">The service used to publish the progress update.</param>
     /// <param name="compositeKey">The composite unique identifier of a media library scan.</param>
     /// <param name="currentProgress">The current job progress.</param>
     /// <param name="totalProgress">The total job progress.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    private async Task<ErrorOr<Success>> PublishJobProgress(IPublisher publisher, MediaLibraryScanCompositeId compositeKey, int currentProgress, int totalProgress, CancellationToken cancellationToken)
+    private async Task<ErrorOr<Success>> PublishJobProgressAsync(IDomainEventPublisher domainEventPublisher, MediaLibraryScanCompositeId compositeKey, int currentProgress, int totalProgress, CancellationToken cancellationToken)
     {
         ErrorOr<MediaLibraryScanJobProgress> scanJobProgressResult = MediaLibraryScanJobProgress.Create(currentProgress, totalProgress, "EnrichingMetadata");
         if (scanJobProgressResult.IsError)
             return scanJobProgressResult.Errors;
 
-        await publisher.Publish(new LibraryScanJobProgressChangedDomainEvent(
+        await domainEventPublisher.PublishAsync(new LibraryScanJobProgressChangedDomainEvent(
             Guid.NewGuid(), LibraryId, compositeKey, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
 
         return Result.Success;

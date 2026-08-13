@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -13,7 +14,6 @@ using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.Library
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
-using Mediator;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -25,7 +25,7 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Commands.ScanLibraries
 /// <summary>
 /// Handler for the command for initiating the scan of all media libraries.
 /// </summary>
-public class ScanLibrariesCommandHandler : IRequestHandler<ScanLibrariesCommand, ErrorOr<IEnumerable<MediaLibraryScanResponse>>>
+public class ScanLibrariesCommandHandler : ICommandHandler<ScanLibrariesCommand, ErrorOr<IEnumerable<MediaLibraryScanResponse>>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUserService;
@@ -54,10 +54,10 @@ public class ScanLibrariesCommandHandler : IRequestHandler<ScanLibrariesCommand,
     /// <summary>
     /// Handles the command for initiating the scan of all media libraries.
     /// </summary>
-    /// <param name="request">The request to be handled.</param>
+    /// <param name="command">The command to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async ValueTask<ErrorOr<IEnumerable<MediaLibraryScanResponse>>> Handle(ScanLibrariesCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<IEnumerable<MediaLibraryScanResponse>>> HandleAsync(ScanLibrariesCommand command, CancellationToken cancellationToken)
     {
         ILibraryRepository libraryRepository = _unitOfWork.GetRepository<ILibraryRepository>();
         ILibraryScanRepository libraryScanRepository = _unitOfWork.GetRepository<ILibraryScanRepository>();

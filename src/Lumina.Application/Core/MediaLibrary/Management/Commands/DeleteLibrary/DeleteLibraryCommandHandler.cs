@@ -1,15 +1,17 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.DomainEvents;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Domain.Common.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
-using Mediator;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
@@ -21,12 +23,13 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Commands.DeleteLibrary
 /// <summary>
 /// Handler for the command to delete a library by its Id.
 /// </summary>
-public class DeleteLibraryCommandHandler : IRequestHandler<DeleteLibraryCommand, ErrorOr<Deleted>>
+public class DeleteLibraryCommandHandler : ICommandHandler<DeleteLibraryCommand, ErrorOr<Deleted>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUserService;
     private readonly IAuthorizationService _authorizationService;
     private readonly IDomainEventsQueue _domainEventsQueue;
+    private readonly IValidator<DeleteLibraryCommand> _validator;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DeleteLibraryCommandHandler"/> class.
@@ -35,29 +38,36 @@ public class DeleteLibraryCommandHandler : IRequestHandler<DeleteLibraryCommand,
     /// <param name="currentUserService">Injected service to retrieve the current user information.</param>
     /// <param name="domainEventsQueue">Injected service for the queue of domain events.</param>
     /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
+    /// <param name="validator">Injected validator for application validation rules.</param>
     public DeleteLibraryCommandHandler(
         IAuthorizationService authorizationService,
         ICurrentUserService currentUserService,
         IDomainEventsQueue domainEventsQueue,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        IValidator<DeleteLibraryCommand> validator)
     {
         _authorizationService = authorizationService;
         _currentUserService = currentUserService;
         _domainEventsQueue = domainEventsQueue;
         _unitOfWork = unitOfWork;
+        _validator = validator;
     }
 
     /// <summary>
     /// Handles the command to delete a library by its Id.
     /// </summary>
-    /// <param name="request">The request to be handled.</param>
+    /// <param name="command">The command to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async ValueTask<ErrorOr<Deleted>> Handle(DeleteLibraryCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<Deleted>> HandleAsync(DeleteLibraryCommand command, CancellationToken cancellationToken)
     {
+        List<Error> validationResult = _validator.Validate(command);
+        if (validationResult.Count > 0)
+            return validationResult;
+
         // get the library with the specified id from the repository
         ILibraryRepository libraryRepository = _unitOfWork.GetRepository<ILibraryRepository>();
-        ErrorOr<LibraryEntity?> getLibraryResult = await libraryRepository.GetByIdAsync(request.Id, cancellationToken).ConfigureAwait(false);
+        ErrorOr<LibraryEntity?> getLibraryResult = await libraryRepository.GetByIdAsync(command.Id, cancellationToken).ConfigureAwait(false);
         if (getLibraryResult.IsError)
             return getLibraryResult.Errors;
         else if (getLibraryResult.Value is null)
@@ -83,7 +93,7 @@ public class DeleteLibraryCommandHandler : IRequestHandler<DeleteLibraryCommand,
             _domainEventsQueue.Enqueue(domainEvent);
 
         // perform the deletion
-        ErrorOr<Deleted> deletePersistenceLibraryResult = await libraryRepository.DeleteByIdAsync(request.Id, cancellationToken).ConfigureAwait(false);
+        ErrorOr<Deleted> deletePersistenceLibraryResult = await libraryRepository.DeleteByIdAsync(command.Id, cancellationToken).ConfigureAwait(false);
         if (deletePersistenceLibraryResult.IsError)
             return deletePersistenceLibraryResult.Errors;
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

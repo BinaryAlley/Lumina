@@ -1,7 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Contracts.Responses.MediaLibrary.Management;
-using Mediator;
+using Lumina.Application.Common.CQRS;
 #endregion
 
 namespace Lumina.Application.Core.MediaLibrary.Management.Queries.GetEnabledLibraries;
@@ -9,4 +7,4 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Queries.GetEnabledLibr
 /// <summary>
 /// Query for getting the list of enabled media libraries.
 /// </summary>
-public record GetEnabledLibrariesQuery : IRequest<ErrorOr<LibraryResponse[]>>;
+public record GetEnabledLibrariesQuery : IQuery;

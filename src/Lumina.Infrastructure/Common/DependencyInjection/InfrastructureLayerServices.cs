@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation;
 using Lumina.Application.Common.DomainEvents;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
@@ -8,7 +7,9 @@ using Lumina.Application.Common.Infrastructure.Models.DTO.Configuration;
 using Lumina.Application.Common.Infrastructure.Plugins;
 using Lumina.Application.Common.Infrastructure.Security;
 using Lumina.Application.Common.Infrastructure.Time;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.MediaLibrary.Management.Progress;
+using Lumina.Domain.Common.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Cancellation;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Queue;
@@ -35,6 +36,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 #endregion
 
@@ -55,8 +57,15 @@ public static class InfrastructureLayerServices
     public static IServiceCollection AddInfrastructureLayerServices(this IServiceCollection services, IConfiguration configuration)
     {
         // scan the current assembly for validators and add them to the DI container
-        services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly(), ServiceLifetime.Singleton);
+        IEnumerable<Type> concreteTypes = Assembly.GetExecutingAssembly()
+            .GetTypes()
+            .Where(type => !type.IsInterface && !type.IsAbstract && !type.IsGenericTypeDefinition);
 
+        foreach (Type implementation in concreteTypes)
+            foreach (Type contract in implementation.GetInterfaces())
+                if (contract.IsGenericType && contract.GetGenericTypeDefinition() == typeof(IValidator<>))
+                    services.AddSingleton(contract, implementation);
+      
         services.AddSingleton<IFileHashService, FileHashService>();
         services.AddSingleton<IPasswordHashService, PasswordHashService>();
         services.AddSingleton<ICryptographyService, CryptographyService>();
@@ -67,6 +76,7 @@ public static class InfrastructureLayerServices
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 
         services.AddScoped<IDomainEventsQueue, DomainEventsQueue>();
+        services.AddScoped<IDomainEventPublisher, DomainEventPublisher>();
 
         // authorization
         services.AddScoped<IOver18Policy, Over18Policy>();

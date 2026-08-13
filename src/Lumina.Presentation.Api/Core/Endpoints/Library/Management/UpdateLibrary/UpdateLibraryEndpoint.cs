@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
+using Lumina.Application.Core.MediaLibrary.Management.Commands.UpdateLibrary;
 using Lumina.Contracts.Requests.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
 using Lumina.Presentation.Api.Common.Routes.Library.Management;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,15 +19,15 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Library.Management.UpdateLibrar
 /// </summary>
 public class UpdateLibraryEndpoint : BaseEndpoint<UpdateLibraryRequest, IResult>
 {
-    private readonly ISender _sender;
+    private readonly ICommandHandler<UpdateLibraryCommand, ErrorOr<LibraryResponse>> _updateLibraryCommandHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UpdateLibraryEndpoint"/> class.
     /// </summary>
-    /// <param name="sender">Injected service for mediating commands and queries.</param>
-    public UpdateLibraryEndpoint(ISender sender)
+    /// <param name="updateLibraryCommandHandler">Injected service for handling update library commands.</param>
+    public UpdateLibraryEndpoint(ICommandHandler<UpdateLibraryCommand, ErrorOr<LibraryResponse>> updateLibraryCommandHandler)
     {
-        _sender = sender;
+        _updateLibraryCommandHandler = updateLibraryCommandHandler;
     }
 
     /// <summary>
@@ -35,7 +35,7 @@ public class UpdateLibraryEndpoint : BaseEndpoint<UpdateLibraryRequest, IResult>
     /// </summary>
     public override void Configure()
     {
-        Verbs(Http.PUT);
+        Verbs(FastEndpoints.Http.PUT);
         Routes(ApiRoutes.Libraries.UPDATE_LIBRARY);
         Version(1);
         DontCatchExceptions();
@@ -48,7 +48,7 @@ public class UpdateLibraryEndpoint : BaseEndpoint<UpdateLibraryRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(UpdateLibraryRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<LibraryResponse> result = await _sender.Send(request.ToCommand(), cancellationToken).ConfigureAwait(false);
+        ErrorOr<LibraryResponse> result = await _updateLibraryCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

@@ -5,6 +5,7 @@ using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Security;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.UsersManagement.Authentication.Commands.ChangePassword;
 using Lumina.Application.UnitTests.Common.Mapping.UserManagement.Users.Fixtures;
 using Lumina.Contracts.Responses.Authentication;
@@ -39,13 +40,17 @@ public class ChangePasswordCommandHandlerTests
 
         _mockUnitOfWork.GetRepository<IUserRepository>().Returns(_mockUserRepository);
 
+        IValidator<ChangePasswordCommand> mockValidator = Substitute.For<IValidator<ChangePasswordCommand>>();
+        mockValidator.Validate(Arg.Any<ChangePasswordCommand>())
+            .Returns([]);
         _sut = new ChangePasswordCommandHandler(
             _mockUnitOfWork,
-            _mockHashService);
+            _mockHashService,
+            mockValidator);
     }
 
     [Fact]
-    public async Task Handle_WhenPasswordChangeIsSuccessful_ShouldUpdateUserAndReturnSuccess()
+    public async Task HandleAsync_WhenPasswordChangeIsSuccessful_ShouldUpdateUserAndReturnSuccess()
     {
         // Arrange
         string currentPassword = "currentPassword";
@@ -72,7 +77,7 @@ public class ChangePasswordCommandHandlerTests
             .Returns(Result.Updated);
 
         // Act
-        ErrorOr<ChangePasswordResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<ChangePasswordResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -86,7 +91,7 @@ public class ChangePasswordCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserDoesNotExist_ShouldReturnError()
+    public async Task HandleAsync_WhenUserDoesNotExist_ShouldReturnError()
     {
         // Arrange
         ChangePasswordCommand command = new("nonexistentUser", "oldPass", "newPass", "newPass");
@@ -95,7 +100,7 @@ public class ChangePasswordCommandHandlerTests
             .Returns(ErrorOrFactory.From<UserEntity?>(null));
 
         // Act
-        ErrorOr<ChangePasswordResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<ChangePasswordResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -107,7 +112,7 @@ public class ChangePasswordCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCurrentPasswordIsIncorrect_ShouldReturnError()
+    public async Task HandleAsync_WhenCurrentPasswordIsIncorrect_ShouldReturnError()
     {
         // Arrange
         UserEntity user = UserEntityFixture.CreateUserEntity();
@@ -125,7 +130,7 @@ public class ChangePasswordCommandHandlerTests
             .Returns(false);
 
         // Act
-        ErrorOr<ChangePasswordResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<ChangePasswordResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -138,7 +143,7 @@ public class ChangePasswordCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUpdateFails_ShouldReturnError()
+    public async Task HandleAsync_WhenUpdateFails_ShouldReturnError()
     {
         // Arrange
         string currentPassword = "currentPassword";
@@ -163,7 +168,7 @@ public class ChangePasswordCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<ChangePasswordResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<ChangePasswordResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -176,7 +181,7 @@ public class ChangePasswordCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenGetByUsernameReturnsError_ShouldReturnError()
+    public async Task HandleAsync_WhenGetByUsernameReturnsError_ShouldReturnError()
     {
         // Arrange
         string currentPassword = "currentPassword";
@@ -193,7 +198,7 @@ public class ChangePasswordCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<ChangePasswordResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<ChangePasswordResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);

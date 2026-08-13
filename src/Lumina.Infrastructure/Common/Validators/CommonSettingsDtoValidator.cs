@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation;
+using Lumina.Application.Common.Infrastructure.Validation;
+using Lumina.Application.Common.Utilities;
 using Lumina.Infrastructure.Common.Models.DTO.Configuration;
 #endregion
 
@@ -15,6 +16,8 @@ public class CommonSettingsDtoValidator : AbstractValidator<CommonSettingsDto>
     /// </summary>
     public CommonSettingsDtoValidator()
     {
-        RuleFor(x => x.Theme).NotEmpty().WithMessage(Errors.Errors.Configuration.ApplicationThemeCannotBeEmpty.Description);
+        RuleFor(settings => settings.Theme)
+            .NotEmpty()
+            .WithError(Errors.Errors.Configuration.ApplicationThemeCannotBeEmpty);
     }
 }

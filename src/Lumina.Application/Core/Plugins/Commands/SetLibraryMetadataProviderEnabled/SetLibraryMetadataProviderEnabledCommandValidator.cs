@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation;
+using Lumina.Application.Common.Infrastructure.Validation;
+using Lumina.Application.Common.Utilities;
 using Lumina.Domain.SharedKernel.Common.Errors;
 #endregion
 
@@ -15,9 +16,12 @@ public class SetLibraryMetadataProviderEnabledCommandValidator : AbstractValidat
     /// </summary>
     public SetLibraryMetadataProviderEnabledCommandValidator()
     {
-        RuleFor(x => x.LibraryId)
-            .NotEmpty().WithMessage(Errors.Plugins.LibraryIdCannotBeEmpty.Description);
-        RuleFor(x => x.PluginId)
-            .NotEmpty().WithMessage(Errors.Plugins.PluginIdCannotBeEmpty.Description);
+        RuleFor(command => command.LibraryId)
+            .NotEmpty()
+            .WithError(Errors.Plugins.LibraryIdCannotBeEmpty);
+
+        RuleFor(command => command.PluginId)
+            .NotEmpty()
+            .WithError(Errors.Plugins.PluginIdCannotBeEmpty);
     }
 }

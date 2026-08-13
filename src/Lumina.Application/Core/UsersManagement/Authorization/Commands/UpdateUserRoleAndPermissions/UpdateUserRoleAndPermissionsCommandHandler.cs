@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Authorization;
@@ -7,8 +8,8 @@ using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Contracts.Responses.Authorization;
-using Mediator;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,11 +24,12 @@ namespace Lumina.Application.Core.UsersManagement.Authorization.Commands.UpdateU
 /// <summary>
 /// Handler for the command to update an authorization role.
 /// </summary>
-public class UpdateUserRoleAndPermissionsCommandHandler : IRequestHandler<UpdateUserRoleAndPermissionsCommand, ErrorOr<AuthorizationResponse>>
+public class UpdateUserRoleAndPermissionsCommandHandler : ICommandHandler<UpdateUserRoleAndPermissionsCommand, ErrorOr<AuthorizationResponse>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IAuthorizationService _authorizationService;
     private readonly ICurrentUserService _currentUserService;
+    private readonly IValidator<UpdateUserRoleAndPermissionsCommand> _validator;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UpdateUserRoleAndPermissionsCommandHandler"/> class.
@@ -35,23 +37,29 @@ public class UpdateUserRoleAndPermissionsCommandHandler : IRequestHandler<Update
     /// <param name="authorizationService">Injected service for authorization related functionality.</param>
     /// <param name="currentUserService">Injected service to retrieve the current user information.</param>
     /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
-    public UpdateUserRoleAndPermissionsCommandHandler(IAuthorizationService authorizationService, ICurrentUserService currentUserService, IUnitOfWork unitOfWork)
+    /// <param name="validator">Injected validator for application validation rules.</param>
+    public UpdateUserRoleAndPermissionsCommandHandler(IAuthorizationService authorizationService, ICurrentUserService currentUserService, IUnitOfWork unitOfWork, IValidator<UpdateUserRoleAndPermissionsCommand> validator)
     {
         _unitOfWork = unitOfWork;
         _authorizationService = authorizationService;
         _currentUserService = currentUserService;
+        _validator = validator;
     }
 
     /// <summary>
     /// Handles the command to update an authorization role.
     /// </summary>
-    /// <param name="request">The request to be handled.</param>
+    /// <param name="command">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
     /// An <see cref="ErrorOr{TValue}"/> containing either a successfully updated <see cref="RoleResponse"/>, or an error message.
     /// </returns>
-    public async ValueTask<ErrorOr<AuthorizationResponse>> Handle(UpdateUserRoleAndPermissionsCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<AuthorizationResponse>> HandleAsync(UpdateUserRoleAndPermissionsCommand command, CancellationToken cancellationToken)
     {
+        List<Error> validationResult = _validator.Validate(command);
+        if (validationResult.Count > 0)
+            return validationResult;
+
         // only admins can update user authorizations
         bool isAdmin = await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false);
         if (!isAdmin)
@@ -63,15 +71,15 @@ public class UpdateUserRoleAndPermissionsCommandHandler : IRequestHandler<Update
         IPermissionRepository permissionRepository = _unitOfWork.GetRepository<IPermissionRepository>();
 
         // get the user to update
-        ErrorOr<UserEntity?> getUserResult = await userRepository.GetByIdAsync(request.UserId, cancellationToken).ConfigureAwait(false);
+        ErrorOr<UserEntity?> getUserResult = await userRepository.GetByIdAsync(command.UserId, cancellationToken).ConfigureAwait(false);
         if (getUserResult.IsError || getUserResult.Value is null)
             return DomainErrors.Users.UserDoesNotExist;
 
         ErrorOr<RoleEntity?> getRoleResult = default;
-        if (request.RoleId is not null)
+        if (command.RoleId is not null)
         {
             // get the new role
-            getRoleResult = await roleRepository.GetByIdAsync(request.RoleId!.Value, cancellationToken).ConfigureAwait(false);
+            getRoleResult = await roleRepository.GetByIdAsync(command.RoleId!.Value, cancellationToken).ConfigureAwait(false);
             if (getRoleResult.IsError || getRoleResult.Value is null)
                 return ApplicationErrors.Authorization.RoleNotFound;
 
@@ -90,7 +98,7 @@ public class UpdateUserRoleAndPermissionsCommandHandler : IRequestHandler<Update
         }
         // get the permissions to assign
         ErrorOr<IEnumerable<PermissionEntity>> getPermissionsResult =
-            await permissionRepository.GetByIdsAsync(request.Permissions, cancellationToken).ConfigureAwait(false);
+            await permissionRepository.GetByIdsAsync(command.Permissions, cancellationToken).ConfigureAwait(false);
         if (getPermissionsResult.IsError)
             return getPermissionsResult.Errors;
 
@@ -98,12 +106,12 @@ public class UpdateUserRoleAndPermissionsCommandHandler : IRequestHandler<Update
         UserEntity userToUpdate = getUserResult.Value;
 
         UserRoleEntity? userRole = default!;
-        if (request.RoleId is not null)
+        if (command.RoleId is not null)
         {
             userRole = new()
             {
                 UserId = userToUpdate.Id,
-                RoleId = request.RoleId.Value,
+                RoleId = command.RoleId.Value,
                 Role = getRoleResult.Value!,
                 User = userToUpdate
             };
@@ -119,7 +127,7 @@ public class UpdateUserRoleAndPermissionsCommandHandler : IRequestHandler<Update
             TempPasswordCreated = userToUpdate.TempPasswordCreated,
             Libraries = userToUpdate.Libraries,
             UserRole = userRole,
-            UserPermissions = request.Permissions.Select(permissionId => new UserPermissionEntity
+            UserPermissions = command.Permissions.Select(permissionId => new UserPermissionEntity
             {
                 UserId = userToUpdate.Id,
                 PermissionId = permissionId,

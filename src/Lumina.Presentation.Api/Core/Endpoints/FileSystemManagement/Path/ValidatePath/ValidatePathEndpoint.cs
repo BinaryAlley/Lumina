@@ -1,11 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using FastEndpoints;
+using ErrorOr;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Paths;
+using Lumina.Application.Core.FileSystemManagement.Paths.Queries.ValidatePath;
 using Lumina.Contracts.Requests.FileSystemManagement.Path;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
 using Lumina.Presentation.Api.Common.Routes.FileSystemManagement;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,15 +19,15 @@ namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.Valid
 /// </summary>
 public class ValidatePathEndpoint : BaseEndpoint<ValidatePathRequest, IResult>
 {
-    private readonly ISender _sender;
+    private readonly IQueryHandler<ValidatePathQuery, ErrorOr<PathValidResponse>> _validatePathQueryHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ValidatePathEndpoint"/> class.
     /// </summary>
-    /// <param name="sender">Injected service for mediating commands and queries.</param>
-    public ValidatePathEndpoint(ISender sender)
+    /// <param name="validatePathQueryHandler">Injected service for handling validate path queries.</param>
+    public ValidatePathEndpoint(IQueryHandler<ValidatePathQuery, ErrorOr<PathValidResponse>> validatePathQueryHandler)
     {
-        _sender = sender;
+        _validatePathQueryHandler = validatePathQueryHandler;
     }
 
     /// <summary>
@@ -34,7 +35,7 @@ public class ValidatePathEndpoint : BaseEndpoint<ValidatePathRequest, IResult>
     /// </summary>
     public override void Configure()
     {
-        Verbs(Http.GET);
+        Verbs(FastEndpoints.Http.GET);
         Routes(ApiRoutes.Path.VALIDATE);
         Version(1);
         DontCatchExceptions();
@@ -47,7 +48,7 @@ public class ValidatePathEndpoint : BaseEndpoint<ValidatePathRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(ValidatePathRequest request, CancellationToken cancellationToken)
     {
-        PathValidResponse result = await _sender.Send(request.ToQuery(), cancellationToken).ConfigureAwait(false);
-        return TypedResults.Ok(result);
+        ErrorOr<PathValidResponse> result = await _validatePathQueryHandler.HandleAsync(request.ToQuery(), cancellationToken).ConfigureAwait(false);
+        return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

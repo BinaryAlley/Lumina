@@ -1,7 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation.TestHelper;
+using ErrorOr;
 using Lumina.Application.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
+using Lumina.Application.UnitTests.Common.Setup;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
 using DomainErrors = Lumina.Domain.SharedKernel.Common.Errors.Errors;
@@ -35,11 +37,10 @@ public class UpdateUserRoleAndPermissionsCommandValidatorTests
             [Guid.NewGuid()]);
 
         // Act
-        TestValidationResult<UpdateUserRoleAndPermissionsCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.UserId)
-            .WithErrorMessage(DomainErrors.Users.UserIdCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(DomainErrors.Users.UserIdCannotBeEmpty);
     }
 
     [Fact]
@@ -52,11 +53,10 @@ public class UpdateUserRoleAndPermissionsCommandValidatorTests
             [Guid.Empty, Guid.NewGuid()]);
 
         // Act
-        TestValidationResult<UpdateUserRoleAndPermissionsCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor("Permissions[0]")
-            .WithErrorMessage(ApplicationErrors.Authorization.PermissionIdCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(ApplicationErrors.Authorization.PermissionIdCannotBeEmpty);
     }
 
     [Fact]
@@ -69,10 +69,10 @@ public class UpdateUserRoleAndPermissionsCommandValidatorTests
             null!);
 
         // Act
-        TestValidationResult<UpdateUserRoleAndPermissionsCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Permissions);
+        result.ShouldNotHaveValidationError(ApplicationErrors.Authorization.PermissionIdCannotBeEmpty);
     }
 
     [Fact]
@@ -85,10 +85,10 @@ public class UpdateUserRoleAndPermissionsCommandValidatorTests
             []);
 
         // Act
-        TestValidationResult<UpdateUserRoleAndPermissionsCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Permissions);
+        result.ShouldNotHaveValidationError(ApplicationErrors.Authorization.PermissionIdCannotBeEmpty);
     }
 
     [Fact]
@@ -101,7 +101,7 @@ public class UpdateUserRoleAndPermissionsCommandValidatorTests
             [Guid.NewGuid()]);
 
         // Act
-        TestValidationResult<UpdateUserRoleAndPermissionsCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
         result.ShouldNotHaveAnyValidationErrors();

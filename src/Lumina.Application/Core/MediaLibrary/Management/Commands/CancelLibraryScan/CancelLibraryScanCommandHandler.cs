@@ -1,15 +1,17 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.DomainEvents;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Domain.Common.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate;
-using Mediator;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
@@ -21,12 +23,13 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Commands.CancelLibrary
 /// <summary>
 /// Handler for the command for canceling the scan of a media library.
 /// </summary>
-public class CancelLibraryScanCommandHandler : IRequestHandler<CancelLibraryScanCommand, ErrorOr<Success>>
+public class CancelLibraryScanCommandHandler : ICommandHandler<CancelLibraryScanCommand, ErrorOr<Success>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUserService;
     private readonly IAuthorizationService _authorizationService;
     private readonly IDomainEventsQueue _domainEventsQueue;
+    private readonly IValidator<CancelLibraryScanCommand> _validator;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CancelLibraryScanCommandHandler"/> class.
@@ -35,30 +38,37 @@ public class CancelLibraryScanCommandHandler : IRequestHandler<CancelLibraryScan
     /// <param name="currentUserService">Injected service to retrieve the current user information.</param>
     /// <param name="domainEventsQueue">Injected service for the queue of domain events.</param>
     /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
+    /// <param name="validator">Injected validator for application validation rules.</param>
     public CancelLibraryScanCommandHandler(
         IAuthorizationService authorizationService,
         ICurrentUserService currentUserService,
         IDomainEventsQueue domainEventsQueue,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        IValidator<CancelLibraryScanCommand> validator)
     {
         _authorizationService = authorizationService;
         _currentUserService = currentUserService;
         _domainEventsQueue = domainEventsQueue;
         _unitOfWork = unitOfWork;
+        _validator = validator;
     }
 
     /// <summary>
     /// Handles the command for canceling the scan of a media library.
     /// </summary>
-    /// <param name="request">The request to be handled.</param>
+    /// <param name="command">The command to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async ValueTask<ErrorOr<Success>> Handle(CancelLibraryScanCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<Success>> HandleAsync(CancelLibraryScanCommand command, CancellationToken cancellationToken)
     {
+        List<Error> validationResult = _validator.Validate(command);
+        if (validationResult.Count > 0)
+            return validationResult;
+
         ILibraryScanRepository libraryScanRepository = _unitOfWork.GetRepository<ILibraryScanRepository>();
 
         // get the library scan from the repository
-        ErrorOr<LibraryScanEntity?> getLibraryScansResult = await libraryScanRepository.GetByIdAsync(request.ScanId, cancellationToken).ConfigureAwait(false);
+        ErrorOr<LibraryScanEntity?> getLibraryScansResult = await libraryScanRepository.GetByIdAsync(command.ScanId, cancellationToken).ConfigureAwait(false);
         if (getLibraryScansResult.IsError)
             return getLibraryScansResult.Errors;
         if (getLibraryScansResult.Value is null)

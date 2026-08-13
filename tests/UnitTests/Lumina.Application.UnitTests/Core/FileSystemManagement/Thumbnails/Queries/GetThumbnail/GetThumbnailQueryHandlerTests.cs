@@ -6,6 +6,7 @@ using Lumina.Application.Core.FileSystemManagement.Thumbnails.Queries.GetThumbna
 using Lumina.Contracts.Responses.FileSystemManagement.Thumbnails;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Lumina.Application.Common.Infrastructure.Validation;
 using NSubstitute;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
@@ -28,11 +29,14 @@ public class GetThumbnailQueryHandlerTests
     {
         _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
         _mockThumbnailService = Substitute.For<IThumbnailService>();
-        _sut = new GetThumbnailQueryHandler(_mockThumbnailService);
+        IValidator<GetThumbnailQuery> mockValidator = Substitute.For<IValidator<GetThumbnailQuery>>();
+        mockValidator.Validate(Arg.Any<GetThumbnailQuery>())
+            .Returns([]);
+        _sut = new GetThumbnailQueryHandler(_mockThumbnailService, mockValidator);
     }
 
     [Fact]
-    public async Task Handle_WhenCalledWithValidQuery_ShouldReturnSuccessResult()
+    public async Task HandleAsync_WhenCalledWithValidQuery_ShouldReturnSuccessResult()
     {
         // Arrange
         GetThumbnailQuery query = _fixture.Create<GetThumbnailQuery>();
@@ -42,7 +46,7 @@ public class GetThumbnailQueryHandlerTests
             .Returns(ErrorOrFactory.From(thumbnail));
 
         // Act
-        ErrorOr<ThumbnailResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<ThumbnailResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -53,7 +57,7 @@ public class GetThumbnailQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenThumbnailServiceReturnsError_ShouldReturnFailureResult()
+    public async Task HandleAsync_WhenThumbnailServiceReturnsError_ShouldReturnFailureResult()
     {
         // Arrange
         GetThumbnailQuery query = _fixture.Create<GetThumbnailQuery>();
@@ -62,7 +66,7 @@ public class GetThumbnailQueryHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<ThumbnailResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<ThumbnailResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -71,7 +75,7 @@ public class GetThumbnailQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCancellationRequested_ShouldCancelOperation()
+    public async Task HandleAsync_WhenCancellationRequested_ShouldCancelOperation()
     {
         // Arrange
         GetThumbnailQuery query = _fixture.Create<GetThumbnailQuery>();
@@ -82,7 +86,7 @@ public class GetThumbnailQueryHandlerTests
             .Returns(Task.FromCanceled<ErrorOr<Thumbnail>>(cts.Token));
 
         // Act & Assert
-        await Assert.ThrowsAsync<TaskCanceledException>(() => _sut.Handle(query, cts.Token).AsTask());
+        await Assert.ThrowsAsync<TaskCanceledException>(() => _sut.HandleAsync(query, cts.Token));
         await _mockThumbnailService.Received(1).GetThumbnailAsync(query.Path!, query.Quality, cts.Token);
     }
 }

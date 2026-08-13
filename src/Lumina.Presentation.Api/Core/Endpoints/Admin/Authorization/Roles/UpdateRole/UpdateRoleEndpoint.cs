@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.Authorization;
+using Lumina.Application.Core.Admin.Authorization.Roles.Commands.UpdateRole;
 using Lumina.Contracts.Requests.Authorization;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.Presentation.Api.Common.Routes.UsersManagement;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,15 +19,15 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Admin.Authorization.Roles.Updat
 /// </summary>
 public class UpdateRoleEndpoint : BaseEndpoint<UpdateRoleRequest, IResult>
 {
-    private readonly ISender _sender;
+    private readonly ICommandHandler<UpdateRoleCommand, ErrorOr<RolePermissionsResponse>> _updateRoleCommandHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UpdateRoleEndpoint"/> class.
     /// </summary>
-    /// <param name="sender">Injected service for mediating commands and queries.</param>
-    public UpdateRoleEndpoint(ISender sender)
+    /// <param name="updateRoleCommandHandler">Injected service for handling update role commands.</param>
+    public UpdateRoleEndpoint(ICommandHandler<UpdateRoleCommand, ErrorOr<RolePermissionsResponse>> updateRoleCommandHandler)
     {
-        _sender = sender;
+        _updateRoleCommandHandler = updateRoleCommandHandler;
     }
 
     /// <summary>
@@ -35,7 +35,7 @@ public class UpdateRoleEndpoint : BaseEndpoint<UpdateRoleRequest, IResult>
     /// </summary>
     public override void Configure()
     {
-        Verbs(Http.PUT);
+        Verbs(FastEndpoints.Http.PUT);
         Routes(ApiRoutes.Roles.UPDATE_ROLE);
         Version(1);
         DontCatchExceptions();
@@ -48,7 +48,7 @@ public class UpdateRoleEndpoint : BaseEndpoint<UpdateRoleRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(UpdateRoleRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<RolePermissionsResponse> result = await _sender.Send(request.ToCommand(), cancellationToken).ConfigureAwait(false);
+        ErrorOr<RolePermissionsResponse> result = await _updateRoleCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Paths;
+using Lumina.Application.Core.FileSystemManagement.Paths.Queries.GetPathParent;
 using Lumina.Contracts.Requests.FileSystemManagement.Path;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
 using Lumina.Presentation.Api.Common.Routes.FileSystemManagement;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.Threading;
@@ -20,15 +20,15 @@ namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.GetPa
 /// </summary>
 public class GetPathParentEndpoint : BaseEndpoint<GetPathParentRequest, IResult>
 {
-    private readonly ISender _sender;
+    private readonly IQueryHandler<GetPathParentQuery, ErrorOr<IEnumerable<PathSegmentResponse>>> _getPathParentQueryHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetPathParentEndpoint"/> class.
     /// </summary>
-    /// <param name="sender">Injected service for mediating commands and queries.</param>
-    public GetPathParentEndpoint(ISender sender)
+    /// <param name="getPathParentQueryHandler">Injected service for handling get path parent queries.</param>
+    public GetPathParentEndpoint(IQueryHandler<GetPathParentQuery, ErrorOr<IEnumerable<PathSegmentResponse>>> getPathParentQueryHandler)
     {
-        _sender = sender;
+        _getPathParentQueryHandler = getPathParentQueryHandler;
     }
 
     /// <summary>
@@ -36,7 +36,7 @@ public class GetPathParentEndpoint : BaseEndpoint<GetPathParentRequest, IResult>
     /// </summary>
     public override void Configure()
     {
-        Verbs(Http.GET);
+        Verbs(FastEndpoints.Http.GET);
         Routes(ApiRoutes.Path.GET_PATH_PARENT);
         Version(1);
         DontCatchExceptions();
@@ -49,7 +49,7 @@ public class GetPathParentEndpoint : BaseEndpoint<GetPathParentRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(GetPathParentRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<IEnumerable<PathSegmentResponse>> result = await _sender.Send(request.ToQuery(), cancellationToken).ConfigureAwait(false);
+        ErrorOr<IEnumerable<PathSegmentResponse>> result = await _getPathParentQueryHandler.HandleAsync(request.ToQuery(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

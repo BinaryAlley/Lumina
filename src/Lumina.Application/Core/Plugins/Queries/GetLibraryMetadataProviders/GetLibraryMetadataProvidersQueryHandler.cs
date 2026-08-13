@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Mapping.Plugins;
 using Lumina.Contracts.Responses.Plugins;
-using Mediator;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +18,7 @@ namespace Lumina.Application.Core.Plugins.Queries.GetLibraryMetadataProviders;
 /// <summary>
 /// Handler for the query to get the metadata providers configured for a media library.
 /// </summary>
-public class GetLibraryMetadataProvidersQueryHandler : IRequestHandler<GetLibraryMetadataProvidersQuery, ErrorOr<IReadOnlyList<LibraryMetadataProviderResponse>>>
+public class GetLibraryMetadataProvidersQueryHandler : IQueryHandler<GetLibraryMetadataProvidersQuery, ErrorOr<IReadOnlyList<LibraryMetadataProviderResponse>>>
 {
     private readonly IUnitOfWork _unitOfWork;
 
@@ -34,15 +34,15 @@ public class GetLibraryMetadataProvidersQueryHandler : IRequestHandler<GetLibrar
     /// <summary>
     /// Handles the query to get the metadata providers configured for a media library.
     /// </summary>
-    /// <param name="request">The request to be handled.</param>
+    /// <param name="query">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
     /// An <see cref="ErrorOr{TValue}"/> containing either a collection of <see cref="LibraryMetadataProviderResponse"/>, or an error.
     /// </returns>
-    public async ValueTask<ErrorOr<IReadOnlyList<LibraryMetadataProviderResponse>>> Handle(GetLibraryMetadataProvidersQuery request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<IReadOnlyList<LibraryMetadataProviderResponse>>> HandleAsync(GetLibraryMetadataProvidersQuery query, CancellationToken cancellationToken)
     {
         ILibraryMetadataProviderConfigurationRepository configurationRepository = _unitOfWork.GetRepository<ILibraryMetadataProviderConfigurationRepository>();
-        ErrorOr<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>> getConfigurationsResult = await configurationRepository.GetByLibraryIdAsync(request.LibraryId, cancellationToken).ConfigureAwait(false);
+        ErrorOr<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>> getConfigurationsResult = await configurationRepository.GetByLibraryIdAsync(query.LibraryId, cancellationToken).ConfigureAwait(false);
         if (getConfigurationsResult.IsError)
             return getConfigurationsResult.Errors;
 

@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook;
 using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Presentation.Api.Common.Routes.Library.WrittenContentLibrary.BookLibrary;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,15 +19,15 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.B
 /// </summary>
 public class AddBookEndpoint : BaseEndpoint<AddBookRequest, IResult>
 {
-    private readonly ISender _sender;
+    private readonly ICommandHandler<AddBookCommand, ErrorOr<BookResponse>> _addBookCommandHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AddBookEndpoint"/> class.
     /// </summary>
-    /// <param name="sender">Injected service for mediating commands and queries.</param>
-    public AddBookEndpoint(ISender sender)
+    /// <param name="addBookCommandHandler">Injected service for handling add book commands.</param>
+    public AddBookEndpoint(ICommandHandler<AddBookCommand, ErrorOr<BookResponse>> addBookCommandHandler)
     {
-        _sender = sender;
+        _addBookCommandHandler = addBookCommandHandler;
     }
 
     /// <summary>
@@ -35,7 +35,7 @@ public class AddBookEndpoint : BaseEndpoint<AddBookRequest, IResult>
     /// </summary>
     public override void Configure()
     {
-        Verbs(Http.POST);
+        Verbs(FastEndpoints.Http.POST);
         Routes(ApiRoutes.Books.ADD_BOOK);
         Version(1);
         DontCatchExceptions();
@@ -48,7 +48,7 @@ public class AddBookEndpoint : BaseEndpoint<AddBookRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(AddBookRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<BookResponse> result = await _sender.Send(request.ToCommand(), cancellationToken).ConfigureAwait(false);
+        ErrorOr<BookResponse> result = await _addBookCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Created($"{BaseURL}api/v1{ApiRoutes.Books.ADD_BOOK}/{result.Value.Id}", result.Value), Problem);
     }
 }

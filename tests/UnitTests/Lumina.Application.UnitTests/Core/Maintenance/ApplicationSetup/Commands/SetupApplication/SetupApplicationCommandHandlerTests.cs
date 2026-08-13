@@ -8,6 +8,7 @@ using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Security;
 using Lumina.Application.Common.Infrastructure.Time;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.Maintenance.ApplicationSetup.Commands.SetupApplication;
 using Lumina.Application.UnitTests.Common.Mapping.UserManagement.Users.Fixtures;
 using Lumina.Application.UnitTests.Core.Maintenance.ApplicationSetup.Commands.SetupApplication.Fixtures;
@@ -53,6 +54,9 @@ public class SetupApplicationCommandHandlerTests
         _mockDateTimeProvider = Substitute.For<IDateTimeProvider>();
         _mockDataSeedService = Substitute.For<IDataSeedService>();
         _setupApplicationCommandFixture = new SetupApplicationCommandFixture();
+        IValidator<SetupApplicationCommand> mockValidator = Substitute.For<IValidator<SetupApplicationCommand>>();
+        mockValidator.Validate(Arg.Any<SetupApplicationCommand>())
+            .Returns([]);
 
         _mockUnitOfWork.GetRepository<IUserRepository>().Returns(_mockUserRepository);
         _mockDateTimeProvider.UtcNow.Returns(DateTime.UtcNow);
@@ -64,11 +68,12 @@ public class SetupApplicationCommandHandlerTests
             _mockTotpTokenGenerator,
             _mockQRCodeGenerator,
             _mockDateTimeProvider,
-            _mockDataSeedService);
+            _mockDataSeedService,
+            mockValidator);
     }
 
     [Fact]
-    public async Task Handle_WhenNoExistingUsers_ShouldCreateAdminUserWithout2FA()
+    public async Task HandleAsync_WhenNoExistingUsers_ShouldCreateAdminUserWithout2FA()
     {
         // Arrange
         SetupApplicationCommand command = _setupApplicationCommandFixture.CreateSetupApplicationCommand() with { Use2fa = false };
@@ -82,7 +87,7 @@ public class SetupApplicationCommandHandlerTests
             .Returns(Result.Created);
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -96,7 +101,7 @@ public class SetupApplicationCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenNoExistingUsersAndWith2FA_ShouldCreateAdminUserWithTOTP()
+    public async Task HandleAsync_WhenNoExistingUsersAndWith2FA_ShouldCreateAdminUserWithTOTP()
     {
         // Arrange
         SetupApplicationCommand command = _setupApplicationCommandFixture.CreateSetupApplicationCommand() with { Use2fa = true };
@@ -119,7 +124,7 @@ public class SetupApplicationCommandHandlerTests
             .Returns(Result.Created);
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -133,7 +138,7 @@ public class SetupApplicationCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserAlreadyExists_ShouldReturnError()
+    public async Task HandleAsync_WhenUserAlreadyExists_ShouldReturnError()
     {
         // Arrange
         SetupApplicationCommand command = _setupApplicationCommandFixture.CreateSetupApplicationCommand();
@@ -143,7 +148,7 @@ public class SetupApplicationCommandHandlerTests
             .Returns(new[] { existingUser });
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -155,7 +160,7 @@ public class SetupApplicationCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenGetAllUsersReturnsError_ShouldReturnError()
+    public async Task HandleAsync_WhenGetAllUsersReturnsError_ShouldReturnError()
     {
         // Arrange
         SetupApplicationCommand command = _setupApplicationCommandFixture.CreateSetupApplicationCommand();
@@ -165,7 +170,7 @@ public class SetupApplicationCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -177,7 +182,7 @@ public class SetupApplicationCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenInsertUserReturnsError_ShouldReturnError()
+    public async Task HandleAsync_WhenInsertUserReturnsError_ShouldReturnError()
     {
         // Arrange
         SetupApplicationCommand command = _setupApplicationCommandFixture.CreateSetupApplicationCommand();
@@ -189,7 +194,7 @@ public class SetupApplicationCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -201,7 +206,7 @@ public class SetupApplicationCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenSetDefaultAuthorizationPermissionsFails_ShouldReturnError()
+    public async Task HandleAsync_WhenSetDefaultAuthorizationPermissionsFails_ShouldReturnError()
     {
         // Arrange
         SetupApplicationCommand command = _setupApplicationCommandFixture.CreateSetupApplicationCommand();
@@ -215,7 +220,7 @@ public class SetupApplicationCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -226,7 +231,7 @@ public class SetupApplicationCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenSetDefaultAuthorizationRolesFails_ShouldReturnError()
+    public async Task HandleAsync_WhenSetDefaultAuthorizationRolesFails_ShouldReturnError()
     {
         // Arrange
         SetupApplicationCommand command = _setupApplicationCommandFixture.CreateSetupApplicationCommand();
@@ -242,7 +247,7 @@ public class SetupApplicationCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -254,7 +259,7 @@ public class SetupApplicationCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenSetAdminRolePermissionsFails_ShouldReturnError()
+    public async Task HandleAsync_WhenSetAdminRolePermissionsFails_ShouldReturnError()
     {
         // Arrange
         SetupApplicationCommand command = _setupApplicationCommandFixture.CreateSetupApplicationCommand();
@@ -272,7 +277,7 @@ public class SetupApplicationCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -285,7 +290,7 @@ public class SetupApplicationCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenSetAdminRoleToAdministratorAccountFails_ShouldReturnError()
+    public async Task HandleAsync_WhenSetAdminRoleToAdministratorAccountFails_ShouldReturnError()
     {
         // Arrange
         SetupApplicationCommand command = _setupApplicationCommandFixture.CreateSetupApplicationCommand();
@@ -305,7 +310,7 @@ public class SetupApplicationCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -318,7 +323,7 @@ public class SetupApplicationCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenAllOperationsSucceed_ShouldReturnSuccessResponse()
+    public async Task HandleAsync_WhenAllOperationsSucceed_ShouldReturnSuccessResponse()
     {
         // Arrange
         SetupApplicationCommand command = _setupApplicationCommandFixture.CreateSetupApplicationCommand();
@@ -337,7 +342,7 @@ public class SetupApplicationCommandHandlerTests
             .Returns(Result.Created);
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);

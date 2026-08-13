@@ -1,7 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Contracts.Responses.Authorization;
-using Mediator;
+using Lumina.Application.Common.CQRS;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -20,4 +18,4 @@ public record UpdateRoleCommand(
     Guid RoleId,
     string RoleName,
     List<Guid> Permissions
-) : IRequest<ErrorOr<RolePermissionsResponse>>;
+) : ICommand;

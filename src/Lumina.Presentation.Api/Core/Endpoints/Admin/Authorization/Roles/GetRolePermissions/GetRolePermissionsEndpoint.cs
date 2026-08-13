@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.Authorization;
+using Lumina.Application.Core.Admin.Authorization.Roles.Queries.GetRolePermissions;
 using Lumina.Contracts.Requests.Authorization;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.Presentation.Api.Common.Routes.UsersManagement;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,15 +19,15 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Admin.Authorization.Roles.GetRo
 /// </summary>
 public class GetRolePermissionsEndpoint : BaseEndpoint<GetRolePermissionsRequest, IResult>
 {
-    private readonly ISender _sender;
+    private readonly IQueryHandler<GetRolePermissionsQuery, ErrorOr<RolePermissionsResponse>> _addRoleQueryHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetRolePermissionsEndpoint"/> class.
     /// </summary>
-    /// <param name="sender">Injected service for mediating commands and queries.</param>
-    public GetRolePermissionsEndpoint(ISender sender)
+    /// <param name="addRoleQueryHandler">Injected service for handling add role commands.</param>
+    public GetRolePermissionsEndpoint(IQueryHandler<GetRolePermissionsQuery, ErrorOr<RolePermissionsResponse>> addRoleQueryHandler)
     {
-        _sender = sender;
+        _addRoleQueryHandler = addRoleQueryHandler;
     }
 
     /// <summary>
@@ -35,7 +35,7 @@ public class GetRolePermissionsEndpoint : BaseEndpoint<GetRolePermissionsRequest
     /// </summary>
     public override void Configure()
     {
-        Verbs(Http.GET);
+        Verbs(FastEndpoints.Http.GET);
         Routes(ApiRoutes.Roles.GET_ROLE_PERMISSIONS_BY_ROLE_ID);
         Version(1);
         DontCatchExceptions();
@@ -48,7 +48,7 @@ public class GetRolePermissionsEndpoint : BaseEndpoint<GetRolePermissionsRequest
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(GetRolePermissionsRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<RolePermissionsResponse> result = await _sender.Send(request.ToQuery(), cancellationToken).ConfigureAwait(false);
+        ErrorOr<RolePermissionsResponse> result = await _addRoleQueryHandler.HandleAsync(request.ToQuery(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

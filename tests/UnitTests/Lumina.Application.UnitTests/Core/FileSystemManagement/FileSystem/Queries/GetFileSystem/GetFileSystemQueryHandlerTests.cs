@@ -40,14 +40,14 @@ public class GetFileSystemQueryHandlerTests
     [Theory]
     [InlineData(PlatformType.Unix)]
     [InlineData(PlatformType.Windows)]
-    public async Task Handle_WhenCalled_ShouldReturnCorrectFileSystemTypeResponse(PlatformType platformType)
+    public async Task HandleAsync_WhenCalled_ShouldReturnCorrectFileSystemTypeResponse(PlatformType platformType)
     {
         // Arrange
         GetFileSystemQuery query = _fixture.Create<GetFileSystemQuery>();
         _mockPlatformContext.Platform.Returns(platformType);
 
         // Act
-        FileSystemTypeResponse result = await _sut.Handle(query, CancellationToken.None);
+        FileSystemTypeResponse result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
@@ -56,14 +56,14 @@ public class GetFileSystemQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCalled_ShouldReturnValueTaskResult()
+    public async Task HandleAsync_WhenCalled_ShouldReturnValueTaskResult()
     {
         // Arrange
         GetFileSystemQuery query = _fixture.Create<GetFileSystemQuery>();
         _mockPlatformContext.Platform.Returns(PlatformType.Unix);
 
         // Act
-        ValueTask<FileSystemTypeResponse> resultTask = _sut.Handle(query, CancellationToken.None);
+        Task<FileSystemTypeResponse> resultTask = _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(resultTask.IsCompleted);
@@ -73,7 +73,7 @@ public class GetFileSystemQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCalled_ShouldNotDependOnQueryContent()
+    public async Task HandleAsync_WhenCalled_ShouldNotDependOnQueryContent()
     {
         // Arrange
         GetFileSystemQuery query1 = _fixture.Create<GetFileSystemQuery>();
@@ -81,8 +81,8 @@ public class GetFileSystemQueryHandlerTests
         _mockPlatformContext.Platform.Returns(PlatformType.Windows);
 
         // Act
-        FileSystemTypeResponse result1 = await _sut.Handle(query1, CancellationToken.None);
-        FileSystemTypeResponse result2 = await _sut.Handle(query2, CancellationToken.None);
+        FileSystemTypeResponse result1 = await _sut.HandleAsync(query1, CancellationToken.None);
+        FileSystemTypeResponse result2 = await _sut.HandleAsync(query2, CancellationToken.None);
 
         // Assert
         Assert.Equal(result1.PlatformType, result2.PlatformType);
@@ -90,7 +90,7 @@ public class GetFileSystemQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenCalled_ShouldIgnoreCancellationToken()
+    public async Task HandleAsync_WhenCalled_ShouldIgnoreCancellationToken()
     {
         // Arrange
         GetFileSystemQuery query = _fixture.Create<GetFileSystemQuery>();
@@ -99,7 +99,7 @@ public class GetFileSystemQueryHandlerTests
 
         // Act & Assert
         Exception? exception = await Record.ExceptionAsync(async () =>
-            await _sut.Handle(query, cancellationToken));
+            await _sut.HandleAsync(query, cancellationToken));
         Assert.Null(exception);
         _mockPlatformContextManager.Received(1).GetCurrentContext();
     }

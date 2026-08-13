@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.Plugins;
+using Lumina.Application.Core.Plugins.Commands.ReorderLibraryMetadataProviders;
 using Lumina.Contracts.Requests.Plugins;
 using Lumina.Presentation.Api.Common.Routes.Library.Management;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,15 +18,15 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Plugins.ReorderLibraryMetadataP
 /// </summary>
 public class ReorderLibraryMetadataProvidersEndpoint : BaseEndpoint<ReorderLibraryMetadataProvidersRequest, IResult>
 {
-    private readonly ISender _sender;
+    private readonly ICommandHandler<ReorderLibraryMetadataProvidersCommand, ErrorOr<Success>> _reorderLibraryMetadataProvidersCommandHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ReorderLibraryMetadataProvidersEndpoint"/> class.
     /// </summary>
-    /// <param name="sender">Injected service for mediating commands and queries.</param>
-    public ReorderLibraryMetadataProvidersEndpoint(ISender sender)
+    /// <param name="reorderLibraryMetadataProvidersCommandHandler">Injected service for handling reorder library metadata providers commands.</param>
+    public ReorderLibraryMetadataProvidersEndpoint(ICommandHandler<ReorderLibraryMetadataProvidersCommand, ErrorOr<Success>> reorderLibraryMetadataProvidersCommandHandler)
     {
-        _sender = sender;
+        _reorderLibraryMetadataProvidersCommandHandler = reorderLibraryMetadataProvidersCommandHandler;
     }
 
     /// <summary>
@@ -34,7 +34,7 @@ public class ReorderLibraryMetadataProvidersEndpoint : BaseEndpoint<ReorderLibra
     /// </summary>
     public override void Configure()
     {
-        Verbs(Http.PUT);
+        Verbs(FastEndpoints.Http.PUT);
         Routes(ApiRoutes.Libraries.REORDER_LIBRARY_METADATA_PROVIDERS);
         Version(1);
         DontCatchExceptions();
@@ -47,7 +47,7 @@ public class ReorderLibraryMetadataProvidersEndpoint : BaseEndpoint<ReorderLibra
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(ReorderLibraryMetadataProvidersRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<Success> result = await _sender.Send(request.ToCommand(), cancellationToken).ConfigureAwait(false);
+        ErrorOr<Success> result = await _reorderLibraryMetadataProvidersCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

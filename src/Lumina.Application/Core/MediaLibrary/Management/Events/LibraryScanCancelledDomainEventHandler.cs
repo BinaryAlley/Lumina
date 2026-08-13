@@ -5,6 +5,7 @@ using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Events;
 using Lumina.Domain.Common.Exceptions;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
@@ -13,7 +14,6 @@ using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.Library
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Progress;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
-using Mediator;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -21,9 +21,9 @@ using System.Threading.Tasks;
 namespace Lumina.Application.Core.MediaLibrary.Management.Events;
 
 /// <summary>
-/// Handler for the event raised when a media library scan is cancelled.
+/// Handler for the domain event raised when a media library scan is cancelled.
 /// </summary>
-public class LibraryScanCancelledDomainEventHandler : INotificationHandler<LibraryScanCancelledDomainEvent>
+public class LibraryScanCancelledDomainEventHandler : IDomainEventHandler<LibraryScanCancelledDomainEvent>
 {
     private readonly IMediaLibraryScanningService _mediaLibraryScanningService;
     private readonly IMediaLibrariesScanCancellationTracker _mediaLibrariesScanCancellationTracker;
@@ -56,7 +56,7 @@ public class LibraryScanCancelledDomainEventHandler : INotificationHandler<Libra
     /// </summary>
     /// <param name="domainEvent">The domain event to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    public async ValueTask Handle(LibraryScanCancelledDomainEvent domainEvent, CancellationToken cancellationToken)
+    public async ValueTask HandleAsync(LibraryScanCancelledDomainEvent domainEvent, CancellationToken cancellationToken)
     {
         // get the library scan from the repository
         ErrorOr<LibraryScanEntity?> getLibraryScansResult = await _libraryScanRepository.GetByIdAsync(domainEvent.ScanId.Value, cancellationToken).ConfigureAwait(false);

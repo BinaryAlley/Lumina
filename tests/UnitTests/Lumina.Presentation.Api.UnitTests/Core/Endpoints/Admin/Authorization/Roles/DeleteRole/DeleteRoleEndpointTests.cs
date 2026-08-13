@@ -1,10 +1,9 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.Admin.Authorization.Roles.Commands.DeleteRole;
 using Lumina.Contracts.Requests.Authorization;
 using Lumina.Presentation.Api.Core.Endpoints.Admin.Authorization.Roles.DeleteRole;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -22,7 +21,7 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Admin.Authorization.R
 [ExcludeFromCodeCoverage]
 public class DeleteRoleEndpointTests
 {
-    private readonly ISender _mockSender;
+    private readonly ICommandHandler<DeleteRoleCommand, ErrorOr<Deleted>> _mockHandler;
     private readonly DeleteRoleEndpoint _sut;
 
     /// <summary>
@@ -30,8 +29,8 @@ public class DeleteRoleEndpointTests
     /// </summary>
     public DeleteRoleEndpointTests()
     {
-        _mockSender = Substitute.For<ISender>();
-        _sut = Factory.Create<DeleteRoleEndpoint>(_mockSender);
+        _mockHandler = Substitute.For<ICommandHandler<DeleteRoleCommand, ErrorOr<Deleted>>>();
+        _sut = FastEndpoints.Factory.Create<DeleteRoleEndpoint>(_mockHandler);
     }
 
     [Fact]
@@ -40,7 +39,7 @@ public class DeleteRoleEndpointTests
         // Arrange
         DeleteRoleRequest request = new(Guid.NewGuid());
         CancellationToken cancellationToken = CancellationToken.None;
-        _mockSender.Send(Arg.Any<DeleteRoleCommand>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<DeleteRoleCommand>(), Arg.Any<CancellationToken>())
             .Returns(ErrorOrFactory.From(Result.Deleted));
 
         // Act
@@ -51,13 +50,13 @@ public class DeleteRoleEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenMediatorReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
     {
         // Arrange
         DeleteRoleRequest request = new(Guid.NewGuid());
         CancellationToken cancellationToken = CancellationToken.None;
         Error expectedError = Error.Failure("Role.Deletion.Failed", "Failed to delete role.");
-        _mockSender.Send(Arg.Any<DeleteRoleCommand>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<DeleteRoleCommand>(), Arg.Any<CancellationToken>())
             .Returns(expectedError);
 
         // Act
@@ -83,14 +82,14 @@ public class DeleteRoleEndpointTests
         Guid roleId = Guid.NewGuid();
         DeleteRoleRequest request = new(roleId);
         CancellationToken cancellationToken = CancellationToken.None;
-        _mockSender.Send(Arg.Any<DeleteRoleCommand>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<DeleteRoleCommand>(), Arg.Any<CancellationToken>())
             .Returns(ErrorOrFactory.From(Result.Deleted));
 
         // Act
         await _sut.ExecuteAsync(request, cancellationToken);
 
         // Assert
-        await _mockSender.Received(1).Send(
+        await _mockHandler.Received(1).HandleAsync(
             Arg.Is<DeleteRoleCommand>(cmd => cmd.RoleId == request.RoleId),
             Arg.Is(cancellationToken));
     }
@@ -103,16 +102,14 @@ public class DeleteRoleEndpointTests
         TaskCompletionSource<bool> operationStarted = new();
         TaskCompletionSource<bool> cancellationRequested = new();
 
-        _mockSender.Send(Arg.Any<DeleteRoleCommand>(), Arg.Any<CancellationToken>())
-            .Returns(info => new ValueTask<ErrorOr<Deleted>>(
-                Task.Run(async () =>
-                {
-                    operationStarted.SetResult(true);
-                    await cancellationRequested.Task;
-                    info.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                    return ErrorOrFactory.From(Result.Deleted);
-                }, info.Arg<CancellationToken>())
-            ));
+        _mockHandler.HandleAsync(Arg.Any<DeleteRoleCommand>(), Arg.Any<CancellationToken>())
+            .Returns(info => Task.Run(async () =>
+            {
+                operationStarted.SetResult(true);
+                await cancellationRequested.Task;
+                info.Arg<CancellationToken>().ThrowIfCancellationRequested();
+                return ErrorOrFactory.From(Result.Deleted);
+            }, info.Arg<CancellationToken>()));
 
         // Act
         Task<IResult> operationTask = _sut.ExecuteAsync(new DeleteRoleRequest(Guid.NewGuid()), cts.Token);

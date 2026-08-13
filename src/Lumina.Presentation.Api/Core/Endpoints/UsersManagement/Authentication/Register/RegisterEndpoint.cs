@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.Authentication;
+using Lumina.Application.Core.UsersManagement.Authentication.Commands.RegisterUser;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.Presentation.Api.Common.Routes.UsersManagement;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
-using Mediator;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
@@ -20,15 +20,15 @@ namespace Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authentication.
 /// </summary>
 public class RegisterEndpoint : BaseEndpoint<RegistrationRequest, IResult>
 {
-    private readonly ISender _sender;
+    private readonly ICommandHandler<RegisterUserCommand, ErrorOr<RegistrationResponse>> _registerUserCommandHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RegisterEndpoint"/> class.
     /// </summary>
-    /// <param name="sender">Injected service for mediating commands and queries.</param>
-    public RegisterEndpoint(ISender sender)
+    /// <param name="registerUserCommandHandler">Injected service for handling register user commands.</param>
+    public RegisterEndpoint(ICommandHandler<RegisterUserCommand, ErrorOr<RegistrationResponse>> registerUserCommandHandler)
     {
-        _sender = sender;
+        _registerUserCommandHandler = registerUserCommandHandler;
     }
 
     /// <summary>
@@ -36,7 +36,7 @@ public class RegisterEndpoint : BaseEndpoint<RegistrationRequest, IResult>
     /// </summary>
     public override void Configure()
     {
-        Verbs(Http.POST);
+        Verbs(FastEndpoints.Http.POST);
         Routes(ApiRoutes.Authentication.REGISTER_ACCOUNT);
         Version(1);
         AllowAnonymous();
@@ -51,7 +51,7 @@ public class RegisterEndpoint : BaseEndpoint<RegistrationRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(RegistrationRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<RegistrationResponse> result = await _sender.Send(request.ToCommand(), cancellationToken).ConfigureAwait(false);
+        ErrorOr<RegistrationResponse> result = await _registerUserCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Created($"{BaseURL}api/v1{ApiRoutes.Users.GET_USER_BY_ID.Replace("{id}", success.Id.ToString())}", result.Value), Problem);
     }
 }

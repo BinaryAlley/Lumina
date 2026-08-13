@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Repositories.Authorization;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -8,7 +9,6 @@ using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Mapping.Authorization;
 using Lumina.Contracts.Responses.Authorization;
-using Mediator;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,7 +19,7 @@ namespace Lumina.Application.Core.Admin.Authorization.Roles.Queries.GetRoles;
 /// <summary>
 /// Handler for the query to retrieve the list of authorization roles.
 /// </summary>
-public class GetRolesQueryHandler : IRequestHandler<GetRolesQuery, ErrorOr<IEnumerable<RoleResponse>>>
+public class GetRolesQueryHandler : IQueryHandler<GetRolesQuery, ErrorOr<IEnumerable<RoleResponse>>>
 {
     private readonly ICurrentUserService _currentUserService;
     private readonly IAuthorizationService _authorizationService;
@@ -41,12 +41,12 @@ public class GetRolesQueryHandler : IRequestHandler<GetRolesQuery, ErrorOr<IEnum
     /// <summary>
     /// Handles the query to retrieve the list of authorization roles.
     /// </summary>
-    /// <param name="request">The request to be handled.</param>
+    /// <param name="query">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
     /// An <see cref="ErrorOr{TValue}"/> containing either a collection of <see cref="RoleResponse"/>, or an error message.
     /// </returns>
-    public async ValueTask<ErrorOr<IEnumerable<RoleResponse>>> Handle(GetRolesQuery request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<IEnumerable<RoleResponse>>> HandleAsync(GetRolesQuery query, CancellationToken cancellationToken)
     {
         // only admins can see the list of authorization roles
         bool isAdmin = await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false);

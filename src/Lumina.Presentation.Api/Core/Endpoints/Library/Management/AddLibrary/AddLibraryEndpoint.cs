@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
+using Lumina.Application.Core.MediaLibrary.Management.Commands.AddLibrary;
 using Lumina.Contracts.Requests.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
 using Lumina.Presentation.Api.Common.Routes.Library.Management;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,15 +19,15 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Library.Management.AddLibrary;
 /// </summary>
 public class AddLibraryEndpoint : BaseEndpoint<AddLibraryRequest, IResult>
 {
-    private readonly ISender _sender;
+    private readonly ICommandHandler<AddLibraryCommand, ErrorOr<LibraryResponse>> _addLibraryCommandHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AddLibraryEndpoint"/> class.
     /// </summary>
-    /// <param name="sender">Injected service for mediating commands and queries.</param>
-    public AddLibraryEndpoint(ISender sender)
+    /// <param name="addLibraryCommandHandler">Injected service for handling add library commands.</param>
+    public AddLibraryEndpoint(ICommandHandler<AddLibraryCommand, ErrorOr<LibraryResponse>> addLibraryCommandHandler)
     {
-        _sender = sender;
+        _addLibraryCommandHandler = addLibraryCommandHandler;
     }
 
     /// <summary>
@@ -35,7 +35,7 @@ public class AddLibraryEndpoint : BaseEndpoint<AddLibraryRequest, IResult>
     /// </summary>
     public override void Configure()
     {
-        Verbs(Http.POST);
+        Verbs(FastEndpoints.Http.POST);
         Routes(ApiRoutes.Libraries.ADD_LIBRARY);
         Version(1);
         DontCatchExceptions();
@@ -48,7 +48,7 @@ public class AddLibraryEndpoint : BaseEndpoint<AddLibraryRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(AddLibraryRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<LibraryResponse> result = await _sender.Send(request.ToCommand(), cancellationToken).ConfigureAwait(false);
+        ErrorOr<LibraryResponse> result = await _addLibraryCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Created($"{BaseURL}api/v1{ApiRoutes.Libraries.ADD_LIBRARY}/{result.Value.Id}", result.Value), Problem);
     }
 }

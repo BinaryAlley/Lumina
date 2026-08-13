@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Mediator;
+using Lumina.Application.Common.CQRS;
 using System;
 using System.Collections.Generic;
 #endregion
@@ -15,4 +14,4 @@ namespace Lumina.Application.Core.Plugins.Commands.UpdatePluginSettings;
 public record UpdatePluginSettingsCommand(
     Guid PluginId,
     IReadOnlyDictionary<string, string>? Settings
-) : IRequest<ErrorOr<Success>>;
+) : ICommand;

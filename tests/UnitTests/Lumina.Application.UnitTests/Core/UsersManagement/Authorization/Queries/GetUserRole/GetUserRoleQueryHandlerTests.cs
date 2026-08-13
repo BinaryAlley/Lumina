@@ -6,6 +6,7 @@ using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetUserRole;
 using Lumina.Application.UnitTests.Common.Mapping.UserManagement.Users.Fixtures;
 using Lumina.Application.UnitTests.Core.UsersManagement.Authorization.Queries.GetUserRole.Fixtures;
@@ -48,14 +49,18 @@ public class GetUserRoleQueryHandlerTests
         _mockCurrentUserService.UserId.Returns(_userId);
         _mockUnitOfWork.GetRepository<IUserRepository>().Returns(_mockUserRepository);
 
+        IValidator<GetUserRoleQuery> mockValidator = Substitute.For<IValidator<GetUserRoleQuery>>();
+        mockValidator.Validate(Arg.Any<GetUserRoleQuery>())
+            .Returns([]);
         _sut = new GetUserRoleQueryHandler(
             _mockAuthorizationService,
             _mockCurrentUserService,
-            _mockUnitOfWork);
+            _mockUnitOfWork,
+            mockValidator);
     }
 
     [Fact]
-    public async Task Handle_WhenUserIsNotAdmin_ShouldReturnNotAuthorizedError()
+    public async Task HandleAsync_WhenUserIsNotAdmin_ShouldReturnNotAuthorizedError()
     {
         // Arrange
         GetUserRoleQuery query = _getUserRoleQueryFixture.CreateQuery();
@@ -63,7 +68,7 @@ public class GetUserRoleQueryHandlerTests
             .Returns(false);
 
         // Act
-        ErrorOr<RoleResponse?> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<RoleResponse?> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -72,7 +77,7 @@ public class GetUserRoleQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenGetUserByIdFails_ShouldReturnError()
+    public async Task HandleAsync_WhenGetUserByIdFails_ShouldReturnError()
     {
         // Arrange
         GetUserRoleQuery query = _getUserRoleQueryFixture.CreateQuery();
@@ -84,7 +89,7 @@ public class GetUserRoleQueryHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<RoleResponse?> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<RoleResponse?> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -92,7 +97,7 @@ public class GetUserRoleQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserDoesNotExist_ShouldReturnUsernameDoesNotExistError()
+    public async Task HandleAsync_WhenUserDoesNotExist_ShouldReturnUsernameDoesNotExistError()
     {
         // Arrange
         GetUserRoleQuery query = _getUserRoleQueryFixture.CreateQuery();
@@ -103,7 +108,7 @@ public class GetUserRoleQueryHandlerTests
             .Returns((UserEntity?)null);
 
         // Act
-        ErrorOr<RoleResponse?> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<RoleResponse?> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -111,7 +116,7 @@ public class GetUserRoleQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserHasNoRole_ShouldReturnNull()
+    public async Task HandleAsync_WhenUserHasNoRole_ShouldReturnNull()
     {
         // Arrange
         GetUserRoleQuery query = _getUserRoleQueryFixture.CreateQuery();
@@ -123,7 +128,7 @@ public class GetUserRoleQueryHandlerTests
             .Returns(user);
 
         // Act
-        ErrorOr<RoleResponse?> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<RoleResponse?> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -131,7 +136,7 @@ public class GetUserRoleQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenUserHasRole_ShouldReturnRole()
+    public async Task HandleAsync_WhenUserHasRole_ShouldReturnRole()
     {
         // Arrange
         GetUserRoleQuery query = _getUserRoleQueryFixture.CreateQuery();
@@ -159,7 +164,7 @@ public class GetUserRoleQueryHandlerTests
             .Returns(user);
 
         // Act
-        ErrorOr<RoleResponse?> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<RoleResponse?> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);

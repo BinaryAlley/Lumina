@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Mapping.Authentication;
+using Lumina.Application.Core.UsersManagement.Authentication.Queries.LoginUser;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.Presentation.Api.Common.Routes.UsersManagement;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
-using Mediator;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
@@ -23,15 +23,15 @@ namespace Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authentication.
 /// </summary>
 public class LoginEndpoint : BaseEndpoint<LoginRequest, IResult>
 {
-    private readonly ISender _sender;
+    private readonly IQueryHandler<LoginUserQuery, ErrorOr<LoginResponse>> _loginQueryHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LoginEndpoint"/> class.
     /// </summary>
-    /// <param name="sender">Injected service for mediating commands and queries.</param>
-    public LoginEndpoint(ISender sender)
+    /// <param name="loginQueryHandler">Injected service for handling login queries.</param>
+    public LoginEndpoint(IQueryHandler<LoginUserQuery, ErrorOr<LoginResponse>> loginQueryHandler)
     {
-        _sender = sender;
+        _loginQueryHandler = loginQueryHandler;
     }
 
     /// <summary>
@@ -39,7 +39,7 @@ public class LoginEndpoint : BaseEndpoint<LoginRequest, IResult>
     /// </summary>
     public override void Configure()
     {
-        Verbs(Http.POST);
+        Verbs(FastEndpoints.Http.POST);
         Routes(ApiRoutes.Authentication.LOGIN_ACCOUNT);
         Version(1);
         AllowAnonymous();
@@ -54,7 +54,7 @@ public class LoginEndpoint : BaseEndpoint<LoginRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(LoginRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<LoginResponse> result = await _sender.Send(request.ToQuery(), cancellationToken).ConfigureAwait(false);
+        ErrorOr<LoginResponse> result = await _loginQueryHandler.HandleAsync(request.ToQuery(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

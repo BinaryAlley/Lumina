@@ -1,8 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation.TestHelper;
+using ErrorOr;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Core.UsersManagement.Authentication.Queries.LoginUser;
+using Lumina.Application.UnitTests.Common.Setup;
 using Lumina.Application.UnitTests.Core.UsersManagement.Authentication.Queries.LoginUser.Fixtures;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -32,11 +34,10 @@ public class LoginUserQueryValidatorTests
         query = query with { Username = null! };
 
         // Act
-        TestValidationResult<LoginUserQuery> result = _validator.TestValidate(query);
+        List<Error> result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Username)
-            .WithErrorMessage(Errors.Authentication.UsernameCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.UsernameCannotBeEmpty);
     }
 
     [Fact]
@@ -47,11 +48,10 @@ public class LoginUserQueryValidatorTests
         query = query with { Username = string.Empty };
 
         // Act
-        TestValidationResult<LoginUserQuery> result = _validator.TestValidate(query);
+        List<Error> result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Username)
-            .WithErrorMessage(Errors.Authentication.UsernameCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.UsernameCannotBeEmpty);
     }
 
     [Fact]
@@ -62,11 +62,10 @@ public class LoginUserQueryValidatorTests
         query = query with { Username = "   " };
 
         // Act
-        TestValidationResult<LoginUserQuery> result = _validator.TestValidate(query);
+        List<Error> result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Username)
-            .WithErrorMessage(Errors.Authentication.UsernameCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.UsernameCannotBeEmpty);
     }
 
     [Fact]
@@ -77,11 +76,10 @@ public class LoginUserQueryValidatorTests
         query = query with { Password = null! };
 
         // Act
-        TestValidationResult<LoginUserQuery> result = _validator.TestValidate(query);
+        List<Error> result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Password)
-            .WithErrorMessage(Errors.Authentication.PasswordCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.PasswordCannotBeEmpty);
     }
 
     [Fact]
@@ -92,11 +90,10 @@ public class LoginUserQueryValidatorTests
         query = query with { Password = string.Empty };
 
         // Act
-        TestValidationResult<LoginUserQuery> result = _validator.TestValidate(query);
+        List<Error> result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Password)
-            .WithErrorMessage(Errors.Authentication.PasswordCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.PasswordCannotBeEmpty);
     }
 
     [Fact]
@@ -107,11 +104,10 @@ public class LoginUserQueryValidatorTests
         query = query with { Password = "   " };
 
         // Act
-        TestValidationResult<LoginUserQuery> result = _validator.TestValidate(query);
+        List<Error> result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Password)
-            .WithErrorMessage(Errors.Authentication.PasswordCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.PasswordCannotBeEmpty);
     }
 
     [Theory]
@@ -128,11 +124,10 @@ public class LoginUserQueryValidatorTests
         query = query with { Password = password };
 
         // Act
-        TestValidationResult<LoginUserQuery> result = _validator.TestValidate(query);
+        List<Error> result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Password)
-            .WithErrorMessage(Errors.Authentication.InvalidPassword.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.InvalidPassword);
     }
 
     [Theory]
@@ -147,10 +142,10 @@ public class LoginUserQueryValidatorTests
         query = query with { Password = password };
 
         // Act
-        TestValidationResult<LoginUserQuery> result = _validator.TestValidate(query);
+        List<Error> result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Password);
+        result.ShouldNotHaveValidationError(Errors.Authentication.InvalidPassword);
     }
 
     [Theory]
@@ -167,11 +162,10 @@ public class LoginUserQueryValidatorTests
         query = query with { TotpCode = totpCode };
 
         // Act
-        TestValidationResult<LoginUserQuery> result = _validator.TestValidate(query);
+        List<Error> result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.TotpCode)
-            .WithErrorMessage(Errors.Authentication.InvalidTotpCode.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.InvalidTotpCode);
     }
 
     [Theory]
@@ -185,10 +179,10 @@ public class LoginUserQueryValidatorTests
         query = query with { TotpCode = totpCode };
 
         // Act
-        TestValidationResult<LoginUserQuery> result = _validator.TestValidate(query);
+        List<Error> result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.TotpCode);
+        result.ShouldNotHaveValidationError(Errors.Authentication.InvalidTotpCode);
     }
 
     [Fact]
@@ -199,10 +193,10 @@ public class LoginUserQueryValidatorTests
         query = query with { TotpCode = null };
 
         // Act
-        TestValidationResult<LoginUserQuery> result = _validator.TestValidate(query);
+        List<Error> result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.TotpCode);
+        result.ShouldNotHaveValidationError(Errors.Authentication.InvalidTotpCode);
     }
 
     [Fact]
@@ -212,11 +206,11 @@ public class LoginUserQueryValidatorTests
         LoginUserQuery query = LoginUserQueryFixture.CreateLoginQuery(true);
 
         // Act
-        TestValidationResult<LoginUserQuery> result = _validator.TestValidate(query);
+        List<Error> result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Username);
-        result.ShouldNotHaveValidationErrorFor(x => x.Password);
-        result.ShouldNotHaveValidationErrorFor(x => x.TotpCode);
+        result.ShouldNotHaveValidationError(Errors.Authentication.UsernameCannotBeEmpty);
+        result.ShouldNotHaveValidationError(Errors.Authentication.InvalidPassword);
+        result.ShouldNotHaveValidationError(Errors.Authentication.InvalidTotpCode);
     }
 }

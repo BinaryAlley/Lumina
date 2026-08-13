@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.FileSystemManagement.Paths.Queries.GetPathSeparator;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
 using Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.GetPathSeparator;
 using Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.Fixtures;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -22,7 +22,7 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.
 [ExcludeFromCodeCoverage]
 public class GetPathSeparatorEndpointTests
 {
-    private readonly ISender _mockSender;
+    private readonly IQueryHandler<GetPathSeparatorQuery, PathSeparatorResponse> _mockHandler;
     private readonly GetPathSeparatorEndpoint _sut;
     private readonly PathSeparatorResponseFixture _pathSeparatorResponseFixture;
 
@@ -31,8 +31,8 @@ public class GetPathSeparatorEndpointTests
     /// </summary>
     public GetPathSeparatorEndpointTests()
     {
-        _mockSender = Substitute.For<ISender>();
-        _sut = Factory.Create<GetPathSeparatorEndpoint>(_mockSender);
+        _mockHandler = Substitute.For<IQueryHandler<GetPathSeparatorQuery, PathSeparatorResponse>>();
+        _sut = Factory.Create<GetPathSeparatorEndpoint>(_mockHandler);
         _pathSeparatorResponseFixture = new PathSeparatorResponseFixture();
     }
 
@@ -42,7 +42,7 @@ public class GetPathSeparatorEndpointTests
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;
         PathSeparatorResponse expectedResponse = _pathSeparatorResponseFixture.Create();
-        _mockSender.Send(Arg.Any<GetPathSeparatorQuery>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<GetPathSeparatorQuery>(), Arg.Any<CancellationToken>())
             .Returns(expectedResponse);
 
         // Act
@@ -54,18 +54,18 @@ public class GetPathSeparatorEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalled_ShouldSendGetPathSeparatorQueryToMediator()
+    public async Task ExecuteAsync_WhenCalled_ShouldSendGetPathSeparatorQueryToHandler()
     {
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;
-        _mockSender.Send(Arg.Any<GetPathSeparatorQuery>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<GetPathSeparatorQuery>(), Arg.Any<CancellationToken>())
             .Returns(_pathSeparatorResponseFixture.Create());
 
         // Act
         await _sut.ExecuteAsync(cancellationToken);
 
         // Assert
-        await _mockSender.Received(1).Send(Arg.Any<GetPathSeparatorQuery>(), Arg.Is(cancellationToken));
+        await _mockHandler.Received(1).HandleAsync(Arg.Any<GetPathSeparatorQuery>(), Arg.Is(cancellationToken));
     }
 
     [Fact]
@@ -76,14 +76,14 @@ public class GetPathSeparatorEndpointTests
         TaskCompletionSource<bool> operationStarted = new();
         TaskCompletionSource<bool> cancellationRequested = new();
 
-        _mockSender.Send(Arg.Any<GetPathSeparatorQuery>(), Arg.Any<CancellationToken>())
-            .Returns(callInfo => new ValueTask<PathSeparatorResponse>(Task.Run(async () =>
+        _mockHandler.HandleAsync(Arg.Any<GetPathSeparatorQuery>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo => Task.Run(async () =>
             {
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
                 return _pathSeparatorResponseFixture.Create();
-            }, callInfo.Arg<CancellationToken>())));
+            }, callInfo.Arg<CancellationToken>()));
 
         // Act
         Task<IResult> operationTask = _sut.ExecuteAsync(cts.Token);

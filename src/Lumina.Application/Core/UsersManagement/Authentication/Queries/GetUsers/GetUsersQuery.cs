@@ -1,8 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Contracts.Responses.UsersManagement.Users;
-using Mediator;
-using System.Collections.Generic;
+using Lumina.Application.Common.CQRS;
 #endregion
 
 namespace Lumina.Application.Core.UsersManagement.Authentication.Queries.GetUsers;
@@ -10,4 +7,4 @@ namespace Lumina.Application.Core.UsersManagement.Authentication.Queries.GetUser
 /// <summary>
 /// Query for retrieving the list of users.
 /// </summary>
-public record GetUsersQuery() : IRequest<ErrorOr<IEnumerable<UserResponse>>>;
+public record GetUsersQuery() : IQuery;

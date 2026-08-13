@@ -1,11 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.MediaLibrary.Management.Commands.ScanLibraries;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
 using Lumina.Presentation.Api.Common.Routes.Library.Management;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.Threading;
@@ -17,17 +16,17 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Library.Management.ScanLibrarie
 /// <summary>
 /// API endpoint for the <c>/libraries/scans</c> route.
 /// </summary>
-public class ScanLibrariesEndpoint : BaseEndpoint<EmptyRequest, IResult>
+public class ScanLibrariesEndpoint : BaseEndpoint<FastEndpoints.EmptyRequest, IResult>
 {
-    private readonly ISender _sender;
+    private readonly ICommandHandler<ScanLibrariesCommand, ErrorOr<IEnumerable<MediaLibraryScanResponse>>> _scanLibrariesCommandHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ScanLibrariesEndpoint"/> class.
     /// </summary>
-    /// <param name="sender">Injected service for mediating commands and queries.</param>
-    public ScanLibrariesEndpoint(ISender sender)
+    /// <param name="scanLibrariesCommandHandler">Injected service for handling scan libraries commands.</param>
+    public ScanLibrariesEndpoint(ICommandHandler<ScanLibrariesCommand, ErrorOr<IEnumerable<MediaLibraryScanResponse>>> scanLibrariesCommandHandler)
     {
-        _sender = sender;
+        _scanLibrariesCommandHandler = scanLibrariesCommandHandler;
     }
 
     /// <summary>
@@ -35,7 +34,7 @@ public class ScanLibrariesEndpoint : BaseEndpoint<EmptyRequest, IResult>
     /// </summary>
     public override void Configure()
     {
-        Verbs(Http.POST);
+        Verbs(FastEndpoints.Http.POST);
         Routes(ApiRoutes.Libraries.SCAN_LIBRARIES);
         Version(1);
         DontCatchExceptions();
@@ -45,9 +44,9 @@ public class ScanLibrariesEndpoint : BaseEndpoint<EmptyRequest, IResult>
     /// Initiates a scan of all media libraries.
     /// </summary>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    public override async Task<IResult> ExecuteAsync(EmptyRequest _, CancellationToken cancellationToken)
+    public override async Task<IResult> ExecuteAsync(FastEndpoints.EmptyRequest _, CancellationToken cancellationToken)
     {
-        ErrorOr<IEnumerable<MediaLibraryScanResponse>> result = await _sender.Send(new ScanLibrariesCommand(), cancellationToken).ConfigureAwait(false);
+        ErrorOr<IEnumerable<MediaLibraryScanResponse>> result = await _scanLibrariesCommandHandler.HandleAsync(new ScanLibrariesCommand(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

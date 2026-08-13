@@ -2,6 +2,7 @@
 using ErrorOr;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.Plugins.Commands.UpdatePluginSettings;
 using NSubstitute;
 using System;
@@ -29,11 +30,14 @@ public class UpdatePluginSettingsCommandHandlerTests
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
         _mockPluginRepository = Substitute.For<IPluginRepository>();
         _mockUnitOfWork.GetRepository<IPluginRepository>().Returns(_mockPluginRepository);
-        _sut = new UpdatePluginSettingsCommandHandler(_mockUnitOfWork);
+        IValidator<UpdatePluginSettingsCommand> mockValidator = Substitute.For<IValidator<UpdatePluginSettingsCommand>>();
+        mockValidator.Validate(Arg.Any<UpdatePluginSettingsCommand>())
+            .Returns([]);
+        _sut = new UpdatePluginSettingsCommandHandler(_mockUnitOfWork, mockValidator);
     }
 
     [Fact]
-    public async Task Handle_WhenCalled_ShouldPersistTheSettings()
+    public async Task HandleAsync_WhenCalled_ShouldPersistTheSettings()
     {
         // Arrange
         Guid pluginId = Guid.NewGuid();
@@ -42,7 +46,7 @@ public class UpdatePluginSettingsCommandHandlerTests
             .Returns(Result.Updated);
 
         // Act
-        ErrorOr<Success> result = await _sut.Handle(new UpdatePluginSettingsCommand(pluginId, settings), CancellationToken.None);
+        ErrorOr<Success> result = await _sut.HandleAsync(new UpdatePluginSettingsCommand(pluginId, settings), CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);

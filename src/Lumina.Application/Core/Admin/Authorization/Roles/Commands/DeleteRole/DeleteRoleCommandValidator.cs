@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation;
 using Lumina.Application.Common.Errors;
+using Lumina.Application.Common.Infrastructure.Validation;
+using Lumina.Application.Common.Utilities;
 using System;
 #endregion
 
@@ -16,8 +17,8 @@ public class DeleteRoleCommandValidator : AbstractValidator<DeleteRoleCommand>
     /// </summary>
     public DeleteRoleCommandValidator()
     {
-        RuleFor(x => x.RoleId)
-            .NotEmpty().WithMessage(Errors.Authorization.RoleIdCannotBeEmpty.Description)
-            .Must(id => id != Guid.Empty).WithMessage(Errors.Authorization.RoleIdCannotBeEmpty.Description);
+        RuleFor(command => command.RoleId)
+            .NotEmpty().WithError(Errors.Authorization.RoleIdCannotBeEmpty)
+            .Must(id => id != Guid.Empty).WithError(Errors.Authorization.RoleIdCannotBeEmpty);
     }
 }

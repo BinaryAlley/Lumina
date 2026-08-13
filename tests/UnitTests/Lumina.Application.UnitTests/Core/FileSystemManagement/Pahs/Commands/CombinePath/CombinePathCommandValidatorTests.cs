@@ -1,8 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation.TestHelper;
+using ErrorOr;
 using Lumina.Application.Core.FileSystemManagement.Paths.Commands.CombinePath;
+using Lumina.Application.UnitTests.Common.Setup;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Pahs.Commands.CombinePath.Fixtures;
 using Lumina.Domain.SharedKernel.Common.Errors;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -32,11 +34,10 @@ public class CombinePathCommandValidatorTests
         command = command with { OriginalPath = null! };
 
         // Act
-        TestValidationResult<CombinePathCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.OriginalPath)
-            .WithErrorMessage(Errors.FileSystemManagement.PathCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.FileSystemManagement.PathCannotBeEmpty);
     }
 
     [Fact]
@@ -47,11 +48,10 @@ public class CombinePathCommandValidatorTests
         command = command with { OriginalPath = string.Empty };
 
         // Act
-        TestValidationResult<CombinePathCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.OriginalPath)
-            .WithErrorMessage(Errors.FileSystemManagement.PathCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.FileSystemManagement.PathCannotBeEmpty);
     }
 
     [Fact]
@@ -62,11 +62,10 @@ public class CombinePathCommandValidatorTests
         command = command with { OriginalPath = "   " };
 
         // Act
-        TestValidationResult<CombinePathCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.OriginalPath)
-            .WithErrorMessage(Errors.FileSystemManagement.PathCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.FileSystemManagement.PathCannotBeEmpty);
     }
 
     [Fact]
@@ -77,11 +76,10 @@ public class CombinePathCommandValidatorTests
         command = command with { NewPath = null! };
 
         // Act
-        TestValidationResult<CombinePathCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.NewPath)
-            .WithErrorMessage(Errors.FileSystemManagement.PathCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.FileSystemManagement.PathCannotBeEmpty);
     }
 
     [Fact]
@@ -92,11 +90,10 @@ public class CombinePathCommandValidatorTests
         command = command with { NewPath = string.Empty };
 
         // Act
-        TestValidationResult<CombinePathCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.NewPath)
-            .WithErrorMessage(Errors.FileSystemManagement.PathCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.FileSystemManagement.PathCannotBeEmpty);
     }
 
     [Fact]
@@ -107,11 +104,10 @@ public class CombinePathCommandValidatorTests
         command = command with { NewPath = "   " };
 
         // Act
-        TestValidationResult<CombinePathCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.NewPath)
-            .WithErrorMessage(Errors.FileSystemManagement.PathCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.FileSystemManagement.PathCannotBeEmpty);
     }
 
     [Fact]
@@ -122,10 +118,10 @@ public class CombinePathCommandValidatorTests
         command = command with { OriginalPath = "/valid/path", NewPath = "new/segment" };
 
         // Act
-        TestValidationResult<CombinePathCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.OriginalPath);
-        result.ShouldNotHaveValidationErrorFor(x => x.NewPath);
+        result.ShouldNotHaveValidationError(Errors.FileSystemManagement.PathCannotBeEmpty);
+        result.ShouldNotHaveValidationError(Errors.FileSystemManagement.PathCannotBeEmpty);
     }
 }

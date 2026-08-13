@@ -1,8 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Contracts.Responses.FileSystemManagement.Files;
-using Mediator;
-using System.Collections.Generic;
+using Lumina.Application.Common.CQRS;
 using System.Diagnostics;
 #endregion
 
@@ -17,4 +14,4 @@ namespace Lumina.Application.Core.FileSystemManagement.Files.Queries.GetFiles;
 public record GetFilesQuery(
     string? Path, 
     bool IncludeHiddenElements
-) : IRequest<ErrorOr<IEnumerable<FileResponse>>>;
+) : IQuery;

@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Responses.FileSystemManagement.FileSystem;
-using Mediator;
+using Lumina.Application.Common.CQRS;
 #endregion
 
 namespace Lumina.Application.Core.FileSystemManagement.FileSystem.Queries.GetFileSystem;
@@ -8,4 +7,4 @@ namespace Lumina.Application.Core.FileSystemManagement.FileSystem.Queries.GetFil
 /// <summary>
 /// Query for retrieving the file system type.
 /// </summary>
-public record GetFileSystemQuery() : IRequest<FileSystemTypeResponse>;
+public record GetFileSystemQuery() : IQuery;

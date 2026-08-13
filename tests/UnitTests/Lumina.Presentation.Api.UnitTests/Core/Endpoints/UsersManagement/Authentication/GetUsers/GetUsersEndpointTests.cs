@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.UsersManagement.Authentication.Queries.GetUsers;
 using Lumina.Contracts.Responses.UsersManagement.Users;
 using Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authentication.GetUsers;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -23,15 +23,15 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.UsersManagement.Authe
 [ExcludeFromCodeCoverage]
 public class GetUsersEndpointTests
 {
-    private readonly ISender _mockSender;
+    private readonly IQueryHandler<GetUsersQuery, ErrorOr<IEnumerable<UserResponse>>> _mockHandler;
     private readonly GetUsersEndpoint _sut;
     /// <summary>
     /// Initializes a new instance of the <see cref="GetUsersEndpointTests"/> class.
     /// </summary>
     public GetUsersEndpointTests()
     {
-        _mockSender = Substitute.For<ISender>();
-        _sut = Factory.Create<GetUsersEndpoint>(_mockSender);
+        _mockHandler = Substitute.For<IQueryHandler<GetUsersQuery, ErrorOr<IEnumerable<UserResponse>>>>();
+        _sut = Factory.Create<GetUsersEndpoint>(_mockHandler);
     }
 
     [Fact]
@@ -43,7 +43,7 @@ public class GetUsersEndpointTests
         [
         new UserResponse(Guid.NewGuid(), "testUser", DateTime.UtcNow, null)
     ];
-        _mockSender.Send(Arg.Any<GetUsersQuery>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<GetUsersQuery>(), Arg.Any<CancellationToken>())
             .Returns(ErrorOrFactory.From(expectedResponse));
 
         // Act
@@ -55,12 +55,12 @@ public class GetUsersEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenMediatorReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
     {
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;
         Error expectedError = Error.Failure("Users.NotFound", "No users found.");
-        _mockSender.Send(Arg.Any<GetUsersQuery>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<GetUsersQuery>(), Arg.Any<CancellationToken>())
             .Returns(expectedError);
 
         // Act
@@ -84,16 +84,14 @@ public class GetUsersEndpointTests
     {
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;
-        _mockSender.Send(Arg.Any<GetUsersQuery>(), Arg.Any<CancellationToken>())
-            .Returns(new ValueTask<ErrorOr<IEnumerable<UserResponse>>>(
-                ErrorOrFactory.From(Array.Empty<UserResponse>() as IEnumerable<UserResponse>)
-            ));
+        _mockHandler.HandleAsync(Arg.Any<GetUsersQuery>(), Arg.Any<CancellationToken>())
+            .Returns(ErrorOrFactory.From(Array.Empty<UserResponse>() as IEnumerable<UserResponse>));
 
         // Act
         await _sut.ExecuteAsync(new EmptyRequest(), cancellationToken);
 
         // Assert
-        await _mockSender.Received(1).Send(
+        await _mockHandler.Received(1).HandleAsync(
             Arg.Any<GetUsersQuery>(),
             Arg.Is(cancellationToken));
     }
@@ -106,16 +104,14 @@ public class GetUsersEndpointTests
         TaskCompletionSource<bool> operationStarted = new();
         TaskCompletionSource<bool> cancellationRequested = new();
 
-        _mockSender.Send(Arg.Any<GetUsersQuery>(), Arg.Any<CancellationToken>())
-            .Returns(info => new ValueTask<ErrorOr<IEnumerable<UserResponse>>>(
-                Task.Run(async () =>
-                {
-                    operationStarted.SetResult(true);
-                    await cancellationRequested.Task;
-                    info.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                    return ErrorOrFactory.From(Array.Empty<UserResponse>() as IEnumerable<UserResponse>);
-                }, info.Arg<CancellationToken>())
-            ));
+        _mockHandler.HandleAsync(Arg.Any<GetUsersQuery>(), Arg.Any<CancellationToken>())
+            .Returns(info => Task.Run(async () =>
+            {
+                operationStarted.SetResult(true);
+                await cancellationRequested.Task;
+                info.Arg<CancellationToken>().ThrowIfCancellationRequested();
+                return ErrorOrFactory.From(Array.Empty<UserResponse>() as IEnumerable<UserResponse>);
+            }, info.Arg<CancellationToken>()));
 
         // Act
         Task<IResult> operationTask = _sut.ExecuteAsync(new EmptyRequest(), cts.Token);

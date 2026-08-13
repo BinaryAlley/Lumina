@@ -1,7 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Contracts.Responses.Authentication;
-using Mediator;
+using Lumina.Application.Common.CQRS;
 using System.Diagnostics;
 #endregion
 
@@ -18,4 +16,4 @@ public record LoginUserQuery(
     string? Username,
     string? Password,
     string? TotpCode = null
-) : IRequest<ErrorOr<LoginResponse>>;
+) : IQuery;

@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using FluentValidation;
-using FluentValidation.Results;
+using ErrorOr;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Infrastructure.Common.Validation;
 using Lumina.Infrastructure.UnitTests.Common.Validation.Fixtures;
 using Microsoft.Extensions.Options;
@@ -15,17 +15,17 @@ using System.Diagnostics.CodeAnalysis;
 namespace Lumina.Infrastructure.UnitTests.Common.Validation;
 
 /// <summary>
-/// Contains unit tests for the <see cref="FluentValidationOptions"/> class.
+/// Contains unit tests for the <see cref="ValidationOptions"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class FluentValidationOptionsTests
+public class ValidationOptionsTests
 {
     private readonly IFixture _fixture;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="FluentValidationOptionsTests"/> class.
+    /// Initializes a new instance of the <see cref="ValidationOptionsTests"/> class.
     /// </summary>
-    public FluentValidationOptionsTests()
+    public ValidationOptionsTests()
     {
         _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
     }
@@ -35,10 +35,10 @@ public class FluentValidationOptionsTests
     {
         // Arrange
         string name = _fixture.Create<string>();
-        FluentValidationOptionsFixture options = _fixture.Create<FluentValidationOptionsFixture>();
-        IValidator<FluentValidationOptionsFixture> validator = Substitute.For<IValidator<FluentValidationOptionsFixture>>();
-        validator.Validate(options).Returns(new ValidationResult());
-        FluentValidationOptions<FluentValidationOptionsFixture> sut = new(name, validator);
+        ValidationOptionsFixture options = _fixture.Create<ValidationOptionsFixture>();
+        IValidator<ValidationOptionsFixture> validator = Substitute.For<IValidator<ValidationOptionsFixture>>();
+        validator.Validate(options).Returns([]);
+        ValidationOptions<ValidationOptionsFixture> sut = new(name, validator);
 
         // Act
         ValidateOptionsResult result = sut.Validate(name, options);
@@ -55,9 +55,9 @@ public class FluentValidationOptionsTests
         // Arrange
         string name = _fixture.Create<string>();
         string differentName = _fixture.Create<string>();
-        FluentValidationOptionsFixture options = _fixture.Create<FluentValidationOptionsFixture>();
-        IValidator<FluentValidationOptionsFixture> validator = Substitute.For<IValidator<FluentValidationOptionsFixture>>();
-        FluentValidationOptions<FluentValidationOptionsFixture> sut = new(name, validator);
+        ValidationOptionsFixture options = _fixture.Create<ValidationOptionsFixture>();
+        IValidator<ValidationOptionsFixture> validator = Substitute.For<IValidator<ValidationOptionsFixture>>();
+        ValidationOptions<ValidationOptionsFixture> sut = new(name, validator);
 
         // Act
         ValidateOptionsResult result = sut.Validate(differentName, options);
@@ -71,10 +71,10 @@ public class FluentValidationOptionsTests
     public void Validate_WhenNullName_ShouldValidateOptions()
     {
         // Arrange
-        FluentValidationOptionsFixture options = _fixture.Create<FluentValidationOptionsFixture>();
-        IValidator<FluentValidationOptionsFixture> validator = Substitute.For<IValidator<FluentValidationOptionsFixture>>();
-        validator.Validate(options).Returns(new ValidationResult());
-        FluentValidationOptions<FluentValidationOptionsFixture> sut = new(null, validator);
+        ValidationOptionsFixture options = _fixture.Create<ValidationOptionsFixture>();
+        IValidator<ValidationOptionsFixture> validator = Substitute.For<IValidator<ValidationOptionsFixture>>();
+        validator.Validate(options).Returns([]);
+        ValidationOptions<ValidationOptionsFixture> sut = new(null, validator);
 
         // Act
         ValidateOptionsResult result = sut.Validate(_fixture.Create<string>(), options);
@@ -90,8 +90,8 @@ public class FluentValidationOptionsTests
     {
         // Arrange
         string name = _fixture.Create<string>();
-        IValidator<FluentValidationOptionsFixture> validator = Substitute.For<IValidator<FluentValidationOptionsFixture>>();
-        FluentValidationOptions<FluentValidationOptionsFixture> sut = new(name, validator);
+        IValidator<ValidationOptionsFixture> validator = Substitute.For<IValidator<ValidationOptionsFixture>>();
+        ValidationOptions<ValidationOptionsFixture> sut = new(name, validator);
 
         // Act
         Action act = () => sut.Validate(name, null!);
@@ -105,14 +105,14 @@ public class FluentValidationOptionsTests
     {
         // Arrange
         string name = _fixture.Create<string>();
-        FluentValidationOptionsFixture options = _fixture.Create<FluentValidationOptionsFixture>();
-        IValidator<FluentValidationOptionsFixture> validator = Substitute.For<IValidator<FluentValidationOptionsFixture>>();
-        List<ValidationFailure> validationFailures =
+        ValidationOptionsFixture options = _fixture.Create<ValidationOptionsFixture>();
+        IValidator<ValidationOptionsFixture> validator = Substitute.For<IValidator<ValidationOptionsFixture>>();
+        List<Error> validationFailures =
         [
-            new("PropertyName", "Error Message")
+            Error.Validation("PropertyName", "Error Message")
         ];
-        validator.Validate(options).Returns(new ValidationResult(validationFailures));
-        FluentValidationOptions<FluentValidationOptionsFixture> sut = new(name, validator);
+        validator.Validate(options).Returns(validationFailures);
+        ValidationOptions<ValidationOptionsFixture> sut = new(name, validator);
 
         // Act
         ValidateOptionsResult result = sut.Validate(name, options);
