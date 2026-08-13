@@ -55,7 +55,7 @@ public class AddRoleEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenMediatorReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
     {
         // Arrange
         AddRoleRequest request = new("Admin", [Guid.NewGuid()]);

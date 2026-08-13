@@ -60,7 +60,7 @@ public class UpdateRoleEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenMediatorReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
     {
         // Arrange
         UpdateRoleRequest request = new(Guid.NewGuid(), "UpdatedAdmin", [Guid.NewGuid()]);

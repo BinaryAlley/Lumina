@@ -58,7 +58,7 @@ public class GetRolePermissionsEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenMediatorReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
     {
         // Arrange
         GetRolePermissionsRequest request = new(Guid.NewGuid());

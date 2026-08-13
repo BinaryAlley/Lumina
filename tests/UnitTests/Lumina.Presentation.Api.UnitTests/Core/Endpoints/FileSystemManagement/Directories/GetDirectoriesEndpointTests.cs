@@ -60,7 +60,7 @@ public class GetDirectoriesEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenMediatorReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
     {
         // Arrange
         GetDirectoriesRequest request = _fixture.Create<GetDirectoriesRequest>();
@@ -86,7 +86,7 @@ public class GetDirectoriesEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenMediatorReturnsValidationError_ShouldReturnValidationProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsValidationError_ShouldReturnValidationProblemResult()
     {
         // Arrange
         GetDirectoriesRequest request = _fixture.Create<GetDirectoriesRequest>();
@@ -112,7 +112,7 @@ public class GetDirectoriesEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalled_ShouldSendGetDirectoriesQueryToMediator()
+    public async Task ExecuteAsync_WhenCalled_ShouldSendGetDirectoriesQueryToHandler()
     {
         // Arrange
         GetDirectoriesRequest request = _fixture.Create<GetDirectoriesRequest>();

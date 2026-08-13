@@ -51,7 +51,7 @@ public class CheckInitializationEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalled_ShouldSendCheckInitializationQueryToMediator()
+    public async Task ExecuteAsync_WhenCalled_ShouldSendCheckInitializationQueryToHandler()
     {
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;

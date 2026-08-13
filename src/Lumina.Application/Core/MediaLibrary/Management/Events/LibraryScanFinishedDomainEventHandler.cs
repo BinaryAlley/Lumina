@@ -6,12 +6,12 @@ using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Application.Core.MediaLibrary.Management.Progress;
 using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Events;
 using Lumina.Domain.Common.Exceptions;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Cancellation;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Progress;
-using Mediator;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -19,9 +19,9 @@ using System.Threading.Tasks;
 namespace Lumina.Application.Core.MediaLibrary.Management.Events;
 
 /// <summary>
-/// Handler for the event raised when a media library scan is finished.
+/// Handler for the domain event raised when a media library scan is finished.
 /// </summary>
-public class LibraryScanFinishedDomainEventHandler : INotificationHandler<LibraryScanFinishedDomainEvent>
+public class LibraryScanFinishedDomainEventHandler : IDomainEventHandler<LibraryScanFinishedDomainEvent>
 {
     private readonly IMediaLibrariesScanProgressTracker _mediaLibrariesScanProgressTracker;
     private readonly IMediaLibrariesScanCancellationTracker _mediaLibrariesScanCancellationTracker;
@@ -52,7 +52,7 @@ public class LibraryScanFinishedDomainEventHandler : INotificationHandler<Librar
     /// </summary>
     /// <param name="domainEvent">The domain event to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    public async ValueTask Handle(LibraryScanFinishedDomainEvent domainEvent, CancellationToken cancellationToken)
+    public async ValueTask HandleAsync(LibraryScanFinishedDomainEvent domainEvent, CancellationToken cancellationToken)
     {
         ILibraryScanRepository libraryScanRepository = _unitOfWork.GetRepository<ILibraryScanRepository>();
        

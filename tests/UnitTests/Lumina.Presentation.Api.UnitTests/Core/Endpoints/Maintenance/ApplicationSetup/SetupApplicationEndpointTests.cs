@@ -59,7 +59,7 @@ public class SetupApplicationEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenMediatorReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
     {
         // Arrange
         RegistrationRequest request = _registrationRequestFixture.Create();

@@ -57,7 +57,7 @@ public class GetDrivesEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenMediatorReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
     {
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;
@@ -82,7 +82,7 @@ public class GetDrivesEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalled_ShouldSendGetDrivesQueryToMediator()
+    public async Task ExecuteAsync_WhenCalled_ShouldSendGetDrivesQueryToHandler()
     {
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;

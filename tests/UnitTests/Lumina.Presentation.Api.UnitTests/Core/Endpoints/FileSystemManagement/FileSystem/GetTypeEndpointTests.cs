@@ -71,7 +71,7 @@ public class GetFileSystemTypeEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalled_ShouldSendGetFileSystemQueryToMediator()
+    public async Task ExecuteAsync_WhenCalled_ShouldSendGetFileSystemQueryToHandler()
     {
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;

@@ -24,7 +24,6 @@
     <ItemGroup>
         <PackageReference Include="FastEndpoints" Version="5.31.0.6-beta" />
         <PackageReference Include="FastEndpoints.Swagger" Version="5.31.0.6-beta" />
-        <PackageReference Include="Mediator.Abstractions" Version="3.0.0-preview.27" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.0" />
         <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />

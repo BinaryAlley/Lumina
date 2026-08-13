@@ -63,7 +63,7 @@ public class GetTreeFilesEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenMediatorReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
     {
         // Arrange
         GetTreeFilesRequest request = _fixture.Create<GetTreeFilesRequest>();
@@ -89,7 +89,7 @@ public class GetTreeFilesEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenMediatorReturnsValidationError_ShouldReturnValidationProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsValidationError_ShouldReturnValidationProblemResult()
     {
         // Arrange
         GetTreeFilesRequest request = _fixture.Create<GetTreeFilesRequest>();

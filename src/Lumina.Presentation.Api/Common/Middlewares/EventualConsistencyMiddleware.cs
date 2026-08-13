@@ -3,7 +3,6 @@ using Lumina.Application.Common.DomainEvents;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Events;
 using Lumina.Domain.Common.Exceptions;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
@@ -35,10 +34,10 @@ public class EventualConsistencyMiddleware
     /// Handles incoming HTTP requests and ensures that domain events are published and the database transaction is committed upon successful request completion.
     /// </summary>
     /// <param name="context">The current HTTP context.</param>
-    /// <param name="publisher">The domain event publisher used to publish events.</param>
+    /// <param name="domainEventPublisher">The domain event publisher used to publish events.</param>
     /// <param name="dbContext">The database context used to manage the transaction.</param>
     /// <param name="domainEventQueue">In memory queue containing the queued domain events.</param>
-    public async Task InvokeAsync(HttpContext context, IPublisher publisher, LuminaDbContext dbContext, IDomainEventsQueue domainEventQueue)
+    public async Task InvokeAsync(HttpContext context, IDomainEventPublisher domainEventPublisher, LuminaDbContext dbContext, IDomainEventsQueue domainEventQueue)
     {
         // begin a new database transaction - this will wrap any database operations performed during this HTTP request in an atomic operation
         IDbContextTransaction transaction = await dbContext.Database.BeginTransactionAsync(context.RequestAborted).ConfigureAwait(false);
@@ -59,7 +58,7 @@ public class EventualConsistencyMiddleware
 
                     // check if domain events exist in the channel queue and publish them
                     while (domainEventQueue.TryDequeue(out IDomainEvent? nextEvent))
-                        await publisher.Publish(nextEvent);
+                        await domainEventPublisher.PublishAsync(nextEvent);
                 }
             }
             catch (EventualConsistencyException ex)

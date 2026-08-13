@@ -57,7 +57,7 @@ public class CheckPathExistsEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalled_ShouldSendCheckPathExistsQueryToMediator()
+    public async Task ExecuteAsync_WhenCalled_ShouldSendCheckPathExistsQueryToHandler()
     {
         // Arrange
         CheckPathExistsRequest request = _checkPathExistsRequestFixture.Create(path: @"C:\Users\TestUser\Documents", includeHiddenElements: true);

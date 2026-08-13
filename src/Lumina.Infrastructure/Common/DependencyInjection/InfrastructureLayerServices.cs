@@ -9,6 +9,7 @@ using Lumina.Application.Common.Infrastructure.Security;
 using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.MediaLibrary.Management.Progress;
+using Lumina.Domain.Common.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Cancellation;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Queue;
@@ -75,6 +76,7 @@ public static class InfrastructureLayerServices
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 
         services.AddScoped<IDomainEventsQueue, DomainEventsQueue>();
+        services.AddScoped<IDomainEventPublisher, DomainEventPublisher>();
 
         // authorization
         services.AddScoped<IOver18Policy, Over18Policy>();

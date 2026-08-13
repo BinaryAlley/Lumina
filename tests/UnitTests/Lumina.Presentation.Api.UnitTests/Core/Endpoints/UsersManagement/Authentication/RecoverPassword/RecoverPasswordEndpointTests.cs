@@ -56,7 +56,7 @@ public class RecoverPasswordEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenMediatorReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
     {
         // Arrange
         RecoverPasswordRequest request = _recoverPasswordRequestFixture.Create();

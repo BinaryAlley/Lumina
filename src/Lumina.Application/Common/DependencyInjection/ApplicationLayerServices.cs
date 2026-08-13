@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Domain.Common.Events;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -22,17 +23,12 @@ public static class ApplicationLayerServices
     /// <returns>The updated <see cref="IServiceCollection"/>.</returns>
     public static IServiceCollection AddApplicationLayerServices(this IServiceCollection services)
     {
-        // register the Mediator publisher used for publishing domain events
-        services.AddMediator(options =>
-        {
-            options.ServiceLifetime = ServiceLifetime.Scoped;
-        });
-
         Type[] handlerContractTypes =
         [
             typeof(CQRS.ICommandHandler<,>),
             typeof(CQRS.IQueryHandler<,>),
             typeof(Infrastructure.Validation.IValidator<>),
+            typeof(IDomainEventHandler<>),
         ];
 
         IEnumerable<Type> concreteTypes = Assembly.GetExecutingAssembly()

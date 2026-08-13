@@ -60,7 +60,7 @@ public class GetUserPermissionsEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenMediatorReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
     {
         // Arrange
         GetUserPermissionsRequest request = new(Guid.NewGuid());

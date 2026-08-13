@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 #endregion
 
 namespace Lumina.Application.UnitTests.Common.CQRS;
@@ -17,6 +18,7 @@ namespace Lumina.Application.UnitTests.Common.CQRS;
 public class HandlersCallTheirValidatorsTests
 {
     private static readonly Assembly s_applicationAssembly = typeof(ICommand).Assembly;
+    private static readonly Dictionary<short, OpCode> s_opCodes = BuildOpCodeLookup();
 
     /// <summary>
     /// Ensures every command or query that has a validator has a handler that calls that validator.
@@ -101,6 +103,12 @@ public class HandlersCallTheirValidatorsTests
                 yield return nestedDescendant;
     }
 
+    /// <summary>
+    /// Checks whether the IL of the specified <paramref name="method"/> contains a call to <see cref="IValidator{TRequest}.Validate"/>.
+    /// </summary>
+    /// <param name="method">The method whose IL is inspected.</param>
+    /// <param name="validatorInterface">The closed validator interface whose <c>Validate</c> method is being looked for.</param>
+    /// <returns><see langword="true"/> if the method calls the validator, <see langword="false"/> otherwise.</returns>
     private static bool CallsValidatorMethod(MethodInfo method, Type validatorInterface)
     {
         MethodBody? body = method.GetMethodBody();
@@ -112,38 +120,110 @@ public class HandlersCallTheirValidatorsTests
             return false;
 
         Module module = method.Module;
-        for (int i = 0; i < il.Length; i++)
+        int offset = 0;
+        while (offset < il.Length)
         {
-            // 0x28 is the call opcode and 0x6F is the callvirt opcode, both followed by a 4-byte metadata token
-            if (il[i] != 0x28 && il[i] != 0x6F)
-                continue;
+            // read the opcode, handling the 0xFE prefix used by two-byte opcodes
+            short opCodeValue = il[offset];
+            int opCodeSize = 1;
+            if (opCodeValue == 0xFE && offset + 1 < il.Length)
+            {
+                opCodeValue = (short)((0xFE << 8) | il[offset + 1]);
+                opCodeSize = 2;
+            }
 
-            if (i + 4 >= il.Length)
+            if (!s_opCodes.TryGetValue(opCodeValue, out OpCode opCode))
+                return false;
+
+            offset += opCodeSize;
+            if (offset >= il.Length)
                 break;
 
-            int token = il[i + 1] | (il[i + 2] << 8) | (il[i + 3] << 16) | (il[i + 4] << 24);
-            try
+            if (opCode == OpCodes.Call || opCode == OpCodes.Callvirt)
             {
-                if (module.ResolveMethod(token) is MethodInfo resolvedMethod &&
-                    resolvedMethod.Name == nameof(IValidator<object>.Validate) &&
-                    resolvedMethod.DeclaringType != null &&
-                    resolvedMethod.DeclaringType.Equals(validatorInterface))
-                    return true;
+                int token = ReadInt32(il, offset);
+                try
+                {
+                    if (module.ResolveMethod(token) is MethodInfo resolvedMethod &&
+                        resolvedMethod.Name == nameof(IValidator<object>.Validate) &&
+                        resolvedMethod.DeclaringType != null &&
+                        resolvedMethod.DeclaringType.Equals(validatorInterface))
+                        return true;
+                }
+                catch (ArgumentException)
+                {
+                    // the token is not a valid method token, skip it
+                }
+                catch (BadImageFormatException)
+                {
+                    // the token references corrupt metadata, skip it
+                }
+                catch (InvalidOperationException)
+                {
+                    // the token cannot be resolved as a method, skip it
+                }
             }
-            catch (ArgumentException)
+
+            if (opCode.OperandType == OperandType.InlineSwitch)
             {
-                // the token is not a valid method token, skip it
+                int switchCases = ReadInt32(il, offset);
+                offset += 4 + (switchCases * 4);
             }
-            catch (BadImageFormatException)
-            {
-                // the token references corrupt metadata, skip it
-            }
-            catch (InvalidOperationException)
-            {
-                // the token cannot be resolved as a method, skip it
-            }
-            i += 4;
+            else
+                offset += GetOperandSize(opCode);
         }
         return false;
+    }
+
+    /// <summary>
+    /// Builds a lookup table of all opcodes, keyed by their numeric value.
+    /// </summary>
+    /// <returns>The built lookup table.</returns>
+    private static Dictionary<short, OpCode> BuildOpCodeLookup()
+    {
+        Dictionary<short, OpCode> opCodes = [];
+        foreach (FieldInfo field in typeof(OpCodes).GetFields(BindingFlags.Public | BindingFlags.Static))
+            if (field.GetValue(null) is OpCode opCode)
+                opCodes[opCode.Value] = opCode;
+        return opCodes;
+    }
+
+    /// <summary>
+    /// Gets the size in bytes of the operand of the specified <paramref name="opCode"/>.
+    /// </summary>
+    /// <param name="opCode">The opcode whose operand size is returned.</param>
+    /// <returns>The size of the operand in bytes.</returns>
+    private static int GetOperandSize(OpCode opCode)
+    {
+        return opCode.OperandType switch
+        {
+            OperandType.InlineNone => 0,
+            OperandType.ShortInlineI => 1,
+            OperandType.ShortInlineVar => 1,
+            OperandType.ShortInlineBrTarget => 1,
+            OperandType.InlineVar => 2,
+            OperandType.InlineBrTarget => 4,
+            OperandType.InlineField => 4,
+            OperandType.InlineMethod => 4,
+            OperandType.InlineType => 4,
+            OperandType.InlineString => 4,
+            OperandType.InlineSig => 4,
+            OperandType.ShortInlineR => 4,
+            OperandType.InlineI => 4,
+            OperandType.InlineR => 8,
+            OperandType.InlineI8 => 8,
+            _ => 0,
+        };
+    }
+
+    /// <summary>
+    /// Reads a 4-byte little-endian integer from the specified offset in the IL stream.
+    /// </summary>
+    /// <param name="il">The IL byte stream.</param>
+    /// <param name="offset">The offset at which to read the integer.</param>
+    /// <returns>The read integer.</returns>
+    private static int ReadInt32(byte[] il, int offset)
+    {
+        return il[offset] | (il[offset + 1] << 8) | (il[offset + 2] << 16) | (il[offset + 3] << 24);
     }
 }

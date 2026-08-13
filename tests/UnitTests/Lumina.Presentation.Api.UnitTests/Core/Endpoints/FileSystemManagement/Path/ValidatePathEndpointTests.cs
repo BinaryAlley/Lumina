@@ -58,7 +58,7 @@ public class ValidatePathEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalled_ShouldSendValidatePathQueryToMediator()
+    public async Task ExecuteAsync_WhenCalled_ShouldSendValidatePathQueryToHandler()
     {
         // Arrange
         ValidatePathRequest request = _validatePathRequestFixture.Create(@"C:\Users\TestUser\Documents");
@@ -76,7 +76,7 @@ public class ValidatePathEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenMediatorReturnsValidationError_ShouldReturnValidationProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsValidationError_ShouldReturnValidationProblemResult()
     {
         // Arrange
         ValidatePathRequest request = _validatePathRequestFixture.Create(@"C:\Users\TestUser\Documents");

@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Domain.Common.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
-using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading;
@@ -30,8 +30,8 @@ internal static class ScanFailurePublisher
         try
         {
             await using AsyncServiceScope asyncServiceScope = serviceScopeFactory.CreateAsyncScope();
-            IPublisher publisher = asyncServiceScope.ServiceProvider.GetService<IPublisher>()!;
-            await publisher.Publish(new LibraryScanFailedDomainEvent(Guid.NewGuid(), libraryId, compositeKey, DateTime.UtcNow, exception.Message), cancellationToken).ConfigureAwait(false);
+            IDomainEventPublisher domainEventPublisher = asyncServiceScope.ServiceProvider.GetService<IDomainEventPublisher>()!;
+            await domainEventPublisher.PublishAsync(new LibraryScanFailedDomainEvent(Guid.NewGuid(), libraryId, compositeKey, DateTime.UtcNow, exception.Message), cancellationToken).ConfigureAwait(false);
         }
         catch
         {

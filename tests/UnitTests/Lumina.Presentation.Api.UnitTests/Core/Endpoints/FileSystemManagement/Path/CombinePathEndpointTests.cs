@@ -58,7 +58,7 @@ public class CombinePathEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenMediatorReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
     {
         // Arrange
         CombinePathRequest request = _combinePathRequestFixture.Create("InvalidPath", "TestUser");
@@ -84,7 +84,7 @@ public class CombinePathEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenMediatorReturnsValidationError_ShouldReturnValidationProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsValidationError_ShouldReturnValidationProblemResult()
     {
         // Arrange
         CombinePathRequest request = _combinePathRequestFixture.Create("InvalidPath", "TestUser");
@@ -110,7 +110,7 @@ public class CombinePathEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalled_ShouldSendCombinePathCommandToMediator()
+    public async Task ExecuteAsync_WhenCalled_ShouldSendCombinePathCommandToHandler()
     {
         // Arrange
         CombinePathRequest request = _combinePathRequestFixture.Create("C:\\Users", "TestUser");

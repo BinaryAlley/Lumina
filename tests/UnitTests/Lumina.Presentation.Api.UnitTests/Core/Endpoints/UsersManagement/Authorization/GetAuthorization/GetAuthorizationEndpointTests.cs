@@ -62,7 +62,7 @@ public class GetAuthorizationEndpointTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenMediatorReturnsError_ShouldReturnProblemResult()
+    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
     {
         // Arrange
         GetAuthorizationRequest request = GetAuthorizationRequestFixture.Create();
