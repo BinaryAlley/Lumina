@@ -1,13 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.Admin.Authorization.Roles.Queries.GetRolePermissions;
 using Lumina.Contracts.DTO.Authentication;
 using Lumina.Contracts.Requests.Authorization;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using Lumina.Presentation.Api.Core.Endpoints.Admin.Authorization.Roles.GetRolePermissions;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -25,7 +24,7 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Admin.Authorization.R
 [ExcludeFromCodeCoverage]
 public class GetRolePermissionsEndpointTests
 {
-    private readonly ISender _mockSender;
+    private readonly IQueryHandler<GetRolePermissionsQuery, ErrorOr<RolePermissionsResponse>> _mockHandler;
     private readonly GetRolePermissionsEndpoint _sut;
 
     /// <summary>
@@ -33,8 +32,8 @@ public class GetRolePermissionsEndpointTests
     /// </summary>
     public GetRolePermissionsEndpointTests()
     {
-        _mockSender = Substitute.For<ISender>();
-        _sut = Factory.Create<GetRolePermissionsEndpoint>(_mockSender);
+        _mockHandler = Substitute.For<IQueryHandler<GetRolePermissionsQuery, ErrorOr<RolePermissionsResponse>>>();
+        _sut = FastEndpoints.Factory.Create<GetRolePermissionsEndpoint>(_mockHandler);
     }
 
     [Fact]
@@ -47,7 +46,7 @@ public class GetRolePermissionsEndpointTests
             new RoleDto(Guid.NewGuid(), "Admin"),
             [new PermissionDto(Guid.NewGuid(), AuthorizationPermission.CanViewUsers)]
         );
-        _mockSender.Send(Arg.Any<GetRolePermissionsQuery>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<GetRolePermissionsQuery>(), Arg.Any<CancellationToken>())
             .Returns(ErrorOrFactory.From(expectedResponse));
 
         // Act
@@ -65,7 +64,7 @@ public class GetRolePermissionsEndpointTests
         GetRolePermissionsRequest request = new(Guid.NewGuid());
         CancellationToken cancellationToken = CancellationToken.None;
         Error expectedError = Error.Failure("Role.Permissions.NotFound", "Role permissions not found.");
-        _mockSender.Send(Arg.Any<GetRolePermissionsQuery>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<GetRolePermissionsQuery>(), Arg.Any<CancellationToken>())
             .Returns(expectedError);
 
         // Act
@@ -91,7 +90,7 @@ public class GetRolePermissionsEndpointTests
         Guid roleId = Guid.NewGuid();
         GetRolePermissionsRequest request = new(roleId);
         CancellationToken cancellationToken = CancellationToken.None;
-        _mockSender.Send(Arg.Any<GetRolePermissionsQuery>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<GetRolePermissionsQuery>(), Arg.Any<CancellationToken>())
             .Returns(ErrorOrFactory.From(new RolePermissionsResponse(
                 new RoleDto(Guid.NewGuid(), "Admin"),
                 []
@@ -101,7 +100,7 @@ public class GetRolePermissionsEndpointTests
         await _sut.ExecuteAsync(request, cancellationToken);
 
         // Assert
-        await _mockSender.Received(1).Send(
+        await _mockHandler.Received(1).HandleAsync(
             Arg.Is<GetRolePermissionsQuery>(cmd => cmd.RoleId == request.RoleId),
             Arg.Is(cancellationToken));
     }
@@ -114,19 +113,17 @@ public class GetRolePermissionsEndpointTests
         TaskCompletionSource<bool> operationStarted = new();
         TaskCompletionSource<bool> cancellationRequested = new();
 
-        _mockSender.Send(Arg.Any<GetRolePermissionsQuery>(), Arg.Any<CancellationToken>())
-            .Returns(info => new ValueTask<ErrorOr<RolePermissionsResponse>>(
-                Task.Run(async () =>
-                {
-                    operationStarted.SetResult(true);
-                    await cancellationRequested.Task;
-                    info.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                    return ErrorOrFactory.From(new RolePermissionsResponse(
-                        new RoleDto(Guid.NewGuid(), "Admin"),
-                        []
-                    ));
-                }, info.Arg<CancellationToken>())
-            ));
+        _mockHandler.HandleAsync(Arg.Any<GetRolePermissionsQuery>(), Arg.Any<CancellationToken>())
+            .Returns(info => Task.Run(async () =>
+            {
+                operationStarted.SetResult(true);
+                await cancellationRequested.Task;
+                info.Arg<CancellationToken>().ThrowIfCancellationRequested();
+                return ErrorOrFactory.From(new RolePermissionsResponse(
+                    new RoleDto(Guid.NewGuid(), "Admin"),
+                    []
+                ));
+            }, info.Arg<CancellationToken>()));
 
         // Act
         Task<IResult> operationTask = _sut.ExecuteAsync(new GetRolePermissionsRequest(Guid.NewGuid()), cts.Token);

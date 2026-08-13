@@ -6,6 +6,7 @@ using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.Admin.Authorization.Roles.Queries.GetRolePermissions;
 using Lumina.Application.UnitTests.Core.Admin.Authorization.Roles.Queries.GetRolePermissions.Fixtures;
 using Lumina.Contracts.Responses.Authorization;
@@ -38,6 +39,9 @@ public class GetRolePermissionsQueryHandlerTests
     /// </summary>
     public GetRolePermissionsQueryHandlerTests()
     {
+        IValidator<GetRolePermissionsQuery> mockValidator = Substitute.For<IValidator<GetRolePermissionsQuery>>();
+        mockValidator.Validate(Arg.Any<GetRolePermissionsQuery>())
+            .Returns([]);
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
@@ -51,7 +55,8 @@ public class GetRolePermissionsQueryHandlerTests
         _sut = new GetRolePermissionsQueryHandler(
             _mockAuthorizationService,
             _mockCurrentUserService,
-            _mockUnitOfWork);
+            _mockUnitOfWork,
+            mockValidator);
     }
 
     [Fact]
@@ -63,7 +68,7 @@ public class GetRolePermissionsQueryHandlerTests
             .Returns(false);
 
         // Act
-        ErrorOr<RolePermissionsResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<RolePermissionsResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -84,7 +89,7 @@ public class GetRolePermissionsQueryHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<RolePermissionsResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<RolePermissionsResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -103,7 +108,7 @@ public class GetRolePermissionsQueryHandlerTests
             .Returns((RoleEntity?)null);
 
         // Act
-        ErrorOr<RolePermissionsResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<RolePermissionsResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -141,7 +146,7 @@ public class GetRolePermissionsQueryHandlerTests
             .Returns(role);
 
         // Act
-        ErrorOr<RolePermissionsResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<RolePermissionsResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);

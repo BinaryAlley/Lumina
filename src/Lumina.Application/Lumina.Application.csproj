@@ -32,4 +32,8 @@
         <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.0" />
         <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.0" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Common\CQRS\" />
+    </ItemGroup>
 </Project>

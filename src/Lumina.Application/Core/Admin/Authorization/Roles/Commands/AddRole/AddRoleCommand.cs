@@ -1,7 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Contracts.Responses.Authorization;
-using Mediator;
+using Lumina.Application.Common.CQRS;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,4 +16,4 @@ namespace Lumina.Application.Core.Admin.Authorization.Roles.Commands.AddRole;
 public record AddRoleCommand(
     string RoleName,
     List<Guid> Permissions
-) : IRequest<ErrorOr<RolePermissionsResponse>>;
+) : ICommand;

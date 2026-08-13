@@ -1,9 +1,12 @@
 #region ========================================================================= USING =====================================================================================
+using ErrorOr;
 using FluentValidation.TestHelper;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Core.Admin.Authorization.Roles.Commands.AddRole;
+using Lumina.Application.UnitTests.Common.Setup;
 using Lumina.Application.UnitTests.Core.Admin.Authorization.Roles.Commands.AddRole.Fixtures;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -35,11 +38,10 @@ public class AddRoleCommandValidatorTests
         command = command with { RoleName = null! };
 
         // Act
-        TestValidationResult<AddRoleCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.RoleName)
-            .WithErrorMessage(Errors.Authorization.RoleNameCannotBeNull.Description);
+        result.ShouldHaveValidationError(Errors.Authorization.RoleNameCannotBeNull);
     }
 
     [Fact]
@@ -50,11 +52,10 @@ public class AddRoleCommandValidatorTests
         command = command with { RoleName = string.Empty };
 
         // Act
-        TestValidationResult<AddRoleCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.RoleName)
-            .WithErrorMessage(Errors.Authorization.RoleNameCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authorization.RoleNameCannotBeEmpty);
     }
 
     [Fact]
@@ -65,11 +66,10 @@ public class AddRoleCommandValidatorTests
         command = command with { RoleName = " " };
 
         // Act
-        TestValidationResult<AddRoleCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.RoleName)
-            .WithErrorMessage(Errors.Authorization.RoleNameCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authorization.RoleNameCannotBeEmpty);
     }
 
     [Fact]
@@ -80,11 +80,10 @@ public class AddRoleCommandValidatorTests
         command = command with { Permissions = null! };
 
         // Act
-        TestValidationResult<AddRoleCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Permissions)
-            .WithErrorMessage(Errors.Authorization.PermissionsListCannotBeNull.Description);
+        result.ShouldHaveValidationError(Errors.Authorization.PermissionsListCannotBeNull);
     }
 
     [Fact]
@@ -95,11 +94,10 @@ public class AddRoleCommandValidatorTests
         command = command with { Permissions = [] };
 
         // Act
-        TestValidationResult<AddRoleCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Permissions)
-            .WithErrorMessage(Errors.Authorization.PermissionsListCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authorization.PermissionsListCannotBeEmpty);
     }
 
     [Fact]
@@ -110,11 +108,10 @@ public class AddRoleCommandValidatorTests
         command = command with { Permissions = [Guid.Empty, Guid.NewGuid()] };
 
         // Act
-        TestValidationResult<AddRoleCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor("Permissions[0]")
-            .WithErrorMessage(Errors.Authorization.PermissionIdCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authorization.PermissionIdCannotBeEmpty);
     }
 
     [Fact]
@@ -124,7 +121,7 @@ public class AddRoleCommandValidatorTests
         AddRoleCommand command = _fixture.CreateCommand();
 
         // Act
-        TestValidationResult<AddRoleCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
         result.ShouldNotHaveAnyValidationErrors();

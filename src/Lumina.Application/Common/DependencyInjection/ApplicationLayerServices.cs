@@ -3,7 +3,11 @@ using FluentValidation;
 using Lumina.Application.Common.Behaviors;
 using Mediator;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Reflection;
 #endregion
 
 namespace Lumina.Application.Common.DependencyInjection;
@@ -33,6 +37,32 @@ public static class ApplicationLayerServices
         // register fluent validators
         services.AddValidatorsFromAssembly(typeof(ApplicationLayerServices).Assembly);
 
+        Type[] handlers =
+        [
+            typeof(CQRS.ICommandHandler<,>),
+            typeof(CQRS.IQueryHandler<,>),
+            typeof(Infrastructure.Validation.IValidator<>),
+        ];
+
+        IEnumerable<Type> types = Assembly.GetExecutingAssembly()
+                    .GetTypes()
+                    .Where(type => !type.IsInterface && !type.IsAbstract);
+
+        var registrations = types
+                    .SelectMany(type => type.GetInterfaces(),
+                        (implementation, service) => new { Service = service, Implmentation = implementation })
+                    .Where(type => type.Service.IsGenericType && handlers.Contains(type.Service.GetGenericTypeDefinition()));
+
+        foreach (var registration in registrations)
+        {
+            if (!services.Any(service => service.ServiceType == registration.Service))
+            {
+                if (registration.Service.GetGenericTypeDefinition() == typeof(Infrastructure.Validation.IValidator<>))
+                    services.AddSingleton(registration.Service, registration.Implmentation);
+                else
+                    services.AddScoped(registration.Service, registration.Implmentation);
+            }
+        }
         return services;
     }
 }
