@@ -249,21 +249,26 @@
      */
     async function checkPathAsync(path) {
         const pathValidResponse = await callApiGetAsync(`${clientBasePath}path/api-validate?path=${encodeURIComponent(path)}`);
-        if (pathValidResponse !== undefined) {
-            if (!pathValidResponse.isValid) {
-                notificationService.show("Specified path is not valid!", NotificationType.ERROR); // TODO: should ask error message from server when translation is implemented
-                addressBarInput.value = _path;
-                if (addressBarInput.value !== null && !addressBarInput.value.endsWith(pathSeparator))
-                    addressBarInput.value += pathSeparator;
-            } else {
-                const pathExistsResponse = await callApiGetAsync(`${clientBasePath}path/api-check-path-exists?path=${encodeURIComponent(path)}&includeHiddenElements=${showHiddenElements}`);
-                if (pathExistsResponse !== undefined && !pathExistsResponse.exists) {
-                    notificationService.show("Specified path does not exist!", NotificationType.ERROR); // TODO: should ask error message from server when translation is implemented
-                    return false;
-                }
-            }
-            return pathValidResponse.isValid;
+        if (pathValidResponse === undefined) {
+            // the API rejected the path with a validation error (e.g. it is empty), treat it as invalid and restore the address bar
+            addressBarInput.value = _path;
+            if (addressBarInput.value !== null && !addressBarInput.value.endsWith(pathSeparator))
+                addressBarInput.value += pathSeparator;
+            return false;
         }
+        if (!pathValidResponse.isValid) {
+            notificationService.show("Specified path is not valid!", NotificationType.ERROR); // TODO: should ask error message from server when translation is implemented
+            addressBarInput.value = _path;
+            if (addressBarInput.value !== null && !addressBarInput.value.endsWith(pathSeparator))
+                addressBarInput.value += pathSeparator;
+        } else {
+            const pathExistsResponse = await callApiGetAsync(`${clientBasePath}path/api-check-path-exists?path=${encodeURIComponent(path)}&includeHiddenElements=${showHiddenElements}`);
+            if (pathExistsResponse !== undefined && !pathExistsResponse.exists) {
+                notificationService.show("Specified path does not exist!", NotificationType.ERROR); // TODO: should ask error message from server when translation is implemented
+                return false;
+            }
+        }
+        return pathValidResponse.isValid;
     }
 
     /**

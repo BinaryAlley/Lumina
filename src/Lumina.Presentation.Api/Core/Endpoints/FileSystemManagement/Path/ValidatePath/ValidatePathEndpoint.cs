@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using ErrorOr;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Paths;
 using Lumina.Application.Core.FileSystemManagement.Paths.Queries.ValidatePath;
@@ -18,13 +19,13 @@ namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.Valid
 /// </summary>
 public class ValidatePathEndpoint : BaseEndpoint<ValidatePathRequest, IResult>
 {
-    private readonly IQueryHandler<ValidatePathQuery, PathValidResponse> _validatePathQueryHandler;
+    private readonly IQueryHandler<ValidatePathQuery, ErrorOr<PathValidResponse>> _validatePathQueryHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ValidatePathEndpoint"/> class.
     /// </summary>
     /// <param name="validatePathQueryHandler">Injected service for handling validate path queries.</param>
-    public ValidatePathEndpoint(IQueryHandler<ValidatePathQuery, PathValidResponse> validatePathQueryHandler)
+    public ValidatePathEndpoint(IQueryHandler<ValidatePathQuery, ErrorOr<PathValidResponse>> validatePathQueryHandler)
     {
         _validatePathQueryHandler = validatePathQueryHandler;
     }
@@ -47,7 +48,7 @@ public class ValidatePathEndpoint : BaseEndpoint<ValidatePathRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(ValidatePathRequest request, CancellationToken cancellationToken)
     {
-        PathValidResponse result = await _validatePathQueryHandler.HandleAsync(request.ToQuery(), cancellationToken).ConfigureAwait(false);
-        return TypedResults.Ok(result);
+        ErrorOr<PathValidResponse> result = await _validatePathQueryHandler.HandleAsync(request.ToQuery(), cancellationToken).ConfigureAwait(false);
+        return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

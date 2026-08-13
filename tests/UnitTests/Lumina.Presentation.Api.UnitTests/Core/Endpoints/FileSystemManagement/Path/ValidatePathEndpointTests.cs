@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using ErrorOr;
 using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.FileSystemManagement.Paths.Queries.ValidatePath;
@@ -8,6 +9,7 @@ using Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.ValidateP
 using Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.Fixtures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -23,7 +25,7 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.
 [ExcludeFromCodeCoverage]
 public class ValidatePathEndpointTests
 {
-    private readonly IQueryHandler<ValidatePathQuery, PathValidResponse> _mockHandler;
+    private readonly IQueryHandler<ValidatePathQuery, ErrorOr<PathValidResponse>> _mockHandler;
     private readonly ValidatePathEndpoint _sut;
     private readonly ValidatePathRequestFixture _validatePathRequestFixture;
 
@@ -32,7 +34,7 @@ public class ValidatePathEndpointTests
     /// </summary>
     public ValidatePathEndpointTests()
     {
-        _mockHandler = Substitute.For<IQueryHandler<ValidatePathQuery, PathValidResponse>>();
+        _mockHandler = Substitute.For<IQueryHandler<ValidatePathQuery, ErrorOr<PathValidResponse>>>();
         _sut = Factory.Create<ValidatePathEndpoint>(_mockHandler);
         _validatePathRequestFixture = new ValidatePathRequestFixture();
     }
@@ -74,6 +76,32 @@ public class ValidatePathEndpointTests
     }
 
     [Fact]
+    public async Task ExecuteAsync_WhenMediatorReturnsValidationError_ShouldReturnValidationProblemResult()
+    {
+        // Arrange
+        ValidatePathRequest request = _validatePathRequestFixture.Create(@"C:\Users\TestUser\Documents");
+        CancellationToken cancellationToken = CancellationToken.None;
+        Error expectedError = Error.Validation("Path.Invalid", "The provided path is invalid.");
+        _mockHandler.HandleAsync(Arg.Any<ValidatePathQuery>(), Arg.Any<CancellationToken>())
+            .Returns(expectedError);
+
+        // Act
+        IResult result = await _sut.ExecuteAsync(request, cancellationToken);
+
+        // Assert
+        ProblemHttpResult problemDetails = Assert.IsType<ProblemHttpResult>(result);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, problemDetails.StatusCode);
+        Assert.Equal("application/problem+json", problemDetails.ContentType);
+        HttpValidationProblemDetails validationProblemDetails = Assert.IsType<HttpValidationProblemDetails>(problemDetails.ProblemDetails);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, validationProblemDetails.Status);
+        Assert.Equal("General.Validation", validationProblemDetails.Title);
+        Assert.Equal("OneOrMoreValidationErrorsOccurred", validationProblemDetails.Detail);
+        Assert.Equal("https://tools.ietf.org/html/rfc4918#section-11.2", validationProblemDetails.Type);
+        Assert.Single(validationProblemDetails.Errors);
+        Assert.Equal(new[] { "The provided path is invalid." }, validationProblemDetails.Errors["Path.Invalid"]);
+    }
+
+    [Fact]
     public async Task ExecuteAsync_WhenCancellationRequested_ShouldCancelOperation()
     {
         // Arrange
@@ -88,7 +116,7 @@ public class ValidatePathEndpointTests
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return new PathValidResponse(true);
+                return ErrorOrFactory.From(new PathValidResponse(true));
             }, callInfo.Arg<CancellationToken>()));
 
         // Act
