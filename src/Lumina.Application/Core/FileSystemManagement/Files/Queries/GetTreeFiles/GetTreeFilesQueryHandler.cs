@@ -1,10 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Files;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
-using Mediator;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,30 +16,37 @@ namespace Lumina.Application.Core.FileSystemManagement.Files.Queries.GetTreeFile
 /// <summary>
 /// Handler for the query to get all files.
 /// </summary>
-public class GetTreeFilesQueryHandler : IRequestHandler<GetTreeFilesQuery, ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>>
+public class GetTreeFilesQueryHandler : IQueryHandler<GetTreeFilesQuery, ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>>
 {
     private readonly IFileService _fileService;
+    private readonly IValidator<GetTreeFilesQuery> _validator;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetTreeFilesQueryHandler"/> class.
     /// </summary>
     /// <param name="fileService">Injected service for handling files.</param>
-    public GetTreeFilesQueryHandler(IFileService fileService)
+    /// <param name="validator">Injected validator for application validation rules.</param>
+    public GetTreeFilesQueryHandler(IFileService fileService, IValidator<GetTreeFilesQuery> validator)
     {
         _fileService = fileService;
+        _validator = validator;
     }
 
     /// <summary>
     /// Gets the list of files at the specified path.
     /// </summary>
-    /// <param name="request">The query containing the requested path.</param>
+    /// <param name="query">The query containing the requested path.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
     /// An <see cref="ErrorOr{TValue}"/> containing either a collection of <see cref="FileSystemTreeNodeResponse"/>, or an error message.
     /// </returns>
-    public ValueTask<ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>> Handle(GetTreeFilesQuery request, CancellationToken cancellationToken)
+    public Task<ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>> HandleAsync(GetTreeFilesQuery query, CancellationToken cancellationToken)
     {
-        ErrorOr<IEnumerable<File>> getFilesResult = _fileService.GetFiles(request.Path!, request.IncludeHiddenElements);
-        return ValueTask.FromResult(getFilesResult.Match(values => ErrorOrFactory.From(values.ToFileSystemTreeNodeResponses()), errors => errors));
+        List<Error> validationResult = _validator.Validate(query);
+        if (validationResult.Count > 0)
+            return Task.FromResult<ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>>(validationResult);
+
+        ErrorOr<IEnumerable<File>> getFilesResult = _fileService.GetFiles(query.Path!, query.IncludeHiddenElements);
+        return Task.FromResult(getFilesResult.Match(values => ErrorOrFactory.From(values.ToFileSystemTreeNodeResponses()), errors => errors));
     }
 }

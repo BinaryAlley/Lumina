@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.UsersManagement.Authentication.Queries.LoginUser;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authentication.Login;
 using Lumina.Presentation.Api.UnitTests.Core.Endpoints.UsersManagement.Authentication.Login.Fixtures;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -24,7 +24,7 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.UsersManagement.Authe
 [ExcludeFromCodeCoverage]
 public class LoginEndpointTests
 {
-    private readonly ISender _mockSender;
+    private readonly IQueryHandler<LoginUserQuery, ErrorOr<LoginResponse>> _mockHandler;
     private readonly LoginEndpoint _sut;
     private readonly LoginRequestFixture _loginRequestFixture;
 
@@ -33,8 +33,8 @@ public class LoginEndpointTests
     /// </summary>
     public LoginEndpointTests()
     {
-        _mockSender = Substitute.For<ISender>();
-        _sut = Factory.Create<LoginEndpoint>(_mockSender);
+        _mockHandler = Substitute.For<IQueryHandler<LoginUserQuery, ErrorOr<LoginResponse>>>();
+        _sut = Factory.Create<LoginEndpoint>(_mockHandler);
         _loginRequestFixture = new LoginRequestFixture();
     }
 
@@ -45,7 +45,7 @@ public class LoginEndpointTests
         LoginRequest request = _loginRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
         LoginResponse expectedResponse = new(Guid.NewGuid(), "testUser", "jwt_token", true);
-        _mockSender.Send(Arg.Any<LoginUserQuery>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<LoginUserQuery>(), Arg.Any<CancellationToken>())
             .Returns(ErrorOrFactory.From(expectedResponse));
 
         // Act
@@ -63,7 +63,7 @@ public class LoginEndpointTests
         LoginRequest request = _loginRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
         Error expectedError = Error.Validation("Login.Failed", "Invalid username or password.");
-        _mockSender.Send(Arg.Any<LoginUserQuery>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<LoginUserQuery>(), Arg.Any<CancellationToken>())
             .Returns(expectedError);
 
         // Act
@@ -87,14 +87,14 @@ public class LoginEndpointTests
         // Arrange
         LoginRequest request = _loginRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
-        _mockSender.Send(Arg.Any<LoginUserQuery>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<LoginUserQuery>(), Arg.Any<CancellationToken>())
             .Returns(ErrorOrFactory.From(new LoginResponse(Guid.NewGuid(), "testUser", "jwt_token", true)));
 
         // Act
         await _sut.ExecuteAsync(request, cancellationToken);
 
         // Assert
-        await _mockSender.Received(1).Send(
+        await _mockHandler.Received(1).HandleAsync(
             Arg.Is<LoginUserQuery>(q =>
                 q.Username == request.Username &&
                 q.Password == request.Password &&
@@ -111,14 +111,14 @@ public class LoginEndpointTests
         TaskCompletionSource<bool> operationStarted = new();
         TaskCompletionSource<bool> cancellationRequested = new();
 
-        _mockSender.Send(Arg.Any<LoginUserQuery>(), Arg.Any<CancellationToken>())
-            .Returns(callInfo => new ValueTask<ErrorOr<LoginResponse>>(Task.Run(async () =>
+        _mockHandler.HandleAsync(Arg.Any<LoginUserQuery>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo => Task.Run(async () =>
             {
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
                 return ErrorOrFactory.From(new LoginResponse(Guid.NewGuid(), "testUser", "jwt_token", true));
-            }, callInfo.Arg<CancellationToken>())));
+            }, callInfo.Arg<CancellationToken>()));
 
         // Act
         Task<IResult> operationTask = _sut.ExecuteAsync(request, cts.Token);

@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation;
+using Lumina.Application.Common.Infrastructure.Validation;
+using Lumina.Application.Common.Utilities;
 using Lumina.Domain.SharedKernel.Common.Errors;
 #endregion
 
@@ -15,7 +16,8 @@ public class UpdatePluginSettingsCommandValidator : AbstractValidator<UpdatePlug
     /// </summary>
     public UpdatePluginSettingsCommandValidator()
     {
-        RuleFor(x => x.PluginId)
-            .NotEmpty().WithMessage(Errors.Plugins.PluginIdCannotBeEmpty.Description);
+        RuleFor(command => command.PluginId)
+            .NotEmpty()
+            .WithError(Errors.Plugins.PluginIdCannotBeEmpty);
     }
 }

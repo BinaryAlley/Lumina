@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.Plugins;
+using Lumina.Application.Core.Plugins.Queries.GetLibraryMetadataProviders;
 using Lumina.Contracts.Requests.Plugins;
 using Lumina.Contracts.Responses.Plugins;
 using Lumina.Presentation.Api.Common.Routes.Library.Management;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.Threading;
@@ -20,15 +20,15 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Plugins.GetLibraryMetadataProvi
 /// </summary>
 public class GetLibraryMetadataProvidersEndpoint : BaseEndpoint<GetLibraryMetadataProvidersRequest, IResult>
 {
-    private readonly ISender _sender;
+    private readonly IQueryHandler<GetLibraryMetadataProvidersQuery, ErrorOr<IReadOnlyList<LibraryMetadataProviderResponse>>> _getLibraryMetadataProvidersQueryHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetLibraryMetadataProvidersEndpoint"/> class.
     /// </summary>
-    /// <param name="sender">Injected service for mediating commands and queries.</param>
-    public GetLibraryMetadataProvidersEndpoint(ISender sender)
+    /// <param name="getLibraryMetadataProvidersQueryHandler">Injected service for handling get library metadata providers queries.</param>
+    public GetLibraryMetadataProvidersEndpoint(IQueryHandler<GetLibraryMetadataProvidersQuery, ErrorOr<IReadOnlyList<LibraryMetadataProviderResponse>>> getLibraryMetadataProvidersQueryHandler)
     {
-        _sender = sender;
+        _getLibraryMetadataProvidersQueryHandler = getLibraryMetadataProvidersQueryHandler;
     }
 
     /// <summary>
@@ -36,7 +36,7 @@ public class GetLibraryMetadataProvidersEndpoint : BaseEndpoint<GetLibraryMetada
     /// </summary>
     public override void Configure()
     {
-        Verbs(Http.GET);
+        Verbs(FastEndpoints.Http.GET);
         Routes(ApiRoutes.Libraries.GET_LIBRARY_METADATA_PROVIDERS);
         Version(1);
         DontCatchExceptions();
@@ -49,7 +49,7 @@ public class GetLibraryMetadataProvidersEndpoint : BaseEndpoint<GetLibraryMetada
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(GetLibraryMetadataProvidersRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<IReadOnlyList<LibraryMetadataProviderResponse>> result = await _sender.Send(request.ToQuery(), cancellationToken).ConfigureAwait(false);
+        ErrorOr<IReadOnlyList<LibraryMetadataProviderResponse>> result = await _getLibraryMetadataProvidersQueryHandler.HandleAsync(request.ToQuery(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

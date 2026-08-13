@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation;
+using Lumina.Application.Common.Infrastructure.Validation;
+using Lumina.Application.Common.Utilities;
 using Lumina.Domain.SharedKernel.Common.Errors;
 #endregion
 
@@ -15,7 +16,12 @@ public class CombinePathCommandValidator : AbstractValidator<CombinePathCommand>
     /// </summary>
     public CombinePathCommandValidator()
     {
-        RuleFor(x => x.OriginalPath).NotEmpty().WithMessage(Errors.FileSystemManagement.PathCannotBeEmpty.Description);
-        RuleFor(x => x.NewPath).NotEmpty().WithMessage(Errors.FileSystemManagement.PathCannotBeEmpty.Description);
+        RuleFor(command => command.OriginalPath)
+            .NotEmpty()
+            .WithError(Errors.FileSystemManagement.PathCannotBeEmpty);
+       
+        RuleFor(command => command.NewPath)
+            .NotEmpty()
+            .WithError(Errors.FileSystemManagement.PathCannotBeEmpty);
     }
 }

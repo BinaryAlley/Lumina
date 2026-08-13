@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation;
+using Lumina.Application.Common.Infrastructure.Validation;
+using Lumina.Application.Common.Utilities;
 using Lumina.Domain.SharedKernel.Common.Errors;
 #endregion
 
@@ -15,10 +16,14 @@ public class ReorderLibraryMetadataProvidersCommandValidator : AbstractValidator
     /// </summary>
     public ReorderLibraryMetadataProvidersCommandValidator()
     {
-        RuleFor(x => x.LibraryId)
-            .NotEmpty().WithMessage(Errors.Plugins.LibraryIdCannotBeEmpty.Description);
-        RuleFor(x => x.PluginIds)
-            .NotNull().WithMessage(Errors.Plugins.PluginIdsListCannotBeNull.Description)
-            .NotEmpty().WithMessage(Errors.Plugins.PluginIdsListCannotBeEmpty.Description);
+        RuleFor(command => command.LibraryId)
+            .NotEmpty()
+            .WithError(Errors.Plugins.LibraryIdCannotBeEmpty);
+       
+        RuleFor(command => command.PluginIds)
+            .NotNull()
+            .WithError(Errors.Plugins.PluginIdsListCannotBeNull)
+            .NotEmpty()
+            .WithError(Errors.Plugins.PluginIdsListCannotBeEmpty);
     }
 }

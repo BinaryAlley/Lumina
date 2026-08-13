@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
+using Lumina.Application.Core.MediaLibrary.Management.Queries.GetLibrary;
 using Lumina.Contracts.Requests.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
 using Lumina.Presentation.Api.Common.Routes.Library.Management;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,15 +19,15 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Library.Management.GetLibrary;
 /// </summary>
 public class GetLibraryEndpoint : BaseEndpoint<GetLibraryRequest, IResult>
 {
-    private readonly ISender _sender;
+    private readonly IQueryHandler<GetLibraryQuery, ErrorOr<LibraryResponse>> _getLibraryQueryHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetLibraryEndpoint"/> class.
     /// </summary>
-    /// <param name="sender">Injected service for mediating commands and queries.</param>
-    public GetLibraryEndpoint(ISender sender)
+    /// <param name="getLibraryQueryHandler">Injected service for handling get library queries.</param>
+    public GetLibraryEndpoint(IQueryHandler<GetLibraryQuery, ErrorOr<LibraryResponse>> getLibraryQueryHandler)
     {
-        _sender = sender;
+        _getLibraryQueryHandler = getLibraryQueryHandler;
     }
 
     /// <summary>
@@ -35,7 +35,7 @@ public class GetLibraryEndpoint : BaseEndpoint<GetLibraryRequest, IResult>
     /// </summary>
     public override void Configure()
     {
-        Verbs(Http.GET);
+        Verbs(FastEndpoints.Http.GET);
         Routes(ApiRoutes.Libraries.GET_LIBRARY_BY_ID);
         Version(1);
         DontCatchExceptions();
@@ -48,7 +48,7 @@ public class GetLibraryEndpoint : BaseEndpoint<GetLibraryRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(GetLibraryRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<LibraryResponse> result = await _sender.Send(request.ToQuery(), cancellationToken).ConfigureAwait(false);
+        ErrorOr<LibraryResponse> result = await _getLibraryQueryHandler.HandleAsync(request.ToQuery(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

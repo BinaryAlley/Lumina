@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation;
+using Lumina.Application.Common.Infrastructure.Validation;
+using Lumina.Application.Common.Utilities;
 using Lumina.Domain.SharedKernel.Common.Errors;
 using System;
 #endregion
@@ -16,8 +17,10 @@ public class GetAuthorizationQueryValidator : AbstractValidator<GetAuthorization
     /// </summary>
     public GetAuthorizationQueryValidator()
     {
-        RuleFor(x => x.UserId)
-            .NotEmpty().WithMessage(Errors.Users.UserIdCannotBeEmpty.Description)
-            .Must(id => id != Guid.Empty).WithMessage(Errors.Users.UserIdCannotBeEmpty.Description);
+        RuleFor(query => query.UserId)
+            .NotEmpty()
+            .WithError(Errors.Users.UserIdCannotBeEmpty)
+            .Must(id => id != Guid.Empty)
+            .WithError(Errors.Users.UserIdCannotBeEmpty);
     }
 }

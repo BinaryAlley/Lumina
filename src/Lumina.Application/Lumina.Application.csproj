@@ -20,8 +20,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="FluentValidation" Version="11.10.0" />
-        <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.10.0" />
         <PackageReference Include="Mediator.Abstractions" Version="3.0.0-preview.27" />
         <PackageReference Include="Mediator.SourceGenerator" Version="3.0.0-preview.27">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

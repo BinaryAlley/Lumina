@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.Authorization;
+using Lumina.Application.Core.Admin.Authorization.Roles.Commands.DeleteRole;
 using Lumina.Contracts.Requests.Authorization;
 using Lumina.Presentation.Api.Common.Routes.UsersManagement;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,15 +18,15 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Admin.Authorization.Roles.Delet
 /// </summary>
 public class DeleteRoleEndpoint : BaseEndpoint<DeleteRoleRequest, IResult>
 {
-    private readonly ISender _sender;
+    private readonly ICommandHandler<DeleteRoleCommand, ErrorOr<Deleted>> _deleteRoleCommandHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DeleteRoleEndpoint"/> class.
     /// </summary>
-    /// <param name="sender">Injected service for mediating commands and queries.</param>
-    public DeleteRoleEndpoint(ISender sender)
+    /// <param name="deleteRoleCommandHandler">Injected service for handling delete role commands.</param>
+    public DeleteRoleEndpoint(ICommandHandler<DeleteRoleCommand, ErrorOr<Deleted>> deleteRoleCommandHandler)
     {
-        _sender = sender;
+        _deleteRoleCommandHandler = deleteRoleCommandHandler;
     }
 
     /// <summary>
@@ -34,7 +34,7 @@ public class DeleteRoleEndpoint : BaseEndpoint<DeleteRoleRequest, IResult>
     /// </summary>
     public override void Configure()
     {
-        Verbs(Http.DELETE);
+        Verbs(FastEndpoints.Http.DELETE);
         Routes(ApiRoutes.Roles.DELETE_ROLE);
         Version(1);
         DontCatchExceptions();
@@ -47,7 +47,7 @@ public class DeleteRoleEndpoint : BaseEndpoint<DeleteRoleRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(DeleteRoleRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<Deleted> result = await _sender.Send(request.ToCommand(), cancellationToken).ConfigureAwait(false);
+        ErrorOr<Deleted> result = await _deleteRoleCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.NoContent(), Problem);
     }
 }

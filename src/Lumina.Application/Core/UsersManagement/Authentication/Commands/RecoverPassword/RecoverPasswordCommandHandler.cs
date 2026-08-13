@@ -1,14 +1,16 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Security;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Contracts.Responses.Authentication;
-using Mediator;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -18,12 +20,13 @@ namespace Lumina.Application.Core.UsersManagement.Authentication.Commands.Recove
 /// <summary>
 /// Handler for the command to recover the password of an account.
 /// </summary>
-public class RecoverPasswordCommandHandler : IRequestHandler<RecoverPasswordCommand, ErrorOr<RecoverPasswordResponse>>
+public class RecoverPasswordCommandHandler : ICommandHandler<RecoverPasswordCommand, ErrorOr<RecoverPasswordResponse>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IPasswordHashService _hashService;
     private readonly ITotpTokenGenerator _totpTokenGenerator;
     private readonly ICryptographyService _cryptographyService;
+    private readonly IValidator<RecoverPasswordCommand> _validator;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RecoverPasswordCommandHandler"/> class.
@@ -32,31 +35,38 @@ public class RecoverPasswordCommandHandler : IRequestHandler<RecoverPasswordComm
     /// <param name="hashService">Injected service for password hashing functionality.</param>
     /// <param name="totpTokenGenerator">Injected service for generating and validating TOTP tokens.</param>
     /// <param name="cryptographyService">Injected service for cryptographic functionality.</param>
+    /// <param name="validator">Injected validator for application validation rules.</param>
     public RecoverPasswordCommandHandler(
         IUnitOfWork unitOfWork,
         IPasswordHashService hashService,
         ITotpTokenGenerator totpTokenGenerator,
-        ICryptographyService cryptographyService)
+        ICryptographyService cryptographyService,
+        IValidator<RecoverPasswordCommand> validator)
     {
         _unitOfWork = unitOfWork;
         _hashService = hashService;
         _totpTokenGenerator = totpTokenGenerator;
         _cryptographyService = cryptographyService;
+        _validator = validator;
     }
 
     /// <summary>
     /// Handles the command to recover the password of an account.
     /// </summary>
-    /// <param name="request">The request to be handled.</param>
+    /// <param name="command">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
     /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="RecoverPasswordResponse"/>, or an error message.
     /// </returns>
-    public async ValueTask<ErrorOr<RecoverPasswordResponse>> Handle(RecoverPasswordCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<RecoverPasswordResponse>> HandleAsync(RecoverPasswordCommand command, CancellationToken cancellationToken)
     {
+        List<Error> validationResult = _validator.Validate(command);
+        if (validationResult.Count > 0)
+            return validationResult;
+
         // check if any users already exists
         IUserRepository userRepository = _unitOfWork.GetRepository<IUserRepository>();
-        ErrorOr<UserEntity?> getUserResult = await userRepository.GetByUsernameAsync(request.Username!, cancellationToken).ConfigureAwait(false);
+        ErrorOr<UserEntity?> getUserResult = await userRepository.GetByUsernameAsync(command.Username!, cancellationToken).ConfigureAwait(false);
         if (getUserResult.IsError)
             return getUserResult.Errors;
         else if (getUserResult.Value is null)
@@ -67,10 +77,10 @@ public class RecoverPasswordCommandHandler : IRequestHandler<RecoverPasswordComm
         bool usesTotp = !string.IsNullOrEmpty(getUserResult.Value.TotpSecret);
         if (!usesTotp)
             return Errors.Authentication.InvalidTotpCode;
-        if (usesTotp && string.IsNullOrEmpty(request.TotpCode))
+        if (usesTotp && string.IsNullOrEmpty(command.TotpCode))
             return Errors.Authentication.InvalidTotpCode;
-        else if (usesTotp && !string.IsNullOrEmpty(request.TotpCode)) // and if they do, validate it
-            if (!_totpTokenGenerator.ValidateToken(Convert.FromBase64String(_cryptographyService.Decrypt(getUserResult.Value.TotpSecret!)), request.TotpCode))
+        else if (usesTotp && !string.IsNullOrEmpty(command.TotpCode)) // and if they do, validate it
+            if (!_totpTokenGenerator.ValidateToken(Convert.FromBase64String(_cryptographyService.Decrypt(getUserResult.Value.TotpSecret!)), command.TotpCode))
                 return Errors.Authentication.InvalidTotpCode;
         // hash the new password and assign it to a temporary password that will be valid 15 minutes
         getUserResult.Value.TempPassword = Uri.EscapeDataString(_hashService.HashString("Abcd123$")); // TODO: replace with random password generator

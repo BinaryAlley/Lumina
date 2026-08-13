@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.Seed;
@@ -8,8 +9,8 @@ using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Security;
 using Lumina.Application.Common.Infrastructure.Time;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Contracts.Responses.Authentication;
-using Mediator;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +23,7 @@ namespace Lumina.Application.Core.Maintenance.ApplicationSetup.Commands.SetupApp
 /// <summary>
 /// Handler for the command to perform the initial application setup.
 /// </summary>
-public class SetupApplicationCommandHandler : IRequestHandler<SetupApplicationCommand, ErrorOr<RegistrationResponse>>
+public class SetupApplicationCommandHandler : ICommandHandler<SetupApplicationCommand, ErrorOr<RegistrationResponse>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IPasswordHashService _hashService;
@@ -31,6 +32,7 @@ public class SetupApplicationCommandHandler : IRequestHandler<SetupApplicationCo
     private readonly IQRCodeGenerator _qRCodeGenerator;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IDataSeedService _dataSeedService;
+    private readonly IValidator<SetupApplicationCommand> _validator;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SetupApplicationCommandHandler"/> class.
@@ -42,6 +44,7 @@ public class SetupApplicationCommandHandler : IRequestHandler<SetupApplicationCo
     /// <param name="qRCodeGenerator">Injected service for generating QR codes.</param>
     /// <param name="dateTimeProvider">Injected service for time related concerns.</param>
     /// <param name="dataSeedService">Injected service for the initial persistence medium data seed.</param>
+    /// <param name="validator">Injected validator for application validation rules.</param>
     public SetupApplicationCommandHandler(
         IUnitOfWork unitOfWork,
         IPasswordHashService hashService,
@@ -49,7 +52,8 @@ public class SetupApplicationCommandHandler : IRequestHandler<SetupApplicationCo
         ITotpTokenGenerator totpTokenGenerator,
         IQRCodeGenerator qRCodeGenerator,
         IDateTimeProvider dateTimeProvider,
-        IDataSeedService dataSeedService)
+        IDataSeedService dataSeedService,
+        IValidator<SetupApplicationCommand> validator)
     {
         _unitOfWork = unitOfWork;
         _hashService = hashService;
@@ -58,18 +62,23 @@ public class SetupApplicationCommandHandler : IRequestHandler<SetupApplicationCo
         _qRCodeGenerator = qRCodeGenerator;
         _dateTimeProvider = dateTimeProvider;
         _dataSeedService = dataSeedService;
+        _validator = validator;
     }
 
     /// <summary>
     /// Handles the command to perform the initial application setup.
     /// </summary>
-    /// <param name="request">The request to be handled.</param>
+    /// <param name="command">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
     /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="RegistrationResponse"/>, or an error message.
     /// </returns>
-    public async ValueTask<ErrorOr<RegistrationResponse>> Handle(SetupApplicationCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<RegistrationResponse>> HandleAsync(SetupApplicationCommand command, CancellationToken cancellationToken)
     {
+        List<Error> validationResult = _validator.Validate(command);
+        if (validationResult.Count > 0)
+            return validationResult;
+
         // check if any users already exists (admin account is only set once!)
         IUserRepository userRepository = _unitOfWork.GetRepository<IUserRepository>();
         ErrorOr<IEnumerable<UserEntity>> selectUsersResult = await userRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
@@ -83,8 +92,8 @@ public class SetupApplicationCommandHandler : IRequestHandler<SetupApplicationCo
         UserEntity user = new()
         {
             Id = id,
-            Username = request.Username!,
-            Password = Uri.EscapeDataString(_hashService.HashString(request.Password!)),
+            Username = command.Username!,
+            Password = Uri.EscapeDataString(_hashService.HashString(command.Password!)),
             CreatedOnUtc = _dateTimeProvider.UtcNow,
             Libraries = [],
             UserPermissions = [],
@@ -93,12 +102,12 @@ public class SetupApplicationCommandHandler : IRequestHandler<SetupApplicationCo
             LibraryScans = [],
         };
         // if the user enabled two factor auth, include a QR with the totp secret
-        if (request.Use2fa)
+        if (command.Use2fa)
         {
             // generate a TOTP secret
             byte[] secret = _totpTokenGenerator.GenerateSecret();
             // convert the secret into a QR code for the user to scan
-            totpSecret = _qRCodeGenerator.GenerateQrCodeDataUri(request.Username!, secret);
+            totpSecret = _qRCodeGenerator.GenerateQrCodeDataUri(command.Username!, secret);
             // store the TOTP secret in the repository, encrypted
             user.TotpSecret = _cryptographyService.Encrypt(Convert.ToBase64String(secret));
         }

@@ -54,7 +54,7 @@ public class GetDrivesQueryHandlerTests
             .Returns(ErrorOrFactory.From(drives));
 
         // Act
-        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.Handle(getDrivesQuery, CancellationToken.None);
+        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.HandleAsync(getDrivesQuery, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -90,7 +90,7 @@ public class GetDrivesQueryHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -108,7 +108,7 @@ public class GetDrivesQueryHandlerTests
             .Returns(emptyList);
 
         // Act
-        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);

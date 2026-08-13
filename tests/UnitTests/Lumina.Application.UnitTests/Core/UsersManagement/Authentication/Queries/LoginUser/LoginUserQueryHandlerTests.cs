@@ -7,6 +7,7 @@ using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Security;
 using Lumina.Application.Common.Infrastructure.Time;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.UsersManagement.Authentication.Queries.LoginUser;
 using Lumina.Application.UnitTests.Common.Mapping.UserManagement.Users.Fixtures;
 using Lumina.Contracts.Responses.Authentication;
@@ -50,13 +51,17 @@ public class LoginUserQueryHandlerTests
         _mockUnitOfWork.GetRepository<IUserRepository>().Returns(_mockUserRepository);
         _mockDateTimeProvider.UtcNow.Returns(DateTime.UtcNow);
 
+        IValidator<LoginUserQuery> mockValidator = Substitute.For<IValidator<LoginUserQuery>>();
+        mockValidator.Validate(Arg.Any<LoginUserQuery>())
+            .Returns([]);
         _sut = new LoginUserQueryHandler(
             _mockUnitOfWork,
             _mockHashService,
             _mockJwtTokenGenerator,
             _mockTotpTokenGenerator,
             _mockCryptographyService,
-            _mockDateTimeProvider);
+            _mockDateTimeProvider,
+            mockValidator);
     }
 
     [Fact]
@@ -81,7 +86,7 @@ public class LoginUserQueryHandlerTests
             .Returns(jwtToken);
 
         // Act
-        ErrorOr<LoginResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -120,7 +125,7 @@ public class LoginUserQueryHandlerTests
             .Returns(true);
 
         // Act
-        ErrorOr<LoginResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -140,7 +145,7 @@ public class LoginUserQueryHandlerTests
             .Returns(ErrorOrFactory.From<UserEntity?>(null));
 
         // Act
-        ErrorOr<LoginResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -166,7 +171,7 @@ public class LoginUserQueryHandlerTests
             .Returns(false);
 
         // Act
-        ErrorOr<LoginResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -196,7 +201,7 @@ public class LoginUserQueryHandlerTests
             .Returns(true);
 
         // Act
-        ErrorOr<LoginResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -236,7 +241,7 @@ public class LoginUserQueryHandlerTests
             .Returns(jwtToken);
 
         // Act
-        ErrorOr<LoginResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -266,7 +271,7 @@ public class LoginUserQueryHandlerTests
             .Returns(true);
 
         // Act
-        ErrorOr<LoginResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -299,7 +304,7 @@ public class LoginUserQueryHandlerTests
             .Returns(false);
 
         // Act
-        ErrorOr<LoginResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -317,7 +322,7 @@ public class LoginUserQueryHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<LoginResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -347,7 +352,7 @@ public class LoginUserQueryHandlerTests
             .Returns(false); // Temp password check also fails
 
         // Act
-        ErrorOr<LoginResponse> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);

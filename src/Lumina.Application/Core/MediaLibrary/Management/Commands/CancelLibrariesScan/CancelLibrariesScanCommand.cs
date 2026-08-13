@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Mediator;
+using Lumina.Application.Common.CQRS;
 #endregion
 
 namespace Lumina.Application.Core.MediaLibrary.Management.Commands.CancelLibrariesScan;
@@ -8,4 +7,4 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Commands.CancelLibrari
 /// <summary>
 /// Command for canceling the previously started scan of all media libraries.
 /// </summary>
-public record CancelLibrariesScanCommand : IRequest<ErrorOr<Success>>;
+public record CancelLibrariesScanCommand : ICommand;

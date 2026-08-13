@@ -5,6 +5,7 @@ using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.Books;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook;
 using Lumina.Application.UnitTests.Common.Setup;
 using Lumina.Application.UnitTests.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook.Fixtures;
@@ -48,7 +49,10 @@ public class AddBookCommandHandlerTests
 
         _mockUnitOfWork.GetRepository<IBookRepository>().Returns(_mockBookRepository);
 
-        _sut = new AddBookCommandHandler(_mockUnitOfWork);
+        IValidator<AddBookCommand> mockValidator = Substitute.For<IValidator<AddBookCommand>>();
+        mockValidator.Validate(Arg.Any<AddBookCommand>())
+            .Returns([]);
+        _sut = new AddBookCommandHandler(_mockUnitOfWork, mockValidator);
         _commandBookFixture = new AddBookCommandFixture();
     }
 
@@ -62,7 +66,7 @@ public class AddBookCommandHandlerTests
             .Returns(Result.Created);
 
         // Act
-        ErrorOr<BookResponse> result = await _sut.Handle(bookCommand, CancellationToken.None);
+        ErrorOr<BookResponse> result = await _sut.HandleAsync(bookCommand, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -81,7 +85,7 @@ public class AddBookCommandHandlerTests
             .Returns(Errors.WrittenContent.BookAlreadyExists);
 
         // Act
-        ErrorOr<BookResponse> result = await _sut.Handle(bookCommand, CancellationToken.None);
+        ErrorOr<BookResponse> result = await _sut.HandleAsync(bookCommand, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -98,7 +102,7 @@ public class AddBookCommandHandlerTests
         bookCommand = bookCommand with { ISBNs = [new IsbnDto("invalid", IsbnFormat.Isbn13)] };
 
         // Act
-        ErrorOr<BookResponse> result = await _sut.Handle(bookCommand, CancellationToken.None);
+        ErrorOr<BookResponse> result = await _sut.HandleAsync(bookCommand, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -115,7 +119,7 @@ public class AddBookCommandHandlerTests
         bookCommand = bookCommand with { Ratings = [new BookRatingDto(-1, 5, null, null)] };
 
         // Act
-        ErrorOr<BookResponse> result = await _sut.Handle(bookCommand, CancellationToken.None);
+        ErrorOr<BookResponse> result = await _sut.HandleAsync(bookCommand, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -138,7 +142,7 @@ public class AddBookCommandHandlerTests
         };
 
         // Act
-        ErrorOr<BookResponse> result = await _sut.Handle(bookCommand, CancellationToken.None);
+        ErrorOr<BookResponse> result = await _sut.HandleAsync(bookCommand, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -161,7 +165,7 @@ public class AddBookCommandHandlerTests
         };
 
         // Act
-        ErrorOr<BookResponse> result = await _sut.Handle(bookCommand, CancellationToken.None);
+        ErrorOr<BookResponse> result = await _sut.HandleAsync(bookCommand, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -191,7 +195,7 @@ public class AddBookCommandHandlerTests
         };
 
         // Act
-        ErrorOr<BookResponse> result = await _sut.Handle(bookCommand, CancellationToken.None);
+        ErrorOr<BookResponse> result = await _sut.HandleAsync(bookCommand, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -214,7 +218,7 @@ public class AddBookCommandHandlerTests
         };
 
         // Act
-        ErrorOr<BookResponse> result = await _sut.Handle(bookCommand, CancellationToken.None);
+        ErrorOr<BookResponse> result = await _sut.HandleAsync(bookCommand, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -237,7 +241,7 @@ public class AddBookCommandHandlerTests
         };
 
         // Act
-        ErrorOr<BookResponse> result = await _sut.Handle(bookCommand, CancellationToken.None);
+        ErrorOr<BookResponse> result = await _sut.HandleAsync(bookCommand, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);

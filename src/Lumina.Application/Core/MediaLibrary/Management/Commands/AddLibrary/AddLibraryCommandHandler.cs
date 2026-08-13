@@ -1,11 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.DomainEvents;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
 using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
@@ -16,8 +18,8 @@ using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.File
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
-using Mediator;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
@@ -29,13 +31,14 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Commands.AddLibrary;
 /// <summary>
 /// Handler for the command to add a media library.
 /// </summary>
-public class AddLibraryCommandHandler : IRequestHandler<AddLibraryCommand, ErrorOr<LibraryResponse>>
+public class AddLibraryCommandHandler : ICommandHandler<AddLibraryCommand, ErrorOr<LibraryResponse>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUserService;
     private readonly IDomainEventsQueue _domainEventsQueue;
     private readonly IEnvironmentContext _environmentContext;
     private readonly IAuthorizationService _authorizationService;
+    private readonly IValidator<AddLibraryCommand> _validator;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AddLibraryCommandHandler"/> class.
@@ -45,30 +48,36 @@ public class AddLibraryCommandHandler : IRequestHandler<AddLibraryCommand, Error
     /// <param name="domainEventsQueue">Injected service for the queue of domain events.</param>
     /// <param name="environmentContext">Injected facade service for environment contextual services.</param>
     /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
+    /// <param name="validator">Injected validator for application validation rules.</param>
     public AddLibraryCommandHandler(
         IAuthorizationService authorizationService,
         ICurrentUserService currentUserService, 
         IDomainEventsQueue domainEventsQueue,
         IEnvironmentContext environmentContext,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        IValidator<AddLibraryCommand> validator)
     {
         _unitOfWork = unitOfWork;
         _currentUserService = currentUserService;
         _domainEventsQueue = domainEventsQueue;
         _environmentContext = environmentContext;
         _authorizationService = authorizationService;
+        _validator = validator;
     }
 
     /// <summary>
     /// Handles the command to add a media library.
     /// </summary>
-    /// <param name="request">The request to be handled.</param>
+    /// <param name="command">The command to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
     /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="LibraryResponse"/>, or an error message.
     /// </returns>
-    public async ValueTask<ErrorOr<LibraryResponse>> Handle(AddLibraryCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<LibraryResponse>> HandleAsync(AddLibraryCommand command, CancellationToken cancellationToken)
     {
+        List<Error> validationResult = _validator.Validate(command);
+        if (validationResult.Count > 0)
+            return validationResult;
 
         // if the user that made the request is not an Admin or they don't have the permission to manage media libraries, they do not have the right to create it
         if (!await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false) &&
@@ -76,9 +85,9 @@ public class AddLibraryCommandHandler : IRequestHandler<AddLibraryCommand, Error
             return ApplicationErrors.Authorization.NotAuthorized;
 
         // make sure the file is an actual supported image
-        if (request.CoverImage is not null)
+        if (command.CoverImage is not null)
         {
-            ErrorOr<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(request.CoverImage);
+            ErrorOr<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(command.CoverImage);
             if (fileSystemPathIdResult.IsError)
                 return fileSystemPathIdResult.Errors;
 
@@ -92,15 +101,15 @@ public class AddLibraryCommandHandler : IRequestHandler<AddLibraryCommand, Error
         // create a domain library object
         ErrorOr<Library> createLibraryResult = Library.Create(
             UserId.Create(_currentUserService.UserId!.Value),
-            request.Title!,
-            Enum.Parse<LibraryType>(request.LibraryType!),
-            request.ContentLocations!,
-            request.CoverImage,
-            request.IsEnabled,
-            request.IsLocked,
-            request.DownloadMetadataFromWeb,
-            request.ShouldSaveMetadataInMediaDirectories,
-            request.ShouldSkipUnchangedDirectoriesDuringScan,
+            command.Title!,
+            Enum.Parse<LibraryType>(command.LibraryType!),
+            command.ContentLocations!,
+            command.CoverImage,
+            command.IsEnabled,
+            command.IsLocked,
+            command.DownloadMetadataFromWeb,
+            command.ShouldSaveMetadataInMediaDirectories,
+            command.ShouldSkipUnchangedDirectoriesDuringScan,
             []
         );
 

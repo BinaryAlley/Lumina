@@ -1,7 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Contracts.Responses.Authentication;
-using Mediator;
+using Lumina.Application.Common.CQRS;
 #endregion
 
 namespace Lumina.Application.Core.UsersManagement.Authentication.Commands.ChangePassword;
@@ -18,4 +16,4 @@ public record ChangePasswordCommand(
     string? CurrentPassword,
     string? NewPassword,
     string? NewPasswordConfirm
-) : IRequest<ErrorOr<ChangePasswordResponse>>;
+) : ICommand;

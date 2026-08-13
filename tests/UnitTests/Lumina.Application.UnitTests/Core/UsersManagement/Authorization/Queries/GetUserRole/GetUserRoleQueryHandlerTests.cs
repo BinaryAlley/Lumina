@@ -6,6 +6,7 @@ using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetUserRole;
 using Lumina.Application.UnitTests.Common.Mapping.UserManagement.Users.Fixtures;
 using Lumina.Application.UnitTests.Core.UsersManagement.Authorization.Queries.GetUserRole.Fixtures;
@@ -48,10 +49,14 @@ public class GetUserRoleQueryHandlerTests
         _mockCurrentUserService.UserId.Returns(_userId);
         _mockUnitOfWork.GetRepository<IUserRepository>().Returns(_mockUserRepository);
 
+        IValidator<GetUserRoleQuery> mockValidator = Substitute.For<IValidator<GetUserRoleQuery>>();
+        mockValidator.Validate(Arg.Any<GetUserRoleQuery>())
+            .Returns([]);
         _sut = new GetUserRoleQueryHandler(
             _mockAuthorizationService,
             _mockCurrentUserService,
-            _mockUnitOfWork);
+            _mockUnitOfWork,
+            mockValidator);
     }
 
     [Fact]
@@ -63,7 +68,7 @@ public class GetUserRoleQueryHandlerTests
             .Returns(false);
 
         // Act
-        ErrorOr<RoleResponse?> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<RoleResponse?> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -84,7 +89,7 @@ public class GetUserRoleQueryHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<RoleResponse?> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<RoleResponse?> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -103,7 +108,7 @@ public class GetUserRoleQueryHandlerTests
             .Returns((UserEntity?)null);
 
         // Act
-        ErrorOr<RoleResponse?> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<RoleResponse?> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -123,7 +128,7 @@ public class GetUserRoleQueryHandlerTests
             .Returns(user);
 
         // Act
-        ErrorOr<RoleResponse?> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<RoleResponse?> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -159,7 +164,7 @@ public class GetUserRoleQueryHandlerTests
             .Returns(user);
 
         // Act
-        ErrorOr<RoleResponse?> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<RoleResponse?> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);

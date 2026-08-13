@@ -1,8 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Contracts.Responses.Authorization;
-using Mediator;
-using System.Collections.Generic;
+using Lumina.Application.Common.CQRS;
 #endregion
 
 namespace Lumina.Application.Core.Admin.Authorization.Permissions.Queries.GetPermissions;
@@ -10,4 +7,4 @@ namespace Lumina.Application.Core.Admin.Authorization.Permissions.Queries.GetPer
 /// <summary>
 /// Query for retrieving the list of authorization permissions.
 /// </summary>
-public record GetPermissionsQuery : IRequest<ErrorOr<IEnumerable<PermissionResponse>>>;
+public record GetPermissionsQuery : IQuery;

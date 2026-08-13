@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Mediator;
+using Lumina.Application.Common.CQRS;
 using System;
 using System.Diagnostics;
 #endregion
@@ -14,4 +13,4 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Commands.DeleteLibrary
 [DebuggerDisplay("Id: {Id}")]
 public record DeleteLibraryCommand(
     Guid Id
-) : IRequest<ErrorOr<Deleted>>;
+) : ICommand;

@@ -1,8 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation.TestHelper;
+using ErrorOr;
 using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetUserPermissions;
+using Lumina.Application.UnitTests.Common.Setup;
 using Lumina.Domain.SharedKernel.Common.Errors;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -31,11 +33,10 @@ public class GetUserPermissionsQueryValidatorTests
         GetUserPermissionsQuery query = new(null);
 
         // Act
-        TestValidationResult<GetUserPermissionsQuery> result = _validator.TestValidate(query);
+        List<Error> result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.UserId)
-            .WithErrorMessage(Errors.Users.UserIdCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Users.UserIdCannotBeEmpty);
     }
 
     [Fact]
@@ -45,11 +46,10 @@ public class GetUserPermissionsQueryValidatorTests
         GetUserPermissionsQuery query = new(Guid.Empty);
 
         // Act
-        TestValidationResult<GetUserPermissionsQuery> result = _validator.TestValidate(query);
+        List<Error> result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.UserId)
-            .WithErrorMessage(Errors.Users.UserIdCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Users.UserIdCannotBeEmpty);
     }
 
     [Fact]
@@ -59,9 +59,9 @@ public class GetUserPermissionsQueryValidatorTests
         GetUserPermissionsQuery query = new(Guid.NewGuid());
 
         // Act
-        TestValidationResult<GetUserPermissionsQuery> result = _validator.TestValidate(query);
+        List<Error> result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.UserId);
+        result.ShouldNotHaveValidationError(Errors.Users.UserIdCannotBeEmpty);
     }
 }

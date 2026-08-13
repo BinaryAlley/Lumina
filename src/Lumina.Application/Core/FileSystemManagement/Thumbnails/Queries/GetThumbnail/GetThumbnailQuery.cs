@@ -1,7 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Contracts.Responses.FileSystemManagement.Thumbnails;
-using Mediator;
+using Lumina.Application.Common.CQRS;
 using System.Diagnostics;
 #endregion
 
@@ -16,4 +14,4 @@ namespace Lumina.Application.Core.FileSystemManagement.Thumbnails.Queries.GetThu
 public record GetThumbnailQuery(
     string? Path, 
     int Quality
-) : IRequest<ErrorOr<ThumbnailResponse>>;
+) : IQuery;

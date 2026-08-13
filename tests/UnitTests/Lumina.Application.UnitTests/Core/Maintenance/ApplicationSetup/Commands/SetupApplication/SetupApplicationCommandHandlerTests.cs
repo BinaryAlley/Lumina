@@ -8,6 +8,7 @@ using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Security;
 using Lumina.Application.Common.Infrastructure.Time;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.Maintenance.ApplicationSetup.Commands.SetupApplication;
 using Lumina.Application.UnitTests.Common.Mapping.UserManagement.Users.Fixtures;
 using Lumina.Application.UnitTests.Core.Maintenance.ApplicationSetup.Commands.SetupApplication.Fixtures;
@@ -53,6 +54,9 @@ public class SetupApplicationCommandHandlerTests
         _mockDateTimeProvider = Substitute.For<IDateTimeProvider>();
         _mockDataSeedService = Substitute.For<IDataSeedService>();
         _setupApplicationCommandFixture = new SetupApplicationCommandFixture();
+        IValidator<SetupApplicationCommand> mockValidator = Substitute.For<IValidator<SetupApplicationCommand>>();
+        mockValidator.Validate(Arg.Any<SetupApplicationCommand>())
+            .Returns([]);
 
         _mockUnitOfWork.GetRepository<IUserRepository>().Returns(_mockUserRepository);
         _mockDateTimeProvider.UtcNow.Returns(DateTime.UtcNow);
@@ -64,7 +68,8 @@ public class SetupApplicationCommandHandlerTests
             _mockTotpTokenGenerator,
             _mockQRCodeGenerator,
             _mockDateTimeProvider,
-            _mockDataSeedService);
+            _mockDataSeedService,
+            mockValidator);
     }
 
     [Fact]
@@ -82,7 +87,7 @@ public class SetupApplicationCommandHandlerTests
             .Returns(Result.Created);
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -119,7 +124,7 @@ public class SetupApplicationCommandHandlerTests
             .Returns(Result.Created);
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -143,7 +148,7 @@ public class SetupApplicationCommandHandlerTests
             .Returns(new[] { existingUser });
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -165,7 +170,7 @@ public class SetupApplicationCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -189,7 +194,7 @@ public class SetupApplicationCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -215,7 +220,7 @@ public class SetupApplicationCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -242,7 +247,7 @@ public class SetupApplicationCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -272,7 +277,7 @@ public class SetupApplicationCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -305,7 +310,7 @@ public class SetupApplicationCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -337,7 +342,7 @@ public class SetupApplicationCommandHandlerTests
             .Returns(Result.Created);
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);

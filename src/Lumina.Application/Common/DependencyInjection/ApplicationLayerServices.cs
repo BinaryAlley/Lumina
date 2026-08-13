@@ -1,7 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation;
-using Lumina.Application.Common.Behaviors;
-using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -25,44 +22,39 @@ public static class ApplicationLayerServices
     /// <returns>The updated <see cref="IServiceCollection"/>.</returns>
     public static IServiceCollection AddApplicationLayerServices(this IServiceCollection services)
     {
-        // register Mediator
+        // register the Mediator publisher used for publishing domain events
         services.AddMediator(options =>
         {
             options.ServiceLifetime = ServiceLifetime.Scoped;
         });
 
-        // register the validation behavior
-        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-
-        // register fluent validators
-        services.AddValidatorsFromAssembly(typeof(ApplicationLayerServices).Assembly);
-
-        Type[] handlers =
+        Type[] handlerContractTypes =
         [
             typeof(CQRS.ICommandHandler<,>),
             typeof(CQRS.IQueryHandler<,>),
             typeof(Infrastructure.Validation.IValidator<>),
         ];
 
-        IEnumerable<Type> types = Assembly.GetExecutingAssembly()
-                    .GetTypes()
-                    .Where(type => !type.IsInterface && !type.IsAbstract);
+        IEnumerable<Type> concreteTypes = Assembly.GetExecutingAssembly()
+            .GetTypes()
+            .Where(type => !type.IsInterface && !type.IsAbstract && !type.IsGenericTypeDefinition);
 
-        var registrations = types
-                    .SelectMany(type => type.GetInterfaces(),
-                        (implementation, service) => new { Service = service, Implmentation = implementation })
-                    .Where(type => type.Service.IsGenericType && handlers.Contains(type.Service.GetGenericTypeDefinition()));
+        var handlerRegistrations = concreteTypes
+            .SelectMany(implementation => implementation.GetInterfaces(),
+                (implementation, contract) => new { Contract = contract, Implementation = implementation })
+            .Where(registration => registration.Contract.IsGenericType && handlerContractTypes.Contains(registration.Contract.GetGenericTypeDefinition()));
 
-        foreach (var registration in registrations)
+        foreach (var registration in handlerRegistrations)
         {
-            if (!services.Any(service => service.ServiceType == registration.Service))
-            {
-                if (registration.Service.GetGenericTypeDefinition() == typeof(Infrastructure.Validation.IValidator<>))
-                    services.AddSingleton(registration.Service, registration.Implmentation);
-                else
-                    services.AddScoped(registration.Service, registration.Implmentation);
-            }
+            if (services.Any(service => service.ServiceType == registration.Contract))
+                continue;
+
+            if (registration.Contract.GetGenericTypeDefinition() == typeof(Infrastructure.Validation.IValidator<>))
+                services.AddSingleton(registration.Contract, registration.Implementation);
+            else
+                services.AddScoped(registration.Contract, registration.Implementation);
         }
+
         return services;
     }
 }

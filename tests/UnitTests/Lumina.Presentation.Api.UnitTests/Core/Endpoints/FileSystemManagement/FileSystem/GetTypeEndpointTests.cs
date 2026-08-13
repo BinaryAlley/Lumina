@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.FileSystemManagement.FileSystem.Queries.GetFileSystem;
 using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using Lumina.Contracts.Responses.FileSystemManagement.FileSystem;
 using Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.FileSystem.GetType;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -22,7 +22,7 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.
 [ExcludeFromCodeCoverage]
 public class GetFileSystemTypeEndpointTests
 {
-    private readonly ISender _mockSender;
+    private readonly IQueryHandler<GetFileSystemQuery, FileSystemTypeResponse> _mockHandler;
     private readonly GetTypeEndpoint _sut;
 
     /// <summary>
@@ -30,8 +30,8 @@ public class GetFileSystemTypeEndpointTests
     /// </summary>
     public GetFileSystemTypeEndpointTests()
     {
-        _mockSender = Substitute.For<ISender>();
-        _sut = Factory.Create<GetTypeEndpoint>(_mockSender);
+        _mockHandler = Substitute.For<IQueryHandler<GetFileSystemQuery, FileSystemTypeResponse>>();
+        _sut = Factory.Create<GetTypeEndpoint>(_mockHandler);
     }
 
     [Fact]
@@ -40,7 +40,7 @@ public class GetFileSystemTypeEndpointTests
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;
         FileSystemTypeResponse expectedResponse = new(PlatformType.Windows);
-        _mockSender.Send(Arg.Any<GetFileSystemQuery>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<GetFileSystemQuery>(), Arg.Any<CancellationToken>())
             .Returns(expectedResponse);
 
         // Act
@@ -59,7 +59,7 @@ public class GetFileSystemTypeEndpointTests
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;
         FileSystemTypeResponse expectedResponse = new(platformType);
-        _mockSender.Send(Arg.Any<GetFileSystemQuery>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<GetFileSystemQuery>(), Arg.Any<CancellationToken>())
             .Returns(expectedResponse);
 
         // Act
@@ -75,14 +75,14 @@ public class GetFileSystemTypeEndpointTests
     {
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;
-        _mockSender.Send(Arg.Any<GetFileSystemQuery>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<GetFileSystemQuery>(), Arg.Any<CancellationToken>())
             .Returns(new FileSystemTypeResponse(PlatformType.Windows));
 
         // Act
         await _sut.ExecuteAsync(new EmptyRequest(), cancellationToken);
 
         // Assert
-        await _mockSender.Received(1).Send(Arg.Any<GetFileSystemQuery>(), Arg.Is(cancellationToken));
+        await _mockHandler.Received(1).HandleAsync(Arg.Any<GetFileSystemQuery>(), Arg.Is(cancellationToken));
     }
 
     [Fact]
@@ -93,14 +93,14 @@ public class GetFileSystemTypeEndpointTests
         TaskCompletionSource<bool> operationStarted = new();
         TaskCompletionSource<bool> cancellationRequested = new();
 
-        _mockSender.Send(Arg.Any<GetFileSystemQuery>(), Arg.Any<CancellationToken>())
-            .Returns(callInfo => new ValueTask<FileSystemTypeResponse>(Task.Run(async () =>
+        _mockHandler.HandleAsync(Arg.Any<GetFileSystemQuery>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo => Task.Run(async () =>
             {
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
                 return new FileSystemTypeResponse(PlatformType.Windows);
-            }, callInfo.Arg<CancellationToken>())));
+            }, callInfo.Arg<CancellationToken>()));
 
         // Act
         Task<IResult> operationTask = _sut.ExecuteAsync(new EmptyRequest(), cts.Token);

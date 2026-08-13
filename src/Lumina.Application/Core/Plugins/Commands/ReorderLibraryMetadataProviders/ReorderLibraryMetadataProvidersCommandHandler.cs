@@ -1,9 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.UoW;
-using Mediator;
+using Lumina.Application.Common.Infrastructure.Validation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,38 +17,45 @@ namespace Lumina.Application.Core.Plugins.Commands.ReorderLibraryMetadataProvide
 /// <summary>
 /// Handler for the command to reorder the metadata providers of a media library.
 /// </summary>
-public class ReorderLibraryMetadataProvidersCommandHandler : IRequestHandler<ReorderLibraryMetadataProvidersCommand, ErrorOr<Success>>
+public class ReorderLibraryMetadataProvidersCommandHandler : ICommandHandler<ReorderLibraryMetadataProvidersCommand, ErrorOr<Success>>
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IValidator<ReorderLibraryMetadataProvidersCommand> _validator;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ReorderLibraryMetadataProvidersCommandHandler"/> class.
     /// </summary>
     /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
-    public ReorderLibraryMetadataProvidersCommandHandler(IUnitOfWork unitOfWork)
+    /// <param name="validator">Injected validator for application validation rules.</param>
+    public ReorderLibraryMetadataProvidersCommandHandler(IUnitOfWork unitOfWork, IValidator<ReorderLibraryMetadataProvidersCommand> validator)
     {
         _unitOfWork = unitOfWork;
+        _validator = validator;
     }
 
     /// <summary>
     /// Handles the command to reorder the metadata providers of a media library.
     /// </summary>
-    /// <param name="request">The request to be handled.</param>
+    /// <param name="command">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
     /// An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.
     /// </returns>
-    public async ValueTask<ErrorOr<Success>> Handle(ReorderLibraryMetadataProvidersCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<Success>> HandleAsync(ReorderLibraryMetadataProvidersCommand command, CancellationToken cancellationToken)
     {
+        List<Error> validationResult = _validator.Validate(command);
+        if (validationResult.Count > 0)
+            return validationResult;
+
         ILibraryMetadataProviderConfigurationRepository configurationRepository = _unitOfWork.GetRepository<ILibraryMetadataProviderConfigurationRepository>();
-        ErrorOr<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>> getConfigurationsResult = await configurationRepository.GetByLibraryIdAsync(request.LibraryId, cancellationToken).ConfigureAwait(false);
+        ErrorOr<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>> getConfigurationsResult = await configurationRepository.GetByLibraryIdAsync(command.LibraryId, cancellationToken).ConfigureAwait(false);
         if (getConfigurationsResult.IsError)
             return getConfigurationsResult.Errors;
 
         Dictionary<Guid, LibraryMetadataProviderConfigurationEntity> configurationsByPluginId = getConfigurationsResult.Value.ToDictionary(configuration => configuration.PluginId);
-        for (int rank = 0; rank < request.PluginIds.Count; rank++)
+        for (int rank = 0; rank < command.PluginIds.Count; rank++)
         {
-            Guid pluginId = request.PluginIds[rank];
+            Guid pluginId = command.PluginIds[rank];
             if (configurationsByPluginId.TryGetValue(pluginId, out LibraryMetadataProviderConfigurationEntity? configuration))
             {
                 configuration.Rank = rank + 1;

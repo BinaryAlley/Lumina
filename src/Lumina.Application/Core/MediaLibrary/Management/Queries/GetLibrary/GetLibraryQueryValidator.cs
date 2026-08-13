@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation;
+using Lumina.Application.Common.Infrastructure.Validation;
+using Lumina.Application.Common.Utilities;
 using Lumina.Domain.SharedKernel.Common.Errors;
 using System;
 #endregion
@@ -16,8 +17,10 @@ public class GetLibraryQueryValidator : AbstractValidator<GetLibraryQuery>
     /// </summary>
     public GetLibraryQueryValidator()
     {
-        RuleFor(x => x.Id)
-            .NotEmpty().WithMessage(Errors.Library.LibraryIdCannotBeEmpty.Description)
-            .Must(id => id != Guid.Empty).WithMessage(Errors.Library.LibraryIdCannotBeEmpty.Description);
+        RuleFor(query => query.Id)
+            .NotEmpty()
+            .WithError(Errors.Library.LibraryIdCannotBeEmpty)
+            .Must(id => id != Guid.Empty)
+            .WithError(Errors.Library.LibraryIdCannotBeEmpty);
     }
 }

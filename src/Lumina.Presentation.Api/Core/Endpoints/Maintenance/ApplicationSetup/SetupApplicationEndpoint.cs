@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.Application.Common.Mapping.Authentication;
+using Lumina.Application.Core.Maintenance.ApplicationSetup.Commands.SetupApplication;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,15 +19,15 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Maintenance.ApplicationSetup;
 /// </summary>
 public class SetupApplicationEndpoint : BaseEndpoint<RegistrationRequest, IResult>
 {
-    private readonly ISender _sender;
+    private readonly ICommandHandler<SetupApplicationCommand, ErrorOr<RegistrationResponse>> _setupApplicationCommandHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SetupApplicationEndpoint"/> class.
     /// </summary>
-    /// <param name="sender">Injected service for mediating commands and queries.</param>
-    public SetupApplicationEndpoint(ISender sender)
+    /// <param name="setupApplicationCommandHandler">Injected service for handling setup application commands.</param>
+    public SetupApplicationEndpoint(ICommandHandler<SetupApplicationCommand, ErrorOr<RegistrationResponse>> setupApplicationCommandHandler)
     {
-        _sender = sender;
+        _setupApplicationCommandHandler = setupApplicationCommandHandler;
     }
 
     /// <summary>
@@ -35,7 +35,7 @@ public class SetupApplicationEndpoint : BaseEndpoint<RegistrationRequest, IResul
     /// </summary>
     public override void Configure()
     {
-        Verbs(Http.POST);
+        Verbs(FastEndpoints.Http.POST);
         Routes(ApiRoutes.Initialization.SETUP_APPLICATION);
         Version(1);
         AllowAnonymous();
@@ -49,7 +49,7 @@ public class SetupApplicationEndpoint : BaseEndpoint<RegistrationRequest, IResul
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(RegistrationRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<RegistrationResponse> result = await _sender.Send(request.ToSetupCommand(), cancellationToken).ConfigureAwait(false);
+        ErrorOr<RegistrationResponse> result = await _setupApplicationCommandHandler.HandleAsync(request.ToSetupCommand(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Created($"{BaseURL}api/v1{Api.Common.Routes.UsersManagement.ApiRoutes.Users.GET_USER_BY_ID.Replace("{id}", success.Id.ToString())}", result.Value), Problem);
     }
 }

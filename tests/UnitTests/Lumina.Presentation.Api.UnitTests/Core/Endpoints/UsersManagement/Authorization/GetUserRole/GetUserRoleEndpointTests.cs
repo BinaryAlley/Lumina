@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetUserRole;
 using Lumina.Contracts.Requests.Authorization;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authorization.GetUserRole;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -23,7 +23,7 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.UsersManagement.Autho
 [ExcludeFromCodeCoverage]
 public class GetUserRoleEndpointTests
 {
-    private readonly ISender _mockSender;
+    private readonly IQueryHandler<GetUserRoleQuery, ErrorOr<RoleResponse?>> _mockHandler;
     private readonly GetUserRoleEndpoint _sut;
 
     /// <summary>
@@ -31,8 +31,8 @@ public class GetUserRoleEndpointTests
     /// </summary>
     public GetUserRoleEndpointTests()
     {
-        _mockSender = Substitute.For<ISender>();
-        _sut = Factory.Create<GetUserRoleEndpoint>(_mockSender);
+        _mockHandler = Substitute.For<IQueryHandler<GetUserRoleQuery, ErrorOr<RoleResponse?>>>();
+        _sut = Factory.Create<GetUserRoleEndpoint>(_mockHandler);
     }
 
     [Fact]
@@ -42,8 +42,8 @@ public class GetUserRoleEndpointTests
         GetUserRoleRequest request = new(Guid.NewGuid());
         CancellationToken cancellationToken = CancellationToken.None;
         RoleResponse expectedResponse = new(Guid.NewGuid(), "Admin");
-        _mockSender.Send(Arg.Any<GetUserRoleQuery>(), Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(expectedResponse));
+        _mockHandler.HandleAsync(Arg.Any<GetUserRoleQuery>(), Arg.Any<CancellationToken>())
+            .Returns(ErrorOrFactory.From<RoleResponse?>(expectedResponse));
 
         // Act
         IResult result = await _sut.ExecuteAsync(request, cancellationToken);
@@ -60,7 +60,7 @@ public class GetUserRoleEndpointTests
         GetUserRoleRequest request = new(Guid.NewGuid());
         CancellationToken cancellationToken = CancellationToken.None;
         Error expectedError = Error.Failure("User.Role.NotFound", "User role not found.");
-        _mockSender.Send(Arg.Any<GetUserRoleQuery>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<GetUserRoleQuery>(), Arg.Any<CancellationToken>())
             .Returns(expectedError);
 
         // Act
@@ -86,14 +86,14 @@ public class GetUserRoleEndpointTests
         Guid userId = Guid.NewGuid();
         GetUserRoleRequest request = new(userId);
         CancellationToken cancellationToken = CancellationToken.None;
-        _mockSender.Send(Arg.Any<GetUserRoleQuery>(), Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(new RoleResponse(Guid.NewGuid(), "Admin")));
+        _mockHandler.HandleAsync(Arg.Any<GetUserRoleQuery>(), Arg.Any<CancellationToken>())
+            .Returns(ErrorOrFactory.From<RoleResponse?>(new RoleResponse(Guid.NewGuid(), "Admin")));
 
         // Act
         await _sut.ExecuteAsync(request, cancellationToken);
 
         // Assert
-        await _mockSender.Received(1).Send(
+        await _mockHandler.Received(1).HandleAsync(
             Arg.Is<GetUserRoleQuery>(cmd => cmd.UserId == request.UserId),
             Arg.Is(cancellationToken));
     }
@@ -106,16 +106,14 @@ public class GetUserRoleEndpointTests
         TaskCompletionSource<bool> operationStarted = new();
         TaskCompletionSource<bool> cancellationRequested = new();
 
-        _mockSender.Send(Arg.Any<GetUserRoleQuery>(), Arg.Any<CancellationToken>())
-            .Returns(info => new ValueTask<ErrorOr<RoleResponse?>>(
-                Task.Run(async () =>
-                {
-                    operationStarted.SetResult(true);
-                    await cancellationRequested.Task;
-                    info.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                    return ErrorOrFactory.From(new RoleResponse(Guid.NewGuid(), "Admin"));
-                }, info.Arg<CancellationToken>())
-            ));
+        _mockHandler.HandleAsync(Arg.Any<GetUserRoleQuery>(), Arg.Any<CancellationToken>())
+            .Returns(info => Task.Run(async () =>
+            {
+                operationStarted.SetResult(true);
+                await cancellationRequested.Task;
+                info.Arg<CancellationToken>().ThrowIfCancellationRequested();
+                return ErrorOrFactory.From<RoleResponse?>(new RoleResponse(Guid.NewGuid(), "Admin"));
+            }, info.Arg<CancellationToken>()));
 
         // Act
         Task<IResult> operationTask = _sut.ExecuteAsync(new GetUserRoleRequest(Guid.NewGuid()), cts.Token);

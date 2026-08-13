@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Files;
 using Lumina.Application.Core.FileSystemManagement.FileSystem.Queries.GetFileSystem;
 using Lumina.Contracts.Requests.FileSystemManagement.Files;
 using Lumina.Contracts.Responses.FileSystemManagement.FileSystem;
 using Lumina.Presentation.Api.Common.Routes.FileSystemManagement;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.Threading;
@@ -21,15 +21,15 @@ namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.FileSystem
 /// </summary>
 public class GetTypeEndpoint : BaseEndpoint<EmptyRequest, IResult>
 {
-    private readonly ISender _sender;
+    private readonly IQueryHandler<GetFileSystemQuery, FileSystemTypeResponse> _getFileSystemQueryHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetTypeEndpoint"/> class.
     /// </summary>
-    /// <param name="sender">Injected service for mediating commands and queries.</param>
-    public GetTypeEndpoint(ISender sender)
+    /// <param name="getFileSystemQueryHandler">Injected service for handling get file system queries.</param>
+    public GetTypeEndpoint(IQueryHandler<GetFileSystemQuery, FileSystemTypeResponse> getFileSystemQueryHandler)
     {
-        _sender = sender;
+        _getFileSystemQueryHandler = getFileSystemQueryHandler;
     }
 
     /// <summary>
@@ -37,7 +37,7 @@ public class GetTypeEndpoint : BaseEndpoint<EmptyRequest, IResult>
     /// </summary>
     public override void Configure()
     {
-        Verbs(Http.GET);
+        Verbs(FastEndpoints.Http.GET);
         Routes(ApiRoutes.FileSystem.GET_TYPES);
         Version(1);
         DontCatchExceptions();
@@ -49,7 +49,7 @@ public class GetTypeEndpoint : BaseEndpoint<EmptyRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(EmptyRequest _, CancellationToken cancellationToken)
     {
-        FileSystemTypeResponse platformType = await _sender.Send(new GetFileSystemQuery(), cancellationToken).ConfigureAwait(false);
+        FileSystemTypeResponse platformType = await _getFileSystemQueryHandler.HandleAsync(new GetFileSystemQuery(), cancellationToken).ConfigureAwait(false);
         return TypedResults.Ok(platformType);
     }
 }

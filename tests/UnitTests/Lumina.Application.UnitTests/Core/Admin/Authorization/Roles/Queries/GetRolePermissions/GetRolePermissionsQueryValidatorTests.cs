@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FluentValidation.TestHelper;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Core.Admin.Authorization.Roles.Queries.GetRolePermissions;
 using Lumina.Application.UnitTests.Common.Setup;

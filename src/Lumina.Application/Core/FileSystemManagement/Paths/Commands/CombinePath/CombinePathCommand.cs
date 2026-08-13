@@ -1,7 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Contracts.Responses.FileSystemManagement.Path;
-using Mediator;
+using Lumina.Application.Common.CQRS;
 using System.Diagnostics;
 #endregion
 
@@ -16,4 +14,4 @@ namespace Lumina.Application.Core.FileSystemManagement.Paths.Commands.CombinePat
 public record CombinePathCommand(
     string? OriginalPath, 
     string? NewPath
-) : IRequest<ErrorOr<PathSegmentResponse>>;
+) : ICommand;

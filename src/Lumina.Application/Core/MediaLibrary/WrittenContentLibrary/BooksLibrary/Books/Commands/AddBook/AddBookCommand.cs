@@ -1,8 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Application.Common.CQRS;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
-using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Mediator;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -56,4 +54,4 @@ public record AddBookCommand(
     List<IsbnDto>? ISBNs,
     List<MediaContributorDto>? Contributors,
     List<BookRatingDto>? Ratings
-) : IRequest<ErrorOr<BookResponse>>;
+) : ICommand;

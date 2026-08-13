@@ -1,7 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation.TestHelper;
+using ErrorOr;
 using Lumina.Application.Core.FileSystemManagement.Directories.Queries.GetDirectories;
+using Lumina.Application.UnitTests.Common.Setup;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Directories.Queries.GetDirectories.Fixtures;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Lumina.Domain.SharedKernel.Common.Errors;
 #endregion
@@ -32,11 +34,10 @@ public class GetDirectoriesQueryValidatorTests
         query = query with { Path = null! };
 
         // Act
-        TestValidationResult<GetDirectoriesQuery> result = _validator.TestValidate(query);
+        List<Error> result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Path)
-            .WithErrorMessage(Errors.FileSystemManagement.PathCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.FileSystemManagement.PathCannotBeEmpty);
     }
 
     [Fact]
@@ -47,11 +48,10 @@ public class GetDirectoriesQueryValidatorTests
         query = query with { Path = string.Empty };
 
         // Act
-        TestValidationResult<GetDirectoriesQuery> result = _validator.TestValidate(query);
+        List<Error> result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Path)
-            .WithErrorMessage(Errors.FileSystemManagement.PathCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.FileSystemManagement.PathCannotBeEmpty);
     }
 
     [Fact]
@@ -62,11 +62,10 @@ public class GetDirectoriesQueryValidatorTests
         query = query with { Path = "   " };
 
         // Act
-        TestValidationResult<GetDirectoriesQuery> result = _validator.TestValidate(query);
+        List<Error> result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Path)
-            .WithErrorMessage(Errors.FileSystemManagement.PathCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.FileSystemManagement.PathCannotBeEmpty);
     }
 
     [Fact]
@@ -77,10 +76,10 @@ public class GetDirectoriesQueryValidatorTests
         query = query with { Path = "/valid/path" };
 
         // Act
-        TestValidationResult<GetDirectoriesQuery> result = _validator.TestValidate(query);
+        List<Error> result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Path);
+        result.ShouldNotHaveValidationError(Errors.FileSystemManagement.PathCannotBeEmpty);
     }
 
     [Fact]
@@ -91,10 +90,10 @@ public class GetDirectoriesQueryValidatorTests
         query = query with { IncludeHiddenElements = true };
 
         // Act
-        TestValidationResult<GetDirectoriesQuery> result = _validator.TestValidate(query);
+        List<Error> result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.IncludeHiddenElements);
+        result.ShouldNotHaveAnyValidationErrors();
     }
 
     [Fact]
@@ -105,9 +104,9 @@ public class GetDirectoriesQueryValidatorTests
         query = query with { IncludeHiddenElements = false };
 
         // Act
-        TestValidationResult<GetDirectoriesQuery> result = _validator.TestValidate(query);
+        List<Error> result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.IncludeHiddenElements);
+        result.ShouldNotHaveAnyValidationErrors();
     }
 }

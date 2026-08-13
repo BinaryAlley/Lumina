@@ -1,9 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using FastEndpoints;
 using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Presentation.Api.Common.Routes.Library.WrittenContentLibrary.BookLibrary;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,23 +14,12 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.B
 /// </summary>
 public class GetBookEndpoint : BaseEndpoint<GetBookRequest, IResult>
 {
-    private readonly ISender _sender;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="GetBookEndpoint"/> class.
-    /// </summary>
-    /// <param name="sender">Injected service for mediating commands and queries.</param>
-    public GetBookEndpoint(ISender sender)
-    {
-        _sender = sender;
-    }
-
     /// <summary>
     /// Configures the API endpoint.
     /// </summary>
     public override void Configure()
     {
-        Verbs(Http.GET);
+        Verbs(FastEndpoints.Http.GET);
         Routes(ApiRoutes.Books.GET_BOOK_BY_ID);
         Version(1);
         AllowAnonymous();

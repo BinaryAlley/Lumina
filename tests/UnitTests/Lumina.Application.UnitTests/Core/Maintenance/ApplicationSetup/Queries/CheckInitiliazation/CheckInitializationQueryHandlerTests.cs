@@ -48,7 +48,7 @@ public class CheckInitializationQueryHandlerTests
             .Returns(ErrorOrFactory.From(users.AsEnumerable()));
 
         // Act
-        InitializationResponse result = await _sut.Handle(new CheckInitializationQuery(), CancellationToken.None);
+        InitializationResponse result = await _sut.HandleAsync(new CheckInitializationQuery(), CancellationToken.None);
 
         // Assert
         Assert.True(result.IsInitialized);
@@ -63,7 +63,7 @@ public class CheckInitializationQueryHandlerTests
             .Returns(ErrorOrFactory.From(Enumerable.Empty<UserEntity>()));
 
         // Act
-        InitializationResponse result = await _sut.Handle(new CheckInitializationQuery(), CancellationToken.None);
+        InitializationResponse result = await _sut.HandleAsync(new CheckInitializationQuery(), CancellationToken.None);
 
         // Assert
         Assert.False(result.IsInitialized);
@@ -79,7 +79,7 @@ public class CheckInitializationQueryHandlerTests
             .Returns(error);
 
         // Act
-        InitializationResponse result = await _sut.Handle(new CheckInitializationQuery(), CancellationToken.None);
+        InitializationResponse result = await _sut.HandleAsync(new CheckInitializationQuery(), CancellationToken.None);
 
         // Assert
         Assert.False(result.IsInitialized);

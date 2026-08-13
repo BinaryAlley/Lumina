@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Application.Common.CQRS;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
-using Mediator;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -11,7 +11,7 @@ namespace Lumina.Application.Core.FileSystemManagement.Paths.Queries.ValidatePat
 /// <summary>
 /// Handler for the query to validate a file system path.
 /// </summary>
-public class ValidatePathQueryHandler : IRequestHandler<ValidatePathQuery, PathValidResponse>
+public class ValidatePathQueryHandler : IQueryHandler<ValidatePathQuery, PathValidResponse>
 {
     private readonly IPathService _pathService;
 
@@ -27,13 +27,13 @@ public class ValidatePathQueryHandler : IRequestHandler<ValidatePathQuery, PathV
     /// <summary>
     /// Validates the specified file system path.
     /// </summary>
-    /// <param name="request">The query containing the request.</param>
+    /// <param name="query">The query containing the request.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
     /// <see langword="true"/> if the specified path is valid, <see langword="false"/> otherwise.
     /// </returns>
-    public ValueTask<PathValidResponse> Handle(ValidatePathQuery request, CancellationToken cancellationToken)
+    public Task<PathValidResponse> HandleAsync(ValidatePathQuery query, CancellationToken cancellationToken)
     {
-        return ValueTask.FromResult(new PathValidResponse(_pathService.IsValidPath(request.Path!)));
+        return Task.FromResult(new PathValidResponse(_pathService.IsValidPath(query.Path!)));
     }
 }

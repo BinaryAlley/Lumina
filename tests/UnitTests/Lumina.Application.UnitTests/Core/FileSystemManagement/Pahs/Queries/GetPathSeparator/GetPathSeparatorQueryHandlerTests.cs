@@ -38,7 +38,7 @@ public class GetPathSeparatorQueryHandlerTests
         _mockPathService.PathSeparator.Returns(expectedSeparator);
 
         // Act
-        PathSeparatorResponse result = await _sut.Handle(query, CancellationToken.None);
+        PathSeparatorResponse result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
@@ -57,7 +57,7 @@ public class GetPathSeparatorQueryHandlerTests
         _mockPathService.PathSeparator.Returns(separator);
 
         // Act
-        PathSeparatorResponse result = await _sut.Handle(query, CancellationToken.None);
+        PathSeparatorResponse result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
@@ -74,8 +74,8 @@ public class GetPathSeparatorQueryHandlerTests
         _mockPathService.PathSeparator.Returns(expectedSeparator);
 
         // Act
-        PathSeparatorResponse result1 = await _sut.Handle(query, CancellationToken.None);
-        PathSeparatorResponse result2 = await _sut.Handle(query, CancellationToken.None);
+        PathSeparatorResponse result1 = await _sut.HandleAsync(query, CancellationToken.None);
+        PathSeparatorResponse result2 = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.Equal(result1, result2);
@@ -91,7 +91,7 @@ public class GetPathSeparatorQueryHandlerTests
 
         // Act
         Exception? exception = await Record.ExceptionAsync(
-            async () => await _sut.Handle(query, cts.Token)
+            async () => await _sut.HandleAsync(query, cts.Token)
         );
 
         // Assert

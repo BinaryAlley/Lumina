@@ -7,6 +7,7 @@ using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
 using Lumina.Application.UnitTests.Common.Mapping.UserManagement.Users.Fixtures;
 using Lumina.Application.UnitTests.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions.Fixtures;
@@ -60,10 +61,14 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
         _mockUnitOfWork.GetRepository<IRoleRepository>().Returns(_mockRoleRepository);
         _mockUnitOfWork.GetRepository<IPermissionRepository>().Returns(_mockPermissionRepository);
 
+        IValidator<UpdateUserRoleAndPermissionsCommand> mockValidator = Substitute.For<IValidator<UpdateUserRoleAndPermissionsCommand>>();
+        mockValidator.Validate(Arg.Any<UpdateUserRoleAndPermissionsCommand>())
+            .Returns([]);
         _sut = new UpdateUserRoleAndPermissionsCommandHandler(
             _mockAuthorizationService,
             _mockCurrentUserService,
-            _mockUnitOfWork);
+            _mockUnitOfWork,
+            mockValidator);
     }
 
     [Fact]
@@ -75,7 +80,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
             .Returns(false);
 
         // Act
-        ErrorOr<AuthorizationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -94,7 +99,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
             .Returns((UserEntity?)null);
 
         // Act
-        ErrorOr<AuthorizationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -116,7 +121,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
             .Returns((RoleEntity?)null);
 
         // Act
-        ErrorOr<AuthorizationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -162,7 +167,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
             .Returns(ErrorOrFactory.From(users));
 
         // Act
-        ErrorOr<AuthorizationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -192,7 +197,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<AuthorizationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -242,7 +247,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
             .Returns(Result.Updated);
 
         // Act
-        ErrorOr<AuthorizationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -286,7 +291,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<AuthorizationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -321,7 +326,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<AuthorizationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);

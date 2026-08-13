@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation;
+using Lumina.Application.Common.Infrastructure.Validation;
+using Lumina.Application.Common.Utilities;
 using System;
 using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
 using DomainErrors = Lumina.Domain.SharedKernel.Common.Errors.Errors;
@@ -17,16 +18,17 @@ public class UpdateUserRoleAndPermissionsCommandValidator : AbstractValidator<Up
     /// </summary>
     public UpdateUserRoleAndPermissionsCommandValidator()
     {
-        RuleFor(x => x.UserId)
-            .NotEmpty().WithMessage(DomainErrors.Users.UserIdCannotBeEmpty.Description)
-            .Must(id => id != Guid.Empty).WithMessage(DomainErrors.Users.UserIdCannotBeEmpty.Description);
+        RuleFor(command => command.UserId)
+            .NotEmpty()
+            .WithError(DomainErrors.Users.UserIdCannotBeEmpty)
+            .Must(id => id != Guid.Empty)
+            .WithError(DomainErrors.Users.UserIdCannotBeEmpty);
 
-        // validate Permissions only if provided
-        When(x => x.Permissions != null && x.Permissions.Count != 0, () =>
-        {
-            RuleForEach(x => x.Permissions)
-                .NotEmpty().WithMessage(ApplicationErrors.Authorization.PermissionIdCannotBeEmpty.Description)
-                .Must(id => id != Guid.Empty).WithMessage(ApplicationErrors.Authorization.PermissionIdCannotBeEmpty.Description);
-        });
+        // validate each permission Id when the list is provided
+        RuleForEach(command => command.Permissions)
+            .NotEmpty()
+            .WithError(ApplicationErrors.Authorization.PermissionIdCannotBeEmpty)
+            .Must(id => id != Guid.Empty)
+            .WithError(ApplicationErrors.Authorization.PermissionIdCannotBeEmpty);
     }
 }

@@ -1,8 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Contracts.Responses.MediaLibrary.Management;
-using Mediator;
-using System.Collections.Generic;
+using Lumina.Application.Common.CQRS;
 #endregion
 
 namespace Lumina.Application.Core.MediaLibrary.Management.Commands.ScanLibraries;
@@ -10,4 +7,4 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Commands.ScanLibraries
 /// <summary>
 /// Command for initiating the scan of all media libraries.
 /// </summary>
-public record ScanLibrariesCommand() : IRequest<ErrorOr<IEnumerable<MediaLibraryScanResponse>>>;
+public record ScanLibrariesCommand() : ICommand;

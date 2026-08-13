@@ -1,7 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Contracts.Responses.MediaLibrary.Management;
-using Mediator;
+using Lumina.Application.Common.CQRS;
 using System;
 using System.Diagnostics;
 #endregion
@@ -15,4 +13,4 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Queries.GetLibrary;
 [DebuggerDisplay("Id: {Id}")]
 public record GetLibraryQuery(
     Guid Id
-) : IRequest<ErrorOr<LibraryResponse>>;
+) : IQuery;

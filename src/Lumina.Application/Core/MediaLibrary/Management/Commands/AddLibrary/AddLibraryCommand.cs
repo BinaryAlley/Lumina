@@ -1,7 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Contracts.Responses.MediaLibrary.Management;
-using Mediator;
+using Lumina.Application.Common.CQRS;
 using System;
 using System.Diagnostics;
 #endregion
@@ -31,4 +29,4 @@ public record AddLibraryCommand(
     bool DownloadMetadataFromWeb,
     bool ShouldSaveMetadataInMediaDirectories,
     bool ShouldSkipUnchangedDirectoriesDuringScan
-) : IRequest<ErrorOr<LibraryResponse>>;
+) : ICommand;

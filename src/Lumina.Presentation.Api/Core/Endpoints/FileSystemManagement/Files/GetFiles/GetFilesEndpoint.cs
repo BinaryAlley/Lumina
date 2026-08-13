@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Files;
+using Lumina.Application.Core.FileSystemManagement.Files.Queries.GetFiles;
 using Lumina.Contracts.Requests.FileSystemManagement.Files;
 using Lumina.Contracts.Responses.FileSystemManagement.Files;
 using Lumina.Presentation.Api.Common.Routes.FileSystemManagement;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.Threading;
@@ -20,15 +20,15 @@ namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Files.GetF
 /// </summary>
 public class GetFilesEndpoint : BaseEndpoint<GetFilesRequest, IResult>
 {
-    private readonly ISender _sender;
+    private readonly IQueryHandler<GetFilesQuery, ErrorOr<IEnumerable<FileResponse>>> _getFilesQueryHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetFilesEndpoint"/> class.
     /// </summary>
-    /// <param name="sender">Injected service for mediating commands and queries.</param>
-    public GetFilesEndpoint(ISender sender)
+    /// <param name="getFilesQueryHandler">Injected service for handling get files queries.</param>
+    public GetFilesEndpoint(IQueryHandler<GetFilesQuery, ErrorOr<IEnumerable<FileResponse>>> getFilesQueryHandler)
     {
-        _sender = sender;
+        _getFilesQueryHandler = getFilesQueryHandler;
     }
 
     /// <summary>
@@ -36,7 +36,7 @@ public class GetFilesEndpoint : BaseEndpoint<GetFilesRequest, IResult>
     /// </summary>
     public override void Configure()
     {
-        Verbs(Http.GET);
+        Verbs(FastEndpoints.Http.GET);
         Routes(ApiRoutes.Files.GET_FILES);
         Version(1);
         DontCatchExceptions();
@@ -49,7 +49,7 @@ public class GetFilesEndpoint : BaseEndpoint<GetFilesRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(GetFilesRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<IEnumerable<FileResponse>> result = await _sender.Send(request.ToQuery(), cancellationToken).ConfigureAwait(false);
+        ErrorOr<IEnumerable<FileResponse>> result = await _getFilesQueryHandler.HandleAsync(request.ToQuery(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

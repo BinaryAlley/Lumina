@@ -1,7 +1,7 @@
 ﻿#region ========================================================================= USING =====================================================================================
+using Lumina.Application.Common.CQRS;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
-using Mediator;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -11,7 +11,7 @@ namespace Lumina.Application.Core.FileSystemManagement.Paths.Queries.GetPathSepa
 /// <summary>
 /// Handler for the query to get the path separator character of a file system path.
 /// </summary>
-public class GetPathSeparatorQueryHandler : IRequestHandler<GetPathSeparatorQuery, PathSeparatorResponse>
+public class GetPathSeparatorQueryHandler : IQueryHandler<GetPathSeparatorQuery, PathSeparatorResponse>
 {
     private readonly IPathService _pathService;
 
@@ -27,11 +27,11 @@ public class GetPathSeparatorQueryHandler : IRequestHandler<GetPathSeparatorQuer
     /// <summary>
     /// Gets the path separator character of a file system path.
     /// </summary>
-    /// <param name="request">The query containing the request.</param>
+    /// <param name="query">The query containing the request.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>The file system path separator character.</returns>
-    public ValueTask<PathSeparatorResponse> Handle(GetPathSeparatorQuery request, CancellationToken cancellationToken)
+    public Task<PathSeparatorResponse> HandleAsync(GetPathSeparatorQuery query, CancellationToken cancellationToken)
     {
-        return ValueTask.FromResult(new PathSeparatorResponse(_pathService.PathSeparator.ToString()));
+        return Task.FromResult(new PathSeparatorResponse(_pathService.PathSeparator.ToString()));
     }
 }

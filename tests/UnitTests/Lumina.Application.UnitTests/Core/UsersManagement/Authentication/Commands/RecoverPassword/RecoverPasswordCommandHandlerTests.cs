@@ -6,6 +6,7 @@ using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Security;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.UsersManagement.Authentication.Commands.RecoverPassword;
 using Lumina.Application.UnitTests.Common.Mapping.UserManagement.Users.Fixtures;
 using Lumina.Contracts.Responses.Authentication;
@@ -44,11 +45,15 @@ public class RecoverPasswordCommandHandlerTests
 
         _mockUnitOfWork.GetRepository<IUserRepository>().Returns(_mockUserRepository);
 
+        IValidator<RecoverPasswordCommand> mockValidator = Substitute.For<IValidator<RecoverPasswordCommand>>();
+        mockValidator.Validate(Arg.Any<RecoverPasswordCommand>())
+            .Returns([]);
         _sut = new RecoverPasswordCommandHandler(
             _mockUnitOfWork,
             _mockHashService,
             _mockTotpTokenGenerator,
-            _mockCryptographyService);
+            _mockCryptographyService,
+            mockValidator);
     }
 
     [Fact]
@@ -78,7 +83,7 @@ public class RecoverPasswordCommandHandlerTests
             .Returns(Result.Updated);
 
         // Act
-        ErrorOr<RecoverPasswordResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RecoverPasswordResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -101,7 +106,7 @@ public class RecoverPasswordCommandHandlerTests
             .Returns(ErrorOrFactory.From<UserEntity?>(null));
 
         // Act
-        ErrorOr<RecoverPasswordResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RecoverPasswordResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -126,7 +131,7 @@ public class RecoverPasswordCommandHandlerTests
             .Returns(ErrorOrFactory.From<UserEntity?>(user));
 
         // Act
-        ErrorOr<RecoverPasswordResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RecoverPasswordResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -150,7 +155,7 @@ public class RecoverPasswordCommandHandlerTests
             .Returns(ErrorOrFactory.From<UserEntity?>(user));
 
         // Act
-        ErrorOr<RecoverPasswordResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RecoverPasswordResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -182,7 +187,7 @@ public class RecoverPasswordCommandHandlerTests
             .Returns(false);
 
         // Act
-        ErrorOr<RecoverPasswordResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RecoverPasswordResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -218,7 +223,7 @@ public class RecoverPasswordCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<RecoverPasswordResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RecoverPasswordResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -247,7 +252,7 @@ public class RecoverPasswordCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<RecoverPasswordResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RecoverPasswordResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -273,7 +278,7 @@ public class RecoverPasswordCommandHandlerTests
             .Returns(ErrorOrFactory.From<UserEntity?>(user));
 
         // Act
-        ErrorOr<RecoverPasswordResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RecoverPasswordResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);

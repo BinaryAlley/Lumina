@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Mediator;
+using Lumina.Application.Common.CQRS;
 using System;
 #endregion
 
@@ -16,4 +15,4 @@ public record SetLibraryMetadataProviderEnabledCommand(
     Guid LibraryId,
     Guid PluginId,
     bool IsEnabled
-) : IRequest<ErrorOr<Success>>;
+) : ICommand;

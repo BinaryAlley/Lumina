@@ -6,6 +6,7 @@ using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.Admin.Authorization.Roles.Commands.DeleteRole;
 using Lumina.Application.UnitTests.Core.Admin.Authorization.Roles.Commands.DeleteRole.Fixtures;
 using NSubstitute;
@@ -36,6 +37,9 @@ public class DeleteRoleCommandHandlerTests
     /// </summary>
     public DeleteRoleCommandHandlerTests()
     {
+        IValidator<DeleteRoleCommand> mockValidator = Substitute.For<IValidator<DeleteRoleCommand>>();
+        mockValidator.Validate(Arg.Any<DeleteRoleCommand>())
+            .Returns([]);
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
@@ -49,7 +53,8 @@ public class DeleteRoleCommandHandlerTests
         _sut = new DeleteRoleCommandHandler(
             _mockAuthorizationService,
             _mockCurrentUserService,
-            _mockUnitOfWork);
+            _mockUnitOfWork,
+            mockValidator);
     }
 
     [Fact]
@@ -61,7 +66,7 @@ public class DeleteRoleCommandHandlerTests
             .Returns(false);
 
         // Act
-        ErrorOr<Deleted> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<Deleted> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -81,7 +86,7 @@ public class DeleteRoleCommandHandlerTests
             .Returns((RoleEntity?)null);
 
         // Act
-        ErrorOr<Deleted> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<Deleted> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -102,7 +107,7 @@ public class DeleteRoleCommandHandlerTests
             .Returns(adminRole);
 
         // Act
-        ErrorOr<Deleted> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<Deleted> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -123,7 +128,7 @@ public class DeleteRoleCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<Deleted> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<Deleted> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -147,7 +152,7 @@ public class DeleteRoleCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<Deleted> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<Deleted> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -170,7 +175,7 @@ public class DeleteRoleCommandHandlerTests
             .Returns(Result.Deleted);
 
         // Act
-        ErrorOr<Deleted> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<Deleted> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);

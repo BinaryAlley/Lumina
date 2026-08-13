@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation;
+using Lumina.Application.Common.Infrastructure.Validation;
+using Lumina.Application.Common.Utilities;
 using Lumina.Domain.SharedKernel.Common.Errors;
 using System;
 #endregion
@@ -16,11 +17,16 @@ public class GetLibraryScanProgressQueryValidator : AbstractValidator<GetLibrary
     /// </summary>
     public GetLibraryScanProgressQueryValidator()
     {
-        RuleFor(x => x.ScanId)
-            .NotEmpty().WithMessage(Errors.LibraryScanning.LibraryScanIdCannotBeEmpty.Description)
-            .Must(id => id != Guid.Empty).WithMessage(Errors.LibraryScanning.LibraryScanIdCannotBeEmpty.Description);
-        RuleFor(x => x.LibraryId)
-            .NotEmpty().WithMessage(Errors.Library.LibraryIdCannotBeEmpty.Description)
-            .Must(id => id != Guid.Empty).WithMessage(Errors.Library.LibraryIdCannotBeEmpty.Description);
+        RuleFor(query => query.ScanId)
+            .NotEmpty()
+            .WithError(Errors.LibraryScanning.LibraryScanIdCannotBeEmpty)
+            .Must(id => id != Guid.Empty)
+            .WithError(Errors.LibraryScanning.LibraryScanIdCannotBeEmpty);
+       
+        RuleFor(query => query.LibraryId)
+            .NotEmpty()
+            .WithError(Errors.Library.LibraryIdCannotBeEmpty)
+            .Must(id => id != Guid.Empty)
+            .WithError(Errors.Library.LibraryIdCannotBeEmpty);
     }
 }

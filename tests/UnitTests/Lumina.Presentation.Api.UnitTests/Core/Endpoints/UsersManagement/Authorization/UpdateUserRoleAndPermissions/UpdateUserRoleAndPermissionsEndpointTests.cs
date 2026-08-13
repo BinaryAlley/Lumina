@@ -1,12 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
 using Lumina.Contracts.Requests.Authorization;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authorization.UpdateUserRoleAndPermissions;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -26,7 +25,7 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.UsersManagement.Autho
 [ExcludeFromCodeCoverage]
 public class UpdateUserRoleAndPermissionsEndpointTests
 {
-    private readonly ISender _mockSender;
+    private readonly ICommandHandler<UpdateUserRoleAndPermissionsCommand, ErrorOr<AuthorizationResponse>> _mockHandler;
     private readonly UpdateUserRoleAndPermissionsEndpoint _sut;
 
     /// <summary>
@@ -34,8 +33,8 @@ public class UpdateUserRoleAndPermissionsEndpointTests
     /// </summary>
     public UpdateUserRoleAndPermissionsEndpointTests()
     {
-        _mockSender = Substitute.For<ISender>();
-        _sut = Factory.Create<UpdateUserRoleAndPermissionsEndpoint>(_mockSender);
+        _mockHandler = Substitute.For<ICommandHandler<UpdateUserRoleAndPermissionsCommand, ErrorOr<AuthorizationResponse>>>();
+        _sut = FastEndpoints.Factory.Create<UpdateUserRoleAndPermissionsEndpoint>(_mockHandler);
     }
 
     [Fact]
@@ -53,7 +52,7 @@ public class UpdateUserRoleAndPermissionsEndpointTests
             "Admin",
             new HashSet<AuthorizationPermission> { AuthorizationPermission.CanViewUsers }
         );
-        _mockSender.Send(Arg.Any<UpdateUserRoleAndPermissionsCommand>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<UpdateUserRoleAndPermissionsCommand>(), Arg.Any<CancellationToken>())
             .Returns(ErrorOrFactory.From(expectedResponse));
 
         // Act
@@ -75,7 +74,7 @@ public class UpdateUserRoleAndPermissionsEndpointTests
         );
         CancellationToken cancellationToken = CancellationToken.None;
         Error expectedError = Error.Failure("Authorization.Update.Failed", "Failed to update user role and permissions.");
-        _mockSender.Send(Arg.Any<UpdateUserRoleAndPermissionsCommand>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<UpdateUserRoleAndPermissionsCommand>(), Arg.Any<CancellationToken>())
             .Returns(expectedError);
 
         // Act
@@ -104,7 +103,7 @@ public class UpdateUserRoleAndPermissionsEndpointTests
             [Guid.NewGuid()]
         );
         CancellationToken cancellationToken = CancellationToken.None;
-        _mockSender.Send(Arg.Any<UpdateUserRoleAndPermissionsCommand>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<UpdateUserRoleAndPermissionsCommand>(), Arg.Any<CancellationToken>())
             .Returns(ErrorOrFactory.From(new AuthorizationResponse(
                 Guid.NewGuid(),
                 "Admin",
@@ -115,7 +114,7 @@ public class UpdateUserRoleAndPermissionsEndpointTests
         await _sut.ExecuteAsync(request, cancellationToken);
 
         // Assert
-        await _mockSender.Received(1).Send(
+        await _mockHandler.Received(1).HandleAsync(
             Arg.Is<UpdateUserRoleAndPermissionsCommand>(cmd =>
                 cmd.UserId == request.UserId &&
                 cmd.RoleId == request.RoleId &&
@@ -131,20 +130,18 @@ public class UpdateUserRoleAndPermissionsEndpointTests
         TaskCompletionSource<bool> operationStarted = new();
         TaskCompletionSource<bool> cancellationRequested = new();
 
-        _mockSender.Send(Arg.Any<UpdateUserRoleAndPermissionsCommand>(), Arg.Any<CancellationToken>())
-            .Returns(info => new ValueTask<ErrorOr<AuthorizationResponse>>(
-                Task.Run(async () =>
-                {
-                    operationStarted.SetResult(true);
-                    await cancellationRequested.Task;
-                    info.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                    return ErrorOrFactory.From(new AuthorizationResponse(
-                        Guid.NewGuid(),
-                        "Admin",
-                        new HashSet<AuthorizationPermission> { AuthorizationPermission.CanViewUsers }
-                    ));
-                }, info.Arg<CancellationToken>())
-            ));
+        _mockHandler.HandleAsync(Arg.Any<UpdateUserRoleAndPermissionsCommand>(), Arg.Any<CancellationToken>())
+            .Returns(info => Task.Run(async () =>
+            {
+                operationStarted.SetResult(true);
+                await cancellationRequested.Task;
+                info.Arg<CancellationToken>().ThrowIfCancellationRequested();
+                return ErrorOrFactory.From(new AuthorizationResponse(
+                    Guid.NewGuid(),
+                    "Admin",
+                    new HashSet<AuthorizationPermission> { AuthorizationPermission.CanViewUsers }
+                ));
+            }, info.Arg<CancellationToken>()));
 
         // Act
         Task<IResult> operationTask = _sut.ExecuteAsync(

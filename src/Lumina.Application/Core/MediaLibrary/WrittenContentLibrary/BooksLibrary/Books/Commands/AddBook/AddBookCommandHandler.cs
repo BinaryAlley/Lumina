@@ -1,9 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Repositories.Books;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.Common.Primitives;
@@ -13,7 +15,6 @@ using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.Boo
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.ExternalIdentifiers.LibraryManagementBoundedContext.LibraryAggregate;
-using Mediator;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,42 +28,49 @@ namespace Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrar
 /// <summary>
 /// Handler for the command to add a book.
 /// </summary>
-public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<BookResponse>>
+public class AddBookCommandHandler : ICommandHandler<AddBookCommand, ErrorOr<BookResponse>>
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IValidator<AddBookCommand> _validator;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AddBookCommandHandler"/> class.
     /// </summary>
     /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
-    public AddBookCommandHandler(IUnitOfWork unitOfWork)
+    /// <param name="validator">Injected validator for application validation rules.</param>
+    public AddBookCommandHandler(IUnitOfWork unitOfWork, IValidator<AddBookCommand> validator)
     {
         _unitOfWork = unitOfWork;
+        _validator = validator;
     }
 
     /// <summary>
     /// Handles the command to add a book.
     /// </summary>
-    /// <param name="request">The request to be handled.</param>
+    /// <param name="command">The command to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
     /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="BookResponse"/>, or an error message.
     /// </returns>
-    public async ValueTask<ErrorOr<BookResponse>> Handle(AddBookCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<BookResponse>> HandleAsync(AddBookCommand command, CancellationToken cancellationToken)
     {
+        List<Error> validationResult = _validator.Validate(command);
+        if (validationResult.Count > 0)
+            return validationResult;
+
         // TODO: update Api.Book.md documentation when the functionality is fully implemented
         List<MediaContributorId> contributorIds = [];
-        foreach (MediaContributorDto mediaContributor in request.Contributors!)
+        foreach (MediaContributorDto mediaContributor in command.Contributors!)
         {
             // TODO: add logic to search the media contributors repository for existing contributors, based on the provided names
         }
         BookSeries? bookSeries = null;
-        if (request.Series != null)
+        if (command.Series != null)
         {
             // TODO: add logic to search the book series repository for existing book series, based on the provided title
             // TODO: uncomment integration and unit tests about series
         }
-        List<ErrorOr<BookRating>> domainRatingsResult = request.Ratings!.ConvertAll(rating => BookRating.Create(
+        List<ErrorOr<BookRating>> domainRatingsResult = command.Ratings!.ConvertAll(rating => BookRating.Create(
                 rating.Value ?? default,
                 rating.MaxValue ?? default,
                 Optional<BookRatingSource>.FromNullable(rating.Source.HasValue ? (BookRatingSource)(int)rating.Source : (BookRatingSource?)null),
@@ -74,88 +82,88 @@ public class AddBookCommandHandler : IRequestHandler<AddBookCommand, ErrorOr<Boo
 
         List<BookRating> domainRatings = [.. domainRatingsResult.Select(rating => rating.Value)];
 
-        List<ErrorOr<Genre>> domainGenresResult = request.Metadata!.Genres!.ConvertAll(genre => Genre.Create(genre.Name!));
+        List<ErrorOr<Genre>> domainGenresResult = command.Metadata!.Genres!.ConvertAll(genre => Genre.Create(genre.Name!));
         errors = [.. domainGenresResult.Where(genreResult => genreResult.IsError).SelectMany(genreResult => genreResult.Errors)];
         if (errors.Count != 0)
             return errors;
         List<Genre> domainGenres = [.. domainGenresResult.Select(genre => genre.Value)];
 
-        List<ErrorOr<Tag>> domainTagsResult = request.Metadata.Tags!.ConvertAll(tag => Tag.Create(tag.Name!));
+        List<ErrorOr<Tag>> domainTagsResult = command.Metadata.Tags!.ConvertAll(tag => Tag.Create(tag.Name!));
         errors = [.. domainTagsResult.Where(tagResult => tagResult.IsError).SelectMany(tagResult => tagResult.Errors)];
         if (errors.Count != 0)
             return errors;
         List<Tag> domainTags = [.. domainTagsResult.Select(tag => tag.Value)];
 
-        List<ErrorOr<Isbn>> domainIsbnsResult = request.ISBNs!.ConvertAll(isbn => Isbn.Create(isbn.Value!, (IsbnFormat)(int)isbn.Format!));
+        List<ErrorOr<Isbn>> domainIsbnsResult = command.ISBNs!.ConvertAll(isbn => Isbn.Create(isbn.Value!, (IsbnFormat)(int)isbn.Format!));
         errors = [.. domainIsbnsResult.Where(isbnResult => isbnResult.IsError).SelectMany(isbnResult => isbnResult.Errors)];
         if (errors.Count != 0)
             return errors;
         List<Isbn> domainIsbns = [.. domainIsbnsResult.Select(isbn => isbn.Value)];
 
         ErrorOr<ReleaseInfo> releaseInfoResult = ReleaseInfo.Create(
-            Optional<DateOnly>.FromNullable(request.Metadata.ReleaseInfo!.OriginalReleaseDate),
-            Optional<int>.FromNullable(request.Metadata.ReleaseInfo.OriginalReleaseYear),
-            Optional<DateOnly>.FromNullable(request.Metadata.ReleaseInfo.ReReleaseDate),
-            Optional<int>.FromNullable(request.Metadata.ReleaseInfo.ReReleaseYear),
-            Optional<string>.FromNullable(request.Metadata.ReleaseInfo.ReleaseCountry),
-            Optional<string>.FromNullable(request.Metadata.ReleaseInfo.ReleaseVersion)
+            Optional<DateOnly>.FromNullable(command.Metadata.ReleaseInfo!.OriginalReleaseDate),
+            Optional<int>.FromNullable(command.Metadata.ReleaseInfo.OriginalReleaseYear),
+            Optional<DateOnly>.FromNullable(command.Metadata.ReleaseInfo.ReReleaseDate),
+            Optional<int>.FromNullable(command.Metadata.ReleaseInfo.ReReleaseYear),
+            Optional<string>.FromNullable(command.Metadata.ReleaseInfo.ReleaseCountry),
+            Optional<string>.FromNullable(command.Metadata.ReleaseInfo.ReleaseVersion)
         );
         if (releaseInfoResult.IsError)
             return releaseInfoResult.Errors;
         ReleaseInfo releaseInfo = releaseInfoResult.Value;
         LanguageInfo? languageInfo = null;
-        if (request.Metadata.Language is not null)
+        if (command.Metadata.Language is not null)
         {
             ErrorOr<LanguageInfo> languageInfoResult = LanguageInfo.Create(
-                request.Metadata.Language.LanguageCode!,
-                request.Metadata.Language.LanguageName!,
-                Optional<string>.FromNullable(request.Metadata.Language.NativeName));
+                command.Metadata.Language.LanguageCode!,
+                command.Metadata.Language.LanguageName!,
+                Optional<string>.FromNullable(command.Metadata.Language.NativeName));
             if (languageInfoResult.IsError)
                 return languageInfoResult.Errors;
             languageInfo = languageInfoResult.Value;
         }
         LanguageInfo? originalLanguageInfo = null;
-        if (request.Metadata.OriginalLanguage is not null)
+        if (command.Metadata.OriginalLanguage is not null)
         {
             ErrorOr<LanguageInfo> originalLanguageInfoResult = LanguageInfo.Create(
-                request.Metadata.OriginalLanguage.LanguageCode!,
-                request.Metadata.OriginalLanguage.LanguageName!,
-                Optional<string>.FromNullable(request.Metadata.OriginalLanguage.NativeName));
+                command.Metadata.OriginalLanguage.LanguageCode!,
+                command.Metadata.OriginalLanguage.LanguageName!,
+                Optional<string>.FromNullable(command.Metadata.OriginalLanguage.NativeName));
             if (originalLanguageInfoResult.IsError)
                 return originalLanguageInfoResult.Errors;
             originalLanguageInfo = originalLanguageInfoResult.Value;
         }
         ErrorOr<WrittenContentMetadata> metadataResult = WrittenContentMetadata.Create(
-            request.Metadata.Title!,
-            Optional<string>.FromNullable(request.Metadata.OriginalTitle),
-            Optional<string>.FromNullable(request.Metadata.Description),
+            command.Metadata.Title!,
+            Optional<string>.FromNullable(command.Metadata.OriginalTitle),
+            Optional<string>.FromNullable(command.Metadata.Description),
             releaseInfo,
             domainGenres,
             domainTags,
             Optional<LanguageInfo>.FromNullable(languageInfo),
             Optional<LanguageInfo>.FromNullable(originalLanguageInfo),
-            Optional<string>.FromNullable(request.Metadata.Publisher),
-            Optional<int>.FromNullable(request.Metadata.PageCount)
+            Optional<string>.FromNullable(command.Metadata.Publisher),
+            Optional<int>.FromNullable(command.Metadata.PageCount)
         );
         if (metadataResult.IsError)
             return metadataResult.Errors;
         ErrorOr<Book> createBookResult = Book.Create(
-            LibraryId.Create(request.LibraryId),
-            request.Path,
+            LibraryId.Create(command.LibraryId),
+            command.Path,
             metadataResult.Value,
-            Optional<BookFormat>.FromNullable(request.Format),
-            Optional<string>.FromNullable(request.Edition),
-            request.VolumeNumber ?? default,
+            Optional<BookFormat>.FromNullable(command.Format),
+            Optional<string>.FromNullable(command.Edition),
+            command.VolumeNumber ?? default,
             Optional<BookSeries>.FromNullable(bookSeries),
-            Optional<string>.FromNullable(request.ASIN),
-            Optional<string>.FromNullable(request.GoodreadsId),
-            Optional<string>.FromNullable(request.LCCN),
-            Optional<string>.FromNullable(request.OCLCNumber),
-            Optional<string>.FromNullable(request.OpenLibraryId),
-            Optional<string>.FromNullable(request.LibraryThingId),
-            Optional<string>.FromNullable(request.GoogleBooksId),
-            Optional<string>.FromNullable(request.BarnesAndNobleId),
-            Optional<string>.FromNullable(request.AppleBooksId),
+            Optional<string>.FromNullable(command.ASIN),
+            Optional<string>.FromNullable(command.GoodreadsId),
+            Optional<string>.FromNullable(command.LCCN),
+            Optional<string>.FromNullable(command.OCLCNumber),
+            Optional<string>.FromNullable(command.OpenLibraryId),
+            Optional<string>.FromNullable(command.LibraryThingId),
+            Optional<string>.FromNullable(command.GoogleBooksId),
+            Optional<string>.FromNullable(command.BarnesAndNobleId),
+            Optional<string>.FromNullable(command.AppleBooksId),
             domainIsbns,
             contributorIds,
             ratings: domainRatings

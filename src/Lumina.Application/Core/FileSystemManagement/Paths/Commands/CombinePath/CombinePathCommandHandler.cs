@@ -1,9 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
+using Lumina.Application.Common.CQRS;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.FileSystemManagement.Paths.Commands.SplitPath;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
-using Mediator;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -13,30 +15,37 @@ namespace Lumina.Application.Core.FileSystemManagement.Paths.Commands.CombinePat
 /// <summary>
 /// Handler for the command to split a file system path.
 /// </summary>
-public class CombinePathCommandHandler : IRequestHandler<CombinePathCommand, ErrorOr<PathSegmentResponse>>
+public class CombinePathCommandHandler : ICommandHandler<CombinePathCommand, ErrorOr<PathSegmentResponse>>
 {
     private readonly IPathService _pathService;
+    private readonly IValidator<CombinePathCommand> _validator;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SplitPathCommandHandler"/> class.
     /// </summary>
     /// <param name="pathService">Injected service for handling file system paths.</param>
-    public CombinePathCommandHandler(IPathService pathService)
+    /// <param name="validator">Injected validator for application validation rules.</param>
+    public CombinePathCommandHandler(IPathService pathService, IValidator<CombinePathCommand> validator)
     {
         _pathService = pathService;
+        _validator = validator;
     }
 
     /// <summary>
     /// Combines two file system paths.
     /// </summary>
-    /// <param name="request">The command containing the requested paths.</param>
+    /// <param name="command">The command containing the requested paths.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
     /// An <see cref="ErrorOr{TValue}"/> containing either a <see cref="PathSegmentResponse"/>, or an error message.
     /// </returns>
-    public ValueTask<ErrorOr<PathSegmentResponse>> Handle(CombinePathCommand request, CancellationToken cancellationToken)
+    public Task<ErrorOr<PathSegmentResponse>> HandleAsync(CombinePathCommand command, CancellationToken cancellationToken)
     {
-        ErrorOr<string> combinePathResult = _pathService.CombinePath(request.OriginalPath!, request.NewPath!);
-        return ValueTask.FromResult(combinePathResult.Match(values => ErrorOrFactory.From(new PathSegmentResponse(combinePathResult.Value)), errors => errors));
+        List<Error> validationResult = _validator.Validate(command);
+        if (validationResult.Count > 0)
+            return Task.FromResult<ErrorOr<PathSegmentResponse>>(validationResult);
+
+        ErrorOr<string> combinePathResult = _pathService.CombinePath(command.OriginalPath!, command.NewPath!);
+        return Task.FromResult(combinePathResult.Match(values => ErrorOrFactory.From(new PathSegmentResponse(combinePathResult.Value)), errors => errors));
     }
 }

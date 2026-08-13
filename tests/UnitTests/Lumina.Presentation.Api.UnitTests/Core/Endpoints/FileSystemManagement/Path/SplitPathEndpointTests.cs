@@ -1,12 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.FileSystemManagement.Paths.Commands.SplitPath;
 using Lumina.Contracts.Requests.FileSystemManagement.Path;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
 using Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.SplitPath;
 using Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.Fixtures;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -26,7 +25,7 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.
 [ExcludeFromCodeCoverage]
 public class SplitPathEndpointTests
 {
-    private readonly ISender _mockSender;
+    private readonly ICommandHandler<SplitPathCommand, ErrorOr<IEnumerable<PathSegmentResponse>>> _mockHandler;
     private readonly SplitPathEndpoint _sut;
     private readonly PathSegmentResponseFixture _pathSegmentResponseFixture;
     private readonly SplitPathRequestFixture _splitPathRequestFixture;
@@ -36,8 +35,8 @@ public class SplitPathEndpointTests
     /// </summary>
     public SplitPathEndpointTests()
     {
-        _mockSender = Substitute.For<ISender>();
-        _sut = Factory.Create<SplitPathEndpoint>(_mockSender);
+        _mockHandler = Substitute.For<ICommandHandler<SplitPathCommand, ErrorOr<IEnumerable<PathSegmentResponse>>>>();
+        _sut = FastEndpoints.Factory.Create<SplitPathEndpoint>(_mockHandler);
         _pathSegmentResponseFixture = new PathSegmentResponseFixture();
         _splitPathRequestFixture = new SplitPathRequestFixture();
     }
@@ -49,7 +48,7 @@ public class SplitPathEndpointTests
         SplitPathRequest request = _splitPathRequestFixture.Create(@"C:\Users\TestUser\Documents");
         CancellationToken cancellationToken = CancellationToken.None;
         IEnumerable<PathSegmentResponse> expectedResponse = _pathSegmentResponseFixture.CreateMany();
-        _mockSender.Send(Arg.Any<SplitPathCommand>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<SplitPathCommand>(), Arg.Any<CancellationToken>())
             .Returns(ErrorOrFactory.From(expectedResponse));
 
         // Act
@@ -67,7 +66,7 @@ public class SplitPathEndpointTests
         SplitPathRequest request = _splitPathRequestFixture.Create(@"InvalidPath");
         CancellationToken cancellationToken = CancellationToken.None;
         Error expectedError = Error.Validation("Path.Invalid", "The provided path is invalid.");
-        _mockSender.Send(Arg.Any<SplitPathCommand>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<SplitPathCommand>(), Arg.Any<CancellationToken>())
             .Returns(expectedError);
 
         // Act
@@ -93,14 +92,14 @@ public class SplitPathEndpointTests
         // Arrange
         SplitPathRequest request = _splitPathRequestFixture.Create(@"C:\Users\TestUser\Documents");
         CancellationToken cancellationToken = CancellationToken.None;
-        _mockSender.Send(Arg.Any<SplitPathCommand>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<SplitPathCommand>(), Arg.Any<CancellationToken>())
             .Returns(ErrorOrFactory.From(_pathSegmentResponseFixture.CreateMany().AsEnumerable()));
 
         // Act
         await _sut.ExecuteAsync(request, cancellationToken);
 
         // Assert
-        await _mockSender.Received(1).Send(
+        await _mockHandler.Received(1).HandleAsync(
             Arg.Is<SplitPathCommand>(c => c.Path == request.Path),
             Arg.Is(cancellationToken));
     }
@@ -114,8 +113,8 @@ public class SplitPathEndpointTests
         TaskCompletionSource<bool> operationStarted = new();
         TaskCompletionSource<bool> cancellationRequested = new();
 
-        _mockSender.Send(Arg.Any<SplitPathCommand>(), Arg.Any<CancellationToken>())
-            .Returns(callInfo => new ValueTask<ErrorOr<IEnumerable<PathSegmentResponse>>>(Task.Run(async () =>
+        _mockHandler.HandleAsync(Arg.Any<SplitPathCommand>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo => Task.Run(async () =>
             {
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
@@ -124,7 +123,7 @@ public class SplitPathEndpointTests
                 {
                     _pathSegmentResponseFixture.Create()
                 }.AsEnumerable());
-            }, callInfo.Arg<CancellationToken>())));
+            }, callInfo.Arg<CancellationToken>()));
 
         // Act
         Task<IResult> operationTask = _sut.ExecuteAsync(request, cts.Token);

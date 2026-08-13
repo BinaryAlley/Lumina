@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation;
+using Lumina.Application.Common.Infrastructure.Validation;
+using Lumina.Application.Common.Utilities;
 using Lumina.Infrastructure.Common.Models.DTO.Configuration;
 using System;
 using System.Buffers.Text;
@@ -17,8 +18,10 @@ public class EncryptionSettingsDtoValidator : AbstractValidator<EncryptionSettin
     /// </summary>
     public EncryptionSettingsDtoValidator()
     {
-        RuleFor(x => x.SecretKey)
-            .NotEmpty().WithMessage(Errors.Errors.Configuration.EncryptionSecretKeyCannotBeEmpty.Description)
-            .Must(value => Base64.IsValid(value.AsSpan())).WithMessage(Errors.Errors.Configuration.EncryptionSecretKeyMustBeABase64String.Description);
+        RuleFor(settings => settings.SecretKey)
+            .NotEmpty()
+            .WithError(Errors.Errors.Configuration.EncryptionSecretKeyCannotBeEmpty)
+            .Must(value => Base64.IsValid(value.AsSpan()))
+            .WithError(Errors.Errors.Configuration.EncryptionSecretKeyMustBeABase64String);
     }
 }

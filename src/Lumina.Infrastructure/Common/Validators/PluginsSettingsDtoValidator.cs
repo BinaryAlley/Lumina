@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Infrastructure.Models.DTO.Configuration;
+using Lumina.Application.Common.Utilities;
 using Lumina.Infrastructure.Common.Errors;
 #endregion
 
@@ -16,6 +17,8 @@ public class PluginsSettingsDtoValidator : AbstractValidator<PluginsSettingsDto>
     /// </summary>
     public PluginsSettingsDtoValidator()
     {
-        RuleFor(x => x.Directory).NotEmpty().WithMessage(Errors.Errors.Configuration.PluginsDirectoryCannotBeEmpty.Description);
+        RuleFor(settings => settings.Directory)
+            .NotEmpty()
+            .WithError(Errors.Errors.Configuration.PluginsDirectoryCannotBeEmpty);
     }
 }

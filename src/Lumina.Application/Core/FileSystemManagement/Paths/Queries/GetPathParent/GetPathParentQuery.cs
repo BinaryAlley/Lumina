@@ -1,8 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Contracts.Responses.FileSystemManagement.Path;
-using Mediator;
-using System.Collections.Generic;
+using Lumina.Application.Common.CQRS;
 using System.Diagnostics;
 #endregion
 
@@ -15,4 +12,4 @@ namespace Lumina.Application.Core.FileSystemManagement.Paths.Queries.GetPathPare
 [DebuggerDisplay("Path: {Path}")]
 public record GetPathParentQuery(
     string? Path
-) : IRequest<ErrorOr<IEnumerable<PathSegmentResponse>>>;
+) : IQuery;

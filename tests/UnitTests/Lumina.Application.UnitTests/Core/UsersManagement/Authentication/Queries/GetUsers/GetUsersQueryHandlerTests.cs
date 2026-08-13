@@ -65,7 +65,7 @@ public class GetUsersQueryHandlerTests
             .Returns(false);
 
         // Act
-        ErrorOr<IEnumerable<UserResponse>> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<IEnumerable<UserResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -86,7 +86,7 @@ public class GetUsersQueryHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<IEnumerable<UserResponse>> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<IEnumerable<UserResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -107,7 +107,7 @@ public class GetUsersQueryHandlerTests
             .Returns(ErrorOrFactory.From(users));
 
         // Act
-        ErrorOr<IEnumerable<UserResponse>> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<IEnumerable<UserResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);

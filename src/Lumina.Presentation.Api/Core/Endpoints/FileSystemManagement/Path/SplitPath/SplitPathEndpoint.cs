@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Paths;
+using Lumina.Application.Core.FileSystemManagement.Paths.Commands.SplitPath;
 using Lumina.Contracts.Requests.FileSystemManagement.Path;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
 using Lumina.Presentation.Api.Common.Routes.FileSystemManagement;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.Threading;
@@ -20,15 +20,15 @@ namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.Split
 /// </summary>
 public class SplitPathEndpoint : BaseEndpoint<SplitPathRequest, IResult>
 {
-    private readonly ISender _sender;
+    private readonly ICommandHandler<SplitPathCommand, ErrorOr<IEnumerable<PathSegmentResponse>>> _splitPathCommandHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SplitPathEndpoint"/> class.
     /// </summary>
-    /// <param name="sender">Injected service for mediating commands and queries.</param>
-    public SplitPathEndpoint(ISender sender)
+    /// <param name="splitPathCommandHandler">Injected service for handling split path commands.</param>
+    public SplitPathEndpoint(ICommandHandler<SplitPathCommand, ErrorOr<IEnumerable<PathSegmentResponse>>> splitPathCommandHandler)
     {
-        _sender = sender;
+        _splitPathCommandHandler = splitPathCommandHandler;
     }
 
     /// <summary>
@@ -36,7 +36,7 @@ public class SplitPathEndpoint : BaseEndpoint<SplitPathRequest, IResult>
     /// </summary>
     public override void Configure()
     {
-        Verbs(Http.GET);
+        Verbs(FastEndpoints.Http.GET);
         Routes(ApiRoutes.Path.SPLIT);
         Version(1);
         DontCatchExceptions();
@@ -49,7 +49,7 @@ public class SplitPathEndpoint : BaseEndpoint<SplitPathRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(SplitPathRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<IEnumerable<PathSegmentResponse>> result = await _sender.Send(request.ToCommand(), cancellationToken).ConfigureAwait(false);
+        ErrorOr<IEnumerable<PathSegmentResponse>> result = await _splitPathCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

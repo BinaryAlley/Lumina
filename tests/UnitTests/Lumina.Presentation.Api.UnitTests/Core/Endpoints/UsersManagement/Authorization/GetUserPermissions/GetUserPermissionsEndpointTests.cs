@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
 using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetUserPermissions;
 using Lumina.Contracts.Requests.Authorization;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authorization.GetUserPermissions;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -25,7 +25,7 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.UsersManagement.Autho
 [ExcludeFromCodeCoverage]
 public class GetUserPermissionsEndpointTests
 {
-    private readonly ISender _mockSender;
+    private readonly IQueryHandler<GetUserPermissionsQuery, ErrorOr<IEnumerable<PermissionResponse>>> _mockHandler;
     private readonly GetUserPermissionsEndpoint _sut;
 
     /// <summary>
@@ -33,8 +33,8 @@ public class GetUserPermissionsEndpointTests
     /// </summary>
     public GetUserPermissionsEndpointTests()
     {
-        _mockSender = Substitute.For<ISender>();
-        _sut = Factory.Create<GetUserPermissionsEndpoint>(_mockSender);
+        _mockHandler = Substitute.For<IQueryHandler<GetUserPermissionsQuery, ErrorOr<IEnumerable<PermissionResponse>>>>();
+        _sut = Factory.Create<GetUserPermissionsEndpoint>(_mockHandler);
     }
 
     [Fact]
@@ -48,7 +48,7 @@ public class GetUserPermissionsEndpointTests
             new PermissionResponse(Guid.NewGuid(), AuthorizationPermission.CanViewUsers),
             new PermissionResponse(Guid.NewGuid(), AuthorizationPermission.CanDeleteUsers)
         ];
-        _mockSender.Send(Arg.Any<GetUserPermissionsQuery>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<GetUserPermissionsQuery>(), Arg.Any<CancellationToken>())
             .Returns(ErrorOrFactory.From(expectedResponse));
 
         // Act
@@ -66,7 +66,7 @@ public class GetUserPermissionsEndpointTests
         GetUserPermissionsRequest request = new(Guid.NewGuid());
         CancellationToken cancellationToken = CancellationToken.None;
         Error expectedError = Error.Failure("User.Permissions.NotFound", "User permissions not found.");
-        _mockSender.Send(Arg.Any<GetUserPermissionsQuery>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<GetUserPermissionsQuery>(), Arg.Any<CancellationToken>())
             .Returns(expectedError);
 
         // Act
@@ -92,16 +92,14 @@ public class GetUserPermissionsEndpointTests
         Guid userId = Guid.NewGuid();
         GetUserPermissionsRequest request = new(userId);
         CancellationToken cancellationToken = CancellationToken.None;
-        _mockSender.Send(Arg.Any<GetUserPermissionsQuery>(), Arg.Any<CancellationToken>())
-            .Returns(new ValueTask<ErrorOr<IEnumerable<PermissionResponse>>>(
-                ErrorOrFactory.From(Array.Empty<PermissionResponse>() as IEnumerable<PermissionResponse>)
-            ));
+        _mockHandler.HandleAsync(Arg.Any<GetUserPermissionsQuery>(), Arg.Any<CancellationToken>())
+            .Returns(ErrorOrFactory.From(Array.Empty<PermissionResponse>() as IEnumerable<PermissionResponse>));
 
         // Act
         await _sut.ExecuteAsync(request, cancellationToken);
 
         // Assert
-        await _mockSender.Received(1).Send(
+        await _mockHandler.Received(1).HandleAsync(
             Arg.Is<GetUserPermissionsQuery>(cmd => cmd.UserId == request.UserId),
             Arg.Is(cancellationToken));
     }
@@ -114,16 +112,14 @@ public class GetUserPermissionsEndpointTests
         TaskCompletionSource<bool> operationStarted = new();
         TaskCompletionSource<bool> cancellationRequested = new();
 
-        _mockSender.Send(Arg.Any<GetUserPermissionsQuery>(), Arg.Any<CancellationToken>())
-            .Returns(info => new ValueTask<ErrorOr<IEnumerable<PermissionResponse>>>(
-                Task.Run(async () =>
-                {
-                    operationStarted.SetResult(true);
-                    await cancellationRequested.Task;
-                    info.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                    return ErrorOrFactory.From(Array.Empty<PermissionResponse>() as IEnumerable<PermissionResponse>);
-                }, info.Arg<CancellationToken>())
-            ));
+        _mockHandler.HandleAsync(Arg.Any<GetUserPermissionsQuery>(), Arg.Any<CancellationToken>())
+            .Returns(info => Task.Run(async () =>
+            {
+                operationStarted.SetResult(true);
+                await cancellationRequested.Task;
+                info.Arg<CancellationToken>().ThrowIfCancellationRequested();
+                return ErrorOrFactory.From(Array.Empty<PermissionResponse>() as IEnumerable<PermissionResponse>);
+            }, info.Arg<CancellationToken>()));
 
         // Act
         Task<IResult> operationTask = _sut.ExecuteAsync(new GetUserPermissionsRequest(Guid.NewGuid()), cts.Token);

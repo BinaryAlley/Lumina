@@ -1,8 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Contracts.Responses.FileSystemManagement.Path;
-using Mediator;
-using System.Collections.Generic;
+using Lumina.Application.Common.CQRS;
 using System.Diagnostics;
 #endregion
 
@@ -15,4 +12,4 @@ namespace Lumina.Application.Core.FileSystemManagement.Paths.Commands.SplitPath;
 [DebuggerDisplay("Path: {Path}")]
 public record SplitPathCommand(
     string? Path
-) : IRequest<ErrorOr<IEnumerable<PathSegmentResponse>>>;
+) : ICommand;

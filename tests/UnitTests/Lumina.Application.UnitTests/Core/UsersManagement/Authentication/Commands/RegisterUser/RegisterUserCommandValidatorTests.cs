@@ -1,8 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation.TestHelper;
+using ErrorOr;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Core.UsersManagement.Authentication.Commands.RegisterUser;
+using Lumina.Application.UnitTests.Common.Setup;
 using Lumina.Application.UnitTests.Core.UsersManagement.Authentication.Commands.RegisterUser.Fixture;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -32,11 +34,10 @@ public class RegisterUserCommandValidatorTests
         command = command with { Username = null! };
 
         // Act
-        TestValidationResult<RegisterUserCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Username)
-            .WithErrorMessage(Errors.Authentication.UsernameCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.UsernameCannotBeEmpty);
     }
 
     [Fact]
@@ -47,11 +48,10 @@ public class RegisterUserCommandValidatorTests
         command = command with { Username = string.Empty };
 
         // Act
-        TestValidationResult<RegisterUserCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Username)
-            .WithErrorMessage(Errors.Authentication.UsernameCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.UsernameCannotBeEmpty);
     }
 
     [Fact]
@@ -62,11 +62,10 @@ public class RegisterUserCommandValidatorTests
         command = command with { Username = "   " };
 
         // Act
-        TestValidationResult<RegisterUserCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Username)
-            .WithErrorMessage(Errors.Authentication.UsernameCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.UsernameCannotBeEmpty);
     }
 
     [Fact]
@@ -77,11 +76,10 @@ public class RegisterUserCommandValidatorTests
         command = command with { Password = null! };
 
         // Act
-        TestValidationResult<RegisterUserCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Password)
-            .WithErrorMessage(Errors.Authentication.PasswordCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.PasswordCannotBeEmpty);
     }
 
     [Fact]
@@ -92,11 +90,10 @@ public class RegisterUserCommandValidatorTests
         command = command with { Password = string.Empty };
 
         // Act
-        TestValidationResult<RegisterUserCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Password)
-            .WithErrorMessage(Errors.Authentication.PasswordCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.PasswordCannotBeEmpty);
     }
 
     [Fact]
@@ -107,11 +104,10 @@ public class RegisterUserCommandValidatorTests
         command = command with { Password = "   " };
 
         // Act
-        TestValidationResult<RegisterUserCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Password)
-            .WithErrorMessage(Errors.Authentication.PasswordCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.PasswordCannotBeEmpty);
     }
 
     [Fact]
@@ -122,11 +118,10 @@ public class RegisterUserCommandValidatorTests
         command = command with { PasswordConfirm = null! };
 
         // Act
-        TestValidationResult<RegisterUserCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.PasswordConfirm)
-            .WithErrorMessage(Errors.Authentication.PasswordConfirmCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.PasswordConfirmCannotBeEmpty);
     }
 
     [Fact]
@@ -137,11 +132,10 @@ public class RegisterUserCommandValidatorTests
         command = command with { PasswordConfirm = string.Empty };
 
         // Act
-        TestValidationResult<RegisterUserCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.PasswordConfirm)
-            .WithErrorMessage(Errors.Authentication.PasswordConfirmCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.PasswordConfirmCannotBeEmpty);
     }
 
     [Fact]
@@ -152,11 +146,10 @@ public class RegisterUserCommandValidatorTests
         command = command with { PasswordConfirm = "   " };
 
         // Act
-        TestValidationResult<RegisterUserCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.PasswordConfirm)
-            .WithErrorMessage(Errors.Authentication.PasswordConfirmCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.PasswordConfirmCannotBeEmpty);
     }
 
     [Fact]
@@ -167,11 +160,10 @@ public class RegisterUserCommandValidatorTests
         command = command with { PasswordConfirm = "$321Bcda" };
 
         // Act
-        TestValidationResult<RegisterUserCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Password)
-            .WithErrorMessage(Errors.Authentication.PasswordsNotMatch.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.PasswordsNotMatch);
     }
 
     [Theory]
@@ -188,11 +180,10 @@ public class RegisterUserCommandValidatorTests
         command = command with { Password = password, PasswordConfirm = password };
 
         // Act
-        TestValidationResult<RegisterUserCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Password)
-            .WithErrorMessage(Errors.Authentication.InvalidPassword.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.InvalidPassword);
     }
 
     [Theory]
@@ -207,10 +198,10 @@ public class RegisterUserCommandValidatorTests
         command = command with { Password = password, PasswordConfirm = password };
 
         // Act
-        TestValidationResult<RegisterUserCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Password);
+        result.ShouldNotHaveValidationError(Errors.Authentication.InvalidPassword);
     }
 
     [Fact]
@@ -226,12 +217,12 @@ public class RegisterUserCommandValidatorTests
         };
 
         // Act
-        TestValidationResult<RegisterUserCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Username);
-        result.ShouldNotHaveValidationErrorFor(x => x.Password);
-        result.ShouldNotHaveValidationErrorFor(x => x.PasswordConfirm);
+        result.ShouldNotHaveValidationError(Errors.Authentication.UsernameCannotBeEmpty);
+        result.ShouldNotHaveValidationError(Errors.Authentication.InvalidPassword);
+        result.ShouldNotHaveValidationError(Errors.Authentication.PasswordConfirmCannotBeEmpty);
     }
 
     [Theory]
@@ -245,11 +236,10 @@ public class RegisterUserCommandValidatorTests
         command = command with { Username = username };
 
         // Act
-        TestValidationResult<RegisterUserCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Username)
-            .WithErrorMessage(Errors.Authentication.UsernameMustBeBetween3And255CharactersLong.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.UsernameMustBeBetween3And255CharactersLong);
     }
 
     [Theory]
@@ -270,10 +260,10 @@ public class RegisterUserCommandValidatorTests
         command = command with { Username = username };
 
         // Act
-        TestValidationResult<RegisterUserCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Username);
+        result.ShouldHaveValidationError(Errors.Authentication.InvalidUsername);
     }
 
     [Theory]
@@ -291,9 +281,9 @@ public class RegisterUserCommandValidatorTests
         command = command with { Username = username };
 
         // Act
-        TestValidationResult<RegisterUserCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Username);
-    }    
+        result.ShouldNotHaveValidationError(Errors.Authentication.InvalidUsername);
+    }
 }

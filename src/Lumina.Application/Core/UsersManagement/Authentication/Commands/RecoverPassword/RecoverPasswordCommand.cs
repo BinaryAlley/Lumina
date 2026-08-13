@@ -1,7 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Contracts.Responses.Authentication;
-using Mediator;
+using Lumina.Application.Common.CQRS;
 using System.Diagnostics;
 #endregion
 
@@ -16,4 +14,4 @@ namespace Lumina.Application.Core.UsersManagement.Authentication.Commands.Recove
 public record class RecoverPasswordCommand(
     string? Username,
     string? TotpCode
-) : IRequest<ErrorOr<RecoverPasswordResponse>>;
+) : ICommand;

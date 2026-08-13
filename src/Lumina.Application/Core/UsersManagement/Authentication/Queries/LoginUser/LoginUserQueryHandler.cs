@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -7,9 +8,10 @@ using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Security;
 using Lumina.Application.Common.Infrastructure.Time;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Contracts.Responses.Authentication;
-using Mediator;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -19,7 +21,7 @@ namespace Lumina.Application.Core.UsersManagement.Authentication.Queries.LoginUs
 /// <summary>
 /// Handler for the query to authenticate an account.
 /// </summary>
-public class LoginUserQueryHandler : IRequestHandler<LoginUserQuery, ErrorOr<LoginResponse>>
+public class LoginUserQueryHandler : IQueryHandler<LoginUserQuery, ErrorOr<LoginResponse>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IPasswordHashService _hashService;
@@ -27,6 +29,7 @@ public class LoginUserQueryHandler : IRequestHandler<LoginUserQuery, ErrorOr<Log
     private readonly ITotpTokenGenerator _totpTokenGenerator;
     private readonly ICryptographyService _cryptographyService;
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly IValidator<LoginUserQuery> _validator;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LoginUserQueryHandler"/> class.
@@ -37,13 +40,15 @@ public class LoginUserQueryHandler : IRequestHandler<LoginUserQuery, ErrorOr<Log
     /// <param name="totpTokenGenerator">Injected service for generating and validating TOTP tokens.</param>
     /// <param name="cryptographyService">Injected service for cryptographic functionality.</param>
     /// <param name="dateTimeProvider">Injected service for time related concerns.</param>
+    /// <param name="validator">Injected validator for application validation rules.</param>
     public LoginUserQueryHandler(
         IUnitOfWork unitOfWork, 
         IPasswordHashService hashService, 
         IJwtTokenGenerator jwtTokenGenerator, 
         ITotpTokenGenerator totpTokenGenerator, 
         ICryptographyService cryptographyService,
-        IDateTimeProvider dateTimeProvider)
+        IDateTimeProvider dateTimeProvider,
+        IValidator<LoginUserQuery> validator)
     {
         _unitOfWork = unitOfWork;
         _hashService = hashService;
@@ -51,27 +56,32 @@ public class LoginUserQueryHandler : IRequestHandler<LoginUserQuery, ErrorOr<Log
         _totpTokenGenerator = totpTokenGenerator;
         _cryptographyService = cryptographyService;
         _dateTimeProvider = dateTimeProvider;
+        _validator = validator;
     }
 
     /// <summary>
     /// Handles the query to authenticate an account.
     /// </summary>
-    /// <param name="request">The request to be handled.</param>
+    /// <param name="query">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
     /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="LoginResponse"/>, or an error message.
     /// </returns>
-    public async ValueTask<ErrorOr<LoginResponse>> Handle(LoginUserQuery request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<LoginResponse>> HandleAsync(LoginUserQuery query, CancellationToken cancellationToken)
     {
+        List<Error> validationResult = _validator.Validate(query);
+        if (validationResult.Count > 0)
+            return validationResult;
+
         // check if any users already exists
         IUserRepository userRepository = _unitOfWork.GetRepository<IUserRepository>();
-        ErrorOr<UserEntity?> getUserResult = await userRepository.GetByUsernameAsync(request.Username!, cancellationToken).ConfigureAwait(false);
+        ErrorOr<UserEntity?> getUserResult = await userRepository.GetByUsernameAsync(query.Username!, cancellationToken).ConfigureAwait(false);
         if (getUserResult.IsError)
             return getUserResult.Errors;
         else if (getUserResult.Value is null)
             return Errors.Authentication.InvalidUsernameOrPassword;
         // validate that the password is correct
-        if (!_hashService.CheckStringAgainstHash(request.Password!, Uri.UnescapeDataString(getUserResult.Value.Password!)))
+        if (!_hashService.CheckStringAgainstHash(query.Password!, Uri.UnescapeDataString(getUserResult.Value.Password!)))
         {
             // if a password reset was requested, a temp password is being used - if the hash check failed against the regular password, try against the temp one too
             if (getUserResult.Value.TempPassword is not null)
@@ -87,7 +97,7 @@ public class LoginUserQueryHandler : IRequestHandler<LoginUserQuery, ErrorOr<Log
                 }
                 else // temporary password is still valid, validate password against it
                 {
-                    if (!_hashService.CheckStringAgainstHash(request.Password!, Uri.UnescapeDataString(getUserResult.Value.TempPassword!)))
+                    if (!_hashService.CheckStringAgainstHash(query.Password!, Uri.UnescapeDataString(getUserResult.Value.TempPassword!)))
                         return Errors.Authentication.InvalidUsernameOrPassword;
                 }
             }
@@ -98,10 +108,10 @@ public class LoginUserQueryHandler : IRequestHandler<LoginUserQuery, ErrorOr<Log
         string token = _jwtTokenGenerator.GenerateToken(getUserResult.Value.Id.ToString(), getUserResult.Value.Username);
         // check if the user uses TOTP
         bool usesTotp = !string.IsNullOrEmpty(getUserResult.Value.TotpSecret);
-        if (usesTotp && string.IsNullOrEmpty(request.TotpCode)) 
+        if (usesTotp && string.IsNullOrEmpty(query.TotpCode)) 
             return Errors.Authentication.InvalidTotpCode;
-        else if (usesTotp && !string.IsNullOrEmpty(request.TotpCode)) // and if they do, validate it
-            if (!_totpTokenGenerator.ValidateToken(Convert.FromBase64String(_cryptographyService.Decrypt(getUserResult.Value.TotpSecret!)), request.TotpCode))
+        else if (usesTotp && !string.IsNullOrEmpty(query.TotpCode)) // and if they do, validate it
+            if (!_totpTokenGenerator.ValidateToken(Convert.FromBase64String(_cryptographyService.Decrypt(getUserResult.Value.TotpSecret!)), query.TotpCode))
                 return Errors.Authentication.InvalidTotpCode;
         return new LoginResponse(getUserResult.Value.Id, getUserResult.Value.Username, token, usesTotp);
     }

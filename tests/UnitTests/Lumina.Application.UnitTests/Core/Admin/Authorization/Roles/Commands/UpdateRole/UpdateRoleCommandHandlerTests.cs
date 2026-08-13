@@ -6,6 +6,7 @@ using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.Admin.Authorization.Roles.Commands.UpdateRole;
 using Lumina.Application.UnitTests.Core.Admin.Authorization.Roles.Commands.UpdateRole.Fixtures;
 using Lumina.Contracts.Responses.Authorization;
@@ -39,6 +40,9 @@ public class UpdateRoleCommandHandlerTests
     /// </summary>
     public UpdateRoleCommandHandlerTests()
     {
+        IValidator<UpdateRoleCommand> mockValidator = Substitute.For<IValidator<UpdateRoleCommand>>();
+        mockValidator.Validate(Arg.Any<UpdateRoleCommand>())
+            .Returns([]);
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
@@ -52,7 +56,8 @@ public class UpdateRoleCommandHandlerTests
         _sut = new UpdateRoleCommandHandler(
             _mockAuthorizationService,
             _mockCurrentUserService,
-            _mockUnitOfWork);
+            _mockUnitOfWork,
+            mockValidator);
     }
 
     [Fact]
@@ -64,7 +69,7 @@ public class UpdateRoleCommandHandlerTests
             .Returns(false);
 
         // Act
-        ErrorOr<RolePermissionsResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RolePermissionsResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -85,7 +90,7 @@ public class UpdateRoleCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<RolePermissionsResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RolePermissionsResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -108,7 +113,7 @@ public class UpdateRoleCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<RolePermissionsResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RolePermissionsResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -129,7 +134,7 @@ public class UpdateRoleCommandHandlerTests
             .Returns((RoleEntity?)null);
 
         // Act
-        ErrorOr<RolePermissionsResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RolePermissionsResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -145,7 +150,7 @@ public class UpdateRoleCommandHandlerTests
         {
             Id = command.RoleId,
             RoleName = command.RoleName,
-            RolePermissions = command.Permissions.Select(p => new RolePermissionEntity
+            RolePermissions = [.. command.Permissions.Select(p => new RolePermissionEntity
             {
                 RoleId = command.RoleId,
                 PermissionId = p,
@@ -155,7 +160,7 @@ public class UpdateRoleCommandHandlerTests
                     Id = p,
                     PermissionName = AuthorizationPermission.CanViewUsers
                 }
-            }).ToList()
+            })]
         };
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
@@ -166,7 +171,7 @@ public class UpdateRoleCommandHandlerTests
             .Returns(role);
 
         // Act
-        ErrorOr<RolePermissionsResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RolePermissionsResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);

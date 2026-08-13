@@ -7,6 +7,7 @@ using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Security;
 using Lumina.Application.Common.Infrastructure.Time;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.UsersManagement.Authentication.Commands.RegisterUser;
 using Lumina.Application.UnitTests.Common.Mapping.UserManagement.Users.Fixtures;
 using Lumina.Application.UnitTests.Core.UsersManagement.Authentication.Commands.RegisterUser.Fixture;
@@ -51,13 +52,17 @@ public class RegisterUserCommandHandlerTests
         _mockUnitOfWork.GetRepository<IUserRepository>().Returns(_mockUserRepository);
         _mockDateTimeProvider.UtcNow.Returns(DateTime.UtcNow);
 
+        IValidator<RegisterUserCommand> mockValidator = Substitute.For<IValidator<RegisterUserCommand>>();
+        mockValidator.Validate(Arg.Any<RegisterUserCommand>())
+            .Returns([]);
         _sut = new RegisterUserCommandHandler(
             _mockUnitOfWork,
             _mockHashService,
             _mockCryptographyService,
             _mockTotpTokenGenerator,
             _mockQRCodeGenerator,
-            _mockDateTimeProvider);
+            _mockDateTimeProvider,
+            mockValidator);
     }
 
     [Fact]
@@ -84,7 +89,7 @@ public class RegisterUserCommandHandlerTests
             .Returns(Result.Created);
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -115,7 +120,7 @@ public class RegisterUserCommandHandlerTests
             .Returns(Result.Created);
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -142,7 +147,7 @@ public class RegisterUserCommandHandlerTests
             .Returns(ErrorOrFactory.From<UserEntity?>(existingUser));
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -166,7 +171,7 @@ public class RegisterUserCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -188,7 +193,7 @@ public class RegisterUserCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.Handle(command, CancellationToken.None);
+        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);

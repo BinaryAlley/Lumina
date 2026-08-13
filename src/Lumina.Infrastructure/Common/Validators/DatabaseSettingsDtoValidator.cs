@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation;
+using Lumina.Application.Common.Infrastructure.Validation;
+using Lumina.Application.Common.Utilities;
 using Lumina.Infrastructure.Common.Models.DTO.Configuration;
 #endregion
 
@@ -15,6 +16,8 @@ public class DatabaseSettingsDtoValidator : AbstractValidator<DatabaseSettingsDt
     /// </summary>
     public DatabaseSettingsDtoValidator()
     {
-        RuleFor(x => x.DefaultConnection).NotEmpty().WithMessage(Errors.Errors.Configuration.DatabaseConnectionStringCannotBeEmpty.Description);
+        RuleFor(settings => settings.DefaultConnection)
+            .NotEmpty()
+            .WithError(Errors.Errors.Configuration.DatabaseConnectionStringCannotBeEmpty);
     }
 }

@@ -70,7 +70,7 @@ public class GetPermissionsQueryHandlerTests
             .Returns(ErrorOrFactory.From(permissions));
 
         // Act
-        ErrorOr<IEnumerable<PermissionResponse>> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<IEnumerable<PermissionResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -89,7 +89,7 @@ public class GetPermissionsQueryHandlerTests
             .Returns(false);
 
         // Act
-        ErrorOr<IEnumerable<PermissionResponse>> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<IEnumerable<PermissionResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -111,7 +111,7 @@ public class GetPermissionsQueryHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<IEnumerable<PermissionResponse>> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<IEnumerable<PermissionResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -137,7 +137,7 @@ public class GetPermissionsQueryHandlerTests
             .Returns(ErrorOrFactory.From(permissions));
 
         // Act
-        ErrorOr<IEnumerable<PermissionResponse>> result = await _sut.Handle(query, cancellationToken);
+        ErrorOr<IEnumerable<PermissionResponse>> result = await _sut.HandleAsync(query, cancellationToken);
 
         // Assert
         Assert.False(result.IsError);

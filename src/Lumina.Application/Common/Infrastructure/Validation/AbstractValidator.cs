@@ -20,7 +20,7 @@ public abstract class AbstractValidator<TRequest> : IValidator<TRequest>
     /// <typeparam name="TProperty">The type of the property being validated.</typeparam>
     /// <param name="propertySelector">A function that selects the property to validate from the request instance.</param>
     /// <returns>An <see cref="IRuleBuilder{TRequest, TProperty}"/> instance to configure the rule fluently.</returns>
-    protected IRuleBuilder<TRequest, TProperty> RuleFor<TProperty>(Func<TRequest, TProperty> propertySelector)
+    public IRuleBuilder<TRequest, TProperty> RuleFor<TProperty>(Func<TRequest, TProperty> propertySelector)
     {
         ValidationRule<TRequest, TProperty> rule = new(propertySelector);
         _rules.Add(rule);
@@ -33,7 +33,7 @@ public abstract class AbstractValidator<TRequest> : IValidator<TRequest>
     /// <typeparam name="TItem">The type of the items in the collection being validated.</typeparam>
     /// <param name="collectionSelector">A function that selects the collection to validate from the request instance.</param>
     /// <returns>An <see cref="IRuleBuilder{TRequest, TItem}"/> instance to configure the per-item rule fluently.</returns>
-    protected IRuleBuilder<TRequest, TItem> RuleForEach<TItem>(Func<TRequest, IEnumerable<TItem>?> collectionSelector)
+    public IRuleBuilder<TRequest, TItem> RuleForEach<TItem>(Func<TRequest, IEnumerable<TItem>?> collectionSelector)
     {
         ValidationRuleForEach<TRequest, TItem> rule = new(collectionSelector);
         _rules.Add(rule);

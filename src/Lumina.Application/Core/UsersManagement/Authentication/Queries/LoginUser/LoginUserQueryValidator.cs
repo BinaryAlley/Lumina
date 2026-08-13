@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation;
 using Lumina.Application.Common.Errors;
-using System.Linq;
+using Lumina.Application.Common.Infrastructure.Validation;
+using Lumina.Application.Common.Utilities;
 #endregion
 
 namespace Lumina.Application.Core.UsersManagement.Authentication.Queries.LoginUser;
@@ -16,18 +16,19 @@ public class LoginUserQueryValidator : AbstractValidator<LoginUserQuery>
     /// </summary>
     public LoginUserQueryValidator()
     {
-        RuleFor(x => x.Username).NotEmpty().WithMessage(Errors.Authentication.UsernameCannotBeEmpty.Description);
-        RuleFor(x => x.Password).NotEmpty().WithMessage(Errors.Authentication.PasswordCannotBeEmpty.Description)
-            .Matches("^(?=.*[A-Z])(?=.*[0-9])(?=.*[^a-zA-Z0-9]).{8,}$").WithMessage(Errors.Authentication.InvalidPassword.Description);
-        RuleFor(m => m!.TotpCode)
-            .Custom((code, context) =>
-            {
-                if (string.IsNullOrEmpty(code))
-                    return;
-                if (code.Length != 6)
-                    context.AddFailure("TotpCode", Errors.Authentication.InvalidTotpCode.Description);
-                if (!code.All(char.IsDigit))
-                    context.AddFailure("TotpCode", Errors.Authentication.InvalidTotpCode.Description);
-            });
+        RuleFor(query => query.Username)
+            .NotEmpty()
+            .WithError(Errors.Authentication.UsernameCannotBeEmpty);
+       
+        RuleFor(query => query.Password)
+            .NotEmpty()
+            .WithError(Errors.Authentication.PasswordCannotBeEmpty)
+            .Matches("^(?=.*[A-Z])(?=.*[0-9])(?=.*[^a-zA-Z0-9]).{8,}$")
+            .WithError(Errors.Authentication.InvalidPassword);
+      
+        RuleFor(query => query.TotpCode)
+            .Matches("^[0-9]{6}$")
+            .When(query => !string.IsNullOrEmpty(query.TotpCode))
+            .WithError(Errors.Authentication.InvalidTotpCode);
     }
 }

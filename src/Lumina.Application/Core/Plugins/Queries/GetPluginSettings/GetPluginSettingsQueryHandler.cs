@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -8,7 +9,6 @@ using Lumina.Application.Common.Mapping.Plugins;
 using Lumina.Contracts.Responses.Plugins;
 using Lumina.Domain.SharedKernel.Common.Errors;
 using Lumina.Plugins.Contracts.Core.Plugins;
-using Mediator;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -20,7 +20,7 @@ namespace Lumina.Application.Core.Plugins.Queries.GetPluginSettings;
 /// <summary>
 /// Handler for the query to get the settings of a plugin and their schema.
 /// </summary>
-public class GetPluginSettingsQueryHandler : IRequestHandler<GetPluginSettingsQuery, ErrorOr<PluginSettingsResponse>>
+public class GetPluginSettingsQueryHandler : IQueryHandler<GetPluginSettingsQuery, ErrorOr<PluginSettingsResponse>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IPluginManager _pluginManager;
@@ -39,15 +39,15 @@ public class GetPluginSettingsQueryHandler : IRequestHandler<GetPluginSettingsQu
     /// <summary>
     /// Handles the query to get the settings of a plugin and their schema.
     /// </summary>
-    /// <param name="request">The request to be handled.</param>
+    /// <param name="query">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
     /// An <see cref="ErrorOr{TValue}"/> containing either a <see cref="PluginSettingsResponse"/>, or an error.
     /// </returns>
-    public async ValueTask<ErrorOr<PluginSettingsResponse>> Handle(GetPluginSettingsQuery request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<PluginSettingsResponse>> HandleAsync(GetPluginSettingsQuery query, CancellationToken cancellationToken)
     {
         IPluginRepository pluginRepository = _unitOfWork.GetRepository<IPluginRepository>();
-        ErrorOr<PluginEntity?> getPluginResult = await pluginRepository.GetByIdAsync(request.PluginId, cancellationToken).ConfigureAwait(false);
+        ErrorOr<PluginEntity?> getPluginResult = await pluginRepository.GetByIdAsync(query.PluginId, cancellationToken).ConfigureAwait(false);
         if (getPluginResult.IsError)
             return getPluginResult.Errors;
         PluginEntity? pluginEntity = getPluginResult.Value;
@@ -55,10 +55,10 @@ public class GetPluginSettingsQueryHandler : IRequestHandler<GetPluginSettingsQu
             return Errors.Plugins.PluginNotFound;
 
         // the schema comes from the loaded plugin, the current values from the storage medium
-        IPlugin? loadedPlugin = _pluginManager.GetPlugin(request.PluginId);
+        IPlugin? loadedPlugin = _pluginManager.GetPlugin(query.PluginId);
         IReadOnlyList<PluginSettingDescriptorResponse> schema = loadedPlugin is not null
             ? loadedPlugin.GetSettingsSchema().Select(setting => setting.ToResponse()).ToList()
             : [];
-        return new PluginSettingsResponse(request.PluginId, schema, pluginEntity.ToSettings());
+        return new PluginSettingsResponse(query.PluginId, schema, pluginEntity.ToSettings());
     }
 }

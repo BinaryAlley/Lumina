@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.Authentication;
+using Lumina.Application.Core.UsersManagement.Authentication.Commands.RecoverPassword;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.Presentation.Api.Common.Routes.UsersManagement;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
-using Mediator;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
@@ -20,15 +20,15 @@ namespace Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authentication.
 /// </summary>
 public class RecoverPasswordEndpoint : BaseEndpoint<RecoverPasswordRequest, IResult>
 {
-    private readonly ISender _sender;
+    private readonly ICommandHandler<RecoverPasswordCommand, ErrorOr<RecoverPasswordResponse>> _recoverPasswordCommandHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RecoverPasswordEndpoint"/> class.
     /// </summary>
-    /// <param name="sender">Injected service for mediating commands and queries.</param>
-    public RecoverPasswordEndpoint(ISender sender)
+    /// <param name="recoverPasswordCommandHandler">Injected service for handling recover password commands.</param>
+    public RecoverPasswordEndpoint(ICommandHandler<RecoverPasswordCommand, ErrorOr<RecoverPasswordResponse>> recoverPasswordCommandHandler)
     {
-        _sender = sender;
+        _recoverPasswordCommandHandler = recoverPasswordCommandHandler;
     }
 
     /// <summary>
@@ -36,7 +36,7 @@ public class RecoverPasswordEndpoint : BaseEndpoint<RecoverPasswordRequest, IRes
     /// </summary>
     public override void Configure()
     {
-        Verbs(Http.POST);
+        Verbs(FastEndpoints.Http.POST);
         Routes(ApiRoutes.Authentication.RECOVER_PASSWORD);
         Version(1);
         AllowAnonymous();
@@ -51,7 +51,7 @@ public class RecoverPasswordEndpoint : BaseEndpoint<RecoverPasswordRequest, IRes
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(RecoverPasswordRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<RecoverPasswordResponse> result = await _sender.Send(request.ToCommand(), cancellationToken).ConfigureAwait(false);
+        ErrorOr<RecoverPasswordResponse> result = await _recoverPasswordCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

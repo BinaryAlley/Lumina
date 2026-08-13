@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Mediator;
+using Lumina.Application.Common.CQRS;
 using System;
 using System.Diagnostics;
 #endregion
@@ -14,4 +13,4 @@ namespace Lumina.Application.Core.Admin.Authorization.Roles.Commands.DeleteRole;
 [DebuggerDisplay("RoleId: {RoleId}")]
 public record DeleteRoleCommand(
     Guid RoleId
-) : IRequest<ErrorOr<Deleted>>;
+) : ICommand;

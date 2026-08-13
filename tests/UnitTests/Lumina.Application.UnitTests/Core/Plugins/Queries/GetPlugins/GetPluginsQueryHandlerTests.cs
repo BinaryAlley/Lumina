@@ -44,7 +44,7 @@ public class GetPluginsQueryHandlerTests
         _mockPluginRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(plugins);
 
         // Act
-        ErrorOr<IReadOnlyList<PluginResponse>> result = await _sut.Handle(new GetPluginsQuery(), CancellationToken.None);
+        ErrorOr<IReadOnlyList<PluginResponse>> result = await _sut.HandleAsync(new GetPluginsQuery(), CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);
@@ -61,7 +61,7 @@ public class GetPluginsQueryHandlerTests
             .Returns(Error.Failure(description: "Failed to get plugins"));
 
         // Act
-        ErrorOr<IReadOnlyList<PluginResponse>> result = await _sut.Handle(new GetPluginsQuery(), CancellationToken.None);
+        ErrorOr<IReadOnlyList<PluginResponse>> result = await _sut.HandleAsync(new GetPluginsQuery(), CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);

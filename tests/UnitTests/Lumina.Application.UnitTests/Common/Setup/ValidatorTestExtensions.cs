@@ -30,7 +30,7 @@ public static class ValidatorTestExtensions
     /// <param name="expectedError">The error that should not be present in the validation results.</param>
     public static void ShouldNotHaveValidationError(this List<Error> errors, Error expectedError)
     {
-        Assert.DoesNotContain(errors, error => error.Code == expectedError.Code);
+        Assert.DoesNotContain(errors, error => error.Description == expectedError.Description);
     }
 
     /// <summary>
@@ -40,7 +40,7 @@ public static class ValidatorTestExtensions
     /// <param name="expectedError">The error that should be present in the validation results.</param>
     public static void ShouldHaveValidationError(this List<Error> errors, Error expectedError)
     {
-        Assert.Contains(errors, error => error.Code == expectedError.Code);
+        Assert.Contains(errors, error => error.Description == expectedError.Description);
     }
 
     /// <summary>

@@ -63,7 +63,7 @@ public class GetRolesQueryHandlerTests
             .Returns(false);
 
         // Act
-        ErrorOr<IEnumerable<RoleResponse>> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<IEnumerable<RoleResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -84,7 +84,7 @@ public class GetRolesQueryHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<IEnumerable<RoleResponse>> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<IEnumerable<RoleResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
@@ -108,7 +108,7 @@ public class GetRolesQueryHandlerTests
             .Returns(ErrorOrFactory.From(roles));
 
         // Act
-        ErrorOr<IEnumerable<RoleResponse>> result = await _sut.Handle(query, CancellationToken.None);
+        ErrorOr<IEnumerable<RoleResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsError);

@@ -1,8 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation.TestHelper;
+using ErrorOr;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Core.Admin.Authorization.Roles.Commands.DeleteRole;
+using Lumina.Application.UnitTests.Common.Setup;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -31,11 +33,10 @@ public class DeleteRoleCommandValidatorTests
         DeleteRoleCommand command = new(Guid.Empty);
 
         // Act
-        TestValidationResult<DeleteRoleCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.RoleId)
-            .WithErrorMessage(Errors.Authorization.RoleIdCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authorization.RoleIdCannotBeEmpty);
     }
 
     [Fact]
@@ -45,9 +46,9 @@ public class DeleteRoleCommandValidatorTests
         DeleteRoleCommand command = new(Guid.NewGuid());
 
         // Act
-        TestValidationResult<DeleteRoleCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.RoleId);
+        result.ShouldNotHaveValidationError(Errors.Authorization.RoleIdCannotBeEmpty);
     }
 }

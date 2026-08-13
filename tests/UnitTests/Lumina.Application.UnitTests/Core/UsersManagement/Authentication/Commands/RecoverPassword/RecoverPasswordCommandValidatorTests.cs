@@ -1,8 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation.TestHelper;
+using ErrorOr;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Core.UsersManagement.Authentication.Commands.RecoverPassword;
+using Lumina.Application.UnitTests.Common.Setup;
 using Lumina.Application.UnitTests.Core.UsersManagement.Authentication.Commands.RecoverPassword.Fixtures;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -32,11 +34,10 @@ public class RecoverPasswordCommandValidatorTests
         command = command with { Username = null! };
 
         // Act
-        TestValidationResult<RecoverPasswordCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Username)
-            .WithErrorMessage(Errors.Authentication.UsernameCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.UsernameCannotBeEmpty);
     }
 
     [Fact]
@@ -47,11 +48,10 @@ public class RecoverPasswordCommandValidatorTests
         command = command with { Username = string.Empty };
 
         // Act
-        TestValidationResult<RecoverPasswordCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Username)
-            .WithErrorMessage(Errors.Authentication.UsernameCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.UsernameCannotBeEmpty);
     }
 
     [Fact]
@@ -62,11 +62,10 @@ public class RecoverPasswordCommandValidatorTests
         command = command with { Username = "   " };
 
         // Act
-        TestValidationResult<RecoverPasswordCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Username)
-            .WithErrorMessage(Errors.Authentication.UsernameCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.UsernameCannotBeEmpty);
     }
 
     [Fact]
@@ -77,11 +76,10 @@ public class RecoverPasswordCommandValidatorTests
         command = command with { TotpCode = null! };
 
         // Act
-        TestValidationResult<RecoverPasswordCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.TotpCode)
-            .WithErrorMessage(Errors.Authentication.TotpCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.TotpCannotBeEmpty);
     }
 
     [Fact]
@@ -92,11 +90,10 @@ public class RecoverPasswordCommandValidatorTests
         command = command with { TotpCode = string.Empty };
 
         // Act
-        TestValidationResult<RecoverPasswordCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.TotpCode)
-            .WithErrorMessage(Errors.Authentication.TotpCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.TotpCannotBeEmpty);
     }
 
     [Fact]
@@ -107,11 +104,10 @@ public class RecoverPasswordCommandValidatorTests
         command = command with { TotpCode = "   " };
 
         // Act
-        TestValidationResult<RecoverPasswordCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.TotpCode)
-            .WithErrorMessage(Errors.Authentication.TotpCannotBeEmpty.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.TotpCannotBeEmpty);
     }
 
     [Theory]
@@ -128,11 +124,10 @@ public class RecoverPasswordCommandValidatorTests
         command = command with { TotpCode = totpCode };
 
         // Act
-        TestValidationResult<RecoverPasswordCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.TotpCode)
-            .WithErrorMessage(Errors.Authentication.InvalidTotpCode.Description);
+        result.ShouldHaveValidationError(Errors.Authentication.InvalidTotpCode);
     }
 
     [Theory]
@@ -146,10 +141,10 @@ public class RecoverPasswordCommandValidatorTests
         command = command with { TotpCode = totpCode };
 
         // Act
-        TestValidationResult<RecoverPasswordCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.TotpCode);
+        result.ShouldNotHaveValidationError(Errors.Authentication.InvalidTotpCode);
     }
 
     [Fact]
@@ -159,10 +154,10 @@ public class RecoverPasswordCommandValidatorTests
         RecoverPasswordCommand command = RecoverPasswordCommandFixture.CreateRecoverPasswordCommand();
 
         // Act
-        TestValidationResult<RecoverPasswordCommand> result = _validator.TestValidate(command);
+        List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Username);
-        result.ShouldNotHaveValidationErrorFor(x => x.TotpCode);
+        result.ShouldNotHaveValidationError(Errors.Authentication.UsernameCannotBeEmpty);
+        result.ShouldNotHaveValidationError(Errors.Authentication.TotpCannotBeEmpty);
     }
 }

@@ -3,11 +3,11 @@ using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using ErrorOr;
 using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.FileSystemManagement.Directories.Queries.GetDirectories;
 using Lumina.Contracts.Requests.FileSystemManagement.Directories;
 using Lumina.Contracts.Responses.FileSystemManagement.Directories;
 using Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Directories.GetDirectories;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -28,7 +28,7 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.
 public class GetDirectoriesEndpointTests
 {
     private readonly IFixture _fixture;
-    private readonly ISender _mockSender;
+    private readonly IQueryHandler<GetDirectoriesQuery, ErrorOr<IEnumerable<DirectoryResponse>>> _mockHandler;
     private readonly GetDirectoriesEndpoint _sut;
 
     /// <summary>
@@ -37,8 +37,8 @@ public class GetDirectoriesEndpointTests
     public GetDirectoriesEndpointTests()
     {
         _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
-        _mockSender = Substitute.For<ISender>();
-        _sut = Factory.Create<GetDirectoriesEndpoint>(_mockSender);
+        _mockHandler = Substitute.For<IQueryHandler<GetDirectoriesQuery, ErrorOr<IEnumerable<DirectoryResponse>>>>();
+        _sut = Factory.Create<GetDirectoriesEndpoint>(_mockHandler);
     }
 
     [Fact]
@@ -48,7 +48,7 @@ public class GetDirectoriesEndpointTests
         GetDirectoriesRequest request = _fixture.Create<GetDirectoriesRequest>();
         CancellationToken cancellationToken = CancellationToken.None;
         List<DirectoryResponse> expectedResponses = _fixture.CreateMany<DirectoryResponse>(3).ToList();
-        _mockSender.Send(Arg.Any<GetDirectoriesQuery>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<GetDirectoriesQuery>(), Arg.Any<CancellationToken>())
             .Returns(ErrorOrFactory.From(expectedResponses.AsEnumerable()));
 
         // Act
@@ -66,7 +66,7 @@ public class GetDirectoriesEndpointTests
         GetDirectoriesRequest request = _fixture.Create<GetDirectoriesRequest>();
         CancellationToken cancellationToken = CancellationToken.None;
         Error expectedError = Error.NotFound("Directory.NotFound", "The requested directory was not found.");
-        _mockSender.Send(Arg.Any<GetDirectoriesQuery>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<GetDirectoriesQuery>(), Arg.Any<CancellationToken>())
             .Returns(expectedError);
 
         // Act
@@ -92,7 +92,7 @@ public class GetDirectoriesEndpointTests
         GetDirectoriesRequest request = _fixture.Create<GetDirectoriesRequest>();
         CancellationToken cancellationToken = CancellationToken.None;
         Error expectedError = Error.Validation("Path.Invalid", "The provided path is invalid.");
-        _mockSender.Send(Arg.Any<GetDirectoriesQuery>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<GetDirectoriesQuery>(), Arg.Any<CancellationToken>())
           .Returns(expectedError);
 
         // Act
@@ -117,14 +117,14 @@ public class GetDirectoriesEndpointTests
         // Arrange
         GetDirectoriesRequest request = _fixture.Create<GetDirectoriesRequest>();
         CancellationToken cancellationToken = CancellationToken.None;
-        _mockSender.Send(Arg.Any<GetDirectoriesQuery>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<GetDirectoriesQuery>(), Arg.Any<CancellationToken>())
             .Returns(ErrorOrFactory.From(Enumerable.Empty<DirectoryResponse>()));
 
         // Act
         await _sut.ExecuteAsync(request, cancellationToken);
 
         // Assert
-        await _mockSender.Received(1).Send(
+        await _mockHandler.Received(1).HandleAsync(
             Arg.Is<GetDirectoriesQuery>(q => q.Path == request.Path && q.IncludeHiddenElements == request.IncludeHiddenElements),
             Arg.Is(cancellationToken));
     }
@@ -138,14 +138,14 @@ public class GetDirectoriesEndpointTests
         TaskCompletionSource<bool> operationStarted = new();
         TaskCompletionSource<bool> cancellationRequested = new();
 
-        _mockSender.Send(Arg.Any<GetDirectoriesQuery>(), Arg.Any<CancellationToken>())
-            .Returns(callInfo => new ValueTask<ErrorOr<IEnumerable<DirectoryResponse>>>(Task.Run(async () =>
+        _mockHandler.HandleAsync(Arg.Any<GetDirectoriesQuery>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo => Task.Run(async () =>
             {
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
                 return ErrorOrFactory.From(_fixture.CreateMany<DirectoryResponse>(3).AsEnumerable());
-            }, callInfo.Arg<CancellationToken>())));
+            }, callInfo.Arg<CancellationToken>()));
 
         // Act
         Task<IResult> operationTask = _sut.ExecuteAsync(request, cts.Token);

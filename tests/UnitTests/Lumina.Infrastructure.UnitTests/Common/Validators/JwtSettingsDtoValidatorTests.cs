@@ -1,11 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
+using ErrorOr;
 using Lumina.Infrastructure.Common.Errors;
 using Lumina.Infrastructure.Common.Models.DTO.Configuration;
 using Lumina.Infrastructure.Common.Validators;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 #endregion
 
 namespace Lumina.Infrastructure.UnitTests.Common.Validators;
@@ -40,11 +41,10 @@ public class JwtSettingsDtoValidatorTests
             .Create();
 
         // Act
-        FluentValidation.Results.ValidationResult result = _validator.Validate(model);
+        List<Error> result = _validator.Validate(model);
 
         // Assert
-        Assert.True(result.IsValid);
-        Assert.Empty(result.Errors);
+        Assert.Empty(result);
     }
 
     [Fact]
@@ -59,13 +59,12 @@ public class JwtSettingsDtoValidatorTests
             .Create();
 
         // Act
-        FluentValidation.Results.ValidationResult result = _validator.Validate(model);
+        List<Error> result = _validator.Validate(model);
 
         // Assert
-        Assert.False(result.IsValid);
-        Assert.Equal(2, result.Errors.Count);
-        Assert.Contains(Errors.Configuration.JwtSecretKeyCannotBeEmpty.Description, result.Errors.Select(e => e.ErrorMessage));
-        Assert.Contains(Errors.Configuration.JwtSecretKeyTooShort.Description, result.Errors.Select(e => e.ErrorMessage));
+        Assert.Equal(2, result.Count);
+        Assert.Contains(result, error => error.Description == Errors.Configuration.JwtSecretKeyCannotBeEmpty.Description);
+        Assert.Contains(result, error => error.Description == Errors.Configuration.JwtSecretKeyTooShort.Description);
     }
 
     [Fact]
@@ -80,12 +79,11 @@ public class JwtSettingsDtoValidatorTests
             .Create();
 
         // Act
-        FluentValidation.Results.ValidationResult result = _validator.Validate(model);
+        List<Error> result = _validator.Validate(model);
 
         // Assert
-        Assert.False(result.IsValid);
-        Assert.Single(result.Errors);
-        Assert.Equal(Errors.Configuration.JwtSecretKeyTooShort.Description, result.Errors[0].ErrorMessage);
+        Assert.Single(result);
+        Assert.Equal(Errors.Configuration.JwtSecretKeyTooShort.Description, result[0].Description);
     }
 
     [Theory]
@@ -103,12 +101,11 @@ public class JwtSettingsDtoValidatorTests
             .Create();
 
         // Act
-        FluentValidation.Results.ValidationResult result = _validator.Validate(model);
+        List<Error> result = _validator.Validate(model);
 
         // Assert
-        Assert.False(result.IsValid);
-        Assert.Single(result.Errors);
-        Assert.Equal(Errors.Configuration.JwtExpiryMinutesMustBePositive.Description, result.Errors[0].ErrorMessage);
+        Assert.Single(result);
+        Assert.Equal(Errors.Configuration.JwtExpiryMinutesMustBePositive.Description, result[0].Description);
     }
 
     [Fact]
@@ -123,12 +120,11 @@ public class JwtSettingsDtoValidatorTests
             .Create();
 
         // Act
-        FluentValidation.Results.ValidationResult result = _validator.Validate(model);
+        List<Error> result = _validator.Validate(model);
 
         // Assert
-        Assert.False(result.IsValid);
-        Assert.Single(result.Errors);
-        Assert.Equal(Errors.Configuration.JwtIssuerCannotBeEmpty.Description, result.Errors[0].ErrorMessage);
+        Assert.Single(result);
+        Assert.Equal(Errors.Configuration.JwtIssuerCannotBeEmpty.Description, result[0].Description);
     }
 
     [Fact]
@@ -143,11 +139,10 @@ public class JwtSettingsDtoValidatorTests
             .Create();
 
         // Act
-        FluentValidation.Results.ValidationResult result = _validator.Validate(model);
+        List<Error> result = _validator.Validate(model);
 
         // Assert
-        Assert.False(result.IsValid);
-        Assert.Single(result.Errors);
-        Assert.Equal(Errors.Configuration.JwtAudienceCannotBeEmpty.Description, result.Errors[0].ErrorMessage);
+        Assert.Single(result);
+        Assert.Equal(Errors.Configuration.JwtAudienceCannotBeEmpty.Description, result[0].Description);
     }
 }

@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.Authentication;
 using Lumina.Application.Common.Mapping.Authorization;
+using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetAuthorization;
 using Lumina.Contracts.Requests.Authorization;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.Presentation.Api.Common.Routes.UsersManagement;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,15 +20,15 @@ namespace Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authorization.G
 /// </summary>
 public class GetAuthorizationEndpoint : BaseEndpoint<GetAuthorizationRequest, IResult>
 {
-    private readonly ISender _sender;
+    private readonly IQueryHandler<GetAuthorizationQuery, ErrorOr<AuthorizationResponse>> _getAuthorizationQueryHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetAuthorizationEndpoint"/> class.
     /// </summary>
-    /// <param name="sender">Injected service for mediating commands and queries.</param>
-    public GetAuthorizationEndpoint(ISender sender)
+    /// <param name="getAuthorizationQueryHandler">Injected service for handling get authorization queries.</param>
+    public GetAuthorizationEndpoint(IQueryHandler<GetAuthorizationQuery, ErrorOr<AuthorizationResponse>> getAuthorizationQueryHandler)
     {
-        _sender = sender;
+        _getAuthorizationQueryHandler = getAuthorizationQueryHandler;
     }
 
     /// <summary>
@@ -36,7 +36,7 @@ public class GetAuthorizationEndpoint : BaseEndpoint<GetAuthorizationRequest, IR
     /// </summary>
     public override void Configure()
     {
-        Verbs(Http.GET);
+        Verbs(FastEndpoints.Http.GET);
         Routes(ApiRoutes.Authorization.GET_AUTHORIZATION);
         Version(1);
         DontCatchExceptions();
@@ -49,7 +49,7 @@ public class GetAuthorizationEndpoint : BaseEndpoint<GetAuthorizationRequest, IR
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(GetAuthorizationRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<AuthorizationResponse> result = await _sender.Send(request.ToQuery(), cancellationToken).ConfigureAwait(false);
+        ErrorOr<AuthorizationResponse> result = await _getAuthorizationQueryHandler.HandleAsync(request.ToQuery(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

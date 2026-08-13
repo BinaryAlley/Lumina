@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -10,7 +11,6 @@ using Lumina.Contracts.Responses.MediaLibrary.Management;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Progress;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
-using Mediator;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -22,7 +22,7 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Queries.GetRunningLibr
 /// <summary>
 /// Handler for the query to get the ongoing media library scans.
 /// </summary>
-public class GetRunningLibraryScansQueryHandler : IRequestHandler<GetRunningLibraryScansQuery, ErrorOr<IEnumerable<MediaLibraryScanProgressResponse>>>
+public class GetRunningLibraryScansQueryHandler : IQueryHandler<GetRunningLibraryScansQuery, ErrorOr<IEnumerable<MediaLibraryScanProgressResponse>>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUserService;
@@ -51,12 +51,12 @@ public class GetRunningLibraryScansQueryHandler : IRequestHandler<GetRunningLibr
     /// <summary>
     /// Handles the query to get the ongoing media library scans.
     /// </summary>
-    /// <param name="request">The request to be handled.</param>
+    /// <param name="query">The query to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
     /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="MediaLibraryScanProgress"/>, or an error message.
     /// </returns>
-    public async ValueTask<ErrorOr<IEnumerable<MediaLibraryScanProgressResponse>>> Handle(GetRunningLibraryScansQuery request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<IEnumerable<MediaLibraryScanProgressResponse>>> HandleAsync(GetRunningLibraryScansQuery query, CancellationToken cancellationToken)
     {
         // get the ongoing library scans from the repository
         ILibraryScanRepository libraryScanRepository = _unitOfWork.GetRepository<ILibraryScanRepository>();

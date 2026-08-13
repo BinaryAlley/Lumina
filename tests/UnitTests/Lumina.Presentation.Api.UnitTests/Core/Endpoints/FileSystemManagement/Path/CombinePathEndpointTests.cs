@@ -1,12 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.FileSystemManagement.Paths.Commands.CombinePath;
 using Lumina.Contracts.Requests.FileSystemManagement.Path;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
 using Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.CombinePath;
 using Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.Fixtures;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -24,7 +23,7 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.
 [ExcludeFromCodeCoverage]
 public class CombinePathEndpointTests
 {
-    private readonly ISender _mockSender;
+    private readonly ICommandHandler<CombinePathCommand, ErrorOr<PathSegmentResponse>> _mockHandler;
     private readonly CombinePathEndpoint _sut;
     private readonly PathSegmentResponseFixture _pathSegmentResponseFixture;
     private readonly CombinePathRequestFixture _combinePathRequestFixture;
@@ -34,8 +33,8 @@ public class CombinePathEndpointTests
     /// </summary>
     public CombinePathEndpointTests()
     {
-        _mockSender = Substitute.For<ISender>();
-        _sut = Factory.Create<CombinePathEndpoint>(_mockSender);
+        _mockHandler = Substitute.For<ICommandHandler<CombinePathCommand, ErrorOr<PathSegmentResponse>>>();
+        _sut = FastEndpoints.Factory.Create<CombinePathEndpoint>(_mockHandler);
         _pathSegmentResponseFixture = new PathSegmentResponseFixture();
         _combinePathRequestFixture = new CombinePathRequestFixture();
     }
@@ -47,7 +46,7 @@ public class CombinePathEndpointTests
         CombinePathRequest request = _combinePathRequestFixture.Create("C:\\Users", "TestUser");
         CancellationToken cancellationToken = CancellationToken.None;
         PathSegmentResponse expectedResponse = _pathSegmentResponseFixture.Create();
-        _mockSender.Send(Arg.Any<CombinePathCommand>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<CombinePathCommand>(), Arg.Any<CancellationToken>())
             .Returns(ErrorOrFactory.From(expectedResponse));
 
         // Act
@@ -65,7 +64,7 @@ public class CombinePathEndpointTests
         CombinePathRequest request = _combinePathRequestFixture.Create("InvalidPath", "TestUser");
         CancellationToken cancellationToken = CancellationToken.None;
         Error expectedError = Error.NotFound("Path.NotFound", "The requested path was not found.");
-        _mockSender.Send(Arg.Any<CombinePathCommand>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<CombinePathCommand>(), Arg.Any<CancellationToken>())
             .Returns(expectedError);
 
         // Act
@@ -91,7 +90,7 @@ public class CombinePathEndpointTests
         CombinePathRequest request = _combinePathRequestFixture.Create("InvalidPath", "TestUser");
         CancellationToken cancellationToken = CancellationToken.None;
         Error expectedError = Error.Validation("Path.Invalid", "The provided path is invalid.");
-        _mockSender.Send(Arg.Any<CombinePathCommand>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<CombinePathCommand>(), Arg.Any<CancellationToken>())
               .Returns(expectedError);
 
         // Act
@@ -116,14 +115,14 @@ public class CombinePathEndpointTests
         // Arrange
         CombinePathRequest request = _combinePathRequestFixture.Create("C:\\Users", "TestUser");
         CancellationToken cancellationToken = CancellationToken.None;
-        _mockSender.Send(Arg.Any<CombinePathCommand>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<CombinePathCommand>(), Arg.Any<CancellationToken>())
             .Returns(ErrorOrFactory.From(_pathSegmentResponseFixture.Create()));
 
         // Act
         await _sut.ExecuteAsync(request, cancellationToken);
 
         // Assert
-        await _mockSender.Received(1).Send(
+        await _mockHandler.Received(1).HandleAsync(
             Arg.Is<CombinePathCommand>(c => c.OriginalPath == request.OriginalPath && c.NewPath == request.NewPath),
             Arg.Is(cancellationToken));
     }
@@ -137,14 +136,14 @@ public class CombinePathEndpointTests
         TaskCompletionSource<bool> operationStarted = new();
         TaskCompletionSource<bool> cancellationRequested = new();
 
-        _mockSender.Send(Arg.Any<CombinePathCommand>(), Arg.Any<CancellationToken>())
-            .Returns(callInfo => new ValueTask<ErrorOr<PathSegmentResponse>>(Task.Run(async () =>
+        _mockHandler.HandleAsync(Arg.Any<CombinePathCommand>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo => Task.Run(async () =>
             {
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
                 return ErrorOrFactory.From(_pathSegmentResponseFixture.Create());
-            }, callInfo.Arg<CancellationToken>())));
+            }, callInfo.Arg<CancellationToken>()));
 
         // Act
         Task<IResult> operationTask = _sut.ExecuteAsync(request, cts.Token);

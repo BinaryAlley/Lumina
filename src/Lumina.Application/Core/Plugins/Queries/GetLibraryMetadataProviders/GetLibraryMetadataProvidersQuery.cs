@@ -1,9 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Contracts.Responses.Plugins;
-using Mediator;
+using Lumina.Application.Common.CQRS;
 using System;
-using System.Collections.Generic;
 #endregion
 
 namespace Lumina.Application.Core.Plugins.Queries.GetLibraryMetadataProviders;
@@ -14,4 +11,4 @@ namespace Lumina.Application.Core.Plugins.Queries.GetLibraryMetadataProviders;
 /// <param name="LibraryId">The Id of the media library whose metadata providers are retrieved.</param>
 public record GetLibraryMetadataProvidersQuery(
     Guid LibraryId
-) : IRequest<ErrorOr<IReadOnlyList<LibraryMetadataProviderResponse>>>;
+) : IQuery;

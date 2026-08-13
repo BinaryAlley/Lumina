@@ -1,12 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using ErrorOr;
-using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.UsersManagement.Authentication.Commands.RegisterUser;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authentication.Register;
 using Lumina.Presentation.Api.UnitTests.Core.Endpoints.Maintenance.ApplicationSetup.Fixtures;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -24,7 +23,7 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.UsersManagement.Authe
 [ExcludeFromCodeCoverage]
 public class RegisterEndpointTests
 {
-    private readonly ISender _mockSender;
+    private readonly ICommandHandler<RegisterUserCommand, ErrorOr<RegistrationResponse>> _mockHandler;
     private readonly RegisterEndpoint _sut;
     private readonly RegistrationRequestFixture _registrationRequestFixture;
 
@@ -33,8 +32,8 @@ public class RegisterEndpointTests
     /// </summary>
     public RegisterEndpointTests()
     {
-        _mockSender = Substitute.For<ISender>();
-        _sut = Factory.Create<RegisterEndpoint>(_mockSender);
+        _mockHandler = Substitute.For<ICommandHandler<RegisterUserCommand, ErrorOr<RegistrationResponse>>>();
+        _sut = FastEndpoints.Factory.Create<RegisterEndpoint>(_mockHandler);
         _registrationRequestFixture = new RegistrationRequestFixture();
     }
 
@@ -45,7 +44,7 @@ public class RegisterEndpointTests
         RegistrationRequest request = _registrationRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
         RegistrationResponse expectedResponse = new(Guid.NewGuid(), "testUser", "TOTP123");
-        _mockSender.Send(Arg.Any<RegisterUserCommand>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<RegisterUserCommand>(), Arg.Any<CancellationToken>())
             .Returns(ErrorOrFactory.From(expectedResponse));
 
         // Act
@@ -64,7 +63,7 @@ public class RegisterEndpointTests
         RegistrationRequest request = _registrationRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
         Error expectedError = Error.Validation("Registration.Failed", "Username is already taken.");
-        _mockSender.Send(Arg.Any<RegisterUserCommand>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<RegisterUserCommand>(), Arg.Any<CancellationToken>())
             .Returns(expectedError);
 
         // Act
@@ -88,14 +87,14 @@ public class RegisterEndpointTests
         // Arrange
         RegistrationRequest request = _registrationRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
-        _mockSender.Send(Arg.Any<RegisterUserCommand>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<RegisterUserCommand>(), Arg.Any<CancellationToken>())
             .Returns(ErrorOrFactory.From(new RegistrationResponse(Guid.NewGuid(), "testUser", "TOTP123")));
 
         // Act
         await _sut.ExecuteAsync(request, cancellationToken);
 
         // Assert
-        await _mockSender.Received(1).Send(
+        await _mockHandler.Received(1).HandleAsync(
             Arg.Is<RegisterUserCommand>(cmd =>
                 cmd.Username == request.Username &&
                 cmd.Password == request.Password &&
@@ -113,14 +112,14 @@ public class RegisterEndpointTests
         TaskCompletionSource<bool> operationStarted = new();
         TaskCompletionSource<bool> cancellationRequested = new();
 
-        _mockSender.Send(Arg.Any<RegisterUserCommand>(), Arg.Any<CancellationToken>())
-            .Returns(callInfo => new ValueTask<ErrorOr<RegistrationResponse>>(Task.Run(async () =>
+        _mockHandler.HandleAsync(Arg.Any<RegisterUserCommand>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo => Task.Run(async () =>
             {
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
                 return ErrorOrFactory.From(new RegistrationResponse(Guid.NewGuid(), "testUser", "TOTP123"));
-            }, callInfo.Arg<CancellationToken>())));
+            }, callInfo.Arg<CancellationToken>()));
 
         // Act
         Task<IResult> operationTask = _sut.ExecuteAsync(request, cts.Token);

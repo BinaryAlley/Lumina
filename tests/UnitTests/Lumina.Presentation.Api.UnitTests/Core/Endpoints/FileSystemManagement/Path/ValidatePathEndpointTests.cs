@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
+using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.FileSystemManagement.Paths.Queries.ValidatePath;
 using Lumina.Contracts.Requests.FileSystemManagement.Path;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
 using Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.ValidatePath;
 using Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.Fixtures;
-using Mediator;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -23,7 +23,7 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.
 [ExcludeFromCodeCoverage]
 public class ValidatePathEndpointTests
 {
-    private readonly ISender _mockSender;
+    private readonly IQueryHandler<ValidatePathQuery, PathValidResponse> _mockHandler;
     private readonly ValidatePathEndpoint _sut;
     private readonly ValidatePathRequestFixture _validatePathRequestFixture;
 
@@ -32,8 +32,8 @@ public class ValidatePathEndpointTests
     /// </summary>
     public ValidatePathEndpointTests()
     {
-        _mockSender = Substitute.For<ISender>();
-        _sut = Factory.Create<ValidatePathEndpoint>(_mockSender);
+        _mockHandler = Substitute.For<IQueryHandler<ValidatePathQuery, PathValidResponse>>();
+        _sut = Factory.Create<ValidatePathEndpoint>(_mockHandler);
         _validatePathRequestFixture = new ValidatePathRequestFixture();
     }
 
@@ -44,7 +44,7 @@ public class ValidatePathEndpointTests
         ValidatePathRequest request = _validatePathRequestFixture.Create(@"C:\Users\TestUser\Documents");
         CancellationToken cancellationToken = CancellationToken.None;
         PathValidResponse expectedResponse = new(true);
-        _mockSender.Send(Arg.Any<ValidatePathQuery>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<ValidatePathQuery>(), Arg.Any<CancellationToken>())
             .Returns(expectedResponse);
 
         // Act
@@ -61,14 +61,14 @@ public class ValidatePathEndpointTests
         // Arrange
         ValidatePathRequest request = _validatePathRequestFixture.Create(@"C:\Users\TestUser\Documents");
         CancellationToken cancellationToken = CancellationToken.None;
-        _mockSender.Send(Arg.Any<ValidatePathQuery>(), Arg.Any<CancellationToken>())
+        _mockHandler.HandleAsync(Arg.Any<ValidatePathQuery>(), Arg.Any<CancellationToken>())
             .Returns(new PathValidResponse(true));
 
         // Act
         await _sut.ExecuteAsync(request, cancellationToken);
 
         // Assert
-        await _mockSender.Received(1).Send(
+        await _mockHandler.Received(1).HandleAsync(
             Arg.Is<ValidatePathQuery>(q => q.Path == request.Path),
             Arg.Is(cancellationToken));
     }
@@ -82,14 +82,14 @@ public class ValidatePathEndpointTests
         TaskCompletionSource<bool> operationStarted = new();
         TaskCompletionSource<bool> cancellationRequested = new();
 
-        _mockSender.Send(Arg.Any<ValidatePathQuery>(), Arg.Any<CancellationToken>())
-            .Returns(callInfo => new ValueTask<PathValidResponse>(Task.Run(async () =>
+        _mockHandler.HandleAsync(Arg.Any<ValidatePathQuery>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo => Task.Run(async () =>
             {
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
                 return new PathValidResponse(true);
-            }, callInfo.Arg<CancellationToken>())));
+            }, callInfo.Arg<CancellationToken>()));
 
         // Act
         Task<IResult> operationTask = _sut.ExecuteAsync(request, cts.Token);

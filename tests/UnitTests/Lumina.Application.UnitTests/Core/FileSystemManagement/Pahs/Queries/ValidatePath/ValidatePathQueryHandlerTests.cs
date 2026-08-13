@@ -37,7 +37,7 @@ public class ValidatePathQueryHandlerTests
         _mockPathService.IsValidPath(query.Path!).Returns(true);
 
         // Act
-        PathValidResponse result = await _sut.Handle(query, CancellationToken.None);
+        PathValidResponse result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsValid);
@@ -52,7 +52,7 @@ public class ValidatePathQueryHandlerTests
         _mockPathService.IsValidPath(query.Path!).Returns(false);
 
         // Act
-        PathValidResponse result = await _sut.Handle(query, CancellationToken.None);
+        PathValidResponse result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsValid);
@@ -67,7 +67,7 @@ public class ValidatePathQueryHandlerTests
         _mockPathService.IsValidPath(Arg.Any<string>()).Returns(false);
 
         // Act
-        PathValidResponse result = await _sut.Handle(query, CancellationToken.None);
+        PathValidResponse result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsValid);
@@ -82,7 +82,7 @@ public class ValidatePathQueryHandlerTests
         _mockPathService.IsValidPath(Arg.Any<string>()).Returns(false);
 
         // Act
-        PathValidResponse result = await _sut.Handle(query, CancellationToken.None);
+        PathValidResponse result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsValid);

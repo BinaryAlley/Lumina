@@ -1,8 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Contracts.Responses.MediaLibrary.Management;
-using Mediator;
-using System.Collections.Generic;
+using Lumina.Application.Common.CQRS;
 #endregion
 
 namespace Lumina.Application.Core.MediaLibrary.Management.Queries.GetRunningLibraryScans;
@@ -10,4 +7,4 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Queries.GetRunningLibr
 /// <summary>
 /// Query for getting the list of ongoing media library scans.
 /// </summary>
-public record GetRunningLibraryScansQuery : IRequest<ErrorOr<IEnumerable<MediaLibraryScanProgressResponse>>>;
+public record GetRunningLibraryScansQuery : IQuery;
