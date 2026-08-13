@@ -45,10 +45,8 @@ public class PluginsController : Controller
         // load the settings of the loaded plugins, so that the settings forms can be rendered on the server
         Dictionary<Guid, PluginSettingsModel> settingsByPluginId = [];
         foreach (PluginModel plugin in plugins)
-        {
             if (plugin.LoadStatus == PluginLoadStatus.Loaded)
                 settingsByPluginId[plugin.Id] = await _apiHttpClient.GetAsync<PluginSettingsModel>($"plugins/{plugin.Id}/settings", cancellationToken).ConfigureAwait(false);
-        }
 
         ViewData["pluginSettings"] = settingsByPluginId;
         return View(plugins);

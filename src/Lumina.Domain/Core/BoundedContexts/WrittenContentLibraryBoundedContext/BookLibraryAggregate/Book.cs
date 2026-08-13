@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Lumina.Domain.Common.Models.Core;
 using Lumina.Domain.Common.Primitives;
@@ -233,9 +232,9 @@ public sealed class Book : AggregateRoot<BookId>
     /// <param name="contributors">The list of objects representing the unique identifiers of the media contributors of the book.</param>
     /// <param name="ratings">The list of ratings for the book.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="Book"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="Book"/>, or an error message.
     /// </returns>
-    public static ErrorOr<Book> Create(
+    public static Result<Book> Create(
         LibraryId libraryId,
         string path,
         WrittenContentMetadata metadata,
@@ -309,9 +308,9 @@ public sealed class Book : AggregateRoot<BookId>
     /// <param name="contributors">The list of objects representing the unique identifiers of the media contributors of the book.</param>
     /// <param name="ratings">The list of ratings for the book.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="Book"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="Book"/>, or an error message.
     /// </returns>
-    public static ErrorOr<Book> Create(
+    public static Result<Book> Create(
         BookId id,
         LibraryId libraryId,
         string path,
