@@ -1,9 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Common.Models.Common;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Hybrid;
 using System;
 using System.Net;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -16,16 +18,19 @@ namespace Lumina.Presentation.Web.Common.Services;
 public class CachedAuthorizationHandler : DelegatingHandler
 {
     private readonly HybridCache _hybridCache;
+    private readonly IHttpContextAccessor _httpContextAccessor;
     private const string AUTHORIZATION_ENDPOINT = "/auth/get-authorization";
     private const string LOGIN_ENDPOINT = "/api/v1/auth/login";
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="CachedAuthorizationHandler"/> class with the specified hybrid cache.
+    /// Initializes a new instance of the <see cref="CachedAuthorizationHandler"/> class.
     /// </summary>
     /// <param name="hybridCache">The hybrid caching mechanism to store and retrieve authorization responses.</param>
-    public CachedAuthorizationHandler(HybridCache hybridCache)
+    /// <param name="httpContextAccessor">The <see cref="IHttpContextAccessor"/> used to access the currently authenticated user.</param>
+    public CachedAuthorizationHandler(HybridCache hybridCache, IHttpContextAccessor httpContextAccessor)
     {
         _hybridCache = hybridCache;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     /// <summary>
@@ -39,16 +44,17 @@ public class CachedAuthorizationHandler : DelegatingHandler
     {
         // get the called API endpoint
         string requestPath = request.RequestUri!.AbsolutePath;
+        string cacheKey = GetAuthorizationCacheKey();
         // if it's any endpoint other than the one for the authorization request, fire it away towards the original API service
         if (!requestPath.EndsWith(AUTHORIZATION_ENDPOINT, StringComparison.OrdinalIgnoreCase))
         {
             if (requestPath.EndsWith(LOGIN_ENDPOINT)) // if login endpoint was hit, a new user is now present, delete previous cached permissions
-                await _hybridCache.RemoveAsync(AUTHORIZATION_ENDPOINT, cancellationToken).ConfigureAwait(false);
+                await _hybridCache.RemoveAsync(cacheKey, cancellationToken).ConfigureAwait(false);
             return await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
         }
         // otherwise, check the hybrid cache to see if there is a cached authorization
         CachedResponseModel response = await _hybridCache.GetOrCreateAsync(
-            AUTHORIZATION_ENDPOINT,
+            cacheKey,
             async (cancellationToken) =>
             {
                 // perform the actual API call if cache is empty or expired
@@ -70,10 +76,21 @@ public class CachedAuthorizationHandler : DelegatingHandler
         // if the API returned 401 Unauthorized (i.e. token expired), DO NOT cache this response - it will be used for authorization endpoints even after successful login,
         // resulting in incorrect login redirection cycles!
         if (response.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.NotFound)
-            await _hybridCache.RemoveAsync(AUTHORIZATION_ENDPOINT, cancellationToken).ConfigureAwait(false);
+            await _hybridCache.RemoveAsync(cacheKey, cancellationToken).ConfigureAwait(false);
         return new HttpResponseMessage(response.StatusCode)
         {
             Content = new StringContent(response.Content)
         };
+    }
+
+    /// <summary>
+    /// Builds the hybrid cache key for the authorization response, scoped to the currently authenticated user.
+    /// </summary>
+    /// <returns>The cache key for the currently authenticated user's authorization response.</returns>
+    private string GetAuthorizationCacheKey()
+    {
+        // key the cache entry by the authenticated user's id to prevent one user's authorization response from being served to another user
+        string? userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        return userId is null ? AUTHORIZATION_ENDPOINT : $"{AUTHORIZATION_ENDPOINT}:{userId}";
     }
 }
