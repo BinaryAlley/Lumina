@@ -116,7 +116,10 @@ public class VideoMetadata : BaseMetadata
             language, originalLanguage, frameRate, videoCodec, audioCodec, genres, tags);
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets the list of items that define equality of the object.
+    /// </summary>
+    /// <returns>A list of items defining the equality.</returns>
     public override IEnumerable<object> GetEqualityComponents()
     {
         foreach (object component in base.GetEqualityComponents())

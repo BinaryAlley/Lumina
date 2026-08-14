@@ -41,7 +41,10 @@ public class Genre : ValueObject
         return new Genre(name);
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets the list of items that define equality of the object.
+    /// </summary>
+    /// <returns>A list of items defining the equality.</returns>
     public override IEnumerable<object> GetEqualityComponents()
     {
         yield return Name;

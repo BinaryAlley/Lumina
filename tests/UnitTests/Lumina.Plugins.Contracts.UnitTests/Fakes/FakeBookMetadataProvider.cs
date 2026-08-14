@@ -20,28 +20,45 @@ namespace Lumina.Plugins.Contracts.UnitTests.Fakes;
 /// </summary>
 public sealed class FakeBookMetadataProvider : IPlugin, IPluginServiceRegistrator, IRemoteMetadataProvider<BookMetadataLookupDto, BookMetadataDto>
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets the stable unique identifier of the plugin, used to persist its state.
+    /// </summary>
     public Guid Id { get; } = Guid.Parse("11111111-1111-1111-1111-111111111111");
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets the display name of the plugin.
+    /// </summary>
     public string Name { get; } = "Fake Book Metadata Provider";
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets the author of the plugin.
+    /// </summary>
     public string Author { get; } = "Lumina";
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets the version of the plugin.
+    /// </summary>
     public Version Version { get; } = new(1, 0, 0);
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets the description of the plugin.
+    /// </summary>
     public string Description { get; } = "A fake metadata provider used to exercise the plugin contracts.";
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets the media library type this metadata provider supports.
+    /// </summary>
     public LibraryType SupportedLibraryType { get; } = LibraryType.Book;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets a value indicating whether this metadata provider requires access to the web to retrieve metadata.
+    /// </summary>
     public bool RequiresWebAccess { get; } = true;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets the settings schema of the plugin, used by the host to render the plugin settings page.
+    /// </summary>
+    /// <returns>The collection of setting descriptors declared by the plugin.</returns>
     public IReadOnlyList<PluginSettingDescriptor> GetSettingsSchema()
     {
         return
@@ -62,12 +79,20 @@ public sealed class FakeBookMetadataProvider : IPlugin, IPluginServiceRegistrato
         ];
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Registers the services of the plugin into the host dependency injection container.
+    /// </summary>
+    /// <param name="services">The service collection to which the plugin services are added.</param>
     public void RegisterServices(IServiceCollection services)
     {
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Searches for the metadata of the media item described by <paramref name="lookup"/>.
+    /// </summary>
+    /// <param name="lookup">The lookup describing the media item to search for.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>The collection of metadata candidates found for the media item.</returns>
     public Task<IReadOnlyList<BookMetadataDto>> GetSearchResultsAsync(BookMetadataLookupDto lookup, CancellationToken cancellationToken)
     {
         return Task.FromResult<IReadOnlyList<BookMetadataDto>>(
@@ -77,7 +102,12 @@ public sealed class FakeBookMetadataProvider : IPlugin, IPluginServiceRegistrato
         );
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets the metadata of the media item described by <paramref name="lookup"/>.
+    /// </summary>
+    /// <param name="lookup">The lookup describing the media item to get the metadata for.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>The metadata of the media item, or <see langword="null"/> when no metadata was found.</returns>
     public Task<BookMetadataDto?> GetMetadataAsync(BookMetadataLookupDto lookup, CancellationToken cancellationToken)
     {
         if (lookup.Title is null)

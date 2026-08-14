@@ -13,7 +13,9 @@ namespace Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 [AttributeUsage(AttributeTargets.Method)]
 public sealed class SkipWhenHiddenAttributeNotSupportedFactAttribute : FactAttribute
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets the reason to skip the test. If set, the test will be skipped instead of executed.
+    /// </summary>
     public override string Skip => FileSystemStructureFixture.HiddenAttributeIsSupported
         ? string.Empty
         : "The file system does not support the hidden file attribute, so the hidden elements scenario cannot be set up.";

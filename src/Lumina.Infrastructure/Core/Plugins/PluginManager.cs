@@ -24,13 +24,20 @@ internal sealed class PluginManager : IPluginManager
         _pluginsById = plugins.ToDictionary(plugin => plugin.Id);
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets the plugins that were loaded successfully.
+    /// </summary>
+    /// <returns>The collection of loaded plugins.</returns>
     public IReadOnlyList<IPlugin> GetPlugins()
     {
         return [.. _pluginsById.Values];
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets the plugin identified by <paramref name="pluginId"/>.
+    /// </summary>
+    /// <param name="pluginId">The unique identifier of the plugin.</param>
+    /// <returns>The plugin, or <see langword="null"/> when no plugin with the provided Id was loaded.</returns>
     public IPlugin? GetPlugin(Guid pluginId)
     {
         return _pluginsById.GetValueOrDefault(pluginId);

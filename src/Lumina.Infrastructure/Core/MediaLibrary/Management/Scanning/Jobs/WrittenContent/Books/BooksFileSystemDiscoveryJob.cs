@@ -60,7 +60,13 @@ internal sealed class BooksFileSystemDiscoveryJob : MediaLibraryScanJob, IBooksF
         _serviceScopeFactory = serviceScopeFactory;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Executes the payload of the media library scan job.
+    /// </summary>
+    /// <typeparam name="TInput">The type of the input parameter representing the data to be processed by this payload.</typeparam>
+    /// <param name="id">The id of the media library scan job.</param>
+    /// <param name="input">The input data to be processed by this payload.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task ExecuteAsync<TInput>(Guid id, TInput input, CancellationToken cancellationToken)
     {
         try

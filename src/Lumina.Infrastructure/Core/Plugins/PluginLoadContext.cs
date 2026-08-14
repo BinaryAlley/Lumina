@@ -23,7 +23,11 @@ internal sealed class PluginLoadContext : AssemblyLoadContext
         _pluginDirectory = pluginDirectory;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Loads the assembly whose assembly name is specified.
+    /// </summary>
+    /// <param name="assemblyName">The object that describes the assembly to be loaded.</param>
+    /// <returns>The loaded assembly, or <see langword="null"/> when it cannot be resolved.</returns>
     protected override Assembly? Load(AssemblyName assemblyName)
     {
         if (assemblyName.Name is null)
