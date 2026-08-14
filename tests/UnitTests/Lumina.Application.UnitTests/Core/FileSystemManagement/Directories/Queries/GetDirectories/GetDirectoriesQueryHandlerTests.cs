@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using ErrorOr;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.FileSystemManagement.Directories.Queries.GetDirectories;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Directories.Fixtures;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Directories.Queries.GetDirectories.Fixtures;
 using Lumina.Contracts.Responses.FileSystemManagement.Directories;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
-using Lumina.Application.Common.Infrastructure.Validation;
+using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -54,18 +54,18 @@ public class GetDirectoriesQueryHandlerTests
         IEnumerable<Directory> directories = _directoryFixture.CreateMany();
 
         _mockDirectoryService.GetSubdirectories(getDirectoriesQuery.Path!, getDirectoriesQuery.IncludeHiddenElements)
-            .Returns(ErrorOrFactory.From(directories));
+            .Returns(Result.From(directories));
 
         // Act
-        ErrorOr<IEnumerable<DirectoryResponse>> result = await _sut.HandleAsync(getDirectoriesQuery, CancellationToken.None);
+        Result<IEnumerable<DirectoryResponse>> result = await _sut.HandleAsync(getDirectoriesQuery, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.IsAssignableFrom<IEnumerable<DirectoryResponse>>(result.Value);
         Assert.Equal(directories.Count(), result.Value.Count());
 
-        List<DirectoryResponse> resultList = result.Value.ToList();
-        List<Directory> directoriesList = directories.ToList();
+        List<DirectoryResponse> resultList = [.. result.Value];
+        List<Directory> directoriesList = [.. directories];
 
         for (int i = 0; i < resultList.Count; i++)
         {
@@ -88,18 +88,18 @@ public class GetDirectoriesQueryHandlerTests
         IEnumerable<Directory> directories = _directoryFixture.CreateMany();
 
         _mockDirectoryService.GetSubdirectories(getDirectoriesQuery.Path!, getDirectoriesQuery.IncludeHiddenElements)
-            .Returns(ErrorOrFactory.From(directories));
+            .Returns(Result.From(directories));
 
         // Act
-        ErrorOr<IEnumerable<DirectoryResponse>> result = await _sut.HandleAsync(getDirectoriesQuery, CancellationToken.None);
+        Result<IEnumerable<DirectoryResponse>> result = await _sut.HandleAsync(getDirectoriesQuery, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.IsAssignableFrom<IEnumerable<DirectoryResponse>>(result.Value);
         Assert.Equal(directories.Count(), result.Value.Count());
 
-        List<DirectoryResponse> resultList = result.Value.ToList();
-        List<Directory> directoriesList = directories.ToList();
+        List<DirectoryResponse> resultList = [.. result.Value];
+        List<Directory> directoriesList = [.. directories];
 
         for (int i = 0; i < resultList.Count; i++)
         {
@@ -123,10 +123,10 @@ public class GetDirectoriesQueryHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<IEnumerable<DirectoryResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<IEnumerable<DirectoryResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
         _mockDirectoryService.Received(1).GetSubdirectories(query.Path!, query.IncludeHiddenElements);
     }
@@ -136,15 +136,15 @@ public class GetDirectoriesQueryHandlerTests
     {
         // Arrange
         GetDirectoriesQuery query = _fixture.Create<GetDirectoriesQuery>();
-        ErrorOr<IEnumerable<Directory>> emptyList = ErrorOrFactory.From(Enumerable.Empty<Directory>());
+        Result<IEnumerable<Directory>> emptyList = Result.From(Enumerable.Empty<Directory>());
         _mockDirectoryService.GetSubdirectories(query.Path!, query.IncludeHiddenElements)
             .Returns(emptyList);
 
         // Act
-        ErrorOr<IEnumerable<DirectoryResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<IEnumerable<DirectoryResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Empty(result.Value);
         _mockDirectoryService.Received(1).GetSubdirectories(query.Path!, query.IncludeHiddenElements);
     }

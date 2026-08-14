@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
@@ -18,7 +18,7 @@ namespace Lumina.Application.Core.Plugins.Queries.GetLibraryMetadataProviders;
 /// <summary>
 /// Handler for the query to get the metadata providers configured for a media library.
 /// </summary>
-public class GetLibraryMetadataProvidersQueryHandler : IQueryHandler<GetLibraryMetadataProvidersQuery, ErrorOr<IReadOnlyList<LibraryMetadataProviderResponse>>>
+public class GetLibraryMetadataProvidersQueryHandler : IQueryHandler<GetLibraryMetadataProvidersQuery, Result<IReadOnlyList<LibraryMetadataProviderResponse>>>
 {
     private readonly IUnitOfWork _unitOfWork;
 
@@ -37,19 +37,19 @@ public class GetLibraryMetadataProvidersQueryHandler : IQueryHandler<GetLibraryM
     /// <param name="query">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a collection of <see cref="LibraryMetadataProviderResponse"/>, or an error.
+    /// An <see cref="Result{TValue}"/> containing either a collection of <see cref="LibraryMetadataProviderResponse"/>, or an error.
     /// </returns>
-    public async Task<ErrorOr<IReadOnlyList<LibraryMetadataProviderResponse>>> HandleAsync(GetLibraryMetadataProvidersQuery query, CancellationToken cancellationToken)
+    public async Task<Result<IReadOnlyList<LibraryMetadataProviderResponse>>> HandleAsync(GetLibraryMetadataProvidersQuery query, CancellationToken cancellationToken)
     {
         ILibraryMetadataProviderConfigurationRepository configurationRepository = _unitOfWork.GetRepository<ILibraryMetadataProviderConfigurationRepository>();
-        ErrorOr<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>> getConfigurationsResult = await configurationRepository.GetByLibraryIdAsync(query.LibraryId, cancellationToken).ConfigureAwait(false);
-        if (getConfigurationsResult.IsError)
+        Result<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>> getConfigurationsResult = await configurationRepository.GetByLibraryIdAsync(query.LibraryId, cancellationToken).ConfigureAwait(false);
+        if (getConfigurationsResult.IsFailure)
             return getConfigurationsResult.Errors;
 
         // build a plugin name lookup from the detected plugins
         IPluginRepository pluginRepository = _unitOfWork.GetRepository<IPluginRepository>();
-        ErrorOr<IEnumerable<PluginEntity>> getPluginsResult = await pluginRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
-        if (getPluginsResult.IsError)
+        Result<IEnumerable<PluginEntity>> getPluginsResult = await pluginRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+        if (getPluginsResult.IsFailure)
             return getPluginsResult.Errors;
         Dictionary<Guid, string> pluginNames = getPluginsResult.Value.ToDictionary(plugin => plugin.Id, plugin => plugin.Name);
 

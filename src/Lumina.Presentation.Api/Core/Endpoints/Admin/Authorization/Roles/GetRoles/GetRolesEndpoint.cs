@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.Admin.Authorization.Roles.Queries.GetRoles;
@@ -19,13 +19,13 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Admin.Authorization.Roles.GetRo
 /// </summary>
 public class GetRolesEndpoint : BaseEndpoint<EmptyRequest, IResult>
 {
-    private readonly IQueryHandler<GetRolesQuery, ErrorOr<IEnumerable<RoleResponse>>> _getRolesQueryHandler;
+    private readonly IQueryHandler<GetRolesQuery, Result<IEnumerable<RoleResponse>>> _getRolesQueryHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetRolesEndpoint"/> class.
     /// </summary>
     /// <param name="getRolesQueryHandler">Injected service for handling get roles queries.</param>
-    public GetRolesEndpoint(IQueryHandler<GetRolesQuery, ErrorOr<IEnumerable<RoleResponse>>> getRolesQueryHandler)
+    public GetRolesEndpoint(IQueryHandler<GetRolesQuery, Result<IEnumerable<RoleResponse>>> getRolesQueryHandler)
     {
         _getRolesQueryHandler = getRolesQueryHandler;
     }
@@ -47,7 +47,7 @@ public class GetRolesEndpoint : BaseEndpoint<EmptyRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(EmptyRequest _, CancellationToken cancellationToken)
     {
-        ErrorOr<IEnumerable<RoleResponse>> result = await _getRolesQueryHandler.HandleAsync(new GetRolesQuery(), cancellationToken).ConfigureAwait(false);
+        Result<IEnumerable<RoleResponse>> result = await _getRolesQueryHandler.HandleAsync(new GetRolesQuery(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

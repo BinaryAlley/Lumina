@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using ErrorOr;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -45,7 +45,7 @@ public class DomainLibraryFixture
             "F:/Content"
         ];
 
-        ErrorOr<Library> library = Library.Create(
+        Result<Library> library = Library.Create(
             UserId.CreateUnique(),
             _faker.Random.String2(_faker.Random.Number(1, 50)),
             _faker.PickRandom<LibraryType>(),
@@ -76,7 +76,7 @@ public class DomainLibraryFixture
         bool shouldSkipUnchangedDirectoriesDuringScan = false,
         IEnumerable<Guid>? scanIds = null)
     {
-        ErrorOr<Library> library = id is null ?
+        Result<Library> library = id is null ?
             Library.Create(
                 userId is not null ? UserId.Create(userId.Value) : UserId.CreateUnique(),
                 title ?? _faker.Random.String2(_faker.Random.Number(1, 50)),

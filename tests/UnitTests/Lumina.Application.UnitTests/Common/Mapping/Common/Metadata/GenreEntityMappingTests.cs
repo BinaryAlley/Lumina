@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Contracts.DTO.Common;
+using Lumina.Domain.Common.Errors;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using Lumina.Domain.SharedKernel.Common.Errors;
 #endregion
 
 namespace Lumina.Application.UnitTests.Common.Mapping.Common.Metadata;
@@ -73,10 +73,10 @@ public class GenreEntityMappingTests
         GenreEntity entity = new("Fiction");
 
         // Act
-        ErrorOr<Genre> result = entity.ToDomainEntity();
+        Result<Genre> result = entity.ToDomainEntity();
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(entity.Name, result.Value.Name);
     }
@@ -91,10 +91,10 @@ public class GenreEntityMappingTests
         GenreEntity entity = new(invalidName);
 
         // Act
-        ErrorOr<Genre> result = entity.ToDomainEntity();
+        Result<Genre> result = entity.ToDomainEntity();
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Metadata.GenreNameCannotBeEmpty, result.FirstError);
     }
 
@@ -111,16 +111,16 @@ public class GenreEntityMappingTests
         ];
 
         // Act
-        IEnumerable<ErrorOr<Genre>> results = entities.ToDomainEntities();
+        IEnumerable<Result<Genre>> results = entities.ToDomainEntities();
 
         // Assert
         Assert.NotNull(results);
         Assert.Equal(entities.Count, results.Count());
 
-        List<ErrorOr<Genre>> resultList = results.ToList();
+        List<Result<Genre>> resultList = results.ToList();
         for (int i = 0; i < entities.Count; i++)
         {
-            Assert.False(resultList[i].IsError);
+            Assert.False(resultList[i].IsFailure);
             Assert.Equal(entities[i].Name, resultList[i].Value.Name);
         }
     }
@@ -146,8 +146,6 @@ public class GenreEntityMappingTests
 
         List<GenreDto> resultList = results.ToList();
         for (int i = 0; i < entities.Count; i++)
-        {
             Assert.Equal(entities[i].Name, resultList[i].Name);
-        }
     }
 }

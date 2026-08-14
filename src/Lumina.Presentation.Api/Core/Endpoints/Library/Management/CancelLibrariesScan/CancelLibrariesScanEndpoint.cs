@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.MediaLibrary.Management.Commands.CancelLibrariesScan;
@@ -17,13 +17,13 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Library.Management.CancelLibrar
 /// </summary>
 public class CancelLibrariesScanEndpoint : BaseEndpoint<EmptyRequest, IResult>
 {
-    private readonly Lumina.Application.Common.CQRS.ICommandHandler<CancelLibrariesScanCommand, ErrorOr<Success>> _cancelLibrariesScanCommandHandler;
+    private readonly Lumina.Application.Common.CQRS.ICommandHandler<CancelLibrariesScanCommand, Result<Success>> _cancelLibrariesScanCommandHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CancelLibrariesScanEndpoint"/> class.
     /// </summary>
     /// <param name="cancelLibrariesScanCommandHandler">Injected service for handling cancel libraries scan commands.</param>
-    public CancelLibrariesScanEndpoint(Lumina.Application.Common.CQRS.ICommandHandler<CancelLibrariesScanCommand, ErrorOr<Success>> cancelLibrariesScanCommandHandler)
+    public CancelLibrariesScanEndpoint(Lumina.Application.Common.CQRS.ICommandHandler<CancelLibrariesScanCommand, Result<Success>> cancelLibrariesScanCommandHandler)
     {
         _cancelLibrariesScanCommandHandler = cancelLibrariesScanCommandHandler;
     }
@@ -33,7 +33,7 @@ public class CancelLibrariesScanEndpoint : BaseEndpoint<EmptyRequest, IResult>
     /// </summary>
     public override void Configure()
     {
-        Verbs(FastEndpoints.Http.POST);
+        Verbs(Http.POST);
         Routes(ApiRoutes.Libraries.CANCEL_LIBRARIES_SCAN);
         Version(1);
         DontCatchExceptions();
@@ -45,7 +45,7 @@ public class CancelLibrariesScanEndpoint : BaseEndpoint<EmptyRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(EmptyRequest _, CancellationToken cancellationToken)
     {
-        ErrorOr<Success> result = await _cancelLibrariesScanCommandHandler.HandleAsync(new CancelLibrariesScanCommand(), cancellationToken).ConfigureAwait(false);
+        Result<Success> result = await _cancelLibrariesScanCommandHandler.HandleAsync(new CancelLibrariesScanCommand(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.NoContent(), Problem);
     }
 }

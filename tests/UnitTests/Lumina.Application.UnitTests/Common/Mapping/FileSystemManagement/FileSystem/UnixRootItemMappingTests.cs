@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.Mapping.FileSystemManagement.FileSystem;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
-using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -19,8 +19,8 @@ public class UnixRootItemMappingTests
     public void ToTreeNodeResponse_WhenMappingUnixRootItem_ShouldMapCorrectly()
     {
         // Arrange
-        ErrorOr<UnixRootItem> createResult = UnixRootItem.Create();
-        Assert.False(createResult.IsError);
+        Result<UnixRootItem> createResult = UnixRootItem.Create();
+        Assert.False(createResult.IsFailure);
         UnixRootItem domainModel = createResult.Value;
 
         // Act

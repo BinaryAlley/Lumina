@@ -1,10 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.MediaLibrary.Management.Queries.GetRunningLibraryScans;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Common.Routes.Library.Management;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
@@ -20,13 +19,13 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Library.Management.GetRunningLi
 /// </summary>
 public class GetRunningLibraryScansEndpoint : BaseEndpoint<EmptyRequest, IResult>
 {
-    private readonly IQueryHandler<GetRunningLibraryScansQuery, ErrorOr<IEnumerable<MediaLibraryScanProgressResponse>>> _getRunningLibraryScansQueryHandler;
+    private readonly IQueryHandler<GetRunningLibraryScansQuery, Result<IEnumerable<MediaLibraryScanProgressResponse>>> _getRunningLibraryScansQueryHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetRunningLibraryScansEndpoint"/> class.
     /// </summary>
     /// <param name="getRunningLibraryScansQueryHandler">Injected service for handling get running library scans queries.</param>
-    public GetRunningLibraryScansEndpoint(IQueryHandler<GetRunningLibraryScansQuery, ErrorOr<IEnumerable<MediaLibraryScanProgressResponse>>> getRunningLibraryScansQueryHandler)
+    public GetRunningLibraryScansEndpoint(IQueryHandler<GetRunningLibraryScansQuery, Result<IEnumerable<MediaLibraryScanProgressResponse>>> getRunningLibraryScansQueryHandler)
     {
         _getRunningLibraryScansQueryHandler = getRunningLibraryScansQueryHandler;
     }
@@ -36,7 +35,7 @@ public class GetRunningLibraryScansEndpoint : BaseEndpoint<EmptyRequest, IResult
     /// </summary>
     public override void Configure()
     {
-        Verbs(FastEndpoints.Http.GET);
+        Verbs(Http.GET);
         Routes(ApiRoutes.Libraries.GET_RUNNING_LIBRARIES_SCAN);
         Version(1);
         DontCatchExceptions();
@@ -48,7 +47,7 @@ public class GetRunningLibraryScansEndpoint : BaseEndpoint<EmptyRequest, IResult
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(EmptyRequest _, CancellationToken cancellationToken)
     {
-        ErrorOr<IEnumerable<MediaLibraryScanProgressResponse>> result = await _getRunningLibraryScansQueryHandler.HandleAsync(new GetRunningLibraryScansQuery(), cancellationToken).ConfigureAwait(false);
+        Result<IEnumerable<MediaLibraryScanProgressResponse>> result = await _getRunningLibraryScansQueryHandler.HandleAsync(new GetRunningLibraryScansQuery(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

@@ -1,10 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.Plugins;
 using Lumina.Application.Core.Plugins.Queries.GetPluginSettings;
 using Lumina.Contracts.Requests.Plugins;
 using Lumina.Contracts.Responses.Plugins;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Common.Routes.Plugins;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
@@ -19,13 +20,13 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Plugins.GetPluginSettings;
 /// </summary>
 public class GetPluginSettingsEndpoint : BaseEndpoint<GetPluginSettingsRequest, IResult>
 {
-    private readonly IQueryHandler<GetPluginSettingsQuery, ErrorOr<PluginSettingsResponse>> _getPluginSettingsQueryHandler;
+    private readonly IQueryHandler<GetPluginSettingsQuery, Result<PluginSettingsResponse>> _getPluginSettingsQueryHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetPluginSettingsEndpoint"/> class.
     /// </summary>
     /// <param name="getPluginSettingsQueryHandler">Injected service for handling get plugin settings queries.</param>
-    public GetPluginSettingsEndpoint(IQueryHandler<GetPluginSettingsQuery, ErrorOr<PluginSettingsResponse>> getPluginSettingsQueryHandler)
+    public GetPluginSettingsEndpoint(IQueryHandler<GetPluginSettingsQuery, Result<PluginSettingsResponse>> getPluginSettingsQueryHandler)
     {
         _getPluginSettingsQueryHandler = getPluginSettingsQueryHandler;
     }
@@ -35,7 +36,7 @@ public class GetPluginSettingsEndpoint : BaseEndpoint<GetPluginSettingsRequest, 
     /// </summary>
     public override void Configure()
     {
-        Verbs(FastEndpoints.Http.GET);
+        Verbs(Http.GET);
         Routes(ApiRoutes.Plugins.GET_PLUGIN_SETTINGS);
         Version(1);
         DontCatchExceptions();
@@ -48,7 +49,7 @@ public class GetPluginSettingsEndpoint : BaseEndpoint<GetPluginSettingsRequest, 
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(GetPluginSettingsRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<PluginSettingsResponse> result = await _getPluginSettingsQueryHandler.HandleAsync(request.ToQuery(), cancellationToken).ConfigureAwait(false);
+        Result<PluginSettingsResponse> result = await _getPluginSettingsQueryHandler.HandleAsync(request.ToQuery(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

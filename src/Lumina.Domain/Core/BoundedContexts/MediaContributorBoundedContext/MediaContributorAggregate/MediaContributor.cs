@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Domain.Common.Models.Core;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.MediaContributorBoundedContext.MediaContributorAggregate.ValueObjects;
@@ -68,7 +67,7 @@ public class MediaContributor : AggregateRoot<MediaContributorId>
     /// </summary>
     /// <param name="name">The name of the contributor.</param>
     /// <returns>The created <see cref="MediaContributor"/> instance.</returns>
-    public static ErrorOr<MediaContributor> Create(MediaContributorName name)
+    public static Result<MediaContributor> Create(MediaContributorName name)
     {
         // TODO: enforce invariants
         throw new NotImplementedException();
@@ -81,7 +80,7 @@ public class MediaContributor : AggregateRoot<MediaContributorId>
     /// <param name="id">The unique identifier of the contributor.</param>
     /// <param name="name">The name of the contributor.</param>
     /// <returns>The created <see cref="MediaContributor"/> instance.</returns>
-    public static ErrorOr<MediaContributor> Create(
+    public static Result<MediaContributor> Create(
         MediaContributorId id,
         MediaContributorName name,
         MediaContributorRole role,

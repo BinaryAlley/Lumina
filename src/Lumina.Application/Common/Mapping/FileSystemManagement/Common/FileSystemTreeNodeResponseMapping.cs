@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
@@ -17,7 +17,7 @@ public static class FileSystemTreeNodeResponseMapping
     /// </summary>
     /// <param name="response">The response to be converted.</param>
     /// <returns>The converted domain entity.</returns>
-    public static ErrorOr<WindowsRootItem> ToWindowsRootItem(this FileSystemTreeNodeResponse response)
+    public static Result<WindowsRootItem> ToWindowsRootItem(this FileSystemTreeNodeResponse response)
     {
         return WindowsRootItem.Create(
             response.Path,
@@ -31,7 +31,7 @@ public static class FileSystemTreeNodeResponseMapping
     /// </summary>
     /// <param name="_">The response to be converted.</param>
     /// <returns>The converted domain entity.</returns>
-    public static ErrorOr<UnixRootItem> ToUnixRootItem(this FileSystemTreeNodeResponse _)
+    public static Result<UnixRootItem> ToUnixRootItem(this FileSystemTreeNodeResponse _)
     {
         return UnixRootItem.Create(
             FileSystemItemStatus.Accessible

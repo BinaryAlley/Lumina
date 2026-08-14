@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.FileSystemManagement.Thumbnails.Queries.GetThumbnail;
 using Lumina.Contracts.Requests.FileSystemManagement.Thumbnails;
 using Lumina.Contracts.Responses.FileSystemManagement.Thumbnails;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Common.Utilities;
 using Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Thumbnails.GetThumbnail;
 using Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.Fixtures;
@@ -25,7 +25,7 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.
 [ExcludeFromCodeCoverage]
 public class GetThumbnailEndpointTests
 {
-    private readonly IQueryHandler<GetThumbnailQuery, ErrorOr<ThumbnailResponse>> _mockHandler;
+    private readonly IQueryHandler<GetThumbnailQuery, Result<ThumbnailResponse>> _mockHandler;
     private readonly GetThumbnailEndpoint _sut;
     private readonly GetThumbnailRequestFixture _getThumbnailRequestFixture;
 
@@ -34,7 +34,7 @@ public class GetThumbnailEndpointTests
     /// </summary>
     public GetThumbnailEndpointTests()
     {
-        _mockHandler = Substitute.For<IQueryHandler<GetThumbnailQuery, ErrorOr<ThumbnailResponse>>>();
+        _mockHandler = Substitute.For<IQueryHandler<GetThumbnailQuery, Result<ThumbnailResponse>>>();
         _sut = Factory.Create<GetThumbnailEndpoint>(_mockHandler);
         _getThumbnailRequestFixture = new GetThumbnailRequestFixture();
     }
@@ -47,7 +47,7 @@ public class GetThumbnailEndpointTests
         CancellationToken cancellationToken = CancellationToken.None;
         ThumbnailResponse expectedResponse = ThumbnailResponseFixture.CreateThumbnailResponse();
         _mockHandler.HandleAsync(Arg.Any<GetThumbnailQuery>(), Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(expectedResponse));
+            .Returns(Result.From(expectedResponse));
 
         // Act
         IResult result = await _sut.ExecuteAsync(request, cancellationToken);
@@ -117,7 +117,7 @@ public class GetThumbnailEndpointTests
         GetThumbnailRequest request = _getThumbnailRequestFixture.Create("/path/to/file.jpg", 80);
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<GetThumbnailQuery>(), Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(ThumbnailResponseFixture.CreateThumbnailResponse()));
+            .Returns(Result.From(ThumbnailResponseFixture.CreateThumbnailResponse()));
 
         // Act
         await _sut.ExecuteAsync(request, cancellationToken);
@@ -141,7 +141,7 @@ public class GetThumbnailEndpointTests
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return ErrorOrFactory.From(ThumbnailResponseFixture.CreateThumbnailResponse());
+                return Result.From(ThumbnailResponseFixture.CreateThumbnailResponse());
             }, callInfo.Arg<CancellationToken>()));
 
         // Act

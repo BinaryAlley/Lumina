@@ -1,11 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.Authentication;
 using Lumina.Application.Common.Mapping.Authorization;
 using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetUserPermissions;
 using Lumina.Contracts.Requests.Authorization;
 using Lumina.Contracts.Responses.Authorization;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Common.Routes.UsersManagement;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
@@ -21,13 +22,13 @@ namespace Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authorization.G
 /// </summary>
 public class GetUserPermissionsEndpoint : BaseEndpoint<GetUserPermissionsRequest, IResult>
 {
-    private readonly IQueryHandler<GetUserPermissionsQuery, ErrorOr<IEnumerable<PermissionResponse>>> _getUserPermissionsQueryHandler;
+    private readonly IQueryHandler<GetUserPermissionsQuery, Result<IEnumerable<PermissionResponse>>> _getUserPermissionsQueryHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetUserPermissionsEndpoint"/> class.
     /// </summary>
     /// <param name="getUserPermissionsQueryHandler">Injected service for handling get user permissions queries.</param>
-    public GetUserPermissionsEndpoint(IQueryHandler<GetUserPermissionsQuery, ErrorOr<IEnumerable<PermissionResponse>>> getUserPermissionsQueryHandler)
+    public GetUserPermissionsEndpoint(IQueryHandler<GetUserPermissionsQuery, Result<IEnumerable<PermissionResponse>>> getUserPermissionsQueryHandler)
     {
         _getUserPermissionsQueryHandler = getUserPermissionsQueryHandler;
     }
@@ -37,7 +38,7 @@ public class GetUserPermissionsEndpoint : BaseEndpoint<GetUserPermissionsRequest
     /// </summary>
     public override void Configure()
     {
-        Verbs(FastEndpoints.Http.GET);
+        Verbs(Http.GET);
         Routes(ApiRoutes.Authorization.GET_USER_PERMISSIONS_BY_USER_ID);
         Version(1);
         DontCatchExceptions();
@@ -50,7 +51,7 @@ public class GetUserPermissionsEndpoint : BaseEndpoint<GetUserPermissionsRequest
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(GetUserPermissionsRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<IEnumerable<PermissionResponse>> result = await _getUserPermissionsQueryHandler.HandleAsync(request.ToQuery(), cancellationToken).ConfigureAwait(false);
+        Result<IEnumerable<PermissionResponse>> result = await _getUserPermissionsQueryHandler.HandleAsync(request.ToQuery(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

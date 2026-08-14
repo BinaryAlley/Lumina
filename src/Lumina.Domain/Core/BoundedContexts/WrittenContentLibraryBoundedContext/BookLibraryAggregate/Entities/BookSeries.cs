@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Models.Core;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
 using System.Collections.Generic;
@@ -56,9 +56,9 @@ public sealed class BookSeries : Entity<BookSeriesId>
     /// <param name="isComplete">The current status of the book series.</param>
     /// <param name="books">The books of the book series.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="BookSeries"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="BookSeries"/>, or an error message.
     /// </returns>
-    public static ErrorOr<BookSeries> Create(
+    public static Result<BookSeries> Create(
         BookSeriesId id,
         WrittenContentMetadata metadata,
         bool isComplete,
@@ -80,9 +80,9 @@ public sealed class BookSeries : Entity<BookSeriesId>
     /// <param name="isComplete">The current status of the book series.</param>
     /// <param name="books">The books of the book series.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="BookSeries"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="BookSeries"/>, or an error message.
     /// </returns>
-    public static ErrorOr<BookSeries> Create(
+    public static Result<BookSeries> Create(
         WrittenContentMetadata metadata,
         bool isComplete,
         List<Book> books)
@@ -99,8 +99,8 @@ public sealed class BookSeries : Entity<BookSeriesId>
     /// Adds a book to the series.
     /// </summary>
     /// <param name="book">The book to be added.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public ErrorOr<Created> AddBook(Book book)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public Result<Created> AddBook(Book book)
     {
         if (_books.Contains(book))
             return Errors.WrittenContent.TheBookIsAlreadyInTheSeries;
@@ -112,8 +112,8 @@ public sealed class BookSeries : Entity<BookSeriesId>
     /// Removes a book from the series.
     /// </summary>
     /// <param name="book">The book to be removed.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public ErrorOr<Deleted> RemoveBook(Book book)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public Result<Deleted> RemoveBook(Book book)
     {
         if (!_books.Contains(book))
             return Errors.WrittenContent.TheBookIsNotInTheSeries;

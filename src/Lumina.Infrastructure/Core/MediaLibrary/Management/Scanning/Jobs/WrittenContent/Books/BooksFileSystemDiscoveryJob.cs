@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -86,28 +86,28 @@ internal sealed class BooksFileSystemDiscoveryJob : MediaLibraryScanJob, IBooksF
                     MediaLibraryScanCompositeId compositeKey = MediaLibraryScanCompositeId.Create(ScanId, UserId);
 
                     // get the library from the repository
-                    ErrorOr<LibraryEntity?> getLibraryResult = await libraryRepository.GetByIdAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
-                    if (getLibraryResult.IsError || getLibraryResult.Value is null)
-                        throw new InvalidOperationException(getLibraryResult.IsError ? getLibraryResult.FirstError.Description : "The media library was not found.");
+                    Result<LibraryEntity?> getLibraryResult = await libraryRepository.GetByIdAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
+                    if (getLibraryResult.IsFailure || getLibraryResult.Value is null)
+                        throw new InvalidOperationException(getLibraryResult.IsFailure ? getLibraryResult.FirstError.Description : "The media library was not found.");
 
                     // convert it to a domain object
-                    ErrorOr<Library> domainLibraryResult = getLibraryResult.Value.ToDomainEntity();
-                    if (domainLibraryResult.IsError)
+                    Result<Library> domainLibraryResult = getLibraryResult.Value.ToDomainEntity();
+                    if (domainLibraryResult.IsFailure)
                         throw new InvalidOperationException(domainLibraryResult.FirstError.Description);
 
                     // when the fast skip is enabled, load the directory scan fingerprints of the library, used to skip the directories that have not changed since the last scan
                     Dictionary<string, DirectoryScanFingerprintEntity>? fingerprintsByPath = null;
                     if (domainLibraryResult.Value.ShouldSkipUnchangedDirectoriesDuringScan)
                     {
-                        ErrorOr<Dictionary<string, DirectoryScanFingerprintEntity>> getFingerprintsResult = await directoryScanFingerprintRepository.GetMappedByLibraryIdAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
-                        if (getFingerprintsResult.IsError)
+                        Result<Dictionary<string, DirectoryScanFingerprintEntity>> getFingerprintsResult = await directoryScanFingerprintRepository.GetMappedByLibraryIdAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
+                        if (getFingerprintsResult.IsFailure)
                             throw new InvalidOperationException(getFingerprintsResult.FirstError.Description);
                         fingerprintsByPath = getFingerprintsResult.Value;
                     }
 
                     // set the initial progress of the scan job
-                    ErrorOr<Success> publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, 0, domainLibraryResult.Value.ContentLocations.Count, cancellationToken).ConfigureAwait(false);
-                    if (publishJobProgressResult.IsError)
+                    Result<Success> publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, 0, domainLibraryResult.Value.ContentLocations.Count, cancellationToken).ConfigureAwait(false);
+                    if (publishJobProgressResult.IsFailure)
                         throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
 
                     TimeSpan heartbeatInterval = TimeSpan.FromSeconds(1);
@@ -139,7 +139,7 @@ internal sealed class BooksFileSystemDiscoveryJob : MediaLibraryScanJob, IBooksF
                         {
                             publishJobProgressResult = await PublishJobProgressAsync(
                                 domainEventPublisher, compositeKey, processedContentLocations, domainLibraryResult.Value.ContentLocations.Count, cancellationToken).ConfigureAwait(false);
-                            if (publishJobProgressResult.IsError)
+                            if (publishJobProgressResult.IsFailure)
                                 throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
                             lastHeartbeat = now;
                         }
@@ -148,14 +148,14 @@ internal sealed class BooksFileSystemDiscoveryJob : MediaLibraryScanJob, IBooksF
                     // flush any remaining discovered files and directory scan fingerprints that did not reach the batch size
                     if (stagingBatch.Count > 0)
                     {
-                        ErrorOr<Created> insertResult = await stagingResultsRepository.InsertRangeAsync(stagingBatch, cancellationToken).ConfigureAwait(false);
-                        if (insertResult.IsError)
+                        Result<Created> insertResult = await stagingResultsRepository.InsertRangeAsync(stagingBatch, cancellationToken).ConfigureAwait(false);
+                        if (insertResult.IsFailure)
                             throw new InvalidOperationException(insertResult.FirstError.Description);
                     }
                     if (fingerprintBatch.Count > 0)
                     {
-                        ErrorOr<Updated> upsertResult = await directoryScanFingerprintRepository.UpsertRangeAsync(fingerprintBatch, cancellationToken).ConfigureAwait(false);
-                        if (upsertResult.IsError)
+                        Result<Updated> upsertResult = await directoryScanFingerprintRepository.UpsertRangeAsync(fingerprintBatch, cancellationToken).ConfigureAwait(false);
+                        if (upsertResult.IsFailure)
                             throw new InvalidOperationException(upsertResult.FirstError.Description);
                     }
 
@@ -235,8 +235,8 @@ internal sealed class BooksFileSystemDiscoveryJob : MediaLibraryScanJob, IBooksF
                 // flush the collected directory scan fingerprints in bounded batches, so that the memory usage stays proportional to the batch size, no matter how many directories the library has
                 if (fingerprintBatch.Count >= STAGING_BATCH_SIZE)
                 {
-                    ErrorOr<Updated> upsertFingerprintsResult = await directoryScanFingerprintRepository.UpsertRangeAsync(fingerprintBatch, cancellationToken).ConfigureAwait(false);
-                    if (upsertFingerprintsResult.IsError)
+                    Result<Updated> upsertFingerprintsResult = await directoryScanFingerprintRepository.UpsertRangeAsync(fingerprintBatch, cancellationToken).ConfigureAwait(false);
+                    if (upsertFingerprintsResult.IsFailure)
                         throw new InvalidOperationException(upsertFingerprintsResult.FirstError.Description);
                     fingerprintBatch.Clear();
                 }
@@ -275,8 +275,8 @@ internal sealed class BooksFileSystemDiscoveryJob : MediaLibraryScanJob, IBooksF
                         });
                         if (stagingBatch.Count >= STAGING_BATCH_SIZE)
                         {
-                            ErrorOr<Created> insertBatchResult = await stagingResultsRepository.InsertRangeAsync(stagingBatch, cancellationToken).ConfigureAwait(false);
-                            if (insertBatchResult.IsError)
+                            Result<Created> insertBatchResult = await stagingResultsRepository.InsertRangeAsync(stagingBatch, cancellationToken).ConfigureAwait(false);
+                            if (insertBatchResult.IsFailure)
                                 throw new InvalidOperationException(insertBatchResult.FirstError.Description);
                             stagingBatch.Clear();
                         }
@@ -326,11 +326,11 @@ internal sealed class BooksFileSystemDiscoveryJob : MediaLibraryScanJob, IBooksF
     /// <param name="currentProgress">The current job progress.</param>
     /// <param name="totalProgress">The total job progress.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    private async Task<ErrorOr<Success>> PublishJobProgressAsync(IDomainEventPublisher domainEventPublisher, MediaLibraryScanCompositeId compositeKey, int currentProgress, int totalProgress, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    private async Task<Result<Success>> PublishJobProgressAsync(IDomainEventPublisher domainEventPublisher, MediaLibraryScanCompositeId compositeKey, int currentProgress, int totalProgress, CancellationToken cancellationToken)
     {
-        ErrorOr<MediaLibraryScanJobProgress> scanJobProgressResult = MediaLibraryScanJobProgress.Create(currentProgress, totalProgress, "DiscoveringFiles");
-        if (scanJobProgressResult.IsError)
+        Result<MediaLibraryScanJobProgress> scanJobProgressResult = MediaLibraryScanJobProgress.Create(currentProgress, totalProgress, "DiscoveringFiles");
+        if (scanJobProgressResult.IsFailure)
             return scanJobProgressResult.Errors;
 
         await domainEventPublisher.PublishAsync(new LibraryScanJobProgressChangedDomainEvent(

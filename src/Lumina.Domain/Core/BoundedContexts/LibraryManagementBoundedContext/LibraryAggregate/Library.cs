@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Domain.Common.Models.Core;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
@@ -143,9 +143,9 @@ public class Library : AggregateRoot<LibraryId>
     /// <param name="shouldSkipUnchangedDirectoriesDuringScan">Whether this media library should skip the directories whose contents have not changed since the last scan, during the scan, or not.</param>
     /// <param name="scanIds">The list of objects representing the unique identifier of scans of the media library.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="Library"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="Library"/>, or an error message.
     /// </returns>
-    public static ErrorOr<Library> Create(
+    public static Result<Library> Create(
         UserId userId,
         string title,
         LibraryType libraryType,
@@ -162,8 +162,8 @@ public class Library : AggregateRoot<LibraryId>
         // go through all the file system paths that make up the media library and create domain objects from them
         foreach (string contentLocation in contentLocations)
         {
-            ErrorOr<FileSystemPathId> contentLocationResult = FileSystemPathId.Create(contentLocation);
-            if (contentLocationResult.IsError)
+            Result<FileSystemPathId> contentLocationResult = FileSystemPathId.Create(contentLocation);
+            if (contentLocationResult.IsFailure)
                 return contentLocationResult.Errors;
             tempContentLocations.Add(contentLocationResult.Value);
         }
@@ -199,9 +199,9 @@ public class Library : AggregateRoot<LibraryId>
     /// <param name="shouldSkipUnchangedDirectoriesDuringScan">Whether this media library should skip the directories whose contents have not changed since the last scan, during the scan, or not.</param>
     /// <param name="scanIds">The list of objects representing the unique identifier of scans of the media library.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="Library"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="Library"/>, or an error message.
     /// </returns>
-    public static ErrorOr<Library> Create(
+    public static Result<Library> Create(
         LibraryId id,
         UserId userId,
         string title,
@@ -219,8 +219,8 @@ public class Library : AggregateRoot<LibraryId>
         // go through all the file system paths that make up the media library and create domain objects from them
         foreach (string contentLocation in contentLocations)
         {
-            ErrorOr<FileSystemPathId> contentLocationResult = FileSystemPathId.Create(contentLocation);
-            if (contentLocationResult.IsError)
+            Result<FileSystemPathId> contentLocationResult = FileSystemPathId.Create(contentLocation);
+            if (contentLocationResult.IsFailure)
                 return contentLocationResult.Errors;
             tempContentLocations.Add(contentLocationResult.Value);
         }
@@ -260,8 +260,8 @@ public class Library : AggregateRoot<LibraryId>
     /// <summary>
     /// Marks the current library as deleted.
     /// </summary>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public ErrorOr<Deleted> Delete()
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public Result<Deleted> Delete()
     {
         // clear all existing events since they become irrelevant when the entity is deleted, and they dont need to be processed
         _domainEvents.Clear();

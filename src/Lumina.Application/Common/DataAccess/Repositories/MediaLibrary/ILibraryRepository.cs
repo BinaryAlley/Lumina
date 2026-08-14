@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.Common.Actions;
 using Lumina.Application.Common.DataAccess.Repositories.Common.Base;
@@ -25,13 +25,13 @@ public interface ILibraryRepository : IRepository<LibraryEntity>,
     /// Gets all media libraries that are marked as enabled and unlocked, from the storage medium.
     /// </summary>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of <see cref="LibraryEntity"/>, or an error.</returns>
-    Task<ErrorOr<IEnumerable<LibraryEntity>>> GetAllEnabledAndUnlockedAsync(CancellationToken cancellationToken);
+    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="LibraryEntity"/>, or an error.</returns>
+    Task<Result<IEnumerable<LibraryEntity>>> GetAllEnabledAndUnlockedAsync(CancellationToken cancellationToken);
 
     /// <summary>
     /// Gets all media libraries that are marked as enabled from the storage medium.
     /// </summary>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of <see cref="LibraryEntity"/>, or an error.</returns>
-    Task<ErrorOr<IEnumerable<LibraryEntity>>> GetAllEnabledAsync(CancellationToken cancellationToken);
+    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="LibraryEntity"/>, or an error.</returns>
+    Task<Result<IEnumerable<LibraryEntity>>> GetAllEnabledAsync(CancellationToken cancellationToken);
 }

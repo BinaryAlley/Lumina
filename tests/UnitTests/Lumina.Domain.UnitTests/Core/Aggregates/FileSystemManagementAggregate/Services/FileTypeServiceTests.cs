@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
-using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
-using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Errors;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
+using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
 using Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.Entities.Fixtures;
 using Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.ValueObjects.Fixtures;
 using NSubstitute;
@@ -55,10 +55,10 @@ public class FileTypeServiceTests
         _mockFileSystemPermissionsService.CanAccessPath(file.Id, FileAccessMode.ReadContents).Returns(true);
 
         // Act
-        ErrorOr<ImageType> result = await sut.GetImageTypeAsync(file, CancellationToken.None);
+        Result<ImageType> result = await sut.GetImageTypeAsync(file, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(ImageType.PNG, result.Value);
     }
 
@@ -74,10 +74,10 @@ public class FileTypeServiceTests
         _mockFileSystemPermissionsService.CanAccessPath(file.Id, FileAccessMode.ReadContents).Returns(false);
 
         // Act
-        ErrorOr<ImageType> result = await sut.GetImageTypeAsync(file, CancellationToken.None);
+        Result<ImageType> result = await sut.GetImageTypeAsync(file, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
     }
 
@@ -93,10 +93,10 @@ public class FileTypeServiceTests
         _mockFileSystemPermissionsService.CanAccessPath(pathId, FileAccessMode.ReadContents).Returns(true);
 
         // Act
-        ErrorOr<ImageType> result = await sut.GetImageTypeAsync(pathId, CancellationToken.None);
+        Result<ImageType> result = await sut.GetImageTypeAsync(pathId, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(ImageType.None, result.Value);
     }
 
@@ -113,10 +113,10 @@ public class FileTypeServiceTests
         _mockFileSystemPermissionsService.CanAccessPath(pathId, FileAccessMode.ReadContents).Returns(true);
 
         // Act
-        ErrorOr<ImageType> result = await sut.GetImageTypeAsync(pathId, CancellationToken.None);
+        Result<ImageType> result = await sut.GetImageTypeAsync(pathId, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(ImageType.SVG, result.Value);
     }
 
@@ -135,10 +135,10 @@ public class FileTypeServiceTests
         _mockFileSystemPermissionsService.CanAccessPath(pathId, FileAccessMode.ReadContents).Returns(true);
 
         // Act
-        ErrorOr<ImageType> result = await sut.GetImageTypeAsync(pathId, CancellationToken.None);
+        Result<ImageType> result = await sut.GetImageTypeAsync(pathId, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(ImageType.TGA, result.Value);
     }
 
@@ -154,10 +154,10 @@ public class FileTypeServiceTests
         _mockFileSystemPermissionsService.CanAccessPath(pathId, FileAccessMode.ReadContents).Returns(true);
 
         // Act
-        ErrorOr<ImageType> result = await sut.GetImageTypeAsync(pathId, CancellationToken.None);
+        Result<ImageType> result = await sut.GetImageTypeAsync(pathId, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(ImageType.None, result.Value);
     }
 
@@ -185,10 +185,10 @@ public class FileTypeServiceTests
         _mockFileSystemPermissionsService.CanAccessPath(pathId, FileAccessMode.ReadContents).Returns(true);
 
         // Act
-        ErrorOr<ImageType> result = await sut.GetImageTypeAsync(pathId, CancellationToken.None);
+        Result<ImageType> result = await sut.GetImageTypeAsync(pathId, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(ImageType.SVG, result.Value);
     }
 
@@ -221,10 +221,10 @@ public class FileTypeServiceTests
         _mockFileSystemPermissionsService.CanAccessPath(pathId, FileAccessMode.ReadContents).Returns(true);
 
         // Act
-        ErrorOr<ImageType> result = await sut.GetImageTypeAsync(pathId, CancellationToken.None);
+        Result<ImageType> result = await sut.GetImageTypeAsync(pathId, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(expectedType, result.Value);
     }
 }

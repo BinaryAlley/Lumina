@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
@@ -64,18 +64,18 @@ internal sealed class MediaLibraryScanDiffJob : MediaLibraryScanJob, IMediaLibra
                     MediaLibraryScanCompositeId compositeKey = MediaLibraryScanCompositeId.Create(ScanId, UserId);
 
                     // set the initial progress of the scan job, it's a 1 step job - comparing the discovered files against the media library scan snapshot
-                    ErrorOr<Success> publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, 0, 1, cancellationToken).ConfigureAwait(false);
-                    if (publishJobProgressResult.IsError)
+                    Result<Success> publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, 0, 1, cancellationToken).ConfigureAwait(false);
+                    if (publishJobProgressResult.IsFailure)
                         throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
 
                     // mark the staging results against the media library scan snapshot of the previous scan
-                    ErrorOr<Updated> markChangesResult = await stagingResultsRepository.MarkChangesAgainstSnapshotAsync(ScanId.Value, LibraryId.Value, cancellationToken).ConfigureAwait(false);
-                    if (markChangesResult.IsError)
+                    Result<Updated> markChangesResult = await stagingResultsRepository.MarkChangesAgainstSnapshotAsync(ScanId.Value, LibraryId.Value, cancellationToken).ConfigureAwait(false);
+                    if (markChangesResult.IsFailure)
                         throw new InvalidOperationException(markChangesResult.FirstError.Description);
 
                     // increment the number of processed elements progress
                     publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, 1, 1, cancellationToken).ConfigureAwait(false);
-                    if (publishJobProgressResult.IsError)
+                    if (publishJobProgressResult.IsFailure)
                         throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
 
                     // this job finished, increment the number of processed jobs progress
@@ -108,11 +108,11 @@ internal sealed class MediaLibraryScanDiffJob : MediaLibraryScanJob, IMediaLibra
     /// <param name="currentProgress">The current job progress.</param>
     /// <param name="totalProgress">The total job progress.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    private async Task<ErrorOr<Success>> PublishJobProgressAsync(IDomainEventPublisher domainEventPublisher, MediaLibraryScanCompositeId compositeKey, int currentProgress, int totalProgress, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    private async Task<Result<Success>> PublishJobProgressAsync(IDomainEventPublisher domainEventPublisher, MediaLibraryScanCompositeId compositeKey, int currentProgress, int totalProgress, CancellationToken cancellationToken)
     {
-        ErrorOr<MediaLibraryScanJobProgress> scanJobProgressResult = MediaLibraryScanJobProgress.Create(currentProgress, totalProgress, "ComparingFileHashes");
-        if (scanJobProgressResult.IsError)
+        Result<MediaLibraryScanJobProgress> scanJobProgressResult = MediaLibraryScanJobProgress.Create(currentProgress, totalProgress, "ComparingFileHashes");
+        if (scanJobProgressResult.IsFailure)
             return scanJobProgressResult.Errors;
 
         await domainEventPublisher.PublishAsync(new LibraryScanJobProgressChangedDomainEvent(

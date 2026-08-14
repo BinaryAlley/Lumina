@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.FileSystemManagement.Drives.Queries.GetDrives;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Drives.GetDrives;
 using Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.Fixtures;
 using Microsoft.AspNetCore.Http;
@@ -25,7 +25,7 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.
 [ExcludeFromCodeCoverage]
 public class GetDrivesEndpointTests
 {
-    private readonly IQueryHandler<GetDrivesQuery, ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>> _mockHandler;
+    private readonly IQueryHandler<GetDrivesQuery, Result<IEnumerable<FileSystemTreeNodeResponse>>> _mockHandler;
     private readonly GetDrivesEndpoint _sut;
     private readonly FileSystemTreeNodeResponseFixture _fileSystemTreeNodeResponseFixture;
 
@@ -34,7 +34,7 @@ public class GetDrivesEndpointTests
     /// </summary>
     public GetDrivesEndpointTests()
     {
-        _mockHandler = Substitute.For<IQueryHandler<GetDrivesQuery, ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>>>();
+        _mockHandler = Substitute.For<IQueryHandler<GetDrivesQuery, Result<IEnumerable<FileSystemTreeNodeResponse>>>>();
         _fileSystemTreeNodeResponseFixture = new FileSystemTreeNodeResponseFixture();
         _sut = Factory.Create<GetDrivesEndpoint>(_mockHandler);
     }
@@ -46,7 +46,7 @@ public class GetDrivesEndpointTests
         CancellationToken cancellationToken = CancellationToken.None;
         List<FileSystemTreeNodeResponse> expectedResponses = _fileSystemTreeNodeResponseFixture.CreateMany(3, 1, 1);
         _mockHandler.HandleAsync(Arg.Any<GetDrivesQuery>(), Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(expectedResponses.AsEnumerable()));
+            .Returns(Result.From(expectedResponses.AsEnumerable()));
 
         // Act
         IResult result = await _sut.ExecuteAsync(new EmptyRequest(), cancellationToken);
@@ -87,7 +87,7 @@ public class GetDrivesEndpointTests
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<GetDrivesQuery>(), Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(Enumerable.Empty<FileSystemTreeNodeResponse>()));
+            .Returns(Result.From(Enumerable.Empty<FileSystemTreeNodeResponse>()));
 
         // Act
         await _sut.ExecuteAsync(new EmptyRequest(), cancellationToken);
@@ -110,7 +110,7 @@ public class GetDrivesEndpointTests
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return ErrorOrFactory.From(_fileSystemTreeNodeResponseFixture.CreateMany(3, 1, 1).AsEnumerable());
+                return Result.From(_fileSystemTreeNodeResponseFixture.CreateMany(3, 1, 1).AsEnumerable());
             }, callInfo.Arg<CancellationToken>()));
 
         // Act

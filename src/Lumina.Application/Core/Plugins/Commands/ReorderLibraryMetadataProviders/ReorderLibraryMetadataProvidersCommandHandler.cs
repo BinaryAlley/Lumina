@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
@@ -17,7 +17,7 @@ namespace Lumina.Application.Core.Plugins.Commands.ReorderLibraryMetadataProvide
 /// <summary>
 /// Handler for the command to reorder the metadata providers of a media library.
 /// </summary>
-public class ReorderLibraryMetadataProvidersCommandHandler : ICommandHandler<ReorderLibraryMetadataProvidersCommand, ErrorOr<Success>>
+public class ReorderLibraryMetadataProvidersCommandHandler : ICommandHandler<ReorderLibraryMetadataProvidersCommand, Result<Success>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IValidator<ReorderLibraryMetadataProvidersCommand> _validator;
@@ -39,17 +39,17 @@ public class ReorderLibraryMetadataProvidersCommandHandler : ICommandHandler<Reo
     /// <param name="command">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.
+    /// An <see cref="Result{TValue}"/> representing either a successful operation, or an error.
     /// </returns>
-    public async Task<ErrorOr<Success>> HandleAsync(ReorderLibraryMetadataProvidersCommand command, CancellationToken cancellationToken)
+    public async Task<Result<Success>> HandleAsync(ReorderLibraryMetadataProvidersCommand command, CancellationToken cancellationToken)
     {
         List<Error> validationResult = _validator.Validate(command);
         if (validationResult.Count > 0)
             return validationResult;
 
         ILibraryMetadataProviderConfigurationRepository configurationRepository = _unitOfWork.GetRepository<ILibraryMetadataProviderConfigurationRepository>();
-        ErrorOr<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>> getConfigurationsResult = await configurationRepository.GetByLibraryIdAsync(command.LibraryId, cancellationToken).ConfigureAwait(false);
-        if (getConfigurationsResult.IsError)
+        Result<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>> getConfigurationsResult = await configurationRepository.GetByLibraryIdAsync(command.LibraryId, cancellationToken).ConfigureAwait(false);
+        if (getConfigurationsResult.IsFailure)
             return getConfigurationsResult.Errors;
 
         Dictionary<Guid, LibraryMetadataProviderConfigurationEntity> configurationsByPluginId = getConfigurationsResult.Value.ToDictionary(configuration => configuration.PluginId);
@@ -59,8 +59,8 @@ public class ReorderLibraryMetadataProvidersCommandHandler : ICommandHandler<Reo
             if (configurationsByPluginId.TryGetValue(pluginId, out LibraryMetadataProviderConfigurationEntity? configuration))
             {
                 configuration.Rank = rank + 1;
-                ErrorOr<Updated> upsertResult = await configurationRepository.UpsertAsync(configuration, cancellationToken).ConfigureAwait(false);
-                if (upsertResult.IsError)
+                Result<Updated> upsertResult = await configurationRepository.UpsertAsync(configuration, cancellationToken).ConfigureAwait(false);
+                if (upsertResult.IsFailure)
                     return upsertResult.Errors;
             }
         }

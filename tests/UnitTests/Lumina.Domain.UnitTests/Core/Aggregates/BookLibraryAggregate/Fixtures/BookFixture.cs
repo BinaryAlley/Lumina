@@ -1,14 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.ExternalIdentifiers.LibraryManagementBoundedContext.LibraryAggregate;
+using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -26,7 +24,7 @@ public static class BookFixture
     /// <returns>The created <see cref="Book"/> domain entity.</returns>
     public static Book CreateValidBook()
     {
-        ErrorOr<Book> bookResult = Book.Create(
+        Result<Book> bookResult = Book.Create(
             LibraryId.Create(Guid.NewGuid()),
             "/books/test.epub",
             WrittenContentMetadata.Create(
@@ -65,7 +63,7 @@ public static class BookFixture
             [],
             []
         );
-        if (bookResult.IsError)
+        if (bookResult.IsFailure)
             throw new InvalidOperationException("Failed to create a valid book in the test fixture.");
         return bookResult.Value;
     }

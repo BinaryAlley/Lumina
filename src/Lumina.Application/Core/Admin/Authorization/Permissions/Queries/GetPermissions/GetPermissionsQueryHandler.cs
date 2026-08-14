@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Repositories.Authorization;
@@ -19,7 +19,7 @@ namespace Lumina.Application.Core.Admin.Authorization.Permissions.Queries.GetPer
 /// <summary>
 /// Handler for the query to retrieve the list of authorization permissions.
 /// </summary>
-public class GetPermissionsQueryHandler : IQueryHandler<GetPermissionsQuery, ErrorOr<IEnumerable<PermissionResponse>>>
+public class GetPermissionsQueryHandler : IQueryHandler<GetPermissionsQuery, Result<IEnumerable<PermissionResponse>>>
 {
     private readonly ICurrentUserService _currentUserService;
     private readonly IAuthorizationService _authorizationService;
@@ -44,15 +44,15 @@ public class GetPermissionsQueryHandler : IQueryHandler<GetPermissionsQuery, Err
     /// <param name="query">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a collection of <see cref="PermissionResponse"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a collection of <see cref="PermissionResponse"/>, or an error message.
     /// </returns>
-    public async Task<ErrorOr<IEnumerable<PermissionResponse>>> HandleAsync(GetPermissionsQuery query, CancellationToken cancellationToken)
+    public async Task<Result<IEnumerable<PermissionResponse>>> HandleAsync(GetPermissionsQuery query, CancellationToken cancellationToken)
     {
         // only admins can see the list of authorization permissions
         bool isAdmin = await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false);
         if (!isAdmin)
             return Errors.Authorization.NotAuthorized;
-        ErrorOr<IEnumerable<PermissionEntity>> getPermissionsResult = await _permissionRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
-        return getPermissionsResult.Match(value => ErrorOrFactory.From(value.ToResponses()), errors => errors);
+        Result<IEnumerable<PermissionEntity>> getPermissionsResult = await _permissionRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+        return getPermissionsResult.Match(value => Result.From(value.ToResponses()), errors => errors);
     }
 }

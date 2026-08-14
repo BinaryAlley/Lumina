@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Application.UnitTests.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook.Fixtures;
 using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using System;
@@ -26,10 +26,10 @@ public class BookMetadataDtoMappingTests
         BookMetadataDto metadata = CreateBookMetadata("The Fellowship of the Ring", "3");
 
         // Act
-        ErrorOr<Success> result = book.ApplyMetadata(metadata, "Goodreads", DateTime.UtcNow);
+        Result<Success> result = book.ApplyMetadata(metadata, "Goodreads", DateTime.UtcNow);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal("The Fellowship of the Ring", book.Metadata.Title);
         Assert.Equal("3", book.GoodreadsId.Value);
         Assert.Equal("The first part of J.R.R. Tolkien's epic adventure.", book.Metadata.Description.Value);
@@ -51,10 +51,10 @@ public class BookMetadataDtoMappingTests
         };
 
         // Act
-        ErrorOr<Success> result = book.ApplyMetadata(metadata, "Goodreads", DateTime.UtcNow);
+        Result<Success> result = book.ApplyMetadata(metadata, "Goodreads", DateTime.UtcNow);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(MetadataStatus.Pending, book.MetadataStatus);
     }
 

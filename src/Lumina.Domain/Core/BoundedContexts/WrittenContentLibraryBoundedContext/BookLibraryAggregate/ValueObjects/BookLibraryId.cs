@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.Models.Core;
 using System;
 using System.Collections.Generic;
@@ -26,7 +26,7 @@ public sealed class BookLibraryId : EntityId<Guid> // TODO: to be removed
     /// Creates a new instance of the <see cref="BookLibraryId"/> class.
     /// </summary>
     /// <returns>The created <see cref="BookLibraryId"/> instance.</returns>
-    public static ErrorOr<BookLibraryId> CreateUnique()
+    public static Result<BookLibraryId> CreateUnique()
     {
         // TODO: enforce invariants
         return new BookLibraryId(Guid.NewGuid());
@@ -37,7 +37,7 @@ public sealed class BookLibraryId : EntityId<Guid> // TODO: to be removed
     /// </summary>
     /// <param name="value">The value used to create the <see cref="BookLibraryId"/> instance.</param>
     /// <returns>The created <see cref="BookLibraryId"/> instance.</returns>
-    public static ErrorOr<BookLibraryId> Create(Guid value)
+    public static Result<BookLibraryId> Create(Guid value)
     {
         // TODO: enforce invariants
         return new BookLibraryId(value);

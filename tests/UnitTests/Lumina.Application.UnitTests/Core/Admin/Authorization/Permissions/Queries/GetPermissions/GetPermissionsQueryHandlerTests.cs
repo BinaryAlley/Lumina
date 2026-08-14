@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Repositories.Authorization;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -8,6 +7,7 @@ using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Core.Admin.Authorization.Permissions.Queries.GetPermissions;
 using Lumina.Contracts.Responses.Authorization;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using NSubstitute;
 using System;
@@ -67,13 +67,13 @@ public class GetPermissionsQueryHandlerTests
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(true);
         _mockPermissionRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(permissions));
+            .Returns(Result.From(permissions));
 
         // Act
-        ErrorOr<IEnumerable<PermissionResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<IEnumerable<PermissionResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(2, result.Value.Count());
         await _mockAuthorizationService.Received(1).IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>());
         await _mockPermissionRepository.Received(1).GetAllAsync(Arg.Any<CancellationToken>());
@@ -89,10 +89,10 @@ public class GetPermissionsQueryHandlerTests
             .Returns(false);
 
         // Act
-        ErrorOr<IEnumerable<PermissionResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<IEnumerable<PermissionResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Authorization.NotAuthorized, result.FirstError);
         await _mockAuthorizationService.Received(1).IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>());
         await _mockPermissionRepository.DidNotReceive().GetAllAsync(Arg.Any<CancellationToken>());
@@ -111,10 +111,10 @@ public class GetPermissionsQueryHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<IEnumerable<PermissionResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<IEnumerable<PermissionResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
         await _mockAuthorizationService.Received(1).IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>());
         await _mockPermissionRepository.Received(1).GetAllAsync(Arg.Any<CancellationToken>());
@@ -134,13 +134,13 @@ public class GetPermissionsQueryHandlerTests
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(true);
         _mockPermissionRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(permissions));
+            .Returns(Result.From(permissions));
 
         // Act
-        ErrorOr<IEnumerable<PermissionResponse>> result = await _sut.HandleAsync(query, cancellationToken);
+        Result<IEnumerable<PermissionResponse>> result = await _sut.HandleAsync(query, cancellationToken);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Single(result.Value);
         await _mockAuthorizationService.Received(1).IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>());
         await _mockPermissionRepository.Received(1).GetAllAsync(Arg.Any<CancellationToken>());

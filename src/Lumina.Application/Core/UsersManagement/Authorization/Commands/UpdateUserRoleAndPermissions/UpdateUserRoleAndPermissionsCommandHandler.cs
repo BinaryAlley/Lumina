@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
@@ -16,7 +16,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.SharedKernel.Common.Errors.Errors;
+using DomainErrors = Lumina.Domain.Common.Errors.Errors;
 #endregion
 
 namespace Lumina.Application.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
@@ -24,7 +24,7 @@ namespace Lumina.Application.Core.UsersManagement.Authorization.Commands.UpdateU
 /// <summary>
 /// Handler for the command to update an authorization role.
 /// </summary>
-public class UpdateUserRoleAndPermissionsCommandHandler : ICommandHandler<UpdateUserRoleAndPermissionsCommand, ErrorOr<AuthorizationResponse>>
+public class UpdateUserRoleAndPermissionsCommandHandler : ICommandHandler<UpdateUserRoleAndPermissionsCommand, Result<AuthorizationResponse>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IAuthorizationService _authorizationService;
@@ -52,9 +52,9 @@ public class UpdateUserRoleAndPermissionsCommandHandler : ICommandHandler<Update
     /// <param name="command">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully updated <see cref="RoleResponse"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully updated <see cref="RoleResponse"/>, or an error message.
     /// </returns>
-    public async Task<ErrorOr<AuthorizationResponse>> HandleAsync(UpdateUserRoleAndPermissionsCommand command, CancellationToken cancellationToken)
+    public async Task<Result<AuthorizationResponse>> HandleAsync(UpdateUserRoleAndPermissionsCommand command, CancellationToken cancellationToken)
     {
         List<Error> validationResult = _validator.Validate(command);
         if (validationResult.Count > 0)
@@ -71,24 +71,24 @@ public class UpdateUserRoleAndPermissionsCommandHandler : ICommandHandler<Update
         IPermissionRepository permissionRepository = _unitOfWork.GetRepository<IPermissionRepository>();
 
         // get the user to update
-        ErrorOr<UserEntity?> getUserResult = await userRepository.GetByIdAsync(command.UserId, cancellationToken).ConfigureAwait(false);
-        if (getUserResult.IsError || getUserResult.Value is null)
+        Result<UserEntity?> getUserResult = await userRepository.GetByIdAsync(command.UserId, cancellationToken).ConfigureAwait(false);
+        if (getUserResult.IsFailure || getUserResult.Value is null)
             return DomainErrors.Users.UserDoesNotExist;
 
-        ErrorOr<RoleEntity?> getRoleResult = default;
+        Result<RoleEntity?> getRoleResult = default;
         if (command.RoleId is not null)
         {
             // get the new role
             getRoleResult = await roleRepository.GetByIdAsync(command.RoleId!.Value, cancellationToken).ConfigureAwait(false);
-            if (getRoleResult.IsError || getRoleResult.Value is null)
+            if (getRoleResult.IsFailure || getRoleResult.Value is null)
                 return ApplicationErrors.Authorization.RoleNotFound;
 
             // check if we're changing an admin's role and if this would leave us without admins
             if (getUserResult.Value.UserRole?.Role.RoleName == "Admin" && getRoleResult.Value.RoleName != "Admin")
             {
                 // count how many admins we have
-                ErrorOr<IEnumerable<UserEntity>> getAllUsersResult = await userRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
-                if (getAllUsersResult.IsError)
+                Result<IEnumerable<UserEntity>> getAllUsersResult = await userRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+                if (getAllUsersResult.IsFailure)
                     return getAllUsersResult.Errors;
 
                 int adminCount = getAllUsersResult.Value.Count(user => user.UserRole?.Role.RoleName == "Admin");
@@ -97,9 +97,9 @@ public class UpdateUserRoleAndPermissionsCommandHandler : ICommandHandler<Update
             }
         }
         // get the permissions to assign
-        ErrorOr<IEnumerable<PermissionEntity>> getPermissionsResult =
+        Result<IEnumerable<PermissionEntity>> getPermissionsResult =
             await permissionRepository.GetByIdsAsync(command.Permissions, cancellationToken).ConfigureAwait(false);
-        if (getPermissionsResult.IsError)
+        if (getPermissionsResult.IsFailure)
             return getPermissionsResult.Errors;
 
         // update the user
@@ -138,8 +138,8 @@ public class UpdateUserRoleAndPermissionsCommandHandler : ICommandHandler<Update
         };
 
         // save changes and return result
-        ErrorOr<Updated> updateResult = await userRepository.UpdateAsync(updatedUser, cancellationToken).ConfigureAwait(false);
-        if (updateResult.IsError)
+        Result<Updated> updateResult = await userRepository.UpdateAsync(updatedUser, cancellationToken).ConfigureAwait(false);
+        if (updateResult.IsFailure)
             return updateResult.Errors;
 
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

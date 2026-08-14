@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
-using Lumina.Domain.Common.Primitives;
+
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,9 +20,9 @@ public static class BookRatingDtoMapping
     /// </summary>
     /// <param name="dto">The DTO to be converted.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully converted <see cref="BookRating"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully converted <see cref="BookRating"/>, or an error message.
     /// </returns>
-    public static ErrorOr<BookRating> ToDomainEntity(this BookRatingDto dto)
+    public static Result<BookRating> ToDomainEntity(this BookRatingDto dto)
     {
         return BookRating.Create(
             dto.Value ?? default,
@@ -37,9 +37,9 @@ public static class BookRatingDtoMapping
     /// </summary>
     /// <param name="dtos">The DTOs to be converted.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a collection of converted <see cref="BookRating"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a collection of converted <see cref="BookRating"/>, or an error message.
     /// </returns>
-    public static IEnumerable<ErrorOr<BookRating>> ToDomainEntities(this IEnumerable<BookRatingDto> dtos)
+    public static IEnumerable<Result<BookRating>> ToDomainEntities(this IEnumerable<BookRatingDto> dtos)
     {
         return dtos.Select(domainEntity => domainEntity.ToDomainEntity());
     }

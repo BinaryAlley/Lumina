@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Models.Core;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
@@ -61,9 +61,9 @@ public class LibraryScan : AggregateRoot<ScanId>
     /// <param name="userId">The object representing the unique identifier of the user initiating the media library scan.</param>
     /// <param name="pastScans">The list of past media library scans the library identified by <paramref name="libraryId"/> had.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="LibraryScan"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="LibraryScan"/>, or an error message.
     /// </returns>
-    public static ErrorOr<LibraryScan> Create(LibraryId libraryId, UserId userId, List<LibraryScan> pastScans)
+    public static Result<LibraryScan> Create(LibraryId libraryId, UserId userId, List<LibraryScan> pastScans)
     {
         return new LibraryScan(ScanId.CreateUnique(), libraryId, userId, LibraryScanJobStatus.Pending, pastScans);
     }
@@ -77,9 +77,9 @@ public class LibraryScan : AggregateRoot<ScanId>
     /// <param name="status">The status of the media library scan.</param>
     /// <param name="pastScans">The list of past media library scans the library identified by <paramref name="libraryId"/> had.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="LibraryScan"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="LibraryScan"/>, or an error message.
     /// </returns>
-    public static ErrorOr<LibraryScan> Create(ScanId id, LibraryId libraryId, UserId userId, LibraryScanJobStatus status, List<LibraryScan> pastScans)
+    public static Result<LibraryScan> Create(ScanId id, LibraryId libraryId, UserId userId, LibraryScanJobStatus status, List<LibraryScan> pastScans)
     {
         return new LibraryScan(id, libraryId, userId, status, pastScans);
     }
@@ -87,8 +87,8 @@ public class LibraryScan : AggregateRoot<ScanId>
     /// <summary>
     /// Queues a media library scan.
     /// </summary>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public ErrorOr<Success> QueueScan()
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public Result<Success> QueueScan()
     {        
         // there must be no active scan for this library in the past 30 days
         if (_pastScans.Any(libraryScan => libraryScan.Status == LibraryScanJobStatus.Running || libraryScan.Status == LibraryScanJobStatus.Pending))
@@ -102,8 +102,8 @@ public class LibraryScan : AggregateRoot<ScanId>
     /// <summary>
     /// Starts the media library scan.
     /// </summary>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public ErrorOr<Success> StartScan()
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public Result<Success> StartScan()
     {
         if (Status == LibraryScanJobStatus.Pending)
             Status = LibraryScanJobStatus.Running;
@@ -122,8 +122,8 @@ public class LibraryScan : AggregateRoot<ScanId>
     /// <summary>
     /// Finishes the media library scan.
     /// </summary>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public ErrorOr<Success> FinishScan()
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public Result<Success> FinishScan()
     {
         if (Status == LibraryScanJobStatus.Running)
             Status = LibraryScanJobStatus.Completed;
@@ -136,8 +136,8 @@ public class LibraryScan : AggregateRoot<ScanId>
     /// <summary>
     /// Cancels the media library scan.
     /// </summary>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public ErrorOr<Success> CancelScan()
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public Result<Success> CancelScan()
     {
         if (Status == LibraryScanJobStatus.Running)
             Status = LibraryScanJobStatus.Canceled;
@@ -152,8 +152,8 @@ public class LibraryScan : AggregateRoot<ScanId>
     /// <summary>
     /// Marks the media library scan as failed.
     /// </summary>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public ErrorOr<Success> FailScan()
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public Result<Success> FailScan()
     {
         if (Status == LibraryScanJobStatus.Running)
             Status = LibraryScanJobStatus.Failed;

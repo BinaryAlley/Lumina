@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
@@ -38,22 +38,22 @@ public sealed class WindowsRootItem : FileSystemItem
     /// <param name="name">The name of the file system root item.</param>
     /// <param name="status">The status of the file system root item.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="WindowsRootItem"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="WindowsRootItem"/>, or an error message.
     /// </returns>
-    public static ErrorOr<WindowsRootItem> Create(
+    public static Result<WindowsRootItem> Create(
         string path,
         string name,
         FileSystemItemStatus status = FileSystemItemStatus.Accessible)
     {
         // TODO: enforce invariants
-        ErrorOr<FileSystemPathId> createPathResult = FileSystemPathId.Create(path);
-        if (createPathResult.IsError)
+        Result<FileSystemPathId> createPathResult = FileSystemPathId.Create(path);
+        if (createPathResult.IsFailure)
             return createPathResult.Errors;
         WindowsRootItem newRoot = new(
             createPathResult.Value,
             name);
-        ErrorOr<Updated> setStatusResult = newRoot.SetStatus(status);
-        if (setStatusResult.IsError)
+        Result<Updated> setStatusResult = newRoot.SetStatus(status);
+        if (setStatusResult.IsFailure)
             return setStatusResult.Errors;
         return newRoot;
     }
@@ -65,9 +65,9 @@ public sealed class WindowsRootItem : FileSystemItem
     /// <param name="name">The name of the file system root item.</param>
     /// <param name="status">The status of the file system root item.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="WindowsRootItem"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="WindowsRootItem"/>, or an error message.
     /// </returns>
-    public static ErrorOr<WindowsRootItem> Create(
+    public static Result<WindowsRootItem> Create(
         FileSystemPathId id,
         string name,
         FileSystemItemStatus status = FileSystemItemStatus.Accessible)
@@ -76,8 +76,8 @@ public sealed class WindowsRootItem : FileSystemItem
         WindowsRootItem newFile = new(
             id,
             name);
-        ErrorOr<Updated> setStatusResult = newFile.SetStatus(status);
-        if (setStatusResult.IsError)
+        Result<Updated> setStatusResult = newFile.SetStatus(status);
+        if (setStatusResult.IsFailure)
             return setStatusResult.Errors;
         return newFile;
     }

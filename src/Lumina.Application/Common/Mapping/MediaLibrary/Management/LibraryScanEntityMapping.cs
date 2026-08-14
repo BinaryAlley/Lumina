@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
@@ -23,9 +23,9 @@ public static class LibraryScanEntityMapping
     /// </summary>
     /// <param name="repositoryEntity">The repository entity to be converted.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a converted <see cref="LibraryScan"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a converted <see cref="LibraryScan"/>, or an error message.
     /// </returns>
-    public static ErrorOr<LibraryScan> ToDomainEntity(this LibraryScanEntity repositoryEntity)
+    public static Result<LibraryScan> ToDomainEntity(this LibraryScanEntity repositoryEntity)
     {
         return LibraryScan.Create(
            ScanId.Create(repositoryEntity.Id),
@@ -41,9 +41,9 @@ public static class LibraryScanEntityMapping
     /// </summary>
     /// <param name="repositoryEntities">The repository entities to be converted.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a collection of converted <see cref="LibraryScan"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a collection of converted <see cref="LibraryScan"/>, or an error message.
     /// </returns>
-    public static IEnumerable<ErrorOr<LibraryScan>> ToDomainEntities(this IEnumerable<LibraryScanEntity> repositoryEntities)
+    public static IEnumerable<Result<LibraryScan>> ToDomainEntities(this IEnumerable<LibraryScanEntity> repositoryEntities)
     {
         return repositoryEntities.Select(domainEntity => domainEntity.ToDomainEntity());
     }

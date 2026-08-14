@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
-using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Errors;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
@@ -20,10 +20,10 @@ public class UnixRootItemTests
     public void Create_WhenCalledWithDefaultStatus_ShouldReturnSuccessfulResult()
     {
         // Arrange & Act
-        ErrorOr<UnixRootItem> result = UnixRootItem.Create();
+        Result<UnixRootItem> result = UnixRootItem.Create();
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal("/", result.Value.Name);
         Assert.Equal("/", result.Value.Id.Path);
@@ -39,10 +39,10 @@ public class UnixRootItemTests
         FileSystemItemStatus customStatus = FileSystemItemStatus.Accessible;
 
         // Act
-        ErrorOr<UnixRootItem> result = UnixRootItem.Create(customStatus);
+        Result<UnixRootItem> result = UnixRootItem.Create(customStatus);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal("/", result.Value.Name);
         Assert.Equal("/", result.Value.Id.Path);
@@ -55,8 +55,8 @@ public class UnixRootItemTests
     public void Items_WhenAccessed_ShouldReturnEmptyReadOnlyCollection()
     {
         // Arrange
-        ErrorOr<UnixRootItem> createResult = UnixRootItem.Create();
-        Assert.False(createResult.IsError);
+        Result<UnixRootItem> createResult = UnixRootItem.Create();
+        Assert.False(createResult.IsFailure);
         UnixRootItem unixRootItem = createResult.Value;
 
         // Act
@@ -71,16 +71,16 @@ public class UnixRootItemTests
     public void SetStatus_WhenCalledWithNewStatus_ShouldUpdateStatus()
     {
         // Arrange
-        ErrorOr<UnixRootItem> createResult = UnixRootItem.Create();
-        Assert.False(createResult.IsError);
+        Result<UnixRootItem> createResult = UnixRootItem.Create();
+        Assert.False(createResult.IsFailure);
         UnixRootItem unixRootItem = createResult.Value;
         FileSystemItemStatus newStatus = FileSystemItemStatus.Accessible;
 
         // Act
-        ErrorOr<Updated> result = unixRootItem.SetStatus(newStatus);
+        Result<Updated> result = unixRootItem.SetStatus(newStatus);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(newStatus, unixRootItem.Status);
     }
 
@@ -88,15 +88,15 @@ public class UnixRootItemTests
     public void SetParent_WhenCalledWithNullParent_ShouldReturnError()
     {
         // Arrange
-        ErrorOr<UnixRootItem> createResult = UnixRootItem.Create();
-        Assert.False(createResult.IsError);
+        Result<UnixRootItem> createResult = UnixRootItem.Create();
+        Assert.False(createResult.IsFailure);
         UnixRootItem unixRootItem = createResult.Value;
 
         // Act
-        ErrorOr<Updated> result = unixRootItem.SetParent(null!);
+        Result<Updated> result = unixRootItem.SetParent(null!);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.ParentNodeCannotBeNull, result.FirstError);
         Assert.False(unixRootItem.Parent.HasValue);
     }

@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.Books;
@@ -16,7 +16,7 @@ namespace Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrar
 /// <summary>
 /// Handler for the query to get all books.
 /// </summary>
-public class GetBooksQueryHandler : IQueryHandler<GetBooksQuery, ErrorOr<IEnumerable<BookResponse>>>
+public class GetBooksQueryHandler : IQueryHandler<GetBooksQuery, Result<IEnumerable<BookResponse>>>
 {
     private readonly IUnitOfWork _unitOfWork;
 
@@ -35,14 +35,14 @@ public class GetBooksQueryHandler : IQueryHandler<GetBooksQuery, ErrorOr<IEnumer
     /// <param name="query">The query to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a collection of <see cref="BookResponse"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a collection of <see cref="BookResponse"/>, or an error message.
     /// </returns>
-    public async Task<ErrorOr<IEnumerable<BookResponse>>> HandleAsync(GetBooksQuery query, CancellationToken cancellationToken)
+    public async Task<Result<IEnumerable<BookResponse>>> HandleAsync(GetBooksQuery query, CancellationToken cancellationToken)
     {
         // get a books repository
         IBookRepository bookRepository = _unitOfWork.GetRepository<IBookRepository>();
         // get all books of the media library from the book repository
-        ErrorOr<IEnumerable<BookEntity>> getBooksResult = await bookRepository.GetByLibraryIdAsync(query.LibraryId, cancellationToken).ConfigureAwait(false);
-        return getBooksResult.Match(result => ErrorOrFactory.From(getBooksResult.Value.ToResponses()), errors => errors);
+        Result<IEnumerable<BookEntity>> getBooksResult = await bookRepository.GetByLibraryIdAsync(query.LibraryId, cancellationToken).ConfigureAwait(false);
+        return getBooksResult.Match(result => Result.From(getBooksResult.Value.ToResponses()), errors => errors);
     }
 }

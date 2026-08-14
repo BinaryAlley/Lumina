@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 #endregion
 
 namespace Lumina.Infrastructure.Common.Errors;

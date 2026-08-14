@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,13 +19,13 @@ public interface IMediaLibraryScanningService
     /// <param name="libraryType">The type of the media library to be scanned.</param>
     /// <param name="downloadMetadataFromWeb">Whether the library permits downloading data from the web, or not.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    Task<ErrorOr<Success>> StartScanAsync(LibraryScan scan, LibraryType libraryType, bool downloadMetadataFromWeb, CancellationToken cancellationToken);
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Success>> StartScanAsync(LibraryScan scan, LibraryType libraryType, bool downloadMetadataFromWeb, CancellationToken cancellationToken);
 
     /// <summary>
     /// Cancels <paramref name="scan"/>.
     /// </summary>
     /// <param name="scan">The scan to cancel.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    ErrorOr<Success> CancelScan(LibraryScan scan);
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Result<Success> CancelScan(LibraryScan scan);
 }

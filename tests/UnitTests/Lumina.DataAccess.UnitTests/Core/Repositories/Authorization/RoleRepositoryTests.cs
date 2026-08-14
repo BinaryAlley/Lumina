@@ -1,12 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using EntityFrameworkCore.Testing.NSubstitute;
-using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.Errors;
 using Lumina.DataAccess.Core.Repositories.Authorization;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.DataAccess.UnitTests.Core.Repositories.Authorization.Fixtures;
-using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
+using Lumina.Domain.Common.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
@@ -50,10 +49,10 @@ public class RoleRepositoryTests
         };
 
         // Act
-        ErrorOr<Created> result = await _sut.InsertAsync(role, CancellationToken.None);
+        Result<Created> result = await _sut.InsertAsync(role, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(Result.Created, result.Value);
 
         // Check if the role was added to the context's ChangeTracker
@@ -86,10 +85,10 @@ public class RoleRepositoryTests
         };
 
         // Act
-        ErrorOr<Created> result = await _sut.InsertAsync(newRole, CancellationToken.None);
+        Result<Created> result = await _sut.InsertAsync(newRole, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Authorization.RoleAlreadyExists, result.FirstError);
         Assert.Single(_mockContext.ChangeTracker.Entries<RoleEntity>());
     }
@@ -118,10 +117,10 @@ public class RoleRepositoryTests
         };
 
         // Act
-        ErrorOr<Created> result = await _sut.InsertAsync(newRole, CancellationToken.None);
+        Result<Created> result = await _sut.InsertAsync(newRole, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Authorization.RoleAlreadyExists, result.FirstError);
         Assert.Single(_mockContext.ChangeTracker.Entries<RoleEntity>());
     }
@@ -152,10 +151,10 @@ public class RoleRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        ErrorOr<IEnumerable<RoleEntity>> result = await _sut.GetAllAsync(CancellationToken.None);
+        Result<IEnumerable<RoleEntity>> result = await _sut.GetAllAsync(CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(2, result.Value.Count());
         Assert.Equal(roles, result.Value);
@@ -165,10 +164,10 @@ public class RoleRepositoryTests
     public async Task GetAllAsync_WhenNoRolesExist_ShouldReturnEmptyList()
     {
         // Act
-        ErrorOr<IEnumerable<RoleEntity>> result = await _sut.GetAllAsync(CancellationToken.None);
+        Result<IEnumerable<RoleEntity>> result = await _sut.GetAllAsync(CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Empty(result.Value);
     }
@@ -189,10 +188,10 @@ public class RoleRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        ErrorOr<RoleEntity?> result = await _sut.GetByNameAsync("Admin", CancellationToken.None);
+        Result<RoleEntity?> result = await _sut.GetByNameAsync("Admin", CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(role, result.Value);
     }
@@ -201,10 +200,10 @@ public class RoleRepositoryTests
     public async Task GetByNameAsync_WhenRoleDoesNotExist_ShouldReturnNull()
     {
         // Act
-        ErrorOr<RoleEntity?> result = await _sut.GetByNameAsync("NonExistentRole", CancellationToken.None);
+        Result<RoleEntity?> result = await _sut.GetByNameAsync("NonExistentRole", CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Null(result.Value);
     }
 
@@ -220,10 +219,10 @@ public class RoleRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        ErrorOr<RoleEntity?> result = await _sut.GetByIdAsync(role.Id, CancellationToken.None);
+        Result<RoleEntity?> result = await _sut.GetByIdAsync(role.Id, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(role.Id, result.Value.Id);
         Assert.Equal(role.RoleName, result.Value.RoleName);
@@ -238,10 +237,10 @@ public class RoleRepositoryTests
         Guid nonExistentId = Guid.NewGuid();
 
         // Act
-        ErrorOr<RoleEntity?> result = await _sut.GetByIdAsync(nonExistentId, CancellationToken.None);
+        Result<RoleEntity?> result = await _sut.GetByIdAsync(nonExistentId, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Null(result.Value);
     }
 
@@ -271,10 +270,10 @@ public class RoleRepositoryTests
         };
 
         // Act
-        ErrorOr<Updated> result = await _sut.UpdateAsync(updatedRole, CancellationToken.None);
+        Result<Updated> result = await _sut.UpdateAsync(updatedRole, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(Result.Updated, result.Value);
 
         EntityEntry<RoleEntity>? updatedEntry = _mockContext.ChangeTracker.Entries<RoleEntity>()
@@ -296,10 +295,10 @@ public class RoleRepositoryTests
         };
 
         // Act
-        ErrorOr<Updated> result = await _sut.UpdateAsync(nonExistentRole, CancellationToken.None);
+        Result<Updated> result = await _sut.UpdateAsync(nonExistentRole, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Authorization.RoleNotFound, result.FirstError);
     }
 
@@ -328,10 +327,10 @@ public class RoleRepositoryTests
         };
 
         // Act
-        ErrorOr<Updated> result = await _sut.UpdateAsync(updatedRole, CancellationToken.None);
+        Result<Updated> result = await _sut.UpdateAsync(updatedRole, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(Result.Updated, result.Value);
 
         EntityEntry<RoleEntity>? updatedEntry = _mockContext.ChangeTracker.Entries<RoleEntity>()
@@ -357,10 +356,10 @@ public class RoleRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        ErrorOr<Deleted> result = await _sut.DeleteByIdAsync(existingRole.Id, CancellationToken.None);
+        Result<Deleted> result = await _sut.DeleteByIdAsync(existingRole.Id, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(Result.Deleted, result.Value);
 
         EntityEntry<RoleEntity>? deletedEntry = _mockContext.ChangeTracker.Entries<RoleEntity>()
@@ -376,10 +375,10 @@ public class RoleRepositoryTests
         Guid nonExistentId = Guid.NewGuid();
 
         // Act
-        ErrorOr<Deleted> result = await _sut.DeleteByIdAsync(nonExistentId, CancellationToken.None);
+        Result<Deleted> result = await _sut.DeleteByIdAsync(nonExistentId, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Authorization.RoleNotFound, result.FirstError);
     }
 
@@ -396,10 +395,10 @@ public class RoleRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        ErrorOr<Deleted> result = await _sut.DeleteByIdAsync(existingRole.Id, CancellationToken.None);
+        Result<Deleted> result = await _sut.DeleteByIdAsync(existingRole.Id, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(Result.Deleted, result.Value);
 
         EntityEntry<RoleEntity>? deletedEntry = _mockContext.ChangeTracker.Entries<RoleEntity>()

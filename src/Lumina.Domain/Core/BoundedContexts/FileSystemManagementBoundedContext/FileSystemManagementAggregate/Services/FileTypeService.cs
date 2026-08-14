@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
-using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using System;
@@ -40,8 +40,8 @@ public class FileTypeService : IFileTypeService
     /// </summary>
     /// <param name="file">The file to determine if it is an image or not.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing the type of image or an error.</returns>
-    public async Task<ErrorOr<ImageType>> GetImageTypeAsync(File file, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> containing the type of image or an error.</returns>
+    public async Task<Result<ImageType>> GetImageTypeAsync(File file, CancellationToken cancellationToken)
     {
         return await GetImageTypeAsync(file.Id, cancellationToken).ConfigureAwait(false);
     }
@@ -51,8 +51,8 @@ public class FileTypeService : IFileTypeService
     /// </summary>
     /// <param name="path">The path of the file to determine if it is an image or not.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing the type of image or an error.</returns>
-    public async Task<ErrorOr<ImageType>> GetImageTypeAsync(FileSystemPathId path, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> containing the type of image or an error.</returns>
+    public async Task<Result<ImageType>> GetImageTypeAsync(FileSystemPathId path, CancellationToken cancellationToken)
     {
         // check if the user has access permissions to the provided path
         if (!_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadContents))

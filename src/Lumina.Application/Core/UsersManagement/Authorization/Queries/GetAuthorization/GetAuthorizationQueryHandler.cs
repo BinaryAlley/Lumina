@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.Errors;
@@ -19,7 +19,7 @@ namespace Lumina.Application.Core.UsersManagement.Authorization.Queries.GetAutho
 /// <summary>
 /// Handler for the query to retrieve the authorization roles and permissions of an account.
 /// </summary>
-public class GetAuthorizationQueryHandler : IQueryHandler<GetAuthorizationQuery, ErrorOr<AuthorizationResponse>>
+public class GetAuthorizationQueryHandler : IQueryHandler<GetAuthorizationQuery, Result<AuthorizationResponse>>
 {
     private readonly ICurrentUserService _currentUserService;
     private readonly IAuthorizationService _authorizationService;
@@ -44,9 +44,9 @@ public class GetAuthorizationQueryHandler : IQueryHandler<GetAuthorizationQuery,
     /// <param name="query">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a <see cref="AuthorizationResponse"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a <see cref="AuthorizationResponse"/>, or an error message.
     /// </returns>
-    public async Task<ErrorOr<AuthorizationResponse>> HandleAsync(GetAuthorizationQuery query, CancellationToken cancellationToken)
+    public async Task<Result<AuthorizationResponse>> HandleAsync(GetAuthorizationQuery query, CancellationToken cancellationToken)
     {
         List<Error> validationResult = _validator.Validate(query);
         if (validationResult.Count > 0)
@@ -56,14 +56,14 @@ public class GetAuthorizationQueryHandler : IQueryHandler<GetAuthorizationQuery,
         if (_currentUserService.UserId != query.UserId)
         {
             // if it is, get the role of the current user, and see if they are Admin
-            ErrorOr<UserAuthorizationEntity> getCurrentUserPermissionResult = await _authorizationService.GetUserAuthorizationAsync(_currentUserService.UserId!.Value, cancellationToken).ConfigureAwait(false);
-            if (getCurrentUserPermissionResult.IsError)
+            Result<UserAuthorizationEntity> getCurrentUserPermissionResult = await _authorizationService.GetUserAuthorizationAsync(_currentUserService.UserId!.Value, cancellationToken).ConfigureAwait(false);
+            if (getCurrentUserPermissionResult.IsFailure)
                 return getCurrentUserPermissionResult.Errors;
             // if the current user is not an Admin, and the account for whom they request the permissions list is not theirs, deny the request
             if (getCurrentUserPermissionResult.Value.Role != "Admin")
                 return Errors.Authorization.NotAuthorized;
         }
-        ErrorOr<UserAuthorizationEntity> getUserPermissionResult = await _authorizationService.GetUserAuthorizationAsync(query.UserId!.Value, cancellationToken).ConfigureAwait(false);
-        return getUserPermissionResult.Match(value => ErrorOrFactory.From(value.ToResponse()), errors => errors);
+        Result<UserAuthorizationEntity> getUserPermissionResult = await _authorizationService.GetUserAuthorizationAsync(query.UserId!.Value, cancellationToken).ConfigureAwait(false);
+        return getUserPermissionResult.Match(value => Result.From(value.ToResponse()), errors => errors);
     }
 }

@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Dapper;
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.DataAccess.Core.UoW;
 using Microsoft.Data.Sqlite;
@@ -42,8 +42,8 @@ internal sealed class LibraryScanSnapshotRepository : ILibraryScanSnapshotReposi
     /// <param name="libraryId">The unique identifier of the library for which to get the deleted media library scan snapshot item paths.</param>
     /// <param name="scanId">The unique identifier of the media library scan for which to determine the deleted media library scan snapshot item paths.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of deleted media library scan snapshot item paths, or an error.</returns>
-    public async Task<ErrorOr<IReadOnlyList<string>>> GetDeletedPathsAsync(Guid libraryId, Guid scanId, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of deleted media library scan snapshot item paths, or an error.</returns>
+    public async Task<Result<IReadOnlyList<string>>> GetDeletedPathsAsync(Guid libraryId, Guid scanId, CancellationToken cancellationToken)
     {
         await using SqliteConnection connection = await OpenConnectionAsync(cancellationToken).ConfigureAwait(false);
         const string GET_DELETED_PATHS_SQL = """
@@ -69,8 +69,8 @@ internal sealed class LibraryScanSnapshotRepository : ILibraryScanSnapshotReposi
     /// </summary>
     /// <param name="libraryId">The unique identifier of the library whose media library scan snapshot item paths are retrieved.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of media library scan snapshot item paths, or an error.</returns>
-    public async Task<ErrorOr<IReadOnlyList<string>>> GetPathsAsync(Guid libraryId, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of media library scan snapshot item paths, or an error.</returns>
+    public async Task<Result<IReadOnlyList<string>>> GetPathsAsync(Guid libraryId, CancellationToken cancellationToken)
     {
         await using SqliteConnection connection = await OpenConnectionAsync(cancellationToken).ConfigureAwait(false);
         const string GET_PATHS_SQL = """
@@ -94,8 +94,8 @@ internal sealed class LibraryScanSnapshotRepository : ILibraryScanSnapshotReposi
     /// <param name="scanId">The unique identifier of the media library scan whose results are applied.</param>
     /// <param name="userId">The unique identifier of the user that initiated the media library scan, used for audit purposes.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<ErrorOr<Updated>> ApplySnapshotSwapAsync(Guid libraryId, Guid scanId, Guid userId, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Updated>> ApplySnapshotSwapAsync(Guid libraryId, Guid scanId, Guid userId, CancellationToken cancellationToken)
     {
         await using SqliteConnection connection = await OpenConnectionAsync(cancellationToken).ConfigureAwait(false);
         await using DbTransaction transaction = await connection.BeginTransactionAsync(cancellationToken);

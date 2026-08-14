@@ -1,9 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using ErrorOr;
-using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -47,9 +46,9 @@ public class FileFixture
         size ??= _faker.Random.Long();
         status ??= _faker.PickRandom<FileSystemItemStatus>();
 
-        ErrorOr<File> fileResult = File.Create(path, name, dateCreated.Value, dateModified.Value, size.Value, status.Value);
+        Result<File> fileResult = File.Create(path, name, dateCreated.Value, dateModified.Value, size.Value, status.Value);
 
-        if (fileResult.IsError)
+        if (fileResult.IsFailure)
             throw new InvalidOperationException("Failed to create File: " + string.Join(", ", fileResult.Errors));
         return fileResult.Value;
     }
@@ -61,7 +60,7 @@ public class FileFixture
     /// <returns>The created list.</returns>
     public List<File> CreateMany(int count = 3)
     {
-        return Enumerable.Range(0, count).Select(_ => CreateFile()).ToList();
+        return [.. Enumerable.Range(0, count).Select(_ => CreateFile())];
     }
 
     /// <summary>

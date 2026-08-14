@@ -1,11 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using EntityFrameworkCore.Testing.NSubstitute;
-using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.DataAccess.Core.Repositories.Plugins;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.DataAccess.UnitTests.Core.Repositories.Plugins.Fixtures;
-using Microsoft.EntityFrameworkCore;
+using Lumina.Domain.Common.Primitives;
 using System;
 using System.Linq;
 using System.Threading;
@@ -44,10 +43,10 @@ public class LibraryMetadataProviderConfigurationRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        ErrorOr<System.Collections.Generic.IReadOnlyList<LibraryMetadataProviderConfigurationEntity>> result = await _sut.GetByLibraryIdAsync(libraryId, CancellationToken.None);
+        Result<System.Collections.Generic.IReadOnlyList<LibraryMetadataProviderConfigurationEntity>> result = await _sut.GetByLibraryIdAsync(libraryId, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         LibraryMetadataProviderConfigurationEntity retrievedConfiguration = Assert.Single(result.Value);
         Assert.Equal(configurationOfLibrary.PluginId, retrievedConfiguration.PluginId);
     }
@@ -61,10 +60,10 @@ public class LibraryMetadataProviderConfigurationRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        ErrorOr<LibraryMetadataProviderConfigurationEntity?> result = await _sut.GetByLibraryAndPluginIdAsync(configuration.LibraryId, configuration.PluginId, CancellationToken.None);
+        Result<LibraryMetadataProviderConfigurationEntity?> result = await _sut.GetByLibraryAndPluginIdAsync(configuration.LibraryId, configuration.PluginId, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(configuration.Id, result.Value!.Id);
     }
 
@@ -75,11 +74,11 @@ public class LibraryMetadataProviderConfigurationRepositoryTests
         LibraryMetadataProviderConfigurationEntity configuration = _configurationFixture.CreateConfiguration(Guid.NewGuid(), Guid.NewGuid(), 1);
 
         // Act
-        ErrorOr<Updated> result = await _sut.UpsertAsync(configuration, CancellationToken.None);
+        Result<Updated> result = await _sut.UpsertAsync(configuration, CancellationToken.None);
         await _mockContext.SaveChangesAsync();
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Single(_mockContext.LibraryMetadataProviderConfigurations);
     }
 
@@ -95,11 +94,11 @@ public class LibraryMetadataProviderConfigurationRepositoryTests
         updatedConfiguration.IsEnabled = true;
 
         // Act
-        ErrorOr<Updated> result = await _sut.UpsertAsync(updatedConfiguration, CancellationToken.None);
+        Result<Updated> result = await _sut.UpsertAsync(updatedConfiguration, CancellationToken.None);
         await _mockContext.SaveChangesAsync();
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         LibraryMetadataProviderConfigurationEntity retrievedConfiguration = _mockContext.LibraryMetadataProviderConfigurations.Single();
         Assert.Equal(5, retrievedConfiguration.Rank);
         Assert.True(retrievedConfiguration.IsEnabled);

@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.DataAccess.Core.UoW;
@@ -34,8 +34,8 @@ internal sealed class LibraryMetadataProviderConfigurationRepository : ILibraryM
     /// </summary>
     /// <param name="libraryId">The Id of the media library whose metadata provider configurations are retrieved.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of <see cref="LibraryMetadataProviderConfigurationEntity"/>, or an error.</returns>
-    public async Task<ErrorOr<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>> GetByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="LibraryMetadataProviderConfigurationEntity"/>, or an error.</returns>
+    public async Task<Result<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>> GetByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken)
     {
         return await _luminaDbContext.LibraryMetadataProviderConfigurations
             .Where(configuration => configuration.LibraryId == libraryId)
@@ -48,8 +48,8 @@ internal sealed class LibraryMetadataProviderConfigurationRepository : ILibraryM
     /// <param name="libraryId">The Id of the media library whose metadata provider configuration is retrieved.</param>
     /// <param name="pluginId">The Id of the plugin whose metadata provider configuration is retrieved.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the <see cref="LibraryMetadataProviderConfigurationEntity"/>, or an error.</returns>
-    public async Task<ErrorOr<LibraryMetadataProviderConfigurationEntity?>> GetByLibraryAndPluginIdAsync(Guid libraryId, Guid pluginId, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> containing either the <see cref="LibraryMetadataProviderConfigurationEntity"/>, or an error.</returns>
+    public async Task<Result<LibraryMetadataProviderConfigurationEntity?>> GetByLibraryAndPluginIdAsync(Guid libraryId, Guid pluginId, CancellationToken cancellationToken)
     {
         return await _luminaDbContext.LibraryMetadataProviderConfigurations
             .FirstOrDefaultAsync(configuration => configuration.LibraryId == libraryId && configuration.PluginId == pluginId, cancellationToken).ConfigureAwait(false);
@@ -60,8 +60,8 @@ internal sealed class LibraryMetadataProviderConfigurationRepository : ILibraryM
     /// </summary>
     /// <param name="configuration">The metadata provider configuration to insert or update.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<ErrorOr<Updated>> UpsertAsync(LibraryMetadataProviderConfigurationEntity configuration, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Updated>> UpsertAsync(LibraryMetadataProviderConfigurationEntity configuration, CancellationToken cancellationToken)
     {
         LibraryMetadataProviderConfigurationEntity? existingConfiguration = await _luminaDbContext.LibraryMetadataProviderConfigurations
             .FirstOrDefaultAsync(repositoryConfiguration => repositoryConfiguration.LibraryId == configuration.LibraryId && repositoryConfiguration.PluginId == configuration.PluginId, cancellationToken).ConfigureAwait(false);

@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetUserPermissions;
 using Lumina.Contracts.Requests.Authorization;
 using Lumina.Contracts.Responses.Authorization;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authorization.GetUserPermissions;
 using Microsoft.AspNetCore.Http;
@@ -25,7 +25,7 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.UsersManagement.Autho
 [ExcludeFromCodeCoverage]
 public class GetUserPermissionsEndpointTests
 {
-    private readonly IQueryHandler<GetUserPermissionsQuery, ErrorOr<IEnumerable<PermissionResponse>>> _mockHandler;
+    private readonly IQueryHandler<GetUserPermissionsQuery, Result<IEnumerable<PermissionResponse>>> _mockHandler;
     private readonly GetUserPermissionsEndpoint _sut;
 
     /// <summary>
@@ -33,7 +33,7 @@ public class GetUserPermissionsEndpointTests
     /// </summary>
     public GetUserPermissionsEndpointTests()
     {
-        _mockHandler = Substitute.For<IQueryHandler<GetUserPermissionsQuery, ErrorOr<IEnumerable<PermissionResponse>>>>();
+        _mockHandler = Substitute.For<IQueryHandler<GetUserPermissionsQuery, Result<IEnumerable<PermissionResponse>>>>();
         _sut = Factory.Create<GetUserPermissionsEndpoint>(_mockHandler);
     }
 
@@ -49,7 +49,7 @@ public class GetUserPermissionsEndpointTests
             new PermissionResponse(Guid.NewGuid(), AuthorizationPermission.CanDeleteUsers)
         ];
         _mockHandler.HandleAsync(Arg.Any<GetUserPermissionsQuery>(), Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(expectedResponse));
+            .Returns(Result.From(expectedResponse));
 
         // Act
         IResult result = await _sut.ExecuteAsync(request, cancellationToken);
@@ -93,7 +93,7 @@ public class GetUserPermissionsEndpointTests
         GetUserPermissionsRequest request = new(userId);
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<GetUserPermissionsQuery>(), Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(Array.Empty<PermissionResponse>() as IEnumerable<PermissionResponse>));
+            .Returns(Result.From(Array.Empty<PermissionResponse>() as IEnumerable<PermissionResponse>));
 
         // Act
         await _sut.ExecuteAsync(request, cancellationToken);
@@ -118,7 +118,7 @@ public class GetUserPermissionsEndpointTests
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 info.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return ErrorOrFactory.From(Array.Empty<PermissionResponse>() as IEnumerable<PermissionResponse>);
+                return Result.From(Array.Empty<PermissionResponse>() as IEnumerable<PermissionResponse>);
             }, info.Arg<CancellationToken>()));
 
         // Act

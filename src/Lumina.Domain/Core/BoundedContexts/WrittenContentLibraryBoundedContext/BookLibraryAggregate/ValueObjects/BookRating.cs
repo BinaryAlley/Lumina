@@ -1,9 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
-using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
+using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
@@ -42,9 +41,9 @@ public class BookRating : Rating
     /// <param name="source">The optional source of the rating.</param>
     /// <param name="voteCount">The optional number of votes or reviews.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="Rating"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="Rating"/>, or an error message.
     /// </returns>
-    public static ErrorOr<BookRating> Create(decimal value, decimal maxValue, Optional<BookRatingSource> source, Optional<int> voteCount)
+    public static Result<BookRating> Create(decimal value, decimal maxValue, Optional<BookRatingSource> source, Optional<int> voteCount)
     {
         if (maxValue < 0 || value < 0)
             return Errors.Metadata.RatingValueMustBePositive;

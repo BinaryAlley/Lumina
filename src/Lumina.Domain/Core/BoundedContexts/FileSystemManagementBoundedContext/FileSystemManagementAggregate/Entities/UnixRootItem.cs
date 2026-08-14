@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
@@ -37,16 +37,16 @@ public sealed class UnixRootItem : FileSystemItem
     /// </summary>
     /// <param name="status">The status of the file system root item.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="UnixRootItem"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="UnixRootItem"/>, or an error message.
     /// </returns>
-    public static ErrorOr<UnixRootItem> Create(FileSystemItemStatus status = FileSystemItemStatus.Accessible)
+    public static Result<UnixRootItem> Create(FileSystemItemStatus status = FileSystemItemStatus.Accessible)
     {
-        ErrorOr<FileSystemPathId> createPathResult = FileSystemPathId.Create(PATH);
-        if (createPathResult.IsError)
+        Result<FileSystemPathId> createPathResult = FileSystemPathId.Create(PATH);
+        if (createPathResult.IsFailure)
             return createPathResult.Errors;
         UnixRootItem newRoot = new(createPathResult.Value, PATH);
-        ErrorOr<Updated> setStatusResult = newRoot.SetStatus(status);
-        if (setStatusResult.IsError)
+        Result<Updated> setStatusResult = newRoot.SetStatus(status);
+        if (setStatusResult.IsFailure)
             return setStatusResult.Errors;
         return newRoot;
     }

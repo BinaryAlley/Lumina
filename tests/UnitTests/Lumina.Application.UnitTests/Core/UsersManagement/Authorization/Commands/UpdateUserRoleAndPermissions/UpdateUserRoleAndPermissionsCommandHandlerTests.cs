@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Authorization;
@@ -12,6 +11,7 @@ using Lumina.Application.Core.UsersManagement.Authorization.Commands.UpdateUserR
 using Lumina.Application.UnitTests.Common.Mapping.UserManagement.Users.Fixtures;
 using Lumina.Application.UnitTests.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions.Fixtures;
 using Lumina.Contracts.Responses.Authorization;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using NSubstitute;
 using System;
@@ -21,7 +21,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.SharedKernel.Common.Errors.Errors;
+using DomainErrors = Lumina.Domain.Common.Errors.Errors;
 #endregion
 
 namespace Lumina.Application.UnitTests.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
@@ -80,10 +80,10 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
             .Returns(false);
 
         // Act
-        ErrorOr<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
         await _mockUserRepository.DidNotReceive().UpdateAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>());
     }
@@ -99,10 +99,10 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
             .Returns((UserEntity?)null);
 
         // Act
-        ErrorOr<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(DomainErrors.Users.UserDoesNotExist, result.FirstError);
     }
 
@@ -121,10 +121,10 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
             .Returns((RoleEntity?)null);
 
         // Act
-        ErrorOr<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(ApplicationErrors.Authorization.RoleNotFound, result.FirstError);
     }
 
@@ -164,13 +164,13 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
         _mockRoleRepository.GetByIdAsync(command.RoleId!.Value, Arg.Any<CancellationToken>())
             .Returns(newRole);
         _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(users));
+            .Returns(Result.From(users));
 
         // Act
-        ErrorOr<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(ApplicationErrors.Authorization.CannotRemoveLastAdmin, result.FirstError);
     }
 
@@ -192,15 +192,15 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
         _mockRoleRepository.GetByIdAsync(command.RoleId!.Value, Arg.Any<CancellationToken>())
             .Returns(role);
         _mockPermissionRepository.GetByIdsAsync(command.Permissions, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(permissions));
+            .Returns(Result.From(permissions));
         _mockUserRepository.UpdateAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>())
             .Returns(error);
 
         // Act
-        ErrorOr<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
@@ -216,7 +216,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
             Username = "testUser",
             Password = "hashedPassword",
             Libraries = [],
-            UserPermissions = command.Permissions.Select((p, i) => new UserPermissionEntity
+            UserPermissions = [.. command.Permissions.Select((p, i) => new UserPermissionEntity
             {
                 UserId = command.UserId,
                 PermissionId = p,
@@ -226,7 +226,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
                     Id = p,
                     PermissionName = (AuthorizationPermission)(i + 1) 
                 }
-            }).ToList(),
+            })],
             UserRole = null,
             CreatedOnUtc = DateTime.UtcNow,
             CreatedBy = command.UserId
@@ -242,15 +242,15 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
         _mockRoleRepository.GetByIdAsync(command.RoleId!.Value, Arg.Any<CancellationToken>())
             .Returns(role);
         _mockPermissionRepository.GetByIdsAsync(command.Permissions, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(permissions));
+            .Returns(Result.From(permissions));
         _mockUserRepository.UpdateAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Updated);
 
         // Act
-        ErrorOr<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(command.UserId, result.Value.UserId);
         Assert.Equal(role.RoleName, result.Value.Role);
         Assert.Equal(command.Permissions.Count, result.Value.Permissions.Count);
@@ -291,10 +291,10 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
     }
 
@@ -326,10 +326,10 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
     }
 }

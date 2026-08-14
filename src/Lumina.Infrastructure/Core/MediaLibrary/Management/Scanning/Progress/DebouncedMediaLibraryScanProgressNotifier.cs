@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using DebounceThrottle;
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Application.Core.MediaLibrary.Management.Progress;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
@@ -54,8 +54,8 @@ public sealed class DebouncedMediaLibraryScanProgressNotifier : IMediaLibrarySca
             if (cancellationToken.IsCancellationRequested)
                 return;
 
-            ErrorOr<MediaLibraryScanProgress> progressResult = _mediaLibrariesScanProgressTracker.GetScanProgress(mediaLibraryScanCompositeId);
-            if (progressResult.IsError)
+            Result<MediaLibraryScanProgress> progressResult = _mediaLibrariesScanProgressTracker.GetScanProgress(mediaLibraryScanCompositeId);
+            if (progressResult.IsFailure)
                 return;
 
             MediaLibraryScanProgressResponse progress = progressResult.Value.ToResponse();
@@ -72,11 +72,11 @@ public sealed class DebouncedMediaLibraryScanProgressNotifier : IMediaLibrarySca
     {
         if (cancellationToken.IsCancellationRequested)
             return;
-        ErrorOr<MediaLibraryScanProgress> progressResult = _mediaLibrariesScanProgressTracker.RemoveScanProgress(mediaLibraryScanCompositeId);
+        Result<MediaLibraryScanProgress> progressResult = _mediaLibrariesScanProgressTracker.RemoveScanProgress(mediaLibraryScanCompositeId);
         
         CleanupDebouncer(mediaLibraryScanCompositeId);
 
-        if (!progressResult.IsError)
+        if (!progressResult.IsFailure)
         {
             MediaLibraryScanProgressResponse progress = progressResult.Value.ToResponse();
             await _hubContext.Clients.Group(mediaLibraryScanCompositeId.ToString()).SendAsync(
@@ -93,11 +93,11 @@ public sealed class DebouncedMediaLibraryScanProgressNotifier : IMediaLibrarySca
     {
         if (cancellationToken.IsCancellationRequested)
             return;
-        ErrorOr<MediaLibraryScanProgress> progressResult = _mediaLibrariesScanProgressTracker.RemoveScanProgress(mediaLibraryScanCompositeId);
+        Result<MediaLibraryScanProgress> progressResult = _mediaLibrariesScanProgressTracker.RemoveScanProgress(mediaLibraryScanCompositeId);
 
         CleanupDebouncer(mediaLibraryScanCompositeId);
         
-        if (!progressResult.IsError)
+        if (!progressResult.IsFailure)
         {
             MediaLibraryScanProgressResponse progress = progressResult.Value.ToResponse();
             await _hubContext.Clients.Group(mediaLibraryScanCompositeId.ToString()).SendAsync(

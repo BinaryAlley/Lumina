@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Paths;
 using Lumina.Application.Core.FileSystemManagement.Paths.Commands.SplitPath;
@@ -20,13 +20,13 @@ namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.Split
 /// </summary>
 public class SplitPathEndpoint : BaseEndpoint<SplitPathRequest, IResult>
 {
-    private readonly ICommandHandler<SplitPathCommand, ErrorOr<IEnumerable<PathSegmentResponse>>> _splitPathCommandHandler;
+    private readonly ICommandHandler<SplitPathCommand, Result<IEnumerable<PathSegmentResponse>>> _splitPathCommandHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SplitPathEndpoint"/> class.
     /// </summary>
     /// <param name="splitPathCommandHandler">Injected service for handling split path commands.</param>
-    public SplitPathEndpoint(ICommandHandler<SplitPathCommand, ErrorOr<IEnumerable<PathSegmentResponse>>> splitPathCommandHandler)
+    public SplitPathEndpoint(ICommandHandler<SplitPathCommand, Result<IEnumerable<PathSegmentResponse>>> splitPathCommandHandler)
     {
         _splitPathCommandHandler = splitPathCommandHandler;
     }
@@ -49,7 +49,7 @@ public class SplitPathEndpoint : BaseEndpoint<SplitPathRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(SplitPathRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<IEnumerable<PathSegmentResponse>> result = await _splitPathCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
+        Result<IEnumerable<PathSegmentResponse>> result = await _splitPathCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

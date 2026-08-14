@@ -1,17 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.Admin.Authorization.Roles.Commands.UpdateRole;
 using Lumina.Contracts.DTO.Authentication;
 using Lumina.Contracts.Requests.Authorization;
 using Lumina.Contracts.Responses.Authorization;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using Lumina.Presentation.Api.Core.Endpoints.Admin.Authorization.Roles.UpdateRole;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
@@ -26,7 +25,7 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Admin.Authorization.R
 [ExcludeFromCodeCoverage]
 public class UpdateRoleEndpointTests
 {
-    private readonly ICommandHandler<UpdateRoleCommand, ErrorOr<RolePermissionsResponse>> _mockHandler;
+    private readonly ICommandHandler<UpdateRoleCommand, Result<RolePermissionsResponse>> _mockHandler;
     private readonly UpdateRoleEndpoint _sut;
 
     /// <summary>
@@ -34,7 +33,7 @@ public class UpdateRoleEndpointTests
     /// </summary>
     public UpdateRoleEndpointTests()
     {
-        _mockHandler = Substitute.For<ICommandHandler<UpdateRoleCommand, ErrorOr<RolePermissionsResponse>>>();
+        _mockHandler = Substitute.For<ICommandHandler<UpdateRoleCommand, Result<RolePermissionsResponse>>>();
         _sut = FastEndpoints.Factory.Create<UpdateRoleEndpoint>(_mockHandler);
     }
 
@@ -49,7 +48,7 @@ public class UpdateRoleEndpointTests
             [new PermissionDto(Guid.NewGuid(), AuthorizationPermission.CanViewUsers)]
         );
         _mockHandler.HandleAsync(Arg.Any<UpdateRoleCommand>(), Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(expectedResponse));
+            .Returns(Result.From(expectedResponse));
 
         // Act
         IResult result = await _sut.ExecuteAsync(request, cancellationToken);
@@ -92,7 +91,7 @@ public class UpdateRoleEndpointTests
         UpdateRoleRequest request = new(Guid.NewGuid(), "UpdatedAdmin", [Guid.NewGuid()]);
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<UpdateRoleCommand>(), Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(new RolePermissionsResponse(
+            .Returns(Result.From(new RolePermissionsResponse(
                 new RoleDto(Guid.NewGuid(), "UpdatedAdmin"),
                 []
             )));
@@ -123,7 +122,7 @@ public class UpdateRoleEndpointTests
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 info.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return ErrorOrFactory.From(new RolePermissionsResponse(
+                return Result.From(new RolePermissionsResponse(
                     new RoleDto(Guid.NewGuid(), "UpdatedAdmin"),
                     []
                 ));

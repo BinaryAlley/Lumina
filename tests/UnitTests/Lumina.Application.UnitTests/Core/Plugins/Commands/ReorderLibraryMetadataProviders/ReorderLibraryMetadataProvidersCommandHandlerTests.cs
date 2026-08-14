@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.Plugins.Commands.ReorderLibraryMetadataProviders;
 using Lumina.DataAccess.UnitTests.Core.Repositories.Plugins.Fixtures;
+using Lumina.Domain.Common.Primitives;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -52,10 +52,10 @@ public class ReorderLibraryMetadataProvidersCommandHandlerTests
             .Returns(Result.Updated);
 
         // Act
-        ErrorOr<Success> result = await _sut.HandleAsync(new ReorderLibraryMetadataProvidersCommand(libraryId, [secondProvider.PluginId, firstProvider.PluginId]), CancellationToken.None);
+        Result<Success> result = await _sut.HandleAsync(new ReorderLibraryMetadataProvidersCommand(libraryId, [secondProvider.PluginId, firstProvider.PluginId]), CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         await _mockConfigurationRepository.Received(1).UpsertAsync(
             Arg.Is<LibraryMetadataProviderConfigurationEntity>(configuration => configuration.PluginId == secondProvider.PluginId && configuration.Rank == 1),
             Arg.Any<CancellationToken>());

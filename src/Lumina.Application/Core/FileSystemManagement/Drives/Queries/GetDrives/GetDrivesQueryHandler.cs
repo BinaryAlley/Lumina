@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.FileSystemManagement.FileSystem;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
@@ -15,7 +15,7 @@ namespace Lumina.Application.Core.FileSystemManagement.Drives.Queries.GetDrives;
 /// <summary>
 /// Handler for the query to get all drives.
 /// </summary>
-public class GetDrivesQueryHandler : IQueryHandler<GetDrivesQuery, ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>>
+public class GetDrivesQueryHandler : IQueryHandler<GetDrivesQuery, Result<IEnumerable<FileSystemTreeNodeResponse>>>
 {
     private readonly IDriveService _driveService;
 
@@ -34,11 +34,11 @@ public class GetDrivesQueryHandler : IQueryHandler<GetDrivesQuery, ErrorOr<IEnum
     /// <param name="query">The query containing the requested path.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a collection of <see cref="FileSystemTreeNodeResponse"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a collection of <see cref="FileSystemTreeNodeResponse"/>, or an error message.
     /// </returns>
-    public Task<ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>> HandleAsync(GetDrivesQuery query, CancellationToken cancellationToken)
+    public Task<Result<IEnumerable<FileSystemTreeNodeResponse>>> HandleAsync(GetDrivesQuery query, CancellationToken cancellationToken)
     {
-        ErrorOr<IEnumerable<FileSystemItem>> getDrivesResult = _driveService.GetDrives();
-        return Task.FromResult(getDrivesResult.Match(values => ErrorOrFactory.From(values.ToTreeNodeResponses()), errors => errors));
+        Result<IEnumerable<FileSystemItem>> getDrivesResult = _driveService.GetDrives();
+        return Task.FromResult(getDrivesResult.Match(values => Result.From(values.ToTreeNodeResponses()), errors => errors));
     }
 }

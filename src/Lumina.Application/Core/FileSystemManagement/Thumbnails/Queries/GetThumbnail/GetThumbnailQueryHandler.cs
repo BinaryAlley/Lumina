@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Thumbnails;
 using Lumina.Application.Common.Infrastructure.Validation;
@@ -16,7 +16,7 @@ namespace Lumina.Application.Core.FileSystemManagement.Thumbnails.Queries.GetThu
 /// <summary>
 /// Handler for the query to get the file thumbnail.
 /// </summary>
-public class GetThumbnailQueryHandler : IQueryHandler<GetThumbnailQuery, ErrorOr<ThumbnailResponse>>
+public class GetThumbnailQueryHandler : IQueryHandler<GetThumbnailQuery, Result<ThumbnailResponse>>
 {
     private readonly IThumbnailService _thumbnailsService;
     private readonly IValidator<GetThumbnailQuery> _validator;
@@ -37,14 +37,14 @@ public class GetThumbnailQueryHandler : IQueryHandler<GetThumbnailQuery, ErrorOr
     /// </summary>
     /// <param name="query">The query to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{T}"/> containing either a thumbnail, or an error.</returns>
-    public async Task<ErrorOr<ThumbnailResponse>> HandleAsync(GetThumbnailQuery query, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{T}"/> containing either a thumbnail, or an error.</returns>
+    public async Task<Result<ThumbnailResponse>> HandleAsync(GetThumbnailQuery query, CancellationToken cancellationToken)
     {
         List<Error> validationResult = _validator.Validate(query);
         if (validationResult.Count > 0)
             return validationResult;
 
-        ErrorOr<Thumbnail> getThumbnailResult = await _thumbnailsService.GetThumbnailAsync(query.Path!, query.Quality, cancellationToken);
-        return await ValueTask.FromResult(getThumbnailResult.Match(value => ErrorOrFactory.From(value.ToResponse()), errors => errors));
+        Result<Thumbnail> getThumbnailResult = await _thumbnailsService.GetThumbnailAsync(query.Path!, query.Quality, cancellationToken);
+        return await ValueTask.FromResult(getThumbnailResult.Match(value => Result.From(value.ToResponse()), errors => errors));
     }
 }

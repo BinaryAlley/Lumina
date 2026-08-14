@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
@@ -46,9 +46,9 @@ public static class LibraryEntityMapping
     /// </summary>
     /// <param name="repositoryEntity">The repository entity to be converted.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully converted <see cref="Library"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully converted <see cref="Library"/>, or an error message.
     /// </returns>
-    public static ErrorOr<Library> ToDomainEntity(this LibraryEntity repositoryEntity)
+    public static Result<Library> ToDomainEntity(this LibraryEntity repositoryEntity)
     {
         return Library.Create(
             LibraryId.Create(repositoryEntity.Id),
@@ -71,9 +71,9 @@ public static class LibraryEntityMapping
     /// </summary>
     /// <param name="repositoryEntities">The repository entities to be converted.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a collection of converted <see cref="Library"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a collection of converted <see cref="Library"/>, or an error message.
     /// </returns>
-    public static IEnumerable<ErrorOr<Library>> ToDomainEntities(this IEnumerable<LibraryEntity> repositoryEntities)
+    public static IEnumerable<Result<Library>> ToDomainEntities(this IEnumerable<LibraryEntity> repositoryEntities)
     {
         return repositoryEntities.Select(library => library.ToDomainEntity());
     }

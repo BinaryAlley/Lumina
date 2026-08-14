@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Paths;
@@ -16,7 +16,7 @@ namespace Lumina.Application.Core.FileSystemManagement.Paths.Commands.SplitPath;
 /// <summary>
 /// Handler for the command to split a file system path.
 /// </summary>
-public class SplitPathCommandHandler : ICommandHandler<SplitPathCommand, ErrorOr<IEnumerable<PathSegmentResponse>>>
+public class SplitPathCommandHandler : ICommandHandler<SplitPathCommand, Result<IEnumerable<PathSegmentResponse>>>
 {
     private readonly IPathService _pathService;
     private readonly IValidator<SplitPathCommand> _validator;
@@ -38,15 +38,15 @@ public class SplitPathCommandHandler : ICommandHandler<SplitPathCommand, ErrorOr
     /// <param name="command">The command containing the requested path.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a collection of <see cref="PathSegmentResponse"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a collection of <see cref="PathSegmentResponse"/>, or an error message.
     /// </returns>
-    public Task<ErrorOr<IEnumerable<PathSegmentResponse>>> HandleAsync(SplitPathCommand command, CancellationToken cancellationToken)
+    public Task<Result<IEnumerable<PathSegmentResponse>>> HandleAsync(SplitPathCommand command, CancellationToken cancellationToken)
     {
         List<Error> validationResult = _validator.Validate(command);
         if (validationResult.Count > 0)
-            return Task.FromResult<ErrorOr<IEnumerable<PathSegmentResponse>>>(validationResult);
+            return Task.FromResult<Result<IEnumerable<PathSegmentResponse>>>(validationResult);
 
-        ErrorOr<IEnumerable<PathSegment>> parsePathResult = _pathService.ParsePath(command.Path!);
-        return Task.FromResult(parsePathResult.Match(values => ErrorOrFactory.From(values.ToResponses()), errors => errors));
+        Result<IEnumerable<PathSegment>> parsePathResult = _pathService.ParsePath(command.Path!);
+        return Task.FromResult(parsePathResult.Match(values => Result.From(values.ToResponses()), errors => errors));
     }
 }

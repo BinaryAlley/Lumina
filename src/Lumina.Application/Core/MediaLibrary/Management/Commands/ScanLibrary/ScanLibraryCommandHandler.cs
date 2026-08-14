@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
@@ -21,7 +21,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.SharedKernel.Common.Errors.Errors;
+using DomainErrors = Lumina.Domain.Common.Errors.Errors;
 #endregion
 
 namespace Lumina.Application.Core.MediaLibrary.Management.Commands.ScanLibrary;
@@ -29,7 +29,7 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Commands.ScanLibrary;
 /// <summary>
 /// Handler for the command for initiating the scan of a media library.
 /// </summary>
-public class ScanLibraryCommandHandler : ICommandHandler<ScanLibraryCommand, ErrorOr<MediaLibraryScanResponse>>
+public class ScanLibraryCommandHandler : ICommandHandler<ScanLibraryCommand, Result<MediaLibraryScanResponse>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUserService;
@@ -64,8 +64,8 @@ public class ScanLibraryCommandHandler : ICommandHandler<ScanLibraryCommand, Err
     /// </summary>
     /// <param name="command">The command to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<ErrorOr<MediaLibraryScanResponse>> HandleAsync(ScanLibraryCommand command, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<MediaLibraryScanResponse>> HandleAsync(ScanLibraryCommand command, CancellationToken cancellationToken)
     {
         List<Error> validationResult = _validator.Validate(command);
         if (validationResult.Count > 0)
@@ -75,8 +75,8 @@ public class ScanLibraryCommandHandler : ICommandHandler<ScanLibraryCommand, Err
         ILibraryScanRepository libraryScanRepository = _unitOfWork.GetRepository<ILibraryScanRepository>();
 
         // get the media library from the persistence medium
-        ErrorOr<LibraryEntity?> getLibraryResult = await libraryRepository.GetByIdAsync(command.Id, cancellationToken).ConfigureAwait(false);
-        if (getLibraryResult.IsError)
+        Result<LibraryEntity?> getLibraryResult = await libraryRepository.GetByIdAsync(command.Id, cancellationToken).ConfigureAwait(false);
+        if (getLibraryResult.IsFailure)
             return getLibraryResult.Errors;
 
         if (getLibraryResult.Value is null)
@@ -95,37 +95,37 @@ public class ScanLibraryCommandHandler : ICommandHandler<ScanLibraryCommand, Err
             return DomainErrors.Library.CannotScanLockedLibrary;
 
         // convert the persistence library to a domain entity
-        ErrorOr<Library> domainLibraryResult = getLibraryResult.Value.ToDomainEntity();
-        if (domainLibraryResult.IsError)
+        Result<Library> domainLibraryResult = getLibraryResult.Value.ToDomainEntity();
+        if (domainLibraryResult.IsFailure)
             return domainLibraryResult.Errors;
 
         // get the past month's scans for this library
-        ErrorOr<IEnumerable<LibraryScanEntity>> pastLibraryScansResult = await libraryScanRepository.GetPastMonthScansByLibraryIdAsync(command.Id, cancellationToken).ConfigureAwait(false);
-        if (pastLibraryScansResult.IsError)
+        Result<IEnumerable<LibraryScanEntity>> pastLibraryScansResult = await libraryScanRepository.GetPastMonthScansByLibraryIdAsync(command.Id, cancellationToken).ConfigureAwait(false);
+        if (pastLibraryScansResult.IsFailure)
             return pastLibraryScansResult.Errors;
         
         // convert the repository scans history to domain objects
-        IEnumerable<ErrorOr<LibraryScan>> pastLibraryScansDomainResult = pastLibraryScansResult.Value.ToDomainEntities();
-        foreach (ErrorOr<LibraryScan> pastLibraryScanDomainResult in pastLibraryScansDomainResult)
-            if (pastLibraryScanDomainResult.IsError)
+        IEnumerable<Result<LibraryScan>> pastLibraryScansDomainResult = pastLibraryScansResult.Value.ToDomainEntities();
+        foreach (Result<LibraryScan> pastLibraryScanDomainResult in pastLibraryScansDomainResult)
+            if (pastLibraryScanDomainResult.IsFailure)
                 return pastLibraryScanDomainResult.Errors;
 
         // queue the media library scan
-        ErrorOr<LibraryScan> libraryScanResult = LibraryScan.Create(
+        Result<LibraryScan> libraryScanResult = LibraryScan.Create(
             LibraryId.Create(command.Id), 
             UserId.Create(_currentUserService.UserId!.Value),
             [.. pastLibraryScansDomainResult.Select(pastLibraryScanDomainResult => pastLibraryScanDomainResult.Value)]
         );
-        if (libraryScanResult.IsError)
+        if (libraryScanResult.IsFailure)
             return libraryScanResult.Errors;
         
-        ErrorOr<Success> queueScanResult = libraryScanResult.Value.QueueScan();
-        if (queueScanResult.IsError)
+        Result<Success> queueScanResult = libraryScanResult.Value.QueueScan();
+        if (queueScanResult.IsFailure)
             return queueScanResult.Errors;
 
         // add the library scan to the persistence medium
-        ErrorOr<Created> insertLibraryScanResult = await libraryScanRepository.InsertAsync(libraryScanResult.Value.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
-        if (insertLibraryScanResult.IsError)
+        Result<Created> insertLibraryScanResult = await libraryScanRepository.InsertAsync(libraryScanResult.Value.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
+        if (insertLibraryScanResult.IsFailure)
             return insertLibraryScanResult.Errors;
 
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

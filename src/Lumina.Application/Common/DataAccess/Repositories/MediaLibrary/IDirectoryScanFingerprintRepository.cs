@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.Common.Base;
 using System;
@@ -20,14 +20,14 @@ public interface IDirectoryScanFingerprintRepository : IRepository<DirectoryScan
     /// </summary>
     /// <param name="libraryId">The unique identifier of the library for which to get the directory scan fingerprints.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a path mapped dictionary of directory scan fingerprints, or an error.</returns>
-    Task<ErrorOr<Dictionary<string, DirectoryScanFingerprintEntity>>> GetMappedByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken);
+    /// <returns>An <see cref="Result{TValue}"/> containing either a path mapped dictionary of directory scan fingerprints, or an error.</returns>
+    Task<Result<Dictionary<string, DirectoryScanFingerprintEntity>>> GetMappedByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Inserts or updates the provided directory scan fingerprints in the storage medium.
     /// </summary>
     /// <param name="entities">The directory scan fingerprints to insert or update.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    Task<ErrorOr<Updated>> UpsertRangeAsync(IReadOnlyCollection<DirectoryScanFingerprintEntity> entities, CancellationToken cancellationToken);
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Updated>> UpsertRangeAsync(IReadOnlyCollection<DirectoryScanFingerprintEntity> entities, CancellationToken cancellationToken);
 }

@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
@@ -26,7 +26,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.SharedKernel.Common.Errors.Errors;
+using DomainErrors = Lumina.Domain.Common.Errors.Errors;
 #endregion
 
 namespace Lumina.Application.Core.MediaLibrary.Management.Commands.UpdateLibrary;
@@ -34,7 +34,7 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Commands.UpdateLibrary
 /// <summary>
 /// Handler for the command to update a media library.
 /// </summary>
-public class UpdateLibraryCommandHandler : ICommandHandler<UpdateLibraryCommand, ErrorOr<LibraryResponse>>
+public class UpdateLibraryCommandHandler : ICommandHandler<UpdateLibraryCommand, Result<LibraryResponse>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUserService;
@@ -74,9 +74,9 @@ public class UpdateLibraryCommandHandler : ICommandHandler<UpdateLibraryCommand,
     /// <param name="command">The command to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully updated <see cref="LibraryResponse"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully updated <see cref="LibraryResponse"/>, or an error message.
     /// </returns>
-    public async Task<ErrorOr<LibraryResponse>> HandleAsync(UpdateLibraryCommand command, CancellationToken cancellationToken)
+    public async Task<Result<LibraryResponse>> HandleAsync(UpdateLibraryCommand command, CancellationToken cancellationToken)
     {
         List<Error> validationResult = _validator.Validate(command);
         if (validationResult.Count > 0)
@@ -85,12 +85,12 @@ public class UpdateLibraryCommandHandler : ICommandHandler<UpdateLibraryCommand,
         // make sure the file is an actual supported image
         if (command.CoverImage is not null)
         {
-            ErrorOr<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(command.CoverImage);
-            if (fileSystemPathIdResult.IsError)
+            Result<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(command.CoverImage);
+            if (fileSystemPathIdResult.IsFailure)
                 return fileSystemPathIdResult.Errors;
 
-            ErrorOr<ImageType> imageCheckResult = await _environmentContext.FileTypeService.GetImageTypeAsync(fileSystemPathIdResult.Value, cancellationToken).ConfigureAwait(false);
-            if (imageCheckResult.IsError)
+            Result<ImageType> imageCheckResult = await _environmentContext.FileTypeService.GetImageTypeAsync(fileSystemPathIdResult.Value, cancellationToken).ConfigureAwait(false);
+            if (imageCheckResult.IsFailure)
                 return imageCheckResult.Errors;
             if (imageCheckResult.Value == ImageType.None)
                 return DomainErrors.Library.CoverFileMustBeAnImage;
@@ -98,8 +98,8 @@ public class UpdateLibraryCommandHandler : ICommandHandler<UpdateLibraryCommand,
 
         // get a library repository and retrieve the library to update
         ILibraryRepository libraryRepository = _unitOfWork.GetRepository<ILibraryRepository>();
-        ErrorOr<LibraryEntity?> getLibraryResult = await libraryRepository.GetByIdAsync(command.Id, cancellationToken).ConfigureAwait(false);
-        if (getLibraryResult.IsError)
+        Result<LibraryEntity?> getLibraryResult = await libraryRepository.GetByIdAsync(command.Id, cancellationToken).ConfigureAwait(false);
+        if (getLibraryResult.IsFailure)
             return getLibraryResult.Errors;
         else if (getLibraryResult.Value is null)
             return DomainErrors.Library.LibraryNotFound;
@@ -111,7 +111,7 @@ public class UpdateLibraryCommandHandler : ICommandHandler<UpdateLibraryCommand,
             return ApplicationErrors.Authorization.NotAuthorized;
 
         // create a domain library object
-        ErrorOr<Library> createLibraryResult = Library.Create(
+        Result<Library> createLibraryResult = Library.Create(
             LibraryId.Create(command.Id),
             UserId.Create(command.OwnerId),
             command.Title!,
@@ -125,20 +125,20 @@ public class UpdateLibraryCommandHandler : ICommandHandler<UpdateLibraryCommand,
             command.ShouldSkipUnchangedDirectoriesDuringScan,
             getLibraryResult.Value.LibraryScans.Select(libraryScan => ScanId.Create(libraryScan.Id)).ToList()
         );
-        if (createLibraryResult.IsError)
+        if (createLibraryResult.IsFailure)
             return createLibraryResult.Errors;
         // convert the domain library entity to a repository library entity
         LibraryEntity persistenceLibrary = createLibraryResult.Value.ToRepositoryEntity();
 
         // update the repository entity and save changes
-        ErrorOr<Updated> updateLibraryResult = await libraryRepository.UpdateAsync(persistenceLibrary, cancellationToken).ConfigureAwait(false);
-        if (updateLibraryResult.IsError)
+        Result<Updated> updateLibraryResult = await libraryRepository.UpdateAsync(persistenceLibrary, cancellationToken).ConfigureAwait(false);
+        if (updateLibraryResult.IsFailure)
             return updateLibraryResult.Errors;
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         // retrieve the updated media library from the persistence medium and return it
-        ErrorOr<LibraryEntity?> getCreatedLibraryResult = await libraryRepository.GetByIdAsync(createLibraryResult.Value.Id.Value, cancellationToken).ConfigureAwait(false);
-        if (getCreatedLibraryResult.IsError)
+        Result<LibraryEntity?> getCreatedLibraryResult = await libraryRepository.GetByIdAsync(createLibraryResult.Value.Id.Value, cancellationToken).ConfigureAwait(false);
+        if (getCreatedLibraryResult.IsFailure)
             return getCreatedLibraryResult.Errors;
         if (getCreatedLibraryResult.Value is null)
             return ApplicationErrors.Persistence.ErrorPersistingMediaLibrary;

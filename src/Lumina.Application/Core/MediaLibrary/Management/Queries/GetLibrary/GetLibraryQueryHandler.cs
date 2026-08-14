@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
@@ -14,7 +14,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.SharedKernel.Common.Errors.Errors;
+using DomainErrors = Lumina.Domain.Common.Errors.Errors;
 #endregion
 
 namespace Lumina.Application.Core.MediaLibrary.Management.Queries.GetLibrary;
@@ -22,7 +22,7 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Queries.GetLibrary;
 /// <summary>
 /// Handler for the query to get a library by its Id.
 /// </summary>
-public class GetLibraryQueryHandler : IQueryHandler<GetLibraryQuery, ErrorOr<LibraryResponse>>
+public class GetLibraryQueryHandler : IQueryHandler<GetLibraryQuery, Result<LibraryResponse>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUserService;
@@ -54,9 +54,9 @@ public class GetLibraryQueryHandler : IQueryHandler<GetLibraryQuery, ErrorOr<Lib
     /// <param name="query">The query to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="LibraryResponse"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="LibraryResponse"/>, or an error message.
     /// </returns>
-    public async Task<ErrorOr<LibraryResponse>> HandleAsync(GetLibraryQuery query, CancellationToken cancellationToken)
+    public async Task<Result<LibraryResponse>> HandleAsync(GetLibraryQuery query, CancellationToken cancellationToken)
     {
         List<Error> validationResult = _validator.Validate(query);
         if (validationResult.Count > 0)
@@ -64,8 +64,8 @@ public class GetLibraryQueryHandler : IQueryHandler<GetLibraryQuery, ErrorOr<Lib
 
         // get the library with the specified id from the repository
         ILibraryRepository libraryRepository = _unitOfWork.GetRepository<ILibraryRepository>();
-        ErrorOr<LibraryEntity?> getLibraryResult = await libraryRepository.GetByIdAsync(query.Id, cancellationToken).ConfigureAwait(false);
-        if (getLibraryResult.IsError)
+        Result<LibraryEntity?> getLibraryResult = await libraryRepository.GetByIdAsync(query.Id, cancellationToken).ConfigureAwait(false);
+        if (getLibraryResult.IsFailure)
             return getLibraryResult.Errors;
         else if (getLibraryResult.Value is null)
             return DomainErrors.Library.LibraryNotFound;

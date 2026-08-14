@@ -1,16 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using EntityFrameworkCore.Testing.NSubstitute;
-using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Common.Errors;
 using Lumina.DataAccess.Core.Repositories.Authorization;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.DataAccess.UnitTests.Core.Repositories.Authorization.Fixtures;
-using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
+using Lumina.Domain.Common.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
@@ -46,10 +42,10 @@ public class UserRoleRepositoryTests
         UserRoleEntity userRole = _userRoleEntityFixture.CreateUserRoleModel();
 
         // Act
-        ErrorOr<Created> result = await _sut.InsertAsync(userRole, CancellationToken.None);
+        Result<Created> result = await _sut.InsertAsync(userRole, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(Result.Created, result.Value);
 
         EntityEntry<UserRoleEntity>? addedUserRole = _mockContext.ChangeTracker.Entries<UserRoleEntity>()

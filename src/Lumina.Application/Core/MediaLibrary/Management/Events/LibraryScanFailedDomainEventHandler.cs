@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Application.Core.MediaLibrary.Management.Progress;
-using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Events;
 using Lumina.Domain.Common.Exceptions;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate;
@@ -58,27 +58,27 @@ public class LibraryScanFailedDomainEventHandler : IDomainEventHandler<LibrarySc
         ILibraryScanStagingResultsRepository stagingResultsRepository = _unitOfWork.GetRepository<ILibraryScanStagingResultsRepository>();
 
         // get the library scan from the repository
-        ErrorOr<LibraryScanEntity?> getLibraryScansResult = await libraryScanRepository.GetByIdAsync(
+        Result<LibraryScanEntity?> getLibraryScansResult = await libraryScanRepository.GetByIdAsync(
             domainEvent.MediaLibraryScanCompositeId.ScanId.Value, cancellationToken).ConfigureAwait(false);
-        if (getLibraryScansResult.IsError)
+        if (getLibraryScansResult.IsFailure)
             throw new EventualConsistencyException(getLibraryScansResult.FirstError, getLibraryScansResult.Errors);
         if (getLibraryScansResult.Value is null)
             throw new EventualConsistencyException(Errors.LibraryScanning.LibraryScanNotFound);
 
         // convert the repository scan to a domain object
-        ErrorOr<LibraryScan> libraryScanDomainResult = getLibraryScansResult.Value.ToDomainEntity();
-        if (libraryScanDomainResult.IsError)
+        Result<LibraryScan> libraryScanDomainResult = getLibraryScansResult.Value.ToDomainEntity();
+        if (libraryScanDomainResult.IsFailure)
             throw new EventualConsistencyException(libraryScanDomainResult.FirstError, libraryScanDomainResult.Errors);
 
         // mark the media library scan as failed
-        ErrorOr<Success> failScanResult = libraryScanDomainResult.Value.FailScan();
+        Result<Success> failScanResult = libraryScanDomainResult.Value.FailScan();
         // we're going to ignore errors in this point, because scan jobs run in parallel, and two concurrent jobs of the same scan might trigger this domain event,
         // trying to set as failed a scan that has already been marked as failed by a concurrent job
-        if (!failScanResult.IsError)
+        if (!failScanResult.IsFailure)
         {
             // update the status of the library scan in the repository
-            ErrorOr<Updated> updateLibraryScanResult = await libraryScanRepository.UpdateAsync(libraryScanDomainResult.Value.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
-            if (updateLibraryScanResult.IsError)
+            Result<Updated> updateLibraryScanResult = await libraryScanRepository.UpdateAsync(libraryScanDomainResult.Value.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
+            if (updateLibraryScanResult.IsFailure)
                 throw new EventualConsistencyException(updateLibraryScanResult.FirstError, updateLibraryScanResult.Errors);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
@@ -87,8 +87,8 @@ public class LibraryScanFailedDomainEventHandler : IDomainEventHandler<LibrarySc
         // release the scan processing resources, regardless of whether the scan was already marked as failed by a concurrent job
         _mediaLibrariesScanCancellationTracker.RemoveScan(domainEvent.MediaLibraryScanCompositeId);
         _mediaLibrariesScanProgressTracker.RemoveScanProgress(domainEvent.MediaLibraryScanCompositeId);
-        ErrorOr<Success> clearStagingResult = await stagingResultsRepository.ClearForScanAsync(domainEvent.MediaLibraryScanCompositeId.ScanId.Value, cancellationToken).ConfigureAwait(false);
-        if (clearStagingResult.IsError)
+        Result<Success> clearStagingResult = await stagingResultsRepository.ClearForScanAsync(domainEvent.MediaLibraryScanCompositeId.ScanId.Value, cancellationToken).ConfigureAwait(false);
+        if (clearStagingResult.IsFailure)
             throw new EventualConsistencyException(clearStagingResult.FirstError, clearStagingResult.Errors);
 
         // notify SignalR clients that the library scan failed

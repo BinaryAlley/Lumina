@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.Common.Actions;
 using Lumina.Application.Common.DataAccess.Repositories.Common.Base;
@@ -25,16 +25,16 @@ public interface ILibraryScanStagingResultsRepository : IRepository<LibraryScanS
     /// <param name="scanId">The unique identifier of the media library scan whose staging results are marked.</param>
     /// <param name="libraryId">The unique identifier of the library whose media library scan snapshot is compared against.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    Task<ErrorOr<Updated>> MarkChangesAgainstSnapshotAsync(Guid scanId, Guid libraryId, CancellationToken cancellationToken);
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Updated>> MarkChangesAgainstSnapshotAsync(Guid scanId, Guid libraryId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Gets the number of media library scan staging results of the current scan that need their content hashed.
     /// </summary>
     /// <param name="scanId">The unique identifier of the media library scan whose staging results are counted.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the number of staging results that need hashing, or an error.</returns>
-    Task<ErrorOr<int>> GetFilesToHashCountAsync(Guid scanId, CancellationToken cancellationToken);
+    /// <returns>An <see cref="Result{TValue}"/> containing either the number of staging results that need hashing, or an error.</returns>
+    Task<Result<int>> GetFilesToHashCountAsync(Guid scanId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Gets a page of the media library scan staging results that need their content hashed, ordered by path, using keyset pagination.
@@ -43,8 +43,8 @@ public interface ILibraryScanStagingResultsRepository : IRepository<LibraryScanS
     /// <param name="lastPath">The path of the last retrieved file system item, used for keyset pagination. Pass <see langword="null"/> to get the first page.</param>
     /// <param name="pageSize">The maximum number of staging results to retrieve.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a page of staging results that need hashing, or an error.</returns>
-    Task<ErrorOr<IReadOnlyList<HashedFileSystemFileDto>>> GetFilesToHashPageAsync(Guid scanId, string? lastPath, int pageSize, CancellationToken cancellationToken);
+    /// <returns>An <see cref="Result{TValue}"/> containing either a page of staging results that need hashing, or an error.</returns>
+    Task<Result<IReadOnlyList<HashedFileSystemFileDto>>> GetFilesToHashPageAsync(Guid scanId, string? lastPath, int pageSize, CancellationToken cancellationToken);
 
     /// <summary>
     /// Updates the content hashes of the provided media library scan staging results.
@@ -52,14 +52,14 @@ public interface ILibraryScanStagingResultsRepository : IRepository<LibraryScanS
     /// <param name="scanId">The unique identifier of the media library scan whose staging results are updated.</param>
     /// <param name="hashedFiles">The file system items whose content hashes are updated.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    Task<ErrorOr<Updated>> UpdateFileHashesAsync(Guid scanId, IReadOnlyCollection<HashedFileSystemFileDto> hashedFiles, CancellationToken cancellationToken);
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Updated>> UpdateFileHashesAsync(Guid scanId, IReadOnlyCollection<HashedFileSystemFileDto> hashedFiles, CancellationToken cancellationToken);
 
     /// <summary>
     /// Clears all the media library scan staging results of the provided media library scan from the storage medium.
     /// </summary>
     /// <param name="scanId">The unique identifier of the media library scan whose staging results are cleared.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    Task<ErrorOr<Success>> ClearForScanAsync(Guid scanId, CancellationToken cancellationToken);
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Success>> ClearForScanAsync(Guid scanId, CancellationToken cancellationToken);
 }

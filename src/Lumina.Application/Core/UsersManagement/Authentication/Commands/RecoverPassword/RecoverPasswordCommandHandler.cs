@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
@@ -20,7 +20,7 @@ namespace Lumina.Application.Core.UsersManagement.Authentication.Commands.Recove
 /// <summary>
 /// Handler for the command to recover the password of an account.
 /// </summary>
-public class RecoverPasswordCommandHandler : ICommandHandler<RecoverPasswordCommand, ErrorOr<RecoverPasswordResponse>>
+public class RecoverPasswordCommandHandler : ICommandHandler<RecoverPasswordCommand, Result<RecoverPasswordResponse>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IPasswordHashService _hashService;
@@ -56,9 +56,9 @@ public class RecoverPasswordCommandHandler : ICommandHandler<RecoverPasswordComm
     /// <param name="command">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="RecoverPasswordResponse"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="RecoverPasswordResponse"/>, or an error message.
     /// </returns>
-    public async Task<ErrorOr<RecoverPasswordResponse>> HandleAsync(RecoverPasswordCommand command, CancellationToken cancellationToken)
+    public async Task<Result<RecoverPasswordResponse>> HandleAsync(RecoverPasswordCommand command, CancellationToken cancellationToken)
     {
         List<Error> validationResult = _validator.Validate(command);
         if (validationResult.Count > 0)
@@ -66,8 +66,8 @@ public class RecoverPasswordCommandHandler : ICommandHandler<RecoverPasswordComm
 
         // check if any users already exists
         IUserRepository userRepository = _unitOfWork.GetRepository<IUserRepository>();
-        ErrorOr<UserEntity?> getUserResult = await userRepository.GetByUsernameAsync(command.Username!, cancellationToken).ConfigureAwait(false);
-        if (getUserResult.IsError)
+        Result<UserEntity?> getUserResult = await userRepository.GetByUsernameAsync(command.Username!, cancellationToken).ConfigureAwait(false);
+        if (getUserResult.IsFailure)
             return getUserResult.Errors;
         else if (getUserResult.Value is null)
             return Errors.Authentication.UsernameDoesNotExist;
@@ -86,8 +86,8 @@ public class RecoverPasswordCommandHandler : ICommandHandler<RecoverPasswordComm
         getUserResult.Value.TempPassword = Uri.EscapeDataString(_hashService.HashString("Abcd123$")); // TODO: replace with random password generator
         getUserResult.Value.TempPasswordCreated = DateTime.UtcNow;
         // update the user
-        ErrorOr<Updated> updateUserResult = await userRepository.UpdateAsync(getUserResult.Value, cancellationToken).ConfigureAwait(false);
-        if (updateUserResult.IsError)
+        Result<Updated> updateUserResult = await userRepository.UpdateAsync(getUserResult.Value, cancellationToken).ConfigureAwait(false);
+        if (updateUserResult.IsFailure)
             return updateUserResult.Errors;
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return new RecoverPasswordResponse(true);

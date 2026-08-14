@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.Authorization;
 using Lumina.Application.Core.Admin.Authorization.Roles.Commands.UpdateRole;
@@ -19,13 +19,13 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Admin.Authorization.Roles.Updat
 /// </summary>
 public class UpdateRoleEndpoint : BaseEndpoint<UpdateRoleRequest, IResult>
 {
-    private readonly ICommandHandler<UpdateRoleCommand, ErrorOr<RolePermissionsResponse>> _updateRoleCommandHandler;
+    private readonly ICommandHandler<UpdateRoleCommand, Result<RolePermissionsResponse>> _updateRoleCommandHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UpdateRoleEndpoint"/> class.
     /// </summary>
     /// <param name="updateRoleCommandHandler">Injected service for handling update role commands.</param>
-    public UpdateRoleEndpoint(ICommandHandler<UpdateRoleCommand, ErrorOr<RolePermissionsResponse>> updateRoleCommandHandler)
+    public UpdateRoleEndpoint(ICommandHandler<UpdateRoleCommand, Result<RolePermissionsResponse>> updateRoleCommandHandler)
     {
         _updateRoleCommandHandler = updateRoleCommandHandler;
     }
@@ -48,7 +48,7 @@ public class UpdateRoleEndpoint : BaseEndpoint<UpdateRoleRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(UpdateRoleRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<RolePermissionsResponse> result = await _updateRoleCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
+        Result<RolePermissionsResponse> result = await _updateRoleCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

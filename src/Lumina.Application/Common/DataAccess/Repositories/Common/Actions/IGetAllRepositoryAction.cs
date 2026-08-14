@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.Common;
 using System.Collections.Generic;
 using System.Threading;
@@ -18,6 +18,6 @@ public interface IGetAllRepositoryAction<TModel> where TModel : IStorageEntity
     /// Gets all data of type <typeparamref name="TModel"/> from the storage medium.
     /// </summary>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of <typeparamref name="TModel"/>, or an error.</returns>
-    Task<ErrorOr<IEnumerable<TModel>>> GetAllAsync(CancellationToken cancellationToken);
+    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <typeparamref name="TModel"/>, or an error.</returns>
+    Task<Result<IEnumerable<TModel>>> GetAllAsync(CancellationToken cancellationToken);
 }

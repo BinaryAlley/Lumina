@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.FileSystemManagement.Paths.Queries.CheckPathExists;
 using Lumina.Contracts.Requests.FileSystemManagement.Path;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.CheckPathExists;
 using Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.Fixtures;
 using Microsoft.AspNetCore.Http;
@@ -24,7 +24,7 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.
 [ExcludeFromCodeCoverage]
 public class CheckPathExistsEndpointTests
 {
-    private readonly IQueryHandler<CheckPathExistsQuery, ErrorOr<PathExistsResponse>> _mockHandler;
+    private readonly IQueryHandler<CheckPathExistsQuery, Result<PathExistsResponse>> _mockHandler;
     private readonly CheckPathExistsEndpoint _sut;
     private readonly CheckPathExistsRequestFixture _checkPathExistsRequestFixture;
 
@@ -33,7 +33,7 @@ public class CheckPathExistsEndpointTests
     /// </summary>
     public CheckPathExistsEndpointTests()
     {
-        _mockHandler = Substitute.For<IQueryHandler<CheckPathExistsQuery, ErrorOr<PathExistsResponse>>>();
+        _mockHandler = Substitute.For<IQueryHandler<CheckPathExistsQuery, Result<PathExistsResponse>>>();
         _sut = Factory.Create<CheckPathExistsEndpoint>(_mockHandler);
         _checkPathExistsRequestFixture = new CheckPathExistsRequestFixture();
     }
@@ -89,7 +89,7 @@ public class CheckPathExistsEndpointTests
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return ErrorOrFactory.From(new PathExistsResponse(true));
+                return Result.From(new PathExistsResponse(true));
             }, callInfo.Arg<CancellationToken>()));
 
         // Act

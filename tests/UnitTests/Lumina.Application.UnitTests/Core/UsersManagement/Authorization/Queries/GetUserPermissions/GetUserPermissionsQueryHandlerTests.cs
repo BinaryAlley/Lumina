@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -10,6 +9,7 @@ using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetUserPermissions;
 using Lumina.Application.UnitTests.Core.UsersManagement.Authorization.Queries.GetUserPermissions.Fixtures;
 using Lumina.Contracts.Responses.Authorization;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using NSubstitute;
 using System;
@@ -70,10 +70,10 @@ public class GetUserPermissionsQueryHandlerTests
             .Returns(false);
 
         // Act
-        ErrorOr<IEnumerable<PermissionResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<IEnumerable<PermissionResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Authorization.NotAuthorized, result.FirstError);
         await _mockUserRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
     }
@@ -91,10 +91,10 @@ public class GetUserPermissionsQueryHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<IEnumerable<PermissionResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<IEnumerable<PermissionResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
     }
 
@@ -110,10 +110,10 @@ public class GetUserPermissionsQueryHandlerTests
             .Returns((UserEntity?)null);
 
         // Act
-        ErrorOr<IEnumerable<PermissionResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<IEnumerable<PermissionResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Authentication.UsernameDoesNotExist, result.FirstError);
     }
 
@@ -149,10 +149,10 @@ public class GetUserPermissionsQueryHandlerTests
             .Returns(user);
 
         // Act
-        ErrorOr<IEnumerable<PermissionResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<IEnumerable<PermissionResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Single(result.Value);
         Assert.Equal(AuthorizationPermission.CanViewUsers, result.Value.First().PermissionName);
     }

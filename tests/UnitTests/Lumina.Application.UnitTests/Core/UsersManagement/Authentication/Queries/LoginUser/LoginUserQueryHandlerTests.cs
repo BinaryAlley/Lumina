@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -11,6 +10,7 @@ using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.UsersManagement.Authentication.Queries.LoginUser;
 using Lumina.Application.UnitTests.Common.Mapping.UserManagement.Users.Fixtures;
 using Lumina.Contracts.Responses.Authentication;
+using Lumina.Domain.Common.Primitives;
 using NSubstitute;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -79,17 +79,17 @@ public class LoginUserQueryHandlerTests
         LoginUserQuery query = new(user.Username, password);
 
         _mockUserRepository.GetByUsernameAsync(user.Username, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From<UserEntity?>(user));
+            .Returns(Result.From<UserEntity?>(user));
         _mockHashService.CheckStringAgainstHash(password, hashedPassword)
             .Returns(true);
         _mockJwtTokenGenerator.GenerateToken(user.Id.ToString(), user.Username)
             .Returns(jwtToken);
 
         // Act
-        ErrorOr<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(user.Id, result.Value.Id);
         Assert.Equal(user.Username, result.Value.Username);
         Assert.Equal(jwtToken, result.Value.Token);
@@ -114,7 +114,7 @@ public class LoginUserQueryHandlerTests
         LoginUserQuery query = new(user.Username, password, totpCode);
 
         _mockUserRepository.GetByUsernameAsync(user.Username, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From<UserEntity?>(user));
+            .Returns(Result.From<UserEntity?>(user));
         _mockHashService.CheckStringAgainstHash(password, hashedPassword)
             .Returns(true);
         _mockJwtTokenGenerator.GenerateToken(user.Id.ToString(), user.Username)
@@ -125,10 +125,10 @@ public class LoginUserQueryHandlerTests
             .Returns(true);
 
         // Act
-        ErrorOr<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(user.Id, result.Value.Id);
         Assert.Equal(user.Username, result.Value.Username);
         Assert.Equal(jwtToken, result.Value.Token);
@@ -142,13 +142,13 @@ public class LoginUserQueryHandlerTests
         LoginUserQuery query = new("nonexistentUser", "password");
 
         _mockUserRepository.GetByUsernameAsync(query.Username!, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From<UserEntity?>(null));
+            .Returns(Result.From<UserEntity?>(null));
 
         // Act
-        ErrorOr<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Authentication.InvalidUsernameOrPassword, result.FirstError);
     }
 
@@ -166,15 +166,15 @@ public class LoginUserQueryHandlerTests
         LoginUserQuery query = new(user.Username, password);
 
         _mockUserRepository.GetByUsernameAsync(user.Username, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From<UserEntity?>(user));
+            .Returns(Result.From<UserEntity?>(user));
         _mockHashService.CheckStringAgainstHash(password, hashedPassword)
             .Returns(false);
 
         // Act
-        ErrorOr<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Authentication.InvalidUsernameOrPassword, result.FirstError);
     }
 
@@ -194,17 +194,17 @@ public class LoginUserQueryHandlerTests
         LoginUserQuery query = new(user.Username, password);
 
         _mockUserRepository.GetByUsernameAsync(user.Username, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From<UserEntity?>(user));
+            .Returns(Result.From<UserEntity?>(user));
         _mockHashService.CheckStringAgainstHash(password, hashedPassword)
             .Returns(false);
         _mockHashService.CheckStringAgainstHash(password, hashedTempPassword)
             .Returns(true);
 
         // Act
-        ErrorOr<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Authentication.TempPasswordExpired, result.FirstError);
 
         await _mockUserRepository.Received(1).UpdateAsync(Arg.Is<UserEntity>(u =>
@@ -232,7 +232,7 @@ public class LoginUserQueryHandlerTests
         LoginUserQuery query = new(user.Username, password);
 
         _mockUserRepository.GetByUsernameAsync(user.Username, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From<UserEntity?>(user));
+            .Returns(Result.From<UserEntity?>(user));
         _mockHashService.CheckStringAgainstHash(password, hashedPassword)
             .Returns(false); // Regular password check fails
         _mockHashService.CheckStringAgainstHash(password, hashedTempPassword)
@@ -241,10 +241,10 @@ public class LoginUserQueryHandlerTests
             .Returns(jwtToken);
 
         // Act
-        ErrorOr<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(user.Id, result.Value.Id);
         Assert.Equal(user.Username, result.Value.Username);
         Assert.Equal(jwtToken, result.Value.Token);
@@ -266,15 +266,15 @@ public class LoginUserQueryHandlerTests
         LoginUserQuery query = new(user.Username, password);
 
         _mockUserRepository.GetByUsernameAsync(user.Username, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From<UserEntity?>(user));
+            .Returns(Result.From<UserEntity?>(user));
         _mockHashService.CheckStringAgainstHash(password, hashedPassword)
             .Returns(true);
 
         // Act
-        ErrorOr<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Authentication.InvalidTotpCode, result.FirstError);
     }
 
@@ -295,7 +295,7 @@ public class LoginUserQueryHandlerTests
         LoginUserQuery query = new(user.Username, password, totpCode);
 
         _mockUserRepository.GetByUsernameAsync(user.Username, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From<UserEntity?>(user));
+            .Returns(Result.From<UserEntity?>(user));
         _mockHashService.CheckStringAgainstHash(password, hashedPassword)
             .Returns(true);
         _mockCryptographyService.Decrypt(encryptedTotpSecret)
@@ -304,10 +304,10 @@ public class LoginUserQueryHandlerTests
             .Returns(false);
 
         // Act
-        ErrorOr<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Authentication.InvalidTotpCode, result.FirstError);
     }
 
@@ -322,10 +322,10 @@ public class LoginUserQueryHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
     }
 
@@ -345,17 +345,17 @@ public class LoginUserQueryHandlerTests
         LoginUserQuery query = new(user.Username, password);
 
         _mockUserRepository.GetByUsernameAsync(user.Username, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From<UserEntity?>(user));
+            .Returns(Result.From<UserEntity?>(user));
         _mockHashService.CheckStringAgainstHash(password, hashedPassword)
             .Returns(false); // Regular password check fails
         _mockHashService.CheckStringAgainstHash(password, hashedTempPassword)
             .Returns(false); // Temp password check also fails
 
         // Act
-        ErrorOr<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Authentication.InvalidUsernameOrPassword, result.FirstError);
 
         _mockHashService.Received(1).CheckStringAgainstHash(password, hashedPassword);

@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.FileSystemManagement.Paths.Commands.SplitPath;
@@ -15,7 +15,7 @@ namespace Lumina.Application.Core.FileSystemManagement.Paths.Commands.CombinePat
 /// <summary>
 /// Handler for the command to split a file system path.
 /// </summary>
-public class CombinePathCommandHandler : ICommandHandler<CombinePathCommand, ErrorOr<PathSegmentResponse>>
+public class CombinePathCommandHandler : ICommandHandler<CombinePathCommand, Result<PathSegmentResponse>>
 {
     private readonly IPathService _pathService;
     private readonly IValidator<CombinePathCommand> _validator;
@@ -37,15 +37,15 @@ public class CombinePathCommandHandler : ICommandHandler<CombinePathCommand, Err
     /// <param name="command">The command containing the requested paths.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a <see cref="PathSegmentResponse"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a <see cref="PathSegmentResponse"/>, or an error message.
     /// </returns>
-    public Task<ErrorOr<PathSegmentResponse>> HandleAsync(CombinePathCommand command, CancellationToken cancellationToken)
+    public Task<Result<PathSegmentResponse>> HandleAsync(CombinePathCommand command, CancellationToken cancellationToken)
     {
         List<Error> validationResult = _validator.Validate(command);
         if (validationResult.Count > 0)
-            return Task.FromResult<ErrorOr<PathSegmentResponse>>(validationResult);
+            return Task.FromResult<Result<PathSegmentResponse>>(validationResult);
 
-        ErrorOr<string> combinePathResult = _pathService.CombinePath(command.OriginalPath!, command.NewPath!);
-        return Task.FromResult(combinePathResult.Match(values => ErrorOrFactory.From(new PathSegmentResponse(combinePathResult.Value)), errors => errors));
+        Result<string> combinePathResult = _pathService.CombinePath(command.OriginalPath!, command.NewPath!);
+        return Task.FromResult(combinePathResult.Match(values => Result.From(new PathSegmentResponse(combinePathResult.Value)), errors => errors));
     }
 }

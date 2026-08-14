@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
-using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Errors;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
 using Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.Services.Fixtures;
 using Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.ValueObjects.Fixtures;
 using NSubstitute;
@@ -57,15 +57,15 @@ public class ThumbnailServiceTests
         }
 
         _mockEnvironmentContext.FileTypeService.GetImageTypeAsync(pathId, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(ImageType.JPEG));
+            .Returns(Result.From(ImageType.JPEG));
         _mockEnvironmentContext.FileProviderService.GetFileAsync(pathId)
-            .Returns(ErrorOrFactory.From(imageBytes));
+            .Returns(Result.From(imageBytes));
 
         // Act
-        ErrorOr<Thumbnail> result = await _sut.GetThumbnailAsync(path, quality, CancellationToken.None);
+        Result<Thumbnail> result = await _sut.GetThumbnailAsync(path, quality, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(ImageType.JPEG, result.Value.Type);
         Assert.NotEmpty(result.Value.Bytes);
     }
@@ -78,10 +78,10 @@ public class ThumbnailServiceTests
         int quality = 80;
 
         // Act
-        ErrorOr<Thumbnail> result = await _sut.GetThumbnailAsync(invalidPath, quality, CancellationToken.None);
+        Result<Thumbnail> result = await _sut.GetThumbnailAsync(invalidPath, quality, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
     }
 
@@ -96,10 +96,10 @@ public class ThumbnailServiceTests
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        ErrorOr<Thumbnail> result = await _sut.GetThumbnailAsync(pathId, quality, CancellationToken.None);
+        Result<Thumbnail> result = await _sut.GetThumbnailAsync(pathId, quality, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
     }
 
@@ -111,13 +111,13 @@ public class ThumbnailServiceTests
         int quality = 80;
 
         _mockEnvironmentContext.FileTypeService.GetImageTypeAsync(pathId, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(ImageType.None));
+            .Returns(Result.From(ImageType.None));
 
         // Act
-        ErrorOr<Thumbnail> result = await _sut.GetThumbnailAsync(pathId, quality, CancellationToken.None);
+        Result<Thumbnail> result = await _sut.GetThumbnailAsync(pathId, quality, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Thumbnails.NoThumbnail, result.FirstError);
     }
 
@@ -129,15 +129,15 @@ public class ThumbnailServiceTests
         int quality = 80;
 
         _mockEnvironmentContext.FileTypeService.GetImageTypeAsync(pathId, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(ImageType.JPEG));
+            .Returns(Result.From(ImageType.JPEG));
         _mockEnvironmentContext.FileProviderService.GetFileAsync(pathId)
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        ErrorOr<Thumbnail> result = await _sut.GetThumbnailAsync(pathId, quality, CancellationToken.None);
+        Result<Thumbnail> result = await _sut.GetThumbnailAsync(pathId, quality, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
     }
 
@@ -150,15 +150,15 @@ public class ThumbnailServiceTests
         int quality = 80;
 
         _mockEnvironmentContext.FileTypeService.GetImageTypeAsync(pathId, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(imageType));
+            .Returns(Result.From(imageType));
         _mockEnvironmentContext.FileProviderService.GetFileAsync(pathId)
-            .Returns(ErrorOrFactory.From(imageBytes));
+            .Returns(Result.From(imageBytes));
 
         // Act
-        ErrorOr<Thumbnail> result = await _sut.GetThumbnailAsync(pathId, quality, CancellationToken.None);
+        Result<Thumbnail> result = await _sut.GetThumbnailAsync(pathId, quality, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(imageType, result.Value.Type);
         Assert.NotEmpty(result.Value.Bytes);
 
@@ -179,7 +179,7 @@ public class ThumbnailServiceTests
         cts.Cancel();
 
         _mockEnvironmentContext.FileTypeService.GetImageTypeAsync(pathId, cts.Token)
-            .Returns(Task.FromCanceled<ErrorOr<ImageType>>(cts.Token));
+            .Returns(Task.FromCanceled<Result<ImageType>>(cts.Token));
 
         // Act & Assert
         await Assert.ThrowsAsync<TaskCanceledException>(() =>

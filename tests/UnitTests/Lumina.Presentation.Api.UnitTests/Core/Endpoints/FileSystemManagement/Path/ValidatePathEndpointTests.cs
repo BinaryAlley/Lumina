@@ -1,15 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.FileSystemManagement.Paths.Queries.ValidatePath;
 using Lumina.Contracts.Requests.FileSystemManagement.Path;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.ValidatePath;
 using Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.Fixtures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -25,7 +24,7 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.
 [ExcludeFromCodeCoverage]
 public class ValidatePathEndpointTests
 {
-    private readonly IQueryHandler<ValidatePathQuery, ErrorOr<PathValidResponse>> _mockHandler;
+    private readonly IQueryHandler<ValidatePathQuery, Result<PathValidResponse>> _mockHandler;
     private readonly ValidatePathEndpoint _sut;
     private readonly ValidatePathRequestFixture _validatePathRequestFixture;
 
@@ -34,7 +33,7 @@ public class ValidatePathEndpointTests
     /// </summary>
     public ValidatePathEndpointTests()
     {
-        _mockHandler = Substitute.For<IQueryHandler<ValidatePathQuery, ErrorOr<PathValidResponse>>>();
+        _mockHandler = Substitute.For<IQueryHandler<ValidatePathQuery, Result<PathValidResponse>>>();
         _sut = Factory.Create<ValidatePathEndpoint>(_mockHandler);
         _validatePathRequestFixture = new ValidatePathRequestFixture();
     }
@@ -116,7 +115,7 @@ public class ValidatePathEndpointTests
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return ErrorOrFactory.From(new PathValidResponse(true));
+                return Result.From(new PathValidResponse(true));
             }, callInfo.Arg<CancellationToken>()));
 
         // Act

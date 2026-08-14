@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using ErrorOr;
-using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
@@ -23,12 +23,12 @@ public class WindowsRootItemFixture
     /// <returns>The created <see cref="WindowsRootItem"/>.</returns>
     public WindowsRootItem Create()
     {
-        ErrorOr<WindowsRootItem> windowsRootItemResult = WindowsRootItem.Create(
+        Result<WindowsRootItem> windowsRootItemResult = WindowsRootItem.Create(
             _faker.System.FilePath(),
             _faker.System.FileName(),
             _faker.PickRandom<FileSystemItemStatus>()
         );
-        if (windowsRootItemResult.IsError)
+        if (windowsRootItemResult.IsFailure)
             throw new InvalidOperationException("Failed to create File: " + string.Join(", ", windowsRootItemResult.Errors));
         return windowsRootItemResult.Value;
     }

@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Repositories.Authorization;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -10,6 +9,7 @@ using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.Admin.Authorization.Roles.Commands.AddRole;
 using Lumina.Application.UnitTests.Core.Admin.Authorization.Roles.Commands.AddRole.Fixtures;
 using Lumina.Contracts.Responses.Authorization;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using NSubstitute;
 using System;
@@ -69,10 +69,10 @@ public class AddRoleCommandHandlerTests
             .Returns(false);
 
         // Act
-        ErrorOr<RolePermissionsResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<RolePermissionsResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Authorization.NotAuthorized, result.FirstError);
         await _mockRoleRepository.DidNotReceive().InsertAsync(Arg.Any<RoleEntity>(), Arg.Any<CancellationToken>());
     }
@@ -90,10 +90,10 @@ public class AddRoleCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<RolePermissionsResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<RolePermissionsResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
@@ -113,10 +113,10 @@ public class AddRoleCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<RolePermissionsResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<RolePermissionsResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
     }
 
@@ -134,10 +134,10 @@ public class AddRoleCommandHandlerTests
             .Returns((RoleEntity?)null);
 
         // Act
-        ErrorOr<RolePermissionsResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<RolePermissionsResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Persistence.ErrorPersistingAuthorizationRole, result.FirstError);
     }
 
@@ -172,10 +172,10 @@ public class AddRoleCommandHandlerTests
             .Returns(role);
 
         // Act
-        ErrorOr<RolePermissionsResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<RolePermissionsResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(command.RoleName, result.Value.Role.RoleName);
         Assert.Equal(command.Permissions.Count, result.Value.Permissions.Length);
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());

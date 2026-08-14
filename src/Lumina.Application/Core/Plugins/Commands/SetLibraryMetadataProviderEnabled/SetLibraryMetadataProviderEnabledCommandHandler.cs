@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
@@ -17,7 +17,7 @@ namespace Lumina.Application.Core.Plugins.Commands.SetLibraryMetadataProviderEna
 /// <summary>
 /// Handler for the command to enable or disable a metadata provider for a media library.
 /// </summary>
-public class SetLibraryMetadataProviderEnabledCommandHandler : ICommandHandler<SetLibraryMetadataProviderEnabledCommand, ErrorOr<Success>>
+public class SetLibraryMetadataProviderEnabledCommandHandler : ICommandHandler<SetLibraryMetadataProviderEnabledCommand, Result<Success>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IValidator<SetLibraryMetadataProviderEnabledCommand> _validator;
@@ -39,17 +39,17 @@ public class SetLibraryMetadataProviderEnabledCommandHandler : ICommandHandler<S
     /// <param name="command">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.
+    /// An <see cref="Result{TValue}"/> representing either a successful operation, or an error.
     /// </returns>
-    public async Task<ErrorOr<Success>> HandleAsync(SetLibraryMetadataProviderEnabledCommand command, CancellationToken cancellationToken)
+    public async Task<Result<Success>> HandleAsync(SetLibraryMetadataProviderEnabledCommand command, CancellationToken cancellationToken)
     {
         List<Error> validationResult = _validator.Validate(command);
         if (validationResult.Count > 0)
             return validationResult;
 
         ILibraryMetadataProviderConfigurationRepository configurationRepository = _unitOfWork.GetRepository<ILibraryMetadataProviderConfigurationRepository>();
-        ErrorOr<LibraryMetadataProviderConfigurationEntity?> getConfigurationResult = await configurationRepository.GetByLibraryAndPluginIdAsync(command.LibraryId, command.PluginId, cancellationToken).ConfigureAwait(false);
-        if (getConfigurationResult.IsError)
+        Result<LibraryMetadataProviderConfigurationEntity?> getConfigurationResult = await configurationRepository.GetByLibraryAndPluginIdAsync(command.LibraryId, command.PluginId, cancellationToken).ConfigureAwait(false);
+        if (getConfigurationResult.IsFailure)
             return getConfigurationResult.Errors;
 
         LibraryMetadataProviderConfigurationEntity configuration;
@@ -61,8 +61,8 @@ public class SetLibraryMetadataProviderEnabledCommandHandler : ICommandHandler<S
         else
         {
             // compute the rank to assign to the new configuration, appending it after the existing ones
-            ErrorOr<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>> getConfigurationsResult = await configurationRepository.GetByLibraryIdAsync(command.LibraryId, cancellationToken).ConfigureAwait(false);
-            if (getConfigurationsResult.IsError)
+            Result<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>> getConfigurationsResult = await configurationRepository.GetByLibraryIdAsync(command.LibraryId, cancellationToken).ConfigureAwait(false);
+            if (getConfigurationsResult.IsFailure)
                 return getConfigurationsResult.Errors;
             int nextRank = getConfigurationsResult.Value.Count == 0 ? 1 : getConfigurationsResult.Value.Max(configuration => configuration.Rank) + 1;
             configuration = new LibraryMetadataProviderConfigurationEntity
@@ -78,8 +78,8 @@ public class SetLibraryMetadataProviderEnabledCommandHandler : ICommandHandler<S
             };
         }
 
-        ErrorOr<Updated> upsertResult = await configurationRepository.UpsertAsync(configuration, cancellationToken).ConfigureAwait(false);
-        if (upsertResult.IsError)
+        Result<Updated> upsertResult = await configurationRepository.UpsertAsync(configuration, cancellationToken).ConfigureAwait(false);
+        if (upsertResult.IsFailure)
             return upsertResult.Errors;
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return Result.Success;

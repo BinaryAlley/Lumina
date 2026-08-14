@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.Models.Core;
-using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Errors;
 using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
@@ -33,12 +33,12 @@ public class Tag : ValueObject
     /// </summary>
     /// <param name="name">The value of the tag.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="Tag"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="Tag"/>, or an error message.
     /// </returns>
-    public static ErrorOr<Tag> Create(string? name)
+    public static Result<Tag> Create(string? name)
     {
         if (string.IsNullOrWhiteSpace(name))
-            return Errors.Metadata.TagNameCannotBeEmpty;
+            return Errors.Errors.Metadata.TagNameCannotBeEmpty;
         return new Tag(name);
     }
 

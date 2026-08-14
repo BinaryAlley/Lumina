@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.Authorization;
 using Lumina.Application.Core.Admin.Authorization.Roles.Commands.AddRole;
@@ -19,13 +19,13 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Admin.Authorization.Roles.AddRo
 /// </summary>
 public class AddRoleEndpoint : BaseEndpoint<AddRoleRequest, IResult>
 {
-    private readonly ICommandHandler<AddRoleCommand, ErrorOr<RolePermissionsResponse>> _addRoleCommandHandler;
+    private readonly ICommandHandler<AddRoleCommand, Result<RolePermissionsResponse>> _addRoleCommandHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AddRoleEndpoint"/> class.
     /// </summary>
     /// <param name="addRoleCommandHandler">Injected service for handling add role commands.</param>
-    public AddRoleEndpoint(ICommandHandler<AddRoleCommand, ErrorOr<RolePermissionsResponse>> addRoleCommandHandler)
+    public AddRoleEndpoint(ICommandHandler<AddRoleCommand, Result<RolePermissionsResponse>> addRoleCommandHandler)
     {
         _addRoleCommandHandler = addRoleCommandHandler;
     }
@@ -48,7 +48,7 @@ public class AddRoleEndpoint : BaseEndpoint<AddRoleRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(AddRoleRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<RolePermissionsResponse> result = await _addRoleCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
+        Result<RolePermissionsResponse> result = await _addRoleCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

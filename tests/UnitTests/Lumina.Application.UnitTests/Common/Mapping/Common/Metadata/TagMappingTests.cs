@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.Mapping.Common.Metadata;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -20,8 +20,8 @@ public class TagMappingTests
     public void ToRepositoryEntity_WhenMappingTag_ShouldMapCorrectly()
     {
         // Arrange
-        ErrorOr<Tag> createResult = Tag.Create("indie");
-        Assert.False(createResult.IsError);
+        Result<Tag> createResult = Tag.Create("indie");
+        Assert.False(createResult.IsFailure);
         Tag tag = createResult.Value;
 
         // Act
@@ -41,8 +41,8 @@ public class TagMappingTests
     public void ToRepositoryEntity_WhenMappingDifferentTags_ShouldMapCorrectly(string name)
     {
         // Arrange
-        ErrorOr<Tag> createResult = Tag.Create(name);
-        Assert.False(createResult.IsError);
+        Result<Tag> createResult = Tag.Create(name);
+        Assert.False(createResult.IsFailure);
         Tag tag = createResult.Value;
 
         // Act
@@ -72,7 +72,7 @@ public class TagMappingTests
         // Assert
         Assert.NotNull(results);
         Assert.Equal(tags.Count, results.Count());
-        List<TagEntity> resultList = results.ToList();
+        List<TagEntity> resultList = [.. results];
         for (int i = 0; i < tags.Count; i++)
             Assert.Equal(tags[i].Name, resultList[i].Name);
     }

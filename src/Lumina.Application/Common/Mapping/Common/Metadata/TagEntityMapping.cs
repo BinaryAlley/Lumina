@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Contracts.DTO.Common;
 using Lumina.Domain.Common.ValueObjects.Metadata;
@@ -41,9 +41,9 @@ public static class TagEntityMapping
     /// </summary>
     /// <param name="repositoryEntity">The repository entity to be converted.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully converted <see cref="Tag"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully converted <see cref="Tag"/>, or an error message.
     /// </returns>
-    public static ErrorOr<Tag> ToDomainEntity(this TagEntity repositoryEntity)
+    public static Result<Tag> ToDomainEntity(this TagEntity repositoryEntity)
     {
         return Tag.Create(
             repositoryEntity.Name ?? default
@@ -55,9 +55,9 @@ public static class TagEntityMapping
     /// </summary>
     /// <param name="repositoryEntities">The repository entities to be converted.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a collection of converted <see cref="Tag"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a collection of converted <see cref="Tag"/>, or an error message.
     /// </returns>
-    public static IEnumerable<ErrorOr<Tag>> ToDomainEntities(this IEnumerable<TagEntity> repositoryEntities)
+    public static IEnumerable<Result<Tag>> ToDomainEntities(this IEnumerable<TagEntity> repositoryEntities)
     {
         return repositoryEntities.Select(domainEntity => domainEntity.ToDomainEntity());
     }

@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Repositories.Authorization;
@@ -21,7 +21,7 @@ namespace Lumina.Application.Core.Admin.Authorization.Roles.Commands.AddRole;
 /// <summary>
 /// Handler for the command to add an authorization role.
 /// </summary>
-public class AddRoleCommandHandler : ICommandHandler<AddRoleCommand, ErrorOr<RolePermissionsResponse>>
+public class AddRoleCommandHandler : ICommandHandler<AddRoleCommand, Result<RolePermissionsResponse>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IAuthorizationService _authorizationService;
@@ -49,9 +49,9 @@ public class AddRoleCommandHandler : ICommandHandler<AddRoleCommand, ErrorOr<Rol
     /// <param name="request">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="RoleResponse"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="RoleResponse"/>, or an error message.
     /// </returns>
-    public async Task<ErrorOr<RolePermissionsResponse>> HandleAsync(AddRoleCommand request, CancellationToken cancellationToken)
+    public async Task<Result<RolePermissionsResponse>> HandleAsync(AddRoleCommand request, CancellationToken cancellationToken)
     {
         List<Error> validationResult = _validator.Validate(request);
         if (validationResult.Count > 0)
@@ -77,13 +77,13 @@ public class AddRoleCommandHandler : ICommandHandler<AddRoleCommand, ErrorOr<Rol
             })]
         };
         // save the new role in the repository
-        ErrorOr<Created> insertRoleResult = await roleRepository.InsertAsync(newRole, cancellationToken).ConfigureAwait(false);
-        if (insertRoleResult.IsError)
+        Result<Created> insertRoleResult = await roleRepository.InsertAsync(newRole, cancellationToken).ConfigureAwait(false);
+        if (insertRoleResult.IsFailure)
             return insertRoleResult.Errors;
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         // retrieve the newly saved authorization role from the persistence medium and return it
-        ErrorOr<RoleEntity?> getRoleResult = await roleRepository.GetByNameAsync(request.RoleName, cancellationToken).ConfigureAwait(false);
-        if (getRoleResult.IsError)
+        Result<RoleEntity?> getRoleResult = await roleRepository.GetByNameAsync(request.RoleName, cancellationToken).ConfigureAwait(false);
+        if (getRoleResult.IsFailure)
             return getRoleResult.Errors;
         if (getRoleResult.Value is null)
             return Errors.Persistence.ErrorPersistingAuthorizationRole;

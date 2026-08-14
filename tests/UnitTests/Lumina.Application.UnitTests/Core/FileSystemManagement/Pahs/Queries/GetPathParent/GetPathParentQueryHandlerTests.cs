@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using ErrorOr;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.FileSystemManagement.Paths.Queries.GetPathParent;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Pahs.Fixtures;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Pahs.Queries.GetPathParent.Fixtures;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
-using Lumina.Application.Common.Infrastructure.Validation;
 using NSubstitute;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -53,13 +53,13 @@ public class GetPathParentQueryHandlerTests
         IEnumerable<PathSegmentResponse> pathSegmentResponses = pathSegments.Select(segment => new PathSegmentResponse(segment.Name));
 
         _mockPathService.GoUpOneLevel(query.Path!)
-            .Returns(ErrorOrFactory.From(pathSegments));
+            .Returns(Result.From(pathSegments));
 
         // Act
-        ErrorOr<IEnumerable<PathSegmentResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<IEnumerable<PathSegmentResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.IsAssignableFrom<IEnumerable<PathSegmentResponse>>(result.Value);
         Assert.Equal(pathSegmentResponses, result.Value);
         _mockPathService.Received(1).GoUpOneLevel(query.Path!);
@@ -75,10 +75,10 @@ public class GetPathParentQueryHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<IEnumerable<PathSegmentResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<IEnumerable<PathSegmentResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
         _mockPathService.Received(1).GoUpOneLevel(query.Path!);
     }
@@ -88,15 +88,15 @@ public class GetPathParentQueryHandlerTests
     {
         // Arrange
         GetPathParentQuery query = _fixture.Create<GetPathParentQuery>();
-        ErrorOr<IEnumerable<PathSegment>> emptyList = ErrorOrFactory.From(Enumerable.Empty<PathSegment>());
+        Result<IEnumerable<PathSegment>> emptyList = Result.From(Enumerable.Empty<PathSegment>());
         _mockPathService.GoUpOneLevel(query.Path!)
             .Returns(emptyList);
 
         // Act
-        ErrorOr<IEnumerable<PathSegmentResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<IEnumerable<PathSegmentResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Empty(result.Value);
         _mockPathService.Received(1).GoUpOneLevel(query.Path!);
     }

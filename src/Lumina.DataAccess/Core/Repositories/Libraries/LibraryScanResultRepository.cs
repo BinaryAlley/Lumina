@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.DataAccess.Core.UoW;
@@ -30,10 +30,10 @@ internal sealed class LibraryScanResultRepository : ILibraryScanResultRepository
     /// </summary>
     /// <param name="libraryScan">The library scan result to add.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public Task<ErrorOr<Created>> InsertAsync(LibraryScanResultEntity libraryScan, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public Task<Result<Created>> InsertAsync(LibraryScanResultEntity libraryScan, CancellationToken cancellationToken)
     {
         _luminaDbContext.LibraryScanResults.Add(libraryScan);
-        return Task.FromResult(ErrorOrFactory.From(Result.Created));
+        return Task.FromResult(Result.From(Result.Created));
     }
 }

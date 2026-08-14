@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Dapper;
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.Infrastructure.Models.DTO.MediaLibraryScanJobPayloads;
@@ -40,8 +40,8 @@ internal sealed class LibraryScanStagingResultsRepository : ILibraryScanStagingR
     /// </summary>
     /// <param name="entities">The media library scan staging results to add.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<ErrorOr<Created>> InsertRangeAsync(IReadOnlyCollection<LibraryScanStagingResultsEntity> entities, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Created>> InsertRangeAsync(IReadOnlyCollection<LibraryScanStagingResultsEntity> entities, CancellationToken cancellationToken)
     {
         // nothing to insert for an empty collection
         if (entities.Count == 0)
@@ -69,8 +69,8 @@ internal sealed class LibraryScanStagingResultsRepository : ILibraryScanStagingR
     /// <param name="scanId">The unique identifier of the media library scan whose staging results are marked.</param>
     /// <param name="libraryId">The unique identifier of the library whose media library scan snapshot is compared against.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<ErrorOr<Updated>> MarkChangesAgainstSnapshotAsync(Guid scanId, Guid libraryId, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Updated>> MarkChangesAgainstSnapshotAsync(Guid scanId, Guid libraryId, CancellationToken cancellationToken)
     {
         await using SqliteConnection connection = await OpenConnectionAsync(cancellationToken).ConfigureAwait(false);
         // compare the discovered file system items against the media library scan snapshot of the previous scan, entirely in the database, so that the snapshot never needs to be loaded into memory:
@@ -102,8 +102,8 @@ internal sealed class LibraryScanStagingResultsRepository : ILibraryScanStagingR
     /// </summary>
     /// <param name="scanId">The unique identifier of the media library scan whose staging results are counted.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the number of staging results that need hashing, or an error.</returns>
-    public async Task<ErrorOr<int>> GetFilesToHashCountAsync(Guid scanId, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> containing either the number of staging results that need hashing, or an error.</returns>
+    public async Task<Result<int>> GetFilesToHashCountAsync(Guid scanId, CancellationToken cancellationToken)
     {
         await using SqliteConnection connection = await OpenConnectionAsync(cancellationToken).ConfigureAwait(false);
         const string GET_FILES_TO_HASH_COUNT_SQL = """
@@ -125,8 +125,8 @@ internal sealed class LibraryScanStagingResultsRepository : ILibraryScanStagingR
     /// <param name="lastPath">The path of the last retrieved file system item, used for keyset pagination. Pass <see langword="null"/> to get the first page.</param>
     /// <param name="pageSize">The maximum number of staging results to retrieve.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a page of staging results that need hashing, or an error.</returns>
-    public async Task<ErrorOr<IReadOnlyList<HashedFileSystemFileDto>>> GetFilesToHashPageAsync(Guid scanId, string? lastPath, int pageSize, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> containing either a page of staging results that need hashing, or an error.</returns>
+    public async Task<Result<IReadOnlyList<HashedFileSystemFileDto>>> GetFilesToHashPageAsync(Guid scanId, string? lastPath, int pageSize, CancellationToken cancellationToken)
     {
         await using SqliteConnection connection = await OpenConnectionAsync(cancellationToken).ConfigureAwait(false);
         const string GET_FILES_TO_HASH_SQL = """
@@ -151,8 +151,8 @@ internal sealed class LibraryScanStagingResultsRepository : ILibraryScanStagingR
     /// <param name="scanId">The unique identifier of the media library scan whose staging results are updated.</param>
     /// <param name="hashedFiles">The file system items whose content hashes are updated.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<ErrorOr<Updated>> UpdateFileHashesAsync(Guid scanId, IReadOnlyCollection<HashedFileSystemFileDto> hashedFiles, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Updated>> UpdateFileHashesAsync(Guid scanId, IReadOnlyCollection<HashedFileSystemFileDto> hashedFiles, CancellationToken cancellationToken)
     {
         await using SqliteConnection connection = await OpenConnectionAsync(cancellationToken).ConfigureAwait(false);
         await using DbTransaction transaction = await connection.BeginTransactionAsync(cancellationToken);
@@ -179,8 +179,8 @@ internal sealed class LibraryScanStagingResultsRepository : ILibraryScanStagingR
     /// </summary>
     /// <param name="scanId">The unique identifier of the media library scan whose staging results are cleared.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<ErrorOr<Success>> ClearForScanAsync(Guid scanId, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Success>> ClearForScanAsync(Guid scanId, CancellationToken cancellationToken)
     {
         await using SqliteConnection connection = await OpenConnectionAsync(cancellationToken).ConfigureAwait(false);
         const string CLEAR_SQL = "DELETE FROM LibraryScanStagingResults WHERE LibraryScanId = @scanId;";

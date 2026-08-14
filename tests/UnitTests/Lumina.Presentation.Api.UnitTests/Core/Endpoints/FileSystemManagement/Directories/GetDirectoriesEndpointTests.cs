@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using ErrorOr;
 using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.FileSystemManagement.Directories.Queries.GetDirectories;
 using Lumina.Contracts.Requests.FileSystemManagement.Directories;
 using Lumina.Contracts.Responses.FileSystemManagement.Directories;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Directories.GetDirectories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -28,7 +28,7 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.
 public class GetDirectoriesEndpointTests
 {
     private readonly IFixture _fixture;
-    private readonly IQueryHandler<GetDirectoriesQuery, ErrorOr<IEnumerable<DirectoryResponse>>> _mockHandler;
+    private readonly IQueryHandler<GetDirectoriesQuery, Result<IEnumerable<DirectoryResponse>>> _mockHandler;
     private readonly GetDirectoriesEndpoint _sut;
 
     /// <summary>
@@ -37,7 +37,7 @@ public class GetDirectoriesEndpointTests
     public GetDirectoriesEndpointTests()
     {
         _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
-        _mockHandler = Substitute.For<IQueryHandler<GetDirectoriesQuery, ErrorOr<IEnumerable<DirectoryResponse>>>>();
+        _mockHandler = Substitute.For<IQueryHandler<GetDirectoriesQuery, Result<IEnumerable<DirectoryResponse>>>>();
         _sut = Factory.Create<GetDirectoriesEndpoint>(_mockHandler);
     }
 
@@ -47,9 +47,9 @@ public class GetDirectoriesEndpointTests
         // Arrange
         GetDirectoriesRequest request = _fixture.Create<GetDirectoriesRequest>();
         CancellationToken cancellationToken = CancellationToken.None;
-        List<DirectoryResponse> expectedResponses = _fixture.CreateMany<DirectoryResponse>(3).ToList();
+        List<DirectoryResponse> expectedResponses = [.. _fixture.CreateMany<DirectoryResponse>(3)];
         _mockHandler.HandleAsync(Arg.Any<GetDirectoriesQuery>(), Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(expectedResponses.AsEnumerable()));
+            .Returns(Result.From(expectedResponses.AsEnumerable()));
 
         // Act
         IResult result = await _sut.ExecuteAsync(request, cancellationToken);
@@ -118,7 +118,7 @@ public class GetDirectoriesEndpointTests
         GetDirectoriesRequest request = _fixture.Create<GetDirectoriesRequest>();
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<GetDirectoriesQuery>(), Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(Enumerable.Empty<DirectoryResponse>()));
+            .Returns(Result.From(Enumerable.Empty<DirectoryResponse>()));
 
         // Act
         await _sut.ExecuteAsync(request, cancellationToken);
@@ -144,7 +144,7 @@ public class GetDirectoriesEndpointTests
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return ErrorOrFactory.From(_fixture.CreateMany<DirectoryResponse>(3).AsEnumerable());
+                return Result.From(_fixture.CreateMany<DirectoryResponse>(3).AsEnumerable());
             }, callInfo.Arg<CancellationToken>()));
 
         // Act

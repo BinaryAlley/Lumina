@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.Books;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
@@ -71,18 +71,18 @@ internal sealed class MediaLibraryScanResultsSaveJob : MediaLibraryScanJob, IMed
                     MediaLibraryScanCompositeId compositeKey = MediaLibraryScanCompositeId.Create(ScanId, UserId);
 
                     // set the initial progress of the scan job, it's a 1 step job - applying the scan results to the storage medium
-                    ErrorOr<Success> publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, 0, 1, cancellationToken).ConfigureAwait(false);
-                    if (publishJobProgressResult.IsError)
+                    Result<Success> publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, 0, 1, cancellationToken).ConfigureAwait(false);
+                    if (publishJobProgressResult.IsFailure)
                         throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
 
                     // get the paths of the media library scan snapshot items that are no longer present in the current scan, so that deletion events can be raised for them
-                    ErrorOr<IReadOnlyList<string>> getDeletedPathsResult = await libraryScanSnapshotRepository.GetDeletedPathsAsync(LibraryId.Value, ScanId.Value, cancellationToken).ConfigureAwait(false);
-                    if (getDeletedPathsResult.IsError)
+                    Result<IReadOnlyList<string>> getDeletedPathsResult = await libraryScanSnapshotRepository.GetDeletedPathsAsync(LibraryId.Value, ScanId.Value, cancellationToken).ConfigureAwait(false);
+                    if (getDeletedPathsResult.IsFailure)
                         throw new InvalidOperationException(getDeletedPathsResult.FirstError.Description);
 
                     // apply the results of the current scan to the storage medium, atomically replacing the media library scan snapshot of the previous scan
-                    ErrorOr<Updated> applySnapshotSwapResult = await libraryScanSnapshotRepository.ApplySnapshotSwapAsync(LibraryId.Value, ScanId.Value, UserId.Value, cancellationToken).ConfigureAwait(false);
-                    if (applySnapshotSwapResult.IsError)
+                    Result<Updated> applySnapshotSwapResult = await libraryScanSnapshotRepository.ApplySnapshotSwapAsync(LibraryId.Value, ScanId.Value, UserId.Value, cancellationToken).ConfigureAwait(false);
+                    if (applySnapshotSwapResult.IsFailure)
                         throw new InvalidOperationException(applySnapshotSwapResult.FirstError.Description);
 
                     // raise a deletion event for every media library scan snapshot item that is no longer present on disk
@@ -93,29 +93,29 @@ internal sealed class MediaLibraryScanResultsSaveJob : MediaLibraryScanJob, IMed
                     }
 
                     // materialize the books of the media library from the scan snapshot, so that they are browsable even without web metadata
-                    ErrorOr<IReadOnlyList<string>> getPathsResult = await libraryScanSnapshotRepository.GetPathsAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
-                    if (getPathsResult.IsError)
+                    Result<IReadOnlyList<string>> getPathsResult = await libraryScanSnapshotRepository.GetPathsAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
+                    if (getPathsResult.IsFailure)
                         throw new InvalidOperationException(getPathsResult.FirstError.Description);
                     IBookRepository bookRepository = unitOfWork.GetRepository<IBookRepository>();
                     foreach (string path in getPathsResult.Value)
                     {
                         cancellationToken.ThrowIfCancellationRequested();
 
-                        ErrorOr<BookEntity?> getExistingBookResult = await bookRepository.GetByPathAsync(LibraryId.Value, path, cancellationToken).ConfigureAwait(false);
-                        if (getExistingBookResult.IsError)
+                        Result<BookEntity?> getExistingBookResult = await bookRepository.GetByPathAsync(LibraryId.Value, path, cancellationToken).ConfigureAwait(false);
+                        if (getExistingBookResult.IsFailure)
                             throw new InvalidOperationException(getExistingBookResult.FirstError.Description);
                         if (getExistingBookResult.Value is not null)
                             continue;
 
-                        ErrorOr<Created> insertBookResult = await bookRepository.InsertAsync(CreateShellBookEntity(LibraryId.Value, path), cancellationToken).ConfigureAwait(false);
-                        if (insertBookResult.IsError)
+                        Result<Created> insertBookResult = await bookRepository.InsertAsync(CreateShellBookEntity(LibraryId.Value, path), cancellationToken).ConfigureAwait(false);
+                        if (insertBookResult.IsFailure)
                             throw new InvalidOperationException(insertBookResult.FirstError.Description);
                     }
                     await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
                     // increment the number of processed elements progress
                     publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, 1, 1, cancellationToken).ConfigureAwait(false);
-                    if (publishJobProgressResult.IsError)
+                    if (publishJobProgressResult.IsFailure)
                         throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
 
                     Status = LibraryScanJobStatus.Completed;
@@ -149,11 +149,11 @@ internal sealed class MediaLibraryScanResultsSaveJob : MediaLibraryScanJob, IMed
     /// <param name="currentProgress">The current job progress.</param>
     /// <param name="totalProgress">The total job progress.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    private async Task<ErrorOr<Success>> PublishJobProgressAsync(IDomainEventPublisher domainEventPublisher, MediaLibraryScanCompositeId compositeKey, int currentProgress, int totalProgress, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    private async Task<Result<Success>> PublishJobProgressAsync(IDomainEventPublisher domainEventPublisher, MediaLibraryScanCompositeId compositeKey, int currentProgress, int totalProgress, CancellationToken cancellationToken)
     {
-        ErrorOr<MediaLibraryScanJobProgress> scanJobProgressResult = MediaLibraryScanJobProgress.Create(currentProgress, totalProgress, "SavingScanData");
-        if (scanJobProgressResult.IsError)
+        Result<MediaLibraryScanJobProgress> scanJobProgressResult = MediaLibraryScanJobProgress.Create(currentProgress, totalProgress, "SavingScanData");
+        if (scanJobProgressResult.IsFailure)
             return scanJobProgressResult.Errors;
 
         await domainEventPublisher.PublishAsync(new LibraryScanJobProgressChangedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);

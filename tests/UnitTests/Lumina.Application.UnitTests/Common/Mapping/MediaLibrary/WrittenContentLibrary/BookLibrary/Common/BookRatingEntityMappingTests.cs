@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
 using Lumina.Application.UnitTests.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Common.Fixtures;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -95,10 +95,10 @@ public class BookRatingEntityMappingTests
         BookRatingEntity entity = _fixture.CreateBookRating();
 
         // Act
-        ErrorOr<BookRating> result = entity.ToDomainEntity();
+        Result<BookRating> result = entity.ToDomainEntity();
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(entity.Value, result.Value.Value);
         Assert.Equal(entity.MaxValue, result.Value.MaxValue);
@@ -113,10 +113,10 @@ public class BookRatingEntityMappingTests
         BookRatingEntity entity = _fixture.CreateInvalidBookRating();
 
         // Act
-        ErrorOr<BookRating> result = entity.ToDomainEntity();
+        Result<BookRating> result = entity.ToDomainEntity();
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(default, result.Value.Value);
         Assert.Equal(default, result.Value.MaxValue);
@@ -135,14 +135,14 @@ public class BookRatingEntityMappingTests
         ];
 
         // Act
-        IEnumerable<ErrorOr<BookRating>> results = entities.ToDomainEntities();
+        IEnumerable<Result<BookRating>> results = entities.ToDomainEntities();
 
         // Assert
         Assert.NotNull(results);
         Assert.Equal(entities.Count, results.Count());
-        foreach (ErrorOr<BookRating> result in results)
+        foreach (Result<BookRating> result in results)
         {
-            Assert.False(result.IsError);
+            Assert.False(result.IsFailure);
             Assert.NotNull(result.Value);
             Assert.InRange(result.Value.Value, 1, 5);
             Assert.Equal(5, result.Value.MaxValue);

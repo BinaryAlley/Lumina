@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Application.UnitTests.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Common.Fixtures;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using Lumina.Domain.Core.BoundedContexts.MediaContributorBoundedContext.MediaContributorAggregate.ValueObjects;
@@ -9,6 +9,7 @@ using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.Boo
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.ExternalIdentifiers.LibraryManagementBoundedContext.LibraryAggregate;
+using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -24,6 +25,8 @@ namespace Lumina.Application.UnitTests.Core.MediaLibrary.WrittenContentLibrary.B
 public class BookFixture
 {
     private readonly Fixture _fixture;
+    private readonly IsbnFixture _isbnFixture;
+    private readonly BookRatingFixture _bookRatingFixture;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BookFixture"/> class.
@@ -33,6 +36,8 @@ public class BookFixture
         _fixture = new Fixture();
         _fixture.Customizations.Add(new DateOnlySpecimenBuilder());
         _fixture.Customizations.Add(new NullableDateOnlySpecimenBuilder());
+        _isbnFixture = new IsbnFixture();
+        _bookRatingFixture = new BookRatingFixture();
         ConfigureCustomDomainTypes();
     }
 
@@ -106,16 +111,8 @@ public class BookFixture
             _fixture.Create<Optional<int>>()
         ).Value);
 
-        _fixture.Register(() => Isbn.Create(
-            _fixture.Create<string>(),
-            _fixture.Create<IsbnFormat>()
-        ).Value);
+        _fixture.Register(() => _isbnFixture.CreateIsbn13());
 
-        _fixture.Register(() => BookRating.Create(
-            _fixture.Create<decimal>(),
-            _fixture.Create<decimal>(),
-            _fixture.Create<Optional<BookRatingSource>>(),
-            _fixture.Create<Optional<int>>()
-        ).Value);
+        _fixture.Register(() => _bookRatingFixture.CreateBookRating());
     }
 }

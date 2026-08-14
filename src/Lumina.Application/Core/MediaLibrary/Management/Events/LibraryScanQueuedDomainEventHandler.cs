@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -51,19 +51,19 @@ public class LibraryScanQueuedDomainEventHandler : IDomainEventHandler<LibrarySc
         ILibraryScanRepository libraryScanRepository = _unitOfWork.GetRepository<ILibraryScanRepository>();
         
         // get the library scan that was queued, from the repository
-        ErrorOr<LibraryScanEntity?> getLibraryScanResult = await libraryScanRepository.GetByIdAsync(domainEvent.ScanId.Value, cancellationToken).ConfigureAwait(false);
-        if (getLibraryScanResult.IsError || getLibraryScanResult.Value is null)
+        Result<LibraryScanEntity?> getLibraryScanResult = await libraryScanRepository.GetByIdAsync(domainEvent.ScanId.Value, cancellationToken).ConfigureAwait(false);
+        if (getLibraryScanResult.IsFailure || getLibraryScanResult.Value is null)
             throw new EventualConsistencyException(getLibraryScanResult.FirstError, getLibraryScanResult.Errors);
 
         // convert the repository entity to a domain entity
-        ErrorOr<LibraryScan> libraryScanDomainResult = getLibraryScanResult.Value.ToDomainEntity();
-        if (libraryScanDomainResult.IsError)
+        Result<LibraryScan> libraryScanDomainResult = getLibraryScanResult.Value.ToDomainEntity();
+        if (libraryScanDomainResult.IsFailure)
             throw new EventualConsistencyException(libraryScanDomainResult.FirstError, libraryScanDomainResult.Errors);
 
         // start the media library scan
-        ErrorOr<Success> startScanResult = await _mediaLibraryScanningService.StartScanAsync(
+        Result<Success> startScanResult = await _mediaLibraryScanningService.StartScanAsync(
             libraryScanDomainResult.Value, getLibraryScanResult.Value.Library.LibraryType, getLibraryScanResult.Value.Library.DownloadMetadataFromWeb, cancellationToken).ConfigureAwait(false);
-        if (startScanResult.IsError)
+        if (startScanResult.IsFailure)
             throw new EventualConsistencyException(startScanResult.FirstError, startScanResult.Errors);
 
         // queue any domain events

@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using EntityFrameworkCore.Testing.NSubstitute;
-using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.DataAccess.Core.Repositories.Books;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.DataAccess.UnitTests.Core.Repositories.Books.Fixtures;
+using Lumina.Domain.Common.Errors;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
-using Lumina.Domain.SharedKernel.Common.Errors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
@@ -47,10 +47,10 @@ public class BookRepositoryTests
         BookEntity bookModel = _bookEntityFixture.CreateBookModel();
 
         // Act
-        ErrorOr<Created> result = await _sut.InsertAsync(bookModel, CancellationToken.None);
+        Result<Created> result = await _sut.InsertAsync(bookModel, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(Result.Created, result.Value);
 
         // check if the book was added to the context's ChangeTracker
@@ -69,10 +69,10 @@ public class BookRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        ErrorOr<Created> result = await _sut.InsertAsync(bookModel, CancellationToken.None);
+        Result<Created> result = await _sut.InsertAsync(bookModel, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.WrittenContent.BookAlreadyExists, result.FirstError);
         Assert.Single(_mockContext.ChangeTracker.Entries<BookEntity>()); // only the existing book should be in the context
     }
@@ -89,10 +89,10 @@ public class BookRepositoryTests
         bookModel.Tags = [new("Existing"), new("New")];
 
         // Act
-        ErrorOr<Created> result = await _sut.InsertAsync(bookModel, CancellationToken.None);
+        Result<Created> result = await _sut.InsertAsync(bookModel, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(Result.Created, result.Value);
 
         EntityEntry<BookEntity>? addedBook = _mockContext.ChangeTracker.Entries<BookEntity>()
@@ -116,10 +116,10 @@ public class BookRepositoryTests
         bookModel.Genres = [new("Existing"), new("New")];
 
         // Act
-        ErrorOr<Created> result = await _sut.InsertAsync(bookModel, CancellationToken.None);
+        Result<Created> result = await _sut.InsertAsync(bookModel, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(Result.Created, result.Value);
 
         EntityEntry<BookEntity>? addedBook = _mockContext.ChangeTracker.Entries<BookEntity>()
@@ -145,10 +145,10 @@ public class BookRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        ErrorOr<IEnumerable<BookEntity>> result = await _sut.GetAllAsync(CancellationToken.None);
+        Result<IEnumerable<BookEntity>> result = await _sut.GetAllAsync(CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(3, result.Value.Count());
         Assert.Equal(books, result.Value);
@@ -158,10 +158,10 @@ public class BookRepositoryTests
     public async Task GetAllAsync_WhenNoBooksExist_ShouldReturnEmptyList()
     {
         // Act
-        ErrorOr<IEnumerable<BookEntity>> result = await _sut.GetAllAsync(CancellationToken.None);
+        Result<IEnumerable<BookEntity>> result = await _sut.GetAllAsync(CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Empty(result.Value);
     }
@@ -178,10 +178,10 @@ public class BookRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        ErrorOr<IEnumerable<BookEntity>> result = await _sut.GetAllAsync(CancellationToken.None);
+        Result<IEnumerable<BookEntity>> result = await _sut.GetAllAsync(CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Single(result.Value);
         BookEntity retrievedBook = result.Value.First();
@@ -203,10 +203,10 @@ public class BookRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        ErrorOr<IEnumerable<BookEntity>> result = await _sut.GetByLibraryIdAsync(libraryId, CancellationToken.None);
+        Result<IEnumerable<BookEntity>> result = await _sut.GetByLibraryIdAsync(libraryId, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         BookEntity retrievedBook = Assert.Single(result.Value);
         Assert.Equal(bookOfLibrary.Id, retrievedBook.Id);
     }
@@ -220,10 +220,10 @@ public class BookRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        ErrorOr<BookEntity?> result = await _sut.GetByPathAsync(book.LibraryId, book.Path, CancellationToken.None);
+        Result<BookEntity?> result = await _sut.GetByPathAsync(book.LibraryId, book.Path, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(book.Id, result.Value!.Id);
     }
 
@@ -236,10 +236,10 @@ public class BookRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        ErrorOr<BookEntity?> result = await _sut.GetByPathAsync(book.LibraryId, "/books/non-existent.epub", CancellationToken.None);
+        Result<BookEntity?> result = await _sut.GetByPathAsync(book.LibraryId, "/books/non-existent.epub", CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Null(result.Value);
     }
 
@@ -267,10 +267,10 @@ public class BookRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        ErrorOr<IReadOnlyList<BookEntity>> result = await _sut.GetBooksNeedingMetadataAsync(libraryId, null, 10, CancellationToken.None);
+        Result<IReadOnlyList<BookEntity>> result = await _sut.GetBooksNeedingMetadataAsync(libraryId, null, 10, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(2, result.Value.Count);
         Assert.Contains(result.Value, book => book.Id == pendingBook.Id);
         Assert.Contains(result.Value, book => book.Id == failedBook.Id);
@@ -291,10 +291,10 @@ public class BookRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        ErrorOr<IReadOnlyList<BookEntity>> result = await _sut.GetBooksNeedingMetadataAsync(libraryId, firstBook.Path, 10, CancellationToken.None);
+        Result<IReadOnlyList<BookEntity>> result = await _sut.GetBooksNeedingMetadataAsync(libraryId, firstBook.Path, 10, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         BookEntity retrievedBook = Assert.Single(result.Value);
         Assert.Equal(secondBook.Id, retrievedBook.Id);
     }
@@ -310,10 +310,10 @@ public class BookRepositoryTests
         book.Title = "Updated Title";
 
         // Act
-        ErrorOr<Updated> result = await _sut.UpdateAsync(book, CancellationToken.None);
+        Result<Updated> result = await _sut.UpdateAsync(book, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(Result.Updated, result.Value);
         BookEntity? retrievedBook = await _mockContext.Books.FindAsync(book.Id);
         Assert.Equal("Updated Title", retrievedBook!.Title);
@@ -326,10 +326,10 @@ public class BookRepositoryTests
         BookEntity book = _bookEntityFixture.CreateBookModel();
 
         // Act
-        ErrorOr<Updated> result = await _sut.UpdateAsync(book, CancellationToken.None);
+        Result<Updated> result = await _sut.UpdateAsync(book, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.WrittenContent.BookNotFound, result.FirstError);
     }
 }

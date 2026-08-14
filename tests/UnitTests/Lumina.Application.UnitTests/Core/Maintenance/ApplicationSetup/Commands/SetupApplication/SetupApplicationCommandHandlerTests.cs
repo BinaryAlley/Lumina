@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.Seed;
@@ -13,6 +12,7 @@ using Lumina.Application.Core.Maintenance.ApplicationSetup.Commands.SetupApplica
 using Lumina.Application.UnitTests.Common.Mapping.UserManagement.Users.Fixtures;
 using Lumina.Application.UnitTests.Core.Maintenance.ApplicationSetup.Commands.SetupApplication.Fixtures;
 using Lumina.Contracts.Responses.Authentication;
+using Lumina.Domain.Common.Primitives;
 using NSubstitute;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -80,17 +80,25 @@ public class SetupApplicationCommandHandlerTests
         string hashedPassword = Uri.EscapeDataString("hashedPassword");
 
         _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(Enumerable.Empty<UserEntity>()));
+            .Returns(Result.From(Enumerable.Empty<UserEntity>()));
         _mockHashService.HashString(command.Password!)
             .Returns(hashedPassword);
         _mockUserRepository.InsertAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Created);
+        _mockDataSeedService.SetDefaultAuthorizationPermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Created);
+        _mockDataSeedService.SetDefaultAuthorizationRolesAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Created);
+        _mockDataSeedService.SetAdminRolePermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Created);
+        _mockDataSeedService.SetAdminRoleToAdministratorAccount(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Created);
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(command.Username, result.Value.Username);
         Assert.Null(result.Value.TotpSecret);
@@ -111,7 +119,7 @@ public class SetupApplicationCommandHandlerTests
         string encryptedSecret = "encryptedSecret";
 
         _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(Enumerable.Empty<UserEntity>()));
+            .Returns(Result.From(Enumerable.Empty<UserEntity>()));
         _mockHashService.HashString(command.Password!)
             .Returns(hashedPassword);
         _mockTotpTokenGenerator.GenerateSecret()
@@ -122,12 +130,20 @@ public class SetupApplicationCommandHandlerTests
             .Returns(encryptedSecret);
         _mockUserRepository.InsertAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Created);
+        _mockDataSeedService.SetDefaultAuthorizationPermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Created);
+        _mockDataSeedService.SetDefaultAuthorizationRolesAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Created);
+        _mockDataSeedService.SetAdminRolePermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Created);
+        _mockDataSeedService.SetAdminRoleToAdministratorAccount(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Created);
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(command.Username, result.Value.Username);
         Assert.Equal(qrCodeUri, result.Value.TotpSecret);
@@ -148,10 +164,10 @@ public class SetupApplicationCommandHandlerTests
             .Returns(new[] { existingUser });
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Authorization.AdminAccountAlreadyCreated, result.FirstError);
 
         await _mockUserRepository.Received(1).GetAllAsync(Arg.Any<CancellationToken>());
@@ -170,10 +186,10 @@ public class SetupApplicationCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
 
         await _mockUserRepository.Received(1).GetAllAsync(Arg.Any<CancellationToken>());
@@ -189,15 +205,15 @@ public class SetupApplicationCommandHandlerTests
         Error error = Error.Failure("Database.Error", "Failed to insert user");
 
         _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(Enumerable.Empty<UserEntity>()));
+            .Returns(Result.From(Enumerable.Empty<UserEntity>()));
         _mockUserRepository.InsertAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>())
             .Returns(error);
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
 
         await _mockUserRepository.Received(1).GetAllAsync(Arg.Any<CancellationToken>());
@@ -213,17 +229,17 @@ public class SetupApplicationCommandHandlerTests
         Error error = Error.Failure("Database.Error", "Failed to set default permissions");
 
         _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(Enumerable.Empty<UserEntity>()));
+            .Returns(Result.From(Enumerable.Empty<UserEntity>()));
         _mockUserRepository.InsertAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Created);
         _mockDataSeedService.SetDefaultAuthorizationPermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
             .Returns(error);
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
 
         await _mockDataSeedService.Received(1).SetDefaultAuthorizationPermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
@@ -238,7 +254,7 @@ public class SetupApplicationCommandHandlerTests
         Error error = Error.Failure("Database.Error", "Failed to set default roles");
 
         _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(Enumerable.Empty<UserEntity>()));
+            .Returns(Result.From(Enumerable.Empty<UserEntity>()));
         _mockUserRepository.InsertAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Created);
         _mockDataSeedService.SetDefaultAuthorizationPermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
@@ -247,10 +263,10 @@ public class SetupApplicationCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
 
         await _mockDataSeedService.Received(1).SetDefaultAuthorizationPermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
@@ -266,7 +282,7 @@ public class SetupApplicationCommandHandlerTests
         Error error = Error.Failure("Database.Error", "Failed to set admin role permissions");
 
         _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(Enumerable.Empty<UserEntity>()));
+            .Returns(Result.From(Enumerable.Empty<UserEntity>()));
         _mockUserRepository.InsertAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Created);
         _mockDataSeedService.SetDefaultAuthorizationPermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
@@ -277,10 +293,10 @@ public class SetupApplicationCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
 
         await _mockDataSeedService.Received(1).SetDefaultAuthorizationPermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
@@ -297,7 +313,7 @@ public class SetupApplicationCommandHandlerTests
         Error error = Error.Failure("Database.Error", "Failed to set admin role to administrator account");
 
         _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(Enumerable.Empty<UserEntity>()));
+            .Returns(Result.From(Enumerable.Empty<UserEntity>()));
         _mockUserRepository.InsertAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Created);
         _mockDataSeedService.SetDefaultAuthorizationPermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
@@ -310,10 +326,10 @@ public class SetupApplicationCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
 
         await _mockDataSeedService.Received(1).SetDefaultAuthorizationPermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
@@ -329,7 +345,7 @@ public class SetupApplicationCommandHandlerTests
         SetupApplicationCommand command = _setupApplicationCommandFixture.CreateSetupApplicationCommand();
 
         _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(Enumerable.Empty<UserEntity>()));
+            .Returns(Result.From(Enumerable.Empty<UserEntity>()));
         _mockUserRepository.InsertAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Created);
         _mockDataSeedService.SetDefaultAuthorizationPermissionsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
@@ -342,10 +358,10 @@ public class SetupApplicationCommandHandlerTests
             .Returns(Result.Created);
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(command.Username, result.Value.Username);
 

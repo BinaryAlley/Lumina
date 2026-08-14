@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using FastEndpoints;
 using Lumina.Application.Common.DependencyInjection;
 using Lumina.DataAccess.Common.DependencyInjection;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.DependencyInjection;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Infrastructure.Common.DependencyInjection;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Progress;
@@ -151,8 +151,8 @@ public class Program
         {
             IServiceProvider services = scope.ServiceProvider;            
             IFileSystemStructureSeedService context = services.GetRequiredService<IFileSystemStructureSeedService>();
-            ErrorOr<Created> setDefaultDirectoriesResult = context.SetDefaultDirectories(mediaRootPath);
-            if (setDefaultDirectoriesResult.IsError)
+            Result<Created> setDefaultDirectoriesResult = context.SetDefaultDirectories(mediaRootPath);
+            if (setDefaultDirectoriesResult.IsFailure)
                 throw new InvalidOperationException("Could not create default file system directories structure: " + setDefaultDirectoriesResult.FirstError.Description);
         }
 

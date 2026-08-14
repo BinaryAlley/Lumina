@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.Plugins;
 using Lumina.Application.Core.Plugins.Commands.ReorderLibraryMetadataProviders;
 using Lumina.Contracts.Requests.Plugins;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Common.Routes.Library.Management;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
@@ -18,13 +18,13 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Plugins.ReorderLibraryMetadataP
 /// </summary>
 public class ReorderLibraryMetadataProvidersEndpoint : BaseEndpoint<ReorderLibraryMetadataProvidersRequest, IResult>
 {
-    private readonly ICommandHandler<ReorderLibraryMetadataProvidersCommand, ErrorOr<Success>> _reorderLibraryMetadataProvidersCommandHandler;
+    private readonly ICommandHandler<ReorderLibraryMetadataProvidersCommand, Result<Success>> _reorderLibraryMetadataProvidersCommandHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ReorderLibraryMetadataProvidersEndpoint"/> class.
     /// </summary>
     /// <param name="reorderLibraryMetadataProvidersCommandHandler">Injected service for handling reorder library metadata providers commands.</param>
-    public ReorderLibraryMetadataProvidersEndpoint(ICommandHandler<ReorderLibraryMetadataProvidersCommand, ErrorOr<Success>> reorderLibraryMetadataProvidersCommandHandler)
+    public ReorderLibraryMetadataProvidersEndpoint(ICommandHandler<ReorderLibraryMetadataProvidersCommand, Result<Success>> reorderLibraryMetadataProvidersCommandHandler)
     {
         _reorderLibraryMetadataProvidersCommandHandler = reorderLibraryMetadataProvidersCommandHandler;
     }
@@ -47,7 +47,7 @@ public class ReorderLibraryMetadataProvidersEndpoint : BaseEndpoint<ReorderLibra
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(ReorderLibraryMetadataProvidersRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<Success> result = await _reorderLibraryMetadataProvidersCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
+        Result<Success> result = await _reorderLibraryMetadataProvidersCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

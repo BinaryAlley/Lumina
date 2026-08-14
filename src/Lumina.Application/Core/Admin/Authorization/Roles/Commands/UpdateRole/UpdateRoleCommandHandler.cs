@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Repositories.Authorization;
@@ -21,7 +21,7 @@ namespace Lumina.Application.Core.Admin.Authorization.Roles.Commands.UpdateRole;
 /// <summary>
 /// Handler for the command to update an authorization role.
 /// </summary>
-public class UpdateRoleCommandHandler : ICommandHandler<UpdateRoleCommand, ErrorOr<RolePermissionsResponse>>
+public class UpdateRoleCommandHandler : ICommandHandler<UpdateRoleCommand, Result<RolePermissionsResponse>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IAuthorizationService _authorizationService;
@@ -49,9 +49,9 @@ public class UpdateRoleCommandHandler : ICommandHandler<UpdateRoleCommand, Error
     /// <param name="command">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully updated <see cref="RoleResponse"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully updated <see cref="RoleResponse"/>, or an error message.
     /// </returns>
-    public async Task<ErrorOr<RolePermissionsResponse>> HandleAsync(UpdateRoleCommand command, CancellationToken cancellationToken)
+    public async Task<Result<RolePermissionsResponse>> HandleAsync(UpdateRoleCommand command, CancellationToken cancellationToken)
     {
         List<Error> validationResult = _validator.Validate(command);
         if (validationResult.Count > 0)
@@ -78,13 +78,13 @@ public class UpdateRoleCommandHandler : ICommandHandler<UpdateRoleCommand, Error
             }).ToList()
         };
         // save the updated role in the repository
-        ErrorOr<Updated> updateRoleResult = await roleRepository.UpdateAsync(newRole, cancellationToken).ConfigureAwait(false);
-        if (updateRoleResult.IsError)
+        Result<Updated> updateRoleResult = await roleRepository.UpdateAsync(newRole, cancellationToken).ConfigureAwait(false);
+        if (updateRoleResult.IsFailure)
             return updateRoleResult.Errors;
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         // retrieve the updated authorization role from the persistence medium and return it
-        ErrorOr<RoleEntity?> getRoleResult = await roleRepository.GetByIdAsync(command.RoleId, cancellationToken).ConfigureAwait(false);
-        if (getRoleResult.IsError)
+        Result<RoleEntity?> getRoleResult = await roleRepository.GetByIdAsync(command.RoleId, cancellationToken).ConfigureAwait(false);
+        if (getRoleResult.IsFailure)
             return getRoleResult.Errors;
         if (getRoleResult.Value is null)
             return Errors.Persistence.ErrorPersistingAuthorizationRole;

@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Authorization;
@@ -41,8 +41,8 @@ public class DataSeedService : IDataSeedService
     /// </summary>
     /// <param name="adminId">The unique identifier of the admin admin user who will own these permissions.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<ErrorOr<Created>> SetDefaultAuthorizationPermissionsAsync(Guid adminId, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Created>> SetDefaultAuthorizationPermissionsAsync(Guid adminId, CancellationToken cancellationToken)
     {
         IPermissionRepository permissionRepository = _unitOfWork.GetRepository<IPermissionRepository>();
         // create the default authorization permissions and add them to the repository.
@@ -55,8 +55,8 @@ public class DataSeedService : IDataSeedService
         ];
         foreach (PermissionEntity permission in defaultPermissions)
         {
-            ErrorOr<Created> insertPermissionResult = await permissionRepository.InsertAsync(permission, cancellationToken).ConfigureAwait(false);
-            if (insertPermissionResult.IsError)
+            Result<Created> insertPermissionResult = await permissionRepository.InsertAsync(permission, cancellationToken).ConfigureAwait(false);
+            if (insertPermissionResult.IsFailure)
                 return insertPermissionResult.Errors;
         }
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
@@ -68,8 +68,8 @@ public class DataSeedService : IDataSeedService
     /// </summary>
     /// <param name="userId">The unique identifier of the admin user for whom roles will be set.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<ErrorOr<Created>> SetDefaultAuthorizationRolesAsync(Guid userId, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Created>> SetDefaultAuthorizationRolesAsync(Guid userId, CancellationToken cancellationToken)
     {
         IRoleRepository roleRepository = _unitOfWork.GetRepository<IRoleRepository>();
 
@@ -80,8 +80,8 @@ public class DataSeedService : IDataSeedService
         ];
         foreach (RoleEntity role in defaultRoles)
         {
-            ErrorOr<Created> insertRoleResult = await roleRepository.InsertAsync(role, cancellationToken).ConfigureAwait(false);
-            if (insertRoleResult.IsError)
+            Result<Created> insertRoleResult = await roleRepository.InsertAsync(role, cancellationToken).ConfigureAwait(false);
+            if (insertRoleResult.IsFailure)
                 return insertRoleResult.Errors;
         }
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
@@ -93,24 +93,24 @@ public class DataSeedService : IDataSeedService
     /// </summary>
     /// <param name="userId">The unique identifier of the admin user to receive admin role permissions.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<ErrorOr<Created>> SetAdminRolePermissionsAsync(Guid userId, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Created>> SetAdminRolePermissionsAsync(Guid userId, CancellationToken cancellationToken)
     {
         IRolePermissionRepository rolePermissionRepository = _unitOfWork.GetRepository<IRolePermissionRepository>();
         IRoleRepository roleRepository = _unitOfWork.GetRepository<IRoleRepository>();
         IPermissionRepository permissionRepository = _unitOfWork.GetRepository<IPermissionRepository>();
 
         // get the admin role
-        ErrorOr<RoleEntity?> getAdminRoleResult = await roleRepository.GetByNameAsync("Admin", cancellationToken).ConfigureAwait(false);
-        if (getAdminRoleResult.IsError)
+        Result<RoleEntity?> getAdminRoleResult = await roleRepository.GetByNameAsync("Admin", cancellationToken).ConfigureAwait(false);
+        if (getAdminRoleResult.IsFailure)
             return getAdminRoleResult.Errors;
 
         if (getAdminRoleResult.Value is null)
             return Errors.Authorization.AdminAccountNotFound;
 
         // get all permissions
-        ErrorOr<IEnumerable<PermissionEntity>> getPermissionsResult = await permissionRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
-        if (getPermissionsResult.IsError)
+        Result<IEnumerable<PermissionEntity>> getPermissionsResult = await permissionRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+        if (getPermissionsResult.IsFailure)
             return getPermissionsResult.Errors;
 
         // add each permission to the admin role
@@ -125,8 +125,8 @@ public class DataSeedService : IDataSeedService
                 CreatedBy = userId,
                 CreatedOnUtc = _dateTimeProvider.UtcNow
             };
-            ErrorOr<Created> insertRolePermissionResult = await rolePermissionRepository.InsertAsync(rolePermissionEntity, cancellationToken).ConfigureAwait(false);
-            if (insertRolePermissionResult.IsError)
+            Result<Created> insertRolePermissionResult = await rolePermissionRepository.InsertAsync(rolePermissionEntity, cancellationToken).ConfigureAwait(false);
+            if (insertRolePermissionResult.IsFailure)
                 return insertRolePermissionResult.Errors;
         }
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
@@ -138,8 +138,8 @@ public class DataSeedService : IDataSeedService
     /// </summary>
     /// <param name="userId">The unique identifier of the admin user to receive the admin role.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<ErrorOr<Created>> SetAdminRoleToAdministratorAccount(Guid userId, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Created>> SetAdminRoleToAdministratorAccount(Guid userId, CancellationToken cancellationToken)
     {
         IUserRoleRepository userRoleRepository = _unitOfWork.GetRepository<IUserRoleRepository>();
         IRoleRepository roleRepository = _unitOfWork.GetRepository<IRoleRepository>();
@@ -147,16 +147,16 @@ public class DataSeedService : IDataSeedService
 
 
         // get the admin role
-        ErrorOr<RoleEntity?> getAdminRoleResult = await roleRepository.GetByNameAsync("Admin", cancellationToken).ConfigureAwait(false);
-        if (getAdminRoleResult.IsError)
+        Result<RoleEntity?> getAdminRoleResult = await roleRepository.GetByNameAsync("Admin", cancellationToken).ConfigureAwait(false);
+        if (getAdminRoleResult.IsFailure)
             return getAdminRoleResult.Errors;
 
         if (getAdminRoleResult.Value is null)
             return Errors.Authorization.AdminRoleNotFound;
 
         // get admin user
-        ErrorOr<UserEntity?> getUserResult = await userRepository.GetByIdAsync(userId, cancellationToken).ConfigureAwait(false);
-        if (getUserResult.IsError)
+        Result<UserEntity?> getUserResult = await userRepository.GetByIdAsync(userId, cancellationToken).ConfigureAwait(false);
+        if (getUserResult.IsFailure)
             return getUserResult.Errors;
 
         if (getUserResult.Value is null)
@@ -172,8 +172,8 @@ public class DataSeedService : IDataSeedService
             User = getUserResult.Value,
             UserId = getUserResult.Value.Id
         };
-        ErrorOr<Created> insertUserRoleResult = await userRoleRepository.InsertAsync(userRole, cancellationToken).ConfigureAwait(false);
-        if (insertUserRoleResult.IsError)
+        Result<Created> insertUserRoleResult = await userRoleRepository.InsertAsync(userRole, cancellationToken).ConfigureAwait(false);
+        if (insertUserRoleResult.IsFailure)
             return insertUserRoleResult.Errors;
 
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

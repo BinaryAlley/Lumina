@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using FastEndpoints;
+using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.SharedKernel.Common.Enums.Primitives;
 using Lumina.Presentation.Api.UnitTests.Core.Endpoints.Common.Fixtures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;

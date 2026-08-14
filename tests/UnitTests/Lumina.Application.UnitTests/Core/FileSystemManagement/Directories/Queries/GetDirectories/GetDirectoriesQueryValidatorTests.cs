@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Core.FileSystemManagement.Directories.Queries.GetDirectories;
 using Lumina.Application.UnitTests.Common.Setup;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Directories.Queries.GetDirectories.Fixtures;
+using Lumina.Domain.Common.Errors;
+using Lumina.Domain.Common.Primitives;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using Lumina.Domain.SharedKernel.Common.Errors;
 #endregion
 
 namespace Lumina.Application.UnitTests.Core.FileSystemManagement.Directories.Queries.GetDirectories;

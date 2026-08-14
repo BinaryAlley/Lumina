@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
@@ -15,7 +15,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.SharedKernel.Common.Errors.Errors;
+using DomainErrors = Lumina.Domain.Common.Errors.Errors;
 #endregion
 
 namespace Lumina.Application.Core.MediaLibrary.Management.Commands.CancelLibraryScan;
@@ -23,7 +23,7 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Commands.CancelLibrary
 /// <summary>
 /// Handler for the command for canceling the scan of a media library.
 /// </summary>
-public class CancelLibraryScanCommandHandler : ICommandHandler<CancelLibraryScanCommand, ErrorOr<Success>>
+public class CancelLibraryScanCommandHandler : ICommandHandler<CancelLibraryScanCommand, Result<Success>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUserService;
@@ -58,8 +58,8 @@ public class CancelLibraryScanCommandHandler : ICommandHandler<CancelLibraryScan
     /// </summary>
     /// <param name="command">The command to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<ErrorOr<Success>> HandleAsync(CancelLibraryScanCommand command, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Success>> HandleAsync(CancelLibraryScanCommand command, CancellationToken cancellationToken)
     {
         List<Error> validationResult = _validator.Validate(command);
         if (validationResult.Count > 0)
@@ -68,8 +68,8 @@ public class CancelLibraryScanCommandHandler : ICommandHandler<CancelLibraryScan
         ILibraryScanRepository libraryScanRepository = _unitOfWork.GetRepository<ILibraryScanRepository>();
 
         // get the library scan from the repository
-        ErrorOr<LibraryScanEntity?> getLibraryScansResult = await libraryScanRepository.GetByIdAsync(command.ScanId, cancellationToken).ConfigureAwait(false);
-        if (getLibraryScansResult.IsError)
+        Result<LibraryScanEntity?> getLibraryScansResult = await libraryScanRepository.GetByIdAsync(command.ScanId, cancellationToken).ConfigureAwait(false);
+        if (getLibraryScansResult.IsFailure)
             return getLibraryScansResult.Errors;
         if (getLibraryScansResult.Value is null)
             return DomainErrors.LibraryScanning.LibraryScanNotFound;
@@ -80,18 +80,18 @@ public class CancelLibraryScanCommandHandler : ICommandHandler<CancelLibraryScan
             return ApplicationErrors.Authorization.NotAuthorized;
 
         // convert the repository scan to a domain object
-        ErrorOr<LibraryScan> libraryScanDomainResult = getLibraryScansResult.Value.ToDomainEntity();
-        if (libraryScanDomainResult.IsError)
+        Result<LibraryScan> libraryScanDomainResult = getLibraryScansResult.Value.ToDomainEntity();
+        if (libraryScanDomainResult.IsFailure)
             return libraryScanDomainResult.Errors;
 
         // cancel the media library scan
-        ErrorOr<Success> cancelScanResult = libraryScanDomainResult.Value.CancelScan();
-        if (cancelScanResult.IsError)
+        Result<Success> cancelScanResult = libraryScanDomainResult.Value.CancelScan();
+        if (cancelScanResult.IsFailure)
             return cancelScanResult.Errors;
 
         // update the status of the library scan in the repository
-        ErrorOr<Updated> updateLibraryScanResult = await libraryScanRepository.UpdateAsync(libraryScanDomainResult.Value.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
-        if (updateLibraryScanResult.IsError)
+        Result<Updated> updateLibraryScanResult = await libraryScanRepository.UpdateAsync(libraryScanDomainResult.Value.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
+        if (updateLibraryScanResult.IsFailure)
             return updateLibraryScanResult.Errors;
 
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

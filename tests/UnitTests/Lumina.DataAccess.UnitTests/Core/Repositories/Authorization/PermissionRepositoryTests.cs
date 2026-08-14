@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using EntityFrameworkCore.Testing.NSubstitute;
-using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.Errors;
 using Lumina.DataAccess.Core.Repositories.Authorization;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.DataAccess.UnitTests.Core.Repositories.Authorization.Fixtures;
+using Lumina.Domain.Common.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
@@ -45,10 +45,10 @@ public class PermissionRepositoryTests
         PermissionEntity permissionModel = _permissionEntityFixture.CreatePermissionModel();
 
         // Act
-        ErrorOr<Created> result = await _sut.InsertAsync(permissionModel, CancellationToken.None);
+        Result<Created> result = await _sut.InsertAsync(permissionModel, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(Result.Created, result.Value);
 
         // check if the permission was added to the context's ChangeTracker
@@ -67,10 +67,10 @@ public class PermissionRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        ErrorOr<Created> result = await _sut.InsertAsync(permissionModel, CancellationToken.None);
+        Result<Created> result = await _sut.InsertAsync(permissionModel, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Authorization.PermissionAlreadyExists, result.FirstError);
         Assert.Single(_mockContext.ChangeTracker.Entries<PermissionEntity>());
     }
@@ -89,10 +89,10 @@ public class PermissionRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        ErrorOr<IEnumerable<PermissionEntity>> result = await _sut.GetAllAsync(CancellationToken.None);
+        Result<IEnumerable<PermissionEntity>> result = await _sut.GetAllAsync(CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(3, result.Value.Count());
         Assert.Equal(permissions, result.Value);
@@ -102,10 +102,10 @@ public class PermissionRepositoryTests
     public async Task GetAllAsync_WhenNoPermissionsExist_ShouldReturnEmptyList()
     {
         // Act
-        ErrorOr<IEnumerable<PermissionEntity>> result = await _sut.GetAllAsync(CancellationToken.None);
+        Result<IEnumerable<PermissionEntity>> result = await _sut.GetAllAsync(CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Empty(result.Value);
     }
@@ -123,16 +123,16 @@ public class PermissionRepositoryTests
         _mockContext.Permissions.AddRange(permissions);
         await _mockContext.SaveChangesAsync();
 
-        List<Guid> requestedIds = permissions.Take(2).Select(p => p.Id).ToList();
+        List<Guid> requestedIds = [.. permissions.Take(2).Select(p => p.Id)];
 
         // Act
-        ErrorOr<IEnumerable<PermissionEntity>> result = await _sut.GetByIdsAsync(requestedIds, CancellationToken.None);
+        Result<IEnumerable<PermissionEntity>> result = await _sut.GetByIdsAsync(requestedIds, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(2, result.Value.Count());
-        Assert.Equal(requestedIds, result.Value.Select(p => p.Id).ToList());
+        Assert.Equal(requestedIds, [.. result.Value.Select(p => p.Id)]);
     }
 
     [Fact]
@@ -142,10 +142,10 @@ public class PermissionRepositoryTests
         List<Guid> requestedIds = [Guid.NewGuid(), Guid.NewGuid()];
 
         // Act
-        ErrorOr<IEnumerable<PermissionEntity>> result = await _sut.GetByIdsAsync(requestedIds, CancellationToken.None);
+        Result<IEnumerable<PermissionEntity>> result = await _sut.GetByIdsAsync(requestedIds, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Empty(result.Value);
     }

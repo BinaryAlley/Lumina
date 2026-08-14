@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
@@ -14,7 +14,7 @@ namespace Lumina.Application.Core.FileSystemManagement.Paths.Queries.ValidatePat
 /// <summary>
 /// Handler for the query to validate a file system path.
 /// </summary>
-public class ValidatePathQueryHandler : IQueryHandler<ValidatePathQuery, ErrorOr<PathValidResponse>>
+public class ValidatePathQueryHandler : IQueryHandler<ValidatePathQuery, Result<PathValidResponse>>
 {
     private readonly IPathService _pathService;
     private readonly IValidator<ValidatePathQuery> _validator;
@@ -36,14 +36,14 @@ public class ValidatePathQueryHandler : IQueryHandler<ValidatePathQuery, ErrorOr
     /// <param name="query">The query containing the request.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either <see langword="true"/> if the specified path is valid, <see langword="false"/> if it isn't, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either <see langword="true"/> if the specified path is valid, <see langword="false"/> if it isn't, or an error message.
     /// </returns>
-    public Task<ErrorOr<PathValidResponse>> HandleAsync(ValidatePathQuery query, CancellationToken cancellationToken)
+    public Task<Result<PathValidResponse>> HandleAsync(ValidatePathQuery query, CancellationToken cancellationToken)
     {
         List<Error> validationResult = _validator.Validate(query);
         if (validationResult.Count > 0)
-            return Task.FromResult<ErrorOr<PathValidResponse>>(validationResult);
+            return Task.FromResult<Result<PathValidResponse>>(validationResult);
 
-        return Task.FromResult(ErrorOrFactory.From(new PathValidResponse(_pathService.IsValidPath(query.Path!))));
+        return Task.FromResult(Result.From(new PathValidResponse(_pathService.IsValidPath(query.Path!))));
     }
 }

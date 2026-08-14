@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
@@ -20,7 +20,7 @@ namespace Lumina.Application.Core.UsersManagement.Authorization.Queries.GetUserR
 /// <summary>
 /// Handler for the query to retrieve the authorization role of a user.
 /// </summary>
-public class GetUserRoleQueryHandler : IQueryHandler<GetUserRoleQuery, ErrorOr<RoleResponse?>>
+public class GetUserRoleQueryHandler : IQueryHandler<GetUserRoleQuery, Result<RoleResponse?>>
 {
     private readonly ICurrentUserService _currentUserService;
     private readonly IAuthorizationService _authorizationService;
@@ -48,9 +48,9 @@ public class GetUserRoleQueryHandler : IQueryHandler<GetUserRoleQuery, ErrorOr<R
     /// <param name="query">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a <see cref="RoleResponse"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a <see cref="RoleResponse"/>, or an error message.
     /// </returns>
-    public async Task<ErrorOr<RoleResponse?>> HandleAsync(GetUserRoleQuery query, CancellationToken cancellationToken)
+    public async Task<Result<RoleResponse?>> HandleAsync(GetUserRoleQuery query, CancellationToken cancellationToken)
     {
         List<Error> validationResult = _validator.Validate(query);
         if (validationResult.Count > 0)
@@ -61,11 +61,11 @@ public class GetUserRoleQueryHandler : IQueryHandler<GetUserRoleQuery, ErrorOr<R
         if (!isAdmin)
             return Errors.Authorization.NotAuthorized;
         // get the user from the repository and return its roles
-        ErrorOr<UserEntity?> getUserResult = await _userRepository.GetByIdAsync(query.UserId!.Value, cancellationToken).ConfigureAwait(false);
-        if (getUserResult.IsError)
+        Result<UserEntity?> getUserResult = await _userRepository.GetByIdAsync(query.UserId!.Value, cancellationToken).ConfigureAwait(false);
+        if (getUserResult.IsFailure)
             return getUserResult.Errors;
         else if (getUserResult.Value is null)
             return Errors.Authentication.UsernameDoesNotExist;
-        return ErrorOrFactory.From(getUserResult.Value.UserRole?.Role.ToResponse());
+        return Result.From(getUserResult.Value.UserRole?.Role.ToResponse());
     }
 }

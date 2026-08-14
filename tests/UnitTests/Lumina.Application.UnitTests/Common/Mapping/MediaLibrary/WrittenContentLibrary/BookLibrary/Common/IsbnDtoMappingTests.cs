@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
 using Lumina.Application.UnitTests.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Common.Fixtures;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
+using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -36,10 +36,10 @@ public class IsbnDtoMappingTests
         IsbnDto dto = _isbnDtoFixture.CreateIsbn10();
 
         // Act
-        ErrorOr<Isbn> result = dto.ToDomainEntity();
+        Result<Isbn> result = dto.ToDomainEntity();
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(dto.Value, result.Value.Value);
         Assert.Equal(dto.Format!.Value, result.Value.Format);
@@ -52,10 +52,10 @@ public class IsbnDtoMappingTests
         IsbnDto dto = _isbnDtoFixture.CreateIsbn13();
 
         // Act
-        ErrorOr<Isbn> result = dto.ToDomainEntity();
+        Result<Isbn> result = dto.ToDomainEntity();
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(dto.Value, result.Value.Value);
         Assert.Equal(dto.Format!.Value, result.Value.Format);
@@ -68,10 +68,10 @@ public class IsbnDtoMappingTests
         IsbnDto dto = _isbnDtoFixture.CreateWithoutFormat();
 
         // Act
-        ErrorOr<Isbn> result = dto.ToDomainEntity();
+        Result<Isbn> result = dto.ToDomainEntity();
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(dto.Value, result.Value.Value);
         Assert.Equal(IsbnFormat.Isbn13, result.Value.Format); // default format
@@ -84,10 +84,10 @@ public class IsbnDtoMappingTests
         IsbnDto dto = _isbnDtoFixture.CreateInvalid();
 
         // Act
-        ErrorOr<Isbn> result = dto.ToDomainEntity();
+        Result<Isbn> result = dto.ToDomainEntity();
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
     }
 
     [Fact]
@@ -102,14 +102,14 @@ public class IsbnDtoMappingTests
         ];
 
         // Act
-        IEnumerable<ErrorOr<Isbn>> results = dtos.ToDomainEntities();
+        IEnumerable<Result<Isbn>> results = dtos.ToDomainEntities();
 
         // Assert
         Assert.NotNull(results);
         Assert.Equal(dtos.Count, results.Count());
 
-        List<ErrorOr<Isbn>> resultList = results.ToList();
-        Assert.All(resultList, result => Assert.False(result.IsError));
+        List<Result<Isbn>> resultList = [.. results];
+        Assert.All(resultList, result => Assert.False(result.IsFailure));
 
         Assert.Equal(dtos[0].Value, resultList[0].Value.Value);
         Assert.Equal(dtos[0].Format!.Value, resultList[0].Value.Format);
@@ -133,20 +133,20 @@ public class IsbnDtoMappingTests
         ];
 
         // Act
-        IEnumerable<ErrorOr<Isbn>> results = dtos.ToDomainEntities();
+        IEnumerable<Result<Isbn>> results = dtos.ToDomainEntities();
 
         // Assert
         Assert.NotNull(results);
         Assert.Equal(dtos.Count, results.Count());
 
-        List<ErrorOr<Isbn>> resultList = results.ToList();
+        List<Result<Isbn>> resultList = [.. results];
 
-        Assert.False(resultList[0].IsError);
+        Assert.False(resultList[0].IsFailure);
         Assert.Equal(dtos[0].Value, resultList[0].Value.Value);
 
-        Assert.True(resultList[1].IsError);
+        Assert.True(resultList[1].IsFailure);
 
-        Assert.False(resultList[2].IsError);
+        Assert.False(resultList[2].IsFailure);
         Assert.Equal(dtos[2].Value, resultList[2].Value.Value);
     }
 }

@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
@@ -21,7 +21,7 @@ namespace Lumina.Application.Core.UsersManagement.Authorization.Queries.GetUserP
 /// <summary>
 /// Handler for the query to retrieve the authorization permissions of a user.
 /// </summary>
-public class GetUserPermissionsQueryHandler : IQueryHandler<GetUserPermissionsQuery, ErrorOr<IEnumerable<PermissionResponse>>>
+public class GetUserPermissionsQueryHandler : IQueryHandler<GetUserPermissionsQuery, Result<IEnumerable<PermissionResponse>>>
 {
     private readonly ICurrentUserService _currentUserService;
     private readonly IAuthorizationService _authorizationService;
@@ -49,9 +49,9 @@ public class GetUserPermissionsQueryHandler : IQueryHandler<GetUserPermissionsQu
     /// <param name="query">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a collection of <see cref="PermissionResponse"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a collection of <see cref="PermissionResponse"/>, or an error message.
     /// </returns>
-    public async Task<ErrorOr<IEnumerable<PermissionResponse>>> HandleAsync(GetUserPermissionsQuery query, CancellationToken cancellationToken)
+    public async Task<Result<IEnumerable<PermissionResponse>>> HandleAsync(GetUserPermissionsQuery query, CancellationToken cancellationToken)
     {
         List<Error> validationResult = _validator.Validate(query);
         if (validationResult.Count > 0)
@@ -62,11 +62,11 @@ public class GetUserPermissionsQueryHandler : IQueryHandler<GetUserPermissionsQu
         if (!isAdmin)
             return Errors.Authorization.NotAuthorized;
         // get the user from the repository and return its permissions
-        ErrorOr<UserEntity?> getUserResult = await _userRepository.GetByIdAsync(query.UserId!.Value, cancellationToken).ConfigureAwait(false);
-        if (getUserResult.IsError)
+        Result<UserEntity?> getUserResult = await _userRepository.GetByIdAsync(query.UserId!.Value, cancellationToken).ConfigureAwait(false);
+        if (getUserResult.IsFailure)
             return getUserResult.Errors;
         else if (getUserResult.Value is null)
             return Errors.Authentication.UsernameDoesNotExist;
-        return ErrorOrFactory.From(getUserResult.Value.UserPermissions.Select(userPermission => userPermission.Permission).ToResponses());
+        return Result.From(getUserResult.Value.UserPermissions.Select(userPermission => userPermission.Permission).ToResponses());
     }
 }

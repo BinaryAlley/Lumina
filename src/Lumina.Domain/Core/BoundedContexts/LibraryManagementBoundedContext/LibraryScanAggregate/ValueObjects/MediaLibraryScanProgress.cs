@@ -1,11 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Models.Core;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
@@ -97,9 +96,9 @@ public sealed class MediaLibraryScanProgress : ValueObject
     /// <param name="status">The status of the media library scan.</param>
     /// <param name="currentJobProgress">The optional current job progress of the media library scan.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="MediaLibraryScanProgress"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="MediaLibraryScanProgress"/>, or an error message.
     /// </returns>
-    public static ErrorOr<MediaLibraryScanProgress> Create(
+    public static Result<MediaLibraryScanProgress> Create(
         ScanId scanId,
         UserId userId,
         LibraryId libraryId, 

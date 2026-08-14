@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Contracts.DTO.Common;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -23,10 +23,10 @@ public class TagDtoMappingTests
         TagDto tagDto = new("indie");
 
         // Act
-        ErrorOr<Tag> result = tagDto.ToDomainEntity();
+        Result<Tag> result = tagDto.ToDomainEntity();
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(tagDto.Name, result.Value.Name);
     }
@@ -43,10 +43,10 @@ public class TagDtoMappingTests
         TagDto tagDto = new(name);
 
         // Act
-        ErrorOr<Tag> result = tagDto.ToDomainEntity();
+        Result<Tag> result = tagDto.ToDomainEntity();
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(tagDto.Name, result.Value.Name);
     }
@@ -61,10 +61,10 @@ public class TagDtoMappingTests
         TagDto tagDto = new(invalidName);
 
         // Act
-        ErrorOr<Tag> result = tagDto.ToDomainEntity();
+        Result<Tag> result = tagDto.ToDomainEntity();
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
     }
 
     [Fact]
@@ -80,16 +80,16 @@ public class TagDtoMappingTests
         ];
 
         // Act
-        IEnumerable<ErrorOr<Tag>> results = tagDtos.ToDomainEntities();
+        IEnumerable<Result<Tag>> results = tagDtos.ToDomainEntities();
 
         // Assert
         Assert.NotNull(results);
         Assert.Equal(tagDtos.Count, results.Count());
 
-        List<ErrorOr<Tag>> resultList = results.ToList();
+        List<Result<Tag>> resultList = [.. results];
         for (int i = 0; i < tagDtos.Count; i++)
         {
-            Assert.False(resultList[i].IsError);
+            Assert.False(resultList[i].IsFailure);
             Assert.Equal(tagDtos[i].Name, resultList[i].Value.Name);
         }
     }
@@ -107,21 +107,21 @@ public class TagDtoMappingTests
         ];
 
         // Act
-        IEnumerable<ErrorOr<Tag>> results = tagDtos.ToDomainEntities();
+        IEnumerable<Result<Tag>> results = tagDtos.ToDomainEntities();
 
         // Assert
         Assert.NotNull(results);
         Assert.Equal(tagDtos.Count, results.Count());
 
-        List<ErrorOr<Tag>> resultList = results.ToList();
-        Assert.False(resultList[0].IsError);
+        List<Result<Tag>> resultList = [.. results];
+        Assert.False(resultList[0].IsFailure);
         Assert.Equal("indie", resultList[0].Value.Name);
 
-        Assert.True(resultList[1].IsError);
+        Assert.True(resultList[1].IsFailure);
 
-        Assert.False(resultList[2].IsError);
+        Assert.False(resultList[2].IsFailure);
         Assert.Equal("electronic", resultList[2].Value.Name);
 
-        Assert.True(resultList[3].IsError);
+        Assert.True(resultList[3].IsFailure);
     }
 }

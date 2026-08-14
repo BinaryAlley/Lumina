@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.UsersManagement.Authentication.Commands.RecoverPassword;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authentication.RecoverPassword;
 using Lumina.Presentation.Api.UnitTests.Core.Endpoints.UsersManagement.Authentication.RecoverPassword.Fixtures;
 using Microsoft.AspNetCore.Http;
@@ -23,7 +23,7 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.UsersManagement.Authe
 [ExcludeFromCodeCoverage]
 public class RecoverPasswordEndpointTests
 {
-    private readonly ICommandHandler<RecoverPasswordCommand, ErrorOr<RecoverPasswordResponse>> _mockHandler;
+    private readonly ICommandHandler<RecoverPasswordCommand, Result<RecoverPasswordResponse>> _mockHandler;
     private readonly RecoverPasswordEndpoint _sut;
     private readonly RecoverPasswordRequestFixture _recoverPasswordRequestFixture;
 
@@ -32,7 +32,7 @@ public class RecoverPasswordEndpointTests
     /// </summary>
     public RecoverPasswordEndpointTests()
     {
-        _mockHandler = Substitute.For<ICommandHandler<RecoverPasswordCommand, ErrorOr<RecoverPasswordResponse>>>();
+        _mockHandler = Substitute.For<ICommandHandler<RecoverPasswordCommand, Result<RecoverPasswordResponse>>>();
         _sut = FastEndpoints.Factory.Create<RecoverPasswordEndpoint>(_mockHandler);
         _recoverPasswordRequestFixture = new RecoverPasswordRequestFixture();
     }
@@ -45,7 +45,7 @@ public class RecoverPasswordEndpointTests
         CancellationToken cancellationToken = CancellationToken.None;
         RecoverPasswordResponse expectedResponse = new(IsPasswordReset: true);
         _mockHandler.HandleAsync(Arg.Any<RecoverPasswordCommand>(), Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(expectedResponse));
+            .Returns(Result.From(expectedResponse));
 
         // Act
         IResult result = await _sut.ExecuteAsync(request, cancellationToken);
@@ -87,7 +87,7 @@ public class RecoverPasswordEndpointTests
         RecoverPasswordRequest request = _recoverPasswordRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<RecoverPasswordCommand>(), Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(new RecoverPasswordResponse(true)));
+            .Returns(Result.From(new RecoverPasswordResponse(true)));
 
         // Act
         await _sut.ExecuteAsync(request, cancellationToken);
@@ -115,7 +115,7 @@ public class RecoverPasswordEndpointTests
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return ErrorOrFactory.From(new RecoverPasswordResponse(true));
+                return Result.From(new RecoverPasswordResponse(true));
             }, callInfo.Arg<CancellationToken>()));
 
         // Act

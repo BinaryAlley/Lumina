@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
@@ -15,7 +15,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.SharedKernel.Common.Errors.Errors;
+using DomainErrors = Lumina.Domain.Common.Errors.Errors;
 #endregion
 
 namespace Lumina.Application.Core.MediaLibrary.Management.Commands.DeleteLibrary;
@@ -23,7 +23,7 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Commands.DeleteLibrary
 /// <summary>
 /// Handler for the command to delete a library by its Id.
 /// </summary>
-public class DeleteLibraryCommandHandler : ICommandHandler<DeleteLibraryCommand, ErrorOr<Deleted>>
+public class DeleteLibraryCommandHandler : ICommandHandler<DeleteLibraryCommand, Result<Deleted>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUserService;
@@ -58,8 +58,8 @@ public class DeleteLibraryCommandHandler : ICommandHandler<DeleteLibraryCommand,
     /// </summary>
     /// <param name="command">The command to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<ErrorOr<Deleted>> HandleAsync(DeleteLibraryCommand command, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Deleted>> HandleAsync(DeleteLibraryCommand command, CancellationToken cancellationToken)
     {
         List<Error> validationResult = _validator.Validate(command);
         if (validationResult.Count > 0)
@@ -67,8 +67,8 @@ public class DeleteLibraryCommandHandler : ICommandHandler<DeleteLibraryCommand,
 
         // get the library with the specified id from the repository
         ILibraryRepository libraryRepository = _unitOfWork.GetRepository<ILibraryRepository>();
-        ErrorOr<LibraryEntity?> getLibraryResult = await libraryRepository.GetByIdAsync(command.Id, cancellationToken).ConfigureAwait(false);
-        if (getLibraryResult.IsError)
+        Result<LibraryEntity?> getLibraryResult = await libraryRepository.GetByIdAsync(command.Id, cancellationToken).ConfigureAwait(false);
+        if (getLibraryResult.IsFailure)
             return getLibraryResult.Errors;
         else if (getLibraryResult.Value is null)
             return DomainErrors.Library.LibraryNotFound;
@@ -79,13 +79,13 @@ public class DeleteLibraryCommandHandler : ICommandHandler<DeleteLibraryCommand,
             return ApplicationErrors.Authorization.NotAuthorized;
 
         // create a domain library object
-        ErrorOr<Library> createLibraryResult = getLibraryResult.Value.ToDomainEntity();
-        if (createLibraryResult.IsError)
+        Result<Library> createLibraryResult = getLibraryResult.Value.ToDomainEntity();
+        if (createLibraryResult.IsFailure)
             return createLibraryResult.Errors;
 
         // delete the domain aggregate
-        ErrorOr<Deleted> deleteDomainLibraryResult = createLibraryResult.Value.Delete();
-        if (deleteDomainLibraryResult.IsError)
+        Result<Deleted> deleteDomainLibraryResult = createLibraryResult.Value.Delete();
+        if (deleteDomainLibraryResult.IsFailure)
             return deleteDomainLibraryResult.Errors;
 
         // queue any domain events
@@ -93,8 +93,8 @@ public class DeleteLibraryCommandHandler : ICommandHandler<DeleteLibraryCommand,
             _domainEventsQueue.Enqueue(domainEvent);
 
         // perform the deletion
-        ErrorOr<Deleted> deletePersistenceLibraryResult = await libraryRepository.DeleteByIdAsync(command.Id, cancellationToken).ConfigureAwait(false);
-        if (deletePersistenceLibraryResult.IsError)
+        Result<Deleted> deletePersistenceLibraryResult = await libraryRepository.DeleteByIdAsync(command.Id, cancellationToken).ConfigureAwait(false);
+        if (deletePersistenceLibraryResult.IsFailure)
             return deletePersistenceLibraryResult.Errors;
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 

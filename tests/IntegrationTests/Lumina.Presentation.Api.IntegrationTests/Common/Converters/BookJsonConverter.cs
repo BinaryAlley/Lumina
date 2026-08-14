@@ -67,7 +67,7 @@ public class BookJsonConverter : JsonConverter<Book>
             List<MediaContributorId> contributorIds = DeserializeContributorIds(root.GetProperty("contributors"));
             List<BookRating> ratings = DeserializeRatings(root.GetProperty("ratings"));
 
-            ErrorOr.ErrorOr<Book> createBookResult = Book.Create(
+            Result<Book> createBookResult = Book.Create(
                 BookId.Create(id),
                 LibraryId.Create(libraryId),
                 path,
@@ -91,7 +91,7 @@ public class BookJsonConverter : JsonConverter<Book>
                 contributorIds,
                 ratings: ratings
             );
-            if (createBookResult.IsError)
+            if (createBookResult.IsFailure)
                 throw new JsonException($"Failed to create Book: {string.Join(", ", createBookResult.Errors)}");
             return createBookResult.Value;
         }
@@ -128,7 +128,7 @@ public class BookJsonConverter : JsonConverter<Book>
         if (element.TryGetProperty("pageCount", out JsonElement pageCountElement))
             if (pageCountElement.ValueKind != JsonValueKind.Null)
                 pageCount = pageCountElement.GetInt32();
-        ErrorOr.ErrorOr<WrittenContentMetadata> metadataResult = WrittenContentMetadata.Create(
+        Result<WrittenContentMetadata> metadataResult = WrittenContentMetadata.Create(
             title!,
             Optional<string>.FromNullable(originalTitle),
             Optional<string>.FromNullable(description),
@@ -141,7 +141,7 @@ public class BookJsonConverter : JsonConverter<Book>
             Optional<int>.FromNullable(pageCount)
         );
 
-        if (metadataResult.IsError)
+        if (metadataResult.IsFailure)
             throw new JsonException($"Failed to create WrittenContentMetadata: {string.Join(", ", metadataResult.Errors)}");
         return metadataResult.Value;
     }
@@ -166,7 +166,7 @@ public class BookJsonConverter : JsonConverter<Book>
         string? releaseVersion = element.TryGetProperty("releaseVersion", out JsonElement rvElement) ?
             rvElement.GetString() : null;
 
-        ErrorOr.ErrorOr<ReleaseInfo> releaseInfoResult = ReleaseInfo.Create(
+        Result<ReleaseInfo> releaseInfoResult = ReleaseInfo.Create(
             Optional<DateOnly>.FromNullable(originalReleaseDate),
             Optional<int>.FromNullable(originalReleaseYear),
             Optional<DateOnly>.FromNullable(reReleaseDate),
@@ -175,7 +175,7 @@ public class BookJsonConverter : JsonConverter<Book>
             Optional<string>.FromNullable(releaseVersion)
         );
 
-        if (releaseInfoResult.IsError)
+        if (releaseInfoResult.IsFailure)
             throw new JsonException($"Failed to create ReleaseInfo: {string.Join(", ", releaseInfoResult.Errors)}");
         return releaseInfoResult.Value;
     }
@@ -187,9 +187,7 @@ public class BookJsonConverter : JsonConverter<Book>
     /// <returns>The deserialized list of <see cref="Genre"/>.</returns>
     private static List<Genre> DeserializeGenres(JsonElement element)
     {
-        return element.EnumerateArray()
-            .Select(g => Genre.Create(g.GetProperty("name").GetString()!).Value)
-            .ToList();
+        return [.. element.EnumerateArray().Select(g => Genre.Create(g.GetProperty("name").GetString()!).Value)];
     }
 
     /// <summary>
@@ -199,9 +197,7 @@ public class BookJsonConverter : JsonConverter<Book>
     /// <returns>The deserialized list of <see cref="Tag"/>.</returns>
     private static List<Tag> DeserializeTags(JsonElement element)
     {
-        return element.EnumerateArray()
-            .Select(t => Tag.Create(t.GetProperty("name").GetString()!).Value)
-            .ToList();
+        return [.. element.EnumerateArray().Select(t => Tag.Create(t.GetProperty("name").GetString()!).Value)];
     }
 
     /// <summary>
@@ -217,13 +213,13 @@ public class BookJsonConverter : JsonConverter<Book>
             string? languageName = element.GetProperty("languageName").GetString();
             string? nativeName = element.TryGetProperty("nativeName", out JsonElement nnElement) ? nnElement.GetString() : null;
 
-            ErrorOr.ErrorOr<LanguageInfo> languageInfoResult = LanguageInfo.Create(
+            Result<LanguageInfo> languageInfoResult = LanguageInfo.Create(
                 languageCode!,
                 languageName!,
                 Optional<string>.FromNullable(nativeName)
             );
 
-            if (languageInfoResult.IsError)
+            if (languageInfoResult.IsFailure)
                 throw new JsonException($"Failed to create LanguageInfo: {string.Join(", ", languageInfoResult.Errors)}");
             return languageInfoResult.Value;
         }
@@ -249,10 +245,9 @@ public class BookJsonConverter : JsonConverter<Book>
     /// <returns>The deserialized list of <see cref="Isbn"/>.</returns>
     private static List<Isbn> DeserializeIsbns(JsonElement element)
     {
-        return element.EnumerateArray()
+        return [.. element.EnumerateArray()
             .Select(i => Isbn.Create(i.GetProperty("value").GetString()!,
-                Enum.Parse<IsbnFormat>(i.GetProperty("format").GetString()!)).Value)
-            .ToList();
+                Enum.Parse<IsbnFormat>(i.GetProperty("format").GetString()!)).Value)];
     }
 
     /// <summary>
@@ -273,7 +268,7 @@ public class BookJsonConverter : JsonConverter<Book>
     /// <returns>The deserialized list of <see cref="BookRating"/>.</returns>
     private static List<BookRating> DeserializeRatings(JsonElement element)
     {
-        return element.EnumerateArray()
+        return [.. element.EnumerateArray()
             .Select(r => BookRating.Create(
                 r.GetProperty("value").GetInt32(),
                 r.GetProperty("maxValue").GetInt32(),
@@ -282,7 +277,6 @@ public class BookJsonConverter : JsonConverter<Book>
                     r.TryGetProperty("voteCount", out JsonElement voteCountElement) && voteCountElement.ValueKind != JsonValueKind.Null
                         ? voteCountElement.GetInt32()
                         : (int?)null)
-            ).Value)
-            .ToList();
+            ).Value)];
     }
 }

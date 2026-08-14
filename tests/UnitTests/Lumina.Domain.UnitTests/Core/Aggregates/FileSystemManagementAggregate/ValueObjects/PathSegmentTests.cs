@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Errors;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.ValueObjects.Fixtures;
 using System.Diagnostics.CodeAnalysis;
@@ -33,10 +33,10 @@ public class PathSegmentTests
         bool isDrive = false;
 
         // Act
-        ErrorOr<PathSegment> result = PathSegment.Create(name, isDirectory, isDrive);
+        Result<PathSegment> result = PathSegment.Create(name, isDirectory, isDrive);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(name, result.Value.Name);
         Assert.Equal(isDirectory, result.Value.IsDirectory);
         Assert.Equal(isDrive, result.Value.IsDrive);
@@ -49,10 +49,10 @@ public class PathSegmentTests
     public void Create_WithInvalidName_ShouldReturnError(string? invalidName)
     {
         // Act
-        ErrorOr<PathSegment> result = PathSegment.Create(invalidName!, true, false);
+        Result<PathSegment> result = PathSegment.Create(invalidName!, true, false);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.NameCannotBeEmpty, result.FirstError);
     }
 

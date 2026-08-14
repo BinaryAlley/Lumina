@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
@@ -22,7 +22,7 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Queries.GetRunningLibr
 /// <summary>
 /// Handler for the query to get the ongoing media library scans.
 /// </summary>
-public class GetRunningLibraryScansQueryHandler : IQueryHandler<GetRunningLibraryScansQuery, ErrorOr<IEnumerable<MediaLibraryScanProgressResponse>>>
+public class GetRunningLibraryScansQueryHandler : IQueryHandler<GetRunningLibraryScansQuery, Result<IEnumerable<MediaLibraryScanProgressResponse>>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUserService;
@@ -54,14 +54,14 @@ public class GetRunningLibraryScansQueryHandler : IQueryHandler<GetRunningLibrar
     /// <param name="query">The query to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="MediaLibraryScanProgress"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="MediaLibraryScanProgress"/>, or an error message.
     /// </returns>
-    public async Task<ErrorOr<IEnumerable<MediaLibraryScanProgressResponse>>> HandleAsync(GetRunningLibraryScansQuery query, CancellationToken cancellationToken)
+    public async Task<Result<IEnumerable<MediaLibraryScanProgressResponse>>> HandleAsync(GetRunningLibraryScansQuery query, CancellationToken cancellationToken)
     {
         // get the ongoing library scans from the repository
         ILibraryScanRepository libraryScanRepository = _unitOfWork.GetRepository<ILibraryScanRepository>();
-        ErrorOr<IEnumerable<LibraryScanEntity>> getRunningScansResult = await libraryScanRepository.GetRunningScansAsync(cancellationToken).ConfigureAwait(false);
-        if (getRunningScansResult.IsError)
+        Result<IEnumerable<LibraryScanEntity>> getRunningScansResult = await libraryScanRepository.GetRunningScansAsync(cancellationToken).ConfigureAwait(false);
+        if (getRunningScansResult.IsFailure)
             return getRunningScansResult.Errors;
 
         // filter the library scans by what the user is allowed to see
@@ -75,21 +75,21 @@ public class GetRunningLibraryScansQueryHandler : IQueryHandler<GetRunningLibrar
 
         // for each of the filtered library scans, get their progress
         List<MediaLibraryScanProgressResponse> libraryScanProgresses = [];
-        IEnumerable<ErrorOr<LibraryScan>> userRunningDomainLibraryScans = userRunningRepositoryLibraryScans.ToDomainEntities();
-        foreach (ErrorOr<LibraryScan> userRunningDomainLibraryScan in userRunningDomainLibraryScans)
+        IEnumerable<Result<LibraryScan>> userRunningDomainLibraryScans = userRunningRepositoryLibraryScans.ToDomainEntities();
+        foreach (Result<LibraryScan> userRunningDomainLibraryScan in userRunningDomainLibraryScans)
         {
-            if (userRunningDomainLibraryScan.IsError)
+            if (userRunningDomainLibraryScan.IsFailure)
                 return userRunningDomainLibraryScan.Errors;
             else
             {
-                ErrorOr<MediaLibraryScanProgress> getLibraryScanProgressResult = _mediaLibrariesScanProgressTracker.GetScanProgress(
+                Result<MediaLibraryScanProgress> getLibraryScanProgressResult = _mediaLibrariesScanProgressTracker.GetScanProgress(
                     MediaLibraryScanCompositeId.Create(userRunningDomainLibraryScan.Value.Id, userRunningDomainLibraryScan.Value.UserId));
-                if (getLibraryScanProgressResult.IsError)
+                if (getLibraryScanProgressResult.IsFailure)
                     return getLibraryScanProgressResult.Errors;
                 libraryScanProgresses.Add(getLibraryScanProgressResult.Value.ToResponse());
             }
         }
 
-        return ErrorOrFactory.From(libraryScanProgresses.AsEnumerable());
+        return Result.From(libraryScanProgresses.AsEnumerable());
     }
 }

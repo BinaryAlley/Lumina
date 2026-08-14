@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.Common.Actions;
 using Lumina.Application.Common.DataAccess.Repositories.Common.Base;
@@ -24,13 +24,13 @@ public interface ILibraryScanRepository : IRepository<LibraryScanEntity>,
     /// Gets the media library scans that belong to a media library identified by <paramref name="libraryId"/>, for the previous month, from the storage medium.
     /// </summary>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of <see cref="LibraryScanEntity"/>, or an error.</returns>
-    Task<ErrorOr<IEnumerable<LibraryScanEntity>>> GetPastMonthScansByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken);
+    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="LibraryScanEntity"/>, or an error.</returns>
+    Task<Result<IEnumerable<LibraryScanEntity>>> GetPastMonthScansByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Gets the media library scans have a <see cref="LibraryScanJobStatus.Running"/> status, from the storage medium.
     /// </summary>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of <see cref="LibraryScanEntity"/>, or an error.</returns>
-    Task<ErrorOr<IEnumerable<LibraryScanEntity>>> GetRunningScansAsync(CancellationToken cancellationToken);
+    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="LibraryScanEntity"/>, or an error.</returns>
+    Task<Result<IEnumerable<LibraryScanEntity>>> GetRunningScansAsync(CancellationToken cancellationToken);
 }

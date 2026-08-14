@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.Common;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,6 +18,6 @@ public interface IUpdateRepositoryAction<TModel> where TModel : IStorageEntity
     /// </summary>
     /// <param name="data">The element that will be updated.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    Task<ErrorOr<Updated>> UpdateAsync(TModel data, CancellationToken cancellationToken);
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Updated>> UpdateAsync(TModel data, CancellationToken cancellationToken);
 }

@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.Common.Base;
+using Lumina.Domain.Common.Errors;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
-using Lumina.Domain.SharedKernel.Common.Errors;
 using Lumina.Infrastructure.Core.Authorization;
 using Lumina.Infrastructure.Core.Authorization.Policies.Common.Factory;
 using Lumina.Infrastructure.UnitTests.Core.Authorization.Fixtures;
@@ -52,7 +52,7 @@ public class AuthorizationServiceTests
         // Arrange
         Guid userId = Guid.NewGuid();
         _mockUserRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From<UserEntity?>(null));
+            .Returns(Result.From<UserEntity?>(null));
 
         // Act
         bool result = await _sut.HasPermissionAsync(userId, AuthorizationPermission.CanViewUsers, CancellationToken.None);
@@ -87,7 +87,7 @@ public class AuthorizationServiceTests
             directPermissions: [AuthorizationPermission.CanViewUsers]);
 
         _mockUserRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From<UserEntity?>(user));
+            .Returns(Result.From<UserEntity?>(user));
 
         // Act
         bool result = await _sut.HasPermissionAsync(user.Id, AuthorizationPermission.CanViewUsers, CancellationToken.None);
@@ -110,7 +110,7 @@ public class AuthorizationServiceTests
             rolePermissions: rolePermissions);
 
         _mockUserRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From<UserEntity?>(user));
+            .Returns(Result.From<UserEntity?>(user));
 
         // Act
         bool result = await _sut.HasPermissionAsync(user.Id, AuthorizationPermission.CanViewUsers, CancellationToken.None);
@@ -127,7 +127,7 @@ public class AuthorizationServiceTests
         UserEntity user = AuthorizationServiceFixture.CreateUserWithPermissions();
 
         _mockUserRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From<UserEntity?>(user));
+            .Returns(Result.From<UserEntity?>(user));
 
         // Act
         bool result = await _sut.HasPermissionAsync(user.Id, AuthorizationPermission.CanViewUsers, CancellationToken.None);
@@ -145,7 +145,7 @@ public class AuthorizationServiceTests
             directPermissions: [AuthorizationPermission.CanDeleteUsers]);
 
         _mockUserRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From<UserEntity?>(user));
+            .Returns(Result.From<UserEntity?>(user));
 
         // Act
         bool result = await _sut.HasPermissionAsync(user.Id, AuthorizationPermission.CanViewUsers, CancellationToken.None);
@@ -169,7 +169,7 @@ public class AuthorizationServiceTests
             rolePermissions: rolePermissions);
 
         _mockUserRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From<UserEntity?>(user));
+            .Returns(Result.From<UserEntity?>(user));
 
         // Act
         bool result = await _sut.HasPermissionAsync(user.Id, AuthorizationPermission.CanViewUsers, CancellationToken.None);
@@ -185,7 +185,7 @@ public class AuthorizationServiceTests
         // Arrange
         Guid userId = Guid.NewGuid();
         _mockUserRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From<UserEntity?>(null));
+            .Returns(Result.From<UserEntity?>(null));
 
         // Act
         bool result = await _sut.IsInRoleAsync(userId, "Admin", CancellationToken.None);
@@ -225,7 +225,7 @@ public class AuthorizationServiceTests
             rolePermissions: rolePermissions);
 
         _mockUserRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From<UserEntity?>(user));
+            .Returns(Result.From<UserEntity?>(user));
 
         // Act
         bool result = await _sut.IsInRoleAsync(user.Id, "Admin", CancellationToken.None);
@@ -248,7 +248,7 @@ public class AuthorizationServiceTests
             rolePermissions: rolePermissions);
 
         _mockUserRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From<UserEntity?>(user));
+            .Returns(Result.From<UserEntity?>(user));
 
         // Act
         bool result = await _sut.IsInRoleAsync(user.Id, "Admin", CancellationToken.None);
@@ -265,7 +265,7 @@ public class AuthorizationServiceTests
         UserEntity user = AuthorizationServiceFixture.CreateUserWithPermissions();
 
         _mockUserRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From<UserEntity?>(user));
+            .Returns(Result.From<UserEntity?>(user));
 
         // Act
         bool result = await _sut.IsInRoleAsync(user.Id, "Admin", CancellationToken.None);
@@ -402,13 +402,13 @@ public class AuthorizationServiceTests
         // Arrange
         Guid userId = Guid.NewGuid();
         _mockUserRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From<UserEntity?>(null));
+            .Returns(Result.From<UserEntity?>(null));
 
         // Act
-        ErrorOr<UserAuthorizationEntity> result = await _sut.GetUserAuthorizationAsync(userId, CancellationToken.None);
+        Result<UserAuthorizationEntity> result = await _sut.GetUserAuthorizationAsync(userId, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Users.UserDoesNotExist, result.FirstError);
         await _mockUserRepository.Received(1).GetByIdAsync(userId, Arg.Any<CancellationToken>());
     }
@@ -423,10 +423,10 @@ public class AuthorizationServiceTests
             .Returns(error);
 
         // Act
-        ErrorOr<UserAuthorizationEntity> result = await _sut.GetUserAuthorizationAsync(userId, CancellationToken.None);
+        Result<UserAuthorizationEntity> result = await _sut.GetUserAuthorizationAsync(userId, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
         await _mockUserRepository.Received(1).GetByIdAsync(userId, Arg.Any<CancellationToken>());
     }
@@ -437,13 +437,13 @@ public class AuthorizationServiceTests
         // Arrange
         UserEntity user = AuthorizationServiceFixture.CreateUserWithPermissions();
         _mockUserRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From<UserEntity?>(user));
+            .Returns(Result.From<UserEntity?>(user));
 
         // Act
-        ErrorOr<UserAuthorizationEntity> result = await _sut.GetUserAuthorizationAsync(user.Id, CancellationToken.None);
+        Result<UserAuthorizationEntity> result = await _sut.GetUserAuthorizationAsync(user.Id, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(user.Id, result.Value.UserId);
         Assert.Null(result.Value.Role);
         Assert.Empty(result.Value.Permissions);
@@ -462,13 +462,13 @@ public class AuthorizationServiceTests
             ]);
 
         _mockUserRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From<UserEntity?>(user));
+            .Returns(Result.From<UserEntity?>(user));
 
         // Act
-        ErrorOr<UserAuthorizationEntity> result = await _sut.GetUserAuthorizationAsync(user.Id, CancellationToken.None);
+        Result<UserAuthorizationEntity> result = await _sut.GetUserAuthorizationAsync(user.Id, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(user.Id, result.Value.UserId);
         Assert.Null(result.Value.Role);
         Assert.Equal([AuthorizationPermission.CanViewUsers, AuthorizationPermission.CanDeleteUsers],
@@ -492,13 +492,13 @@ public class AuthorizationServiceTests
             rolePermissions: rolePermissions);
 
         _mockUserRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From<UserEntity?>(user));
+            .Returns(Result.From<UserEntity?>(user));
 
         // Act
-        ErrorOr<UserAuthorizationEntity> result = await _sut.GetUserAuthorizationAsync(user.Id, CancellationToken.None);
+        Result<UserAuthorizationEntity> result = await _sut.GetUserAuthorizationAsync(user.Id, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(user.Id, result.Value.UserId);
         Assert.Equal("Admin", result.Value.Role);
         Assert.Equal([AuthorizationPermission.CanViewUsers, AuthorizationPermission.CanDeleteUsers],
@@ -523,13 +523,13 @@ public class AuthorizationServiceTests
             rolePermissions: rolePermissions);
 
         _mockUserRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From<UserEntity?>(user));
+            .Returns(Result.From<UserEntity?>(user));
 
         // Act
-        ErrorOr<UserAuthorizationEntity> result = await _sut.GetUserAuthorizationAsync(user.Id, CancellationToken.None);
+        Result<UserAuthorizationEntity> result = await _sut.GetUserAuthorizationAsync(user.Id, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(user.Id, result.Value.UserId);
         Assert.Equal("Admin", result.Value.Role);
         Assert.Equivalent(

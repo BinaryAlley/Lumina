@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using ErrorOr;
 using Lumina.Application.Common.Infrastructure.Validation;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Infrastructure.Common.Validation;
 using Lumina.Infrastructure.UnitTests.Common.Validation.Fixtures;
 using Microsoft.Extensions.Options;

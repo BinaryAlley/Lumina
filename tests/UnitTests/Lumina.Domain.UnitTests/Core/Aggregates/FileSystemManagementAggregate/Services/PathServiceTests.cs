@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Errors;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Path;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Platform;
@@ -202,13 +202,13 @@ public class PathServiceTests
         string name = "SubDir";
         FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(path);
         FileSystemPathId combinedPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\BaseDir\SubDir");
-        _mockPathStrategy.CombinePath(pathId, name).Returns(ErrorOrFactory.From(combinedPathId));
+        _mockPathStrategy.CombinePath(pathId, name).Returns(Result.From(combinedPathId));
 
         // Act
-        ErrorOr<string> result = _sut.CombinePath(path, name);
+        Result<string> result = _sut.CombinePath(path, name);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(@"C:\BaseDir\SubDir", result.Value);
         _mockPathStrategy.Received(1).CombinePath(Arg.Is<FileSystemPathId>(id => id.Path == path), name);
     }
@@ -221,10 +221,10 @@ public class PathServiceTests
         string name = "SubDir";
 
         // Act
-        ErrorOr<string> result = _sut.CombinePath(invalidPath, name);
+        Result<string> result = _sut.CombinePath(invalidPath, name);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
         _mockPathStrategy.DidNotReceive().CombinePath(Arg.Any<FileSystemPathId>(), Arg.Any<string>());
     }
@@ -239,10 +239,10 @@ public class PathServiceTests
         _mockPathStrategy.CombinePath(pathId, name).Returns(Errors.FileSystemManagement.InvalidPath);
 
         // Act
-        ErrorOr<string> result = _sut.CombinePath(path, name);
+        Result<string> result = _sut.CombinePath(path, name);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
         _mockPathStrategy.Received(1).CombinePath(Arg.Is<FileSystemPathId>(id => id.Path == path), name);
     }
@@ -255,10 +255,10 @@ public class PathServiceTests
         string? name = null;
 
         // Act
-        ErrorOr<string> result = _sut.CombinePath(path, name!);
+        Result<string> result = _sut.CombinePath(path, name!);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
         _mockPathStrategy.DidNotReceive().CombinePath(Arg.Any<FileSystemPathId>(), Arg.Any<string>());
     }
@@ -270,13 +270,13 @@ public class PathServiceTests
         string validPath = @"C:\ValidPath\SubDir";
         FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(validPath);
         List<PathSegment> expectedSegments = _pathSegmentFixture.CreateMany();
-        _mockPathStrategy.ParsePath(pathId).Returns(ErrorOrFactory.From(expectedSegments.AsEnumerable()));
+        _mockPathStrategy.ParsePath(pathId).Returns(Result.From(expectedSegments.AsEnumerable()));
 
         // Act
-        ErrorOr<IEnumerable<PathSegment>> result = _sut.ParsePath(validPath);
+        Result<IEnumerable<PathSegment>> result = _sut.ParsePath(validPath);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(expectedSegments, result.Value);
         _mockPathStrategy.Received(1).ParsePath(Arg.Is<FileSystemPathId>(id => id.Path == validPath));
     }
@@ -288,10 +288,10 @@ public class PathServiceTests
         string invalidPath = string.Empty;
 
         // Act
-        ErrorOr<IEnumerable<PathSegment>> result = _sut.ParsePath(invalidPath);
+        Result<IEnumerable<PathSegment>> result = _sut.ParsePath(invalidPath);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
         _mockPathStrategy.DidNotReceive().ParsePath(Arg.Any<FileSystemPathId>());
     }
@@ -305,10 +305,10 @@ public class PathServiceTests
         _mockPathStrategy.ParsePath(pathId).Returns(Errors.FileSystemManagement.InvalidPath);
 
         // Act
-        ErrorOr<IEnumerable<PathSegment>> result = _sut.ParsePath(path);
+        Result<IEnumerable<PathSegment>> result = _sut.ParsePath(path);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
         _mockPathStrategy.Received(1).ParsePath(Arg.Is<FileSystemPathId>(id => id.Path == path));
     }
@@ -320,10 +320,10 @@ public class PathServiceTests
         string? nullPath = null;
 
         // Act
-        ErrorOr<IEnumerable<PathSegment>> result = _sut.ParsePath(nullPath!);
+        Result<IEnumerable<PathSegment>> result = _sut.ParsePath(nullPath!);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
         _mockPathStrategy.DidNotReceive().ParsePath(Arg.Any<FileSystemPathId>());
     }
@@ -335,13 +335,13 @@ public class PathServiceTests
         string validPath = @"C:\ValidPath\SubDir";
         FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(validPath);
         List<PathSegment> expectedSegments = _pathSegmentFixture.CreateMany(2); // Assuming parent path has 2 segments
-        _mockPathStrategy.GoUpOneLevel(pathId).Returns(ErrorOrFactory.From(expectedSegments.AsEnumerable()));
+        _mockPathStrategy.GoUpOneLevel(pathId).Returns(Result.From(expectedSegments.AsEnumerable()));
 
         // Act
-        ErrorOr<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(validPath);
+        Result<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(validPath);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(expectedSegments, result.Value);
         _mockPathStrategy.Received(1).GoUpOneLevel(Arg.Is<FileSystemPathId>(id => id.Path == validPath));
     }
@@ -353,13 +353,13 @@ public class PathServiceTests
         string rootPath = @"C:\";
         FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(rootPath);
         List<PathSegment> emptySegmentList = [];
-        _mockPathStrategy.GoUpOneLevel(pathId).Returns(ErrorOrFactory.From(emptySegmentList.AsEnumerable()));
+        _mockPathStrategy.GoUpOneLevel(pathId).Returns(Result.From(emptySegmentList.AsEnumerable()));
 
         // Act
-        ErrorOr<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(rootPath);
+        Result<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(rootPath);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Empty(result.Value);
         _mockPathStrategy.Received(1).GoUpOneLevel(Arg.Is<FileSystemPathId>(id => id.Path == rootPath));
     }
@@ -371,10 +371,10 @@ public class PathServiceTests
         string invalidPath = string.Empty;
 
         // Act
-        ErrorOr<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(invalidPath);
+        Result<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(invalidPath);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
         _mockPathStrategy.DidNotReceive().GoUpOneLevel(Arg.Any<FileSystemPathId>());
     }
@@ -388,10 +388,10 @@ public class PathServiceTests
         _mockPathStrategy.GoUpOneLevel(pathId).Returns(Errors.FileSystemManagement.InvalidPath);
 
         // Act
-        ErrorOr<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(path);
+        Result<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(path);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
         _mockPathStrategy.Received(1).GoUpOneLevel(Arg.Is<FileSystemPathId>(id => id.Path == path));
     }
@@ -403,10 +403,10 @@ public class PathServiceTests
         string? nullPath = null;
 
         // Act
-        ErrorOr<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(nullPath!);
+        Result<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(nullPath!);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
         _mockPathStrategy.DidNotReceive().GoUpOneLevel(Arg.Any<FileSystemPathId>());
     }
@@ -465,13 +465,13 @@ public class PathServiceTests
         string validPath = @"C:\ValidPath\SubDir";
         FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(validPath);
         PathSegment expectedRootSegment = _pathSegmentFixture.CreatePathSegment(name: "C:", isDirectory: false, isDrive: true);
-        _mockPathStrategy.GetPathRoot(pathId).Returns(ErrorOrFactory.From(expectedRootSegment));
+        _mockPathStrategy.GetPathRoot(pathId).Returns(Result.From(expectedRootSegment));
 
         // Act
-        ErrorOr<PathSegment> result = _sut.GetPathRoot(validPath);
+        Result<PathSegment> result = _sut.GetPathRoot(validPath);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(expectedRootSegment, result.Value);
         _mockPathStrategy.Received(1).GetPathRoot(Arg.Is<FileSystemPathId>(id => id.Path == validPath));
     }
@@ -483,10 +483,10 @@ public class PathServiceTests
         string invalidPath = string.Empty;
 
         // Act
-        ErrorOr<PathSegment> result = _sut.GetPathRoot(invalidPath);
+        Result<PathSegment> result = _sut.GetPathRoot(invalidPath);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
         _mockPathStrategy.DidNotReceive().GetPathRoot(Arg.Any<FileSystemPathId>());
     }
@@ -500,10 +500,10 @@ public class PathServiceTests
         _mockPathStrategy.GetPathRoot(pathId).Returns(Errors.FileSystemManagement.InvalidPath);
 
         // Act
-        ErrorOr<PathSegment> result = _sut.GetPathRoot(path);
+        Result<PathSegment> result = _sut.GetPathRoot(path);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
         _mockPathStrategy.Received(1).GetPathRoot(Arg.Is<FileSystemPathId>(id => id.Path == path));
     }
@@ -515,10 +515,10 @@ public class PathServiceTests
         string? nullPath = null;
 
         // Act
-        ErrorOr<PathSegment> result = _sut.GetPathRoot(nullPath!);
+        Result<PathSegment> result = _sut.GetPathRoot(nullPath!);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
         _mockPathStrategy.DidNotReceive().GetPathRoot(Arg.Any<FileSystemPathId>());
     }

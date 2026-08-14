@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using ErrorOr;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.FileSystemManagement.Thumbnails.Queries.GetThumbnail;
 using Lumina.Contracts.Responses.FileSystemManagement.Thumbnails;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
-using Lumina.Application.Common.Infrastructure.Validation;
 using NSubstitute;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
@@ -43,13 +43,13 @@ public class GetThumbnailQueryHandlerTests
         Thumbnail thumbnail = _fixture.Create<Thumbnail>();
 
         _mockThumbnailService.GetThumbnailAsync(query.Path!, query.Quality, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(thumbnail));
+            .Returns(Result.From(thumbnail));
 
         // Act
-        ErrorOr<ThumbnailResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<ThumbnailResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(thumbnail.Type, result.Value.Type);
         Assert.Equal(thumbnail.Bytes, result.Value.Bytes);
@@ -66,10 +66,10 @@ public class GetThumbnailQueryHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<ThumbnailResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<ThumbnailResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
         await _mockThumbnailService.Received(1).GetThumbnailAsync(query.Path!, query.Quality, Arg.Any<CancellationToken>());
     }
@@ -83,7 +83,7 @@ public class GetThumbnailQueryHandlerTests
         cts.Cancel();
 
         _mockThumbnailService.GetThumbnailAsync(query.Path!, query.Quality, cts.Token)
-            .Returns(Task.FromCanceled<ErrorOr<Thumbnail>>(cts.Token));
+            .Returns(Task.FromCanceled<Result<Thumbnail>>(cts.Token));
 
         // Act & Assert
         await Assert.ThrowsAsync<TaskCanceledException>(() => _sut.HandleAsync(query, cts.Token));

@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Repositories.Authorization;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -9,6 +8,7 @@ using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Core.Admin.Authorization.Roles.Queries.GetRoles;
 using Lumina.Application.UnitTests.Core.Admin.Authorization.Roles.Queries.GetRoles.Fixtures;
 using Lumina.Contracts.Responses.Authorization;
+using Lumina.Domain.Common.Primitives;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -63,10 +63,10 @@ public class GetRolesQueryHandlerTests
             .Returns(false);
 
         // Act
-        ErrorOr<IEnumerable<RoleResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<IEnumerable<RoleResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Authorization.NotAuthorized, result.FirstError);
         await _mockRoleRepository.DidNotReceive().GetAllAsync(Arg.Any<CancellationToken>());
     }
@@ -84,10 +84,10 @@ public class GetRolesQueryHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<IEnumerable<RoleResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<IEnumerable<RoleResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
     }
 
@@ -105,13 +105,13 @@ public class GetRolesQueryHandlerTests
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(true);
         _mockRoleRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(roles));
+            .Returns(Result.From(roles));
 
         // Act
-        ErrorOr<IEnumerable<RoleResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<IEnumerable<RoleResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(2, result.Value.Count());
     }
 }

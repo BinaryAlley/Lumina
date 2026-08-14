@@ -1,13 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
-using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Platform;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.Entities.Fixtures;
 using Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.ValueObjects.Fixtures;
 using NSubstitute;
@@ -76,25 +75,25 @@ public class FileServiceTests
         ];
 
         _mockEnvironmentContext.FileProviderService.GetFilePaths(pathId, includeHiddenElements)
-            .Returns(ErrorOrFactory.From(filePaths.AsEnumerable()));
+            .Returns(Result.From(filePaths.AsEnumerable()));
 
         foreach (FileSystemPathId filePath in filePaths)
         {
             _mockEnvironmentContext.FileProviderService.GetFileName(filePath)
-                .Returns(ErrorOrFactory.From(System.IO.Path.GetFileName(filePath.Path)));
+                .Returns(Result.From(System.IO.Path.GetFileName(filePath.Path)));
             _mockEnvironmentContext.FileProviderService.GetLastWriteTime(filePath)
-                .Returns(ErrorOrFactory.From(Optional<DateTime>.FromNullable(DateTime.Now)));
+                .Returns(Result.From(Optional<DateTime>.FromNullable(DateTime.Now)));
             _mockEnvironmentContext.FileProviderService.GetCreationTime(filePath)
-                .Returns(ErrorOrFactory.From(Optional<DateTime>.FromNullable(DateTime.Now.AddDays(-1))));
+                .Returns(Result.From(Optional<DateTime>.FromNullable(DateTime.Now.AddDays(-1))));
             _mockEnvironmentContext.FileProviderService.GetSize(filePath)
-                .Returns(ErrorOrFactory.From((long?)1024));
+                .Returns(Result.From((long?)1024));
         }
 
         // Act
-        ErrorOr<IEnumerable<File>> result = _sut.GetFiles(path, includeHiddenElements);
+        Result<IEnumerable<File>> result = _sut.GetFiles(path, includeHiddenElements);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(2, result.Value.Count());
         Assert.Equal(["File1.txt", "File2.txt"], result.Value.Select(f => f.Name));
     }
@@ -107,10 +106,10 @@ public class FileServiceTests
         bool includeHiddenElements = false;
 
         // Act
-        ErrorOr<IEnumerable<File>> result = _sut.GetFiles(invalidPath, includeHiddenElements);
+        Result<IEnumerable<File>> result = _sut.GetFiles(invalidPath, includeHiddenElements);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
     }
 
@@ -126,10 +125,10 @@ public class FileServiceTests
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        ErrorOr<IEnumerable<File>> result = _sut.GetFiles(path, includeHiddenElements);
+        Result<IEnumerable<File>> result = _sut.GetFiles(path, includeHiddenElements);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
     }
 
@@ -143,7 +142,7 @@ public class FileServiceTests
         FileSystemPathId filePath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathTestDirInaccessible);
 
         _mockEnvironmentContext.FileProviderService.GetFilePaths(pathId, includeHiddenElements)
-            .Returns(ErrorOrFactory.From(new[] { filePath }.AsEnumerable()));
+            .Returns(Result.From(new[] { filePath }.AsEnumerable()));
 
         _mockEnvironmentContext.FileProviderService.GetFileName(filePath)
             .Returns(Errors.Permission.UnauthorizedAccess);
@@ -152,13 +151,13 @@ public class FileServiceTests
         _mockEnvironmentContext.FileProviderService.GetCreationTime(filePath)
             .Returns(Errors.Permission.UnauthorizedAccess);
         _mockEnvironmentContext.FileProviderService.GetSize(filePath)
-            .Returns(ErrorOrFactory.From((long?)null));
+            .Returns(Result.From((long?)null));
 
         // Act
-        ErrorOr<IEnumerable<File>> result = _sut.GetFiles(path, includeHiddenElements);
+        Result<IEnumerable<File>> result = _sut.GetFiles(path, includeHiddenElements);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Single(result.Value);
         Assert.Equal(FileSystemItemStatus.Inaccessible, result.Value.First().Status);
     }
@@ -176,25 +175,25 @@ public class FileServiceTests
         ];
 
         _mockEnvironmentContext.FileProviderService.GetFilePaths(parentFile.Id, includeHiddenElements)
-            .Returns(ErrorOrFactory.From(filePaths.AsEnumerable()));
+            .Returns(Result.From(filePaths.AsEnumerable()));
 
         foreach (FileSystemPathId filePath in filePaths)
         {
             _mockEnvironmentContext.FileProviderService.GetFileName(filePath)
-                .Returns(ErrorOrFactory.From(System.IO.Path.GetFileName(filePath.Path)));
+                .Returns(Result.From(System.IO.Path.GetFileName(filePath.Path)));
             _mockEnvironmentContext.FileProviderService.GetLastWriteTime(filePath)
-                .Returns(ErrorOrFactory.From(Optional<DateTime>.FromNullable(DateTime.Now)));
+                .Returns(Result.From(Optional<DateTime>.FromNullable(DateTime.Now)));
             _mockEnvironmentContext.FileProviderService.GetCreationTime(filePath)
-                .Returns(ErrorOrFactory.From(Optional<DateTime>.FromNullable(DateTime.Now.AddDays(-1))));
+                .Returns(Result.From(Optional<DateTime>.FromNullable(DateTime.Now.AddDays(-1))));
             _mockEnvironmentContext.FileProviderService.GetSize(filePath)
-                .Returns(ErrorOrFactory.From((long?)1024));
+                .Returns(Result.From((long?)1024));
         }
 
         // Act
-        ErrorOr<IEnumerable<File>> result = _sut.GetFiles(parentFile, includeHiddenElements);
+        Result<IEnumerable<File>> result = _sut.GetFiles(parentFile, includeHiddenElements);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(2, result.Value.Count());
         Assert.Equal(["File1.txt", "File2.txt"], result.Value.Select(f => f.Name));
     }
@@ -210,10 +209,10 @@ public class FileServiceTests
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        ErrorOr<IEnumerable<File>> result = _sut.GetFiles(parentFile, includeHiddenElements);
+        Result<IEnumerable<File>> result = _sut.GetFiles(parentFile, includeHiddenElements);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
     }
 
@@ -226,7 +225,7 @@ public class FileServiceTests
         FileSystemPathId filePath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathTestDirInaccessible);
 
         _mockEnvironmentContext.FileProviderService.GetFilePaths(parentFile.Id, includeHiddenElements)
-            .Returns(ErrorOrFactory.From(new[] { filePath }.AsEnumerable()));
+            .Returns(Result.From(new[] { filePath }.AsEnumerable()));
 
         _mockEnvironmentContext.FileProviderService.GetFileName(filePath)
             .Returns(Errors.Permission.UnauthorizedAccess);
@@ -235,13 +234,13 @@ public class FileServiceTests
         _mockEnvironmentContext.FileProviderService.GetCreationTime(filePath)
             .Returns(Errors.Permission.UnauthorizedAccess);
         _mockEnvironmentContext.FileProviderService.GetSize(filePath)
-            .Returns(ErrorOrFactory.From((long?)null));
+            .Returns(Result.From((long?)null));
 
         // Act
-        ErrorOr<IEnumerable<File>> result = _sut.GetFiles(parentFile, includeHiddenElements);
+        Result<IEnumerable<File>> result = _sut.GetFiles(parentFile, includeHiddenElements);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Single(result.Value);
         Assert.Equal(FileSystemItemStatus.Inaccessible, result.Value.First().Status);
     }
@@ -259,25 +258,25 @@ public class FileServiceTests
         ];
 
         _mockEnvironmentContext.FileProviderService.GetFilePaths(pathId, includeHiddenElements)
-            .Returns(ErrorOrFactory.From(filePaths.AsEnumerable()));
+            .Returns(Result.From(filePaths.AsEnumerable()));
 
         foreach (FileSystemPathId filePath in filePaths)
         {
             _mockEnvironmentContext.FileProviderService.GetFileName(filePath)
-                .Returns(ErrorOrFactory.From(System.IO.Path.GetFileName(filePath.Path)));
+                .Returns(Result.From(System.IO.Path.GetFileName(filePath.Path)));
             _mockEnvironmentContext.FileProviderService.GetLastWriteTime(filePath)
-                .Returns(ErrorOrFactory.From(Optional<DateTime>.FromNullable(DateTime.Now)));
+                .Returns(Result.From(Optional<DateTime>.FromNullable(DateTime.Now)));
             _mockEnvironmentContext.FileProviderService.GetCreationTime(filePath)
-                .Returns(ErrorOrFactory.From(Optional<DateTime>.FromNullable(DateTime.Now.AddDays(-1))));
+                .Returns(Result.From(Optional<DateTime>.FromNullable(DateTime.Now.AddDays(-1))));
             _mockEnvironmentContext.FileProviderService.GetSize(filePath)
-                .Returns(ErrorOrFactory.From((long?)1024));
+                .Returns(Result.From((long?)1024));
         }
 
         // Act
-        ErrorOr<IEnumerable<File>> result = _sut.GetFiles(pathId, includeHiddenElements);
+        Result<IEnumerable<File>> result = _sut.GetFiles(pathId, includeHiddenElements);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(2, result.Value.Count());
         Assert.Equal(["File1.txt", "File2.txt"], result.Value.Select(f => f.Name));
     }
@@ -293,10 +292,10 @@ public class FileServiceTests
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        ErrorOr<IEnumerable<File>> result = _sut.GetFiles(pathId, includeHiddenElements);
+        Result<IEnumerable<File>> result = _sut.GetFiles(pathId, includeHiddenElements);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
     }
 
@@ -309,7 +308,7 @@ public class FileServiceTests
         FileSystemPathId filePath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathTestDirInaccessible);
 
         _mockEnvironmentContext.FileProviderService.GetFilePaths(pathId, includeHiddenElements)
-            .Returns(ErrorOrFactory.From(new[] { filePath }.AsEnumerable()));
+            .Returns(Result.From(new[] { filePath }.AsEnumerable()));
 
         _mockEnvironmentContext.FileProviderService.GetFileName(filePath)
             .Returns(Errors.Permission.UnauthorizedAccess);
@@ -318,13 +317,13 @@ public class FileServiceTests
         _mockEnvironmentContext.FileProviderService.GetCreationTime(filePath)
             .Returns(Errors.Permission.UnauthorizedAccess);
         _mockEnvironmentContext.FileProviderService.GetSize(filePath)
-            .Returns(ErrorOrFactory.From((long?)null));
+            .Returns(Result.From((long?)null));
 
         // Act
-        ErrorOr<IEnumerable<File>> result = _sut.GetFiles(pathId, includeHiddenElements);
+        Result<IEnumerable<File>> result = _sut.GetFiles(pathId, includeHiddenElements);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Single(result.Value);
         Assert.Equal(FileSystemItemStatus.Inaccessible, result.Value.First().Status);
     }
@@ -354,10 +353,10 @@ public class FileServiceTests
         _mockEnvironmentContext.FileProviderService.GetSize(copiedFilePathId).Returns((long?)1024);
 
         // Act
-        ErrorOr<File> result = _sut.CopyFile(sourcePath, destinationPath, overrideExisting);
+        Result<File> result = _sut.CopyFile(sourcePath, destinationPath, overrideExisting);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal("file.txt", result.Value.Name);
         Assert.Equal(FileSystemItemStatus.Accessible, result.Value.Status);
@@ -372,13 +371,13 @@ public class FileServiceTests
         bool overrideExisting = true;
         FileSystemPathId sourcePathId = _fileSystemPathIdFixture.CreateFileSystemPathId(sourcePath);
 
-        _mockEnvironmentContext.FileProviderService.FileExists(sourcePathId).Returns(ErrorOrFactory.From(false));
+        _mockEnvironmentContext.FileProviderService.FileExists(sourcePathId).Returns(Result.From(false));
 
         // Act
-        ErrorOr<File> result = _sut.CopyFile(sourcePath, destinationPath, overrideExisting);
+        Result<File> result = _sut.CopyFile(sourcePath, destinationPath, overrideExisting);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.FileNotFound, result.FirstError);
     }
 
@@ -393,15 +392,15 @@ public class FileServiceTests
         FileSystemPathId destinationPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(destinationPath);
 
         _mockPlatformContext.PathStrategy.PathSeparator.Returns(_dirSeparator);
-        _mockEnvironmentContext.FileProviderService.FileExists(sourcePathId).Returns(ErrorOrFactory.From(true));
+        _mockEnvironmentContext.FileProviderService.FileExists(sourcePathId).Returns(Result.From(true));
         _mockEnvironmentContext.FileProviderService.CopyFile(sourcePathId, destinationPathId, overrideExisting)
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        ErrorOr<File> result = _sut.CopyFile(sourcePath, destinationPath, overrideExisting);
+        Result<File> result = _sut.CopyFile(sourcePath, destinationPath, overrideExisting);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
     }
 
@@ -417,20 +416,20 @@ public class FileServiceTests
         FileSystemPathId copiedFilePathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestinationFile);
 
         _mockPlatformContext.PathStrategy.PathSeparator.Returns(_dirSeparator);
-        _mockEnvironmentContext.FileProviderService.FileExists(sourcePathId).Returns(ErrorOrFactory.From(true));
+        _mockEnvironmentContext.FileProviderService.FileExists(sourcePathId).Returns(Result.From(true));
         _mockEnvironmentContext.FileProviderService.CopyFile(sourcePathId, destinationPathId, overrideExisting)
-            .Returns(ErrorOrFactory.From(copiedFilePathId));
+            .Returns(Result.From(copiedFilePathId));
 
         _mockEnvironmentContext.FileProviderService.GetFileName(copiedFilePathId).Returns(Errors.Permission.UnauthorizedAccess);
         _mockEnvironmentContext.FileProviderService.GetLastWriteTime(copiedFilePathId).Returns(Errors.Permission.UnauthorizedAccess);
         _mockEnvironmentContext.FileProviderService.GetCreationTime(copiedFilePathId).Returns(Errors.Permission.UnauthorizedAccess);
-        _mockEnvironmentContext.FileProviderService.GetSize(copiedFilePathId).Returns(ErrorOrFactory.From((long?)null));
+        _mockEnvironmentContext.FileProviderService.GetSize(copiedFilePathId).Returns(Result.From((long?)null));
 
         // Act
-        ErrorOr<File> result = _sut.CopyFile(sourcePath, destinationPath, overrideExisting);
+        Result<File> result = _sut.CopyFile(sourcePath, destinationPath, overrideExisting);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(FileSystemItemStatus.Inaccessible, result.Value.Status);
     }
@@ -444,10 +443,10 @@ public class FileServiceTests
         bool overrideExisting = true;
 
         // Act
-        ErrorOr<File> result = _sut.CopyFile(invalidSourcePath, destinationPath, overrideExisting);
+        Result<File> result = _sut.CopyFile(invalidSourcePath, destinationPath, overrideExisting);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
     }
 
@@ -461,10 +460,10 @@ public class FileServiceTests
         _mockPlatformContext.PathStrategy.PathSeparator.Returns(_dirSeparator);
 
         // Act
-        ErrorOr<File> result = _sut.CopyFile(sourcePath, invalidDestinationPath, overrideExisting);
+        Result<File> result = _sut.CopyFile(sourcePath, invalidDestinationPath, overrideExisting);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
     }
 
@@ -488,10 +487,10 @@ public class FileServiceTests
         _mockEnvironmentContext.FileProviderService.GetSize(copiedFilePathId).Returns((long?)1024);
 
         // Act
-        ErrorOr<File> result = _sut.CopyFile(sourcePathId, destinationPathId, overrideExisting);
+        Result<File> result = _sut.CopyFile(sourcePathId, destinationPathId, overrideExisting);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal("file.txt", result.Value.Name);
         Assert.Equal(FileSystemItemStatus.Accessible, result.Value.Status);
@@ -508,10 +507,10 @@ public class FileServiceTests
         _mockEnvironmentContext.FileProviderService.FileExists(sourcePathId).Returns(false);
 
         // Act
-        ErrorOr<File> result = _sut.CopyFile(sourcePathId, destinationPathId, overrideExisting);
+        Result<File> result = _sut.CopyFile(sourcePathId, destinationPathId, overrideExisting);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.FileNotFound, result.FirstError);
     }
 
@@ -528,10 +527,10 @@ public class FileServiceTests
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        ErrorOr<File> result = _sut.CopyFile(sourcePathId, destinationPathId, overrideExisting);
+        Result<File> result = _sut.CopyFile(sourcePathId, destinationPathId, overrideExisting);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
     }
 
@@ -551,13 +550,13 @@ public class FileServiceTests
         _mockEnvironmentContext.FileProviderService.GetFileName(copiedFilePathId).Returns(Errors.Permission.UnauthorizedAccess);
         _mockEnvironmentContext.FileProviderService.GetLastWriteTime(copiedFilePathId).Returns(Errors.Permission.UnauthorizedAccess);
         _mockEnvironmentContext.FileProviderService.GetCreationTime(copiedFilePathId).Returns(Errors.Permission.UnauthorizedAccess);
-        _mockEnvironmentContext.FileProviderService.GetSize(copiedFilePathId).Returns(ErrorOrFactory.From((long?)null));
+        _mockEnvironmentContext.FileProviderService.GetSize(copiedFilePathId).Returns(Result.From((long?)null));
 
         // Act
-        ErrorOr<File> result = _sut.CopyFile(sourcePathId, destinationPathId, overrideExisting);
+        Result<File> result = _sut.CopyFile(sourcePathId, destinationPathId, overrideExisting);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(FileSystemItemStatus.Inaccessible, result.Value.Status);
     }
@@ -587,10 +586,10 @@ public class FileServiceTests
         _mockEnvironmentContext.FileProviderService.GetSize(movedFilePathId).Returns((long?)1024);
 
         // Act
-        ErrorOr<File> result = _sut.MoveFile(sourcePath, destinationPath, overrideExisting);
+        Result<File> result = _sut.MoveFile(sourcePath, destinationPath, overrideExisting);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal("file.txt", result.Value.Name);
         Assert.Equal(FileSystemItemStatus.Accessible, result.Value.Status);
@@ -609,10 +608,10 @@ public class FileServiceTests
         _mockEnvironmentContext.FileProviderService.FileExists(sourcePathId).Returns(false);
 
         // Act
-        ErrorOr<File> result = _sut.MoveFile(sourcePath, destinationPath, overrideExisting);
+        Result<File> result = _sut.MoveFile(sourcePath, destinationPath, overrideExisting);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.FileNotFound, result.FirstError);
     }
 
@@ -632,10 +631,10 @@ public class FileServiceTests
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        ErrorOr<File> result = _sut.MoveFile(sourcePath, destinationPath, overrideExisting);
+        Result<File> result = _sut.MoveFile(sourcePath, destinationPath, overrideExisting);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
     }
 
@@ -660,13 +659,13 @@ public class FileServiceTests
         _mockEnvironmentContext.FileProviderService.GetFileName(movedFilePathId).Returns(Errors.Permission.UnauthorizedAccess);
         _mockEnvironmentContext.FileProviderService.GetLastWriteTime(movedFilePathId).Returns(Errors.Permission.UnauthorizedAccess);
         _mockEnvironmentContext.FileProviderService.GetCreationTime(movedFilePathId).Returns(Errors.Permission.UnauthorizedAccess);
-        _mockEnvironmentContext.FileProviderService.GetSize(movedFilePathId).Returns(ErrorOrFactory.From((long?)null));
+        _mockEnvironmentContext.FileProviderService.GetSize(movedFilePathId).Returns(Result.From((long?)null));
 
         // Act
-        ErrorOr<File> result = _sut.MoveFile(sourcePath, destinationPath, overrideExisting);
+        Result<File> result = _sut.MoveFile(sourcePath, destinationPath, overrideExisting);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(FileSystemItemStatus.Inaccessible, result.Value.Status);
     }
@@ -682,10 +681,10 @@ public class FileServiceTests
         _mockPlatformContext.PathStrategy.PathSeparator.Returns(_dirSeparator);
 
         // Act
-        ErrorOr<File> result = _sut.MoveFile(invalidSourcePath, destinationPath, overrideExisting);
+        Result<File> result = _sut.MoveFile(invalidSourcePath, destinationPath, overrideExisting);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
     }
 
@@ -700,10 +699,10 @@ public class FileServiceTests
         _mockPlatformContext.PathStrategy.PathSeparator.Returns(_dirSeparator);
 
         // Act
-        ErrorOr<File> result = _sut.MoveFile(sourcePath, invalidDestinationPath, overrideExisting);
+        Result<File> result = _sut.MoveFile(sourcePath, invalidDestinationPath, overrideExisting);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
     }
 
@@ -727,10 +726,10 @@ public class FileServiceTests
         _mockEnvironmentContext.FileProviderService.GetSize(movedFilePathId).Returns((long?)1024);
 
         // Act
-        ErrorOr<File> result = _sut.MoveFile(sourcePathId, destinationPathId, overrideExisting);
+        Result<File> result = _sut.MoveFile(sourcePathId, destinationPathId, overrideExisting);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal("file.txt", result.Value.Name);
         Assert.Equal(FileSystemItemStatus.Accessible, result.Value.Status);
@@ -749,10 +748,10 @@ public class FileServiceTests
         _mockEnvironmentContext.FileProviderService.FileExists(sourcePathId).Returns(false);
 
         // Act
-        ErrorOr<File> result = _sut.MoveFile(sourcePathId, destinationPathId, overrideExisting);
+        Result<File> result = _sut.MoveFile(sourcePathId, destinationPathId, overrideExisting);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.FileNotFound, result.FirstError);
     }
 
@@ -769,10 +768,10 @@ public class FileServiceTests
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        ErrorOr<File> result = _sut.MoveFile(sourcePathId, destinationPathId, overrideExisting);
+        Result<File> result = _sut.MoveFile(sourcePathId, destinationPathId, overrideExisting);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
     }
 
@@ -792,13 +791,13 @@ public class FileServiceTests
         _mockEnvironmentContext.FileProviderService.GetFileName(movedFilePathId).Returns(Errors.Permission.UnauthorizedAccess);
         _mockEnvironmentContext.FileProviderService.GetLastWriteTime(movedFilePathId).Returns(Errors.Permission.UnauthorizedAccess);
         _mockEnvironmentContext.FileProviderService.GetCreationTime(movedFilePathId).Returns(Errors.Permission.UnauthorizedAccess);
-        _mockEnvironmentContext.FileProviderService.GetSize(movedFilePathId).Returns(ErrorOrFactory.From((long?)null));
+        _mockEnvironmentContext.FileProviderService.GetSize(movedFilePathId).Returns(Result.From((long?)null));
 
         // Act
-        ErrorOr<File> result = _sut.MoveFile(sourcePathId, destinationPathId, overrideExisting);
+        Result<File> result = _sut.MoveFile(sourcePathId, destinationPathId, overrideExisting);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(FileSystemItemStatus.Inaccessible, result.Value.Status);
     }
@@ -817,10 +816,10 @@ public class FileServiceTests
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        ErrorOr<File> result = _sut.MoveFile(sourcePath, destinationPath, overrideExisting);
+        Result<File> result = _sut.MoveFile(sourcePath, destinationPath, overrideExisting);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
     }
 
@@ -835,22 +834,22 @@ public class FileServiceTests
 
         _mockPlatformContext.PathStrategy.PathSeparator.Returns(_dirSeparator);
         _mockPlatformContext.PathStrategy.CombinePath(Arg.Any<FileSystemPathId>(), newName)
-            .Returns(ErrorOrFactory.From(newPathId));
+            .Returns(Result.From(newPathId));
         _mockEnvironmentContext.FileProviderService.FileExists(newPathId).Returns(false);
         _mockEnvironmentContext.FileProviderService.RenameFile(pathId, newName)
-            .Returns(ErrorOrFactory.From(newPathId));
-        _mockEnvironmentContext.FileProviderService.GetFileName(newPathId).Returns(ErrorOrFactory.From(newName));
+            .Returns(Result.From(newPathId));
+        _mockEnvironmentContext.FileProviderService.GetFileName(newPathId).Returns(Result.From(newName));
         _mockEnvironmentContext.FileProviderService.GetLastWriteTime(newPathId)
-            .Returns(ErrorOrFactory.From(Optional<DateTime>.FromNullable(DateTime.Now)));
+            .Returns(Result.From(Optional<DateTime>.FromNullable(DateTime.Now)));
         _mockEnvironmentContext.FileProviderService.GetCreationTime(newPathId)
-            .Returns(ErrorOrFactory.From(Optional<DateTime>.FromNullable(DateTime.Now.AddDays(-1))));
-        _mockEnvironmentContext.FileProviderService.GetSize(newPathId).Returns(ErrorOrFactory.From((long?)1024));
+            .Returns(Result.From(Optional<DateTime>.FromNullable(DateTime.Now.AddDays(-1))));
+        _mockEnvironmentContext.FileProviderService.GetSize(newPathId).Returns(Result.From((long?)1024));
 
         // Act
-        ErrorOr<File> result = _sut.RenameFile(path, newName);
+        Result<File> result = _sut.RenameFile(path, newName);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(newName, result.Value.Name);
         Assert.Equal(FileSystemItemStatus.Accessible, result.Value.Status);
@@ -866,14 +865,14 @@ public class FileServiceTests
 
         _mockPlatformContext.PathStrategy.PathSeparator.Returns(_dirSeparator);
         _mockPlatformContext.PathStrategy.CombinePath(Arg.Any<FileSystemPathId>(), newName)
-            .Returns(ErrorOrFactory.From(newPathId));
+            .Returns(Result.From(newPathId));
         _mockEnvironmentContext.FileProviderService.FileExists(newPathId).Returns(true);
 
         // Act
-        ErrorOr<File> result = _sut.RenameFile(path, newName);
+        Result<File> result = _sut.RenameFile(path, newName);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.FileAlreadyExists, result.FirstError);
     }
 
@@ -888,16 +887,16 @@ public class FileServiceTests
 
         _mockPlatformContext.PathStrategy.PathSeparator.Returns(_dirSeparator);
         _mockPlatformContext.PathStrategy.CombinePath(Arg.Any<FileSystemPathId>(), newName)
-            .Returns(ErrorOrFactory.From(newPathId));
+            .Returns(Result.From(newPathId));
         _mockEnvironmentContext.FileProviderService.FileExists(newPathId).Returns(false);
         _mockEnvironmentContext.FileProviderService.RenameFile(pathId, newName)
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        ErrorOr<File> result = _sut.RenameFile(path, newName);
+        Result<File> result = _sut.RenameFile(path, newName);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
     }
 
@@ -912,21 +911,21 @@ public class FileServiceTests
 
         _mockPlatformContext.PathStrategy.PathSeparator.Returns(_dirSeparator);
         _mockPlatformContext.PathStrategy.CombinePath(Arg.Any<FileSystemPathId>(), newName)
-            .Returns(ErrorOrFactory.From(newPathId));
+            .Returns(Result.From(newPathId));
         _mockEnvironmentContext.FileProviderService.FileExists(newPathId).Returns(false);
         _mockEnvironmentContext.FileProviderService.RenameFile(pathId, newName)
-            .Returns(ErrorOrFactory.From(newPathId));
+            .Returns(Result.From(newPathId));
 
         _mockEnvironmentContext.FileProviderService.GetFileName(newPathId).Returns(Errors.Permission.UnauthorizedAccess);
         _mockEnvironmentContext.FileProviderService.GetLastWriteTime(newPathId).Returns(Errors.Permission.UnauthorizedAccess);
         _mockEnvironmentContext.FileProviderService.GetCreationTime(newPathId).Returns(Errors.Permission.UnauthorizedAccess);
-        _mockEnvironmentContext.FileProviderService.GetSize(newPathId).Returns(ErrorOrFactory.From((long?)null));
+        _mockEnvironmentContext.FileProviderService.GetSize(newPathId).Returns(Result.From((long?)null));
 
         // Act
-        ErrorOr<File> result = _sut.RenameFile(path, newName);
+        Result<File> result = _sut.RenameFile(path, newName);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(FileSystemItemStatus.Inaccessible, result.Value.Status);
     }
@@ -941,10 +940,10 @@ public class FileServiceTests
         _mockPlatformContext.PathStrategy.PathSeparator.Returns(_dirSeparator);
 
         // Act
-        ErrorOr<File> result = _sut.RenameFile(invalidPath, newName);
+        Result<File> result = _sut.RenameFile(invalidPath, newName);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
     }
 
@@ -957,22 +956,22 @@ public class FileServiceTests
         FileSystemPathId newPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSourceNewFile);
 
         _mockPlatformContext.PathStrategy.CombinePath(Arg.Any<FileSystemPathId>(), newName)
-            .Returns(ErrorOrFactory.From(newPathId));
+            .Returns(Result.From(newPathId));
         _mockEnvironmentContext.FileProviderService.FileExists(newPathId).Returns(false);
         _mockEnvironmentContext.FileProviderService.RenameFile(pathId, newName)
-            .Returns(ErrorOrFactory.From(newPathId));
-        _mockEnvironmentContext.FileProviderService.GetFileName(newPathId).Returns(ErrorOrFactory.From(newName));
+            .Returns(Result.From(newPathId));
+        _mockEnvironmentContext.FileProviderService.GetFileName(newPathId).Returns(Result.From(newName));
         _mockEnvironmentContext.FileProviderService.GetLastWriteTime(newPathId)
-            .Returns(ErrorOrFactory.From(Optional<DateTime>.FromNullable(DateTime.Now)));
+            .Returns(Result.From(Optional<DateTime>.FromNullable(DateTime.Now)));
         _mockEnvironmentContext.FileProviderService.GetCreationTime(newPathId)
-            .Returns(ErrorOrFactory.From(Optional<DateTime>.FromNullable(DateTime.Now.AddDays(-1))));
-        _mockEnvironmentContext.FileProviderService.GetSize(newPathId).Returns(ErrorOrFactory.From((long?)1024));
+            .Returns(Result.From(Optional<DateTime>.FromNullable(DateTime.Now.AddDays(-1))));
+        _mockEnvironmentContext.FileProviderService.GetSize(newPathId).Returns(Result.From((long?)1024));
 
         // Act
-        ErrorOr<File> result = _sut.RenameFile(pathId, newName);
+        Result<File> result = _sut.RenameFile(pathId, newName);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(newName, result.Value.Name);
         Assert.Equal(FileSystemItemStatus.Accessible, result.Value.Status);
@@ -987,14 +986,14 @@ public class FileServiceTests
         FileSystemPathId newPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSourceExistingFile);
 
         _mockPlatformContext.PathStrategy.CombinePath(Arg.Any<FileSystemPathId>(), newName)
-            .Returns(ErrorOrFactory.From(newPathId));
+            .Returns(Result.From(newPathId));
         _mockEnvironmentContext.FileProviderService.FileExists(newPathId).Returns(true);
 
         // Act
-        ErrorOr<File> result = _sut.RenameFile(pathId, newName);
+        Result<File> result = _sut.RenameFile(pathId, newName);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.FileAlreadyExists, result.FirstError);
     }
 
@@ -1007,16 +1006,16 @@ public class FileServiceTests
         FileSystemPathId newPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSourceNewFile);
 
         _mockPlatformContext.PathStrategy.CombinePath(Arg.Any<FileSystemPathId>(), newName)
-            .Returns(ErrorOrFactory.From(newPathId));
+            .Returns(Result.From(newPathId));
         _mockEnvironmentContext.FileProviderService.FileExists(newPathId).Returns(false);
         _mockEnvironmentContext.FileProviderService.RenameFile(pathId, newName)
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        ErrorOr<File> result = _sut.RenameFile(pathId, newName);
+        Result<File> result = _sut.RenameFile(pathId, newName);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
     }
 
@@ -1029,21 +1028,21 @@ public class FileServiceTests
         FileSystemPathId newPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSourceNewFile);
 
         _mockPlatformContext.PathStrategy.CombinePath(Arg.Any<FileSystemPathId>(), newName)
-            .Returns(ErrorOrFactory.From(newPathId));
+            .Returns(Result.From(newPathId));
         _mockEnvironmentContext.FileProviderService.FileExists(newPathId).Returns(false);
         _mockEnvironmentContext.FileProviderService.RenameFile(pathId, newName)
-            .Returns(ErrorOrFactory.From(newPathId));
+            .Returns(Result.From(newPathId));
 
         _mockEnvironmentContext.FileProviderService.GetFileName(newPathId).Returns(Errors.Permission.UnauthorizedAccess);
         _mockEnvironmentContext.FileProviderService.GetLastWriteTime(newPathId).Returns(Errors.Permission.UnauthorizedAccess);
         _mockEnvironmentContext.FileProviderService.GetCreationTime(newPathId).Returns(Errors.Permission.UnauthorizedAccess);
-        _mockEnvironmentContext.FileProviderService.GetSize(newPathId).Returns(ErrorOrFactory.From((long?)null));
+        _mockEnvironmentContext.FileProviderService.GetSize(newPathId).Returns(Result.From((long?)null));
 
         // Act
-        ErrorOr<File> result = _sut.RenameFile(pathId, newName);
+        Result<File> result = _sut.RenameFile(pathId, newName);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(FileSystemItemStatus.Inaccessible, result.Value.Status);
     }
@@ -1060,10 +1059,10 @@ public class FileServiceTests
             .Returns(Errors.FileSystemManagement.InvalidPath);
 
         // Act
-        ErrorOr<File> result = _sut.RenameFile(path, newName);
+        Result<File> result = _sut.RenameFile(path, newName);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
     }
 
@@ -1077,15 +1076,15 @@ public class FileServiceTests
 
         _mockPlatformContext.PathStrategy.PathSeparator.Returns(_dirSeparator);
         _mockPlatformContext.PathStrategy.CombinePath(Arg.Any<FileSystemPathId>(), newName)
-            .Returns(ErrorOrFactory.From(newPathId));
+            .Returns(Result.From(newPathId));
         _mockEnvironmentContext.FileProviderService.FileExists(newPathId)
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        ErrorOr<File> result = _sut.RenameFile(path, newName);
+        Result<File> result = _sut.RenameFile(path, newName);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
     }
 
@@ -1100,10 +1099,10 @@ public class FileServiceTests
             .Returns(Errors.FileSystemManagement.InvalidPath);
 
         // Act
-        ErrorOr<File> result = _sut.RenameFile(pathId, newName);
+        Result<File> result = _sut.RenameFile(pathId, newName);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
     }
 
@@ -1116,15 +1115,15 @@ public class FileServiceTests
         FileSystemPathId newPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSourceNewFile);
 
         _mockPlatformContext.PathStrategy.CombinePath(Arg.Any<FileSystemPathId>(), newName)
-            .Returns(ErrorOrFactory.From(newPathId));
+            .Returns(Result.From(newPathId));
         _mockEnvironmentContext.FileProviderService.FileExists(newPathId)
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        ErrorOr<File> result = _sut.RenameFile(pathId, newName);
+        Result<File> result = _sut.RenameFile(pathId, newName);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
     }
 
@@ -1139,10 +1138,10 @@ public class FileServiceTests
             .Returns(Result.Deleted);
 
         // Act
-        ErrorOr<Deleted> result = _sut.DeleteFile(path);
+        Result<Deleted> result = _sut.DeleteFile(path);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(Result.Deleted, result.Value);
     }
 
@@ -1153,10 +1152,10 @@ public class FileServiceTests
         string invalidPath = string.Empty;
 
         // Act
-        ErrorOr<Deleted> result = _sut.DeleteFile(invalidPath);
+        Result<Deleted> result = _sut.DeleteFile(invalidPath);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
     }
 
@@ -1171,10 +1170,10 @@ public class FileServiceTests
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        ErrorOr<Deleted> result = _sut.DeleteFile(path);
+        Result<Deleted> result = _sut.DeleteFile(path);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
     }
 
@@ -1188,10 +1187,10 @@ public class FileServiceTests
             .Returns(Result.Deleted);
 
         // Act
-        ErrorOr<Deleted> result = _sut.DeleteFile(pathId);
+        Result<Deleted> result = _sut.DeleteFile(pathId);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(Result.Deleted, result.Value);
     }
 
@@ -1205,10 +1204,10 @@ public class FileServiceTests
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        ErrorOr<Deleted> result = _sut.DeleteFile(pathId);
+        Result<Deleted> result = _sut.DeleteFile(pathId);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
     }
 }

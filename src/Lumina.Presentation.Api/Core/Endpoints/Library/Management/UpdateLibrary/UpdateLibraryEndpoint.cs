@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Application.Core.MediaLibrary.Management.Commands.UpdateLibrary;
 using Lumina.Contracts.Requests.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Common.Routes.Library.Management;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
@@ -19,13 +19,13 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Library.Management.UpdateLibrar
 /// </summary>
 public class UpdateLibraryEndpoint : BaseEndpoint<UpdateLibraryRequest, IResult>
 {
-    private readonly ICommandHandler<UpdateLibraryCommand, ErrorOr<LibraryResponse>> _updateLibraryCommandHandler;
+    private readonly ICommandHandler<UpdateLibraryCommand, Result<LibraryResponse>> _updateLibraryCommandHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UpdateLibraryEndpoint"/> class.
     /// </summary>
     /// <param name="updateLibraryCommandHandler">Injected service for handling update library commands.</param>
-    public UpdateLibraryEndpoint(ICommandHandler<UpdateLibraryCommand, ErrorOr<LibraryResponse>> updateLibraryCommandHandler)
+    public UpdateLibraryEndpoint(ICommandHandler<UpdateLibraryCommand, Result<LibraryResponse>> updateLibraryCommandHandler)
     {
         _updateLibraryCommandHandler = updateLibraryCommandHandler;
     }
@@ -48,7 +48,7 @@ public class UpdateLibraryEndpoint : BaseEndpoint<UpdateLibraryRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(UpdateLibraryRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<LibraryResponse> result = await _updateLibraryCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
+        Result<LibraryResponse> result = await _updateLibraryCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

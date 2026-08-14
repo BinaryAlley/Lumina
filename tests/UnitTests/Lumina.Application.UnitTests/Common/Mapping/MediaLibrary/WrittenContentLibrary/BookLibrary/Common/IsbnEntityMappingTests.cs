@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
+using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -75,10 +75,10 @@ public class IsbnEntityMappingTests
         IsbnEntity entity = new("0-7475-3269-9", IsbnFormat.Isbn10);
 
         // Act
-        ErrorOr<Isbn> result = entity.ToDomainEntity();
+        Result<Isbn> result = entity.ToDomainEntity();
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(entity.Value, result.Value.Value);
         Assert.Equal(entity.Format, result.Value.Format);
@@ -94,10 +94,10 @@ public class IsbnEntityMappingTests
         IsbnEntity entity = new(invalidValue, null);
 
         // Act
-        ErrorOr<Isbn> result = entity.ToDomainEntity();
+        Result<Isbn> result = entity.ToDomainEntity();
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
     }
 
     [Fact]
@@ -111,16 +111,16 @@ public class IsbnEntityMappingTests
         ];
 
         // Act
-        IEnumerable<ErrorOr<Isbn>> results = entities.ToDomainEntities();
+        IEnumerable<Result<Isbn>> results = entities.ToDomainEntities();
 
         // Assert
         Assert.NotNull(results);
         Assert.Equal(entities.Count, results.Count());
 
-        List<ErrorOr<Isbn>> resultList = results.ToList();
+        List<Result<Isbn>> resultList = [.. results];
         for (int i = 0; i < entities.Count; i++)
         {
-            Assert.False(resultList[i].IsError);
+            Assert.False(resultList[i].IsFailure);
             Assert.Equal(entities[i].Value, resultList[i].Value.Value);
             Assert.Equal(entities[i].Format, resultList[i].Value.Format);
         }
@@ -143,7 +143,7 @@ public class IsbnEntityMappingTests
         Assert.NotNull(results);
         Assert.Equal(entities.Count, results.Count());
 
-        List<IsbnDto> resultList = results.ToList();
+        List<IsbnDto> resultList = [.. results];
         for (int i = 0; i < entities.Count; i++)
         {
             Assert.Equal(entities[i].Value, resultList[i].Value);

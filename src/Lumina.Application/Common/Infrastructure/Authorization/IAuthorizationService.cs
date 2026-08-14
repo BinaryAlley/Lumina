@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.Common.Base;
 using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
@@ -47,6 +47,6 @@ public interface IAuthorizationService
     /// </summary>
     /// <param name="userId">The unique identifier of the user for whom to retrieve the authorization roles and permissions.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a <see cref="UserAuthorizationEntity"/>, or an error.</returns>
-    Task<ErrorOr<UserAuthorizationEntity>> GetUserAuthorizationAsync(Guid userId, CancellationToken cancellationToken);
+    /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="UserAuthorizationEntity"/>, or an error.</returns>
+    Task<Result<UserAuthorizationEntity>> GetUserAuthorizationAsync(Guid userId, CancellationToken cancellationToken);
 }

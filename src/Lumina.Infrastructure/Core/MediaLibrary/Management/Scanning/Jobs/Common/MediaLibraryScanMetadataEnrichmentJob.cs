@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Books;
@@ -81,8 +81,8 @@ internal sealed class MediaLibraryScanMetadataEnrichmentJob : MediaLibraryScanJo
                     MediaLibraryScanCompositeId compositeKey = MediaLibraryScanCompositeId.Create(ScanId, UserId);
 
                     // get the metadata providers configured for the media library, in their configured order, that support the media library type
-                    ErrorOr<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>> getConfigurationsResult = await configurationRepository.GetByLibraryIdAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
-                    if (getConfigurationsResult.IsError)
+                    Result<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>> getConfigurationsResult = await configurationRepository.GetByLibraryIdAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
+                    if (getConfigurationsResult.IsFailure)
                         throw new InvalidOperationException(getConfigurationsResult.FirstError.Description);
                     List<IRemoteMetadataProvider> providers = [];
                     foreach (LibraryMetadataProviderConfigurationEntity configuration in getConfigurationsResult.Value.Where(configuration => configuration.IsEnabled).OrderBy(configuration => configuration.Rank))
@@ -96,14 +96,14 @@ internal sealed class MediaLibraryScanMetadataEnrichmentJob : MediaLibraryScanJo
                     }
 
                     // count the books that need their metadata enriched, for progress reporting purposes
-                    ErrorOr<int> getBooksToEnrichCountResult = await bookRepository.GetBooksNeedingMetadataCountAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
-                    if (getBooksToEnrichCountResult.IsError)
+                    Result<int> getBooksToEnrichCountResult = await bookRepository.GetBooksNeedingMetadataCountAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
+                    if (getBooksToEnrichCountResult.IsFailure)
                         throw new InvalidOperationException(getBooksToEnrichCountResult.FirstError.Description);
                     int totalBooksToEnrich = getBooksToEnrichCountResult.Value;
 
                     // set the initial progress of the scan job
-                    ErrorOr<Success> publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, 0, totalBooksToEnrich, cancellationToken).ConfigureAwait(false);
-                    if (publishJobProgressResult.IsError)
+                    Result<Success> publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, 0, totalBooksToEnrich, cancellationToken).ConfigureAwait(false);
+                    if (publishJobProgressResult.IsFailure)
                         throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
 
                     DateTime lastUpdateTime = DateTime.UtcNow;
@@ -116,8 +116,8 @@ internal sealed class MediaLibraryScanMetadataEnrichmentJob : MediaLibraryScanJo
                     {
                         cancellationToken.ThrowIfCancellationRequested();
 
-                        ErrorOr<IReadOnlyList<BookEntity>> getBooksPageResult = await bookRepository.GetBooksNeedingMetadataAsync(LibraryId.Value, lastPath, ENRICHMENT_PAGE_SIZE, cancellationToken).ConfigureAwait(false);
-                        if (getBooksPageResult.IsError)
+                        Result<IReadOnlyList<BookEntity>> getBooksPageResult = await bookRepository.GetBooksNeedingMetadataAsync(LibraryId.Value, lastPath, ENRICHMENT_PAGE_SIZE, cancellationToken).ConfigureAwait(false);
+                        if (getBooksPageResult.IsFailure)
                             throw new InvalidOperationException(getBooksPageResult.FirstError.Description);
                         IReadOnlyList<BookEntity> booksPage = getBooksPageResult.Value;
                         if (booksPage.Count == 0)
@@ -135,7 +135,7 @@ internal sealed class MediaLibraryScanMetadataEnrichmentJob : MediaLibraryScanJo
                             {
                                 // increment the number of processed elements progress
                                 publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, Interlocked.Increment(ref processedBooksCount), totalBooksToEnrich, cancellationToken).ConfigureAwait(false);
-                                if (publishJobProgressResult.IsError)
+                                if (publishJobProgressResult.IsFailure)
                                     throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
                                 lastUpdateTime = now;
                             }
@@ -178,8 +178,8 @@ internal sealed class MediaLibraryScanMetadataEnrichmentJob : MediaLibraryScanJo
     private static async Task EnrichBookAsync(BookEntity bookEntity, IReadOnlyList<IRemoteMetadataProvider> providers, IBookRepository bookRepository, CancellationToken cancellationToken)
     {
         // convert the book to a domain object
-        ErrorOr<Book> getBookResult = bookEntity.ToDomainEntity();
-        if (getBookResult.IsError)
+        Result<Book> getBookResult = bookEntity.ToDomainEntity();
+        if (getBookResult.IsFailure)
             return;
         Book book = getBookResult.Value;
 
@@ -202,12 +202,12 @@ internal sealed class MediaLibraryScanMetadataEnrichmentJob : MediaLibraryScanJo
                 if (metadataResult is not BookMetadataDto bookMetadata || !IsUsableMetadata(bookMetadata))
                     continue;
 
-                ErrorOr<Success> applyMetadataResult = book.ApplyMetadata(bookMetadata, provider.Name, DateTime.UtcNow);
-                if (applyMetadataResult.IsError)
+                Result<Success> applyMetadataResult = book.ApplyMetadata(bookMetadata, provider.Name, DateTime.UtcNow);
+                if (applyMetadataResult.IsFailure)
                     continue;
 
-                ErrorOr<Updated> updateBookResult = await bookRepository.UpdateAsync(book.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
-                if (updateBookResult.IsError)
+                Result<Updated> updateBookResult = await bookRepository.UpdateAsync(book.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
+                if (updateBookResult.IsFailure)
                     continue;
 
                 return;
@@ -247,11 +247,11 @@ internal sealed class MediaLibraryScanMetadataEnrichmentJob : MediaLibraryScanJo
     /// <param name="currentProgress">The current job progress.</param>
     /// <param name="totalProgress">The total job progress.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    private async Task<ErrorOr<Success>> PublishJobProgressAsync(IDomainEventPublisher domainEventPublisher, MediaLibraryScanCompositeId compositeKey, int currentProgress, int totalProgress, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    private async Task<Result<Success>> PublishJobProgressAsync(IDomainEventPublisher domainEventPublisher, MediaLibraryScanCompositeId compositeKey, int currentProgress, int totalProgress, CancellationToken cancellationToken)
     {
-        ErrorOr<MediaLibraryScanJobProgress> scanJobProgressResult = MediaLibraryScanJobProgress.Create(currentProgress, totalProgress, "EnrichingMetadata");
-        if (scanJobProgressResult.IsError)
+        Result<MediaLibraryScanJobProgress> scanJobProgressResult = MediaLibraryScanJobProgress.Create(currentProgress, totalProgress, "EnrichingMetadata");
+        if (scanJobProgressResult.IsFailure)
             return scanJobProgressResult.Errors;
 
         await domainEventPublisher.PublishAsync(new LibraryScanJobProgressChangedDomainEvent(

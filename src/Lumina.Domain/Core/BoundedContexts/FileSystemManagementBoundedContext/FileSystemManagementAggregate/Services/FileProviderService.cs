@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
-using Lumina.Domain.SharedKernel.Common.Errors;
 using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
+using Lumina.Domain.Common.Errors;
+
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using System;
 using System.Collections.Generic;
@@ -37,18 +37,18 @@ internal class FileProviderService : IFileProviderService
     /// </summary>
     /// <param name="path">The path for which to retrieve the list of files.</param>
     /// <param name="includeHiddenElements">Whether to include hidden files or not.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of file paths or an error.</returns>
-    public ErrorOr<IEnumerable<FileSystemPathId>> GetFilePaths(FileSystemPathId path, bool includeHiddenElements)
+    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of file paths or an error.</returns>
+    public Result<IEnumerable<FileSystemPathId>> GetFilePaths(FileSystemPathId path, bool includeHiddenElements)
     {
         // check if the user has access permissions to the provided path
         if (!_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ListDirectory))
             return Errors.Permission.UnauthorizedAccess;
-        return ErrorOrFactory.From(_fileSystem.Directory.GetFiles(path.Path)
+        return Result.From(_fileSystem.Directory.GetFiles(path.Path)
                                                         .Where(path => includeHiddenElements || (GetAttributes(path) & FileAttributes.Hidden) != FileAttributes.Hidden)
                                                         .OrderBy(path => path)
                                                         .Select(path => FileSystemPathId.Create(path))
-                                                        .Where(errorOrPathId => !errorOrPathId.IsError)
-                                                        .Select(errorOrPathId => errorOrPathId.Value)
+                                                        .Where(pathIdResult => !pathIdResult.IsFailure)
+                                                        .Select(pathIdResult => pathIdResult.Value)
                                                         .AsEnumerable());
     }
 
@@ -74,8 +74,8 @@ internal class FileProviderService : IFileProviderService
     /// Checks if a file with the specified path exists.
     /// </summary>
     /// <param name="path">The path of the file whose existance is checked.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the result of checking the existance of a file, or an error.</returns>
-    public ErrorOr<bool> FileExists(FileSystemPathId path)
+    /// <returns>An <see cref="Result{TValue}"/> containing either the result of checking the existance of a file, or an error.</returns>
+    public Result<bool> FileExists(FileSystemPathId path)
     {
         return _fileSystem.File.Exists(path.Path);
     }
@@ -84,8 +84,8 @@ internal class FileProviderService : IFileProviderService
     /// Retrieves the file name from the specified path.
     /// </summary>
     /// <param name="path">The path to extract the file name from.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the name of the file without the path, or the last segment of the path if no file name is found, or an error.</returns>
-    public ErrorOr<string> GetFileName(FileSystemPathId path)
+    /// <returns>An <see cref="Result{TValue}"/> containing either the name of the file without the path, or the last segment of the path if no file name is found, or an error.</returns>
+    public Result<string> GetFileName(FileSystemPathId path)
     {
         return _fileSystem.Path.GetFileName(path.Path);
     }
@@ -94,8 +94,8 @@ internal class FileProviderService : IFileProviderService
     /// Retrieves the contents of a file at the specified path.
     /// </summary>
     /// <param name="path">The path for which to retrieve the file contents.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the contents of a file at the specified path, or an error.</returns>
-    public ErrorOr<byte[]> GetFileAsync(FileSystemPathId path)
+    /// <returns>An <see cref="Result{TValue}"/> containing either the contents of a file at the specified path, or an error.</returns>
+    public Result<byte[]> GetFileAsync(FileSystemPathId path)
     {
         // check if the user has access permissions to the provided path
         if (!_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadContents))
@@ -107,8 +107,8 @@ internal class FileProviderService : IFileProviderService
     /// Gets the last write time of a file at the specified path.
     /// </summary>
     /// <param name="path">The path of the file to retrieve the last write time for.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the optional last write time of <paramref name="path"/> if available, or an error.</returns>
-    public ErrorOr<Optional<DateTime>> GetLastWriteTime(FileSystemPathId path)
+    /// <returns>An <see cref="Result{TValue}"/> containing either the optional last write time of <paramref name="path"/> if available, or an error.</returns>
+    public Result<Optional<DateTime>> GetLastWriteTime(FileSystemPathId path)
     {
         // check if the user has access permissions to the provided path
         if (!_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties))
@@ -120,8 +120,8 @@ internal class FileProviderService : IFileProviderService
     /// Gets the creation time of a file at the specified path.
     /// </summary>
     /// <param name="path">The path of the file to retrieve the creation time for.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the optional creation time of <paramref name="path"/> if available, or an error.</returns>
-    public ErrorOr<Optional<DateTime>> GetCreationTime(FileSystemPathId path)
+    /// <returns>An <see cref="Result{TValue}"/> containing either the optional creation time of <paramref name="path"/> if available, or an error.</returns>
+    public Result<Optional<DateTime>> GetCreationTime(FileSystemPathId path)
     {
         // check if the user has access permissions to the provided path
         if (!_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties))
@@ -133,8 +133,8 @@ internal class FileProviderService : IFileProviderService
     /// Gets the size of a file at the specified path.
     /// </summary>
     /// <param name="path">The path of the file to retrieve the size for.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the size of <paramref name="path"/> or an error.</returns>
-    public ErrorOr<long?> GetSize(FileSystemPathId path)
+    /// <returns>An <see cref="Result{TValue}"/> containing either the size of <paramref name="path"/> or an error.</returns>
+    public Result<long?> GetSize(FileSystemPathId path)
     {
         // check if the user has access permissions to the provided path
         if (!_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties))
@@ -148,8 +148,8 @@ internal class FileProviderService : IFileProviderService
     /// <param name="sourceFilePath">Identifier for the path where the file to be copied is located.</param>
     /// <param name="destinationDirectoryPath">Identifier for the path of the directory where the file will be copied.</param>
     /// <param name="overrideExisting">Whether to override existing files, or not.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the copied file, or an error.</returns>
-    public ErrorOr<FileSystemPathId> CopyFile(FileSystemPathId sourceFilePath, FileSystemPathId destinationDirectoryPath, bool overrideExisting)
+    /// <returns>An <see cref="Result{TValue}"/> containing either the copied file, or an error.</returns>
+    public Result<FileSystemPathId> CopyFile(FileSystemPathId sourceFilePath, FileSystemPathId destinationDirectoryPath, bool overrideExisting)
     {
         // check if the source file exists
         if (!_fileSystem.File.Exists(sourceFilePath.Path))
@@ -201,8 +201,8 @@ internal class FileProviderService : IFileProviderService
     /// <param name="sourceFilePath">Identifier for the path where the file to be moved is located.</param>
     /// <param name="destinationDirectoryPath">Identifier for the path of the directory where the file will be moved.</param>
     /// <param name="overrideExisting">Whether to override existing files, or not.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a moved file, or an error.</returns>
-    public ErrorOr<FileSystemPathId> MoveFile(FileSystemPathId sourceFilePath, FileSystemPathId destinationDirectoryPath, bool overrideExisting)
+    /// <returns>An <see cref="Result{TValue}"/> containing either a moved file, or an error.</returns>
+    public Result<FileSystemPathId> MoveFile(FileSystemPathId sourceFilePath, FileSystemPathId destinationDirectoryPath, bool overrideExisting)
     {
         // check if the source file exists
         if (!_fileSystem.File.Exists(sourceFilePath.Path))
@@ -232,20 +232,20 @@ internal class FileProviderService : IFileProviderService
     /// </summary>
     /// <param name="path">The path of the file to be renamed.</param>
     /// <param name="name">The new name of the file.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the absolute path of the renamed file, or an error.</returns>
-    public ErrorOr<FileSystemPathId> RenameFile(FileSystemPathId path, string name)
+    /// <returns>An <see cref="Result{TValue}"/> containing either the absolute path of the renamed file, or an error.</returns>
+    public Result<FileSystemPathId> RenameFile(FileSystemPathId path, string name)
     {
         string? parentDirectory = _fileSystem.FileInfo.New(path.Path)?.DirectoryName;
         if (!string.IsNullOrEmpty(parentDirectory))
         {
-            ErrorOr<FileSystemPathId> parendDirectoryResult = FileSystemPathId.Create(parentDirectory);
-            if (parendDirectoryResult.IsError)
+            Result<FileSystemPathId> parendDirectoryResult = FileSystemPathId.Create(parentDirectory);
+            if (parendDirectoryResult.IsFailure)
                 return parendDirectoryResult.Errors;
             string? newFile = _fileSystem.Path.Combine(parendDirectoryResult.Value.Path, name);
             if (!string.IsNullOrEmpty(newFile))
             {
-                ErrorOr<FileSystemPathId> newFilePathResult = FileSystemPathId.Create(newFile);
-                if (newFilePathResult.IsError)
+                Result<FileSystemPathId> newFilePathResult = FileSystemPathId.Create(newFile);
+                if (newFilePathResult.IsFailure)
                     return newFilePathResult.Errors;
                 // check if the user has access permissions to the provided path
                 if (!_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.Execute))
@@ -266,8 +266,8 @@ internal class FileProviderService : IFileProviderService
     /// Deletes a file at the specified path.
     /// </summary>
     /// <param name="path">The path of the file to be deleted.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the result of deleting a file, or an error.</returns>
-    public ErrorOr<Deleted> DeleteFile(FileSystemPathId path)
+    /// <returns>An <see cref="Result{TValue}"/> containing either the result of deleting a file, or an error.</returns>
+    public Result<Deleted> DeleteFile(FileSystemPathId path)
     {
         // check if the user has access permissions to the provided path
         if (!_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.Delete))

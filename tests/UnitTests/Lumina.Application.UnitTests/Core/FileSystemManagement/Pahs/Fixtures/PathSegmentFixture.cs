@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using System;
 using System.Collections.Generic;
@@ -39,9 +39,9 @@ public class PathSegmentFixture
         isDirectory ??= true;
         isDrive ??= false;
 
-        ErrorOr<PathSegment> pathResult = PathSegment.Create(name, isDirectory.Value, isDrive.Value);
+        Result<PathSegment> pathResult = PathSegment.Create(name, isDirectory.Value, isDrive.Value);
 
-        if (pathResult.IsError)
+        if (pathResult.IsFailure)
             throw new InvalidOperationException("Failed to create PathSegment: " + string.Join(", ", pathResult.Errors));
         return pathResult.Value;
     }

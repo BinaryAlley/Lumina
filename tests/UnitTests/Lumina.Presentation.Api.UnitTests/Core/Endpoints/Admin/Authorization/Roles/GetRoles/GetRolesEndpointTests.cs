@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.Admin.Authorization.Roles.Queries.GetRoles;
 using Lumina.Contracts.Responses.Authorization;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Core.Endpoints.Admin.Authorization.Roles.GetRoles;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -23,7 +23,7 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Admin.Authorization.R
 [ExcludeFromCodeCoverage]
 public class GetRolesEndpointTests
 {
-    private readonly IQueryHandler<GetRolesQuery, ErrorOr<IEnumerable<RoleResponse>>> _mockHandler;
+    private readonly IQueryHandler<GetRolesQuery, Result<IEnumerable<RoleResponse>>> _mockHandler;
     private readonly GetRolesEndpoint _sut;
 
     /// <summary>
@@ -31,7 +31,7 @@ public class GetRolesEndpointTests
     /// </summary>
     public GetRolesEndpointTests()
     {
-        _mockHandler = Substitute.For<IQueryHandler<GetRolesQuery, ErrorOr<IEnumerable<RoleResponse>>>>();
+        _mockHandler = Substitute.For<IQueryHandler<GetRolesQuery, Result<IEnumerable<RoleResponse>>>>();
         _sut = Factory.Create<GetRolesEndpoint>(_mockHandler);
     }
 
@@ -45,7 +45,7 @@ public class GetRolesEndpointTests
         new RoleResponse(Guid.NewGuid(), "Admin")
     ];
         _mockHandler.HandleAsync(Arg.Any<GetRolesQuery>(), Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(expectedResponse));
+            .Returns(Result.From(expectedResponse));
 
         // Act
         IResult result = await _sut.ExecuteAsync(new EmptyRequest(), cancellationToken);
@@ -86,7 +86,7 @@ public class GetRolesEndpointTests
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<GetRolesQuery>(), Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(new List<RoleResponse>
+            .Returns(Result.From(new List<RoleResponse>
                 {
                     new(Guid.NewGuid(), "Admin")
                 } as IEnumerable<RoleResponse>));
@@ -114,7 +114,7 @@ public class GetRolesEndpointTests
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 info.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return ErrorOrFactory.From(new List<RoleResponse>() as IEnumerable<RoleResponse>);
+                return Result.From(new List<RoleResponse>() as IEnumerable<RoleResponse>);
             }, info.Arg<CancellationToken>()));
 
         // Act

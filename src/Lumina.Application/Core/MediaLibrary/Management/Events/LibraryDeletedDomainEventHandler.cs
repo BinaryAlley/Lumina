@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.Infrastructure.Models.DTO.Configuration;
 using Lumina.Domain.Common.Exceptions;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
@@ -45,16 +45,16 @@ public class LibraryDeletedDomainEventHandler : IDomainEventHandler<LibraryDelet
     public ValueTask HandleAsync(LibraryDeletedDomainEvent domainEvent, CancellationToken cancellationToken)
     {
         // delete the media library directory in the internal location for media library files
-        ErrorOr<string> libraryPathResult = GetLibraryPath(domainEvent.Library.Id.Value);
-        if (libraryPathResult.IsError)
+        Result<string> libraryPathResult = GetLibraryPath(domainEvent.Library.Id.Value);
+        if (libraryPathResult.IsFailure)
             throw new EventualConsistencyException(libraryPathResult.FirstError, libraryPathResult.Errors);
 
-        ErrorOr<FileSystemPathId> newLibraryPathIdResult = FileSystemPathId.Create(libraryPathResult.Value);
-        if (newLibraryPathIdResult.IsError)
+        Result<FileSystemPathId> newLibraryPathIdResult = FileSystemPathId.Create(libraryPathResult.Value);
+        if (newLibraryPathIdResult.IsFailure)
             throw new EventualConsistencyException(newLibraryPathIdResult.FirstError, newLibraryPathIdResult.Errors);
 
-        ErrorOr<Deleted> deleteLibraryDirectoryResult = _environmentContext.DirectoryProviderService.DeleteDirectory(newLibraryPathIdResult.Value);
-        if (deleteLibraryDirectoryResult.IsError)
+        Result<Deleted> deleteLibraryDirectoryResult = _environmentContext.DirectoryProviderService.DeleteDirectory(newLibraryPathIdResult.Value);
+        if (deleteLibraryDirectoryResult.IsFailure)
             throw new EventualConsistencyException(deleteLibraryDirectoryResult.FirstError, deleteLibraryDirectoryResult.Errors);
         
         return ValueTask.CompletedTask;
@@ -65,23 +65,23 @@ public class LibraryDeletedDomainEventHandler : IDomainEventHandler<LibraryDelet
     /// </summary>
     /// <param name="libraryId">The id of the media library for which to regtrieve the file system path.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either the file system path of the media library, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either the file system path of the media library, or an error message.
     /// </returns>
-    private ErrorOr<string> GetLibraryPath(Guid libraryId)
+    private Result<string> GetLibraryPath(Guid libraryId)
     {
         // root directory for media
-        ErrorOr<string> rootPathResult = _pathService.CombinePath(AppContext.BaseDirectory, _mediaSettingsModel.RootDirectory);
-        if (rootPathResult.IsError)
+        Result<string> rootPathResult = _pathService.CombinePath(AppContext.BaseDirectory, _mediaSettingsModel.RootDirectory);
+        if (rootPathResult.IsFailure)
             return rootPathResult.Errors;
 
         // libraries directory
-        ErrorOr<string> librariesPathResult = _pathService.CombinePath(rootPathResult.Value, _mediaSettingsModel.LibrariesDirectory);
-        if (librariesPathResult.IsError)
+        Result<string> librariesPathResult = _pathService.CombinePath(rootPathResult.Value, _mediaSettingsModel.LibrariesDirectory);
+        if (librariesPathResult.IsFailure)
             return librariesPathResult.Errors;
 
         // this new particular library' directory
-        ErrorOr<string> libraryPathResult = _pathService.CombinePath(librariesPathResult.Value, libraryId.ToString());
-        if (libraryPathResult.IsError)
+        Result<string> libraryPathResult = _pathService.CombinePath(librariesPathResult.Value, libraryId.ToString());
+        if (libraryPathResult.IsFailure)
             return libraryPathResult.Errors;
         return libraryPathResult.Value;
     }

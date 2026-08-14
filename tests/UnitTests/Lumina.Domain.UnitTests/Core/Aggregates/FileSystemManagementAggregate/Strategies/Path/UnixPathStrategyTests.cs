@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Errors;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Path;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.ValueObjects.Fixtures;
@@ -233,10 +233,10 @@ public class UnixPathStrategyTests
         string name = "documents";
 
         // Act
-        ErrorOr<FileSystemPathId> result = _sut.CombinePath(path, name);
+        Result<FileSystemPathId> result = _sut.CombinePath(path, name);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal("/home/user/documents/", result.Value.Path);
     }
 
@@ -248,10 +248,10 @@ public class UnixPathStrategyTests
         string name = "documents";
 
         // Act
-        ErrorOr<FileSystemPathId> result = _sut.CombinePath(path, name);
+        Result<FileSystemPathId> result = _sut.CombinePath(path, name);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal("/home/user/documents/", result.Value.Path);
     }
 
@@ -263,10 +263,10 @@ public class UnixPathStrategyTests
         string name = "/documents";
 
         // Act
-        ErrorOr<FileSystemPathId> result = _sut.CombinePath(path, name);
+        Result<FileSystemPathId> result = _sut.CombinePath(path, name);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal("/home/user/documents/", result.Value.Path);
     }
 
@@ -278,10 +278,10 @@ public class UnixPathStrategyTests
         string name = "";
 
         // Act
-        ErrorOr<FileSystemPathId> result = _sut.CombinePath(path, name);
+        Result<FileSystemPathId> result = _sut.CombinePath(path, name);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.NameCannotBeEmpty, result.FirstError);
     }
 
@@ -293,10 +293,10 @@ public class UnixPathStrategyTests
         string name = null!;
 
         // Act
-        ErrorOr<FileSystemPathId> result = _sut.CombinePath(path, name);
+        Result<FileSystemPathId> result = _sut.CombinePath(path, name);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.NameCannotBeEmpty, result.FirstError);
     }
 
@@ -308,10 +308,10 @@ public class UnixPathStrategyTests
         string name = "home";
 
         // Act
-        ErrorOr<FileSystemPathId> result = _sut.CombinePath(path, name);
+        Result<FileSystemPathId> result = _sut.CombinePath(path, name);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal("/home/", result.Value.Path);
     }
 
@@ -322,10 +322,10 @@ public class UnixPathStrategyTests
         FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId("/home/user/documents/file.txt");
 
         // Act
-        ErrorOr<IEnumerable<PathSegment>> result = _sut.ParsePath(path);
+        Result<IEnumerable<PathSegment>> result = _sut.ParsePath(path);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(5, result.Value.Count());
         Assert.Equal(_pathSegmentFixture.CreatePathSegment("/", false, true), result.Value.ElementAt(0));
         Assert.Equal(_pathSegmentFixture.CreatePathSegment("home", true, false), result.Value.ElementAt(1));
@@ -341,10 +341,10 @@ public class UnixPathStrategyTests
         FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId("/");
 
         // Act
-        ErrorOr<IEnumerable<PathSegment>> result = _sut.ParsePath(path);
+        Result<IEnumerable<PathSegment>> result = _sut.ParsePath(path);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Single(result.Value);
         Assert.Equal(_pathSegmentFixture.CreatePathSegment("/", false, true), result.Value.Single());
     }
@@ -356,10 +356,10 @@ public class UnixPathStrategyTests
         FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId("/home/user/documents/");
 
         // Act
-        ErrorOr<IEnumerable<PathSegment>> result = _sut.ParsePath(path);
+        Result<IEnumerable<PathSegment>> result = _sut.ParsePath(path);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(4, result.Value.Count());
         Assert.Equal(_pathSegmentFixture.CreatePathSegment("documents", true, false), result.Value.Last());
     }
@@ -371,10 +371,10 @@ public class UnixPathStrategyTests
         FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId("home/user");
 
         // Act
-        ErrorOr<IEnumerable<PathSegment>> result = _sut.ParsePath(path);
+        Result<IEnumerable<PathSegment>> result = _sut.ParsePath(path);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
     }
 
@@ -385,10 +385,10 @@ public class UnixPathStrategyTests
         FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId("/home/user/file.with.dots.txt");
 
         // Act
-        ErrorOr<IEnumerable<PathSegment>> result = _sut.ParsePath(path);
+        Result<IEnumerable<PathSegment>> result = _sut.ParsePath(path);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(4, result.Value.Count());
         Assert.Equal(_pathSegmentFixture.CreatePathSegment("file.with.dots.txt", false, false), result.Value.Last());
     }
@@ -400,10 +400,10 @@ public class UnixPathStrategyTests
         FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId("/home/user/documents");
 
         // Act
-        ErrorOr<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(path);
+        Result<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(path);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(3, result.Value.Count());
         Assert.Equal(_pathSegmentFixture.CreatePathSegment("/", false, true), result.Value.ElementAt(0));
         Assert.Equal(_pathSegmentFixture.CreatePathSegment("home", true, false), result.Value.ElementAt(1));
@@ -417,10 +417,10 @@ public class UnixPathStrategyTests
         FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId("/");
 
         // Act
-        ErrorOr<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(path);
+        Result<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(path);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.CannotNavigateUp, result.FirstError);
     }
 
@@ -431,10 +431,10 @@ public class UnixPathStrategyTests
         FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId("/home/user/");
 
         // Act
-        ErrorOr<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(path);
+        Result<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(path);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(2, result.Value.Count());
         Assert.Equal(_pathSegmentFixture.CreatePathSegment("/", false, true), result.Value.ElementAt(0));
         Assert.Equal(_pathSegmentFixture.CreatePathSegment("home", true, false), result.Value.ElementAt(1));
@@ -447,10 +447,10 @@ public class UnixPathStrategyTests
         FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId("invalid/path");
 
         // Act
-        ErrorOr<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(path);
+        Result<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(path);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
     }
 
@@ -461,10 +461,10 @@ public class UnixPathStrategyTests
         FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId("/home");
 
         // Act
-        ErrorOr<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(path);
+        Result<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(path);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Single(result.Value);
         Assert.Equal(_pathSegmentFixture.CreatePathSegment("/", false, true), result.Value.Single());
     }
@@ -516,10 +516,10 @@ public class UnixPathStrategyTests
         FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId("/home/user/documents");
 
         // Act
-        ErrorOr<PathSegment> result = _sut.GetPathRoot(path);
+        Result<PathSegment> result = _sut.GetPathRoot(path);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(_pathSegmentFixture.CreatePathSegment("/", false, true), result.Value);
     }
 
@@ -530,10 +530,10 @@ public class UnixPathStrategyTests
         FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId("/");
 
         // Act
-        ErrorOr<PathSegment> result = _sut.GetPathRoot(path);
+        Result<PathSegment> result = _sut.GetPathRoot(path);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(_pathSegmentFixture.CreatePathSegment("/", false, true), result.Value);
     }
 
@@ -544,10 +544,10 @@ public class UnixPathStrategyTests
         FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId("home/user");
 
         // Act
-        ErrorOr<PathSegment> result = _sut.GetPathRoot(path);
+        Result<PathSegment> result = _sut.GetPathRoot(path);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
     }
 }
