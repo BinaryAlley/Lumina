@@ -30,7 +30,7 @@ public class SetLibraryMetadataProviderEnabledCommandHandlerTests
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
         _mockConfigurationRepository = Substitute.For<ILibraryMetadataProviderConfigurationRepository>();
-        _mockUnitOfWork.GetRepository<ILibraryMetadataProviderConfigurationRepository>().Returns(_mockConfigurationRepository);
+        _mockUnitOfWork.LibraryMetadataProviderConfigurationRepository.Returns(_mockConfigurationRepository);
         IValidator<SetLibraryMetadataProviderEnabledCommand> mockValidator = Substitute.For<IValidator<SetLibraryMetadataProviderEnabledCommand>>();
         mockValidator.Validate(Arg.Any<SetLibraryMetadataProviderEnabledCommand>())
             .Returns([]);

@@ -80,8 +80,7 @@ public class SetupApplicationCommandHandler : ICommandHandler<SetupApplicationCo
             return validationResult;
 
         // check if any users already exists (admin account is only set once!)
-        IUserRepository userRepository = _unitOfWork.GetRepository<IUserRepository>();
-        Result<IEnumerable<UserEntity>> selectUsersResult = await userRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+        Result<IEnumerable<UserEntity>> selectUsersResult = await _unitOfWork.UserRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
         if (selectUsersResult.IsFailure)
             return selectUsersResult.Errors;
         else if (selectUsersResult.Value.Any())
@@ -112,7 +111,7 @@ public class SetupApplicationCommandHandler : ICommandHandler<SetupApplicationCo
             user.TotpSecret = _cryptographyService.Encrypt(Convert.ToBase64String(secret));
         }
         // insert the user
-        Result<Created> insertUserResult = await userRepository.InsertAsync(user, cancellationToken).ConfigureAwait(false);
+        Result<Created> insertUserResult = await _unitOfWork.UserRepository.InsertAsync(user, cancellationToken).ConfigureAwait(false);
         if (insertUserResult.IsFailure)
             return insertUserResult.Errors;
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

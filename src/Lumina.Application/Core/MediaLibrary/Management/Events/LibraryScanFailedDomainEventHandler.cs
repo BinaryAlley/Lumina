@@ -54,11 +54,8 @@ public class LibraryScanFailedDomainEventHandler : IDomainEventHandler<LibrarySc
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public async ValueTask HandleAsync(LibraryScanFailedDomainEvent domainEvent, CancellationToken cancellationToken)
     {
-        ILibraryScanRepository libraryScanRepository = _unitOfWork.GetRepository<ILibraryScanRepository>();
-        ILibraryScanStagingResultsRepository stagingResultsRepository = _unitOfWork.GetRepository<ILibraryScanStagingResultsRepository>();
-
         // get the library scan from the repository
-        Result<LibraryScanEntity?> getLibraryScansResult = await libraryScanRepository.GetByIdAsync(
+        Result<LibraryScanEntity?> getLibraryScansResult = await _unitOfWork.LibraryScanRepository.GetByIdAsync(
             domainEvent.MediaLibraryScanCompositeId.ScanId.Value, cancellationToken).ConfigureAwait(false);
         if (getLibraryScansResult.IsFailure)
             throw new EventualConsistencyException(getLibraryScansResult.FirstError, getLibraryScansResult.Errors);
@@ -77,7 +74,7 @@ public class LibraryScanFailedDomainEventHandler : IDomainEventHandler<LibrarySc
         if (!failScanResult.IsFailure)
         {
             // update the status of the library scan in the repository
-            Result<Updated> updateLibraryScanResult = await libraryScanRepository.UpdateAsync(libraryScanDomainResult.Value.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
+            Result<Updated> updateLibraryScanResult = await _unitOfWork.LibraryScanRepository.UpdateAsync(libraryScanDomainResult.Value.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
             if (updateLibraryScanResult.IsFailure)
                 throw new EventualConsistencyException(updateLibraryScanResult.FirstError, updateLibraryScanResult.Errors);
 
@@ -87,7 +84,7 @@ public class LibraryScanFailedDomainEventHandler : IDomainEventHandler<LibrarySc
         // release the scan processing resources, regardless of whether the scan was already marked as failed by a concurrent job
         _mediaLibrariesScanCancellationTracker.RemoveScan(domainEvent.MediaLibraryScanCompositeId);
         _mediaLibrariesScanProgressTracker.RemoveScanProgress(domainEvent.MediaLibraryScanCompositeId);
-        Result<Success> clearStagingResult = await stagingResultsRepository.ClearForScanAsync(domainEvent.MediaLibraryScanCompositeId.ScanId.Value, cancellationToken).ConfigureAwait(false);
+        Result<Success> clearStagingResult = await _unitOfWork.LibraryScanStagingResultsRepository.ClearForScanAsync(domainEvent.MediaLibraryScanCompositeId.ScanId.Value, cancellationToken).ConfigureAwait(false);
         if (clearStagingResult.IsFailure)
             throw new EventualConsistencyException(clearStagingResult.FirstError, clearStagingResult.Errors);
 

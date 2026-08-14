@@ -65,10 +65,8 @@ public class CancelLibraryScanCommandHandler : ICommandHandler<CancelLibraryScan
         if (validationResult.Count > 0)
             return validationResult;
 
-        ILibraryScanRepository libraryScanRepository = _unitOfWork.GetRepository<ILibraryScanRepository>();
-
         // get the library scan from the repository
-        Result<LibraryScanEntity?> getLibraryScansResult = await libraryScanRepository.GetByIdAsync(command.ScanId, cancellationToken).ConfigureAwait(false);
+        Result<LibraryScanEntity?> getLibraryScansResult = await _unitOfWork.LibraryScanRepository.GetByIdAsync(command.ScanId, cancellationToken).ConfigureAwait(false);
         if (getLibraryScansResult.IsFailure)
             return getLibraryScansResult.Errors;
         if (getLibraryScansResult.Value is null)
@@ -90,7 +88,7 @@ public class CancelLibraryScanCommandHandler : ICommandHandler<CancelLibraryScan
             return cancelScanResult.Errors;
 
         // update the status of the library scan in the repository
-        Result<Updated> updateLibraryScanResult = await libraryScanRepository.UpdateAsync(libraryScanDomainResult.Value.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
+        Result<Updated> updateLibraryScanResult = await _unitOfWork.LibraryScanRepository.UpdateAsync(libraryScanDomainResult.Value.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
         if (updateLibraryScanResult.IsFailure)
             return updateLibraryScanResult.Errors;
 

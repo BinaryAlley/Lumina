@@ -66,8 +66,7 @@ public class LibrarySavedDomainEventHandler : IDomainEventHandler<LibrarySavedDo
                 throw new EventualConsistencyException(saveCoverImageResult.FirstError, saveCoverImageResult.Errors);
             domainEvent.Library.SetInternalLibraryCoverImagePath(saveCoverImageResult.Value);
             // update the media library with the new cover location
-            ILibraryRepository libraryRepository = _unitOfWork.GetRepository<ILibraryRepository>();
-            Result<Updated> updateLibraryResult = await libraryRepository.UpdateAsync(domainEvent.Library.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
+            Result<Updated> updateLibraryResult = await _unitOfWork.LibraryRepository.UpdateAsync(domainEvent.Library.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
             if (updateLibraryResult.IsFailure)
                 throw new EventualConsistencyException(updateLibraryResult.FirstError, updateLibraryResult.Errors);
 

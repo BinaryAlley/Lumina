@@ -54,10 +54,8 @@ public class LibraryScanFinishedDomainEventHandler : IDomainEventHandler<Library
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public async ValueTask HandleAsync(LibraryScanFinishedDomainEvent domainEvent, CancellationToken cancellationToken)
     {
-        ILibraryScanRepository libraryScanRepository = _unitOfWork.GetRepository<ILibraryScanRepository>();
-       
         // get the library scan from the repository
-        Result<LibraryScanEntity?> getLibraryScansResult = await libraryScanRepository.GetByIdAsync(
+        Result<LibraryScanEntity?> getLibraryScansResult = await _unitOfWork.LibraryScanRepository.GetByIdAsync(
             domainEvent.MediaLibraryScanCompositeId.ScanId.Value, cancellationToken).ConfigureAwait(false);
         if (getLibraryScansResult.IsFailure)
             throw new EventualConsistencyException(getLibraryScansResult.FirstError, getLibraryScansResult.Errors);
@@ -75,7 +73,7 @@ public class LibraryScanFinishedDomainEventHandler : IDomainEventHandler<Library
             throw new EventualConsistencyException(finishScanResult.FirstError, finishScanResult.Errors);
 
         // update the library scan in the repository
-        Result<Updated> updateLibraryScanResult = await libraryScanRepository.UpdateAsync(libraryScanDomainResult.Value.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
+        Result<Updated> updateLibraryScanResult = await _unitOfWork.LibraryScanRepository.UpdateAsync(libraryScanDomainResult.Value.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
         if (updateLibraryScanResult.IsFailure)
             throw new EventualConsistencyException(updateLibraryScanResult.FirstError, updateLibraryScanResult.Errors);
 

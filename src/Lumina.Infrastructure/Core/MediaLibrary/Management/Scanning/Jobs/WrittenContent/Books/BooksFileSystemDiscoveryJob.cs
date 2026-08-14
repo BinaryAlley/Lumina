@@ -79,14 +79,11 @@ internal sealed class BooksFileSystemDiscoveryJob : MediaLibraryScanJob, IBooksF
                     await using AsyncServiceScope asyncServiceScope = _serviceScopeFactory.CreateAsyncScope();
                     IUnitOfWork unitOfWork = asyncServiceScope.ServiceProvider.GetService<IUnitOfWork>()!;
                     IDomainEventPublisher domainEventPublisher = asyncServiceScope.ServiceProvider.GetService<IDomainEventPublisher>()!;
-                    ILibraryRepository libraryRepository = unitOfWork.GetRepository<ILibraryRepository>()!;
-                    ILibraryScanStagingResultsRepository stagingResultsRepository = unitOfWork.GetRepository<ILibraryScanStagingResultsRepository>();
-                    IDirectoryScanFingerprintRepository directoryScanFingerprintRepository = unitOfWork.GetRepository<IDirectoryScanFingerprintRepository>();
 
                     MediaLibraryScanCompositeId compositeKey = MediaLibraryScanCompositeId.Create(ScanId, UserId);
 
                     // get the library from the repository
-                    Result<LibraryEntity?> getLibraryResult = await libraryRepository.GetByIdAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
+                    Result<LibraryEntity?> getLibraryResult = await unitOfWork.LibraryRepository.GetByIdAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
                     if (getLibraryResult.IsFailure || getLibraryResult.Value is null)
                         throw new InvalidOperationException(getLibraryResult.IsFailure ? getLibraryResult.FirstError.Description : "The media library was not found.");
 
@@ -99,7 +96,7 @@ internal sealed class BooksFileSystemDiscoveryJob : MediaLibraryScanJob, IBooksF
                     Dictionary<string, DirectoryScanFingerprintEntity>? fingerprintsByPath = null;
                     if (domainLibraryResult.Value.ShouldSkipUnchangedDirectoriesDuringScan)
                     {
-                        Result<Dictionary<string, DirectoryScanFingerprintEntity>> getFingerprintsResult = await directoryScanFingerprintRepository.GetMappedByLibraryIdAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
+                        Result<Dictionary<string, DirectoryScanFingerprintEntity>> getFingerprintsResult = await unitOfWork.DirectoryScanFingerprintRepository.GetMappedByLibraryIdAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
                         if (getFingerprintsResult.IsFailure)
                             throw new InvalidOperationException(getFingerprintsResult.FirstError.Description);
                         fingerprintsByPath = getFingerprintsResult.Value;
@@ -128,8 +125,8 @@ internal sealed class BooksFileSystemDiscoveryJob : MediaLibraryScanJob, IBooksF
                             fingerprintsByPath,
                             stagingBatch,
                             fingerprintBatch,
-                            stagingResultsRepository,
-                            directoryScanFingerprintRepository,
+                            unitOfWork.LibraryScanStagingResultsRepository,
+                            unitOfWork.DirectoryScanFingerprintRepository,
                             cancellationToken).ConfigureAwait(false);
                         processedContentLocations++;
 
@@ -148,13 +145,13 @@ internal sealed class BooksFileSystemDiscoveryJob : MediaLibraryScanJob, IBooksF
                     // flush any remaining discovered files and directory scan fingerprints that did not reach the batch size
                     if (stagingBatch.Count > 0)
                     {
-                        Result<Created> insertResult = await stagingResultsRepository.InsertRangeAsync(stagingBatch, cancellationToken).ConfigureAwait(false);
+                        Result<Created> insertResult = await unitOfWork.LibraryScanStagingResultsRepository.InsertRangeAsync(stagingBatch, cancellationToken).ConfigureAwait(false);
                         if (insertResult.IsFailure)
                             throw new InvalidOperationException(insertResult.FirstError.Description);
                     }
                     if (fingerprintBatch.Count > 0)
                     {
-                        Result<Updated> upsertResult = await directoryScanFingerprintRepository.UpsertRangeAsync(fingerprintBatch, cancellationToken).ConfigureAwait(false);
+                        Result<Updated> upsertResult = await unitOfWork.DirectoryScanFingerprintRepository.UpsertRangeAsync(fingerprintBatch, cancellationToken).ConfigureAwait(false);
                         if (upsertResult.IsFailure)
                             throw new InvalidOperationException(upsertResult.FirstError.Description);
                     }

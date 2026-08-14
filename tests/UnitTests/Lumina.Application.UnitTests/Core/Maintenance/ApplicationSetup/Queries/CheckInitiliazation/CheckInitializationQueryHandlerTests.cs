@@ -34,7 +34,7 @@ public class CheckInitializationQueryHandlerTests
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
         _mockUserRepository = Substitute.For<IUserRepository>();
 
-        _mockUnitOfWork.GetRepository<IUserRepository>().Returns(_mockUserRepository);
+        _mockUnitOfWork.UserRepository.Returns(_mockUserRepository);
 
         _sut = new CheckInitializationQueryHandler(_mockUnitOfWork);
     }

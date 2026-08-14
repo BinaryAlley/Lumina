@@ -1,11 +1,17 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Repositories.Common.Base;
+using Lumina.Application.Common.DataAccess.Repositories.Authorization;
+using Lumina.Application.Common.DataAccess.Repositories.Books;
+using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
+using Lumina.Application.Common.DataAccess.Repositories.Plugins;
+using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.DataAccess.Core.Repositories.Common.Factory;
+using Lumina.DataAccess.Core.Repositories.Authorization;
+using Lumina.DataAccess.Core.Repositories.Books;
+using Lumina.DataAccess.Core.Repositories.Libraries;
+using Lumina.DataAccess.Core.Repositories.Plugins;
+using Lumina.DataAccess.Core.Repositories.Users;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -15,79 +21,188 @@ namespace Lumina.DataAccess.Core.UoW;
 /// <summary>
 /// Interaction boundary with the Data Access Layer.
 /// </summary>
-public class UnitOfWork : IUnitOfWork
+public class UnitOfWork : IUnitOfWork, IDisposable
 {
     private readonly LuminaDbContext _luminaDbContext;
-    private readonly IRepositoryFactory _repositoryFactory;
+    private IDbContextTransaction? _transaction;
+
+    private IPermissionRepository? _permissionRepository;
+    private IRolePermissionRepository? _rolePermissionRepository;
+    private IRoleRepository? _roleRepository;
+    private IUserRoleRepository? _userRoleRepository;
+    private IBookRepository? _bookRepository;
+    private IDirectoryScanFingerprintRepository? _directoryScanFingerprintRepository;
+    private ILibraryRepository? _libraryRepository;
+    private ILibraryScanRepository? _libraryScanRepository;
+    private ILibraryScanSnapshotRepository? _libraryScanSnapshotRepository;
+    private ILibraryScanStagingResultsRepository? _libraryScanStagingResultsRepository;
+    private ILibraryMetadataProviderConfigurationRepository? _libraryMetadataProviderConfigurationRepository;
+    private IPluginRepository? _pluginRepository;
+    private IUserRepository? _userRepository;
 
     /// <summary>
-    /// Gets or sets the collection of available repositories.
+    /// Gets the permission repository.
     /// </summary>
-    internal RepositoryDictionary Repositories { get; private set; } = new RepositoryDictionary();
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="UnitOfWork"/> class.
-    /// </summary>
-    /// <param name="repositoryFactory">The factory used to generate repositories.</param>
-    /// <param name="luminaDbContext">Injected Entity Framework DbContext.</param>
-    public UnitOfWork(IRepositoryFactory repositoryFactory, LuminaDbContext luminaDbContext)
+    public IPermissionRepository PermissionRepository
     {
-        _repositoryFactory = repositoryFactory;
-        _luminaDbContext = luminaDbContext;
-        AddRepositories();
-    }
-
-    /// <summary>
-    /// Adds all the repositories from the Data Access Layer so that they can be exposed to the Business Layer.
-    /// </summary>
-    internal void AddRepositories()
-    {
-        // get all the concrete implementations of IRepository<>
-        IEnumerable<Type> repositoryClassTypes =
-            Assembly.GetExecutingAssembly()
-                    .GetTypes()
-                    .Where(t => !t.IsInterface && !t.IsAbstract && t.GetInterfaces()
-                                                                    .Any(i => i.IsGenericType &&
-                                                                              i.GetGenericTypeDefinition() == typeof(IRepository<>)));
-        // store all repositories
-        foreach (Type repositoryClassType in repositoryClassTypes)
+        get
         {
-            // get the interface that implements IRepository<> of the currently iterated repository class
-            Type repositoryInterfaceType = repositoryClassType.GetInterfaces()
-                                                              .Where(i => !i.IsGenericType &&
-                                                                           i.GetInterfaces()
-                                                                            .Any(a => a.GetGenericTypeDefinition() == typeof(IRepository<>)))
-                                                              .First();
-            // ask the concrete type for the repository interface type from the repositories factory;
-            // because the method for creating a repository is generic and we need to call it with a runtime type, reflection is the only option
-            object repositoryClass = typeof(IRepositoryFactory).GetMethod("CreateRepository")!
-                                                               .MakeGenericMethod(repositoryInterfaceType)
-                                                               .Invoke(_repositoryFactory, null)!;
-            Repositories.Add(repositoryClass);
+            _permissionRepository ??= new PermissionRepository(_luminaDbContext);
+            return _permissionRepository;
         }
     }
 
     /// <summary>
-    /// Exposes a repository of type <typeparamref name="TRepository"/> to the Business Logic Layer.
+    /// Gets the role permission repository.
     /// </summary>
-    /// <typeparam name="TRepository">The type of the exposed repository.</typeparam>
-    /// <returns>A repository of type <typeparamref name="TRepository"/>.</returns>
-    public TRepository GetRepository<TRepository>()
+    public IRolePermissionRepository RolePermissionRepository
     {
-        // get the repository type based on the type of the provided repository interface
-        Type repositoryType = Assembly.GetExecutingAssembly()
-                                      .GetTypes()
-                                      .Where(type => !type.IsInterface && !type.IsAbstract && typeof(TRepository).IsAssignableFrom(type))
-                                      .First();
-        return Repositories.Get<TRepository>(repositoryType);
+        get
+        {
+            _rolePermissionRepository ??= new RolePermissionRepository(_luminaDbContext);
+            return _rolePermissionRepository;
+        }
     }
 
     /// <summary>
-    /// Resets the list of repositories.
+    /// Gets the role repository.
     /// </summary>
-    internal void ResetRepositories()
+    public IRoleRepository RoleRepository
     {
-        Repositories.Clear();
+        get
+        {
+            _roleRepository ??= new RoleRepository(_luminaDbContext);
+            return _roleRepository;
+        }
+    }
+
+    /// <summary>
+    /// Gets the user role repository.
+    /// </summary>
+    public IUserRoleRepository UserRoleRepository
+    {
+        get
+        {
+            _userRoleRepository ??= new UserRoleRepository(_luminaDbContext);
+            return _userRoleRepository;
+        }
+    }
+
+    /// <summary>
+    /// Gets the book repository.
+    /// </summary>
+    public IBookRepository BookRepository
+    {
+        get
+        {
+            _bookRepository ??= new BookRepository(_luminaDbContext);
+            return _bookRepository;
+        }
+    }
+
+    /// <summary>
+    /// Gets the directory scan fingerprint repository.
+    /// </summary>
+    public IDirectoryScanFingerprintRepository DirectoryScanFingerprintRepository
+    {
+        get
+        {
+            _directoryScanFingerprintRepository ??= new DirectoryScanFingerprintRepository(_luminaDbContext);
+            return _directoryScanFingerprintRepository;
+        }
+    }
+
+    /// <summary>
+    /// Gets the library repository.
+    /// </summary>
+    public ILibraryRepository LibraryRepository
+    {
+        get
+        {
+            _libraryRepository ??= new LibraryRepository(_luminaDbContext);
+            return _libraryRepository;
+        }
+    }
+
+    /// <summary>
+    /// Gets the library scan repository.
+    /// </summary>
+    public ILibraryScanRepository LibraryScanRepository
+    {
+        get
+        {
+            _libraryScanRepository ??= new LibraryScanRepository(_luminaDbContext);
+            return _libraryScanRepository;
+        }
+    }
+
+    /// <summary>
+    /// Gets the library scan snapshot repository.
+    /// </summary>
+    public ILibraryScanSnapshotRepository LibraryScanSnapshotRepository
+    {
+        get
+        {
+            _libraryScanSnapshotRepository ??= new LibraryScanSnapshotRepository(_luminaDbContext);
+            return _libraryScanSnapshotRepository;
+        }
+    }
+
+    /// <summary>
+    /// Gets the library scan staging results repository.
+    /// </summary>
+    public ILibraryScanStagingResultsRepository LibraryScanStagingResultsRepository
+    {
+        get
+        {
+            _libraryScanStagingResultsRepository ??= new LibraryScanStagingResultsRepository(_luminaDbContext);
+            return _libraryScanStagingResultsRepository;
+        }
+    }
+
+    /// <summary>
+    /// Gets the library metadata provider configuration repository.
+    /// </summary>
+    public ILibraryMetadataProviderConfigurationRepository LibraryMetadataProviderConfigurationRepository
+    {
+        get
+        {
+            _libraryMetadataProviderConfigurationRepository ??= new LibraryMetadataProviderConfigurationRepository(_luminaDbContext);
+            return _libraryMetadataProviderConfigurationRepository;
+        }
+    }
+
+    /// <summary>
+    /// Gets the plugin repository.
+    /// </summary>
+    public IPluginRepository PluginRepository
+    {
+        get
+        {
+            _pluginRepository ??= new PluginRepository(_luminaDbContext);
+            return _pluginRepository;
+        }
+    }
+
+    /// <summary>
+    /// Gets the user repository.
+    /// </summary>
+    public IUserRepository UserRepository
+    {
+        get
+        {
+            _userRepository ??= new UserRepository(_luminaDbContext);
+            return _userRepository;
+        }
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UnitOfWork"/> class.
+    /// </summary>
+    /// <param name="luminaDbContext">Injected Entity Framework DbContext.</param>
+    public UnitOfWork(LuminaDbContext luminaDbContext)
+    {
+        _luminaDbContext = luminaDbContext;
     }
 
     /// <summary>
@@ -100,18 +215,51 @@ public class UnitOfWork : IUnitOfWork
     }
 
     /// <summary>
-    /// Opens a transaction.
+    /// Begins a new database transaction.
     /// </summary>
-    public void OpenTransaction()
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    public async Task BeginTransactionAsync(CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        _transaction = await _luminaDbContext.Database.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
-    /// Commits a transaction.
+    /// Commits the current transaction.
     /// </summary>
-    public void CommitTransaction()
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    public async Task CommitTransactionAsync(CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        if (_transaction is not null)
+        {
+            await _transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
+            await _transaction.DisposeAsync().ConfigureAwait(false);
+            _transaction = null;
+        }
+    }
+
+    /// <summary>
+    /// Rolls back the current transaction.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    public async Task RollbackTransactionAsync(CancellationToken cancellationToken)
+    {
+        if (_transaction is not null)
+        {
+            await _transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
+            await _transaction.DisposeAsync().ConfigureAwait(false);
+            _transaction = null;
+        }
+    }
+
+    /// <summary>
+    /// Disposes the unit of work and its resources.
+    /// </summary>
+    public void Dispose()
+    {
+        _transaction?.Dispose();
+        _luminaDbContext.Dispose();
     }
 }

@@ -1,18 +1,22 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
+using Lumina.Application.Common.DataAccess.Repositories.Authorization;
 using Lumina.Application.Common.DataAccess.Repositories.Books;
+using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
+using Lumina.Application.Common.DataAccess.Repositories.Plugins;
+using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.DataAccess.Common.DependencyInjection;
-using Lumina.DataAccess.Core.Repositories.Common.Factory;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.DataAccess.UnitTests.Common.Setup;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
@@ -43,100 +47,50 @@ public class UnitOfWorkTests
         }));
     }
 
-    [Fact]
-    public void ResetRepositories_WhenCalled_ShouldClearAllRepositories()
+    /// <summary>
+    /// Provides the repository properties exposed by the unit of work.
+    /// </summary>
+    /// <returns>An enumerable of tuples containing the repository property name and its accessor.</returns>
+    public static IEnumerable<object[]> GetRepositoryProperties()
     {
-        // Arrange
-        ServiceCollection services = new();
-        DataAccessLayerServices.AddDataAccessLayerServices(services);
-        services.AddTransient<ICurrentUserService, TestCurrentUserService>();
-        services.AddTransient<IDateTimeProvider, TestDateTimeProvider>();
-        ServiceProvider serviceProvider = services.BuildServiceProvider();
-        UnitOfWork unitOfWork = (UnitOfWork)serviceProvider.GetRequiredService<IUnitOfWork>();
-
-        // Act
-        unitOfWork.ResetRepositories();
-
-        // Assert
-        Assert.Equal(0, unitOfWork.Repositories.Count);
+        yield return new object[] { nameof(IUnitOfWork.PermissionRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.PermissionRepository) };
+        yield return new object[] { nameof(IUnitOfWork.RolePermissionRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.RolePermissionRepository) };
+        yield return new object[] { nameof(IUnitOfWork.RoleRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.RoleRepository) };
+        yield return new object[] { nameof(IUnitOfWork.UserRoleRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.UserRoleRepository) };
+        yield return new object[] { nameof(IUnitOfWork.BookRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.BookRepository) };
+        yield return new object[] { nameof(IUnitOfWork.DirectoryScanFingerprintRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.DirectoryScanFingerprintRepository) };
+        yield return new object[] { nameof(IUnitOfWork.LibraryRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.LibraryRepository) };
+        yield return new object[] { nameof(IUnitOfWork.LibraryScanRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.LibraryScanRepository) };
+        yield return new object[] { nameof(IUnitOfWork.LibraryScanSnapshotRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.LibraryScanSnapshotRepository) };
+        yield return new object[] { nameof(IUnitOfWork.LibraryScanStagingResultsRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.LibraryScanStagingResultsRepository) };
+        yield return new object[] { nameof(IUnitOfWork.LibraryMetadataProviderConfigurationRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.LibraryMetadataProviderConfigurationRepository) };
+        yield return new object[] { nameof(IUnitOfWork.PluginRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.PluginRepository) };
+        yield return new object[] { nameof(IUnitOfWork.UserRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.UserRepository) };
     }
 
-    [Fact]
-    public void AddRepositories_WhenCalled_ShouldAddRepositories()
+    [Theory]
+    [MemberData(nameof(GetRepositoryProperties))]
+    public void RepositoryProperty_WhenAccessed_ShouldReturnRepositoryAndCacheInstance(string propertyName, Func<UnitOfWork, object> repositoryAccessor)
     {
         // Arrange
-        ServiceCollection services = new();
-        DataAccessLayerServices.AddDataAccessLayerServices(services);
-        services.AddTransient<ICurrentUserService, TestCurrentUserService>();
-        services.AddTransient<IDateTimeProvider, TestDateTimeProvider>();
-        ServiceProvider serviceProvider = services.BuildServiceProvider();
-        UnitOfWork unitOfWork = (UnitOfWork)serviceProvider.GetRequiredService<IUnitOfWork>();
-        int initialCount = unitOfWork.Repositories.Count;
+        UnitOfWork unitOfWork = CreateUnitOfWork();
 
         // Act
-        unitOfWork.ResetRepositories();
-        unitOfWork.AddRepositories();
+        object firstAccess = repositoryAccessor(unitOfWork);
+        object secondAccess = repositoryAccessor(unitOfWork);
 
         // Assert
-        Assert.True(unitOfWork.Repositories.Count > 0);
-        Assert.Equal(initialCount, unitOfWork.Repositories.Count);
-    }
-
-    [Fact]
-    public void Constructor_WhenCalled_ShouldAddRepositories()
-    {
-        // Arrange
-        IRepositoryFactory repositoryFactory = _fixture.Create<IRepositoryFactory>();
-        LuminaDbContext dbContext = _fixture.Create<LuminaDbContext>();
-
-        // Act
-        UnitOfWork unitOfWork = new(repositoryFactory, dbContext);
-
-        // Assert
-        Assert.True(unitOfWork.Repositories.Count > 0);
-    }
-
-    [Fact]
-    public void GetRepository_WhenRepositoryNotAdded_ShouldReturnNull()
-    {
-        // Arrange
-        ServiceCollection services = new();
-        DataAccessLayerServices.AddDataAccessLayerServices(services);
-        services.AddTransient<ICurrentUserService, TestCurrentUserService>();
-        services.AddTransient<IDateTimeProvider, TestDateTimeProvider>();
-        ServiceProvider serviceProvider = services.BuildServiceProvider();
-        UnitOfWork unitOfWork = (UnitOfWork)serviceProvider.GetRequiredService<IUnitOfWork>();
-        unitOfWork.ResetRepositories();
-
-        // Act
-        IBookRepository result = unitOfWork.GetRepository<IBookRepository>();
-
-        // Assert
-        Assert.Null(result);
-    }
-
-    [Fact]
-    public void GetRepository_WhenRepositoriesAdded_ShouldReturnRepositories()
-    {
-        // Arrange
-        ServiceCollection services = new();
-        DataAccessLayerServices.AddDataAccessLayerServices(services);
-        services.AddTransient<ICurrentUserService, TestCurrentUserService>();
-        services.AddTransient<IDateTimeProvider, TestDateTimeProvider>();
-        ServiceProvider serviceProvider = services.BuildServiceProvider();
-        UnitOfWork unitOfWork = (UnitOfWork)serviceProvider.GetRequiredService<IUnitOfWork>();
-
-        // Act & Assert
-        Assert.NotNull(unitOfWork.GetRepository<IBookRepository>());
+        Assert.NotNull(firstAccess);
+        Assert.Same(firstAccess, secondAccess);
+        Assert.EndsWith(propertyName, firstAccess.GetType().Name);
     }
 
     [Fact]
     public async Task SaveChangesAsync_WhenCalled_ShouldCallDbContextSaveChangesAsync()
     {
         // Arrange
-        IRepositoryFactory repositoryFactory = _fixture.Create<IRepositoryFactory>();
         LuminaDbContext dbContext = _fixture.Create<LuminaDbContext>();
-        UnitOfWork unitOfWork = new(repositoryFactory, dbContext);
+        UnitOfWork unitOfWork = new(dbContext);
         CancellationToken cancellationToken = new();
 
         // Act
@@ -144,5 +98,29 @@ public class UnitOfWorkTests
 
         // Assert
         await dbContext.Received(1).SaveChangesAsync(cancellationToken);
+    }
+
+    [Fact]
+    public void UnitOfWork_WhenResolvedFromServiceProvider_ShouldExposeRepositories()
+    {
+        // Arrange
+        ServiceCollection services = new();
+        DataAccessLayerServices.AddDataAccessLayerServices(services);
+        services.AddTransient<ICurrentUserService, TestCurrentUserService>();
+        services.AddTransient<IDateTimeProvider, TestDateTimeProvider>();
+        ServiceProvider serviceProvider = services.BuildServiceProvider();
+
+        // Act
+        IUnitOfWork unitOfWork = serviceProvider.GetRequiredService<IUnitOfWork>();
+
+        // Assert
+        Assert.NotNull(unitOfWork.PermissionRepository);
+        Assert.NotNull(unitOfWork.RoleRepository);
+        Assert.NotNull(unitOfWork.UserRepository);
+    }
+
+    private UnitOfWork CreateUnitOfWork()
+    {
+        return new(_fixture.Create<LuminaDbContext>());
     }
 }

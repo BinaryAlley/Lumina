@@ -1,18 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Repositories.Common.Base;
 using Lumina.Application.Common.DataAccess.Seed;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.DataAccess.Common.Interceptors;
-using Lumina.DataAccess.Core.Repositories.Common.Factory;
 using Lumina.DataAccess.Core.Seed;
 using Lumina.DataAccess.Core.UoW;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 #endregion
 
@@ -41,28 +37,6 @@ public static class DataAccessLayerServices
         });
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<UpdateAuditableEntitiesInterceptor>();
-
-        Type[]? dataAccessLayerTypes = Assembly.GetExecutingAssembly().GetTypes();
-        Type? genericRepositoryType = typeof(IRepository<>);
-        Type? repositoryFactoryType = typeof(RepositoryFactory);
-        Type? iRepositoryFactoryType = typeof(IRepositoryFactory);
-
-        services.AddScoped(iRepositoryFactoryType!, repositoryFactoryType!);
-
-        // get all classes implementing IRepository (all repository classes) and register them as their corresponding repository interface
-        IEnumerable<Type> repositoryTypes = dataAccessLayerTypes.Where(type => !type.IsInterface &&
-                                                                                type.GetInterfaces()
-                                                                                    .Any(type => type.IsGenericType &&
-                                                                                                 type.GetGenericTypeDefinition() == genericRepositoryType));
-        foreach (Type type in repositoryTypes)
-        {
-            services.AddScoped(type.GetInterfaces() // TODO: change to scoped when DbContext is implemented
-                                   .Where(type => !type.IsGenericType &&
-                                                   type.GetInterfaces()
-                                                       .Any(type => type.GetGenericTypeDefinition() == genericRepositoryType))
-                                   .First(), type);
-        }
-
         services.AddScoped<IDataSeedService, DataSeedService>();
     }
 }

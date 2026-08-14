@@ -22,8 +22,8 @@ namespace Lumina.Application.Core.Admin.Authorization.Permissions.Queries.GetPer
 public class GetPermissionsQueryHandler : IQueryHandler<GetPermissionsQuery, Result<IEnumerable<PermissionResponse>>>
 {
     private readonly ICurrentUserService _currentUserService;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IAuthorizationService _authorizationService;
-    private readonly IPermissionRepository _permissionRepository;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetPermissionsQueryHandler"/> class.
@@ -35,7 +35,7 @@ public class GetPermissionsQueryHandler : IQueryHandler<GetPermissionsQuery, Res
     {
         _authorizationService = authorizationService;
         _currentUserService = currentUserService;
-        _permissionRepository = unitOfWork.GetRepository<IPermissionRepository>();
+        _unitOfWork = unitOfWork;
     }
 
     /// <summary>
@@ -52,7 +52,7 @@ public class GetPermissionsQueryHandler : IQueryHandler<GetPermissionsQuery, Res
         bool isAdmin = await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false);
         if (!isAdmin)
             return Errors.Authorization.NotAuthorized;
-        Result<IEnumerable<PermissionEntity>> getPermissionsResult = await _permissionRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+        Result<IEnumerable<PermissionEntity>> getPermissionsResult = await _unitOfWork.PermissionRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
         return getPermissionsResult.Match(value => Result.From(value.ToResponses()), errors => errors);
     }
 }

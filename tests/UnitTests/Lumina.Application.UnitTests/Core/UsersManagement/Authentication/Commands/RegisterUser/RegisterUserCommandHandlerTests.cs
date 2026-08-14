@@ -49,7 +49,7 @@ public class RegisterUserCommandHandlerTests
         _mockUserRepository = Substitute.For<IUserRepository>();
         _mockDateTimeProvider = Substitute.For<IDateTimeProvider>();
 
-        _mockUnitOfWork.GetRepository<IUserRepository>().Returns(_mockUserRepository);
+        _mockUnitOfWork.UserRepository.Returns(_mockUserRepository);
         _mockDateTimeProvider.UtcNow.Returns(DateTime.UtcNow);
 
         IValidator<RegisterUserCommand> mockValidator = Substitute.For<IValidator<RegisterUserCommand>>();

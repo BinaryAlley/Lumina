@@ -49,7 +49,7 @@ public class GetUserPermissionsQueryHandlerTests
         _userId = Guid.NewGuid();
 
         _mockCurrentUserService.UserId.Returns(_userId);
-        _mockUnitOfWork.GetRepository<IUserRepository>().Returns(_mockUserRepository);
+        _mockUnitOfWork.UserRepository.Returns(_mockUserRepository);
 
         IValidator<GetUserPermissionsQuery> mockValidator = Substitute.For<IValidator<GetUserPermissionsQuery>>();
         mockValidator.Validate(Arg.Any<GetUserPermissionsQuery>())

@@ -45,7 +45,7 @@ public class GetPermissionsQueryHandlerTests
         _userId = Guid.NewGuid();
 
         _mockCurrentUserService.UserId.Returns(_userId);
-        _mockUnitOfWork.GetRepository<IPermissionRepository>().Returns(_mockPermissionRepository);
+        _mockUnitOfWork.PermissionRepository.Returns(_mockPermissionRepository);
 
         _sut = new GetPermissionsQueryHandler(
             _mockAuthorizationService,

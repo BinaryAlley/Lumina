@@ -47,8 +47,7 @@ public class ReorderLibraryMetadataProvidersCommandHandler : ICommandHandler<Reo
         if (validationResult.Count > 0)
             return validationResult;
 
-        ILibraryMetadataProviderConfigurationRepository configurationRepository = _unitOfWork.GetRepository<ILibraryMetadataProviderConfigurationRepository>();
-        Result<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>> getConfigurationsResult = await configurationRepository.GetByLibraryIdAsync(command.LibraryId, cancellationToken).ConfigureAwait(false);
+        Result<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>> getConfigurationsResult = await _unitOfWork.LibraryMetadataProviderConfigurationRepository.GetByLibraryIdAsync(command.LibraryId, cancellationToken).ConfigureAwait(false);
         if (getConfigurationsResult.IsFailure)
             return getConfigurationsResult.Errors;
 
@@ -59,7 +58,7 @@ public class ReorderLibraryMetadataProvidersCommandHandler : ICommandHandler<Reo
             if (configurationsByPluginId.TryGetValue(pluginId, out LibraryMetadataProviderConfigurationEntity? configuration))
             {
                 configuration.Rank = rank + 1;
-                Result<Updated> upsertResult = await configurationRepository.UpsertAsync(configuration, cancellationToken).ConfigureAwait(false);
+                Result<Updated> upsertResult = await _unitOfWork.LibraryMetadataProviderConfigurationRepository.UpsertAsync(configuration, cancellationToken).ConfigureAwait(false);
                 if (upsertResult.IsFailure)
                     return upsertResult.Errors;
             }

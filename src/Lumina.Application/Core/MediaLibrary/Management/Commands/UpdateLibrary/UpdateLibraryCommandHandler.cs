@@ -97,8 +97,7 @@ public class UpdateLibraryCommandHandler : ICommandHandler<UpdateLibraryCommand,
         }
 
         // get a library repository and retrieve the library to update
-        ILibraryRepository libraryRepository = _unitOfWork.GetRepository<ILibraryRepository>();
-        Result<LibraryEntity?> getLibraryResult = await libraryRepository.GetByIdAsync(command.Id, cancellationToken).ConfigureAwait(false);
+        Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository.GetByIdAsync(command.Id, cancellationToken).ConfigureAwait(false);
         if (getLibraryResult.IsFailure)
             return getLibraryResult.Errors;
         else if (getLibraryResult.Value is null)
@@ -131,13 +130,13 @@ public class UpdateLibraryCommandHandler : ICommandHandler<UpdateLibraryCommand,
         LibraryEntity persistenceLibrary = createLibraryResult.Value.ToRepositoryEntity();
 
         // update the repository entity and save changes
-        Result<Updated> updateLibraryResult = await libraryRepository.UpdateAsync(persistenceLibrary, cancellationToken).ConfigureAwait(false);
+        Result<Updated> updateLibraryResult = await _unitOfWork.LibraryRepository.UpdateAsync(persistenceLibrary, cancellationToken).ConfigureAwait(false);
         if (updateLibraryResult.IsFailure)
             return updateLibraryResult.Errors;
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         // retrieve the updated media library from the persistence medium and return it
-        Result<LibraryEntity?> getCreatedLibraryResult = await libraryRepository.GetByIdAsync(createLibraryResult.Value.Id.Value, cancellationToken).ConfigureAwait(false);
+        Result<LibraryEntity?> getCreatedLibraryResult = await _unitOfWork.LibraryRepository.GetByIdAsync(createLibraryResult.Value.Id.Value, cancellationToken).ConfigureAwait(false);
         if (getCreatedLibraryResult.IsFailure)
             return getCreatedLibraryResult.Errors;
         if (getCreatedLibraryResult.Value is null)

@@ -47,7 +47,7 @@ public class AddBookCommandHandlerTests
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
         _mockBookRepository = Substitute.For<IBookRepository>();
 
-        _mockUnitOfWork.GetRepository<IBookRepository>().Returns(_mockBookRepository);
+        _mockUnitOfWork.BookRepository.Returns(_mockBookRepository);
 
         IValidator<AddBookCommand> mockValidator = Substitute.For<IValidator<AddBookCommand>>();
         mockValidator.Validate(Arg.Any<AddBookCommand>())

@@ -59,11 +59,8 @@ public class ScanLibrariesCommandHandler : ICommandHandler<ScanLibrariesCommand,
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<IEnumerable<MediaLibraryScanResponse>>> HandleAsync(ScanLibrariesCommand command, CancellationToken cancellationToken)
     {
-        ILibraryRepository libraryRepository = _unitOfWork.GetRepository<ILibraryRepository>();
-        ILibraryScanRepository libraryScanRepository = _unitOfWork.GetRepository<ILibraryScanRepository>();
-        
         // get all media libraries that are enabled and unlocked from the persistence medium
-        Result<IEnumerable<LibraryEntity>> getLibrariesResult = await libraryRepository.GetAllEnabledAndUnlockedAsync(cancellationToken).ConfigureAwait(false);
+        Result<IEnumerable<LibraryEntity>> getLibrariesResult = await _unitOfWork.LibraryRepository.GetAllEnabledAndUnlockedAsync(cancellationToken).ConfigureAwait(false);
         if (getLibrariesResult.IsFailure)
             return getLibrariesResult.Errors;
 
@@ -85,7 +82,7 @@ public class ScanLibrariesCommandHandler : ICommandHandler<ScanLibrariesCommand,
 
             // get the past month's scans for this library
             Result<IEnumerable<LibraryScanEntity>> pastLibraryScansResult = 
-                await libraryScanRepository.GetPastMonthScansByLibraryIdAsync(domainLibraryResult.Value.Id.Value, cancellationToken).ConfigureAwait(false);
+                await _unitOfWork.LibraryScanRepository.GetPastMonthScansByLibraryIdAsync(domainLibraryResult.Value.Id.Value, cancellationToken).ConfigureAwait(false);
             if (pastLibraryScansResult.IsFailure)
                 return pastLibraryScansResult.Errors;
 
@@ -111,7 +108,7 @@ public class ScanLibrariesCommandHandler : ICommandHandler<ScanLibrariesCommand,
                 continue; 
 
             // add the library scan to the persistence medium
-            Result<Created> insertLibraryScanResult = await libraryScanRepository.InsertAsync(libraryScanResult.Value.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
+            Result<Created> insertLibraryScanResult = await _unitOfWork.LibraryScanRepository.InsertAsync(libraryScanResult.Value.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
             if (insertLibraryScanResult.IsFailure)
                 return insertLibraryScanResult.Errors;
 

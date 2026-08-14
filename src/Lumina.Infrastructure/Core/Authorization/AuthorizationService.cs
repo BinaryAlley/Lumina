@@ -23,7 +23,7 @@ namespace Lumina.Infrastructure.Core.Authorization;
 /// </summary>
 public class AuthorizationService : IAuthorizationService
 {
-    private readonly IUserRepository _userRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IAuthorizationPolicyFactory _authorizationPolicyFactory;
 
     /// <summary>
@@ -33,7 +33,7 @@ public class AuthorizationService : IAuthorizationService
     /// <param name="authorizationPolicyFactory">The factory used to generate authorization policies.</param>
     public AuthorizationService(IUnitOfWork unitOfWork, IAuthorizationPolicyFactory authorizationPolicyFactory)
     {
-        _userRepository = unitOfWork.GetRepository<IUserRepository>();
+        _unitOfWork = unitOfWork;
         _authorizationPolicyFactory = authorizationPolicyFactory;
     }
 
@@ -46,7 +46,7 @@ public class AuthorizationService : IAuthorizationService
     /// <returns><see langword="true"/> if the user has the specified permission, <see langword="false"/> otherwise.</returns>
     public async Task<bool> HasPermissionAsync(Guid userId, AuthorizationPermission permission, CancellationToken cancellationToken)
     {
-        Result<UserEntity?> getUserResult = await _userRepository.GetByIdAsync(userId, cancellationToken).ConfigureAwait(false);
+        Result<UserEntity?> getUserResult = await _unitOfWork.UserRepository.GetByIdAsync(userId, cancellationToken).ConfigureAwait(false);
         if (getUserResult.IsFailure || getUserResult.Value is null)
             return false;
 
@@ -68,7 +68,7 @@ public class AuthorizationService : IAuthorizationService
     /// <returns><see langword="true"/> if the user is in the specified role, <see langword="false"/> otherwise.</returns>
     public async Task<bool> IsInRoleAsync(Guid userId, string role, CancellationToken cancellationToken)
     {
-        Result<UserEntity?> getUserResult = await _userRepository.GetByIdAsync(userId, cancellationToken).ConfigureAwait(false);
+        Result<UserEntity?> getUserResult = await _unitOfWork.UserRepository.GetByIdAsync(userId, cancellationToken).ConfigureAwait(false);
         if (getUserResult.IsFailure || getUserResult.Value is null)
             return false;
         return getUserResult.Value.UserRole?.Role.RoleName == role;
@@ -96,7 +96,7 @@ public class AuthorizationService : IAuthorizationService
     /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="UserAuthorizationEntity"/>, or an error.</returns>
     public async Task<Result<UserAuthorizationEntity>> GetUserAuthorizationAsync(Guid userId, CancellationToken cancellationToken)
     {
-        Result<UserEntity?> getUserResult = await _userRepository.GetByIdAsync(userId, cancellationToken).ConfigureAwait(false);
+        Result<UserEntity?> getUserResult = await _unitOfWork.UserRepository.GetByIdAsync(userId, cancellationToken).ConfigureAwait(false);
 
         if (getUserResult.IsFailure)
             return getUserResult.Errors;
@@ -108,9 +108,7 @@ public class AuthorizationService : IAuthorizationService
         string? role = getUserResult.Value.UserRole?.Role.RoleName;
 
         // get direct user permissions
-        HashSet<AuthorizationPermission> directPermissions = getUserResult.Value.UserPermissions
-            .Select(userPermission => userPermission.Permission.PermissionName)
-            .ToHashSet();
+        HashSet<AuthorizationPermission> directPermissions = [.. getUserResult.Value.UserPermissions.Select(userPermission => userPermission.Permission.PermissionName)];
 
         // get permissions from roles
         HashSet<AuthorizationPermission>? rolePermissions = getUserResult.Value.UserRole?.Role.RolePermissions

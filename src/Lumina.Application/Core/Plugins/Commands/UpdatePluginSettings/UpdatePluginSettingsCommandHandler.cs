@@ -45,9 +45,8 @@ public class UpdatePluginSettingsCommandHandler : ICommandHandler<UpdatePluginSe
         if (validationResult.Count > 0)
             return validationResult;
 
-        IPluginRepository pluginRepository = _unitOfWork.GetRepository<IPluginRepository>();
         string? settingsJson = command.Settings is not null ? JsonSerializer.Serialize(command.Settings) : null;
-        Result<Updated> updateResult = await pluginRepository.UpdateSettingsAsync(command.PluginId, settingsJson, cancellationToken).ConfigureAwait(false);
+        Result<Updated> updateResult = await _unitOfWork.PluginRepository.UpdateSettingsAsync(command.PluginId, settingsJson, cancellationToken).ConfigureAwait(false);
         if (updateResult.IsFailure)
             return updateResult.Errors;
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

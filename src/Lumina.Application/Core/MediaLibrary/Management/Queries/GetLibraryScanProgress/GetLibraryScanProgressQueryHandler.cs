@@ -70,8 +70,7 @@ public class GetLibraryScanProgressQueryHandler : IQueryHandler<GetLibraryScanPr
             return validationResult;
 
         // get the library with the specified id from the repository
-        ILibraryRepository libraryRepository = _unitOfWork.GetRepository<ILibraryRepository>();
-        Result<LibraryEntity?> getLibraryResult = await libraryRepository.GetByIdAsync(query.LibraryId, cancellationToken).ConfigureAwait(false);
+        Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository.GetByIdAsync(query.LibraryId, cancellationToken).ConfigureAwait(false);
         if (getLibraryResult.IsFailure)
             return getLibraryResult.Errors;
         else if (getLibraryResult.Value is null)

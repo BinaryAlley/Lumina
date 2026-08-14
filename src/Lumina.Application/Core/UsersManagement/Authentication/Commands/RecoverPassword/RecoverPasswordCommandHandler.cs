@@ -65,8 +65,7 @@ public class RecoverPasswordCommandHandler : ICommandHandler<RecoverPasswordComm
             return validationResult;
 
         // check if any users already exists
-        IUserRepository userRepository = _unitOfWork.GetRepository<IUserRepository>();
-        Result<UserEntity?> getUserResult = await userRepository.GetByUsernameAsync(command.Username!, cancellationToken).ConfigureAwait(false);
+        Result<UserEntity?> getUserResult = await _unitOfWork.UserRepository.GetByUsernameAsync(command.Username!, cancellationToken).ConfigureAwait(false);
         if (getUserResult.IsFailure)
             return getUserResult.Errors;
         else if (getUserResult.Value is null)
@@ -86,7 +85,7 @@ public class RecoverPasswordCommandHandler : ICommandHandler<RecoverPasswordComm
         getUserResult.Value.TempPassword = Uri.EscapeDataString(_hashService.HashString("Abcd123$")); // TODO: replace with random password generator
         getUserResult.Value.TempPasswordCreated = DateTime.UtcNow;
         // update the user
-        Result<Updated> updateUserResult = await userRepository.UpdateAsync(getUserResult.Value, cancellationToken).ConfigureAwait(false);
+        Result<Updated> updateUserResult = await _unitOfWork.UserRepository.UpdateAsync(getUserResult.Value, cancellationToken).ConfigureAwait(false);
         if (updateUserResult.IsFailure)
             return updateUserResult.Errors;
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

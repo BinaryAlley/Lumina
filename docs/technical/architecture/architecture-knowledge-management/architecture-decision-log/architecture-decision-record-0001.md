@@ -31,7 +31,7 @@ internal sealed class FileSystemDiscoveryJob : MediaLibraryScanJob, IFileSystemD
     {
         await using AsyncServiceScope asyncServiceScope = _serviceScopeFactory.CreateAsyncScope();
         IUnitOfWork unitOfWork = asyncServiceScope.ServiceProvider.GetService<IUnitOfWork>();
-        ILibraryRepository libraryRepository = unitOfWork.GetRepository<ILibraryRepository>();
+        ILibraryRepository libraryRepository = unitOfWork.LibraryRepository;
         // execution logic
     }
 }

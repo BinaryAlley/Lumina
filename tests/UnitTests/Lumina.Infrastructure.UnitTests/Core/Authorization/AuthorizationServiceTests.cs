@@ -41,7 +41,7 @@ public class AuthorizationServiceTests
         _mockUserRepository = Substitute.For<IUserRepository>();
         _mockAuthorizationPolicyFactory = Substitute.For<IAuthorizationPolicyFactory>();
 
-        _mockUnitOfWork.GetRepository<IUserRepository>().Returns(_mockUserRepository);
+        _mockUnitOfWork.UserRepository.Returns(_mockUserRepository);
 
         _sut = new AuthorizationService(_mockUnitOfWork, _mockAuthorizationPolicyFactory);
     }

@@ -43,7 +43,7 @@ public class DataSeedServiceTests
         _fixedUtcNow = DateTime.UtcNow;
 
         _mockDateTimeProvider.UtcNow.Returns(_fixedUtcNow);
-        _mockUnitOfWork.GetRepository<IPermissionRepository>().Returns(_mockPermissionRepository);
+        _mockUnitOfWork.PermissionRepository.Returns(_mockPermissionRepository);
 
         _sut = new DataSeedService(_mockUnitOfWork, _mockDateTimeProvider);
     }
@@ -126,7 +126,7 @@ public class DataSeedServiceTests
         // Arrange
         Guid userId = Guid.NewGuid();
         IRoleRepository mockRoleRepository = Substitute.For<IRoleRepository>();
-        _mockUnitOfWork.GetRepository<IRoleRepository>().Returns(mockRoleRepository);
+        _mockUnitOfWork.RoleRepository.Returns(mockRoleRepository);
         mockRoleRepository
             .InsertAsync(Arg.Any<RoleEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Created);
@@ -156,7 +156,7 @@ public class DataSeedServiceTests
         // Arrange
         Guid userId = Guid.NewGuid();
         IRoleRepository mockRoleRepository = Substitute.For<IRoleRepository>();
-        _mockUnitOfWork.GetRepository<IRoleRepository>().Returns(mockRoleRepository);
+        _mockUnitOfWork.RoleRepository.Returns(mockRoleRepository);
 
         Error expectedError = Error.Conflict("Role.Conflict", "Role already exists");
         mockRoleRepository
@@ -181,7 +181,7 @@ public class DataSeedServiceTests
         List<string> capturedRoleNames = [];
 
         IRoleRepository mockRoleRepository = Substitute.For<IRoleRepository>();
-        _mockUnitOfWork.GetRepository<IRoleRepository>().Returns(mockRoleRepository);
+        _mockUnitOfWork.RoleRepository.Returns(mockRoleRepository);
 
         mockRoleRepository
             .InsertAsync(Arg.Any<RoleEntity>(), Arg.Any<CancellationToken>())
@@ -203,7 +203,7 @@ public class DataSeedServiceTests
         RoleEntity? capturedRole = null;
 
         IRoleRepository mockRoleRepository = Substitute.For<IRoleRepository>();
-        _mockUnitOfWork.GetRepository<IRoleRepository>().Returns(mockRoleRepository);
+        _mockUnitOfWork.RoleRepository.Returns(mockRoleRepository);
 
         mockRoleRepository
             .InsertAsync(Arg.Any<RoleEntity>(), Arg.Any<CancellationToken>())
@@ -238,9 +238,9 @@ public class DataSeedServiceTests
         IPermissionRepository mockPermissionRepository = Substitute.For<IPermissionRepository>();
         IRolePermissionRepository mockRolePermissionRepository = Substitute.For<IRolePermissionRepository>();
 
-        _mockUnitOfWork.GetRepository<IRoleRepository>().Returns(mockRoleRepository);
-        _mockUnitOfWork.GetRepository<IPermissionRepository>().Returns(mockPermissionRepository);
-        _mockUnitOfWork.GetRepository<IRolePermissionRepository>().Returns(mockRolePermissionRepository);
+        _mockUnitOfWork.RoleRepository.Returns(mockRoleRepository);
+        _mockUnitOfWork.PermissionRepository.Returns(mockPermissionRepository);
+        _mockUnitOfWork.RolePermissionRepository.Returns(mockRolePermissionRepository);
 
         mockRoleRepository.GetByNameAsync("Admin", Arg.Any<CancellationToken>()).Returns(adminRole);
         mockPermissionRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(permissions);
@@ -271,7 +271,7 @@ public class DataSeedServiceTests
         // Arrange
         Guid userId = Guid.NewGuid();
         IRoleRepository mockRoleRepository = Substitute.For<IRoleRepository>();
-        _mockUnitOfWork.GetRepository<IRoleRepository>().Returns(mockRoleRepository);
+        _mockUnitOfWork.RoleRepository.Returns(mockRoleRepository);
 
         mockRoleRepository
             .GetByNameAsync("Admin", Arg.Any<CancellationToken>())
@@ -297,8 +297,8 @@ public class DataSeedServiceTests
         IRoleRepository mockRoleRepository = Substitute.For<IRoleRepository>();
         IPermissionRepository mockPermissionRepository = Substitute.For<IPermissionRepository>();
 
-        _mockUnitOfWork.GetRepository<IRoleRepository>().Returns(mockRoleRepository);
-        _mockUnitOfWork.GetRepository<IPermissionRepository>().Returns(mockPermissionRepository);
+        _mockUnitOfWork.RoleRepository.Returns(mockRoleRepository);
+        _mockUnitOfWork.PermissionRepository.Returns(mockPermissionRepository);
 
         mockRoleRepository.GetByNameAsync("Admin", Arg.Any<CancellationToken>()).Returns(adminRole);
         mockPermissionRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(expectedError);
@@ -326,9 +326,9 @@ public class DataSeedServiceTests
         IPermissionRepository mockPermissionRepository = Substitute.For<IPermissionRepository>();
         IRolePermissionRepository mockRolePermissionRepository = Substitute.For<IRolePermissionRepository>();
 
-        _mockUnitOfWork.GetRepository<IRoleRepository>().Returns(mockRoleRepository);
-        _mockUnitOfWork.GetRepository<IPermissionRepository>().Returns(mockPermissionRepository);
-        _mockUnitOfWork.GetRepository<IRolePermissionRepository>().Returns(mockRolePermissionRepository);
+        _mockUnitOfWork.RoleRepository.Returns(mockRoleRepository);
+        _mockUnitOfWork.PermissionRepository.Returns(mockPermissionRepository);
+        _mockUnitOfWork.RolePermissionRepository.Returns(mockRolePermissionRepository);
 
         mockRoleRepository.GetByNameAsync("Admin", Arg.Any<CancellationToken>()).Returns(adminRole);
         mockPermissionRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(permissions);
@@ -352,7 +352,7 @@ public class DataSeedServiceTests
         Error expectedError = Error.Failure("Role.NotFound", "Failed to retrieve admin role");
 
         IRoleRepository mockRoleRepository = Substitute.For<IRoleRepository>();
-        _mockUnitOfWork.GetRepository<IRoleRepository>().Returns(mockRoleRepository);
+        _mockUnitOfWork.RoleRepository.Returns(mockRoleRepository);
 
         mockRoleRepository
             .GetByNameAsync("Admin", Arg.Any<CancellationToken>())
@@ -383,9 +383,9 @@ public class DataSeedServiceTests
         IUserRepository mockUserRepository = Substitute.For<IUserRepository>();
         IUserRoleRepository mockUserRoleRepository = Substitute.For<IUserRoleRepository>();
 
-        _mockUnitOfWork.GetRepository<IRoleRepository>().Returns(mockRoleRepository);
-        _mockUnitOfWork.GetRepository<IUserRepository>().Returns(mockUserRepository);
-        _mockUnitOfWork.GetRepository<IUserRoleRepository>().Returns(mockUserRoleRepository);
+        _mockUnitOfWork.RoleRepository.Returns(mockRoleRepository);
+        _mockUnitOfWork.UserRepository.Returns(mockUserRepository);
+        _mockUnitOfWork.UserRoleRepository.Returns(mockUserRoleRepository);
 
         mockRoleRepository.GetByNameAsync("Admin", Arg.Any<CancellationToken>()).Returns(adminRole);
         mockUserRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>()).Returns(adminUser);
@@ -417,7 +417,7 @@ public class DataSeedServiceTests
         // Arrange
         Guid userId = Guid.NewGuid();
         IRoleRepository mockRoleRepository = Substitute.For<IRoleRepository>();
-        _mockUnitOfWork.GetRepository<IRoleRepository>().Returns(mockRoleRepository);
+        _mockUnitOfWork.RoleRepository.Returns(mockRoleRepository);
 
         mockRoleRepository
             .GetByNameAsync("Admin", Arg.Any<CancellationToken>())
@@ -442,8 +442,8 @@ public class DataSeedServiceTests
         IRoleRepository mockRoleRepository = Substitute.For<IRoleRepository>();
         IUserRepository mockUserRepository = Substitute.For<IUserRepository>();
 
-        _mockUnitOfWork.GetRepository<IRoleRepository>().Returns(mockRoleRepository);
-        _mockUnitOfWork.GetRepository<IUserRepository>().Returns(mockUserRepository);
+        _mockUnitOfWork.RoleRepository.Returns(mockRoleRepository);
+        _mockUnitOfWork.UserRepository.Returns(mockUserRepository);
 
         mockRoleRepository.GetByNameAsync("Admin", Arg.Any<CancellationToken>()).Returns(adminRole);
         mockUserRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>()).Returns((UserEntity?)null);
@@ -472,9 +472,9 @@ public class DataSeedServiceTests
         IUserRepository mockUserRepository = Substitute.For<IUserRepository>();
         IUserRoleRepository mockUserRoleRepository = Substitute.For<IUserRoleRepository>();
 
-        _mockUnitOfWork.GetRepository<IRoleRepository>().Returns(mockRoleRepository);
-        _mockUnitOfWork.GetRepository<IUserRepository>().Returns(mockUserRepository);
-        _mockUnitOfWork.GetRepository<IUserRoleRepository>().Returns(mockUserRoleRepository);
+        _mockUnitOfWork.RoleRepository.Returns(mockRoleRepository);
+        _mockUnitOfWork.UserRepository.Returns(mockUserRepository);
+        _mockUnitOfWork.UserRoleRepository.Returns(mockUserRoleRepository);
 
         mockRoleRepository.GetByNameAsync("Admin", Arg.Any<CancellationToken>()).Returns(adminRole);
         mockUserRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>()).Returns(adminUser);
@@ -498,7 +498,7 @@ public class DataSeedServiceTests
         Error expectedError = Error.Failure("Role.NotFound", "Failed to retrieve admin role");
 
         IRoleRepository mockRoleRepository = Substitute.For<IRoleRepository>();
-        _mockUnitOfWork.GetRepository<IRoleRepository>().Returns(mockRoleRepository);
+        _mockUnitOfWork.RoleRepository.Returns(mockRoleRepository);
 
         mockRoleRepository
             .GetByNameAsync("Admin", Arg.Any<CancellationToken>())
@@ -525,8 +525,8 @@ public class DataSeedServiceTests
         IRoleRepository mockRoleRepository = Substitute.For<IRoleRepository>();
         IUserRepository mockUserRepository = Substitute.For<IUserRepository>();
 
-        _mockUnitOfWork.GetRepository<IRoleRepository>().Returns(mockRoleRepository);
-        _mockUnitOfWork.GetRepository<IUserRepository>().Returns(mockUserRepository);
+        _mockUnitOfWork.RoleRepository.Returns(mockRoleRepository);
+        _mockUnitOfWork.UserRepository.Returns(mockUserRepository);
 
         mockRoleRepository.GetByNameAsync("Admin", Arg.Any<CancellationToken>()).Returns(adminRole);
         mockUserRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>()).Returns(expectedError);

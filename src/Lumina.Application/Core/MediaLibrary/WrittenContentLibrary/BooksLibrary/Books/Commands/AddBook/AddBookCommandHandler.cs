@@ -171,9 +171,8 @@ public class AddBookCommandHandler : ICommandHandler<AddBookCommand, Result<Book
         if (createBookResult.IsFailure)
             return createBookResult.Errors;
 
-        IBookRepository bookRepository = _unitOfWork.GetRepository<IBookRepository>();
         BookEntity persistenceBook = createBookResult.Value.ToRepositoryEntity();
-        Result<Created> insertBookResult = await bookRepository.InsertAsync(persistenceBook, cancellationToken).ConfigureAwait(false);
+        Result<Created> insertBookResult = await _unitOfWork.BookRepository.InsertAsync(persistenceBook, cancellationToken).ConfigureAwait(false);
         if (insertBookResult.IsFailure)
             return insertBookResult.Errors;
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

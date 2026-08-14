@@ -50,7 +50,6 @@ internal sealed class PluginDetectionSyncJob : BackgroundService
 
         await using AsyncServiceScope asyncServiceScope = _serviceScopeFactory.CreateAsyncScope();
         IUnitOfWork unitOfWork = asyncServiceScope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-        IPluginRepository pluginRepository = unitOfWork.GetRepository<IPluginRepository>();
 
         foreach (IPlugin plugin in _pluginManager.GetPlugins())
         {
@@ -66,7 +65,7 @@ internal sealed class PluginDetectionSyncJob : BackgroundService
                 CreatedBy = default,
                 UpdatedBy = default
             };
-            Result<Updated> upsertResult = await pluginRepository.UpsertAsync(pluginEntity, stoppingToken).ConfigureAwait(false);
+            Result<Updated> upsertResult = await unitOfWork.PluginRepository.UpsertAsync(pluginEntity, stoppingToken).ConfigureAwait(false);
             if (upsertResult.IsFailure)
                 _logger.LogError("Failed to persist the detection of plugin '{PluginName}': {Error}", plugin.Name, upsertResult.FirstError.Description);
         }

@@ -1,4 +1,9 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
+using Lumina.Application.Common.DataAccess.Repositories.Authorization;
+using Lumina.Application.Common.DataAccess.Repositories.Books;
+using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
+using Lumina.Application.Common.DataAccess.Repositories.Plugins;
+using Lumina.Application.Common.DataAccess.Repositories.Users;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -11,11 +16,69 @@ namespace Lumina.Application.Common.DataAccess.UoW;
 public interface IUnitOfWork
 {
     /// <summary>
-    /// Exposes a repository of type <typeparamref name="TRepository"/> to the Business Layer.
+    /// Gets the permission repository.
     /// </summary>
-    /// <typeparam name="TRepository">The type of the exposed repository.</typeparam>
-    /// <returns>A repository of type <typeparamref name="TRepository"/>.</returns>
-    TRepository GetRepository<TRepository>();
+    IPermissionRepository PermissionRepository { get; }
+
+    /// <summary>
+    /// Gets the role permission repository.
+    /// </summary>
+    IRolePermissionRepository RolePermissionRepository { get; }
+
+    /// <summary>
+    /// Gets the role repository.
+    /// </summary>
+    IRoleRepository RoleRepository { get; }
+
+    /// <summary>
+    /// Gets the role user repository.
+    /// </summary>
+    IUserRoleRepository UserRoleRepository { get; }
+
+    /// <summary>
+    /// Gets the book repository.
+    /// </summary>
+    IBookRepository BookRepository { get; }
+
+    /// <summary>
+    /// Gets the directory scan fingerprint repository.
+    /// </summary>
+    IDirectoryScanFingerprintRepository DirectoryScanFingerprintRepository { get; }
+
+    /// <summary>
+    /// Gets the library repository.
+    /// </summary>
+    ILibraryRepository LibraryRepository { get; }
+
+    /// <summary>
+    /// Gets the library scan repository.
+    /// </summary>
+    ILibraryScanRepository LibraryScanRepository { get; }
+
+    /// <summary>
+    /// Gets the library scan snapshot repository.
+    /// </summary>
+    ILibraryScanSnapshotRepository LibraryScanSnapshotRepository { get; }
+
+    /// <summary>
+    /// Gets the library scan staging results repository.
+    /// </summary>
+    ILibraryScanStagingResultsRepository LibraryScanStagingResultsRepository { get; }
+
+    /// <summary>
+    /// Gets the library metadata provider configuration repository.
+    /// </summary>
+    ILibraryMetadataProviderConfigurationRepository LibraryMetadataProviderConfigurationRepository { get; }
+
+    /// <summary>
+    /// Gets the plugin repository.
+    /// </summary>
+    IPluginRepository PluginRepository { get; }
+
+    /// <summary>
+    /// Gets the user repository.
+    /// </summary>
+    IUserRepository UserRepository { get; }
 
     /// <summary>
     /// Saves all changes made to the database.
@@ -24,12 +87,24 @@ public interface IUnitOfWork
     Task SaveChangesAsync(CancellationToken cancellationToken);
 
     /// <summary>
-    /// Opens a transaction.
+    /// Begins a new database transaction.
     /// </summary>
-    void OpenTransaction();
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task BeginTransactionAsync(CancellationToken cancellationToken);
 
     /// <summary>
-    /// Commits a transaction.
+    /// Commits the current transaction.
     /// </summary>
-    void CommitTransaction();
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task CommitTransactionAsync(CancellationToken cancellationToken);
+
+
+    /// <summary>
+    /// Rolls back the current transaction.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task RollbackTransactionAsync(CancellationToken cancellationToken);
 }

@@ -56,10 +56,8 @@ public class CancelLibrariesScanCommandHandler : ICommandHandler<CancelLibraries
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Success>> HandleAsync(CancelLibrariesScanCommand command, CancellationToken cancellationToken)
     {
-        ILibraryScanRepository libraryScanRepository = _unitOfWork.GetRepository<ILibraryScanRepository>();
-
         // get the running library scans of the current user from the repository
-        Result<IEnumerable<LibraryScanEntity>> getRunningLibraryScansResult = await libraryScanRepository.GetRunningScansAsync(cancellationToken).ConfigureAwait(false);
+        Result<IEnumerable<LibraryScanEntity>> getRunningLibraryScansResult = await _unitOfWork.LibraryScanRepository.GetRunningScansAsync(cancellationToken).ConfigureAwait(false);
         if (getRunningLibraryScansResult.IsFailure)
             return getRunningLibraryScansResult.Errors;
 
@@ -88,7 +86,7 @@ public class CancelLibrariesScanCommandHandler : ICommandHandler<CancelLibraries
                 return cancelScanResult.Errors;
 
             // update the status of the library scan in the repository
-            Result<Updated> updateLibraryScanResult = await libraryScanRepository.UpdateAsync(libraryScanDomainResult.Value.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
+            Result<Updated> updateLibraryScanResult = await _unitOfWork.LibraryScanRepository.UpdateAsync(libraryScanDomainResult.Value.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
             if (updateLibraryScanResult.IsFailure)
                 return updateLibraryScanResult.Errors;
 
