@@ -66,8 +66,7 @@ public class DeleteLibraryCommandHandler : ICommandHandler<DeleteLibraryCommand,
             return validationResult;
 
         // get the library with the specified id from the repository
-        ILibraryRepository libraryRepository = _unitOfWork.GetRepository<ILibraryRepository>();
-        Result<LibraryEntity?> getLibraryResult = await libraryRepository.GetByIdAsync(command.Id, cancellationToken).ConfigureAwait(false);
+        Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository.GetByIdAsync(command.Id, cancellationToken).ConfigureAwait(false);
         if (getLibraryResult.IsFailure)
             return getLibraryResult.Errors;
         else if (getLibraryResult.Value is null)
@@ -93,7 +92,7 @@ public class DeleteLibraryCommandHandler : ICommandHandler<DeleteLibraryCommand,
             _domainEventsQueue.Enqueue(domainEvent);
 
         // perform the deletion
-        Result<Deleted> deletePersistenceLibraryResult = await libraryRepository.DeleteByIdAsync(command.Id, cancellationToken).ConfigureAwait(false);
+        Result<Deleted> deletePersistenceLibraryResult = await _unitOfWork.LibraryRepository.DeleteByIdAsync(command.Id, cancellationToken).ConfigureAwait(false);
         if (deletePersistenceLibraryResult.IsFailure)
             return deletePersistenceLibraryResult.Errors;
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

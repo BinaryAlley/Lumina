@@ -47,7 +47,7 @@ public class GetUserRoleQueryHandlerTests
         _userId = Guid.NewGuid();
 
         _mockCurrentUserService.UserId.Returns(_userId);
-        _mockUnitOfWork.GetRepository<IUserRepository>().Returns(_mockUserRepository);
+        _mockUnitOfWork.UserRepository.Returns(_mockUserRepository);
 
         IValidator<GetUserRoleQuery> mockValidator = Substitute.For<IValidator<GetUserRoleQuery>>();
         mockValidator.Validate(Arg.Any<GetUserRoleQuery>())

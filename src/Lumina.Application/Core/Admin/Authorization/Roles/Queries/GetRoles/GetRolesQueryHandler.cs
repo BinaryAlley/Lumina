@@ -35,7 +35,7 @@ public class GetRolesQueryHandler : IQueryHandler<GetRolesQuery, Result<IEnumera
     {
         _authorizationService = authorizationService;
         _currentUserService = currentUserService;
-        _roleRepository = unitOfWork.GetRepository<IRoleRepository>();
+        _roleRepository = unitOfWork.RoleRepository;
     }
 
     /// <summary>

@@ -74,8 +74,7 @@ public class LoginUserQueryHandler : IQueryHandler<LoginUserQuery, Result<LoginR
             return validationResult;
 
         // check if any users already exists
-        IUserRepository userRepository = _unitOfWork.GetRepository<IUserRepository>();
-        Result<UserEntity?> getUserResult = await userRepository.GetByUsernameAsync(query.Username!, cancellationToken).ConfigureAwait(false);
+        Result<UserEntity?> getUserResult = await _unitOfWork.UserRepository.GetByUsernameAsync(query.Username!, cancellationToken).ConfigureAwait(false);
         if (getUserResult.IsFailure)
             return getUserResult.Errors;
         else if (getUserResult.Value is null)
@@ -91,7 +90,7 @@ public class LoginUserQueryHandler : IQueryHandler<LoginUserQuery, Result<LoginR
                 {
                     getUserResult.Value.TempPassword = null;
                     getUserResult.Value.TempPasswordCreated = null;
-                    await userRepository.UpdateAsync(getUserResult.Value, cancellationToken);
+                    await _unitOfWork.UserRepository.UpdateAsync(getUserResult.Value, cancellationToken);
                     await _unitOfWork.SaveChangesAsync(cancellationToken);
                     return Errors.Authentication.TempPasswordExpired;
                 }

@@ -55,8 +55,7 @@ public class ChangePasswordCommandHandler : ICommandHandler<ChangePasswordComman
         if (validationResult.Count > 0)
             return validationResult;
 
-        IUserRepository userRepository = _unitOfWork.GetRepository<IUserRepository>();
-        Result<UserEntity?> getUserResult = await userRepository.GetByUsernameAsync(command.Username!, cancellationToken).ConfigureAwait(false);
+        Result<UserEntity?> getUserResult = await _unitOfWork.UserRepository.GetByUsernameAsync(command.Username!, cancellationToken).ConfigureAwait(false);
         if (getUserResult.IsFailure)
             return getUserResult.Errors;
         else if (getUserResult.Value is null)
@@ -69,7 +68,7 @@ public class ChangePasswordCommandHandler : ICommandHandler<ChangePasswordComman
         getUserResult.Value.TempPassword = null;
         getUserResult.Value.TempPasswordCreated = null;
         // update the user
-        Result<Updated> updateUserResult = await userRepository.UpdateAsync(getUserResult.Value, cancellationToken).ConfigureAwait(false);
+        Result<Updated> updateUserResult = await _unitOfWork.UserRepository.UpdateAsync(getUserResult.Value, cancellationToken).ConfigureAwait(false);
         if (updateUserResult.IsFailure)
             return updateUserResult.Errors;
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

@@ -1,11 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Repositories.Books;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.DataAccess.Common.DependencyInjection;
-using Lumina.DataAccess.Core.Repositories.Books;
-using Lumina.DataAccess.Core.Repositories.Common.Factory;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.DataAccess.UnitTests.Common.Setup;
 using Microsoft.EntityFrameworkCore;
@@ -36,8 +33,6 @@ public class DataAccessLayerServicesTests
         // Assert
         Assert.Contains(services, sd => sd.ServiceType == typeof(LuminaDbContext));
         Assert.Contains(services, sd => sd.ServiceType == typeof(IUnitOfWork) && sd.ImplementationType == typeof(UnitOfWork));
-        Assert.Contains(services, sd => sd.ServiceType == typeof(IRepositoryFactory) && sd.ImplementationType == typeof(RepositoryFactory));
-        Assert.Contains(services, sd => sd.ServiceType == typeof(IBookRepository) && sd.ImplementationType == typeof(BookRepository));
     }
 
     [Fact]
@@ -62,7 +57,7 @@ public class DataAccessLayerServicesTests
     }
 
     [Fact]
-    public void AddDataAccessLayerServices_WhenCalled_ShouldRegisterRepositories()
+    public void AddDataAccessLayerServices_WhenCalled_ShouldExposeRepositoriesThroughUnitOfWork()
     {
         // Arrange
         ServiceCollection services = new();
@@ -72,11 +67,12 @@ public class DataAccessLayerServicesTests
 
         services.AddTransient<ICurrentUserService, TestCurrentUserService>();
         services.AddTransient<IDateTimeProvider, TestDateTimeProvider>();
-        
+
         ServiceProvider serviceProvider = services.BuildServiceProvider();
 
         // Assert
-        IBookRepository? repository = serviceProvider.GetService<IBookRepository>();
-        Assert.NotNull(repository);
+        IUnitOfWork unitOfWork = serviceProvider.GetRequiredService<IUnitOfWork>();
+        Assert.NotNull(unitOfWork.BookRepository);
+        Assert.NotNull(unitOfWork.PermissionRepository);
     }
 }

@@ -23,9 +23,9 @@ namespace Lumina.Application.Core.UsersManagement.Authorization.Queries.GetUserP
 /// </summary>
 public class GetUserPermissionsQueryHandler : IQueryHandler<GetUserPermissionsQuery, Result<IEnumerable<PermissionResponse>>>
 {
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUserService;
     private readonly IAuthorizationService _authorizationService;
-    private readonly IUserRepository _userRepository;
     private readonly IValidator<GetUserPermissionsQuery> _validator;
 
     /// <summary>
@@ -39,7 +39,7 @@ public class GetUserPermissionsQueryHandler : IQueryHandler<GetUserPermissionsQu
     {
         _authorizationService = authorizationService;
         _currentUserService = currentUserService;
-        _userRepository = unitOfWork.GetRepository<IUserRepository>();
+        _unitOfWork = unitOfWork;
         _validator = validator;
     }
 
@@ -62,7 +62,7 @@ public class GetUserPermissionsQueryHandler : IQueryHandler<GetUserPermissionsQu
         if (!isAdmin)
             return Errors.Authorization.NotAuthorized;
         // get the user from the repository and return its permissions
-        Result<UserEntity?> getUserResult = await _userRepository.GetByIdAsync(query.UserId!.Value, cancellationToken).ConfigureAwait(false);
+        Result<UserEntity?> getUserResult = await _unitOfWork.UserRepository.GetByIdAsync(query.UserId!.Value, cancellationToken).ConfigureAwait(false);
         if (getUserResult.IsFailure)
             return getUserResult.Errors;
         else if (getUserResult.Value is null)

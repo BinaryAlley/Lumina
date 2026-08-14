@@ -28,7 +28,6 @@ public class LibraryScanCancelledDomainEventHandler : IDomainEventHandler<Librar
     private readonly IMediaLibraryScanningService _mediaLibraryScanningService;
     private readonly IMediaLibrariesScanCancellationTracker _mediaLibrariesScanCancellationTracker;
     private readonly IMediaLibrariesScanProgressTracker _mediaLibrariesScanProgressTracker;
-    private readonly ILibraryScanRepository _libraryScanRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     /// <summary>
@@ -47,7 +46,6 @@ public class LibraryScanCancelledDomainEventHandler : IDomainEventHandler<Librar
         _mediaLibraryScanningService = mediaLibraryScanningService;
         _mediaLibrariesScanCancellationTracker = mediaLibrariesScanCancellationTracker;
         _mediaLibrariesScanProgressTracker = mediaLibrariesScanProgressTracker;
-        _libraryScanRepository = unitOfWork.GetRepository<ILibraryScanRepository>();
         _unitOfWork = unitOfWork;
     }
 
@@ -59,7 +57,7 @@ public class LibraryScanCancelledDomainEventHandler : IDomainEventHandler<Librar
     public async ValueTask HandleAsync(LibraryScanCancelledDomainEvent domainEvent, CancellationToken cancellationToken)
     {
         // get the library scan from the repository
-        Result<LibraryScanEntity?> getLibraryScansResult = await _libraryScanRepository.GetByIdAsync(domainEvent.ScanId.Value, cancellationToken).ConfigureAwait(false);
+        Result<LibraryScanEntity?> getLibraryScansResult = await _unitOfWork.LibraryScanRepository.GetByIdAsync(domainEvent.ScanId.Value, cancellationToken).ConfigureAwait(false);
         if (getLibraryScansResult.IsFailure)
             throw new EventualConsistencyException(getLibraryScansResult.FirstError, getLibraryScansResult.Errors);
         if (getLibraryScansResult.Value is null)
@@ -76,11 +74,11 @@ public class LibraryScanCancelledDomainEventHandler : IDomainEventHandler<Librar
             throw new EventualConsistencyException(cancelScanResult.FirstError, cancelScanResult.Errors);
 
         // release the scan processing resources
-        ILibraryScanStagingResultsRepository stagingResultsRepository = _unitOfWork.GetRepository<ILibraryScanStagingResultsRepository>();
+
         MediaLibraryScanCompositeId compositeId = MediaLibraryScanCompositeId.Create(domainEvent.ScanId, UserId.Create(getLibraryScansResult.Value.UserId));
         _mediaLibrariesScanCancellationTracker.RemoveScan(compositeId);
         _mediaLibrariesScanProgressTracker.RemoveScanProgress(compositeId);
-        Result<Success> clearStagingResult = await stagingResultsRepository.ClearForScanAsync(domainEvent.ScanId.Value, cancellationToken).ConfigureAwait(false);
+        Result<Success> clearStagingResult = await _unitOfWork.LibraryScanStagingResultsRepository.ClearForScanAsync(domainEvent.ScanId.Value, cancellationToken).ConfigureAwait(false);
         if (clearStagingResult.IsFailure)
             throw new EventualConsistencyException(clearStagingResult.FirstError, clearStagingResult.Errors);
     }

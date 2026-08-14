@@ -43,7 +43,7 @@ public class RecoverPasswordCommandHandlerTests
         _mockCryptographyService = Substitute.For<ICryptographyService>();
         _mockUserRepository = Substitute.For<IUserRepository>();
 
-        _mockUnitOfWork.GetRepository<IUserRepository>().Returns(_mockUserRepository);
+        _mockUnitOfWork.UserRepository.Returns(_mockUserRepository);
 
         IValidator<RecoverPasswordCommand> mockValidator = Substitute.For<IValidator<RecoverPasswordCommand>>();
         mockValidator.Validate(Arg.Any<RecoverPasswordCommand>())

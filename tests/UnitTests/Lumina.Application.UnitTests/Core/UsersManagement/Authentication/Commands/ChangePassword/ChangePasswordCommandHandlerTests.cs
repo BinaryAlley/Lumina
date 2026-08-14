@@ -38,7 +38,7 @@ public class ChangePasswordCommandHandlerTests
         _mockHashService = Substitute.For<IPasswordHashService>();
         _mockUserRepository = Substitute.For<IUserRepository>();
 
-        _mockUnitOfWork.GetRepository<IUserRepository>().Returns(_mockUserRepository);
+        _mockUnitOfWork.UserRepository.Returns(_mockUserRepository);
 
         IValidator<ChangePasswordCommand> mockValidator = Substitute.For<IValidator<ChangePasswordCommand>>();
         mockValidator.Validate(Arg.Any<ChangePasswordCommand>())

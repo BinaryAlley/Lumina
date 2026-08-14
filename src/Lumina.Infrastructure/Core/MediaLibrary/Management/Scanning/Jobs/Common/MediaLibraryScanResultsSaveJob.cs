@@ -66,7 +66,7 @@ internal sealed class MediaLibraryScanResultsSaveJob : MediaLibraryScanJob, IMed
                     await using AsyncServiceScope asyncServiceScope = _serviceScopeFactory.CreateAsyncScope();
                     IUnitOfWork unitOfWork = asyncServiceScope.ServiceProvider.GetService<IUnitOfWork>()!;
                     IDomainEventPublisher domainEventPublisher = asyncServiceScope.ServiceProvider.GetService<IDomainEventPublisher>()!;
-                    ILibraryScanSnapshotRepository libraryScanSnapshotRepository = unitOfWork.GetRepository<ILibraryScanSnapshotRepository>();
+
 
                     MediaLibraryScanCompositeId compositeKey = MediaLibraryScanCompositeId.Create(ScanId, UserId);
 
@@ -76,12 +76,12 @@ internal sealed class MediaLibraryScanResultsSaveJob : MediaLibraryScanJob, IMed
                         throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
 
                     // get the paths of the media library scan snapshot items that are no longer present in the current scan, so that deletion events can be raised for them
-                    Result<IReadOnlyList<string>> getDeletedPathsResult = await libraryScanSnapshotRepository.GetDeletedPathsAsync(LibraryId.Value, ScanId.Value, cancellationToken).ConfigureAwait(false);
+                    Result<IReadOnlyList<string>> getDeletedPathsResult = await unitOfWork.LibraryScanSnapshotRepository.GetDeletedPathsAsync(LibraryId.Value, ScanId.Value, cancellationToken).ConfigureAwait(false);
                     if (getDeletedPathsResult.IsFailure)
                         throw new InvalidOperationException(getDeletedPathsResult.FirstError.Description);
 
                     // apply the results of the current scan to the storage medium, atomically replacing the media library scan snapshot of the previous scan
-                    Result<Updated> applySnapshotSwapResult = await libraryScanSnapshotRepository.ApplySnapshotSwapAsync(LibraryId.Value, ScanId.Value, UserId.Value, cancellationToken).ConfigureAwait(false);
+                    Result<Updated> applySnapshotSwapResult = await unitOfWork.LibraryScanSnapshotRepository.ApplySnapshotSwapAsync(LibraryId.Value, ScanId.Value, UserId.Value, cancellationToken).ConfigureAwait(false);
                     if (applySnapshotSwapResult.IsFailure)
                         throw new InvalidOperationException(applySnapshotSwapResult.FirstError.Description);
 
@@ -93,21 +93,21 @@ internal sealed class MediaLibraryScanResultsSaveJob : MediaLibraryScanJob, IMed
                     }
 
                     // materialize the books of the media library from the scan snapshot, so that they are browsable even without web metadata
-                    Result<IReadOnlyList<string>> getPathsResult = await libraryScanSnapshotRepository.GetPathsAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
+                    Result<IReadOnlyList<string>> getPathsResult = await unitOfWork.LibraryScanSnapshotRepository.GetPathsAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
                     if (getPathsResult.IsFailure)
                         throw new InvalidOperationException(getPathsResult.FirstError.Description);
-                    IBookRepository bookRepository = unitOfWork.GetRepository<IBookRepository>();
+
                     foreach (string path in getPathsResult.Value)
                     {
                         cancellationToken.ThrowIfCancellationRequested();
 
-                        Result<BookEntity?> getExistingBookResult = await bookRepository.GetByPathAsync(LibraryId.Value, path, cancellationToken).ConfigureAwait(false);
+                        Result<BookEntity?> getExistingBookResult = await unitOfWork.BookRepository.GetByPathAsync(LibraryId.Value, path, cancellationToken).ConfigureAwait(false);
                         if (getExistingBookResult.IsFailure)
                             throw new InvalidOperationException(getExistingBookResult.FirstError.Description);
                         if (getExistingBookResult.Value is not null)
                             continue;
 
-                        Result<Created> insertBookResult = await bookRepository.InsertAsync(CreateShellBookEntity(LibraryId.Value, path), cancellationToken).ConfigureAwait(false);
+                        Result<Created> insertBookResult = await unitOfWork.BookRepository.InsertAsync(CreateShellBookEntity(LibraryId.Value, path), cancellationToken).ConfigureAwait(false);
                         if (insertBookResult.IsFailure)
                             throw new InvalidOperationException(insertBookResult.FirstError.Description);
                     }

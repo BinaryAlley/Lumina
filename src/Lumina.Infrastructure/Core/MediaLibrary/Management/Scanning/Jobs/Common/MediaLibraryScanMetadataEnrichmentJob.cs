@@ -1,14 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Books;
-using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.Common.Events;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
@@ -75,13 +74,11 @@ internal sealed class MediaLibraryScanMetadataEnrichmentJob : MediaLibraryScanJo
                     await using AsyncServiceScope asyncServiceScope = _serviceScopeFactory.CreateAsyncScope();
                     IUnitOfWork unitOfWork = asyncServiceScope.ServiceProvider.GetService<IUnitOfWork>()!;
                     IDomainEventPublisher domainEventPublisher = asyncServiceScope.ServiceProvider.GetService<IDomainEventPublisher>()!;
-                    ILibraryMetadataProviderConfigurationRepository configurationRepository = unitOfWork.GetRepository<ILibraryMetadataProviderConfigurationRepository>();
-                    IBookRepository bookRepository = unitOfWork.GetRepository<IBookRepository>();
-
+                    
                     MediaLibraryScanCompositeId compositeKey = MediaLibraryScanCompositeId.Create(ScanId, UserId);
 
                     // get the metadata providers configured for the media library, in their configured order, that support the media library type
-                    Result<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>> getConfigurationsResult = await configurationRepository.GetByLibraryIdAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
+                    Result<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>> getConfigurationsResult = await unitOfWork.LibraryMetadataProviderConfigurationRepository.GetByLibraryIdAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
                     if (getConfigurationsResult.IsFailure)
                         throw new InvalidOperationException(getConfigurationsResult.FirstError.Description);
                     List<IRemoteMetadataProvider> providers = [];
@@ -96,7 +93,7 @@ internal sealed class MediaLibraryScanMetadataEnrichmentJob : MediaLibraryScanJo
                     }
 
                     // count the books that need their metadata enriched, for progress reporting purposes
-                    Result<int> getBooksToEnrichCountResult = await bookRepository.GetBooksNeedingMetadataCountAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
+                    Result<int> getBooksToEnrichCountResult = await unitOfWork.BookRepository.GetBooksNeedingMetadataCountAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
                     if (getBooksToEnrichCountResult.IsFailure)
                         throw new InvalidOperationException(getBooksToEnrichCountResult.FirstError.Description);
                     int totalBooksToEnrich = getBooksToEnrichCountResult.Value;
@@ -116,7 +113,7 @@ internal sealed class MediaLibraryScanMetadataEnrichmentJob : MediaLibraryScanJo
                     {
                         cancellationToken.ThrowIfCancellationRequested();
 
-                        Result<IReadOnlyList<BookEntity>> getBooksPageResult = await bookRepository.GetBooksNeedingMetadataAsync(LibraryId.Value, lastPath, ENRICHMENT_PAGE_SIZE, cancellationToken).ConfigureAwait(false);
+                        Result<IReadOnlyList<BookEntity>> getBooksPageResult = await unitOfWork.BookRepository.GetBooksNeedingMetadataAsync(LibraryId.Value, lastPath, ENRICHMENT_PAGE_SIZE, cancellationToken).ConfigureAwait(false);
                         if (getBooksPageResult.IsFailure)
                             throw new InvalidOperationException(getBooksPageResult.FirstError.Description);
                         IReadOnlyList<BookEntity> booksPage = getBooksPageResult.Value;
@@ -127,7 +124,7 @@ internal sealed class MediaLibraryScanMetadataEnrichmentJob : MediaLibraryScanJo
                         {
                             cancellationToken.ThrowIfCancellationRequested();
 
-                            await EnrichBookAsync(bookEntity, providers, bookRepository, cancellationToken).ConfigureAwait(false);
+                            await EnrichBookAsync(bookEntity, providers, unitOfWork.BookRepository, cancellationToken).ConfigureAwait(false);
 
                             // check if enough time has passed since last update
                             DateTime now = DateTime.UtcNow;

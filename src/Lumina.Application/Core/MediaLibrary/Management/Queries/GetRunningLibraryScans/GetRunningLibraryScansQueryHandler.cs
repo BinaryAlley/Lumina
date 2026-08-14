@@ -59,8 +59,7 @@ public class GetRunningLibraryScansQueryHandler : IQueryHandler<GetRunningLibrar
     public async Task<Result<IEnumerable<MediaLibraryScanProgressResponse>>> HandleAsync(GetRunningLibraryScansQuery query, CancellationToken cancellationToken)
     {
         // get the ongoing library scans from the repository
-        ILibraryScanRepository libraryScanRepository = _unitOfWork.GetRepository<ILibraryScanRepository>();
-        Result<IEnumerable<LibraryScanEntity>> getRunningScansResult = await libraryScanRepository.GetRunningScansAsync(cancellationToken).ConfigureAwait(false);
+        Result<IEnumerable<LibraryScanEntity>> getRunningScansResult = await _unitOfWork.LibraryScanRepository.GetRunningScansAsync(cancellationToken).ConfigureAwait(false);
         if (getRunningScansResult.IsFailure)
             return getRunningScansResult.Errors;
 

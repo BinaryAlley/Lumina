@@ -48,10 +48,8 @@ public class LibraryScanQueuedDomainEventHandler : IDomainEventHandler<LibrarySc
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public async ValueTask HandleAsync(LibraryScanQueuedDomainEvent domainEvent, CancellationToken cancellationToken)
     {
-        ILibraryScanRepository libraryScanRepository = _unitOfWork.GetRepository<ILibraryScanRepository>();
-        
         // get the library scan that was queued, from the repository
-        Result<LibraryScanEntity?> getLibraryScanResult = await libraryScanRepository.GetByIdAsync(domainEvent.ScanId.Value, cancellationToken).ConfigureAwait(false);
+        Result<LibraryScanEntity?> getLibraryScanResult = await _unitOfWork.LibraryScanRepository.GetByIdAsync(domainEvent.ScanId.Value, cancellationToken).ConfigureAwait(false);
         if (getLibraryScanResult.IsFailure || getLibraryScanResult.Value is null)
             throw new EventualConsistencyException(getLibraryScanResult.FirstError, getLibraryScanResult.Errors);
 

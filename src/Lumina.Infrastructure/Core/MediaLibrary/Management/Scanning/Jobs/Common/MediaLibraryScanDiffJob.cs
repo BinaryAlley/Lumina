@@ -59,7 +59,7 @@ internal sealed class MediaLibraryScanDiffJob : MediaLibraryScanJob, IMediaLibra
                     await using AsyncServiceScope asyncServiceScope = _serviceScopeFactory.CreateAsyncScope();
                     IUnitOfWork unitOfWork = asyncServiceScope.ServiceProvider.GetService<IUnitOfWork>()!;
                     IDomainEventPublisher domainEventPublisher = asyncServiceScope.ServiceProvider.GetService<IDomainEventPublisher>()!;
-                    ILibraryScanStagingResultsRepository stagingResultsRepository = unitOfWork.GetRepository<ILibraryScanStagingResultsRepository>();
+
 
                     MediaLibraryScanCompositeId compositeKey = MediaLibraryScanCompositeId.Create(ScanId, UserId);
 
@@ -69,7 +69,7 @@ internal sealed class MediaLibraryScanDiffJob : MediaLibraryScanJob, IMediaLibra
                         throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
 
                     // mark the staging results against the media library scan snapshot of the previous scan
-                    Result<Updated> markChangesResult = await stagingResultsRepository.MarkChangesAgainstSnapshotAsync(ScanId.Value, LibraryId.Value, cancellationToken).ConfigureAwait(false);
+                    Result<Updated> markChangesResult = await unitOfWork.LibraryScanStagingResultsRepository.MarkChangesAgainstSnapshotAsync(ScanId.Value, LibraryId.Value, cancellationToken).ConfigureAwait(false);
                     if (markChangesResult.IsFailure)
                         throw new InvalidOperationException(markChangesResult.FirstError.Description);
 

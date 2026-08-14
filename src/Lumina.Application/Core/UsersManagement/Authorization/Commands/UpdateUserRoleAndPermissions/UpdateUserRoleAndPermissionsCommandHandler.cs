@@ -65,13 +65,8 @@ public class UpdateUserRoleAndPermissionsCommandHandler : ICommandHandler<Update
         if (!isAdmin)
             return ApplicationErrors.Authorization.NotAuthorized;
 
-        // get repositories
-        IUserRepository userRepository = _unitOfWork.GetRepository<IUserRepository>();
-        IRoleRepository roleRepository = _unitOfWork.GetRepository<IRoleRepository>();
-        IPermissionRepository permissionRepository = _unitOfWork.GetRepository<IPermissionRepository>();
-
         // get the user to update
-        Result<UserEntity?> getUserResult = await userRepository.GetByIdAsync(command.UserId, cancellationToken).ConfigureAwait(false);
+        Result<UserEntity?> getUserResult = await _unitOfWork.UserRepository.GetByIdAsync(command.UserId, cancellationToken).ConfigureAwait(false);
         if (getUserResult.IsFailure || getUserResult.Value is null)
             return DomainErrors.Users.UserDoesNotExist;
 
@@ -79,7 +74,7 @@ public class UpdateUserRoleAndPermissionsCommandHandler : ICommandHandler<Update
         if (command.RoleId is not null)
         {
             // get the new role
-            getRoleResult = await roleRepository.GetByIdAsync(command.RoleId!.Value, cancellationToken).ConfigureAwait(false);
+            getRoleResult = await _unitOfWork.RoleRepository.GetByIdAsync(command.RoleId!.Value, cancellationToken).ConfigureAwait(false);
             if (getRoleResult.IsFailure || getRoleResult.Value is null)
                 return ApplicationErrors.Authorization.RoleNotFound;
 
@@ -87,7 +82,7 @@ public class UpdateUserRoleAndPermissionsCommandHandler : ICommandHandler<Update
             if (getUserResult.Value.UserRole?.Role.RoleName == "Admin" && getRoleResult.Value.RoleName != "Admin")
             {
                 // count how many admins we have
-                Result<IEnumerable<UserEntity>> getAllUsersResult = await userRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+                Result<IEnumerable<UserEntity>> getAllUsersResult = await _unitOfWork.UserRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
                 if (getAllUsersResult.IsFailure)
                     return getAllUsersResult.Errors;
 
@@ -98,7 +93,7 @@ public class UpdateUserRoleAndPermissionsCommandHandler : ICommandHandler<Update
         }
         // get the permissions to assign
         Result<IEnumerable<PermissionEntity>> getPermissionsResult =
-            await permissionRepository.GetByIdsAsync(command.Permissions, cancellationToken).ConfigureAwait(false);
+            await _unitOfWork.PermissionRepository.GetByIdsAsync(command.Permissions, cancellationToken).ConfigureAwait(false);
         if (getPermissionsResult.IsFailure)
             return getPermissionsResult.Errors;
 
@@ -127,18 +122,18 @@ public class UpdateUserRoleAndPermissionsCommandHandler : ICommandHandler<Update
             TempPasswordCreated = userToUpdate.TempPasswordCreated,
             Libraries = userToUpdate.Libraries,
             UserRole = userRole,
-            UserPermissions = command.Permissions.Select(permissionId => new UserPermissionEntity
+            UserPermissions = [.. command.Permissions.Select(permissionId => new UserPermissionEntity
             {
                 UserId = userToUpdate.Id,
                 PermissionId = permissionId,
                 Permission = getPermissionsResult.Value.First(permission => permission.Id == permissionId),
                 User = userToUpdate
-            }).ToList(),
+            })],
             LibraryScans = userToUpdate.LibraryScans
         };
 
         // save changes and return result
-        Result<Updated> updateResult = await userRepository.UpdateAsync(updatedUser, cancellationToken).ConfigureAwait(false);
+        Result<Updated> updateResult = await _unitOfWork.UserRepository.UpdateAsync(updatedUser, cancellationToken).ConfigureAwait(false);
         if (updateResult.IsFailure)
             return updateResult.Errors;
 

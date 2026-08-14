@@ -22,9 +22,9 @@ namespace Lumina.Application.Core.UsersManagement.Authentication.Queries.GetUser
 /// </summary>
 public class GetUsersQueryHandler : IQueryHandler<GetUsersQuery, Result<IEnumerable<UserResponse>>>
 {
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUserService;
     private readonly IAuthorizationService _authorizationService;
-    private readonly IUserRepository _userRepository;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetUsersQueryHandler"/> class.
@@ -36,7 +36,7 @@ public class GetUsersQueryHandler : IQueryHandler<GetUsersQuery, Result<IEnumera
     {
         _authorizationService = authorizationService;
         _currentUserService = currentUserService;
-        _userRepository = unitOfWork.GetRepository<IUserRepository>();
+        _unitOfWork = unitOfWork;
     }
 
     /// <summary>
@@ -53,7 +53,7 @@ public class GetUsersQueryHandler : IQueryHandler<GetUsersQuery, Result<IEnumera
         bool isAdmin = await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false);
         if (!isAdmin)
             return Errors.Authorization.NotAuthorized;
-        Result<IEnumerable<UserEntity>> getRolesResult = await _userRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+        Result<IEnumerable<UserEntity>> getRolesResult = await _unitOfWork.UserRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
         return getRolesResult.Match(value => Result.From(value.ToResponses()), errors => errors);
     }
 }

@@ -52,8 +52,7 @@ public class GetEnabledLibrariesQueryHandler : IQueryHandler<GetEnabledLibraries
     public async Task<Result<LibraryResponse[]>> HandleAsync(GetEnabledLibrariesQuery query, CancellationToken cancellationToken)
     {
         // get the enabled libraries from the repository
-        ILibraryRepository libraryRepository = _unitOfWork.GetRepository<ILibraryRepository>();
-        Result<IEnumerable<LibraryEntity>> getEnabledLibrariesResult = await libraryRepository.GetAllEnabledAsync(cancellationToken).ConfigureAwait(false);
+        Result<IEnumerable<LibraryEntity>> getEnabledLibrariesResult = await _unitOfWork.LibraryRepository.GetAllEnabledAsync(cancellationToken).ConfigureAwait(false);
         if (getEnabledLibrariesResult.IsFailure)
             return getEnabledLibrariesResult.Errors;
 

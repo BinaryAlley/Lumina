@@ -62,8 +62,6 @@ public class UpdateRoleCommandHandler : ICommandHandler<UpdateRoleCommand, Resul
         if (!isAdmin)
             return Errors.Authorization.NotAuthorized;
 
-        IRoleRepository roleRepository = _unitOfWork.GetRepository<IRoleRepository>();
-
         // update the role and its permissions
         RoleEntity newRole = new()
         {
@@ -78,12 +76,12 @@ public class UpdateRoleCommandHandler : ICommandHandler<UpdateRoleCommand, Resul
             }).ToList()
         };
         // save the updated role in the repository
-        Result<Updated> updateRoleResult = await roleRepository.UpdateAsync(newRole, cancellationToken).ConfigureAwait(false);
+        Result<Updated> updateRoleResult = await _unitOfWork.RoleRepository.UpdateAsync(newRole, cancellationToken).ConfigureAwait(false);
         if (updateRoleResult.IsFailure)
             return updateRoleResult.Errors;
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         // retrieve the updated authorization role from the persistence medium and return it
-        Result<RoleEntity?> getRoleResult = await roleRepository.GetByIdAsync(command.RoleId, cancellationToken).ConfigureAwait(false);
+        Result<RoleEntity?> getRoleResult = await _unitOfWork.RoleRepository.GetByIdAsync(command.RoleId, cancellationToken).ConfigureAwait(false);
         if (getRoleResult.IsFailure)
             return getRoleResult.Errors;
         if (getRoleResult.Value is null)

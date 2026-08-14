@@ -57,9 +57,9 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
         _userId = Guid.NewGuid();
 
         _mockCurrentUserService.UserId.Returns(_userId);
-        _mockUnitOfWork.GetRepository<IUserRepository>().Returns(_mockUserRepository);
-        _mockUnitOfWork.GetRepository<IRoleRepository>().Returns(_mockRoleRepository);
-        _mockUnitOfWork.GetRepository<IPermissionRepository>().Returns(_mockPermissionRepository);
+        _mockUnitOfWork.UserRepository.Returns(_mockUserRepository);
+        _mockUnitOfWork.RoleRepository.Returns(_mockRoleRepository);
+        _mockUnitOfWork.PermissionRepository.Returns(_mockPermissionRepository);
 
         IValidator<UpdateUserRoleAndPermissionsCommand> mockValidator = Substitute.For<IValidator<UpdateUserRoleAndPermissionsCommand>>();
         mockValidator.Validate(Arg.Any<UpdateUserRoleAndPermissionsCommand>())

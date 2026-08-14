@@ -46,7 +46,7 @@ public class GetRolesQueryHandlerTests
         _userId = Guid.NewGuid();
 
         _mockCurrentUserService.UserId.Returns(_userId);
-        _mockUnitOfWork.GetRepository<IRoleRepository>().Returns(_mockRoleRepository);
+        _mockUnitOfWork.RoleRepository.Returns(_mockRoleRepository);
 
         _sut = new GetRolesQueryHandler(
             _mockAuthorizationService,

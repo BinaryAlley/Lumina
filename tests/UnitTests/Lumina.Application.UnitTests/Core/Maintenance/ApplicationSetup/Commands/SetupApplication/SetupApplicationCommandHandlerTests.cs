@@ -58,7 +58,7 @@ public class SetupApplicationCommandHandlerTests
         mockValidator.Validate(Arg.Any<SetupApplicationCommand>())
             .Returns([]);
 
-        _mockUnitOfWork.GetRepository<IUserRepository>().Returns(_mockUserRepository);
+        _mockUnitOfWork.UserRepository.Returns(_mockUserRepository);
         _mockDateTimeProvider.UtcNow.Returns(DateTime.UtcNow);
 
         _sut = new SetupApplicationCommandHandler(

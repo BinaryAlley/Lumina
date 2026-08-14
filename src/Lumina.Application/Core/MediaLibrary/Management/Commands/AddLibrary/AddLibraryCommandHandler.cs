@@ -116,18 +116,16 @@ public class AddLibraryCommandHandler : ICommandHandler<AddLibraryCommand, Resul
         if (createLibraryResult.IsFailure)
             return createLibraryResult.Errors;
 
-        // get a library repository
-        ILibraryRepository libraryRepository = _unitOfWork.GetRepository<ILibraryRepository>();
         // convert the domain library entity to a repository library entity
         LibraryEntity persistenceLibrary = createLibraryResult.Value.ToRepositoryEntity();
         // insert the repository entity and save changes
-        Result<Created> insertLibraryResult = await libraryRepository.InsertAsync(persistenceLibrary, cancellationToken).ConfigureAwait(false);
+        Result<Created> insertLibraryResult = await _unitOfWork.LibraryRepository.InsertAsync(persistenceLibrary, cancellationToken).ConfigureAwait(false);
         if (insertLibraryResult.IsFailure)
             return insertLibraryResult.Errors;
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         // retrieve the newly saved media library from the persistence medium and return it
-        Result<LibraryEntity?> getCreatedLibraryResult = await libraryRepository.GetByIdAsync(createLibraryResult.Value.Id.Value, cancellationToken).ConfigureAwait(false);
+        Result<LibraryEntity?> getCreatedLibraryResult = await _unitOfWork.LibraryRepository.GetByIdAsync(createLibraryResult.Value.Id.Value, cancellationToken).ConfigureAwait(false);
         if (getCreatedLibraryResult.IsFailure)
             return getCreatedLibraryResult.Errors;
         if (getCreatedLibraryResult.Value is null)

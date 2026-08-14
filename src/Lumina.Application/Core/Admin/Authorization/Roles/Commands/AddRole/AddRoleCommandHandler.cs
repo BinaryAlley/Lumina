@@ -62,8 +62,6 @@ public class AddRoleCommandHandler : ICommandHandler<AddRoleCommand, Result<Role
         if (!isAdmin)
             return Errors.Authorization.NotAuthorized;
 
-        IRoleRepository roleRepository = _unitOfWork.GetRepository<IRoleRepository>();
-
         // create the new role, with its permissions
         RoleEntity newRole = new()
         {
@@ -77,12 +75,12 @@ public class AddRoleCommandHandler : ICommandHandler<AddRoleCommand, Result<Role
             })]
         };
         // save the new role in the repository
-        Result<Created> insertRoleResult = await roleRepository.InsertAsync(newRole, cancellationToken).ConfigureAwait(false);
+        Result<Created> insertRoleResult = await _unitOfWork.RoleRepository.InsertAsync(newRole, cancellationToken).ConfigureAwait(false);
         if (insertRoleResult.IsFailure)
             return insertRoleResult.Errors;
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         // retrieve the newly saved authorization role from the persistence medium and return it
-        Result<RoleEntity?> getRoleResult = await roleRepository.GetByNameAsync(request.RoleName, cancellationToken).ConfigureAwait(false);
+        Result<RoleEntity?> getRoleResult = await _unitOfWork.RoleRepository.GetByNameAsync(request.RoleName, cancellationToken).ConfigureAwait(false);
         if (getRoleResult.IsFailure)
             return getRoleResult.Errors;
         if (getRoleResult.Value is null)

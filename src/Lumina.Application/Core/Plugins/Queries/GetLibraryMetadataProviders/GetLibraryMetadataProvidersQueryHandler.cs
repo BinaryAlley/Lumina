@@ -41,14 +41,12 @@ public class GetLibraryMetadataProvidersQueryHandler : IQueryHandler<GetLibraryM
     /// </returns>
     public async Task<Result<IReadOnlyList<LibraryMetadataProviderResponse>>> HandleAsync(GetLibraryMetadataProvidersQuery query, CancellationToken cancellationToken)
     {
-        ILibraryMetadataProviderConfigurationRepository configurationRepository = _unitOfWork.GetRepository<ILibraryMetadataProviderConfigurationRepository>();
-        Result<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>> getConfigurationsResult = await configurationRepository.GetByLibraryIdAsync(query.LibraryId, cancellationToken).ConfigureAwait(false);
+        Result<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>> getConfigurationsResult = await _unitOfWork.LibraryMetadataProviderConfigurationRepository.GetByLibraryIdAsync(query.LibraryId, cancellationToken).ConfigureAwait(false);
         if (getConfigurationsResult.IsFailure)
             return getConfigurationsResult.Errors;
 
         // build a plugin name lookup from the detected plugins
-        IPluginRepository pluginRepository = _unitOfWork.GetRepository<IPluginRepository>();
-        Result<IEnumerable<PluginEntity>> getPluginsResult = await pluginRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+        Result<IEnumerable<PluginEntity>> getPluginsResult = await _unitOfWork.PluginRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
         if (getPluginsResult.IsFailure)
             return getPluginsResult.Errors;
         Dictionary<Guid, string> pluginNames = getPluginsResult.Value.ToDictionary(plugin => plugin.Id, plugin => plugin.Name);

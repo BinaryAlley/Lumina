@@ -63,13 +63,13 @@ internal sealed class MediaLibraryScanHashJob : MediaLibraryScanJob, IMediaLibra
                     await using AsyncServiceScope asyncServiceScope = _serviceScopeFactory.CreateAsyncScope();
                     IUnitOfWork unitOfWork = asyncServiceScope.ServiceProvider.GetService<IUnitOfWork>()!;
                     IDomainEventPublisher domainEventPublisher = asyncServiceScope.ServiceProvider.GetService<IDomainEventPublisher>()!;
-                    ILibraryScanStagingResultsRepository stagingResultsRepository = unitOfWork.GetRepository<ILibraryScanStagingResultsRepository>();
+
                     IFileHashService fileHashService = asyncServiceScope.ServiceProvider.GetService<IFileHashService>()!;
 
                     MediaLibraryScanCompositeId compositeKey = MediaLibraryScanCompositeId.Create(ScanId, UserId);
 
                     // count the files that need hashing, for progress reporting purposes
-                    Result<int> getFilesToHashCountResult = await stagingResultsRepository.GetFilesToHashCountAsync(ScanId.Value, cancellationToken).ConfigureAwait(false);
+                    Result<int> getFilesToHashCountResult = await unitOfWork.LibraryScanStagingResultsRepository.GetFilesToHashCountAsync(ScanId.Value, cancellationToken).ConfigureAwait(false);
                     if (getFilesToHashCountResult.IsFailure)
                         throw new InvalidOperationException(getFilesToHashCountResult.FirstError.Description);
                     int totalFilesToHash = getFilesToHashCountResult.Value;
@@ -89,7 +89,7 @@ internal sealed class MediaLibraryScanHashJob : MediaLibraryScanJob, IMediaLibra
                     {
                         cancellationToken.ThrowIfCancellationRequested();
 
-                        Result<IReadOnlyList<HashedFileSystemFileDto>> getFilesToHashPageResult = await stagingResultsRepository.GetFilesToHashPageAsync(ScanId.Value, lastPath, HASHING_PAGE_SIZE, cancellationToken).ConfigureAwait(false);
+                        Result<IReadOnlyList<HashedFileSystemFileDto>> getFilesToHashPageResult = await unitOfWork.LibraryScanStagingResultsRepository.GetFilesToHashPageAsync(ScanId.Value, lastPath, HASHING_PAGE_SIZE, cancellationToken).ConfigureAwait(false);
                         if (getFilesToHashPageResult.IsFailure)
                             throw new InvalidOperationException(getFilesToHashPageResult.FirstError.Description);
                         IReadOnlyList<HashedFileSystemFileDto> filesToHashPage = getFilesToHashPageResult.Value;
@@ -112,7 +112,7 @@ internal sealed class MediaLibraryScanHashJob : MediaLibraryScanJob, IMediaLibra
                         }, cancellationToken).ConfigureAwait(false);
 
                         // write the computed hashes back to the staging results
-                        Result<Updated> updateHashesResult = await stagingResultsRepository.UpdateFileHashesAsync(ScanId.Value, hashedFiles, cancellationToken).ConfigureAwait(false);
+                        Result<Updated> updateHashesResult = await unitOfWork.LibraryScanStagingResultsRepository.UpdateFileHashesAsync(ScanId.Value, hashedFiles, cancellationToken).ConfigureAwait(false);
                         if (updateHashesResult.IsFailure)
                             throw new InvalidOperationException(updateHashesResult.FirstError.Description);
 

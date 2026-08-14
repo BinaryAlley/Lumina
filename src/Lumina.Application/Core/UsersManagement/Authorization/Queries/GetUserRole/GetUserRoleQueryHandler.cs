@@ -22,9 +22,9 @@ namespace Lumina.Application.Core.UsersManagement.Authorization.Queries.GetUserR
 /// </summary>
 public class GetUserRoleQueryHandler : IQueryHandler<GetUserRoleQuery, Result<RoleResponse?>>
 {
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUserService;
     private readonly IAuthorizationService _authorizationService;
-    private readonly IUserRepository _userRepository;
     private readonly IValidator<GetUserRoleQuery> _validator;
 
     /// <summary>
@@ -38,7 +38,7 @@ public class GetUserRoleQueryHandler : IQueryHandler<GetUserRoleQuery, Result<Ro
     {
         _authorizationService = authorizationService;
         _currentUserService = currentUserService;
-        _userRepository = unitOfWork.GetRepository<IUserRepository>();
+        _unitOfWork = unitOfWork;
         _validator = validator;
     }
 
@@ -61,7 +61,7 @@ public class GetUserRoleQueryHandler : IQueryHandler<GetUserRoleQuery, Result<Ro
         if (!isAdmin)
             return Errors.Authorization.NotAuthorized;
         // get the user from the repository and return its roles
-        Result<UserEntity?> getUserResult = await _userRepository.GetByIdAsync(query.UserId!.Value, cancellationToken).ConfigureAwait(false);
+        Result<UserEntity?> getUserResult = await _unitOfWork.UserRepository.GetByIdAsync(query.UserId!.Value, cancellationToken).ConfigureAwait(false);
         if (getUserResult.IsFailure)
             return getUserResult.Errors;
         else if (getUserResult.Value is null)

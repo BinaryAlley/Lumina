@@ -30,7 +30,7 @@ public class GetPluginsQueryHandlerTests
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
         _mockPluginRepository = Substitute.For<IPluginRepository>();
-        _mockUnitOfWork.GetRepository<IPluginRepository>().Returns(_mockPluginRepository);
+        _mockUnitOfWork.PluginRepository.Returns(_mockPluginRepository);
         _sut = new GetPluginsQueryHandler(_mockUnitOfWork);
     }
 

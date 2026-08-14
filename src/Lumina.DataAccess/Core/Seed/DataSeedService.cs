@@ -44,7 +44,6 @@ public class DataSeedService : IDataSeedService
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Created>> SetDefaultAuthorizationPermissionsAsync(Guid adminId, CancellationToken cancellationToken)
     {
-        IPermissionRepository permissionRepository = _unitOfWork.GetRepository<IPermissionRepository>();
         // create the default authorization permissions and add them to the repository.
         PermissionEntity[] defaultPermissions =
         [
@@ -55,7 +54,7 @@ public class DataSeedService : IDataSeedService
         ];
         foreach (PermissionEntity permission in defaultPermissions)
         {
-            Result<Created> insertPermissionResult = await permissionRepository.InsertAsync(permission, cancellationToken).ConfigureAwait(false);
+            Result<Created> insertPermissionResult = await _unitOfWork.PermissionRepository.InsertAsync(permission, cancellationToken).ConfigureAwait(false);
             if (insertPermissionResult.IsFailure)
                 return insertPermissionResult.Errors;
         }
@@ -71,8 +70,6 @@ public class DataSeedService : IDataSeedService
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Created>> SetDefaultAuthorizationRolesAsync(Guid userId, CancellationToken cancellationToken)
     {
-        IRoleRepository roleRepository = _unitOfWork.GetRepository<IRoleRepository>();
-
         // create the default authorization roles and add them to the repository
         RoleEntity[] defaultRoles =
         [
@@ -80,7 +77,7 @@ public class DataSeedService : IDataSeedService
         ];
         foreach (RoleEntity role in defaultRoles)
         {
-            Result<Created> insertRoleResult = await roleRepository.InsertAsync(role, cancellationToken).ConfigureAwait(false);
+            Result<Created> insertRoleResult = await _unitOfWork.RoleRepository.InsertAsync(role, cancellationToken).ConfigureAwait(false);
             if (insertRoleResult.IsFailure)
                 return insertRoleResult.Errors;
         }
@@ -96,12 +93,8 @@ public class DataSeedService : IDataSeedService
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Created>> SetAdminRolePermissionsAsync(Guid userId, CancellationToken cancellationToken)
     {
-        IRolePermissionRepository rolePermissionRepository = _unitOfWork.GetRepository<IRolePermissionRepository>();
-        IRoleRepository roleRepository = _unitOfWork.GetRepository<IRoleRepository>();
-        IPermissionRepository permissionRepository = _unitOfWork.GetRepository<IPermissionRepository>();
-
         // get the admin role
-        Result<RoleEntity?> getAdminRoleResult = await roleRepository.GetByNameAsync("Admin", cancellationToken).ConfigureAwait(false);
+        Result<RoleEntity?> getAdminRoleResult = await _unitOfWork.RoleRepository.GetByNameAsync("Admin", cancellationToken).ConfigureAwait(false);
         if (getAdminRoleResult.IsFailure)
             return getAdminRoleResult.Errors;
 
@@ -109,7 +102,7 @@ public class DataSeedService : IDataSeedService
             return Errors.Authorization.AdminAccountNotFound;
 
         // get all permissions
-        Result<IEnumerable<PermissionEntity>> getPermissionsResult = await permissionRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+        Result<IEnumerable<PermissionEntity>> getPermissionsResult = await _unitOfWork.PermissionRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
         if (getPermissionsResult.IsFailure)
             return getPermissionsResult.Errors;
 
@@ -125,7 +118,7 @@ public class DataSeedService : IDataSeedService
                 CreatedBy = userId,
                 CreatedOnUtc = _dateTimeProvider.UtcNow
             };
-            Result<Created> insertRolePermissionResult = await rolePermissionRepository.InsertAsync(rolePermissionEntity, cancellationToken).ConfigureAwait(false);
+            Result<Created> insertRolePermissionResult = await _unitOfWork.RolePermissionRepository.InsertAsync(rolePermissionEntity, cancellationToken).ConfigureAwait(false);
             if (insertRolePermissionResult.IsFailure)
                 return insertRolePermissionResult.Errors;
         }
@@ -141,13 +134,8 @@ public class DataSeedService : IDataSeedService
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Created>> SetAdminRoleToAdministratorAccount(Guid userId, CancellationToken cancellationToken)
     {
-        IUserRoleRepository userRoleRepository = _unitOfWork.GetRepository<IUserRoleRepository>();
-        IRoleRepository roleRepository = _unitOfWork.GetRepository<IRoleRepository>();
-        IUserRepository userRepository = _unitOfWork.GetRepository<IUserRepository>();
-
-
         // get the admin role
-        Result<RoleEntity?> getAdminRoleResult = await roleRepository.GetByNameAsync("Admin", cancellationToken).ConfigureAwait(false);
+        Result<RoleEntity?> getAdminRoleResult = await _unitOfWork.RoleRepository.GetByNameAsync("Admin", cancellationToken).ConfigureAwait(false);
         if (getAdminRoleResult.IsFailure)
             return getAdminRoleResult.Errors;
 
@@ -155,7 +143,7 @@ public class DataSeedService : IDataSeedService
             return Errors.Authorization.AdminRoleNotFound;
 
         // get admin user
-        Result<UserEntity?> getUserResult = await userRepository.GetByIdAsync(userId, cancellationToken).ConfigureAwait(false);
+        Result<UserEntity?> getUserResult = await _unitOfWork.UserRepository.GetByIdAsync(userId, cancellationToken).ConfigureAwait(false);
         if (getUserResult.IsFailure)
             return getUserResult.Errors;
 
@@ -172,7 +160,7 @@ public class DataSeedService : IDataSeedService
             User = getUserResult.Value,
             UserId = getUserResult.Value.Id
         };
-        Result<Created> insertUserRoleResult = await userRoleRepository.InsertAsync(userRole, cancellationToken).ConfigureAwait(false);
+        Result<Created> insertUserRoleResult = await _unitOfWork.UserRoleRepository.InsertAsync(userRole, cancellationToken).ConfigureAwait(false);
         if (insertUserRoleResult.IsFailure)
             return insertUserRoleResult.Errors;
 

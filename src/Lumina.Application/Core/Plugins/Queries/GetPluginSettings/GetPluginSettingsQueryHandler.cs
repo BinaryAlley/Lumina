@@ -46,8 +46,7 @@ public class GetPluginSettingsQueryHandler : IQueryHandler<GetPluginSettingsQuer
     /// </returns>
     public async Task<Result<PluginSettingsResponse>> HandleAsync(GetPluginSettingsQuery query, CancellationToken cancellationToken)
     {
-        IPluginRepository pluginRepository = _unitOfWork.GetRepository<IPluginRepository>();
-        Result<PluginEntity?> getPluginResult = await pluginRepository.GetByIdAsync(query.PluginId, cancellationToken).ConfigureAwait(false);
+        Result<PluginEntity?> getPluginResult = await _unitOfWork.PluginRepository.GetByIdAsync(query.PluginId, cancellationToken).ConfigureAwait(false);
         if (getPluginResult.IsFailure)
             return getPluginResult.Errors;
         PluginEntity? pluginEntity = getPluginResult.Value;

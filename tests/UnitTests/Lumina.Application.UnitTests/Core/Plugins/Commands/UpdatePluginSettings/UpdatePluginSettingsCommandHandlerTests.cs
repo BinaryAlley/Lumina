@@ -29,7 +29,7 @@ public class UpdatePluginSettingsCommandHandlerTests
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
         _mockPluginRepository = Substitute.For<IPluginRepository>();
-        _mockUnitOfWork.GetRepository<IPluginRepository>().Returns(_mockPluginRepository);
+        _mockUnitOfWork.PluginRepository.Returns(_mockPluginRepository);
         IValidator<UpdatePluginSettingsCommand> mockValidator = Substitute.For<IValidator<UpdatePluginSettingsCommand>>();
         mockValidator.Validate(Arg.Any<UpdatePluginSettingsCommand>())
             .Returns([]);

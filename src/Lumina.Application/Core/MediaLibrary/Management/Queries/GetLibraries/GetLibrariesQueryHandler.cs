@@ -52,8 +52,7 @@ public class GetLibrariesQueryHandler : IQueryHandler<GetLibrariesQuery, Result<
     public async Task<Result<LibraryResponse[]>> HandleAsync(GetLibrariesQuery query, CancellationToken cancellationToken)
     {
         // get the libraries from the repository
-        ILibraryRepository libraryRepository = _unitOfWork.GetRepository<ILibraryRepository>();
-        Result<IEnumerable<LibraryEntity>> getLibrariesResult = await libraryRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+        Result<IEnumerable<LibraryEntity>> getLibrariesResult = await _unitOfWork.LibraryRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
         if (getLibrariesResult.IsFailure)
             return getLibrariesResult.Errors;
 

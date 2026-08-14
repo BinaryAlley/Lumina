@@ -63,8 +63,7 @@ public class GetLibraryQueryHandler : IQueryHandler<GetLibraryQuery, Result<Libr
             return validationResult;
 
         // get the library with the specified id from the repository
-        ILibraryRepository libraryRepository = _unitOfWork.GetRepository<ILibraryRepository>();
-        Result<LibraryEntity?> getLibraryResult = await libraryRepository.GetByIdAsync(query.Id, cancellationToken).ConfigureAwait(false);
+        Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository.GetByIdAsync(query.Id, cancellationToken).ConfigureAwait(false);
         if (getLibraryResult.IsFailure)
             return getLibraryResult.Errors;
         else if (getLibraryResult.Value is null)

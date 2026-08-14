@@ -17,7 +17,7 @@ namespace Lumina.Infrastructure.Core.Authorization.Policies.Over18;
 /// </summary>
 public class Over18Policy : IOver18Policy
 {
-    private readonly IUserRepository _userRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IDateTimeProvider _dateTimeProvider;
 
     /// <summary>
@@ -27,7 +27,7 @@ public class Over18Policy : IOver18Policy
     /// <param name="dateTimeProvider">Injected service for time related functionality.</param>
     public Over18Policy(IUnitOfWork unitOfWork, IDateTimeProvider dateTimeProvider)
     {
-        _userRepository = unitOfWork.GetRepository<IUserRepository>();
+        _unitOfWork = unitOfWork;
         _dateTimeProvider = dateTimeProvider;
     }
 
@@ -39,7 +39,7 @@ public class Over18Policy : IOver18Policy
     /// <returns><see langword="true"/> if the policy evaluation succeeds, <see langword="false"/> otherwise.</returns>
     public async Task<bool> EvaluateAsync(Guid userId, CancellationToken cancellationToken)
     {
-        Result<UserEntity?> getUserResult = await _userRepository.GetByIdAsync(userId, cancellationToken).ConfigureAwait(false);
+        Result<UserEntity?> getUserResult = await _unitOfWork.UserRepository.GetByIdAsync(userId, cancellationToken).ConfigureAwait(false);
         if (getUserResult.IsFailure || getUserResult.Value is null)
             return false;
 

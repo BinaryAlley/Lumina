@@ -38,7 +38,7 @@ public class GetRolePermissionsQueryHandler : IQueryHandler<GetRolePermissionsQu
     {
         _authorizationService = authorizationService;
         _currentUserService = currentUserService;
-        _roleRepository = unitOfWork.GetRepository<IRoleRepository>();
+        _roleRepository = unitOfWork.RoleRepository;
         _validator = validator;
     }
 

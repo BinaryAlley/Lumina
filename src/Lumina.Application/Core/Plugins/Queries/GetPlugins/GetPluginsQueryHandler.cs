@@ -40,10 +40,7 @@ public class GetPluginsQueryHandler : IQueryHandler<GetPluginsQuery, Result<IRea
     /// </returns>
     public async Task<Result<IReadOnlyList<PluginResponse>>> HandleAsync(GetPluginsQuery query, CancellationToken cancellationToken)
     {
-        IPluginRepository pluginRepository = _unitOfWork.GetRepository<IPluginRepository>();
-        Result<IEnumerable<PluginEntity>> getPluginsResult = await pluginRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
-        return getPluginsResult.Match(
-            plugins => Result.From<IReadOnlyList<PluginResponse>>(plugins.Select(plugin => plugin.ToResponse()).ToList()),
-            errors => errors);
+        Result<IEnumerable<PluginEntity>> getPluginsResult = await _unitOfWork.PluginRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+        return getPluginsResult.Match(plugins => Result.From<IReadOnlyList<PluginResponse>>([.. plugins.Select(plugin => plugin.ToResponse())]), errors => errors);
     }
 }

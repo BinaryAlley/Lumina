@@ -62,8 +62,7 @@ public class DeleteRoleCommandHandler : ICommandHandler<DeleteRoleCommand, Resul
             return Errors.Authorization.NotAuthorized;
 
         // check if a role with the requested Id exists
-        IRoleRepository roleRepository = _unitOfWork.GetRepository<IRoleRepository>();
-        Result<RoleEntity?> getExistingRoleResult = await roleRepository.GetByIdAsync(command.RoleId, cancellationToken).ConfigureAwait(false);
+        Result<RoleEntity?> getExistingRoleResult = await _unitOfWork.RoleRepository.GetByIdAsync(command.RoleId, cancellationToken).ConfigureAwait(false);
         if (getExistingRoleResult.IsFailure)
             return getExistingRoleResult.Errors;
         else if (getExistingRoleResult.Value is null)
@@ -71,7 +70,7 @@ public class DeleteRoleCommandHandler : ICommandHandler<DeleteRoleCommand, Resul
         else if (getExistingRoleResult.Value.RoleName == "Admin")
             return Errors.Authorization.AdminRoleCannotBeDeleted;
         // delete the role and its permissions
-        Result<Deleted> deleteRoleResult = await roleRepository.DeleteByIdAsync(command.RoleId, cancellationToken).ConfigureAwait(false);
+        Result<Deleted> deleteRoleResult = await _unitOfWork.RoleRepository.DeleteByIdAsync(command.RoleId, cancellationToken).ConfigureAwait(false);
         if (deleteRoleResult.IsFailure)
             return deleteRoleResult.Errors;
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

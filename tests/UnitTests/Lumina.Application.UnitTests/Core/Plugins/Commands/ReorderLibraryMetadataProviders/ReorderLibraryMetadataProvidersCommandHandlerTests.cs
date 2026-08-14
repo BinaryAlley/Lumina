@@ -31,7 +31,7 @@ public class ReorderLibraryMetadataProvidersCommandHandlerTests
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
         _mockConfigurationRepository = Substitute.For<ILibraryMetadataProviderConfigurationRepository>();
-        _mockUnitOfWork.GetRepository<ILibraryMetadataProviderConfigurationRepository>().Returns(_mockConfigurationRepository);
+        _mockUnitOfWork.LibraryMetadataProviderConfigurationRepository.Returns(_mockConfigurationRepository);
         IValidator<ReorderLibraryMetadataProvidersCommand> mockValidator = Substitute.For<IValidator<ReorderLibraryMetadataProvidersCommand>>();
         mockValidator.Validate(Arg.Any<ReorderLibraryMetadataProvidersCommand>())
             .Returns([]);

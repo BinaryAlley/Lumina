@@ -39,10 +39,8 @@ public class GetBooksQueryHandler : IQueryHandler<GetBooksQuery, Result<IEnumera
     /// </returns>
     public async Task<Result<IEnumerable<BookResponse>>> HandleAsync(GetBooksQuery query, CancellationToken cancellationToken)
     {
-        // get a books repository
-        IBookRepository bookRepository = _unitOfWork.GetRepository<IBookRepository>();
         // get all books of the media library from the book repository
-        Result<IEnumerable<BookEntity>> getBooksResult = await bookRepository.GetByLibraryIdAsync(query.LibraryId, cancellationToken).ConfigureAwait(false);
+        Result<IEnumerable<BookEntity>> getBooksResult = await _unitOfWork.BookRepository.GetByLibraryIdAsync(query.LibraryId, cancellationToken).ConfigureAwait(false);
         return getBooksResult.Match(result => Result.From(getBooksResult.Value.ToResponses()), errors => errors);
     }
 }
