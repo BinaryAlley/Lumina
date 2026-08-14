@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.UsersManagement.Authentication.Commands.ChangePassword;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authentication.ChangePassword;
 using Lumina.Presentation.Api.UnitTests.Core.Endpoints.UsersManagement.Authentication.ChangePassword.Fixtures;
 using Microsoft.AspNetCore.Http;
@@ -23,7 +23,7 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.UsersManagement.Authe
 [ExcludeFromCodeCoverage]
 public class ChangePasswordEndpointTests
 {
-    private readonly ICommandHandler<ChangePasswordCommand, ErrorOr<ChangePasswordResponse>> _mockHandler;
+    private readonly ICommandHandler<ChangePasswordCommand, Result<ChangePasswordResponse>> _mockHandler;
     private readonly ChangePasswordEndpoint _sut;
     private readonly ChangePasswordRequestFixture _changePasswordRequestFixture;
 
@@ -32,7 +32,7 @@ public class ChangePasswordEndpointTests
     /// </summary>
     public ChangePasswordEndpointTests()
     {
-        _mockHandler = Substitute.For<ICommandHandler<ChangePasswordCommand, ErrorOr<ChangePasswordResponse>>>();
+        _mockHandler = Substitute.For<ICommandHandler<ChangePasswordCommand, Result<ChangePasswordResponse>>>();
         _sut = FastEndpoints.Factory.Create<ChangePasswordEndpoint>(_mockHandler);
         _changePasswordRequestFixture = new ChangePasswordRequestFixture();
     }
@@ -45,7 +45,7 @@ public class ChangePasswordEndpointTests
         CancellationToken cancellationToken = CancellationToken.None;
         ChangePasswordResponse expectedResponse = new(IsPasswordChanged: true);
         _mockHandler.HandleAsync(Arg.Any<ChangePasswordCommand>(), Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(expectedResponse));
+            .Returns(Result.From(expectedResponse));
 
         // Act
         IResult result = await _sut.ExecuteAsync(request, cancellationToken);
@@ -87,7 +87,7 @@ public class ChangePasswordEndpointTests
         ChangePasswordRequest request = _changePasswordRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<ChangePasswordCommand>(), Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(new ChangePasswordResponse(true)));
+            .Returns(Result.From(new ChangePasswordResponse(true)));
 
         // Act
         await _sut.ExecuteAsync(request, cancellationToken);
@@ -117,7 +117,7 @@ public class ChangePasswordEndpointTests
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return ErrorOrFactory.From(new ChangePasswordResponse(true));
+                return Result.From(new ChangePasswordResponse(true));
             }, callInfo.Arg<CancellationToken>()));
 
         // Act

@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using System;
@@ -96,9 +95,9 @@ public class VideoMetadata : BaseMetadata
     /// <param name="genres">The genres of the video.</param>
     /// <param name="tags">The tags associated with the video.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="VideoMetadata"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="VideoMetadata"/>, or an error message.
     /// </returns>
-    public static ErrorOr<VideoMetadata> Create(
+    public static Result<VideoMetadata> Create(
         string title,
         Optional<string> originalTitle,
         int durationInSeconds,

@@ -1,13 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.FileSystemManagement.Paths.Queries.ValidatePath;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Pahs.Queries.ValidatePath.Fixtures;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
+using Lumina.Domain.Common.Errors;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
-using Lumina.Domain.SharedKernel.Common.Errors;
 using NSubstitute;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
@@ -45,10 +44,10 @@ public class ValidatePathQueryHandlerTests
         _mockPathService.IsValidPath(query.Path!).Returns(true);
 
         // Act
-        ErrorOr<PathValidResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<PathValidResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.True(result.Value.IsValid);
         _mockPathService.Received(1).IsValidPath(query.Path!);
     }
@@ -61,10 +60,10 @@ public class ValidatePathQueryHandlerTests
         _mockPathService.IsValidPath(query.Path!).Returns(false);
 
         // Act
-        ErrorOr<PathValidResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<PathValidResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.False(result.Value.IsValid);
         _mockPathService.Received(1).IsValidPath(query.Path!);
     }
@@ -77,10 +76,10 @@ public class ValidatePathQueryHandlerTests
         _mockPathService.IsValidPath(Arg.Any<string>()).Returns(false);
 
         // Act
-        ErrorOr<PathValidResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<PathValidResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.False(result.Value.IsValid);
         _mockPathService.Received(1).IsValidPath(Arg.Any<string>());
     }
@@ -93,10 +92,10 @@ public class ValidatePathQueryHandlerTests
         _mockPathService.IsValidPath(Arg.Any<string>()).Returns(false);
 
         // Act
-        ErrorOr<PathValidResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<PathValidResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.False(result.Value.IsValid);
         _mockPathService.Received(1).IsValidPath(Arg.Any<string>());
     }
@@ -110,10 +109,10 @@ public class ValidatePathQueryHandlerTests
             .Returns([Errors.FileSystemManagement.PathCannotBeEmpty]);
 
         // Act
-        ErrorOr<PathValidResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<PathValidResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.PathCannotBeEmpty, result.FirstError);
         _mockPathService.DidNotReceive().IsValidPath(Arg.Any<string>());
     }

@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Domain.Common.Primitives;
+
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -102,9 +102,9 @@ public class AudioMetadata : BaseMetadata
     /// <param name="genres">The genres of the audio.</param>
     /// <param name="tags">The tags associated with the audio.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="AudioMetadata"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="AudioMetadata"/>, or an error message.
     /// </returns>
-    public static ErrorOr<AudioMetadata> Create(
+    public static Result<AudioMetadata> Create(
         string title,
         Optional<string> originalTitle,
         int durationInSeconds,

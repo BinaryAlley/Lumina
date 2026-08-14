@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Repositories.Books;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -8,7 +8,7 @@ using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentL
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Domain.Common.Primitives;
+
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using Lumina.Domain.Core.BoundedContexts.MediaContributorBoundedContext.MediaContributorAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
@@ -28,7 +28,7 @@ namespace Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrar
 /// <summary>
 /// Handler for the command to add a book.
 /// </summary>
-public class AddBookCommandHandler : ICommandHandler<AddBookCommand, ErrorOr<BookResponse>>
+public class AddBookCommandHandler : ICommandHandler<AddBookCommand, Result<BookResponse>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IValidator<AddBookCommand> _validator;
@@ -50,9 +50,9 @@ public class AddBookCommandHandler : ICommandHandler<AddBookCommand, ErrorOr<Boo
     /// <param name="command">The command to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="BookResponse"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="BookResponse"/>, or an error message.
     /// </returns>
-    public async Task<ErrorOr<BookResponse>> HandleAsync(AddBookCommand command, CancellationToken cancellationToken)
+    public async Task<Result<BookResponse>> HandleAsync(AddBookCommand command, CancellationToken cancellationToken)
     {
         List<Error> validationResult = _validator.Validate(command);
         if (validationResult.Count > 0)
@@ -70,37 +70,37 @@ public class AddBookCommandHandler : ICommandHandler<AddBookCommand, ErrorOr<Boo
             // TODO: add logic to search the book series repository for existing book series, based on the provided title
             // TODO: uncomment integration and unit tests about series
         }
-        List<ErrorOr<BookRating>> domainRatingsResult = command.Ratings!.ConvertAll(rating => BookRating.Create(
+        List<Result<BookRating>> domainRatingsResult = command.Ratings!.ConvertAll(rating => BookRating.Create(
                 rating.Value ?? default,
                 rating.MaxValue ?? default,
                 Optional<BookRatingSource>.FromNullable(rating.Source.HasValue ? (BookRatingSource)(int)rating.Source : (BookRatingSource?)null),
                 Optional<int>.FromNullable(rating.VoteCount)));
         // check if any of the results contain errors
-        List<Error> errors = [.. domainRatingsResult.Where(ratingResult => ratingResult.IsError).SelectMany(ratingResult => ratingResult.Errors)];
+        List<Error> errors = [.. domainRatingsResult.Where(ratingResult => ratingResult.IsFailure).SelectMany(ratingResult => ratingResult.Errors)];
         if (errors.Count != 0) // if there are errors, return them            
             return errors;
 
         List<BookRating> domainRatings = [.. domainRatingsResult.Select(rating => rating.Value)];
 
-        List<ErrorOr<Genre>> domainGenresResult = command.Metadata!.Genres!.ConvertAll(genre => Genre.Create(genre.Name!));
-        errors = [.. domainGenresResult.Where(genreResult => genreResult.IsError).SelectMany(genreResult => genreResult.Errors)];
+        List<Result<Genre>> domainGenresResult = command.Metadata!.Genres!.ConvertAll(genre => Genre.Create(genre.Name!));
+        errors = [.. domainGenresResult.Where(genreResult => genreResult.IsFailure).SelectMany(genreResult => genreResult.Errors)];
         if (errors.Count != 0)
             return errors;
         List<Genre> domainGenres = [.. domainGenresResult.Select(genre => genre.Value)];
 
-        List<ErrorOr<Tag>> domainTagsResult = command.Metadata.Tags!.ConvertAll(tag => Tag.Create(tag.Name!));
-        errors = [.. domainTagsResult.Where(tagResult => tagResult.IsError).SelectMany(tagResult => tagResult.Errors)];
+        List<Result<Tag>> domainTagsResult = command.Metadata.Tags!.ConvertAll(tag => Tag.Create(tag.Name!));
+        errors = [.. domainTagsResult.Where(tagResult => tagResult.IsFailure).SelectMany(tagResult => tagResult.Errors)];
         if (errors.Count != 0)
             return errors;
         List<Tag> domainTags = [.. domainTagsResult.Select(tag => tag.Value)];
 
-        List<ErrorOr<Isbn>> domainIsbnsResult = command.ISBNs!.ConvertAll(isbn => Isbn.Create(isbn.Value!, (IsbnFormat)(int)isbn.Format!));
-        errors = [.. domainIsbnsResult.Where(isbnResult => isbnResult.IsError).SelectMany(isbnResult => isbnResult.Errors)];
+        List<Result<Isbn>> domainIsbnsResult = command.ISBNs!.ConvertAll(isbn => Isbn.Create(isbn.Value!, (IsbnFormat)(int)isbn.Format!));
+        errors = [.. domainIsbnsResult.Where(isbnResult => isbnResult.IsFailure).SelectMany(isbnResult => isbnResult.Errors)];
         if (errors.Count != 0)
             return errors;
         List<Isbn> domainIsbns = [.. domainIsbnsResult.Select(isbn => isbn.Value)];
 
-        ErrorOr<ReleaseInfo> releaseInfoResult = ReleaseInfo.Create(
+        Result<ReleaseInfo> releaseInfoResult = ReleaseInfo.Create(
             Optional<DateOnly>.FromNullable(command.Metadata.ReleaseInfo!.OriginalReleaseDate),
             Optional<int>.FromNullable(command.Metadata.ReleaseInfo.OriginalReleaseYear),
             Optional<DateOnly>.FromNullable(command.Metadata.ReleaseInfo.ReReleaseDate),
@@ -108,32 +108,32 @@ public class AddBookCommandHandler : ICommandHandler<AddBookCommand, ErrorOr<Boo
             Optional<string>.FromNullable(command.Metadata.ReleaseInfo.ReleaseCountry),
             Optional<string>.FromNullable(command.Metadata.ReleaseInfo.ReleaseVersion)
         );
-        if (releaseInfoResult.IsError)
+        if (releaseInfoResult.IsFailure)
             return releaseInfoResult.Errors;
         ReleaseInfo releaseInfo = releaseInfoResult.Value;
         LanguageInfo? languageInfo = null;
         if (command.Metadata.Language is not null)
         {
-            ErrorOr<LanguageInfo> languageInfoResult = LanguageInfo.Create(
+            Result<LanguageInfo> languageInfoResult = LanguageInfo.Create(
                 command.Metadata.Language.LanguageCode!,
                 command.Metadata.Language.LanguageName!,
                 Optional<string>.FromNullable(command.Metadata.Language.NativeName));
-            if (languageInfoResult.IsError)
+            if (languageInfoResult.IsFailure)
                 return languageInfoResult.Errors;
             languageInfo = languageInfoResult.Value;
         }
         LanguageInfo? originalLanguageInfo = null;
         if (command.Metadata.OriginalLanguage is not null)
         {
-            ErrorOr<LanguageInfo> originalLanguageInfoResult = LanguageInfo.Create(
+            Result<LanguageInfo> originalLanguageInfoResult = LanguageInfo.Create(
                 command.Metadata.OriginalLanguage.LanguageCode!,
                 command.Metadata.OriginalLanguage.LanguageName!,
                 Optional<string>.FromNullable(command.Metadata.OriginalLanguage.NativeName));
-            if (originalLanguageInfoResult.IsError)
+            if (originalLanguageInfoResult.IsFailure)
                 return originalLanguageInfoResult.Errors;
             originalLanguageInfo = originalLanguageInfoResult.Value;
         }
-        ErrorOr<WrittenContentMetadata> metadataResult = WrittenContentMetadata.Create(
+        Result<WrittenContentMetadata> metadataResult = WrittenContentMetadata.Create(
             command.Metadata.Title!,
             Optional<string>.FromNullable(command.Metadata.OriginalTitle),
             Optional<string>.FromNullable(command.Metadata.Description),
@@ -145,9 +145,9 @@ public class AddBookCommandHandler : ICommandHandler<AddBookCommand, ErrorOr<Boo
             Optional<string>.FromNullable(command.Metadata.Publisher),
             Optional<int>.FromNullable(command.Metadata.PageCount)
         );
-        if (metadataResult.IsError)
+        if (metadataResult.IsFailure)
             return metadataResult.Errors;
-        ErrorOr<Book> createBookResult = Book.Create(
+        Result<Book> createBookResult = Book.Create(
             LibraryId.Create(command.LibraryId),
             command.Path,
             metadataResult.Value,
@@ -168,13 +168,13 @@ public class AddBookCommandHandler : ICommandHandler<AddBookCommand, ErrorOr<Boo
             contributorIds,
             ratings: domainRatings
         );
-        if (createBookResult.IsError)
+        if (createBookResult.IsFailure)
             return createBookResult.Errors;
 
         IBookRepository bookRepository = _unitOfWork.GetRepository<IBookRepository>();
         BookEntity persistenceBook = createBookResult.Value.ToRepositoryEntity();
-        ErrorOr<Created> insertBookResult = await bookRepository.InsertAsync(persistenceBook, cancellationToken).ConfigureAwait(false);
-        if (insertBookResult.IsError)
+        Result<Created> insertBookResult = await bookRepository.InsertAsync(persistenceBook, cancellationToken).ConfigureAwait(false);
+        if (insertBookResult.IsFailure)
             return insertBookResult.Errors;
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 

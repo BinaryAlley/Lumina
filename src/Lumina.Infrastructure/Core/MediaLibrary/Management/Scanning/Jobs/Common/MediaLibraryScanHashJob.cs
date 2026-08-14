@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Security;
@@ -69,14 +69,14 @@ internal sealed class MediaLibraryScanHashJob : MediaLibraryScanJob, IMediaLibra
                     MediaLibraryScanCompositeId compositeKey = MediaLibraryScanCompositeId.Create(ScanId, UserId);
 
                     // count the files that need hashing, for progress reporting purposes
-                    ErrorOr<int> getFilesToHashCountResult = await stagingResultsRepository.GetFilesToHashCountAsync(ScanId.Value, cancellationToken).ConfigureAwait(false);
-                    if (getFilesToHashCountResult.IsError)
+                    Result<int> getFilesToHashCountResult = await stagingResultsRepository.GetFilesToHashCountAsync(ScanId.Value, cancellationToken).ConfigureAwait(false);
+                    if (getFilesToHashCountResult.IsFailure)
                         throw new InvalidOperationException(getFilesToHashCountResult.FirstError.Description);
                     int totalFilesToHash = getFilesToHashCountResult.Value;
 
                     // set the initial progress of the scan job
-                    ErrorOr<Success> publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, 0, totalFilesToHash, cancellationToken).ConfigureAwait(false);
-                    if (publishJobProgressResult.IsError)
+                    Result<Success> publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, 0, totalFilesToHash, cancellationToken).ConfigureAwait(false);
+                    if (publishJobProgressResult.IsFailure)
                         throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
 
                     DateTime lastUpdateTime = DateTime.UtcNow;
@@ -89,8 +89,8 @@ internal sealed class MediaLibraryScanHashJob : MediaLibraryScanJob, IMediaLibra
                     {
                         cancellationToken.ThrowIfCancellationRequested();
 
-                        ErrorOr<IReadOnlyList<HashedFileSystemFileDto>> getFilesToHashPageResult = await stagingResultsRepository.GetFilesToHashPageAsync(ScanId.Value, lastPath, HASHING_PAGE_SIZE, cancellationToken).ConfigureAwait(false);
-                        if (getFilesToHashPageResult.IsError)
+                        Result<IReadOnlyList<HashedFileSystemFileDto>> getFilesToHashPageResult = await stagingResultsRepository.GetFilesToHashPageAsync(ScanId.Value, lastPath, HASHING_PAGE_SIZE, cancellationToken).ConfigureAwait(false);
+                        if (getFilesToHashPageResult.IsFailure)
                             throw new InvalidOperationException(getFilesToHashPageResult.FirstError.Description);
                         IReadOnlyList<HashedFileSystemFileDto> filesToHashPage = getFilesToHashPageResult.Value;
                         if (filesToHashPage.Count == 0)
@@ -105,15 +105,15 @@ internal sealed class MediaLibraryScanHashJob : MediaLibraryScanJob, IMediaLibra
                             {
                                 // increment the number of processed elements progress
                                 publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, Interlocked.Increment(ref processedFilesCount), totalFilesToHash, cancellationToken).ConfigureAwait(false);
-                                if (publishJobProgressResult.IsError)
+                                if (publishJobProgressResult.IsFailure)
                                     throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
                                 lastUpdateTime = now;
                             }
                         }, cancellationToken).ConfigureAwait(false);
 
                         // write the computed hashes back to the staging results
-                        ErrorOr<Updated> updateHashesResult = await stagingResultsRepository.UpdateFileHashesAsync(ScanId.Value, hashedFiles, cancellationToken).ConfigureAwait(false);
-                        if (updateHashesResult.IsError)
+                        Result<Updated> updateHashesResult = await stagingResultsRepository.UpdateFileHashesAsync(ScanId.Value, hashedFiles, cancellationToken).ConfigureAwait(false);
+                        if (updateHashesResult.IsFailure)
                             throw new InvalidOperationException(updateHashesResult.FirstError.Description);
 
                         lastPath = filesToHashPage[^1].Path;
@@ -149,11 +149,11 @@ internal sealed class MediaLibraryScanHashJob : MediaLibraryScanJob, IMediaLibra
     /// <param name="currentProgress">The current job progress.</param>
     /// <param name="totalProgress">The total job progress.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    private async Task<ErrorOr<Success>> PublishJobProgressAsync(IDomainEventPublisher domainEventPublisher, MediaLibraryScanCompositeId compositeKey, int currentProgress, int totalProgress, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    private async Task<Result<Success>> PublishJobProgressAsync(IDomainEventPublisher domainEventPublisher, MediaLibraryScanCompositeId compositeKey, int currentProgress, int totalProgress, CancellationToken cancellationToken)
     {
-        ErrorOr<MediaLibraryScanJobProgress> scanJobProgressResult = MediaLibraryScanJobProgress.Create(currentProgress, totalProgress, "HashingFileContents");
-        if (scanJobProgressResult.IsError)
+        Result<MediaLibraryScanJobProgress> scanJobProgressResult = MediaLibraryScanJobProgress.Create(currentProgress, totalProgress, "HashingFileContents");
+        if (scanJobProgressResult.IsFailure)
             return scanJobProgressResult.Errors;
 
         await domainEventPublisher.PublishAsync(new LibraryScanJobProgressChangedDomainEvent(

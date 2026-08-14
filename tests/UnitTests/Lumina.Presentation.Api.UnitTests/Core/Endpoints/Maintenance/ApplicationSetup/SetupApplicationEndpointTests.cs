@@ -1,11 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.Maintenance.ApplicationSetup.Commands.SetupApplication;
-using Lumina.Application.Core.Maintenance.ApplicationSetup.Queries.CheckInitialization;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
-using Lumina.Contracts.Responses.UsersManagement;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Core.Endpoints.Maintenance.ApplicationSetup;
 using Lumina.Presentation.Api.UnitTests.Core.Endpoints.Maintenance.ApplicationSetup.Fixtures;
 using Microsoft.AspNetCore.Http;
@@ -25,7 +23,7 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Maintenance.Applicati
 [ExcludeFromCodeCoverage]
 public class SetupApplicationEndpointTests
 {
-    private readonly ICommandHandler<SetupApplicationCommand, ErrorOr<RegistrationResponse>> _mockHandler;
+    private readonly ICommandHandler<SetupApplicationCommand, Result<RegistrationResponse>> _mockHandler;
     private readonly SetupApplicationEndpoint _sut;
     private readonly RegistrationRequestFixture _registrationRequestFixture;
 
@@ -34,7 +32,7 @@ public class SetupApplicationEndpointTests
     /// </summary>
     public SetupApplicationEndpointTests()
     {
-        _mockHandler = Substitute.For<ICommandHandler<SetupApplicationCommand, ErrorOr<RegistrationResponse>>>();
+        _mockHandler = Substitute.For<ICommandHandler<SetupApplicationCommand, Result<RegistrationResponse>>>();
         _sut = FastEndpoints.Factory.Create<SetupApplicationEndpoint>(_mockHandler);
         _registrationRequestFixture = new RegistrationRequestFixture();
     }
@@ -47,7 +45,7 @@ public class SetupApplicationEndpointTests
         CancellationToken cancellationToken = CancellationToken.None;
         RegistrationResponse expectedResponse = new(Guid.NewGuid(), "testUser", "TOTP123");
         _mockHandler.HandleAsync(Arg.Any<SetupApplicationCommand>(), Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(expectedResponse));
+            .Returns(Result.From(expectedResponse));
 
         // Act
         IResult result = await _sut.ExecuteAsync(request, cancellationToken);
@@ -91,7 +89,7 @@ public class SetupApplicationEndpointTests
         RegistrationRequest request = _registrationRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<SetupApplicationCommand>(), Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(new RegistrationResponse(Guid.NewGuid(), "testUser", "TOTP123")));
+            .Returns(Result.From(new RegistrationResponse(Guid.NewGuid(), "testUser", "TOTP123")));
 
         // Act
         await _sut.ExecuteAsync(request, cancellationToken);
@@ -121,7 +119,7 @@ public class SetupApplicationEndpointTests
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return ErrorOrFactory.From(new RegistrationResponse(Guid.NewGuid(), "testUser", "TOTP123"));
+                return Result.From(new RegistrationResponse(Guid.NewGuid(), "testUser", "TOTP123"));
             }, callInfo.Arg<CancellationToken>()));
 
         // Act

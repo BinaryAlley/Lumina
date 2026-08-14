@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Paths;
 using Lumina.Application.Core.FileSystemManagement.Paths.Commands.CombinePath;
 using Lumina.Contracts.Requests.FileSystemManagement.Path;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Common.Routes.FileSystemManagement;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
@@ -19,13 +19,13 @@ namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.Combi
 /// </summary>
 public class CombinePathEndpoint : BaseEndpoint<CombinePathRequest, IResult>
 {
-    private readonly ICommandHandler<CombinePathCommand, ErrorOr<PathSegmentResponse>> _combinePathCommandHandler;
+    private readonly ICommandHandler<CombinePathCommand, Result<PathSegmentResponse>> _combinePathCommandHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CombinePathEndpoint"/> class.
     /// </summary>
     /// <param name="combinePathCommandHandler">Injected service for handling combine path commands.</param>
-    public CombinePathEndpoint(ICommandHandler<CombinePathCommand, ErrorOr<PathSegmentResponse>> combinePathCommandHandler)
+    public CombinePathEndpoint(ICommandHandler<CombinePathCommand, Result<PathSegmentResponse>> combinePathCommandHandler)
     {
         _combinePathCommandHandler = combinePathCommandHandler;
     }
@@ -48,7 +48,7 @@ public class CombinePathEndpoint : BaseEndpoint<CombinePathRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(CombinePathRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<PathSegmentResponse> result = await _combinePathCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
+        Result<PathSegmentResponse> result = await _combinePathCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

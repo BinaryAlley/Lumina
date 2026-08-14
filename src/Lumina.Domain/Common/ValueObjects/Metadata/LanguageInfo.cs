@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Domain.Common.Models.Core;
 using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Models.Core;
+
+using Lumina.Domain.Common.Errors;
 using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
@@ -50,16 +50,16 @@ public class LanguageInfo : ValueObject
     /// <param name="languageName">The full name of the language in English.</param>
     /// <param name="nativeName">The optional native name of the language.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="LanguageInfo"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="LanguageInfo"/>, or an error message.
     /// </returns>
-    public static ErrorOr<LanguageInfo> Create(string? languageCode, string? languageName, Optional<string> nativeName)
+    public static Result<LanguageInfo> Create(string? languageCode, string? languageName, Optional<string> nativeName)
     {
         if (string.IsNullOrWhiteSpace(languageCode))
-            return Errors.Metadata.LanguageCodeCannotBeEmpty;
+            return Errors.Errors.Metadata.LanguageCodeCannotBeEmpty;
         if (string.IsNullOrWhiteSpace(languageName))
-            return Errors.Metadata.LanguageNameCannotBeEmpty;
+            return Errors.Errors.Metadata.LanguageNameCannotBeEmpty;
         if (languageCode.Length != 2)
-            return Errors.Metadata.InvalidIsoCode;
+            return Errors.Errors.Metadata.InvalidIsoCode;
         return new LanguageInfo(languageCode, languageName, nativeName);
     }
 

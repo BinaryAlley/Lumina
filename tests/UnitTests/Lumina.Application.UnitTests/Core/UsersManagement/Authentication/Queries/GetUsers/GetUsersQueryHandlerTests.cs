@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -10,6 +9,7 @@ using Lumina.Application.Core.UsersManagement.Authentication.Queries.GetUsers;
 using Lumina.Application.UnitTests.Common.Mapping.UserManagement.Users.Fixtures;
 using Lumina.Application.UnitTests.Core.UsersManagement.Authentication.Queries.GetUsers.Fixtures;
 using Lumina.Contracts.Responses.UsersManagement.Users;
+using Lumina.Domain.Common.Primitives;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -65,10 +65,10 @@ public class GetUsersQueryHandlerTests
             .Returns(false);
 
         // Act
-        ErrorOr<IEnumerable<UserResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<IEnumerable<UserResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Authorization.NotAuthorized, result.FirstError);
         await _mockUserRepository.DidNotReceive().GetAllAsync(Arg.Any<CancellationToken>());
     }
@@ -86,10 +86,10 @@ public class GetUsersQueryHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<IEnumerable<UserResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<IEnumerable<UserResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
     }
 
@@ -104,13 +104,13 @@ public class GetUsersQueryHandlerTests
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(true);
         _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(users));
+            .Returns(Result.From(users));
 
         // Act
-        ErrorOr<IEnumerable<UserResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<IEnumerable<UserResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(2, result.Value.Count());
     }
 }

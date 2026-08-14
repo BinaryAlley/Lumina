@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.FileSystemManagement.Paths.Queries.GetPathParent;
 using Lumina.Contracts.Requests.FileSystemManagement.Path;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.GetPathParent;
 using Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.Fixtures;
 using Microsoft.AspNetCore.Http;
@@ -26,7 +26,7 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.
 [ExcludeFromCodeCoverage]
 public class GetPathParentEndpointTests
 {
-    private readonly IQueryHandler<GetPathParentQuery, ErrorOr<IEnumerable<PathSegmentResponse>>> _mockHandler;
+    private readonly IQueryHandler<GetPathParentQuery, Result<IEnumerable<PathSegmentResponse>>> _mockHandler;
     private readonly GetPathParentEndpoint _sut;
     private readonly PathSegmentResponseFixture _pathSegmentResponseFixture;
     private readonly GetPathParentRequestFixture _getPathParentRequestFixture;
@@ -36,7 +36,7 @@ public class GetPathParentEndpointTests
     /// </summary>
     public GetPathParentEndpointTests()
     {
-        _mockHandler = Substitute.For<IQueryHandler<GetPathParentQuery, ErrorOr<IEnumerable<PathSegmentResponse>>>>();
+        _mockHandler = Substitute.For<IQueryHandler<GetPathParentQuery, Result<IEnumerable<PathSegmentResponse>>>>();
         _sut = Factory.Create<GetPathParentEndpoint>(_mockHandler);
         _pathSegmentResponseFixture = new PathSegmentResponseFixture();
         _getPathParentRequestFixture = new GetPathParentRequestFixture();
@@ -50,7 +50,7 @@ public class GetPathParentEndpointTests
         CancellationToken cancellationToken = CancellationToken.None;
         IEnumerable<PathSegmentResponse> expectedResponse = _pathSegmentResponseFixture.CreateMany();
         _mockHandler.HandleAsync(Arg.Any<GetPathParentQuery>(), Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(expectedResponse));
+            .Returns(Result.From(expectedResponse));
 
         // Act
         IResult result = await _sut.ExecuteAsync(request, cancellationToken);
@@ -119,7 +119,7 @@ public class GetPathParentEndpointTests
         GetPathParentRequest request = _getPathParentRequestFixture.Create(@"C:\Users\TestUser");
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<GetPathParentQuery>(), Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(_pathSegmentResponseFixture.CreateMany().AsEnumerable()));
+            .Returns(Result.From(_pathSegmentResponseFixture.CreateMany().AsEnumerable()));
 
         // Act
         await _sut.ExecuteAsync(request, cancellationToken);
@@ -143,7 +143,7 @@ public class GetPathParentEndpointTests
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return ErrorOrFactory.From(_pathSegmentResponseFixture.CreateMany().AsEnumerable());
+                return Result.From(_pathSegmentResponseFixture.CreateMany().AsEnumerable());
             }, callInfo.Arg<CancellationToken>()));
 
         // Act

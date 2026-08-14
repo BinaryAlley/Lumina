@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Repositories.Authorization;
@@ -22,7 +22,7 @@ namespace Lumina.Application.Core.Admin.Authorization.Roles.Commands.DeleteRole;
 /// <summary>
 /// Handler for the command to delete an authorization role.
 /// </summary>
-public class DeleteRoleCommandHandler : ICommandHandler<DeleteRoleCommand, ErrorOr<Deleted>>
+public class DeleteRoleCommandHandler : ICommandHandler<DeleteRoleCommand, Result<Deleted>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IAuthorizationService _authorizationService;
@@ -49,8 +49,8 @@ public class DeleteRoleCommandHandler : ICommandHandler<DeleteRoleCommand, Error
     /// </summary>
     /// <param name="command">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<ErrorOr<Deleted>> HandleAsync(DeleteRoleCommand command, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Deleted>> HandleAsync(DeleteRoleCommand command, CancellationToken cancellationToken)
     {
         List<Error> validationResult = _validator.Validate(command);
         if (validationResult.Count > 0)
@@ -63,16 +63,16 @@ public class DeleteRoleCommandHandler : ICommandHandler<DeleteRoleCommand, Error
 
         // check if a role with the requested Id exists
         IRoleRepository roleRepository = _unitOfWork.GetRepository<IRoleRepository>();
-        ErrorOr<RoleEntity?> getExistingRoleResult = await roleRepository.GetByIdAsync(command.RoleId, cancellationToken).ConfigureAwait(false);
-        if (getExistingRoleResult.IsError)
+        Result<RoleEntity?> getExistingRoleResult = await roleRepository.GetByIdAsync(command.RoleId, cancellationToken).ConfigureAwait(false);
+        if (getExistingRoleResult.IsFailure)
             return getExistingRoleResult.Errors;
         else if (getExistingRoleResult.Value is null)
             return Errors.Authorization.RoleNotFound;
         else if (getExistingRoleResult.Value.RoleName == "Admin")
             return Errors.Authorization.AdminRoleCannotBeDeleted;
         // delete the role and its permissions
-        ErrorOr<Deleted> deleteRoleResult = await roleRepository.DeleteByIdAsync(command.RoleId, cancellationToken).ConfigureAwait(false);
-        if (deleteRoleResult.IsError)
+        Result<Deleted> deleteRoleResult = await roleRepository.DeleteByIdAsync(command.RoleId, cancellationToken).ConfigureAwait(false);
+        if (deleteRoleResult.IsFailure)
             return deleteRoleResult.Errors;
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return deleteRoleResult.Value;

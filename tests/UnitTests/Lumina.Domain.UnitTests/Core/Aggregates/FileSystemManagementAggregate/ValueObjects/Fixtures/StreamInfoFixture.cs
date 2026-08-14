@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using ErrorOr;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using System;
@@ -58,10 +57,10 @@ public class StreamInfoFixture
         sampleRate ??= Optional<int>.FromNullable(_faker.Random.Bool() ? (int?)_faker.Random.Number(8000, 192000) : null);
         channels ??= Optional<int>.FromNullable(_faker.Random.Bool() ? (int?)_faker.Random.Number(1, 8) : null);
 
-        ErrorOr<StreamInfo> streamInfoResult = StreamInfo.Create(
+        Result<StreamInfo> streamInfoResult = StreamInfo.Create(
             streamId, mimeType, bitrate.Value, codec, resolution.Value, frameRate.Value, sampleRate.Value, channels.Value);
 
-        if (streamInfoResult.IsError)
+        if (streamInfoResult.IsFailure)
             throw new InvalidOperationException("Failed to create StreamInfo: " + string.Join(", ", streamInfoResult.Errors));
         return streamInfoResult.Value;
     }
@@ -73,6 +72,6 @@ public class StreamInfoFixture
     /// <returns>The created list.</returns>
     public List<StreamInfo> CreateMany(int count = 3)
     {
-        return Enumerable.Range(0, count).Select(_ => CreateStreamInfo()).ToList();
+        return [.. Enumerable.Range(0, count).Select(_ => CreateStreamInfo())];
     }
 }

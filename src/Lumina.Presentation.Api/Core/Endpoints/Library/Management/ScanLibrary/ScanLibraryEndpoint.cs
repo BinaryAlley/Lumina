@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Application.Core.MediaLibrary.Management.Commands.ScanLibrary;
 using Lumina.Contracts.Requests.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Common.Routes.Library.Management;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
@@ -19,13 +19,13 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Library.Management.ScanLibrary;
 /// </summary>
 public class ScanLibraryEndpoint : BaseEndpoint<ScanLibraryRequest, IResult>
 {
-    private readonly ICommandHandler<ScanLibraryCommand, ErrorOr<MediaLibraryScanResponse>> _scanLibraryCommandHandler;
+    private readonly ICommandHandler<ScanLibraryCommand, Result<MediaLibraryScanResponse>> _scanLibraryCommandHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ScanLibraryEndpoint"/> class.
     /// </summary>
     /// <param name="scanLibraryCommandHandler">Injected service for handling scan library commands.</param>
-    public ScanLibraryEndpoint(ICommandHandler<ScanLibraryCommand, ErrorOr<MediaLibraryScanResponse>> scanLibraryCommandHandler)
+    public ScanLibraryEndpoint(ICommandHandler<ScanLibraryCommand, Result<MediaLibraryScanResponse>> scanLibraryCommandHandler)
     {
         _scanLibraryCommandHandler = scanLibraryCommandHandler;
     }
@@ -47,7 +47,7 @@ public class ScanLibraryEndpoint : BaseEndpoint<ScanLibraryRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(ScanLibraryRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<MediaLibraryScanResponse> result = await _scanLibraryCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
+        Result<MediaLibraryScanResponse> result = await _scanLibraryCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

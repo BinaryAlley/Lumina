@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
@@ -23,7 +23,7 @@ namespace Lumina.Application.Core.Maintenance.ApplicationSetup.Commands.SetupApp
 /// <summary>
 /// Handler for the command to perform the initial application setup.
 /// </summary>
-public class SetupApplicationCommandHandler : ICommandHandler<SetupApplicationCommand, ErrorOr<RegistrationResponse>>
+public class SetupApplicationCommandHandler : ICommandHandler<SetupApplicationCommand, Result<RegistrationResponse>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IPasswordHashService _hashService;
@@ -71,9 +71,9 @@ public class SetupApplicationCommandHandler : ICommandHandler<SetupApplicationCo
     /// <param name="command">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="RegistrationResponse"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="RegistrationResponse"/>, or an error message.
     /// </returns>
-    public async Task<ErrorOr<RegistrationResponse>> HandleAsync(SetupApplicationCommand command, CancellationToken cancellationToken)
+    public async Task<Result<RegistrationResponse>> HandleAsync(SetupApplicationCommand command, CancellationToken cancellationToken)
     {
         List<Error> validationResult = _validator.Validate(command);
         if (validationResult.Count > 0)
@@ -81,8 +81,8 @@ public class SetupApplicationCommandHandler : ICommandHandler<SetupApplicationCo
 
         // check if any users already exists (admin account is only set once!)
         IUserRepository userRepository = _unitOfWork.GetRepository<IUserRepository>();
-        ErrorOr<IEnumerable<UserEntity>> selectUsersResult = await userRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
-        if (selectUsersResult.IsError)
+        Result<IEnumerable<UserEntity>> selectUsersResult = await userRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+        if (selectUsersResult.IsFailure)
             return selectUsersResult.Errors;
         else if (selectUsersResult.Value.Any())
             return Errors.Authorization.AdminAccountAlreadyCreated;
@@ -112,26 +112,26 @@ public class SetupApplicationCommandHandler : ICommandHandler<SetupApplicationCo
             user.TotpSecret = _cryptographyService.Encrypt(Convert.ToBase64String(secret));
         }
         // insert the user
-        ErrorOr<Created> insertUserResult = await userRepository.InsertAsync(user, cancellationToken).ConfigureAwait(false);
-        if (insertUserResult.IsError)
+        Result<Created> insertUserResult = await userRepository.InsertAsync(user, cancellationToken).ConfigureAwait(false);
+        if (insertUserResult.IsFailure)
             return insertUserResult.Errors;
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         // set the default permissions, roles, roles permissions
-        ErrorOr<Created> setPermissionsResult = await _dataSeedService.SetDefaultAuthorizationPermissionsAsync(id, cancellationToken).ConfigureAwait(false);
-        if (setPermissionsResult.IsError)
+        Result<Created> setPermissionsResult = await _dataSeedService.SetDefaultAuthorizationPermissionsAsync(id, cancellationToken).ConfigureAwait(false);
+        if (setPermissionsResult.IsFailure)
             return setPermissionsResult.Errors;
 
-        ErrorOr<Created> setRoleResult = await _dataSeedService.SetDefaultAuthorizationRolesAsync(id, cancellationToken).ConfigureAwait(false);
-        if (setRoleResult.IsError)
+        Result<Created> setRoleResult = await _dataSeedService.SetDefaultAuthorizationRolesAsync(id, cancellationToken).ConfigureAwait(false);
+        if (setRoleResult.IsFailure)
             return setRoleResult.Errors;
 
-        ErrorOr<Created> setRolePermissionResult = await _dataSeedService.SetAdminRolePermissionsAsync(id, cancellationToken).ConfigureAwait(false);
-        if (setRolePermissionResult.IsError)
+        Result<Created> setRolePermissionResult = await _dataSeedService.SetAdminRolePermissionsAsync(id, cancellationToken).ConfigureAwait(false);
+        if (setRolePermissionResult.IsFailure)
             return setRolePermissionResult.Errors;
 
-        ErrorOr<Created> setRoleToAdminResult = await _dataSeedService.SetAdminRoleToAdministratorAccount(id, cancellationToken).ConfigureAwait(false);
-        if (setRoleToAdminResult.IsError)
+        Result<Created> setRoleToAdminResult = await _dataSeedService.SetAdminRoleToAdministratorAccount(id, cancellationToken).ConfigureAwait(false);
+        if (setRoleToAdminResult.IsFailure)
             return setRoleToAdminResult.Errors;
 
         // TODO: insert the default admin profile preferences when they are implemented

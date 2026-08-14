@@ -1,13 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
-using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Platform;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.Entities.Fixtures;
 using Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.ValueObjects.Fixtures;
 using NSubstitute;
@@ -66,23 +65,23 @@ public class DirectoryServiceTests
         ];
 
         _mockEnvironmentContext.DirectoryProviderService.GetSubdirectoryPaths(pathId, includeHiddenElements)
-            .Returns(ErrorOrFactory.From(subPaths.AsEnumerable()));
+            .Returns(Result.From(subPaths.AsEnumerable()));
 
         foreach (FileSystemPathId subPath in subPaths)
         {
             _mockEnvironmentContext.DirectoryProviderService.GetFileName(subPath)
-                .Returns(ErrorOrFactory.From(System.IO.Path.GetFileName(subPath.Path)));
+                .Returns(Result.From(System.IO.Path.GetFileName(subPath.Path)));
             _mockEnvironmentContext.DirectoryProviderService.GetLastWriteTime(subPath)
-                .Returns(ErrorOrFactory.From(Optional<DateTime>.FromNullable(DateTime.Now)));
+                .Returns(Result.From(Optional<DateTime>.FromNullable(DateTime.Now)));
             _mockEnvironmentContext.DirectoryProviderService.GetCreationTime(subPath)
-                .Returns(ErrorOrFactory.From(Optional<DateTime>.FromNullable(DateTime.Now.AddDays(-1))));
+                .Returns(Result.From(Optional<DateTime>.FromNullable(DateTime.Now.AddDays(-1))));
         }
 
         // Act
-        ErrorOr<IEnumerable<Directory>> result = _sut.GetSubdirectories(path, includeHiddenElements);
+        Result<IEnumerable<Directory>> result = _sut.GetSubdirectories(path, includeHiddenElements);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(2, result.Value.Count());
         Assert.Equal(["Sub1", "Sub2"], result.Value.Select(d => d.Name));
     }
@@ -95,10 +94,10 @@ public class DirectoryServiceTests
         bool includeHiddenElements = false;
 
         // Act
-        ErrorOr<IEnumerable<Directory>> result = _sut.GetSubdirectories(invalidPath, includeHiddenElements);
+        Result<IEnumerable<Directory>> result = _sut.GetSubdirectories(invalidPath, includeHiddenElements);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
     }
 
@@ -114,10 +113,10 @@ public class DirectoryServiceTests
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        ErrorOr<IEnumerable<Directory>> result = _sut.GetSubdirectories(path, includeHiddenElements);
+        Result<IEnumerable<Directory>> result = _sut.GetSubdirectories(path, includeHiddenElements);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
     }
 
@@ -133,7 +132,7 @@ public class DirectoryServiceTests
         );
 
         _mockEnvironmentContext.DirectoryProviderService.GetSubdirectoryPaths(pathId, includeHiddenElements)
-            .Returns(ErrorOrFactory.From(new[] { subPath }.AsEnumerable()));
+            .Returns(Result.From(new[] { subPath }.AsEnumerable()));
 
         _mockEnvironmentContext.DirectoryProviderService.GetFileName(subPath)
             .Returns(Errors.Permission.UnauthorizedAccess);
@@ -143,10 +142,10 @@ public class DirectoryServiceTests
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        ErrorOr<IEnumerable<Directory>> result = _sut.GetSubdirectories(path, includeHiddenElements);
+        Result<IEnumerable<Directory>> result = _sut.GetSubdirectories(path, includeHiddenElements);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Single(result.Value);
         Assert.Equal(FileSystemItemStatus.Inaccessible, result.Value.First().Status);
     }
@@ -164,23 +163,23 @@ public class DirectoryServiceTests
         ];
 
         _mockEnvironmentContext.DirectoryProviderService.GetSubdirectoryPaths(parentDirectory.Id, includeHiddenElements)
-            .Returns(ErrorOrFactory.From(subPaths.AsEnumerable()));
+            .Returns(Result.From(subPaths.AsEnumerable()));
 
         foreach (FileSystemPathId subPath in subPaths)
         {
             _mockEnvironmentContext.DirectoryProviderService.GetFileName(subPath)
-                .Returns(ErrorOrFactory.From(System.IO.Path.GetFileName(subPath.Path)));
+                .Returns(Result.From(System.IO.Path.GetFileName(subPath.Path)));
             _mockEnvironmentContext.DirectoryProviderService.GetLastWriteTime(subPath)
-                .Returns(ErrorOrFactory.From(Optional<DateTime>.FromNullable(DateTime.Now)));
+                .Returns(Result.From(Optional<DateTime>.FromNullable(DateTime.Now)));
             _mockEnvironmentContext.DirectoryProviderService.GetCreationTime(subPath)
-                .Returns(ErrorOrFactory.From(Optional<DateTime>.FromNullable(DateTime.Now.AddDays(-1))));
+                .Returns(Result.From(Optional<DateTime>.FromNullable(DateTime.Now.AddDays(-1))));
         }
 
         // Act
-        ErrorOr<IEnumerable<Directory>> result = _sut.GetSubdirectories(parentDirectory, includeHiddenElements);
+        Result<IEnumerable<Directory>> result = _sut.GetSubdirectories(parentDirectory, includeHiddenElements);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(2, result.Value.Count());
         Assert.Equal(["Sub1", "Sub2"], result.Value.Select(d => d.Name));
     }
@@ -196,10 +195,10 @@ public class DirectoryServiceTests
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        ErrorOr<IEnumerable<Directory>> result = _sut.GetSubdirectories(parentDirectory, includeHiddenElements);
+        Result<IEnumerable<Directory>> result = _sut.GetSubdirectories(parentDirectory, includeHiddenElements);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
     }
 
@@ -214,7 +213,7 @@ public class DirectoryServiceTests
         );
 
         _mockEnvironmentContext.DirectoryProviderService.GetSubdirectoryPaths(parentDirectory.Id, includeHiddenElements)
-            .Returns(ErrorOrFactory.From(new[] { subPath }.AsEnumerable()));
+            .Returns(Result.From(new[] { subPath }.AsEnumerable()));
 
         _mockEnvironmentContext.DirectoryProviderService.GetFileName(subPath)
             .Returns(Errors.Permission.UnauthorizedAccess);
@@ -224,10 +223,10 @@ public class DirectoryServiceTests
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        ErrorOr<IEnumerable<Directory>> result = _sut.GetSubdirectories(parentDirectory, includeHiddenElements);
+        Result<IEnumerable<Directory>> result = _sut.GetSubdirectories(parentDirectory, includeHiddenElements);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Single(result.Value);
         Assert.Equal(FileSystemItemStatus.Inaccessible, result.Value.First().Status);
     }
@@ -245,23 +244,23 @@ public class DirectoryServiceTests
         ];
 
         _mockEnvironmentContext.DirectoryProviderService.GetSubdirectoryPaths(pathId, includeHiddenElements)
-            .Returns(ErrorOrFactory.From(subPaths.AsEnumerable()));
+            .Returns(Result.From(subPaths.AsEnumerable()));
 
         foreach (FileSystemPathId subPath in subPaths)
         {
             _mockEnvironmentContext.DirectoryProviderService.GetFileName(subPath)
-                .Returns(ErrorOrFactory.From(System.IO.Path.GetFileName(subPath.Path)));
+                .Returns(Result.From(System.IO.Path.GetFileName(subPath.Path)));
             _mockEnvironmentContext.DirectoryProviderService.GetLastWriteTime(subPath)
-                .Returns(ErrorOrFactory.From(Optional<DateTime>.FromNullable(DateTime.Now)));
+                .Returns(Result.From(Optional<DateTime>.FromNullable(DateTime.Now)));
             _mockEnvironmentContext.DirectoryProviderService.GetCreationTime(subPath)
-                .Returns(ErrorOrFactory.From(Optional<DateTime>.FromNullable(DateTime.Now.AddDays(-1))));
+                .Returns(Result.From(Optional<DateTime>.FromNullable(DateTime.Now.AddDays(-1))));
         }
 
         // Act
-        ErrorOr<IEnumerable<Directory>> result = _sut.GetSubdirectories(pathId, includeHiddenElements);
+        Result<IEnumerable<Directory>> result = _sut.GetSubdirectories(pathId, includeHiddenElements);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(2, result.Value.Count());
         Assert.Equal(["Sub1", "Sub2"], result.Value.Select(d => d.Name));
     }
@@ -277,10 +276,10 @@ public class DirectoryServiceTests
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        ErrorOr<IEnumerable<Directory>> result = _sut.GetSubdirectories(pathId, includeHiddenElements);
+        Result<IEnumerable<Directory>> result = _sut.GetSubdirectories(pathId, includeHiddenElements);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
     }
 
@@ -295,7 +294,7 @@ public class DirectoryServiceTests
         );
 
         _mockEnvironmentContext.DirectoryProviderService.GetSubdirectoryPaths(pathId, includeHiddenElements)
-            .Returns(ErrorOrFactory.From(new[] { subPath }.AsEnumerable()));
+            .Returns(Result.From(new[] { subPath }.AsEnumerable()));
 
         _mockEnvironmentContext.DirectoryProviderService.GetFileName(subPath)
             .Returns(Errors.Permission.UnauthorizedAccess);
@@ -305,10 +304,10 @@ public class DirectoryServiceTests
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        ErrorOr<IEnumerable<Directory>> result = _sut.GetSubdirectories(pathId, includeHiddenElements);
+        Result<IEnumerable<Directory>> result = _sut.GetSubdirectories(pathId, includeHiddenElements);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Single(result.Value);
         Assert.Equal(FileSystemItemStatus.Inaccessible, result.Value.First().Status);
     }
@@ -322,20 +321,23 @@ public class DirectoryServiceTests
         FileSystemPathId parentPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(parentPath);
         FileSystemPathId newDirPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(System.IO.Path.Combine(parentPath, newDirName));
 
+        _mockPlatformContext.PathStrategy.CombinePath(parentPathId, newDirName).Returns(Result.From(newDirPathId));
+        _mockEnvironmentContext.DirectoryProviderService.DirectoryExists(newDirPathId).Returns(Result.From(false));
+
         _mockEnvironmentContext.DirectoryProviderService.CreateDirectory(parentPathId, newDirName)
-            .Returns(ErrorOrFactory.From(newDirPathId));
+            .Returns(Result.From(newDirPathId));
         _mockEnvironmentContext.DirectoryProviderService.GetFileName(newDirPathId)
-            .Returns(ErrorOrFactory.From(newDirName));
+            .Returns(Result.From(newDirName));
         _mockEnvironmentContext.DirectoryProviderService.GetLastWriteTime(newDirPathId)
-            .Returns(ErrorOrFactory.From(Optional<DateTime>.FromNullable(DateTime.Now)));
+            .Returns(Result.From(Optional<DateTime>.FromNullable(DateTime.Now)));
         _mockEnvironmentContext.DirectoryProviderService.GetCreationTime(newDirPathId)
-            .Returns(ErrorOrFactory.From(Optional<DateTime>.FromNullable(DateTime.Now)));
+            .Returns(Result.From(Optional<DateTime>.FromNullable(DateTime.Now)));
 
         // Act
-        ErrorOr<Directory> result = _sut.CreateDirectory(parentPath, newDirName);
+        Result<Directory> result = _sut.CreateDirectory(parentPath, newDirName);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(newDirPathId, result.Value.Id);
     }
 
@@ -347,10 +349,10 @@ public class DirectoryServiceTests
         string newDirName = "NewDirectory";
 
         // Act
-        ErrorOr<Directory> result = _sut.CreateDirectory(invalidPath, newDirName);
+        Result<Directory> result = _sut.CreateDirectory(invalidPath, newDirName);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
     }
 
@@ -362,20 +364,23 @@ public class DirectoryServiceTests
         string newDirName = "NewDirectory";
         FileSystemPathId newDirPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(System.IO.Path.Combine(parentPathId.Path, newDirName));
 
+        _mockPlatformContext.PathStrategy.CombinePath(parentPathId, newDirName).Returns(Result.From(newDirPathId));
+        _mockEnvironmentContext.DirectoryProviderService.DirectoryExists(newDirPathId).Returns(Result.From(false));
+
         _mockEnvironmentContext.DirectoryProviderService.CreateDirectory(parentPathId, newDirName)
-            .Returns(ErrorOrFactory.From(newDirPathId));
+            .Returns(Result.From(newDirPathId));
         _mockEnvironmentContext.DirectoryProviderService.GetFileName(newDirPathId)
-            .Returns(ErrorOrFactory.From(newDirName));
+            .Returns(Result.From(newDirName));
         _mockEnvironmentContext.DirectoryProviderService.GetLastWriteTime(newDirPathId)
-            .Returns(ErrorOrFactory.From(Optional<DateTime>.FromNullable(DateTime.Now)));
+            .Returns(Result.From(Optional<DateTime>.FromNullable(DateTime.Now)));
         _mockEnvironmentContext.DirectoryProviderService.GetCreationTime(newDirPathId)
-            .Returns(ErrorOrFactory.From(Optional<DateTime>.FromNullable(DateTime.Now)));
+            .Returns(Result.From(Optional<DateTime>.FromNullable(DateTime.Now)));
 
         // Act
-        ErrorOr<Directory> result = _sut.CreateDirectory(parentPathId, newDirName);
+        Result<Directory> result = _sut.CreateDirectory(parentPathId, newDirName);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(newDirPathId, result.Value.Id);
     }
 
@@ -385,15 +390,19 @@ public class DirectoryServiceTests
         // Arrange
         FileSystemPathId parentPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDirTest);
         string newDirName = "NewDirectory";
+        FileSystemPathId newDirPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(System.IO.Path.Combine(parentPathId.Path, newDirName));
+
+        _mockPlatformContext.PathStrategy.CombinePath(parentPathId, newDirName).Returns(Result.From(newDirPathId));
+        _mockEnvironmentContext.DirectoryProviderService.DirectoryExists(newDirPathId).Returns(Result.From(false));
 
         _mockEnvironmentContext.DirectoryProviderService.CreateDirectory(parentPathId, newDirName)
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        ErrorOr<Directory> result = _sut.CreateDirectory(parentPathId, newDirName);
+        Result<Directory> result = _sut.CreateDirectory(parentPathId, newDirName);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
     }
 
@@ -405,8 +414,11 @@ public class DirectoryServiceTests
         string newDirName = "NewDirectory";
         FileSystemPathId newDirPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(System.IO.Path.Combine(parentPathId.Path, newDirName));
 
+        _mockPlatformContext.PathStrategy.CombinePath(parentPathId, newDirName).Returns(Result.From(newDirPathId));
+        _mockEnvironmentContext.DirectoryProviderService.DirectoryExists(newDirPathId).Returns(Result.From(false));
+
         _mockEnvironmentContext.DirectoryProviderService.CreateDirectory(parentPathId, newDirName)
-            .Returns(ErrorOrFactory.From(newDirPathId));
+            .Returns(Result.From(newDirPathId));
 
         _mockEnvironmentContext.DirectoryProviderService.GetFileName(newDirPathId)
             .Returns(Errors.Permission.UnauthorizedAccess);
@@ -416,10 +428,10 @@ public class DirectoryServiceTests
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        ErrorOr<Directory> result = _sut.CreateDirectory(parentPathId, newDirName);
+        Result<Directory> result = _sut.CreateDirectory(parentPathId, newDirName);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(FileSystemItemStatus.Inaccessible, result.Value.Status);
         Assert.Equal(newDirPathId, result.Value.Id);
         Assert.False(result.Value.DateCreated.HasValue);
@@ -434,15 +446,15 @@ public class DirectoryServiceTests
         string newDirName = "NewDirectory";
         FileSystemPathId newDirPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(System.IO.Path.Combine(parentPathId.Path, newDirName));
 
-        _mockPlatformContext.PathStrategy.CombinePath(parentPathId, newDirName).Returns(ErrorOrFactory.From(newDirPathId));
+        _mockPlatformContext.PathStrategy.CombinePath(parentPathId, newDirName).Returns(Result.From(newDirPathId));
         _mockEnvironmentContext.DirectoryProviderService.DirectoryExists(newDirPathId)
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        ErrorOr<Directory> result = _sut.CreateDirectory(parentPathId, newDirName);
+        Result<Directory> result = _sut.CreateDirectory(parentPathId, newDirName);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
     }
 
@@ -453,15 +465,15 @@ public class DirectoryServiceTests
         FileSystemPathId parentPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDirTest);
         string newDirName = "ExistingDirectory";
         FileSystemPathId newDirPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(System.IO.Path.Combine(parentPathId.Path, newDirName));
-        _mockPlatformContext.PathStrategy.CombinePath(parentPathId, newDirName).Returns(ErrorOrFactory.From(newDirPathId));
+        _mockPlatformContext.PathStrategy.CombinePath(parentPathId, newDirName).Returns(Result.From(newDirPathId));
 
         _mockEnvironmentContext.DirectoryProviderService.DirectoryExists(newDirPathId).Returns(true);
 
         // Act
-        ErrorOr<Directory> result = _sut.CreateDirectory(parentPathId, newDirName);
+        Result<Directory> result = _sut.CreateDirectory(parentPathId, newDirName);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.DirectoryAlreadyExists, result.FirstError);
     }
 
@@ -476,10 +488,10 @@ public class DirectoryServiceTests
             .Returns(Errors.FileSystemManagement.InvalidPath);
 
         // Act
-        ErrorOr<Directory> result = _sut.CreateDirectory(parentPathId, newDirName);
+        Result<Directory> result = _sut.CreateDirectory(parentPathId, newDirName);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
 
         // Verify that DirectoryExists was not called
@@ -498,20 +510,23 @@ public class DirectoryServiceTests
             s_isUnix ? "/TestDir/NewName" : @"C:\TestDir\NewName"
         );
 
+        _mockPlatformContext.PathStrategy.CombinePath(oldPathId, newName).Returns(Result.From(newPathId));
+        _mockEnvironmentContext.DirectoryProviderService.DirectoryExists(newPathId).Returns(Result.From(false));
+
         _mockEnvironmentContext.DirectoryProviderService.RenameDirectory(oldPathId, newName)
-            .Returns(ErrorOrFactory.From(newPathId));
+            .Returns(Result.From(newPathId));
         _mockEnvironmentContext.DirectoryProviderService.GetFileName(newPathId)
-            .Returns(ErrorOrFactory.From(newName));
+            .Returns(Result.From(newName));
         _mockEnvironmentContext.DirectoryProviderService.GetLastWriteTime(newPathId)
-            .Returns(ErrorOrFactory.From(Optional<DateTime>.FromNullable(DateTime.Now)));
+            .Returns(Result.From(Optional<DateTime>.FromNullable(DateTime.Now)));
         _mockEnvironmentContext.DirectoryProviderService.GetCreationTime(newPathId)
-            .Returns(ErrorOrFactory.From(Optional<DateTime>.FromNullable(DateTime.Now)));
+            .Returns(Result.From(Optional<DateTime>.FromNullable(DateTime.Now)));
 
         // Act
-        ErrorOr<Directory> result = _sut.RenameDirectory(oldPath, newName);
+        Result<Directory> result = _sut.RenameDirectory(oldPath, newName);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(newPathId, result.Value.Id);
         Assert.Equal(newName, result.Value.Name);
     }
@@ -524,10 +539,10 @@ public class DirectoryServiceTests
         string newName = "NewName";
 
         // Act
-        ErrorOr<Directory> result = _sut.RenameDirectory(invalidPath, newName);
+        Result<Directory> result = _sut.RenameDirectory(invalidPath, newName);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
     }
 
@@ -543,20 +558,23 @@ public class DirectoryServiceTests
             s_isUnix ? "/TestDir/NewName" : @"C:\TestDir\NewName"
         );
 
+        _mockPlatformContext.PathStrategy.CombinePath(oldPathId, newName).Returns(Result.From(newPathId));
+        _mockEnvironmentContext.DirectoryProviderService.DirectoryExists(newPathId).Returns(Result.From(false));
+
         _mockEnvironmentContext.DirectoryProviderService.RenameDirectory(oldPathId, newName)
-            .Returns(ErrorOrFactory.From(newPathId));
+            .Returns(Result.From(newPathId));
         _mockEnvironmentContext.DirectoryProviderService.GetFileName(newPathId)
-            .Returns(ErrorOrFactory.From(newName));
+            .Returns(Result.From(newName));
         _mockEnvironmentContext.DirectoryProviderService.GetLastWriteTime(newPathId)
-            .Returns(ErrorOrFactory.From(Optional<DateTime>.FromNullable(DateTime.Now)));
+            .Returns(Result.From(Optional<DateTime>.FromNullable(DateTime.Now)));
         _mockEnvironmentContext.DirectoryProviderService.GetCreationTime(newPathId)
-            .Returns(ErrorOrFactory.From(Optional<DateTime>.FromNullable(DateTime.Now)));
+            .Returns(Result.From(Optional<DateTime>.FromNullable(DateTime.Now)));
 
         // Act
-        ErrorOr<Directory> result = _sut.RenameDirectory(oldPathId, newName);
+        Result<Directory> result = _sut.RenameDirectory(oldPathId, newName);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(newPathId, result.Value.Id);
         Assert.Equal(newName, result.Value.Name);
     }
@@ -569,15 +587,21 @@ public class DirectoryServiceTests
             s_isUnix ? "/TestDir/OldName" : @"C:\TestDir\OldName"
         );
         string newName = "NewName";
+        FileSystemPathId newPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(
+            s_isUnix ? "/TestDir/NewName" : @"C:\TestDir\NewName"
+        );
+
+        _mockPlatformContext.PathStrategy.CombinePath(oldPathId, newName).Returns(Result.From(newPathId));
+        _mockEnvironmentContext.DirectoryProviderService.DirectoryExists(newPathId).Returns(Result.From(false));
 
         _mockEnvironmentContext.DirectoryProviderService.RenameDirectory(oldPathId, newName)
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        ErrorOr<Directory> result = _sut.RenameDirectory(oldPathId, newName);
+        Result<Directory> result = _sut.RenameDirectory(oldPathId, newName);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
     }
 
@@ -593,8 +617,11 @@ public class DirectoryServiceTests
             s_isUnix ? "/TestDir/NewName" : @"C:\TestDir\NewName"
         );
 
+        _mockPlatformContext.PathStrategy.CombinePath(oldPathId, newName).Returns(Result.From(newPathId));
+        _mockEnvironmentContext.DirectoryProviderService.DirectoryExists(newPathId).Returns(Result.From(false));
+
         _mockEnvironmentContext.DirectoryProviderService.RenameDirectory(oldPathId, newName)
-            .Returns(ErrorOrFactory.From(newPathId));
+            .Returns(Result.From(newPathId));
 
         _mockEnvironmentContext.DirectoryProviderService.GetFileName(newPathId)
             .Returns(Errors.Permission.UnauthorizedAccess);
@@ -604,10 +631,10 @@ public class DirectoryServiceTests
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        ErrorOr<Directory> result = _sut.RenameDirectory(oldPathId, newName);
+        Result<Directory> result = _sut.RenameDirectory(oldPathId, newName);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(FileSystemItemStatus.Inaccessible, result.Value.Status);
         Assert.Equal(newPathId, result.Value.Id);
         Assert.False(result.Value.DateCreated.HasValue);
@@ -627,15 +654,15 @@ public class DirectoryServiceTests
         );
 
         _mockPlatformContext.PathStrategy.CombinePath(Arg.Any<FileSystemPathId>(), newName)
-            .Returns(ErrorOrFactory.From(newPathId));
+            .Returns(Result.From(newPathId));
         _mockEnvironmentContext.DirectoryProviderService.DirectoryExists(newPathId)
-            .Returns(ErrorOrFactory.From(true));
+            .Returns(Result.From(true));
 
         // Act
-        ErrorOr<Directory> result = _sut.RenameDirectory(oldPathId, newName);
+        Result<Directory> result = _sut.RenameDirectory(oldPathId, newName);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.DirectoryAlreadyExists, result.FirstError);
     }
 
@@ -652,10 +679,10 @@ public class DirectoryServiceTests
             .Returns(Errors.FileSystemManagement.InvalidPath);
 
         // Act
-        ErrorOr<Directory> result = _sut.RenameDirectory(oldPathId, newName);
+        Result<Directory> result = _sut.RenameDirectory(oldPathId, newName);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
 
         // Verify that DirectoryExists and RenameDirectory were not called
@@ -675,16 +702,16 @@ public class DirectoryServiceTests
             s_isUnix ? "/TestDir/NewName" : @"C:\TestDir\NewName"
         );
         _mockPlatformContext.PathStrategy.CombinePath(Arg.Any<FileSystemPathId>(), newName)
-            .Returns(ErrorOrFactory.From(newPathId));
+            .Returns(Result.From(newPathId));
 
         _mockEnvironmentContext.DirectoryProviderService.DirectoryExists(newPathId)
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        ErrorOr<Directory> result = _sut.RenameDirectory(oldPathId, newName);
+        Result<Directory> result = _sut.RenameDirectory(oldPathId, newName);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
 
         // Verify that RenameDirectory was not called
@@ -702,10 +729,10 @@ public class DirectoryServiceTests
             .Returns(Result.Deleted);
 
         // Act
-        ErrorOr<Deleted> result = _sut.DeleteDirectory(path);
+        Result<Deleted> result = _sut.DeleteDirectory(path);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(Result.Deleted, result.Value);
     }
 
@@ -716,10 +743,10 @@ public class DirectoryServiceTests
         string invalidPath = string.Empty;
 
         // Act
-        ErrorOr<Deleted> result = _sut.DeleteDirectory(invalidPath);
+        Result<Deleted> result = _sut.DeleteDirectory(invalidPath);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
     }
 
@@ -735,10 +762,10 @@ public class DirectoryServiceTests
             .Returns(Result.Deleted);
 
         // Act
-        ErrorOr<Deleted> result = _sut.DeleteDirectory(pathId);
+        Result<Deleted> result = _sut.DeleteDirectory(pathId);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(Result.Deleted, result.Value);
     }
 
@@ -754,10 +781,10 @@ public class DirectoryServiceTests
             .Returns(Errors.Permission.UnauthorizedAccess);
 
         // Act
-        ErrorOr<Deleted> result = _sut.DeleteDirectory(pathId);
+        Result<Deleted> result = _sut.DeleteDirectory(pathId);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
     }
 
@@ -773,10 +800,10 @@ public class DirectoryServiceTests
             .Returns(Errors.FileSystemManagement.DirectoryNotFound);
 
         // Act
-        ErrorOr<Deleted> result = _sut.DeleteDirectory(pathId);
+        Result<Deleted> result = _sut.DeleteDirectory(pathId);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.DirectoryNotFound, result.FirstError);
     }
 }

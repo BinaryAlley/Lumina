@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
@@ -17,7 +17,7 @@ namespace Lumina.Application.Core.Plugins.Queries.GetPlugins;
 /// <summary>
 /// Handler for the query to get all the detected plugins.
 /// </summary>
-public class GetPluginsQueryHandler : IQueryHandler<GetPluginsQuery, ErrorOr<IReadOnlyList<PluginResponse>>>
+public class GetPluginsQueryHandler : IQueryHandler<GetPluginsQuery, Result<IReadOnlyList<PluginResponse>>>
 {
     private readonly IUnitOfWork _unitOfWork;
 
@@ -36,14 +36,14 @@ public class GetPluginsQueryHandler : IQueryHandler<GetPluginsQuery, ErrorOr<IRe
     /// <param name="query">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a collection of <see cref="PluginResponse"/>, or an error.
+    /// An <see cref="Result{TValue}"/> containing either a collection of <see cref="PluginResponse"/>, or an error.
     /// </returns>
-    public async Task<ErrorOr<IReadOnlyList<PluginResponse>>> HandleAsync(GetPluginsQuery query, CancellationToken cancellationToken)
+    public async Task<Result<IReadOnlyList<PluginResponse>>> HandleAsync(GetPluginsQuery query, CancellationToken cancellationToken)
     {
         IPluginRepository pluginRepository = _unitOfWork.GetRepository<IPluginRepository>();
-        ErrorOr<IEnumerable<PluginEntity>> getPluginsResult = await pluginRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+        Result<IEnumerable<PluginEntity>> getPluginsResult = await pluginRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
         return getPluginsResult.Match(
-            plugins => ErrorOrFactory.From<IReadOnlyList<PluginResponse>>(plugins.Select(plugin => plugin.ToResponse()).ToList()),
+            plugins => Result.From<IReadOnlyList<PluginResponse>>(plugins.Select(plugin => plugin.ToResponse()).ToList()),
             errors => errors);
     }
 }

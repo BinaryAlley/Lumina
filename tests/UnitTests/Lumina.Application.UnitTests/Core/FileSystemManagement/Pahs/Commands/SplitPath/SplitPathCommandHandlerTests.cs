@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using ErrorOr;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.FileSystemManagement.Paths.Commands.SplitPath;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Pahs.Commands.SplitPath.Fixtures;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Pahs.Fixtures;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
-using Lumina.Application.Common.Infrastructure.Validation;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -54,18 +54,18 @@ public class SplitPathCommandHandlerTests
         IEnumerable<PathSegment> pathSegments = _pathSegmentFixture.CreateMany();
 
         _mockPathService.ParsePath(splitPathCommand.Path!)
-            .Returns(ErrorOrFactory.From(pathSegments));
+            .Returns(Result.From(pathSegments));
 
         // Act
-        ErrorOr<IEnumerable<PathSegmentResponse>> result = await _sut.HandleAsync(splitPathCommand, CancellationToken.None);
+        Result<IEnumerable<PathSegmentResponse>> result = await _sut.HandleAsync(splitPathCommand, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.IsAssignableFrom<IEnumerable<PathSegmentResponse>>(result.Value);
         Assert.Equal(pathSegments.Count(), result.Value.Count());
 
-        List<PathSegmentResponse> resultList = result.Value.ToList();
-        List<PathSegment> segmentsList = pathSegments.ToList();
+        List<PathSegmentResponse> resultList = [.. result.Value];
+        List<PathSegment> segmentsList = [.. pathSegments];
 
         for (int i = 0; i < resultList.Count; i++)
             Assert.Equal(segmentsList[i].Name, resultList[i].Path);
@@ -82,10 +82,10 @@ public class SplitPathCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<IEnumerable<PathSegmentResponse>> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<IEnumerable<PathSegmentResponse>> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
         _mockPathService.Received(1).ParsePath(command.Path!);
     }
@@ -95,15 +95,15 @@ public class SplitPathCommandHandlerTests
     {
         // Arrange
         SplitPathCommand command = _fixture.Create<SplitPathCommand>();
-        ErrorOr<IEnumerable<PathSegment>> emptyList = ErrorOrFactory.From(Enumerable.Empty<PathSegment>());
+        Result<IEnumerable<PathSegment>> emptyList = Result.From(Enumerable.Empty<PathSegment>());
         _mockPathService.ParsePath(command.Path!)
             .Returns(emptyList);
 
         // Act
-        ErrorOr<IEnumerable<PathSegmentResponse>> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<IEnumerable<PathSegmentResponse>> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Empty(result.Value);
         _mockPathService.Received(1).ParsePath(command.Path!);
     }

@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Errors;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -36,8 +36,8 @@ internal sealed class LibraryScanRepository : ILibraryScanRepository
     /// </summary>
     /// <param name="libraryScan">The library scan to add.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<ErrorOr<Created>> InsertAsync(LibraryScanEntity libraryScan, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Created>> InsertAsync(LibraryScanEntity libraryScan, CancellationToken cancellationToken)
     {
         bool libraryScanExists = await _luminaDbContext.LibraryScans.AnyAsync(
             repositoryScanLibrary => repositoryScanLibrary.Id == libraryScan.Id, cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -53,8 +53,8 @@ internal sealed class LibraryScanRepository : ILibraryScanRepository
     /// </summary>
     /// <param name="id">The id of the library scan to get.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a <see cref="LibraryScanEntity"/> identified by <paramref name="id"/>, or an error.</returns>
-    public async Task<ErrorOr<LibraryScanEntity?>> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="LibraryScanEntity"/> identified by <paramref name="id"/>, or an error.</returns>
+    public async Task<Result<LibraryScanEntity?>> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         return await _luminaDbContext.LibraryScans
             .Include(libraryScan => libraryScan.Library)
@@ -66,8 +66,8 @@ internal sealed class LibraryScanRepository : ILibraryScanRepository
     /// Gets the media library scans that belong to a media library identified by <paramref name="libraryId"/>, for the previous month, from the storage medium.
     /// </summary>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of <see cref="LibraryScanEntity"/>, or an error.</returns>
-    public async Task<ErrorOr<IEnumerable<LibraryScanEntity>>> GetPastMonthScansByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="LibraryScanEntity"/>, or an error.</returns>
+    public async Task<Result<IEnumerable<LibraryScanEntity>>> GetPastMonthScansByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken)
     {
         return await _luminaDbContext.LibraryScans
             .Include(library => library.Library)
@@ -79,8 +79,8 @@ internal sealed class LibraryScanRepository : ILibraryScanRepository
     /// Gets the media library scans that have a <see cref="LibraryScanJobStatus.Running"/> status, from the storage medium.
     /// </summary>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of <see cref="LibraryScanEntity"/>, or an error.</returns>
-    public async Task<ErrorOr<IEnumerable<LibraryScanEntity>>> GetRunningScansAsync(CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="LibraryScanEntity"/>, or an error.</returns>
+    public async Task<Result<IEnumerable<LibraryScanEntity>>> GetRunningScansAsync(CancellationToken cancellationToken)
     {
         return await _luminaDbContext.LibraryScans
             .Include(library => library.Library)
@@ -93,8 +93,8 @@ internal sealed class LibraryScanRepository : ILibraryScanRepository
     /// </summary>
     /// <param name="data">The media library scan to update.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<ErrorOr<Updated>> UpdateAsync(LibraryScanEntity data, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Updated>> UpdateAsync(LibraryScanEntity data, CancellationToken cancellationToken)
     {
         LibraryScanEntity? foundLibraryScan = await _luminaDbContext.LibraryScans
             .Include(libraryScan => libraryScan.Library)

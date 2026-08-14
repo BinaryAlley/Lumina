@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Domain.Common.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Cancellation;
@@ -57,12 +57,12 @@ internal class MediaLibraryScanningService : IMediaLibraryScanningService
     /// <param name="libraryType">The type of the media library to be scanned.</param>
     /// <param name="downloadMetadataFromWeb">Whether the library permits downloading data from the web, or not.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<ErrorOr<Success>> StartScanAsync(LibraryScan scan, LibraryType libraryType, bool downloadMetadataFromWeb, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Success>> StartScanAsync(LibraryScan scan, LibraryType libraryType, bool downloadMetadataFromWeb, CancellationToken cancellationToken)
     {
         // mark the scan itself as started
-        ErrorOr<Success> startScanResult = scan.StartScan();
-        if (startScanResult.IsError)
+        Result<Success> startScanResult = scan.StartScan();
+        if (startScanResult.IsFailure)
             return startScanResult.Errors;
 
         foreach (IDomainEvent domainEvent in scan.GetDomainEvents())
@@ -103,8 +103,8 @@ internal class MediaLibraryScanningService : IMediaLibraryScanningService
     /// Cancels <paramref name="scan"/>.
     /// </summary>
     /// <param name="scan">The media library scan to cancel.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public ErrorOr<Success> CancelScan(LibraryScan scan)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public Result<Success> CancelScan(LibraryScan scan)
     {
         // trigger the process that cancels the jobs of the scan
         _mediaLibrariesScanCancellationTracker.CancelScan(MediaLibraryScanCompositeId.Create(scan.Id, scan.UserId));

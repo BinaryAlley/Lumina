@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.CQRS;
+using Lumina.Application.Common.Mapping.MediaLibrary.Management;
+using Lumina.Application.Core.MediaLibrary.Management.Commands.DeleteLibrary;
 using Lumina.Contracts.Requests.MediaLibrary.Management;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Common.Routes.Library.Management;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
-using Lumina.Application.Common.Mapping.MediaLibrary.Management;
-using Lumina.Application.Core.MediaLibrary.Management.Commands.DeleteLibrary;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -18,13 +18,13 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Library.Management.DeleteLibrar
 /// </summary>
 public class DeleteLibraryEndpoint : BaseEndpoint<DeleteLibraryRequest, IResult>
 {
-    private readonly ICommandHandler<DeleteLibraryCommand, ErrorOr<Deleted>> _deleteLibraryCommandHandler;
+    private readonly ICommandHandler<DeleteLibraryCommand, Result<Deleted>> _deleteLibraryCommandHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DeleteLibraryEndpoint"/> class.
     /// </summary>
     /// <param name="deleteLibraryCommandHandler">Injected service for handling delete library commands.</param>
-    public DeleteLibraryEndpoint(ICommandHandler<DeleteLibraryCommand, ErrorOr<Deleted>> deleteLibraryCommandHandler)
+    public DeleteLibraryEndpoint(ICommandHandler<DeleteLibraryCommand, Result<Deleted>> deleteLibraryCommandHandler)
     {
         _deleteLibraryCommandHandler = deleteLibraryCommandHandler;
     }
@@ -47,7 +47,7 @@ public class DeleteLibraryEndpoint : BaseEndpoint<DeleteLibraryRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(DeleteLibraryRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<Deleted> result = await _deleteLibraryCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
+        Result<Deleted> result = await _deleteLibraryCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

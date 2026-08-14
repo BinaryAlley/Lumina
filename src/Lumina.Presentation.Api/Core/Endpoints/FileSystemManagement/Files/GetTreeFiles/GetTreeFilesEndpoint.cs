@@ -1,10 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Files;
 using Lumina.Application.Core.FileSystemManagement.Files.Queries.GetTreeFiles;
 using Lumina.Contracts.Requests.FileSystemManagement.Files;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Common.Routes.FileSystemManagement;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
@@ -20,13 +21,13 @@ namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Files.GetT
 /// </summary>
 public class GetTreeFilesEndpoint : BaseEndpoint<GetTreeFilesRequest, IResult>
 {
-    private readonly IQueryHandler<GetTreeFilesQuery, ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>> _getTreeFilesQueryHandler;
+    private readonly IQueryHandler<GetTreeFilesQuery, Result<IEnumerable<FileSystemTreeNodeResponse>>> _getTreeFilesQueryHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetTreeFilesEndpoint"/> class.
     /// </summary>
     /// <param name="getTreeFilesQueryHandler">Injected service for handling get tree files queries.</param>
-    public GetTreeFilesEndpoint(IQueryHandler<GetTreeFilesQuery, ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>> getTreeFilesQueryHandler)
+    public GetTreeFilesEndpoint(IQueryHandler<GetTreeFilesQuery, Result<IEnumerable<FileSystemTreeNodeResponse>>> getTreeFilesQueryHandler)
     {
         _getTreeFilesQueryHandler = getTreeFilesQueryHandler;
     }
@@ -36,7 +37,7 @@ public class GetTreeFilesEndpoint : BaseEndpoint<GetTreeFilesRequest, IResult>
     /// </summary>
     public override void Configure()
     {
-        Verbs(FastEndpoints.Http.GET);
+        Verbs(Http.GET);
         Routes(ApiRoutes.Files.GET_TREE_FILES);
         Version(1);
         DontCatchExceptions();
@@ -49,7 +50,7 @@ public class GetTreeFilesEndpoint : BaseEndpoint<GetTreeFilesRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(GetTreeFilesRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _getTreeFilesQueryHandler.HandleAsync(request.ToQuery(), cancellationToken).ConfigureAwait(false);
+        Result<IEnumerable<FileSystemTreeNodeResponse>> result = await _getTreeFilesQueryHandler.HandleAsync(request.ToQuery(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

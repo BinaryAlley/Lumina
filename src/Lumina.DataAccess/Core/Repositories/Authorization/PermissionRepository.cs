@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Repositories.Authorization;
 using Lumina.Application.Common.Errors;
@@ -35,8 +35,8 @@ internal sealed class PermissionRepository : IPermissionRepository
     /// </summary>
     /// <param name="permission">The authorization permission to add.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<ErrorOr<Created>> InsertAsync(PermissionEntity permission, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Created>> InsertAsync(PermissionEntity permission, CancellationToken cancellationToken)
     {
         bool permissionExists = await _luminaDbContext.Permissions.AnyAsync(repositoryPermission => repositoryPermission.Id == permission.Id, cancellationToken).ConfigureAwait(false);
         if (permissionExists)
@@ -50,8 +50,8 @@ internal sealed class PermissionRepository : IPermissionRepository
     /// Gets all autorization permissions.
     /// </summary>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of <see cref="PermissionEntity"/>, or an error.</returns>
-    public async Task<ErrorOr<IEnumerable<PermissionEntity>>> GetAllAsync(CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="PermissionEntity"/>, or an error.</returns>
+    public async Task<Result<IEnumerable<PermissionEntity>>> GetAllAsync(CancellationToken cancellationToken)
     {
         return await _luminaDbContext.Permissions.ToListAsync(cancellationToken).ConfigureAwait(false);
     }
@@ -61,8 +61,8 @@ internal sealed class PermissionRepository : IPermissionRepository
     /// </summary>
     /// <param name="ids">The list of Ids of the permissions to get.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of <see cref="PermissionEntity"/>, or an error.</returns>
-    public async Task<ErrorOr<IEnumerable<PermissionEntity>>> GetByIdsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="PermissionEntity"/>, or an error.</returns>
+    public async Task<Result<IEnumerable<PermissionEntity>>> GetByIdsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken)
     {
         return await _luminaDbContext.Permissions.Where(permission => ids.Contains(permission.Id)).ToListAsync(cancellationToken).ConfigureAwait(false);
     }

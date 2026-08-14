@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.Models.Core;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
 using System.Diagnostics;
@@ -33,9 +33,9 @@ public sealed class User : AggregateRoot<UserId>
     /// </summary>
     /// <param name="username">The username of the user.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="User"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="User"/>, or an error message.
     /// </returns>
-    public static ErrorOr<User> Create(string username)
+    public static Result<User> Create(string username)
     {
         return new User(UserId.CreateUnique(), username);
     }
@@ -46,9 +46,9 @@ public sealed class User : AggregateRoot<UserId>
     /// <param name="id">The object representing the unique identifier of the user.</param>
     /// <param name="username">The username of the user.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="User"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="User"/>, or an error message.
     /// </returns>
-    public static ErrorOr<User> Create(UserId id, string username)
+    public static Result<User> Create(UserId id, string username)
     {
         return new User(id, username);
     }

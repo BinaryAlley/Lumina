@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Common;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Directories.Fixtures;
-using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -33,10 +33,10 @@ public class FileSystemTreeNodeResponseMappingTests
         FileSystemTreeNodeResponse response = _fileSystemTreeNodeResponseFixture.Create();
 
         // Act
-        ErrorOr<WindowsRootItem> result = response.ToWindowsRootItem();
+        Result<WindowsRootItem> result = response.ToWindowsRootItem();
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(response.Path, result.Value.Id.Path);
         Assert.Equal(response.Name, result.Value.Name);
@@ -50,10 +50,10 @@ public class FileSystemTreeNodeResponseMappingTests
         FileSystemTreeNodeResponse response = _fileSystemTreeNodeResponseFixture.Create();
 
         // Act
-        ErrorOr<UnixRootItem> result = response.ToUnixRootItem();
+        Result<UnixRootItem> result = response.ToUnixRootItem();
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(FileSystemItemStatus.Accessible, result.Value.Status);
     }

@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.Infrastructure.Validation;
+using Lumina.Domain.Common.Primitives;
 using System.Collections.Generic;
 #endregion
 

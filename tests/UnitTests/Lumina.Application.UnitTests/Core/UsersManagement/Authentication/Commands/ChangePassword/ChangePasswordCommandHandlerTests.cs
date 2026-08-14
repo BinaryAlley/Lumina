@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -9,6 +8,7 @@ using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.UsersManagement.Authentication.Commands.ChangePassword;
 using Lumina.Application.UnitTests.Common.Mapping.UserManagement.Users.Fixtures;
 using Lumina.Contracts.Responses.Authentication;
+using Lumina.Domain.Common.Primitives;
 using NSubstitute;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -68,7 +68,7 @@ public class ChangePasswordCommandHandlerTests
             newPassword);
 
         _mockUserRepository.GetByUsernameAsync(user.Username, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From<UserEntity?>(user));
+            .Returns(Result.From<UserEntity?>(user));
         _mockHashService.CheckStringAgainstHash(currentPassword, "hashedCurrentPassword")
             .Returns(true);
         _mockHashService.HashString(newPassword)
@@ -77,10 +77,10 @@ public class ChangePasswordCommandHandlerTests
             .Returns(Result.Updated);
 
         // Act
-        ErrorOr<ChangePasswordResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<ChangePasswordResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.True(result.Value.IsPasswordChanged);
 
         await _mockUserRepository.Received(1).GetByUsernameAsync(user.Username, Arg.Any<CancellationToken>());
@@ -97,13 +97,13 @@ public class ChangePasswordCommandHandlerTests
         ChangePasswordCommand command = new("nonexistentUser", "oldPass", "newPass", "newPass");
 
         _mockUserRepository.GetByUsernameAsync(command.Username!, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From<UserEntity?>(null));
+            .Returns(Result.From<UserEntity?>(null));
 
         // Act
-        ErrorOr<ChangePasswordResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<ChangePasswordResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Authentication.UsernameDoesNotExist, result.FirstError);
 
         await _mockUserRepository.Received(1).GetByUsernameAsync(command.Username!, Arg.Any<CancellationToken>());
@@ -125,15 +125,15 @@ public class ChangePasswordCommandHandlerTests
             "newPass");
 
         _mockUserRepository.GetByUsernameAsync(user.Username, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From<UserEntity?>(user));
+            .Returns(Result.From<UserEntity?>(user));
         _mockHashService.CheckStringAgainstHash(incorrectPassword, Uri.UnescapeDataString(user.Password))
             .Returns(false);
 
         // Act
-        ErrorOr<ChangePasswordResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<ChangePasswordResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Authentication.InvalidCurrentPassword, result.FirstError);
 
         await _mockUserRepository.Received(1).GetByUsernameAsync(user.Username, Arg.Any<CancellationToken>());
@@ -161,17 +161,17 @@ public class ChangePasswordCommandHandlerTests
             newPassword);
 
         _mockUserRepository.GetByUsernameAsync(user.Username, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From<UserEntity?>(user));
+            .Returns(Result.From<UserEntity?>(user));
         _mockHashService.CheckStringAgainstHash(currentPassword, "hashedCurrentPassword")
             .Returns(true);
         _mockUserRepository.UpdateAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>())
             .Returns(error);
 
         // Act
-        ErrorOr<ChangePasswordResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<ChangePasswordResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
 
         await _mockUserRepository.Received(1).GetByUsernameAsync(user.Username, Arg.Any<CancellationToken>());
@@ -198,10 +198,10 @@ public class ChangePasswordCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<ChangePasswordResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<ChangePasswordResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
 
         await _mockUserRepository.Received(1).GetByUsernameAsync(command.Username!, Arg.Any<CancellationToken>());

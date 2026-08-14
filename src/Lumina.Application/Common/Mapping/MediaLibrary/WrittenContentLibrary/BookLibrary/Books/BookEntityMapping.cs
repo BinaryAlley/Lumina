@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
@@ -8,7 +8,7 @@ using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
-using Lumina.Domain.Common.Primitives;
+
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Entities;
@@ -31,31 +31,31 @@ public static class BookEntityMapping
     /// </summary>
     /// <param name="repositoryEntity">The repository entity to be converted.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully converted <see cref="Book"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully converted <see cref="Book"/>, or an error message.
     /// </returns>
-    public static ErrorOr<Book> ToDomainEntity(this BookEntity repositoryEntity)
+    public static Result<Book> ToDomainEntity(this BookEntity repositoryEntity)
     {
-        IEnumerable<ErrorOr<Tag>> tagsResult = repositoryEntity.Tags.ToDomainEntities();
-        foreach (ErrorOr<Tag> tagResult in tagsResult)
-            if (tagResult.IsError)
+        IEnumerable<Result<Tag>> tagsResult = repositoryEntity.Tags.ToDomainEntities();
+        foreach (Result<Tag> tagResult in tagsResult)
+            if (tagResult.IsFailure)
                 return tagResult.Errors;
 
-        IEnumerable<ErrorOr<Genre>> genresResult = repositoryEntity.Genres.ToDomainEntities();
-        foreach (ErrorOr<Genre> genreResult in genresResult)
-            if (genreResult.IsError)
+        IEnumerable<Result<Genre>> genresResult = repositoryEntity.Genres.ToDomainEntities();
+        foreach (Result<Genre> genreResult in genresResult)
+            if (genreResult.IsFailure)
                 return genreResult.Errors;
 
-        IEnumerable<ErrorOr<Isbn>> isbnsResult = repositoryEntity.ISBNs.ToDomainEntities();
-        foreach (ErrorOr<Isbn> isbnResult in isbnsResult)
-            if (isbnResult.IsError)
+        IEnumerable<Result<Isbn>> isbnsResult = repositoryEntity.ISBNs.ToDomainEntities();
+        foreach (Result<Isbn> isbnResult in isbnsResult)
+            if (isbnResult.IsFailure)
                 return isbnResult.Errors;
 
-        IEnumerable<ErrorOr<BookRating>> bookRatingsResult = repositoryEntity.Ratings.ToDomainEntities();
-        foreach (ErrorOr<BookRating> bookRatingResult in bookRatingsResult)
-            if (bookRatingResult.IsError)
+        IEnumerable<Result<BookRating>> bookRatingsResult = repositoryEntity.Ratings.ToDomainEntities();
+        foreach (Result<BookRating> bookRatingResult in bookRatingsResult)
+            if (bookRatingResult.IsFailure)
                 return bookRatingResult.Errors;
 
-        ErrorOr<ReleaseInfo> releaseInfoResult = ReleaseInfo.Create(
+        Result<ReleaseInfo> releaseInfoResult = ReleaseInfo.Create(
                     Optional<DateOnly>.FromNullable(repositoryEntity.OriginalReleaseDate),
                     Optional<int>.FromNullable(repositoryEntity.OriginalReleaseYear),
                     Optional<DateOnly>.FromNullable(repositoryEntity.ReReleaseDate),
@@ -63,18 +63,18 @@ public static class BookEntityMapping
                     Optional<string>.FromNullable(repositoryEntity.ReleaseCountry),
                     Optional<string>.FromNullable(repositoryEntity.ReleaseVersion)
                 );
-        if (releaseInfoResult.IsError)
+        if (releaseInfoResult.IsFailure)
             return releaseInfoResult.Errors;
 
         Optional<LanguageInfo> languageInfo = Optional<LanguageInfo>.None();
         if (repositoryEntity.LanguageCode is not null)
         {
-            ErrorOr<LanguageInfo> languageInfoResult = LanguageInfo.Create(
+            Result<LanguageInfo> languageInfoResult = LanguageInfo.Create(
                     repositoryEntity.LanguageCode,
                     repositoryEntity.LanguageName,
                     Optional<string>.FromNullable(repositoryEntity.LanguageNativeName)
                 );
-            if (languageInfoResult.IsError)
+            if (languageInfoResult.IsFailure)
                 return languageInfoResult.Errors;
             languageInfo = languageInfoResult.Value;
         }
@@ -82,29 +82,29 @@ public static class BookEntityMapping
         Optional<LanguageInfo> originalLanguageCode = Optional<LanguageInfo>.None();
         if (repositoryEntity.OriginalLanguageCode is not null)
         {
-            ErrorOr<LanguageInfo> originalLanguageInfoResult = LanguageInfo.Create(
+            Result<LanguageInfo> originalLanguageInfoResult = LanguageInfo.Create(
                     repositoryEntity.OriginalLanguageCode,
                     repositoryEntity.OriginalLanguageName!,
                     Optional<string>.FromNullable(repositoryEntity.OriginalLanguageNativeName)
                 );
-            if (originalLanguageInfoResult.IsError)
+            if (originalLanguageInfoResult.IsFailure)
                 return originalLanguageInfoResult.Errors;
             originalLanguageCode = originalLanguageInfoResult.Value;
         }
 
-        ErrorOr<WrittenContentMetadata> writtenContentMetadataResult = WrittenContentMetadata.Create(
+        Result<WrittenContentMetadata> writtenContentMetadataResult = WrittenContentMetadata.Create(
                 repositoryEntity.Title,
                 Optional<string>.FromNullable(repositoryEntity.OriginalTitle),
                 Optional<string>.FromNullable(repositoryEntity.Description),
                 releaseInfoResult.Value,
-                genresResult.Select(genre => genre.Value).ToList(),
-                tagsResult.Select(tag => tag.Value).ToList(),
+                [.. genresResult.Select(genre => genre.Value)],
+                [.. tagsResult.Select(tag => tag.Value)],
                 languageInfo,
                 originalLanguageCode,
                 Optional<string>.FromNullable(repositoryEntity.Publisher),
                 Optional<int>.FromNullable(repositoryEntity.PageCount)
             );
-        if (writtenContentMetadataResult.IsError)
+        if (writtenContentMetadataResult.IsFailure)
             return writtenContentMetadataResult.Errors;
 
         Optional<BookFormat> bookFormat = Optional<BookFormat>.FromNullable(repositoryEntity.Format);
@@ -129,9 +129,9 @@ public static class BookEntityMapping
             Optional<string>.FromNullable(repositoryEntity.AppleBooksId),
             repositoryEntity.CreatedOnUtc,
             Optional<DateTime>.FromNullable(repositoryEntity.UpdatedOnUtc),
-            isbnsResult.Select(isbn => isbn.Value).ToList(),
+            [.. isbnsResult.Select(isbn => isbn.Value)],
             [],
-            bookRatingsResult.Select(bookRating => bookRating.Value).ToList());
+            [.. bookRatingsResult.Select(bookRating => bookRating.Value)]);
     }
 
     /// <summary>
@@ -140,9 +140,9 @@ public static class BookEntityMapping
     /// <param name="repositoryEntities">The repository entities to be converted.</param>
     /// <returns>The converted domain entities.</returns>
     /// <returns>
-    /// An colection of <see cref="ErrorOr{TValue}"/> containing either a collection of converted <see cref="Book"/>, or error messages.
+    /// An colection of <see cref="Result{TValue}"/> containing either a collection of converted <see cref="Book"/>, or error messages.
     /// </returns>
-    public static IEnumerable<ErrorOr<Book>> ToDomainEntities(this IEnumerable<BookEntity> repositoryEntities)
+    public static IEnumerable<Result<Book>> ToDomainEntities(this IEnumerable<BookEntity> repositoryEntities)
     {
         return repositoryEntities.Select(repositoryEntity => repositoryEntity.ToDomainEntity());
     }

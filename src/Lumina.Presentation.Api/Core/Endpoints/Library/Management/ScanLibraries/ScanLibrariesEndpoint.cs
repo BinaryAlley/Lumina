@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.MediaLibrary.Management.Commands.ScanLibraries;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
@@ -18,13 +18,13 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Library.Management.ScanLibrarie
 /// </summary>
 public class ScanLibrariesEndpoint : BaseEndpoint<FastEndpoints.EmptyRequest, IResult>
 {
-    private readonly ICommandHandler<ScanLibrariesCommand, ErrorOr<IEnumerable<MediaLibraryScanResponse>>> _scanLibrariesCommandHandler;
+    private readonly ICommandHandler<ScanLibrariesCommand, Result<IEnumerable<MediaLibraryScanResponse>>> _scanLibrariesCommandHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ScanLibrariesEndpoint"/> class.
     /// </summary>
     /// <param name="scanLibrariesCommandHandler">Injected service for handling scan libraries commands.</param>
-    public ScanLibrariesEndpoint(ICommandHandler<ScanLibrariesCommand, ErrorOr<IEnumerable<MediaLibraryScanResponse>>> scanLibrariesCommandHandler)
+    public ScanLibrariesEndpoint(ICommandHandler<ScanLibrariesCommand, Result<IEnumerable<MediaLibraryScanResponse>>> scanLibrariesCommandHandler)
     {
         _scanLibrariesCommandHandler = scanLibrariesCommandHandler;
     }
@@ -46,7 +46,7 @@ public class ScanLibrariesEndpoint : BaseEndpoint<FastEndpoints.EmptyRequest, IR
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(FastEndpoints.EmptyRequest _, CancellationToken cancellationToken)
     {
-        ErrorOr<IEnumerable<MediaLibraryScanResponse>> result = await _scanLibrariesCommandHandler.HandleAsync(new ScanLibrariesCommand(), cancellationToken).ConfigureAwait(false);
+        Result<IEnumerable<MediaLibraryScanResponse>> result = await _scanLibrariesCommandHandler.HandleAsync(new ScanLibrariesCommand(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

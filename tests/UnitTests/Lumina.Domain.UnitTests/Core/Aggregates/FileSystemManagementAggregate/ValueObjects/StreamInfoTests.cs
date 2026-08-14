@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.ValueObjects.Fixtures;
@@ -40,10 +39,10 @@ public class StreamInfoTests
         Optional<int> channels = Optional<int>.Some(2);
 
         // Act
-        ErrorOr<StreamInfo> result = StreamInfo.Create(streamId, mimeType, bitrate, codec, resolution, frameRate, sampleRate, channels);
+        Result<StreamInfo> result = StreamInfo.Create(streamId, mimeType, bitrate, codec, resolution, frameRate, sampleRate, channels);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(streamId, result.Value.StreamId);
         Assert.Equal(mimeType, result.Value.MimeType);
         Assert.Equal(bitrate, result.Value.Bitrate);
@@ -64,10 +63,10 @@ public class StreamInfoTests
         string codec = "h264";
 
         // Act
-        ErrorOr<StreamInfo> result = StreamInfo.Create(streamId!, mimeType, bitrate, codec, Optional<string>.None(), Optional<float>.None(), Optional<int>.None(), Optional<int>.None());
+        Result<StreamInfo> result = StreamInfo.Create(streamId!, mimeType, bitrate, codec, Optional<string>.None(), Optional<float>.None(), Optional<int>.None(), Optional<int>.None());
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.StreamIdCannotBeEmpty, result.FirstError);
     }
 
@@ -81,10 +80,10 @@ public class StreamInfoTests
         string? codec = null;
 
         // Act
-        ErrorOr<StreamInfo> result = StreamInfo.Create(streamId, mimeType, bitrate, codec!, Optional<string>.None(), Optional<float>.None(), Optional<int>.None(), Optional<int>.None());
+        Result<StreamInfo> result = StreamInfo.Create(streamId, mimeType, bitrate, codec!, Optional<string>.None(), Optional<float>.None(), Optional<int>.None(), Optional<int>.None());
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.CodecCannotBeEmpty, result.FirstError);
     }
 
@@ -98,10 +97,10 @@ public class StreamInfoTests
         string codec = "h264";
 
         // Act
-        ErrorOr<StreamInfo> result = StreamInfo.Create(streamId, mimeType, bitrate, codec, Optional<string>.None(), Optional<float>.None(), Optional<int>.None(), Optional<int>.None());
+        Result<StreamInfo> result = StreamInfo.Create(streamId, mimeType, bitrate, codec, Optional<string>.None(), Optional<float>.None(), Optional<int>.None(), Optional<int>.None());
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.BitrateMustBeAPositiveNumber, result.FirstError);
     }
 

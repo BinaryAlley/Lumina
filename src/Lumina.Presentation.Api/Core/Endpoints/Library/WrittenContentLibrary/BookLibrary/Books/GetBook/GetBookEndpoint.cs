@@ -33,7 +33,7 @@ public class GetBookEndpoint : BaseEndpoint<GetBookRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(GetBookRequest request, CancellationToken cancellationToken)
     {
-        //ErrorOr<Book> result = await _sender.Send(request.ToCommand(), cancellationToken).ConfigureAwait(false);
+        //Result<Book> result = await _sender.Send(request.ToCommand(), cancellationToken).ConfigureAwait(false);
         //return result.Match(success => TypedResults.CreatedAtRoute($"/api/v1/books/{success.Id}", success), Problem);
         return await Task.FromResult(TypedResults.Ok());
     }

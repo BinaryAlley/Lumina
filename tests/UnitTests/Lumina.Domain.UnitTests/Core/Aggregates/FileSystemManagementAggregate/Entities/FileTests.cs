@@ -1,10 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
-using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
@@ -28,10 +27,10 @@ public class FileTests
         long size = 1024;
 
         // Act
-        ErrorOr<File> result = File.Create(path, name, dateCreated, dateModified, size);
+        Result<File> result = File.Create(path, name, dateCreated, dateModified, size);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(name, result.Value.Name);
         Assert.Equal(dateCreated, result.Value.DateCreated);
@@ -51,10 +50,10 @@ public class FileTests
         long size = 1024;
 
         // Act
-        ErrorOr<File> result = File.Create(invalidPath, name, dateCreated, dateModified, size);
+        Result<File> result = File.Create(invalidPath, name, dateCreated, dateModified, size);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
     }
 
@@ -62,8 +61,8 @@ public class FileTests
     public void Create_WhenCalledWithFileSystemPathId_ShouldReturnSuccessfulResult()
     {
         // Arrange
-        ErrorOr<FileSystemPathId> pathIdResult = FileSystemPathId.Create("/valid/path/file.txt");
-        Assert.False(pathIdResult.IsError);
+        Result<FileSystemPathId> pathIdResult = FileSystemPathId.Create("/valid/path/file.txt");
+        Assert.False(pathIdResult.IsFailure);
         FileSystemPathId pathId = pathIdResult.Value;
         string name = "file.txt";
         Optional<DateTime> dateCreated = DateTime.Now;
@@ -71,10 +70,10 @@ public class FileTests
         long size = 1024;
 
         // Act
-        ErrorOr<File> result = File.Create(pathId, name, dateCreated, dateModified, size);
+        Result<File> result = File.Create(pathId, name, dateCreated, dateModified, size);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(pathId, result.Value.Id);
         Assert.Equal(name, result.Value.Name);
@@ -88,16 +87,16 @@ public class FileTests
     public void UpdateLastModified_WhenCalled_ShouldUpdateDateModified()
     {
         // Arrange
-        ErrorOr<File> fileResult = File.Create("/valid/path/file.txt", "file.txt", Optional<DateTime>.None(), Optional<DateTime>.None(), 1024);
-        Assert.False(fileResult.IsError);
+        Result<File> fileResult = File.Create("/valid/path/file.txt", "file.txt", Optional<DateTime>.None(), Optional<DateTime>.None(), 1024);
+        Assert.False(fileResult.IsFailure);
         File file = fileResult.Value;
         DateTime newDate = DateTime.Now;
 
         // Act
-        ErrorOr<Updated> result = file.UpdateLastModified(newDate);
+        Result<Updated> result = file.UpdateLastModified(newDate);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(newDate, file.DateModified.Value);
     }
 
@@ -105,16 +104,16 @@ public class FileTests
     public void UpdateSize_WhenCalled_ShouldUpdateFileSize()
     {
         // Arrange
-        ErrorOr<File> fileResult = File.Create("/valid/path/file.txt", "file.txt", Optional<DateTime>.None(), Optional<DateTime>.None(), 1024);
-        Assert.False(fileResult.IsError);
+        Result<File> fileResult = File.Create("/valid/path/file.txt", "file.txt", Optional<DateTime>.None(), Optional<DateTime>.None(), 1024);
+        Assert.False(fileResult.IsFailure);
         File file = fileResult.Value;
         long newSize = 2048;
 
         // Act
-        ErrorOr<Updated> result = file.UpdateSize(newSize);
+        Result<Updated> result = file.UpdateSize(newSize);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(newSize, file.Size);
     }
 
@@ -122,16 +121,16 @@ public class FileTests
     public void Rename_WhenCalledWithValidName_ShouldUpdateFileName()
     {
         // Arrange
-        ErrorOr<File> fileResult = File.Create("/valid/path/file.txt", "file.txt", Optional<DateTime>.None(), Optional<DateTime>.None(), 1024);
-        Assert.False(fileResult.IsError);
+        Result<File> fileResult = File.Create("/valid/path/file.txt", "file.txt", Optional<DateTime>.None(), Optional<DateTime>.None(), 1024);
+        Assert.False(fileResult.IsFailure);
         File file = fileResult.Value;
         string newName = "newfile.txt";
 
         // Act
-        ErrorOr<Updated> result = file.Rename(newName);
+        Result<Updated> result = file.Rename(newName);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(newName, file.Name);
     }
 
@@ -139,16 +138,16 @@ public class FileTests
     public void Rename_WhenCalledWithEmptyName_ShouldReturnError()
     {
         // Arrange
-        ErrorOr<File> fileResult = File.Create("/valid/path/file.txt", "file.txt", Optional<DateTime>.None(), Optional<DateTime>.None(), 1024);
-        Assert.False(fileResult.IsError);
+        Result<File> fileResult = File.Create("/valid/path/file.txt", "file.txt", Optional<DateTime>.None(), Optional<DateTime>.None(), 1024);
+        Assert.False(fileResult.IsFailure);
         File file = fileResult.Value;
         string emptyName = "";
 
         // Act
-        ErrorOr<Updated> result = file.Rename(emptyName);
+        Result<Updated> result = file.Rename(emptyName);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.NameCannotBeEmpty, result.FirstError);
         Assert.Equal("file.txt", file.Name);
     }

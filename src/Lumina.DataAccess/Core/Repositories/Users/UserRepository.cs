@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Errors;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -35,8 +35,8 @@ internal sealed class UserRepository : IUserRepository
     /// </summary>
     /// <param name="user">The user to add.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<ErrorOr<Created>> InsertAsync(UserEntity user, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Created>> InsertAsync(UserEntity user, CancellationToken cancellationToken)
     {
         bool userExists = await _luminaDbContext.Users.AnyAsync(repositoryUser => repositoryUser.Id == user.Id, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (userExists)
@@ -50,8 +50,8 @@ internal sealed class UserRepository : IUserRepository
     /// Gets all users.
     /// </summary>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of <see cref="UserEntity"/>, or an error.</returns>
-    public async Task<ErrorOr<IEnumerable<UserEntity>>> GetAllAsync(CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="UserEntity"/>, or an error.</returns>
+    public async Task<Result<IEnumerable<UserEntity>>> GetAllAsync(CancellationToken cancellationToken)
     {
         return await _luminaDbContext.Users.ToListAsync(cancellationToken).ConfigureAwait(false);
     }
@@ -61,8 +61,8 @@ internal sealed class UserRepository : IUserRepository
     /// </summary>
     /// <param name="username">The username of the user to get.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a <see cref="UserEntity"/> if found, or an error.</returns>
-    public async Task<ErrorOr<UserEntity?>> GetByUsernameAsync(string username, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="UserEntity"/> if found, or an error.</returns>
+    public async Task<Result<UserEntity?>> GetByUsernameAsync(string username, CancellationToken cancellationToken)
     {
         return await _luminaDbContext.Users
             .Include(user => user.Libraries)
@@ -80,8 +80,8 @@ internal sealed class UserRepository : IUserRepository
     /// </summary>
     /// <param name="data">Ther user to update.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<ErrorOr<Updated>> UpdateAsync(UserEntity data, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Updated>> UpdateAsync(UserEntity data, CancellationToken cancellationToken)
     {
         UserEntity? foundUser = await _luminaDbContext.Users
             .Include(user => user.Libraries)
@@ -135,8 +135,8 @@ internal sealed class UserRepository : IUserRepository
     /// </summary>
     /// <param name="id">The id of the user to get.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a <see cref="UserEntity"/> identified by <paramref name="id"/>, or an error.</returns>
-    public async Task<ErrorOr<UserEntity?>> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="UserEntity"/> identified by <paramref name="id"/>, or an error.</returns>
+    public async Task<Result<UserEntity?>> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         return await _luminaDbContext.Users
             .Include(user => user.Libraries)

@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using ErrorOr;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook;
 using Lumina.Application.UnitTests.Common.Setup;
 using Lumina.Application.UnitTests.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook.Fixtures;
+using Lumina.Domain.Common.Errors;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
-using Lumina.Domain.SharedKernel.Common.Errors;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -409,7 +409,7 @@ public class AddBookCommandValidatorTests
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
-        bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { Genres = bookCommand.Metadata.Genres!.Select((genre, index) => index == 0 ? genre with { Name = string.Empty } : genre).ToList() } };
+        bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { Genres = [.. bookCommand.Metadata.Genres!.Select((genre, index) => index == 0 ? genre with { Name = string.Empty } : genre)] } };
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -423,7 +423,7 @@ public class AddBookCommandValidatorTests
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
-        bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { Genres = bookCommand.Metadata.Genres!.Select((genre, index) => index == 0 ? genre with { Name = new Faker().Random.String2(51) } : genre).ToList() } };
+        bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { Genres = [.. bookCommand.Metadata.Genres!.Select((genre, index) => index == 0 ? genre with { Name = new Faker().Random.String2(51) } : genre)] } };
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -441,7 +441,7 @@ public class AddBookCommandValidatorTests
         {
             Metadata = bookCommand.Metadata! with
             {
-                Genres = bookCommand.Metadata.Genres!.Select((genre, index) => index == 0 ? genre with { Name = new Faker().Random.String2(50) } : genre).ToList()
+                Genres = [.. bookCommand.Metadata.Genres!.Select((genre, index) => index == 0 ? genre with { Name = new Faker().Random.String2(50) } : genre)]
             }
         };
 
@@ -471,7 +471,7 @@ public class AddBookCommandValidatorTests
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
-        bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { Tags = bookCommand.Metadata.Tags!.Select((tag, index) => index == 0 ? tag with { Name = string.Empty } : tag).ToList() } };
+        bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { Tags = [.. bookCommand.Metadata.Tags!.Select((tag, index) => index == 0 ? tag with { Name = string.Empty } : tag)] } };
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -485,7 +485,7 @@ public class AddBookCommandValidatorTests
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
-        bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { Tags = bookCommand.Metadata.Tags!.Select((tag, index) => index == 0 ? tag with { Name = new Faker().Random.String2(51) } : tag).ToList() } };
+        bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { Tags = [.. bookCommand.Metadata.Tags!.Select((tag, index) => index == 0 ? tag with { Name = new Faker().Random.String2(51) } : tag)] } };
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -503,7 +503,7 @@ public class AddBookCommandValidatorTests
         {
             Metadata = bookCommand.Metadata! with
             {
-                Tags = bookCommand.Metadata.Tags!.Select((tag, index) => index == 0 ? tag with { Name = new Faker().Random.String2(50) } : tag).ToList()
+                Tags = [.. bookCommand.Metadata.Tags!.Select((tag, index) => index == 0 ? tag with { Name = new Faker().Random.String2(50) } : tag)]
             }
         };
 
@@ -1569,7 +1569,7 @@ public class AddBookCommandValidatorTests
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
-        bookCommand = bookCommand with { ISBNs = bookCommand.ISBNs!.Select((isbn, index) => index == 0 ? isbn with { Value = null! } : isbn).ToList() };
+        bookCommand = bookCommand with { ISBNs = [.. bookCommand.ISBNs!.Select((isbn, index) => index == 0 ? isbn with { Value = null! } : isbn)] };
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -1583,7 +1583,7 @@ public class AddBookCommandValidatorTests
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
-        bookCommand = bookCommand with { ISBNs = bookCommand.ISBNs!.Select((isbn, index) => index == 0 ? isbn with { Value = new Faker().Random.String2(5), Format = IsbnFormat.Isbn10 } : isbn).ToList() };
+        bookCommand = bookCommand with { ISBNs = [.. bookCommand.ISBNs!.Select((isbn, index) => index == 0 ? isbn with { Value = new Faker().Random.String2(5), Format = IsbnFormat.Isbn10 } : isbn)] };
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -1597,7 +1597,7 @@ public class AddBookCommandValidatorTests
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
-        bookCommand = bookCommand with { ISBNs = bookCommand.ISBNs!.Select((isbn, index) => index == 0 ? isbn with { Value = new Faker().Random.String2(5), Format = IsbnFormat.Isbn13 } : isbn).ToList() };
+        bookCommand = bookCommand with { ISBNs = [.. bookCommand.ISBNs!.Select((isbn, index) => index == 0 ? isbn with { Value = new Faker().Random.String2(5), Format = IsbnFormat.Isbn13 } : isbn)] };
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -1611,7 +1611,7 @@ public class AddBookCommandValidatorTests
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
-        bookCommand = bookCommand with { ISBNs = bookCommand.ISBNs!.Select((isbn, index) => index == 0 ? isbn with { Format = (IsbnFormat)99 } : isbn).ToList() };
+        bookCommand = bookCommand with { ISBNs = [.. bookCommand.ISBNs!.Select((isbn, index) => index == 0 ? isbn with { Format = (IsbnFormat)99 } : isbn)] };
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -1625,7 +1625,7 @@ public class AddBookCommandValidatorTests
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
-        bookCommand = bookCommand with { ISBNs = bookCommand.ISBNs!.Select((isbn, index) => index == 0 ? isbn with { Value = "0-306-40615-2", Format = IsbnFormat.Isbn10 } : isbn).ToList() };
+        bookCommand = bookCommand with { ISBNs = [.. bookCommand.ISBNs!.Select((isbn, index) => index == 0 ? isbn with { Value = "0-306-40615-2", Format = IsbnFormat.Isbn10 } : isbn)] };
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -1639,7 +1639,7 @@ public class AddBookCommandValidatorTests
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
-        bookCommand = bookCommand with { ISBNs = bookCommand.ISBNs!.Select((isbn, index) => index == 0 ? isbn with { Value = "978-3-16-148410-0", Format = IsbnFormat.Isbn13 } : isbn).ToList() };
+        bookCommand = bookCommand with { ISBNs = [.. bookCommand.ISBNs!.Select((isbn, index) => index == 0 ? isbn with { Value = "978-3-16-148410-0", Format = IsbnFormat.Isbn13 } : isbn)] };
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -1667,7 +1667,7 @@ public class AddBookCommandValidatorTests
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
-        bookCommand = bookCommand with { Contributors = bookCommand.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Name = null! } : contributor).ToList() };
+        bookCommand = bookCommand with { Contributors = [.. bookCommand.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Name = null! } : contributor)] };
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -1681,7 +1681,7 @@ public class AddBookCommandValidatorTests
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
-        bookCommand = bookCommand with { Contributors = bookCommand.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Name = contributor.Name! with { DisplayName = new Faker().Random.String2(101) } } : contributor).ToList() };
+        bookCommand = bookCommand with { Contributors = [.. bookCommand.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Name = contributor.Name! with { DisplayName = new Faker().Random.String2(101) } } : contributor)] };
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -1695,7 +1695,7 @@ public class AddBookCommandValidatorTests
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
-        bookCommand = bookCommand with { Contributors = bookCommand.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Name = contributor.Name! with { DisplayName = null! } } : contributor).ToList() };
+        bookCommand = bookCommand with { Contributors = [.. bookCommand.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Name = contributor.Name! with { DisplayName = null! } } : contributor)] };
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -1709,7 +1709,7 @@ public class AddBookCommandValidatorTests
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
-        bookCommand = bookCommand with { Contributors = bookCommand.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Name = contributor.Name! with { LegalName = new Faker().Random.String2(101) } } : contributor).ToList() };
+        bookCommand = bookCommand with { Contributors = [.. bookCommand.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Name = contributor.Name! with { LegalName = new Faker().Random.String2(101) } } : contributor)] };
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -1723,7 +1723,7 @@ public class AddBookCommandValidatorTests
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
-        bookCommand = bookCommand with { Contributors = bookCommand.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Role = null! } : contributor).ToList() };
+        bookCommand = bookCommand with { Contributors = [.. bookCommand.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Role = null! } : contributor)] };
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -1737,7 +1737,7 @@ public class AddBookCommandValidatorTests
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
-        bookCommand = bookCommand with { Contributors = bookCommand.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Role = contributor.Role! with { Name = null! } } : contributor).ToList() };
+        bookCommand = bookCommand with { Contributors = [.. bookCommand.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Role = contributor.Role! with { Name = null! } } : contributor)] };
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -1751,7 +1751,7 @@ public class AddBookCommandValidatorTests
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
-        bookCommand = bookCommand with { Contributors = bookCommand.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Role = contributor.Role! with { Name = new Faker().Random.String2(51) } } : contributor).ToList() };
+        bookCommand = bookCommand with { Contributors = [.. bookCommand.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Role = contributor.Role! with { Name = new Faker().Random.String2(51) } } : contributor)] };
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -1765,7 +1765,7 @@ public class AddBookCommandValidatorTests
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
-        bookCommand = bookCommand with { Contributors = bookCommand.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Role = contributor.Role! with { Category = null! } } : contributor).ToList() };
+        bookCommand = bookCommand with { Contributors = [.. bookCommand.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Role = contributor.Role! with { Category = null! } } : contributor)] };
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -1779,7 +1779,7 @@ public class AddBookCommandValidatorTests
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
-        bookCommand = bookCommand with { Contributors = bookCommand.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Role = contributor.Role! with { Category = new Faker().Random.String2(51) } } : contributor).ToList() };
+        bookCommand = bookCommand with { Contributors = [.. bookCommand.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Role = contributor.Role! with { Category = new Faker().Random.String2(51) } } : contributor)] };
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -1807,7 +1807,7 @@ public class AddBookCommandValidatorTests
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
-        bookCommand = bookCommand with { Ratings = bookCommand.Ratings!.Select((rating, index) => index == 0 ? rating with { Value = -1 } : rating).ToList() };
+        bookCommand = bookCommand with { Ratings = [.. bookCommand.Ratings!.Select((rating, index) => index == 0 ? rating with { Value = -1 } : rating)] };
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -1821,7 +1821,7 @@ public class AddBookCommandValidatorTests
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
-        bookCommand = bookCommand with { Ratings = bookCommand.Ratings!.Select((rating, index) => index == 0 ? rating with { Value = 6, MaxValue = 5 } : rating).ToList() };
+        bookCommand = bookCommand with { Ratings = [.. bookCommand.Ratings!.Select((rating, index) => index == 0 ? rating with { Value = 6, MaxValue = 5 } : rating)] };
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -1835,7 +1835,7 @@ public class AddBookCommandValidatorTests
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
-        bookCommand = bookCommand with { Ratings = bookCommand.Ratings!.Select((rating, index) => index == 0 ? rating with { MaxValue = -1 } : rating).ToList() };
+        bookCommand = bookCommand with { Ratings = [.. bookCommand.Ratings!.Select((rating, index) => index == 0 ? rating with { MaxValue = -1 } : rating)] };
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -1849,7 +1849,7 @@ public class AddBookCommandValidatorTests
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
-        bookCommand = bookCommand with { Ratings = bookCommand.Ratings!.Select((rating, index) => index == 0 ? rating with { VoteCount = -1 } : rating).ToList() };
+        bookCommand = bookCommand with { Ratings = [.. bookCommand.Ratings!.Select((rating, index) => index == 0 ? rating with { VoteCount = -1 } : rating)] };
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);
@@ -1865,9 +1865,9 @@ public class AddBookCommandValidatorTests
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
         bookCommand = bookCommand with
         {
-            Ratings = bookCommand.Ratings!.Select((rating, index) => index == 0 ? rating
+            Ratings = [.. bookCommand.Ratings!.Select((rating, index) => index == 0 ? rating
             with
-            { Value = 4, MaxValue = 5, VoteCount = 100 } : rating).ToList()
+            { Value = 4, MaxValue = 5, VoteCount = 100 } : rating)]
         };
 
         // Act
@@ -1882,7 +1882,7 @@ public class AddBookCommandValidatorTests
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
-        bookCommand = bookCommand with { Ratings = bookCommand.Ratings!.Select((rating, index) => index == 0 ? rating with { VoteCount = null } : rating).ToList() };
+        bookCommand = bookCommand with { Ratings = [.. bookCommand.Ratings!.Select((rating, index) => index == 0 ? rating with { VoteCount = null } : rating)] };
 
         // Act
         List<Error> result = _validator.TestValidate(bookCommand);

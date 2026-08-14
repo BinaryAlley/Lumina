@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -37,8 +37,8 @@ internal sealed class PluginSettingsStore : IPluginSettingsStore
     public async Task<IReadOnlyDictionary<string, string>?> GetSettingsAsync(Guid pluginId, CancellationToken cancellationToken)
     {
         IPluginRepository pluginRepository = _unitOfWork.GetRepository<IPluginRepository>();
-        ErrorOr<PluginEntity?> getPluginResult = await pluginRepository.GetByIdAsync(pluginId, cancellationToken).ConfigureAwait(false);
-        if (getPluginResult.IsError)
+        Result<PluginEntity?> getPluginResult = await pluginRepository.GetByIdAsync(pluginId, cancellationToken).ConfigureAwait(false);
+        if (getPluginResult.IsFailure)
         {
             _logger.LogWarning("Failed to read the settings of the plugin with Id '{PluginId}': {Error}", pluginId, getPluginResult.FirstError.Description);
             return null;

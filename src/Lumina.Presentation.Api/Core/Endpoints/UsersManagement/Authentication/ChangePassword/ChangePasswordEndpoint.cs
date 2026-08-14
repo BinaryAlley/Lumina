@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.Authentication;
 using Lumina.Application.Core.UsersManagement.Authentication.Commands.ChangePassword;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Common.Routes.UsersManagement;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
@@ -19,13 +19,13 @@ namespace Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authentication.
 /// </summary>
 public class ChangePasswordEndpoint : BaseEndpoint<ChangePasswordRequest, IResult>
 {
-    private readonly ICommandHandler<ChangePasswordCommand, ErrorOr<ChangePasswordResponse>> _changePasswordCommandHandler;
+    private readonly ICommandHandler<ChangePasswordCommand, Result<ChangePasswordResponse>> _changePasswordCommandHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ChangePasswordEndpoint"/> class.
     /// </summary>
     /// <param name="changePasswordCommandHandler">Injected service for handling change password commands.</param>
-    public ChangePasswordEndpoint(ICommandHandler<ChangePasswordCommand, ErrorOr<ChangePasswordResponse>> changePasswordCommandHandler)
+    public ChangePasswordEndpoint(ICommandHandler<ChangePasswordCommand, Result<ChangePasswordResponse>> changePasswordCommandHandler)
     {
         _changePasswordCommandHandler = changePasswordCommandHandler;
     }
@@ -48,7 +48,7 @@ public class ChangePasswordEndpoint : BaseEndpoint<ChangePasswordRequest, IResul
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(ChangePasswordRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<ChangePasswordResponse> result = await _changePasswordCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
+        Result<ChangePasswordResponse> result = await _changePasswordCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

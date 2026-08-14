@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
-using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Errors;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
@@ -25,10 +25,10 @@ public class WindowsRootItemTests
         string name = "C:";
 
         // Act
-        ErrorOr<WindowsRootItem> result = WindowsRootItem.Create(path, name);
+        Result<WindowsRootItem> result = WindowsRootItem.Create(path, name);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(name, result.Value.Name);
         Assert.Equal(path, result.Value.Id.Path);
@@ -45,10 +45,10 @@ public class WindowsRootItemTests
         string name = "Invalid";
 
         // Act
-        ErrorOr<WindowsRootItem> result = WindowsRootItem.Create(invalidPath, name);
+        Result<WindowsRootItem> result = WindowsRootItem.Create(invalidPath, name);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
     }
 
@@ -61,10 +61,10 @@ public class WindowsRootItemTests
         FileSystemItemStatus customStatus = FileSystemItemStatus.Accessible;
 
         // Act
-        ErrorOr<WindowsRootItem> result = WindowsRootItem.Create(path, name, customStatus);
+        Result<WindowsRootItem> result = WindowsRootItem.Create(path, name, customStatus);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(name, result.Value.Name);
         Assert.Equal(path, result.Value.Id.Path);
@@ -76,16 +76,16 @@ public class WindowsRootItemTests
     public void Create_WhenCalledWithFileSystemPathId_ShouldReturnSuccessfulResult()
     {
         // Arrange
-        ErrorOr<FileSystemPathId> pathIdResult = FileSystemPathId.Create("E:\\");
-        Assert.False(pathIdResult.IsError);
+        Result<FileSystemPathId> pathIdResult = FileSystemPathId.Create("E:\\");
+        Assert.False(pathIdResult.IsFailure);
         FileSystemPathId pathId = pathIdResult.Value;
         string name = "E:";
 
         // Act
-        ErrorOr<WindowsRootItem> result = WindowsRootItem.Create(pathId, name);
+        Result<WindowsRootItem> result = WindowsRootItem.Create(pathId, name);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(pathId, result.Value.Id);
         Assert.Equal(name, result.Value.Name);
@@ -97,8 +97,8 @@ public class WindowsRootItemTests
     public void Items_WhenAccessed_ShouldReturnEmptyReadOnlyCollection()
     {
         // Arrange
-        ErrorOr<WindowsRootItem> createResult = WindowsRootItem.Create("F:\\", "F:");
-        Assert.False(createResult.IsError);
+        Result<WindowsRootItem> createResult = WindowsRootItem.Create("F:\\", "F:");
+        Assert.False(createResult.IsFailure);
         WindowsRootItem windowsRootItem = createResult.Value;
 
         // Act
@@ -113,16 +113,16 @@ public class WindowsRootItemTests
     public void SetStatus_WhenCalledWithNewStatus_ShouldUpdateStatus()
     {
         // Arrange
-        ErrorOr<WindowsRootItem> createResult = WindowsRootItem.Create("G:\\", "G:");
-        Assert.False(createResult.IsError);
+        Result<WindowsRootItem> createResult = WindowsRootItem.Create("G:\\", "G:");
+        Assert.False(createResult.IsFailure);
         WindowsRootItem windowsRootItem = createResult.Value;
         FileSystemItemStatus newStatus = FileSystemItemStatus.Accessible;
 
         // Act
-        ErrorOr<Updated> result = windowsRootItem.SetStatus(newStatus);
+        Result<Updated> result = windowsRootItem.SetStatus(newStatus);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(newStatus, windowsRootItem.Status);
     }
 
@@ -130,15 +130,15 @@ public class WindowsRootItemTests
     public void SetParent_WhenCalledWithNullParent_ShouldReturnError()
     {
         // Arrange
-        ErrorOr<WindowsRootItem> createResult = WindowsRootItem.Create("H:\\", "H:");
-        Assert.False(createResult.IsError);
+        Result<WindowsRootItem> createResult = WindowsRootItem.Create("H:\\", "H:");
+        Assert.False(createResult.IsFailure);
         WindowsRootItem windowsRootItem = createResult.Value;
         
         // Act
-        ErrorOr<Updated> result = windowsRootItem.SetParent(null!);
+        Result<Updated> result = windowsRootItem.SetParent(null!);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.ParentNodeCannotBeNull, result.FirstError);
         Assert.False(windowsRootItem.Parent.HasValue);
     }

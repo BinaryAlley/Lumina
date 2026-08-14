@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
-using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Events;
 using Lumina.Domain.Common.Exceptions;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
@@ -61,22 +61,22 @@ public class LibrarySavedDomainEventHandler : IDomainEventHandler<LibrarySavedDo
         if (domainEvent.Library.CoverImage is not null)
         {
             // attempt to copy the image from the original location provided by the user to the internal location for media library files
-            ErrorOr<string> saveCoverImageResult = await SaveCoverImageToMediaDirectoryAsync(domainEvent.Library.Id.Value, domainEvent.Library.CoverImage, cancellationToken).ConfigureAwait(false);
-            if (saveCoverImageResult.IsError)
+            Result<string> saveCoverImageResult = await SaveCoverImageToMediaDirectoryAsync(domainEvent.Library.Id.Value, domainEvent.Library.CoverImage, cancellationToken).ConfigureAwait(false);
+            if (saveCoverImageResult.IsFailure)
                 throw new EventualConsistencyException(saveCoverImageResult.FirstError, saveCoverImageResult.Errors);
             domainEvent.Library.SetInternalLibraryCoverImagePath(saveCoverImageResult.Value);
             // update the media library with the new cover location
             ILibraryRepository libraryRepository = _unitOfWork.GetRepository<ILibraryRepository>();
-            ErrorOr<Updated> updateLibraryResult = await libraryRepository.UpdateAsync(domainEvent.Library.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
-            if (updateLibraryResult.IsError)
+            Result<Updated> updateLibraryResult = await libraryRepository.UpdateAsync(domainEvent.Library.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
+            if (updateLibraryResult.IsFailure)
                 throw new EventualConsistencyException(updateLibraryResult.FirstError, updateLibraryResult.Errors);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         }
         else // no cover image is provided, delete any cover image that might exist in the internal location for media library files
         {
-            ErrorOr<string> libraryPathResult = GetLibraryPath(domainEvent.Library.Id.Value);
-            if (libraryPathResult.IsError)
+            Result<string> libraryPathResult = GetLibraryPath(domainEvent.Library.Id.Value);
+            if (libraryPathResult.IsFailure)
                 throw new EventualConsistencyException(libraryPathResult.FirstError, libraryPathResult.Errors);
             DeleteCoverImageFromMediaDirectory(libraryPathResult.Value);
         }
@@ -87,23 +87,23 @@ public class LibrarySavedDomainEventHandler : IDomainEventHandler<LibrarySavedDo
     /// </summary>
     /// <param name="libraryId">The id of the media library for which to regtrieve the file system path.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either the file system path of the media library, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either the file system path of the media library, or an error message.
     /// </returns>
-    private ErrorOr<string> GetLibraryPath(Guid libraryId)
+    private Result<string> GetLibraryPath(Guid libraryId)
     {
         // root directory for media
-        ErrorOr<string> rootPathResult = _pathService.CombinePath(AppContext.BaseDirectory, _mediaSettingsModel.RootDirectory); 
-        if (rootPathResult.IsError)
+        Result<string> rootPathResult = _pathService.CombinePath(AppContext.BaseDirectory, _mediaSettingsModel.RootDirectory); 
+        if (rootPathResult.IsFailure)
             return rootPathResult.Errors;
 
         // libraries directory
-        ErrorOr<string> librariesPathResult = _pathService.CombinePath(rootPathResult.Value, _mediaSettingsModel.LibrariesDirectory);
-        if (librariesPathResult.IsError)
+        Result<string> librariesPathResult = _pathService.CombinePath(rootPathResult.Value, _mediaSettingsModel.LibrariesDirectory);
+        if (librariesPathResult.IsFailure)
             return librariesPathResult.Errors;
 
         // this new particular library' directory
-        ErrorOr<string> libraryPathResult = _pathService.CombinePath(librariesPathResult.Value, libraryId.ToString());
-        if (libraryPathResult.IsError)
+        Result<string> libraryPathResult = _pathService.CombinePath(librariesPathResult.Value, libraryId.ToString());
+        if (libraryPathResult.IsFailure)
             return libraryPathResult.Errors;
         return libraryPathResult.Value;
     }
@@ -115,62 +115,62 @@ public class LibrarySavedDomainEventHandler : IDomainEventHandler<LibrarySavedDo
     /// <param name="imagePath">The file path of the image file that will be copied to the media directory.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either the location of the new cover image, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either the location of the new cover image, or an error message.
     /// </returns>
-    private async Task<ErrorOr<string>> SaveCoverImageToMediaDirectoryAsync(Guid libraryId, string imagePath, CancellationToken cancellationToken)
+    private async Task<Result<string>> SaveCoverImageToMediaDirectoryAsync(Guid libraryId, string imagePath, CancellationToken cancellationToken)
     {
-        ErrorOr<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(imagePath);
-        if (fileSystemPathIdResult.IsError)
+        Result<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(imagePath);
+        if (fileSystemPathIdResult.IsFailure)
             return fileSystemPathIdResult.Errors;
 
-        ErrorOr<bool> fileExistsResult = _environmentContext.FileProviderService.FileExists(fileSystemPathIdResult.Value);
-        if (fileExistsResult.IsError)
+        Result<bool> fileExistsResult = _environmentContext.FileProviderService.FileExists(fileSystemPathIdResult.Value);
+        if (fileExistsResult.IsFailure)
             return fileExistsResult.Errors;
         if (!fileExistsResult.Value)
             return Errors.FileSystemManagement.FileNotFound;
 
         // make sure the file is an actual supported image
-        ErrorOr<ImageType> imageCheckResult = await _environmentContext.FileTypeService.GetImageTypeAsync(fileSystemPathIdResult.Value, cancellationToken).ConfigureAwait(false);
-        if (imageCheckResult.IsError)
+        Result<ImageType> imageCheckResult = await _environmentContext.FileTypeService.GetImageTypeAsync(fileSystemPathIdResult.Value, cancellationToken).ConfigureAwait(false);
+        if (imageCheckResult.IsFailure)
             return imageCheckResult.Errors;
         if (imageCheckResult.Value == ImageType.None)
             return Errors.Library.CoverFileMustBeAnImage;
 
         // the provided cover image path exists and is a valid image, store it in the media directory
-        ErrorOr<string> rootPathResult = _pathService.CombinePath(AppContext.BaseDirectory, _mediaSettingsModel.RootDirectory); // root directory for media
-        if (rootPathResult.IsError)
+        Result<string> rootPathResult = _pathService.CombinePath(AppContext.BaseDirectory, _mediaSettingsModel.RootDirectory); // root directory for media
+        if (rootPathResult.IsFailure)
             return rootPathResult.Errors;
 
-        ErrorOr<string> librariesPathResult = _pathService.CombinePath(rootPathResult.Value, _mediaSettingsModel.LibrariesDirectory); // libraries directory
-        if (librariesPathResult.IsError)
+        Result<string> librariesPathResult = _pathService.CombinePath(rootPathResult.Value, _mediaSettingsModel.LibrariesDirectory); // libraries directory
+        if (librariesPathResult.IsFailure)
             return librariesPathResult.Errors;
 
-        ErrorOr<FileSystemPathId> rootPathIdResult = FileSystemPathId.Create(rootPathResult.Value);
-        if (rootPathIdResult.IsError)
+        Result<FileSystemPathId> rootPathIdResult = FileSystemPathId.Create(rootPathResult.Value);
+        if (rootPathIdResult.IsFailure)
             return rootPathIdResult.Errors;
 
-        ErrorOr<FileSystemPathId> librariesPathIdResult = FileSystemPathId.Create(librariesPathResult.Value);
-        if (librariesPathIdResult.IsError)
+        Result<FileSystemPathId> librariesPathIdResult = FileSystemPathId.Create(librariesPathResult.Value);
+        if (librariesPathIdResult.IsFailure)
             return librariesPathIdResult.Errors;
 
         // create the path of the new library
-        ErrorOr<string> libraryPathResult = GetLibraryPath(libraryId);
-        if (libraryPathResult.IsError)
+        Result<string> libraryPathResult = GetLibraryPath(libraryId);
+        if (libraryPathResult.IsFailure)
             return libraryPathResult.Errors;
 
-        ErrorOr<FileSystemPathId> newLibraryPathIdResult = FileSystemPathId.Create(libraryPathResult.Value);
-        if (newLibraryPathIdResult.IsError)
+        Result<FileSystemPathId> newLibraryPathIdResult = FileSystemPathId.Create(libraryPathResult.Value);
+        if (newLibraryPathIdResult.IsFailure)
             return newLibraryPathIdResult.Errors;
 
         // check if it doesn't already exist, and if so, create it
-        ErrorOr<bool> directoryExistsResult = _environmentContext.DirectoryProviderService.DirectoryExists(newLibraryPathIdResult.Value);
-        if (directoryExistsResult.IsError)
+        Result<bool> directoryExistsResult = _environmentContext.DirectoryProviderService.DirectoryExists(newLibraryPathIdResult.Value);
+        if (directoryExistsResult.IsFailure)
             return directoryExistsResult.Errors;
 
         if (!directoryExistsResult.Value)
         {
-            ErrorOr<FileSystemPathId> createDirectoryResult = _environmentContext.DirectoryProviderService.CreateDirectory(librariesPathIdResult.Value, libraryId.ToString());
-            if (createDirectoryResult.IsError)
+            Result<FileSystemPathId> createDirectoryResult = _environmentContext.DirectoryProviderService.CreateDirectory(librariesPathIdResult.Value, libraryId.ToString());
+            if (createDirectoryResult.IsFailure)
                 return createDirectoryResult.Errors;
         }
         else
@@ -178,18 +178,18 @@ public class LibrarySavedDomainEventHandler : IDomainEventHandler<LibrarySavedDo
             // delete previous library covers that might exist
             DeleteCoverImageFromMediaDirectory(libraryPathResult.Value);
 
-            ErrorOr<Deleted> deleteExistingCoverImageResult = DeleteCoverImageFromMediaDirectory(libraryPathResult.Value);
-            if (deleteExistingCoverImageResult.IsError)
+            Result<Deleted> deleteExistingCoverImageResult = DeleteCoverImageFromMediaDirectory(libraryPathResult.Value);
+            if (deleteExistingCoverImageResult.IsFailure)
                 return deleteExistingCoverImageResult.Errors;
         }
         // copy the new cover file from the location provided by the user
-        ErrorOr<FileSystemPathId> copyFileResult = _environmentContext.FileProviderService.CopyFile(fileSystemPathIdResult.Value, newLibraryPathIdResult.Value, true);
-        if (copyFileResult.IsError)
+        Result<FileSystemPathId> copyFileResult = _environmentContext.FileProviderService.CopyFile(fileSystemPathIdResult.Value, newLibraryPathIdResult.Value, true);
+        if (copyFileResult.IsFailure)
             return copyFileResult.Errors;
 
         // rename the new cover file to the standard naming
-        ErrorOr<FileSystemPathId> renameFileResult = _environmentContext.FileProviderService.RenameFile(copyFileResult.Value, $"cover.{imageCheckResult.Value.ToString().ToLower()}");
-        if (renameFileResult.IsError)
+        Result<FileSystemPathId> renameFileResult = _environmentContext.FileProviderService.RenameFile(copyFileResult.Value, $"cover.{imageCheckResult.Value.ToString().ToLower()}");
+        if (renameFileResult.IsFailure)
             return renameFileResult.Errors;
 
         // get the internal relative path for the copied file
@@ -203,17 +203,17 @@ public class LibrarySavedDomainEventHandler : IDomainEventHandler<LibrarySavedDo
     /// Deletes the cover image from the media directory.
     /// </summary>
     /// <param name="libraryPath">The path where the library content is located.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    private ErrorOr<Deleted> DeleteCoverImageFromMediaDirectory(string libraryPath)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    private Result<Deleted> DeleteCoverImageFromMediaDirectory(string libraryPath)
     {
 
-        ErrorOr<FileSystemPathId> newLibraryPathIdResult = FileSystemPathId.Create(libraryPath);
-        if (newLibraryPathIdResult.IsError)
+        Result<FileSystemPathId> newLibraryPathIdResult = FileSystemPathId.Create(libraryPath);
+        if (newLibraryPathIdResult.IsFailure)
             return newLibraryPathIdResult.Errors;
 
         // get existing files of this media library's directory, and delete previous cover files, if they are found
-        ErrorOr<IEnumerable<FileSystemPathId>> getExistingLibraryFilesResult = _environmentContext.FileProviderService.GetFilePaths(newLibraryPathIdResult.Value, true);
-        if (getExistingLibraryFilesResult.IsError)
+        Result<IEnumerable<FileSystemPathId>> getExistingLibraryFilesResult = _environmentContext.FileProviderService.GetFilePaths(newLibraryPathIdResult.Value, true);
+        if (getExistingLibraryFilesResult.IsFailure)
             return getExistingLibraryFilesResult.Errors;
 
         foreach (FileSystemPathId filePathId in getExistingLibraryFilesResult.Value)

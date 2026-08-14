@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Errors;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.ValueObjects.Fixtures;
 using System.Diagnostics.CodeAnalysis;
@@ -31,10 +31,10 @@ public class FileSystemPathIdTests
         string validPath = @"C:\TestDir\file.txt";
 
         // Act
-        ErrorOr<FileSystemPathId> result = FileSystemPathId.Create(validPath);
+        Result<FileSystemPathId> result = FileSystemPathId.Create(validPath);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(validPath, result.Value.Path);
     }
 
@@ -45,10 +45,10 @@ public class FileSystemPathIdTests
     public void Create_WithInvalidPath_ShouldReturnError(string? invalidPath)
     {
         // Act
-        ErrorOr<FileSystemPathId> result = FileSystemPathId.Create(invalidPath!);
+        Result<FileSystemPathId> result = FileSystemPathId.Create(invalidPath!);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
     }
 

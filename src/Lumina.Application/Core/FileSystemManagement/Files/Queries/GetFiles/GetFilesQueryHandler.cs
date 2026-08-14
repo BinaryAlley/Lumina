@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Files;
 using Lumina.Application.Common.Infrastructure.Validation;
@@ -16,7 +16,7 @@ namespace Lumina.Application.Core.FileSystemManagement.Files.Queries.GetFiles;
 /// <summary>
 /// Handler for the query to get all files.
 /// </summary>
-public class GetFilesQueryHandler : IQueryHandler<GetFilesQuery, ErrorOr<IEnumerable<FileResponse>>>
+public class GetFilesQueryHandler : IQueryHandler<GetFilesQuery, Result<IEnumerable<FileResponse>>>
 {
     private readonly IFileService _fileService;
     private readonly IValidator<GetFilesQuery> _validator;
@@ -38,15 +38,15 @@ public class GetFilesQueryHandler : IQueryHandler<GetFilesQuery, ErrorOr<IEnumer
     /// <param name="query">The query containing the requested path.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a collection of <see cref="FileResponse"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a collection of <see cref="FileResponse"/>, or an error message.
     /// </returns>
-    public Task<ErrorOr<IEnumerable<FileResponse>>> HandleAsync(GetFilesQuery query, CancellationToken cancellationToken)
+    public Task<Result<IEnumerable<FileResponse>>> HandleAsync(GetFilesQuery query, CancellationToken cancellationToken)
     {
         List<Error> validationResult = _validator.Validate(query);
         if (validationResult.Count > 0)
-            return Task.FromResult<ErrorOr<IEnumerable<FileResponse>>>(validationResult);
+            return Task.FromResult<Result<IEnumerable<FileResponse>>>(validationResult);
 
-        ErrorOr<IEnumerable<File>> getFilesResult = _fileService.GetFiles(query.Path!, query.IncludeHiddenElements);
-        return Task.FromResult(getFilesResult.Match(values => ErrorOrFactory.From(values.ToResponses()), errors => errors));
+        Result<IEnumerable<File>> getFilesResult = _fileService.GetFiles(query.Path!, query.IncludeHiddenElements);
+        return Task.FromResult(getFilesResult.Match(values => Result.From(values.ToResponses()), errors => errors));
     }
 }

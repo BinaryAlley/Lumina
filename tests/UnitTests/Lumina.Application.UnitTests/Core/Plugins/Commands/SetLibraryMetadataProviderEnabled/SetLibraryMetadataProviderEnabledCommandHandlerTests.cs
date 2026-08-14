@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.Plugins.Commands.SetLibraryMetadataProviderEnabled;
+using Lumina.Domain.Common.Primitives;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -51,10 +51,10 @@ public class SetLibraryMetadataProviderEnabledCommandHandlerTests
             .Returns(Result.Updated);
 
         // Act
-        ErrorOr<Success> result = await _sut.HandleAsync(new SetLibraryMetadataProviderEnabledCommand(libraryId, pluginId, true), CancellationToken.None);
+        Result<Success> result = await _sut.HandleAsync(new SetLibraryMetadataProviderEnabledCommand(libraryId, pluginId, true), CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         await _mockConfigurationRepository.Received(1).UpsertAsync(
             Arg.Is<LibraryMetadataProviderConfigurationEntity>(configuration => configuration.IsEnabled && configuration.Rank == 1),
             Arg.Any<CancellationToken>());
@@ -81,10 +81,10 @@ public class SetLibraryMetadataProviderEnabledCommandHandlerTests
             .Returns(Result.Updated);
 
         // Act
-        ErrorOr<Success> result = await _sut.HandleAsync(new SetLibraryMetadataProviderEnabledCommand(existingConfiguration.LibraryId, existingConfiguration.PluginId, true), CancellationToken.None);
+        Result<Success> result = await _sut.HandleAsync(new SetLibraryMetadataProviderEnabledCommand(existingConfiguration.LibraryId, existingConfiguration.PluginId, true), CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         await _mockConfigurationRepository.Received(1).UpsertAsync(
             Arg.Is<LibraryMetadataProviderConfigurationEntity>(configuration => configuration.IsEnabled && configuration.Rank == 2),
             Arg.Any<CancellationToken>());

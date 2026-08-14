@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
 using System.Collections.Generic;
 #endregion
@@ -14,6 +14,6 @@ public interface IDriveService
     /// <summary>
     /// Retrieves the list of drives.
     /// </summary>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of drives or an error.</returns>
-    ErrorOr<IEnumerable<FileSystemItem>> GetDrives();
+    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of drives or an error.</returns>
+    Result<IEnumerable<FileSystemItem>> GetDrives();
 }

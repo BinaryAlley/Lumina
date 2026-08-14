@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
@@ -40,8 +40,8 @@ public class CheckInitializationQueryHandler : IQueryHandler<CheckInitialization
     {
         IUserRepository userRepository = _unitOfWork.GetRepository<IUserRepository>();
         // if the repository reports an error, or there are no users, the application has not been initialized
-        ErrorOr<IEnumerable<UserEntity>> selectUsersResult = await userRepository.GetAllAsync(cancellationToken);
-        if (!selectUsersResult.IsError)
+        Result<IEnumerable<UserEntity>> selectUsersResult = await userRepository.GetAllAsync(cancellationToken);
+        if (!selectUsersResult.IsFailure)
             return new InitializationResponse(selectUsersResult.Value.Any());
         return new InitializationResponse(false);
     }

@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
-using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Models.Core;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -46,7 +46,7 @@ public sealed class Isbn : ValueObject
     /// <param name="value">The value representing this object.</param>
     /// <param name="format">The format of the ISBN representing this object.</param>
     /// <returns>The created <see cref="Isbn"/> instance.</returns>
-    public static ErrorOr<Isbn> Create(string? value, IsbnFormat format)
+    public static Result<Isbn> Create(string? value, IsbnFormat format)
     {
         // enforce invariants
         if (string.IsNullOrWhiteSpace(value))

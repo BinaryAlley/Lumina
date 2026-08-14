@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
@@ -19,9 +19,9 @@ public static class IsbnDtoMapping
     /// </summary>
     /// <param name="dto">The DTO to be converted.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully converted <see cref="Isbn"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully converted <see cref="Isbn"/>, or an error message.
     /// </returns>
-    public static ErrorOr<Isbn> ToDomainEntity(this IsbnDto dto)
+    public static Result<Isbn> ToDomainEntity(this IsbnDto dto)
     {
         return Isbn.Create(
             dto.Value,
@@ -34,9 +34,9 @@ public static class IsbnDtoMapping
     /// </summary>
     /// <param name="dtos">The DTOs to be converted.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a collection of converted <see cref="Isbn"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a collection of converted <see cref="Isbn"/>, or an error message.
     /// </returns>
-    public static IEnumerable<ErrorOr<Isbn>> ToDomainEntities(this IEnumerable<IsbnDto> dtos)
+    public static IEnumerable<Result<Isbn>> ToDomainEntities(this IEnumerable<IsbnDto> dtos)
     {
         return dtos.Select(domainEntity => domainEntity.ToDomainEntity());
     }

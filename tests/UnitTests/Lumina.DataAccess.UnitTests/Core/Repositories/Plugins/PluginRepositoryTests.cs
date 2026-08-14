@@ -1,12 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using EntityFrameworkCore.Testing.NSubstitute;
-using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.DataAccess.Core.Repositories.Plugins;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.DataAccess.UnitTests.Core.Repositories.Plugins.Fixtures;
-using Lumina.Domain.SharedKernel.Common.Errors;
-using Microsoft.EntityFrameworkCore;
+using Lumina.Domain.Common.Errors;
+using Lumina.Domain.Common.Primitives;
 using System;
 using System.Linq;
 using System.Threading;
@@ -43,10 +42,10 @@ public class PluginRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        ErrorOr<PluginEntity?> result = await _sut.GetByIdAsync(plugin.Id, CancellationToken.None);
+        Result<PluginEntity?> result = await _sut.GetByIdAsync(plugin.Id, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(plugin.Id, result.Value!.Id);
     }
 
@@ -57,11 +56,11 @@ public class PluginRepositoryTests
         PluginEntity plugin = _pluginFixture.CreatePluginEntity();
 
         // Act
-        ErrorOr<Updated> result = await _sut.UpsertAsync(plugin, CancellationToken.None);
+        Result<Updated> result = await _sut.UpsertAsync(plugin, CancellationToken.None);
         await _mockContext.SaveChangesAsync();
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Single(_mockContext.Plugins);
     }
 
@@ -79,11 +78,11 @@ public class PluginRepositoryTests
         updatedPlugin.SettingsJson = null; // the stored settings must be preserved
 
         // Act
-        ErrorOr<Updated> result = await _sut.UpsertAsync(updatedPlugin, CancellationToken.None);
+        Result<Updated> result = await _sut.UpsertAsync(updatedPlugin, CancellationToken.None);
         await _mockContext.SaveChangesAsync();
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         PluginEntity retrievedPlugin = _mockContext.Plugins.Single();
         Assert.Equal("Updated Name", retrievedPlugin.Name);
         Assert.Equal("""{"preferredLanguage":"en"}""", retrievedPlugin.SettingsJson);
@@ -98,11 +97,11 @@ public class PluginRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        ErrorOr<Updated> result = await _sut.UpdateSettingsAsync(plugin.Id, """{"preferredLanguage":"fr"}""", CancellationToken.None);
+        Result<Updated> result = await _sut.UpdateSettingsAsync(plugin.Id, """{"preferredLanguage":"fr"}""", CancellationToken.None);
         await _mockContext.SaveChangesAsync();
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal("""{"preferredLanguage":"fr"}""", _mockContext.Plugins.Single().SettingsJson);
     }
 
@@ -110,10 +109,10 @@ public class PluginRepositoryTests
     public async Task UpdateSettingsAsync_WhenPluginDoesNotExist_ShouldReturnError()
     {
         // Act
-        ErrorOr<Updated> result = await _sut.UpdateSettingsAsync(Guid.NewGuid(), null, CancellationToken.None);
+        Result<Updated> result = await _sut.UpdateSettingsAsync(Guid.NewGuid(), null, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Plugins.PluginNotFound, result.FirstError);
     }
 }

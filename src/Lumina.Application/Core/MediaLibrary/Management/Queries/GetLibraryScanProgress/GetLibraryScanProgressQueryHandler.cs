@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
@@ -17,7 +17,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.SharedKernel.Common.Errors.Errors;
+using DomainErrors = Lumina.Domain.Common.Errors.Errors;
 #endregion
 
 namespace Lumina.Application.Core.MediaLibrary.Management.Queries.GetLibraryScanProgress;
@@ -25,7 +25,7 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Queries.GetLibraryScan
 /// <summary>
 /// Handler for the query to get the progress of a library scan.
 /// </summary>
-public class GetLibraryScanProgressQueryHandler : IQueryHandler<GetLibraryScanProgressQuery, ErrorOr<MediaLibraryScanProgressResponse>>
+public class GetLibraryScanProgressQueryHandler : IQueryHandler<GetLibraryScanProgressQuery, Result<MediaLibraryScanProgressResponse>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUserService;
@@ -61,9 +61,9 @@ public class GetLibraryScanProgressQueryHandler : IQueryHandler<GetLibraryScanPr
     /// <param name="query">The query to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a <see cref="MediaLibraryScanProgressResponse"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a <see cref="MediaLibraryScanProgressResponse"/>, or an error message.
     /// </returns>
-    public async Task<ErrorOr<MediaLibraryScanProgressResponse>> HandleAsync(GetLibraryScanProgressQuery query, CancellationToken cancellationToken)
+    public async Task<Result<MediaLibraryScanProgressResponse>> HandleAsync(GetLibraryScanProgressQuery query, CancellationToken cancellationToken)
     {
         List<Error> validationResult = _validator.Validate(query);
         if (validationResult.Count > 0)
@@ -71,8 +71,8 @@ public class GetLibraryScanProgressQueryHandler : IQueryHandler<GetLibraryScanPr
 
         // get the library with the specified id from the repository
         ILibraryRepository libraryRepository = _unitOfWork.GetRepository<ILibraryRepository>();
-        ErrorOr<LibraryEntity?> getLibraryResult = await libraryRepository.GetByIdAsync(query.LibraryId, cancellationToken).ConfigureAwait(false);
-        if (getLibraryResult.IsError)
+        Result<LibraryEntity?> getLibraryResult = await libraryRepository.GetByIdAsync(query.LibraryId, cancellationToken).ConfigureAwait(false);
+        if (getLibraryResult.IsFailure)
             return getLibraryResult.Errors;
         else if (getLibraryResult.Value is null)
             return DomainErrors.Library.LibraryNotFound;
@@ -82,9 +82,9 @@ public class GetLibraryScanProgressQueryHandler : IQueryHandler<GetLibraryScanPr
             !await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false))
             return ApplicationErrors.Authorization.NotAuthorized;
 
-        ErrorOr<MediaLibraryScanProgress> getProgressResult = _mediaLibrariesScanProgressTracker.GetScanProgress(
+        Result<MediaLibraryScanProgress> getProgressResult = _mediaLibrariesScanProgressTracker.GetScanProgress(
             MediaLibraryScanCompositeId.Create(ScanId.Create(query.ScanId), UserId.Create(_currentUserService.UserId!.Value)));
-        if (getProgressResult.IsError)
+        if (getProgressResult.IsFailure)
             return getProgressResult.Errors;
 
         return getProgressResult.Value.ToResponse();

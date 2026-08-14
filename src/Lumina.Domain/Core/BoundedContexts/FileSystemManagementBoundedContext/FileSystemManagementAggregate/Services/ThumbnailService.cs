@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
-using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using SixLabors.ImageSharp;
@@ -38,11 +38,11 @@ public class ThumbnailService : IThumbnailService
     /// <param name="path">String representation of the file path.</param>
     /// <param name="quality">The quality of the thumbnail to get.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of bytes representing the thumbnail of the file at the specified path or an error.</returns>
-    public async Task<ErrorOr<Thumbnail>> GetThumbnailAsync(string path, int quality, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of bytes representing the thumbnail of the file at the specified path or an error.</returns>
+    public async Task<Result<Thumbnail>> GetThumbnailAsync(string path, int quality, CancellationToken cancellationToken)
     {
-        ErrorOr<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(path);
-        if (fileSystemPathIdResult.IsError)
+        Result<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(path);
+        if (fileSystemPathIdResult.IsFailure)
             return fileSystemPathIdResult.Errors;
         return await GetThumbnailAsync(fileSystemPathIdResult.Value, quality, cancellationToken);
     }
@@ -53,18 +53,18 @@ public class ThumbnailService : IThumbnailService
     /// <param name="path">The path of the file for which to get the thumbnail.</param>
     /// <param name="quality">The quality of the thumbnail to get.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of bytes representing the thumbnail of the file at the specified path or an error.</returns>
-    public async Task<ErrorOr<Thumbnail>> GetThumbnailAsync(FileSystemPathId path, int quality, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of bytes representing the thumbnail of the file at the specified path or an error.</returns>
+    public async Task<Result<Thumbnail>> GetThumbnailAsync(FileSystemPathId path, int quality, CancellationToken cancellationToken)
     {
         // first, get the type of the image file
-        ErrorOr<ImageType> imageTypeResult = await _environmentContext.FileTypeService.GetImageTypeAsync(path, cancellationToken);
-        if (imageTypeResult.IsError)
+        Result<ImageType> imageTypeResult = await _environmentContext.FileTypeService.GetImageTypeAsync(path, cancellationToken);
+        if (imageTypeResult.IsFailure)
             return imageTypeResult.Errors;
         if (imageTypeResult.Value != ImageType.None)
         {
             // then, get its bytes
-            ErrorOr<byte[]> resultFileContents = _environmentContext.FileProviderService.GetFileAsync(path);
-            if (resultFileContents.IsError)
+            Result<byte[]> resultFileContents = _environmentContext.FileProviderService.GetFileAsync(path);
+            if (resultFileContents.IsFailure)
                 return resultFileContents.Errors;
             byte[] fileContents = resultFileContents.Value;
             // finally, resize or adjust quality based on image type

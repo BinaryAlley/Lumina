@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
 using Lumina.Application.UnitTests.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Common.Fixtures;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -35,10 +35,10 @@ public class BookRatingDtoMappingTests
         BookRatingDto dto = _bookRatingDtoFixture.CreateComplete();
 
         // Act
-        ErrorOr<BookRating> result = dto.ToDomainEntity();
+        Result<BookRating> result = dto.ToDomainEntity();
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(dto.Value!.Value, result.Value.Value);
         Assert.Equal(dto.MaxValue!.Value, result.Value.MaxValue);
@@ -67,10 +67,10 @@ public class BookRatingDtoMappingTests
         BookRatingDto dto = _bookRatingDtoFixture.CreateMinimal();
 
         // Act
-        ErrorOr<BookRating> result = dto.ToDomainEntity();
+        Result<BookRating> result = dto.ToDomainEntity();
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(dto.Value!.Value, result.Value.Value);
         Assert.Equal(dto.MaxValue!.Value, result.Value.MaxValue);
@@ -85,10 +85,10 @@ public class BookRatingDtoMappingTests
         BookRatingDto dto = _bookRatingDtoFixture.CreateInvalid();
 
         // Act
-        ErrorOr<BookRating> result = dto.ToDomainEntity();
+        Result<BookRating> result = dto.ToDomainEntity();
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
     }
 
     [Fact]
@@ -102,15 +102,15 @@ public class BookRatingDtoMappingTests
         ];
 
         // Act
-        IEnumerable<ErrorOr<BookRating>> results = dtos.ToDomainEntities();
+        IEnumerable<Result<BookRating>> results = dtos.ToDomainEntities();
 
         // Assert
         Assert.NotNull(results);
         Assert.Equal(dtos.Count, results.Count());
 
-        List<ErrorOr<BookRating>> resultList = results.ToList();
-        foreach (ErrorOr<BookRating> result in resultList)
-            Assert.False(result.IsError);
+        List<Result<BookRating>> resultList = [.. results];
+        foreach (Result<BookRating> result in resultList)
+            Assert.False(result.IsFailure);
 
         // complete rating
         Assert.Equal(dtos[0].Value!.Value, resultList[0].Value.Value);
@@ -137,16 +137,16 @@ public class BookRatingDtoMappingTests
         ];
 
         // Act
-        IEnumerable<ErrorOr<BookRating>> results = dtos.ToDomainEntities();
+        IEnumerable<Result<BookRating>> results = dtos.ToDomainEntities();
 
         // Assert
         Assert.NotNull(results);
         Assert.Equal(dtos.Count, results.Count());
 
-        List<ErrorOr<BookRating>> resultList = results.ToList();
+        List<Result<BookRating>> resultList = [.. results];
 
-        Assert.False(resultList[0].IsError);
-        Assert.True(resultList[1].IsError);
-        Assert.False(resultList[2].IsError);
+        Assert.False(resultList[0].IsFailure);
+        Assert.True(resultList[1].IsFailure);
+        Assert.False(resultList[2].IsFailure);
     }
 }

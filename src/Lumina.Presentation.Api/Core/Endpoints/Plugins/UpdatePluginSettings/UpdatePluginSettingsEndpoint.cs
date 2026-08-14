@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.Plugins;
 using Lumina.Application.Core.Plugins.Commands.UpdatePluginSettings;
 using Lumina.Contracts.Requests.Plugins;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Common.Routes.Plugins;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
@@ -18,13 +18,13 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Plugins.UpdatePluginSettings;
 /// </summary>
 public class UpdatePluginSettingsEndpoint : BaseEndpoint<UpdatePluginSettingsRequest, IResult>
 {
-    private readonly ICommandHandler<UpdatePluginSettingsCommand, ErrorOr<Success>> _updatePluginSettingsCommandHandler;
+    private readonly ICommandHandler<UpdatePluginSettingsCommand, Result<Success>> _updatePluginSettingsCommandHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UpdatePluginSettingsEndpoint"/> class.
     /// </summary>
     /// <param name="updatePluginSettingsCommandHandler">Injected service for handling update plugin settings commands.</param>
-    public UpdatePluginSettingsEndpoint(ICommandHandler<UpdatePluginSettingsCommand, ErrorOr<Success>> updatePluginSettingsCommandHandler)
+    public UpdatePluginSettingsEndpoint(ICommandHandler<UpdatePluginSettingsCommand, Result<Success>> updatePluginSettingsCommandHandler)
     {
         _updatePluginSettingsCommandHandler = updatePluginSettingsCommandHandler;
     }
@@ -47,7 +47,7 @@ public class UpdatePluginSettingsEndpoint : BaseEndpoint<UpdatePluginSettingsReq
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(UpdatePluginSettingsRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<Success> result = await _updatePluginSettingsCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
+        Result<Success> result = await _updatePluginSettingsCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

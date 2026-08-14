@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.FileSystemManagement.Paths.Queries.GetPathRoot;
 using Lumina.Contracts.Requests.FileSystemManagement.Path;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.GetPathRoot;
 using Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.Fixtures;
 using Microsoft.AspNetCore.Http;
@@ -24,7 +24,7 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.
 [ExcludeFromCodeCoverage]
 public class GetPathRootEndpointTests
 {
-    private readonly IQueryHandler<GetPathRootQuery, ErrorOr<PathSegmentResponse>> _mockHandler;
+    private readonly IQueryHandler<GetPathRootQuery, Result<PathSegmentResponse>> _mockHandler;
     private readonly GetPathRootEndpoint _sut;
     private readonly PathSegmentResponseFixture _pathSegmentResponseFixture;
     private readonly GetPathRootRequestFixture _getPathRootRequestFixture;
@@ -34,7 +34,7 @@ public class GetPathRootEndpointTests
     /// </summary>
     public GetPathRootEndpointTests()
     {
-        _mockHandler = Substitute.For<IQueryHandler<GetPathRootQuery, ErrorOr<PathSegmentResponse>>>();
+        _mockHandler = Substitute.For<IQueryHandler<GetPathRootQuery, Result<PathSegmentResponse>>>();
         _sut = Factory.Create<GetPathRootEndpoint>(_mockHandler);
         _pathSegmentResponseFixture = new PathSegmentResponseFixture();
         _getPathRootRequestFixture = new GetPathRootRequestFixture();
@@ -48,7 +48,7 @@ public class GetPathRootEndpointTests
         CancellationToken cancellationToken = CancellationToken.None;
         PathSegmentResponse expectedResponse = _pathSegmentResponseFixture.Create();
         _mockHandler.HandleAsync(Arg.Any<GetPathRootQuery>(), Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(expectedResponse));
+            .Returns(Result.From(expectedResponse));
 
         // Act
         IResult result = await _sut.ExecuteAsync(request, cancellationToken);
@@ -117,7 +117,7 @@ public class GetPathRootEndpointTests
         GetPathRootRequest request = _getPathRootRequestFixture.Create(@"C:\Users\TestUser");
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<GetPathRootQuery>(), Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(_pathSegmentResponseFixture.Create()));
+            .Returns(Result.From(_pathSegmentResponseFixture.Create()));
 
         // Act
         await _sut.ExecuteAsync(request, cancellationToken);
@@ -141,7 +141,7 @@ public class GetPathRootEndpointTests
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return ErrorOrFactory.From(_pathSegmentResponseFixture.Create());
+                return Result.From(_pathSegmentResponseFixture.Create());
             }, callInfo.Arg<CancellationToken>()));
 
         // Act

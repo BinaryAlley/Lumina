@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Repositories.Authorization;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -10,6 +9,7 @@ using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.Admin.Authorization.Roles.Queries.GetRolePermissions;
 using Lumina.Application.UnitTests.Core.Admin.Authorization.Roles.Queries.GetRolePermissions.Fixtures;
 using Lumina.Contracts.Responses.Authorization;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using NSubstitute;
 using System;
@@ -68,10 +68,10 @@ public class GetRolePermissionsQueryHandlerTests
             .Returns(false);
 
         // Act
-        ErrorOr<RolePermissionsResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<RolePermissionsResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Authorization.NotAuthorized, result.FirstError);
         await _mockRoleRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
     }
@@ -89,10 +89,10 @@ public class GetRolePermissionsQueryHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<RolePermissionsResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<RolePermissionsResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
     }
 
@@ -108,10 +108,10 @@ public class GetRolePermissionsQueryHandlerTests
             .Returns((RoleEntity?)null);
 
         // Act
-        ErrorOr<RolePermissionsResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<RolePermissionsResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Authorization.RoleNotFound, result.FirstError);
     }
 
@@ -146,10 +146,10 @@ public class GetRolePermissionsQueryHandlerTests
             .Returns(role);
 
         // Act
-        ErrorOr<RolePermissionsResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<RolePermissionsResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(role.RoleName, result.Value.Role.RoleName);
         Assert.Single(result.Value.Permissions);
     }

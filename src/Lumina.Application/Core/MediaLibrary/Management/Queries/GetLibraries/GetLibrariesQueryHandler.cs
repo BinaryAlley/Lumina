@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
@@ -19,7 +19,7 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Queries.GetLibraries;
 /// <summary>
 /// Handler for the query to get the media libraries.
 /// </summary>
-public class GetLibrariesQueryHandler : IQueryHandler<GetLibrariesQuery, ErrorOr<LibraryResponse[]>>
+public class GetLibrariesQueryHandler : IQueryHandler<GetLibrariesQuery, Result<LibraryResponse[]>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUserService;
@@ -47,19 +47,19 @@ public class GetLibrariesQueryHandler : IQueryHandler<GetLibrariesQuery, ErrorOr
     /// <param name="query">The query to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="LibraryResponse"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="LibraryResponse"/>, or an error message.
     /// </returns>
-    public async Task<ErrorOr<LibraryResponse[]>> HandleAsync(GetLibrariesQuery query, CancellationToken cancellationToken)
+    public async Task<Result<LibraryResponse[]>> HandleAsync(GetLibrariesQuery query, CancellationToken cancellationToken)
     {
         // get the libraries from the repository
         ILibraryRepository libraryRepository = _unitOfWork.GetRepository<ILibraryRepository>();
-        ErrorOr<IEnumerable<LibraryEntity>> getLibrariesResult = await libraryRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
-        if (getLibrariesResult.IsError)
+        Result<IEnumerable<LibraryEntity>> getLibrariesResult = await libraryRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+        if (getLibrariesResult.IsFailure)
             return getLibrariesResult.Errors;
 
         // admins can see all libraries
         if (await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false))
-            return ErrorOrFactory.From(getLibrariesResult.Value.Select(library => library.ToResponse()).ToArray());
+            return Result.From(getLibrariesResult.Value.Select(library => library.ToResponse()).ToArray());
         else
         {
             // for regular users, only take the libraries that belong to them
@@ -67,7 +67,7 @@ public class GetLibrariesQueryHandler : IQueryHandler<GetLibrariesQuery, ErrorOr
                 .Where(library => library.UserId == _currentUserService.UserId)
                 .Select(library => library.ToResponse())];
 
-            return ErrorOrFactory.From(userLibraries);
+            return Result.From(userLibraries);
         }
     }
 }

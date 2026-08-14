@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Domain.SharedKernel.Common.Errors;
-using Lumina.Domain.Common.Models.Core;
 using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.Common.Errors;
+using Lumina.Domain.Common.Models.Core;
+
 using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
@@ -98,9 +98,9 @@ public class StreamInfo : ValueObject
     /// <param name="sampleRate">The sample rate of the stream (for audio).</param>
     /// <param name="channels">The number of channels (for audio).</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="StreamInfo"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="StreamInfo"/>, or an error message.
     /// </returns>
-    public static ErrorOr<StreamInfo> Create(
+    public static Result<StreamInfo> Create(
         string streamId,
         string mimeType,
         int bitrate,

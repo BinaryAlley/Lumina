@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Application.UnitTests.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook.Fixtures;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -37,10 +37,10 @@ public class BookEntityMappingTests
         BookEntity bookEntity = _bookEntityFixture.CreateBook();
 
         // Act
-        ErrorOr<Book> result = bookEntity.ToDomainEntity();
+        Result<Book> result = bookEntity.ToDomainEntity();
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(bookEntity.Id, result.Value.Id.Value);
         Assert.Equal(bookEntity.Title, result.Value.Metadata.Title);
@@ -325,12 +325,12 @@ public class BookEntityMappingTests
         ];
 
         // Act
-        IEnumerable<ErrorOr<Book>> results = bookEntities.ToDomainEntities();
+        IEnumerable<Result<Book>> results = bookEntities.ToDomainEntities();
 
         // Assert
         Assert.NotNull(results);
         Assert.Equal(bookEntities.Count, results.Count());
-        Assert.All(results, result => Assert.False(result.IsError));
+        Assert.All(results, result => Assert.False(result.IsFailure));
     }
 
     [Fact]

@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Models.Core;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -39,9 +39,9 @@ public sealed class FileSystemPathId : ValueObject
     /// </summary>
     /// <param name="path">The path of the file system item.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="FileSystemPathId"/> or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="FileSystemPathId"/> or an error message.
     /// </returns>
-    public static ErrorOr<FileSystemPathId> Create(string path)
+    public static Result<FileSystemPathId> Create(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
             return Errors.FileSystemManagement.InvalidPath;

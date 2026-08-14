@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using ErrorOr;
 using Lumina.Application.Core.FileSystemManagement.Drives.Queries.GetDrives;
-using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using NSubstitute;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -51,18 +51,18 @@ public class GetDrivesQueryHandlerTests
         ];
 
         _mockDriveService.GetDrives()
-            .Returns(ErrorOrFactory.From(drives));
+            .Returns(Result.From(drives));
 
         // Act
-        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.HandleAsync(getDrivesQuery, CancellationToken.None);
+        Result<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.HandleAsync(getDrivesQuery, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.IsAssignableFrom<IEnumerable<FileSystemTreeNodeResponse>>(result.Value);
         Assert.Equal(drives.Count(), result.Value.Count());
 
-        List<FileSystemTreeNodeResponse> resultList = result.Value.ToList();
-        List<FileSystemItem> drivesList = drives.ToList();
+        List<FileSystemTreeNodeResponse> resultList = [.. result.Value];
+        List<FileSystemItem> drivesList = [.. drives];
 
         for (int i = 0; i < resultList.Count; i++)
         {
@@ -90,10 +90,10 @@ public class GetDrivesQueryHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
         _mockDriveService.Received(1).GetDrives();
     }
@@ -103,15 +103,15 @@ public class GetDrivesQueryHandlerTests
     {
         // Arrange
         GetDrivesQuery query = _fixture.Create<GetDrivesQuery>();
-        ErrorOr<IEnumerable<FileSystemItem>> emptyList = ErrorOrFactory.From(Enumerable.Empty<FileSystemItem>());
+        Result<IEnumerable<FileSystemItem>> emptyList = Result.From(Enumerable.Empty<FileSystemItem>());
         _mockDriveService.GetDrives()
             .Returns(emptyList);
 
         // Act
-        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Empty(result.Value);
         _mockDriveService.Received(1).GetDrives();
     }

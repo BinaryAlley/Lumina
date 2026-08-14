@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.Authorization;
 using Lumina.Application.Core.Admin.Authorization.Roles.Queries.GetRolePermissions;
@@ -19,13 +19,13 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Admin.Authorization.Roles.GetRo
 /// </summary>
 public class GetRolePermissionsEndpoint : BaseEndpoint<GetRolePermissionsRequest, IResult>
 {
-    private readonly IQueryHandler<GetRolePermissionsQuery, ErrorOr<RolePermissionsResponse>> _addRoleQueryHandler;
+    private readonly IQueryHandler<GetRolePermissionsQuery, Result<RolePermissionsResponse>> _addRoleQueryHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetRolePermissionsEndpoint"/> class.
     /// </summary>
     /// <param name="addRoleQueryHandler">Injected service for handling add role commands.</param>
-    public GetRolePermissionsEndpoint(IQueryHandler<GetRolePermissionsQuery, ErrorOr<RolePermissionsResponse>> addRoleQueryHandler)
+    public GetRolePermissionsEndpoint(IQueryHandler<GetRolePermissionsQuery, Result<RolePermissionsResponse>> addRoleQueryHandler)
     {
         _addRoleQueryHandler = addRoleQueryHandler;
     }
@@ -48,7 +48,7 @@ public class GetRolePermissionsEndpoint : BaseEndpoint<GetRolePermissionsRequest
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(GetRolePermissionsRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<RolePermissionsResponse> result = await _addRoleQueryHandler.HandleAsync(request.ToQuery(), cancellationToken).ConfigureAwait(false);
+        Result<RolePermissionsResponse> result = await _addRoleQueryHandler.HandleAsync(request.ToQuery(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

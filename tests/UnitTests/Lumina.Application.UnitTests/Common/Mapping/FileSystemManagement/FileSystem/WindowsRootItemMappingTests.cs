@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.Mapping.FileSystemManagement.FileSystem;
-using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -21,8 +21,8 @@ public class WindowsRootItemMappingTests
         // Arrange
         string path = "C:\\";
         string name = "C:";
-        ErrorOr<WindowsRootItem> createResult = WindowsRootItem.Create(path, name);
-        Assert.False(createResult.IsError);
+        Result<WindowsRootItem> createResult = WindowsRootItem.Create(path, name);
+        Assert.False(createResult.IsFailure);
         WindowsRootItem domainModel = createResult.Value;
 
         // Act
@@ -45,8 +45,8 @@ public class WindowsRootItemMappingTests
         string path = "D:\\";
         string name = "D:";
         FileSystemItemStatus customStatus = FileSystemItemStatus.Inaccessible;
-        ErrorOr<WindowsRootItem> createResult = WindowsRootItem.Create(path, name, customStatus);
-        Assert.False(createResult.IsError);
+        Result<WindowsRootItem> createResult = WindowsRootItem.Create(path, name, customStatus);
+        Assert.False(createResult.IsFailure);
         WindowsRootItem domainModel = createResult.Value;
 
         // Act

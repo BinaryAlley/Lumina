@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.Authentication;
 using Lumina.Application.Core.UsersManagement.Authentication.Commands.RecoverPassword;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Common.Routes.UsersManagement;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Builder;
@@ -20,13 +20,13 @@ namespace Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authentication.
 /// </summary>
 public class RecoverPasswordEndpoint : BaseEndpoint<RecoverPasswordRequest, IResult>
 {
-    private readonly ICommandHandler<RecoverPasswordCommand, ErrorOr<RecoverPasswordResponse>> _recoverPasswordCommandHandler;
+    private readonly ICommandHandler<RecoverPasswordCommand, Result<RecoverPasswordResponse>> _recoverPasswordCommandHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RecoverPasswordEndpoint"/> class.
     /// </summary>
     /// <param name="recoverPasswordCommandHandler">Injected service for handling recover password commands.</param>
-    public RecoverPasswordEndpoint(ICommandHandler<RecoverPasswordCommand, ErrorOr<RecoverPasswordResponse>> recoverPasswordCommandHandler)
+    public RecoverPasswordEndpoint(ICommandHandler<RecoverPasswordCommand, Result<RecoverPasswordResponse>> recoverPasswordCommandHandler)
     {
         _recoverPasswordCommandHandler = recoverPasswordCommandHandler;
     }
@@ -51,7 +51,7 @@ public class RecoverPasswordEndpoint : BaseEndpoint<RecoverPasswordRequest, IRes
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(RecoverPasswordRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<RecoverPasswordResponse> result = await _recoverPasswordCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
+        Result<RecoverPasswordResponse> result = await _recoverPasswordCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

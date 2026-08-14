@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.Common.Base;
 using System;
@@ -21,16 +21,16 @@ public interface ILibraryScanSnapshotRepository : IRepository<LibraryScanSnapsho
     /// <param name="libraryId">The unique identifier of the library for which to get the deleted media library scan snapshot item paths.</param>
     /// <param name="scanId">The unique identifier of the media library scan for which to determine the deleted media library scan snapshot item paths.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of deleted media library scan snapshot item paths, or an error.</returns>
-    Task<ErrorOr<IReadOnlyList<string>>> GetDeletedPathsAsync(Guid libraryId, Guid scanId, CancellationToken cancellationToken);
+    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of deleted media library scan snapshot item paths, or an error.</returns>
+    Task<Result<IReadOnlyList<string>>> GetDeletedPathsAsync(Guid libraryId, Guid scanId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Gets the paths of all the media library scan snapshot items of the media library identified by <paramref name="libraryId"/>.
     /// </summary>
     /// <param name="libraryId">The unique identifier of the library whose media library scan snapshot item paths are retrieved.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of media library scan snapshot item paths, or an error.</returns>
-    Task<ErrorOr<IReadOnlyList<string>>> GetPathsAsync(Guid libraryId, CancellationToken cancellationToken);
+    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of media library scan snapshot item paths, or an error.</returns>
+    Task<Result<IReadOnlyList<string>>> GetPathsAsync(Guid libraryId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Atomically applies the results of the current scan to the storage medium, by replacing the media library scan snapshot of the previous scan with the snapshot of the current scan.
@@ -41,6 +41,6 @@ public interface ILibraryScanSnapshotRepository : IRepository<LibraryScanSnapsho
     /// <param name="scanId">The unique identifier of the media library scan whose results are applied.</param>
     /// <param name="userId">The unique identifier of the user that initiated the media library scan, used for audit purposes.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    Task<ErrorOr<Updated>> ApplySnapshotSwapAsync(Guid libraryId, Guid scanId, Guid userId, CancellationToken cancellationToken);
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Updated>> ApplySnapshotSwapAsync(Guid libraryId, Guid scanId, Guid userId, CancellationToken cancellationToken);
 }

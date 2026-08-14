@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Models.Core;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -49,9 +49,9 @@ public class PathSegment : ValueObject
     /// <param name="isDirectory">Value indicating if the current path segment is a file system directory or not.</param>
     /// <param name="isDrive">Value indicating if the current path segment is a file system drive or not.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="PathSegment"/> or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="PathSegment"/> or an error message.
     /// </returns>
-    public static ErrorOr<PathSegment> Create(string name, bool isDirectory, bool isDrive)
+    public static Result<PathSegment> Create(string name, bool isDirectory, bool isDrive)
     {
         if (string.IsNullOrWhiteSpace(name))
             return Errors.FileSystemManagement.NameCannotBeEmpty;

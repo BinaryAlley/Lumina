@@ -1,6 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Domain.SharedKernel.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using System.Collections.Generic;
@@ -69,9 +67,9 @@ public class WrittenContentMetadata : BaseMetadata
     /// <param name="publisher">The publisher of the written content, if applicable.</param>
     /// <param name="pageCount">The number of pages in the written content, if applicable.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="WrittenContentMetadata"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="WrittenContentMetadata"/>, or an error message.
     /// </returns>
-    public static ErrorOr<WrittenContentMetadata> Create(
+    public static Result<WrittenContentMetadata> Create(
         string title,
         Optional<string> originalTitle,
         Optional<string> description,

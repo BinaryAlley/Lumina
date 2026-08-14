@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Repositories.Books;
 using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
-using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Errors;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -37,8 +37,8 @@ internal sealed class BookRepository : IBookRepository
     /// </summary>
     /// <param name="book">The book to add.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<ErrorOr<Created>> InsertAsync(BookEntity book, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Created>> InsertAsync(BookEntity book, CancellationToken cancellationToken)
     {
         bool bookExists = await _luminaDbContext.Books.AnyAsync(repositoryBook => repositoryBook.Id == book.Id, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (bookExists)
@@ -66,8 +66,8 @@ internal sealed class BookRepository : IBookRepository
     /// </summary>
     /// <param name="id">The Id of the book to get.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a <see cref="BookEntity"/>, or an error.</returns>
-    public async Task<ErrorOr<BookEntity?>> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="BookEntity"/>, or an error.</returns>
+    public async Task<Result<BookEntity?>> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         return await _luminaDbContext.Books
             .Include(book => book.Tags)
@@ -80,8 +80,8 @@ internal sealed class BookRepository : IBookRepository
     /// Gets all books.
     /// </summary>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of <see cref="BookEntity"/>, or an error.</returns>
-    public async Task<ErrorOr<IEnumerable<BookEntity>>> GetAllAsync(CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="BookEntity"/>, or an error.</returns>
+    public async Task<Result<IEnumerable<BookEntity>>> GetAllAsync(CancellationToken cancellationToken)
     {
         return await _luminaDbContext.Books
             .Include(book => book.Tags)
@@ -95,8 +95,8 @@ internal sealed class BookRepository : IBookRepository
     /// </summary>
     /// <param name="libraryId">The Id of the media library whose books are retrieved.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of <see cref="BookEntity"/>, or an error.</returns>
-    public async Task<ErrorOr<IEnumerable<BookEntity>>> GetByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="BookEntity"/>, or an error.</returns>
+    public async Task<Result<IEnumerable<BookEntity>>> GetByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken)
     {
         return await _luminaDbContext.Books
             .Include(book => book.Tags)
@@ -112,8 +112,8 @@ internal sealed class BookRepository : IBookRepository
     /// <param name="libraryId">The Id of the media library whose book is retrieved.</param>
     /// <param name="path">The file system path of the book to be retrieved.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the <see cref="BookEntity"/> stored at the provided path, or an error.</returns>
-    public async Task<ErrorOr<BookEntity?>> GetByPathAsync(Guid libraryId, string path, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> containing either the <see cref="BookEntity"/> stored at the provided path, or an error.</returns>
+    public async Task<Result<BookEntity?>> GetByPathAsync(Guid libraryId, string path, CancellationToken cancellationToken)
     {
         return await _luminaDbContext.Books
             .Include(book => book.Tags)
@@ -130,8 +130,8 @@ internal sealed class BookRepository : IBookRepository
     /// <param name="lastPath">The path of the last retrieved book, used for keyset pagination. Pass <see langword="null"/> to get the first page.</param>
     /// <param name="pageSize">The maximum number of books to retrieve.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a page of books needing their metadata enriched, or an error.</returns>
-    public async Task<ErrorOr<IReadOnlyList<BookEntity>>> GetBooksNeedingMetadataAsync(Guid libraryId, string? lastPath, int pageSize, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> containing either a page of books needing their metadata enriched, or an error.</returns>
+    public async Task<Result<IReadOnlyList<BookEntity>>> GetBooksNeedingMetadataAsync(Guid libraryId, string? lastPath, int pageSize, CancellationToken cancellationToken)
     {
         return await _luminaDbContext.Books
             .Include(book => book.Tags)
@@ -150,8 +150,8 @@ internal sealed class BookRepository : IBookRepository
     /// </summary>
     /// <param name="libraryId">The Id of the media library whose books are counted.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the number of books needing their metadata enriched, or an error.</returns>
-    public async Task<ErrorOr<int>> GetBooksNeedingMetadataCountAsync(Guid libraryId, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> containing either the number of books needing their metadata enriched, or an error.</returns>
+    public async Task<Result<int>> GetBooksNeedingMetadataCountAsync(Guid libraryId, CancellationToken cancellationToken)
     {
         return await _luminaDbContext.Books
             .CountAsync(book => book.LibraryId == libraryId && book.MetadataStatus != MetadataStatus.Enriched, cancellationToken).ConfigureAwait(false);
@@ -162,8 +162,8 @@ internal sealed class BookRepository : IBookRepository
     /// </summary>
     /// <param name="data">The book to update.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<ErrorOr<Updated>> UpdateAsync(BookEntity data, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Updated>> UpdateAsync(BookEntity data, CancellationToken cancellationToken)
     {
         BookEntity? foundBook = await _luminaDbContext.Books
             .Include(book => book.Tags)

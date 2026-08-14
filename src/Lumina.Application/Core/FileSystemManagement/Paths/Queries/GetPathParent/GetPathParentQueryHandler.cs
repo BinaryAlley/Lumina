@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Paths;
@@ -16,7 +16,7 @@ namespace Lumina.Application.Core.FileSystemManagement.Paths.Queries.GetPathPare
 /// <summary>
 /// Handler for the query to get the parent of a file system path.
 /// </summary>
-public class GetPathParentQueryHandler : IQueryHandler<GetPathParentQuery, ErrorOr<IEnumerable<PathSegmentResponse>>>
+public class GetPathParentQueryHandler : IQueryHandler<GetPathParentQuery, Result<IEnumerable<PathSegmentResponse>>>
 {
     private readonly IPathService _pathService;
     private readonly IValidator<GetPathParentQuery> _validator;
@@ -38,15 +38,15 @@ public class GetPathParentQueryHandler : IQueryHandler<GetPathParentQuery, Error
     /// <param name="query">The query containing the requested path.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a collection of <see cref="PathSegmentResponse"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a collection of <see cref="PathSegmentResponse"/>, or an error message.
     /// </returns>
-    public Task<ErrorOr<IEnumerable<PathSegmentResponse>>> HandleAsync(GetPathParentQuery query, CancellationToken cancellationToken)
+    public Task<Result<IEnumerable<PathSegmentResponse>>> HandleAsync(GetPathParentQuery query, CancellationToken cancellationToken)
     {
         List<Error> validationResult = _validator.Validate(query);
         if (validationResult.Count > 0)
-            return Task.FromResult<ErrorOr<IEnumerable<PathSegmentResponse>>>(validationResult);
+            return Task.FromResult<Result<IEnumerable<PathSegmentResponse>>>(validationResult);
 
-        ErrorOr<IEnumerable<PathSegment>> goUpOneLevelResult = _pathService.GoUpOneLevel(query.Path!);
-        return Task.FromResult(goUpOneLevelResult.Match(values => ErrorOrFactory.From(values.ToResponses()), errors => errors));
+        Result<IEnumerable<PathSegment>> goUpOneLevelResult = _pathService.GoUpOneLevel(query.Path!);
+        return Task.FromResult(goUpOneLevelResult.Match(values => Result.From(values.ToResponses()), errors => errors));
     }
 }

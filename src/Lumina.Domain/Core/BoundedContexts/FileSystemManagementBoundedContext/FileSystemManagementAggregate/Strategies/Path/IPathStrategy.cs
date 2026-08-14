@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using System.Collections.Generic;
 #endregion
@@ -33,22 +33,22 @@ public interface IPathStrategy
     /// </summary>
     /// <param name="path">The path to be combined.</param>
     /// <param name="path">The name to be combined with the path.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing the combined path, or an error.</returns>
-    ErrorOr<FileSystemPathId> CombinePath(FileSystemPathId path, string name);
+    /// <returns>An <see cref="Result{TValue}"/> containing the combined path, or an error.</returns>
+    Result<FileSystemPathId> CombinePath(FileSystemPathId path, string name);
 
     /// <summary>
     /// Parses <paramref name="path"/> into path segments.
     /// </summary>
     /// <param name="path">The path to be parsed.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing the path segments, or an error.</returns>
-    ErrorOr<IEnumerable<PathSegment>> ParsePath(FileSystemPathId path);
+    /// <returns>An <see cref="Result{TValue}"/> containing the path segments, or an error.</returns>
+    Result<IEnumerable<PathSegment>> ParsePath(FileSystemPathId path);
 
     /// <summary>
     /// Goes up one level from <paramref name="path"/>, and returns the path segments.
     /// </summary>
     /// <param name="path">The path from which to navigate up one level.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing the path segments of the path up one level from <paramref name="path"/>, or an error.</returns>
-    ErrorOr<IEnumerable<PathSegment>> GoUpOneLevel(FileSystemPathId path);
+    /// <returns>An <see cref="Result{TValue}"/> containing the path segments of the path up one level from <paramref name="path"/>, or an error.</returns>
+    Result<IEnumerable<PathSegment>> GoUpOneLevel(FileSystemPathId path);
 
     /// <summary>
     /// Returns a collection of characters that are invalid for paths.
@@ -60,6 +60,6 @@ public interface IPathStrategy
     /// Returns the root portion of the given path.
     /// </summary>
     /// <param name="path">The path for which to get the root.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing the root of <paramref name="path"/>, or an error.</returns>
-    ErrorOr<PathSegment> GetPathRoot(FileSystemPathId path);
+    /// <returns>An <see cref="Result{TValue}"/> containing the root of <paramref name="path"/>, or an error.</returns>
+    Result<PathSegment> GetPathRoot(FileSystemPathId path);
 }

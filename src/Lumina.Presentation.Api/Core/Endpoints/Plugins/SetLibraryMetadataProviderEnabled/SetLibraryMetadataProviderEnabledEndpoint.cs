@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.Plugins;
 using Lumina.Application.Core.Plugins.Commands.SetLibraryMetadataProviderEnabled;
 using Lumina.Contracts.Requests.Plugins;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Common.Routes.Library.Management;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
@@ -18,13 +18,13 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Plugins.SetLibraryMetadataProvi
 /// </summary>
 public class SetLibraryMetadataProviderEnabledEndpoint : BaseEndpoint<SetLibraryMetadataProviderEnabledRequest, IResult>
 {
-    private readonly ICommandHandler<SetLibraryMetadataProviderEnabledCommand, ErrorOr<Success>> _setLibraryMetadataProviderEnabledCommandHandler;
+    private readonly ICommandHandler<SetLibraryMetadataProviderEnabledCommand, Result<Success>> _setLibraryMetadataProviderEnabledCommandHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SetLibraryMetadataProviderEnabledEndpoint"/> class.
     /// </summary>
     /// <param name="setLibraryMetadataProviderEnabledCommandHandler">Injected service for handling set library metadata provider enabled commands.</param>
-    public SetLibraryMetadataProviderEnabledEndpoint(ICommandHandler<SetLibraryMetadataProviderEnabledCommand, ErrorOr<Success>> setLibraryMetadataProviderEnabledCommandHandler)
+    public SetLibraryMetadataProviderEnabledEndpoint(ICommandHandler<SetLibraryMetadataProviderEnabledCommand, Result<Success>> setLibraryMetadataProviderEnabledCommandHandler)
     {
         _setLibraryMetadataProviderEnabledCommandHandler = setLibraryMetadataProviderEnabledCommandHandler;
     }
@@ -47,7 +47,7 @@ public class SetLibraryMetadataProviderEnabledEndpoint : BaseEndpoint<SetLibrary
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(SetLibraryMetadataProviderEnabledRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<Success> result = await _setLibraryMetadataProviderEnabledCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
+        Result<Success> result = await _setLibraryMetadataProviderEnabledCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

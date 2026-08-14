@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Application.Core.MediaLibrary.Management.Commands.AddLibrary;
@@ -19,13 +19,13 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Library.Management.AddLibrary;
 /// </summary>
 public class AddLibraryEndpoint : BaseEndpoint<AddLibraryRequest, IResult>
 {
-    private readonly ICommandHandler<AddLibraryCommand, ErrorOr<LibraryResponse>> _addLibraryCommandHandler;
+    private readonly ICommandHandler<AddLibraryCommand, Result<LibraryResponse>> _addLibraryCommandHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AddLibraryEndpoint"/> class.
     /// </summary>
     /// <param name="addLibraryCommandHandler">Injected service for handling add library commands.</param>
-    public AddLibraryEndpoint(ICommandHandler<AddLibraryCommand, ErrorOr<LibraryResponse>> addLibraryCommandHandler)
+    public AddLibraryEndpoint(ICommandHandler<AddLibraryCommand, Result<LibraryResponse>> addLibraryCommandHandler)
     {
         _addLibraryCommandHandler = addLibraryCommandHandler;
     }
@@ -48,7 +48,7 @@ public class AddLibraryEndpoint : BaseEndpoint<AddLibraryRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(AddLibraryRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<LibraryResponse> result = await _addLibraryCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
+        Result<LibraryResponse> result = await _addLibraryCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Created($"{BaseURL}api/v1{ApiRoutes.Libraries.ADD_LIBRARY}/{result.Value.Id}", result.Value), Problem);
     }
 }

@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using EntityFrameworkCore.Testing.NSubstitute;
-using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.DataAccess.Core.Repositories.Users;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.DataAccess.UnitTests.Core.Repositories.Authorization.Fixtures;
 using Lumina.DataAccess.UnitTests.Core.Repositories.Users.Fixtures;
-using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Errors;
+using Lumina.Domain.Common.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
@@ -49,10 +49,10 @@ public class UserRepositoryTests
         UserEntity userModel = _userEntityFixture.CreateUserModel();
 
         // Act
-        ErrorOr<Created> result = await _sut.InsertAsync(userModel, CancellationToken.None);
+        Result<Created> result = await _sut.InsertAsync(userModel, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(Result.Created, result.Value);
 
         EntityEntry<UserEntity>? addedUser = _mockContext.ChangeTracker.Entries<UserEntity>()
@@ -70,10 +70,10 @@ public class UserRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        ErrorOr<Created> result = await _sut.InsertAsync(userModel, CancellationToken.None);
+        Result<Created> result = await _sut.InsertAsync(userModel, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Users.UserAlreadyExists, result.FirstError);
         Assert.Single(_mockContext.ChangeTracker.Entries<UserEntity>());
     }
@@ -92,10 +92,10 @@ public class UserRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        ErrorOr<IEnumerable<UserEntity>> result = await _sut.GetAllAsync(CancellationToken.None);
+        Result<IEnumerable<UserEntity>> result = await _sut.GetAllAsync(CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(3, result.Value.Count());
         Assert.Equal(users, result.Value);
@@ -105,10 +105,10 @@ public class UserRepositoryTests
     public async Task GetAllAsync_WhenNoUsersExist_ShouldReturnEmptyList()
     {
         // Act
-        ErrorOr<IEnumerable<UserEntity>> result = await _sut.GetAllAsync(CancellationToken.None);
+        Result<IEnumerable<UserEntity>> result = await _sut.GetAllAsync(CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Empty(result.Value);
     }
@@ -122,10 +122,10 @@ public class UserRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        ErrorOr<UserEntity?> result = await _sut.GetByUsernameAsync(userModel.Username, CancellationToken.None);
+        Result<UserEntity?> result = await _sut.GetByUsernameAsync(userModel.Username, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(userModel, result.Value);
     }
@@ -134,10 +134,10 @@ public class UserRepositoryTests
     public async Task GetByUsernameAsync_WhenUserDoesNotExist_ShouldReturnNull()
     {
         // Act
-        ErrorOr<UserEntity?> result = await _sut.GetByUsernameAsync("nonexistent", CancellationToken.None);
+        Result<UserEntity?> result = await _sut.GetByUsernameAsync("nonexistent", CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Null(result.Value);
     }
 
@@ -166,10 +166,10 @@ public class UserRepositoryTests
         };
 
         // Act
-        ErrorOr<Updated> result = await _sut.UpdateAsync(updatedUser, CancellationToken.None);
+        Result<Updated> result = await _sut.UpdateAsync(updatedUser, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(Result.Updated, result.Value);
 
         UserEntity? modifiedUser = await _mockContext.Users.FirstOrDefaultAsync(u => u.Username == existingUser.Username);
@@ -186,10 +186,10 @@ public class UserRepositoryTests
         UserEntity userModel = _userEntityFixture.CreateUserModel();
 
         // Act
-        ErrorOr<Updated> result = await _sut.UpdateAsync(userModel, CancellationToken.None);
+        Result<Updated> result = await _sut.UpdateAsync(userModel, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Users.UserDoesNotExist, result.FirstError);
     }
 
@@ -202,10 +202,10 @@ public class UserRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Act
-        ErrorOr<UserEntity?> result = await _sut.GetByIdAsync(userModel.Id, CancellationToken.None);
+        Result<UserEntity?> result = await _sut.GetByIdAsync(userModel.Id, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(userModel.Id, result.Value.Id);
         Assert.Equal(userModel.Username, result.Value.Username);
@@ -222,10 +222,10 @@ public class UserRepositoryTests
         Guid nonExistentId = Guid.NewGuid();
 
         // Act
-        ErrorOr<UserEntity?> result = await _sut.GetByIdAsync(nonExistentId, CancellationToken.None);
+        Result<UserEntity?> result = await _sut.GetByIdAsync(nonExistentId, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Null(result.Value);
     }
 
@@ -268,10 +268,10 @@ public class UserRepositoryTests
         };
 
         // Act
-        ErrorOr<Updated> result = await _sut.UpdateAsync(updatedUser, CancellationToken.None);
+        Result<Updated> result = await _sut.UpdateAsync(updatedUser, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(Result.Updated, result.Value);
 
         UserEntity? modifiedUser = await _mockContext.Users
@@ -333,10 +333,10 @@ public class UserRepositoryTests
         };
 
         // Act
-        ErrorOr<Updated> result = await _sut.UpdateAsync(updatedUser, CancellationToken.None);
+        Result<Updated> result = await _sut.UpdateAsync(updatedUser, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(Result.Updated, result.Value);
 
         EntityEntry<UserPermissionEntity>? removedPermission = _mockContext.ChangeTracker
@@ -436,10 +436,10 @@ public class UserRepositoryTests
         };
 
         // Act
-        ErrorOr<Updated> result = await _sut.UpdateAsync(updatedUser, CancellationToken.None);
+        Result<Updated> result = await _sut.UpdateAsync(updatedUser, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(Result.Updated, result.Value);
 
         EntityEntry<UserRoleEntity>? removedRole = _mockContext.ChangeTracker
@@ -496,10 +496,10 @@ public class UserRepositoryTests
         };
 
         // Act
-        ErrorOr<Updated> result = await _sut.UpdateAsync(updatedUser, CancellationToken.None);
+        Result<Updated> result = await _sut.UpdateAsync(updatedUser, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(Result.Updated, result.Value);
 
         EntityEntry<UserRoleEntity>? removedRole = _mockContext.ChangeTracker

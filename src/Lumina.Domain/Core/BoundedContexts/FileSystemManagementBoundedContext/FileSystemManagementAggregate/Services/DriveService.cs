@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
@@ -33,32 +33,32 @@ public class DriveService : IDriveService
     /// <summary>
     /// Retrieves the list of drives.
     /// </summary>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of drives or an error.</returns>
-    public ErrorOr<IEnumerable<FileSystemItem>> GetDrives()
+    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of drives or an error.</returns>
+    public Result<IEnumerable<FileSystemItem>> GetDrives()
     {
         if (_platformContext.Platform == PlatformType.Unix)
         {
-            ErrorOr<UnixRootItem> unixRootResult = UnixRootItem.Create(FileSystemItemStatus.Accessible);
-            if (unixRootResult.IsError)
+            Result<UnixRootItem> unixRootResult = UnixRootItem.Create(FileSystemItemStatus.Accessible);
+            if (unixRootResult.IsFailure)
                 return unixRootResult.Errors;
             return new List<FileSystemItem>() { unixRootResult.Value };
         }
         else
-            return ErrorOrFactory.From(_fileSystem.DriveInfo.GetDrives()
+            return Result.From(_fileSystem.DriveInfo.GetDrives()
                                                             .OrderBy(driveInfo => driveInfo.Name)
                                                             .Where(driveInfo => driveInfo.IsReady)
                                                             .Select(driveInfo =>
                                                             {
-                                                                ErrorOr<FileSystemItem> root;
-                                                                ErrorOr<WindowsRootItem> windowsRootResult = WindowsRootItem.Create(driveInfo.Name, driveInfo.Name);
-                                                                if (windowsRootResult.IsError)
+                                                                Result<FileSystemItem> root;
+                                                                Result<WindowsRootItem> windowsRootResult = WindowsRootItem.Create(driveInfo.Name, driveInfo.Name);
+                                                                if (windowsRootResult.IsFailure)
                                                                     return windowsRootResult.Errors;
                                                                 else
                                                                     root = windowsRootResult.Value;
                                                                 return root;
                                                             })
-                                                            .Where(errorOrDrive => !errorOrDrive.IsError)
-                                                            .Select(errorOrDrive => errorOrDrive.Value)
+                                                            .Where(driveResult => !driveResult.IsFailure)
+                                                            .Select(driveResult => driveResult.Value)
                                                             .AsEnumerable());
     }
 }

@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Paths;
@@ -16,7 +16,7 @@ namespace Lumina.Application.Core.FileSystemManagement.Paths.Queries.GetPathRoot
 /// <summary>
 /// Handler for the query to get the root of a file system path.
 /// </summary>
-public class GetPathRootQueryHandler : IQueryHandler<GetPathRootQuery, ErrorOr<PathSegmentResponse>>
+public class GetPathRootQueryHandler : IQueryHandler<GetPathRootQuery, Result<PathSegmentResponse>>
 {
     private readonly IPathService _pathService;
     private readonly IValidator<GetPathRootQuery> _validator;
@@ -37,14 +37,14 @@ public class GetPathRootQueryHandler : IQueryHandler<GetPathRootQuery, ErrorOr<P
     /// </summary>
     /// <param name="query">The query containing the requested path.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either the root of the specified path, or an error.</returns>
-    public Task<ErrorOr<PathSegmentResponse>> HandleAsync(GetPathRootQuery query, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> containing either the root of the specified path, or an error.</returns>
+    public Task<Result<PathSegmentResponse>> HandleAsync(GetPathRootQuery query, CancellationToken cancellationToken)
     {
         List<Error> validationResult = _validator.Validate(query);
         if (validationResult.Count > 0)
-            return Task.FromResult<ErrorOr<PathSegmentResponse>>(validationResult);
+            return Task.FromResult<Result<PathSegmentResponse>>(validationResult);
 
-        ErrorOr<PathSegment> getPathRootResult = _pathService.GetPathRoot(query.Path!);
-        return Task.FromResult(getPathRootResult.Match(values => ErrorOrFactory.From(values.ToResponse()), errors => errors));
+        Result<PathSegment> getPathRootResult = _pathService.GetPathRoot(query.Path!);
+        return Task.FromResult(getPathRootResult.Match(values => Result.From(values.ToResponse()), errors => errors));
     }
 }

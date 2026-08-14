@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
@@ -23,7 +23,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.SharedKernel.Common.Errors.Errors;
+using DomainErrors = Lumina.Domain.Common.Errors.Errors;
 #endregion
 
 namespace Lumina.Application.Core.MediaLibrary.Management.Commands.AddLibrary;
@@ -31,7 +31,7 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Commands.AddLibrary;
 /// <summary>
 /// Handler for the command to add a media library.
 /// </summary>
-public class AddLibraryCommandHandler : ICommandHandler<AddLibraryCommand, ErrorOr<LibraryResponse>>
+public class AddLibraryCommandHandler : ICommandHandler<AddLibraryCommand, Result<LibraryResponse>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUserService;
@@ -71,9 +71,9 @@ public class AddLibraryCommandHandler : ICommandHandler<AddLibraryCommand, Error
     /// <param name="command">The command to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="LibraryResponse"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="LibraryResponse"/>, or an error message.
     /// </returns>
-    public async Task<ErrorOr<LibraryResponse>> HandleAsync(AddLibraryCommand command, CancellationToken cancellationToken)
+    public async Task<Result<LibraryResponse>> HandleAsync(AddLibraryCommand command, CancellationToken cancellationToken)
     {
         List<Error> validationResult = _validator.Validate(command);
         if (validationResult.Count > 0)
@@ -87,19 +87,19 @@ public class AddLibraryCommandHandler : ICommandHandler<AddLibraryCommand, Error
         // make sure the file is an actual supported image
         if (command.CoverImage is not null)
         {
-            ErrorOr<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(command.CoverImage);
-            if (fileSystemPathIdResult.IsError)
+            Result<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(command.CoverImage);
+            if (fileSystemPathIdResult.IsFailure)
                 return fileSystemPathIdResult.Errors;
 
-            ErrorOr<ImageType> imageCheckResult = await _environmentContext.FileTypeService.GetImageTypeAsync(fileSystemPathIdResult.Value, cancellationToken).ConfigureAwait(false);
-            if (imageCheckResult.IsError)
+            Result<ImageType> imageCheckResult = await _environmentContext.FileTypeService.GetImageTypeAsync(fileSystemPathIdResult.Value, cancellationToken).ConfigureAwait(false);
+            if (imageCheckResult.IsFailure)
                 return imageCheckResult.Errors;
             if (imageCheckResult.Value == ImageType.None)
                 return DomainErrors.Library.CoverFileMustBeAnImage;
         }
 
         // create a domain library object
-        ErrorOr<Library> createLibraryResult = Library.Create(
+        Result<Library> createLibraryResult = Library.Create(
             UserId.Create(_currentUserService.UserId!.Value),
             command.Title!,
             Enum.Parse<LibraryType>(command.LibraryType!),
@@ -113,7 +113,7 @@ public class AddLibraryCommandHandler : ICommandHandler<AddLibraryCommand, Error
             []
         );
 
-        if (createLibraryResult.IsError)
+        if (createLibraryResult.IsFailure)
             return createLibraryResult.Errors;
 
         // get a library repository
@@ -121,14 +121,14 @@ public class AddLibraryCommandHandler : ICommandHandler<AddLibraryCommand, Error
         // convert the domain library entity to a repository library entity
         LibraryEntity persistenceLibrary = createLibraryResult.Value.ToRepositoryEntity();
         // insert the repository entity and save changes
-        ErrorOr<Created> insertLibraryResult = await libraryRepository.InsertAsync(persistenceLibrary, cancellationToken).ConfigureAwait(false);
-        if (insertLibraryResult.IsError)
+        Result<Created> insertLibraryResult = await libraryRepository.InsertAsync(persistenceLibrary, cancellationToken).ConfigureAwait(false);
+        if (insertLibraryResult.IsFailure)
             return insertLibraryResult.Errors;
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         // retrieve the newly saved media library from the persistence medium and return it
-        ErrorOr<LibraryEntity?> getCreatedLibraryResult = await libraryRepository.GetByIdAsync(createLibraryResult.Value.Id.Value, cancellationToken).ConfigureAwait(false);
-        if (getCreatedLibraryResult.IsError)
+        Result<LibraryEntity?> getCreatedLibraryResult = await libraryRepository.GetByIdAsync(createLibraryResult.Value.Id.Value, cancellationToken).ConfigureAwait(false);
+        if (getCreatedLibraryResult.IsFailure)
             return getCreatedLibraryResult.Errors;
         if (getCreatedLibraryResult.Value is null)
             return ApplicationErrors.Persistence.ErrorPersistingMediaLibrary;

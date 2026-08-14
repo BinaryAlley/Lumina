@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
 using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
-using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
+using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Lumina.Presentation.Api.IntegrationTests.Common.Converters;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 using Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.WrittenContentLibrary.BookLibrary.Books.Fixtures;

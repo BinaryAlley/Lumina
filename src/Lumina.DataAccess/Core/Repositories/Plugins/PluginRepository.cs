@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Errors;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -34,8 +34,8 @@ internal sealed class PluginRepository : IPluginRepository
     /// </summary>
     /// <param name="id">The Id of the plugin to get.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a <see cref="PluginEntity"/>, or an error.</returns>
-    public async Task<ErrorOr<PluginEntity?>> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="PluginEntity"/>, or an error.</returns>
+    public async Task<Result<PluginEntity?>> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         return await _luminaDbContext.Plugins
             .FirstOrDefaultAsync(plugin => plugin.Id == id, cancellationToken).ConfigureAwait(false);
@@ -45,8 +45,8 @@ internal sealed class PluginRepository : IPluginRepository
     /// Gets all the detected plugins.
     /// </summary>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of <see cref="PluginEntity"/>, or an error.</returns>
-    public async Task<ErrorOr<IEnumerable<PluginEntity>>> GetAllAsync(CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="PluginEntity"/>, or an error.</returns>
+    public async Task<Result<IEnumerable<PluginEntity>>> GetAllAsync(CancellationToken cancellationToken)
     {
         return await _luminaDbContext.Plugins
             .ToListAsync(cancellationToken).ConfigureAwait(false);
@@ -57,8 +57,8 @@ internal sealed class PluginRepository : IPluginRepository
     /// </summary>
     /// <param name="plugin">The plugin to insert or update.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<ErrorOr<Updated>> UpsertAsync(PluginEntity plugin, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Updated>> UpsertAsync(PluginEntity plugin, CancellationToken cancellationToken)
     {
         PluginEntity? existingPlugin = await _luminaDbContext.Plugins
             .FirstOrDefaultAsync(repositoryPlugin => repositoryPlugin.Id == plugin.Id, cancellationToken).ConfigureAwait(false);
@@ -83,8 +83,8 @@ internal sealed class PluginRepository : IPluginRepository
     /// <param name="pluginId">The Id of the plugin whose settings are updated.</param>
     /// <param name="settingsJson">The serialized settings of the plugin.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<ErrorOr<Updated>> UpdateSettingsAsync(Guid pluginId, string? settingsJson, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Updated>> UpdateSettingsAsync(Guid pluginId, string? settingsJson, CancellationToken cancellationToken)
     {
         PluginEntity? existingPlugin = await _luminaDbContext.Plugins
             .FirstOrDefaultAsync(repositoryPlugin => repositoryPlugin.Id == pluginId, cancellationToken).ConfigureAwait(false);

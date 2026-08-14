@@ -1,11 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Domain.Common.Models.Core;
 using Lumina.Domain.Common.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Lumina.Domain.SharedKernel.Common.Errors;
 #endregion
 
 namespace Lumina.Domain.Common.ValueObjects.Metadata;
@@ -82,9 +80,9 @@ public class ReleaseInfo : ValueObject
     /// <param name="releaseCountry">The optional country or region of release.</param>
     /// <param name="releaseVersion">The optional release version or edition.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="ReleaseInfo"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="ReleaseInfo"/>, or an error message.
     /// </returns>
-    public static ErrorOr<ReleaseInfo> Create(
+    public static Result<ReleaseInfo> Create(
         Optional<DateOnly> originalReleaseDate,
         Optional<int> originalReleaseYear,
         Optional<DateOnly> reReleaseDate,
@@ -93,13 +91,13 @@ public class ReleaseInfo : ValueObject
         Optional<string> releaseVersion)
     {
         if (originalReleaseDate.HasValue && originalReleaseYear.HasValue && originalReleaseDate.Value.Year != originalReleaseYear.Value)
-            return Errors.Metadata.OriginalReleaseDateAndYearMustMatch;
+            return Errors.Errors.Metadata.OriginalReleaseDateAndYearMustMatch;
         if (reReleaseDate.HasValue && reReleaseYear.HasValue && reReleaseDate.Value.Year != reReleaseYear.Value)
-            return Errors.Metadata.ReReleaseDateAndYearMustMatch;
+            return Errors.Errors.Metadata.ReReleaseDateAndYearMustMatch;
         if (originalReleaseDate.HasValue && reReleaseDate.HasValue && originalReleaseDate.Value > reReleaseDate.Value)
-            return Errors.Metadata.ReReleaseDateCannotBeEarlierThanOriginalReleaseDate;
+            return Errors.Errors.Metadata.ReReleaseDateCannotBeEarlierThanOriginalReleaseDate;
         if (originalReleaseYear.HasValue && reReleaseYear.HasValue && originalReleaseYear.Value > reReleaseYear.Value)
-            return Errors.Metadata.ReReleaseYearCannotBeEarlierThanOriginalReleaseYear;
+            return Errors.Errors.Metadata.ReReleaseYearCannotBeEarlierThanOriginalReleaseYear;
         return new ReleaseInfo(originalReleaseDate, originalReleaseYear, reReleaseDate, reReleaseYear, releaseCountry, releaseVersion);
     }
 

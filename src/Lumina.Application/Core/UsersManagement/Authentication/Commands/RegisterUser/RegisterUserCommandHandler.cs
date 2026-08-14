@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
@@ -21,7 +21,7 @@ namespace Lumina.Application.Core.UsersManagement.Authentication.Commands.Regist
 /// <summary>
 /// Handler for the command to register a new user account.
 /// </summary>
-public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, ErrorOr<RegistrationResponse>>
+public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, Result<RegistrationResponse>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IPasswordHashService _hashService;
@@ -65,9 +65,9 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, E
     /// <param name="command">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="RegistrationResponse"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="RegistrationResponse"/>, or an error message.
     /// </returns>
-    public async Task<ErrorOr<RegistrationResponse>> HandleAsync(RegisterUserCommand command, CancellationToken cancellationToken)
+    public async Task<Result<RegistrationResponse>> HandleAsync(RegisterUserCommand command, CancellationToken cancellationToken)
     {
         List<Error> validationResult = _validator.Validate(command);
         if (validationResult.Count > 0)
@@ -75,8 +75,8 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, E
 
         // check if any users already exists (admin account is only set once!)
         IUserRepository userRepository = _unitOfWork.GetRepository<IUserRepository>();
-        ErrorOr<UserEntity?> getUserResult = await userRepository.GetByUsernameAsync(command.Username!, cancellationToken).ConfigureAwait(false);
-        if (getUserResult.IsError)
+        Result<UserEntity?> getUserResult = await userRepository.GetByUsernameAsync(command.Username!, cancellationToken).ConfigureAwait(false);
+        if (getUserResult.IsFailure)
             return getUserResult.Errors;
         else if (getUserResult.Value is not null)
             return Errors.Authentication.UsernameAlreadyExists;
@@ -105,8 +105,8 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, E
             user.TotpSecret = _cryptographyService.Encrypt(Convert.ToBase64String(secret));
         }
         // insert the user
-        ErrorOr<Created> insertUserResult = await userRepository.InsertAsync(user, cancellationToken).ConfigureAwait(false);
-        if (insertUserResult.IsError)
+        Result<Created> insertUserResult = await userRepository.InsertAsync(user, cancellationToken).ConfigureAwait(false);
+        if (insertUserResult.IsFailure)
             return insertUserResult.Errors;
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         // TODO: insert the default admin profile preferences when they are implemented

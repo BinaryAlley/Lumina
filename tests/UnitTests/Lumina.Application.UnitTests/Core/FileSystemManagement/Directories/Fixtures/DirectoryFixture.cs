@@ -1,10 +1,9 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using ErrorOr;
-using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -54,9 +53,9 @@ public class DirectoryFixture
         dateModified ??= Optional<DateTime>.Some(_faker.Date.Recent());
         status ??= _faker.PickRandom<FileSystemItemStatus>();
 
-        ErrorOr<Directory> directoryResult = Directory.Create(path, name, dateCreated.Value, dateModified.Value, status.Value);
+        Result<Directory> directoryResult = Directory.Create(path, name, dateCreated.Value, dateModified.Value, status.Value);
 
-        if (directoryResult.IsError)
+        if (directoryResult.IsFailure)
             throw new InvalidOperationException("Failed to create Directory: " + string.Join(", ", directoryResult.Errors));
         Directory directory = directoryResult.Value;
 
@@ -73,7 +72,7 @@ public class DirectoryFixture
     /// <returns>The created list.</returns>
     public List<Directory> CreateMany(int count = 3)
     {
-        return Enumerable.Range(0, count).Select(_ => CreateDirectory()).ToList();
+        return [.. Enumerable.Range(0, count).Select(_ => CreateDirectory())];
     }
 
     /// <summary>
@@ -85,7 +84,7 @@ public class DirectoryFixture
     /// <returns>A list of <see cref="Directory"/> objects with nested structures.</returns>
     public List<Directory> CreateManyNested(int count = 3, int maxDepth = 3, int maxChildrenPerDirectory = 3)
     {
-        return Enumerable.Range(0, count).Select(_ => CreateNestedDirectory(1, maxDepth, maxChildrenPerDirectory)).ToList();
+        return [.. Enumerable.Range(0, count).Select(_ => CreateNestedDirectory(1, maxDepth, maxChildrenPerDirectory))];
     }
 
     /// <summary>
@@ -106,8 +105,8 @@ public class DirectoryFixture
             for (int i = 0; i < childCount; i++)
             {
                 Directory childDirectory = CreateNestedDirectory(currentDepth + 1, maxDepth, maxChildrenPerDirectory);
-                ErrorOr<Updated> addResult = childDirectory.SetParent(childDirectory);
-                if (!addResult.IsError)
+                Result<Updated> addResult = childDirectory.SetParent(childDirectory);
+                if (!addResult.IsFailure)
                     childItems.Add(childDirectory);
             }
         }

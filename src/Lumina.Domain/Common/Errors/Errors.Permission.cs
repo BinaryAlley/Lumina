@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 #endregion
 
-namespace Lumina.Domain.SharedKernel.Common.Errors;
+namespace Lumina.Domain.Common.Errors;
 
 /// <summary>
 /// Domain permission related error types.

@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
@@ -20,7 +20,7 @@ namespace Lumina.Application.Core.UsersManagement.Authentication.Queries.GetUser
 /// <summary>
 /// Handler for the query to retrieve the list of users.
 /// </summary>
-public class GetUsersQueryHandler : IQueryHandler<GetUsersQuery, ErrorOr<IEnumerable<UserResponse>>>
+public class GetUsersQueryHandler : IQueryHandler<GetUsersQuery, Result<IEnumerable<UserResponse>>>
 {
     private readonly ICurrentUserService _currentUserService;
     private readonly IAuthorizationService _authorizationService;
@@ -45,15 +45,15 @@ public class GetUsersQueryHandler : IQueryHandler<GetUsersQuery, ErrorOr<IEnumer
     /// <param name="query">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a collection of <see cref="UserResponse"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a collection of <see cref="UserResponse"/>, or an error message.
     /// </returns>
-    public async Task<ErrorOr<IEnumerable<UserResponse>>> HandleAsync(GetUsersQuery query, CancellationToken cancellationToken)
+    public async Task<Result<IEnumerable<UserResponse>>> HandleAsync(GetUsersQuery query, CancellationToken cancellationToken)
     {
         // only admins can see the list of users
         bool isAdmin = await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false);
         if (!isAdmin)
             return Errors.Authorization.NotAuthorized;
-        ErrorOr<IEnumerable<UserEntity>> getRolesResult = await _userRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
-        return getRolesResult.Match(value => ErrorOrFactory.From(value.ToResponses()), errors => errors);
+        Result<IEnumerable<UserEntity>> getRolesResult = await _userRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+        return getRolesResult.Match(value => Result.From(value.ToResponses()), errors => errors);
     }
 }

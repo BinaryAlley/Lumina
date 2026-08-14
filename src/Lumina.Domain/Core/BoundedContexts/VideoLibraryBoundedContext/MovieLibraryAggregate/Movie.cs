@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.Models.Core;
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using Lumina.Domain.Core.BoundedContexts.MediaContributorBoundedContext.MediaContributorAggregate.ValueObjects;
@@ -56,7 +56,7 @@ public sealed class Movie : Entity<MovieId>
     /// <param name="contributors">The list of media contributors of the movie.</param>
     /// <param name="ratings">The list of ratings for the movie.</param>
     /// <returns>The created <see cref="Movie"/>.</returns>
-    public static ErrorOr<Movie> Create(VideoMetadata metadata, List<MediaContributorId> contributors, List<Rating> ratings)
+    public static Result<Movie> Create(VideoMetadata metadata, List<MediaContributorId> contributors, List<Rating> ratings)
     {
         // TODO: enforce invariants
         return new Movie(MovieId.CreateUnique(), metadata, contributors, ratings);
@@ -70,7 +70,7 @@ public sealed class Movie : Entity<MovieId>
     /// <param name="contributors">The list of media contributors of the movie.</param>
     /// <param name="ratings">The list of ratings for the movie.</param>
     /// <returns>The created <see cref="Movie"/>.</returns>
-    public static ErrorOr<Movie> Create(MovieId id, VideoMetadata metadata, List<MediaContributorId> contributors, List<Rating> ratings)
+    public static Result<Movie> Create(MovieId id, VideoMetadata metadata, List<MediaContributorId> contributors, List<Rating> ratings)
     {
         // TODO: enforce invariants
         return new Movie(id, metadata, contributors, ratings);

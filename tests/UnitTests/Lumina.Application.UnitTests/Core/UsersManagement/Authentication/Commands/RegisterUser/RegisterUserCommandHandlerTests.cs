@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -12,6 +11,7 @@ using Lumina.Application.Core.UsersManagement.Authentication.Commands.RegisterUs
 using Lumina.Application.UnitTests.Common.Mapping.UserManagement.Users.Fixtures;
 using Lumina.Application.UnitTests.Core.UsersManagement.Authentication.Commands.RegisterUser.Fixture;
 using Lumina.Contracts.Responses.Authentication;
+using Lumina.Domain.Common.Primitives;
 using NSubstitute;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -76,7 +76,7 @@ public class RegisterUserCommandHandlerTests
         string hashedPassword = "hashedPassword";
 
         _mockUserRepository.GetByUsernameAsync(command.Username!, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From<UserEntity?>(null));
+            .Returns(Result.From<UserEntity?>(null));
         _mockHashService.HashString(command.Password!)
             .Returns(hashedPassword);
         _mockTotpTokenGenerator.GenerateSecret()
@@ -89,10 +89,10 @@ public class RegisterUserCommandHandlerTests
             .Returns(Result.Created);
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(command.Username, result.Value.Username);
         Assert.Equal(qrCodeUri, result.Value.TotpSecret);
 
@@ -113,17 +113,17 @@ public class RegisterUserCommandHandlerTests
         string hashedPassword = "hashedPassword";
 
         _mockUserRepository.GetByUsernameAsync(command.Username!, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From<UserEntity?>(null));
+            .Returns(Result.From<UserEntity?>(null));
         _mockHashService.HashString(command.Password!)
             .Returns(hashedPassword);
         _mockUserRepository.InsertAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Created);
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(command.Username, result.Value.Username);
         Assert.Null(result.Value.TotpSecret);
 
@@ -144,13 +144,13 @@ public class RegisterUserCommandHandlerTests
         UserEntity existingUser = UserEntityFixture.CreateUserEntity();
 
         _mockUserRepository.GetByUsernameAsync(command.Username!, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From<UserEntity?>(existingUser));
+            .Returns(Result.From<UserEntity?>(existingUser));
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Authentication.UsernameAlreadyExists, result.FirstError);
 
         await _mockUserRepository.Received(1).GetByUsernameAsync(command.Username!, Arg.Any<CancellationToken>());
@@ -166,15 +166,15 @@ public class RegisterUserCommandHandlerTests
         Error error = Error.Failure("Database.Error", "Failed to insert user");
 
         _mockUserRepository.GetByUsernameAsync(command.Username!, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From<UserEntity?>(null));
+            .Returns(Result.From<UserEntity?>(null));
         _mockUserRepository.InsertAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>())
             .Returns(error);
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
 
         await _mockUserRepository.Received(1).GetByUsernameAsync(command.Username!, Arg.Any<CancellationToken>());
@@ -193,10 +193,10 @@ public class RegisterUserCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<RegistrationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
 
         await _mockUserRepository.Received(1).GetByUsernameAsync(command.Username!, Arg.Any<CancellationToken>());

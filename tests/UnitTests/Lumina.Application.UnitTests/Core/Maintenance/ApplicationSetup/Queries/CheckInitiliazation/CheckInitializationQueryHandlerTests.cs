@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Core.Maintenance.ApplicationSetup.Queries.CheckInitialization;
 using Lumina.Application.UnitTests.Common.Mapping.UserManagement.Users.Fixtures;
 using Lumina.Contracts.Responses.UsersManagement;
+using Lumina.Domain.Common.Primitives;
 using NSubstitute;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -45,7 +45,7 @@ public class CheckInitializationQueryHandlerTests
         // Arrange
         List<UserEntity> users = UserEntityFixture.CreateMany();
         _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(users.AsEnumerable()));
+            .Returns(Result.From(users.AsEnumerable()));
 
         // Act
         InitializationResponse result = await _sut.HandleAsync(new CheckInitializationQuery(), CancellationToken.None);
@@ -60,7 +60,7 @@ public class CheckInitializationQueryHandlerTests
     {
         // Arrange
         _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(Enumerable.Empty<UserEntity>()));
+            .Returns(Result.From(Enumerable.Empty<UserEntity>()));
 
         // Act
         InitializationResponse result = await _sut.HandleAsync(new CheckInitializationQuery(), CancellationToken.None);

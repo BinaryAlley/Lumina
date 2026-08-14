@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.FileSystemManagement.Paths.Queries.CheckPathExists;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Pahs.Queries.CheckPathExists.Fixtures;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
-using Lumina.Application.Common.Infrastructure.Validation;
 using NSubstitute;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
@@ -42,10 +42,10 @@ public class CheckPathExistsQueryHandlerTests
         _mockPathService.Exists(query.Path!).Returns(true);
 
         // Act
-        ErrorOr<PathExistsResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<PathExistsResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.True(result.Value.Exists);
         _mockPathService.Received(1).Exists(query.Path!);
     }
@@ -58,10 +58,10 @@ public class CheckPathExistsQueryHandlerTests
         _mockPathService.Exists(query.Path!).Returns(true);
 
         // Act
-        ErrorOr<PathExistsResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<PathExistsResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.True(result.Value.Exists);
         _mockPathService.Received(1).Exists(query.Path!);
     }
@@ -74,10 +74,10 @@ public class CheckPathExistsQueryHandlerTests
         _mockPathService.Exists(query.Path!, false).Returns(false);
 
         // Act
-        ErrorOr<PathExistsResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<PathExistsResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.False(result.Value.Exists);
         _mockPathService.Received(1).Exists(query.Path!, false);
     }
@@ -90,10 +90,10 @@ public class CheckPathExistsQueryHandlerTests
         _mockPathService.Exists(query.Path!).Returns(false);
 
         // Act
-        ErrorOr<PathExistsResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<PathExistsResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.False(result.Value.Exists);
         _mockPathService.Received(1).Exists(query.Path!);
     }
@@ -106,10 +106,10 @@ public class CheckPathExistsQueryHandlerTests
         _mockPathService.Exists(Arg.Any<string>(), Arg.Any<bool>()).Returns(false);
 
         // Act
-        ErrorOr<PathExistsResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<PathExistsResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.False(result.Value.Exists);
         _mockPathService.Received(1).Exists(Arg.Any<string>(), Arg.Any<bool>());
     }
@@ -123,10 +123,10 @@ public class CheckPathExistsQueryHandlerTests
         CancellationToken cancellationToken = new(true);
 
         // Act
-        ErrorOr<PathExistsResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<PathExistsResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.True(result.Value.Exists);
         _mockPathService.Received(1).Exists(query.Path!);
     }

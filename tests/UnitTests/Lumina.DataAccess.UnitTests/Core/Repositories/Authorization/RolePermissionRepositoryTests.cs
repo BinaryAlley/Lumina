@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using EntityFrameworkCore.Testing.NSubstitute;
-using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.DataAccess.Core.Repositories.Authorization;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.DataAccess.UnitTests.Core.Repositories.Authorization.Fixtures;
+using Lumina.Domain.Common.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Diagnostics.CodeAnalysis;
@@ -42,10 +42,10 @@ public class RolePermissionRepositoryTests
         RolePermissionEntity rolePermissionModel = _rolePermissionEntityFixture.CreateRolePermissionModel();
 
         // Act
-        ErrorOr<Created> result = await _sut.InsertAsync(rolePermissionModel, CancellationToken.None);
+        Result<Created> result = await _sut.InsertAsync(rolePermissionModel, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(Result.Created, result.Value);
 
         // check if the role permission was added to the context's ChangeTracker

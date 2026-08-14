@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using ErrorOr;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.FileSystemManagement.Files.Queries.GetTreeFiles;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Files.Fixtures;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Files.Queries.GetTreeFiles.Fixtures;
-using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
-using Lumina.Application.Common.Infrastructure.Validation;
+using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using NSubstitute;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -54,18 +54,18 @@ public class GetTreeFilesQueryHandlerTests
         IEnumerable<File> files = _fileFixture.CreateMany();
 
         _mockFileService.GetFiles(getFilesQuery.Path!, getFilesQuery.IncludeHiddenElements)
-            .Returns(ErrorOrFactory.From(files));
+            .Returns(Result.From(files));
 
         // Act
-        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.HandleAsync(getFilesQuery, CancellationToken.None);
+        Result<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.HandleAsync(getFilesQuery, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.IsAssignableFrom<IEnumerable<FileSystemTreeNodeResponse>>(result.Value);
         Assert.Equal(files.Count(), result.Value.Count());
 
-        List<FileSystemTreeNodeResponse> resultList = result.Value.ToList();
-        List<File> filesList = files.ToList();
+        List<FileSystemTreeNodeResponse> resultList = [.. result.Value];
+        List<File> filesList = [.. files];
 
         for (int i = 0; i < resultList.Count; i++)
         {
@@ -89,18 +89,18 @@ public class GetTreeFilesQueryHandlerTests
         IEnumerable<File> files = _fileFixture.CreateMany();
 
         _mockFileService.GetFiles(getFilesQuery.Path!, getFilesQuery.IncludeHiddenElements)
-            .Returns(ErrorOrFactory.From(files));
+            .Returns(Result.From(files));
 
         // Act
-        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.HandleAsync(getFilesQuery, CancellationToken.None);
+        Result<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.HandleAsync(getFilesQuery, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.IsAssignableFrom<IEnumerable<FileSystemTreeNodeResponse>>(result.Value);
         Assert.Equal(files.Count(), result.Value.Count());
 
-        List<FileSystemTreeNodeResponse> resultList = result.Value.ToList();
-        List<File> filesList = files.ToList();
+        List<FileSystemTreeNodeResponse> resultList = [.. result.Value];
+        List<File> filesList = [.. files];
 
         for (int i = 0; i < resultList.Count; i++)
         {
@@ -125,10 +125,10 @@ public class GetTreeFilesQueryHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
         _mockFileService.Received(1).GetFiles(query.Path!, query.IncludeHiddenElements);
     }
@@ -138,15 +138,15 @@ public class GetTreeFilesQueryHandlerTests
     {
         // Arrange
         GetTreeFilesQuery query = _fixture.Create<GetTreeFilesQuery>();
-        ErrorOr<IEnumerable<File>> emptyList = ErrorOrFactory.From(Enumerable.Empty<File>());
+        Result<IEnumerable<File>> emptyList = Result.From(Enumerable.Empty<File>());
         _mockFileService.GetFiles(query.Path!, query.IncludeHiddenElements)
             .Returns(emptyList);
 
         // Act
-        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Empty(result.Value);
         _mockFileService.Received(1).GetFiles(query.Path!, query.IncludeHiddenElements);
     }

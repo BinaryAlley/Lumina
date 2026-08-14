@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Contracts.DTO.Common;
+using Lumina.Domain.Common.Errors;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using Lumina.Domain.SharedKernel.Common.Errors;
 #endregion
 
 namespace Lumina.Application.UnitTests.Common.Mapping.Common.Metadata;
@@ -73,10 +73,10 @@ public class TagEntityMappingTests
         TagEntity entity = new("Fantasy");
 
         // Act
-        ErrorOr<Tag> result = entity.ToDomainEntity();
+        Result<Tag> result = entity.ToDomainEntity();
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(entity.Name, result.Value.Name);
     }
@@ -91,10 +91,10 @@ public class TagEntityMappingTests
         TagEntity entity = new(invalidName);
 
         // Act
-        ErrorOr<Tag> result = entity.ToDomainEntity();
+        Result<Tag> result = entity.ToDomainEntity();
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Metadata.TagNameCannotBeEmpty, result.FirstError);
     }
 
@@ -111,16 +111,16 @@ public class TagEntityMappingTests
         ];
 
         // Act
-        IEnumerable<ErrorOr<Tag>> results = entities.ToDomainEntities();
+        IEnumerable<Result<Tag>> results = entities.ToDomainEntities();
 
         // Assert
         Assert.NotNull(results);
         Assert.Equal(entities.Count, results.Count());
 
-        List<ErrorOr<Tag>> resultList = results.ToList();
+        List<Result<Tag>> resultList = [.. results];
         for (int i = 0; i < entities.Count; i++)
         {
-            Assert.False(resultList[i].IsError);
+            Assert.False(resultList[i].IsFailure);
             Assert.Equal(entities[i].Name, resultList[i].Value.Name);
         }
     }
@@ -144,7 +144,7 @@ public class TagEntityMappingTests
         Assert.NotNull(results);
         Assert.Equal(entities.Count, results.Count());
 
-        List<TagDto> resultList = results.ToList();
+        List<TagDto> resultList = [.. results];
         for (int i = 0; i < entities.Count; i++)
             Assert.Equal(entities[i].Name, resultList[i].Name);
     }

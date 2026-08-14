@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Repositories.Authorization;
@@ -20,7 +20,7 @@ namespace Lumina.Application.Core.Admin.Authorization.Roles.Queries.GetRolePermi
 /// <summary>
 /// Handler for the query to retrieve the list of authorization permissions for a role.
 /// </summary>
-public class GetRolePermissionsQueryHandler : IQueryHandler<GetRolePermissionsQuery, ErrorOr<RolePermissionsResponse>>
+public class GetRolePermissionsQueryHandler : IQueryHandler<GetRolePermissionsQuery, Result<RolePermissionsResponse>>
 {
     private readonly ICurrentUserService _currentUserService;
     private readonly IAuthorizationService _authorizationService;
@@ -48,9 +48,9 @@ public class GetRolePermissionsQueryHandler : IQueryHandler<GetRolePermissionsQu
     /// <param name="request">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a collection of <see cref="RoleResponse"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a collection of <see cref="RoleResponse"/>, or an error message.
     /// </returns>
-    public async Task<ErrorOr<RolePermissionsResponse>> HandleAsync(GetRolePermissionsQuery request, CancellationToken cancellationToken)
+    public async Task<Result<RolePermissionsResponse>> HandleAsync(GetRolePermissionsQuery request, CancellationToken cancellationToken)
     {
         List<Error> validationResult = _validator.Validate(request);
         if (validationResult.Count > 0)
@@ -61,8 +61,8 @@ public class GetRolePermissionsQueryHandler : IQueryHandler<GetRolePermissionsQu
         if (!isAdmin)
             return Errors.Authorization.NotAuthorized;
         // get the role from the repository and return its role permissions
-        ErrorOr<RoleEntity?> getRoleResult = await _roleRepository.GetByIdAsync(request.RoleId, cancellationToken).ConfigureAwait(false);
-        if (getRoleResult.IsError)
+        Result<RoleEntity?> getRoleResult = await _roleRepository.GetByIdAsync(request.RoleId, cancellationToken).ConfigureAwait(false);
+        if (getRoleResult.IsFailure)
             return getRoleResult.Errors;
         else if (getRoleResult.Value is null)
             return Errors.Authorization.RoleNotFound;

@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Platform;
+using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using NSubstitute;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -44,10 +44,10 @@ public class DriveServiceTests
         _mockPlatformContext.Platform.Returns(PlatformType.Unix);
 
         // Act
-        ErrorOr<IEnumerable<FileSystemItem>> result = _sut.GetDrives();
+        Result<IEnumerable<FileSystemItem>> result = _sut.GetDrives();
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Single(result.Value);
         Assert.IsType<UnixRootItem>(result.Value.First());
         Assert.Equal(FileSystemItemStatus.Accessible, result.Value.First().Status);
@@ -67,10 +67,10 @@ public class DriveServiceTests
         _mockFileSystem.DriveInfo.GetDrives().Returns(mockDrives);
 
         // Act
-        ErrorOr<IEnumerable<FileSystemItem>> result = _sut.GetDrives();
+        Result<IEnumerable<FileSystemItem>> result = _sut.GetDrives();
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(2, result.Value.Count()); // Only ready drives
         Assert.All(result.Value, item => Assert.IsType<WindowsRootItem>(item));
         Assert.Equal(["C:\\", "D:\\"], result.Value.Select(d => d.Name));

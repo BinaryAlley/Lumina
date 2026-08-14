@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -39,8 +39,8 @@ public class Over18Policy : IOver18Policy
     /// <returns><see langword="true"/> if the policy evaluation succeeds, <see langword="false"/> otherwise.</returns>
     public async Task<bool> EvaluateAsync(Guid userId, CancellationToken cancellationToken)
     {
-        ErrorOr<UserEntity?> getUserResult = await _userRepository.GetByIdAsync(userId, cancellationToken).ConfigureAwait(false);
-        if (getUserResult.IsError || getUserResult.Value is null)
+        Result<UserEntity?> getUserResult = await _userRepository.GetByIdAsync(userId, cancellationToken).ConfigureAwait(false);
+        if (getUserResult.IsFailure || getUserResult.Value is null)
             return false;
 
         // TODO: uncomment when Date of Birth is implemented for users registration

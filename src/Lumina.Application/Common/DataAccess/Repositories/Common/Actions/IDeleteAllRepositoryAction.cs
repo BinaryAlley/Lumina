@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using System.Threading.Tasks;
 #endregion
 
@@ -13,6 +13,6 @@ public interface IDeleteAllRepositoryAction
     /// <summary>
     /// Deletes all entities from the storage medium.
     /// </summary>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    Task<ErrorOr<Deleted>> DeleteAllAsync();
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Deleted>> DeleteAllAsync();
 }

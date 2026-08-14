@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Paths;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -20,8 +20,8 @@ public class PathSegmentMappingTests
     public void ToResponse_WhenMappingPathSegment_ShouldMapCorrectly()
     {
         // Arrange
-        ErrorOr<PathSegment> createResult = PathSegment.Create("TestSegment", true, false);
-        Assert.False(createResult.IsError);
+        Result<PathSegment> createResult = PathSegment.Create("TestSegment", true, false);
+        Assert.False(createResult.IsFailure);
         PathSegment pathSegment = createResult.Value;
 
         // Act
@@ -39,8 +39,8 @@ public class PathSegmentMappingTests
     public void ToResponse_WhenMappingDifferentPathSegmentTypes_ShouldMapCorrectly(string name, bool isDirectory, bool isDrive)
     {
         // Arrange
-        ErrorOr<PathSegment> createResult = PathSegment.Create(name, isDirectory, isDrive);
-        Assert.False(createResult.IsError);
+        Result<PathSegment> createResult = PathSegment.Create(name, isDirectory, isDrive);
+        Assert.False(createResult.IsFailure);
         PathSegment pathSegment = createResult.Value;
 
         // Act
@@ -69,7 +69,7 @@ public class PathSegmentMappingTests
         // Assert
         Assert.NotNull(results);
         Assert.Equal(pathSegments.Count, results.Count());
-        List<PathSegmentResponse> resultList = results.ToList();
+        List<PathSegmentResponse> resultList = [.. results];
         for (int i = 0; i < pathSegments.Count; i++)
             Assert.Equal(pathSegments[i].Name, resultList[i].Path);
     }

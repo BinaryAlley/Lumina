@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Domain.Common.Primitives;
+
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
-using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Errors;
 using System;
 using System.Diagnostics;
 #endregion
@@ -55,9 +55,9 @@ public sealed class File : FileSystemItem
     /// <param name="size">The size of the file in bytes.</param>
     /// <param name="status">The status of the file system item.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="File"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="File"/>, or an error message.
     /// </returns>
-    public static ErrorOr<File> Create(
+    public static Result<File> Create(
         string path,
         string name,
         Optional<DateTime> dateCreated,
@@ -66,8 +66,8 @@ public sealed class File : FileSystemItem
         FileSystemItemStatus status = FileSystemItemStatus.Accessible)
     {
         // TODO: enforce invariants
-        ErrorOr<FileSystemPathId> createPathResult = FileSystemPathId.Create(path);
-        if (createPathResult.IsError)
+        Result<FileSystemPathId> createPathResult = FileSystemPathId.Create(path);
+        if (createPathResult.IsFailure)
             return createPathResult.Errors;
         File newFile = new(
             createPathResult.Value,
@@ -75,8 +75,8 @@ public sealed class File : FileSystemItem
             dateCreated,
             dateModified,
             size);
-        ErrorOr<Updated> setStatusResult = newFile.SetStatus(status);
-        if (setStatusResult.IsError)
+        Result<Updated> setStatusResult = newFile.SetStatus(status);
+        if (setStatusResult.IsFailure)
             return setStatusResult.Errors;
         return newFile;
     }
@@ -91,9 +91,9 @@ public sealed class File : FileSystemItem
     /// <param name="size">The size of the file in bytes.</param>
     /// <param name="status">The status of the file system item.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="File"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="File"/>, or an error message.
     /// </returns>
-    public static ErrorOr<File> Create(
+    public static Result<File> Create(
         FileSystemPathId id,
         string name,
         Optional<DateTime> dateCreated,
@@ -108,8 +108,8 @@ public sealed class File : FileSystemItem
             dateCreated,
             dateModified,
             size);
-        ErrorOr<Updated> setStatusResult = newFile.SetStatus(status);
-        if (setStatusResult.IsError)
+        Result<Updated> setStatusResult = newFile.SetStatus(status);
+        if (setStatusResult.IsFailure)
             return setStatusResult.Errors;
         return newFile;
     }
@@ -118,8 +118,8 @@ public sealed class File : FileSystemItem
     /// Updates the last modified date of the file system item.
     /// </summary>
     /// <param name="date">The new date and time of last modification.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public ErrorOr<Updated> UpdateLastModified(DateTime date)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public Result<Updated> UpdateLastModified(DateTime date)
     {
         DateModified = date;
         return Result.Updated;
@@ -129,8 +129,8 @@ public sealed class File : FileSystemItem
     /// Updates the size of the file.
     /// </summary>
     /// <param name="newSize">The new size, in bytes.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public ErrorOr<Updated> UpdateSize(long newSize)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public Result<Updated> UpdateSize(long newSize)
     {
         Size = newSize;
         return Result.Updated;
@@ -140,8 +140,8 @@ public sealed class File : FileSystemItem
     /// Renames the file system item to the specified new name.
     /// </summary>
     /// <param name="newName">The new name for the file system item.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public ErrorOr<Updated> Rename(string newName)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public Result<Updated> Rename(string newName)
     {
         if (string.IsNullOrWhiteSpace(newName))
             return Errors.FileSystemManagement.NameCannotBeEmpty;

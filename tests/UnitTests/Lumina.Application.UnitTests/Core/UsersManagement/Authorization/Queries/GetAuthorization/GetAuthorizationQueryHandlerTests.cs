@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
@@ -8,6 +7,7 @@ using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetAuthorization;
 using Lumina.Application.UnitTests.Core.UsersManagement.Authorization.Queries.GetAuthorization.Fixtures;
 using Lumina.Contracts.Responses.Authorization;
+using Lumina.Domain.Common.Primitives;
 using NSubstitute;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -50,13 +50,13 @@ public class GetAuthorizationQueryHandlerTests
 
         _mockCurrentUserService.UserId.Returns(userId);
         _mockAuthorizationService.GetUserAuthorizationAsync(userId, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(authEntity));
+            .Returns(Result.From(authEntity));
 
         // Act
-        ErrorOr<AuthorizationResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<AuthorizationResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(userId, result.Value.UserId);
         Assert.Equal(authEntity.Role, result.Value.Role);
         Assert.Equal(authEntity.Permissions, result.Value.Permissions);
@@ -74,15 +74,15 @@ public class GetAuthorizationQueryHandlerTests
 
         _mockCurrentUserService.UserId.Returns(adminUserId);
         _mockAuthorizationService.GetUserAuthorizationAsync(adminUserId, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(adminAuthEntity));
+            .Returns(Result.From(adminAuthEntity));
         _mockAuthorizationService.GetUserAuthorizationAsync(targetUserId, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(targetAuthEntity));
+            .Returns(Result.From(targetAuthEntity));
 
         // Act
-        ErrorOr<AuthorizationResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<AuthorizationResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(targetUserId, result.Value.UserId);
         Assert.Equal(targetAuthEntity.Role, result.Value.Role);
         Assert.Equal(targetAuthEntity.Permissions, result.Value.Permissions);
@@ -99,13 +99,13 @@ public class GetAuthorizationQueryHandlerTests
 
         _mockCurrentUserService.UserId.Returns(currentUserId);
         _mockAuthorizationService.GetUserAuthorizationAsync(currentUserId, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(currentUserAuth));
+            .Returns(Result.From(currentUserAuth));
 
         // Act
-        ErrorOr<AuthorizationResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<AuthorizationResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.Authorization.NotAuthorized, result.FirstError);
     }
 
@@ -123,10 +123,10 @@ public class GetAuthorizationQueryHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<AuthorizationResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<AuthorizationResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
     }
 
@@ -142,15 +142,15 @@ public class GetAuthorizationQueryHandlerTests
 
         _mockCurrentUserService.UserId.Returns(adminUserId);
         _mockAuthorizationService.GetUserAuthorizationAsync(adminUserId, Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(adminAuthEntity));
+            .Returns(Result.From(adminAuthEntity));
         _mockAuthorizationService.GetUserAuthorizationAsync(targetUserId, Arg.Any<CancellationToken>())
             .Returns(error);
 
         // Act
-        ErrorOr<AuthorizationResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<AuthorizationResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
     }
 }

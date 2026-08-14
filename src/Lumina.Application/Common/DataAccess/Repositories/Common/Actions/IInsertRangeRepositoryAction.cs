@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.Common;
 using System.Collections.Generic;
 using System.Threading;
@@ -19,6 +19,6 @@ public interface IInsertRangeRepositoryAction<TModel> where TModel : IStorageEnt
     /// </summary>
     /// <param name="entities">The elements to be saved.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    Task<ErrorOr<Created>> InsertRangeAsync(IReadOnlyCollection<TModel> entities, CancellationToken cancellationToken);
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Created>> InsertRangeAsync(IReadOnlyCollection<TModel> entities, CancellationToken cancellationToken);
 }

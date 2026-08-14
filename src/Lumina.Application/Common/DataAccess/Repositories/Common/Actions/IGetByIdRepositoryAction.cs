@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.Common;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,6 +20,6 @@ public interface IGetByIdRepositoryAction<TModel, TId> where TModel : IStorageEn
     /// </summary>
     /// <param name="id">The id of the element to get.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a <typeparamref name="TModel"/> identified by <paramref name="id"/>, or an error.</returns>
-    Task<ErrorOr<TModel?>> GetByIdAsync(TId id, CancellationToken cancellationToken);
+    /// <returns>An <see cref="Result{TValue}"/> containing either a <typeparamref name="TModel"/> identified by <paramref name="id"/>, or an error.</returns>
+    Task<Result<TModel?>> GetByIdAsync(TId id, CancellationToken cancellationToken);
 }

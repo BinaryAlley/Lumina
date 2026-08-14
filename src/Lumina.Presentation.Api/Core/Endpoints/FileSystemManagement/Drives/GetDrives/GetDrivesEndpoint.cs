@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.FileSystemManagement.Drives.Queries.GetDrives;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Common.Routes.FileSystemManagement;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
@@ -19,13 +19,13 @@ namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Drives.Get
 /// </summary>
 public class GetDrivesEndpoint : BaseEndpoint<EmptyRequest, IResult>
 {
-    private readonly IQueryHandler<GetDrivesQuery, ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>> _getDrivesQueryHandler;
+    private readonly IQueryHandler<GetDrivesQuery, Result<IEnumerable<FileSystemTreeNodeResponse>>> _getDrivesQueryHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetDrivesEndpoint"/> class.
     /// </summary>
     /// <param name="getDrivesQueryHandler">Injected service for handling get drives queries.</param>
-    public GetDrivesEndpoint(IQueryHandler<GetDrivesQuery, ErrorOr<IEnumerable<FileSystemTreeNodeResponse>>> getDrivesQueryHandler)
+    public GetDrivesEndpoint(IQueryHandler<GetDrivesQuery, Result<IEnumerable<FileSystemTreeNodeResponse>>> getDrivesQueryHandler)
     {
         _getDrivesQueryHandler = getDrivesQueryHandler;
     }
@@ -35,7 +35,7 @@ public class GetDrivesEndpoint : BaseEndpoint<EmptyRequest, IResult>
     /// </summary>
     public override void Configure()
     {
-        Verbs(FastEndpoints.Http.GET);
+        Verbs(Http.GET);
         Routes(ApiRoutes.Drives.GET_DRIVES);
         Version(1);
         DontCatchExceptions();
@@ -47,7 +47,7 @@ public class GetDrivesEndpoint : BaseEndpoint<EmptyRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(EmptyRequest _, CancellationToken cancellationToken)
     {
-        ErrorOr<IEnumerable<FileSystemTreeNodeResponse>> result = await _getDrivesQueryHandler.HandleAsync(new GetDrivesQuery(), cancellationToken).ConfigureAwait(false);
+        Result<IEnumerable<FileSystemTreeNodeResponse>> result = await _getDrivesQueryHandler.HandleAsync(new GetDrivesQuery(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

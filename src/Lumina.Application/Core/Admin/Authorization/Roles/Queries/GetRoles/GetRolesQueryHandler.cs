@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Repositories.Authorization;
@@ -19,7 +19,7 @@ namespace Lumina.Application.Core.Admin.Authorization.Roles.Queries.GetRoles;
 /// <summary>
 /// Handler for the query to retrieve the list of authorization roles.
 /// </summary>
-public class GetRolesQueryHandler : IQueryHandler<GetRolesQuery, ErrorOr<IEnumerable<RoleResponse>>>
+public class GetRolesQueryHandler : IQueryHandler<GetRolesQuery, Result<IEnumerable<RoleResponse>>>
 {
     private readonly ICurrentUserService _currentUserService;
     private readonly IAuthorizationService _authorizationService;
@@ -44,15 +44,15 @@ public class GetRolesQueryHandler : IQueryHandler<GetRolesQuery, ErrorOr<IEnumer
     /// <param name="query">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a collection of <see cref="RoleResponse"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a collection of <see cref="RoleResponse"/>, or an error message.
     /// </returns>
-    public async Task<ErrorOr<IEnumerable<RoleResponse>>> HandleAsync(GetRolesQuery query, CancellationToken cancellationToken)
+    public async Task<Result<IEnumerable<RoleResponse>>> HandleAsync(GetRolesQuery query, CancellationToken cancellationToken)
     {
         // only admins can see the list of authorization roles
         bool isAdmin = await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false);
         if (!isAdmin)
             return Errors.Authorization.NotAuthorized;
-        ErrorOr<IEnumerable<RoleEntity>> getRolesResult = await _roleRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
-        return getRolesResult.Match(value => ErrorOrFactory.From(value.ToResponses()), errors => errors);
+        Result<IEnumerable<RoleEntity>> getRolesResult = await _roleRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+        return getRolesResult.Match(value => Result.From(value.ToResponses()), errors => errors);
     }
 }

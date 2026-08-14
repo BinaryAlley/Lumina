@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.FileSystemManagement.Paths.Queries.GetPathRoot;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Pahs.Fixtures;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Pahs.Queries.GetPathRoot.Fixtures;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
-using Lumina.Application.Common.Infrastructure.Validation;
 using NSubstitute;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
@@ -46,13 +46,13 @@ public class GetPathRootQueryHandlerTests
         PathSegment pathSegment = _pathSegmentFixture.CreatePathSegment(isDrive: true);
 
         _mockPathService.GetPathRoot(query.Path!)
-            .Returns(ErrorOrFactory.From(pathSegment));
+            .Returns(Result.From(pathSegment));
 
         // Act
-        ErrorOr<PathSegmentResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<PathSegmentResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(pathSegment.Name, result.Value.Path);
         _mockPathService.Received(1).GetPathRoot(query.Path!);
@@ -68,10 +68,10 @@ public class GetPathRootQueryHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<PathSegmentResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<PathSegmentResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
         _mockPathService.Received(1).GetPathRoot(query.Path!);
     }
@@ -84,13 +84,13 @@ public class GetPathRootQueryHandlerTests
         PathSegment rootPathSegment = _pathSegmentFixture.CreatePathSegment(name: "/", isDirectory: true, isDrive: true);
 
         _mockPathService.GetPathRoot(query.Path!)
-            .Returns(ErrorOrFactory.From(rootPathSegment));
+            .Returns(Result.From(rootPathSegment));
 
         // Act
-        ErrorOr<PathSegmentResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<PathSegmentResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal("/", result.Value.Path);
         _mockPathService.Received(1).GetPathRoot(query.Path!);

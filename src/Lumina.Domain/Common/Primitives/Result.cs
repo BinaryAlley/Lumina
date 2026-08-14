@@ -1,3 +1,9 @@
+#region ========================================================================= USING =====================================================================================
+using System;
+using System.Collections.Generic;
+using System.Linq;
+#endregion
+
 namespace Lumina.Domain.Common.Primitives;
 
 /// <summary>

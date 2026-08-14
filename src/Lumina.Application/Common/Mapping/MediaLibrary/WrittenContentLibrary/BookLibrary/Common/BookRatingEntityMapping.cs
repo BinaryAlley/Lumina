@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
-using Lumina.Domain.Common.Primitives;
+
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,9 +46,9 @@ public static class BookRatingEntityMapping
     /// </summary>
     /// <param name="repositoryEntity">The repository entity to be converted.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully converted <see cref="BookRating"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully converted <see cref="BookRating"/>, or an error message.
     /// </returns>
-    public static ErrorOr<BookRating> ToDomainEntity(this BookRatingEntity repositoryEntity)
+    public static Result<BookRating> ToDomainEntity(this BookRatingEntity repositoryEntity)
     {
         return BookRating.Create(
             repositoryEntity.Value ?? default,
@@ -63,9 +63,9 @@ public static class BookRatingEntityMapping
     /// </summary>
     /// <param name="repositoryEntities">The repository entities to be converted.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a collection of converted <see cref="BookRating"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a collection of converted <see cref="BookRating"/>, or an error message.
     /// </returns>
-    public static IEnumerable<ErrorOr<BookRating>> ToDomainEntities(this IEnumerable<BookRatingEntity> repositoryEntities)
+    public static IEnumerable<Result<BookRating>> ToDomainEntities(this IEnumerable<BookRatingEntity> repositoryEntities)
     {
         return repositoryEntities.Select(domainEntity => domainEntity.ToDomainEntity());
     }

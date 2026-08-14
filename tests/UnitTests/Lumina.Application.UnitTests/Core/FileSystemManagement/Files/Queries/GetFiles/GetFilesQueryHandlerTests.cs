@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using ErrorOr;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.FileSystemManagement.Files.Queries.GetFiles;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Files.Fixtures;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Files.Queries.GetFiles.Fixtures;
 using Lumina.Contracts.Responses.FileSystemManagement.Files;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
-using Lumina.Application.Common.Infrastructure.Validation;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -54,18 +54,18 @@ public class GetFilesQueryHandlerTests
         IEnumerable<File> files = _fileFixture.CreateMany();
 
         _mockFileService.GetFiles(getFilesQuery.Path!, getFilesQuery.IncludeHiddenElements)
-            .Returns(ErrorOrFactory.From(files));
+            .Returns(Result.From(files));
 
         // Act
-        ErrorOr<IEnumerable<FileResponse>> result = await _sut.HandleAsync(getFilesQuery, CancellationToken.None);
+        Result<IEnumerable<FileResponse>> result = await _sut.HandleAsync(getFilesQuery, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.IsAssignableFrom<IEnumerable<FileResponse>>(result.Value);
         Assert.Equal(files.Count(), result.Value.Count());
 
-        List<FileResponse> resultList = result.Value.ToList();
-        List<File> filesList = files.ToList();
+        List<FileResponse> resultList = [.. result.Value];
+        List<File> filesList = [.. files];
 
         for (int i = 0; i < resultList.Count; i++)
         {
@@ -88,18 +88,18 @@ public class GetFilesQueryHandlerTests
         IEnumerable<File> files = _fileFixture.CreateMany();
 
         _mockFileService.GetFiles(getFilesQuery.Path!, getFilesQuery.IncludeHiddenElements)
-            .Returns(ErrorOrFactory.From(files));
+            .Returns(Result.From(files));
 
         // Act
-        ErrorOr<IEnumerable<FileResponse>> result = await _sut.HandleAsync(getFilesQuery, CancellationToken.None);
+        Result<IEnumerable<FileResponse>> result = await _sut.HandleAsync(getFilesQuery, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.IsAssignableFrom<IEnumerable<FileResponse>>(result.Value);
         Assert.Equal(files.Count(), result.Value.Count());
 
-        List<FileResponse> resultList = result.Value.ToList();
-        List<File> filesList = files.ToList();
+        List<FileResponse> resultList = [.. result.Value];
+        List<File> filesList = [.. files];
 
         for (int i = 0; i < resultList.Count; i++)
         {
@@ -123,10 +123,10 @@ public class GetFilesQueryHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<IEnumerable<FileResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<IEnumerable<FileResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
         _mockFileService.Received(1).GetFiles(query.Path!, query.IncludeHiddenElements);
     }
@@ -136,15 +136,15 @@ public class GetFilesQueryHandlerTests
     {
         // Arrange
         GetFilesQuery query = _fixture.Create<GetFilesQuery>();
-        ErrorOr<IEnumerable<File>> emptyList = ErrorOrFactory.From(Enumerable.Empty<File>());
+        Result<IEnumerable<File>> emptyList = Result.From(Enumerable.Empty<File>());
         _mockFileService.GetFiles(query.Path!, query.IncludeHiddenElements)
             .Returns(emptyList);
 
         // Act
-        ErrorOr<IEnumerable<FileResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
+        Result<IEnumerable<FileResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Empty(result.Value);
         _mockFileService.Received(1).GetFiles(query.Path!, query.IncludeHiddenElements);
     }

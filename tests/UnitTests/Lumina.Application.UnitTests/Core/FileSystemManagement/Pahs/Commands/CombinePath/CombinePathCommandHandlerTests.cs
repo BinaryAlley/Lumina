@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using ErrorOr;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.FileSystemManagement.Paths.Commands.CombinePath;
 using Lumina.Application.UnitTests.Core.FileSystemManagement.Pahs.Commands.CombinePath.Fixtures;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
-using Lumina.Application.Common.Infrastructure.Validation;
 using NSubstitute;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
@@ -46,13 +46,13 @@ public class CombinePathCommandHandlerTests
         string combinedPath = System.IO.Path.Combine(combinePathCommand.OriginalPath!, combinePathCommand.NewPath!);
 
         _mockPathService.CombinePath(combinePathCommand.OriginalPath!, combinePathCommand.NewPath!)
-            .Returns(ErrorOrFactory.From(combinedPath));
+            .Returns(Result.From(combinedPath));
 
         // Act
-        ErrorOr<PathSegmentResponse> result = await _sut.HandleAsync(combinePathCommand, CancellationToken.None);
+        Result<PathSegmentResponse> result = await _sut.HandleAsync(combinePathCommand, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.IsType<PathSegmentResponse>(result.Value);
         Assert.Equal(combinedPath, result.Value.Path);
         _mockPathService.Received(1).CombinePath(combinePathCommand.OriginalPath!, combinePathCommand.NewPath!);
@@ -68,10 +68,10 @@ public class CombinePathCommandHandlerTests
             .Returns(error);
 
         // Act
-        ErrorOr<PathSegmentResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<PathSegmentResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
         _mockPathService.Received(1).CombinePath(command.OriginalPath!, command.NewPath!);
     }
@@ -82,13 +82,13 @@ public class CombinePathCommandHandlerTests
         // Arrange
         CombinePathCommand command = _fixture.Create<CombinePathCommand>();
         _mockPathService.CombinePath(command.OriginalPath!, command.NewPath!)
-            .Returns(ErrorOrFactory.From(string.Empty));
+            .Returns(Result.From(string.Empty));
 
         // Act
-        ErrorOr<PathSegmentResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+        Result<PathSegmentResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.IsType<PathSegmentResponse>(result.Value);
         Assert.Empty(result.Value.Path);
         _mockPathService.Received(1).CombinePath(command.OriginalPath!, command.NewPath!);

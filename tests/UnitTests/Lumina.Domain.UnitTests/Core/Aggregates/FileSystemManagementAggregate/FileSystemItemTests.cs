@@ -1,12 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using ErrorOr;
-using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
-using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.Fixtures;
 using Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.ValueObjects.Fixtures;
 using System.Diagnostics.CodeAnalysis;
@@ -59,10 +58,10 @@ public class FileSystemItemTests
         FileSystemItemStatus newStatus = FileSystemItemStatus.Inaccessible;
 
         // Act
-        ErrorOr<Updated> result = item.SetStatus(newStatus);
+        Result<Updated> result = item.SetStatus(newStatus);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(Result.Updated, result.Value);
         Assert.Equal(newStatus, item.Status);
     }
@@ -75,10 +74,10 @@ public class FileSystemItemTests
         FileSystemItemFixture parent = CreateFileSystemItemFixture();
 
         // Act
-        ErrorOr<Updated> result = item.SetParent(parent);
+        Result<Updated> result = item.SetParent(parent);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(Result.Updated, result.Value);
         Assert.Equal(Optional<FileSystemItem>.Some(parent), item.Parent);
     }
@@ -90,10 +89,10 @@ public class FileSystemItemTests
         FileSystemItemFixture item = CreateFileSystemItemFixture();
 
         // Act
-        ErrorOr<Updated> result = item.SetParent(null!);
+        Result<Updated> result = item.SetParent(null!);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.ParentNodeCannotBeNull, result.FirstError);
         Assert.Equal(Optional<FileSystemItem>.None(), item.Parent);
     }

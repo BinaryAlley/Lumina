@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -66,8 +66,8 @@ internal sealed class PluginDetectionSyncJob : BackgroundService
                 CreatedBy = default,
                 UpdatedBy = default
             };
-            ErrorOr<Updated> upsertResult = await pluginRepository.UpsertAsync(pluginEntity, stoppingToken).ConfigureAwait(false);
-            if (upsertResult.IsError)
+            Result<Updated> upsertResult = await pluginRepository.UpsertAsync(pluginEntity, stoppingToken).ConfigureAwait(false);
+            if (upsertResult.IsFailure)
                 _logger.LogError("Failed to persist the detection of plugin '{PluginName}': {Error}", plugin.Name, upsertResult.FirstError.Description);
         }
 

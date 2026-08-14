@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.Admin.Authorization.Roles.Commands.AddRole;
 using Lumina.Contracts.DTO.Authentication;
 using Lumina.Contracts.Requests.Authorization;
 using Lumina.Contracts.Responses.Authorization;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Core.Endpoints.Admin.Authorization.Roles.AddRole;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -24,7 +24,7 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Admin.Authorization.R
 [ExcludeFromCodeCoverage]
 public class AddRoleEndpointTests
 {
-    private readonly ICommandHandler<AddRoleCommand, ErrorOr<RolePermissionsResponse>> _mockHandler;
+    private readonly ICommandHandler<AddRoleCommand, Result<RolePermissionsResponse>> _mockHandler;
     private readonly AddRoleEndpoint _sut;
 
     /// <summary>
@@ -32,7 +32,7 @@ public class AddRoleEndpointTests
     /// </summary>
     public AddRoleEndpointTests()
     {
-        _mockHandler = Substitute.For<ICommandHandler<AddRoleCommand, ErrorOr<RolePermissionsResponse>>>();
+        _mockHandler = Substitute.For<ICommandHandler<AddRoleCommand, Result<RolePermissionsResponse>>>();
         _sut = FastEndpoints.Factory.Create<AddRoleEndpoint>(_mockHandler);
     }
 
@@ -44,7 +44,7 @@ public class AddRoleEndpointTests
         CancellationToken cancellationToken = CancellationToken.None;
         RolePermissionsResponse expectedResponse = new(new RoleDto(Guid.NewGuid(), "Admin"), []);
         _mockHandler.HandleAsync(Arg.Any<AddRoleCommand>(), Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(expectedResponse));
+            .Returns(Result.From(expectedResponse));
 
         // Act
         IResult result = await _sut.ExecuteAsync(request, cancellationToken);
@@ -87,7 +87,7 @@ public class AddRoleEndpointTests
         AddRoleRequest request = new("Admin", [Guid.NewGuid()]);
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<AddRoleCommand>(), Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(new RolePermissionsResponse(new RoleDto(Guid.NewGuid(), "Admin"), [])));
+            .Returns(Result.From(new RolePermissionsResponse(new RoleDto(Guid.NewGuid(), "Admin"), [])));
 
         // Act
         await _sut.ExecuteAsync(request, cancellationToken);
@@ -114,7 +114,7 @@ public class AddRoleEndpointTests
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 info.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return ErrorOrFactory.From(new RolePermissionsResponse(new RoleDto(Guid.NewGuid(), "Admin"), []));
+                return Result.From(new RolePermissionsResponse(new RoleDto(Guid.NewGuid(), "Admin"), []));
             }, info.Arg<CancellationToken>()));
 
         // Act

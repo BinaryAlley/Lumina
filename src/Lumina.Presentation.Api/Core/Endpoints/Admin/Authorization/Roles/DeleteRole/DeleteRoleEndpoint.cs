@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.Authorization;
 using Lumina.Application.Core.Admin.Authorization.Roles.Commands.DeleteRole;
@@ -18,13 +18,13 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Admin.Authorization.Roles.Delet
 /// </summary>
 public class DeleteRoleEndpoint : BaseEndpoint<DeleteRoleRequest, IResult>
 {
-    private readonly ICommandHandler<DeleteRoleCommand, ErrorOr<Deleted>> _deleteRoleCommandHandler;
+    private readonly ICommandHandler<DeleteRoleCommand, Result<Deleted>> _deleteRoleCommandHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DeleteRoleEndpoint"/> class.
     /// </summary>
     /// <param name="deleteRoleCommandHandler">Injected service for handling delete role commands.</param>
-    public DeleteRoleEndpoint(ICommandHandler<DeleteRoleCommand, ErrorOr<Deleted>> deleteRoleCommandHandler)
+    public DeleteRoleEndpoint(ICommandHandler<DeleteRoleCommand, Result<Deleted>> deleteRoleCommandHandler)
     {
         _deleteRoleCommandHandler = deleteRoleCommandHandler;
     }
@@ -47,7 +47,7 @@ public class DeleteRoleEndpoint : BaseEndpoint<DeleteRoleRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(DeleteRoleRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<Deleted> result = await _deleteRoleCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
+        Result<Deleted> result = await _deleteRoleCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.NoContent(), Problem);
     }
 }

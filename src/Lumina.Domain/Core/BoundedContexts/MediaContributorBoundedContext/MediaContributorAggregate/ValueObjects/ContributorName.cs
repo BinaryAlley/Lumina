@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Domain.Common.Models.Core;
 using Lumina.Domain.Common.Primitives;
 using System.Collections.Generic;
@@ -41,7 +40,7 @@ public sealed class MediaContributorName : ValueObject
     /// <param name="displayName">The name by which the contributor is popularly known.</param>
     /// <param name="legalName">The legal name of the contributor.</param>
     /// <returns>The created <see cref="MediaContributorName"/> instance.</returns>
-    public static ErrorOr<MediaContributorName> Create(string displayName, Optional<string> legalName)
+    public static Result<MediaContributorName> Create(string displayName, Optional<string> legalName)
     {
         // TODO: enforce invariants
         return new MediaContributorName(displayName, legalName);

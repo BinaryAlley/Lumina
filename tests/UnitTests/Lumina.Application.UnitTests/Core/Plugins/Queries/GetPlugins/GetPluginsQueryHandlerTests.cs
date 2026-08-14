@@ -1,13 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Core.Plugins.Queries.GetPlugins;
 using Lumina.Contracts.Responses.Plugins;
 using Lumina.DataAccess.UnitTests.Core.Repositories.Plugins.Fixtures;
+using Lumina.Domain.Common.Primitives;
 using NSubstitute;
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,10 +43,10 @@ public class GetPluginsQueryHandlerTests
         _mockPluginRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(plugins);
 
         // Act
-        ErrorOr<IReadOnlyList<PluginResponse>> result = await _sut.HandleAsync(new GetPluginsQuery(), CancellationToken.None);
+        Result<IReadOnlyList<PluginResponse>> result = await _sut.HandleAsync(new GetPluginsQuery(), CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsError);
+        Assert.False(result.IsFailure);
         Assert.Equal(2, result.Value.Count);
         Assert.Equal(plugins[0].Name, result.Value[0].Name);
         Assert.Equal(plugins[0].Id, result.Value[0].Id);
@@ -61,9 +60,9 @@ public class GetPluginsQueryHandlerTests
             .Returns(Error.Failure(description: "Failed to get plugins"));
 
         // Act
-        ErrorOr<IReadOnlyList<PluginResponse>> result = await _sut.HandleAsync(new GetPluginsQuery(), CancellationToken.None);
+        Result<IReadOnlyList<PluginResponse>> result = await _sut.HandleAsync(new GetPluginsQuery(), CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsError);
+        Assert.True(result.IsFailure);
     }
 }

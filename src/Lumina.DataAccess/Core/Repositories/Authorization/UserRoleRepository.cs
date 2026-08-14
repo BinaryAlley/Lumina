@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Repositories.Authorization;
 using Lumina.DataAccess.Core.UoW;
@@ -30,10 +30,10 @@ internal sealed class UserRoleRepository : IUserRoleRepository
     /// </summary>
     /// <param name="userRole">The authorization user role to add.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public Task<ErrorOr<Created>> InsertAsync(UserRoleEntity userRole, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public Task<Result<Created>> InsertAsync(UserRoleEntity userRole, CancellationToken cancellationToken)
     {
         _luminaDbContext.UserRoles.Add(userRole);
-        return Task.FromResult(ErrorOrFactory.From(Result.Created));
+        return Task.FromResult(Result.From(Result.Created));
     }
 }

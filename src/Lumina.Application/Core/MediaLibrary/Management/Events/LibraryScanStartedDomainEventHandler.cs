@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
@@ -38,8 +38,8 @@ public class LibraryScanStartedDomainEventHandler : IDomainEventHandler<LibraryS
         ILibraryScanRepository libraryScanRepository = _unitOfWork.GetRepository<ILibraryScanRepository>();
 
         // update the status of the library scan in the repository
-        ErrorOr<Updated> updateLibraryScanResult = await libraryScanRepository.UpdateAsync(domainEvent.LibraryScan.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
-        if (updateLibraryScanResult.IsError)
+        Result<Updated> updateLibraryScanResult = await libraryScanRepository.UpdateAsync(domainEvent.LibraryScan.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
+        if (updateLibraryScanResult.IsFailure)
             throw new EventualConsistencyException(updateLibraryScanResult.FirstError, updateLibraryScanResult.Errors);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

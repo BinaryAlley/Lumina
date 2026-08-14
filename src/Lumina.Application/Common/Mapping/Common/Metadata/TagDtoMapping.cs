@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Contracts.DTO.Common;
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using System.Collections.Generic;
@@ -18,9 +18,9 @@ public static class TagDtoMapping
     /// </summary>
     /// <param name="dto">The DTO to be converted.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully converted <see cref="Tag"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully converted <see cref="Tag"/>, or an error message.
     /// </returns>
-    public static ErrorOr<Tag> ToDomainEntity(this TagDto dto)
+    public static Result<Tag> ToDomainEntity(this TagDto dto)
     {
         return Tag.Create(
             dto.Name
@@ -32,9 +32,9 @@ public static class TagDtoMapping
     /// </summary>
     /// <param name="dtos">The DTOs to be converted.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a collection of converted <see cref="Tag"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a collection of converted <see cref="Tag"/>, or an error message.
     /// </returns>
-    public static IEnumerable<ErrorOr<Tag>> ToDomainEntities(this IEnumerable<TagDto> dtos)
+    public static IEnumerable<Result<Tag>> ToDomainEntities(this IEnumerable<TagDto> dtos)
     {
         return dtos.Select(domainEntity => domainEntity.ToDomainEntity());
     }

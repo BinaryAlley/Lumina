@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -33,9 +33,9 @@ public class FileSystemPathIdFixture
     {
         path ??= _faker.System.FilePath();
 
-        ErrorOr<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(path);
+        Result<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(path);
 
-        if (fileSystemPathIdResult.IsError)
+        if (fileSystemPathIdResult.IsFailure)
             throw new InvalidOperationException("Failed to create FileSystemPathId: " + string.Join(", ", fileSystemPathIdResult.Errors));
         return fileSystemPathIdResult.Value;
     }

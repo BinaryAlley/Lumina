@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
@@ -21,7 +21,7 @@ namespace Lumina.Application.Core.UsersManagement.Authentication.Queries.LoginUs
 /// <summary>
 /// Handler for the query to authenticate an account.
 /// </summary>
-public class LoginUserQueryHandler : IQueryHandler<LoginUserQuery, ErrorOr<LoginResponse>>
+public class LoginUserQueryHandler : IQueryHandler<LoginUserQuery, Result<LoginResponse>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IPasswordHashService _hashService;
@@ -65,9 +65,9 @@ public class LoginUserQueryHandler : IQueryHandler<LoginUserQuery, ErrorOr<Login
     /// <param name="query">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="LoginResponse"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="LoginResponse"/>, or an error message.
     /// </returns>
-    public async Task<ErrorOr<LoginResponse>> HandleAsync(LoginUserQuery query, CancellationToken cancellationToken)
+    public async Task<Result<LoginResponse>> HandleAsync(LoginUserQuery query, CancellationToken cancellationToken)
     {
         List<Error> validationResult = _validator.Validate(query);
         if (validationResult.Count > 0)
@@ -75,8 +75,8 @@ public class LoginUserQueryHandler : IQueryHandler<LoginUserQuery, ErrorOr<Login
 
         // check if any users already exists
         IUserRepository userRepository = _unitOfWork.GetRepository<IUserRepository>();
-        ErrorOr<UserEntity?> getUserResult = await userRepository.GetByUsernameAsync(query.Username!, cancellationToken).ConfigureAwait(false);
-        if (getUserResult.IsError)
+        Result<UserEntity?> getUserResult = await userRepository.GetByUsernameAsync(query.Username!, cancellationToken).ConfigureAwait(false);
+        if (getUserResult.IsFailure)
             return getUserResult.Errors;
         else if (getUserResult.Value is null)
             return Errors.Authentication.InvalidUsernameOrPassword;

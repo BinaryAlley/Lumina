@@ -1,13 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using ErrorOr;
 using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.FileSystemManagement.Files.Queries.GetFiles;
 using Lumina.Contracts.Requests.FileSystemManagement.Files;
 using Lumina.Contracts.Responses.FileSystemManagement.Files;
-using Lumina.Presentation.Api.Common.Http;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Files.GetFiles;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -16,7 +15,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -30,7 +28,7 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.
 public class GetFilesEndpointTests
 {
     private readonly IFixture _fixture;
-    private readonly IQueryHandler<GetFilesQuery, ErrorOr<IEnumerable<FileResponse>>> _mockHandler;
+    private readonly IQueryHandler<GetFilesQuery, Result<IEnumerable<FileResponse>>> _mockHandler;
     private readonly GetFilesEndpoint _sut;
 
     /// <summary>
@@ -39,7 +37,7 @@ public class GetFilesEndpointTests
     public GetFilesEndpointTests()
     {
         _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
-        _mockHandler = Substitute.For<IQueryHandler<GetFilesQuery, ErrorOr<IEnumerable<FileResponse>>>>();
+        _mockHandler = Substitute.For<IQueryHandler<GetFilesQuery, Result<IEnumerable<FileResponse>>>>();
         _sut = Factory.Create<GetFilesEndpoint>(_mockHandler);
     }
 
@@ -49,9 +47,9 @@ public class GetFilesEndpointTests
         // Arrange
         GetFilesRequest request = _fixture.Create<GetFilesRequest>();
         CancellationToken cancellationToken = CancellationToken.None;
-        List<FileResponse> expectedResponses = _fixture.CreateMany<FileResponse>(3).ToList();
+        List<FileResponse> expectedResponses = [.. _fixture.CreateMany<FileResponse>(3)];
         _mockHandler.HandleAsync(Arg.Any<GetFilesQuery>(), Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(expectedResponses.AsEnumerable()));
+            .Returns(Result.From(expectedResponses.AsEnumerable()));
 
         // Act
         IResult result = await _sut.ExecuteAsync(request, cancellationToken);
@@ -120,7 +118,7 @@ public class GetFilesEndpointTests
         GetFilesRequest request = _fixture.Create<GetFilesRequest>();
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<GetFilesQuery>(), Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(Enumerable.Empty<FileResponse>()));
+            .Returns(Result.From(Enumerable.Empty<FileResponse>()));
 
         // Act
         await _sut.ExecuteAsync(request, cancellationToken);
@@ -147,7 +145,7 @@ public class GetFilesEndpointTests
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return ErrorOrFactory.From(_fixture.CreateMany<FileResponse>(3).AsEnumerable());
+                return Result.From(_fixture.CreateMany<FileResponse>(3).AsEnumerable());
             }, callInfo.Arg<CancellationToken>()));
 
         // Act

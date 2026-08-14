@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
@@ -42,9 +42,9 @@ public static class IsbnEntityMapping
     /// </summary>
     /// <param name="repositoryEntity">The repository entity to be converted.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully converted <see cref="Isbn"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully converted <see cref="Isbn"/>, or an error message.
     /// </returns>
-    public static ErrorOr<Isbn> ToDomainEntity(this IsbnEntity repositoryEntity)
+    public static Result<Isbn> ToDomainEntity(this IsbnEntity repositoryEntity)
     {
         return Isbn.Create(
             repositoryEntity.Value ?? default,
@@ -57,9 +57,9 @@ public static class IsbnEntityMapping
     /// </summary>
     /// <param name="repositoryEntities">The repository entities to be converted.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a collection of converted <see cref="Isbn"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a collection of converted <see cref="Isbn"/>, or an error message.
     /// </returns>
-    public static IEnumerable<ErrorOr<Isbn>> ToDomainEntities(this IEnumerable<IsbnEntity> repositoryEntities)
+    public static IEnumerable<Result<Isbn>> ToDomainEntities(this IEnumerable<IsbnEntity> repositoryEntities)
     {
         return repositoryEntities.Select(domainEntity => domainEntity.ToDomainEntity());
     }

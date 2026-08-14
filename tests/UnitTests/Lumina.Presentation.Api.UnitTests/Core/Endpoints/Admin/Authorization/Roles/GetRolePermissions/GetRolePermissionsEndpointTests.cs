@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.Admin.Authorization.Roles.Queries.GetRolePermissions;
 using Lumina.Contracts.DTO.Authentication;
 using Lumina.Contracts.Requests.Authorization;
 using Lumina.Contracts.Responses.Authorization;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using Lumina.Presentation.Api.Core.Endpoints.Admin.Authorization.Roles.GetRolePermissions;
 using Microsoft.AspNetCore.Http;
@@ -24,7 +24,7 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Admin.Authorization.R
 [ExcludeFromCodeCoverage]
 public class GetRolePermissionsEndpointTests
 {
-    private readonly IQueryHandler<GetRolePermissionsQuery, ErrorOr<RolePermissionsResponse>> _mockHandler;
+    private readonly IQueryHandler<GetRolePermissionsQuery, Result<RolePermissionsResponse>> _mockHandler;
     private readonly GetRolePermissionsEndpoint _sut;
 
     /// <summary>
@@ -32,7 +32,7 @@ public class GetRolePermissionsEndpointTests
     /// </summary>
     public GetRolePermissionsEndpointTests()
     {
-        _mockHandler = Substitute.For<IQueryHandler<GetRolePermissionsQuery, ErrorOr<RolePermissionsResponse>>>();
+        _mockHandler = Substitute.For<IQueryHandler<GetRolePermissionsQuery, Result<RolePermissionsResponse>>>();
         _sut = FastEndpoints.Factory.Create<GetRolePermissionsEndpoint>(_mockHandler);
     }
 
@@ -47,7 +47,7 @@ public class GetRolePermissionsEndpointTests
             [new PermissionDto(Guid.NewGuid(), AuthorizationPermission.CanViewUsers)]
         );
         _mockHandler.HandleAsync(Arg.Any<GetRolePermissionsQuery>(), Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(expectedResponse));
+            .Returns(Result.From(expectedResponse));
 
         // Act
         IResult result = await _sut.ExecuteAsync(request, cancellationToken);
@@ -91,7 +91,7 @@ public class GetRolePermissionsEndpointTests
         GetRolePermissionsRequest request = new(roleId);
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<GetRolePermissionsQuery>(), Arg.Any<CancellationToken>())
-            .Returns(ErrorOrFactory.From(new RolePermissionsResponse(
+            .Returns(Result.From(new RolePermissionsResponse(
                 new RoleDto(Guid.NewGuid(), "Admin"),
                 []
             )));
@@ -119,7 +119,7 @@ public class GetRolePermissionsEndpointTests
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 info.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return ErrorOrFactory.From(new RolePermissionsResponse(
+                return Result.From(new RolePermissionsResponse(
                     new RoleDto(Guid.NewGuid(), "Admin"),
                     []
                 ));

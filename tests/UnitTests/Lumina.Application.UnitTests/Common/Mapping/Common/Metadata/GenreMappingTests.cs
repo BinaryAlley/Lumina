@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.Mapping.Common.Metadata;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -20,8 +20,8 @@ public class GenreMappingTests
     public void ToRepositoryEntity_WhenMappingGenre_ShouldMapCorrectly()
     {
         // Arrange
-        ErrorOr<Genre> createResult = Genre.Create("Rock");
-        Assert.False(createResult.IsError);
+        Result<Genre> createResult = Genre.Create("Rock");
+        Assert.False(createResult.IsFailure);
         Genre genre = createResult.Value;
 
         // Act
@@ -40,8 +40,8 @@ public class GenreMappingTests
     public void ToRepositoryEntity_WhenMappingDifferentGenres_ShouldMapCorrectly(string name)
     {
         // Arrange
-        ErrorOr<Genre> createResult = Genre.Create(name);
-        Assert.False(createResult.IsError);
+        Result<Genre> createResult = Genre.Create(name);
+        Assert.False(createResult.IsFailure);
         Genre genre = createResult.Value;
 
         // Act

@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Domain.Common.Models.Core;
-using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Primitives;
 using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
@@ -33,12 +32,12 @@ public class Genre : ValueObject
     /// </summary>
     /// <param name="name">The value of the genre.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="Genre"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="Genre"/>, or an error message.
     /// </returns>
-    public static ErrorOr<Genre> Create(string? name)
+    public static Result<Genre> Create(string? name)
     {
         if (string.IsNullOrWhiteSpace(name))
-            return Errors.Metadata.GenreNameCannotBeEmpty;
+            return Errors.Errors.Metadata.GenreNameCannotBeEmpty;
         return new Genre(name);
     }
 

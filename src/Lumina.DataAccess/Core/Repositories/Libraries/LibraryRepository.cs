@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Errors;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -35,8 +35,8 @@ internal sealed class LibraryRepository : ILibraryRepository
     /// </summary>
     /// <param name="library">The library to add.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<ErrorOr<Created>> InsertAsync(LibraryEntity library, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Created>> InsertAsync(LibraryEntity library, CancellationToken cancellationToken)
     {
         bool libraryExists = await _luminaDbContext.Libraries.AnyAsync(repositoryLibrary => repositoryLibrary.Id == library.Id, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (libraryExists)
@@ -51,8 +51,8 @@ internal sealed class LibraryRepository : ILibraryRepository
     /// </summary>
     /// <param name="id">The Id of the library to get.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a <see cref="LibraryEntity"/> identified by <paramref name="id"/>, or an error.</returns>
-    public async Task<ErrorOr<LibraryEntity?>> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="LibraryEntity"/> identified by <paramref name="id"/>, or an error.</returns>
+    public async Task<Result<LibraryEntity?>> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         return await _luminaDbContext.Libraries
             .Include(library => library.ContentLocations)
@@ -63,8 +63,8 @@ internal sealed class LibraryRepository : ILibraryRepository
     /// Gets all media libraries that are marked as enabled, from the storage medium.
     /// </summary>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of <see cref="LibraryEntity"/>, or an error.</returns>
-    public async Task<ErrorOr<IEnumerable<LibraryEntity>>> GetAllEnabledAsync(CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="LibraryEntity"/>, or an error.</returns>
+    public async Task<Result<IEnumerable<LibraryEntity>>> GetAllEnabledAsync(CancellationToken cancellationToken)
     {
         return await _luminaDbContext.Libraries
             .Include(library => library.ContentLocations)
@@ -76,8 +76,8 @@ internal sealed class LibraryRepository : ILibraryRepository
     /// Gets all media libraries that are marked as enabled and unlocked, from the storage medium.
     /// </summary>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of <see cref="LibraryEntity"/>, or an error.</returns>
-    public async Task<ErrorOr<IEnumerable<LibraryEntity>>> GetAllEnabledAndUnlockedAsync(CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="LibraryEntity"/>, or an error.</returns>
+    public async Task<Result<IEnumerable<LibraryEntity>>> GetAllEnabledAndUnlockedAsync(CancellationToken cancellationToken)
     {
         return await _luminaDbContext.Libraries
             .Include(library => library.ContentLocations)
@@ -89,8 +89,8 @@ internal sealed class LibraryRepository : ILibraryRepository
     /// Gets all media libraries.
     /// </summary>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing either a collection of <see cref="LibraryEntity"/>, or an error.</returns>
-    public async Task<ErrorOr<IEnumerable<LibraryEntity>>> GetAllAsync(CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="LibraryEntity"/>, or an error.</returns>
+    public async Task<Result<IEnumerable<LibraryEntity>>> GetAllAsync(CancellationToken cancellationToken)
     {
         return await _luminaDbContext.Libraries
             .Include(library => library.ContentLocations)
@@ -102,8 +102,8 @@ internal sealed class LibraryRepository : ILibraryRepository
     /// </summary>
     /// <param name="data">The media library to update.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<ErrorOr<Updated>> UpdateAsync(LibraryEntity data, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Updated>> UpdateAsync(LibraryEntity data, CancellationToken cancellationToken)
     {
         LibraryEntity? foundLibrary = await _luminaDbContext.Libraries
             .Include(library => library.ContentLocations)
@@ -124,8 +124,8 @@ internal sealed class LibraryRepository : ILibraryRepository
     /// </summary>
     /// <param name="id">The Id of the library to delete.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<ErrorOr<Deleted>> DeleteByIdAsync(Guid id, CancellationToken cancellationToken)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Deleted>> DeleteByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         LibraryEntity? library = await _luminaDbContext.Libraries
             .Include(library => library.ContentLocations)

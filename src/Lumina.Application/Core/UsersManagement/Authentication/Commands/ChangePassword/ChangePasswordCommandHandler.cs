@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
@@ -19,7 +19,7 @@ namespace Lumina.Application.Core.UsersManagement.Authentication.Commands.Change
 /// <summary>
 /// Handler for the command to change the password of a user account.
 /// </summary>
-public class ChangePasswordCommandHandler : ICommandHandler<ChangePasswordCommand, ErrorOr<ChangePasswordResponse>>
+public class ChangePasswordCommandHandler : ICommandHandler<ChangePasswordCommand, Result<ChangePasswordResponse>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IPasswordHashService _hashService;
@@ -47,17 +47,17 @@ public class ChangePasswordCommandHandler : ICommandHandler<ChangePasswordComman
     /// <param name="command">The request to be handled.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>
-    /// An <see cref="ErrorOr{TValue}"/> containing either a successfully created <see cref="ChangePasswordResponse"/>, or an error message.
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="ChangePasswordResponse"/>, or an error message.
     /// </returns>
-    public async Task<ErrorOr<ChangePasswordResponse>> HandleAsync(ChangePasswordCommand command, CancellationToken cancellationToken)
+    public async Task<Result<ChangePasswordResponse>> HandleAsync(ChangePasswordCommand command, CancellationToken cancellationToken)
     {
         List<Error> validationResult = _validator.Validate(command);
         if (validationResult.Count > 0)
             return validationResult;
 
         IUserRepository userRepository = _unitOfWork.GetRepository<IUserRepository>();
-        ErrorOr<UserEntity?> getUserResult = await userRepository.GetByUsernameAsync(command.Username!, cancellationToken).ConfigureAwait(false);
-        if (getUserResult.IsError)
+        Result<UserEntity?> getUserResult = await userRepository.GetByUsernameAsync(command.Username!, cancellationToken).ConfigureAwait(false);
+        if (getUserResult.IsFailure)
             return getUserResult.Errors;
         else if (getUserResult.Value is null)
             return Errors.Authentication.UsernameDoesNotExist;
@@ -69,8 +69,8 @@ public class ChangePasswordCommandHandler : ICommandHandler<ChangePasswordComman
         getUserResult.Value.TempPassword = null;
         getUserResult.Value.TempPasswordCreated = null;
         // update the user
-        ErrorOr<Updated> updateUserResult = await userRepository.UpdateAsync(getUserResult.Value, cancellationToken).ConfigureAwait(false);
-        if (updateUserResult.IsError)
+        Result<Updated> updateUserResult = await userRepository.UpdateAsync(getUserResult.Value, cancellationToken).ConfigureAwait(false);
+        if (updateUserResult.IsFailure)
             return updateUserResult.Errors;
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return new ChangePasswordResponse(true);

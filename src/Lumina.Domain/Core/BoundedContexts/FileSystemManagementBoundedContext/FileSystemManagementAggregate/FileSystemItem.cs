@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
-using Lumina.Domain.SharedKernel.Common.Errors;
-using Lumina.Domain.Common.Models.Core;
 using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
+using Lumina.Domain.Common.Errors;
+using Lumina.Domain.Common.Models.Core;
+
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using System.Diagnostics;
 #endregion
@@ -52,8 +52,8 @@ public abstract class FileSystemItem : AggregateRoot<FileSystemPathId>
     /// Sets the status of the filesystem item.
     /// </summary>
     /// <param name="status">The status to be set.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public ErrorOr<Updated> SetStatus(FileSystemItemStatus status)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public Result<Updated> SetStatus(FileSystemItemStatus status)
     {
         Status = status;
         return Result.Updated;
@@ -63,8 +63,8 @@ public abstract class FileSystemItem : AggregateRoot<FileSystemPathId>
     /// Sets the parent of the filesystem item.
     /// </summary>
     /// <param name="parent">The file system item to be set as parent.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> representing either a successful operation, or an error.</returns>
-    public ErrorOr<Updated> SetParent(FileSystemItem parent)
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public Result<Updated> SetParent(FileSystemItem parent)
     {
         if (parent is not null)
             Parent = parent;

@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.MediaLibrary.Management.Queries.GetEnabledLibraries;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Common.Routes.Library.Management;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
@@ -18,13 +18,13 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Library.Management.GetEnabledLi
 /// </summary>
 public class GetEnabledLibrariesEndpoint : BaseEndpoint<EmptyRequest, IResult>
 {
-    private readonly IQueryHandler<GetEnabledLibrariesQuery, ErrorOr<LibraryResponse[]>> _getEnabledLibrariesQueryHandler;
+    private readonly IQueryHandler<GetEnabledLibrariesQuery, Result<LibraryResponse[]>> _getEnabledLibrariesQueryHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetEnabledLibrariesEndpoint"/> class.
     /// </summary>
     /// <param name="getEnabledLibrariesQueryHandler">Injected service for handling get enabled libraries queries.</param>
-    public GetEnabledLibrariesEndpoint(IQueryHandler<GetEnabledLibrariesQuery, ErrorOr<LibraryResponse[]>> getEnabledLibrariesQueryHandler)
+    public GetEnabledLibrariesEndpoint(IQueryHandler<GetEnabledLibrariesQuery, Result<LibraryResponse[]>> getEnabledLibrariesQueryHandler)
     {
         _getEnabledLibrariesQueryHandler = getEnabledLibrariesQueryHandler;
     }
@@ -34,7 +34,7 @@ public class GetEnabledLibrariesEndpoint : BaseEndpoint<EmptyRequest, IResult>
     /// </summary>
     public override void Configure()
     {
-        Verbs(FastEndpoints.Http.GET);
+        Verbs(Http.GET);
         Routes(ApiRoutes.Libraries.GET_ENABLED_LIBRARIES);
         Version(1);
         DontCatchExceptions();
@@ -46,7 +46,7 @@ public class GetEnabledLibrariesEndpoint : BaseEndpoint<EmptyRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(EmptyRequest _, CancellationToken cancellationToken)
     {
-        ErrorOr<LibraryResponse[]> result = await _getEnabledLibrariesQueryHandler.HandleAsync(new GetEnabledLibrariesQuery(), cancellationToken).ConfigureAwait(false);
+        Result<LibraryResponse[]> result = await _getEnabledLibrariesQueryHandler.HandleAsync(new GetEnabledLibrariesQuery(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

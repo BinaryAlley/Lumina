@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
-using Lumina.Domain.SharedKernel.Common.Errors;
+using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using System;
 using System.Collections.Generic;
@@ -78,8 +78,8 @@ public class WindowsPathStrategy : IWindowsPathStrategy
     /// </summary>
     /// <param name="path">The path to be combined.</param>
     /// <param name="name">The name to be combined with the path.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing the combined path, or an error.</returns>
-    public ErrorOr<FileSystemPathId> CombinePath(FileSystemPathId path, string name)
+    /// <returns>An <see cref="Result{TValue}"/> containing the combined path, or an error.</returns>
+    public Result<FileSystemPathId> CombinePath(FileSystemPathId path, string name)
     {
         if (name == null)
             return Errors.FileSystemManagement.NameCannotBeEmpty;
@@ -95,18 +95,18 @@ public class WindowsPathStrategy : IWindowsPathStrategy
     /// Parses <paramref name="path"/> into path segments.
     /// </summary>
     /// <param name="path">The path to be parsed.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing the path segments, or an error.</returns>
-    public ErrorOr<IEnumerable<PathSegment>> ParsePath(FileSystemPathId path)
+    /// <returns>An <see cref="Result{TValue}"/> containing the path segments, or an error.</returns>
+    public Result<IEnumerable<PathSegment>> ParsePath(FileSystemPathId path)
     {
         // Windows paths usually start with a drive letter and colon, e.g., "C:", or "\\" (UNC paths)
         if (!(path.Path.StartsWith(@"\\") || (path.Path.Length >= 3 && char.IsLetter(path.Path[0]) && path.Path[1] == ':' && path.Path[2] == PathSeparator)))
             return Errors.FileSystemManagement.InvalidPath;
-        IEnumerable<ErrorOr<PathSegment>> getPathSegmentsResults = GetPathSegments();
-        foreach (ErrorOr<PathSegment> getPathSegmentsResult in getPathSegmentsResults)
-            if (getPathSegmentsResult.IsError)
+        IEnumerable<Result<PathSegment>> getPathSegmentsResults = GetPathSegments();
+        foreach (Result<PathSegment> getPathSegmentsResult in getPathSegmentsResults)
+            if (getPathSegmentsResult.IsFailure)
                 return getPathSegmentsResult.Errors;
-        return ErrorOrFactory.From(getPathSegmentsResults.Select(getPathSegmentsResult => getPathSegmentsResult.Value));
-        IEnumerable<ErrorOr<PathSegment>> GetPathSegments()
+        return Result.From(getPathSegmentsResults.Select(getPathSegmentsResult => getPathSegmentsResult.Value));
+        IEnumerable<Result<PathSegment>> GetPathSegments()
         {
             if (path.Path.StartsWith(@"\\"))
             {
@@ -135,7 +135,7 @@ public class WindowsPathStrategy : IWindowsPathStrategy
                 }
             }
         }
-        ErrorOr<PathSegment> CreatePathSegment(string segment, int index, int totalSegments)
+        Result<PathSegment> CreatePathSegment(string segment, int index, int totalSegments)
         {
             bool isDirectory = segment.Contains('.')
                 ? index != totalSegments - 1 || path.Path.EndsWith(PathSeparator)
@@ -148,8 +148,8 @@ public class WindowsPathStrategy : IWindowsPathStrategy
     /// Goes up one level from <paramref name="path"/>, and returns the path segments.
     /// </summary>
     /// <param name="path">The path from which to navigate up one level.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing the path segments of the path up one level from <paramref name="path"/>, or an error.</returns>
-    public ErrorOr<IEnumerable<PathSegment>> GoUpOneLevel(FileSystemPathId path)
+    /// <returns>An <see cref="Result{TValue}"/> containing the path segments of the path up one level from <paramref name="path"/>, or an error.</returns>
+    public Result<IEnumerable<PathSegment>> GoUpOneLevel(FileSystemPathId path)
     {
         // validation: ensure the path is not null or empty
         if (!IsValidPath(path))
@@ -174,8 +174,8 @@ public class WindowsPathStrategy : IWindowsPathStrategy
         if (lastIndex <= 2)
             return ParsePath(FileSystemPathId.Create(tempPath[..3]).Value);
         // return the path up to the last backslash
-        ErrorOr<FileSystemPathId> newPathResult = FileSystemPathId.Create(tempPath[..lastIndex]);
-        if (newPathResult.IsError)
+        Result<FileSystemPathId> newPathResult = FileSystemPathId.Create(tempPath[..lastIndex]);
+        if (newPathResult.IsFailure)
             return newPathResult.Errors;
 
         return ParsePath(newPathResult.Value);
@@ -194,8 +194,8 @@ public class WindowsPathStrategy : IWindowsPathStrategy
     /// Returns the root portion of the given path.
     /// </summary>
     /// <param name="path">The path for which to get the root.</param>
-    /// <returns>An <see cref="ErrorOr{TValue}"/> containing the root of <paramref name="path"/>, or an error.</returns>
-    public ErrorOr<PathSegment> GetPathRoot(FileSystemPathId path)
+    /// <returns>An <see cref="Result{TValue}"/> containing the root of <paramref name="path"/>, or an error.</returns>
+    public Result<PathSegment> GetPathRoot(FileSystemPathId path)
     {
         if (!IsValidPath(path))
             return Errors.FileSystemManagement.InvalidPath;

@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -25,7 +25,7 @@ public class LibraryMappingTests
     public void ToRepositoryEntity_WhenMappingValidLibrary_ShouldMapCorrectly()
     {
         // Arrange
-        ErrorOr<Library> libraryResult = Library.Create(
+        Result<Library> libraryResult = Library.Create(
             UserId.CreateUnique(),
             "Test Library",
             LibraryType.Book,
@@ -64,7 +64,7 @@ public class LibraryMappingTests
     public void ToRepositoryEntity_WhenMappingLibraryWithEmptyContentLocations_ShouldMapCorrectly()
     {
         // Arrange
-        ErrorOr<Library> libraryResult = Library.Create(
+        Result<Library> libraryResult = Library.Create(
             UserId.CreateUnique(),
             "Empty Library",
             LibraryType.Book,
@@ -96,7 +96,7 @@ public class LibraryMappingTests
     public void ToRepositoryEntity_WhenMappingDifferentLibraryTypes_ShouldMapCorrectly(LibraryType libraryType)
     {
         // Arrange
-        ErrorOr<Library> libraryResult = Library.Create(
+        Result<Library> libraryResult = Library.Create(
             UserId.CreateUnique(),
             "Test Library",
             libraryType,
@@ -136,7 +136,7 @@ public class LibraryMappingTests
             "F:/Reading Material"
         ];
 
-        ErrorOr<Library> libraryResult = Library.Create(
+        Result<Library> libraryResult = Library.Create(
             UserId.CreateUnique(),
             "Test Library",
             LibraryType.Book,
@@ -170,7 +170,7 @@ public class LibraryMappingTests
             "D:/Books"
         ];
 
-        ErrorOr<Library> libraryResult = Library.Create(
+        Result<Library> libraryResult = Library.Create(
             UserId.CreateUnique(),
             "Test Library",
             LibraryType.Book,
@@ -204,7 +204,7 @@ public class LibraryMappingTests
             "D:/Books"
         ];
 
-        ErrorOr<Library> libraryResult = Library.Create(
+        Result<Library> libraryResult = Library.Create(
             UserId.CreateUnique(),
             "Test Library",
             LibraryType.Book,

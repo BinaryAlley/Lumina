@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using ErrorOr;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.Mapping.Authorization;
 using Lumina.Application.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
 using Lumina.Contracts.Requests.Authorization;
 using Lumina.Contracts.Responses.Authorization;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Common.Routes.UsersManagement;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
@@ -19,13 +19,13 @@ namespace Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authorization.U
 /// </summary>
 public class UpdateUserRoleAndPermissionsEndpoint : BaseEndpoint<UpdateUserRoleAndPermissionsRequest, IResult>
 {
-    private readonly ICommandHandler<UpdateUserRoleAndPermissionsCommand, ErrorOr<AuthorizationResponse>> _updateUserRoleAndPermissionsCommandHandler;
+    private readonly ICommandHandler<UpdateUserRoleAndPermissionsCommand, Result<AuthorizationResponse>> _updateUserRoleAndPermissionsCommandHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UpdateUserRoleAndPermissionsEndpoint"/> class.
     /// </summary>
     /// <param name="updateUserRoleAndPermissionsCommandHandler">Injected service for handling update user role and permissions commands.</param>
-    public UpdateUserRoleAndPermissionsEndpoint(ICommandHandler<UpdateUserRoleAndPermissionsCommand, ErrorOr<AuthorizationResponse>> updateUserRoleAndPermissionsCommandHandler)
+    public UpdateUserRoleAndPermissionsEndpoint(ICommandHandler<UpdateUserRoleAndPermissionsCommand, Result<AuthorizationResponse>> updateUserRoleAndPermissionsCommandHandler)
     {
         _updateUserRoleAndPermissionsCommandHandler = updateUserRoleAndPermissionsCommandHandler;
     }
@@ -48,7 +48,7 @@ public class UpdateUserRoleAndPermissionsEndpoint : BaseEndpoint<UpdateUserRoleA
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(UpdateUserRoleAndPermissionsRequest request, CancellationToken cancellationToken)
     {
-        ErrorOr<AuthorizationResponse> result = await _updateUserRoleAndPermissionsCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
+        Result<AuthorizationResponse> result = await _updateUserRoleAndPermissionsCommandHandler.HandleAsync(request.ToCommand(), cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }
