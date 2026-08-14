@@ -38,31 +38,52 @@ public struct HashedFileSystemFileDto : IEquatable<HashedFileSystemFileDto>
     /// </summary>
     public long Ticks { get; set; }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Indicates whether the current object is equal to another object of the same type.
+    /// </summary>
+    /// <param name="other">An object to compare with this object.</param>
+    /// <returns><see langword="true"/> if the current object is equal to the <paramref name="other"/> parameter, <see langword="false"/> otherwise.</returns>
     public readonly bool Equals(HashedFileSystemFileDto other)
     {
         return Size == other.Size && CurrentHash == other.CurrentHash && OldHash == other.OldHash && Ticks == other.Ticks && Path == other.Path;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Determines whether the specified object is equal to the current object.
+    /// </summary>
+    /// <param name="obj">The object to compare with the current object.</param>
+    /// <returns><see langword="true"/> if the specified object is equal to the current object, <see langword="false"/> otherwise.</returns>
     public override readonly bool Equals(object? obj)
     {
         return obj is HashedFileSystemFileDto item && Equals(item);
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Custom implementation of the equality operator.
+    /// </summary>
+    /// <param name="left">The left operand of equality.</param>
+    /// <param name="right">The right operand of equality.</param>
+    /// <returns><see langword="true"/> if <paramref name="left"/> is equal to <paramref name="right"/>, <see langword="false"/> otherwise.</returns>
     public static bool operator ==(HashedFileSystemFileDto left, HashedFileSystemFileDto right)
     {
         return left.Equals(right);
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Custom implementation of the inequality operator.
+    /// </summary>
+    /// <param name="left">The left operand of equality.</param>
+    /// <param name="right">The right operand of equality.</param>
+    /// <returns><see langword="true"/> if <paramref name="left"/> is not equal to <paramref name="right"/>, <see langword="false"/> otherwise.</returns>
     public static bool operator !=(HashedFileSystemFileDto left, HashedFileSystemFileDto right)
     {
         return !(left == right);
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Serves as the default hash function.
+    /// </summary>
+    /// <returns>A hash code for the current object.</returns>
     public override readonly int GetHashCode()
     {
         return HashCode.Combine(Size, CurrentHash, OldHash, Ticks, Path);

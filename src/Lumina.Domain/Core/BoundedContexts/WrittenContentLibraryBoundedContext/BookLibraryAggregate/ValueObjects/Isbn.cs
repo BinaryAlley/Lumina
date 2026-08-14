@@ -109,7 +109,10 @@ public sealed class Isbn : ValueObject
         return checkDigit == (isbn[12] - '0');
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets the list of items that define equality of the object.
+    /// </summary>
+    /// <returns>A list of items defining the equality.</returns>
     public override IEnumerable<object> GetEqualityComponents()
     {
         yield return Value;

@@ -94,7 +94,10 @@ public class WrittenContentMetadata : BaseMetadata
         );
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets the list of items that define equality of the object.
+    /// </summary>
+    /// <returns>A list of items defining the equality.</returns>
     public override IEnumerable<object> GetEqualityComponents()
     {
         foreach (object component in base.GetEqualityComponents())
