@@ -17,7 +17,7 @@ namespace Lumina.Infrastructure.UnitTests.Common.Validators;
 [ExcludeFromCodeCoverage]
 public class EncryptionSettingsDtoValidatorTests
 {
-    private readonly EncryptionSettingsDtoValidator _validator;
+    private readonly EncryptionSettingsDtoValidator _validator = new();
     private readonly IFixture _fixture;
 
     /// <summary>
@@ -26,11 +26,10 @@ public class EncryptionSettingsDtoValidatorTests
     public EncryptionSettingsDtoValidatorTests()
     {
         _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
-        _validator = new();
     }
 
     [Fact]
-    public void EncryptionSettingsModelValidator_WhenValidBase64SecretKeyProvided_ShouldNotHaveValidationError()
+    public void Validate_WhenValidBase64SecretKeyProvided_ShouldNotHaveValidationError()
     {
         // Arrange
         EncryptionSettingsDto model = _fixture.Build<EncryptionSettingsDto>()
@@ -45,7 +44,7 @@ public class EncryptionSettingsDtoValidatorTests
     }
 
     [Fact]
-    public void EncryptionSettingsModelValidator_WhenSecretKeyIsEmpty_ShouldHaveValidationError()
+    public void Validate_WhenSecretKeyIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
         EncryptionSettingsDto model = _fixture.Build<EncryptionSettingsDto>()
@@ -64,7 +63,7 @@ public class EncryptionSettingsDtoValidatorTests
     [InlineData("not-a-base64-string")]
     [InlineData("invalid!base64")]
     [InlineData("123")]
-    public void EncryptionSettingsModelValidator_WhenSecretKeyIsNotBase64_ShouldHaveValidationError(string invalidBase64)
+    public void Validate_WhenSecretKeyIsNotBase64_ShouldHaveValidationError(string invalidBase64)
     {
         // Arrange
         EncryptionSettingsDto model = _fixture.Build<EncryptionSettingsDto>()

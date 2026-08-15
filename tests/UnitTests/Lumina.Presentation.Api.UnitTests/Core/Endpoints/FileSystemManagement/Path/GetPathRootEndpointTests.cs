@@ -2,11 +2,12 @@
 using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.FileSystemManagement.Paths.Queries.GetPathRoot;
+using Lumina.Contracts.Fixtures.Core.Requests.FileSystemManagement.Path;
+using Lumina.Contracts.Fixtures.Core.Responses.FileSystemManagement.Path;
 using Lumina.Contracts.Requests.FileSystemManagement.Path;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.GetPathRoot;
-using Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.Fixtures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -26,8 +27,8 @@ public class GetPathRootEndpointTests
 {
     private readonly IQueryHandler<GetPathRootQuery, Result<PathSegmentResponse>> _mockHandler;
     private readonly GetPathRootEndpoint _sut;
-    private readonly PathSegmentResponseFixture _pathSegmentResponseFixture;
-    private readonly GetPathRootRequestFixture _getPathRootRequestFixture;
+    private readonly PathSegmentResponseFixture _pathSegmentResponseFixture = new();
+    private readonly GetPathRootRequestFixture _getPathRootRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetPathRootEndpointTests"/> class.
@@ -36,8 +37,6 @@ public class GetPathRootEndpointTests
     {
         _mockHandler = Substitute.For<IQueryHandler<GetPathRootQuery, Result<PathSegmentResponse>>>();
         _sut = Factory.Create<GetPathRootEndpoint>(_mockHandler);
-        _pathSegmentResponseFixture = new PathSegmentResponseFixture();
-        _getPathRootRequestFixture = new GetPathRootRequestFixture();
     }
 
     [Fact]

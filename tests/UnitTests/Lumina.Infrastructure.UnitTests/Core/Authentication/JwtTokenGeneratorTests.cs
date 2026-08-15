@@ -2,7 +2,7 @@
 using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.Infrastructure.Common.Models.DTO.Configuration;
 using Lumina.Infrastructure.Core.Authentication;
-using Lumina.Infrastructure.UnitTests.Core.Authentication.Fixtures;
+using Lumina.Infrastructure.Fixtures.Core.Authentication;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using NSubstitute;

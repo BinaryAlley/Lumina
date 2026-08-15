@@ -2,7 +2,7 @@
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
-using Lumina.Application.UnitTests.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Common.Fixtures;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
@@ -19,21 +19,13 @@ namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.WrittenConten
 [ExcludeFromCodeCoverage]
 public class BookRatingEntityMappingTests
 {
-    private readonly BookRatingEntityFixture _fixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="BookRatingEntityMappingTests"/> class.
-    /// </summary>
-    public BookRatingEntityMappingTests()
-    {
-        _fixture = new BookRatingEntityFixture();
-    }
+    private readonly BookRatingEntityFixture _fixture = new();
 
     [Fact]
     public void ToResponse_WhenMappingValidBookRatingEntity_ShouldMapCorrectly()
     {
         // Arrange
-        BookRatingEntity entity = _fixture.CreateBookRating();
+        BookRatingEntity entity = _fixture.Create();
 
         // Act
         BookRatingDto result = entity.ToResponse();
@@ -50,7 +42,7 @@ public class BookRatingEntityMappingTests
     public void ToResponse_WhenMappingInvalidBookRatingEntity_ShouldMapToDefaults()
     {
         // Arrange
-        BookRatingEntity entity = _fixture.CreateInvalidBookRating();
+        BookRatingEntity entity = _fixture.Create(includeValues: false);
 
         // Act
         BookRatingDto result = entity.ToResponse();
@@ -67,12 +59,7 @@ public class BookRatingEntityMappingTests
     public void ToResponses_WhenMappingMultipleBookRatingEntities_ShouldMapAllCorrectly()
     {
         // Arrange
-        List<BookRatingEntity> entities =
-        [
-            _fixture.CreateBookRating(),
-            _fixture.CreateBookRating()
-        ];
-
+        List<BookRatingEntity> entities = _fixture.CreateMany(2);
         // Act
         IEnumerable<BookRatingDto> results = entities.ToResponses();
 
@@ -92,7 +79,7 @@ public class BookRatingEntityMappingTests
     public void ToDomainEntity_WhenMappingValidBookRatingEntity_ShouldMapCorrectly()
     {
         // Arrange
-        BookRatingEntity entity = _fixture.CreateBookRating();
+        BookRatingEntity entity = _fixture.Create();
 
         // Act
         Result<BookRating> result = entity.ToDomainEntity();
@@ -110,7 +97,7 @@ public class BookRatingEntityMappingTests
     public void ToDomainEntity_WhenMappingInvalidBookRatingEntity_ShouldMapToDefaults()
     {
         // Arrange
-        BookRatingEntity entity = _fixture.CreateInvalidBookRating();
+        BookRatingEntity entity = _fixture.Create(includeValues: false);
 
         // Act
         Result<BookRating> result = entity.ToDomainEntity();
@@ -128,11 +115,7 @@ public class BookRatingEntityMappingTests
     public void ToDomainEntities_WhenMappingMultipleBookRatingEntities_ShouldMapAllCorrectly()
     {
         // Arrange
-        List<BookRatingEntity> entities =
-        [
-            _fixture.CreateBookRating(),
-            _fixture.CreateBookRating()
-        ];
+        List<BookRatingEntity> entities = _fixture.CreateMany(2);
 
         // Act
         IEnumerable<Result<BookRating>> results = entities.ToDomainEntities();

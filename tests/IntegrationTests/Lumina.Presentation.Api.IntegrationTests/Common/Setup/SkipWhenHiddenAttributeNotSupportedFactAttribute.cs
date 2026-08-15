@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.FileSystemManagement.Fixtures;
+using Lumina.Contracts.Fixtures.Core.Responses.FileSystemManagement.Common;
+using Lumina.Presentation.Api.Fixtures.Core.Endpoints.FileSystemManagement;
 using System;
 using System.IO;
 using Xunit;

@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Core.FileSystemManagement.Files.Queries.GetFiles;
+using Lumina.Application.Fixtures.Core.FileSystemManagement.Files.Queries.GetFiles;
 using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Application.UnitTests.Core.FileSystemManagement.Files.Queries.GetFiles.Fixtures;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using System.Collections.Generic;
@@ -16,21 +16,14 @@ namespace Lumina.Application.UnitTests.Core.FileSystemManagement.Files.Queries.G
 [ExcludeFromCodeCoverage]
 public class GetFilesQueryValidatorTests
 {
-    private readonly GetFilesQueryValidator _validator;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="GetFilesQueryValidatorTests"/> class.
-    /// </summary>
-    public GetFilesQueryValidatorTests()
-    {
-        _validator = new GetFilesQueryValidator();
-    }
+    private readonly GetFilesQueryValidator _validator = new();
+    private readonly GetFilesQueryFixture _getFilesQueryFixture = new();
 
     [Fact]
     public void Validate_WhenPathIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        GetFilesQuery query = GetFilesQueryFixture.CreateGetFilesQuery();
+        GetFilesQuery query = _getFilesQueryFixture.Create();
         query = query with { Path = null! };
 
         // Act
@@ -44,7 +37,7 @@ public class GetFilesQueryValidatorTests
     public void Validate_WhenPathIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        GetFilesQuery query = GetFilesQueryFixture.CreateGetFilesQuery();
+        GetFilesQuery query = _getFilesQueryFixture.Create();
         query = query with { Path = string.Empty };
 
         // Act
@@ -58,7 +51,7 @@ public class GetFilesQueryValidatorTests
     public void Validate_WhenPathIsWhitespace_ShouldHaveValidationError()
     {
         // Arrange
-        GetFilesQuery query = GetFilesQueryFixture.CreateGetFilesQuery();
+        GetFilesQuery query = _getFilesQueryFixture.Create();
         query = query with { Path = "   " };
 
         // Act
@@ -72,7 +65,7 @@ public class GetFilesQueryValidatorTests
     public void Validate_WhenPathIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        GetFilesQuery query = GetFilesQueryFixture.CreateGetFilesQuery();
+        GetFilesQuery query = _getFilesQueryFixture.Create();
         query = query with { Path = "/valid/path" };
 
         // Act
@@ -86,7 +79,7 @@ public class GetFilesQueryValidatorTests
     public void Validate_WhenIncludeHiddenElementsIsTrue_ShouldNotHaveValidationError()
     {
         // Arrange
-        GetFilesQuery query = GetFilesQueryFixture.CreateGetFilesQuery();
+        GetFilesQuery query = _getFilesQueryFixture.Create();
         query = query with { IncludeHiddenElements = true };
 
         // Act
@@ -100,7 +93,7 @@ public class GetFilesQueryValidatorTests
     public void Validate_WhenIncludeHiddenElementsIsFalse_ShouldNotHaveValidationError()
     {
         // Arrange
-        GetFilesQuery query = GetFilesQueryFixture.CreateGetFilesQuery();
+        GetFilesQuery query = _getFilesQueryFixture.Create();
         query = query with { IncludeHiddenElements = false };
 
         // Act

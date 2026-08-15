@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using AutoFixture;
-using AutoFixture.AutoNSubstitute;
 using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.FileSystemManagement.Files.Queries.GetFiles;
+using Lumina.Contracts.Fixtures.Core.Requests.FileSystemManagement.Files;
+using Lumina.Contracts.Fixtures.Core.Responses.FileSystemManagement.Files;
 using Lumina.Contracts.Requests.FileSystemManagement.Files;
 using Lumina.Contracts.Responses.FileSystemManagement.Files;
 using Lumina.Domain.Common.Primitives;
@@ -27,16 +27,16 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.
 [ExcludeFromCodeCoverage]
 public class GetFilesEndpointTests
 {
-    private readonly IFixture _fixture;
     private readonly IQueryHandler<GetFilesQuery, Result<IEnumerable<FileResponse>>> _mockHandler;
     private readonly GetFilesEndpoint _sut;
+    private readonly GetFilesRequestFixture _getFilesRequestFixture = new();
+    private readonly FileResponseFixture _fileResponseFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetFilesEndpointTests"/> class.
     /// </summary>
     public GetFilesEndpointTests()
     {
-        _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
         _mockHandler = Substitute.For<IQueryHandler<GetFilesQuery, Result<IEnumerable<FileResponse>>>>();
         _sut = Factory.Create<GetFilesEndpoint>(_mockHandler);
     }
@@ -45,9 +45,9 @@ public class GetFilesEndpointTests
     public async Task ExecuteAsync_WhenCalled_ShouldReturnOkResultWithFileResponses()
     {
         // Arrange
-        GetFilesRequest request = _fixture.Create<GetFilesRequest>();
+        GetFilesRequest request = _getFilesRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
-        List<FileResponse> expectedResponses = [.. _fixture.CreateMany<FileResponse>(3)];
+        List<FileResponse> expectedResponses = [.. _fileResponseFixture.CreateMany(3)];
         _mockHandler.HandleAsync(Arg.Any<GetFilesQuery>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(expectedResponses.AsEnumerable()));
 
@@ -63,7 +63,7 @@ public class GetFilesEndpointTests
     public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
     {
         // Arrange
-        GetFilesRequest request = _fixture.Create<GetFilesRequest>();
+        GetFilesRequest request = _getFilesRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
         Error expectedError = Error.NotFound("File.NotFound", "The requested file was not found.");
         _mockHandler.HandleAsync(Arg.Any<GetFilesQuery>(), Arg.Any<CancellationToken>())
@@ -89,7 +89,7 @@ public class GetFilesEndpointTests
     public async Task ExecuteAsync_WhenHandlerReturnsValidationError_ShouldReturnValidationProblemResult()
     {
         // Arrange
-        GetFilesRequest request = _fixture.Create<GetFilesRequest>();
+        GetFilesRequest request = _getFilesRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
         Error expectedError = Error.Validation("Path.Invalid", "The provided path is invalid.");
         _mockHandler.HandleAsync(Arg.Any<GetFilesQuery>(), Arg.Any<CancellationToken>())
@@ -115,7 +115,7 @@ public class GetFilesEndpointTests
     public async Task ExecuteAsync_WhenCalled_ShouldSendGetFilesQueryToSender()
     {
         // Arrange
-        GetFilesRequest request = _fixture.Create<GetFilesRequest>();
+        GetFilesRequest request = _getFilesRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<GetFilesQuery>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(Enumerable.Empty<FileResponse>()));
@@ -134,7 +134,7 @@ public class GetFilesEndpointTests
     public async Task ExecuteAsync_WhenCancellationRequested_ShouldCancelOperation()
     {
         // Arrange
-        GetFilesRequest request = _fixture.Create<GetFilesRequest>();
+        GetFilesRequest request = _getFilesRequestFixture.Create();
         CancellationTokenSource cts = new();
         TaskCompletionSource<bool> operationStarted = new();
         TaskCompletionSource<bool> cancellationRequested = new();
@@ -145,7 +145,7 @@ public class GetFilesEndpointTests
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return Result.From(_fixture.CreateMany<FileResponse>(3).AsEnumerable());
+                return Result.From(_fileResponseFixture.CreateMany(3).AsEnumerable());
             }, callInfo.Arg<CancellationToken>()));
 
         // Act

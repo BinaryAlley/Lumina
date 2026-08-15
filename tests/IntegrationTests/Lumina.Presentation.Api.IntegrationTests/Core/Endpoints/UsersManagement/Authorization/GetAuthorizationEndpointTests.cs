@@ -65,7 +65,7 @@ public class GetAuthorizationEndpointTests : IClassFixture<AuthenticatedLuminaAp
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithValidRequest_ShouldReturnAuthorizationDetails()
+    public async Task GetAuthorization_WhenCalledWithValidRequest_ShouldReturnAuthorizationDetails()
     {
         // Arrange
         using IServiceScope scope = _apiFactory.Services.CreateScope();
@@ -97,7 +97,7 @@ public class GetAuthorizationEndpointTests : IClassFixture<AuthenticatedLuminaAp
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenUserDoesNotExist_ShouldReturnForbiddenResult()
+    public async Task GetAuthorization_WhenUserDoesNotExist_ShouldReturnForbiddenResult()
     {
         // Arrange
         GetAuthorizationRequest request = new(Guid.NewGuid());
@@ -121,7 +121,7 @@ public class GetAuthorizationEndpointTests : IClassFixture<AuthenticatedLuminaAp
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenUserIdIsEmpty_ShouldReturnValidationError()
+    public async Task GetAuthorization_WhenUserIdIsEmpty_ShouldReturnValidationError()
     {
         // Arrange
         GetAuthorizationRequest request = new(Guid.Empty);
@@ -150,7 +150,7 @@ public class GetAuthorizationEndpointTests : IClassFixture<AuthenticatedLuminaAp
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCancellationRequested_ShouldThrowTaskCanceledException()
+    public async Task GetAuthorization_WhenCancellationRequested_ShouldThrowTaskCanceledException()
     {
         // Arrange
         GetAuthorizationRequest request = new(Guid.NewGuid());

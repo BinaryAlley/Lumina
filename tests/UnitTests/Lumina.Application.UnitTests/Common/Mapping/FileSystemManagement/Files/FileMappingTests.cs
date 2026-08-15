@@ -1,10 +1,9 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.FileSystemManagement.Files;
-using Lumina.Application.UnitTests.Core.FileSystemManagement.Files.Fixtures;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
 using Lumina.Contracts.Responses.FileSystemManagement.Files;
-using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -19,21 +18,13 @@ namespace Lumina.Application.UnitTests.Common.Mapping.FileSystemManagement.Files
 [ExcludeFromCodeCoverage]
 public class FileMappingTests
 {
-    private readonly FileFixture _fileFixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="FileMappingTests"/> class.
-    /// </summary>
-    public FileMappingTests()
-    {
-        _fileFixture = new();
-    }
+    private readonly FileFixture _fileFixture = new();
 
     [Fact]
     public void ToFileSystemTreeNodeResponse_WhenMappingFile_ShouldMapCorrectly()
     {
         // Arrange
-        File domainModel = _fileFixture.CreateFile();
+        File domainModel = _fileFixture.Create();
 
         // Act
         FileSystemTreeNodeResponse result = domainModel.ToFileSystemTreeNodeResponse();
@@ -60,8 +51,8 @@ public class FileMappingTests
         Assert.NotNull(result);
         Assert.Equal(domainModels.Count(), result.Count());
 
-        List<FileSystemTreeNodeResponse> resultList = result.ToList();
-        List<File> domainModelsList = domainModels.ToList();
+        List<FileSystemTreeNodeResponse> resultList = [.. result];
+        List<File> domainModelsList = [.. domainModels];
         for (int i = 0; i < resultList.Count; i++)
         {
             Assert.Equal(domainModelsList[i].Name, resultList[i].Name);
@@ -77,7 +68,7 @@ public class FileMappingTests
     public void ToResponse_WhenMappingFile_ShouldMapCorrectly()
     {
         // Arrange
-        File domainModel = _fileFixture.CreateFile();
+        File domainModel = _fileFixture.Create();
 
         // Act
         FileResponse result = domainModel.ToResponse();
@@ -104,8 +95,8 @@ public class FileMappingTests
         Assert.NotNull(result);
         Assert.Equal(domainModels.Count(), result.Count());
 
-        List<FileResponse> resultList = result.ToList();
-        List<File> domainModelsList = domainModels.ToList();
+        List<FileResponse> resultList = [.. result];
+        List<File> domainModelsList = [.. domainModels];
         for (int i = 0; i < resultList.Count; i++)
         {
             Assert.Equal(domainModelsList[i].Name, resultList[i].Name);

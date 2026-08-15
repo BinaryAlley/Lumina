@@ -2,10 +2,10 @@
 using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.FileSystemManagement.Drives.Queries.GetDrives;
+using Lumina.Contracts.Fixtures.Core.Responses.FileSystemManagement.Common;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Drives.GetDrives;
-using Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.Fixtures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -27,7 +27,7 @@ public class GetDrivesEndpointTests
 {
     private readonly IQueryHandler<GetDrivesQuery, Result<IEnumerable<FileSystemTreeNodeResponse>>> _mockHandler;
     private readonly GetDrivesEndpoint _sut;
-    private readonly FileSystemTreeNodeResponseFixture _fileSystemTreeNodeResponseFixture;
+    private readonly FileSystemTreeNodeResponseFixture _fileSystemTreeNodeResponseFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DrivesControllerTests"/> class.
@@ -35,7 +35,6 @@ public class GetDrivesEndpointTests
     public GetDrivesEndpointTests()
     {
         _mockHandler = Substitute.For<IQueryHandler<GetDrivesQuery, Result<IEnumerable<FileSystemTreeNodeResponse>>>>();
-        _fileSystemTreeNodeResponseFixture = new FileSystemTreeNodeResponseFixture();
         _sut = Factory.Create<GetDrivesEndpoint>(_mockHandler);
     }
 

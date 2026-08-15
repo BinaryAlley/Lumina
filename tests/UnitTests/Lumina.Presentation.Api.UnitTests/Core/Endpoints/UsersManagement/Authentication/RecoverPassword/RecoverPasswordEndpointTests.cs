@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.UsersManagement.Authentication.Commands.RecoverPassword;
+using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authentication.RecoverPassword;
-using Lumina.Presentation.Api.UnitTests.Core.Endpoints.UsersManagement.Authentication.RecoverPassword.Fixtures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -25,7 +25,7 @@ public class RecoverPasswordEndpointTests
 {
     private readonly ICommandHandler<RecoverPasswordCommand, Result<RecoverPasswordResponse>> _mockHandler;
     private readonly RecoverPasswordEndpoint _sut;
-    private readonly RecoverPasswordRequestFixture _recoverPasswordRequestFixture;
+    private readonly RecoverPasswordRequestFixture _recoverPasswordRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RecoverPasswordEndpointTests"/> class.
@@ -34,7 +34,6 @@ public class RecoverPasswordEndpointTests
     {
         _mockHandler = Substitute.For<ICommandHandler<RecoverPasswordCommand, Result<RecoverPasswordResponse>>>();
         _sut = FastEndpoints.Factory.Create<RecoverPasswordEndpoint>(_mockHandler);
-        _recoverPasswordRequestFixture = new RecoverPasswordRequestFixture();
     }
 
     [Fact]

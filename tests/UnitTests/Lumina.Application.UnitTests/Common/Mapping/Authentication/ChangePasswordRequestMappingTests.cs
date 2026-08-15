@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Application.Common.Mapping.Authentication; 
 using Lumina.Application.Core.UsersManagement.Authentication.Commands.ChangePassword;
-using Lumina.Application.UnitTests.Core.UsersManagement.Authentication.Commands.ChangePassword.Fixtures;
+using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
 using Lumina.Contracts.Requests.Authentication;
 using System.Diagnostics.CodeAnalysis;
-using Lumina.Application.Common.Mapping.Authentication; 
 #endregion
 
 namespace Lumina.Application.UnitTests.Common.Mapping.Authentication;
@@ -14,21 +14,13 @@ namespace Lumina.Application.UnitTests.Common.Mapping.Authentication;
 [ExcludeFromCodeCoverage]
 public class ChangePasswordRequestMappingTests
 {
-    private readonly ChangePasswordRequestFixture _fixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ChangePasswordRequestMappingTests"/> class.
-    /// </summary>
-    public ChangePasswordRequestMappingTests()
-    {
-        _fixture = new();
-    }
+    private readonly ChangePasswordRequestFixture _fixture = new();
 
     [Fact]
     public void ToCommand_WhenMappingRequest_ShouldMapCorrectly()
     {
         // Arrange
-        ChangePasswordRequest request = _fixture.CreateChangePasswordRequest();
+        ChangePasswordRequest request = _fixture.Create();
 
         // Act
         ChangePasswordCommand result = request.ToCommand();

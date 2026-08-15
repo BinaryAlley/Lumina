@@ -49,7 +49,7 @@ public class CheckPathExistsEndpointTests : IClassFixture<AuthenticatedLuminaApi
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithExistingPath_ShouldReturnOkResultWithExistsTrue()
+    public async Task CheckPathExists_WhenCalledWithExistingPath_ShouldReturnOkResultWithExistsTrue()
     {
         // Arrange
         string tempPath = System.IO.Path.GetTempPath();
@@ -66,7 +66,7 @@ public class CheckPathExistsEndpointTests : IClassFixture<AuthenticatedLuminaApi
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithNonExistingPath_ShouldReturnOkResultWithExistsFalse()
+    public async Task CheckPathExists_WhenCalledWithNonExistingPath_ShouldReturnOkResultWithExistsFalse()
     {
         // Arrange
         string nonExistingPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), Guid.NewGuid().ToString());
@@ -83,7 +83,7 @@ public class CheckPathExistsEndpointTests : IClassFixture<AuthenticatedLuminaApi
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithEmptyPath_ShouldReturnValidationProblemResult()
+    public async Task CheckPathExists_WhenCalledWithEmptyPath_ShouldReturnValidationProblemResult()
     {
         // Arrange
         string path = "";
@@ -111,7 +111,7 @@ public class CheckPathExistsEndpointTests : IClassFixture<AuthenticatedLuminaApi
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithInvalidPath_ShouldReturnOkResultWithExistsFalse()
+    public async Task CheckPathExists_WhenCalledWithInvalidPath_ShouldReturnOkResultWithExistsFalse()
     {
         // Arrange
         string invalidPath = "invalid:path";
@@ -128,7 +128,7 @@ public class CheckPathExistsEndpointTests : IClassFixture<AuthenticatedLuminaApi
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCancellationTokenIsCanceled_ShouldThrowTaskCanceledException()
+    public async Task CheckPathExists_WhenCancellationTokenIsCanceled_ShouldThrowTaskCanceledException()
     {
         // Arrange
         string testPath = System.IO.Path.GetTempPath();

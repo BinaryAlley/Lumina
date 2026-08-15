@@ -40,6 +40,8 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\src\Lumina.Application\Lumina.Application.csproj" />
-        <ProjectReference Include="..\Lumina.DataAccess.UnitTests\Lumina.DataAccess.UnitTests.csproj" />
+        <ProjectReference Include="..\..\Common\Lumina.Application.Fixtures\Lumina.Application.Fixtures.csproj" />
+        <ProjectReference Include="..\..\Common\Lumina.Domain.Fixtures\Lumina.Domain.Fixtures.csproj" />
+        <ProjectReference Include="..\..\Common\Lumina.Contracts.Fixtures\Lumina.Contracts.Fixtures.csproj" />
     </ItemGroup>
 </Project>

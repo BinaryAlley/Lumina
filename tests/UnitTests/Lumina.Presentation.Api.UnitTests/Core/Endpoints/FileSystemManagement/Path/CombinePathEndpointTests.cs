@@ -1,11 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.FileSystemManagement.Paths.Commands.CombinePath;
+using Lumina.Contracts.Fixtures.Core.Requests.FileSystemManagement.Path;
+using Lumina.Contracts.Fixtures.Core.Responses.FileSystemManagement.Path;
 using Lumina.Contracts.Requests.FileSystemManagement.Path;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.CombinePath;
-using Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.Fixtures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -25,8 +26,8 @@ public class CombinePathEndpointTests
 {
     private readonly ICommandHandler<CombinePathCommand, Result<PathSegmentResponse>> _mockHandler;
     private readonly CombinePathEndpoint _sut;
-    private readonly PathSegmentResponseFixture _pathSegmentResponseFixture;
-    private readonly CombinePathRequestFixture _combinePathRequestFixture;
+    private readonly PathSegmentResponseFixture _pathSegmentResponseFixture = new();
+    private readonly CombinePathRequestFixture _combinePathRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CombinePathEndpointTests"/> class.
@@ -35,8 +36,6 @@ public class CombinePathEndpointTests
     {
         _mockHandler = Substitute.For<ICommandHandler<CombinePathCommand, Result<PathSegmentResponse>>>();
         _sut = FastEndpoints.Factory.Create<CombinePathEndpoint>(_mockHandler);
-        _pathSegmentResponseFixture = new PathSegmentResponseFixture();
-        _combinePathRequestFixture = new CombinePathRequestFixture();
     }
 
     [Fact]

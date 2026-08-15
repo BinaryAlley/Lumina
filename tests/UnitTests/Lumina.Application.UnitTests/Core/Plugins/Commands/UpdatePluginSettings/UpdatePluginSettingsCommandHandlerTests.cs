@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Diagnostics.CodeAnalysis;
 #endregion
 
 namespace Lumina.Application.UnitTests.Core.Plugins.Commands.UpdatePluginSettings;
@@ -16,6 +17,7 @@ namespace Lumina.Application.UnitTests.Core.Plugins.Commands.UpdatePluginSetting
 /// <summary>
 /// Contains unit tests for the <see cref="UpdatePluginSettingsCommandHandler"/> class.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class UpdatePluginSettingsCommandHandlerTests
 {
     private readonly IUnitOfWork _mockUnitOfWork;

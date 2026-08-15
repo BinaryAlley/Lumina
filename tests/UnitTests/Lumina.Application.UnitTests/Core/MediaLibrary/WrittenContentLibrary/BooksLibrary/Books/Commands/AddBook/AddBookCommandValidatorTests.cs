@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook;
+using Lumina.Application.Fixtures.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook;
 using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Application.UnitTests.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook.Fixtures;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
@@ -20,23 +20,14 @@ namespace Lumina.Application.UnitTests.Core.MediaLibrary.WrittenContentLibrary.B
 [ExcludeFromCodeCoverage]
 public class AddBookCommandValidatorTests
 {
-    private readonly AddBookCommandFixture _commandBookFixture;
-    private readonly AddBookCommandValidator _validator;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AddBookCommandValidatorTests"/> class.
-    /// </summary>
-    public AddBookCommandValidatorTests()
-    {
-        _validator = new AddBookCommandValidator();
-        _commandBookFixture = new AddBookCommandFixture();
-    }
+    private readonly AddBookCommandFixture _commandBookFixture = new();
+    private readonly AddBookCommandValidator _validator = new();
 
     [Fact]
     public void Validate_WhenTitleIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { Title = null! } };
 
         // Act
@@ -50,7 +41,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenTitleExceeds255Characters_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { Title = new Faker().Random.String2(300) } };
 
         // Act
@@ -64,7 +55,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenTitleIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { Title = new Faker().Random.String2(200) } };
 
         // Act
@@ -78,7 +69,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenOriginalTitleExceeds255Characters_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { OriginalTitle = new Faker().Random.String2(300) } };
 
         // Act
@@ -92,7 +83,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenOriginalTitleIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { OriginalTitle = new Faker().Random.String2(200) } };
 
         // Act
@@ -106,7 +97,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenOriginalTitleIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { OriginalTitle = null! } };
 
         // Act
@@ -120,7 +111,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenDescriptionExceeds2000Characters_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { Description = new Faker().Random.String2(2001) } };
 
         // Act
@@ -134,7 +125,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenDescriptionIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { Description = new Faker().Random.String2(1500) } };
 
         // Act
@@ -148,7 +139,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenDescriptionIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { Description = null! } };
 
         // Act
@@ -162,7 +153,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenDescriptionIsEmpty_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { Description = string.Empty } };
 
         // Act
@@ -176,7 +167,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenReleaseInfoIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { ReleaseInfo = null! } };
 
         // Act
@@ -190,7 +181,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenOriginalReleaseYearIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { ReleaseInfo = bookCommand.Metadata.ReleaseInfo! with { OriginalReleaseDate = null!, OriginalReleaseYear = new Faker().Random.Int(2000, 2005), ReReleaseYear = new Faker().Random.Int(2005, 2010), ReReleaseDate = null! } } };
 
         // Act
@@ -204,7 +195,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenOriginalReleaseYearIsLessThan1_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { ReleaseInfo = bookCommand.Metadata.ReleaseInfo! with { OriginalReleaseYear = 0 } } };
 
         // Act
@@ -218,7 +209,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenOriginalReleaseYearIsGreaterThan9999_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { ReleaseInfo = bookCommand.Metadata.ReleaseInfo! with { OriginalReleaseYear = 10000 } } };
 
         // Act
@@ -232,7 +223,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenReReleaseYearIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with
         {
             Metadata = bookCommand.Metadata! with
@@ -254,7 +245,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenReReleaseYearIsLessThan1_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { ReleaseInfo = bookCommand.Metadata.ReleaseInfo! with { ReReleaseYear = 0 } } };
 
         // Act
@@ -268,7 +259,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenReReleaseYearIsGreaterThan9999_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { ReleaseInfo = bookCommand.Metadata.ReleaseInfo! with { ReReleaseYear = 10000 } } };
 
         // Act
@@ -282,7 +273,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenReleaseCountryIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { ReleaseInfo = bookCommand.Metadata.ReleaseInfo! with { ReleaseCountry = new Faker().Random.String2(2).ToUpper() } } };
 
         // Act
@@ -296,7 +287,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenReleaseCountryIsInvalid_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { ReleaseInfo = bookCommand.Metadata.ReleaseInfo! with { ReleaseCountry = new Faker().Random.String2(3) } } };
 
         // Act
@@ -310,7 +301,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenReleaseVersionIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { ReleaseInfo = bookCommand.Metadata.ReleaseInfo! with { ReleaseVersion = new Faker().Random.String2(50) } } };
 
         // Act
@@ -324,7 +315,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenReleaseVersionExceeds50Characters_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { ReleaseInfo = bookCommand.Metadata.ReleaseInfo! with { ReleaseVersion = new Faker().Random.String2(51) } } };
 
         // Act
@@ -338,7 +329,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenReReleaseYearIsAfterOriginalReleaseYear_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { ReleaseInfo = bookCommand.Metadata.ReleaseInfo! with { OriginalReleaseYear = 2000, ReReleaseYear = 2001, ReReleaseDate = null! } } };
 
         // Act
@@ -352,7 +343,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenReReleaseYearIsBeforeOriginalReleaseYear_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { ReleaseInfo = bookCommand.Metadata.ReleaseInfo! with { OriginalReleaseYear = 2001, ReReleaseYear = 2000, ReReleaseDate = null! } } };
 
         // Act
@@ -366,7 +357,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenReReleaseDateIsAfterOriginalReleaseDate_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { ReleaseInfo = bookCommand.Metadata.ReleaseInfo! with { OriginalReleaseDate = new DateOnly(2000, 1, 1), ReReleaseDate = new DateOnly(2001, 1, 1) } } };
 
         // Act
@@ -380,7 +371,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenReReleaseDateIsBeforeOriginalReleaseDate_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { ReleaseInfo = bookCommand.Metadata.ReleaseInfo! with { OriginalReleaseDate = new DateOnly(2001, 1, 1), ReReleaseDate = new DateOnly(2000, 1, 1) } } };
 
         // Act
@@ -394,7 +385,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenGenresIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { Genres = null! } };
 
         // Act
@@ -408,7 +399,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenGenreNameIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { Genres = [.. bookCommand.Metadata.Genres!.Select((genre, index) => index == 0 ? genre with { Name = string.Empty } : genre)] } };
 
         // Act
@@ -422,7 +413,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenGenreNameExceeds50Characters_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { Genres = [.. bookCommand.Metadata.Genres!.Select((genre, index) => index == 0 ? genre with { Name = new Faker().Random.String2(51) } : genre)] } };
 
         // Act
@@ -436,7 +427,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenGenresAreValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with
         {
             Metadata = bookCommand.Metadata! with
@@ -456,7 +447,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenTagsIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { Tags = null! } };
 
         // Act
@@ -470,7 +461,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenTagNameIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { Tags = [.. bookCommand.Metadata.Tags!.Select((tag, index) => index == 0 ? tag with { Name = string.Empty } : tag)] } };
 
         // Act
@@ -484,7 +475,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenTagNameExceeds50Characters_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { Tags = [.. bookCommand.Metadata.Tags!.Select((tag, index) => index == 0 ? tag with { Name = new Faker().Random.String2(51) } : tag)] } };
 
         // Act
@@ -498,7 +489,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenTagsAreValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with
         {
             Metadata = bookCommand.Metadata! with
@@ -518,7 +509,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenLanguageIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { Language = null! } };
 
         // Act
@@ -532,7 +523,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenLanguageCodeIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { Language = bookCommand.Metadata.Language! with { LanguageCode = string.Empty } } };
 
         // Act
@@ -546,7 +537,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenLanguageCodeExceeds2Characters_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { Language = bookCommand.Metadata.Language! with { LanguageCode = new Faker().Random.String2(3) } } };
 
         // Act
@@ -560,7 +551,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenLanguageNameIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { Language = bookCommand.Metadata.Language! with { LanguageName = string.Empty } } };
 
         // Act
@@ -574,7 +565,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenLanguageNameExceeds50Characters_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { Language = bookCommand.Metadata.Language! with { LanguageName = new Faker().Random.String2(51) } } };
 
         // Act
@@ -588,7 +579,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenLanguageNativeNameIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { Language = bookCommand.Metadata.Language! with { NativeName = null! } } };
 
         // Act
@@ -602,7 +593,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenLanguageNativeNameExceeds50Characters_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { Language = bookCommand.Metadata.Language! with { NativeName = new Faker().Random.String2(51) } } };
 
         // Act
@@ -616,7 +607,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenOriginalLanguageIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { OriginalLanguage = null! } };
 
         // Act
@@ -630,7 +621,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenOriginalLanguageCodeIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { OriginalLanguage = bookCommand.Metadata.OriginalLanguage! with { LanguageCode = string.Empty } } };
 
         // Act
@@ -644,7 +635,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenOriginalLanguageCodeExceeds2Characters_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { OriginalLanguage = bookCommand.Metadata.OriginalLanguage! with { LanguageCode = new Faker().Random.String2(3) } } };
 
         // Act
@@ -658,7 +649,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenOriginalLanguageNameIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { OriginalLanguage = bookCommand.Metadata.OriginalLanguage! with { LanguageName = string.Empty } } };
 
         // Act
@@ -672,7 +663,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenOriginalLanguageNameExceeds50Characters_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { OriginalLanguage = bookCommand.Metadata.OriginalLanguage! with { LanguageName = new Faker().Random.String2(51) } } };
 
         // Act
@@ -686,7 +677,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenOriginalLanguageNativeNameIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { OriginalLanguage = bookCommand.Metadata.OriginalLanguage! with { NativeName = null! } } };
 
         // Act
@@ -700,7 +691,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenOriginalLanguageNativeNameExceeds50Characters_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { OriginalLanguage = bookCommand.Metadata.OriginalLanguage! with { NativeName = new Faker().Random.String2(51) } } };
 
         // Act
@@ -714,7 +705,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithEmptyPublisher_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { Publisher = null! } };
 
         // Act
@@ -728,7 +719,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithValidPublisher_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { Publisher = new Faker().Random.String2(100) } };
 
         // Act
@@ -742,7 +733,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithInvalidLengthPublisher_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { Publisher = new Faker().Random.String2(101) } };
 
         // Act
@@ -756,7 +747,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenPageCountIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { PageCount = null } };
 
         // Act
@@ -770,7 +761,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenPageCountIsZero_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { PageCount = 0 } };
 
         // Act
@@ -784,7 +775,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenPageCountIsNegative_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { PageCount = -1 } };
 
         // Act
@@ -798,7 +789,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenPageCountIsPositive_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Metadata = bookCommand.Metadata! with { PageCount = 100 } };
 
         // Act
@@ -812,7 +803,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenFormatIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Format = null };
 
         // Act
@@ -826,7 +817,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenFormatIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Format = BookFormat.Hardcover };
 
         // Act
@@ -840,7 +831,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenFormatIsInvalid_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Format = (BookFormat)99 };
 
         // Act
@@ -854,7 +845,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenEditionIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Edition = null };
 
         // Act
@@ -868,7 +859,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenEditionIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Edition = new Faker().Random.String2(50) };
 
         // Act
@@ -882,7 +873,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenEditionExceeds50Characters_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Edition = new Faker().Random.String2(51) };
 
         // Act
@@ -896,7 +887,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenVolumeNumberIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { VolumeNumber = null };
 
         // Act
@@ -910,7 +901,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenVolumeNumberIsZero_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { VolumeNumber = 0 };
 
         // Act
@@ -924,7 +915,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenVolumeNumberIsNegative_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { VolumeNumber = -1 };
 
         // Act
@@ -938,7 +929,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenVolumeNumberIsPositive_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { VolumeNumber = 1 };
 
         // Act
@@ -952,7 +943,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenSeriesIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Series = null };
 
         // Act
@@ -966,7 +957,7 @@ public class AddBookCommandValidatorTests
     //public void Validate_WhenSeriesTitleIsEmpty_ShouldHaveValidationError()
     //{
     //    // Arrange
-    //    var bookCommand = _commandBookFixture.CreateCommandBook();
+    //    var bookCommand = _commandBookFixture.Create();
     //    bookCommand = bookCommand with { Series = bookCommand.Series! with { Title = string.Empty } };
 
     //    // Act
@@ -980,7 +971,7 @@ public class AddBookCommandValidatorTests
     //public void Validate_WhenSeriesTitleExceeds255Characters_ShouldHaveValidationError()
     //{
     //    // Arrange
-    //    var bookCommand = _commandBookFixture.CreateCommandBook();
+    //    var bookCommand = _commandBookFixture.Create();
     //    bookCommand = bookCommand with { Series = bookCommand.Series! with { Title = new Faker().Random.String2(256) } };
 
     //    // Act
@@ -994,7 +985,7 @@ public class AddBookCommandValidatorTests
     //public void Validate_WhenSeriesTitleIsValid_ShouldNotHaveValidationError()
     //{
     //    // Arrange
-    //    var bookCommand = _commandBookFixture.CreateCommandBook();
+    //    var bookCommand = _commandBookFixture.Create();
     //    bookCommand = bookCommand with { Series = bookCommand.Series! with { Title = new Faker().Random.String2(200) } };
 
     //    // Act
@@ -1008,7 +999,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenAsinIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { ASIN = new Faker().Random.String2(10) };
 
         // Act
@@ -1022,7 +1013,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenAsinIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { ASIN = null };
 
         // Act
@@ -1036,7 +1027,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenAsinIsNotTenCharacters_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { ASIN = new Faker().Random.String2(9) };
 
         // Act
@@ -1050,7 +1041,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenGoodreadsIdIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { GoodreadsId = null };
 
         // Act
@@ -1064,7 +1055,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenGoodreadsIdIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { GoodreadsId = "123456789" };
 
         // Act
@@ -1078,7 +1069,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenGoodreadsIdIsNonNumeric_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { GoodreadsId = "abc123" };
 
         // Act
@@ -1092,7 +1083,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenGoodreadsIdContainsSpaces_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { GoodreadsId = "123 456" };
 
         // Act
@@ -1106,7 +1097,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenGoodreadsIdContainsSpecialCharacters_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { GoodreadsId = "123-456" };
 
         // Act
@@ -1120,7 +1111,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenLccnIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { LCCN = null };
 
         // Act
@@ -1134,7 +1125,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenLccnIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { LCCN = "n78890351" };
 
         // Act
@@ -1148,7 +1139,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenLccnHasInvalidFormat_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { LCCN = "invalid123" };
 
         // Act
@@ -1162,7 +1153,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenLccnIsTooLong_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { LCCN = new Faker().Random.String2(15) };
 
         // Act
@@ -1176,7 +1167,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenLccnIsTooShort_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { LCCN = "n12" };
 
         // Act
@@ -1190,7 +1181,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithEmptyOclcNumber_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { OCLCNumber = null };
 
         // Act
@@ -1204,7 +1195,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithValidOclcNumberFormat1_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { OCLCNumber = "ocm12345678" };
 
         // Act
@@ -1218,7 +1209,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithValidOclcNumberFormat2_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { OCLCNumber = "ocn123456789" };
 
         // Act
@@ -1232,7 +1223,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithValidOclcNumberFormat3_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { OCLCNumber = "on1234567890" };
 
         // Act
@@ -1246,7 +1237,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithValidOclcNumberFormat4_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { OCLCNumber = "(OCoLC)1234567890" };
 
         // Act
@@ -1260,7 +1251,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithValidOclcNumberFormat5_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { OCLCNumber = "12345678" };
 
         // Act
@@ -1274,7 +1265,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithInvalidOclcNumber_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { OCLCNumber = "invalid_oclc_number" };
 
         // Act
@@ -1288,7 +1279,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenOpenLibraryIdIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { OpenLibraryId = null! };
 
         // Act
@@ -1302,7 +1293,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenOpenLibraryIdIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { OpenLibraryId = "OL123456M" };
 
         // Act
@@ -1316,7 +1307,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenOpenLibraryIdIsInvalid_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { OpenLibraryId = "InvalidID" };
 
         // Act
@@ -1330,7 +1321,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenOpenLibraryIdStartsWithOLButIsInvalidFormat_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { OpenLibraryId = "OL123ABC" };
 
         // Act
@@ -1344,7 +1335,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenOpenLibraryIdHasValidFormatButInvalidSuffix_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { OpenLibraryId = "OL123456X" };
 
         // Act
@@ -1358,7 +1349,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithEmptyLibraryThingId_ShouldAddBook()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { LibraryThingId = null };
 
         // Act
@@ -1372,7 +1363,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithValidLibraryThingId_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { LibraryThingId = new Faker().Random.String2(50) };
 
         // Act
@@ -1386,7 +1377,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithInvalidLengthLibraryThingId_ShouldReturnBadRequest()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { LibraryThingId = new Faker().Random.String2(51) };
 
         // Act
@@ -1400,7 +1391,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithEmptyGoogleBooksId_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { GoogleBooksId = null! };
 
         // Act
@@ -1414,7 +1405,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithInvalidLengthGoogleBooksId_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { GoogleBooksId = new Faker().Random.String2(11) };
 
         // Act
@@ -1428,7 +1419,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithInvalidFormatGoogleBooksId_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { GoogleBooksId = new Faker().Random.String2(11) + " " };
 
         // Act
@@ -1442,7 +1433,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithValidGoogleBooksId_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { GoogleBooksId = new Faker().Random.String2(12, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-") };
 
         // Act
@@ -1456,7 +1447,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithEmptyBarnesAndNobleId_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { BarnesAndNobleId = null! };
 
         // Act
@@ -1470,7 +1461,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithInvalidLengthBarnesAndNobleId_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { BarnesAndNobleId = new Faker().Random.String2(11) };
 
         // Act
@@ -1484,7 +1475,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithNonNumericBarnesAndNobleId_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { BarnesAndNobleId = new Faker().Random.AlphaNumeric(10) };
 
         // Act
@@ -1498,7 +1489,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithValidBarnesAndNobleId_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { BarnesAndNobleId = new Faker().Random.Number(1000000000, 999999999).ToString() };
 
         // Act
@@ -1512,7 +1503,7 @@ public class AddBookCommandValidatorTests
     public void AddBook_WhenCalledWithEmptyAppleBooksId_ShouldAddBook()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { AppleBooksId = null };
 
         // Act
@@ -1526,7 +1517,7 @@ public class AddBookCommandValidatorTests
     public void AddBook_WhenCalledWithValidAppleBooksId_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { AppleBooksId = "id123456" };
 
         // Act
@@ -1540,7 +1531,7 @@ public class AddBookCommandValidatorTests
     public void AddBook_WhenCalledWithInvalidAppleBooksId_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { AppleBooksId = "invalid_id" };
 
         // Act
@@ -1554,7 +1545,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithNullIsbns_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { ISBNs = null! };
 
         // Act
@@ -1568,7 +1559,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithEmptyIsbnValue_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { ISBNs = [.. bookCommand.ISBNs!.Select((isbn, index) => index == 0 ? isbn with { Value = null! } : isbn)] };
 
         // Act
@@ -1582,7 +1573,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithInvalidIsbn10Value_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { ISBNs = [.. bookCommand.ISBNs!.Select((isbn, index) => index == 0 ? isbn with { Value = new Faker().Random.String2(5), Format = IsbnFormat.Isbn10 } : isbn)] };
 
         // Act
@@ -1596,7 +1587,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithInvalidIsbn13Value_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { ISBNs = [.. bookCommand.ISBNs!.Select((isbn, index) => index == 0 ? isbn with { Value = new Faker().Random.String2(5), Format = IsbnFormat.Isbn13 } : isbn)] };
 
         // Act
@@ -1610,7 +1601,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithInvalidIsbnFormat_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { ISBNs = [.. bookCommand.ISBNs!.Select((isbn, index) => index == 0 ? isbn with { Format = (IsbnFormat)99 } : isbn)] };
 
         // Act
@@ -1624,7 +1615,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithValidIsbn10_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { ISBNs = [.. bookCommand.ISBNs!.Select((isbn, index) => index == 0 ? isbn with { Value = "0-306-40615-2", Format = IsbnFormat.Isbn10 } : isbn)] };
 
         // Act
@@ -1638,7 +1629,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithValidIsbn13_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { ISBNs = [.. bookCommand.ISBNs!.Select((isbn, index) => index == 0 ? isbn with { Value = "978-3-16-148410-0", Format = IsbnFormat.Isbn13 } : isbn)] };
 
         // Act
@@ -1652,7 +1643,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithNullContributors_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Contributors = null! };
 
         // Act
@@ -1666,7 +1657,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithNullContributorName_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Contributors = [.. bookCommand.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Name = null! } : contributor)] };
 
         // Act
@@ -1680,7 +1671,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithInvalidLengthContributorDisplayName_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Contributors = [.. bookCommand.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Name = contributor.Name! with { DisplayName = new Faker().Random.String2(101) } } : contributor)] };
 
         // Act
@@ -1694,7 +1685,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithEmptyContributorDisplayName_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Contributors = [.. bookCommand.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Name = contributor.Name! with { DisplayName = null! } } : contributor)] };
 
         // Act
@@ -1708,7 +1699,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithInvalidLengthContributorLegalName_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Contributors = [.. bookCommand.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Name = contributor.Name! with { LegalName = new Faker().Random.String2(101) } } : contributor)] };
 
         // Act
@@ -1722,7 +1713,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithNullContributorRole_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Contributors = [.. bookCommand.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Role = null! } : contributor)] };
 
         // Act
@@ -1736,7 +1727,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithEmptyContributorRoleName_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Contributors = [.. bookCommand.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Role = contributor.Role! with { Name = null! } } : contributor)] };
 
         // Act
@@ -1750,7 +1741,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithInvalidLengthContributorRoleName_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Contributors = [.. bookCommand.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Role = contributor.Role! with { Name = new Faker().Random.String2(51) } } : contributor)] };
 
         // Act
@@ -1764,7 +1755,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithEmptyContributorRoleCategory_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Contributors = [.. bookCommand.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Role = contributor.Role! with { Category = null! } } : contributor)] };
 
         // Act
@@ -1778,7 +1769,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithInvalidLengthContributorRoleCategory_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Contributors = [.. bookCommand.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Role = contributor.Role! with { Category = new Faker().Random.String2(51) } } : contributor)] };
 
         // Act
@@ -1792,7 +1783,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithNullRatings_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Ratings = null! };
 
         // Act
@@ -1806,7 +1797,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithNegativeRatingValue_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Ratings = [.. bookCommand.Ratings!.Select((rating, index) => index == 0 ? rating with { Value = -1 } : rating)] };
 
         // Act
@@ -1820,7 +1811,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithRatingValueGreaterThanMaxValue_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Ratings = [.. bookCommand.Ratings!.Select((rating, index) => index == 0 ? rating with { Value = 6, MaxValue = 5 } : rating)] };
 
         // Act
@@ -1834,7 +1825,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithNegativeMaxRatingValue_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Ratings = [.. bookCommand.Ratings!.Select((rating, index) => index == 0 ? rating with { MaxValue = -1 } : rating)] };
 
         // Act
@@ -1848,7 +1839,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithNegativeVoteCount_ShouldHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Ratings = [.. bookCommand.Ratings!.Select((rating, index) => index == 0 ? rating with { VoteCount = -1 } : rating)] };
 
         // Act
@@ -1862,7 +1853,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithValidRatings_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with
         {
             Ratings = [.. bookCommand.Ratings!.Select((rating, index) => index == 0 ? rating
@@ -1881,7 +1872,7 @@ public class AddBookCommandValidatorTests
     public void Validate_WhenCalledWithNullVoteCount_ShouldNotHaveValidationError()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Ratings = [.. bookCommand.Ratings!.Select((rating, index) => index == 0 ? rating with { VoteCount = null } : rating)] };
 
         // Act

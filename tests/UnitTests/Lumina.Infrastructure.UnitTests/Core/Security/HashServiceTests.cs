@@ -12,15 +12,7 @@ namespace Lumina.Infrastructure.UnitTests.Core.Security;
 [ExcludeFromCodeCoverage]
 public class HashServiceTests
 {
-    private readonly PasswordHashService _sut;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="HashServiceTests"/> class.
-    /// </summary>
-    public HashServiceTests()
-    {
-        _sut = new PasswordHashService();
-    }
+    private readonly PasswordHashService _sut = new();
 
     [Fact]
     public void HashString_WhenCalled_ShouldReturnNonEmptyHash()

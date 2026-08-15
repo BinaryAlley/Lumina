@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Application.UnitTests.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook.Fixtures;
 using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using System;
 #endregion
@@ -22,7 +22,7 @@ public class BookMetadataDtoMappingTests
     public void ApplyMetadata_WhenCalledWithValidMetadata_ShouldApplyItAndMarkTheBookAsEnriched()
     {
         // Arrange
-        Book book = _bookFixture.CreateDomainBook();
+        Book book = _bookFixture.Create();
         BookMetadataDto metadata = CreateBookMetadata("The Fellowship of the Ring", "3");
 
         // Act
@@ -44,7 +44,7 @@ public class BookMetadataDtoMappingTests
     public void ApplyMetadata_WhenCalledWithInvalidGenres_ShouldReturnError()
     {
         // Arrange
-        Book book = _bookFixture.CreateDomainBook();
+        Book book = _bookFixture.Create();
         BookMetadataDto metadata = CreateBookMetadata("The Fellowship of the Ring", "3") with
         {
             Genres = [new GenreDto("")]

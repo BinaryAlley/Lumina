@@ -26,9 +26,9 @@ namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.UsersManagement.A
 [ExcludeFromCodeCoverage]
 public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
 {
-    private readonly PasswordHashService _hashService;
+    private readonly PasswordHashService _hashService = new();
     private readonly ICryptographyService _cryptographyService;
-    private readonly TotpTokenGenerator _totpTokenGenerator;
+    private readonly TotpTokenGenerator _totpTokenGenerator = new();
     private readonly LuminaApiFactory _apiFactory;
     private readonly HttpClient _client;
     private readonly JsonSerializerOptions _jsonOptions = new()
@@ -49,8 +49,6 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
         // set a fake IP for this test instance
         _client.DefaultRequestHeaders.Clear();
         _client.DefaultRequestHeaders.Add("X-Forwarded-For", $"192.168.1.1");
-        _hashService = new PasswordHashService();
-        _totpTokenGenerator = new TotpTokenGenerator();
         _testUsername = $"testuser_{Guid.NewGuid()}";
 
         using IServiceScope scope = apiFactory.Services.CreateScope();
@@ -145,7 +143,7 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenRateLimitExceeded_ShouldReturnTooManyRequests()
+    public async Task Login_WhenRateLimitExceeded_ShouldReturnTooManyRequests()
     {
         // Arrange
         // set a fake IP for this test instance

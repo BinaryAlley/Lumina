@@ -2,9 +2,9 @@
 using EntityFrameworkCore.Testing.NSubstitute;
 using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.DataAccess.Core.Repositories.Books;
 using Lumina.DataAccess.Core.UoW;
-using Lumina.DataAccess.UnitTests.Core.Repositories.Books.Fixtures;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
@@ -28,7 +28,7 @@ public class BookRepositoryTests
 {
     private readonly LuminaDbContext _mockContext;
     private readonly BookRepository _sut;
-    private readonly BookEntityFixture _bookEntityFixture;
+    private readonly BookEntityFixture _bookEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BookRepositoryTests"/> class.
@@ -37,14 +37,13 @@ public class BookRepositoryTests
     {
         _mockContext = Create.MockedDbContextFor<LuminaDbContext>();
         _sut = new BookRepository(_mockContext);
-        _bookEntityFixture = new BookEntityFixture();
     }
 
     [Fact]
     public async Task InsertAsync_WhenBookDoesNotExist_ShouldAddBookToContextAndReturnCreated()
     {
         // Arrange
-        BookEntity bookModel = _bookEntityFixture.CreateBookModel();
+        BookEntity bookModel = _bookEntityFixture.Create();
 
         // Act
         Result<Created> result = await _sut.InsertAsync(bookModel, CancellationToken.None);
@@ -63,7 +62,7 @@ public class BookRepositoryTests
     public async Task InsertAsync_WhenBookAlreadyExists_ShouldReturnError()
     {
         // Arrange
-        BookEntity bookModel = _bookEntityFixture.CreateBookModel();
+        BookEntity bookModel = _bookEntityFixture.Create();
 
         _mockContext.Books.Add(bookModel);
         await _mockContext.SaveChangesAsync();
@@ -85,7 +84,7 @@ public class BookRepositoryTests
         _mockContext.Set<TagEntity>().Add(existingTag);
         await _mockContext.SaveChangesAsync();
 
-        BookEntity bookModel = _bookEntityFixture.CreateBookModel();
+        BookEntity bookModel = _bookEntityFixture.Create();
         bookModel.Tags = [new("Existing"), new("New")];
 
         // Act
@@ -112,7 +111,7 @@ public class BookRepositoryTests
         _mockContext.Set<GenreEntity>().Add(existingGenre);
         await _mockContext.SaveChangesAsync();
 
-        BookEntity bookModel = _bookEntityFixture.CreateBookModel();
+        BookEntity bookModel = _bookEntityFixture.Create();
         bookModel.Genres = [new("Existing"), new("New")];
 
         // Act
@@ -135,12 +134,7 @@ public class BookRepositoryTests
     public async Task GetAllAsync_WhenCalled_ShouldReturnAllBooks()
     {
         // Arrange
-        List<BookEntity> books =
-        [
-            _bookEntityFixture.CreateBookModel(),
-            _bookEntityFixture.CreateBookModel(),
-            _bookEntityFixture.CreateBookModel()
-        ];
+        List<BookEntity> books = _bookEntityFixture.CreateMany(3);
         _mockContext.Books.AddRange(books);
         await _mockContext.SaveChangesAsync();
 
@@ -170,7 +164,7 @@ public class BookRepositoryTests
     public async Task GetAllAsync_WhenCalled_ShouldIncludeRelatedEntities()
     {
         // Arrange
-        BookEntity book = _bookEntityFixture.CreateBookModel();
+        BookEntity book = _bookEntityFixture.Create();
         book.Tags = [new TagEntity("Tag1"), new TagEntity("Tag2")];
         book.Genres = [new GenreEntity("Genre1"), new GenreEntity("Genre2")];
         book.ISBNs = [new IsbnEntity("1234567890", IsbnFormat.Isbn10), new IsbnEntity("1234567890123", IsbnFormat.Isbn13)];
@@ -195,9 +189,9 @@ public class BookRepositoryTests
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
-        BookEntity bookOfLibrary = _bookEntityFixture.CreateBookModel();
+        BookEntity bookOfLibrary = _bookEntityFixture.Create();
         bookOfLibrary.LibraryId = libraryId;
-        BookEntity bookOfAnotherLibrary = _bookEntityFixture.CreateBookModel();
+        BookEntity bookOfAnotherLibrary = _bookEntityFixture.Create();
         bookOfAnotherLibrary.LibraryId = Guid.NewGuid();
         _mockContext.Books.AddRange(bookOfLibrary, bookOfAnotherLibrary);
         await _mockContext.SaveChangesAsync();
@@ -215,7 +209,7 @@ public class BookRepositoryTests
     public async Task GetByPathAsync_WhenBookExists_ShouldReturnTheBook()
     {
         // Arrange
-        BookEntity book = _bookEntityFixture.CreateBookModel();
+        BookEntity book = _bookEntityFixture.Create();
         _mockContext.Books.Add(book);
         await _mockContext.SaveChangesAsync();
 
@@ -231,7 +225,7 @@ public class BookRepositoryTests
     public async Task GetByPathAsync_WhenBookDoesNotExist_ShouldReturnNull()
     {
         // Arrange
-        BookEntity book = _bookEntityFixture.CreateBookModel();
+        BookEntity book = _bookEntityFixture.Create();
         _mockContext.Books.Add(book);
         await _mockContext.SaveChangesAsync();
 
@@ -248,19 +242,19 @@ public class BookRepositoryTests
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
-        BookEntity pendingBook = _bookEntityFixture.CreateBookModel();
+        BookEntity pendingBook = _bookEntityFixture.Create();
         pendingBook.LibraryId = libraryId;
         pendingBook.Path = "/books/a.epub";
         pendingBook.MetadataStatus = MetadataStatus.Pending;
-        BookEntity enrichedBook = _bookEntityFixture.CreateBookModel();
+        BookEntity enrichedBook = _bookEntityFixture.Create();
         enrichedBook.LibraryId = libraryId;
         enrichedBook.Path = "/books/b.epub";
         enrichedBook.MetadataStatus = MetadataStatus.Enriched;
-        BookEntity failedBook = _bookEntityFixture.CreateBookModel();
+        BookEntity failedBook = _bookEntityFixture.Create();
         failedBook.LibraryId = libraryId;
         failedBook.Path = "/books/c.epub";
         failedBook.MetadataStatus = MetadataStatus.Failed;
-        BookEntity bookOfAnotherLibrary = _bookEntityFixture.CreateBookModel();
+        BookEntity bookOfAnotherLibrary = _bookEntityFixture.Create();
         bookOfAnotherLibrary.LibraryId = Guid.NewGuid();
         bookOfAnotherLibrary.MetadataStatus = MetadataStatus.Pending;
         _mockContext.Books.AddRange(pendingBook, enrichedBook, failedBook, bookOfAnotherLibrary);
@@ -281,10 +275,10 @@ public class BookRepositoryTests
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
-        BookEntity firstBook = _bookEntityFixture.CreateBookModel();
+        BookEntity firstBook = _bookEntityFixture.Create();
         firstBook.LibraryId = libraryId;
         firstBook.Path = "/books/a.epub";
-        BookEntity secondBook = _bookEntityFixture.CreateBookModel();
+        BookEntity secondBook = _bookEntityFixture.Create();
         secondBook.LibraryId = libraryId;
         secondBook.Path = "/books/b.epub";
         _mockContext.Books.AddRange(firstBook, secondBook);
@@ -303,7 +297,7 @@ public class BookRepositoryTests
     public async Task UpdateAsync_WhenBookExists_ShouldUpdateItsScalarProperties()
     {
         // Arrange
-        BookEntity book = _bookEntityFixture.CreateBookModel();
+        BookEntity book = _bookEntityFixture.Create();
         _mockContext.Books.Add(book);
         await _mockContext.SaveChangesAsync();
 
@@ -323,7 +317,7 @@ public class BookRepositoryTests
     public async Task UpdateAsync_WhenBookDoesNotExist_ShouldReturnError()
     {
         // Arrange
-        BookEntity book = _bookEntityFixture.CreateBookModel();
+        BookEntity book = _bookEntityFixture.Create();
 
         // Act
         Result<Updated> result = await _sut.UpdateAsync(book, CancellationToken.None);

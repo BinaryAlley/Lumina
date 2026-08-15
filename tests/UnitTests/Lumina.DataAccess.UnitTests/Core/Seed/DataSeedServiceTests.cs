@@ -6,8 +6,8 @@ using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Time;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
 using Lumina.DataAccess.Core.Seed;
-using Lumina.DataAccess.UnitTests.Core.Repositories.Users.Fixtures;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using NSubstitute;
@@ -375,7 +375,7 @@ public class DataSeedServiceTests
         Guid userId = Guid.NewGuid();
         RoleEntity adminRole = new() { Id = Guid.NewGuid(), RoleName = "Admin" };
         UserEntityFixture userFixture = new();
-        UserEntity adminUser = userFixture.CreateUserModel();
+        UserEntity adminUser = userFixture.Create();
         // Use the adminUser.Id instead of the randomly generated userId
         userId = adminUser.Id;
 
@@ -464,7 +464,7 @@ public class DataSeedServiceTests
         // Arrange
         Guid userId = Guid.NewGuid();
         RoleEntity adminRole = new() { Id = Guid.NewGuid(), RoleName = "Admin" };
-        UserEntity adminUser = new UserEntityFixture().CreateUserModel();
+        UserEntity adminUser = new UserEntityFixture().Create();
 
         Error expectedError = Error.Failure("UserRole.InsertFailed", "Failed to insert user role");
 

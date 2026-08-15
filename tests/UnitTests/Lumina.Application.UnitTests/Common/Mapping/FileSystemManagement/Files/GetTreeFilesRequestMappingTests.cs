@@ -1,8 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using AutoFixture;
-using AutoFixture.AutoNSubstitute;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Files;
 using Lumina.Application.Core.FileSystemManagement.Files.Queries.GetTreeFiles;
+using Lumina.Contracts.Fixtures.Core.Requests.FileSystemManagement.Files;
 using Lumina.Contracts.Requests.FileSystemManagement.Files;
 using System.Diagnostics.CodeAnalysis;
 #endregion
@@ -15,21 +14,13 @@ namespace Lumina.Application.UnitTests.Common.Mapping.FileSystemManagement.Files
 [ExcludeFromCodeCoverage]
 public class GetTreeFilesRequestMappingTests
 {
-    private readonly IFixture _fixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="GetTreeFilesRequestMappingTests"/> class.
-    /// </summary>
-    public GetTreeFilesRequestMappingTests()
-    {
-        _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
-    }
+    private readonly GetTreeFilesRequestFixture _getTreeFilesRequestFixture = new();
 
     [Fact]
     public void ToQuery_WhenMappingGetTreeFilesRequest_ShouldMapCorrectly()
     {
         // Arrange
-        GetTreeFilesRequest request = _fixture.Create<GetTreeFilesRequest>();
+        GetTreeFilesRequest request = _getTreeFilesRequestFixture.Create();
 
         // Act
         GetTreeFilesQuery result = request.ToQuery();

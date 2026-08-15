@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.FileSystemManagement.Directories;
-using Lumina.Application.UnitTests.Core.FileSystemManagement.Directories.Fixtures;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
 using Lumina.Contracts.Responses.FileSystemManagement.Directories;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -18,25 +18,17 @@ namespace Lumina.Application.UnitTests.Common.Mapping.FileSystemManagement.Direc
 [ExcludeFromCodeCoverage]
 public class DirectoryMappingTests
 {
-    private readonly DirectoryFixture _directoryFixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DirectoryMappingTests"/> class.
-    /// </summary>
-    public DirectoryMappingTests()
-    {
-        _directoryFixture = new DirectoryFixture();
-    }
+    private readonly DirectoryFixture _directoryFixture = new();
 
     [Fact]
     public void ToFileSystemTreeNodeResponse_WhenMappingDirectory_ShouldMapCorrectly()
     {
         // Arrange
-        Directory directory = _directoryFixture.CreateDirectory();
+        Directory directory = _directoryFixture.Create();
         List<FileSystemItem> childItems =
         [
-            _directoryFixture.CreateDirectory(),
-            _directoryFixture.CreateDirectory()
+            _directoryFixture.Create(),
+            _directoryFixture.Create()
         ];
         foreach (FileSystemItem item in childItems)
             directory.AddItem(item);
@@ -88,11 +80,11 @@ public class DirectoryMappingTests
     public void ToResponse_WhenMappingDirectory_ShouldMapCorrectly()
     {
         // Arrange
-        Directory directory = _directoryFixture.CreateDirectory();
+        Directory directory = _directoryFixture.Create();
         List<FileSystemItem> childItems =
         [
-            _directoryFixture.CreateDirectory(),
-            _directoryFixture.CreateDirectory()
+            _directoryFixture.Create(),
+            _directoryFixture.Create()
         ];
         foreach (FileSystemItem item in childItems)
             directory.AddItem(item);

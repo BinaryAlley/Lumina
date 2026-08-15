@@ -1,20 +1,18 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.FileSystemManagement.FileSystem;
-using Lumina.Application.UnitTests.Common.Mapping.FileSystemManagement.FileSystem.Fixtures;
-using Lumina.Application.UnitTests.Core.FileSystemManagement.Directories.Fixtures;
-using Lumina.Application.UnitTests.Core.FileSystemManagement.Files.Fixtures;
-using Lumina.Application.UnitTests.Core.FileSystemManagement.FileSystem.Fixtures;
-using Lumina.Application.UnitTests.Core.FileSystemManagement.Fixtures;
+using Lumina.Contracts.DTO.FileSystemManagement;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
-using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using Lumina.Contracts.DTO.FileSystemManagement;
 #endregion
 
 namespace Lumina.Application.UnitTests.Common.Mapping.FileSystemManagement.FileSystem;
@@ -25,29 +23,17 @@ namespace Lumina.Application.UnitTests.Common.Mapping.FileSystemManagement.FileS
 [ExcludeFromCodeCoverage]
 public class FileSystemItemMappingTests
 {
-    private readonly FileSystemPathIdFixture _fileSystemPathIdFixture;
-    private readonly DirectoryFixture _directoryFixture;
-    private readonly FileFixture _fileFixture;
-    private readonly WindowsRootItemFixture _windowsRootItemFixture;
-    private readonly UnixRootItemFixture _unixRootItemFixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="FileSystemItemMappingTests"/> class.
-    /// </summary>
-    public FileSystemItemMappingTests()
-    {
-        _fileSystemPathIdFixture = new FileSystemPathIdFixture();
-        _directoryFixture = new DirectoryFixture();
-        _fileFixture = new FileFixture();
-        _windowsRootItemFixture = new WindowsRootItemFixture();
-        _unixRootItemFixture = new UnixRootItemFixture();
-    }
+    private readonly FileSystemPathIdFixture _fileSystemPathIdFixture = new();
+    private readonly DirectoryFixture _directoryFixture = new();
+    private readonly FileFixture _fileFixture = new();
+    private readonly WindowsRootItemFixture _windowsRootItemFixture = new();
+    private readonly UnixRootItemFixture _unixRootItemFixture = new();
 
     [Fact]
     public void ToFileSystemItemModel_WhenMappingFileSystemItem_ShouldMapCorrectly()
     {
         // Arrange
-        FileSystemPathId id = _fileSystemPathIdFixture.CreateFileSystemPathId();
+        FileSystemPathId id = _fileSystemPathIdFixture.Create();
         string name = "TestItem";
         FileSystemItemType type = FileSystemItemType.File;
         FileSystemItemFixture domainModel = new(id, name, type);
@@ -69,7 +55,7 @@ public class FileSystemItemMappingTests
     public void ToTreeNodeResponse_WhenMappingDirectory_ShouldMapCorrectly()
     {
         // Arrange
-        Directory directory = _directoryFixture.CreateDirectory();
+        Directory directory = _directoryFixture.Create();
 
         // Act
         FileSystemTreeNodeResponse result = directory.ToTreeNodeResponse();
@@ -85,7 +71,7 @@ public class FileSystemItemMappingTests
     public void ToTreeNodeResponse_WhenMappingFile_ShouldMapCorrectly()
     {
         // Arrange
-        File file = _fileFixture.CreateFile();
+        File file = _fileFixture.Create();
 
         // Act
         FileSystemTreeNodeResponse result = file.ToTreeNodeResponse();
@@ -141,7 +127,7 @@ public class FileSystemItemMappingTests
     public void ToFileSystemItemModel_WhenMappingDifferentFileSystemItems_ShouldMapCorrectly(string name, FileSystemItemType type)
     {
         // Arrange
-        FileSystemPathId id = _fileSystemPathIdFixture.CreateFileSystemPathId();
+        FileSystemPathId id = _fileSystemPathIdFixture.Create();
         FileSystemItemFixture domainModel = new(id, name, type);
 
         // Act
@@ -161,8 +147,8 @@ public class FileSystemItemMappingTests
         // Arrange
         List<FileSystemItem> domainModels =
         [
-            _directoryFixture.CreateDirectory(),
-            _fileFixture.CreateFile(),
+            _directoryFixture.Create(),
+            _fileFixture.Create(),
             _windowsRootItemFixture.Create(),
             _unixRootItemFixture.Create()
         ];
@@ -174,7 +160,7 @@ public class FileSystemItemMappingTests
         Assert.NotNull(result);
         Assert.Equal(domainModels.Count, result.Count());
 
-        List<FileSystemTreeNodeResponse> resultList = result.ToList();
+        List<FileSystemTreeNodeResponse> resultList = [.. result];
         for (int i = 0; i < resultList.Count; i++)
         {
             Assert.Equal(domainModels[i].Name, resultList[i].Name);
@@ -189,7 +175,7 @@ public class FileSystemItemMappingTests
     public void ToTreeNodeResponse_WhenMappingInvalidFileSystemItem_ShouldThrowArgumentException()
     {
         // Arrange
-        FileSystemPathId id = _fileSystemPathIdFixture.CreateFileSystemPathId();
+        FileSystemPathId id = _fileSystemPathIdFixture.Create();
         string name = "TestItem";
         FileSystemItemType type = FileSystemItemType.File;
         FileSystemItemFixture invalidItem = new(id, name, type);
@@ -212,8 +198,8 @@ public class FileSystemItemMappingTests
         Assert.NotNull(result);
         Assert.Equal(domainModels.Count(), result.Count());
 
-        List<FileSystemTreeNodeResponse> resultList = result.ToList();
-        List<FileSystemItem> domainModelsList = domainModels.ToList();
+        List<FileSystemTreeNodeResponse> resultList = [.. result];
+        List<FileSystemItem> domainModelsList = [.. domainModels];
         for (int i = 0; i < resultList.Count; i++)
         {
             Assert.Equal(domainModelsList[i].Name, resultList[i].Name);

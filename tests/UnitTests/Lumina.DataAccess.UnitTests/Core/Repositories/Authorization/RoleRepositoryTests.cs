@@ -2,9 +2,9 @@
 using EntityFrameworkCore.Testing.NSubstitute;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.Errors;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
 using Lumina.DataAccess.Core.Repositories.Authorization;
 using Lumina.DataAccess.Core.UoW;
-using Lumina.DataAccess.UnitTests.Core.Repositories.Authorization.Fixtures;
 using Lumina.Domain.Common.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -212,7 +212,7 @@ public class RoleRepositoryTests
     {
         // Arrange
         RolePermissionEntityFixture rolePermissionFixture = new();
-        RolePermissionEntity rolePermission = rolePermissionFixture.CreateRolePermissionModel();
+        RolePermissionEntity rolePermission = rolePermissionFixture.Create();
         RoleEntity role = rolePermission.Role;
 
         _mockContext.Roles.Add(role);
@@ -307,14 +307,14 @@ public class RoleRepositoryTests
     {
         // Arrange
         RolePermissionEntityFixture rolePermissionFixture = new();
-        RolePermissionEntity rolePermission = rolePermissionFixture.CreateRolePermissionModel();
+        RolePermissionEntity rolePermission = rolePermissionFixture.Create();
         RoleEntity existingRole = rolePermission.Role;
         existingRole.RolePermissions = [rolePermission];
 
         _mockContext.Roles.Add(existingRole);
         await _mockContext.SaveChangesAsync();
 
-        RolePermissionEntity newRolePermission = rolePermissionFixture.CreateRolePermissionModel();
+        RolePermissionEntity newRolePermission = rolePermissionFixture.Create();
         RoleEntity updatedRole = new()
         {
             Id = existingRole.Id,
@@ -387,7 +387,7 @@ public class RoleRepositoryTests
     {
         // Arrange
         RolePermissionEntityFixture rolePermissionFixture = new();
-        RolePermissionEntity rolePermission = rolePermissionFixture.CreateRolePermissionModel();
+        RolePermissionEntity rolePermission = rolePermissionFixture.Create();
         RoleEntity existingRole = rolePermission.Role;
         existingRole.RolePermissions = [rolePermission];
 

@@ -42,5 +42,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\src\Lumina.DataAccess\Lumina.DataAccess.csproj" />
+        <ProjectReference Include="..\..\Common\Lumina.Application.Fixtures\Lumina.Application.Fixtures.csproj" />
     </ItemGroup>
 </Project>

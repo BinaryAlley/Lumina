@@ -2,11 +2,11 @@
 using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.UsersManagement.Authentication.Queries.LoginUser;
+using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authentication.Login;
-using Lumina.Presentation.Api.UnitTests.Core.Endpoints.UsersManagement.Authentication.Login.Fixtures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -26,7 +26,7 @@ public class LoginEndpointTests
 {
     private readonly IQueryHandler<LoginUserQuery, Result<LoginResponse>> _mockHandler;
     private readonly LoginEndpoint _sut;
-    private readonly LoginRequestFixture _loginRequestFixture;
+    private readonly LoginRequestFixture _loginRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LoginEndpointTests"/> class.
@@ -35,7 +35,6 @@ public class LoginEndpointTests
     {
         _mockHandler = Substitute.For<IQueryHandler<LoginUserQuery, Result<LoginResponse>>>();
         _sut = Factory.Create<LoginEndpoint>(_mockHandler);
-        _loginRequestFixture = new LoginRequestFixture();
     }
 
     [Fact]

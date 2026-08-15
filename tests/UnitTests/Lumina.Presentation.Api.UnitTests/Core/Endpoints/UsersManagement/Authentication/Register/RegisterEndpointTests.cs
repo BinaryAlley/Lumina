@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.UsersManagement.Authentication.Commands.RegisterUser;
+using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authentication.Register;
-using Lumina.Presentation.Api.UnitTests.Core.Endpoints.Maintenance.ApplicationSetup.Fixtures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -25,7 +25,7 @@ public class RegisterEndpointTests
 {
     private readonly ICommandHandler<RegisterUserCommand, Result<RegistrationResponse>> _mockHandler;
     private readonly RegisterEndpoint _sut;
-    private readonly RegistrationRequestFixture _registrationRequestFixture;
+    private readonly RegistrationRequestFixture _registrationRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RegisterEndpointTests"/> class.
@@ -34,7 +34,6 @@ public class RegisterEndpointTests
     {
         _mockHandler = Substitute.For<ICommandHandler<RegisterUserCommand, Result<RegistrationResponse>>>();
         _sut = FastEndpoints.Factory.Create<RegisterEndpoint>(_mockHandler);
-        _registrationRequestFixture = new RegistrationRequestFixture();
     }
 
     [Fact]

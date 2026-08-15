@@ -2,11 +2,12 @@
 using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.FileSystemManagement.Paths.Queries.GetPathParent;
+using Lumina.Contracts.Fixtures.Core.Requests.FileSystemManagement.Path;
+using Lumina.Contracts.Fixtures.Core.Responses.FileSystemManagement.Path;
 using Lumina.Contracts.Requests.FileSystemManagement.Path;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.GetPathParent;
-using Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.Fixtures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -28,8 +29,8 @@ public class GetPathParentEndpointTests
 {
     private readonly IQueryHandler<GetPathParentQuery, Result<IEnumerable<PathSegmentResponse>>> _mockHandler;
     private readonly GetPathParentEndpoint _sut;
-    private readonly PathSegmentResponseFixture _pathSegmentResponseFixture;
-    private readonly GetPathParentRequestFixture _getPathParentRequestFixture;
+    private readonly PathSegmentResponseFixture _pathSegmentResponseFixture = new();
+    private readonly GetPathParentRequestFixture _getPathParentRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetPathParentEndpointTests"/> class.
@@ -38,8 +39,6 @@ public class GetPathParentEndpointTests
     {
         _mockHandler = Substitute.For<IQueryHandler<GetPathParentQuery, Result<IEnumerable<PathSegmentResponse>>>>();
         _sut = Factory.Create<GetPathParentEndpoint>(_mockHandler);
-        _pathSegmentResponseFixture = new PathSegmentResponseFixture();
-        _getPathParentRequestFixture = new GetPathParentRequestFixture();
     }
 
     [Fact]

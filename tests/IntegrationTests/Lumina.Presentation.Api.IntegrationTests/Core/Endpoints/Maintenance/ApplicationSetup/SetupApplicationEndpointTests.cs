@@ -60,7 +60,7 @@ public class SetupApplicationEndpointTests : IClassFixture<AuthenticatedLuminaAp
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithValidRequestAnd2FA_ShouldSetupApplicationSuccessfully()
+    public async Task SetupApplication_WhenCalledWithValidRequestAnd2FA_ShouldSetupApplicationSuccessfully()
     {
         // Arrange
         RegistrationRequest request = new(
@@ -94,7 +94,7 @@ public class SetupApplicationEndpointTests : IClassFixture<AuthenticatedLuminaAp
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithValidRequestWithout2FA_ShouldSetupApplicationSuccessfully()
+    public async Task SetupApplication_WhenCalledWithValidRequestWithout2FA_ShouldSetupApplicationSuccessfully()
     {
         // Arrange
         RegistrationRequest request = new(
@@ -126,7 +126,7 @@ public class SetupApplicationEndpointTests : IClassFixture<AuthenticatedLuminaAp
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenAdminAccountAlreadyExists_ShouldReturnConflict()
+    public async Task SetupApplication_WhenAdminAccountAlreadyExists_ShouldReturnConflict()
     {
         // Arrange
         await CreateTestUser();
@@ -156,7 +156,7 @@ public class SetupApplicationEndpointTests : IClassFixture<AuthenticatedLuminaAp
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenRequestIsNull_ShouldReturnValidationError()
+    public async Task SetupApplication_WhenRequestIsNull_ShouldReturnValidationError()
     {
         // Arrange
         RegistrationRequest? request = null;
@@ -214,6 +214,7 @@ public class SetupApplicationEndpointTests : IClassFixture<AuthenticatedLuminaAp
 
         UserEntity user = new()
         {
+            Id = Guid.NewGuid(),
             Username = _testUsername,
             Password = new PasswordHashService().HashString("TestPass123!"),
             Libraries = [],

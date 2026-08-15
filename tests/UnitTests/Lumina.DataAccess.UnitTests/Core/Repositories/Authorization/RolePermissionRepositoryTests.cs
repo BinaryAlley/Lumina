@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
 using EntityFrameworkCore.Testing.NSubstitute;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
 using Lumina.DataAccess.Core.Repositories.Authorization;
 using Lumina.DataAccess.Core.UoW;
-using Lumina.DataAccess.UnitTests.Core.Repositories.Authorization.Fixtures;
 using Lumina.Domain.Common.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -23,7 +23,7 @@ public class RolePermissionRepositoryTests
 {
     private readonly LuminaDbContext _mockContext;
     private readonly RolePermissionRepository _sut;
-    private readonly RolePermissionEntityFixture _rolePermissionEntityFixture;
+    private readonly RolePermissionEntityFixture _rolePermissionEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RolePermissionRepositoryTests"/> class.
@@ -32,14 +32,13 @@ public class RolePermissionRepositoryTests
     {
         _mockContext = Create.MockedDbContextFor<LuminaDbContext>();
         _sut = new RolePermissionRepository(_mockContext);
-        _rolePermissionEntityFixture = new RolePermissionEntityFixture();
     }
 
     [Fact]
     public async Task InsertAsync_WhenCalled_ShouldAddRolePermissionToContextAndReturnCreated()
     {
         // Arrange
-        RolePermissionEntity rolePermissionModel = _rolePermissionEntityFixture.CreateRolePermissionModel();
+        RolePermissionEntity rolePermissionModel = _rolePermissionEntityFixture.Create();
 
         // Act
         Result<Created> result = await _sut.InsertAsync(rolePermissionModel, CancellationToken.None);

@@ -2,9 +2,10 @@
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Thumbnails;
-using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
 using Lumina.Contracts.Responses.FileSystemManagement.Thumbnails;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -19,6 +20,7 @@ namespace Lumina.Application.UnitTests.Common.Mapping.FileSystemManagement.Thumb
 public class ThumbnailMappingTests
 {
     private readonly IFixture _fixture;
+    private readonly ThumbnailFixture _thumbnailFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ThumbnailMappingTests"/> class.
@@ -32,7 +34,7 @@ public class ThumbnailMappingTests
     public void ToResponse_WhenMappingThumbnail_ShouldMapCorrectly()
     {
         // Arrange
-        Thumbnail domainModel = _fixture.Create<Thumbnail>();
+        Thumbnail domainModel = _thumbnailFixture.Create();
 
         // Act
         ThumbnailResponse result = domainModel.ToResponse();
@@ -50,7 +52,7 @@ public class ThumbnailMappingTests
     public void ToResponse_WhenMappingDifferentImageTypes_ShouldMapCorrectly(ImageType imageType)
     {
         // Arrange
-        byte[] bytes = _fixture.CreateMany<byte>(100).ToArray();
+        byte[] bytes = [.. _fixture.CreateMany<byte>(100)];
         Thumbnail domainModel = new(imageType, bytes);
 
         // Act
@@ -83,10 +85,10 @@ public class ThumbnailMappingTests
     public void ToResponse_WhenMappingMultipleThumbnails_ShouldMapAllCorrectly()
     {
         // Arrange
-        List<Thumbnail> thumbnails = _fixture.CreateMany<Thumbnail>(3).ToList();
+        List<Thumbnail> thumbnails = _thumbnailFixture.CreateMany(3);
 
         // Act
-        List<ThumbnailResponse> results = thumbnails.Select(t => t.ToResponse()).ToList();
+        List<ThumbnailResponse> results = [.. thumbnails.Select(t => t.ToResponse())];
 
         // Assert
         Assert.NotNull(results);

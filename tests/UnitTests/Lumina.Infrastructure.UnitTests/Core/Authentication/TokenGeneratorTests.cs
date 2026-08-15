@@ -11,15 +11,7 @@ namespace Lumina.Infrastructure.UnitTests.Core.Authentication;
 [ExcludeFromCodeCoverage]
 public class TokenGeneratorTests
 {
-    private readonly TokenGenerator _sut;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="TokenGeneratorTests"/> class.
-    /// </summary>
-    public TokenGeneratorTests()
-    {
-        _sut = new TokenGenerator();
-    }
+    private readonly TokenGenerator _sut = new();
 
     [Fact]
     public void GenerateToken_WhenCalled_ShouldGenerateNonEmptyToken()

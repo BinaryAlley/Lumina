@@ -2,9 +2,9 @@
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
-using Lumina.Application.UnitTests.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Common.Fixtures;
-using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
+using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -18,21 +18,13 @@ namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.WrittenConten
 [ExcludeFromCodeCoverage]
 public class IsbnMappingTests
 {
-    private readonly IsbnFixture _isbnFixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="IsbnMappingTests"/> class.
-    /// </summary>
-    public IsbnMappingTests()
-    {
-        _isbnFixture = new IsbnFixture();
-    }
+    private readonly IsbnFixture _isbnFixture = new();
 
     [Fact]
     public void ToRepositoryEntity_WhenMappingIsbn10_ShouldMapCorrectly()
     {
         // Arrange
-        Isbn isbn = _isbnFixture.CreateIsbn10();
+        Isbn isbn = _isbnFixture.Create(IsbnFormat.Isbn10);
 
         // Act
         IsbnEntity result = isbn.ToRepositoryEntity();
@@ -47,7 +39,7 @@ public class IsbnMappingTests
     public void ToRepositoryEntity_WhenMappingIsbn13_ShouldMapCorrectly()
     {
         // Arrange
-        Isbn isbn = _isbnFixture.CreateIsbn13();
+        Isbn isbn = _isbnFixture.Create(IsbnFormat.Isbn13);
 
         // Act
         IsbnEntity result = isbn.ToRepositoryEntity();
@@ -64,9 +56,9 @@ public class IsbnMappingTests
         // Arrange
         List<Isbn> isbns =
         [
-            _isbnFixture.CreateIsbn10(),
-            _isbnFixture.CreateIsbn13(),
-            _isbnFixture.CreateIsbn10()
+            _isbnFixture.Create(IsbnFormat.Isbn10),
+            _isbnFixture.Create(IsbnFormat.Isbn13),
+            _isbnFixture.Create(IsbnFormat.Isbn10)
         ];
 
         // Act
@@ -76,7 +68,7 @@ public class IsbnMappingTests
         Assert.NotNull(results);
         Assert.Equal(isbns.Count, results.Count());
 
-        List<IsbnEntity> resultList = results.ToList();
+        List<IsbnEntity> resultList = [.. results];
         for (int i = 0; i < isbns.Count; i++)
         {
             Assert.Equal(isbns[i].Value, resultList[i].Value);

@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.UsersManagement.Authentication.Commands.ChangePassword;
+using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authentication.ChangePassword;
-using Lumina.Presentation.Api.UnitTests.Core.Endpoints.UsersManagement.Authentication.ChangePassword.Fixtures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -25,7 +25,7 @@ public class ChangePasswordEndpointTests
 {
     private readonly ICommandHandler<ChangePasswordCommand, Result<ChangePasswordResponse>> _mockHandler;
     private readonly ChangePasswordEndpoint _sut;
-    private readonly ChangePasswordRequestFixture _changePasswordRequestFixture;
+    private readonly ChangePasswordRequestFixture _changePasswordRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ChangePasswordEndpointTests"/> class.
@@ -34,7 +34,6 @@ public class ChangePasswordEndpointTests
     {
         _mockHandler = Substitute.For<ICommandHandler<ChangePasswordCommand, Result<ChangePasswordResponse>>>();
         _sut = FastEndpoints.Factory.Create<ChangePasswordEndpoint>(_mockHandler);
-        _changePasswordRequestFixture = new ChangePasswordRequestFixture();
     }
 
     [Fact]

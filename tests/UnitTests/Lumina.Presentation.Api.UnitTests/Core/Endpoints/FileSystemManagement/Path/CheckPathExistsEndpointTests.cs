@@ -2,11 +2,11 @@
 using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.FileSystemManagement.Paths.Queries.CheckPathExists;
+using Lumina.Contracts.Fixtures.Core.Requests.FileSystemManagement.Path;
 using Lumina.Contracts.Requests.FileSystemManagement.Path;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.CheckPathExists;
-using Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.Fixtures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -26,7 +26,7 @@ public class CheckPathExistsEndpointTests
 {
     private readonly IQueryHandler<CheckPathExistsQuery, Result<PathExistsResponse>> _mockHandler;
     private readonly CheckPathExistsEndpoint _sut;
-    private readonly CheckPathExistsRequestFixture _checkPathExistsRequestFixture;
+    private readonly CheckPathExistsRequestFixture _checkPathExistsRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CheckPathExistsEndpointTests"/> class.
@@ -35,7 +35,6 @@ public class CheckPathExistsEndpointTests
     {
         _mockHandler = Substitute.For<IQueryHandler<CheckPathExistsQuery, Result<PathExistsResponse>>>();
         _sut = Factory.Create<CheckPathExistsEndpoint>(_mockHandler);
-        _checkPathExistsRequestFixture = new CheckPathExistsRequestFixture();
     }
 
     [Fact]

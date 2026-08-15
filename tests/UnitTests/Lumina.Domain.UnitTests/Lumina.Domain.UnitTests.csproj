@@ -41,5 +41,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\src\Lumina.Domain\Lumina.Domain.csproj" />
+        <ProjectReference Include="..\..\Common\Lumina.Domain.Fixtures\Lumina.Domain.Fixtures.csproj" />
+        <ProjectReference Include="..\..\Common\Lumina.Domain.SharedKernel.Fixtures\Lumina.Domain.SharedKernel.Fixtures.csproj" />
     </ItemGroup>
 </Project>

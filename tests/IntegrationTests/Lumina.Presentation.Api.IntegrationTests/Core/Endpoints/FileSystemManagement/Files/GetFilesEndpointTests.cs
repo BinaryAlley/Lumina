@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.Responses.FileSystemManagement.Files;
+using Lumina.Presentation.Api.Fixtures.Core.Endpoints.FileSystemManagement;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
-using Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.FileSystemManagement.Fixtures;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -53,7 +53,7 @@ public class GetFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     }
 
     [SkipWhenHiddenAttributeNotSupportedFact]
-    public async Task ExecuteAsync_WhenCalledWithValidPathAndNotIncludeHiddenElements_ShouldReturnFilesWithoutHiddenElements()
+    public async Task GetFiles_WhenCalledWithValidPathAndNotIncludeHiddenElements_ShouldReturnFilesWithoutHiddenElements()
     {
         // Arrange
         FileSystemStructureFixture fileSystemFixture = new();
@@ -90,7 +90,7 @@ public class GetFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     }
 
     [SkipWhenHiddenAttributeNotSupportedFact]
-    public async Task ExecuteAsync_WhenCalledWithValidPathAndHiddenChildrenAndNotIncludeHiddenElements_ShouldReturnNoFiles()
+    public async Task GetFiles_WhenCalledWithValidPathAndHiddenChildrenAndNotIncludeHiddenElements_ShouldReturnNoFiles()
     {
         // Arrange
         FileSystemStructureFixture fileSystemFixture = new();
@@ -122,7 +122,7 @@ public class GetFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithValidPathAndWithIncludeHiddenElements_ShouldReturnFilesWithHiddenElements()
+    public async Task GetFiles_WhenCalledWithValidPathAndWithIncludeHiddenElements_ShouldReturnFilesWithHiddenElements()
     {
         // Arrange
         FileSystemStructureFixture fileSystemFixture = new();
@@ -163,7 +163,7 @@ public class GetFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithInvalidPath_ShouldReturnForbiddenResult()
+    public async Task GetFiles_WhenCalledWithInvalidPath_ShouldReturnForbiddenResult()
     {
         // Arrange
         string invalidPath = "invalid:path";
@@ -185,11 +185,11 @@ public class GetFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         Assert.Equal("UnauthorizedAccess", problemDetails["detail"].GetString());
         Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.4", problemDetails["type"].GetString());
         Assert.NotNull(problemDetails["traceId"].GetString());
-        Assert.NotEmpty(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithEmptyPath_ShouldReturnValidationProblemResult()
+    public async Task GetFiles_WhenCalledWithEmptyPath_ShouldReturnValidationProblemResult()
     {
         // Arrange
         string emptyPath = "";
@@ -211,7 +211,7 @@ public class GetFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         Assert.Equal("OneOrMoreValidationErrorsOccurred", problemDetails["detail"].GetString());
         Assert.Equal("https://tools.ietf.org/html/rfc4918#section-11.2", problemDetails["type"].GetString());
         Assert.NotNull(problemDetails["traceId"].GetString());
-        Assert.NotEmpty(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
 
         Dictionary<string, string[]>? errors = problemDetails["errors"].Deserialize<Dictionary<string, string[]>>(_jsonOptions);
         Assert.NotNull(errors);
@@ -220,7 +220,7 @@ public class GetFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithCancellationToken_ShouldCompleteSuccessfully()
+    public async Task GetFiles_WhenCalledWithCancellationToken_ShouldCompleteSuccessfully()
     {
         // Arrange
         string testPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "testDirectory");
@@ -236,7 +236,7 @@ public class GetFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCancellationTokenIsCanceled_ShouldThrowTaskCanceledException()
+    public async Task GetFiles_WhenCancellationTokenIsCanceled_ShouldThrowTaskCanceledException()
     {
         // Arrange
         string testPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "testDirectory");

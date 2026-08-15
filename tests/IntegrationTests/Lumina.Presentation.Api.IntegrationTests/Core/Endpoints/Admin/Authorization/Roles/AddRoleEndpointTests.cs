@@ -58,7 +58,7 @@ public class AddRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithValidRequest_ShouldCreateRole()
+    public async Task AddRole_WhenCalledWithValidRequest_ShouldCreateRole()
     {
         // Arrange
         using IServiceScope scope = _apiFactory.Services.CreateScope();
@@ -91,7 +91,7 @@ public class AddRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithNonAdminAccount_ShouldReturnForbiddenResult()
+    public async Task AddRole_WhenCalledWithNonAdminAccount_ShouldReturnForbiddenResult()
     {
         // Arrange
         _client = await _apiFactory.CreateAuthenticatedClientAsync();
@@ -119,7 +119,7 @@ public class AddRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenRoleAlreadyExists_ShouldReturnConflict()
+    public async Task AddRole_WhenRoleAlreadyExists_ShouldReturnConflict()
     {
         // Arrange
         AddRoleRequest request = new(
@@ -146,7 +146,7 @@ public class AddRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCancellationRequested_ShouldThrowTaskCanceledException()
+    public async Task AddRole_WhenCancellationRequested_ShouldThrowTaskCanceledException()
     {
         // Arrange
         using CancellationTokenSource cts = new();

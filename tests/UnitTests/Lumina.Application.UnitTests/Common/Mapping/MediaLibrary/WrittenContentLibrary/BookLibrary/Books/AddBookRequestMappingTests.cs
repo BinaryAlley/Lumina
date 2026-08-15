@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook;
-using Lumina.Application.UnitTests.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook.Fixtures;
 using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
+using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using System;
@@ -18,21 +18,13 @@ namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.WrittenConten
 [ExcludeFromCodeCoverage]
 public class AddBookRequestMappingTests
 {
-    private readonly AddBookRequestFixture _requestFixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AddBookRequestMappingTests"/> class.
-    /// </summary>
-    public AddBookRequestMappingTests()
-    {
-        _requestFixture = new AddBookRequestFixture();
-    }
+    private readonly AddBookRequestFixture _requestFixture = new();
 
     [Fact]
     public void ToCommand_WhenMappingCompleteRequest_ShouldMapAllPropertiesCorrectly()
     {
         // Arrange
-        AddBookRequest request = _requestFixture.CreateRequestBook();
+        AddBookRequest request = _requestFixture.Create();
 
         // Act
         AddBookCommand result = request.ToCommand();

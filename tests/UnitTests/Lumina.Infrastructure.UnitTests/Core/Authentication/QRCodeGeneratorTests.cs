@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Infrastructure.Core.Authentication;
-using Lumina.Infrastructure.UnitTests.Core.Authentication.Fixtures;
+using Lumina.Infrastructure.Fixtures.Core.Authentication;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
@@ -13,15 +13,7 @@ namespace Lumina.Infrastructure.UnitTests.Core.Authentication;
 [ExcludeFromCodeCoverage]
 public class QRCodeGeneratorTests
 {
-    private readonly QRCodeGenerator _sut;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="QRCodeGeneratorTests"/> class.
-    /// </summary>
-    public QRCodeGeneratorTests()
-    {
-        _sut = new QRCodeGenerator();
-    }
+    private readonly QRCodeGenerator _sut = new();
 
     [Fact]
     public void GenerateQrCodeDataUri_WhenCalled_ShouldReturnValidDataUri()

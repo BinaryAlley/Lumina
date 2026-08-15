@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetAuthorization;
+using Lumina.Application.Fixtures.Core.UsersManagement.Authorization.Queries.GetAuthorization;
 using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Application.UnitTests.Core.UsersManagement.Authorization.Queries.GetAuthorization.Fixtures;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using System;
@@ -17,21 +17,14 @@ namespace Lumina.Application.UnitTests.Core.UsersManagement.Authorization.Querie
 [ExcludeFromCodeCoverage]
 public class GetAuthorizationQueryValidatorTests
 {
-    private readonly GetAuthorizationQueryValidator _validator;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="GetAuthorizationQueryValidatorTests"/> class.
-    /// </summary>
-    public GetAuthorizationQueryValidatorTests()
-    {
-        _validator = new GetAuthorizationQueryValidator();
-    }
+    private readonly GetAuthorizationQueryValidator _validator = new();
+    private readonly GetAuthorizationQueryFixture _getAuthorizationQueryFixture = new();
 
     [Fact]
     public void Validate_WhenUserIdIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        GetAuthorizationQuery query = GetAuthorizationQueryFixture.CreateGetAuthorizationQuery();
+        GetAuthorizationQuery query = _getAuthorizationQueryFixture.Create();
         query = query with { UserId = null };
 
         // Act
@@ -45,7 +38,7 @@ public class GetAuthorizationQueryValidatorTests
     public void Validate_WhenUserIdIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        GetAuthorizationQuery query = GetAuthorizationQueryFixture.CreateGetAuthorizationQuery();
+        GetAuthorizationQuery query = _getAuthorizationQueryFixture.Create();
         query = query with { UserId = Guid.Empty };
 
         // Act
@@ -59,7 +52,7 @@ public class GetAuthorizationQueryValidatorTests
     public void Validate_WhenUserIdIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        GetAuthorizationQuery query = GetAuthorizationQueryFixture.CreateGetAuthorizationQuery();
+        GetAuthorizationQuery query = _getAuthorizationQueryFixture.Create();
 
         // Act
         List<Error> result = _validator.TestValidate(query);

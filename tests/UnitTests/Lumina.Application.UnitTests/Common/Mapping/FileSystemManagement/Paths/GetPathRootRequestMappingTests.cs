@@ -1,8 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using AutoFixture;
-using AutoFixture.AutoNSubstitute;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Paths;
 using Lumina.Application.Core.FileSystemManagement.Paths.Queries.GetPathRoot;
+using Lumina.Contracts.Fixtures.Core.Requests.FileSystemManagement.Path;
 using Lumina.Contracts.Requests.FileSystemManagement.Path;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -17,21 +16,13 @@ namespace Lumina.Application.UnitTests.Common.Mapping.FileSystemManagement.Paths
 [ExcludeFromCodeCoverage]
 public class GetPathRootRequestMappingTests
 {
-    private readonly IFixture _fixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="GetPathRootRequestMappingTests"/> class.
-    /// </summary>
-    public GetPathRootRequestMappingTests()
-    {
-        _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
-    }
+    private readonly GetPathRootRequestFixture _getPathRootRequestFixture = new();
 
     [Fact]
     public void ToQuery_WhenMappingGetPathRootRequest_ShouldMapCorrectly()
     {
         // Arrange
-        GetPathRootRequest request = _fixture.Create<GetPathRootRequest>();
+        GetPathRootRequest request = _getPathRootRequestFixture.Create();
 
         // Act
         GetPathRootQuery result = request.ToQuery();
@@ -63,10 +54,10 @@ public class GetPathRootRequestMappingTests
     public void ToQuery_WhenMappingMultipleRequests_ShouldMapAllCorrectly()
     {
         // Arrange
-        List<GetPathRootRequest> requests = _fixture.CreateMany<GetPathRootRequest>().ToList();
+        List<GetPathRootRequest> requests = _getPathRootRequestFixture.CreateMany();
 
         // Act
-        List<GetPathRootQuery> results = requests.Select(r => r.ToQuery()).ToList();
+        List<GetPathRootQuery> results = [.. requests.Select(r => r.ToQuery())];
 
         // Assert
         Assert.NotNull(results);

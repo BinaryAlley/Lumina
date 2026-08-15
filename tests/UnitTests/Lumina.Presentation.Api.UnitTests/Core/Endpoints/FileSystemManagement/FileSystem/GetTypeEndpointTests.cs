@@ -20,15 +20,15 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.
 /// Contains unit tests for the <see cref="GetTypeEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetFileSystemTypeEndpointTests
+public class GetTypeEndpointTests
 {
     private readonly IQueryHandler<GetFileSystemQuery, FileSystemTypeResponse> _mockHandler;
     private readonly GetTypeEndpoint _sut;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="GetFileSystemTypeEndpointTests"/> class.
+    /// Initializes a new instance of the <see cref="GetTypeEndpointTests"/> class.
     /// </summary>
-    public GetFileSystemTypeEndpointTests()
+    public GetTypeEndpointTests()
     {
         _mockHandler = Substitute.For<IQueryHandler<GetFileSystemQuery, FileSystemTypeResponse>>();
         _sut = Factory.Create<GetTypeEndpoint>(_mockHandler);

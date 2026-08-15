@@ -3,13 +3,14 @@ using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Core.Plugins.Queries.GetPlugins;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Plugins;
 using Lumina.Contracts.Responses.Plugins;
-using Lumina.DataAccess.UnitTests.Core.Repositories.Plugins.Fixtures;
 using Lumina.Domain.Common.Primitives;
 using NSubstitute;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Diagnostics.CodeAnalysis;
 #endregion
 
 namespace Lumina.Application.UnitTests.Core.Plugins.Queries.GetPlugins;
@@ -17,6 +18,7 @@ namespace Lumina.Application.UnitTests.Core.Plugins.Queries.GetPlugins;
 /// <summary>
 /// Contains unit tests for the <see cref="GetPluginsQueryHandler"/> class.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class GetPluginsQueryHandlerTests
 {
     private readonly IUnitOfWork _mockUnitOfWork;
@@ -39,7 +41,7 @@ public class GetPluginsQueryHandlerTests
     {
         // Arrange
         PluginEntityFixture pluginFixture = new();
-        List<PluginEntity> plugins = [pluginFixture.CreatePluginEntity(), pluginFixture.CreatePluginEntity()];
+        List<PluginEntity> plugins = [pluginFixture.Create(), pluginFixture.Create()];
         _mockPluginRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(plugins);
 
         // Act

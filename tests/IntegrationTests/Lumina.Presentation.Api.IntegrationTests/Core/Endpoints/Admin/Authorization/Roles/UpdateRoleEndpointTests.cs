@@ -58,7 +58,7 @@ public class UpdateRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithValidRequest_ShouldUpdateRole()
+    public async Task UpdateRole_WhenCalledWithValidRequest_ShouldUpdateRole()
     {
         // Arrange
         using IServiceScope scope = _apiFactory.Services.CreateScope();
@@ -103,7 +103,7 @@ public class UpdateRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithNonAdminAccount_ShouldReturnForbiddenResult()
+    public async Task UpdateRole_WhenCalledWithNonAdminAccount_ShouldReturnForbiddenResult()
     {
         // Arrange
         _client = await _apiFactory.CreateAuthenticatedClientAsync();
@@ -132,7 +132,7 @@ public class UpdateRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenRoleDoesNotExist_ShouldReturnNotFound()
+    public async Task UpdateRole_WhenRoleDoesNotExist_ShouldReturnNotFound()
     {
         // Arrange
         Guid nonExistentRoleId = Guid.NewGuid();
@@ -161,7 +161,7 @@ public class UpdateRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCancellationRequested_ShouldThrowTaskCanceledException()
+    public async Task UpdateRole_WhenCancellationRequested_ShouldThrowTaskCanceledException()
     {
         // Arrange
         using CancellationTokenSource cts = new();

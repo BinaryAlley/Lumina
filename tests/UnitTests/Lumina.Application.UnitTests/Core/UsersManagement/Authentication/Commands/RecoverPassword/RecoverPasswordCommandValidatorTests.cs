@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Core.UsersManagement.Authentication.Commands.RecoverPassword;
+using Lumina.Application.Fixtures.Core.UsersManagement.Authentication.Commands.RecoverPassword;
 using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Application.UnitTests.Core.UsersManagement.Authentication.Commands.RecoverPassword.Fixtures;
 using Lumina.Domain.Common.Primitives;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -16,21 +16,14 @@ namespace Lumina.Application.UnitTests.Core.UsersManagement.Authentication.Comma
 [ExcludeFromCodeCoverage]
 public class RecoverPasswordCommandValidatorTests
 {
-    private readonly RecoverPasswordCommandValidator _validator;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="RecoverPasswordCommandValidatorTests"/> class.
-    /// </summary>
-    public RecoverPasswordCommandValidatorTests()
-    {
-        _validator = new RecoverPasswordCommandValidator();
-    }
+    private readonly RecoverPasswordCommandValidator _validator = new();
+    private readonly RecoverPasswordCommandFixture _recoverPasswordCommandFixture = new();
 
     [Fact]
     public void Validate_WhenUsernameIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        RecoverPasswordCommand command = RecoverPasswordCommandFixture.CreateRecoverPasswordCommand();
+        RecoverPasswordCommand command = _recoverPasswordCommandFixture.Create();
         command = command with { Username = null! };
 
         // Act
@@ -44,7 +37,7 @@ public class RecoverPasswordCommandValidatorTests
     public void Validate_WhenUsernameIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        RecoverPasswordCommand command = RecoverPasswordCommandFixture.CreateRecoverPasswordCommand();
+        RecoverPasswordCommand command = _recoverPasswordCommandFixture.Create();
         command = command with { Username = string.Empty };
 
         // Act
@@ -58,7 +51,7 @@ public class RecoverPasswordCommandValidatorTests
     public void Validate_WhenUsernameIsWhiteSpace_ShouldHaveValidationError()
     {
         // Arrange
-        RecoverPasswordCommand command = RecoverPasswordCommandFixture.CreateRecoverPasswordCommand();
+        RecoverPasswordCommand command = _recoverPasswordCommandFixture.Create();
         command = command with { Username = "   " };
 
         // Act
@@ -72,7 +65,7 @@ public class RecoverPasswordCommandValidatorTests
     public void Validate_WhenTotpCodeIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        RecoverPasswordCommand command = RecoverPasswordCommandFixture.CreateRecoverPasswordCommand();
+        RecoverPasswordCommand command = _recoverPasswordCommandFixture.Create();
         command = command with { TotpCode = null! };
 
         // Act
@@ -86,7 +79,7 @@ public class RecoverPasswordCommandValidatorTests
     public void Validate_WhenTotpCodeIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        RecoverPasswordCommand command = RecoverPasswordCommandFixture.CreateRecoverPasswordCommand();
+        RecoverPasswordCommand command = _recoverPasswordCommandFixture.Create();
         command = command with { TotpCode = string.Empty };
 
         // Act
@@ -100,7 +93,7 @@ public class RecoverPasswordCommandValidatorTests
     public void Validate_WhenTotpCodeIsWhiteSpace_ShouldHaveValidationError()
     {
         // Arrange
-        RecoverPasswordCommand command = RecoverPasswordCommandFixture.CreateRecoverPasswordCommand();
+        RecoverPasswordCommand command = _recoverPasswordCommandFixture.Create();
         command = command with { TotpCode = "   " };
 
         // Act
@@ -120,7 +113,7 @@ public class RecoverPasswordCommandValidatorTests
     public void Validate_WhenTotpCodeIsInvalid_ShouldHaveValidationError(string totpCode)
     {
         // Arrange
-        RecoverPasswordCommand command = RecoverPasswordCommandFixture.CreateRecoverPasswordCommand();
+        RecoverPasswordCommand command = _recoverPasswordCommandFixture.Create();
         command = command with { TotpCode = totpCode };
 
         // Act
@@ -137,7 +130,7 @@ public class RecoverPasswordCommandValidatorTests
     public void Validate_WhenTotpCodeIsValid_ShouldNotHaveValidationError(string totpCode)
     {
         // Arrange
-        RecoverPasswordCommand command = RecoverPasswordCommandFixture.CreateRecoverPasswordCommand();
+        RecoverPasswordCommand command = _recoverPasswordCommandFixture.Create();
         command = command with { TotpCode = totpCode };
 
         // Act
@@ -151,7 +144,7 @@ public class RecoverPasswordCommandValidatorTests
     public void Validate_WhenCommandIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        RecoverPasswordCommand command = RecoverPasswordCommandFixture.CreateRecoverPasswordCommand();
+        RecoverPasswordCommand command = _recoverPasswordCommandFixture.Create();
 
         // Act
         List<Error> result = _validator.TestValidate(command);

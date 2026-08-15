@@ -34,9 +34,9 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
 {
     private HttpClient _client;
     private readonly AuthenticatedLuminaApiFactory _apiFactory;
-    private readonly PasswordHashService _hashService;
+    private readonly PasswordHashService _hashService = new();
     private readonly ICryptographyService _cryptographyService;
-    private readonly TotpTokenGenerator _totpTokenGenerator;
+    private readonly TotpTokenGenerator _totpTokenGenerator = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -52,8 +52,6 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;
-        _hashService = new PasswordHashService();
-        _totpTokenGenerator = new TotpTokenGenerator();
         _testUsername = $"testuser_{Guid.NewGuid()}";
 
         // get the encryption service with the test key from factory
@@ -71,7 +69,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithValidRequest_ShouldResetPassword()
+    public async Task RecoverPassword_WhenCalledWithValidRequest_ShouldResetPassword()
     {
         // Arrange       
         UserEntity user = await CreateUserWithTotp();
@@ -115,7 +113,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenUserDoesNotExist_ShouldReturnNotFound()
+    public async Task RecoverPassword_WhenUserDoesNotExist_ShouldReturnNotFound()
     {
         // Arrange
         RecoverPasswordRequest request = new(
@@ -142,7 +140,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenInvalidTotpCode_ShouldReturnForbiddenResult()
+    public async Task RecoverPassword_WhenInvalidTotpCode_ShouldReturnForbiddenResult()
     {
         // Arrange
         UserEntity user = await CreateUserWithTotp();
@@ -175,7 +173,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenRequestIsNull_ShouldReturnValidationError()
+    public async Task RecoverPassword_WhenRequestIsNull_ShouldReturnValidationError()
     {
         // Arrange
         RecoverPasswordRequest? request = null;
@@ -205,7 +203,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenUserDoesNotUseTotpAndTriesToRecover_ShouldReturnForbiddenResult()
+    public async Task RecoverPassword_WhenUserDoesNotUseTotpAndTriesToRecover_ShouldReturnForbiddenResult()
     {
         // Arrange
         UserEntity user = await CreateUserWithoutTotp();
@@ -239,7 +237,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenUserDoesNotUseTotpAndTriesToRecoverWithoutCode_ShouldReturnForbiddenResult()
+    public async Task RecoverPassword_WhenUserDoesNotUseTotpAndTriesToRecoverWithoutCode_ShouldReturnForbiddenResult()
     {
         // Arrange
         // Setup user without TOTP
@@ -248,6 +246,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
             LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
             UserEntity userWithoutTotp = new()
             {
+                Id = Guid.NewGuid(),
                 Username = "userwithoutotp2",
                 Password = _hashService.HashString("OldPass123!"),
                 TotpSecret = null, // No TOTP configured
@@ -290,7 +289,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCancellationRequested_ShouldThrowTaskCanceledException()
+    public async Task RecoverPassword_WhenCancellationRequested_ShouldThrowTaskCanceledException()
     {
         // Arrange
         RecoverPasswordRequest request = new(
@@ -316,6 +315,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
         byte[] totpSecret = _totpTokenGenerator.GenerateSecret();
         UserEntity user = new()
         {
+            Id = Guid.NewGuid(),
             Username = _testUsername,
             Password = _hashService.HashString("OldPass123!"),
             TotpSecret = _cryptographyService.Encrypt(Convert.ToBase64String(totpSecret)),

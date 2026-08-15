@@ -1,14 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using AutoFixture;
-using AutoFixture.AutoNSubstitute;
 using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.FileSystemManagement.Files.Queries.GetTreeFiles;
+using Lumina.Contracts.Fixtures.Core.Requests.FileSystemManagement.Files;
+using Lumina.Contracts.Fixtures.Core.Responses.FileSystemManagement.Common;
 using Lumina.Contracts.Requests.FileSystemManagement.Files;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Files.GetTreeFiles;
-using Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.Fixtures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -28,19 +27,17 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.
 [ExcludeFromCodeCoverage]
 public class GetTreeFilesEndpointTests
 {
-    private readonly IFixture _fixture;
     private readonly IQueryHandler<GetTreeFilesQuery, Result<IEnumerable<FileSystemTreeNodeResponse>>> _mockHandler;
     private readonly GetTreeFilesEndpoint _sut;
-    private readonly FileSystemTreeNodeResponseFixture _fileSystemTreeNodeResponseFixture;
+    private readonly FileSystemTreeNodeResponseFixture _fileSystemTreeNodeResponseFixture = new();
+    private readonly GetTreeFilesRequestFixture _getTreeFilesRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetTreeFilesEndpointTests"/> class.
     /// </summary>
     public GetTreeFilesEndpointTests()
     {
-        _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
         _mockHandler = Substitute.For<IQueryHandler<GetTreeFilesQuery, Result<IEnumerable<FileSystemTreeNodeResponse>>>>();
-        _fileSystemTreeNodeResponseFixture = new FileSystemTreeNodeResponseFixture();
         _sut = Factory.Create<GetTreeFilesEndpoint>(_mockHandler);
     }
 
@@ -48,7 +45,7 @@ public class GetTreeFilesEndpointTests
     public async Task ExecuteAsync_WhenCalled_ShouldReturnOkResultWithFileSystemTreeNodeResponses()
     {
         // Arrange
-        GetTreeFilesRequest request = _fixture.Create<GetTreeFilesRequest>();
+        GetTreeFilesRequest request = _getTreeFilesRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
         List<FileSystemTreeNodeResponse> expectedResponses = _fileSystemTreeNodeResponseFixture.CreateMany(3, 3, 5);
         _mockHandler.HandleAsync(Arg.Any<GetTreeFilesQuery>(), Arg.Any<CancellationToken>())
@@ -66,7 +63,7 @@ public class GetTreeFilesEndpointTests
     public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
     {
         // Arrange
-        GetTreeFilesRequest request = _fixture.Create<GetTreeFilesRequest>();
+        GetTreeFilesRequest request = _getTreeFilesRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
         Error expectedError = Error.NotFound("File.NotFound", "The requested file was not found.");
         _mockHandler.HandleAsync(Arg.Any<GetTreeFilesQuery>(), Arg.Any<CancellationToken>())
@@ -92,7 +89,7 @@ public class GetTreeFilesEndpointTests
     public async Task ExecuteAsync_WhenHandlerReturnsValidationError_ShouldReturnValidationProblemResult()
     {
         // Arrange
-        GetTreeFilesRequest request = _fixture.Create<GetTreeFilesRequest>();
+        GetTreeFilesRequest request = _getTreeFilesRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
         Error expectedError = Error.Validation("Path.Invalid", "The provided path is invalid.");
         _mockHandler.HandleAsync(Arg.Any<GetTreeFilesQuery>(), Arg.Any<CancellationToken>())
@@ -118,7 +115,7 @@ public class GetTreeFilesEndpointTests
     public async Task ExecuteAsync_WhenCalled_ShouldSendGetTreeFilesQueryToSender()
     {
         // Arrange
-        GetTreeFilesRequest request = _fixture.Create<GetTreeFilesRequest>();
+        GetTreeFilesRequest request = _getTreeFilesRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<GetTreeFilesQuery>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(Enumerable.Empty<FileSystemTreeNodeResponse>()));
@@ -137,7 +134,7 @@ public class GetTreeFilesEndpointTests
     public async Task ExecuteAsync_WhenCancellationRequested_ShouldCancelOperation()
     {
         // Arrange
-        GetTreeFilesRequest request = _fixture.Create<GetTreeFilesRequest>();
+        GetTreeFilesRequest request = _getTreeFilesRequestFixture.Create();
         CancellationTokenSource cts = new();
         TaskCompletionSource<bool> operationStarted = new();
         TaskCompletionSource<bool> cancellationRequested = new();

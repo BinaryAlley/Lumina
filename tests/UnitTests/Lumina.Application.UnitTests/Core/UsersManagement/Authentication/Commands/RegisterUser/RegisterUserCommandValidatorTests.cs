@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Core.UsersManagement.Authentication.Commands.RegisterUser;
+using Lumina.Application.Fixtures.Core.UsersManagement.Authentication.Commands.RegisterUser;
 using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Application.UnitTests.Core.UsersManagement.Authentication.Commands.RegisterUser.Fixture;
 using Lumina.Domain.Common.Primitives;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -16,21 +16,14 @@ namespace Lumina.Application.UnitTests.Core.UsersManagement.Authentication.Comma
 [ExcludeFromCodeCoverage]
 public class RegisterUserCommandValidatorTests
 {
-    private readonly RegisterUserCommandValidator _validator;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="RegisterUserCommandValidatorTests"/> class.
-    /// </summary>
-    public RegisterUserCommandValidatorTests()
-    {
-        _validator = new RegisterUserCommandValidator();
-    }
+    private readonly RegisterUserCommandValidator _validator = new();
+    private readonly RegisterUserCommandFixture _registerUserCommandFixture = new();
 
     [Fact]
     public void Validate_WhenUsernameIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        RegisterUserCommand command = RegisterUserCommandFixture.CreateRegisterCommand();
+        RegisterUserCommand command = _registerUserCommandFixture.Create();
         command = command with { Username = null! };
 
         // Act
@@ -44,7 +37,7 @@ public class RegisterUserCommandValidatorTests
     public void Validate_WhenUsernameIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        RegisterUserCommand command = RegisterUserCommandFixture.CreateRegisterCommand();
+        RegisterUserCommand command = _registerUserCommandFixture.Create();
         command = command with { Username = string.Empty };
 
         // Act
@@ -58,7 +51,7 @@ public class RegisterUserCommandValidatorTests
     public void Validate_WhenUsernameIsWhiteSpace_ShouldHaveValidationError()
     {
         // Arrange
-        RegisterUserCommand command = RegisterUserCommandFixture.CreateRegisterCommand();
+        RegisterUserCommand command = _registerUserCommandFixture.Create();
         command = command with { Username = "   " };
 
         // Act
@@ -72,7 +65,7 @@ public class RegisterUserCommandValidatorTests
     public void Validate_WhenPasswordIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        RegisterUserCommand command = RegisterUserCommandFixture.CreateRegisterCommand();
+        RegisterUserCommand command = _registerUserCommandFixture.Create();
         command = command with { Password = null! };
 
         // Act
@@ -86,7 +79,7 @@ public class RegisterUserCommandValidatorTests
     public void Validate_WhenPasswordIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        RegisterUserCommand command = RegisterUserCommandFixture.CreateRegisterCommand();
+        RegisterUserCommand command = _registerUserCommandFixture.Create();
         command = command with { Password = string.Empty };
 
         // Act
@@ -100,7 +93,7 @@ public class RegisterUserCommandValidatorTests
     public void Validate_WhenPasswordIsWhiteSpace_ShouldHaveValidationError()
     {
         // Arrange
-        RegisterUserCommand command = RegisterUserCommandFixture.CreateRegisterCommand();
+        RegisterUserCommand command = _registerUserCommandFixture.Create();
         command = command with { Password = "   " };
 
         // Act
@@ -114,7 +107,7 @@ public class RegisterUserCommandValidatorTests
     public void Validate_WhenPasswordConfirmIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        RegisterUserCommand command = RegisterUserCommandFixture.CreateRegisterCommand();
+        RegisterUserCommand command = _registerUserCommandFixture.Create();
         command = command with { PasswordConfirm = null! };
 
         // Act
@@ -128,7 +121,7 @@ public class RegisterUserCommandValidatorTests
     public void Validate_WhenPasswordConfirmIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        RegisterUserCommand command = RegisterUserCommandFixture.CreateRegisterCommand();
+        RegisterUserCommand command = _registerUserCommandFixture.Create();
         command = command with { PasswordConfirm = string.Empty };
 
         // Act
@@ -142,7 +135,7 @@ public class RegisterUserCommandValidatorTests
     public void Validate_WhenPasswordConfirmIsWhiteSpace_ShouldHaveValidationError()
     {
         // Arrange
-        RegisterUserCommand command = RegisterUserCommandFixture.CreateRegisterCommand();
+        RegisterUserCommand command = _registerUserCommandFixture.Create();
         command = command with { PasswordConfirm = "   " };
 
         // Act
@@ -156,7 +149,7 @@ public class RegisterUserCommandValidatorTests
     public void Validate_WhenPasswordAndPasswordConfirmDontMatch_ShouldHaveValidationError()
     {
         // Arrange
-        RegisterUserCommand command = RegisterUserCommandFixture.CreateRegisterCommand();
+        RegisterUserCommand command = _registerUserCommandFixture.Create();
         command = command with { PasswordConfirm = "$321Bcda" };
 
         // Act
@@ -176,7 +169,7 @@ public class RegisterUserCommandValidatorTests
     public void Validate_WhenPasswordDoesNotMatchPattern_ShouldHaveValidationError(string password)
     {
         // Arrange
-        RegisterUserCommand command = RegisterUserCommandFixture.CreateRegisterCommand();
+        RegisterUserCommand command = _registerUserCommandFixture.Create();
         command = command with { Password = password, PasswordConfirm = password };
 
         // Act
@@ -194,7 +187,7 @@ public class RegisterUserCommandValidatorTests
     public void Validate_WhenPasswordMatchesPattern_ShouldNotHaveValidationError(string password)
     {
         // Arrange
-        RegisterUserCommand command = RegisterUserCommandFixture.CreateRegisterCommand();
+        RegisterUserCommand command = _registerUserCommandFixture.Create();
         command = command with { Password = password, PasswordConfirm = password };
 
         // Act
@@ -208,7 +201,7 @@ public class RegisterUserCommandValidatorTests
     public void Validate_WhenCommandIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        RegisterUserCommand command = RegisterUserCommandFixture.CreateRegisterCommand();
+        RegisterUserCommand command = _registerUserCommandFixture.Create();
         command = command with
         {
             Username = "valid.user123",
@@ -232,7 +225,7 @@ public class RegisterUserCommandValidatorTests
     public void Validate_WhenUsernameHasInvalidLength_ShouldHaveValidationError(string username)
     {
         // Arrange
-        RegisterUserCommand command = RegisterUserCommandFixture.CreateRegisterCommand();
+        RegisterUserCommand command = _registerUserCommandFixture.Create();
         command = command with { Username = username };
 
         // Act
@@ -256,7 +249,7 @@ public class RegisterUserCommandValidatorTests
     public void Validate_WhenUsernameHasInvalidFormat_ShouldHaveValidationError(string username)
     {
         // Arrange
-        RegisterUserCommand command = RegisterUserCommandFixture.CreateRegisterCommand();
+        RegisterUserCommand command = _registerUserCommandFixture.Create();
         command = command with { Username = username };
 
         // Act
@@ -277,7 +270,7 @@ public class RegisterUserCommandValidatorTests
     public void Validate_WhenUsernameHasValidFormat_ShouldNotHaveValidationError(string username)
     {
         // Arrange
-        RegisterUserCommand command = RegisterUserCommandFixture.CreateRegisterCommand();
+        RegisterUserCommand command = _registerUserCommandFixture.Create();
         command = command with { Username = username };
 
         // Act

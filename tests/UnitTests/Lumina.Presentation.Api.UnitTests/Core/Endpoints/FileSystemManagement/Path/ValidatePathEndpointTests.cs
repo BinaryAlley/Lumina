@@ -2,11 +2,11 @@
 using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.FileSystemManagement.Paths.Queries.ValidatePath;
+using Lumina.Contracts.Fixtures.Core.Requests.FileSystemManagement.Path;
 using Lumina.Contracts.Requests.FileSystemManagement.Path;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.ValidatePath;
-using Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.Fixtures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -26,7 +26,7 @@ public class ValidatePathEndpointTests
 {
     private readonly IQueryHandler<ValidatePathQuery, Result<PathValidResponse>> _mockHandler;
     private readonly ValidatePathEndpoint _sut;
-    private readonly ValidatePathRequestFixture _validatePathRequestFixture;
+    private readonly ValidatePathRequestFixture _validatePathRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ValidatePathEndpointTests"/> class.
@@ -35,7 +35,6 @@ public class ValidatePathEndpointTests
     {
         _mockHandler = Substitute.For<IQueryHandler<ValidatePathQuery, Result<PathValidResponse>>>();
         _sut = Factory.Create<ValidatePathEndpoint>(_mockHandler);
-        _validatePathRequestFixture = new ValidatePathRequestFixture();
     }
 
     [Fact]

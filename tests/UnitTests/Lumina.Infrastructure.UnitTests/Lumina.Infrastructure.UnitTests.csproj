@@ -40,6 +40,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\src\Lumina.Infrastructure\Lumina.Infrastructure.csproj" />
+        <ProjectReference Include="..\..\Common\Lumina.Infrastructure.Fixtures\Lumina.Infrastructure.Fixtures.csproj" />
     </ItemGroup>
 
 </Project>

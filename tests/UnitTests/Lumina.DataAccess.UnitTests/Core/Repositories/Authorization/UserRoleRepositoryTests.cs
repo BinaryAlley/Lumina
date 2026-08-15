@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
 using EntityFrameworkCore.Testing.NSubstitute;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
 using Lumina.DataAccess.Core.Repositories.Authorization;
 using Lumina.DataAccess.Core.UoW;
-using Lumina.DataAccess.UnitTests.Core.Repositories.Authorization.Fixtures;
 using Lumina.Domain.Common.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -23,7 +23,7 @@ public class UserRoleRepositoryTests
 {
     private readonly LuminaDbContext _mockContext;
     private readonly UserRoleRepository _sut;
-    private readonly UserRoleEntityFixture _userRoleEntityFixture;
+    private readonly UserRoleEntityFixture _userRoleEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UserRoleRepositoryTests"/> class.
@@ -32,14 +32,13 @@ public class UserRoleRepositoryTests
     {
         _mockContext = Create.MockedDbContextFor<LuminaDbContext>();
         _sut = new UserRoleRepository(_mockContext);
-        _userRoleEntityFixture = new UserRoleEntityFixture();
     }
 
     [Fact]
     public async Task InsertAsync_WhenUserRoleIsValid_ShouldAddToContextAndReturnCreated()
     {
         // Arrange
-        UserRoleEntity userRole = _userRoleEntityFixture.CreateUserRoleModel();
+        UserRoleEntity userRole = _userRoleEntityFixture.Create();
 
         // Act
         Result<Created> result = await _sut.InsertAsync(userRole, CancellationToken.None);

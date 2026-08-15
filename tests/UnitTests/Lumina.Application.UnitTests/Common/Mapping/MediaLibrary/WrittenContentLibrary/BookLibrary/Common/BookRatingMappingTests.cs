@@ -2,8 +2,10 @@
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
-using Lumina.Application.UnitTests.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Common.Fixtures;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
+using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -17,21 +19,13 @@ namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.WrittenConten
 [ExcludeFromCodeCoverage]
 public class BookRatingMappingTests
 {
-    private readonly BookRatingFixture _bookRatingFixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="BookRatingMappingTests"/> class.
-    /// </summary>
-    public BookRatingMappingTests()
-    {
-        _bookRatingFixture = new BookRatingFixture();
-    }
+    private readonly BookRatingFixture _bookRatingFixture = new();
 
     [Fact]
     public void ToRepositoryEntity_WhenMappingCompleteBookRating_ShouldMapAllPropertiesCorrectly()
     {
         // Arrange
-        BookRating bookRating = _bookRatingFixture.CreateBookRating();
+        BookRating bookRating = _bookRatingFixture.Create();
 
         // Act
         BookRatingEntity result = bookRating.ToRepositoryEntity();
@@ -48,7 +42,7 @@ public class BookRatingMappingTests
     public void ToRepositoryEntity_WhenMappingBookRatingWithoutSource_ShouldMapCorrectly()
     {
         // Arrange
-        BookRating bookRating = _bookRatingFixture.CreateBookRatingWithoutSource();
+        BookRating bookRating = _bookRatingFixture.Create(source: Optional<BookRatingSource>.None());
 
         // Act
         BookRatingEntity result = bookRating.ToRepositoryEntity();
@@ -65,7 +59,7 @@ public class BookRatingMappingTests
     public void ToRepositoryEntity_WhenMappingBookRatingWithoutVoteCount_ShouldMapCorrectly()
     {
         // Arrange
-        BookRating bookRating = _bookRatingFixture.CreateBookRatingWithoutVoteCount();
+        BookRating bookRating = _bookRatingFixture.Create(voteCount: Optional<int>.None());
 
         // Act
         BookRatingEntity result = bookRating.ToRepositoryEntity();
@@ -84,9 +78,9 @@ public class BookRatingMappingTests
         // Arrange
         List<BookRating> bookRatings =
         [
-            _bookRatingFixture.CreateBookRating(),
-            _bookRatingFixture.CreateBookRatingWithoutSource(),
-            _bookRatingFixture.CreateBookRatingWithoutVoteCount()
+            _bookRatingFixture.Create(),
+            _bookRatingFixture.Create(source: Optional<BookRatingSource>.None()),
+            _bookRatingFixture.Create(voteCount: Optional<int>.None())
         ];
 
         // Act
@@ -96,7 +90,7 @@ public class BookRatingMappingTests
         Assert.NotNull(results);
         Assert.Equal(bookRatings.Count, results.Count());
 
-        List<BookRatingEntity> resultList = results.ToList();
+        List<BookRatingEntity> resultList = [.. results];
 
         // complete rating
         Assert.Equal(bookRatings[0].Value, resultList[0].Value);

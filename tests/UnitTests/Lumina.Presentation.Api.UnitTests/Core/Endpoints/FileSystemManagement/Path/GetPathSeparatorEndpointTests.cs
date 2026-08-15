@@ -2,9 +2,9 @@
 using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.FileSystemManagement.Paths.Queries.GetPathSeparator;
+using Lumina.Contracts.Fixtures.Core.Responses.FileSystemManagement.Path;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
 using Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.GetPathSeparator;
-using Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.Fixtures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -24,7 +24,7 @@ public class GetPathSeparatorEndpointTests
 {
     private readonly IQueryHandler<GetPathSeparatorQuery, PathSeparatorResponse> _mockHandler;
     private readonly GetPathSeparatorEndpoint _sut;
-    private readonly PathSeparatorResponseFixture _pathSeparatorResponseFixture;
+    private readonly PathSeparatorResponseFixture _pathSeparatorResponseFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetPathSeparatorEndpointTests"/> class.
@@ -33,7 +33,6 @@ public class GetPathSeparatorEndpointTests
     {
         _mockHandler = Substitute.For<IQueryHandler<GetPathSeparatorQuery, PathSeparatorResponse>>();
         _sut = Factory.Create<GetPathSeparatorEndpoint>(_mockHandler);
-        _pathSeparatorResponseFixture = new PathSeparatorResponseFixture();
     }
 
     [Fact]

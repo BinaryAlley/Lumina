@@ -4,13 +4,14 @@ using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.Plugins.Commands.ReorderLibraryMetadataProviders;
-using Lumina.DataAccess.UnitTests.Core.Repositories.Plugins.Fixtures;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Plugins;
 using Lumina.Domain.Common.Primitives;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Diagnostics.CodeAnalysis;
 #endregion
 
 namespace Lumina.Application.UnitTests.Core.Plugins.Commands.ReorderLibraryMetadataProviders;
@@ -18,6 +19,7 @@ namespace Lumina.Application.UnitTests.Core.Plugins.Commands.ReorderLibraryMetad
 /// <summary>
 /// Contains unit tests for the <see cref="ReorderLibraryMetadataProvidersCommandHandler"/> class.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class ReorderLibraryMetadataProvidersCommandHandlerTests
 {
     private readonly IUnitOfWork _mockUnitOfWork;
@@ -44,8 +46,8 @@ public class ReorderLibraryMetadataProvidersCommandHandlerTests
         // Arrange
         Guid libraryId = Guid.NewGuid();
         LibraryMetadataProviderConfigurationEntityFixture configurationFixture = new();
-        LibraryMetadataProviderConfigurationEntity firstProvider = configurationFixture.CreateConfiguration(libraryId, Guid.NewGuid(), 2);
-        LibraryMetadataProviderConfigurationEntity secondProvider = configurationFixture.CreateConfiguration(libraryId, Guid.NewGuid(), 1);
+        LibraryMetadataProviderConfigurationEntity firstProvider = configurationFixture.Create(libraryId, Guid.NewGuid(), 2);
+        LibraryMetadataProviderConfigurationEntity secondProvider = configurationFixture.Create(libraryId, Guid.NewGuid(), 1);
         _mockConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
             .Returns(new List<LibraryMetadataProviderConfigurationEntity> { firstProvider, secondProvider });
         _mockConfigurationRepository.UpsertAsync(Arg.Any<LibraryMetadataProviderConfigurationEntity>(), Arg.Any<CancellationToken>())

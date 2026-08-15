@@ -3,7 +3,7 @@ using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
 using Lumina.Application.Common.Mapping.UsersManagement.Users;
-using Lumina.Application.UnitTests.Common.Mapping.UserManagement.Users.Fixtures;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Contracts.Responses.UsersManagement.Users;
 using System;
 using System.Collections.Generic;
@@ -19,11 +19,13 @@ namespace Lumina.Application.UnitTests.Common.Mapping.UserManagement.Users;
 [ExcludeFromCodeCoverage]
 public class UserEntityMappingTests
 {
+    private readonly UserEntityFixture _userEntityFixture = new();
+
     [Fact]
     public void ToResponse_WhenMappingValidUserEntity_ShouldMapCorrectly()
     {
         // Arrange
-        UserEntity entity = UserEntityFixture.CreateUserEntity();
+        UserEntity entity = _userEntityFixture.Create();
 
         // Act
         UserResponse result = entity.ToResponse();
@@ -44,7 +46,7 @@ public class UserEntityMappingTests
     public void ToResponse_WhenMappingDifferentUsernames_ShouldMapCorrectly(string username)
     {
         // Arrange
-        UserEntity entity = UserEntityFixture.CreateUserEntity();
+        UserEntity entity = _userEntityFixture.Create();
         entity.Username = username;
 
         // Act
@@ -59,7 +61,7 @@ public class UserEntityMappingTests
     public void ToResponse_WhenMappingWithUpdatedDateTime_ShouldMapCorrectly()
     {
         // Arrange
-        UserEntity entity = UserEntityFixture.CreateUserEntity();
+        UserEntity entity = _userEntityFixture.Create();
         entity.UpdatedOnUtc = DateTime.UtcNow.AddDays(-1);
 
         // Act
@@ -74,7 +76,7 @@ public class UserEntityMappingTests
     public void ToResponse_WhenMappingWithLibraries_ShouldNotAffectMapping()
     {
         // Arrange
-        UserEntity entity = UserEntityFixture.CreateUserEntity(2);
+        UserEntity entity = _userEntityFixture.Create(2);
 
         // Act
         UserResponse result = entity.ToResponse();
@@ -91,7 +93,7 @@ public class UserEntityMappingTests
     public void ToResponses_WhenMappingMultipleEntities_ShouldMapCorrectly()
     {
         // Arrange
-        List<UserEntity> entities = UserEntityFixture.CreateMany(3);
+        List<UserEntity> entities = _userEntityFixture.CreateMany(3);
 
         // Act
         IEnumerable<UserResponse> results = entities.ToResponses();
@@ -127,7 +129,7 @@ public class UserEntityMappingTests
     public void ToResponse_WhenMappingWithoutUpdatedDateTime_ShouldMapCorrectly()
     {
         // Arrange
-        UserEntity entity = UserEntityFixture.CreateUserEntity();
+        UserEntity entity = _userEntityFixture.Create();
         entity.UpdatedOnUtc = null;
 
         // Act

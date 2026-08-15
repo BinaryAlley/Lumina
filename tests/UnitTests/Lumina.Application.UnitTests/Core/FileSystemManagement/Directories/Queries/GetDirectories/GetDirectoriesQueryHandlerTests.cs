@@ -3,12 +3,12 @@ using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.FileSystemManagement.Directories.Queries.GetDirectories;
-using Lumina.Application.UnitTests.Core.FileSystemManagement.Directories.Fixtures;
-using Lumina.Application.UnitTests.Core.FileSystemManagement.Directories.Queries.GetDirectories.Fixtures;
+using Lumina.Application.Fixtures.Core.FileSystemManagement.Directories.Queries.GetDirectories;
 using Lumina.Contracts.Responses.FileSystemManagement.Directories;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -29,7 +29,8 @@ public class GetDirectoriesQueryHandlerTests
     private readonly IFixture _fixture;
     private readonly IDirectoryService _mockDirectoryService;
     private readonly GetDirectoriesQueryHandler _sut;
-    private readonly DirectoryFixture _directoryFixture;
+    private readonly DirectoryFixture _directoryFixture = new();
+    private readonly GetDirectoriesQueryFixture _getDirectoriesQueryFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetDirectoriesQueryHandlerTests"/> class.
@@ -42,14 +43,13 @@ public class GetDirectoriesQueryHandlerTests
         mockValidator.Validate(Arg.Any<GetDirectoriesQuery>())
             .Returns([]);
         _sut = new GetDirectoriesQueryHandler(_mockDirectoryService, mockValidator);
-        _directoryFixture = new DirectoryFixture();
     }
 
     [Fact]
     public async Task HandleAsync_WhenCalledWithValidQueryWithoutFilesIncluded_ShouldReturnSuccessResult()
     {
         // Arrange
-        GetDirectoriesQuery getDirectoriesQuery = GetDirectoriesQueryFixture.CreateGetDirectoriesQuery(false);
+        GetDirectoriesQuery getDirectoriesQuery = _getDirectoriesQueryFixture.Create(includeHiddenElements: false);
 
         IEnumerable<Directory> directories = _directoryFixture.CreateMany();
 
@@ -83,7 +83,7 @@ public class GetDirectoriesQueryHandlerTests
     public async Task HandleAsync_WhenCalledWithValidQueryWithFilesIncluded_ShouldReturnSuccessResult()
     {
         // Arrange
-        GetDirectoriesQuery getDirectoriesQuery = GetDirectoriesQueryFixture.CreateGetDirectoriesQuery(true);
+        GetDirectoriesQuery getDirectoriesQuery = _getDirectoriesQueryFixture.Create(includeHiddenElements: true);
 
         IEnumerable<Directory> directories = _directoryFixture.CreateMany();
 
@@ -117,7 +117,7 @@ public class GetDirectoriesQueryHandlerTests
     public async Task HandleAsync_WhenDirectoryServiceReturnsError_ShouldReturnFailureResult()
     {
         // Arrange
-        GetDirectoriesQuery query = _fixture.Create<GetDirectoriesQuery>();
+        GetDirectoriesQuery query = _getDirectoriesQueryFixture.Create();
         Error error = Error.Failure("DirectoryService.Error", "An error occurred");
         _mockDirectoryService.GetSubdirectories(query.Path!, query.IncludeHiddenElements)
             .Returns(error);
@@ -135,7 +135,7 @@ public class GetDirectoriesQueryHandlerTests
     public async Task HandleAsync_WhenDirectoryServiceReturnsEmptyList_ShouldReturnEmptySuccessResult()
     {
         // Arrange
-        GetDirectoriesQuery query = _fixture.Create<GetDirectoriesQuery>();
+        GetDirectoriesQuery query = _getDirectoriesQueryFixture.Create();
         Result<IEnumerable<Directory>> emptyList = Result.From(Enumerable.Empty<Directory>());
         _mockDirectoryService.GetSubdirectories(query.Path!, query.IncludeHiddenElements)
             .Returns(emptyList);

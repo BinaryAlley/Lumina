@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Presentation.Api.Fixtures.Core.Endpoints.FileSystemManagement;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
-using Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.FileSystemManagement.Fixtures;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -52,7 +52,7 @@ public class GetThumbnailEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithValidPathAndQuality_ShouldReturnOkResultWithThumbnail()
+    public async Task GetThumbnail_WhenCalledWithValidPathAndQuality_ShouldReturnOkResultWithThumbnail()
     {
         // Arrange
         int quality = 80;
@@ -68,7 +68,7 @@ public class GetThumbnailEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithInvalidPath_ShouldReturnForbiddenResult()
+    public async Task GetThumbnail_WhenCalledWithInvalidPath_ShouldReturnForbiddenResult()
     {
         // Arrange
         string invalidImagePath = "/path/to/nonexistent/image.jpg";
@@ -89,11 +89,11 @@ public class GetThumbnailEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         Assert.Equal("UnauthorizedAccess", problemDetails["detail"].GetString());
         Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.4", problemDetails["type"].GetString());
         Assert.NotNull(problemDetails["traceId"].GetString());
-        Assert.NotEmpty(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithEmptyPath_ShouldReturnValidationProblemResult()
+    public async Task GetThumbnail_WhenCalledWithEmptyPath_ShouldReturnValidationProblemResult()
     {
         // Arrange
         string invalidImagePath = "";
@@ -114,7 +114,7 @@ public class GetThumbnailEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         Assert.Equal("OneOrMoreValidationErrorsOccurred", problemDetails["detail"].GetString());
         Assert.Equal("https://tools.ietf.org/html/rfc4918#section-11.2", problemDetails["type"].GetString());
         Assert.NotNull(problemDetails["traceId"].GetString());
-        Assert.NotEmpty(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
 
         Dictionary<string, string[]>? errors = problemDetails["errors"].Deserialize<Dictionary<string, string[]>>(_jsonOptions);
         Assert.NotNull(errors);
@@ -123,7 +123,7 @@ public class GetThumbnailEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithInvalidQuality_ShouldReturnValidationProblemResult()
+    public async Task GetThumbnail_WhenCalledWithInvalidQuality_ShouldReturnValidationProblemResult()
     {
         // Arrange
         int invalidQuality = -1;
@@ -143,7 +143,7 @@ public class GetThumbnailEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         Assert.Equal("OneOrMoreValidationErrorsOccurred", problemDetails["detail"].GetString());
         Assert.Equal("https://tools.ietf.org/html/rfc4918#section-11.2", problemDetails["type"].GetString());
         Assert.NotNull(problemDetails["traceId"].GetString());
-        Assert.NotEmpty(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
 
         Dictionary<string, string[]>? errors = problemDetails["errors"].Deserialize<Dictionary<string, string[]>>(_jsonOptions);
         Assert.NotNull(errors);
@@ -152,7 +152,7 @@ public class GetThumbnailEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCancellationTokenIsCanceled_ShouldThrowTaskCanceledException()
+    public async Task GetThumbnail_WhenCancellationTokenIsCanceled_ShouldThrowTaskCanceledException()
     {
         // Arrange
         int quality = 80;

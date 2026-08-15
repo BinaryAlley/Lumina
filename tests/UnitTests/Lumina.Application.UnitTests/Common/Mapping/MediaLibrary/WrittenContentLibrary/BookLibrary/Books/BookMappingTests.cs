@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
 using System.Diagnostics.CodeAnalysis;
-using Lumina.Application.UnitTests.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook.Fixtures;
 #endregion
 
 namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
@@ -16,21 +16,13 @@ namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.WrittenConten
 [ExcludeFromCodeCoverage]
 public class BookMappingTests
 {
-    private readonly BookFixture _bookFixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="BookMappingTests"/> class.
-    /// </summary>
-    public BookMappingTests()
-    {
-        _bookFixture = new BookFixture();
-    }
+    private readonly BookFixture _bookFixture = new();
 
     [Fact]
     public void ToRepositoryEntity_WhenMappingCompleteBook_ShouldMapAllPropertiesCorrectly()
     {
         // Arrange
-        Book book = _bookFixture.CreateDomainBook();
+        Book book = _bookFixture.Create();
 
         // Act
         BookEntity result = book.ToRepositoryEntity();

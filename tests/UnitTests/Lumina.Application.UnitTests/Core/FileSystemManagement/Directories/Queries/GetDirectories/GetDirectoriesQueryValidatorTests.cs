@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Core.FileSystemManagement.Directories.Queries.GetDirectories;
+using Lumina.Application.Fixtures.Core.FileSystemManagement.Directories.Queries.GetDirectories;
 using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Application.UnitTests.Core.FileSystemManagement.Directories.Queries.GetDirectories.Fixtures;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using System.Collections.Generic;
@@ -16,21 +16,14 @@ namespace Lumina.Application.UnitTests.Core.FileSystemManagement.Directories.Que
 [ExcludeFromCodeCoverage]
 public class GetDirectoriesQueryValidatorTests
 {
-    private readonly GetDirectoriesQueryValidator _validator;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="GetDirectoriesQueryValidatorTests"/> class.
-    /// </summary>
-    public GetDirectoriesQueryValidatorTests()
-    {
-        _validator = new GetDirectoriesQueryValidator();
-    }
+    private readonly GetDirectoriesQueryValidator _validator = new();
+    private readonly GetDirectoriesQueryFixture _getDirectoriesQueryFixture = new();
 
     [Fact]
     public void Validate_WhenPathIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        GetDirectoriesQuery query = GetDirectoriesQueryFixture.CreateGetDirectoriesQuery();
+        GetDirectoriesQuery query = _getDirectoriesQueryFixture.Create();
         query = query with { Path = null! };
 
         // Act
@@ -44,7 +37,7 @@ public class GetDirectoriesQueryValidatorTests
     public void Validate_WhenPathIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        GetDirectoriesQuery query = GetDirectoriesQueryFixture.CreateGetDirectoriesQuery();
+        GetDirectoriesQuery query = _getDirectoriesQueryFixture.Create();
         query = query with { Path = string.Empty };
 
         // Act
@@ -58,7 +51,7 @@ public class GetDirectoriesQueryValidatorTests
     public void Validate_WhenPathIsWhitespace_ShouldHaveValidationError()
     {
         // Arrange
-        GetDirectoriesQuery query = GetDirectoriesQueryFixture.CreateGetDirectoriesQuery();
+        GetDirectoriesQuery query = _getDirectoriesQueryFixture.Create();
         query = query with { Path = "   " };
 
         // Act
@@ -72,7 +65,7 @@ public class GetDirectoriesQueryValidatorTests
     public void Validate_WhenPathIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        GetDirectoriesQuery query = GetDirectoriesQueryFixture.CreateGetDirectoriesQuery();
+        GetDirectoriesQuery query = _getDirectoriesQueryFixture.Create();
         query = query with { Path = "/valid/path" };
 
         // Act
@@ -86,7 +79,7 @@ public class GetDirectoriesQueryValidatorTests
     public void Validate_WhenIncludeHiddenElementsIsTrue_ShouldNotHaveValidationError()
     {
         // Arrange
-        GetDirectoriesQuery query = GetDirectoriesQueryFixture.CreateGetDirectoriesQuery();
+        GetDirectoriesQuery query = _getDirectoriesQueryFixture.Create();
         query = query with { IncludeHiddenElements = true };
 
         // Act
@@ -100,7 +93,7 @@ public class GetDirectoriesQueryValidatorTests
     public void Validate_WhenIncludeHiddenElementsIsFalse_ShouldNotHaveValidationError()
     {
         // Arrange
-        GetDirectoriesQuery query = GetDirectoriesQueryFixture.CreateGetDirectoriesQuery();
+        GetDirectoriesQuery query = _getDirectoriesQueryFixture.Create();
         query = query with { IncludeHiddenElements = false };
 
         // Act

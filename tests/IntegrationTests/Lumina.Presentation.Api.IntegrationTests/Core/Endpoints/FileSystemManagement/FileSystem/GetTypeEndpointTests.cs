@@ -48,7 +48,7 @@ public class GetTypeEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalled_ShouldReturnOkResultWithFileSystemTypeResponse()
+    public async Task GetType_WhenCalled_ShouldReturnOkResultWithFileSystemTypeResponse()
     {
         // Act
         HttpResponseMessage response = await _client.GetAsync("/api/v1/file-system/get-type");
@@ -62,7 +62,7 @@ public class GetTypeEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledMultipleTimes_ShouldReturnConsistentResults()
+    public async Task GetType_WhenCalledMultipleTimes_ShouldReturnConsistentResults()
     {
         // Act
         HttpResponseMessage response1 = await _client.GetAsync("/api/v1/file-system/get-type");
@@ -84,7 +84,7 @@ public class GetTypeEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithCancellationToken_ShouldCompleteSuccessfully()
+    public async Task GetType_WhenCalledWithCancellationToken_ShouldCompleteSuccessfully()
     {
         // Arrange
         using CancellationTokenSource cts = new(TimeSpan.FromSeconds(5));

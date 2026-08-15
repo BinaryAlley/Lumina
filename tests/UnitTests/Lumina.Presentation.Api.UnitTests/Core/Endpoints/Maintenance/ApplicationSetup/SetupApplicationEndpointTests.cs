@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.Maintenance.ApplicationSetup.Commands.SetupApplication;
+using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Core.Endpoints.Maintenance.ApplicationSetup;
-using Lumina.Presentation.Api.UnitTests.Core.Endpoints.Maintenance.ApplicationSetup.Fixtures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -25,7 +25,7 @@ public class SetupApplicationEndpointTests
 {
     private readonly ICommandHandler<SetupApplicationCommand, Result<RegistrationResponse>> _mockHandler;
     private readonly SetupApplicationEndpoint _sut;
-    private readonly RegistrationRequestFixture _registrationRequestFixture;
+    private readonly RegistrationRequestFixture _registrationRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SetupApplicationEndpointTests"/> class.
@@ -34,7 +34,6 @@ public class SetupApplicationEndpointTests
     {
         _mockHandler = Substitute.For<ICommandHandler<SetupApplicationCommand, Result<RegistrationResponse>>>();
         _sut = FastEndpoints.Factory.Create<SetupApplicationEndpoint>(_mockHandler);
-        _registrationRequestFixture = new RegistrationRequestFixture();
     }
 
     [Fact]

@@ -9,8 +9,8 @@ using Lumina.Application.Common.Infrastructure.Security;
 using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.Maintenance.ApplicationSetup.Commands.SetupApplication;
-using Lumina.Application.UnitTests.Common.Mapping.UserManagement.Users.Fixtures;
-using Lumina.Application.UnitTests.Core.Maintenance.ApplicationSetup.Commands.SetupApplication.Fixtures;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Application.Fixtures.Core.Maintenance.ApplicationSetup.Commands.SetupApplication;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.Domain.Common.Primitives;
 using NSubstitute;
@@ -38,7 +38,8 @@ public class SetupApplicationCommandHandlerTests
     private readonly IDateTimeProvider _mockDateTimeProvider;
     private readonly IDataSeedService _mockDataSeedService;
     private readonly SetupApplicationCommandHandler _sut;
-    private readonly SetupApplicationCommandFixture _setupApplicationCommandFixture;
+    private readonly UserEntityFixture _userEntityFixture = new();
+    private readonly SetupApplicationCommandFixture _setupApplicationCommandFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SetupApplicationCommandHandlerTests"/> class.
@@ -53,7 +54,6 @@ public class SetupApplicationCommandHandlerTests
         _mockUserRepository = Substitute.For<IUserRepository>();
         _mockDateTimeProvider = Substitute.For<IDateTimeProvider>();
         _mockDataSeedService = Substitute.For<IDataSeedService>();
-        _setupApplicationCommandFixture = new SetupApplicationCommandFixture();
         IValidator<SetupApplicationCommand> mockValidator = Substitute.For<IValidator<SetupApplicationCommand>>();
         mockValidator.Validate(Arg.Any<SetupApplicationCommand>())
             .Returns([]);
@@ -76,7 +76,7 @@ public class SetupApplicationCommandHandlerTests
     public async Task HandleAsync_WhenNoExistingUsers_ShouldCreateAdminUserWithout2FA()
     {
         // Arrange
-        SetupApplicationCommand command = _setupApplicationCommandFixture.CreateSetupApplicationCommand() with { Use2fa = false };
+        SetupApplicationCommand command = _setupApplicationCommandFixture.Create() with { Use2fa = false };
         string hashedPassword = Uri.EscapeDataString("hashedPassword");
 
         _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
@@ -112,7 +112,7 @@ public class SetupApplicationCommandHandlerTests
     public async Task HandleAsync_WhenNoExistingUsersAndWith2FA_ShouldCreateAdminUserWithTOTP()
     {
         // Arrange
-        SetupApplicationCommand command = _setupApplicationCommandFixture.CreateSetupApplicationCommand() with { Use2fa = true };
+        SetupApplicationCommand command = _setupApplicationCommandFixture.Create() with { Use2fa = true };
         string hashedPassword = Uri.EscapeDataString("hashedPassword");
         byte[] totpSecret = [1, 2, 3];
         string qrCodeUri = "data:image/png;base64,test";
@@ -157,8 +157,8 @@ public class SetupApplicationCommandHandlerTests
     public async Task HandleAsync_WhenUserAlreadyExists_ShouldReturnError()
     {
         // Arrange
-        SetupApplicationCommand command = _setupApplicationCommandFixture.CreateSetupApplicationCommand();
-        UserEntity existingUser = UserEntityFixture.CreateUserEntity();
+        SetupApplicationCommand command = _setupApplicationCommandFixture.Create();
+        UserEntity existingUser = _userEntityFixture.Create();
 
         _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
             .Returns(new[] { existingUser });
@@ -179,7 +179,7 @@ public class SetupApplicationCommandHandlerTests
     public async Task HandleAsync_WhenGetAllUsersReturnsError_ShouldReturnError()
     {
         // Arrange
-        SetupApplicationCommand command = _setupApplicationCommandFixture.CreateSetupApplicationCommand();
+        SetupApplicationCommand command = _setupApplicationCommandFixture.Create();
         Error error = Error.Failure("Database.Error", "Failed to retrieve users");
 
         _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
@@ -201,7 +201,7 @@ public class SetupApplicationCommandHandlerTests
     public async Task HandleAsync_WhenInsertUserReturnsError_ShouldReturnError()
     {
         // Arrange
-        SetupApplicationCommand command = _setupApplicationCommandFixture.CreateSetupApplicationCommand();
+        SetupApplicationCommand command = _setupApplicationCommandFixture.Create();
         Error error = Error.Failure("Database.Error", "Failed to insert user");
 
         _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
@@ -225,7 +225,7 @@ public class SetupApplicationCommandHandlerTests
     public async Task HandleAsync_WhenSetDefaultAuthorizationPermissionsFails_ShouldReturnError()
     {
         // Arrange
-        SetupApplicationCommand command = _setupApplicationCommandFixture.CreateSetupApplicationCommand();
+        SetupApplicationCommand command = _setupApplicationCommandFixture.Create();
         Error error = Error.Failure("Database.Error", "Failed to set default permissions");
 
         _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
@@ -250,7 +250,7 @@ public class SetupApplicationCommandHandlerTests
     public async Task HandleAsync_WhenSetDefaultAuthorizationRolesFails_ShouldReturnError()
     {
         // Arrange
-        SetupApplicationCommand command = _setupApplicationCommandFixture.CreateSetupApplicationCommand();
+        SetupApplicationCommand command = _setupApplicationCommandFixture.Create();
         Error error = Error.Failure("Database.Error", "Failed to set default roles");
 
         _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
@@ -278,7 +278,7 @@ public class SetupApplicationCommandHandlerTests
     public async Task HandleAsync_WhenSetAdminRolePermissionsFails_ShouldReturnError()
     {
         // Arrange
-        SetupApplicationCommand command = _setupApplicationCommandFixture.CreateSetupApplicationCommand();
+        SetupApplicationCommand command = _setupApplicationCommandFixture.Create();
         Error error = Error.Failure("Database.Error", "Failed to set admin role permissions");
 
         _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
@@ -309,7 +309,7 @@ public class SetupApplicationCommandHandlerTests
     public async Task HandleAsync_WhenSetAdminRoleToAdministratorAccountFails_ShouldReturnError()
     {
         // Arrange
-        SetupApplicationCommand command = _setupApplicationCommandFixture.CreateSetupApplicationCommand();
+        SetupApplicationCommand command = _setupApplicationCommandFixture.Create();
         Error error = Error.Failure("Database.Error", "Failed to set admin role to administrator account");
 
         _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
@@ -342,7 +342,7 @@ public class SetupApplicationCommandHandlerTests
     public async Task HandleAsync_WhenAllOperationsSucceed_ShouldReturnSuccessResponse()
     {
         // Arrange
-        SetupApplicationCommand command = _setupApplicationCommandFixture.CreateSetupApplicationCommand();
+        SetupApplicationCommand command = _setupApplicationCommandFixture.Create();
 
         _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
             .Returns(Result.From(Enumerable.Empty<UserEntity>()));

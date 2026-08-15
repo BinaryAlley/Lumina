@@ -6,7 +6,7 @@ using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Core.Admin.Authorization.Roles.Queries.GetRoles;
-using Lumina.Application.UnitTests.Core.Admin.Authorization.Roles.Queries.GetRoles.Fixtures;
+using Lumina.Application.Fixtures.Core.Admin.Authorization.Roles.Queries.GetRoles;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.Domain.Common.Primitives;
 using NSubstitute;
@@ -30,7 +30,7 @@ public class GetRolesQueryHandlerTests
     private readonly ICurrentUserService _mockCurrentUserService;
     private readonly IRoleRepository _mockRoleRepository;
     private readonly GetRolesQueryHandler _sut;
-    private readonly GetRolesQueryFixture _getRolesQueryFixture;
+    private readonly GetRolesQueryFixture _getRolesQueryFixture = new();
     private readonly Guid _userId;
 
     /// <summary>
@@ -42,7 +42,6 @@ public class GetRolesQueryHandlerTests
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
         _mockRoleRepository = Substitute.For<IRoleRepository>();
-        _getRolesQueryFixture = new GetRolesQueryFixture();
         _userId = Guid.NewGuid();
 
         _mockCurrentUserService.UserId.Returns(_userId);
@@ -58,7 +57,7 @@ public class GetRolesQueryHandlerTests
     public async Task HandleAsync_WhenUserIsNotAdmin_ShouldReturnNotAuthorizedError()
     {
         // Arrange
-        GetRolesQuery query = _getRolesQueryFixture.CreateQuery();
+        GetRolesQuery query = _getRolesQueryFixture.Create();
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(false);
 
@@ -75,7 +74,7 @@ public class GetRolesQueryHandlerTests
     public async Task HandleAsync_WhenGetRolesFails_ShouldReturnError()
     {
         // Arrange
-        GetRolesQuery query = _getRolesQueryFixture.CreateQuery();
+        GetRolesQuery query = _getRolesQueryFixture.Create();
         Error error = Error.Failure("Database.Error", "Failed to get roles");
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
@@ -95,7 +94,7 @@ public class GetRolesQueryHandlerTests
     public async Task HandleAsync_WhenAllOperationsSucceed_ShouldReturnRoles()
     {
         // Arrange
-        GetRolesQuery query = _getRolesQueryFixture.CreateQuery();
+        GetRolesQuery query = _getRolesQueryFixture.Create();
         IEnumerable<RoleEntity> roles =
         [
             new RoleEntity { Id = Guid.NewGuid(), RoleName = "Admin" },

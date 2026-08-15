@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
+using Lumina.Presentation.Api.Fixtures.Core.Endpoints.FileSystemManagement;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
-using Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.FileSystemManagement.Fixtures;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -53,7 +53,7 @@ public class GetTreeFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     }
 
     [SkipWhenHiddenAttributeNotSupportedFact]
-    public async Task ExecuteAsync_WhenCalledWithValidPathAndNotIncludeHiddenElements_ShouldReturnTreeFilesWithoutHiddenElements()
+    public async Task GetTreeFiles_WhenCalledWithValidPathAndNotIncludeHiddenElements_ShouldReturnTreeFilesWithoutHiddenElements()
     {
         // Arrange
         FileSystemStructureFixture fileSystemFixture = new();
@@ -90,7 +90,7 @@ public class GetTreeFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     }
 
     [SkipWhenHiddenAttributeNotSupportedFact]
-    public async Task ExecuteAsync_WhenCalledWithValidPathAndHiddenChildrenAndNotIncludeHiddenElements_ShouldReturnNoTreeFiles()
+    public async Task GetTreeFiles_WhenCalledWithValidPathAndHiddenChildrenAndNotIncludeHiddenElements_ShouldReturnNoTreeFiles()
     {
         // Arrange
         FileSystemStructureFixture fileSystemFixture = new();
@@ -123,7 +123,7 @@ public class GetTreeFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithValidPathAndWithIncludeHiddenElements_ShouldReturnTreeFilesWithHiddenElements()
+    public async Task GetTreeFiles_WhenCalledWithValidPathAndWithIncludeHiddenElements_ShouldReturnTreeFilesWithHiddenElements()
     {
         // Arrange
         FileSystemStructureFixture fileSystemFixture = new();
@@ -163,7 +163,7 @@ public class GetTreeFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         }
     }
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithInvalidPath_ShouldReturnForbiddenResult()
+    public async Task GetTreeFiles_WhenCalledWithInvalidPath_ShouldReturnForbiddenResult()
     {
         // Arrange
         string invalidPath = "invalid:path";
@@ -185,11 +185,11 @@ public class GetTreeFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         Assert.Equal("UnauthorizedAccess", problemDetails["detail"].GetString());
         Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.4", problemDetails["type"].GetString());
         Assert.NotNull(problemDetails["traceId"].GetString());
-        Assert.NotEmpty(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithEmptyPath_ShouldReturnValidationProblemResult()
+    public async Task GetTreeFiles_WhenCalledWithEmptyPath_ShouldReturnValidationProblemResult()
     {
         // Arrange
         string emptyPath = "";
@@ -211,7 +211,7 @@ public class GetTreeFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         Assert.Equal("OneOrMoreValidationErrorsOccurred", problemDetails["detail"].GetString());
         Assert.Equal("https://tools.ietf.org/html/rfc4918#section-11.2", problemDetails["type"].GetString());
         Assert.NotNull(problemDetails["traceId"].GetString());
-        Assert.NotEmpty(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
 
         Dictionary<string, string[]>? errors = problemDetails["errors"].Deserialize<Dictionary<string, string[]>>(_jsonOptions);
         Assert.NotNull(errors);
@@ -220,7 +220,7 @@ public class GetTreeFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithCancellationToken_ShouldCompleteSuccessfully()
+    public async Task GetTreeFiles_WhenCalledWithCancellationToken_ShouldCompleteSuccessfully()
     {
         // Arrange
         string testPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "testDirectory");
@@ -236,7 +236,7 @@ public class GetTreeFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCancellationTokenIsCanceled_ShouldThrowTaskCanceledException()
+    public async Task GetTreeFiles_WhenCancellationTokenIsCanceled_ShouldThrowTaskCanceledException()
     {
         // Arrange
         string testPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "testDirectory");

@@ -16,15 +16,7 @@ namespace Lumina.Application.UnitTests.Core.Admin.Authorization.Roles.Commands.D
 [ExcludeFromCodeCoverage]
 public class DeleteRoleCommandValidatorTests
 {
-    private readonly DeleteRoleCommandValidator _validator;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DeleteRoleCommandValidatorTests"/> class.
-    /// </summary>
-    public DeleteRoleCommandValidatorTests()
-    {
-        _validator = new DeleteRoleCommandValidator();
-    }
+    private readonly DeleteRoleCommandValidator _validator = new();
 
     [Fact]
     public void Validate_WhenRoleIdIsEmpty_ShouldHaveValidationError()

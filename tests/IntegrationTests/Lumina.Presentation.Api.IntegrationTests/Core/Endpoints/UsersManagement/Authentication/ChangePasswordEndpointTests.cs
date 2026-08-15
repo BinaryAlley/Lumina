@@ -54,7 +54,7 @@ public class ChangePasswordEndpointTests : IClassFixture<AuthenticatedLuminaApiF
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithValidRequest_ShouldChangePasswordSuccessfully()
+    public async Task ChangePassword_WhenCalledWithValidRequest_ShouldChangePasswordSuccessfully()
     {
         // Arrange
         ChangePasswordRequest request = new(
@@ -79,7 +79,7 @@ public class ChangePasswordEndpointTests : IClassFixture<AuthenticatedLuminaApiF
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenPasswordsDoNotMatch_ShouldReturnValidationError()
+    public async Task ChangePassword_WhenPasswordsDoNotMatch_ShouldReturnValidationError()
     {
         // Arrange
         ChangePasswordRequest request = new(
@@ -113,7 +113,7 @@ public class ChangePasswordEndpointTests : IClassFixture<AuthenticatedLuminaApiF
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenUserDoesNotExist_ShouldReturnNotFound()
+    public async Task ChangePassword_WhenUserDoesNotExist_ShouldReturnNotFound()
     {
         // Arrange
         ChangePasswordRequest request = new(
@@ -142,7 +142,7 @@ public class ChangePasswordEndpointTests : IClassFixture<AuthenticatedLuminaApiF
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCurrentPasswordIsIncorrect_ShouldReturnForbiddenResult()
+    public async Task ChangePassword_WhenCurrentPasswordIsIncorrect_ShouldReturnForbiddenResult()
     {
         // Arrange
         ChangePasswordRequest request = new(
@@ -171,7 +171,7 @@ public class ChangePasswordEndpointTests : IClassFixture<AuthenticatedLuminaApiF
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenRequestIsNull_ShouldReturnValidationError()
+    public async Task ChangePassword_WhenRequestIsNull_ShouldReturnValidationError()
     {
         // Arrange
         ChangePasswordRequest? request = null;
@@ -203,7 +203,7 @@ public class ChangePasswordEndpointTests : IClassFixture<AuthenticatedLuminaApiF
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCancellationRequested_ShouldThrowTaskCanceledException()
+    public async Task ChangePassword_WhenCancellationRequested_ShouldThrowTaskCanceledException()
     {
         // Arrange
         ChangePasswordRequest request = new(

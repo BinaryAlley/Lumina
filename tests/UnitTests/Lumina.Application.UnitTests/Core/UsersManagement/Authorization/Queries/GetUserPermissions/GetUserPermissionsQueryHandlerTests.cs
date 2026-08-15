@@ -7,7 +7,7 @@ using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetUserPermissions;
-using Lumina.Application.UnitTests.Core.UsersManagement.Authorization.Queries.GetUserPermissions.Fixtures;
+using Lumina.Application.Fixtures.Core.UsersManagement.Authorization.Queries.GetUserPermissions;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
@@ -33,7 +33,7 @@ public class GetUserPermissionsQueryHandlerTests
     private readonly ICurrentUserService _mockCurrentUserService;
     private readonly IUserRepository _mockUserRepository;
     private readonly GetUserPermissionsQueryHandler _sut;
-    private readonly GetUserPermissionsQueryFixture _getUserPermissionsQueryFixture;
+    private readonly GetUserPermissionsQueryFixture _getUserPermissionsQueryFixture = new();
     private readonly Guid _userId;
 
     /// <summary>
@@ -45,7 +45,6 @@ public class GetUserPermissionsQueryHandlerTests
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
         _mockUserRepository = Substitute.For<IUserRepository>();
-        _getUserPermissionsQueryFixture = new GetUserPermissionsQueryFixture();
         _userId = Guid.NewGuid();
 
         _mockCurrentUserService.UserId.Returns(_userId);
@@ -65,7 +64,7 @@ public class GetUserPermissionsQueryHandlerTests
     public async Task HandleAsync_WhenUserIsNotAdmin_ShouldReturnNotAuthorizedError()
     {
         // Arrange
-        GetUserPermissionsQuery query = _getUserPermissionsQueryFixture.CreateQuery();
+        GetUserPermissionsQuery query = _getUserPermissionsQueryFixture.Create();
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(false);
 
@@ -82,7 +81,7 @@ public class GetUserPermissionsQueryHandlerTests
     public async Task HandleAsync_WhenGetUserByIdFails_ShouldReturnError()
     {
         // Arrange
-        GetUserPermissionsQuery query = _getUserPermissionsQueryFixture.CreateQuery();
+        GetUserPermissionsQuery query = _getUserPermissionsQueryFixture.Create();
         Error error = Error.Failure("Database.Error", "Failed to get user");
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
@@ -102,7 +101,7 @@ public class GetUserPermissionsQueryHandlerTests
     public async Task HandleAsync_WhenUserDoesNotExist_ShouldReturnUsernameDoesNotExistError()
     {
         // Arrange
-        GetUserPermissionsQuery query = _getUserPermissionsQueryFixture.CreateQuery();
+        GetUserPermissionsQuery query = _getUserPermissionsQueryFixture.Create();
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(true);
@@ -121,7 +120,7 @@ public class GetUserPermissionsQueryHandlerTests
     public async Task HandleAsync_WhenUserHasPermissions_ShouldReturnPermissions()
     {
         // Arrange
-        GetUserPermissionsQuery query = _getUserPermissionsQueryFixture.CreateQuery();
+        GetUserPermissionsQuery query = _getUserPermissionsQueryFixture.Create();
         UserEntity user = new()
         {
             Id = query.UserId!.Value,

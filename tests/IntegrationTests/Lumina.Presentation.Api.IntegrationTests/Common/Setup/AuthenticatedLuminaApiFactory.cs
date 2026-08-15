@@ -25,7 +25,7 @@ namespace Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 [ExcludeFromCodeCoverage]
 public class AuthenticatedLuminaApiFactory : LuminaApiFactory, IDisposable
 {
-    private readonly PasswordHashService _hashService;
+    private readonly PasswordHashService _hashService = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
@@ -35,14 +35,6 @@ public class AuthenticatedLuminaApiFactory : LuminaApiFactory, IDisposable
     /// Gets the username of the currently created test user.
     /// </summary>
     public string? TestUsername { get; private set; }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AuthenticatedLuminaApiFactory"/> class.
-    /// </summary>
-    public AuthenticatedLuminaApiFactory()
-    {
-        _hashService = new PasswordHashService();
-    }
 
     /// <summary>
     /// Creates an HTTP client with authentication headers and a test user

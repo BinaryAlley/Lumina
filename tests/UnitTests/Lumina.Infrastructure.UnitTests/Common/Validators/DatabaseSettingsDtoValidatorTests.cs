@@ -17,7 +17,7 @@ namespace Lumina.Infrastructure.UnitTests.Common.Validators;
 [ExcludeFromCodeCoverage]
 public class DatabaseSettingsDtoValidatorTests
 {
-    private readonly DatabaseSettingsDtoValidator _validator;
+    private readonly DatabaseSettingsDtoValidator _validator = new();
     private readonly IFixture _fixture;
 
     /// <summary>
@@ -26,11 +26,10 @@ public class DatabaseSettingsDtoValidatorTests
     public DatabaseSettingsDtoValidatorTests()
     {
         _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
-        _validator = new();
     }
 
     [Fact]
-    public void DatabaseSettingsModelValidator_WhenDefaultConnectionProvided_ShouldNotHaveValidationError()
+    public void Validate_WhenDefaultConnectionProvided_ShouldNotHaveValidationError()
     {
         // Arrange
         DatabaseSettingsDto model = _fixture.Build<DatabaseSettingsDto>()
@@ -45,7 +44,7 @@ public class DatabaseSettingsDtoValidatorTests
     }
 
     [Fact]
-    public void DatabaseSettingsModelValidator_WhenDefaultConnectionNotProvided_ShouldHaveValidationError()
+    public void Validate_WhenDefaultConnectionNotProvided_ShouldHaveValidationError()
     {
         // Arrange
         DatabaseSettingsDto model = _fixture.Build<DatabaseSettingsDto>()

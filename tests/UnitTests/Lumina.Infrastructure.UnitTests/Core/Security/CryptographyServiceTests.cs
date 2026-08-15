@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Infrastructure.Common.Models.DTO.Configuration;
 using Lumina.Infrastructure.Core.Security;
-using Lumina.Infrastructure.UnitTests.Core.Security.Fixtures;
+using Lumina.Infrastructure.Fixtures.Core.Security;
 using Microsoft.Extensions.Options;
 using System;
 using System.Diagnostics.CodeAnalysis;

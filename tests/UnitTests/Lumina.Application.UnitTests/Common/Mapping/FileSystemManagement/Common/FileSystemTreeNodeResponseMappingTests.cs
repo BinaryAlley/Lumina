@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.FileSystemManagement.Common;
-using Lumina.Application.UnitTests.Core.FileSystemManagement.Directories.Fixtures;
+using Lumina.Contracts.Fixtures.Core.Responses.FileSystemManagement.Common;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
@@ -16,15 +16,7 @@ namespace Lumina.Application.UnitTests.Common.Mapping.FileSystemManagement.Commo
 [ExcludeFromCodeCoverage]
 public class FileSystemTreeNodeResponseMappingTests
 {
-    private readonly FileSystemTreeNodeResponseFixture _fileSystemTreeNodeResponseFixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="FileSystemTreeNodeResponseMappingTests"/> class.
-    /// </summary>
-    public FileSystemTreeNodeResponseMappingTests()
-    {
-        _fileSystemTreeNodeResponseFixture = new();
-    }
+    private readonly FileSystemTreeNodeResponseFixture _fileSystemTreeNodeResponseFixture = new();
 
     [Fact]
     public void ToWindowsRootItem_WhenMappingFileSystemTreeNodeResponse_ShouldMapCorrectly()

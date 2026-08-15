@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.Responses.FileSystemManagement.Directories;
+using Lumina.Presentation.Api.Fixtures.Core.Endpoints.FileSystemManagement;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
-using Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.FileSystemManagement.Fixtures;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -123,7 +123,7 @@ public class GetDirectoriesEndpointTests : IClassFixture<AuthenticatedLuminaApiF
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithInvalidPath_ShouldReturnForbiddenResult()
+    public async Task GetDirectories_WhenCalledWithInvalidPath_ShouldReturnForbiddenResult()
     {
         // Arrange
         string invalidPath = "invalid:path";
@@ -145,11 +145,11 @@ public class GetDirectoriesEndpointTests : IClassFixture<AuthenticatedLuminaApiF
         Assert.Equal("UnauthorizedAccess", problemDetails["detail"].GetString());
         Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.4", problemDetails["type"].GetString());
         Assert.NotNull(problemDetails["traceId"].GetString());
-        Assert.NotEmpty(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithEmptyPath_ShouldReturnValidationProblemResult()
+    public async Task GetDirectories_WhenCalledWithEmptyPath_ShouldReturnValidationProblemResult()
     {
         // Arrange
         string emptyPath = "";
@@ -171,7 +171,7 @@ public class GetDirectoriesEndpointTests : IClassFixture<AuthenticatedLuminaApiF
         Assert.Equal("OneOrMoreValidationErrorsOccurred", problemDetails["detail"].GetString());
         Assert.Equal("https://tools.ietf.org/html/rfc4918#section-11.2", problemDetails["type"].GetString());
         Assert.NotNull(problemDetails["traceId"].GetString());
-        Assert.NotEmpty(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
 
         Dictionary<string, string[]>? errors = problemDetails["errors"].Deserialize<Dictionary<string, string[]>>(_jsonOptions);
         Assert.NotNull(errors);
@@ -180,7 +180,7 @@ public class GetDirectoriesEndpointTests : IClassFixture<AuthenticatedLuminaApiF
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithCancellationToken_ShouldCompleteSuccessfully()
+    public async Task GetDirectories_WhenCalledWithCancellationToken_ShouldCompleteSuccessfully()
     {
         // Arrange
         string testPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "testDirectory");
@@ -196,7 +196,7 @@ public class GetDirectoriesEndpointTests : IClassFixture<AuthenticatedLuminaApiF
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCancellationTokenIsCanceled_ShouldThrowTaskCanceledException()
+    public async Task GetDirectories_WhenCancellationTokenIsCanceled_ShouldThrowTaskCanceledException()
     {
         // Arrange
         string testPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "testDirectory");

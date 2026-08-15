@@ -2,9 +2,9 @@
 using EntityFrameworkCore.Testing.NSubstitute;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.Errors;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
 using Lumina.DataAccess.Core.Repositories.Authorization;
 using Lumina.DataAccess.Core.UoW;
-using Lumina.DataAccess.UnitTests.Core.Repositories.Authorization.Fixtures;
 using Lumina.Domain.Common.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -26,7 +26,7 @@ public class PermissionRepositoryTests
 {
     private readonly LuminaDbContext _mockContext;
     private readonly PermissionRepository _sut;
-    private readonly PermissionEntityFixture _permissionEntityFixture;
+    private readonly PermissionEntityFixture _permissionEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PermissionRepositoryTests"/> class.
@@ -35,14 +35,13 @@ public class PermissionRepositoryTests
     {
         _mockContext = Create.MockedDbContextFor<LuminaDbContext>();
         _sut = new PermissionRepository(_mockContext);
-        _permissionEntityFixture = new PermissionEntityFixture();
     }
 
     [Fact]
     public async Task InsertAsync_WhenPermissionDoesNotExist_ShouldAddPermissionToContextAndReturnCreated()
     {
         // Arrange
-        PermissionEntity permissionModel = _permissionEntityFixture.CreatePermissionModel();
+        PermissionEntity permissionModel = _permissionEntityFixture.Create();
 
         // Act
         Result<Created> result = await _sut.InsertAsync(permissionModel, CancellationToken.None);
@@ -61,7 +60,7 @@ public class PermissionRepositoryTests
     public async Task InsertAsync_WhenPermissionAlreadyExists_ShouldReturnError()
     {
         // Arrange
-        PermissionEntity permissionModel = _permissionEntityFixture.CreatePermissionModel();
+        PermissionEntity permissionModel = _permissionEntityFixture.Create();
 
         _mockContext.Permissions.Add(permissionModel);
         await _mockContext.SaveChangesAsync();
@@ -79,12 +78,7 @@ public class PermissionRepositoryTests
     public async Task GetAllAsync_WhenPermissionsExist_ShouldReturnAllPermissions()
     {
         // Arrange
-        List<PermissionEntity> permissions =
-        [
-            _permissionEntityFixture.CreatePermissionModel(),
-            _permissionEntityFixture.CreatePermissionModel(),
-            _permissionEntityFixture.CreatePermissionModel()
-        ];
+        List<PermissionEntity> permissions = _permissionEntityFixture.CreateMany(3);
         _mockContext.Permissions.AddRange(permissions);
         await _mockContext.SaveChangesAsync();
 
@@ -114,12 +108,7 @@ public class PermissionRepositoryTests
     public async Task GetByIdsAsync_WhenPermissionsExist_ShouldReturnMatchingPermissions()
     {
         // Arrange
-        List<PermissionEntity> permissions =
-        [
-            _permissionEntityFixture.CreatePermissionModel(),
-            _permissionEntityFixture.CreatePermissionModel(),
-            _permissionEntityFixture.CreatePermissionModel()
-        ];
+        List<PermissionEntity> permissions = _permissionEntityFixture.CreateMany(3);
         _mockContext.Permissions.AddRange(permissions);
         await _mockContext.SaveChangesAsync();
 

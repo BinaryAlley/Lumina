@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Core.UsersManagement.Authentication.Queries.LoginUser;
+using Lumina.Application.Fixtures.Core.UsersManagement.Authentication.Queries.LoginUser;
 using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Application.UnitTests.Core.UsersManagement.Authentication.Queries.LoginUser.Fixtures;
 using Lumina.Domain.Common.Primitives;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -16,21 +16,14 @@ namespace Lumina.Application.UnitTests.Core.UsersManagement.Authentication.Queri
 [ExcludeFromCodeCoverage]
 public class LoginUserQueryValidatorTests
 {
-    private readonly LoginUserQueryValidator _validator;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="LoginUserQueryValidatorTests"/> class.
-    /// </summary>
-    public LoginUserQueryValidatorTests()
-    {
-        _validator = new LoginUserQueryValidator();
-    }
+    private readonly LoginUserQueryValidator _validator = new();
+    private readonly LoginUserQueryFixture _loginUserQueryFixture = new();
 
     [Fact]
     public void Validate_WhenUsernameIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        LoginUserQuery query = LoginUserQueryFixture.CreateLoginQuery();
+        LoginUserQuery query = _loginUserQueryFixture.Create();
         query = query with { Username = null! };
 
         // Act
@@ -44,7 +37,7 @@ public class LoginUserQueryValidatorTests
     public void Validate_WhenUsernameIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        LoginUserQuery query = LoginUserQueryFixture.CreateLoginQuery();
+        LoginUserQuery query = _loginUserQueryFixture.Create();
         query = query with { Username = string.Empty };
 
         // Act
@@ -58,7 +51,7 @@ public class LoginUserQueryValidatorTests
     public void Validate_WhenUsernameIsWhiteSpace_ShouldHaveValidationError()
     {
         // Arrange
-        LoginUserQuery query = LoginUserQueryFixture.CreateLoginQuery();
+        LoginUserQuery query = _loginUserQueryFixture.Create();
         query = query with { Username = "   " };
 
         // Act
@@ -72,7 +65,7 @@ public class LoginUserQueryValidatorTests
     public void Validate_WhenPasswordIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        LoginUserQuery query = LoginUserQueryFixture.CreateLoginQuery();
+        LoginUserQuery query = _loginUserQueryFixture.Create();
         query = query with { Password = null! };
 
         // Act
@@ -86,7 +79,7 @@ public class LoginUserQueryValidatorTests
     public void Validate_WhenPasswordIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        LoginUserQuery query = LoginUserQueryFixture.CreateLoginQuery();
+        LoginUserQuery query = _loginUserQueryFixture.Create();
         query = query with { Password = string.Empty };
 
         // Act
@@ -100,7 +93,7 @@ public class LoginUserQueryValidatorTests
     public void Validate_WhenPasswordIsWhiteSpace_ShouldHaveValidationError()
     {
         // Arrange
-        LoginUserQuery query = LoginUserQueryFixture.CreateLoginQuery();
+        LoginUserQuery query = _loginUserQueryFixture.Create();
         query = query with { Password = "   " };
 
         // Act
@@ -120,7 +113,7 @@ public class LoginUserQueryValidatorTests
     public void Validate_WhenPasswordDoesNotMatchPattern_ShouldHaveValidationError(string password)
     {
         // Arrange
-        LoginUserQuery query = LoginUserQueryFixture.CreateLoginQuery();
+        LoginUserQuery query = _loginUserQueryFixture.Create();
         query = query with { Password = password };
 
         // Act
@@ -138,7 +131,7 @@ public class LoginUserQueryValidatorTests
     public void Validate_WhenPasswordMatchesPattern_ShouldNotHaveValidationError(string password)
     {
         // Arrange
-        LoginUserQuery query = LoginUserQueryFixture.CreateLoginQuery();
+        LoginUserQuery query = _loginUserQueryFixture.Create();
         query = query with { Password = password };
 
         // Act
@@ -158,7 +151,7 @@ public class LoginUserQueryValidatorTests
     public void Validate_WhenTotpCodeIsInvalid_ShouldHaveValidationError(string totpCode)
     {
         // Arrange
-        LoginUserQuery query = LoginUserQueryFixture.CreateLoginQuery();
+        LoginUserQuery query = _loginUserQueryFixture.Create();
         query = query with { TotpCode = totpCode };
 
         // Act
@@ -175,7 +168,7 @@ public class LoginUserQueryValidatorTests
     public void Validate_WhenTotpCodeIsValid_ShouldNotHaveValidationError(string totpCode)
     {
         // Arrange
-        LoginUserQuery query = LoginUserQueryFixture.CreateLoginQuery();
+        LoginUserQuery query = _loginUserQueryFixture.Create();
         query = query with { TotpCode = totpCode };
 
         // Act
@@ -189,7 +182,7 @@ public class LoginUserQueryValidatorTests
     public void Validate_WhenTotpCodeIsNull_ShouldNotHaveValidationError()
     {
         // Arrange
-        LoginUserQuery query = LoginUserQueryFixture.CreateLoginQuery();
+        LoginUserQuery query = _loginUserQueryFixture.Create();
         query = query with { TotpCode = null };
 
         // Act
@@ -203,7 +196,7 @@ public class LoginUserQueryValidatorTests
     public void Validate_WhenQueryIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        LoginUserQuery query = LoginUserQueryFixture.CreateLoginQuery(true);
+        LoginUserQuery query = _loginUserQueryFixture.Create(includeTotpCode: true);
 
         // Act
         List<Error> result = _validator.TestValidate(query);

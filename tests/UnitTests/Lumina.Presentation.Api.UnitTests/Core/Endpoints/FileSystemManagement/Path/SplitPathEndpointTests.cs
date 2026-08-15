@@ -1,11 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.FileSystemManagement.Paths.Commands.SplitPath;
+using Lumina.Contracts.Fixtures.Core.Requests.FileSystemManagement.Path;
+using Lumina.Contracts.Fixtures.Core.Responses.FileSystemManagement.Path;
 using Lumina.Contracts.Requests.FileSystemManagement.Path;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.SplitPath;
-using Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.Fixtures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -27,8 +28,8 @@ public class SplitPathEndpointTests
 {
     private readonly ICommandHandler<SplitPathCommand, Result<IEnumerable<PathSegmentResponse>>> _mockHandler;
     private readonly SplitPathEndpoint _sut;
-    private readonly PathSegmentResponseFixture _pathSegmentResponseFixture;
-    private readonly SplitPathRequestFixture _splitPathRequestFixture;
+    private readonly PathSegmentResponseFixture _pathSegmentResponseFixture = new();
+    private readonly SplitPathRequestFixture _splitPathRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SplitPathEndpointTests"/> class.
@@ -37,8 +38,6 @@ public class SplitPathEndpointTests
     {
         _mockHandler = Substitute.For<ICommandHandler<SplitPathCommand, Result<IEnumerable<PathSegmentResponse>>>>();
         _sut = FastEndpoints.Factory.Create<SplitPathEndpoint>(_mockHandler);
-        _pathSegmentResponseFixture = new PathSegmentResponseFixture();
-        _splitPathRequestFixture = new SplitPathRequestFixture();
     }
 
     [Fact]

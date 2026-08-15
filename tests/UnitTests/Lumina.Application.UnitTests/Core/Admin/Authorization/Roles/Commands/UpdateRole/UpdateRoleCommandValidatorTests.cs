@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Core.Admin.Authorization.Roles.Commands.UpdateRole;
+using Lumina.Application.Fixtures.Core.Admin.Authorization.Roles.Commands.UpdateRole;
 using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Application.UnitTests.Core.Admin.Authorization.Roles.Commands.UpdateRole.Fixtures;
 using Lumina.Domain.Common.Primitives;
 using System;
 using System.Collections.Generic;
@@ -17,23 +17,14 @@ namespace Lumina.Application.UnitTests.Core.Admin.Authorization.Roles.Commands.U
 [ExcludeFromCodeCoverage]
 public class UpdateRoleCommandValidatorTests
 {
-    private readonly UpdateRoleCommandValidator _validator;
-    private readonly UpdateRoleCommandFixture _fixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="UpdateRoleCommandValidatorTests"/> class.
-    /// </summary>
-    public UpdateRoleCommandValidatorTests()
-    {
-        _validator = new UpdateRoleCommandValidator();
-        _fixture = new UpdateRoleCommandFixture();
-    }
+    private readonly UpdateRoleCommandValidator _validator = new();
+    private readonly UpdateRoleCommandFixture _fixture = new();
 
     [Fact]
     public void Validate_WhenRoleIdIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateRoleCommand command = _fixture.CreateCommand();
+        UpdateRoleCommand command = _fixture.Create();
         command = command with { RoleId = Guid.Empty };
 
         // Act
@@ -47,7 +38,7 @@ public class UpdateRoleCommandValidatorTests
     public void Validate_WhenRoleNameIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateRoleCommand command = _fixture.CreateCommand();
+        UpdateRoleCommand command = _fixture.Create();
         command = command with { RoleName = null! };
 
         // Act
@@ -61,7 +52,7 @@ public class UpdateRoleCommandValidatorTests
     public void Validate_WhenRoleNameIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateRoleCommand command = _fixture.CreateCommand();
+        UpdateRoleCommand command = _fixture.Create();
         command = command with { RoleName = string.Empty };
 
         // Act
@@ -75,7 +66,7 @@ public class UpdateRoleCommandValidatorTests
     public void Validate_WhenRoleNameIsWhitespace_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateRoleCommand command = _fixture.CreateCommand();
+        UpdateRoleCommand command = _fixture.Create();
         command = command with { RoleName = " " };
 
         // Act
@@ -89,7 +80,7 @@ public class UpdateRoleCommandValidatorTests
     public void Validate_WhenPermissionsIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateRoleCommand command = _fixture.CreateCommand();
+        UpdateRoleCommand command = _fixture.Create();
         command = command with { Permissions = null! };
 
         // Act
@@ -103,7 +94,7 @@ public class UpdateRoleCommandValidatorTests
     public void Validate_WhenPermissionsIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateRoleCommand command = _fixture.CreateCommand();
+        UpdateRoleCommand command = _fixture.Create();
         command = command with { Permissions = [] };
 
         // Act
@@ -117,7 +108,7 @@ public class UpdateRoleCommandValidatorTests
     public void Validate_WhenPermissionContainsEmptyGuid_ShouldHaveValidationError()
     {
         // Arrange
-        UpdateRoleCommand command = _fixture.CreateCommand();
+        UpdateRoleCommand command = _fixture.Create();
         command = command with { Permissions = [Guid.Empty, Guid.NewGuid()] };
 
         // Act
@@ -131,7 +122,7 @@ public class UpdateRoleCommandValidatorTests
     public void Validate_WhenCommandIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        UpdateRoleCommand command = _fixture.CreateCommand();
+        UpdateRoleCommand command = _fixture.Create();
 
         // Act
         List<Error> result = _validator.TestValidate(command);
