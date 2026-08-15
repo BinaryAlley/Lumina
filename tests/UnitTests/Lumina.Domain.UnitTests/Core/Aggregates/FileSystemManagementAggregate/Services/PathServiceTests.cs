@@ -5,7 +5,7 @@ using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.File
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Path;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Platform;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
-using Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.ValueObjects.Fixtures;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using NSubstitute;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -47,7 +47,7 @@ public class PathServiceTests
     {
         // Arrange
         string validPath = @"C:\ValidPath";
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(validPath);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(validPath);
         _mockPathStrategy.IsValidPath(pathId).Returns(true);
 
         // Act
@@ -63,7 +63,7 @@ public class PathServiceTests
     {
         // Arrange
         string invalidPath = @"C:\Invalid\*Path";
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(invalidPath);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(invalidPath);
         _mockPathStrategy.IsValidPath(pathId).Returns(false);
 
         // Act
@@ -107,7 +107,7 @@ public class PathServiceTests
     {
         // Arrange
         string existingPath = @"C:\ExistingPath";
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(existingPath);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(existingPath);
         _mockPathStrategy.Exists(pathId).Returns(true);
 
         // Act
@@ -123,7 +123,7 @@ public class PathServiceTests
     {
         // Arrange
         string existingPath = @"C:\ExistingPath";
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(existingPath);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(existingPath);
         _mockPathStrategy.Exists(pathId, true).Returns(true);
 
         // Act
@@ -139,7 +139,7 @@ public class PathServiceTests
     {
         // Arrange
         string existingPath = @"C:\ExistingPath";
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(existingPath);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(existingPath);
         _mockPathStrategy.Exists(pathId, false).Returns(false);
 
         // Act
@@ -155,7 +155,7 @@ public class PathServiceTests
     {
         // Arrange
         string nonExistingPath = @"C:\NonExistingPath";
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(nonExistingPath);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(nonExistingPath);
         _mockPathStrategy.Exists(pathId).Returns(false);
 
         // Act
@@ -200,8 +200,8 @@ public class PathServiceTests
         // Arrange
         string path = @"C:\BaseDir";
         string name = "SubDir";
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(path);
-        FileSystemPathId combinedPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\BaseDir\SubDir");
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path);
+        FileSystemPathId combinedPathId = _fileSystemPathIdFixture.Create(@"C:\BaseDir\SubDir");
         _mockPathStrategy.CombinePath(pathId, name).Returns(Result.From(combinedPathId));
 
         // Act
@@ -235,7 +235,7 @@ public class PathServiceTests
         // Arrange
         string path = @"C:\BaseDir";
         string name = "Invalid*Name";
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(path);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path);
         _mockPathStrategy.CombinePath(pathId, name).Returns(Errors.FileSystemManagement.InvalidPath);
 
         // Act
@@ -268,7 +268,7 @@ public class PathServiceTests
     {
         // Arrange
         string validPath = @"C:\ValidPath\SubDir";
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(validPath);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(validPath);
         List<PathSegment> expectedSegments = _pathSegmentFixture.CreateMany();
         _mockPathStrategy.ParsePath(pathId).Returns(Result.From(expectedSegments.AsEnumerable()));
 
@@ -301,7 +301,7 @@ public class PathServiceTests
     {
         // Arrange
         string path = @"C:\InvalidPath\*SubDir";
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(path);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path);
         _mockPathStrategy.ParsePath(pathId).Returns(Errors.FileSystemManagement.InvalidPath);
 
         // Act
@@ -333,7 +333,7 @@ public class PathServiceTests
     {
         // Arrange
         string validPath = @"C:\ValidPath\SubDir";
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(validPath);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(validPath);
         List<PathSegment> expectedSegments = _pathSegmentFixture.CreateMany(2); // Assuming parent path has 2 segments
         _mockPathStrategy.GoUpOneLevel(pathId).Returns(Result.From(expectedSegments.AsEnumerable()));
 
@@ -351,7 +351,7 @@ public class PathServiceTests
     {
         // Arrange
         string rootPath = @"C:\";
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(rootPath);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(rootPath);
         List<PathSegment> emptySegmentList = [];
         _mockPathStrategy.GoUpOneLevel(pathId).Returns(Result.From(emptySegmentList.AsEnumerable()));
 
@@ -384,7 +384,7 @@ public class PathServiceTests
     {
         // Arrange
         string path = @"C:\InvalidPath\*SubDir";
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(path);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path);
         _mockPathStrategy.GoUpOneLevel(pathId).Returns(Errors.FileSystemManagement.InvalidPath);
 
         // Act
@@ -463,8 +463,8 @@ public class PathServiceTests
     {
         // Arrange
         string validPath = @"C:\ValidPath\SubDir";
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(validPath);
-        PathSegment expectedRootSegment = _pathSegmentFixture.CreatePathSegment(name: "C:", isDirectory: false, isDrive: true);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(validPath);
+        PathSegment expectedRootSegment = _pathSegmentFixture.Create(name: "C:", isDirectory: false, isDrive: true);
         _mockPathStrategy.GetPathRoot(pathId).Returns(Result.From(expectedRootSegment));
 
         // Act
@@ -496,7 +496,7 @@ public class PathServiceTests
     {
         // Arrange
         string path = @"C:\InvalidPath\*SubDir";
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(path);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path);
         _mockPathStrategy.GetPathRoot(pathId).Returns(Errors.FileSystemManagement.InvalidPath);
 
         // Act

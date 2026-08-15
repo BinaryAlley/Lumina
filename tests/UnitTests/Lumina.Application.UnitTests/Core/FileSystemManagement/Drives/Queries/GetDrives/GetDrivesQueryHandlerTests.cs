@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using AutoFixture;
-using AutoFixture.AutoNSubstitute;
 using Lumina.Application.Core.FileSystemManagement.Drives.Queries.GetDrives;
+using Lumina.Application.Fixtures.Core.FileSystemManagement.Drives.Queries.GetDrives;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
@@ -24,17 +23,17 @@ namespace Lumina.Application.UnitTests.Core.FileSystemManagement.Drives.Queries.
 [ExcludeFromCodeCoverage]
 public class GetDrivesQueryHandlerTests
 {
-    private readonly IFixture _fixture;
     private readonly IDriveService _mockDriveService;
     private readonly GetDrivesQueryHandler _sut;
+    private readonly GetDrivesQueryFixture _getDrivesQueryFixture;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetDrivesQueryHandlerTests"/> class.
     /// </summary>
     public GetDrivesQueryHandlerTests()
     {
-        _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
         _mockDriveService = Substitute.For<IDriveService>();
+        _getDrivesQueryFixture = new GetDrivesQueryFixture();
         _sut = new GetDrivesQueryHandler(_mockDriveService);
     }
 
@@ -42,7 +41,7 @@ public class GetDrivesQueryHandlerTests
     public async Task HandleAsync_WhenCalled_ShouldReturnSuccessResult()
     {
         // Arrange
-        GetDrivesQuery getDrivesQuery = _fixture.Create<GetDrivesQuery>();
+        GetDrivesQuery getDrivesQuery = _getDrivesQueryFixture.Create();
 
         IEnumerable<FileSystemItem> drives =
         [
@@ -84,7 +83,7 @@ public class GetDrivesQueryHandlerTests
     public async Task HandleAsync_WhenDriveServiceReturnsError_ShouldReturnFailureResult()
     {
         // Arrange
-        GetDrivesQuery query = _fixture.Create<GetDrivesQuery>();
+        GetDrivesQuery query = _getDrivesQueryFixture.Create();
         Error error = Error.Failure("DriveService.Error", "An error occurred");
         _mockDriveService.GetDrives()
             .Returns(error);
@@ -102,7 +101,7 @@ public class GetDrivesQueryHandlerTests
     public async Task HandleAsync_WhenDriveServiceReturnsEmptyList_ShouldReturnEmptySuccessResult()
     {
         // Arrange
-        GetDrivesQuery query = _fixture.Create<GetDrivesQuery>();
+        GetDrivesQuery query = _getDrivesQueryFixture.Create();
         Result<IEnumerable<FileSystemItem>> emptyList = Result.From(Enumerable.Empty<FileSystemItem>());
         _mockDriveService.GetDrives()
             .Returns(emptyList);

@@ -3,12 +3,12 @@ using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.FileSystemManagement.Files.Queries.GetTreeFiles;
-using Lumina.Application.UnitTests.Core.FileSystemManagement.Files.Fixtures;
-using Lumina.Application.UnitTests.Core.FileSystemManagement.Files.Queries.GetTreeFiles.Fixtures;
+using Lumina.Application.Fixtures.Core.FileSystemManagement.Files.Queries.GetTreeFiles;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using NSubstitute;
 using System.Collections.Generic;
@@ -30,6 +30,7 @@ public class GetTreeFilesQueryHandlerTests
     private readonly IFileService _mockFileService;
     private readonly GetTreeFilesQueryHandler _sut;
     private readonly FileFixture _fileFixture;
+    private readonly GetTreeFilesQueryFixture _getTreeFilesQueryFixture;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetTreeFilesQueryHandler"/> class.
@@ -43,13 +44,14 @@ public class GetTreeFilesQueryHandlerTests
             .Returns([]);
         _sut = new GetTreeFilesQueryHandler(_mockFileService, mockValidator);
         _fileFixture = new FileFixture();
+        _getTreeFilesQueryFixture = new GetTreeFilesQueryFixture();
     }
 
     [Fact]
     public async Task HandleAsync_WhenCalledWithValidQueryWithoutHiddenFiles_ShouldReturnSuccessResult()
     {
         // Arrange
-        GetTreeFilesQuery getFilesQuery = GetTreeFilesQueryFixture.CreateGetFilesQuery(false);
+        GetTreeFilesQuery getFilesQuery = _getTreeFilesQueryFixture.Create(includeHiddenElements: false);
 
         IEnumerable<File> files = _fileFixture.CreateMany();
 
@@ -84,7 +86,7 @@ public class GetTreeFilesQueryHandlerTests
     public async Task HandleAsync_WhenCalledWithValidQueryWithHiddenFiles_ShouldReturnSuccessResult()
     {
         // Arrange
-        GetTreeFilesQuery getFilesQuery = GetTreeFilesQueryFixture.CreateGetFilesQuery(true);
+        GetTreeFilesQuery getFilesQuery = _getTreeFilesQueryFixture.Create(includeHiddenElements: true);
 
         IEnumerable<File> files = _fileFixture.CreateMany();
 
@@ -119,7 +121,7 @@ public class GetTreeFilesQueryHandlerTests
     public async Task HandleAsync_WhenFileServiceReturnsError_ShouldReturnFailureResult()
     {
         // Arrange
-        GetTreeFilesQuery query = _fixture.Create<GetTreeFilesQuery>();
+        GetTreeFilesQuery query = _getTreeFilesQueryFixture.Create();
         Error error = Error.Failure("FileService.Error", "An error occurred");
         _mockFileService.GetFiles(query.Path!, query.IncludeHiddenElements)
             .Returns(error);
@@ -137,7 +139,7 @@ public class GetTreeFilesQueryHandlerTests
     public async Task HandleAsync_WhenFileServiceReturnsEmptyList_ShouldReturnEmptySuccessResult()
     {
         // Arrange
-        GetTreeFilesQuery query = _fixture.Create<GetTreeFilesQuery>();
+        GetTreeFilesQuery query = _getTreeFilesQueryFixture.Create();
         Result<IEnumerable<File>> emptyList = Result.From(Enumerable.Empty<File>());
         _mockFileService.GetFiles(query.Path!, query.IncludeHiddenElements)
             .Returns(emptyList);

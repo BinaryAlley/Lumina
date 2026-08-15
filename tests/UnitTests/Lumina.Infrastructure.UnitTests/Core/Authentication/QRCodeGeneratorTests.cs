@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Infrastructure.Core.Authentication;
-using Lumina.Infrastructure.UnitTests.Core.Authentication.Fixtures;
+using Lumina.Infrastructure.Fixtures.Core.Authentication;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion

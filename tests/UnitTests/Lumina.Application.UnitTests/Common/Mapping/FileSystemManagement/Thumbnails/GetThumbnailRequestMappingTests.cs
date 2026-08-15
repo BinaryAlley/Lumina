@@ -1,8 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using AutoFixture;
-using AutoFixture.AutoNSubstitute;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Thumbnails;
 using Lumina.Application.Core.FileSystemManagement.Thumbnails.Queries.GetThumbnail;
+using Lumina.Contracts.Fixtures.Core.Requests.FileSystemManagement.Thumbnails;
 using Lumina.Contracts.Requests.FileSystemManagement.Thumbnails;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -17,21 +16,20 @@ namespace Lumina.Application.UnitTests.Common.Mapping.FileSystemManagement.Thumb
 [ExcludeFromCodeCoverage]
 public class GetThumbnailRequestMappingTests
 {
-    private readonly IFixture _fixture;
+    private readonly GetThumbnailRequestFixture _getThumbnailRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetThumbnailRequestMappingTests"/> class.
     /// </summary>
     public GetThumbnailRequestMappingTests()
     {
-        _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
     }
 
     [Fact]
     public void ToQuery_WhenMappingGetThumbnailRequest_ShouldMapCorrectly()
     {
         // Arrange
-        GetThumbnailRequest request = _fixture.Create<GetThumbnailRequest>();
+        GetThumbnailRequest request = _getThumbnailRequestFixture.Create();
 
         // Act
         GetThumbnailQuery result = request.ToQuery();
@@ -64,10 +62,10 @@ public class GetThumbnailRequestMappingTests
     public void ToQuery_WhenMappingMultipleRequests_ShouldMapAllCorrectly()
     {
         // Arrange
-        List<GetThumbnailRequest> requests = _fixture.CreateMany<GetThumbnailRequest>().ToList();
+        List<GetThumbnailRequest> requests = _getThumbnailRequestFixture.CreateMany();
 
         // Act
-        List<GetThumbnailQuery> results = requests.Select(r => r.ToQuery()).ToList();
+        List<GetThumbnailQuery> results = [.. requests.Select(r => r.ToQuery())];
 
         // Assert
         Assert.NotNull(results);

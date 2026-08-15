@@ -1,8 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using AutoFixture;
-using AutoFixture.AutoNSubstitute;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Paths;
 using Lumina.Application.Core.FileSystemManagement.Paths.Commands.CombinePath;
+using Lumina.Contracts.Fixtures.Core.Requests.FileSystemManagement.Path;
 using Lumina.Contracts.Requests.FileSystemManagement.Path;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -17,21 +16,20 @@ namespace Lumina.Application.UnitTests.Common.Mapping.FileSystemManagement.Paths
 [ExcludeFromCodeCoverage]
 public class CombinePathRequestMappingTests
 {
-    private readonly IFixture _fixture;
+    private readonly CombinePathRequestFixture _combinePathRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CombinePathRequestMappingTests"/> class.
     /// </summary>
     public CombinePathRequestMappingTests()
     {
-        _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
     }
 
     [Fact]
     public void ToCommand_WhenMappingCombinePathRequest_ShouldMapCorrectly()
     {
         // Arrange
-        CombinePathRequest request = _fixture.Create<CombinePathRequest>();
+        CombinePathRequest request = _combinePathRequestFixture.Create();
 
         // Act
         CombinePathCommand result = request.ToCommand();
@@ -64,10 +62,10 @@ public class CombinePathRequestMappingTests
     public void ToCommand_WhenMappingMultipleRequests_ShouldMapAllCorrectly()
     {
         // Arrange
-        List<CombinePathRequest> requests = _fixture.CreateMany<CombinePathRequest>().ToList();
+        List<CombinePathRequest> requests = _combinePathRequestFixture.CreateMany();
 
         // Act
-        List<CombinePathCommand> results = requests.Select(r => r.ToCommand()).ToList();
+        List<CombinePathCommand> results = [.. requests.Select(r => r.ToCommand())];
 
         // Assert
         Assert.NotNull(results);

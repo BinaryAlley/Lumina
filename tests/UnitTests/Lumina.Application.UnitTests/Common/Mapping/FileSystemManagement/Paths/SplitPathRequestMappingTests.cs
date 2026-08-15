@@ -1,8 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using AutoFixture;
-using AutoFixture.AutoNSubstitute;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Paths;
 using Lumina.Application.Core.FileSystemManagement.Paths.Commands.SplitPath;
+using Lumina.Contracts.Fixtures.Core.Requests.FileSystemManagement.Path;
 using Lumina.Contracts.Requests.FileSystemManagement.Path;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -17,21 +16,20 @@ namespace Lumina.Application.UnitTests.Common.Mapping.FileSystemManagement.Paths
 [ExcludeFromCodeCoverage]
 public class SplitPathRequestMappingTests
 {
-    private readonly IFixture _fixture;
+    private readonly SplitPathRequestFixture _splitPathRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SplitPathRequestMappingTests"/> class.
     /// </summary>
     public SplitPathRequestMappingTests()
     {
-        _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
     }
 
     [Fact]
     public void ToCommand_WhenMappingSplitPathRequest_ShouldMapCorrectly()
     {
         // Arrange
-        SplitPathRequest request = _fixture.Create<SplitPathRequest>();
+        SplitPathRequest request = _splitPathRequestFixture.Create();
 
         // Act
         SplitPathCommand result = request.ToCommand();
@@ -63,10 +61,10 @@ public class SplitPathRequestMappingTests
     public void ToCommand_WhenMappingMultipleRequests_ShouldMapAllCorrectly()
     {
         // Arrange
-        List<SplitPathRequest> requests = _fixture.CreateMany<SplitPathRequest>().ToList();
+        List<SplitPathRequest> requests = _splitPathRequestFixture.CreateMany();
 
         // Act
-        List<SplitPathCommand> results = requests.Select(r => r.ToCommand()).ToList();
+        List<SplitPathCommand> results = [.. requests.Select(r => r.ToCommand())];
 
         // Assert
         Assert.NotNull(results);

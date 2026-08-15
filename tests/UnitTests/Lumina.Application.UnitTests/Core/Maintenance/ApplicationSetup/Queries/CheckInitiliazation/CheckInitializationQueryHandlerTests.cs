@@ -3,7 +3,7 @@ using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Core.Maintenance.ApplicationSetup.Queries.CheckInitialization;
-using Lumina.Application.UnitTests.Common.Mapping.UserManagement.Users.Fixtures;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Contracts.Responses.UsersManagement;
 using Lumina.Domain.Common.Primitives;
 using NSubstitute;
@@ -25,6 +25,7 @@ public class CheckInitializationQueryHandlerTests
     private readonly IUnitOfWork _mockUnitOfWork;
     private readonly IUserRepository _mockUserRepository;
     private readonly CheckInitializationQueryHandler _sut;
+    private readonly UserEntityFixture _userEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CheckInitializationQueryHandlerTests"/> class.
@@ -43,7 +44,7 @@ public class CheckInitializationQueryHandlerTests
     public async Task HandleAsync_WhenUsersExist_ShouldReturnInitialized()
     {
         // Arrange
-        List<UserEntity> users = UserEntityFixture.CreateMany();
+        List<UserEntity> users = _userEntityFixture.CreateMany();
         _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
             .Returns(Result.From(users.AsEnumerable()));
 

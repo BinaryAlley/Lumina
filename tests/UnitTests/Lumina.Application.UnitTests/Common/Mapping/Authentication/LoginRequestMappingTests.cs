@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.Authentication;
 using Lumina.Application.Core.UsersManagement.Authentication.Queries.LoginUser;
-using Lumina.Application.UnitTests.Core.UsersManagement.Authentication.Queries.LoginUser.Fixtures;
+using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
 using Lumina.Contracts.Requests.Authentication;
 using System.Diagnostics.CodeAnalysis;
 #endregion
@@ -28,7 +28,7 @@ public class LoginRequestMappingTests
     public void ToQuery_WhenMappingRequest_ShouldMapCorrectly()
     {
         // Arrange
-        LoginRequest request = _fixture.CreateLoginRequest();
+        LoginRequest request = _fixture.Create();
 
         // Act
         LoginUserQuery result = request.ToQuery();

@@ -9,7 +9,7 @@ using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using Lumina.Infrastructure.Core.Authorization;
 using Lumina.Infrastructure.Core.Authorization.Policies.Common.Factory;
-using Lumina.Infrastructure.UnitTests.Core.Authorization.Fixtures;
+using Lumina.Infrastructure.Fixtures.Core.Authorization;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using System;

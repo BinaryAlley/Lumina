@@ -5,8 +5,8 @@ using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
-using Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.ValueObjects.Fixtures;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using System;
@@ -57,7 +57,7 @@ public class FileProviderServiceTests
     public void GetFilePaths_WhenUserHasNoAccess_ShouldReturnUnauthorizedAccessError()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId();
+        FileSystemPathId path = _fileSystemPathIdFixture.Create();
         _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ListDirectory).Returns(false);
 
         // Act
@@ -72,8 +72,8 @@ public class FileProviderServiceTests
     public void GetFilePaths_WhenUserHasAccess_ShouldReturnFiles()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId();
-        string[] files = _fixture.CreateMany<string>(3).ToArray();
+        FileSystemPathId path = _fileSystemPathIdFixture.Create();
+        string[] files = [.. _fixture.CreateMany<string>(3)];
         _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ListDirectory).Returns(true);
         _mockFileSystem.Directory.GetFiles(path.Path).Returns(files);
 
@@ -93,7 +93,7 @@ public class FileProviderServiceTests
     public void GetFilePaths_WhenIncludeHiddenElementsIsFalse_ShouldExcludeHiddenFiles()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId();
+        FileSystemPathId path = _fileSystemPathIdFixture.Create();
         string[] files = [_pathVisible1, _pathHidden1];
         _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ListDirectory).Returns(true);
         _mockFileSystem.Directory.GetFiles(path.Path).Returns(files);
@@ -113,7 +113,7 @@ public class FileProviderServiceTests
     public void GetFilePaths_WhenIncludeHiddenElementsIsTrue_ShouldIncludeHiddenFiles()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId();
+        FileSystemPathId path = _fileSystemPathIdFixture.Create();
         string[] files = [_pathVisible1, _pathHidden1];
         _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ListDirectory).Returns(true);
         _mockFileSystem.Directory.GetFiles(path.Path).Returns(files);
@@ -136,7 +136,7 @@ public class FileProviderServiceTests
     public void GetFilePaths_WhenGetAttributesThrowsException_ShouldStillAddFile()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId();
+        FileSystemPathId path = _fileSystemPathIdFixture.Create();
         string[] files = [_pathValid1, _pathInvalid1];
         _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ListDirectory).Returns(true);
         _mockFileSystem.Directory.GetFiles(path.Path).Returns(files);
@@ -156,7 +156,7 @@ public class FileProviderServiceTests
     public void GetFilePaths_WhenCalled_ShouldOrderFilesAlphabetically()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId();
+        FileSystemPathId path = _fileSystemPathIdFixture.Create();
         string[] files = s_isUnix
             ? ["/C.txt", "/A.txt", "/B.txt"]
             : [@"C:\C.txt", @"C:\A.txt", @"C:\B.txt"];
@@ -179,7 +179,7 @@ public class FileProviderServiceTests
     public void GetFilePaths_WhenDirectoryHasNoFiles_ShouldReturnEmptyList()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId();
+        FileSystemPathId path = _fileSystemPathIdFixture.Create();
         _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ListDirectory).Returns(true);
         _mockFileSystem.Directory.GetFiles(path.Path).Returns([]);
 
@@ -195,7 +195,7 @@ public class FileProviderServiceTests
     public void FileExists_WhenFileExists_ShouldReturnTrue()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId();
+        FileSystemPathId path = _fileSystemPathIdFixture.Create();
         _mockFileSystem.File.Exists(path.Path).Returns(true);
 
         // Act
@@ -210,7 +210,7 @@ public class FileProviderServiceTests
     public void FileExists_WhenFileDoesNotExist_ShouldReturnFalse()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId();
+        FileSystemPathId path = _fileSystemPathIdFixture.Create();
         _mockFileSystem.File.Exists(path.Path).Returns(false);
 
         // Act
@@ -225,7 +225,7 @@ public class FileProviderServiceTests
     public void GetFileName_WhenPathIsValid_ShouldReturnFileName()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId();
+        FileSystemPathId path = _fileSystemPathIdFixture.Create();
         string expectedFileName = "testfile.txt";
         _mockFileSystem.Path.GetFileName(path.Path).Returns(expectedFileName);
 
@@ -241,7 +241,7 @@ public class FileProviderServiceTests
     public void GetFileName_WhenPathIsEmpty_ShouldReturnEmptyString()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId();
+        FileSystemPathId path = _fileSystemPathIdFixture.Create();
         _mockFileSystem.Path.GetFileName(path.Path).Returns(string.Empty);
 
         // Act
@@ -286,7 +286,7 @@ public class FileProviderServiceTests
     public void GetFileAsync_WhenUserHasNoAccess_ShouldReturnUnauthorizedAccessError()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId();
+        FileSystemPathId path = _fileSystemPathIdFixture.Create();
         _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadContents).Returns(false);
 
         // Act
@@ -353,7 +353,7 @@ public class FileProviderServiceTests
     public void GetLastWriteTime_WhenUserHasNoAccess_ShouldReturnUnauthorizedAccessError()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId();
+        FileSystemPathId path = _fileSystemPathIdFixture.Create();
         _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties).Returns(false);
 
         // Act
@@ -396,7 +396,7 @@ public class FileProviderServiceTests
     public void GetCreationTime_WhenUserHasNoAccess_ShouldReturnUnauthorizedAccessError()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId();
+        FileSystemPathId path = _fileSystemPathIdFixture.Create();
         _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties).Returns(false);
 
         // Act
@@ -440,7 +440,7 @@ public class FileProviderServiceTests
     public void GetSize_WhenUserHasNoAccess_ShouldReturnUnauthorizedAccessError()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId();
+        FileSystemPathId path = _fileSystemPathIdFixture.Create();
         _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties).Returns(false);
 
         // Act
@@ -473,8 +473,8 @@ public class FileProviderServiceTests
     public void CopyFile_WhenSourceFileExistsAndUserHasAccess_ShouldCopyFileAndReturnPath()
     {
         // Arrange
-        FileSystemPathId sourcePath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSourceFile);
-        FileSystemPathId destinationPath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestination);
+        FileSystemPathId sourcePath = _fileSystemPathIdFixture.Create(_pathSourceFile);
+        FileSystemPathId destinationPath = _fileSystemPathIdFixture.Create(_pathDestination);
         bool overrideExisting = false;
 
         _mockFileSystem.File.Exists(sourcePath.Path).Returns(true);
@@ -496,8 +496,8 @@ public class FileProviderServiceTests
     public void CopyFile_WhenSourceFileDoesNotExist_ShouldReturnError()
     {
         // Arrange
-        FileSystemPathId sourcePath = _fileSystemPathIdFixture.CreateFileSystemPathId();
-        FileSystemPathId destinationPath = _fileSystemPathIdFixture.CreateFileSystemPathId();
+        FileSystemPathId sourcePath = _fileSystemPathIdFixture.Create();
+        FileSystemPathId destinationPath = _fileSystemPathIdFixture.Create();
         bool overrideExisting = false;
 
         _mockFileSystem.File.Exists(sourcePath.Path).Returns(false);
@@ -514,8 +514,8 @@ public class FileProviderServiceTests
     public void CopyFile_WhenDestinationFileExistsAndOverrideIsFalse_ShouldReturnFileAlreadyExistsError()
     {
         // Arrange
-        FileSystemPathId sourcePath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSourceFile);
-        FileSystemPathId destinationPath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestination);
+        FileSystemPathId sourcePath = _fileSystemPathIdFixture.Create(_pathSourceFile);
+        FileSystemPathId destinationPath = _fileSystemPathIdFixture.Create(_pathDestination);
         string expectedDestinationFilePath = _pathDestinationFile;
         bool overrideExisting = false;
 
@@ -541,8 +541,8 @@ public class FileProviderServiceTests
     public void CopyFile_WhenOverrideExistingIsTrue_ShouldOverwriteExistingFile()
     {
         // Arrange
-        FileSystemPathId sourcePath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSourceFile);
-        FileSystemPathId destinationPath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestination);
+        FileSystemPathId sourcePath = _fileSystemPathIdFixture.Create(_pathSourceFile);
+        FileSystemPathId destinationPath = _fileSystemPathIdFixture.Create(_pathDestination);
         bool overrideExisting = true;
 
         _mockFileSystem.File.Exists(sourcePath.Path).Returns(true);
@@ -564,8 +564,8 @@ public class FileProviderServiceTests
     public void CopyFile_WhenExceptionOccurs_ShouldReturnError()
     {
         // Arrange
-        FileSystemPathId sourcePath = _fileSystemPathIdFixture.CreateFileSystemPathId();
-        FileSystemPathId destinationPath = _fileSystemPathIdFixture.CreateFileSystemPathId();
+        FileSystemPathId sourcePath = _fileSystemPathIdFixture.Create();
+        FileSystemPathId destinationPath = _fileSystemPathIdFixture.Create();
         bool overrideExisting = false;
 
         _mockFileSystem.File.Exists(sourcePath.Path).Returns(true);
@@ -585,8 +585,8 @@ public class FileProviderServiceTests
     {
         // Arrange
         string sourceDirectory = _pathSource;
-        FileSystemPathId sourcePath = _fileSystemPathIdFixture.CreateFileSystemPathId(Path.Combine(sourceDirectory, "file.txt"));
-        FileSystemPathId destinationPath = _fileSystemPathIdFixture.CreateFileSystemPathId(sourceDirectory);
+        FileSystemPathId sourcePath = _fileSystemPathIdFixture.Create(Path.Combine(sourceDirectory, "file.txt"));
+        FileSystemPathId destinationPath = _fileSystemPathIdFixture.Create(sourceDirectory);
         string expectedNewFilePath = Path.Combine(sourceDirectory, "file - Copy (1).txt");
         bool overrideExisting = false;
 
@@ -627,10 +627,10 @@ public class FileProviderServiceTests
     public void MoveFile_WhenSourceFileDoesNotExist_ShouldReturnFileNotFoundError()
     {
         // Arrange
-        FileSystemPathId sourcePath = _fileSystemPathIdFixture.CreateFileSystemPathId(
+        FileSystemPathId sourcePath = _fileSystemPathIdFixture.Create(
             s_isUnix ? "/NonExistentSource.txt" : @"C:\NonExistentSource.txt"
         );
-        FileSystemPathId destinationPath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestination);
+        FileSystemPathId destinationPath = _fileSystemPathIdFixture.Create(_pathDestination);
         bool overrideExisting = false;
 
         _mockFileSystem.File.Exists(sourcePath.Path).Returns(false);
@@ -647,8 +647,8 @@ public class FileProviderServiceTests
     public void MoveFile_WhenDestinationFileDoesNotExist_ShouldPerformSimpleMove()
     {
         // Arrange
-        FileSystemPathId sourcePath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSourceFile);
-        FileSystemPathId destinationPath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestination);
+        FileSystemPathId sourcePath = _fileSystemPathIdFixture.Create(_pathSourceFile);
+        FileSystemPathId destinationPath = _fileSystemPathIdFixture.Create(_pathDestination);
         string destinationFilePath = _pathDestinationFile;
         bool overrideExisting = false;
 
@@ -670,8 +670,8 @@ public class FileProviderServiceTests
     public void MoveFile_WhenDestinationFileExistsAndOverrideIsTrue_ShouldOverwriteFile()
     {
         // Arrange
-        FileSystemPathId sourcePath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSourceFile);
-        FileSystemPathId destinationPath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestination);
+        FileSystemPathId sourcePath = _fileSystemPathIdFixture.Create(_pathSourceFile);
+        FileSystemPathId destinationPath = _fileSystemPathIdFixture.Create(_pathDestination);
         string destinationFilePath = _pathDestinationFile;
         bool overrideExisting = true;
 
@@ -693,8 +693,8 @@ public class FileProviderServiceTests
     public void MoveFile_WhenDestinationFileExistsAndOverrideIsFalse_ShouldReturnFileAlreadyExistsError()
     {
         // Arrange
-        FileSystemPathId sourcePath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSourceFile);
-        FileSystemPathId destinationPath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestination);
+        FileSystemPathId sourcePath = _fileSystemPathIdFixture.Create(_pathSourceFile);
+        FileSystemPathId destinationPath = _fileSystemPathIdFixture.Create(_pathDestination);
         string destinationFilePath = _pathDestinationFile;
         bool overrideExisting = false;
 
@@ -715,8 +715,8 @@ public class FileProviderServiceTests
     public void MoveFile_WhenExceptionOccurs_ShouldReturnFileMoveError()
     {
         // Arrange
-        FileSystemPathId sourcePath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSourceFile);
-        FileSystemPathId destinationPath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestination);
+        FileSystemPathId sourcePath = _fileSystemPathIdFixture.Create(_pathSourceFile);
+        FileSystemPathId destinationPath = _fileSystemPathIdFixture.Create(_pathDestination);
         string destinationFilePath = _pathDestinationFile;
         bool overrideExisting = false;
 
@@ -739,7 +739,7 @@ public class FileProviderServiceTests
     public void RenameFile_WhenParentDirectoryIsWritable_ShouldRenameSuccessfully()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId(
+        FileSystemPathId path = _fileSystemPathIdFixture.Create(
             s_isUnix ? "/OldName.txt" : @"C:\OldName.txt"
         );
         string newName = "NewName.txt";
@@ -766,7 +766,7 @@ public class FileProviderServiceTests
     public void RenameFile_WhenParentDirectoryIsNotWritable_ShouldReturnUnauthorizedAccessError()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId(
+        FileSystemPathId path = _fileSystemPathIdFixture.Create(
             s_isUnix ? "/OldName.txt" : @"C:\OldName.txt"
         );
         string newName = "NewName.txt";
@@ -792,7 +792,7 @@ public class FileProviderServiceTests
     public void RenameFile_WhenFileIsNotExecutable_ShouldReturnUnauthorizedAccessError()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId(
+        FileSystemPathId path = _fileSystemPathIdFixture.Create(
             s_isUnix ? "/OldName.txt" : @"C:\OldName.txt"
         );
         string newName = "NewName.txt";
@@ -819,7 +819,7 @@ public class FileProviderServiceTests
     public void RenameFile_WhenParentDirectoryIsNull_ShouldReturnInvalidPathError()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId(
+        FileSystemPathId path = _fileSystemPathIdFixture.Create(
             s_isUnix ? "/OldName.txt" : @"C:\OldName.txt"
         );
         string newName = "NewName.txt";
@@ -839,7 +839,7 @@ public class FileProviderServiceTests
     public void RenameFile_WhenNewPathIsInvalid_ShouldReturnInvalidPathError()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId(
+        FileSystemPathId path = _fileSystemPathIdFixture.Create(
             s_isUnix ? "/OldName.txt" : @"C:\OldName.txt"
         );
         string newName = "NewName.txt";
@@ -863,7 +863,7 @@ public class FileProviderServiceTests
     public void RenameFile_WhenParentDirectoryExistsButNotWritable_ShouldReturnUnauthorizedAccessError()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId(
+        FileSystemPathId path = _fileSystemPathIdFixture.Create(
             s_isUnix ? "/OldName.txt" : @"C:\OldName.txt"
         );
         string newName = "NewName.txt";
@@ -896,7 +896,7 @@ public class FileProviderServiceTests
     public void DeleteFile_WhenFileExistsAndHasDeletePermission_ShouldDeleteSuccessfully()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId(
+        FileSystemPathId path = _fileSystemPathIdFixture.Create(
             s_isUnix ? "/FileToDelete.txt" : @"C:\FileToDelete.txt"
         );
         _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.Delete).Returns(true);
@@ -915,7 +915,7 @@ public class FileProviderServiceTests
     public void DeleteFile_WhenNoDeletePermission_ShouldReturnUnauthorizedAccessError()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId(
+        FileSystemPathId path = _fileSystemPathIdFixture.Create(
             s_isUnix ? "/FileToDelete.txt" : @"C:\FileToDelete.txt"
         );
         _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.Delete).Returns(false);

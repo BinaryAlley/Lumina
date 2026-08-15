@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Core.UsersManagement.Authentication.Commands.ChangePassword;
+using Lumina.Application.Fixtures.Core.UsersManagement.Authentication.Commands.ChangePassword;
 using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Application.UnitTests.Core.UsersManagement.Authentication.Commands.ChangePassword.Fixtures;
 using Lumina.Domain.Common.Primitives;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -17,6 +17,7 @@ namespace Lumina.Application.UnitTests.Core.UsersManagement.Authentication.Comma
 public class ChangePasswordCommandValidatorTests
 {
     private readonly ChangePasswordCommandValidator _validator;
+    private readonly ChangePasswordCommandFixture _changePasswordCommandFixture;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ChangePasswordCommandValidatorTests"/> class.
@@ -24,13 +25,14 @@ public class ChangePasswordCommandValidatorTests
     public ChangePasswordCommandValidatorTests()
     {
         _validator = new ChangePasswordCommandValidator();
+        _changePasswordCommandFixture = new ChangePasswordCommandFixture();
     }
 
     [Fact]
     public void Validate_WhenUsernameIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        ChangePasswordCommand command = ChangePasswordCommandFixture.CreateChangePasswordCommand();
+        ChangePasswordCommand command = _changePasswordCommandFixture.Create();
         command = command with { Username = null! };
 
         // Act
@@ -44,7 +46,7 @@ public class ChangePasswordCommandValidatorTests
     public void Validate_WhenUsernameIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        ChangePasswordCommand command = ChangePasswordCommandFixture.CreateChangePasswordCommand();
+        ChangePasswordCommand command = _changePasswordCommandFixture.Create();
         command = command with { Username = string.Empty };
 
         // Act
@@ -58,7 +60,7 @@ public class ChangePasswordCommandValidatorTests
     public void Validate_WhenUsernameIsWhiteSpace_ShouldHaveValidationError()
     {
         // Arrange
-        ChangePasswordCommand command = ChangePasswordCommandFixture.CreateChangePasswordCommand();
+        ChangePasswordCommand command = _changePasswordCommandFixture.Create();
         command = command with { Username = "   " };
 
         // Act
@@ -72,7 +74,7 @@ public class ChangePasswordCommandValidatorTests
     public void Validate_WhenCurrentPasswordIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        ChangePasswordCommand command = ChangePasswordCommandFixture.CreateChangePasswordCommand();
+        ChangePasswordCommand command = _changePasswordCommandFixture.Create();
         command = command with { CurrentPassword = null! };
 
         // Act
@@ -86,7 +88,7 @@ public class ChangePasswordCommandValidatorTests
     public void Validate_WhenCurrentPasswordIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        ChangePasswordCommand command = ChangePasswordCommandFixture.CreateChangePasswordCommand();
+        ChangePasswordCommand command = _changePasswordCommandFixture.Create();
         command = command with { CurrentPassword = string.Empty };
 
         // Act
@@ -100,7 +102,7 @@ public class ChangePasswordCommandValidatorTests
     public void Validate_WhenCurrentPasswordIsWhiteSpace_ShouldHaveValidationError()
     {
         // Arrange
-        ChangePasswordCommand command = ChangePasswordCommandFixture.CreateChangePasswordCommand();
+        ChangePasswordCommand command = _changePasswordCommandFixture.Create();
         command = command with { CurrentPassword = "   " };
 
         // Act
@@ -114,7 +116,7 @@ public class ChangePasswordCommandValidatorTests
     public void Validate_WhenNewPasswordIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        ChangePasswordCommand command = ChangePasswordCommandFixture.CreateChangePasswordCommand();
+        ChangePasswordCommand command = _changePasswordCommandFixture.Create();
         command = command with { NewPassword = null! };
 
         // Act
@@ -128,7 +130,7 @@ public class ChangePasswordCommandValidatorTests
     public void Validate_WhenNewPasswordIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        ChangePasswordCommand command = ChangePasswordCommandFixture.CreateChangePasswordCommand();
+        ChangePasswordCommand command = _changePasswordCommandFixture.Create();
         command = command with { NewPassword = string.Empty };
 
         // Act
@@ -142,7 +144,7 @@ public class ChangePasswordCommandValidatorTests
     public void Validate_WhenNewPasswordIsWhiteSpace_ShouldHaveValidationError()
     {
         // Arrange
-        ChangePasswordCommand command = ChangePasswordCommandFixture.CreateChangePasswordCommand();
+        ChangePasswordCommand command = _changePasswordCommandFixture.Create();
         command = command with { NewPassword = "   " };
 
         // Act
@@ -156,7 +158,7 @@ public class ChangePasswordCommandValidatorTests
     public void Validate_WhenNewPasswordConfirmIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        ChangePasswordCommand command = ChangePasswordCommandFixture.CreateChangePasswordCommand();
+        ChangePasswordCommand command = _changePasswordCommandFixture.Create();
         command = command with { NewPasswordConfirm = null! };
 
         // Act
@@ -170,7 +172,7 @@ public class ChangePasswordCommandValidatorTests
     public void Validate_WhenNewPasswordConfirmIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        ChangePasswordCommand command = ChangePasswordCommandFixture.CreateChangePasswordCommand();
+        ChangePasswordCommand command = _changePasswordCommandFixture.Create();
         command = command with { NewPasswordConfirm = string.Empty };
 
         // Act
@@ -184,7 +186,7 @@ public class ChangePasswordCommandValidatorTests
     public void Validate_WhenNewPasswordConfirmIsWhiteSpace_ShouldHaveValidationError()
     {
         // Arrange
-        ChangePasswordCommand command = ChangePasswordCommandFixture.CreateChangePasswordCommand();
+        ChangePasswordCommand command = _changePasswordCommandFixture.Create();
         command = command with { NewPasswordConfirm = "   " };
 
         // Act
@@ -198,7 +200,7 @@ public class ChangePasswordCommandValidatorTests
     public void Validate_WhenNewPasswordAndNewPasswordConfirmDontMatch_ShouldHaveValidationError()
     {
         // Arrange
-        ChangePasswordCommand command = ChangePasswordCommandFixture.CreateChangePasswordCommand();
+        ChangePasswordCommand command = _changePasswordCommandFixture.Create();
         command = command with { NewPasswordConfirm = "$321Bcda" };
 
         // Act
@@ -218,7 +220,7 @@ public class ChangePasswordCommandValidatorTests
     public void Validate_WhenCurrentPasswordDoesNotMatchPattern_ShouldHaveValidationError(string password)
     {
         // Arrange
-        ChangePasswordCommand command = ChangePasswordCommandFixture.CreateChangePasswordCommand();
+        ChangePasswordCommand command = _changePasswordCommandFixture.Create();
         command = command with { CurrentPassword = password };
 
         // Act
@@ -238,7 +240,7 @@ public class ChangePasswordCommandValidatorTests
     public void Validate_WhenNewPasswordDoesNotMatchPattern_ShouldHaveValidationError(string password)
     {
         // Arrange
-        ChangePasswordCommand command = ChangePasswordCommandFixture.CreateChangePasswordCommand();
+        ChangePasswordCommand command = _changePasswordCommandFixture.Create();
         command = command with { NewPassword = password, NewPasswordConfirm = password };
 
         // Act
@@ -256,7 +258,7 @@ public class ChangePasswordCommandValidatorTests
     public void Validate_WhenPasswordsMatchPattern_ShouldNotHaveValidationError(string password)
     {
         // Arrange
-        ChangePasswordCommand command = ChangePasswordCommandFixture.CreateChangePasswordCommand();
+        ChangePasswordCommand command = _changePasswordCommandFixture.Create();
         command = command with
         {
             CurrentPassword = password,
@@ -276,7 +278,7 @@ public class ChangePasswordCommandValidatorTests
     public void Validate_WhenCommandIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        ChangePasswordCommand command = ChangePasswordCommandFixture.CreateChangePasswordCommand();
+        ChangePasswordCommand command = _changePasswordCommandFixture.Create();
 
         // Act
         List<Error> result = _validator.TestValidate(command);

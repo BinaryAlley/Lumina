@@ -41,5 +41,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\src\Lumina.Presentation.Api\Lumina.Presentation.Api.csproj" />
+        <ProjectReference Include="..\..\Common\Lumina.Contracts.Fixtures\Lumina.Contracts.Fixtures.csproj" />
+        <ProjectReference Include="..\..\Common\Lumina.Presentation.Api.Fixtures\Lumina.Presentation.Api.Fixtures.csproj" />
     </ItemGroup>
 </Project>

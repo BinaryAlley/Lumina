@@ -2,7 +2,7 @@
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Application.UnitTests.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook.Fixtures;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.Common.Primitives;
@@ -34,7 +34,7 @@ public class BookEntityMappingTests
     public void ToDomainEntity_WhenMappingValidBookEntity_ShouldMapCorrectly()
     {
         // Arrange
-        BookEntity bookEntity = _bookEntityFixture.CreateBook();
+        BookEntity bookEntity = _bookEntityFixture.Create();
 
         // Act
         Result<Book> result = bookEntity.ToDomainEntity();
@@ -264,7 +264,7 @@ public class BookEntityMappingTests
     public void ToResponse_WhenMappingBookEntity_ShouldMapAllPropertiesCorrectly()
     {
         // Arrange
-        BookEntity bookEntity = _bookEntityFixture.CreateBook();
+        BookEntity bookEntity = _bookEntityFixture.Create();
 
         // Act
         BookResponse result = bookEntity.ToResponse();
@@ -318,11 +318,7 @@ public class BookEntityMappingTests
     public void ToDomainModels_WhenMappingMultipleBookEntities_ShouldMapAllCorrectly()
     {
         // Arrange
-        List<BookEntity> bookEntities =
-        [
-            _bookEntityFixture.CreateBook(),
-            _bookEntityFixture.CreateBook()
-        ];
+        List<BookEntity> bookEntities = _bookEntityFixture.CreateMany(2);
 
         // Act
         IEnumerable<Result<Book>> results = bookEntities.ToDomainEntities();
@@ -337,11 +333,8 @@ public class BookEntityMappingTests
     public void ToResponses_WhenMappingMultipleBookEntities_ShouldMapAllCorrectly()
     {
         // Arrange
-        List<BookEntity> bookEntities =
-        [
-            _bookEntityFixture.CreateBook(),
-            _bookEntityFixture.CreateBook()
-        ];
+        List<BookEntity> bookEntities = _bookEntityFixture.CreateMany(2);
+
 
         // Act
         IEnumerable<BookResponse> results = bookEntities.ToResponses();

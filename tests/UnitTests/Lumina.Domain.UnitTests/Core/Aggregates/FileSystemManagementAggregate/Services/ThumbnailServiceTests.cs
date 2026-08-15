@@ -4,9 +4,9 @@ using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Lumina.Domain.Fixtures.Common.Enums.PhotoLibrary;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
-using Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.Services.Fixtures;
-using Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.ValueObjects.Fixtures;
 using NSubstitute;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
@@ -45,7 +45,7 @@ public class ThumbnailServiceTests
         // Arrange
         string path = @"C:\TestImage.jpg";
         int quality = 80;
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(path);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path);
 
         // Create a small valid JPEG image
         byte[] imageBytes;
@@ -89,7 +89,7 @@ public class ThumbnailServiceTests
     public async Task GetThumbnailAsync_WhenFileTypeServiceReturnsError_ShouldPropagateError()
     {
         // Arrange
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestImage.jpg");
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(@"C:\TestImage.jpg");
         int quality = 80;
 
         _mockEnvironmentContext.FileTypeService.GetImageTypeAsync(pathId, Arg.Any<CancellationToken>())
@@ -107,7 +107,7 @@ public class ThumbnailServiceTests
     public async Task GetThumbnailAsync_WhenImageTypeIsNone_ShouldReturnNoThumbnailError()
     {
         // Arrange
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestFile.txt");
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(@"C:\TestFile.txt");
         int quality = 80;
 
         _mockEnvironmentContext.FileTypeService.GetImageTypeAsync(pathId, Arg.Any<CancellationToken>())
@@ -125,7 +125,7 @@ public class ThumbnailServiceTests
     public async Task GetThumbnailAsync_WhenFileProviderServiceReturnsError_ShouldPropagateError()
     {
         // Arrange
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestImage.jpg");
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(@"C:\TestImage.jpg");
         int quality = 80;
 
         _mockEnvironmentContext.FileTypeService.GetImageTypeAsync(pathId, Arg.Any<CancellationToken>())
@@ -146,7 +146,7 @@ public class ThumbnailServiceTests
     public async Task GetThumbnailAsync_WithDifferentImageTypes_ShouldReturnThumbnail(ImageType imageType, byte[] imageBytes)
     {
         // Arrange
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestImage");
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(@"C:\TestImage");
         int quality = 80;
 
         _mockEnvironmentContext.FileTypeService.GetImageTypeAsync(pathId, Arg.Any<CancellationToken>())
@@ -173,7 +173,7 @@ public class ThumbnailServiceTests
     public async Task GetThumbnailAsync_WithCancellation_ShouldThrowTaskCanceledException()
     {
         // Arrange
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestImage.jpg");
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(@"C:\TestImage.jpg");
         int quality = 80;
         CancellationTokenSource cts = new();
         cts.Cancel();

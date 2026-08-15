@@ -2,10 +2,10 @@
 using EntityFrameworkCore.Testing.NSubstitute;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
 using Lumina.DataAccess.Core.Repositories.Users;
 using Lumina.DataAccess.Core.UoW;
-using Lumina.DataAccess.UnitTests.Core.Repositories.Authorization.Fixtures;
-using Lumina.DataAccess.UnitTests.Core.Repositories.Users.Fixtures;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Microsoft.EntityFrameworkCore;
@@ -46,7 +46,7 @@ public class UserRepositoryTests
     public async Task InsertAsync_WhenUserDoesNotExist_ShouldAddUserToContextAndReturnCreated()
     {
         // Arrange
-        UserEntity userModel = _userEntityFixture.CreateUserModel();
+        UserEntity userModel = _userEntityFixture.Create();
 
         // Act
         Result<Created> result = await _sut.InsertAsync(userModel, CancellationToken.None);
@@ -64,7 +64,7 @@ public class UserRepositoryTests
     public async Task InsertAsync_WhenUserAlreadyExists_ShouldReturnError()
     {
         // Arrange
-        UserEntity userModel = _userEntityFixture.CreateUserModel();
+        UserEntity userModel = _userEntityFixture.Create();
 
         _mockContext.Users.Add(userModel);
         await _mockContext.SaveChangesAsync();
@@ -82,12 +82,7 @@ public class UserRepositoryTests
     public async Task GetAllAsync_WhenCalled_ShouldReturnAllUsers()
     {
         // Arrange
-        List<UserEntity> users =
-        [
-            _userEntityFixture.CreateUserModel(),
-            _userEntityFixture.CreateUserModel(),
-            _userEntityFixture.CreateUserModel()
-        ];
+        List<UserEntity> users = _userEntityFixture.CreateMany();
         _mockContext.Users.AddRange(users);
         await _mockContext.SaveChangesAsync();
 
@@ -117,7 +112,7 @@ public class UserRepositoryTests
     public async Task GetByUsernameAsync_WhenUserExists_ShouldReturnUser()
     {
         // Arrange
-        UserEntity userModel = _userEntityFixture.CreateUserModel();
+        UserEntity userModel = _userEntityFixture.Create();
         _mockContext.Users.Add(userModel);
         await _mockContext.SaveChangesAsync();
 
@@ -145,7 +140,7 @@ public class UserRepositoryTests
     public async Task UpdateAsync_WhenUserExists_ShouldUpdateUserAndReturnUpdated()
     {
         // Arrange
-        UserEntity existingUser = _userEntityFixture.CreateUserModel();
+        UserEntity existingUser = _userEntityFixture.Create();
         _mockContext.Users.Add(existingUser);
         await _mockContext.SaveChangesAsync();
 
@@ -183,7 +178,7 @@ public class UserRepositoryTests
     public async Task UpdateAsync_WhenUserDoesNotExist_ShouldReturnError()
     {
         // Arrange
-        UserEntity userModel = _userEntityFixture.CreateUserModel();
+        UserEntity userModel = _userEntityFixture.Create();
 
         // Act
         Result<Updated> result = await _sut.UpdateAsync(userModel, CancellationToken.None);
@@ -197,7 +192,7 @@ public class UserRepositoryTests
     public async Task GetByIdAsync_WhenUserExists_ShouldReturnUserWithAllRelations()
     {
         // Arrange
-        UserEntity userModel = _userEntityFixture.CreateUserModel();
+        UserEntity userModel = _userEntityFixture.Create();
         _mockContext.Users.Add(userModel);
         await _mockContext.SaveChangesAsync();
 
@@ -233,9 +228,9 @@ public class UserRepositoryTests
     public async Task UpdateAsync_WhenUserExistsWithPermissions_ShouldUpdatePermissionsAndReturnUpdated()
     {
         // Arrange
-        UserEntity existingUser = _userEntityFixture.CreateUserModel();
-        PermissionEntity oldPermission = _permissionEntityFixture.CreatePermissionModel();
-        PermissionEntity newPermission = _permissionEntityFixture.CreatePermissionModel();
+        UserEntity existingUser = _userEntityFixture.Create();
+        PermissionEntity oldPermission = _permissionEntityFixture.Create();
+        PermissionEntity newPermission = _permissionEntityFixture.Create();
 
         _mockContext.Users.Add(existingUser);
         _mockContext.Permissions.Add(oldPermission);
@@ -291,9 +286,9 @@ public class UserRepositoryTests
         PermissionEntityFixture permissionFixture = new();
         UserPermissionEntityFixture userPermissionFixture = new();
 
-        UserEntity existingUser = userFixture.CreateUserModel();
-        PermissionEntity oldPermission = permissionFixture.CreatePermissionModel();
-        PermissionEntity newPermission = permissionFixture.CreatePermissionModel();
+        UserEntity existingUser = userFixture.Create();
+        PermissionEntity oldPermission = permissionFixture.Create();
+        PermissionEntity newPermission = permissionFixture.Create();
 
         UserEntity userWithPermissions = new()
         {
@@ -304,7 +299,7 @@ public class UserRepositoryTests
             UserRole = null,
             UserPermissions =
             [
-                userPermissionFixture.CreateUserPermissionModel(existingUser, oldPermission)
+                userPermissionFixture.Create(existingUser, oldPermission)
             ],
             CreatedOnUtc = existingUser.CreatedOnUtc,
             CreatedBy = existingUser.CreatedBy,
@@ -324,7 +319,7 @@ public class UserRepositoryTests
             UserRole = null,
             UserPermissions =
             [
-                userPermissionFixture.CreateUserPermissionModel(existingUser, newPermission)
+                userPermissionFixture.Create(existingUser, newPermission)
             ],
             CreatedBy = existingUser.CreatedBy,
             CreatedOnUtc = existingUser.CreatedOnUtc,
@@ -464,7 +459,7 @@ public class UserRepositoryTests
         UserEntityFixture userFixture = new();
         UserRoleEntityFixture userRoleFixture = new();
 
-        UserRoleEntity oldUserRole = userRoleFixture.CreateUserRoleModel();
+        UserRoleEntity oldUserRole = userRoleFixture.Create();
 
         UserEntity existingUser = new()
         {

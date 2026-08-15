@@ -5,9 +5,9 @@ using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using Lumina.Domain.SharedKernel.Common.Enums.Primitives;
-using Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.ValueObjects.Fixtures;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using System;
@@ -72,7 +72,7 @@ public class DirectoryProviderServiceTests
     public void GetSubdirectoryPaths_WhenUserHasNoAccess_ShouldReturnUnauthorizedAccessError()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId();
+        FileSystemPathId path = _fileSystemPathIdFixture.Create();
         _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ListDirectory, false).Returns(false);
 
         // Act
@@ -87,7 +87,7 @@ public class DirectoryProviderServiceTests
     public void GetSubdirectoryPaths_WhenUserHasAccess_ShouldReturnSubdirectories()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId();
+        FileSystemPathId path = _fileSystemPathIdFixture.Create();
         string[] subdirectories = [.. _fixture.CreateMany<string>(3)];
         _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ListDirectory, false).Returns(true);
         _mockFileSystem.Directory.GetDirectories(path.Path).Returns(subdirectories);
@@ -109,7 +109,7 @@ public class DirectoryProviderServiceTests
     public void GetSubdirectoryPaths_WhenIncludeHiddenElementsIsFalse_ShouldExcludeHiddenDirectories()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId();
+        FileSystemPathId path = _fileSystemPathIdFixture.Create();
         string[] subdirectories = [_pathVisible1, _pathHidden1];
         _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ListDirectory, false).Returns(true);
         _mockFileSystem.Directory.GetDirectories(path.Path).Returns(subdirectories);
@@ -130,7 +130,7 @@ public class DirectoryProviderServiceTests
     public void GetSubdirectoryPaths_WhenIncludeHiddenElementsIsTrue_ShouldIncludeHiddenDirectories()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId();
+        FileSystemPathId path = _fileSystemPathIdFixture.Create();
         string[] subdirectories = [_pathVisible1, _pathHidden1];
         _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ListDirectory, false).Returns(true);
         _mockFileSystem.Directory.GetDirectories(path.Path).Returns(subdirectories);
@@ -154,7 +154,7 @@ public class DirectoryProviderServiceTests
     public void GetSubdirectoryPaths_WhenGetAttributesThrowsException_ShouldStillAddDirectory()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId();
+        FileSystemPathId path = _fileSystemPathIdFixture.Create();
         string[] subdirectories = [_pathValid1, _pathInvalid1];
         _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ListDirectory, false).Returns(true);
         _mockFileSystem.Directory.GetDirectories(path.Path).Returns(subdirectories);
@@ -176,7 +176,7 @@ public class DirectoryProviderServiceTests
     public void GetSubdirectoryPaths_WhenCalled_ShouldOrderDirectoriesAlphabetically()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId();
+        FileSystemPathId path = _fileSystemPathIdFixture.Create();
         string[] subdirectories = s_isUnix
             ? ["/C", "/A", "/B"]
             : [@"C:\C", @"C:\A", @"C:\B"];
@@ -200,7 +200,7 @@ public class DirectoryProviderServiceTests
     public void GetSubdirectoryPaths_WhenDirectoryHasNoSubdirectories_ShouldReturnEmptyList()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId();
+        FileSystemPathId path = _fileSystemPathIdFixture.Create();
         _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ListDirectory, false).Returns(true);
         _mockFileSystem.Directory.GetDirectories(path.Path).Returns([]);
 
@@ -216,7 +216,7 @@ public class DirectoryProviderServiceTests
     public void DirectoryExists_WhenDirectoryExists_ShouldReturnTrue()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId();
+        FileSystemPathId path = _fileSystemPathIdFixture.Create();
         _mockFileSystem.Directory.Exists(path.Path).Returns(true);
 
         // Act
@@ -231,7 +231,7 @@ public class DirectoryProviderServiceTests
     public void DirectoryExists_WhenDirectoryDoesNotExist_ShouldReturnFalse()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId();
+        FileSystemPathId path = _fileSystemPathIdFixture.Create();
         _mockFileSystem.Directory.Exists(path.Path).Returns(false);
 
         // Act
@@ -249,7 +249,7 @@ public class DirectoryProviderServiceTests
         string fullPath = s_isUnix
             ? "/folder/subfolder/file.txt"
             : @"C:\folder\subfolder\file.txt";
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId(fullPath);
+        FileSystemPathId path = _fileSystemPathIdFixture.Create(fullPath);
         _mockFileSystem.Path.GetFileName(fullPath).Returns("file.txt");
 
         // Act
@@ -267,7 +267,7 @@ public class DirectoryProviderServiceTests
         string fullPath = s_isUnix
             ? "/folder/subfolder/"
             : @"C:\folder\subfolder\";
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId(fullPath);
+        FileSystemPathId path = _fileSystemPathIdFixture.Create(fullPath);
         _mockFileSystem.Path.GetFileName(fullPath[..^1]).Returns("subfolder");
         _mockFileSystem.Path.DirectorySeparatorChar.Returns(_dirSeparator);
 
@@ -286,7 +286,7 @@ public class DirectoryProviderServiceTests
         string fullPath = s_isUnix
             ? "/C/"
             : @"/";
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId(fullPath);
+        FileSystemPathId path = _fileSystemPathIdFixture.Create(fullPath);
         _mockFileSystem.Path.GetFileName(fullPath[..^1]).Returns(string.Empty);
         _mockFileSystem.Path.DirectorySeparatorChar.Returns(_dirSeparator);
 
@@ -302,7 +302,7 @@ public class DirectoryProviderServiceTests
     public void GetLastWriteTime_WhenUserHasAccess_ShouldReturnLastWriteTime()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId();
+        FileSystemPathId path = _fileSystemPathIdFixture.Create();
         DateTime expectedDateTime = DateTime.Now;
         _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties, false).Returns(true);
         _mockFileSystem.Directory.GetLastWriteTime(path.Path).Returns(expectedDateTime);
@@ -320,7 +320,7 @@ public class DirectoryProviderServiceTests
     public void GetLastWriteTime_WhenUserHasNoAccess_ShouldReturnUnauthorizedAccessError()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId();
+        FileSystemPathId path = _fileSystemPathIdFixture.Create();
         _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties, false).Returns(false);
 
         // Act
@@ -335,7 +335,7 @@ public class DirectoryProviderServiceTests
     public void GetCreationTime_WhenUserHasAccess_ShouldReturnCreationTime()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId();
+        FileSystemPathId path = _fileSystemPathIdFixture.Create();
         DateTime expectedDateTime = DateTime.Now;
         _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties, false).Returns(true);
         _mockFileSystem.Directory.GetCreationTime(path.Path).Returns(expectedDateTime);
@@ -353,7 +353,7 @@ public class DirectoryProviderServiceTests
     public void GetCreationTime_WhenUserHasNoAccess_ShouldReturnUnauthorizedAccessError()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId();
+        FileSystemPathId path = _fileSystemPathIdFixture.Create();
         _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties, false).Returns(false);
 
         // Act
@@ -368,7 +368,7 @@ public class DirectoryProviderServiceTests
     public void CreateDirectory_WhenUserHasAccess_ShouldCreateDirectoryAndReturnPath()
     {
         // Arrange
-        FileSystemPathId parentPath = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\Parent");
+        FileSystemPathId parentPath = _fileSystemPathIdFixture.Create(@"C:\Parent");
         string directoryName = "NewDirectory";
         string fullPath = s_isUnix
             ? "/Parent/NewDirectory"
@@ -394,7 +394,7 @@ public class DirectoryProviderServiceTests
     public void CreateDirectory_WhenUserHasNoAccess_ShouldReturnUnauthorizedAccessError()
     {
         // Arrange
-        FileSystemPathId parentPath = _fileSystemPathIdFixture.CreateFileSystemPathId();
+        FileSystemPathId parentPath = _fileSystemPathIdFixture.Create();
         string directoryName = "NewDirectory";
 
         _mockFileSystemPermissionsService.CanAccessPath(parentPath, FileAccessMode.Write, false).Returns(false);
@@ -427,7 +427,7 @@ public class DirectoryProviderServiceTests
     public void CreateDirectory_WhenCreatedDirectoryPathIsInvalid_ShouldReturnError()
     {
         // Arrange
-        FileSystemPathId parentPath = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\Parent");
+        FileSystemPathId parentPath = _fileSystemPathIdFixture.Create(@"C:\Parent");
         string directoryName = "NewDirectory";
         string invalidPath = "Invalid:Path";
 
@@ -447,8 +447,8 @@ public class DirectoryProviderServiceTests
     public void CopyDirectory_WhenSourceDirectoryExistsAndUserHasAccess_ShouldCopyDirectoryAndReturnPath()
     {
         // Arrange
-        FileSystemPathId sourcePath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSource);
-        FileSystemPathId destinationPath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestination);
+        FileSystemPathId sourcePath = _fileSystemPathIdFixture.Create(_pathSource);
+        FileSystemPathId destinationPath = _fileSystemPathIdFixture.Create(_pathDestination);
         bool overrideExisting = false;
 
         _mockFileSystem.Directory.Exists(sourcePath.Path).Returns(true);
@@ -476,8 +476,8 @@ public class DirectoryProviderServiceTests
     public void CopyDirectory_WhenSourceDirectoryDoesNotExist_ShouldReturnError()
     {
         // Arrange
-        FileSystemPathId sourcePath = _fileSystemPathIdFixture.CreateFileSystemPathId();
-        FileSystemPathId destinationPath = _fileSystemPathIdFixture.CreateFileSystemPathId();
+        FileSystemPathId sourcePath = _fileSystemPathIdFixture.Create();
+        FileSystemPathId destinationPath = _fileSystemPathIdFixture.Create();
         bool overrideExisting = false;
 
         _mockFileSystem.Directory.Exists(sourcePath.Path).Returns(false);
@@ -494,8 +494,8 @@ public class DirectoryProviderServiceTests
     public void CopyDirectory_WhenDestinationDirectoryExists_ShouldCreateUniqueDirectoryName()
     {
         // Arrange
-        FileSystemPathId sourcePath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSource);
-        FileSystemPathId destinationPath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestination);
+        FileSystemPathId sourcePath = _fileSystemPathIdFixture.Create(_pathSource);
+        FileSystemPathId destinationPath = _fileSystemPathIdFixture.Create(_pathDestination);
         string expectedNewDirectoryPath = s_isUnix
             ? "/Destination - Copy (1)"
             : @"C:\Destination - Copy (1)";
@@ -528,8 +528,8 @@ public class DirectoryProviderServiceTests
     public void CopyDirectory_WhenCopyingFilesAndSubdirectories_ShouldCopyAllContents()
     {
         // Arrange
-        FileSystemPathId sourcePath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSource);
-        FileSystemPathId destinationPath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestination);
+        FileSystemPathId sourcePath = _fileSystemPathIdFixture.Create(_pathSource);
+        FileSystemPathId destinationPath = _fileSystemPathIdFixture.Create(_pathDestination);
         bool overrideExisting = true;
 
 
@@ -583,8 +583,8 @@ public class DirectoryProviderServiceTests
     public void CopyDirectory_WhenExceptionOccurs_ShouldReturnError()
     {
         // Arrange
-        FileSystemPathId sourcePath = _fileSystemPathIdFixture.CreateFileSystemPathId();
-        FileSystemPathId destinationPath = _fileSystemPathIdFixture.CreateFileSystemPathId();
+        FileSystemPathId sourcePath = _fileSystemPathIdFixture.Create();
+        FileSystemPathId destinationPath = _fileSystemPathIdFixture.Create();
         bool overrideExisting = false;
 
         _mockFileSystem.Directory.Exists(sourcePath.Path).Returns(true);
@@ -602,10 +602,10 @@ public class DirectoryProviderServiceTests
     public void MoveDirectory_WhenSourceDirectoryDoesNotExist_ShouldReturnDirectoryNotFoundError()
     {
         // Arrange
-        FileSystemPathId sourcePath = _fileSystemPathIdFixture.CreateFileSystemPathId(
+        FileSystemPathId sourcePath = _fileSystemPathIdFixture.Create(
             s_isUnix ? "/NonExistentSource" : @"C:\NonExistentSource"
         );
-        FileSystemPathId destinationPath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestination);
+        FileSystemPathId destinationPath = _fileSystemPathIdFixture.Create(_pathDestination);
         bool overrideExisting = false;
 
         _mockFileSystem.Directory.Exists(sourcePath.Path).Returns(false);
@@ -622,8 +622,8 @@ public class DirectoryProviderServiceTests
     public void MoveDirectory_WhenDestinationDirectoryDoesNotExist_ShouldPerformSimpleMove()
     {
         // Arrange
-        FileSystemPathId sourcePath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSource);
-        FileSystemPathId destinationPath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestination);
+        FileSystemPathId sourcePath = _fileSystemPathIdFixture.Create(_pathSource);
+        FileSystemPathId destinationPath = _fileSystemPathIdFixture.Create(_pathDestination);
         bool overrideExisting = false;
 
         _mockFileSystem.Directory.Exists(sourcePath.Path).Returns(true);
@@ -642,8 +642,8 @@ public class DirectoryProviderServiceTests
     public void MoveDirectory_WhenDestinationDirectoryExists_ShouldMergeDirectories()
     {
         // Arrange
-        FileSystemPathId sourcePath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSource);
-        FileSystemPathId destinationPath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestination);
+        FileSystemPathId sourcePath = _fileSystemPathIdFixture.Create(_pathSource);
+        FileSystemPathId destinationPath = _fileSystemPathIdFixture.Create(_pathDestination);
         bool overrideExisting = true;
 
         _mockFileSystem.Directory.Exists(sourcePath.Path).Returns(true);
@@ -681,8 +681,8 @@ public class DirectoryProviderServiceTests
     public void MoveDirectory_WhenExceptionOccurs_ShouldReturnDirectoryMoveError()
     {
         // Arrange
-        FileSystemPathId sourcePath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSource);
-        FileSystemPathId destinationPath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestination);
+        FileSystemPathId sourcePath = _fileSystemPathIdFixture.Create(_pathSource);
+        FileSystemPathId destinationPath = _fileSystemPathIdFixture.Create(_pathDestination);
         bool overrideExisting = false;
 
         _mockFileSystem.Directory.Exists(sourcePath.Path).Returns(true);
@@ -702,8 +702,8 @@ public class DirectoryProviderServiceTests
     public void MergeDirectories_WhenSourceContainsFilesAndSubdirectories_ShouldMergeCorrectly()
     {
         // Arrange
-        FileSystemPathId sourcePath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSource);
-        FileSystemPathId destPath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestination);
+        FileSystemPathId sourcePath = _fileSystemPathIdFixture.Create(_pathSource);
+        FileSystemPathId destPath = _fileSystemPathIdFixture.Create(_pathDestination);
         bool overwrite = true;
 
         _mockFileSystem.Directory.Exists(sourcePath.Path).Returns(true);
@@ -745,8 +745,8 @@ public class DirectoryProviderServiceTests
     public void MoveDirectory_WhenOverwriteIsFalse_ShouldMoveOnlyNonExistingFiles()
     {
         // Arrange
-        FileSystemPathId sourcePath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSource);
-        FileSystemPathId destPath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestination);
+        FileSystemPathId sourcePath = _fileSystemPathIdFixture.Create(_pathSource);
+        FileSystemPathId destPath = _fileSystemPathIdFixture.Create(_pathDestination);
         bool overwrite = false;
 
         _mockFileSystem.Directory.Exists(sourcePath.Path).Returns(true);
@@ -803,8 +803,8 @@ public class DirectoryProviderServiceTests
     public void MergeDirectories_WhenSourceContainsNestedDirectories_ShouldMergeRecursively()
     {
         // Arrange
-        FileSystemPathId sourcePath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSource);
-        FileSystemPathId destPath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestination);
+        FileSystemPathId sourcePath = _fileSystemPathIdFixture.Create(_pathSource);
+        FileSystemPathId destPath = _fileSystemPathIdFixture.Create(_pathDestination);
         bool overwrite = true;
 
         _mockFileSystem.Directory.Exists(sourcePath.Path).Returns(true);
@@ -850,7 +850,7 @@ public class DirectoryProviderServiceTests
     public void RenameDirectory_WhenParentDirectoryIsWritable_ShouldRenameSuccessfully()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId(
+        FileSystemPathId path = _fileSystemPathIdFixture.Create(
             s_isUnix ? "/OldName" : @"C:\OldName"
         );
         string newName = "NewName";
@@ -877,7 +877,7 @@ public class DirectoryProviderServiceTests
     public void RenameDirectory_WhenParentDirectoryIsNotWritable_ShouldReturnUnauthorizedAccessError()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId(
+        FileSystemPathId path = _fileSystemPathIdFixture.Create(
             s_isUnix ? "/OldName" : @"C:\OldName"
         );
         string newName = "NewName";
@@ -903,7 +903,7 @@ public class DirectoryProviderServiceTests
     public void RenameDirectory_WhenDirectoryIsNotExecutable_ShouldReturnUnauthorizedAccessError()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId(
+        FileSystemPathId path = _fileSystemPathIdFixture.Create(
             s_isUnix ? "/OldName" : @"C:\OldName"
         );
         string newName = "NewName";
@@ -930,7 +930,7 @@ public class DirectoryProviderServiceTests
     public void RenameDirectory_WhenParentDirectoryIsNull_ShouldReturnInvalidPathError()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId(
+        FileSystemPathId path = _fileSystemPathIdFixture.Create(
             s_isUnix ? "/OldName" : @"C:\OldName"
         );
         string newName = "NewName";
@@ -950,7 +950,7 @@ public class DirectoryProviderServiceTests
     public void RenameDirectory_WhenNewPathIsInvalid_ShouldReturnInvalidPathError()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId(
+        FileSystemPathId path = _fileSystemPathIdFixture.Create(
             s_isUnix ? "/OldName" : @"C:\OldName"
         );
         string newName = "NewName";
@@ -974,7 +974,7 @@ public class DirectoryProviderServiceTests
     public void DeleteDirectory_WhenDirectoryExistsAndHasDeletePermission_ShouldDeleteSuccessfully()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId(
+        FileSystemPathId path = _fileSystemPathIdFixture.Create(
             s_isUnix ? "/DirectoryToDelete" : @"C:\DirectoryToDelete"
         );
         _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.Delete, false).Returns(true);
@@ -994,7 +994,7 @@ public class DirectoryProviderServiceTests
     public void DeleteDirectory_WhenNoDeletePermission_ShouldReturnUnauthorizedAccessError()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId(
+        FileSystemPathId path = _fileSystemPathIdFixture.Create(
             s_isUnix ? "/DirectoryToDelete" : @"C:\DirectoryToDelete"
         );
         _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.Delete, false).Returns(false);

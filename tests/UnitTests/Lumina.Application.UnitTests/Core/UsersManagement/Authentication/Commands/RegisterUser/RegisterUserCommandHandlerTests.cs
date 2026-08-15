@@ -8,8 +8,8 @@ using Lumina.Application.Common.Infrastructure.Security;
 using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.UsersManagement.Authentication.Commands.RegisterUser;
-using Lumina.Application.UnitTests.Common.Mapping.UserManagement.Users.Fixtures;
-using Lumina.Application.UnitTests.Core.UsersManagement.Authentication.Commands.RegisterUser.Fixture;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Application.Fixtures.Core.UsersManagement.Authentication.Commands.RegisterUser;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.Domain.Common.Primitives;
 using NSubstitute;
@@ -35,6 +35,8 @@ public class RegisterUserCommandHandlerTests
     private readonly IUserRepository _mockUserRepository;
     private readonly IDateTimeProvider _mockDateTimeProvider;
     private readonly RegisterUserCommandHandler _sut;
+    private readonly RegisterUserCommandFixture _registerUserCommandFixture = new();
+    private readonly UserEntityFixture _userEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RegisterUserCommandHandlerTests"/> class.
@@ -69,7 +71,7 @@ public class RegisterUserCommandHandlerTests
     public async Task HandleAsync_WhenUserDoesNotExistAndWith2FA_ShouldRegisterUser()
     {
         // Arrange
-        RegisterUserCommand command = RegisterUserCommandFixture.CreateRegisterCommand();
+        RegisterUserCommand command = _registerUserCommandFixture.Create();
         byte[] totpSecret = [1, 2, 3];
         string qrCodeUri = "data:image/png;base64,test";
         string encryptedSecret = "encryptedSecret";
@@ -109,7 +111,7 @@ public class RegisterUserCommandHandlerTests
     public async Task HandleAsync_WhenUserDoesNotExistAndWithout2FA_ShouldRegisterUser()
     {
         // Arrange
-        RegisterUserCommand command = RegisterUserCommandFixture.CreateRegisterCommand() with { Use2fa = false };
+        RegisterUserCommand command = _registerUserCommandFixture.Create() with { Use2fa = false };
         string hashedPassword = "hashedPassword";
 
         _mockUserRepository.GetByUsernameAsync(command.Username!, Arg.Any<CancellationToken>())
@@ -140,8 +142,8 @@ public class RegisterUserCommandHandlerTests
     public async Task HandleAsync_WhenUserAlreadyExists_ShouldReturnError()
     {
         // Arrange
-        RegisterUserCommand command = RegisterUserCommandFixture.CreateRegisterCommand();
-        UserEntity existingUser = UserEntityFixture.CreateUserEntity();
+        RegisterUserCommand command = _registerUserCommandFixture.Create();
+        UserEntity existingUser = _userEntityFixture.Create();
 
         _mockUserRepository.GetByUsernameAsync(command.Username!, Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(existingUser));
@@ -162,7 +164,7 @@ public class RegisterUserCommandHandlerTests
     public async Task HandleAsync_WhenInsertFails_ShouldReturnError()
     {
         // Arrange
-        RegisterUserCommand command = RegisterUserCommandFixture.CreateRegisterCommand();
+        RegisterUserCommand command = _registerUserCommandFixture.Create();
         Error error = Error.Failure("Database.Error", "Failed to insert user");
 
         _mockUserRepository.GetByUsernameAsync(command.Username!, Arg.Any<CancellationToken>())
@@ -186,7 +188,7 @@ public class RegisterUserCommandHandlerTests
     public async Task HandleAsync_WhenGetByUsernameReturnsError_ShouldReturnError()
     {
         // Arrange
-        RegisterUserCommand command = RegisterUserCommandFixture.CreateRegisterCommand();
+        RegisterUserCommand command = _registerUserCommandFixture.Create();
         Error error = Error.Failure("Database.Error", "Failed to check username");
 
         _mockUserRepository.GetByUsernameAsync(command.Username!, Arg.Any<CancellationToken>())

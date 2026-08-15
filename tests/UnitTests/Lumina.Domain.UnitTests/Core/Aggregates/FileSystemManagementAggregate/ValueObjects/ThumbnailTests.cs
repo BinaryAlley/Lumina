@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
-using Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.ValueObjects.Fixtures;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -45,7 +45,7 @@ public class ThumbnailTests
     public void Equals_WithSameProperties_ShouldReturnTrue()
     {
         // Arrange
-        Thumbnail thumbnail1 = _thumbnailFixture.CreateThumbnail();
+        Thumbnail thumbnail1 = _thumbnailFixture.Create();
         Thumbnail thumbnail2 = new(thumbnail1.Type, thumbnail1.Bytes);
 
         // Act
@@ -59,8 +59,8 @@ public class ThumbnailTests
     public void Equals_WithDifferentType_ShouldReturnFalse()
     {
         // Arrange
-        Thumbnail thumbnail1 = _thumbnailFixture.CreateThumbnail(ImageType.PNG);
-        Thumbnail thumbnail2 = _thumbnailFixture.CreateThumbnail(ImageType.JPEG, thumbnail1.Bytes);
+        Thumbnail thumbnail1 = _thumbnailFixture.Create(ImageType.PNG);
+        Thumbnail thumbnail2 = _thumbnailFixture.Create(ImageType.JPEG, thumbnail1.Bytes);
 
         // Act
         bool result = thumbnail1.Equals(thumbnail2);
@@ -73,8 +73,8 @@ public class ThumbnailTests
     public void Equals_WithDifferentBytes_ShouldReturnFalse()
     {
         // Arrange
-        Thumbnail thumbnail1 = _thumbnailFixture.CreateThumbnail();
-        Thumbnail thumbnail2 = _thumbnailFixture.CreateThumbnail(thumbnail1.Type);
+        Thumbnail thumbnail1 = _thumbnailFixture.Create();
+        Thumbnail thumbnail2 = _thumbnailFixture.Create(thumbnail1.Type);
 
         // Act
         bool result = thumbnail1.Equals(thumbnail2);
@@ -87,7 +87,7 @@ public class ThumbnailTests
     public void GetHashCode_WithSameProperties_ShouldReturnSameHashCode()
     {
         // Arrange
-        Thumbnail thumbnail1 = _thumbnailFixture.CreateThumbnail();
+        Thumbnail thumbnail1 = _thumbnailFixture.Create();
         Thumbnail thumbnail2 = new(thumbnail1.Type, thumbnail1.Bytes);
 
         // Act
@@ -102,8 +102,8 @@ public class ThumbnailTests
     public void GetHashCode_WithDifferentProperties_ShouldReturnDifferentHashCode()
     {
         // Arrange
-        Thumbnail thumbnail1 = _thumbnailFixture.CreateThumbnail();
-        Thumbnail thumbnail2 = _thumbnailFixture.CreateThumbnail();
+        Thumbnail thumbnail1 = _thumbnailFixture.Create();
+        Thumbnail thumbnail2 = _thumbnailFixture.Create();
 
         // Act
         int hashCode1 = thumbnail1.GetHashCode();
@@ -117,10 +117,10 @@ public class ThumbnailTests
     public void GetEqualityComponents_ShouldReturnTypeAndBytes()
     {
         // Arrange
-        Thumbnail thumbnail = _thumbnailFixture.CreateThumbnail();
+        Thumbnail thumbnail = _thumbnailFixture.Create();
 
         // Act
-        List<object> components = thumbnail.GetEqualityComponents().ToList();
+        List<object> components = [.. thumbnail.GetEqualityComponents()];
 
         // Assert
         Assert.Equal(2, components.Count);

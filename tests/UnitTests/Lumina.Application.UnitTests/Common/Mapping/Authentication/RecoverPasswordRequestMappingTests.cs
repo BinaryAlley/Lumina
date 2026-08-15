@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.Authentication;
 using Lumina.Application.Core.UsersManagement.Authentication.Commands.RecoverPassword;
-using Lumina.Application.UnitTests.Core.UsersManagement.Authentication.Commands.RecoverPassword.Fixtures;
+using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
 using Lumina.Contracts.Requests.Authentication;
 using System.Diagnostics.CodeAnalysis;
 #endregion
@@ -28,7 +28,7 @@ public class RecoverPasswordRequestMappingTests
     public void ToCommand_WhenMappingRequest_ShouldMapCorrectly()
     {
         // Arrange
-        RecoverPasswordRequest request = _fixture.CreateRecoverPasswordRequest();
+        RecoverPasswordRequest request = _fixture.Create();
 
         // Act
         RecoverPasswordCommand result = request.ToCommand();

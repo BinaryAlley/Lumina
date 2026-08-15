@@ -3,12 +3,12 @@ using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.FileSystemManagement.Files.Queries.GetFiles;
-using Lumina.Application.UnitTests.Core.FileSystemManagement.Files.Fixtures;
-using Lumina.Application.UnitTests.Core.FileSystemManagement.Files.Queries.GetFiles.Fixtures;
+using Lumina.Application.Fixtures.Core.FileSystemManagement.Files.Queries.GetFiles;
 using Lumina.Contracts.Responses.FileSystemManagement.Files;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -30,6 +30,7 @@ public class GetFilesQueryHandlerTests
     private readonly IFileService _mockFileService;
     private readonly GetFilesQueryHandler _sut;
     private readonly FileFixture _fileFixture;
+    private readonly GetFilesQueryFixture _getFilesQueryFixture;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetFilesQueryHandlerTests"/> class.
@@ -43,13 +44,14 @@ public class GetFilesQueryHandlerTests
             .Returns([]);
         _sut = new GetFilesQueryHandler(_mockFileService, mockValidator);
         _fileFixture = new FileFixture();
+        _getFilesQueryFixture = new GetFilesQueryFixture();
     }
 
     [Fact]
     public async Task HandleAsync_WhenCalledWithValidQueryWithoutHiddenFiles_ShouldReturnSuccessResult()
     {
         // Arrange
-        GetFilesQuery getFilesQuery = GetFilesQueryFixture.CreateGetFilesQuery(false);
+        GetFilesQuery getFilesQuery = _getFilesQueryFixture.Create(includeHiddenElements: false);
 
         IEnumerable<File> files = _fileFixture.CreateMany();
 
@@ -83,7 +85,7 @@ public class GetFilesQueryHandlerTests
     public async Task HandleAsync_WhenCalledWithValidQueryWithHiddenFiles_ShouldReturnSuccessResult()
     {
         // Arrange
-        GetFilesQuery getFilesQuery = GetFilesQueryFixture.CreateGetFilesQuery(true);
+        GetFilesQuery getFilesQuery = _getFilesQueryFixture.Create(includeHiddenElements: true);
 
         IEnumerable<File> files = _fileFixture.CreateMany();
 
@@ -117,7 +119,7 @@ public class GetFilesQueryHandlerTests
     public async Task HandleAsync_WhenFileServiceReturnsError_ShouldReturnFailureResult()
     {
         // Arrange
-        GetFilesQuery query = _fixture.Create<GetFilesQuery>();
+        GetFilesQuery query = _getFilesQueryFixture.Create();
         Error error = Error.Failure("FileService.Error", "An error occurred");
         _mockFileService.GetFiles(query.Path!, query.IncludeHiddenElements)
             .Returns(error);
@@ -135,7 +137,7 @@ public class GetFilesQueryHandlerTests
     public async Task HandleAsync_WhenFileServiceReturnsEmptyList_ShouldReturnEmptySuccessResult()
     {
         // Arrange
-        GetFilesQuery query = _fixture.Create<GetFilesQuery>();
+        GetFilesQuery query = _getFilesQueryFixture.Create();
         Result<IEnumerable<File>> emptyList = Result.From(Enumerable.Empty<File>());
         _mockFileService.GetFiles(query.Path!, query.IncludeHiddenElements)
             .Returns(emptyList);

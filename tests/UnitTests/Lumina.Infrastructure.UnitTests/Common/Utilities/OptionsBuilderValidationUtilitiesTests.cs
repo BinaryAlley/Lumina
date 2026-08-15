@@ -4,7 +4,7 @@ using AutoFixture.AutoNSubstitute;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Infrastructure.Common.Utilities;
 using Lumina.Infrastructure.Common.Validation;
-using Lumina.Infrastructure.UnitTests.Common.Utilities.Fixtures;
+using Lumina.Infrastructure.Fixtures.Common.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NSubstitute;

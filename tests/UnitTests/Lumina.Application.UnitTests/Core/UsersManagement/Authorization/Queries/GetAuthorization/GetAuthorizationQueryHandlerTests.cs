@@ -5,7 +5,8 @@ using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetAuthorization;
-using Lumina.Application.UnitTests.Core.UsersManagement.Authorization.Queries.GetAuthorization.Fixtures;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
+using Lumina.Application.Fixtures.Core.UsersManagement.Authorization.Queries.GetAuthorization;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.Domain.Common.Primitives;
 using NSubstitute;
@@ -26,6 +27,8 @@ public class GetAuthorizationQueryHandlerTests
     private readonly IAuthorizationService _mockAuthorizationService;
     private readonly ICurrentUserService _mockCurrentUserService;
     private readonly GetAuthorizationQueryHandler _sut;
+    private readonly GetAuthorizationQueryFixture _getAuthorizationQueryFixture;
+    private readonly UserAuthorizationEntityFixture _userAuthorizationEntityFixture;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetAuthorizationQueryHandlerTests"/> class.
@@ -34,6 +37,8 @@ public class GetAuthorizationQueryHandlerTests
     {
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
+        _getAuthorizationQueryFixture = new GetAuthorizationQueryFixture();
+        _userAuthorizationEntityFixture = new UserAuthorizationEntityFixture();
         IValidator<GetAuthorizationQuery> mockValidator = Substitute.For<IValidator<GetAuthorizationQuery>>();
         mockValidator.Validate(Arg.Any<GetAuthorizationQuery>())
             .Returns([]);
@@ -45,8 +50,8 @@ public class GetAuthorizationQueryHandlerTests
     {
         // Arrange
         Guid userId = Guid.NewGuid();
-        GetAuthorizationQuery query = GetAuthorizationQueryFixture.CreateGetAuthorizationQuery(userId);
-        UserAuthorizationEntity authEntity = GetAuthorizationQueryFixture.CreateUserAuthorizationEntity(userId);
+        GetAuthorizationQuery query = _getAuthorizationQueryFixture.Create(userId);
+        UserAuthorizationEntity authEntity = _userAuthorizationEntityFixture.Create(userId);
 
         _mockCurrentUserService.UserId.Returns(userId);
         _mockAuthorizationService.GetUserAuthorizationAsync(userId, Arg.Any<CancellationToken>())
@@ -68,9 +73,9 @@ public class GetAuthorizationQueryHandlerTests
         // Arrange
         Guid adminUserId = Guid.NewGuid();
         Guid targetUserId = Guid.NewGuid();
-        GetAuthorizationQuery query = GetAuthorizationQueryFixture.CreateGetAuthorizationQuery(targetUserId);
-        UserAuthorizationEntity adminAuthEntity = GetAuthorizationQueryFixture.CreateUserAuthorizationEntity(adminUserId, true);
-        UserAuthorizationEntity targetAuthEntity = GetAuthorizationQueryFixture.CreateUserAuthorizationEntity(targetUserId);
+        GetAuthorizationQuery query = _getAuthorizationQueryFixture.Create(targetUserId);
+        UserAuthorizationEntity adminAuthEntity = _userAuthorizationEntityFixture.Create(adminUserId, true);
+        UserAuthorizationEntity targetAuthEntity = _userAuthorizationEntityFixture.Create(targetUserId);
 
         _mockCurrentUserService.UserId.Returns(adminUserId);
         _mockAuthorizationService.GetUserAuthorizationAsync(adminUserId, Arg.Any<CancellationToken>())
@@ -94,8 +99,8 @@ public class GetAuthorizationQueryHandlerTests
         // Arrange
         Guid currentUserId = Guid.NewGuid();
         Guid targetUserId = Guid.NewGuid();
-        GetAuthorizationQuery query = GetAuthorizationQueryFixture.CreateGetAuthorizationQuery(targetUserId);
-        UserAuthorizationEntity currentUserAuth = GetAuthorizationQueryFixture.CreateUserAuthorizationEntity(currentUserId, false);
+        GetAuthorizationQuery query = _getAuthorizationQueryFixture.Create(targetUserId);
+        UserAuthorizationEntity currentUserAuth = _userAuthorizationEntityFixture.Create(currentUserId, false);
 
         _mockCurrentUserService.UserId.Returns(currentUserId);
         _mockAuthorizationService.GetUserAuthorizationAsync(currentUserId, Arg.Any<CancellationToken>())
@@ -115,7 +120,7 @@ public class GetAuthorizationQueryHandlerTests
         // Arrange
         Guid currentUserId = Guid.NewGuid();
         Guid targetUserId = Guid.NewGuid();
-        GetAuthorizationQuery query = GetAuthorizationQueryFixture.CreateGetAuthorizationQuery(targetUserId);
+        GetAuthorizationQuery query = _getAuthorizationQueryFixture.Create(targetUserId);
         Error error = Error.Failure("Database.Error", "Failed to get user authorization");
 
         _mockCurrentUserService.UserId.Returns(currentUserId);
@@ -136,8 +141,8 @@ public class GetAuthorizationQueryHandlerTests
         // Arrange
         Guid adminUserId = Guid.NewGuid();
         Guid targetUserId = Guid.NewGuid();
-        GetAuthorizationQuery query = GetAuthorizationQueryFixture.CreateGetAuthorizationQuery(targetUserId);
-        UserAuthorizationEntity adminAuthEntity = GetAuthorizationQueryFixture.CreateUserAuthorizationEntity(adminUserId, true);
+        GetAuthorizationQuery query = _getAuthorizationQueryFixture.Create(targetUserId);
+        UserAuthorizationEntity adminAuthEntity = _userAuthorizationEntityFixture.Create(adminUserId, true);
         Error error = Error.Failure("Database.Error", "Failed to get target user authorization");
 
         _mockCurrentUserService.UserId.Returns(adminUserId);

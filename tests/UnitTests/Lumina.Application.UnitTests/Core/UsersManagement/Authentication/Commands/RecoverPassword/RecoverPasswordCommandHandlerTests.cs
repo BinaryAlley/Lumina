@@ -7,7 +7,7 @@ using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Security;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.UsersManagement.Authentication.Commands.RecoverPassword;
-using Lumina.Application.UnitTests.Common.Mapping.UserManagement.Users.Fixtures;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.Domain.Common.Primitives;
 using NSubstitute;
@@ -31,6 +31,7 @@ public class RecoverPasswordCommandHandlerTests
     private readonly ICryptographyService _mockCryptographyService;
     private readonly IUserRepository _mockUserRepository;
     private readonly RecoverPasswordCommandHandler _sut;
+    private readonly UserEntityFixture _userEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CheckInitializationQueryHandlerTests"/> class.
@@ -65,7 +66,7 @@ public class RecoverPasswordCommandHandlerTests
         string decryptedTotpSecret = Convert.ToBase64String(new byte[] { 4, 5, 6 });
         string hashedTempPassword = "hashedTempPassword";
 
-        UserEntity user = UserEntityFixture.CreateUserEntity();
+        UserEntity user = _userEntityFixture.Create();
         user.TotpSecret = encryptedTotpSecret;
         user.TempPassword = null;
 
@@ -121,7 +122,7 @@ public class RecoverPasswordCommandHandlerTests
     public async Task HandleAsync_WhenTempPasswordExists_ShouldReturnError()
     {
         // Arrange
-        UserEntity user = UserEntityFixture.CreateUserEntity();
+        UserEntity user = _userEntityFixture.Create();
         user.TempPassword = "existingTempPassword";
         user.TempPasswordCreated = DateTime.UtcNow;
 
@@ -146,7 +147,7 @@ public class RecoverPasswordCommandHandlerTests
     public async Task HandleAsync_WhenUserDoesNotUseTOTP_ShouldReturnError()
     {
         // Arrange
-        UserEntity user = UserEntityFixture.CreateUserEntity();
+        UserEntity user = _userEntityFixture.Create();
         user.TotpSecret = null;
 
         RecoverPasswordCommand command = new(user.Username, "123456");
@@ -174,7 +175,7 @@ public class RecoverPasswordCommandHandlerTests
         string encryptedTotpSecret = Convert.ToBase64String(new byte[] { 1, 2, 3 });
         string decryptedTotpSecret = Convert.ToBase64String(new byte[] { 4, 5, 6 });
 
-        UserEntity user = UserEntityFixture.CreateUserEntity();
+        UserEntity user = _userEntityFixture.Create();
         user.TotpSecret = encryptedTotpSecret;
 
         RecoverPasswordCommand command = new(user.Username, totpCode);
@@ -208,7 +209,7 @@ public class RecoverPasswordCommandHandlerTests
         string decryptedTotpSecret = Convert.ToBase64String(new byte[] { 4, 5, 6 });
         Error error = Error.Failure("Database.Error", "Failed to update user");
 
-        UserEntity user = UserEntityFixture.CreateUserEntity();
+        UserEntity user = _userEntityFixture.Create();
         user.TotpSecret = encryptedTotpSecret;
 
         RecoverPasswordCommand command = new(user.Username, totpCode);
@@ -242,7 +243,7 @@ public class RecoverPasswordCommandHandlerTests
         string totpCode = "123456";
         string encryptedTotpSecret = Convert.ToBase64String(new byte[] { 1, 2, 3 });
 
-        UserEntity user = UserEntityFixture.CreateUserEntity();
+        UserEntity user = _userEntityFixture.Create();
         user.TotpSecret = encryptedTotpSecret;
 
         RecoverPasswordCommand command = new(user.Username, totpCode);
@@ -269,7 +270,7 @@ public class RecoverPasswordCommandHandlerTests
         // Arrange
         string encryptedTotpSecret = Convert.ToBase64String(new byte[] { 1, 2, 3 });
 
-        UserEntity user = UserEntityFixture.CreateUserEntity();
+        UserEntity user = _userEntityFixture.Create();
         user.TotpSecret = encryptedTotpSecret;
 
         RecoverPasswordCommand command = new(user.Username, null);

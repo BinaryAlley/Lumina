@@ -8,7 +8,7 @@ using Lumina.Application.Common.Infrastructure.Security;
 using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.UsersManagement.Authentication.Queries.LoginUser;
-using Lumina.Application.UnitTests.Common.Mapping.UserManagement.Users.Fixtures;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.Domain.Common.Primitives;
 using NSubstitute;
@@ -34,6 +34,7 @@ public class LoginUserQueryHandlerTests
     private readonly IUserRepository _mockUserRepository;
     private readonly IDateTimeProvider _mockDateTimeProvider;
     private readonly LoginUserQueryHandler _sut;
+    private readonly UserEntityFixture _userEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LoginUserQueryHandlerTests"/> class.
@@ -72,7 +73,7 @@ public class LoginUserQueryHandlerTests
         string hashedPassword = "hashedPassword";
         string jwtToken = "jwtToken";
 
-        UserEntity user = UserEntityFixture.CreateUserEntity();
+        UserEntity user = _userEntityFixture.Create();
         user.Password = Uri.EscapeDataString(hashedPassword);
         user.TotpSecret = null;
 
@@ -107,7 +108,7 @@ public class LoginUserQueryHandlerTests
         string encryptedTotpSecret = Convert.ToBase64String(new byte[] { 1, 2, 3 });
         string decryptedTotpSecret = Convert.ToBase64String(new byte[] { 4, 5, 6 });
 
-        UserEntity user = UserEntityFixture.CreateUserEntity();
+        UserEntity user = _userEntityFixture.Create();
         user.Password = Uri.EscapeDataString(hashedPassword);
         user.TotpSecret = encryptedTotpSecret;
 
@@ -159,7 +160,7 @@ public class LoginUserQueryHandlerTests
         string password = "wrongPassword";
         string hashedPassword = "hashedPassword";
 
-        UserEntity user = UserEntityFixture.CreateUserEntity();
+        UserEntity user = _userEntityFixture.Create();
         user.Password = Uri.EscapeDataString(hashedPassword);
         user.TempPassword = null;
 
@@ -186,7 +187,7 @@ public class LoginUserQueryHandlerTests
         string hashedPassword = "hashedPassword";
         string hashedTempPassword = "hashedTempPassword";
 
-        UserEntity user = UserEntityFixture.CreateUserEntity();
+        UserEntity user = _userEntityFixture.Create();
         user.Password = Uri.EscapeDataString(hashedPassword);
         user.TempPassword = Uri.EscapeDataString(hashedTempPassword);
         user.TempPasswordCreated = DateTime.UtcNow.AddMinutes(-16); // Expired (more than 15 minutes old)
@@ -222,7 +223,7 @@ public class LoginUserQueryHandlerTests
         string hashedTempPassword = "hashedTempPassword";
         string jwtToken = "jwtToken";
 
-        UserEntity user = UserEntityFixture.CreateUserEntity();
+        UserEntity user = _userEntityFixture.Create();
         user.Password = Uri.EscapeDataString(hashedPassword);
         user.TempPassword = Uri.EscapeDataString(hashedTempPassword);
         // Set temp password created time to 10 minutes ago (still valid)
@@ -259,7 +260,7 @@ public class LoginUserQueryHandlerTests
         string hashedPassword = "hashedPassword";
         string encryptedTotpSecret = Convert.ToBase64String(new byte[] { 1, 2, 3 });
 
-        UserEntity user = UserEntityFixture.CreateUserEntity();
+        UserEntity user = _userEntityFixture.Create();
         user.Password = Uri.EscapeDataString(hashedPassword);
         user.TotpSecret = encryptedTotpSecret;
 
@@ -288,7 +289,7 @@ public class LoginUserQueryHandlerTests
         string encryptedTotpSecret = Convert.ToBase64String(new byte[] { 1, 2, 3 });
         string decryptedTotpSecret = Convert.ToBase64String(new byte[] { 4, 5, 6 });
 
-        UserEntity user = UserEntityFixture.CreateUserEntity();
+        UserEntity user = _userEntityFixture.Create();
         user.Password = Uri.EscapeDataString(hashedPassword);
         user.TotpSecret = encryptedTotpSecret;
 
@@ -337,7 +338,7 @@ public class LoginUserQueryHandlerTests
         string hashedPassword = "hashedPassword";
         string hashedTempPassword = "hashedTempPassword";
 
-        UserEntity user = UserEntityFixture.CreateUserEntity();
+        UserEntity user = _userEntityFixture.Create();
         user.Password = Uri.EscapeDataString(hashedPassword);
         user.TempPassword = Uri.EscapeDataString(hashedTempPassword);
         user.TempPasswordCreated = DateTime.UtcNow.AddMinutes(-10); // Valid timeframe

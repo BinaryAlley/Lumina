@@ -8,8 +8,8 @@ using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
-using Lumina.Application.UnitTests.Common.Mapping.UserManagement.Users.Fixtures;
-using Lumina.Application.UnitTests.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions.Fixtures;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Application.Fixtures.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
@@ -39,6 +39,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
     private readonly IRoleRepository _mockRoleRepository;
     private readonly IPermissionRepository _mockPermissionRepository;
     private readonly UpdateUserRoleAndPermissionsCommandHandler _sut;
+    private readonly UserEntityFixture _userEntityFixture = new();
     private readonly UpdateUserRoleAndPermissionsCommandFixture _updateUserRoleAndPermissionsCommandFixture;
     private readonly Guid _userId;
 
@@ -75,7 +76,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
     public async Task HandleAsync_WhenUserIsNotAdmin_ShouldReturnNotAuthorizedError()
     {
         // Arrange
-        UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.CreateCommand();
+        UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.Create();
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(false);
 
@@ -92,7 +93,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
     public async Task HandleAsync_WhenUserDoesNotExist_ShouldReturnUserDoesNotExistError()
     {
         // Arrange
-        UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.CreateCommand();
+        UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.Create();
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(true);
         _mockUserRepository.GetByIdAsync(command.UserId, Arg.Any<CancellationToken>())
@@ -110,8 +111,8 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
     public async Task HandleAsync_WhenRoleDoesNotExist_ShouldReturnRoleNotFoundError()
     {
         // Arrange
-        UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.CreateCommand(roleId: Guid.NewGuid());
-        UserEntity user = UserEntityFixture.CreateUserEntity();
+        UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.Create(roleId: Guid.NewGuid());
+        UserEntity user = _userEntityFixture.Create();
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(true);
@@ -132,7 +133,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
     public async Task HandleAsync_WhenRemovingLastAdmin_ShouldReturnCannotRemoveLastAdminError()
     {
         // Arrange
-        UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.CreateCommand(roleId: Guid.NewGuid());
+        UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.Create(roleId: Guid.NewGuid());
         RoleEntity adminRole = new() { RoleName = "Admin" };
         Guid userId = Guid.NewGuid();
 
@@ -178,8 +179,8 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
     public async Task HandleAsync_WhenUpdateFails_ShouldReturnError()
     {
         // Arrange
-        UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.CreateCommand(roleId: Guid.NewGuid());
-        UserEntity user = UserEntityFixture.CreateUserEntity();
+        UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.Create(roleId: Guid.NewGuid());
+        UserEntity user = _userEntityFixture.Create();
         RoleEntity role = new() { RoleName = "TestRole" };
         IEnumerable<PermissionEntity> permissions = command.Permissions.Select(p =>
             new PermissionEntity { Id = p, PermissionName = AuthorizationPermission.CanViewUsers });
@@ -209,7 +210,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
     public async Task HandleAsync_WhenAllOperationsSucceed_ShouldReturnSuccessResponse()
     {
         // Arrange
-        UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.CreateCommand(roleId: Guid.NewGuid());
+        UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.Create(roleId: Guid.NewGuid());
         UserEntity user = new()
         {
             Id = command.UserId,
@@ -261,7 +262,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
     public async Task HandleAsync_WhenGetAllUsersFails_ShouldReturnError()
     {
         // Arrange
-        UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.CreateCommand(roleId: Guid.NewGuid());
+        UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.Create(roleId: Guid.NewGuid());
         UserEntity user = new()
         {
             Id = command.UserId,
@@ -302,7 +303,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
     public async Task HandleAsync_WhenGetPermissionsFails_ShouldReturnError()
     {
         // Arrange
-        UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.CreateCommand(roleId: Guid.NewGuid());
+        UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.Create(roleId: Guid.NewGuid());
         UserEntity user = new()
         {
             Id = command.UserId,

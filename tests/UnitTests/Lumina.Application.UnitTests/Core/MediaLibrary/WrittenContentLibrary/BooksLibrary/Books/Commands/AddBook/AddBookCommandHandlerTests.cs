@@ -6,8 +6,8 @@ using Lumina.Application.Common.DataAccess.Repositories.Books;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook;
-using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Application.UnitTests.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook.Fixtures;
+using Lumina.Application.Fixtures.Common.Setup;
+using Lumina.Application.Fixtures.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook;
 using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
@@ -60,7 +60,7 @@ public class AddBookCommandHandlerTests
     public async Task HandleAsync_WhenCalledWithValidCommand_ShouldReturnSuccessResult()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
 
         _mockBookRepository.InsertAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Created);
@@ -79,7 +79,7 @@ public class AddBookCommandHandlerTests
     public async Task HandleAsync_WhenRepositoryInsertFails_ShouldReturnFailureResult()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
 
         _mockBookRepository.InsertAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>())
             .Returns(Errors.WrittenContent.BookAlreadyExists);
@@ -98,7 +98,7 @@ public class AddBookCommandHandlerTests
     public async Task HandleAsync_WhenCalledWithInvalidISBN_ShouldReturnFailureResult()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { ISBNs = [new IsbnDto("invalid", IsbnFormat.Isbn13)] };
 
         // Act
@@ -115,7 +115,7 @@ public class AddBookCommandHandlerTests
     public async Task HandleAsync_WhenCalledWithInvalidRating_ShouldReturnFailureResult()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with { Ratings = [new BookRatingDto(-1, 5, null, null)] };
 
         // Act
@@ -132,7 +132,7 @@ public class AddBookCommandHandlerTests
     public async Task HandleAsync_WhenGenreCreationFails_ShouldReturnFailureResult()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with
         {
             Metadata = bookCommand.Metadata! with
@@ -155,7 +155,7 @@ public class AddBookCommandHandlerTests
     public async Task HandleAsync_WhenTagCreationFails_ShouldReturnFailureResult()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with
         {
             Metadata = bookCommand.Metadata! with
@@ -178,7 +178,7 @@ public class AddBookCommandHandlerTests
     public async Task HandleAsync_WhenReleaseInfoCreationFails_ShouldReturnFailureResult()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with
         {
             Metadata = bookCommand.Metadata! with
@@ -208,7 +208,7 @@ public class AddBookCommandHandlerTests
     public async Task HandleAsync_WhenLanguageInfoCreationFails_ShouldReturnFailureResult()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with
         {
             Metadata = bookCommand.Metadata! with
@@ -231,7 +231,7 @@ public class AddBookCommandHandlerTests
     public async Task HandleAsync_WhenOriginalLanguageInfoCreationFails_ShouldReturnFailureResult()
     {
         // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.CreateCommandBook();
+        AddBookCommand bookCommand = _commandBookFixture.Create();
         bookCommand = bookCommand with
         {
             Metadata = bookCommand.Metadata! with

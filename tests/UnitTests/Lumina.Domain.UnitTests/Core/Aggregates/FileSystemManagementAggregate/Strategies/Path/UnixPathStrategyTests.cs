@@ -3,7 +3,7 @@ using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Path;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
-using Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.ValueObjects.Fixtures;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using NSubstitute;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -44,7 +44,7 @@ public class UnixPathStrategyTests
     public void IsValidPath_WithValidUnixPaths_ShouldReturnTrue(string path)
     {
         // Arrange
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(path);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path);
 
         // Act
         bool result = _sut.IsValidPath(pathId);
@@ -61,7 +61,7 @@ public class UnixPathStrategyTests
     public void IsValidPath_WithInvalidUnixPaths_ShouldReturnFalse(string path)
     {
         // Arrange
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(path);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path);
 
         // Act
         bool result = _sut.IsValidPath(pathId);
@@ -75,7 +75,7 @@ public class UnixPathStrategyTests
     {
         // Arrange
         string invalidPath = "/home/user/file\0name";
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(invalidPath);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(invalidPath);
 
         // Act
         bool result = _sut.IsValidPath(pathId);
@@ -98,7 +98,7 @@ public class UnixPathStrategyTests
     public void IsValidPath_WithValidSpecialCharacters_ShouldReturnTrue(string path)
     {
         // Arrange
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(path);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path);
 
         // Act
         bool result = _sut.IsValidPath(pathId);
@@ -112,7 +112,7 @@ public class UnixPathStrategyTests
     {
         // Arrange
         string longPath = "/" + string.Join("/", Enumerable.Repeat("a", 100));
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(longPath);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(longPath);
 
         // Act
         bool result = _sut.IsValidPath(pathId);
@@ -126,7 +126,7 @@ public class UnixPathStrategyTests
     {
         // Arrange
         string existingPath = "/home/user/existing_file.txt";
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(existingPath);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(existingPath);
 
         _mockFileSystem.Path.Exists(existingPath).Returns(true);
         _mockFileSystem.File.Exists(existingPath).Returns(true);
@@ -144,7 +144,7 @@ public class UnixPathStrategyTests
     {
         // Arrange
         string existingPath = "/home/user/existing_file.txt";
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(existingPath);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(existingPath);
         _mockFileSystem.Path.Exists(existingPath).Returns(true);
         _mockFileSystem.File.Exists(existingPath).Returns(true);
         IFileInfo mockFileInfo = Substitute.For<IFileInfo>();
@@ -164,7 +164,7 @@ public class UnixPathStrategyTests
     {
         // Arrange
         string nonExistingPath = "/home/user/non_existing_file.txt";
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(nonExistingPath);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(nonExistingPath);
         _mockFileSystem.Path.Exists(nonExistingPath).Returns(false);
 
         // Act
@@ -180,7 +180,7 @@ public class UnixPathStrategyTests
     {
         // Arrange
         string rootPath = "/";
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(rootPath);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(rootPath);
         _mockFileSystem.Path.Exists(rootPath).Returns(true);
 
         // Act
@@ -196,7 +196,7 @@ public class UnixPathStrategyTests
     {
         // Arrange
         string directoryPath = "/home/user/documents/";
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(directoryPath);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(directoryPath);
         _mockFileSystem.Path.Exists(directoryPath).Returns(true);
         _mockFileSystem.Directory.Exists(directoryPath).Returns(true);
 
@@ -213,7 +213,7 @@ public class UnixPathStrategyTests
     {
         // Arrange
         string filePath = "/home/user/documents/file.txt";
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(filePath);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(filePath);
         _mockFileSystem.Path.Exists(filePath).Returns(true);
         _mockFileSystem.File.Exists(filePath).Returns(true);
 
@@ -229,7 +229,7 @@ public class UnixPathStrategyTests
     public void CombinePath_WithValidPathAndName_ShouldReturnCombinedPath()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId("/home/user");
+        FileSystemPathId path = _fileSystemPathIdFixture.Create("/home/user");
         string name = "documents";
 
         // Act
@@ -244,7 +244,7 @@ public class UnixPathStrategyTests
     public void CombinePath_WithTrailingSlashInPath_ShouldReturnCorrectlyCombinedPath()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId("/home/user/");
+        FileSystemPathId path = _fileSystemPathIdFixture.Create("/home/user/");
         string name = "documents";
 
         // Act
@@ -259,7 +259,7 @@ public class UnixPathStrategyTests
     public void CombinePath_WithLeadingSlashInName_ShouldReturnCorrectlyCombinedPath()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId("/home/user");
+        FileSystemPathId path = _fileSystemPathIdFixture.Create("/home/user");
         string name = "/documents";
 
         // Act
@@ -274,7 +274,7 @@ public class UnixPathStrategyTests
     public void CombinePath_WithEmptyName_ShouldReturnError()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId("/home/user");
+        FileSystemPathId path = _fileSystemPathIdFixture.Create("/home/user");
         string name = "";
 
         // Act
@@ -289,7 +289,7 @@ public class UnixPathStrategyTests
     public void CombinePath_WithNullName_ShouldReturnError()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId("/home/user");
+        FileSystemPathId path = _fileSystemPathIdFixture.Create("/home/user");
         string name = null!;
 
         // Act
@@ -304,7 +304,7 @@ public class UnixPathStrategyTests
     public void CombinePath_WithRootPath_ShouldReturnCorrectlyCombinedPath()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId("/");
+        FileSystemPathId path = _fileSystemPathIdFixture.Create("/");
         string name = "home";
 
         // Act
@@ -319,7 +319,7 @@ public class UnixPathStrategyTests
     public void ParsePath_WithValidUnixPath_ShouldReturnCorrectPathSegments()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId("/home/user/documents/file.txt");
+        FileSystemPathId path = _fileSystemPathIdFixture.Create("/home/user/documents/file.txt");
 
         // Act
         Result<IEnumerable<PathSegment>> result = _sut.ParsePath(path);
@@ -327,18 +327,18 @@ public class UnixPathStrategyTests
         // Assert
         Assert.False(result.IsFailure);
         Assert.Equal(5, result.Value.Count());
-        Assert.Equal(_pathSegmentFixture.CreatePathSegment("/", false, true), result.Value.ElementAt(0));
-        Assert.Equal(_pathSegmentFixture.CreatePathSegment("home", true, false), result.Value.ElementAt(1));
-        Assert.Equal(_pathSegmentFixture.CreatePathSegment("user", true, false), result.Value.ElementAt(2));
-        Assert.Equal(_pathSegmentFixture.CreatePathSegment("documents", true, false), result.Value.ElementAt(3));
-        Assert.Equal(_pathSegmentFixture.CreatePathSegment("file.txt", false, false), result.Value.ElementAt(4));
+        Assert.Equal(_pathSegmentFixture.Create("/", false, true), result.Value.ElementAt(0));
+        Assert.Equal(_pathSegmentFixture.Create("home", true, false), result.Value.ElementAt(1));
+        Assert.Equal(_pathSegmentFixture.Create("user", true, false), result.Value.ElementAt(2));
+        Assert.Equal(_pathSegmentFixture.Create("documents", true, false), result.Value.ElementAt(3));
+        Assert.Equal(_pathSegmentFixture.Create("file.txt", false, false), result.Value.ElementAt(4));
     }
 
     [Fact]
     public void ParsePath_WithRootPath_ShouldReturnSingleRootSegment()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId("/");
+        FileSystemPathId path = _fileSystemPathIdFixture.Create("/");
 
         // Act
         Result<IEnumerable<PathSegment>> result = _sut.ParsePath(path);
@@ -346,14 +346,14 @@ public class UnixPathStrategyTests
         // Assert
         Assert.False(result.IsFailure);
         Assert.Single(result.Value);
-        Assert.Equal(_pathSegmentFixture.CreatePathSegment("/", false, true), result.Value.Single());
+        Assert.Equal(_pathSegmentFixture.Create("/", false, true), result.Value.Single());
     }
 
     [Fact]
     public void ParsePath_WithTrailingSlash_ShouldTreatLastSegmentAsDirectory()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId("/home/user/documents/");
+        FileSystemPathId path = _fileSystemPathIdFixture.Create("/home/user/documents/");
 
         // Act
         Result<IEnumerable<PathSegment>> result = _sut.ParsePath(path);
@@ -361,14 +361,14 @@ public class UnixPathStrategyTests
         // Assert
         Assert.False(result.IsFailure);
         Assert.Equal(4, result.Value.Count());
-        Assert.Equal(_pathSegmentFixture.CreatePathSegment("documents", true, false), result.Value.Last());
+        Assert.Equal(_pathSegmentFixture.Create("documents", true, false), result.Value.Last());
     }
 
     [Fact]
     public void ParsePath_WithRelativePath_ShouldReturnError()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId("home/user");
+        FileSystemPathId path = _fileSystemPathIdFixture.Create("home/user");
 
         // Act
         Result<IEnumerable<PathSegment>> result = _sut.ParsePath(path);
@@ -382,7 +382,7 @@ public class UnixPathStrategyTests
     public void ParsePath_WithPathContainingDots_ShouldParseCorrectly()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId("/home/user/file.with.dots.txt");
+        FileSystemPathId path = _fileSystemPathIdFixture.Create("/home/user/file.with.dots.txt");
 
         // Act
         Result<IEnumerable<PathSegment>> result = _sut.ParsePath(path);
@@ -390,14 +390,14 @@ public class UnixPathStrategyTests
         // Assert
         Assert.False(result.IsFailure);
         Assert.Equal(4, result.Value.Count());
-        Assert.Equal(_pathSegmentFixture.CreatePathSegment("file.with.dots.txt", false, false), result.Value.Last());
+        Assert.Equal(_pathSegmentFixture.Create("file.with.dots.txt", false, false), result.Value.Last());
     }
 
     [Fact]
     public void GoUpOneLevel_WithValidPath_ShouldReturnParentPath()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId("/home/user/documents");
+        FileSystemPathId path = _fileSystemPathIdFixture.Create("/home/user/documents");
 
         // Act
         Result<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(path);
@@ -405,16 +405,16 @@ public class UnixPathStrategyTests
         // Assert
         Assert.False(result.IsFailure);
         Assert.Equal(3, result.Value.Count());
-        Assert.Equal(_pathSegmentFixture.CreatePathSegment("/", false, true), result.Value.ElementAt(0));
-        Assert.Equal(_pathSegmentFixture.CreatePathSegment("home", true, false), result.Value.ElementAt(1));
-        Assert.Equal(_pathSegmentFixture.CreatePathSegment("user", true, false), result.Value.ElementAt(2));
+        Assert.Equal(_pathSegmentFixture.Create("/", false, true), result.Value.ElementAt(0));
+        Assert.Equal(_pathSegmentFixture.Create("home", true, false), result.Value.ElementAt(1));
+        Assert.Equal(_pathSegmentFixture.Create("user", true, false), result.Value.ElementAt(2));
     }
 
     [Fact]
     public void GoUpOneLevel_WithRootPath_ShouldReturnError()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId("/");
+        FileSystemPathId path = _fileSystemPathIdFixture.Create("/");
 
         // Act
         Result<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(path);
@@ -428,7 +428,7 @@ public class UnixPathStrategyTests
     public void GoUpOneLevel_WithTrailingSlash_ShouldReturnCorrectParentPath()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId("/home/user/");
+        FileSystemPathId path = _fileSystemPathIdFixture.Create("/home/user/");
 
         // Act
         Result<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(path);
@@ -436,15 +436,15 @@ public class UnixPathStrategyTests
         // Assert
         Assert.False(result.IsFailure);
         Assert.Equal(2, result.Value.Count());
-        Assert.Equal(_pathSegmentFixture.CreatePathSegment("/", false, true), result.Value.ElementAt(0));
-        Assert.Equal(_pathSegmentFixture.CreatePathSegment("home", true, false), result.Value.ElementAt(1));
+        Assert.Equal(_pathSegmentFixture.Create("/", false, true), result.Value.ElementAt(0));
+        Assert.Equal(_pathSegmentFixture.Create("home", true, false), result.Value.ElementAt(1));
     }
 
     [Fact]
     public void GoUpOneLevel_WithInvalidPath_ShouldReturnError()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId("invalid/path");
+        FileSystemPathId path = _fileSystemPathIdFixture.Create("invalid/path");
 
         // Act
         Result<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(path);
@@ -458,7 +458,7 @@ public class UnixPathStrategyTests
     public void GoUpOneLevel_WithSingleLevelPath_ShouldReturnRootPath()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId("/home");
+        FileSystemPathId path = _fileSystemPathIdFixture.Create("/home");
 
         // Act
         Result<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(path);
@@ -466,7 +466,7 @@ public class UnixPathStrategyTests
         // Assert
         Assert.False(result.IsFailure);
         Assert.Single(result.Value);
-        Assert.Equal(_pathSegmentFixture.CreatePathSegment("/", false, true), result.Value.Single());
+        Assert.Equal(_pathSegmentFixture.Create("/", false, true), result.Value.Single());
     }
 
     [Fact]
@@ -513,35 +513,35 @@ public class UnixPathStrategyTests
     public void GetPathRoot_WithValidUnixPath_ShouldReturnRootSegment()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId("/home/user/documents");
+        FileSystemPathId path = _fileSystemPathIdFixture.Create("/home/user/documents");
 
         // Act
         Result<PathSegment> result = _sut.GetPathRoot(path);
 
         // Assert
         Assert.False(result.IsFailure);
-        Assert.Equal(_pathSegmentFixture.CreatePathSegment("/", false, true), result.Value);
+        Assert.Equal(_pathSegmentFixture.Create("/", false, true), result.Value);
     }
 
     [Fact]
     public void GetPathRoot_WithRootPath_ShouldReturnRootSegment()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId("/");
+        FileSystemPathId path = _fileSystemPathIdFixture.Create("/");
 
         // Act
         Result<PathSegment> result = _sut.GetPathRoot(path);
 
         // Assert
         Assert.False(result.IsFailure);
-        Assert.Equal(_pathSegmentFixture.CreatePathSegment("/", false, true), result.Value);
+        Assert.Equal(_pathSegmentFixture.Create("/", false, true), result.Value);
     }
 
     [Fact]
     public void GetPathRoot_WithInvalidPath_ShouldReturnError()
     {
         // Arrange
-        FileSystemPathId path = _fileSystemPathIdFixture.CreateFileSystemPathId("home/user");
+        FileSystemPathId path = _fileSystemPathIdFixture.Create("home/user");
 
         // Act
         Result<PathSegment> result = _sut.GetPathRoot(path);

@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
-using Lumina.Application.UnitTests.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Common.Fixtures;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
 using System.Collections.Generic;
@@ -32,7 +32,7 @@ public class BookRatingDtoMappingTests
     public void ToDomainEntity_WhenMappingCompleteBookRatinDto_ShouldMapAllPropertiesCorrectly()
     {
         // Arrange
-        BookRatingDto dto = _bookRatingDtoFixture.CreateComplete();
+        BookRatingDto dto = _bookRatingDtoFixture.Create();
 
         // Act
         Result<BookRating> result = dto.ToDomainEntity();
@@ -64,7 +64,7 @@ public class BookRatingDtoMappingTests
     public void ToDomainEntity_WhenMappingMinimalBookRatingDto_ShouldMapRequiredPropertiesCorrectly()
     {
         // Arrange
-        BookRatingDto dto = _bookRatingDtoFixture.CreateMinimal();
+        BookRatingDto dto = _bookRatingDtoFixture.Create(includeOptionalProperties: false);
 
         // Act
         Result<BookRating> result = dto.ToDomainEntity();
@@ -82,7 +82,7 @@ public class BookRatingDtoMappingTests
     public void ToDomainEntity_WhenMappingInvalidBookRatingDto_ShouldReturnError()
     {
         // Arrange
-        BookRatingDto dto = _bookRatingDtoFixture.CreateInvalid();
+        BookRatingDto dto = _bookRatingDtoFixture.Create(value: 10, maxValue: 5);
 
         // Act
         Result<BookRating> result = dto.ToDomainEntity();
@@ -97,8 +97,8 @@ public class BookRatingDtoMappingTests
         // Arrange
         List<BookRatingDto> dtos =
         [
-            _bookRatingDtoFixture.CreateComplete(),
-            _bookRatingDtoFixture.CreateMinimal()
+            _bookRatingDtoFixture.Create(),
+            _bookRatingDtoFixture.Create(includeOptionalProperties: false)
         ];
 
         // Act
@@ -131,9 +131,9 @@ public class BookRatingDtoMappingTests
         // Arrange
         List<BookRatingDto> dtos =
         [
-            _bookRatingDtoFixture.CreateComplete(),
-            _bookRatingDtoFixture.CreateInvalid(),
-            _bookRatingDtoFixture.CreateMinimal()
+            _bookRatingDtoFixture.Create(),
+            _bookRatingDtoFixture.Create(value: 10, maxValue: 5),
+            _bookRatingDtoFixture.Create(includeOptionalProperties: false)
         ];
 
         // Act

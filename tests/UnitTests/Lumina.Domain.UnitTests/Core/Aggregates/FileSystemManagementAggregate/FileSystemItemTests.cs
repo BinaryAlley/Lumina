@@ -5,9 +5,9 @@ using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
-using Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.Fixtures;
-using Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.ValueObjects.Fixtures;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -35,7 +35,7 @@ public class FileSystemItemTests
     public void Constructor_WhenCalled_ShouldSetPropertiesCorrectly()
     {
         // Arrange
-        FileSystemPathId id = _fileSystemPathIdFixture.CreateFileSystemPathId();
+        FileSystemPathId id = _fileSystemPathIdFixture.Create();
         string name = "TestItem";
         FileSystemItemType type = FileSystemItemType.File;
 
@@ -101,7 +101,7 @@ public class FileSystemItemTests
     public void Equals_WithSameId_ShouldReturnTrue()
     {
         // Arrange
-        FileSystemPathId id = _fileSystemPathIdFixture.CreateFileSystemPathId();
+        FileSystemPathId id = _fileSystemPathIdFixture.Create();
         FileSystemItemFixture item1 = CreateFileSystemItemFixture(id);
         FileSystemItemFixture item2 = CreateFileSystemItemFixture(id);
 
@@ -130,7 +130,7 @@ public class FileSystemItemTests
     public void GetHashCode_WithSameId_ShouldReturnSameHashCode()
     {
         // Arrange
-        FileSystemPathId id = _fileSystemPathIdFixture.CreateFileSystemPathId();
+        FileSystemPathId id = _fileSystemPathIdFixture.Create();
         FileSystemItemFixture item1 = CreateFileSystemItemFixture(id);
         FileSystemItemFixture item2 = CreateFileSystemItemFixture(id);
 
@@ -159,7 +159,7 @@ public class FileSystemItemTests
 
     private FileSystemItemFixture CreateFileSystemItemFixture(FileSystemPathId? id = null)
     {
-        id ??= _fileSystemPathIdFixture.CreateFileSystemPathId();
+        id ??= _fileSystemPathIdFixture.Create();
         string name = _fixture.Create<string>();
         FileSystemItemType type = _fixture.Create<FileSystemItemType>();
         return new FileSystemItemFixture(id, name, type);

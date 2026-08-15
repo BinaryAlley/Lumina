@@ -1,8 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using AutoFixture;
-using AutoFixture.AutoNSubstitute;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Paths;
 using Lumina.Application.Core.FileSystemManagement.Paths.Queries.CheckPathExists;
+using Lumina.Contracts.Fixtures.Core.Requests.FileSystemManagement.Path;
 using Lumina.Contracts.Requests.FileSystemManagement.Path;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -17,21 +16,20 @@ namespace Lumina.Application.UnitTests.Common.Mapping.FileSystemManagement.Paths
 [ExcludeFromCodeCoverage]
 public class CheckPathExistsRequestMappingTests
 {
-    private readonly IFixture _fixture;
+    private readonly CheckPathExistsRequestFixture _checkPathExistsRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CheckPathExistsRequestMappingTests"/> class.
     /// </summary>
     public CheckPathExistsRequestMappingTests()
     {
-        _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
     }
 
     [Fact]
     public void ToQuery_WhenMappingCheckPathExistsRequest_ShouldMapCorrectly()
     {
         // Arrange
-        CheckPathExistsRequest request = _fixture.Create<CheckPathExistsRequest>();
+        CheckPathExistsRequest request = _checkPathExistsRequestFixture.Create();
 
         // Act
         CheckPathExistsQuery result = request.ToQuery();
@@ -64,7 +62,7 @@ public class CheckPathExistsRequestMappingTests
     public void ToQuery_WhenMappingMultipleRequests_ShouldMapAllCorrectly()
     {
         // Arrange
-        List<CheckPathExistsRequest> requests = _fixture.CreateMany<CheckPathExistsRequest>().ToList();
+        List<CheckPathExistsRequest> requests = _checkPathExistsRequestFixture.CreateMany();
 
         // Act
         List<CheckPathExistsQuery> results = requests.Select(r => r.ToQuery()).ToList();

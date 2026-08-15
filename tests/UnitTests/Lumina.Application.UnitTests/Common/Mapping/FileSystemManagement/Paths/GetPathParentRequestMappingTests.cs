@@ -1,8 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using AutoFixture;
-using AutoFixture.AutoNSubstitute;
 using Lumina.Application.Common.Mapping.FileSystemManagement.Paths;
 using Lumina.Application.Core.FileSystemManagement.Paths.Queries.GetPathParent;
+using Lumina.Contracts.Fixtures.Core.Requests.FileSystemManagement.Path;
 using Lumina.Contracts.Requests.FileSystemManagement.Path;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -17,21 +16,20 @@ namespace Lumina.Application.UnitTests.Common.Mapping.FileSystemManagement.Paths
 [ExcludeFromCodeCoverage]
 public class GetPathParentRequestMappingTests
 {
-    private readonly IFixture _fixture;
+    private readonly GetPathParentRequestFixture _getPathParentRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetPathParentRequestMappingTests"/> class.
     /// </summary>
     public GetPathParentRequestMappingTests()
     {
-        _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
     }
 
     [Fact]
     public void ToQuery_WhenMappingGetPathParentRequest_ShouldMapCorrectly()
     {
         // Arrange
-        GetPathParentRequest request = _fixture.Create<GetPathParentRequest>();
+        GetPathParentRequest request = _getPathParentRequestFixture.Create();
 
         // Act
         GetPathParentQuery result = request.ToQuery();
@@ -62,10 +60,10 @@ public class GetPathParentRequestMappingTests
     public void ToQuery_WhenMappingMultipleRequests_ShouldMapAllCorrectly()
     {
         // Arrange
-        List<GetPathParentRequest> requests = _fixture.CreateMany<GetPathParentRequest>().ToList();
+        List<GetPathParentRequest> requests = _getPathParentRequestFixture.CreateMany();
 
         // Act
-        List<GetPathParentQuery> results = requests.Select(r => r.ToQuery()).ToList();
+        List<GetPathParentQuery> results = [.. requests.Select(r => r.ToQuery())];
 
         // Assert
         Assert.NotNull(results);

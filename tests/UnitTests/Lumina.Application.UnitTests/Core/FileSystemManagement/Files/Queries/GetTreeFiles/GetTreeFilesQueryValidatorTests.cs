@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Core.FileSystemManagement.Files.Queries.GetTreeFiles;
+using Lumina.Application.Fixtures.Core.FileSystemManagement.Files.Queries.GetTreeFiles;
 using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Application.UnitTests.Core.FileSystemManagement.Files.Queries.GetTreeFiles.Fixtures;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using System.Collections.Generic;
@@ -17,6 +17,7 @@ namespace Lumina.Application.UnitTests.Core.FileSystemManagement.Files.Queries.G
 public class GetTreeFilesQueryValidatorTests
 {
     private readonly GetTreeFilesQueryValidator _validator;
+    private readonly GetTreeFilesQueryFixture _getTreeFilesQueryFixture;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetTreeFilesQueryValidatorTests"/> class.
@@ -24,13 +25,14 @@ public class GetTreeFilesQueryValidatorTests
     public GetTreeFilesQueryValidatorTests()
     {
         _validator = new GetTreeFilesQueryValidator();
+        _getTreeFilesQueryFixture = new GetTreeFilesQueryFixture();
     }
 
     [Fact]
     public void Validate_WhenPathIsNull_ShouldHaveValidationError()
     {
         // Arrange
-        GetTreeFilesQuery query = GetTreeFilesQueryFixture.CreateGetFilesQuery();
+        GetTreeFilesQuery query = _getTreeFilesQueryFixture.Create();
         query = query with { Path = null! };
 
         // Act
@@ -44,7 +46,7 @@ public class GetTreeFilesQueryValidatorTests
     public void Validate_WhenPathIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        GetTreeFilesQuery query = GetTreeFilesQueryFixture.CreateGetFilesQuery();
+        GetTreeFilesQuery query = _getTreeFilesQueryFixture.Create();
         query = query with { Path = string.Empty };
 
         // Act
@@ -58,7 +60,7 @@ public class GetTreeFilesQueryValidatorTests
     public void Validate_WhenPathIsWhitespace_ShouldHaveValidationError()
     {
         // Arrange
-        GetTreeFilesQuery query = GetTreeFilesQueryFixture.CreateGetFilesQuery();
+        GetTreeFilesQuery query = _getTreeFilesQueryFixture.Create();
         query = query with { Path = "   " };
 
         // Act
@@ -72,7 +74,7 @@ public class GetTreeFilesQueryValidatorTests
     public void Validate_WhenPathIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        GetTreeFilesQuery query = GetTreeFilesQueryFixture.CreateGetFilesQuery();
+        GetTreeFilesQuery query = _getTreeFilesQueryFixture.Create();
         query = query with { Path = "/valid/path" };
 
         // Act
@@ -86,7 +88,7 @@ public class GetTreeFilesQueryValidatorTests
     public void Validate_WhenIncludeHiddenElementsIsTrue_ShouldNotHaveValidationError()
     {
         // Arrange
-        GetTreeFilesQuery query = GetTreeFilesQueryFixture.CreateGetFilesQuery();
+        GetTreeFilesQuery query = _getTreeFilesQueryFixture.Create();
         query = query with { IncludeHiddenElements = true };
 
         // Act
@@ -100,7 +102,7 @@ public class GetTreeFilesQueryValidatorTests
     public void Validate_WhenIncludeHiddenElementsIsFalse_ShouldNotHaveValidationError()
     {
         // Arrange
-        GetTreeFilesQuery query = GetTreeFilesQueryFixture.CreateGetFilesQuery();
+        GetTreeFilesQuery query = _getTreeFilesQueryFixture.Create();
         query = query with { IncludeHiddenElements = false };
 
         // Act

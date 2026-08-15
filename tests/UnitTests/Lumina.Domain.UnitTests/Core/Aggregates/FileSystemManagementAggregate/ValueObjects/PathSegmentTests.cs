@@ -2,7 +2,7 @@
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
-using Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.ValueObjects.Fixtures;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -60,8 +60,8 @@ public class PathSegmentTests
     public void Equals_WithSameProperties_ShouldReturnTrue()
     {
         // Arrange
-        PathSegment segment1 = _pathSegmentFixture.CreatePathSegment("folder", true, false);
-        PathSegment segment2 = _pathSegmentFixture.CreatePathSegment("folder", true, false);
+        PathSegment segment1 = _pathSegmentFixture.Create("folder", true, false);
+        PathSegment segment2 = _pathSegmentFixture.Create("folder", true, false);
 
         // Act
         bool result = segment1.Equals(segment2);
@@ -74,8 +74,8 @@ public class PathSegmentTests
     public void Equals_WithDifferentProperties_ShouldReturnFalse()
     {
         // Arrange
-        PathSegment segment1 = _pathSegmentFixture.CreatePathSegment("folder1", true, false);
-        PathSegment segment2 = _pathSegmentFixture.CreatePathSegment("folder2", true, false);
+        PathSegment segment1 = _pathSegmentFixture.Create("folder1", true, false);
+        PathSegment segment2 = _pathSegmentFixture.Create("folder2", true, false);
 
         // Act
         bool result = segment1.Equals(segment2);
@@ -88,8 +88,8 @@ public class PathSegmentTests
     public void GetHashCode_WithSameProperties_ShouldReturnSameHashCode()
     {
         // Arrange
-        PathSegment segment1 = _pathSegmentFixture.CreatePathSegment("folder", true, false);
-        PathSegment segment2 = _pathSegmentFixture.CreatePathSegment("folder", true, false);
+        PathSegment segment1 = _pathSegmentFixture.Create("folder", true, false);
+        PathSegment segment2 = _pathSegmentFixture.Create("folder", true, false);
 
         // Act
         int hashCode1 = segment1.GetHashCode();
@@ -103,8 +103,8 @@ public class PathSegmentTests
     public void GetHashCode_WithDifferentProperties_ShouldReturnDifferentHashCode()
     {
         // Arrange
-        PathSegment segment1 = _pathSegmentFixture.CreatePathSegment("folder1", true, false);
-        PathSegment segment2 = _pathSegmentFixture.CreatePathSegment("folder2", true, false);
+        PathSegment segment1 = _pathSegmentFixture.Create("folder1", true, false);
+        PathSegment segment2 = _pathSegmentFixture.Create("folder2", true, false);
 
         // Act
         int hashCode1 = segment1.GetHashCode();
@@ -118,8 +118,8 @@ public class PathSegmentTests
     public void EqualityOperator_WithSameProperties_ShouldReturnTrue()
     {
         // Arrange
-        PathSegment segment1 = _pathSegmentFixture.CreatePathSegment("folder", true, false);
-        PathSegment segment2 = _pathSegmentFixture.CreatePathSegment("folder", true, false);
+        PathSegment segment1 = _pathSegmentFixture.Create("folder", true, false);
+        PathSegment segment2 = _pathSegmentFixture.Create("folder", true, false);
 
         // Act
         bool result = segment1 == segment2;
@@ -132,8 +132,8 @@ public class PathSegmentTests
     public void InequalityOperator_WithDifferentProperties_ShouldReturnTrue()
     {
         // Arrange
-        PathSegment segment1 = _pathSegmentFixture.CreatePathSegment("folder1", true, false);
-        PathSegment segment2 = _pathSegmentFixture.CreatePathSegment("folder2", true, false);
+        PathSegment segment1 = _pathSegmentFixture.Create("folder1", true, false);
+        PathSegment segment2 = _pathSegmentFixture.Create("folder2", true, false);
 
         // Act
         bool result = segment1 != segment2;

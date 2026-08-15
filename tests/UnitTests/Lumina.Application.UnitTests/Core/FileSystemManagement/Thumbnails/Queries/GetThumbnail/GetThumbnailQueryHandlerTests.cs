@@ -3,10 +3,12 @@ using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.FileSystemManagement.Thumbnails.Queries.GetThumbnail;
+using Lumina.Application.Fixtures.Core.FileSystemManagement.Thumbnails.Queries.GetThumbnail;
 using Lumina.Contracts.Responses.FileSystemManagement.Thumbnails;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using NSubstitute;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
@@ -24,11 +26,15 @@ public class GetThumbnailQueryHandlerTests
     private readonly IFixture _fixture;
     private readonly IThumbnailService _mockThumbnailService;
     private readonly GetThumbnailQueryHandler _sut;
+    private readonly GetThumbnailQueryFixture _getThumbnailQueryFixture;
+    private readonly ThumbnailFixture _thumbnailFixture;
 
     public GetThumbnailQueryHandlerTests()
     {
         _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
         _mockThumbnailService = Substitute.For<IThumbnailService>();
+        _getThumbnailQueryFixture = new GetThumbnailQueryFixture();
+        _thumbnailFixture = new ThumbnailFixture();
         IValidator<GetThumbnailQuery> mockValidator = Substitute.For<IValidator<GetThumbnailQuery>>();
         mockValidator.Validate(Arg.Any<GetThumbnailQuery>())
             .Returns([]);
@@ -39,8 +45,8 @@ public class GetThumbnailQueryHandlerTests
     public async Task HandleAsync_WhenCalledWithValidQuery_ShouldReturnSuccessResult()
     {
         // Arrange
-        GetThumbnailQuery query = _fixture.Create<GetThumbnailQuery>();
-        Thumbnail thumbnail = _fixture.Create<Thumbnail>();
+        GetThumbnailQuery query = _getThumbnailQueryFixture.Create();
+        Thumbnail thumbnail = _thumbnailFixture.Create();
 
         _mockThumbnailService.GetThumbnailAsync(query.Path!, query.Quality, Arg.Any<CancellationToken>())
             .Returns(Result.From(thumbnail));
@@ -60,7 +66,7 @@ public class GetThumbnailQueryHandlerTests
     public async Task HandleAsync_WhenThumbnailServiceReturnsError_ShouldReturnFailureResult()
     {
         // Arrange
-        GetThumbnailQuery query = _fixture.Create<GetThumbnailQuery>();
+        GetThumbnailQuery query = _getThumbnailQueryFixture.Create();
         Error error = Error.Failure("ThumbnailService.Error", "An error occurred");
         _mockThumbnailService.GetThumbnailAsync(query.Path!, query.Quality, Arg.Any<CancellationToken>())
             .Returns(error);
@@ -78,7 +84,7 @@ public class GetThumbnailQueryHandlerTests
     public async Task HandleAsync_WhenCancellationRequested_ShouldCancelOperation()
     {
         // Arrange
-        GetThumbnailQuery query = _fixture.Create<GetThumbnailQuery>();
+        GetThumbnailQuery query = _getThumbnailQueryFixture.Create();
         CancellationTokenSource cts = new();
         cts.Cancel();
 

@@ -2,9 +2,10 @@
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using Lumina.Application.Core.FileSystemManagement.FileSystem.Queries.GetFileSystem;
-using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
+using Lumina.Application.Fixtures.Core.FileSystemManagement.FileSystem.Queries.GetFileSystem;
 using Lumina.Contracts.Responses.FileSystemManagement.FileSystem;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Platform;
+using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using NSubstitute;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -24,6 +25,7 @@ public class GetFileSystemQueryHandlerTests
     private readonly IPlatformContextManager _mockPlatformContextManager;
     private readonly IPlatformContext _mockPlatformContext;
     private readonly GetFileSystemQueryHandler _sut;
+    private readonly GetFileSystemQueryFixture _getFileSystemQueryFixture;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetFileSystemQueryHandlerTests"/> class.
@@ -34,6 +36,7 @@ public class GetFileSystemQueryHandlerTests
         _mockPlatformContextManager = Substitute.For<IPlatformContextManager>();
         _mockPlatformContext = Substitute.For<IPlatformContext>();
         _mockPlatformContextManager.GetCurrentContext().Returns(_mockPlatformContext);
+        _getFileSystemQueryFixture = new GetFileSystemQueryFixture();
         _sut = new GetFileSystemQueryHandler(_mockPlatformContextManager);
     }
 
@@ -43,7 +46,7 @@ public class GetFileSystemQueryHandlerTests
     public async Task HandleAsync_WhenCalled_ShouldReturnCorrectFileSystemTypeResponse(PlatformType platformType)
     {
         // Arrange
-        GetFileSystemQuery query = _fixture.Create<GetFileSystemQuery>();
+        GetFileSystemQuery query = _getFileSystemQueryFixture.Create();
         _mockPlatformContext.Platform.Returns(platformType);
 
         // Act
@@ -59,7 +62,7 @@ public class GetFileSystemQueryHandlerTests
     public async Task HandleAsync_WhenCalled_ShouldReturnValueTaskResult()
     {
         // Arrange
-        GetFileSystemQuery query = _fixture.Create<GetFileSystemQuery>();
+        GetFileSystemQuery query = _getFileSystemQueryFixture.Create();
         _mockPlatformContext.Platform.Returns(PlatformType.Unix);
 
         // Act
@@ -76,8 +79,8 @@ public class GetFileSystemQueryHandlerTests
     public async Task HandleAsync_WhenCalled_ShouldNotDependOnQueryContent()
     {
         // Arrange
-        GetFileSystemQuery query1 = _fixture.Create<GetFileSystemQuery>();
-        GetFileSystemQuery query2 = _fixture.Create<GetFileSystemQuery>();
+        GetFileSystemQuery query1 = _getFileSystemQueryFixture.Create();
+        GetFileSystemQuery query2 = _getFileSystemQueryFixture.Create();
         _mockPlatformContext.Platform.Returns(PlatformType.Windows);
 
         // Act
@@ -93,7 +96,7 @@ public class GetFileSystemQueryHandlerTests
     public async Task HandleAsync_WhenCalled_ShouldIgnoreCancellationToken()
     {
         // Arrange
-        GetFileSystemQuery query = _fixture.Create<GetFileSystemQuery>();
+        GetFileSystemQuery query = _getFileSystemQueryFixture.Create();
         _mockPlatformContext.Platform.Returns(PlatformType.Unix);
         CancellationToken cancellationToken = new(true);
 

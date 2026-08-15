@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.Common.Base;
 using Lumina.Infrastructure.Core.Authorization.Policies.Common.Factory;
-using Lumina.Infrastructure.UnitTests.Core.Authorization.Policies.Common.Factory.Fixtures;
+using Lumina.Infrastructure.Fixtures.Core.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using System;
@@ -48,7 +48,7 @@ public class AuthorizationPolicyFactoryTests
         Action act = () => policyFactory.CreatePolicy<IUnregisteredPolicy>();
         InvalidOperationException exception = Assert.Throws<InvalidOperationException>(() =>
           policyFactory.CreatePolicy<IUnregisteredPolicy>());
-        Assert.Equal("No service for type 'Lumina.Infrastructure.UnitTests.Core.Authorization.Policies.Common.Factory.Fixtures.IUnregisteredPolicy' has been registered.",
+        Assert.Equal("No service for type 'Lumina.Infrastructure.Fixtures.Core.Authorization.IUnregisteredPolicy' has been registered.",
             exception.Message);
     }
 

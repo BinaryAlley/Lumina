@@ -2,7 +2,7 @@
 using FastEndpoints;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.Primitives;
-using Lumina.Presentation.Api.UnitTests.Core.Endpoints.Common.Fixtures;
+using Lumina.Presentation.Api.Fixtures.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System.Collections.Generic;

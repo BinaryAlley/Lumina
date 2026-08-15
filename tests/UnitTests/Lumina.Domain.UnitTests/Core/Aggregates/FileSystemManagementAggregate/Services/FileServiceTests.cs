@@ -6,9 +6,9 @@ using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.File
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Platform;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
-using Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.Entities.Fixtures;
-using Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.ValueObjects.Fixtures;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -67,11 +67,11 @@ public class FileServiceTests
         // Arrange
         string path = _pathTestDir;
         bool includeHiddenElements = false;
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(path);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path);
         FileSystemPathId[] filePaths =
         [
-            _fileSystemPathIdFixture.CreateFileSystemPathId(_pathTestDirFile1),
-            _fileSystemPathIdFixture.CreateFileSystemPathId(_pathTestDirFile2)
+            _fileSystemPathIdFixture.Create(_pathTestDirFile1),
+            _fileSystemPathIdFixture.Create(_pathTestDirFile2)
         ];
 
         _mockEnvironmentContext.FileProviderService.GetFilePaths(pathId, includeHiddenElements)
@@ -119,7 +119,7 @@ public class FileServiceTests
         // Arrange
         string path = _pathTestDir;
         bool includeHiddenElements = false;
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(path);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path);
 
         _mockEnvironmentContext.FileProviderService.GetFilePaths(pathId, includeHiddenElements)
             .Returns(Errors.Permission.UnauthorizedAccess);
@@ -138,8 +138,8 @@ public class FileServiceTests
         // Arrange
         string path = _pathTestDir;
         bool includeHiddenElements = false;
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(path);
-        FileSystemPathId filePath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathTestDirInaccessible);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path);
+        FileSystemPathId filePath = _fileSystemPathIdFixture.Create(_pathTestDirInaccessible);
 
         _mockEnvironmentContext.FileProviderService.GetFilePaths(pathId, includeHiddenElements)
             .Returns(Result.From(new[] { filePath }.AsEnumerable()));
@@ -166,12 +166,12 @@ public class FileServiceTests
     public void GetFilesOverload_WithValidFile_ShouldReturnListOfFiles()
     {
         // Arrange
-        File parentFile = _fileFixture.CreateFile();
+        File parentFile = _fileFixture.Create();
         bool includeHiddenElements = false;
         FileSystemPathId[] filePaths =
         [
-            _fileSystemPathIdFixture.CreateFileSystemPathId(_pathTestDirFile1),
-            _fileSystemPathIdFixture.CreateFileSystemPathId(_pathTestDirFile2)
+            _fileSystemPathIdFixture.Create(_pathTestDirFile1),
+            _fileSystemPathIdFixture.Create(_pathTestDirFile2)
         ];
 
         _mockEnvironmentContext.FileProviderService.GetFilePaths(parentFile.Id, includeHiddenElements)
@@ -202,7 +202,7 @@ public class FileServiceTests
     public void GetFilesOverload_WhenFileProviderServiceReturnsError_ShouldPropagateError()
     {
         // Arrange
-        File parentFile = _fileFixture.CreateFile();
+        File parentFile = _fileFixture.Create();
         bool includeHiddenElements = false;
 
         _mockEnvironmentContext.FileProviderService.GetFilePaths(parentFile.Id, includeHiddenElements)
@@ -220,9 +220,9 @@ public class FileServiceTests
     public void GetFilesOverload_WhenFileDetailsAreInaccessible_ShouldReturnInaccessibleFile()
     {
         // Arrange
-        File parentFile = _fileFixture.CreateFile();
+        File parentFile = _fileFixture.Create();
         bool includeHiddenElements = false;
-        FileSystemPathId filePath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathTestDirInaccessible);
+        FileSystemPathId filePath = _fileSystemPathIdFixture.Create(_pathTestDirInaccessible);
 
         _mockEnvironmentContext.FileProviderService.GetFilePaths(parentFile.Id, includeHiddenElements)
             .Returns(Result.From(new[] { filePath }.AsEnumerable()));
@@ -249,12 +249,12 @@ public class FileServiceTests
     public void GetFiles_WithValidFileSystemPathId_ShouldReturnListOfFiles()
     {
         // Arrange
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathTestDir);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(_pathTestDir);
         bool includeHiddenElements = false;
         FileSystemPathId[] filePaths =
         [
-            _fileSystemPathIdFixture.CreateFileSystemPathId(_pathTestDirFile1),
-            _fileSystemPathIdFixture.CreateFileSystemPathId(_pathTestDirFile2)
+            _fileSystemPathIdFixture.Create(_pathTestDirFile1),
+            _fileSystemPathIdFixture.Create(_pathTestDirFile2)
         ];
 
         _mockEnvironmentContext.FileProviderService.GetFilePaths(pathId, includeHiddenElements)
@@ -285,7 +285,7 @@ public class FileServiceTests
     public void GetFilesWithFileSystemPathId_WhenFileProviderServiceReturnsError_ShouldPropagateError()
     {
         // Arrange
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathTestDir);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(_pathTestDir);
         bool includeHiddenElements = false;
 
         _mockEnvironmentContext.FileProviderService.GetFilePaths(pathId, includeHiddenElements)
@@ -303,9 +303,9 @@ public class FileServiceTests
     public void GetFilesWithFileSystemPathId_WhenFileDetailsAreInaccessible_ShouldReturnInaccessibleFile()
     {
         // Arrange
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathTestDir);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(_pathTestDir);
         bool includeHiddenElements = false;
-        FileSystemPathId filePath = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathTestDirInaccessible);
+        FileSystemPathId filePath = _fileSystemPathIdFixture.Create(_pathTestDirInaccessible);
 
         _mockEnvironmentContext.FileProviderService.GetFilePaths(pathId, includeHiddenElements)
             .Returns(Result.From(new[] { filePath }.AsEnumerable()));
@@ -335,9 +335,9 @@ public class FileServiceTests
         string sourcePath = _pathSourceFile;
         string destinationPath = _pathDestination1;
         bool overrideExisting = true;
-        FileSystemPathId sourcePathId = _fileSystemPathIdFixture.CreateFileSystemPathId(sourcePath);
-        FileSystemPathId destinationPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(destinationPath);
-        FileSystemPathId copiedFilePathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestinationFile);
+        FileSystemPathId sourcePathId = _fileSystemPathIdFixture.Create(sourcePath);
+        FileSystemPathId destinationPathId = _fileSystemPathIdFixture.Create(destinationPath);
+        FileSystemPathId copiedFilePathId = _fileSystemPathIdFixture.Create(_pathDestinationFile);
 
         _mockPlatformContext.PathStrategy.PathSeparator.Returns(_dirSeparator);
         _mockPlatformContext.PathStrategy.CombinePath(Arg.Any<FileSystemPathId>(), Arg.Any<string>())
@@ -369,7 +369,7 @@ public class FileServiceTests
         string sourcePath = _pathSourceNonExistingFile;
         string destinationPath = _pathDestination1;
         bool overrideExisting = true;
-        FileSystemPathId sourcePathId = _fileSystemPathIdFixture.CreateFileSystemPathId(sourcePath);
+        FileSystemPathId sourcePathId = _fileSystemPathIdFixture.Create(sourcePath);
 
         _mockEnvironmentContext.FileProviderService.FileExists(sourcePathId).Returns(Result.From(false));
 
@@ -388,8 +388,8 @@ public class FileServiceTests
         string sourcePath = _pathSourceFile;
         string destinationPath = _pathDestination1;
         bool overrideExisting = true;
-        FileSystemPathId sourcePathId = _fileSystemPathIdFixture.CreateFileSystemPathId(sourcePath);
-        FileSystemPathId destinationPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(destinationPath);
+        FileSystemPathId sourcePathId = _fileSystemPathIdFixture.Create(sourcePath);
+        FileSystemPathId destinationPathId = _fileSystemPathIdFixture.Create(destinationPath);
 
         _mockPlatformContext.PathStrategy.PathSeparator.Returns(_dirSeparator);
         _mockEnvironmentContext.FileProviderService.FileExists(sourcePathId).Returns(Result.From(true));
@@ -411,9 +411,9 @@ public class FileServiceTests
         string sourcePath = _pathSourceFile;
         string destinationPath = _pathDestination1;
         bool overrideExisting = true;
-        FileSystemPathId sourcePathId = _fileSystemPathIdFixture.CreateFileSystemPathId(sourcePath);
-        FileSystemPathId destinationPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(destinationPath);
-        FileSystemPathId copiedFilePathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestinationFile);
+        FileSystemPathId sourcePathId = _fileSystemPathIdFixture.Create(sourcePath);
+        FileSystemPathId destinationPathId = _fileSystemPathIdFixture.Create(destinationPath);
+        FileSystemPathId copiedFilePathId = _fileSystemPathIdFixture.Create(_pathDestinationFile);
 
         _mockPlatformContext.PathStrategy.PathSeparator.Returns(_dirSeparator);
         _mockEnvironmentContext.FileProviderService.FileExists(sourcePathId).Returns(Result.From(true));
@@ -471,9 +471,9 @@ public class FileServiceTests
     public void CopyFile_WithValidFileSystemPathIds_ShouldReturnCopiedFile()
     {
         // Arrange
-        FileSystemPathId sourcePathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSourceFile);
-        FileSystemPathId destinationPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestination2);
-        FileSystemPathId copiedFilePathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestinationFile);
+        FileSystemPathId sourcePathId = _fileSystemPathIdFixture.Create(_pathSourceFile);
+        FileSystemPathId destinationPathId = _fileSystemPathIdFixture.Create(_pathDestination2);
+        FileSystemPathId copiedFilePathId = _fileSystemPathIdFixture.Create(_pathDestinationFile);
         bool overrideExisting = true;
 
         _mockEnvironmentContext.FileProviderService.FileExists(sourcePathId).Returns(true);
@@ -500,8 +500,8 @@ public class FileServiceTests
     public void CopyFileWithFileSystemPathIds_WhenSourceDoesNotExist_ShouldReturnError()
     {
         // Arrange
-        FileSystemPathId sourcePathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSourceNonExistingFile);
-        FileSystemPathId destinationPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestination2);
+        FileSystemPathId sourcePathId = _fileSystemPathIdFixture.Create(_pathSourceNonExistingFile);
+        FileSystemPathId destinationPathId = _fileSystemPathIdFixture.Create(_pathDestination2);
         bool overrideExisting = true;
 
         _mockEnvironmentContext.FileProviderService.FileExists(sourcePathId).Returns(false);
@@ -518,8 +518,8 @@ public class FileServiceTests
     public void CopyFileWithFileSystemPathIds_WhenFileProviderServiceReturnsError_ShouldPropagateError()
     {
         // Arrange
-        FileSystemPathId sourcePathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSourceFile);
-        FileSystemPathId destinationPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestination2);
+        FileSystemPathId sourcePathId = _fileSystemPathIdFixture.Create(_pathSourceFile);
+        FileSystemPathId destinationPathId = _fileSystemPathIdFixture.Create(_pathDestination2);
         bool overrideExisting = true;
 
         _mockEnvironmentContext.FileProviderService.FileExists(sourcePathId).Returns(true);
@@ -538,9 +538,9 @@ public class FileServiceTests
     public void CopyFileWithFileSystemPathIds_WhenRetrievingFileInfoFails_ShouldReturnInaccessibleFile()
     {
         // Arrange
-        FileSystemPathId sourcePathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSourceFile);
-        FileSystemPathId destinationPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestination2);
-        FileSystemPathId copiedFilePathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestinationFile);
+        FileSystemPathId sourcePathId = _fileSystemPathIdFixture.Create(_pathSourceFile);
+        FileSystemPathId destinationPathId = _fileSystemPathIdFixture.Create(_pathDestination2);
+        FileSystemPathId copiedFilePathId = _fileSystemPathIdFixture.Create(_pathDestinationFile);
         bool overrideExisting = true;
 
         _mockEnvironmentContext.FileProviderService.FileExists(sourcePathId).Returns(true);
@@ -568,9 +568,9 @@ public class FileServiceTests
         string sourcePath = _pathSourceFile;
         string destinationPath = _pathDestination1;
         bool overrideExisting = true;
-        FileSystemPathId sourcePathId = _fileSystemPathIdFixture.CreateFileSystemPathId(sourcePath);
-        FileSystemPathId destinationPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(destinationPath);
-        FileSystemPathId movedFilePathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestinationFile);
+        FileSystemPathId sourcePathId = _fileSystemPathIdFixture.Create(sourcePath);
+        FileSystemPathId destinationPathId = _fileSystemPathIdFixture.Create(destinationPath);
+        FileSystemPathId movedFilePathId = _fileSystemPathIdFixture.Create(_pathDestinationFile);
 
         _mockPlatformContext.PathStrategy.PathSeparator.Returns(_dirSeparator);
         _mockPlatformContext.PathStrategy.CombinePath(Arg.Any<FileSystemPathId>(), Arg.Any<string>())
@@ -602,7 +602,7 @@ public class FileServiceTests
         string sourcePath = _pathSourceNonExistingFile;
         string destinationPath = _pathDestination2;
         bool overrideExisting = true;
-        FileSystemPathId sourcePathId = _fileSystemPathIdFixture.CreateFileSystemPathId(sourcePath);
+        FileSystemPathId sourcePathId = _fileSystemPathIdFixture.Create(sourcePath);
 
         _mockPlatformContext.PathStrategy.PathSeparator.Returns(_dirSeparator);
         _mockEnvironmentContext.FileProviderService.FileExists(sourcePathId).Returns(false);
@@ -622,8 +622,8 @@ public class FileServiceTests
         string sourcePath = _pathSourceFile;
         string destinationPath = _pathDestination1;
         bool overrideExisting = true;
-        FileSystemPathId sourcePathId = _fileSystemPathIdFixture.CreateFileSystemPathId(sourcePath);
-        FileSystemPathId destinationPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(destinationPath);
+        FileSystemPathId sourcePathId = _fileSystemPathIdFixture.Create(sourcePath);
+        FileSystemPathId destinationPathId = _fileSystemPathIdFixture.Create(destinationPath);
 
         _mockPlatformContext.PathStrategy.PathSeparator.Returns(_dirSeparator);
         _mockEnvironmentContext.FileProviderService.FileExists(sourcePathId).Returns(true);
@@ -645,9 +645,9 @@ public class FileServiceTests
         string sourcePath = _pathSourceFile;
         string destinationPath = _pathDestination1;
         bool overrideExisting = true;
-        FileSystemPathId sourcePathId = _fileSystemPathIdFixture.CreateFileSystemPathId(sourcePath);
-        FileSystemPathId destinationPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(destinationPath);
-        FileSystemPathId movedFilePathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestinationFile);
+        FileSystemPathId sourcePathId = _fileSystemPathIdFixture.Create(sourcePath);
+        FileSystemPathId destinationPathId = _fileSystemPathIdFixture.Create(destinationPath);
+        FileSystemPathId movedFilePathId = _fileSystemPathIdFixture.Create(_pathDestinationFile);
 
         _mockPlatformContext.PathStrategy.PathSeparator.Returns(_dirSeparator);
         _mockPlatformContext.PathStrategy.CombinePath(Arg.Any<FileSystemPathId>(), Arg.Any<string>())
@@ -710,9 +710,9 @@ public class FileServiceTests
     public void MoveFile_WithValidFileSystemPathIds_ShouldReturnMovedFile()
     {
         // Arrange
-        FileSystemPathId sourcePathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSourceFile);
-        FileSystemPathId destinationPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestination2);
-        FileSystemPathId movedFilePathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestinationFile);
+        FileSystemPathId sourcePathId = _fileSystemPathIdFixture.Create(_pathSourceFile);
+        FileSystemPathId destinationPathId = _fileSystemPathIdFixture.Create(_pathDestination2);
+        FileSystemPathId movedFilePathId = _fileSystemPathIdFixture.Create(_pathDestinationFile);
         bool overrideExisting = true;
 
         _mockEnvironmentContext.FileProviderService.FileExists(sourcePathId).Returns(true);
@@ -739,10 +739,10 @@ public class FileServiceTests
     public void MoveFileWithFileSystemPathIds_WhenSourceDoesNotExist_ShouldReturnError()
     {
         // Arrange
-        FileSystemPathId sourcePathId = _fileSystemPathIdFixture.CreateFileSystemPathId(
+        FileSystemPathId sourcePathId = _fileSystemPathIdFixture.Create(
             s_isUnix ? "/Source/nonexistent.txt" : _pathSourceNonExistingFile
         );
-        FileSystemPathId destinationPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestination2);
+        FileSystemPathId destinationPathId = _fileSystemPathIdFixture.Create(_pathDestination2);
         bool overrideExisting = true;
 
         _mockEnvironmentContext.FileProviderService.FileExists(sourcePathId).Returns(false);
@@ -759,8 +759,8 @@ public class FileServiceTests
     public void MoveFileWithFileSystemPathIds_WhenFileProviderServiceReturnsError_ShouldPropagateError()
     {
         // Arrange
-        FileSystemPathId sourcePathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSourceFile);
-        FileSystemPathId destinationPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestination1);
+        FileSystemPathId sourcePathId = _fileSystemPathIdFixture.Create(_pathSourceFile);
+        FileSystemPathId destinationPathId = _fileSystemPathIdFixture.Create(_pathDestination1);
         bool overrideExisting = true;
 
         _mockEnvironmentContext.FileProviderService.FileExists(sourcePathId).Returns(true);
@@ -779,9 +779,9 @@ public class FileServiceTests
     public void MoveFileWithFileSystemPathIds_WhenRetrievingFileInfoFails_ShouldReturnInaccessibleFile()
     {
         // Arrange
-        FileSystemPathId sourcePathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSourceFile);
-        FileSystemPathId destinationPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestination1);
-        FileSystemPathId movedFilePathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathDestinationFile);
+        FileSystemPathId sourcePathId = _fileSystemPathIdFixture.Create(_pathSourceFile);
+        FileSystemPathId destinationPathId = _fileSystemPathIdFixture.Create(_pathDestination1);
+        FileSystemPathId movedFilePathId = _fileSystemPathIdFixture.Create(_pathDestinationFile);
         bool overrideExisting = true;
 
         _mockEnvironmentContext.FileProviderService.FileExists(sourcePathId).Returns(true);
@@ -809,7 +809,7 @@ public class FileServiceTests
         string sourcePath = _pathSourceFile;
         string destinationPath = _pathDestination1;
         bool overrideExisting = true;
-        FileSystemPathId sourcePathId = _fileSystemPathIdFixture.CreateFileSystemPathId(sourcePath);
+        FileSystemPathId sourcePathId = _fileSystemPathIdFixture.Create(sourcePath);
 
         _mockPlatformContext.PathStrategy.PathSeparator.Returns(_dirSeparator);
         _mockEnvironmentContext.FileProviderService.FileExists(sourcePathId)
@@ -829,8 +829,8 @@ public class FileServiceTests
         // Arrange
         string path = _pathSourceOldFile;
         string newName = "newfile.txt";
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(path);
-        FileSystemPathId newPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSourceNewFile);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path);
+        FileSystemPathId newPathId = _fileSystemPathIdFixture.Create(_pathSourceNewFile);
 
         _mockPlatformContext.PathStrategy.PathSeparator.Returns(_dirSeparator);
         _mockPlatformContext.PathStrategy.CombinePath(Arg.Any<FileSystemPathId>(), newName)
@@ -861,7 +861,7 @@ public class FileServiceTests
         // Arrange
         string path = _pathSourceOldFile;
         string newName = "existingfile.txt";
-        FileSystemPathId newPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSourceExistingFile);
+        FileSystemPathId newPathId = _fileSystemPathIdFixture.Create(_pathSourceExistingFile);
 
         _mockPlatformContext.PathStrategy.PathSeparator.Returns(_dirSeparator);
         _mockPlatformContext.PathStrategy.CombinePath(Arg.Any<FileSystemPathId>(), newName)
@@ -882,8 +882,8 @@ public class FileServiceTests
         // Arrange
         string path = _pathSourceOldFile;
         string newName = "newfile.txt";
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(path);
-        FileSystemPathId newPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSourceNewFile);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path);
+        FileSystemPathId newPathId = _fileSystemPathIdFixture.Create(_pathSourceNewFile);
 
         _mockPlatformContext.PathStrategy.PathSeparator.Returns(_dirSeparator);
         _mockPlatformContext.PathStrategy.CombinePath(Arg.Any<FileSystemPathId>(), newName)
@@ -906,8 +906,8 @@ public class FileServiceTests
         // Arrange
         string path = _pathSourceOldFile;
         string newName = "newfile.txt";
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(path);
-        FileSystemPathId newPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSourceNewFile);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path);
+        FileSystemPathId newPathId = _fileSystemPathIdFixture.Create(_pathSourceNewFile);
 
         _mockPlatformContext.PathStrategy.PathSeparator.Returns(_dirSeparator);
         _mockPlatformContext.PathStrategy.CombinePath(Arg.Any<FileSystemPathId>(), newName)
@@ -951,9 +951,9 @@ public class FileServiceTests
     public void RenameFileWithValidFileSystemPathIdAndName_ShouldReturnRenamedFile()
     {
         // Arrange
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSourceOldFile);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(_pathSourceOldFile);
         string newName = "newfile.txt";
-        FileSystemPathId newPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSourceNewFile);
+        FileSystemPathId newPathId = _fileSystemPathIdFixture.Create(_pathSourceNewFile);
 
         _mockPlatformContext.PathStrategy.CombinePath(Arg.Any<FileSystemPathId>(), newName)
             .Returns(Result.From(newPathId));
@@ -981,9 +981,9 @@ public class FileServiceTests
     public void RenameFileWithFileSystemPathId_WhenNewNameAlreadyExists_ShouldReturnError()
     {
         // Arrange
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSourceOldFile);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(_pathSourceOldFile);
         string newName = "existingfile.txt";
-        FileSystemPathId newPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSourceExistingFile);
+        FileSystemPathId newPathId = _fileSystemPathIdFixture.Create(_pathSourceExistingFile);
 
         _mockPlatformContext.PathStrategy.CombinePath(Arg.Any<FileSystemPathId>(), newName)
             .Returns(Result.From(newPathId));
@@ -1001,9 +1001,9 @@ public class FileServiceTests
     public void RenameFileWithFileSystemPathId_WhenFileProviderServiceReturnsError_ShouldPropagateError()
     {
         // Arrange
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSourceOldFile);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(_pathSourceOldFile);
         string newName = "newfile.txt";
-        FileSystemPathId newPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSourceNewFile);
+        FileSystemPathId newPathId = _fileSystemPathIdFixture.Create(_pathSourceNewFile);
 
         _mockPlatformContext.PathStrategy.CombinePath(Arg.Any<FileSystemPathId>(), newName)
             .Returns(Result.From(newPathId));
@@ -1023,9 +1023,9 @@ public class FileServiceTests
     public void RenameFileWithFileSystemPathId_WhenRetrievingFileInfoFails_ShouldReturnInaccessibleFile()
     {
         // Arrange
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSourceOldFile);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(_pathSourceOldFile);
         string newName = "newfile.txt";
-        FileSystemPathId newPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSourceNewFile);
+        FileSystemPathId newPathId = _fileSystemPathIdFixture.Create(_pathSourceNewFile);
 
         _mockPlatformContext.PathStrategy.CombinePath(Arg.Any<FileSystemPathId>(), newName)
             .Returns(Result.From(newPathId));
@@ -1072,7 +1072,7 @@ public class FileServiceTests
         // Arrange
         string path = _pathSourceOldFile;
         string newName = "newfile.txt";
-        FileSystemPathId newPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSourceNewFile);
+        FileSystemPathId newPathId = _fileSystemPathIdFixture.Create(_pathSourceNewFile);
 
         _mockPlatformContext.PathStrategy.PathSeparator.Returns(_dirSeparator);
         _mockPlatformContext.PathStrategy.CombinePath(Arg.Any<FileSystemPathId>(), newName)
@@ -1092,7 +1092,7 @@ public class FileServiceTests
     public void RenameFileWithFileSystemPathId_WhenCombinePathReturnsError_ShouldPropagateError()
     {
         // Arrange
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSourceOldFile);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(_pathSourceOldFile);
         string newName = "newfile.txt";
 
         _mockPlatformContext.PathStrategy.CombinePath(Arg.Any<FileSystemPathId>(), newName)
@@ -1110,9 +1110,9 @@ public class FileServiceTests
     public void RenameFileWithFileSystemPathId_WhenFileExistsReturnsError_ShouldPropagateError()
     {
         // Arrange
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSourceOldFile);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(_pathSourceOldFile);
         string newName = "newfile.txt";
-        FileSystemPathId newPathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSourceNewFile);
+        FileSystemPathId newPathId = _fileSystemPathIdFixture.Create(_pathSourceNewFile);
 
         _mockPlatformContext.PathStrategy.CombinePath(Arg.Any<FileSystemPathId>(), newName)
             .Returns(Result.From(newPathId));
@@ -1132,7 +1132,7 @@ public class FileServiceTests
     {
         // Arrange
         string path = _pathSourceFile;
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(path);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path);
 
         _mockEnvironmentContext.FileProviderService.DeleteFile(pathId)
             .Returns(Result.Deleted);
@@ -1164,7 +1164,7 @@ public class FileServiceTests
     {
         // Arrange
         string path = _pathSourceFile;
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(path);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path);
 
         _mockEnvironmentContext.FileProviderService.DeleteFile(pathId)
             .Returns(Errors.Permission.UnauthorizedAccess);
@@ -1181,7 +1181,7 @@ public class FileServiceTests
     public void DeleteFile_WithValidFileSystemPathId_ShouldReturnDeleted()
     {
         // Arrange
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSourceFile);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(_pathSourceFile);
 
         _mockEnvironmentContext.FileProviderService.DeleteFile(pathId)
             .Returns(Result.Deleted);
@@ -1198,7 +1198,7 @@ public class FileServiceTests
     public void DeleteFileWithFileSystemPathId_WhenFileProviderServiceReturnsError_ShouldPropagateError()
     {
         // Arrange
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(_pathSourceFile);
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(_pathSourceFile);
 
         _mockEnvironmentContext.FileProviderService.DeleteFile(pathId)
             .Returns(Errors.Permission.UnauthorizedAccess);

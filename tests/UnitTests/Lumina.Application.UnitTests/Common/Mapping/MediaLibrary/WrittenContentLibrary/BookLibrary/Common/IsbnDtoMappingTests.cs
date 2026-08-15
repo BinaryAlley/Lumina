@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
-using Lumina.Application.UnitTests.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Common.Fixtures;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
@@ -33,7 +33,7 @@ public class IsbnDtoMappingTests
     public void ToDomainEntity_WhenMappingValidIsbn10Dto_ShouldMapCorrectly()
     {
         // Arrange
-        IsbnDto dto = _isbnDtoFixture.CreateIsbn10();
+        IsbnDto dto = _isbnDtoFixture.Create(format: IsbnFormat.Isbn10);
 
         // Act
         Result<Isbn> result = dto.ToDomainEntity();
@@ -49,7 +49,7 @@ public class IsbnDtoMappingTests
     public void ToDomainEntity_WhenMappingValidIsbn13Dto_ShouldMapCorrectly()
     {
         // Arrange
-        IsbnDto dto = _isbnDtoFixture.CreateIsbn13();
+        IsbnDto dto = _isbnDtoFixture.Create(format: IsbnFormat.Isbn13);
 
         // Act
         Result<Isbn> result = dto.ToDomainEntity();
@@ -65,7 +65,7 @@ public class IsbnDtoMappingTests
     public void ToDomainEntity_WhenMappingDtoWithoutFormat_ShouldUseDefaultFormat()
     {
         // Arrange
-        IsbnDto dto = _isbnDtoFixture.CreateWithoutFormat();
+        IsbnDto dto = _isbnDtoFixture.Create();
 
         // Act
         Result<Isbn> result = dto.ToDomainEntity();
@@ -81,7 +81,7 @@ public class IsbnDtoMappingTests
     public void ToDomainEntity_WhenMappingInvalidIsbnDto_ShouldReturnError()
     {
         // Arrange
-        IsbnDto dto = _isbnDtoFixture.CreateInvalid();
+        IsbnDto dto = _isbnDtoFixture.Create("invalid-isbn", IsbnFormat.Isbn13);
 
         // Act
         Result<Isbn> result = dto.ToDomainEntity();
@@ -96,9 +96,9 @@ public class IsbnDtoMappingTests
         // Arrange
         List<IsbnDto> dtos =
         [
-            _isbnDtoFixture.CreateIsbn10(),
-            _isbnDtoFixture.CreateIsbn13(),
-            _isbnDtoFixture.CreateWithoutFormat()
+            _isbnDtoFixture.Create(format: IsbnFormat.Isbn10),
+            _isbnDtoFixture.Create(format: IsbnFormat.Isbn13),
+            _isbnDtoFixture.Create(),
         ];
 
         // Act
@@ -127,9 +127,9 @@ public class IsbnDtoMappingTests
         // Arrange
         List<IsbnDto> dtos =
         [
-            _isbnDtoFixture.CreateIsbn10(),
-            _isbnDtoFixture.CreateInvalid(),
-            _isbnDtoFixture.CreateIsbn13()
+            _isbnDtoFixture.Create(format: IsbnFormat.Isbn10),
+            _isbnDtoFixture.Create("invalid-isbn", IsbnFormat.Isbn13),
+            _isbnDtoFixture.Create(format: IsbnFormat.Isbn13)
         ];
 
         // Act

@@ -2,7 +2,7 @@
 using Lumina.Application.Common.Mapping.Authentication;
 using Lumina.Application.Core.Maintenance.ApplicationSetup.Commands.SetupApplication;
 using Lumina.Application.Core.UsersManagement.Authentication.Commands.RegisterUser;
-using Lumina.Application.UnitTests.Core.UsersManagement.Authentication.Commands.RegisterUser.Fixture;
+using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
 using Lumina.Contracts.Requests.Authentication;
 using System.Diagnostics.CodeAnalysis;
 #endregion
@@ -29,7 +29,7 @@ public class RegistrationRequestMappingTests
     public void ToSetupCommand_WhenMappingRequest_ShouldMapCorrectly()
     {
         // Arrange
-        RegistrationRequest request = _fixture.CreateRegistrationRequest();
+        RegistrationRequest request = _fixture.Create();
 
         // Act
         SetupApplicationCommand result = request.ToSetupCommand();
@@ -46,7 +46,7 @@ public class RegistrationRequestMappingTests
     public void ToCommand_WhenMappingRequest_ShouldMapCorrectly()
     {
         // Arrange
-        RegistrationRequest request = _fixture.CreateRegistrationRequest();
+        RegistrationRequest request = _fixture.Create();
 
         // Act
         RegisterUserCommand result = request.ToCommand();

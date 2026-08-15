@@ -4,8 +4,8 @@ using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
 using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
-using Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.Fixtures;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion

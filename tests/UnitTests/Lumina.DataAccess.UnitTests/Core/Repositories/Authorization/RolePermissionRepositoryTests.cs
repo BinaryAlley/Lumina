@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
 using EntityFrameworkCore.Testing.NSubstitute;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
 using Lumina.DataAccess.Core.Repositories.Authorization;
 using Lumina.DataAccess.Core.UoW;
-using Lumina.DataAccess.UnitTests.Core.Repositories.Authorization.Fixtures;
 using Lumina.Domain.Common.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -39,7 +39,7 @@ public class RolePermissionRepositoryTests
     public async Task InsertAsync_WhenCalled_ShouldAddRolePermissionToContextAndReturnCreated()
     {
         // Arrange
-        RolePermissionEntity rolePermissionModel = _rolePermissionEntityFixture.CreateRolePermissionModel();
+        RolePermissionEntity rolePermissionModel = _rolePermissionEntityFixture.Create();
 
         // Act
         Result<Created> result = await _sut.InsertAsync(rolePermissionModel, CancellationToken.None);

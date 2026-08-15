@@ -4,10 +4,10 @@ using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
-using Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.Entities.Fixtures;
-using Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.ValueObjects.Fixtures;
 using NSubstitute;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -46,7 +46,7 @@ public class FileTypeServiceTests
     public async Task GetImageTypeAsync_WithValidFile_ShouldReturnCorrectImageType()
     {
         // Arrange
-        File file = _fileFixture.CreateFile();
+        File file = _fileFixture.Create();
         byte[] pngHeader = [137, 80, 78, 71, 13, 10, 26, 10];
         byte[] fileContent = [.. pngHeader, .. Enumerable.Repeat<byte>(0, 100)];
 
@@ -66,7 +66,7 @@ public class FileTypeServiceTests
     public async Task GetImageTypeAsync_WithUnauthorizedAccess_ShouldReturnError()
     {
         // Arrange
-        File file = _fileFixture.CreateFile();
+        File file = _fileFixture.Create();
 
         SetupMockFileSystem(file.Id, []);
         sut = new FileTypeService(_mockFileSystem, _mockFileSystemPermissionsService);
@@ -85,7 +85,7 @@ public class FileTypeServiceTests
     public async Task GetImageTypeAsync_WithSmallFile_ShouldReturnNone()
     {
         // Arrange
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\test.jpg");
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(@"C:\test.jpg");
         byte[] fileContent = [1, 2, 3]; // Less than BUFFER_SIZE
 
         SetupMockFileSystem(pathId, fileContent);
@@ -104,7 +104,7 @@ public class FileTypeServiceTests
     public async Task GetImageTypeAsync_WithSvgFile_ShouldReturnSvgType()
     {
         // Arrange
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\test.svg");
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(@"C:\test.svg");
         string svgContent = "<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>";
         byte[] fileContent = Encoding.UTF8.GetBytes(svgContent);
 
@@ -124,7 +124,7 @@ public class FileTypeServiceTests
     public async Task GetImageTypeAsync_WithTgaFile_ShouldReturnTgaType()
     {
         // Arrange
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\test.tga");
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(@"C:\test.tga");
         byte[] tgaHeader = new byte[18];
         tgaHeader[2] = 2; // Set image type to 2 (uncompressed true-color image)
         byte[] fileContent = [.. tgaHeader, .. Enumerable.Repeat<byte>(0, 100)];
@@ -146,8 +146,8 @@ public class FileTypeServiceTests
     public async Task GetImageTypeAsync_WithUnknownImageType_ShouldReturnNone()
     {
         // Arrange
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\test.unknown");
-        byte[] fileContent = Enumerable.Repeat<byte>(0, 100).ToArray();
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(@"C:\test.unknown");
+        byte[] fileContent = [.. Enumerable.Repeat<byte>(0, 100)];
 
         SetupMockFileSystem(pathId, fileContent);
         sut = new FileTypeService(_mockFileSystem, _mockFileSystemPermissionsService);
@@ -175,7 +175,7 @@ public class FileTypeServiceTests
     public async Task GetImageTypeAsync_WithSvgFileStartingWithXmlDeclaration_ShouldReturnSvgType()
     {
         // Arrange
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\test.svg");
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(@"C:\test.svg");
         string svgContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>";
         byte[] fileContent = Encoding.UTF8.GetBytes(svgContent);
 
@@ -212,7 +212,7 @@ public class FileTypeServiceTests
     public async Task GetImageTypeAsync_WithVariousImageTypes_ShouldIdentifyCorrectly(byte[] header, ImageType expectedType, string testName)
     {
         // Arrange
-        FileSystemPathId pathId = _fileSystemPathIdFixture.CreateFileSystemPathId($@"C:\test.{testName.ToLower()}");
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create($@"C:\test.{testName.ToLower()}");
         byte[] fileContent = [.. header, .. Enumerable.Repeat<byte>(0, 100)];
 
         SetupMockFileSystem(pathId, fileContent);

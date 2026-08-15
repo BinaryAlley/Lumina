@@ -7,7 +7,7 @@ using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.Admin.Authorization.Roles.Commands.UpdateRole;
-using Lumina.Application.UnitTests.Core.Admin.Authorization.Roles.Commands.UpdateRole.Fixtures;
+using Lumina.Application.Fixtures.Core.Admin.Authorization.Roles.Commands.UpdateRole;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
@@ -64,7 +64,7 @@ public class UpdateRoleCommandHandlerTests
     public async Task HandleAsync_WhenUserIsNotAdmin_ShouldReturnNotAuthorizedError()
     {
         // Arrange
-        UpdateRoleCommand command = _updateRoleCommandFixture.CreateCommand();
+        UpdateRoleCommand command = _updateRoleCommandFixture.Create();
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(false);
 
@@ -81,7 +81,7 @@ public class UpdateRoleCommandHandlerTests
     public async Task HandleAsync_WhenUpdateRoleFails_ShouldReturnError()
     {
         // Arrange
-        UpdateRoleCommand command = _updateRoleCommandFixture.CreateCommand();
+        UpdateRoleCommand command = _updateRoleCommandFixture.Create();
         Error error = Error.Failure("Database.Error", "Failed to update role");
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
@@ -102,7 +102,7 @@ public class UpdateRoleCommandHandlerTests
     public async Task HandleAsync_WhenGetRoleByIdFails_ShouldReturnError()
     {
         // Arrange
-        UpdateRoleCommand command = _updateRoleCommandFixture.CreateCommand();
+        UpdateRoleCommand command = _updateRoleCommandFixture.Create();
         Error error = Error.Failure("Database.Error", "Failed to get role");
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
@@ -124,7 +124,7 @@ public class UpdateRoleCommandHandlerTests
     public async Task HandleAsync_WhenGetRoleByIdReturnsNull_ShouldReturnError()
     {
         // Arrange
-        UpdateRoleCommand command = _updateRoleCommandFixture.CreateCommand();
+        UpdateRoleCommand command = _updateRoleCommandFixture.Create();
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(true);
@@ -145,7 +145,7 @@ public class UpdateRoleCommandHandlerTests
     public async Task HandleAsync_WhenAllOperationsSucceed_ShouldReturnSuccessResponse()
     {
         // Arrange
-        UpdateRoleCommand command = _updateRoleCommandFixture.CreateCommand();
+        UpdateRoleCommand command = _updateRoleCommandFixture.Create();
         RoleEntity role = new()
         {
             Id = command.RoleId,

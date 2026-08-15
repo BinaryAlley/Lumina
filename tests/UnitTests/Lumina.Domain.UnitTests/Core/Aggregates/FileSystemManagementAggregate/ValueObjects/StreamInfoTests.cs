@@ -2,7 +2,7 @@
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
-using Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.ValueObjects.Fixtures;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -108,8 +108,8 @@ public class StreamInfoTests
     public void Equals_WithSameProperties_ShouldReturnTrue()
     {
         // Arrange
-        StreamInfo info1 = _streamInfoFixture.CreateStreamInfo();
-        StreamInfo info2 = _streamInfoFixture.CreateStreamInfo(
+        StreamInfo info1 = _streamInfoFixture.Create();
+        StreamInfo info2 = _streamInfoFixture.Create(
             info1.StreamId, info1.MimeType, info1.Bitrate, info1.Codec,
             info1.Resolution, info1.FrameRate, info1.SampleRate, info1.Channels);
 
@@ -124,8 +124,8 @@ public class StreamInfoTests
     public void Equals_WithDifferentProperties_ShouldReturnFalse()
     {
         // Arrange
-        StreamInfo info1 = _streamInfoFixture.CreateStreamInfo();
-        StreamInfo info2 = _streamInfoFixture.CreateStreamInfo();
+        StreamInfo info1 = _streamInfoFixture.Create();
+        StreamInfo info2 = _streamInfoFixture.Create();
 
         // Act
         bool result = info1.Equals(info2);
@@ -138,8 +138,8 @@ public class StreamInfoTests
     public void GetHashCode_WithSameProperties_ShouldReturnSameHashCode()
     {
         // Arrange
-        StreamInfo info1 = _streamInfoFixture.CreateStreamInfo();
-        StreamInfo info2 = _streamInfoFixture.CreateStreamInfo(
+        StreamInfo info1 = _streamInfoFixture.Create();
+        StreamInfo info2 = _streamInfoFixture.Create(
             info1.StreamId, info1.MimeType, info1.Bitrate, info1.Codec,
             info1.Resolution, info1.FrameRate, info1.SampleRate, info1.Channels);
 
@@ -155,8 +155,8 @@ public class StreamInfoTests
     public void GetHashCode_WithDifferentProperties_ShouldReturnDifferentHashCode()
     {
         // Arrange
-        StreamInfo info1 = _streamInfoFixture.CreateStreamInfo();
-        StreamInfo info2 = _streamInfoFixture.CreateStreamInfo();
+        StreamInfo info1 = _streamInfoFixture.Create();
+        StreamInfo info2 = _streamInfoFixture.Create();
 
         // Act
         int hashCode1 = info1.GetHashCode();

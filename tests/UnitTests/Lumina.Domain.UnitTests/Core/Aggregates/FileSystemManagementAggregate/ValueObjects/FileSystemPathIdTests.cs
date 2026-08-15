@@ -2,7 +2,7 @@
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
-using Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.ValueObjects.Fixtures;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -57,8 +57,8 @@ public class FileSystemPathIdTests
     {
         // Arrange
         string path = @"C:\TestDir\file.txt";
-        FileSystemPathId id1 = _fileSystemPathIdFixture.CreateFileSystemPathId(path);
-        FileSystemPathId id2 = _fileSystemPathIdFixture.CreateFileSystemPathId(path);
+        FileSystemPathId id1 = _fileSystemPathIdFixture.Create(path);
+        FileSystemPathId id2 = _fileSystemPathIdFixture.Create(path);
 
         // Act
         bool result = id1.Equals(id2);
@@ -71,8 +71,8 @@ public class FileSystemPathIdTests
     public void Equals_WithDifferentPath_ShouldReturnFalse()
     {
         // Arrange
-        FileSystemPathId id1 = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestDir\file1.txt");
-        FileSystemPathId id2 = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestDir\file2.txt");
+        FileSystemPathId id1 = _fileSystemPathIdFixture.Create(@"C:\TestDir\file1.txt");
+        FileSystemPathId id2 = _fileSystemPathIdFixture.Create(@"C:\TestDir\file2.txt");
 
         // Act
         bool result = id1.Equals(id2);
@@ -86,8 +86,8 @@ public class FileSystemPathIdTests
     {
         // Arrange
         string path = @"C:\TestDir\file.txt";
-        FileSystemPathId id1 = _fileSystemPathIdFixture.CreateFileSystemPathId(path);
-        FileSystemPathId id2 = _fileSystemPathIdFixture.CreateFileSystemPathId(path);
+        FileSystemPathId id1 = _fileSystemPathIdFixture.Create(path);
+        FileSystemPathId id2 = _fileSystemPathIdFixture.Create(path);
 
         // Act
         int hashCode1 = id1.GetHashCode();
@@ -101,8 +101,8 @@ public class FileSystemPathIdTests
     public void GetHashCode_WithDifferentPath_ShouldReturnDifferentHashCode()
     {
         // Arrange
-        FileSystemPathId id1 = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestDir\file1.txt");
-        FileSystemPathId id2 = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestDir\file2.txt");
+        FileSystemPathId id1 = _fileSystemPathIdFixture.Create(@"C:\TestDir\file1.txt");
+        FileSystemPathId id2 = _fileSystemPathIdFixture.Create(@"C:\TestDir\file2.txt");
 
         // Act
         int hashCode1 = id1.GetHashCode();
@@ -117,8 +117,8 @@ public class FileSystemPathIdTests
     {
         // Arrange
         string path = @"C:\TestDir\file.txt";
-        FileSystemPathId id1 = _fileSystemPathIdFixture.CreateFileSystemPathId(path);
-        FileSystemPathId id2 = _fileSystemPathIdFixture.CreateFileSystemPathId(path);
+        FileSystemPathId id1 = _fileSystemPathIdFixture.Create(path);
+        FileSystemPathId id2 = _fileSystemPathIdFixture.Create(path);
 
         // Act
         bool result = id1 == id2;
@@ -131,8 +131,8 @@ public class FileSystemPathIdTests
     public void InequalityOperator_WithDifferentPath_ShouldReturnTrue()
     {
         // Arrange
-        FileSystemPathId id1 = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestDir\file1.txt");
-        FileSystemPathId id2 = _fileSystemPathIdFixture.CreateFileSystemPathId(@"C:\TestDir\file2.txt");
+        FileSystemPathId id1 = _fileSystemPathIdFixture.Create(@"C:\TestDir\file1.txt");
+        FileSystemPathId id2 = _fileSystemPathIdFixture.Create(@"C:\TestDir\file2.txt");
 
         // Act
         bool result = id1 != id2;
