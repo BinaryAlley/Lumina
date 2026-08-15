@@ -14,15 +14,7 @@ namespace Lumina.Application.UnitTests.Common.Mapping.Authentication;
 [ExcludeFromCodeCoverage]
 public class LoginRequestMappingTests
 {
-    private readonly LoginRequestFixture _fixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="LoginRequestMappingTests"/> class.
-    /// </summary>
-    public LoginRequestMappingTests()
-    {
-        _fixture = new();
-    }
+    private readonly LoginRequestFixture _fixture = new();
 
     [Fact]
     public void ToQuery_WhenMappingRequest_ShouldMapCorrectly()

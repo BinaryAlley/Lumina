@@ -14,15 +14,7 @@ namespace Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.
 [ExcludeFromCodeCoverage]
 public class FileSystemPathIdTests
 {
-    private readonly FileSystemPathIdFixture _fileSystemPathIdFixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="FileSystemPathIdTests"/> class.
-    /// </summary>
-    public FileSystemPathIdTests()
-    {
-        _fileSystemPathIdFixture = new FileSystemPathIdFixture();
-    }
+    private readonly FileSystemPathIdFixture _fileSystemPathIdFixture = new();
 
     [Fact]
     public void Create_WithValidPath_ShouldReturnFileSystemPathId()

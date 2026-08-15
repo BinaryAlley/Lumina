@@ -31,7 +31,7 @@ public class DirectoryProviderServiceTests
     private readonly IFileSystem _mockFileSystem;
     private readonly IFileSystemPermissionsService _mockFileSystemPermissionsService;
     private readonly DirectoryProviderService _sut;
-    private readonly FileSystemPathIdFixture _fileSystemPathIdFixture;
+    private readonly FileSystemPathIdFixture _fileSystemPathIdFixture = new();
     private static readonly bool s_isUnix = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
     private readonly string _pathSource = s_isUnix ? "/Source" : @"C:\Source";
     private readonly string _pathSourceSubDir = s_isUnix ? "/Source/SubDir" : @"C:\Source\SubDir";
@@ -65,7 +65,6 @@ public class DirectoryProviderServiceTests
         _mockFileSystem = Substitute.For<IFileSystem>();
         _mockFileSystemPermissionsService = Substitute.For<IFileSystemPermissionsService>();
         _sut = new DirectoryProviderService(_mockFileSystem, _mockFileSystemPermissionsService);
-        _fileSystemPathIdFixture = new();
     }
 
     [Fact]

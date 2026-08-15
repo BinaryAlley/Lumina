@@ -14,15 +14,7 @@ namespace Lumina.Application.UnitTests.Common.Mapping.Authentication;
 [ExcludeFromCodeCoverage]
 public class RecoverPasswordRequestMappingTests
 {
-    private readonly RecoverPasswordRequestFixture _fixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="RecoverPasswordRequestMappingTests"/> class.
-    /// </summary>
-    public RecoverPasswordRequestMappingTests()
-    {
-        _fixture = new();
-    }
+    private readonly RecoverPasswordRequestFixture _fixture = new();
 
     [Fact]
     public void ToCommand_WhenMappingRequest_ShouldMapCorrectly()

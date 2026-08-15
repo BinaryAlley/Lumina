@@ -16,15 +16,7 @@ namespace Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.
 [ExcludeFromCodeCoverage]
 public class ThumbnailTests
 {
-    private readonly ThumbnailFixture _thumbnailFixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ThumbnailTests"/> class.
-    /// </summary>
-    public ThumbnailTests()
-    {
-        _thumbnailFixture = new ThumbnailFixture();
-    }
+    private readonly ThumbnailFixture _thumbnailFixture = new();
 
     [Fact]
     public void Constructor_WhenCalled_ShouldSetPropertiesCorrectly()

@@ -23,7 +23,7 @@ public class RolePermissionRepositoryTests
 {
     private readonly LuminaDbContext _mockContext;
     private readonly RolePermissionRepository _sut;
-    private readonly RolePermissionEntityFixture _rolePermissionEntityFixture;
+    private readonly RolePermissionEntityFixture _rolePermissionEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RolePermissionRepositoryTests"/> class.
@@ -32,7 +32,6 @@ public class RolePermissionRepositoryTests
     {
         _mockContext = Create.MockedDbContextFor<LuminaDbContext>();
         _sut = new RolePermissionRepository(_mockContext);
-        _rolePermissionEntityFixture = new RolePermissionEntityFixture();
     }
 
     [Fact]

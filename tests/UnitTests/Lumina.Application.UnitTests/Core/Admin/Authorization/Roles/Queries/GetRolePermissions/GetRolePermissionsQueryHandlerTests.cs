@@ -31,7 +31,7 @@ public class GetRolePermissionsQueryHandlerTests
     private readonly ICurrentUserService _mockCurrentUserService;
     private readonly IRoleRepository _mockRoleRepository;
     private readonly GetRolePermissionsQueryHandler _sut;
-    private readonly GetRolePermissionsQueryFixture _getRolePermissionsQueryFixture;
+    private readonly GetRolePermissionsQueryFixture _getRolePermissionsQueryFixture = new();
     private readonly Guid _userId;
 
     /// <summary>
@@ -46,7 +46,6 @@ public class GetRolePermissionsQueryHandlerTests
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
         _mockRoleRepository = Substitute.For<IRoleRepository>();
-        _getRolePermissionsQueryFixture = new GetRolePermissionsQueryFixture();
         _userId = Guid.NewGuid();
 
         _mockCurrentUserService.UserId.Returns(_userId);

@@ -23,7 +23,7 @@ public class ValidatePathQueryHandlerTests
     private readonly IPathService _mockPathService;
     private readonly IValidator<ValidatePathQuery> _mockValidator;
     private readonly ValidatePathQueryHandler _sut;
-    private readonly ValidatePathQueryFixture _validatePathQueryFixture;
+    private readonly ValidatePathQueryFixture _validatePathQueryFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ValidatePathQueryHandlerTests"/> class.
@@ -32,7 +32,6 @@ public class ValidatePathQueryHandlerTests
     {
         _mockPathService = Substitute.For<IPathService>();
         _mockValidator = Substitute.For<IValidator<ValidatePathQuery>>();
-        _validatePathQueryFixture = new ValidatePathQueryFixture();
         _mockValidator.Validate(Arg.Any<ValidatePathQuery>())
             .Returns([]);
         _sut = new ValidatePathQueryHandler(_mockPathService, _mockValidator);

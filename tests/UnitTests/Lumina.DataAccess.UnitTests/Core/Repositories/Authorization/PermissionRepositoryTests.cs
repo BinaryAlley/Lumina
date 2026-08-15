@@ -26,7 +26,7 @@ public class PermissionRepositoryTests
 {
     private readonly LuminaDbContext _mockContext;
     private readonly PermissionRepository _sut;
-    private readonly PermissionEntityFixture _permissionEntityFixture;
+    private readonly PermissionEntityFixture _permissionEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PermissionRepositoryTests"/> class.
@@ -35,7 +35,6 @@ public class PermissionRepositoryTests
     {
         _mockContext = Create.MockedDbContextFor<LuminaDbContext>();
         _sut = new PermissionRepository(_mockContext);
-        _permissionEntityFixture = new PermissionEntityFixture();
     }
 
     [Fact]

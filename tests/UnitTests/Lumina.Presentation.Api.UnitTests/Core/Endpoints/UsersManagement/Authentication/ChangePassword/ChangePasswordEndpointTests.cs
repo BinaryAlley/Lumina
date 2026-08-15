@@ -25,7 +25,7 @@ public class ChangePasswordEndpointTests
 {
     private readonly ICommandHandler<ChangePasswordCommand, Result<ChangePasswordResponse>> _mockHandler;
     private readonly ChangePasswordEndpoint _sut;
-    private readonly ChangePasswordRequestFixture _changePasswordRequestFixture;
+    private readonly ChangePasswordRequestFixture _changePasswordRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ChangePasswordEndpointTests"/> class.
@@ -34,7 +34,6 @@ public class ChangePasswordEndpointTests
     {
         _mockHandler = Substitute.For<ICommandHandler<ChangePasswordCommand, Result<ChangePasswordResponse>>>();
         _sut = FastEndpoints.Factory.Create<ChangePasswordEndpoint>(_mockHandler);
-        _changePasswordRequestFixture = new ChangePasswordRequestFixture();
     }
 
     [Fact]

@@ -30,8 +30,8 @@ public class DirectoryServiceTests
     private readonly IPlatformContextManager _mockPlatformContextManager;
     private readonly IPlatformContext _mockPlatformContext;
     private readonly DirectoryService _sut;
-    private readonly FileSystemPathIdFixture _fileSystemPathIdFixture;
-    private readonly DirectoryFixture _directoryFixture;
+    private readonly FileSystemPathIdFixture _fileSystemPathIdFixture = new();
+    private readonly DirectoryFixture _directoryFixture = new();
     private static readonly bool s_isUnix = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
     private readonly string _pathDirTest = s_isUnix ? "/TestDir" : @"C:\TestDir";
     private readonly string _pathDirTestSubDir1 = s_isUnix ? "/TestDir/Sub1" : @"C:\TestDir\Sub1";
@@ -47,8 +47,6 @@ public class DirectoryServiceTests
         _mockPlatformContext = Substitute.For<IPlatformContext>();
         _mockPlatformContextManager.GetCurrentContext().Returns(_mockPlatformContext);
         _sut = new DirectoryService(_mockEnvironmentContext, _mockPlatformContextManager);
-        _fileSystemPathIdFixture = new FileSystemPathIdFixture();
-        _directoryFixture = new DirectoryFixture();
     }
 
     [Fact]

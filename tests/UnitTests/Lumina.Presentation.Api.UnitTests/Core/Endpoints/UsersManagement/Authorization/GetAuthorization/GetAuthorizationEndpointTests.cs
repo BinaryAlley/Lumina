@@ -29,7 +29,7 @@ public class GetAuthorizationEndpointTests
 {
     private readonly IQueryHandler<GetAuthorizationQuery, Result<AuthorizationResponse>> _mockHandler;
     private readonly GetAuthorizationEndpoint _sut;
-    private readonly GetAuthorizationRequestFixture _getAuthorizationRequestFixture;
+    private readonly GetAuthorizationRequestFixture _getAuthorizationRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetAuthorizationEndpointTests"/> class.
@@ -37,7 +37,6 @@ public class GetAuthorizationEndpointTests
     public GetAuthorizationEndpointTests()
     {
         _mockHandler = Substitute.For<IQueryHandler<GetAuthorizationQuery, Result<AuthorizationResponse>>>();
-        _getAuthorizationRequestFixture = new GetAuthorizationRequestFixture();
         _sut = Factory.Create<GetAuthorizationEndpoint>(_mockHandler);
     }
 

@@ -14,15 +14,7 @@ namespace Lumina.Application.UnitTests.Common.Mapping.Authentication;
 [ExcludeFromCodeCoverage]
 public class ChangePasswordRequestMappingTests
 {
-    private readonly ChangePasswordRequestFixture _fixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ChangePasswordRequestMappingTests"/> class.
-    /// </summary>
-    public ChangePasswordRequestMappingTests()
-    {
-        _fixture = new();
-    }
+    private readonly ChangePasswordRequestFixture _fixture = new();
 
     [Fact]
     public void ToCommand_WhenMappingRequest_ShouldMapCorrectly()

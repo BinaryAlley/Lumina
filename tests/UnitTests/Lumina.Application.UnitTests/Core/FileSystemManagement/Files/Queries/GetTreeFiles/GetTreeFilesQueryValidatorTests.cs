@@ -16,17 +16,8 @@ namespace Lumina.Application.UnitTests.Core.FileSystemManagement.Files.Queries.G
 [ExcludeFromCodeCoverage]
 public class GetTreeFilesQueryValidatorTests
 {
-    private readonly GetTreeFilesQueryValidator _validator;
-    private readonly GetTreeFilesQueryFixture _getTreeFilesQueryFixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="GetTreeFilesQueryValidatorTests"/> class.
-    /// </summary>
-    public GetTreeFilesQueryValidatorTests()
-    {
-        _validator = new GetTreeFilesQueryValidator();
-        _getTreeFilesQueryFixture = new GetTreeFilesQueryFixture();
-    }
+    private readonly GetTreeFilesQueryValidator _validator = new();
+    private readonly GetTreeFilesQueryFixture _getTreeFilesQueryFixture = new();
 
     [Fact]
     public void Validate_WhenPathIsNull_ShouldHaveValidationError()

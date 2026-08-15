@@ -21,19 +21,17 @@ namespace Lumina.Application.Fixtures.Core.MediaLibrary.WrittenContentLibrary.Bo
 [ExcludeFromCodeCoverage]
 public class AddBookCommandFixture
 {
-    private readonly Fixture _fixture;
+    private readonly Fixture _fixture = new();
     private readonly Random _random = new();
-    private readonly Faker _faker;
+    private readonly Faker _faker = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AddBookCommandFixture"/> class.
     /// </summary>
     public AddBookCommandFixture()
     {
-        _fixture = new Fixture();
         _fixture.Customizations.Add(new DateOnlySpecimenBuilder());
         _fixture.Customizations.Add(new NullableDateOnlySpecimenBuilder());
-        _faker = new Faker();
     }
 
     /// <summary>

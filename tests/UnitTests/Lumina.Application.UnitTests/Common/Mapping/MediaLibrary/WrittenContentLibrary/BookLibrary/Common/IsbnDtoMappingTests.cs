@@ -19,15 +19,7 @@ namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.WrittenConten
 [ExcludeFromCodeCoverage]
 public class IsbnDtoMappingTests
 {
-    private readonly IsbnDtoFixture _isbnDtoFixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="IsbnDtoMappingTests"/> class.
-    /// </summary>
-    public IsbnDtoMappingTests()
-    {
-        _isbnDtoFixture = new IsbnDtoFixture();
-    }
+    private readonly IsbnDtoFixture _isbnDtoFixture = new();
 
     [Fact]
     public void ToDomainEntity_WhenMappingValidIsbn10Dto_ShouldMapCorrectly()

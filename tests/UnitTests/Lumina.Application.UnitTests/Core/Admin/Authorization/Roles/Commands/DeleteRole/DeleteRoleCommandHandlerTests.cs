@@ -29,7 +29,7 @@ public class DeleteRoleCommandHandlerTests
     private readonly ICurrentUserService _mockCurrentUserService;
     private readonly IRoleRepository _mockRoleRepository;
     private readonly DeleteRoleCommandHandler _sut;
-    private readonly DeleteRoleCommandFixture _deleteRoleCommandFixture;
+    private readonly DeleteRoleCommandFixture _deleteRoleCommandFixture = new();
     private readonly Guid _userId;
 
     /// <summary>
@@ -44,7 +44,6 @@ public class DeleteRoleCommandHandlerTests
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
         _mockRoleRepository = Substitute.For<IRoleRepository>();
-        _deleteRoleCommandFixture = new DeleteRoleCommandFixture();
         _userId = Guid.NewGuid();
 
         _mockCurrentUserService.UserId.Returns(_userId);

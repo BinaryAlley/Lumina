@@ -16,17 +16,8 @@ namespace Lumina.Application.UnitTests.Core.UsersManagement.Authentication.Queri
 [ExcludeFromCodeCoverage]
 public class LoginUserQueryValidatorTests
 {
-    private readonly LoginUserQueryValidator _validator;
-    private readonly LoginUserQueryFixture _loginUserQueryFixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="LoginUserQueryValidatorTests"/> class.
-    /// </summary>
-    public LoginUserQueryValidatorTests()
-    {
-        _validator = new LoginUserQueryValidator();
-        _loginUserQueryFixture = new LoginUserQueryFixture();
-    }
+    private readonly LoginUserQueryValidator _validator = new();
+    private readonly LoginUserQueryFixture _loginUserQueryFixture = new();
 
     [Fact]
     public void Validate_WhenUsernameIsNull_ShouldHaveValidationError()

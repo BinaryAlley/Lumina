@@ -17,7 +17,7 @@ namespace Lumina.Infrastructure.UnitTests.Common.Validators;
 [ExcludeFromCodeCoverage]
 public class EncryptionSettingsDtoValidatorTests
 {
-    private readonly EncryptionSettingsDtoValidator _validator;
+    private readonly EncryptionSettingsDtoValidator _validator = new();
     private readonly IFixture _fixture;
 
     /// <summary>
@@ -26,7 +26,6 @@ public class EncryptionSettingsDtoValidatorTests
     public EncryptionSettingsDtoValidatorTests()
     {
         _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
-        _validator = new();
     }
 
     [Fact]

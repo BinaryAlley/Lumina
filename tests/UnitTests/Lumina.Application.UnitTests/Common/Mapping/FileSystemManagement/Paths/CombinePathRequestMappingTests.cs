@@ -18,13 +18,6 @@ public class CombinePathRequestMappingTests
 {
     private readonly CombinePathRequestFixture _combinePathRequestFixture = new();
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="CombinePathRequestMappingTests"/> class.
-    /// </summary>
-    public CombinePathRequestMappingTests()
-    {
-    }
-
     [Fact]
     public void ToCommand_WhenMappingCombinePathRequest_ShouldMapCorrectly()
     {

@@ -25,7 +25,7 @@ public class SetupApplicationEndpointTests
 {
     private readonly ICommandHandler<SetupApplicationCommand, Result<RegistrationResponse>> _mockHandler;
     private readonly SetupApplicationEndpoint _sut;
-    private readonly RegistrationRequestFixture _registrationRequestFixture;
+    private readonly RegistrationRequestFixture _registrationRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SetupApplicationEndpointTests"/> class.
@@ -34,7 +34,6 @@ public class SetupApplicationEndpointTests
     {
         _mockHandler = Substitute.For<ICommandHandler<SetupApplicationCommand, Result<RegistrationResponse>>>();
         _sut = FastEndpoints.Factory.Create<SetupApplicationEndpoint>(_mockHandler);
-        _registrationRequestFixture = new RegistrationRequestFixture();
     }
 
     [Fact]

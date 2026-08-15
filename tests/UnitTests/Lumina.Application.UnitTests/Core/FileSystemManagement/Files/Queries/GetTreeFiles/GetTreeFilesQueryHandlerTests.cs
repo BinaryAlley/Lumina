@@ -29,8 +29,8 @@ public class GetTreeFilesQueryHandlerTests
     private readonly IFixture _fixture;
     private readonly IFileService _mockFileService;
     private readonly GetTreeFilesQueryHandler _sut;
-    private readonly FileFixture _fileFixture;
-    private readonly GetTreeFilesQueryFixture _getTreeFilesQueryFixture;
+    private readonly FileFixture _fileFixture = new();
+    private readonly GetTreeFilesQueryFixture _getTreeFilesQueryFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetTreeFilesQueryHandler"/> class.
@@ -43,8 +43,6 @@ public class GetTreeFilesQueryHandlerTests
         mockValidator.Validate(Arg.Any<GetTreeFilesQuery>())
             .Returns([]);
         _sut = new GetTreeFilesQueryHandler(_mockFileService, mockValidator);
-        _fileFixture = new FileFixture();
-        _getTreeFilesQueryFixture = new GetTreeFilesQueryFixture();
     }
 
     [Fact]

@@ -16,17 +16,8 @@ namespace Lumina.Application.UnitTests.Core.Maintenance.ApplicationSetup.Command
 [ExcludeFromCodeCoverage]
 public class SetupApplicationCommandValidatorTests
 {
-    private readonly SetupApplicationCommandValidator _validator;
-    private readonly SetupApplicationCommandFixture _commandFixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="SetupApplicationCommandValidatorTests"/> class.
-    /// </summary>
-    public SetupApplicationCommandValidatorTests()
-    {
-        _validator = new SetupApplicationCommandValidator();
-        _commandFixture = new SetupApplicationCommandFixture();
-    }
+    private readonly SetupApplicationCommandValidator _validator = new();
+    private readonly SetupApplicationCommandFixture _commandFixture = new();
 
     [Fact]
     public void Validate_WhenUsernameIsNull_ShouldHaveValidationError()

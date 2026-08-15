@@ -25,7 +25,7 @@ public class GetFileSystemQueryHandlerTests
     private readonly IPlatformContextManager _mockPlatformContextManager;
     private readonly IPlatformContext _mockPlatformContext;
     private readonly GetFileSystemQueryHandler _sut;
-    private readonly GetFileSystemQueryFixture _getFileSystemQueryFixture;
+    private readonly GetFileSystemQueryFixture _getFileSystemQueryFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetFileSystemQueryHandlerTests"/> class.
@@ -36,7 +36,6 @@ public class GetFileSystemQueryHandlerTests
         _mockPlatformContextManager = Substitute.For<IPlatformContextManager>();
         _mockPlatformContext = Substitute.For<IPlatformContext>();
         _mockPlatformContextManager.GetCurrentContext().Returns(_mockPlatformContext);
-        _getFileSystemQueryFixture = new GetFileSystemQueryFixture();
         _sut = new GetFileSystemQueryHandler(_mockPlatformContextManager);
     }
 

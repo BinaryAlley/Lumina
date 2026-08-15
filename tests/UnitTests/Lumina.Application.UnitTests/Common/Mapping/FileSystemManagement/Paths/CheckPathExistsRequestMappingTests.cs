@@ -18,13 +18,6 @@ public class CheckPathExistsRequestMappingTests
 {
     private readonly CheckPathExistsRequestFixture _checkPathExistsRequestFixture = new();
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="CheckPathExistsRequestMappingTests"/> class.
-    /// </summary>
-    public CheckPathExistsRequestMappingTests()
-    {
-    }
-
     [Fact]
     public void ToQuery_WhenMappingCheckPathExistsRequest_ShouldMapCorrectly()
     {

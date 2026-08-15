@@ -28,8 +28,8 @@ public class GetPathParentQueryHandlerTests
     private readonly IFixture _fixture;
     private readonly IPathService _mockPathService;
     private readonly GetPathParentQueryHandler _sut;
-    private readonly PathSegmentFixture _pathSegmentFixture;
-    private readonly GetPathParentQueryFixture _getPathParentQueryFixture;
+    private readonly PathSegmentFixture _pathSegmentFixture = new();
+    private readonly GetPathParentQueryFixture _getPathParentQueryFixture = new();
 
     public GetPathParentQueryHandlerTests()
     {
@@ -39,8 +39,6 @@ public class GetPathParentQueryHandlerTests
         mockValidator.Validate(Arg.Any<GetPathParentQuery>())
             .Returns([]);
         _sut = new GetPathParentQueryHandler(_mockPathService, mockValidator);
-        _pathSegmentFixture = new PathSegmentFixture();
-        _getPathParentQueryFixture = new GetPathParentQueryFixture();
     }
 
     [Fact]

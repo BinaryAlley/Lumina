@@ -16,17 +16,8 @@ namespace Lumina.Application.UnitTests.Core.FileSystemManagement.Paths.Commands.
 [ExcludeFromCodeCoverage]
 public class SplitPathCommandValidatorTests
 {
-    private readonly SplitPathCommandValidator _validator;
-    private readonly SplitPathCommandFixture _splitPathCommandFixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="SplitPathCommandValidatorTests"/> class.
-    /// </summary>
-    public SplitPathCommandValidatorTests()
-    {
-        _validator = new SplitPathCommandValidator();
-        _splitPathCommandFixture = new SplitPathCommandFixture();
-    }
+    private readonly SplitPathCommandValidator _validator = new();
+    private readonly SplitPathCommandFixture _splitPathCommandFixture = new();
 
     [Fact]
     public void Validate_WhenPathIsNull_ShouldHaveValidationError()

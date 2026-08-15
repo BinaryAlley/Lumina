@@ -39,7 +39,7 @@ public class SetupApplicationCommandHandlerTests
     private readonly IDataSeedService _mockDataSeedService;
     private readonly SetupApplicationCommandHandler _sut;
     private readonly UserEntityFixture _userEntityFixture = new();
-    private readonly SetupApplicationCommandFixture _setupApplicationCommandFixture;
+    private readonly SetupApplicationCommandFixture _setupApplicationCommandFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SetupApplicationCommandHandlerTests"/> class.
@@ -54,7 +54,6 @@ public class SetupApplicationCommandHandlerTests
         _mockUserRepository = Substitute.For<IUserRepository>();
         _mockDateTimeProvider = Substitute.For<IDateTimeProvider>();
         _mockDataSeedService = Substitute.For<IDataSeedService>();
-        _setupApplicationCommandFixture = new SetupApplicationCommandFixture();
         IValidator<SetupApplicationCommand> mockValidator = Substitute.For<IValidator<SetupApplicationCommand>>();
         mockValidator.Validate(Arg.Any<SetupApplicationCommand>())
             .Returns([]);

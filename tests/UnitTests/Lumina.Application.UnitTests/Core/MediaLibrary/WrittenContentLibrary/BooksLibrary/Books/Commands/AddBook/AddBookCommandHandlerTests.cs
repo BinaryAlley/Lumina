@@ -33,7 +33,7 @@ public class AddBookCommandHandlerTests
     private readonly IUnitOfWork _mockUnitOfWork;
     private readonly IBookRepository _mockBookRepository;
     private readonly AddBookCommandHandler _sut;
-    private readonly AddBookCommandFixture _commandBookFixture;
+    private readonly AddBookCommandFixture _commandBookFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AddBookCommandHandlerTests"/> class.
@@ -53,7 +53,6 @@ public class AddBookCommandHandlerTests
         mockValidator.Validate(Arg.Any<AddBookCommand>())
             .Returns([]);
         _sut = new AddBookCommandHandler(_mockUnitOfWork, mockValidator);
-        _commandBookFixture = new AddBookCommandFixture();
     }
 
     [Fact]

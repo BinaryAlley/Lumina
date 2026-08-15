@@ -26,8 +26,8 @@ public class CombinePathEndpointTests
 {
     private readonly ICommandHandler<CombinePathCommand, Result<PathSegmentResponse>> _mockHandler;
     private readonly CombinePathEndpoint _sut;
-    private readonly PathSegmentResponseFixture _pathSegmentResponseFixture;
-    private readonly CombinePathRequestFixture _combinePathRequestFixture;
+    private readonly PathSegmentResponseFixture _pathSegmentResponseFixture = new();
+    private readonly CombinePathRequestFixture _combinePathRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CombinePathEndpointTests"/> class.
@@ -36,8 +36,6 @@ public class CombinePathEndpointTests
     {
         _mockHandler = Substitute.For<ICommandHandler<CombinePathCommand, Result<PathSegmentResponse>>>();
         _sut = FastEndpoints.Factory.Create<CombinePathEndpoint>(_mockHandler);
-        _pathSegmentResponseFixture = new PathSegmentResponseFixture();
-        _combinePathRequestFixture = new CombinePathRequestFixture();
     }
 
     [Fact]

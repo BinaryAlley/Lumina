@@ -20,15 +20,7 @@ namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.WrittenConten
 [ExcludeFromCodeCoverage]
 public class BookEntityMappingTests
 {
-    private readonly BookEntityFixture _bookEntityFixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="BookEntityMappingTests"/> class.
-    /// </summary>
-    public BookEntityMappingTests()
-    {
-        _bookEntityFixture = new BookEntityFixture();
-    }
+    private readonly BookEntityFixture _bookEntityFixture = new();
 
     [Fact]
     public void ToDomainEntity_WhenMappingValidBookEntity_ShouldMapCorrectly()

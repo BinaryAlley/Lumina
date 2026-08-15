@@ -27,8 +27,8 @@ public class GetAuthorizationQueryHandlerTests
     private readonly IAuthorizationService _mockAuthorizationService;
     private readonly ICurrentUserService _mockCurrentUserService;
     private readonly GetAuthorizationQueryHandler _sut;
-    private readonly GetAuthorizationQueryFixture _getAuthorizationQueryFixture;
-    private readonly UserAuthorizationEntityFixture _userAuthorizationEntityFixture;
+    private readonly GetAuthorizationQueryFixture _getAuthorizationQueryFixture = new();
+    private readonly UserAuthorizationEntityFixture _userAuthorizationEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetAuthorizationQueryHandlerTests"/> class.
@@ -37,8 +37,6 @@ public class GetAuthorizationQueryHandlerTests
     {
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
-        _getAuthorizationQueryFixture = new GetAuthorizationQueryFixture();
-        _userAuthorizationEntityFixture = new UserAuthorizationEntityFixture();
         IValidator<GetAuthorizationQuery> mockValidator = Substitute.For<IValidator<GetAuthorizationQuery>>();
         mockValidator.Validate(Arg.Any<GetAuthorizationQuery>())
             .Returns([]);

@@ -14,15 +14,7 @@ namespace Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.
 [ExcludeFromCodeCoverage]
 public class PathSegmentTests
 {
-    private readonly PathSegmentFixture _pathSegmentFixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PathSegmentTests"/> class.
-    /// </summary>
-    public PathSegmentTests()
-    {
-        _pathSegmentFixture = new PathSegmentFixture();
-    }
+    private readonly PathSegmentFixture _pathSegmentFixture = new();
 
     [Fact]
     public void Create_WithValidInput_ShouldReturnPathSegment()

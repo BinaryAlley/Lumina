@@ -21,7 +21,7 @@ public class PluginRepositoryTests
 {
     private readonly LuminaDbContext _mockContext;
     private readonly PluginRepository _sut;
-    private readonly PluginEntityFixture _pluginFixture;
+    private readonly PluginEntityFixture _pluginFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PluginRepositoryTests"/> class.
@@ -30,7 +30,6 @@ public class PluginRepositoryTests
     {
         _mockContext = Create.MockedDbContextFor<LuminaDbContext>();
         _sut = new PluginRepository(_mockContext);
-        _pluginFixture = new PluginEntityFixture();
     }
 
     [Fact]

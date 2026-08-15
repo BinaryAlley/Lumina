@@ -24,8 +24,8 @@ public class PathServiceTests
     private readonly IPlatformContext _mockPlatformContext;
     private readonly IPathStrategy _mockPathStrategy;
     private readonly PathService _sut;
-    private readonly FileSystemPathIdFixture _fileSystemPathIdFixture;
-    private readonly PathSegmentFixture _pathSegmentFixture;
+    private readonly FileSystemPathIdFixture _fileSystemPathIdFixture = new();
+    private readonly PathSegmentFixture _pathSegmentFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PathServiceTests"/> class.
@@ -38,8 +38,6 @@ public class PathServiceTests
         _mockPlatformContext.PathStrategy.Returns(_mockPathStrategy);
         _mockPlatformContextManager.GetCurrentContext().Returns(_mockPlatformContext);
         _sut = new PathService(_mockPlatformContextManager);
-        _fileSystemPathIdFixture = new FileSystemPathIdFixture();
-        _pathSegmentFixture = new PathSegmentFixture();
     }
 
     [Fact]

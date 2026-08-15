@@ -18,13 +18,6 @@ public class GetThumbnailRequestMappingTests
 {
     private readonly GetThumbnailRequestFixture _getThumbnailRequestFixture = new();
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="GetThumbnailRequestMappingTests"/> class.
-    /// </summary>
-    public GetThumbnailRequestMappingTests()
-    {
-    }
-
     [Fact]
     public void ToQuery_WhenMappingGetThumbnailRequest_ShouldMapCorrectly()
     {

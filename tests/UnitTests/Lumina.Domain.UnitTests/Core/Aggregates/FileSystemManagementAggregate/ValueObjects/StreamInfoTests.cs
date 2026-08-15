@@ -15,15 +15,7 @@ namespace Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate.
 [ExcludeFromCodeCoverage]
 public class StreamInfoTests
 {
-    private readonly StreamInfoFixture _streamInfoFixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="StreamInfoTests"/> class.
-    /// </summary>
-    public StreamInfoTests()
-    {
-        _streamInfoFixture = new StreamInfoFixture();
-    }
+    private readonly StreamInfoFixture _streamInfoFixture = new();
 
     [Fact]
     public void Create_WithValidInput_ShouldReturnStreamInfo()

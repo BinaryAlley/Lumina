@@ -27,7 +27,7 @@ public class GetDrivesEndpointTests
 {
     private readonly IQueryHandler<GetDrivesQuery, Result<IEnumerable<FileSystemTreeNodeResponse>>> _mockHandler;
     private readonly GetDrivesEndpoint _sut;
-    private readonly FileSystemTreeNodeResponseFixture _fileSystemTreeNodeResponseFixture;
+    private readonly FileSystemTreeNodeResponseFixture _fileSystemTreeNodeResponseFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DrivesControllerTests"/> class.
@@ -35,7 +35,6 @@ public class GetDrivesEndpointTests
     public GetDrivesEndpointTests()
     {
         _mockHandler = Substitute.For<IQueryHandler<GetDrivesQuery, Result<IEnumerable<FileSystemTreeNodeResponse>>>>();
-        _fileSystemTreeNodeResponseFixture = new FileSystemTreeNodeResponseFixture();
         _sut = Factory.Create<GetDrivesEndpoint>(_mockHandler);
     }
 

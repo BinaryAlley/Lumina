@@ -24,20 +24,17 @@ namespace Lumina.Domain.Fixtures.Core.BoundedContexts.WrittenContentLibraryBound
 [ExcludeFromCodeCoverage]
 public class BookFixture
 {
-    private readonly Fixture _fixture;
-    private readonly IsbnFixture _isbnFixture;
-    private readonly BookRatingFixture _bookRatingFixture;
+    private readonly Fixture _fixture = new();
+    private readonly IsbnFixture _isbnFixture = new();
+    private readonly BookRatingFixture _bookRatingFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BookFixture"/> class.
     /// </summary>
     public BookFixture()
     {
-        _fixture = new Fixture();
         _fixture.Customizations.Add(new DateOnlySpecimenBuilder());
         _fixture.Customizations.Add(new NullableDateOnlySpecimenBuilder());
-        _isbnFixture = new IsbnFixture();
-        _bookRatingFixture = new BookRatingFixture();
         ConfigureCustomDomainTypes();
     }
 

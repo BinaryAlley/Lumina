@@ -16,17 +16,8 @@ namespace Lumina.Application.UnitTests.Core.FileSystemManagement.Paths.Queries.V
 [ExcludeFromCodeCoverage]
 public class ValidatePathQueryValidatorTests
 {
-    private readonly ValidatePathQueryValidator _validator;
-    private readonly ValidatePathQueryFixture _validatePathQueryFixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ValidatePathQueryValidatorTests"/> class.
-    /// </summary>
-    public ValidatePathQueryValidatorTests()
-    {
-        _validator = new ValidatePathQueryValidator();
-        _validatePathQueryFixture = new ValidatePathQueryFixture();
-    }
+    private readonly ValidatePathQueryValidator _validator = new();
+    private readonly ValidatePathQueryFixture _validatePathQueryFixture = new();
 
     [Fact]
     public void Validate_WhenPathIsNull_ShouldHaveValidationError()

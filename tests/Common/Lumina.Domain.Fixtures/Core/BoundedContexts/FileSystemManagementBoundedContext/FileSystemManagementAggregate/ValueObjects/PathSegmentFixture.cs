@@ -16,15 +16,7 @@ namespace Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBounde
 [ExcludeFromCodeCoverage]
 public class PathSegmentFixture
 {
-    private readonly Faker _faker;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PathSegmentFixture"/> class.
-    /// </summary>
-    public PathSegmentFixture()
-    {
-        _faker = new Faker();
-    }
+    private readonly Faker _faker = new();
 
     /// <summary>
     /// Creates a random valid <see cref="PathSegment"/>.

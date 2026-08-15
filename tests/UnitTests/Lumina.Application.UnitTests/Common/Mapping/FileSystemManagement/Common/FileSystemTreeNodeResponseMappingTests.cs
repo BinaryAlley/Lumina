@@ -16,15 +16,7 @@ namespace Lumina.Application.UnitTests.Common.Mapping.FileSystemManagement.Commo
 [ExcludeFromCodeCoverage]
 public class FileSystemTreeNodeResponseMappingTests
 {
-    private readonly FileSystemTreeNodeResponseFixture _fileSystemTreeNodeResponseFixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="FileSystemTreeNodeResponseMappingTests"/> class.
-    /// </summary>
-    public FileSystemTreeNodeResponseMappingTests()
-    {
-        _fileSystemTreeNodeResponseFixture = new();
-    }
+    private readonly FileSystemTreeNodeResponseFixture _fileSystemTreeNodeResponseFixture = new();
 
     [Fact]
     public void ToWindowsRootItem_WhenMappingFileSystemTreeNodeResponse_ShouldMapCorrectly()

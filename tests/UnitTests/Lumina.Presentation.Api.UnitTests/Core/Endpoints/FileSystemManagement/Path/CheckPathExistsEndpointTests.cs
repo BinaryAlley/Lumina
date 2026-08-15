@@ -26,7 +26,7 @@ public class CheckPathExistsEndpointTests
 {
     private readonly IQueryHandler<CheckPathExistsQuery, Result<PathExistsResponse>> _mockHandler;
     private readonly CheckPathExistsEndpoint _sut;
-    private readonly CheckPathExistsRequestFixture _checkPathExistsRequestFixture;
+    private readonly CheckPathExistsRequestFixture _checkPathExistsRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CheckPathExistsEndpointTests"/> class.
@@ -35,7 +35,6 @@ public class CheckPathExistsEndpointTests
     {
         _mockHandler = Substitute.For<IQueryHandler<CheckPathExistsQuery, Result<PathExistsResponse>>>();
         _sut = Factory.Create<CheckPathExistsEndpoint>(_mockHandler);
-        _checkPathExistsRequestFixture = new CheckPathExistsRequestFixture();
     }
 
     [Fact]

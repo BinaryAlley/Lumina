@@ -18,15 +18,7 @@ namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.WrittenConten
 [ExcludeFromCodeCoverage]
 public class IsbnMappingTests
 {
-    private readonly IsbnFixture _isbnFixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="IsbnMappingTests"/> class.
-    /// </summary>
-    public IsbnMappingTests()
-    {
-        _isbnFixture = new IsbnFixture();
-    }
+    private readonly IsbnFixture _isbnFixture = new();
 
     [Fact]
     public void ToRepositoryEntity_WhenMappingIsbn10_ShouldMapCorrectly()

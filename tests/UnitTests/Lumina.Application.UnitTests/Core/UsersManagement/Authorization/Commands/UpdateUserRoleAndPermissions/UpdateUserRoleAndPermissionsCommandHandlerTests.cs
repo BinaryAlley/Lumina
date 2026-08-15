@@ -40,7 +40,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
     private readonly IPermissionRepository _mockPermissionRepository;
     private readonly UpdateUserRoleAndPermissionsCommandHandler _sut;
     private readonly UserEntityFixture _userEntityFixture = new();
-    private readonly UpdateUserRoleAndPermissionsCommandFixture _updateUserRoleAndPermissionsCommandFixture;
+    private readonly UpdateUserRoleAndPermissionsCommandFixture _updateUserRoleAndPermissionsCommandFixture = new();
     private readonly Guid _userId;
 
     /// <summary>
@@ -54,7 +54,6 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
         _mockUserRepository = Substitute.For<IUserRepository>();
         _mockRoleRepository = Substitute.For<IRoleRepository>();
         _mockPermissionRepository = Substitute.For<IPermissionRepository>();
-        _updateUserRoleAndPermissionsCommandFixture = new UpdateUserRoleAndPermissionsCommandFixture();
         _userId = Guid.NewGuid();
 
         _mockCurrentUserService.UserId.Returns(_userId);

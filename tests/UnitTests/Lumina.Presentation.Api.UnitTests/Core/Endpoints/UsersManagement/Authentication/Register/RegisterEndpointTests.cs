@@ -25,7 +25,7 @@ public class RegisterEndpointTests
 {
     private readonly ICommandHandler<RegisterUserCommand, Result<RegistrationResponse>> _mockHandler;
     private readonly RegisterEndpoint _sut;
-    private readonly RegistrationRequestFixture _registrationRequestFixture;
+    private readonly RegistrationRequestFixture _registrationRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RegisterEndpointTests"/> class.
@@ -34,7 +34,6 @@ public class RegisterEndpointTests
     {
         _mockHandler = Substitute.For<ICommandHandler<RegisterUserCommand, Result<RegistrationResponse>>>();
         _sut = FastEndpoints.Factory.Create<RegisterEndpoint>(_mockHandler);
-        _registrationRequestFixture = new RegistrationRequestFixture();
     }
 
     [Fact]

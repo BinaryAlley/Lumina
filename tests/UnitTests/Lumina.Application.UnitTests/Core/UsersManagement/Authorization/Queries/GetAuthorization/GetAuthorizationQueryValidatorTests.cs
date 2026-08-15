@@ -17,17 +17,8 @@ namespace Lumina.Application.UnitTests.Core.UsersManagement.Authorization.Querie
 [ExcludeFromCodeCoverage]
 public class GetAuthorizationQueryValidatorTests
 {
-    private readonly GetAuthorizationQueryValidator _validator;
-    private readonly GetAuthorizationQueryFixture _getAuthorizationQueryFixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="GetAuthorizationQueryValidatorTests"/> class.
-    /// </summary>
-    public GetAuthorizationQueryValidatorTests()
-    {
-        _validator = new GetAuthorizationQueryValidator();
-        _getAuthorizationQueryFixture = new GetAuthorizationQueryFixture();
-    }
+    private readonly GetAuthorizationQueryValidator _validator = new();
+    private readonly GetAuthorizationQueryFixture _getAuthorizationQueryFixture = new();
 
     [Fact]
     public void Validate_WhenUserIdIsNull_ShouldHaveValidationError()

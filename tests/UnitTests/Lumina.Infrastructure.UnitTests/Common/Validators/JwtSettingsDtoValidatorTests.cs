@@ -17,7 +17,7 @@ namespace Lumina.Infrastructure.UnitTests.Common.Validators;
 [ExcludeFromCodeCoverage]
 public class JwtSettingsDtoValidatorTests
 {
-    private readonly JwtSettingsDtoValidator _validator;
+    private readonly JwtSettingsDtoValidator _validator = new();
     private readonly IFixture _fixture;
 
     /// <summary>
@@ -26,7 +26,6 @@ public class JwtSettingsDtoValidatorTests
     public JwtSettingsDtoValidatorTests()
     {
         _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
-        _validator = new();
     }
 
     [Fact]

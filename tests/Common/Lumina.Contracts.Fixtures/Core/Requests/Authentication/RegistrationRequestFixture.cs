@@ -14,15 +14,7 @@ namespace Lumina.Contracts.Fixtures.Core.Requests.Authentication;
 [ExcludeFromCodeCoverage]
 public class RegistrationRequestFixture
 {
-    private readonly Faker _faker;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="RegistrationRequestFixture"/> class.
-    /// </summary>
-    public RegistrationRequestFixture()
-    {
-        _faker = new Faker();
-    }
+    private readonly Faker _faker = new();
 
     /// <summary>
     /// Creates a random valid <see cref="RegistrationRequest"/>.

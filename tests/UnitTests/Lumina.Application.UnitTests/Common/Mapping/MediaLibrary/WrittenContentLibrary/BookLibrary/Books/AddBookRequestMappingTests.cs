@@ -18,15 +18,7 @@ namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.WrittenConten
 [ExcludeFromCodeCoverage]
 public class AddBookRequestMappingTests
 {
-    private readonly AddBookRequestFixture _requestFixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AddBookRequestMappingTests"/> class.
-    /// </summary>
-    public AddBookRequestMappingTests()
-    {
-        _requestFixture = new AddBookRequestFixture();
-    }
+    private readonly AddBookRequestFixture _requestFixture = new();
 
     [Fact]
     public void ToCommand_WhenMappingCompleteRequest_ShouldMapAllPropertiesCorrectly()

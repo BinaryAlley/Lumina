@@ -24,7 +24,7 @@ public class GetPathSeparatorEndpointTests
 {
     private readonly IQueryHandler<GetPathSeparatorQuery, PathSeparatorResponse> _mockHandler;
     private readonly GetPathSeparatorEndpoint _sut;
-    private readonly PathSeparatorResponseFixture _pathSeparatorResponseFixture;
+    private readonly PathSeparatorResponseFixture _pathSeparatorResponseFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetPathSeparatorEndpointTests"/> class.
@@ -33,7 +33,6 @@ public class GetPathSeparatorEndpointTests
     {
         _mockHandler = Substitute.For<IQueryHandler<GetPathSeparatorQuery, PathSeparatorResponse>>();
         _sut = Factory.Create<GetPathSeparatorEndpoint>(_mockHandler);
-        _pathSeparatorResponseFixture = new PathSeparatorResponseFixture();
     }
 
     [Fact]

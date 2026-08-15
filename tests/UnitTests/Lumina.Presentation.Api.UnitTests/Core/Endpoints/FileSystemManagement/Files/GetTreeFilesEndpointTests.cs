@@ -29,8 +29,8 @@ public class GetTreeFilesEndpointTests
 {
     private readonly IQueryHandler<GetTreeFilesQuery, Result<IEnumerable<FileSystemTreeNodeResponse>>> _mockHandler;
     private readonly GetTreeFilesEndpoint _sut;
-    private readonly FileSystemTreeNodeResponseFixture _fileSystemTreeNodeResponseFixture;
-    private readonly GetTreeFilesRequestFixture _getTreeFilesRequestFixture;
+    private readonly FileSystemTreeNodeResponseFixture _fileSystemTreeNodeResponseFixture = new();
+    private readonly GetTreeFilesRequestFixture _getTreeFilesRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetTreeFilesEndpointTests"/> class.
@@ -38,8 +38,6 @@ public class GetTreeFilesEndpointTests
     public GetTreeFilesEndpointTests()
     {
         _mockHandler = Substitute.For<IQueryHandler<GetTreeFilesQuery, Result<IEnumerable<FileSystemTreeNodeResponse>>>>();
-        _fileSystemTreeNodeResponseFixture = new FileSystemTreeNodeResponseFixture();
-        _getTreeFilesRequestFixture = new GetTreeFilesRequestFixture();
         _sut = Factory.Create<GetTreeFilesEndpoint>(_mockHandler);
     }
 

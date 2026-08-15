@@ -16,17 +16,8 @@ namespace Lumina.Application.UnitTests.Core.FileSystemManagement.Paths.Queries.G
 [ExcludeFromCodeCoverage]
 public class GetPathParentQueryValidatorTests
 {
-    private readonly GetPathParentQueryValidator _validator;
-    private readonly GetPathParentQueryFixture _getPathParentQueryFixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="GetPathParentQueryValidatorTests"/> class.
-    /// </summary>
-    public GetPathParentQueryValidatorTests()
-    {
-        _validator = new GetPathParentQueryValidator();
-        _getPathParentQueryFixture = new GetPathParentQueryFixture();
-    }
+    private readonly GetPathParentQueryValidator _validator = new();
+    private readonly GetPathParentQueryFixture _getPathParentQueryFixture = new();
 
     [Fact]
     public void Validate_WhenPathIsNull_ShouldHaveValidationError()

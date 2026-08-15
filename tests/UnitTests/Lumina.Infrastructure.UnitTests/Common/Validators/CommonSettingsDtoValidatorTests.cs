@@ -17,7 +17,7 @@ namespace Lumina.Infrastructure.UnitTests.Common.Validators;
 [ExcludeFromCodeCoverage]
 public class CommonSettingsDtoValidatorTests
 {
-    private readonly CommonSettingsDtoValidator _validator;
+    private readonly CommonSettingsDtoValidator _validator = new();
     private readonly IFixture _fixture;
 
     /// <summary>
@@ -26,7 +26,6 @@ public class CommonSettingsDtoValidatorTests
     public CommonSettingsDtoValidatorTests()
     {
         _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
-        _validator = new();
     }
 
     [Fact]

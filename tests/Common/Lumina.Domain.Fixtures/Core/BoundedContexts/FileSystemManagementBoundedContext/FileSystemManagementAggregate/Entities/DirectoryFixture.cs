@@ -18,15 +18,7 @@ namespace Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBounde
 [ExcludeFromCodeCoverage]
 public class DirectoryFixture
 {
-    private readonly Faker _faker;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DirectoryFixture"/> class.
-    /// </summary>
-    public DirectoryFixture()
-    {
-        _faker = new Faker();
-    }
+    private readonly Faker _faker = new();
 
     /// <summary>
     /// Creates a random valid <see cref="Directory"/>.

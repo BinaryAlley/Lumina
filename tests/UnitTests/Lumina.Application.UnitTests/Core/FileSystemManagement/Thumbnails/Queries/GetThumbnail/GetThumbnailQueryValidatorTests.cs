@@ -15,15 +15,7 @@ namespace Lumina.Application.UnitTests.Core.FileSystemManagement.Thumbnails.Quer
 [ExcludeFromCodeCoverage]
 public class GetThumbnailQueryValidatorTests
 {
-    private readonly GetThumbnailQueryValidator _validator;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="GetThumbnailQueryValidatorTests"/> class.
-    /// </summary>
-    public GetThumbnailQueryValidatorTests()
-    {
-        _validator = new GetThumbnailQueryValidator();
-    }
+    private readonly GetThumbnailQueryValidator _validator = new();
 
     [Fact]
     public void Validate_WhenPathIsNull_ShouldHaveValidationError()

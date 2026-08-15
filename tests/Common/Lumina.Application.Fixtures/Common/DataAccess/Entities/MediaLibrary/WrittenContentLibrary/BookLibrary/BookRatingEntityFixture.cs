@@ -17,15 +17,7 @@ namespace Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Wr
 public class BookRatingEntityFixture
 {
     private readonly Random _random = new();
-    private readonly Faker _faker;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="BookRatingEntityFixture"/> class.
-    /// </summary>
-    public BookRatingEntityFixture()
-    {
-        _faker = new Faker();
-    }
+    private readonly Faker _faker = new();
 
     /// <summary>
     /// Creates a <see cref="BookRatingEntity"/>.

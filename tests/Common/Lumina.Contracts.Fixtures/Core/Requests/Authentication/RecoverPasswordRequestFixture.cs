@@ -14,15 +14,7 @@ namespace Lumina.Contracts.Fixtures.Core.Requests.Authentication;
 [ExcludeFromCodeCoverage]
 public class RecoverPasswordRequestFixture
 {
-    private readonly Faker _faker;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="RecoverPasswordRequestFixture"/> class.
-    /// </summary>
-    public RecoverPasswordRequestFixture()
-    {
-        _faker = new Faker();
-    }
+    private readonly Faker _faker = new();
 
     /// <summary>
     /// Creates a random valid <see cref="RecoverPasswordRequest"/>.

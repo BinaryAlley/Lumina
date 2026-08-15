@@ -16,15 +16,7 @@ namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.WrittenConten
 [ExcludeFromCodeCoverage]
 public class BookMappingTests
 {
-    private readonly BookFixture _bookFixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="BookMappingTests"/> class.
-    /// </summary>
-    public BookMappingTests()
-    {
-        _bookFixture = new BookFixture();
-    }
+    private readonly BookFixture _bookFixture = new();
 
     [Fact]
     public void ToRepositoryEntity_WhenMappingCompleteBook_ShouldMapAllPropertiesCorrectly()

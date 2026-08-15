@@ -16,17 +16,8 @@ namespace Lumina.Application.UnitTests.Core.FileSystemManagement.Paths.Commands.
 [ExcludeFromCodeCoverage]
 public class CombinePathCommandValidatorTests
 {
-    private readonly CombinePathCommandValidator _validator;
-    private readonly CombinePathCommandFixture _combinePathCommandFixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="CombinePathCommandValidatorTests"/> class.
-    /// </summary>
-    public CombinePathCommandValidatorTests()
-    {
-        _validator = new CombinePathCommandValidator();
-        _combinePathCommandFixture = new CombinePathCommandFixture();
-    }
+    private readonly CombinePathCommandValidator _validator = new();
+    private readonly CombinePathCommandFixture _combinePathCommandFixture = new();
 
     [Fact]
     public void Validate_WhenOriginalPathIsNull_ShouldHaveValidationError()

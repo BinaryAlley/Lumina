@@ -23,8 +23,8 @@ public class GetPathRootQueryHandlerTests
 {
     private readonly IPathService _mockPathService;
     private readonly GetPathRootQueryHandler _sut;
-    private readonly PathSegmentFixture _pathSegmentFixture;
-    private readonly GetPathRootQueryFixture _getPathRootQueryFixture;
+    private readonly PathSegmentFixture _pathSegmentFixture = new();
+    private readonly GetPathRootQueryFixture _getPathRootQueryFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetPathRootQueryHandlerTests"/> class.
@@ -32,12 +32,10 @@ public class GetPathRootQueryHandlerTests
     public GetPathRootQueryHandlerTests()
     {
         _mockPathService = Substitute.For<IPathService>();
-        _getPathRootQueryFixture = new GetPathRootQueryFixture();
         IValidator<GetPathRootQuery> mockValidator = Substitute.For<IValidator<GetPathRootQuery>>();
         mockValidator.Validate(Arg.Any<GetPathRootQuery>())
             .Returns([]);
         _sut = new GetPathRootQueryHandler(_mockPathService, mockValidator);
-        _pathSegmentFixture = new PathSegmentFixture();
     }
 
     [Fact]

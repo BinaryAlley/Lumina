@@ -16,15 +16,7 @@ namespace Lumina.Application.UnitTests.Core.Admin.Authorization.Roles.Queries.Ge
 [ExcludeFromCodeCoverage]
 public class GetRolePermissionsQueryValidatorTests
 {
-    private readonly GetRolePermissionsQueryValidator _validator;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="GetRolePermissionsQueryValidatorTests"/> class.
-    /// </summary>
-    public GetRolePermissionsQueryValidatorTests()
-    {
-        _validator = new GetRolePermissionsQueryValidator();
-    }
+    private readonly GetRolePermissionsQueryValidator _validator = new();
 
     [Fact]
     public void Validate_WhenRoleIdIsEmpty_ShouldHaveValidationError()

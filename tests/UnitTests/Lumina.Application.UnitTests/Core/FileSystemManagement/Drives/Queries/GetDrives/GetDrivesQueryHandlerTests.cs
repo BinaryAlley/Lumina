@@ -25,7 +25,7 @@ public class GetDrivesQueryHandlerTests
 {
     private readonly IDriveService _mockDriveService;
     private readonly GetDrivesQueryHandler _sut;
-    private readonly GetDrivesQueryFixture _getDrivesQueryFixture;
+    private readonly GetDrivesQueryFixture _getDrivesQueryFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetDrivesQueryHandlerTests"/> class.
@@ -33,7 +33,6 @@ public class GetDrivesQueryHandlerTests
     public GetDrivesQueryHandlerTests()
     {
         _mockDriveService = Substitute.For<IDriveService>();
-        _getDrivesQueryFixture = new GetDrivesQueryFixture();
         _sut = new GetDrivesQueryHandler(_mockDriveService);
     }
 

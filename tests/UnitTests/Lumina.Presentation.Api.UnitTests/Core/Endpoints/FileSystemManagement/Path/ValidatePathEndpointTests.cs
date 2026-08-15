@@ -26,7 +26,7 @@ public class ValidatePathEndpointTests
 {
     private readonly IQueryHandler<ValidatePathQuery, Result<PathValidResponse>> _mockHandler;
     private readonly ValidatePathEndpoint _sut;
-    private readonly ValidatePathRequestFixture _validatePathRequestFixture;
+    private readonly ValidatePathRequestFixture _validatePathRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ValidatePathEndpointTests"/> class.
@@ -35,7 +35,6 @@ public class ValidatePathEndpointTests
     {
         _mockHandler = Substitute.For<IQueryHandler<ValidatePathQuery, Result<PathValidResponse>>>();
         _sut = Factory.Create<ValidatePathEndpoint>(_mockHandler);
-        _validatePathRequestFixture = new ValidatePathRequestFixture();
     }
 
     [Fact]

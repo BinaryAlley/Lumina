@@ -32,7 +32,7 @@ public class GetUserRoleQueryHandlerTests
     private readonly IUserRepository _mockUserRepository;
     private readonly GetUserRoleQueryHandler _sut;
     private readonly UserEntityFixture _userEntityFixture = new();
-    private readonly GetUserRoleQueryFixture _getUserRoleQueryFixture;
+    private readonly GetUserRoleQueryFixture _getUserRoleQueryFixture = new();
     private readonly Guid _userId;
 
     /// <summary>
@@ -44,7 +44,6 @@ public class GetUserRoleQueryHandlerTests
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
         _mockUserRepository = Substitute.For<IUserRepository>();
-        _getUserRoleQueryFixture = new GetUserRoleQueryFixture();
         _userId = Guid.NewGuid();
 
         _mockCurrentUserService.UserId.Returns(_userId);

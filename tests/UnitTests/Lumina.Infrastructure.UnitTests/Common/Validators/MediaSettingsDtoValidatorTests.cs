@@ -17,7 +17,7 @@ namespace Lumina.Infrastructure.UnitTests.Common.Validators;
 [ExcludeFromCodeCoverage]
 public class MediaSettingsDtoValidatorTests
 {
-    private readonly MediaSettingsDtoValidator _validator;
+    private readonly MediaSettingsDtoValidator _validator = new();
     private readonly IFixture _fixture;
 
     /// <summary>
@@ -26,7 +26,6 @@ public class MediaSettingsDtoValidatorTests
     public MediaSettingsDtoValidatorTests()
     {
         _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
-        _validator = new();
     }
 
     [Fact]

@@ -16,17 +16,8 @@ namespace Lumina.Application.UnitTests.Core.FileSystemManagement.Paths.Queries.C
 [ExcludeFromCodeCoverage]
 public class CheckPathExistsQueryValidatorTests
 {
-    private readonly CheckPathExistsQueryValidator _validator;
-    private readonly CheckPathExistsQueryFixture _checkPathExistsQueryFixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="CheckPathExistsQueryValidatorTests"/> class.
-    /// </summary>
-    public CheckPathExistsQueryValidatorTests()
-    {
-        _validator = new CheckPathExistsQueryValidator();
-        _checkPathExistsQueryFixture = new CheckPathExistsQueryFixture();
-    }
+    private readonly CheckPathExistsQueryValidator _validator = new();
+    private readonly CheckPathExistsQueryFixture _checkPathExistsQueryFixture = new();
 
     [Fact]
     public void Validate_WhenPathIsNull_ShouldHaveValidationError()

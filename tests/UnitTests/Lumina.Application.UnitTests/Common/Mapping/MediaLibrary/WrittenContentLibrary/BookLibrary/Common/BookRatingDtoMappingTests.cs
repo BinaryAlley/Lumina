@@ -18,15 +18,7 @@ namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.WrittenConten
 [ExcludeFromCodeCoverage]
 public class BookRatingDtoMappingTests
 {
-    private readonly BookRatingDtoFixture _bookRatingDtoFixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="BookRatingDtoMappingTests"/> class.
-    /// </summary>
-    public BookRatingDtoMappingTests()
-    {
-        _bookRatingDtoFixture = new BookRatingDtoFixture();
-    }
+    private readonly BookRatingDtoFixture _bookRatingDtoFixture = new();
 
     [Fact]
     public void ToDomainEntity_WhenMappingCompleteBookRatinDto_ShouldMapAllPropertiesCorrectly()

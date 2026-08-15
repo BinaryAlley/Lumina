@@ -18,13 +18,6 @@ public class ValidatePathRequestMappingTests
 {
     private readonly ValidatePathRequestFixture _validatePathRequestFixture = new();
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ValidatePathRequestMappingTests"/> class.
-    /// </summary>
-    public ValidatePathRequestMappingTests()
-    {
-    }
-
     [Fact]
     public void ToQuery_WhenMappingValidatePathRequest_ShouldMapCorrectly()
     {

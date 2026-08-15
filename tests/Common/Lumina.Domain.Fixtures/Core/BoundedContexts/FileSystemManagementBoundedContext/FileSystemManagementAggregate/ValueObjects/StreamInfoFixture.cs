@@ -16,15 +16,7 @@ namespace Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBounde
 [ExcludeFromCodeCoverage]
 public class StreamInfoFixture
 {
-    private readonly Faker _faker;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="StreamInfoFixture"/> class.
-    /// </summary>
-    public StreamInfoFixture()
-    {
-        _faker = new Faker();
-    }
+    private readonly Faker _faker = new();
 
     /// <summary>
     /// Creates a random valid <see cref="StreamInfo"/>.

@@ -16,17 +16,8 @@ namespace Lumina.Application.UnitTests.Core.FileSystemManagement.Directories.Que
 [ExcludeFromCodeCoverage]
 public class GetDirectoriesQueryValidatorTests
 {
-    private readonly GetDirectoriesQueryValidator _validator;
-    private readonly GetDirectoriesQueryFixture _getDirectoriesQueryFixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="GetDirectoriesQueryValidatorTests"/> class.
-    /// </summary>
-    public GetDirectoriesQueryValidatorTests()
-    {
-        _validator = new GetDirectoriesQueryValidator();
-        _getDirectoriesQueryFixture = new GetDirectoriesQueryFixture();
-    }
+    private readonly GetDirectoriesQueryValidator _validator = new();
+    private readonly GetDirectoriesQueryFixture _getDirectoriesQueryFixture = new();
 
     [Fact]
     public void Validate_WhenPathIsNull_ShouldHaveValidationError()

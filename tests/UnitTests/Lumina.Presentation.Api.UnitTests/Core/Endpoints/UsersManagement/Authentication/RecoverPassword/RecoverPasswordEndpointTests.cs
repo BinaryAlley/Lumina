@@ -25,7 +25,7 @@ public class RecoverPasswordEndpointTests
 {
     private readonly ICommandHandler<RecoverPasswordCommand, Result<RecoverPasswordResponse>> _mockHandler;
     private readonly RecoverPasswordEndpoint _sut;
-    private readonly RecoverPasswordRequestFixture _recoverPasswordRequestFixture;
+    private readonly RecoverPasswordRequestFixture _recoverPasswordRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RecoverPasswordEndpointTests"/> class.
@@ -34,7 +34,6 @@ public class RecoverPasswordEndpointTests
     {
         _mockHandler = Substitute.For<ICommandHandler<RecoverPasswordCommand, Result<RecoverPasswordResponse>>>();
         _sut = FastEndpoints.Factory.Create<RecoverPasswordEndpoint>(_mockHandler);
-        _recoverPasswordRequestFixture = new RecoverPasswordRequestFixture();
     }
 
     [Fact]

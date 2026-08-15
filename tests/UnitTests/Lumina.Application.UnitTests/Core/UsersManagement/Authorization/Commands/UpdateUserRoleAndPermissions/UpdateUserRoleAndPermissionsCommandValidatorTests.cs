@@ -17,15 +17,7 @@ namespace Lumina.Application.UnitTests.Core.UsersManagement.Authorization.Comman
 [ExcludeFromCodeCoverage]
 public class UpdateUserRoleAndPermissionsCommandValidatorTests
 {
-    private readonly UpdateUserRoleAndPermissionsCommandValidator _validator;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="UpdateUserRoleAndPermissionsCommandValidatorTests"/> class.
-    /// </summary>
-    public UpdateUserRoleAndPermissionsCommandValidatorTests()
-    {
-        _validator = new UpdateUserRoleAndPermissionsCommandValidator();
-    }
+    private readonly UpdateUserRoleAndPermissionsCommandValidator _validator = new();
 
     [Fact]
     public void Validate_WhenUserIdIsEmpty_ShouldHaveValidationError()

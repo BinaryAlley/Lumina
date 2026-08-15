@@ -30,7 +30,7 @@ public class FileProviderServiceTests
     private readonly IFileSystem _mockFileSystem;
     private readonly IFileSystemPermissionsService _mockFileSystemPermissionsService;
     private readonly FileProviderService _sut;
-    private readonly FileSystemPathIdFixture _fileSystemPathIdFixture;
+    private readonly FileSystemPathIdFixture _fileSystemPathIdFixture = new();
     private static readonly bool s_isUnix = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
     private readonly string _pathVisible1 = s_isUnix ? "/Visible.txt" : @"C:\Visible.txt";
     private readonly string _pathHidden1 = s_isUnix ? "/Hidden.txt" : @"C:\Hidden.txt";
@@ -50,7 +50,6 @@ public class FileProviderServiceTests
         _mockFileSystem = Substitute.For<IFileSystem>();
         _mockFileSystemPermissionsService = Substitute.For<IFileSystemPermissionsService>();
         _sut = new FileProviderService(_mockFileSystem, _mockFileSystemPermissionsService);
-        _fileSystemPathIdFixture = new();
     }
 
     [Fact]

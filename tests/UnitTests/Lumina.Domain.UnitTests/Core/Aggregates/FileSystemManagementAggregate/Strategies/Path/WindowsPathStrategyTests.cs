@@ -21,8 +21,8 @@ public class WindowsPathStrategyTests
 {
     private readonly IFileSystem _mockFileSystem;
     private readonly WindowsPathStrategy _sut;
-    private readonly FileSystemPathIdFixture _fileSystemPathIdFixture;
-    private readonly PathSegmentFixture _pathSegmentFixture;
+    private readonly FileSystemPathIdFixture _fileSystemPathIdFixture = new();
+    private readonly PathSegmentFixture _pathSegmentFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="WindowsPathStrategyTests"/> class.
@@ -31,8 +31,6 @@ public class WindowsPathStrategyTests
     {
         _mockFileSystem = Substitute.For<IFileSystem>();
         _sut = new WindowsPathStrategy(_mockFileSystem);
-        _fileSystemPathIdFixture = new FileSystemPathIdFixture();
-        _pathSegmentFixture = new PathSegmentFixture();
     }
 
     [Theory]

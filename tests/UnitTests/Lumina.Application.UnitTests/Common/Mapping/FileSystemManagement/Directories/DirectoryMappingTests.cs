@@ -18,15 +18,7 @@ namespace Lumina.Application.UnitTests.Common.Mapping.FileSystemManagement.Direc
 [ExcludeFromCodeCoverage]
 public class DirectoryMappingTests
 {
-    private readonly DirectoryFixture _directoryFixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DirectoryMappingTests"/> class.
-    /// </summary>
-    public DirectoryMappingTests()
-    {
-        _directoryFixture = new DirectoryFixture();
-    }
+    private readonly DirectoryFixture _directoryFixture = new();
 
     [Fact]
     public void ToFileSystemTreeNodeResponse_WhenMappingDirectory_ShouldMapCorrectly()

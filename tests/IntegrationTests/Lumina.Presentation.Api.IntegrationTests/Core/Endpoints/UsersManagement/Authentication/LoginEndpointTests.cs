@@ -32,9 +32,9 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
 {
     private HttpClient _client;
     private readonly AuthenticatedLuminaApiFactory _apiFactory;
-    private readonly PasswordHashService _hashService;
+    private readonly PasswordHashService _hashService = new();
     private readonly ICryptographyService _cryptographyService;
-    private readonly TotpTokenGenerator _totpTokenGenerator;
+    private readonly TotpTokenGenerator _totpTokenGenerator = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -50,8 +50,6 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;
-        _hashService = new PasswordHashService();
-        _totpTokenGenerator = new TotpTokenGenerator();
         _testUsername = $"testuser_{Guid.NewGuid()}";
 
         using IServiceScope scope = apiFactory.Services.CreateScope();

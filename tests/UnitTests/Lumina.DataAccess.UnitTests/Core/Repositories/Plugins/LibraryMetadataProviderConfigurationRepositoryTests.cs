@@ -20,7 +20,7 @@ public class LibraryMetadataProviderConfigurationRepositoryTests
 {
     private readonly LuminaDbContext _mockContext;
     private readonly LibraryMetadataProviderConfigurationRepository _sut;
-    private readonly LibraryMetadataProviderConfigurationEntityFixture _configurationFixture;
+    private readonly LibraryMetadataProviderConfigurationEntityFixture _configurationFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LibraryMetadataProviderConfigurationRepositoryTests"/> class.
@@ -29,7 +29,6 @@ public class LibraryMetadataProviderConfigurationRepositoryTests
     {
         _mockContext = Create.MockedDbContextFor<LuminaDbContext>();
         _sut = new LibraryMetadataProviderConfigurationRepository(_mockContext);
-        _configurationFixture = new LibraryMetadataProviderConfigurationEntityFixture();
     }
 
     [Fact]

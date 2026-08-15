@@ -23,23 +23,11 @@ namespace Lumina.Application.UnitTests.Common.Mapping.FileSystemManagement.FileS
 [ExcludeFromCodeCoverage]
 public class FileSystemItemMappingTests
 {
-    private readonly FileSystemPathIdFixture _fileSystemPathIdFixture;
-    private readonly DirectoryFixture _directoryFixture;
-    private readonly FileFixture _fileFixture;
-    private readonly WindowsRootItemFixture _windowsRootItemFixture;
-    private readonly UnixRootItemFixture _unixRootItemFixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="FileSystemItemMappingTests"/> class.
-    /// </summary>
-    public FileSystemItemMappingTests()
-    {
-        _fileSystemPathIdFixture = new FileSystemPathIdFixture();
-        _directoryFixture = new DirectoryFixture();
-        _fileFixture = new FileFixture();
-        _windowsRootItemFixture = new WindowsRootItemFixture();
-        _unixRootItemFixture = new UnixRootItemFixture();
-    }
+    private readonly FileSystemPathIdFixture _fileSystemPathIdFixture = new();
+    private readonly DirectoryFixture _directoryFixture = new();
+    private readonly FileFixture _fileFixture = new();
+    private readonly WindowsRootItemFixture _windowsRootItemFixture = new();
+    private readonly UnixRootItemFixture _unixRootItemFixture = new();
 
     [Fact]
     public void ToFileSystemItemModel_WhenMappingFileSystemItem_ShouldMapCorrectly()

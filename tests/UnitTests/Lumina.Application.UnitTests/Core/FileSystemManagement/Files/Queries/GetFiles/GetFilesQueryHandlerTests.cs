@@ -29,8 +29,8 @@ public class GetFilesQueryHandlerTests
     private readonly IFixture _fixture;
     private readonly IFileService _mockFileService;
     private readonly GetFilesQueryHandler _sut;
-    private readonly FileFixture _fileFixture;
-    private readonly GetFilesQueryFixture _getFilesQueryFixture;
+    private readonly FileFixture _fileFixture = new();
+    private readonly GetFilesQueryFixture _getFilesQueryFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetFilesQueryHandlerTests"/> class.
@@ -43,8 +43,6 @@ public class GetFilesQueryHandlerTests
         mockValidator.Validate(Arg.Any<GetFilesQuery>())
             .Returns([]);
         _sut = new GetFilesQueryHandler(_mockFileService, mockValidator);
-        _fileFixture = new FileFixture();
-        _getFilesQueryFixture = new GetFilesQueryFixture();
     }
 
     [Fact]

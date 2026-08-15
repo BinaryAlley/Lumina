@@ -16,17 +16,8 @@ namespace Lumina.Application.UnitTests.Core.UsersManagement.Authentication.Comma
 [ExcludeFromCodeCoverage]
 public class RegisterUserCommandValidatorTests
 {
-    private readonly RegisterUserCommandValidator _validator;
-    private readonly RegisterUserCommandFixture _registerUserCommandFixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="RegisterUserCommandValidatorTests"/> class.
-    /// </summary>
-    public RegisterUserCommandValidatorTests()
-    {
-        _validator = new RegisterUserCommandValidator();
-        _registerUserCommandFixture = new RegisterUserCommandFixture();
-    }
+    private readonly RegisterUserCommandValidator _validator = new();
+    private readonly RegisterUserCommandFixture _registerUserCommandFixture = new();
 
     [Fact]
     public void Validate_WhenUsernameIsNull_ShouldHaveValidationError()

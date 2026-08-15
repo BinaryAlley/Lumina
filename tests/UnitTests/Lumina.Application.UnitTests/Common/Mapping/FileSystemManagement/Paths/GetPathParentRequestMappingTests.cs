@@ -18,13 +18,6 @@ public class GetPathParentRequestMappingTests
 {
     private readonly GetPathParentRequestFixture _getPathParentRequestFixture = new();
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="GetPathParentRequestMappingTests"/> class.
-    /// </summary>
-    public GetPathParentRequestMappingTests()
-    {
-    }
-
     [Fact]
     public void ToQuery_WhenMappingGetPathParentRequest_ShouldMapCorrectly()
     {

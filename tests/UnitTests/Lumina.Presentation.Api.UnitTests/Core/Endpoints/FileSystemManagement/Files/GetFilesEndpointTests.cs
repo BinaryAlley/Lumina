@@ -29,8 +29,8 @@ public class GetFilesEndpointTests
 {
     private readonly IQueryHandler<GetFilesQuery, Result<IEnumerable<FileResponse>>> _mockHandler;
     private readonly GetFilesEndpoint _sut;
-    private readonly GetFilesRequestFixture _getFilesRequestFixture;
-    private readonly FileResponseFixture _fileResponseFixture;
+    private readonly GetFilesRequestFixture _getFilesRequestFixture = new();
+    private readonly FileResponseFixture _fileResponseFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetFilesEndpointTests"/> class.
@@ -38,8 +38,6 @@ public class GetFilesEndpointTests
     public GetFilesEndpointTests()
     {
         _mockHandler = Substitute.For<IQueryHandler<GetFilesQuery, Result<IEnumerable<FileResponse>>>>();
-        _getFilesRequestFixture = new GetFilesRequestFixture();
-        _fileResponseFixture = new FileResponseFixture();
         _sut = Factory.Create<GetFilesEndpoint>(_mockHandler);
     }
 

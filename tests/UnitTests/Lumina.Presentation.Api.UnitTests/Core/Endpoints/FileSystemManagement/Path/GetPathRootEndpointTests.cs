@@ -27,8 +27,8 @@ public class GetPathRootEndpointTests
 {
     private readonly IQueryHandler<GetPathRootQuery, Result<PathSegmentResponse>> _mockHandler;
     private readonly GetPathRootEndpoint _sut;
-    private readonly PathSegmentResponseFixture _pathSegmentResponseFixture;
-    private readonly GetPathRootRequestFixture _getPathRootRequestFixture;
+    private readonly PathSegmentResponseFixture _pathSegmentResponseFixture = new();
+    private readonly GetPathRootRequestFixture _getPathRootRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetPathRootEndpointTests"/> class.
@@ -37,8 +37,6 @@ public class GetPathRootEndpointTests
     {
         _mockHandler = Substitute.For<IQueryHandler<GetPathRootQuery, Result<PathSegmentResponse>>>();
         _sut = Factory.Create<GetPathRootEndpoint>(_mockHandler);
-        _pathSegmentResponseFixture = new PathSegmentResponseFixture();
-        _getPathRootRequestFixture = new GetPathRootRequestFixture();
     }
 
     [Fact]

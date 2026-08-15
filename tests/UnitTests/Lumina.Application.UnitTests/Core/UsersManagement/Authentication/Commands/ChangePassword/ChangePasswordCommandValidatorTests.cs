@@ -16,17 +16,8 @@ namespace Lumina.Application.UnitTests.Core.UsersManagement.Authentication.Comma
 [ExcludeFromCodeCoverage]
 public class ChangePasswordCommandValidatorTests
 {
-    private readonly ChangePasswordCommandValidator _validator;
-    private readonly ChangePasswordCommandFixture _changePasswordCommandFixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ChangePasswordCommandValidatorTests"/> class.
-    /// </summary>
-    public ChangePasswordCommandValidatorTests()
-    {
-        _validator = new ChangePasswordCommandValidator();
-        _changePasswordCommandFixture = new ChangePasswordCommandFixture();
-    }
+    private readonly ChangePasswordCommandValidator _validator = new();
+    private readonly ChangePasswordCommandFixture _changePasswordCommandFixture = new();
 
     [Fact]
     public void Validate_WhenUsernameIsNull_ShouldHaveValidationError()

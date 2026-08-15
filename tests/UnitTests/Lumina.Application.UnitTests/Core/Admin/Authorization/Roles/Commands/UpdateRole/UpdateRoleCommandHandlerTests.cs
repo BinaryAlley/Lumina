@@ -32,7 +32,7 @@ public class UpdateRoleCommandHandlerTests
     private readonly ICurrentUserService _mockCurrentUserService;
     private readonly IRoleRepository _mockRoleRepository;
     private readonly UpdateRoleCommandHandler _sut;
-    private readonly UpdateRoleCommandFixture _updateRoleCommandFixture;
+    private readonly UpdateRoleCommandFixture _updateRoleCommandFixture = new();
     private readonly Guid _userId;
 
     /// <summary>
@@ -47,7 +47,6 @@ public class UpdateRoleCommandHandlerTests
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
         _mockRoleRepository = Substitute.For<IRoleRepository>();
-        _updateRoleCommandFixture = new UpdateRoleCommandFixture();
         _userId = Guid.NewGuid();
 
         _mockCurrentUserService.UserId.Returns(_userId);

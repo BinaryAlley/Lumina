@@ -12,15 +12,7 @@ namespace Lumina.Infrastructure.UnitTests.Core.Authentication;
 [ExcludeFromCodeCoverage]
 public class TotpTokenGeneratorTests
 {
-    private readonly TotpTokenGenerator _sut;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="TotpTokenGeneratorTests"/> class.
-    /// </summary>
-    public TotpTokenGeneratorTests()
-    {
-        _sut = new TotpTokenGenerator();
-    }
+    private readonly TotpTokenGenerator _sut = new();
 
     [Fact]
     public void GenerateSecret_WhenCalled_ShouldGenerateNonEmptySecret()

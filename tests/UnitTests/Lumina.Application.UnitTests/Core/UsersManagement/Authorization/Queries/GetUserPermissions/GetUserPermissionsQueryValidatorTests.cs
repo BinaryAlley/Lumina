@@ -16,15 +16,7 @@ namespace Lumina.Application.UnitTests.Core.UsersManagement.Authorization.Querie
 [ExcludeFromCodeCoverage]
 public class GetUserPermissionsQueryValidatorTests
 {
-    private readonly GetUserPermissionsQueryValidator _validator;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="GetUserPermissionsQueryValidatorTests"/> class.
-    /// </summary>
-    public GetUserPermissionsQueryValidatorTests()
-    {
-        _validator = new GetUserPermissionsQueryValidator();
-    }
+    private readonly GetUserPermissionsQueryValidator _validator = new();
 
     [Fact]
     public void Validate_WhenUserIdIsNull_ShouldHaveValidationError()

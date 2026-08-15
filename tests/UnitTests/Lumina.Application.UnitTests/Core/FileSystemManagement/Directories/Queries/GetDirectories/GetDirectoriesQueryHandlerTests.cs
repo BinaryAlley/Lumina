@@ -29,8 +29,8 @@ public class GetDirectoriesQueryHandlerTests
     private readonly IFixture _fixture;
     private readonly IDirectoryService _mockDirectoryService;
     private readonly GetDirectoriesQueryHandler _sut;
-    private readonly DirectoryFixture _directoryFixture;
-    private readonly GetDirectoriesQueryFixture _getDirectoriesQueryFixture;
+    private readonly DirectoryFixture _directoryFixture = new();
+    private readonly GetDirectoriesQueryFixture _getDirectoriesQueryFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetDirectoriesQueryHandlerTests"/> class.
@@ -43,8 +43,6 @@ public class GetDirectoriesQueryHandlerTests
         mockValidator.Validate(Arg.Any<GetDirectoriesQuery>())
             .Returns([]);
         _sut = new GetDirectoriesQueryHandler(_mockDirectoryService, mockValidator);
-        _directoryFixture = new DirectoryFixture();
-        _getDirectoriesQueryFixture = new GetDirectoriesQueryFixture();
     }
 
     [Fact]

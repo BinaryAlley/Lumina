@@ -20,16 +20,8 @@ namespace Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedCo
 [ExcludeFromCodeCoverage]
 public class LibraryFixture
 {
-    private readonly Faker _faker;
+    private readonly Faker _faker = new();
     private readonly Random _random = new();
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="LibraryFixture"/> class.
-    /// </summary>
-    public LibraryFixture()
-    {
-        _faker = new Faker();
-    }
 
     /// <summary>
     /// Creates a random valid <see cref="Library"/> domain aggregate.

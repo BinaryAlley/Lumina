@@ -20,17 +20,8 @@ namespace Lumina.Application.UnitTests.Core.MediaLibrary.WrittenContentLibrary.B
 [ExcludeFromCodeCoverage]
 public class AddBookCommandValidatorTests
 {
-    private readonly AddBookCommandFixture _commandBookFixture;
-    private readonly AddBookCommandValidator _validator;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AddBookCommandValidatorTests"/> class.
-    /// </summary>
-    public AddBookCommandValidatorTests()
-    {
-        _validator = new AddBookCommandValidator();
-        _commandBookFixture = new AddBookCommandFixture();
-    }
+    private readonly AddBookCommandFixture _commandBookFixture = new();
+    private readonly AddBookCommandValidator _validator = new();
 
     [Fact]
     public void Validate_WhenTitleIsNull_ShouldHaveValidationError()

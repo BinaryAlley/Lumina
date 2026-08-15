@@ -30,8 +30,8 @@ public class FileServiceTests
     private readonly IPlatformContextManager _mockPlatformContextManager;
     private readonly IPlatformContext _mockPlatformContext;
     private readonly FileService _sut;
-    private readonly FileSystemPathIdFixture _fileSystemPathIdFixture;
-    private readonly FileFixture _fileFixture;
+    private readonly FileSystemPathIdFixture _fileSystemPathIdFixture = new();
+    private readonly FileFixture _fileFixture = new();
     private static readonly bool s_isUnix = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
     private readonly string _pathTestDir = s_isUnix ? "/TestDir" : @"C:\TestDir";
     private readonly string _pathTestDirFile1 = s_isUnix ? "/TestDir/File1.txt" : @"C:\TestDir\File1.txt";
@@ -57,8 +57,6 @@ public class FileServiceTests
         _mockPlatformContext = Substitute.For<IPlatformContext>();
         _mockPlatformContextManager.GetCurrentContext().Returns(_mockPlatformContext);
         _sut = new FileService(_mockEnvironmentContext, _mockPlatformContextManager);
-        _fileSystemPathIdFixture = new FileSystemPathIdFixture();
-        _fileFixture = new FileFixture();
     }
 
     [Fact]

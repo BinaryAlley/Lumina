@@ -18,13 +18,6 @@ public class SplitPathRequestMappingTests
 {
     private readonly SplitPathRequestFixture _splitPathRequestFixture = new();
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="SplitPathRequestMappingTests"/> class.
-    /// </summary>
-    public SplitPathRequestMappingTests()
-    {
-    }
-
     [Fact]
     public void ToCommand_WhenMappingSplitPathRequest_ShouldMapCorrectly()
     {

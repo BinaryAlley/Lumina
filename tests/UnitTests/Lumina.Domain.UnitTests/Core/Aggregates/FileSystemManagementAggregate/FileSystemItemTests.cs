@@ -20,7 +20,7 @@ namespace Lumina.Domain.UnitTests.Core.Aggregates.FileSystemManagementAggregate;
 public class FileSystemItemTests
 {
     private readonly IFixture _fixture;
-    private readonly FileSystemPathIdFixture _fileSystemPathIdFixture;
+    private readonly FileSystemPathIdFixture _fileSystemPathIdFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FileSystemItemTests"/> class.
@@ -28,7 +28,6 @@ public class FileSystemItemTests
     public FileSystemItemTests()
     {
         _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
-        _fileSystemPathIdFixture = new FileSystemPathIdFixture();
     }
 
     [Fact]

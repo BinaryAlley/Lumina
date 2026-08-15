@@ -28,8 +28,8 @@ public class GetThumbnailEndpointTests
 {
     private readonly IQueryHandler<GetThumbnailQuery, Result<ThumbnailResponse>> _mockHandler;
     private readonly GetThumbnailEndpoint _sut;
-    private readonly GetThumbnailRequestFixture _getThumbnailRequestFixture;
-    private readonly ThumbnailResponseFixture _thumbnailResponseFixture;
+    private readonly GetThumbnailRequestFixture _getThumbnailRequestFixture = new();
+    private readonly ThumbnailResponseFixture _thumbnailResponseFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetThumbnailEndpointTests"/> class.
@@ -38,8 +38,6 @@ public class GetThumbnailEndpointTests
     {
         _mockHandler = Substitute.For<IQueryHandler<GetThumbnailQuery, Result<ThumbnailResponse>>>();
         _sut = Factory.Create<GetThumbnailEndpoint>(_mockHandler);
-        _getThumbnailRequestFixture = new GetThumbnailRequestFixture();
-        _thumbnailResponseFixture = new ThumbnailResponseFixture();
     }
 
     [Fact]

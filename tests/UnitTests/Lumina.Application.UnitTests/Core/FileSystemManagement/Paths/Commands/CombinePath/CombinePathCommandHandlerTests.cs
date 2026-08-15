@@ -24,7 +24,7 @@ public class CombinePathCommandHandlerTests
     private readonly IFixture _fixture;
     private readonly IPathService _mockPathService;
     private readonly CombinePathCommandHandler _sut;
-    private readonly CombinePathCommandFixture _combinePathCommandFixture;
+    private readonly CombinePathCommandFixture _combinePathCommandFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CombinePathCommandHandlerTests"/> class.
@@ -37,7 +37,6 @@ public class CombinePathCommandHandlerTests
         mockValidator.Validate(Arg.Any<CombinePathCommand>())
             .Returns([]);
         _sut = new CombinePathCommandHandler(_mockPathService, mockValidator);
-        _combinePathCommandFixture = new CombinePathCommandFixture();
     }
 
     [Fact]

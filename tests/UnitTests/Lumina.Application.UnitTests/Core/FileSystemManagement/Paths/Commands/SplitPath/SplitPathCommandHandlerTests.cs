@@ -29,8 +29,8 @@ public class SplitPathCommandHandlerTests
     private readonly IFixture _fixture;
     private readonly IPathService _mockPathService;
     private readonly SplitPathCommandHandler _sut;
-    private readonly PathSegmentFixture _pathSegmentFixture;
-    private readonly SplitPathCommandFixture _splitPathCommandFixture;
+    private readonly PathSegmentFixture _pathSegmentFixture = new();
+    private readonly SplitPathCommandFixture _splitPathCommandFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SplitPathCommandHandlerTests"/> class.
@@ -43,8 +43,6 @@ public class SplitPathCommandHandlerTests
         mockValidator.Validate(Arg.Any<SplitPathCommand>())
             .Returns([]);
         _sut = new SplitPathCommandHandler(_mockPathService, mockValidator);
-        _pathSegmentFixture = new PathSegmentFixture();
-        _splitPathCommandFixture = new SplitPathCommandFixture();
     }
 
     [Fact]

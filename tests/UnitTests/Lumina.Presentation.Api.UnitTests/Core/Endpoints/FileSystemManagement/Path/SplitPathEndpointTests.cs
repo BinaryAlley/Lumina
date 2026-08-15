@@ -28,8 +28,8 @@ public class SplitPathEndpointTests
 {
     private readonly ICommandHandler<SplitPathCommand, Result<IEnumerable<PathSegmentResponse>>> _mockHandler;
     private readonly SplitPathEndpoint _sut;
-    private readonly PathSegmentResponseFixture _pathSegmentResponseFixture;
-    private readonly SplitPathRequestFixture _splitPathRequestFixture;
+    private readonly PathSegmentResponseFixture _pathSegmentResponseFixture = new();
+    private readonly SplitPathRequestFixture _splitPathRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SplitPathEndpointTests"/> class.
@@ -38,8 +38,6 @@ public class SplitPathEndpointTests
     {
         _mockHandler = Substitute.For<ICommandHandler<SplitPathCommand, Result<IEnumerable<PathSegmentResponse>>>>();
         _sut = FastEndpoints.Factory.Create<SplitPathEndpoint>(_mockHandler);
-        _pathSegmentResponseFixture = new PathSegmentResponseFixture();
-        _splitPathRequestFixture = new SplitPathRequestFixture();
     }
 
     [Fact]

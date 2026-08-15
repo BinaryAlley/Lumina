@@ -18,15 +18,7 @@ namespace Lumina.Application.UnitTests.Common.Mapping.FileSystemManagement.Files
 [ExcludeFromCodeCoverage]
 public class FileMappingTests
 {
-    private readonly FileFixture _fileFixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="FileMappingTests"/> class.
-    /// </summary>
-    public FileMappingTests()
-    {
-        _fileFixture = new();
-    }
+    private readonly FileFixture _fileFixture = new();
 
     [Fact]
     public void ToFileSystemTreeNodeResponse_WhenMappingFile_ShouldMapCorrectly()

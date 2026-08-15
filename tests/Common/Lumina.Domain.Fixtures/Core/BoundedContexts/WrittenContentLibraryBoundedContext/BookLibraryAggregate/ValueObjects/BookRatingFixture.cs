@@ -16,16 +16,8 @@ namespace Lumina.Domain.Fixtures.Core.BoundedContexts.WrittenContentLibraryBound
 [ExcludeFromCodeCoverage]
 public class BookRatingFixture
 {
-    private readonly Fixture _fixture;
+    private readonly Fixture _fixture = new();
     private readonly Random _random = new();
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="BookRatingFixture"/> class.
-    /// </summary>
-    public BookRatingFixture()
-    {
-        _fixture = new Fixture();
-    }
 
     /// <summary>
     /// Creates a random valid <see cref="BookRating"/>.

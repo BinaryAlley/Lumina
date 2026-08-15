@@ -17,15 +17,7 @@ namespace Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBounde
 [ExcludeFromCodeCoverage]
 public class FileFixture
 {
-    private readonly Faker _faker;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="FileFixture"/> class.
-    /// </summary>
-    public FileFixture()
-    {
-        _faker = new Faker();
-    }
+    private readonly Faker _faker = new();
 
     /// <summary>
     /// Creates a random valid <see cref="File"/>.

@@ -29,8 +29,8 @@ public class GetDirectoriesEndpointTests
 {
     private readonly IQueryHandler<GetDirectoriesQuery, Result<IEnumerable<DirectoryResponse>>> _mockHandler;
     private readonly GetDirectoriesEndpoint _sut;
-    private readonly GetDirectoriesRequestFixture _getDirectoriesRequestFixture;
-    private readonly DirectoryResponseFixture _directoryResponseFixture;
+    private readonly GetDirectoriesRequestFixture _getDirectoriesRequestFixture = new();
+    private readonly DirectoryResponseFixture _directoryResponseFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetDirectoriesEndpointTests"/> class.
@@ -38,8 +38,6 @@ public class GetDirectoriesEndpointTests
     public GetDirectoriesEndpointTests()
     {
         _mockHandler = Substitute.For<IQueryHandler<GetDirectoriesQuery, Result<IEnumerable<DirectoryResponse>>>>();
-        _getDirectoriesRequestFixture = new GetDirectoriesRequestFixture();
-        _directoryResponseFixture = new DirectoryResponseFixture();
         _sut = Factory.Create<GetDirectoriesEndpoint>(_mockHandler);
     }
 

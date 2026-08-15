@@ -21,7 +21,7 @@ public class CheckPathExistsQueryHandlerTests
 {
     private readonly IPathService _mockPathService;
     private readonly CheckPathExistsQueryHandler _sut;
-    private readonly CheckPathExistsQueryFixture _checkPathExistsQueryFixture;
+    private readonly CheckPathExistsQueryFixture _checkPathExistsQueryFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CheckPathExistsQueryHandlerTests"/> class.
@@ -29,7 +29,6 @@ public class CheckPathExistsQueryHandlerTests
     public CheckPathExistsQueryHandlerTests()
     {
         _mockPathService = Substitute.For<IPathService>();
-        _checkPathExistsQueryFixture = new CheckPathExistsQueryFixture();
         IValidator<CheckPathExistsQuery> mockValidator = Substitute.For<IValidator<CheckPathExistsQuery>>();
         mockValidator.Validate(Arg.Any<CheckPathExistsQuery>())
             .Returns([]);

@@ -27,7 +27,7 @@ public class ThumbnailServiceTests
 {
     private readonly IEnvironmentContext _mockEnvironmentContext;
     private readonly ThumbnailService _sut;
-    private readonly FileSystemPathIdFixture _fileSystemPathIdFixture;
+    private readonly FileSystemPathIdFixture _fileSystemPathIdFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ThumbnailServiceTests"/> class.
@@ -36,7 +36,6 @@ public class ThumbnailServiceTests
     {
         _mockEnvironmentContext = Substitute.For<IEnvironmentContext>();
         _sut = new ThumbnailService(_mockEnvironmentContext);
-        _fileSystemPathIdFixture = new FileSystemPathIdFixture();
     }
 
     [Fact]

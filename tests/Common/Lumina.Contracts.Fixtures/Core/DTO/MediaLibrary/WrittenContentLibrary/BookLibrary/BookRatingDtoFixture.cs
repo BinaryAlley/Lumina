@@ -16,16 +16,8 @@ namespace Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.
 [ExcludeFromCodeCoverage]
 public class BookRatingDtoFixture
 {
-    private readonly Fixture _fixture;
+    private readonly Fixture _fixture = new();
     private readonly Random _random = new();
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="BookRatingDtoFixture"/> class.
-    /// </summary>
-    public BookRatingDtoFixture()
-    {
-        _fixture = new Fixture();
-    }
 
     /// <summary>
     /// Creates a <see cref="BookRatingDto"/>.

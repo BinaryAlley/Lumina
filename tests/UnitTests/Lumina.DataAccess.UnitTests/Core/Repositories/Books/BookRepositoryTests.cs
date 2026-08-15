@@ -28,7 +28,7 @@ public class BookRepositoryTests
 {
     private readonly LuminaDbContext _mockContext;
     private readonly BookRepository _sut;
-    private readonly BookEntityFixture _bookEntityFixture;
+    private readonly BookEntityFixture _bookEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BookRepositoryTests"/> class.
@@ -37,7 +37,6 @@ public class BookRepositoryTests
     {
         _mockContext = Create.MockedDbContextFor<LuminaDbContext>();
         _sut = new BookRepository(_mockContext);
-        _bookEntityFixture = new BookEntityFixture();
     }
 
     [Fact]

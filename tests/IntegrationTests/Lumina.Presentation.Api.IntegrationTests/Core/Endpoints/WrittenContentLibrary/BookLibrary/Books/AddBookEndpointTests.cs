@@ -39,7 +39,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
             new BookJsonConverter()
         }
     };
-    private readonly AddBookRequestFixture _requestBookFixture;
+    private readonly AddBookRequestFixture _requestBookFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AddBookEndpointTests"/> class.
@@ -49,7 +49,6 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;
-        _requestBookFixture = new AddBookRequestFixture();
     }
 
     /// <summary>

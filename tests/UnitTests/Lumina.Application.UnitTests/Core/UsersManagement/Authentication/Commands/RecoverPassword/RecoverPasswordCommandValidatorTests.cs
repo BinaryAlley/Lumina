@@ -16,17 +16,8 @@ namespace Lumina.Application.UnitTests.Core.UsersManagement.Authentication.Comma
 [ExcludeFromCodeCoverage]
 public class RecoverPasswordCommandValidatorTests
 {
-    private readonly RecoverPasswordCommandValidator _validator;
-    private readonly RecoverPasswordCommandFixture _recoverPasswordCommandFixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="RecoverPasswordCommandValidatorTests"/> class.
-    /// </summary>
-    public RecoverPasswordCommandValidatorTests()
-    {
-        _validator = new RecoverPasswordCommandValidator();
-        _recoverPasswordCommandFixture = new RecoverPasswordCommandFixture();
-    }
+    private readonly RecoverPasswordCommandValidator _validator = new();
+    private readonly RecoverPasswordCommandFixture _recoverPasswordCommandFixture = new();
 
     [Fact]
     public void Validate_WhenUsernameIsNull_ShouldHaveValidationError()

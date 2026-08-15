@@ -16,13 +16,6 @@ public class GetFilesRequestMappingTests
 {
     private readonly GetFilesRequestFixture _getFilesRequestFixture = new();
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="GetFilesRequestMappingTests"/> class.
-    /// </summary>
-    public GetFilesRequestMappingTests()
-    {
-    }
-
     [Fact]
     public void ToQuery_WhenMappingGetFilesRequest_ShouldMapCorrectly()
     {

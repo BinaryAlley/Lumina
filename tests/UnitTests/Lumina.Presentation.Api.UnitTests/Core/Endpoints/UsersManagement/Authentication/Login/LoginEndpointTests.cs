@@ -26,7 +26,7 @@ public class LoginEndpointTests
 {
     private readonly IQueryHandler<LoginUserQuery, Result<LoginResponse>> _mockHandler;
     private readonly LoginEndpoint _sut;
-    private readonly LoginRequestFixture _loginRequestFixture;
+    private readonly LoginRequestFixture _loginRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LoginEndpointTests"/> class.
@@ -35,7 +35,6 @@ public class LoginEndpointTests
     {
         _mockHandler = Substitute.For<IQueryHandler<LoginUserQuery, Result<LoginResponse>>>();
         _sut = Factory.Create<LoginEndpoint>(_mockHandler);
-        _loginRequestFixture = new LoginRequestFixture();
     }
 
     [Fact]

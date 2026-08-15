@@ -16,13 +16,6 @@ public class GetTreeFilesRequestMappingTests
 {
     private readonly GetTreeFilesRequestFixture _getTreeFilesRequestFixture = new();
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="GetTreeFilesRequestMappingTests"/> class.
-    /// </summary>
-    public GetTreeFilesRequestMappingTests()
-    {
-    }
-
     [Fact]
     public void ToQuery_WhenMappingGetTreeFilesRequest_ShouldMapCorrectly()
     {

@@ -33,7 +33,7 @@ public class GetUserPermissionsQueryHandlerTests
     private readonly ICurrentUserService _mockCurrentUserService;
     private readonly IUserRepository _mockUserRepository;
     private readonly GetUserPermissionsQueryHandler _sut;
-    private readonly GetUserPermissionsQueryFixture _getUserPermissionsQueryFixture;
+    private readonly GetUserPermissionsQueryFixture _getUserPermissionsQueryFixture = new();
     private readonly Guid _userId;
 
     /// <summary>
@@ -45,7 +45,6 @@ public class GetUserPermissionsQueryHandlerTests
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
         _mockUserRepository = Substitute.For<IUserRepository>();
-        _getUserPermissionsQueryFixture = new GetUserPermissionsQueryFixture();
         _userId = Guid.NewGuid();
 
         _mockCurrentUserService.UserId.Returns(_userId);

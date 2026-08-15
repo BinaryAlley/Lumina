@@ -26,15 +26,13 @@ public class GetThumbnailQueryHandlerTests
     private readonly IFixture _fixture;
     private readonly IThumbnailService _mockThumbnailService;
     private readonly GetThumbnailQueryHandler _sut;
-    private readonly GetThumbnailQueryFixture _getThumbnailQueryFixture;
-    private readonly ThumbnailFixture _thumbnailFixture;
+    private readonly GetThumbnailQueryFixture _getThumbnailQueryFixture = new();
+    private readonly ThumbnailFixture _thumbnailFixture = new();
 
     public GetThumbnailQueryHandlerTests()
     {
         _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
         _mockThumbnailService = Substitute.For<IThumbnailService>();
-        _getThumbnailQueryFixture = new GetThumbnailQueryFixture();
-        _thumbnailFixture = new ThumbnailFixture();
         IValidator<GetThumbnailQuery> mockValidator = Substitute.For<IValidator<GetThumbnailQuery>>();
         mockValidator.Validate(Arg.Any<GetThumbnailQuery>())
             .Returns([]);

@@ -17,17 +17,8 @@ namespace Lumina.Application.UnitTests.Core.Admin.Authorization.Roles.Commands.A
 [ExcludeFromCodeCoverage]
 public class AddRoleCommandValidatorTests
 {
-    private readonly AddRoleCommandValidator _validator;
-    private readonly AddRoleCommandFixture _fixture;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AddRoleCommandValidatorTests"/> class.
-    /// </summary>
-    public AddRoleCommandValidatorTests()
-    {
-        _validator = new AddRoleCommandValidator();
-        _fixture = new AddRoleCommandFixture();
-    }
+    private readonly AddRoleCommandValidator _validator = new();
+    private readonly AddRoleCommandFixture _fixture = new();
 
     [Fact]
     public void Validate_WhenRoleNameIsNull_ShouldHaveValidationError()

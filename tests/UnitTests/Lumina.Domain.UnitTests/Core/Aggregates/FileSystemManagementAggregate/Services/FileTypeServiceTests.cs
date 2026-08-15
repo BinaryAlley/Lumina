@@ -29,8 +29,8 @@ public class FileTypeServiceTests
     private MockFileSystem _mockFileSystem = null!;
     private readonly IFileSystemPermissionsService _mockFileSystemPermissionsService;
     private FileTypeService? sut;
-    private readonly FileSystemPathIdFixture _fileSystemPathIdFixture;
-    private readonly FileFixture _fileFixture;
+    private readonly FileSystemPathIdFixture _fileSystemPathIdFixture = new();
+    private readonly FileFixture _fileFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FileTypeServiceTests"/> class.
@@ -38,8 +38,6 @@ public class FileTypeServiceTests
     public FileTypeServiceTests()
     {
         _mockFileSystemPermissionsService = Substitute.For<IFileSystemPermissionsService>();
-        _fileSystemPathIdFixture = new FileSystemPathIdFixture();
-        _fileFixture = new FileFixture();
     }
 
     [Fact]

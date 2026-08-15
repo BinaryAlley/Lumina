@@ -15,15 +15,7 @@ namespace Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
 [ExcludeFromCodeCoverage]
 public class RolePermissionEntityFixture
 {
-    private readonly Faker _faker;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="RolePermissionEntityFixture"/> class.
-    /// </summary>
-    public RolePermissionEntityFixture()
-    {
-        _faker = new Faker();
-    }
+    private readonly Faker _faker = new();
 
     /// <summary>
     /// Creates a random valid <see cref="RolePermissionEntity"/>.
