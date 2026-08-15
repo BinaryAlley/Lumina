@@ -66,7 +66,7 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithValidCredentials_ShouldLoginSuccessfully()
+    public async Task Login_WhenCalledWithValidCredentials_ShouldLoginSuccessfully()
     {
         // Arrange
         UserEntity user = await CreateTestUser();
@@ -93,7 +93,7 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithValidCredentialsAndTotp_ShouldLoginSuccessfully()
+    public async Task Login_WhenCalledWithValidCredentialsAndTotp_ShouldLoginSuccessfully()
     {
         // Arrange
         UserEntity user = await CreateTestUserWithTotp();
@@ -125,7 +125,7 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithTempPassword_ShouldLoginSuccessfully()
+    public async Task Login_WhenCalledWithTempPassword_ShouldLoginSuccessfully()
     {
         // Arrange
         UserEntity user = await CreateTestUserWithTempPassword();
@@ -151,7 +151,7 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithExpiredTempPassword_ShouldReturnUnauthorized()
+    public async Task Login_WhenCalledWithExpiredTempPassword_ShouldReturnUnauthorized()
     {
         // Arrange
         UserEntity user = await CreateTestUserWithExpiredTempPassword();
@@ -179,7 +179,7 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithInvalidCredentials_ShouldReturnUnauthorized()
+    public async Task Login_WhenCalledWithInvalidCredentials_ShouldReturnUnauthorized()
     {
         // Arrange
         UserEntity user = await CreateTestUser();
@@ -207,7 +207,7 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithInvalidTotpCode_ShouldReturnUnauthorized()
+    public async Task Login_WhenCalledWithInvalidTotpCode_ShouldReturnUnauthorized()
     {
         // Arrange
         UserEntity user = await CreateTestUserWithTotp();
@@ -247,6 +247,7 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
 
         UserEntity user = new()
         {
+            Id = Guid.NewGuid(),
             Username = _testUsername,
             Password = _hashService.HashString("TestPass123!"),
             Libraries = [],
@@ -269,6 +270,7 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
         byte[] totpSecret = _totpTokenGenerator.GenerateSecret();
         UserEntity user = new()
         {
+            Id = Guid.NewGuid(),
             Username = _testUsername,
             Password = _hashService.HashString("TestPass123!"),
             TotpSecret = _cryptographyService.Encrypt(Convert.ToBase64String(totpSecret)),
@@ -291,6 +293,7 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
 
         UserEntity user = new()
         {
+            Id = Guid.NewGuid(),
             Username = _testUsername,
             Password = _hashService.HashString("TestPass123!"),
             TempPassword = Uri.EscapeDataString(_hashService.HashString("TempPass123!")),
@@ -314,6 +317,7 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
 
         UserEntity user = new()
         {
+            Id = Guid.NewGuid(),
             Username = _testUsername,
             Password = _hashService.HashString("TestPass123!"),
             TempPassword = Uri.EscapeDataString(_hashService.HashString("TempPass123!")),

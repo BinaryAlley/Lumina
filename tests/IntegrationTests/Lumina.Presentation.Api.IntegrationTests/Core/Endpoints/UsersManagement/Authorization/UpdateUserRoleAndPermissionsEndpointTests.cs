@@ -56,7 +56,7 @@ public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<Authentic
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithValidRequest_ShouldUpdateUserRoleAndPermissions()
+    public async Task UpdateUserRoleAndPermissions_WhenCalledWithValidRequest_ShouldUpdateUserRoleAndPermissions()
     {
         // Arrange
         using IServiceScope scope = _apiFactory.Services.CreateScope();
@@ -114,7 +114,7 @@ public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<Authentic
 
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithNonAdminAccount_ShouldReturnForbiddenResult()
+    public async Task UpdateUserRoleAndPermissions_WhenCalledWithNonAdminAccount_ShouldReturnForbiddenResult()
     {
         // Arrange
         _client = await _apiFactory.CreateAuthenticatedClientAsync();
@@ -143,7 +143,7 @@ public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<Authentic
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenTryingToRemoveLastAdmin_ShouldReturnForbiddenResult()
+    public async Task UpdateUserRoleAndPermissions_WhenTryingToRemoveLastAdmin_ShouldReturnForbiddenResult()
     {
         // Arrange
         using IServiceScope scope = _apiFactory.Services.CreateScope();
@@ -188,7 +188,7 @@ public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<Authentic
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenUserDoesNotExist_ShouldReturnNotFound()
+    public async Task UpdateUserRoleAndPermissions_WhenUserDoesNotExist_ShouldReturnNotFound()
     {
         // Arrange
         Guid nonExistentUserId = Guid.NewGuid();
@@ -217,7 +217,7 @@ public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<Authentic
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCancellationRequested_ShouldThrowTaskCanceledException()
+    public async Task UpdateUserRoleAndPermissions_WhenCancellationRequested_ShouldThrowTaskCanceledException()
     {
         // Arrange
         using CancellationTokenSource cts = new();

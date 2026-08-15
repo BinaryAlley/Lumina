@@ -54,7 +54,7 @@ public class GetPermissionsEndpointTests : IClassFixture<AuthenticatedLuminaApiF
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithValidRequest_ShouldReturnPermissions()
+    public async Task GetPermissions_WhenCalledWithValidRequest_ShouldReturnPermissions()
     {
         // Act
         HttpResponseMessage response = await _client.GetAsync("/api/v1/auth/permissions");
@@ -76,7 +76,7 @@ public class GetPermissionsEndpointTests : IClassFixture<AuthenticatedLuminaApiF
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithNonAdminAccount_ShouldReturnForbiddenResult()
+    public async Task GetPermissions_WhenCalledWithNonAdminAccount_ShouldReturnForbiddenResult()
     {
         // Act
         _client = await _apiFactory.CreateAuthenticatedClientAsync(); // authenticated user, but not admin
@@ -99,7 +99,7 @@ public class GetPermissionsEndpointTests : IClassFixture<AuthenticatedLuminaApiF
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCancellationRequested_ShouldThrowTaskCanceledException()
+    public async Task GetPermissions_WhenCancellationRequested_ShouldThrowTaskCanceledException()
     {
         // Arrange
         using CancellationTokenSource cts = new();

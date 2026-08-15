@@ -57,7 +57,7 @@ public class RegisterEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithValidRequest_ShouldRegisterUserSuccessfully()
+    public async Task Register_WhenCalledWithValidRequest_ShouldRegisterUserSuccessfully()
     {
         // Arrange
         RegistrationRequest request = new(
@@ -85,7 +85,7 @@ public class RegisterEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithValidRequestAnd2FA_ShouldRegisterUserWithTotp()
+    public async Task Register_WhenCalledWithValidRequestAnd2FA_ShouldRegisterUserWithTotp()
     {
         // Arrange
         RegistrationRequest request = new(
@@ -112,7 +112,7 @@ public class RegisterEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenUsernameAlreadyExists_ShouldReturnConflict()
+    public async Task Register_WhenUsernameAlreadyExists_ShouldReturnConflict()
     {
         // Arrange
         await CreateTestUser();
@@ -138,7 +138,7 @@ public class RegisterEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenPasswordsDoNotMatch_ShouldReturnValidationError()
+    public async Task Register_WhenPasswordsDoNotMatch_ShouldReturnValidationError()
     {
         // Arrange
         RegistrationRequest request = new(
@@ -164,7 +164,7 @@ public class RegisterEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenRequestIsNull_ShouldReturnValidationError()
+    public async Task Register_WhenRequestIsNull_ShouldReturnValidationError()
     {
         // Arrange
         RegistrationRequest? request = null;
@@ -193,6 +193,7 @@ public class RegisterEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
 
         UserEntity user = new()
         {
+            Id = Guid.NewGuid(),
             Username = _testUsername,
             Password = new PasswordHashService().HashString("TestPass123!"),
             Libraries = [],

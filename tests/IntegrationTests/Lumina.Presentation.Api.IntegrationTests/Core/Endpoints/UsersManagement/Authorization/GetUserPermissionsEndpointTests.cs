@@ -55,7 +55,7 @@ public class GetUserPermissionsEndpointTests : IClassFixture<AuthenticatedLumina
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithValidRequest_ShouldReturnUserPermissions()
+    public async Task GetUserPermissions_WhenCalledWithValidRequest_ShouldReturnUserPermissions()
     {
         // Arrange
         using IServiceScope scope = _apiFactory.Services.CreateScope();
@@ -97,7 +97,7 @@ public class GetUserPermissionsEndpointTests : IClassFixture<AuthenticatedLumina
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithNonAdminAccount_ShouldReturnForbiddenResult()
+    public async Task GetUserPermissions_WhenCalledWithNonAdminAccount_ShouldReturnForbiddenResult()
     {
         // Arrange
         _client = await _apiFactory.CreateAuthenticatedClientAsync();
@@ -125,7 +125,7 @@ public class GetUserPermissionsEndpointTests : IClassFixture<AuthenticatedLumina
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenUserDoesNotExist_ShouldReturnNotFound()
+    public async Task GetUserPermissions_WhenUserDoesNotExist_ShouldReturnNotFound()
     {
         // Arrange
         Guid nonExistentUserId = Guid.NewGuid();
@@ -149,7 +149,7 @@ public class GetUserPermissionsEndpointTests : IClassFixture<AuthenticatedLumina
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCancellationRequested_ShouldThrowTaskCanceledException()
+    public async Task GetUserPermissions_WhenCancellationRequested_ShouldThrowTaskCanceledException()
     {
         // Arrange
         using CancellationTokenSource cts = new();

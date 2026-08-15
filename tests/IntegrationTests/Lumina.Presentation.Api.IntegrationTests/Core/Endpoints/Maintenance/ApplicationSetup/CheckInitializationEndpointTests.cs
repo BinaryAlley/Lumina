@@ -53,8 +53,16 @@ public class CheckInitializationEndpointTests : IClassFixture<AuthenticatedLumin
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenNoUsersExist_ShouldReturnNotInitialized()
+    public async Task CheckInitialization_WhenNoUsersExist_ShouldReturnNotInitialized()
     {
+        // Arrange
+        using (IServiceScope scope = _apiFactory.Services.CreateScope())
+        {
+            LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+            dbContext.Users.RemoveRange(dbContext.Users);
+            await dbContext.SaveChangesAsync();
+        }
+
         // Act
         HttpResponseMessage response = await _client.GetAsync("/api/v1/initialization");
 
@@ -70,7 +78,7 @@ public class CheckInitializationEndpointTests : IClassFixture<AuthenticatedLumin
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenUsersExist_ShouldReturnInitialized()
+    public async Task CheckInitialization_WhenUsersExist_ShouldReturnInitialized()
     {
         // Arrange
         await CreateTestUser();
@@ -90,7 +98,7 @@ public class CheckInitializationEndpointTests : IClassFixture<AuthenticatedLumin
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCancellationRequested_ShouldThrowTaskCanceledException()
+    public async Task CheckInitialization_WhenCancellationRequested_ShouldThrowTaskCanceledException()
     {
         // Arrange
         using CancellationTokenSource cts = new();
@@ -111,6 +119,7 @@ public class CheckInitializationEndpointTests : IClassFixture<AuthenticatedLumin
 
         UserEntity user = new()
         {
+            Id = Guid.NewGuid(),
             Username = _testUsername,
             Password = new PasswordHashService().HashString("TestPass123!"),
             Libraries = [],

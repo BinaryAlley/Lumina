@@ -59,7 +59,7 @@ public class GetDrivesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactor
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalled_ShouldReturnDrives()
+    public async Task GetDrives_WhenCalled_ShouldReturnDrives()
     {
         // Act
         HttpResponseMessage response = await _client.GetAsync($"/api/v1/drives/get-drives");

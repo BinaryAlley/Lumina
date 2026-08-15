@@ -29,7 +29,7 @@ public class DatabaseSettingsDtoValidatorTests
     }
 
     [Fact]
-    public void DatabaseSettingsModelValidator_WhenDefaultConnectionProvided_ShouldNotHaveValidationError()
+    public void Validate_WhenDefaultConnectionProvided_ShouldNotHaveValidationError()
     {
         // Arrange
         DatabaseSettingsDto model = _fixture.Build<DatabaseSettingsDto>()
@@ -44,7 +44,7 @@ public class DatabaseSettingsDtoValidatorTests
     }
 
     [Fact]
-    public void DatabaseSettingsModelValidator_WhenDefaultConnectionNotProvided_ShouldHaveValidationError()
+    public void Validate_WhenDefaultConnectionNotProvided_ShouldHaveValidationError()
     {
         // Arrange
         DatabaseSettingsDto model = _fixture.Build<DatabaseSettingsDto>()

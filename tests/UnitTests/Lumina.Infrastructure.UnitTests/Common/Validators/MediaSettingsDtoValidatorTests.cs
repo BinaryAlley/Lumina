@@ -29,7 +29,7 @@ public class MediaSettingsDtoValidatorTests
     }
 
     [Fact]
-    public void MediaSettingsModelValidator_WhenRootDirectoryProvided_ShouldNotHaveValidationError()
+    public void Validate_WhenRootDirectoryProvided_ShouldNotHaveValidationError()
     {
         // Arrange
         MediaSettingsDto model = _fixture.Build<MediaSettingsDto>()
@@ -44,7 +44,7 @@ public class MediaSettingsDtoValidatorTests
     }
 
     [Fact]
-    public void MediaSettingsModelValidator_WhenRootDirectoryIsEmpty_ShouldHaveValidationError()
+    public void Validate_WhenRootDirectoryIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
         MediaSettingsDto model = _fixture.Build<MediaSettingsDto>()
@@ -60,7 +60,7 @@ public class MediaSettingsDtoValidatorTests
     }
 
     [Fact]
-    public void MediaSettingsModelValidator_WhenRootDirectoryIsWhitespace_ShouldHaveValidationError()
+    public void Validate_WhenRootDirectoryIsWhitespace_ShouldHaveValidationError()
     {
         // Arrange
         MediaSettingsDto model = _fixture.Build<MediaSettingsDto>()
@@ -76,7 +76,7 @@ public class MediaSettingsDtoValidatorTests
     }
 
     [Fact]
-    public void MediaSettingsModelValidator_WhenMediaLibrariesDirectoryIsEmpty_ShouldHaveValidationError()
+    public void Validate_WhenMediaLibrariesDirectoryIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
         MediaSettingsDto model = _fixture.Build<MediaSettingsDto>()
@@ -92,7 +92,7 @@ public class MediaSettingsDtoValidatorTests
     }
 
     [Fact]
-    public void MediaSettingsModelValidator_WhenMediaLibrariesDirectoryProvided_ShouldNotHaveValidationError()
+    public void Validate_WhenMediaLibrariesDirectoryProvided_ShouldNotHaveValidationError()
     {
         // Arrange
         MediaSettingsDto model = _fixture.Build<MediaSettingsDto>()
@@ -107,7 +107,7 @@ public class MediaSettingsDtoValidatorTests
     }
 
     [Fact]
-    public void MediaSettingsModelValidator_WhenMediaLibrariesDirectoryIsWhitespace_ShouldHaveValidationError()
+    public void Validate_WhenMediaLibrariesDirectoryIsWhitespace_ShouldHaveValidationError()
     {
         // Arrange
         MediaSettingsDto model = _fixture.Build<MediaSettingsDto>()

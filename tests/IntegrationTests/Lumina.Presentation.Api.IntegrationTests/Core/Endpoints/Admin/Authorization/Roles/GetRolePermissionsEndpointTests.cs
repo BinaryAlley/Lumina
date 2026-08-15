@@ -56,7 +56,7 @@ public class GetRolePermissionsEndpointTests : IClassFixture<AuthenticatedLumina
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithValidRequest_ShouldReturnRolePermissions()
+    public async Task GetRolePermissions_WhenCalledWithValidRequest_ShouldReturnRolePermissions()
     {
         // Arrange
         using IServiceScope scope = _apiFactory.Services.CreateScope();
@@ -86,7 +86,7 @@ public class GetRolePermissionsEndpointTests : IClassFixture<AuthenticatedLumina
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithNonAdminAccount_ShouldReturnForbiddenResult()
+    public async Task GetRolePermissions_WhenCalledWithNonAdminAccount_ShouldReturnForbiddenResult()
     {
         // Arrange
         _client = await _apiFactory.CreateAuthenticatedClientAsync(); // authenticated user, but not admin
@@ -114,7 +114,7 @@ public class GetRolePermissionsEndpointTests : IClassFixture<AuthenticatedLumina
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithInvalidRoleId_ShouldReturnNotFound()
+    public async Task GetRolePermissions_WhenCalledWithInvalidRoleId_ShouldReturnNotFound()
     {
         // Act
         Guid invalidRoleId = Guid.NewGuid();
@@ -136,7 +136,7 @@ public class GetRolePermissionsEndpointTests : IClassFixture<AuthenticatedLumina
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCancellationRequested_ShouldThrowTaskCanceledException()
+    public async Task GetRolePermissions_WhenCancellationRequested_ShouldThrowTaskCanceledException()
     {
         // Arrange
         using CancellationTokenSource cts = new();

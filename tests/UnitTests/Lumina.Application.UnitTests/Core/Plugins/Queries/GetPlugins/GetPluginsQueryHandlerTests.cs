@@ -10,6 +10,7 @@ using NSubstitute;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Diagnostics.CodeAnalysis;
 #endregion
 
 namespace Lumina.Application.UnitTests.Core.Plugins.Queries.GetPlugins;
@@ -17,6 +18,7 @@ namespace Lumina.Application.UnitTests.Core.Plugins.Queries.GetPlugins;
 /// <summary>
 /// Contains unit tests for the <see cref="GetPluginsQueryHandler"/> class.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class GetPluginsQueryHandlerTests
 {
     private readonly IUnitOfWork _mockUnitOfWork;

@@ -53,7 +53,7 @@ public class GetUsersEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithValidRequest_ShouldReturnUsers()
+    public async Task GetUsers_WhenCalledWithValidRequest_ShouldReturnUsers()
     {
         // Act
         HttpResponseMessage response = await _client.GetAsync("/api/v1/auth/users");
@@ -77,7 +77,7 @@ public class GetUsersEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithNonAdminAccount_ShouldReturnForbiddenResult()
+    public async Task GetUsers_WhenCalledWithNonAdminAccount_ShouldReturnForbiddenResult()
     {
         // Arrange
         _client = await _apiFactory.CreateAuthenticatedClientAsync();
@@ -101,7 +101,7 @@ public class GetUsersEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCancellationRequested_ShouldThrowTaskCanceledException()
+    public async Task GetUsers_WhenCancellationRequested_ShouldThrowTaskCanceledException()
     {
         // Arrange
         using CancellationTokenSource cts = new();

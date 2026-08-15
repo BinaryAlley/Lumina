@@ -53,7 +53,7 @@ public class DeleteRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithValidRequest_ShouldDeleteRole()
+    public async Task DeleteRole_WhenCalledWithValidRequest_ShouldDeleteRole()
     {
         // Arrange
         using IServiceScope scope = _apiFactory.Services.CreateScope();
@@ -82,7 +82,7 @@ public class DeleteRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithNonAdminAccount_ShouldReturnForbiddenResult()
+    public async Task DeleteRole_WhenCalledWithNonAdminAccount_ShouldReturnForbiddenResult()
     {
         // Arrange
         _client = await _apiFactory.CreateAuthenticatedClientAsync();
@@ -107,7 +107,7 @@ public class DeleteRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenTryingToDeleteAdminRole_ShouldReturnForbiddenResult()
+    public async Task DeleteRole_WhenTryingToDeleteAdminRole_ShouldReturnForbiddenResult()
     {
         // Arrange
         using IServiceScope scope = _apiFactory.Services.CreateScope();
@@ -134,7 +134,7 @@ public class DeleteRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenRoleDoesNotExist_ShouldReturnNotFound()
+    public async Task DeleteRole_WhenRoleDoesNotExist_ShouldReturnNotFound()
     {
         // Arrange
         Guid nonExistentRoleId = Guid.NewGuid();
@@ -158,7 +158,7 @@ public class DeleteRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCancellationRequested_ShouldThrowTaskCanceledException()
+    public async Task DeleteRole_WhenCancellationRequested_ShouldThrowTaskCanceledException()
     {
         // Arrange
         using CancellationTokenSource cts = new();

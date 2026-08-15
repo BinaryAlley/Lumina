@@ -29,7 +29,7 @@ public class JwtSettingsDtoValidatorTests
     }
 
     [Fact]
-    public void JwtSettingsModelValidator_WhenAllPropertiesValid_ShouldNotHaveValidationError()
+    public void Validate_WhenAllPropertiesValid_ShouldNotHaveValidationError()
     {
         // Arrange
         JwtSettingsDto model = _fixture.Build<JwtSettingsDto>()
@@ -47,7 +47,7 @@ public class JwtSettingsDtoValidatorTests
     }
 
     [Fact]
-    public void JwtSettingsModelValidator_WhenSecretKeyIsEmpty_ShouldHaveValidationErrors()
+    public void Validate_WhenSecretKeyIsEmpty_ShouldHaveValidationErrors()
     {
         // Arrange
         JwtSettingsDto model = _fixture.Build<JwtSettingsDto>()
@@ -67,7 +67,7 @@ public class JwtSettingsDtoValidatorTests
     }
 
     [Fact]
-    public void JwtSettingsModelValidator_WhenSecretKeyTooShort_ShouldHaveValidationError()
+    public void Validate_WhenSecretKeyTooShort_ShouldHaveValidationError()
     {
         // Arrange
         JwtSettingsDto model = _fixture.Build<JwtSettingsDto>()
@@ -89,7 +89,7 @@ public class JwtSettingsDtoValidatorTests
     [InlineData(0)]
     [InlineData(-1)]
     [InlineData(-60)]
-    public void JwtSettingsModelValidator_WhenExpiryMinutesNotPositive_ShouldHaveValidationError(int minutes)
+    public void Validate_WhenExpiryMinutesNotPositive_ShouldHaveValidationError(int minutes)
     {
         // Arrange
         JwtSettingsDto model = _fixture.Build<JwtSettingsDto>()
@@ -108,7 +108,7 @@ public class JwtSettingsDtoValidatorTests
     }
 
     [Fact]
-    public void JwtSettingsModelValidator_WhenIssuerIsEmpty_ShouldHaveValidationError()
+    public void Validate_WhenIssuerIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
         JwtSettingsDto model = _fixture.Build<JwtSettingsDto>()
@@ -127,7 +127,7 @@ public class JwtSettingsDtoValidatorTests
     }
 
     [Fact]
-    public void JwtSettingsModelValidator_WhenAudienceIsEmpty_ShouldHaveValidationError()
+    public void Validate_WhenAudienceIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
         JwtSettingsDto model = _fixture.Build<JwtSettingsDto>()

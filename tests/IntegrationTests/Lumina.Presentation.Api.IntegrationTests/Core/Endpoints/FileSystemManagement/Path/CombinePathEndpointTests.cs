@@ -49,7 +49,7 @@ public class CombinePathEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithValidPaths_ShouldReturnOkResultWithCombinedPath()
+    public async Task CombinePath_WhenCalledWithValidPaths_ShouldReturnOkResultWithCombinedPath()
     {
         // Arrange
         string originalPath = System.IO.Path.GetTempPath();
@@ -70,7 +70,7 @@ public class CombinePathEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithEmptyPaths_ShouldReturnValidationProblemResult()
+    public async Task CombinePath_WhenCalledWithEmptyPaths_ShouldReturnValidationProblemResult()
     {
         // Arrange
         string originalPath = "";
@@ -100,7 +100,7 @@ public class CombinePathEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithCancellationToken_ShouldCompleteSuccessfully()
+    public async Task CombinePath_WhenCalledWithCancellationToken_ShouldCompleteSuccessfully()
     {
         // Arrange
         string originalPath = "/home/user";
@@ -115,7 +115,7 @@ public class CombinePathEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCancellationTokenIsCanceled_ShouldThrowTaskCanceledException()
+    public async Task CombinePath_WhenCancellationTokenIsCanceled_ShouldThrowTaskCanceledException()
     {
         // Arrange
         string originalPath = System.IO.Path.GetTempPath();

@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Diagnostics.CodeAnalysis;
 #endregion
 
 namespace Lumina.Application.UnitTests.Core.Plugins.Commands.ReorderLibraryMetadataProviders;
@@ -18,6 +19,7 @@ namespace Lumina.Application.UnitTests.Core.Plugins.Commands.ReorderLibraryMetad
 /// <summary>
 /// Contains unit tests for the <see cref="ReorderLibraryMetadataProvidersCommandHandler"/> class.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class ReorderLibraryMetadataProvidersCommandHandlerTests
 {
     private readonly IUnitOfWork _mockUnitOfWork;

@@ -44,7 +44,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDi
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenRateLimitExceeded_ShouldReturnTooManyRequests()
+    public async Task RecoverPassword_WhenRateLimitExceeded_ShouldReturnTooManyRequests()
     {
         // Arrange
         RecoverPasswordRequest request = new(

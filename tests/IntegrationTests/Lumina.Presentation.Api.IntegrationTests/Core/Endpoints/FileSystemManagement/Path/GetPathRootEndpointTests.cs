@@ -49,7 +49,7 @@ public class GetPathRootEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithValidPath_ShouldReturnOkResultWithPathSegmentResponse()
+    public async Task GetPathRoot_WhenCalledWithValidPath_ShouldReturnOkResultWithPathSegmentResponse()
     {
         // Arrange
         string testPath = System.IO.Path.GetTempPath();
@@ -68,7 +68,7 @@ public class GetPathRootEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithInvalidPath_ShouldReturnValidationProblemResult()
+    public async Task GetPathRoot_WhenCalledWithInvalidPath_ShouldReturnValidationProblemResult()
     {
         // Arrange
         string invalidPath = "invalid:path";
@@ -98,7 +98,7 @@ public class GetPathRootEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithEmptyPath_ShouldReturnValidationProblemResult()
+    public async Task GetPathRoot_WhenCalledWithEmptyPath_ShouldReturnValidationProblemResult()
     {
         // Arrange
         string emptyPath = "";
@@ -128,7 +128,7 @@ public class GetPathRootEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithCancellationToken_ShouldCompleteSuccessfully()
+    public async Task GetPathRoot_WhenCalledWithCancellationToken_ShouldCompleteSuccessfully()
     {
         // Arrange
         string testPath = System.IO.Path.GetTempPath();
@@ -143,7 +143,7 @@ public class GetPathRootEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCancellationTokenIsCanceled_ShouldThrowTaskCanceledException()
+    public async Task GetPathRoot_WhenCancellationTokenIsCanceled_ShouldThrowTaskCanceledException()
     {
         // Arrange
         string testPath = System.IO.Path.GetTempPath();

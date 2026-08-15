@@ -50,7 +50,7 @@ public class SplitPathEndpointTests : IClassFixture<AuthenticatedLuminaApiFactor
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithValidPath_ShouldReturnOkResultWithSplitSegments()
+    public async Task SplitPath_WhenCalledWithValidPath_ShouldReturnOkResultWithSplitSegments()
     {
         // Arrange
         string tempPath = System.IO.Path.GetTempPath();
@@ -72,7 +72,7 @@ public class SplitPathEndpointTests : IClassFixture<AuthenticatedLuminaApiFactor
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithEmptyPath_ShouldReturnValidationProblemResult()
+    public async Task SplitPath_WhenCalledWithEmptyPath_ShouldReturnValidationProblemResult()
     {
         // Arrange
         string path = "";
@@ -101,7 +101,7 @@ public class SplitPathEndpointTests : IClassFixture<AuthenticatedLuminaApiFactor
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithInvalidPath_ShouldReturnProblemDetails()
+    public async Task SplitPath_WhenCalledWithInvalidPath_ShouldReturnProblemDetails()
     {
         // Arrange
         string path = "invalid:path";
@@ -130,7 +130,7 @@ public class SplitPathEndpointTests : IClassFixture<AuthenticatedLuminaApiFactor
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCancellationTokenIsCanceled_ShouldThrowTaskCanceledException()
+    public async Task SplitPath_WhenCancellationTokenIsCanceled_ShouldThrowTaskCanceledException()
     {
         // Arrange
         string testPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "testDirectory");

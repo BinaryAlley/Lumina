@@ -29,7 +29,7 @@ public class CommonSettingsDtoValidatorTests
     }
 
     [Fact]
-    public void CommonSettingsModelValidator_WhenThemeProvided_ShouldNotHaveValidationError()
+    public void Validate_WhenThemeProvided_ShouldNotHaveValidationError()
     {
         // Arrange
         CommonSettingsDto model = _fixture.Build<CommonSettingsDto>()
@@ -44,7 +44,7 @@ public class CommonSettingsDtoValidatorTests
     }
 
     [Fact]
-    public void CommonSettingsModelValidator_WhenThemeNotProvided_ShouldNotHaveValidationError()
+    public void Validate_WhenThemeNotProvided_ShouldNotHaveValidationError()
     {
         // Arrange
         CommonSettingsDto model = _fixture.Build<CommonSettingsDto>()

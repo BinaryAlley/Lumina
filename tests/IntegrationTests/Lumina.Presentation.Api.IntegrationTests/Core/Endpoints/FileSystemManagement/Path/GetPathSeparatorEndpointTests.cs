@@ -47,7 +47,7 @@ public class GetPathSeparatorEndpointTests : IClassFixture<AuthenticatedLuminaAp
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalled_ShouldReturnOkResultWithPathSeparatorResponse()
+    public async Task GetPathSeparator_WhenCalled_ShouldReturnOkResultWithPathSeparatorResponse()
     {
         // Act
         HttpResponseMessage response = await _client.GetAsync("/api/v1/path/get-path-separator");
@@ -61,7 +61,7 @@ public class GetPathSeparatorEndpointTests : IClassFixture<AuthenticatedLuminaAp
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledMultipleTimes_ShouldReturnConsistentResults()
+    public async Task GetPathSeparator_WhenCalledMultipleTimes_ShouldReturnConsistentResults()
     {
         // Act
         HttpResponseMessage response1 = await _client.GetAsync("/api/v1/path/get-path-separator");
@@ -83,7 +83,7 @@ public class GetPathSeparatorEndpointTests : IClassFixture<AuthenticatedLuminaAp
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithCancellationToken_ShouldCompleteSuccessfully()
+    public async Task GetPathSeparator_WhenCalledWithCancellationToken_ShouldCompleteSuccessfully()
     {
         // Arrange
         using CancellationTokenSource cts = new(TimeSpan.FromSeconds(5));
@@ -96,7 +96,7 @@ public class GetPathSeparatorEndpointTests : IClassFixture<AuthenticatedLuminaAp
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCancellationTokenIsCanceled_ShouldThrowTaskCanceledException()
+    public async Task GetPathSeparator_WhenCancellationTokenIsCanceled_ShouldThrowTaskCanceledException()
     {
         // Arrange
         using CancellationTokenSource cts = new();

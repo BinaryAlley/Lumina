@@ -143,7 +143,7 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenRateLimitExceeded_ShouldReturnTooManyRequests()
+    public async Task Login_WhenRateLimitExceeded_ShouldReturnTooManyRequests()
     {
         // Arrange
         // set a fake IP for this test instance

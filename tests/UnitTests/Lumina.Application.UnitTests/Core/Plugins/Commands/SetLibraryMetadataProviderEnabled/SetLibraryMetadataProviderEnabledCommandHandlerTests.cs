@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Diagnostics.CodeAnalysis;
 #endregion
 
 namespace Lumina.Application.UnitTests.Core.Plugins.Commands.SetLibraryMetadataProviderEnabled;
@@ -17,6 +18,7 @@ namespace Lumina.Application.UnitTests.Core.Plugins.Commands.SetLibraryMetadataP
 /// <summary>
 /// Contains unit tests for the <see cref="SetLibraryMetadataProviderEnabledCommandHandler"/> class.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class SetLibraryMetadataProviderEnabledCommandHandlerTests
 {
     private readonly IUnitOfWork _mockUnitOfWork;

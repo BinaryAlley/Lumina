@@ -52,7 +52,7 @@ public class GetThumbnailEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithValidPathAndQuality_ShouldReturnOkResultWithThumbnail()
+    public async Task GetThumbnail_WhenCalledWithValidPathAndQuality_ShouldReturnOkResultWithThumbnail()
     {
         // Arrange
         int quality = 80;
@@ -68,7 +68,7 @@ public class GetThumbnailEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithInvalidPath_ShouldReturnForbiddenResult()
+    public async Task GetThumbnail_WhenCalledWithInvalidPath_ShouldReturnForbiddenResult()
     {
         // Arrange
         string invalidImagePath = "/path/to/nonexistent/image.jpg";
@@ -93,7 +93,7 @@ public class GetThumbnailEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithEmptyPath_ShouldReturnValidationProblemResult()
+    public async Task GetThumbnail_WhenCalledWithEmptyPath_ShouldReturnValidationProblemResult()
     {
         // Arrange
         string invalidImagePath = "";
@@ -123,7 +123,7 @@ public class GetThumbnailEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithInvalidQuality_ShouldReturnValidationProblemResult()
+    public async Task GetThumbnail_WhenCalledWithInvalidQuality_ShouldReturnValidationProblemResult()
     {
         // Arrange
         int invalidQuality = -1;
@@ -152,7 +152,7 @@ public class GetThumbnailEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCancellationTokenIsCanceled_ShouldThrowTaskCanceledException()
+    public async Task GetThumbnail_WhenCancellationTokenIsCanceled_ShouldThrowTaskCanceledException()
     {
         // Arrange
         int quality = 80;

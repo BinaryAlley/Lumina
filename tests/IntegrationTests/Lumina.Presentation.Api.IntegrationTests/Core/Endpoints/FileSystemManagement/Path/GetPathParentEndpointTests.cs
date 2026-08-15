@@ -52,7 +52,7 @@ public class GetPathParentEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithValidPath_ShouldReturnOkResultWithPathSegmentResponses()
+    public async Task GetPathParent_WhenCalledWithValidPath_ShouldReturnOkResultWithPathSegmentResponses()
     {
         // Arrange
         string testPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "testDirectory", "testFile.txt");
@@ -87,7 +87,7 @@ public class GetPathParentEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithRootPath_ShouldReturnForbiddenResult()
+    public async Task GetPathParent_WhenCalledWithRootPath_ShouldReturnForbiddenResult()
     {
         // Arrange
         string rootPath = System.IO.Path.GetPathRoot(System.IO.Path.GetTempPath())!;
@@ -112,7 +112,7 @@ public class GetPathParentEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithInvalidPath_ShouldReturnValidationProblemResult()
+    public async Task GetPathParent_WhenCalledWithInvalidPath_ShouldReturnValidationProblemResult()
     {
         // Arrange
         string invalidPath = "invalid:path";
@@ -141,7 +141,7 @@ public class GetPathParentEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithEmptyPath_ShouldReturnValidationProblemResult()
+    public async Task GetPathParent_WhenCalledWithEmptyPath_ShouldReturnValidationProblemResult()
     {
         // Arrange
         string emptyPath = "";
@@ -171,7 +171,7 @@ public class GetPathParentEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCalledWithCancellationToken_ShouldCompleteSuccessfully()
+    public async Task GetPathParent_WhenCalledWithCancellationToken_ShouldCompleteSuccessfully()
     {
         // Arrange
         string testPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "testDirectory");
@@ -186,7 +186,7 @@ public class GetPathParentEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCancellationTokenIsCanceled_ShouldThrowTaskCanceledException()
+    public async Task GetPathParent_WhenCancellationTokenIsCanceled_ShouldThrowTaskCanceledException()
     {
         // Arrange
         string testPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "testDirectory");
