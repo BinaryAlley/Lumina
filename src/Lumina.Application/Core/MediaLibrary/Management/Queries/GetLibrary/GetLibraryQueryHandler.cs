@@ -6,10 +6,12 @@ using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
+using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
 using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -62,6 +64,12 @@ public class GetLibraryQueryHandler : IQueryHandler<GetLibraryQuery, Result<Libr
         if (validationResult.Count > 0)
             return validationResult;
 
+        // an authenticated request must always carry a user identity
+        Guid? currentUserId = _currentUserService.UserId;
+        if (currentUserId is null)
+            return ApplicationErrors.Authorization.NotAuthorized;
+        Guid userId = currentUserId.Value;
+
         // get the library with the specified id from the repository
         Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository.GetByIdAsync(query.Id, cancellationToken).ConfigureAwait(false);
         if (getLibraryResult.IsFailure)
@@ -69,9 +77,10 @@ public class GetLibraryQueryHandler : IQueryHandler<GetLibraryQuery, Result<Libr
         else if (getLibraryResult.Value is null)
             return DomainErrors.Library.LibraryNotFound;
 
-        // if the user that requested the library is not an Admin or is not the owner of the library, they do not have the right to view it
-        if (getLibraryResult.Value.UserId != _currentUserService.UserId ||
-            !await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false))
+        // admins can see all libraries; for everyone else, only the libraries they own
+        bool canAccessLibrary = await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
+            userId, new LibraryOwnershipPolicyContext(query.Id), cancellationToken).ConfigureAwait(false);
+        if (!canAccessLibrary)
             return ApplicationErrors.Authorization.NotAuthorized;
 
         return getLibraryResult.Value.ToResponse();

@@ -6,6 +6,7 @@ using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
+using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
@@ -13,6 +14,7 @@ using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Progress;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -69,6 +71,12 @@ public class GetLibraryScanProgressQueryHandler : IQueryHandler<GetLibraryScanPr
         if (validationResult.Count > 0)
             return validationResult;
 
+        // an authenticated request must always carry a user identity
+        Guid? currentUserId = _currentUserService.UserId;
+        if (currentUserId is null)
+            return ApplicationErrors.Authorization.NotAuthorized;
+        Guid userId = currentUserId.Value;
+
         // get the library with the specified id from the repository
         Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository.GetByIdAsync(query.LibraryId, cancellationToken).ConfigureAwait(false);
         if (getLibraryResult.IsFailure)
@@ -76,13 +84,14 @@ public class GetLibraryScanProgressQueryHandler : IQueryHandler<GetLibraryScanPr
         else if (getLibraryResult.Value is null)
             return DomainErrors.Library.LibraryNotFound;
 
-        // if the user that made the request is not an Admin or is not the owner of the library, they do not have the right to view its scan progress
-        if (getLibraryResult.Value.UserId != _currentUserService.UserId ||
-            !await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false))
+        // admins can view the progress of any library scan; for everyone else, only the ones of the libraries they own
+        bool canAccessLibrary = await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
+            userId, new LibraryOwnershipPolicyContext(query.LibraryId), cancellationToken).ConfigureAwait(false);
+        if (!canAccessLibrary)
             return ApplicationErrors.Authorization.NotAuthorized;
 
         Result<MediaLibraryScanProgress> getProgressResult = _mediaLibrariesScanProgressTracker.GetScanProgress(
-            MediaLibraryScanCompositeId.Create(ScanId.Create(query.ScanId), UserId.Create(_currentUserService.UserId!.Value)));
+            MediaLibraryScanCompositeId.Create(ScanId.Create(query.ScanId), UserId.Create(userId)));
         if (getProgressResult.IsFailure)
             return getProgressResult.Errors;
 

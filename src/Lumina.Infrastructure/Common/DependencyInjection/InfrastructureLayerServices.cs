@@ -2,6 +2,7 @@
 using Lumina.Application.Common.DomainEvents;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
+using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.Over18;
 using Lumina.Application.Common.Infrastructure.Models.DTO.Configuration;
 using Lumina.Application.Common.Infrastructure.Plugins;
@@ -19,6 +20,7 @@ using Lumina.Infrastructure.Common.Models.DTO.Plugins;
 using Lumina.Infrastructure.Core.Authentication;
 using Lumina.Infrastructure.Core.Authorization;
 using Lumina.Infrastructure.Core.Authorization.Policies.Common.Factory;
+using Lumina.Infrastructure.Core.Authorization.Policies.LibraryOwnership;
 using Lumina.Infrastructure.Core.Authorization.Policies.Over18;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Cancellation;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Common;
@@ -80,6 +82,7 @@ public static class InfrastructureLayerServices
 
         // authorization
         services.AddScoped<IOver18Policy, Over18Policy>();
+        services.AddScoped<ILibraryOwnershipPolicy, LibraryOwnershipPolicy>();
         services.AddScoped<IAuthorizationPolicyFactory, AuthorizationPolicyFactory>();
         services.AddScoped<IAuthorizationService, AuthorizationService>();
 

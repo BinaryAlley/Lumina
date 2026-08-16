@@ -14,7 +14,7 @@ namespace Lumina.Infrastructure.Fixtures.Core.Authorization;
 [ExcludeFromCodeCoverage]
 public class TestAuthorizationPolicy : IAuthorizationPolicy
 {
-    public Task<bool> EvaluateAsync(Guid userId, CancellationToken cancellationToken)
+    public Task<bool> EvaluateAsync(Guid userId, PolicyContext? context, CancellationToken cancellationToken)
     {
         return Task.FromResult(true);
     }

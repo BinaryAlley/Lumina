@@ -4,10 +4,12 @@ using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -51,19 +53,25 @@ public class GetLibrariesQueryHandler : IQueryHandler<GetLibrariesQuery, Result<
     /// </returns>
     public async Task<Result<LibraryResponse[]>> HandleAsync(GetLibrariesQuery query, CancellationToken cancellationToken)
     {
+        // an authenticated request must always carry a user identity
+        Guid? currentUserId = _currentUserService.UserId;
+        if (currentUserId is null)
+            return Errors.Authorization.NotAuthorized;
+        Guid userId = currentUserId.Value;
+
         // get the libraries from the repository
         Result<IEnumerable<LibraryEntity>> getLibrariesResult = await _unitOfWork.LibraryRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
         if (getLibrariesResult.IsFailure)
             return getLibrariesResult.Errors;
 
         // admins can see all libraries
-        if (await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false))
+        if (await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false))
             return Result.From(getLibrariesResult.Value.Select(library => library.ToResponse()).ToArray());
         else
         {
             // for regular users, only take the libraries that belong to them
             LibraryResponse[] userLibraries = [.. getLibrariesResult.Value
-                .Where(library => library.UserId == _currentUserService.UserId)
+                .Where(library => library.UserId == userId)
                 .Select(library => library.ToResponse())];
 
             return Result.From(userLibraries);

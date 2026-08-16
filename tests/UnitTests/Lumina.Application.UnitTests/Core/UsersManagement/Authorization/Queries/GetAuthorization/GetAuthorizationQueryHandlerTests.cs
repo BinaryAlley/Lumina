@@ -113,6 +113,22 @@ public class GetAuthorizationQueryHandlerTests
     }
 
     [Fact]
+    public async Task HandleAsync_WhenUserIsNotAuthenticated_ShouldReturnNotAuthorizedError()
+    {
+        // Arrange
+        GetAuthorizationQuery query = _getAuthorizationQueryFixture.Create();
+        _mockCurrentUserService.UserId.Returns((Guid?)null);
+
+        // Act
+        Result<AuthorizationResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Authorization.NotAuthorized, result.FirstError);
+        await _mockAuthorizationService.DidNotReceive().GetUserAuthorizationAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task HandleAsync_WhenGetCurrentUserAuthorizationFails_ShouldReturnError()
     {
         // Arrange

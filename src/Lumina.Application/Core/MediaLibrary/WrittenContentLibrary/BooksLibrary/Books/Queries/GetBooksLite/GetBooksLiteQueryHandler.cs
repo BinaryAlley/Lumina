@@ -6,15 +6,16 @@ using Lumina.Application.Common.DataAccess.Repositories.Books;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Lumina.Contracts.Responses.Common;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
+using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Errors;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DTO.Pagination;
 #endregion
 
@@ -59,14 +60,17 @@ public class GetBooksLiteQueryHandler : IQueryHandler<GetBooksLiteQuery, Result<
         if (validationResult.Count > 0)
             return validationResult;
 
-        // check if the user has the rights to access the library they are requesting (admins can see all libraries)
-        bool isAdmin = await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false);
-        if (!isAdmin) // if its not an admin, then it must own the library
-        {
-            Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository.GetByIdAsync(query.Filter.LibraryId, cancellationToken).ConfigureAwait(false);
-            if (getLibraryResult.IsFailure || getLibraryResult.Value?.UserId != _currentUserService.UserId)
-                return Errors.Authorization.NotAuthorized;
-        }
+        // an authenticated request must always carry a user identity
+        Guid? currentUserId = _currentUserService.UserId;
+        if (currentUserId is null)
+            return Errors.Authorization.NotAuthorized;
+        Guid userId = currentUserId.Value;
+
+        // admins can see all libraries; for everyone else, only the libraries they own
+        bool canAccessLibrary = await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
+            userId, new LibraryOwnershipPolicyContext(query.Filter.LibraryId), cancellationToken).ConfigureAwait(false);
+        if (!canAccessLibrary)
+            return Errors.Authorization.NotAuthorized;
 
         // get all books of the media library from the book repository
         Result<PaginatedResultDto<BookEntity>> getBooksResult = await _unitOfWork.BookRepository.GetPaginatedAsync(

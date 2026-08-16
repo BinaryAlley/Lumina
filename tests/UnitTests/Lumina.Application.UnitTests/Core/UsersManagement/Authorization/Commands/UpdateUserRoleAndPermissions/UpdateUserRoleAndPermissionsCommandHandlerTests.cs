@@ -89,6 +89,23 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
     }
 
     [Fact]
+    public async Task HandleAsync_WhenUserIsNotAuthenticated_ShouldReturnNotAuthorizedError()
+    {
+        // Arrange
+        UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.Create();
+        _mockCurrentUserService.UserId.Returns((Guid?)null);
+
+        // Act
+        Result<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
+        await _mockAuthorizationService.DidNotReceive().IsInRoleAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+        await _mockUserRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task HandleAsync_WhenUserDoesNotExist_ShouldReturnUserDoesNotExistError()
     {
         // Arrange

@@ -4,6 +4,7 @@ using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
@@ -11,6 +12,7 @@ using Lumina.Contracts.Responses.MediaLibrary.Management;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Progress;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -58,19 +60,24 @@ public class GetRunningLibraryScansQueryHandler : IQueryHandler<GetRunningLibrar
     /// </returns>
     public async Task<Result<IEnumerable<MediaLibraryScanProgressResponse>>> HandleAsync(GetRunningLibraryScansQuery query, CancellationToken cancellationToken)
     {
+        // an authenticated request must always carry a user identity
+        Guid? currentUserId = _currentUserService.UserId;
+        if (currentUserId is null)
+            return Errors.Authorization.NotAuthorized;
+        Guid userId = currentUserId.Value;
+
         // get the ongoing library scans from the repository
         Result<IEnumerable<LibraryScanEntity>> getRunningScansResult = await _unitOfWork.LibraryScanRepository.GetRunningScansAsync(cancellationToken).ConfigureAwait(false);
         if (getRunningScansResult.IsFailure)
             return getRunningScansResult.Errors;
 
-        // filter the library scans by what the user is allowed to see
+        // filter the library scans by what the user is allowed to see: admins see all libraries, regular users only their own
         LibraryScanEntity[] userRunningRepositoryLibraryScans = [];
-        // admins can see all libraries
-        if (!await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false))
+        if (await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false))
             userRunningRepositoryLibraryScans = [.. getRunningScansResult.Value];
-        else // for regular users, only take the libraries that belong to them
+        else
             userRunningRepositoryLibraryScans = getRunningScansResult.Value
-                .Where(libraryScan => libraryScan.UserId == _currentUserService.UserId).ToArray();
+                .Where(libraryScan => libraryScan.UserId == userId).ToArray();
 
         // for each of the filtered library scans, get their progress
         List<MediaLibraryScanProgressResponse> libraryScanProgresses = [];

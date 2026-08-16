@@ -1,11 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.Books;
-using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
+using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Queries.GetBooksLite;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
@@ -15,7 +14,6 @@ using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.Common;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -38,7 +36,6 @@ public class GetBooksLiteQueryHandlerTests
 {
     private readonly IUnitOfWork _mockUnitOfWork;
     private readonly IBookRepository _mockBookRepository;
-    private readonly ILibraryRepository _mockLibraryRepository;
     private readonly IAuthorizationService _mockAuthorizationService;
     private readonly ICurrentUserService _mockCurrentUserService;
     private readonly IValidator<GetBooksLiteQuery> _mockValidator;
@@ -55,35 +52,22 @@ public class GetBooksLiteQueryHandlerTests
         _mockBookRepository = Substitute.For<IBookRepository>();
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
         _mockUnitOfWork.BookRepository.Returns(_mockBookRepository);
-        _mockLibraryRepository = Substitute.For<ILibraryRepository>();
-        _mockUnitOfWork.LibraryRepository.Returns(_mockLibraryRepository);
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
         _mockValidator = Substitute.For<IValidator<GetBooksLiteQuery>>();
         _userId = Guid.NewGuid();
 
-        // default stubs: the current user is not an admin, but owns the requested library
+        // default stubs: the current user is authenticated and the library ownership policy allows access
         _mockCurrentUserService.UserId.Returns(_userId);
-        _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>()).Returns(false);
-        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
-            .Returns(Result.From((LibraryEntity?)new LibraryEntity
-            {
-                Id = Guid.NewGuid(),
-                UserId = _userId,
-                Title = "Test Library",
-                LibraryType = LibraryType.EBook,
-                ContentLocations = [],
-                CreatedBy = _userId,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedBy = null
-            }));
+        _mockAuthorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(_userId, Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>())
+            .Returns(true);
         _mockValidator.Validate(Arg.Any<GetBooksLiteQuery>()).Returns([]);
 
         _sut = new GetBooksLiteQueryHandler(_mockUnitOfWork, _mockAuthorizationService, _mockCurrentUserService, _mockValidator);
     }
 
     [Fact]
-    public async Task HandleAsync_WhenRepositoryReturnsPaginatedBooks_ShouldReturnMappedPaginatedResponses()
+    public async Task HandleAsync_WhenPolicyAllowsAccess_ShouldReturnMappedPaginatedResponses()
     {
         // Arrange
         GetBooksLiteQuery query = _getBooksLiteQueryFixture.Create();
@@ -241,53 +225,12 @@ public class GetBooksLiteQueryHandlerTests
     }
 
     [Fact]
-    public async Task HandleAsync_WhenUserIsAdmin_ShouldBypassLibraryOwnershipCheck()
+    public async Task HandleAsync_WhenPolicyDeniesAccess_ShouldReturnNotAuthorizedError()
     {
         // Arrange
         GetBooksLiteQuery query = _getBooksLiteQueryFixture.Create();
-        _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>()).Returns(true);
-        PaginatedResultDto<BookEntity> paginatedBooks = new()
-        {
-            Data = [],
-            CurrentPage = 1,
-            PerPage = 10,
-            Count = 0,
-            NumberOfPages = 0
-        };
-        _mockBookRepository.GetPaginatedAsync(
-                Arg.Any<PaginationDataDto?>(),
-                Arg.Any<string?>(),
-                Arg.Any<SortOrder?>(),
-                Arg.Any<LibraryFilterDto>(),
-                Arg.Any<CancellationToken>())
-            .Returns(Result.From(paginatedBooks));
-
-        // Act
-        Result<PaginatedResponse<BookLiteResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
-
-        // Assert
-        Assert.False(result.IsFailure);
-        await _mockUnitOfWork.LibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
-    }
-
-    [Fact]
-    public async Task HandleAsync_WhenUserDoesNotOwnLibrary_ShouldReturnNotAuthorizedError()
-    {
-        // Arrange
-        GetBooksLiteQuery query = _getBooksLiteQueryFixture.Create();
-        Guid otherUserId = Guid.NewGuid();
-        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
-            .Returns(Result.From((LibraryEntity?)new LibraryEntity
-            {
-                Id = Guid.NewGuid(),
-                UserId = otherUserId,
-                Title = "Someone else's library",
-                LibraryType = LibraryType.EBook,
-                ContentLocations = [],
-                CreatedBy = otherUserId,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedBy = null
-            }));
+        _mockAuthorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(_userId, Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>())
+            .Returns(false);
 
         // Act
         Result<PaginatedResponse<BookLiteResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
@@ -295,16 +238,17 @@ public class GetBooksLiteQueryHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
+        await _mockAuthorizationService.Received(1).EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
+            _userId, Arg.Is<LibraryOwnershipPolicyContext>(context => context.LibraryId == query.Filter.LibraryId), Arg.Any<CancellationToken>());
         await _mockBookRepository.DidNotReceive().GetPaginatedAsync(Arg.Any<PaginationDataDto?>(), Arg.Any<string?>(), Arg.Any<SortOrder?>(), Arg.Any<LibraryFilterDto>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
-    public async Task HandleAsync_WhenLibraryDoesNotExist_ShouldReturnNotAuthorizedError()
+    public async Task HandleAsync_WhenUserIsNotAuthenticated_ShouldReturnNotAuthorizedError()
     {
         // Arrange
         GetBooksLiteQuery query = _getBooksLiteQueryFixture.Create();
-        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
-            .Returns(Result<LibraryEntity?>.Success(null));
+        _mockCurrentUserService.UserId.Returns((Guid?)null);
 
         // Act
         Result<PaginatedResponse<BookLiteResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
@@ -312,6 +256,7 @@ public class GetBooksLiteQueryHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
+        await _mockAuthorizationService.DidNotReceive().EvaluatePolicyAsync<ILibraryOwnershipPolicy>(Arg.Any<Guid>(), Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>());
         await _mockBookRepository.DidNotReceive().GetPaginatedAsync(Arg.Any<PaginationDataDto?>(), Arg.Any<string?>(), Arg.Any<SortOrder?>(), Arg.Any<LibraryFilterDto>(), Arg.Any<CancellationToken>());
     }
 
@@ -328,7 +273,7 @@ public class GetBooksLiteQueryHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.Library.LibraryIdCannotBeEmpty, result.FirstError);
-        await _mockAuthorizationService.DidNotReceive().IsInRoleAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+        await _mockAuthorizationService.DidNotReceive().EvaluatePolicyAsync<ILibraryOwnershipPolicy>(Arg.Any<Guid>(), Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>());
         await _mockBookRepository.DidNotReceive().GetPaginatedAsync(Arg.Any<PaginationDataDto?>(), Arg.Any<string?>(), Arg.Any<SortOrder?>(), Arg.Any<LibraryFilterDto>(), Arg.Any<CancellationToken>());
     }
 }

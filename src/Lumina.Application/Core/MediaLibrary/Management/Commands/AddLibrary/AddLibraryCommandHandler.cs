@@ -79,9 +79,15 @@ public class AddLibraryCommandHandler : ICommandHandler<AddLibraryCommand, Resul
         if (validationResult.Count > 0)
             return validationResult;
 
-        // if the user that made the request is not an Admin or they don't have the permission to manage media libraries, they do not have the right to create it
-        if (!await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false) &&
-            !await _authorizationService.HasPermissionAsync(_currentUserService.UserId!.Value, AuthorizationPermission.CanCreateLibraries, cancellationToken).ConfigureAwait(false))
+        // an authenticated request must always carry a user identity
+        Guid? currentUserId = _currentUserService.UserId;
+        if (currentUserId is null)
+            return ApplicationErrors.Authorization.NotAuthorized;
+        Guid userId = currentUserId.Value;
+
+        // only admins or users with the permission to manage media libraries can create them
+        if (!await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false) &&
+            !await _authorizationService.HasPermissionAsync(userId, AuthorizationPermission.CanCreateLibraries, cancellationToken).ConfigureAwait(false))
             return ApplicationErrors.Authorization.NotAuthorized;
 
         // make sure the file is an actual supported image
@@ -100,7 +106,7 @@ public class AddLibraryCommandHandler : ICommandHandler<AddLibraryCommand, Resul
 
         // create a domain library object
         Result<Library> createLibraryResult = Library.Create(
-            UserId.Create(_currentUserService.UserId!.Value),
+            UserId.Create(userId),
             command.Title!,
             Enum.Parse<LibraryType>(command.LibraryType!),
             command.ContentLocations!,

@@ -3,6 +3,7 @@ using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.Infrastructure.Authorization.Policies.Common.Base;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.Over18;
 using Lumina.Application.Common.Infrastructure.Time;
 using System;
@@ -32,12 +33,13 @@ public class Over18Policy : IOver18Policy
     }
 
     /// <summary>
-    /// Evaluates the policy for the user identified by <paramref name="userId"/>.
+    /// Evaluates the policy for the user identified by <paramref name="userId"/>. The <paramref name="context"/> is not used by this policy.
     /// </summary>
     /// <param name="userId">The unique identifier of the user for which to evaluate the policy.</param>
+    /// <param name="context">The context describing the resource against which the policy is evaluated. Not used by this policy.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns><see langword="true"/> if the policy evaluation succeeds, <see langword="false"/> otherwise.</returns>
-    public async Task<bool> EvaluateAsync(Guid userId, CancellationToken cancellationToken)
+    public async Task<bool> EvaluateAsync(Guid userId, PolicyContext? context, CancellationToken cancellationToken)
     {
         Result<UserEntity?> getUserResult = await _unitOfWork.UserRepository.GetByIdAsync(userId, cancellationToken).ConfigureAwait(false);
         if (getUserResult.IsFailure || getUserResult.Value is null)

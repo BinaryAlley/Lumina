@@ -8,9 +8,11 @@ using Lumina.Application.Common.DomainEvents;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
+using Lumina.Application.Common.Errors;
 using Lumina.Domain.Common.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Cancellation;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -56,6 +58,12 @@ public class CancelLibrariesScanCommandHandler : ICommandHandler<CancelLibraries
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Success>> HandleAsync(CancelLibrariesScanCommand command, CancellationToken cancellationToken)
     {
+        // an authenticated request must always carry a user identity
+        Guid? currentUserId = _currentUserService.UserId;
+        if (currentUserId is null)
+            return Errors.Authorization.NotAuthorized;
+        Guid userId = currentUserId.Value;
+
         // get the running library scans of the current user from the repository
         Result<IEnumerable<LibraryScanEntity>> getRunningLibraryScansResult = await _unitOfWork.LibraryScanRepository.GetRunningScansAsync(cancellationToken).ConfigureAwait(false);
         if (getRunningLibraryScansResult.IsFailure)
@@ -64,10 +72,10 @@ public class CancelLibrariesScanCommandHandler : ICommandHandler<CancelLibraries
         // filter the library scans to process
         List<LibraryScanEntity> authorizedLibraryScans = [];
         // admins can see all library scans
-        if (await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false))
+        if (await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false))
             authorizedLibraryScans.AddRange(getRunningLibraryScansResult.Value);
         else // for regular users, only take the library scans that belong to them
-            authorizedLibraryScans.AddRange(getRunningLibraryScansResult.Value.Where(libraryScan => libraryScan.UserId == _currentUserService.UserId));
+            authorizedLibraryScans.AddRange(getRunningLibraryScansResult.Value.Where(libraryScan => libraryScan.UserId == userId));
 
         // convert persistence library scans to domain entities
         IEnumerable<Result<LibraryScan>> libraryScansDomainResult = authorizedLibraryScans.ToDomainEntities();
