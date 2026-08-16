@@ -14,6 +14,7 @@ public static partial class Errors
         public static Error CannotScanLockedLibrary => Error.Forbidden(description: nameof(CannotScanLockedLibrary));
         public static Error CannotScanDisabledLibrary => Error.Forbidden(description: nameof(CannotScanDisabledLibrary));
         public static Error LibraryIdCannotBeEmpty => Error.Validation(description: nameof(LibraryIdCannotBeEmpty));
+        public static Error FilterMustIncludeLibraryId => Error.Validation(description: nameof(FilterMustIncludeLibraryId));
         public static Error LibraryAlreadyExists => Error.Conflict(description: nameof(LibraryAlreadyExists));
         public static Error LibraryNotFound => Error.NotFound(description: nameof(LibraryNotFound));
         public static Error LibraryTypeCannotBeNull => Error.Validation(description: nameof(LibraryTypeCannotBeNull));

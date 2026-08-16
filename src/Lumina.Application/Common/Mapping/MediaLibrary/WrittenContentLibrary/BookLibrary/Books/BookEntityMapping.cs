@@ -1,19 +1,20 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
 using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
+using Lumina.Contracts.Responses.Common;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
-
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.ExternalIdentifiers.LibraryManagementBoundedContext.LibraryAggregate;
+using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -225,8 +226,68 @@ public static class BookEntityMapping
     /// </summary>
     /// <param name="repositoryEntities">The repository entities to be converted.</param>
     /// <returns>The converted reponses.</returns>
-    public static IEnumerable<BookResponse> ToResponses(this IEnumerable<BookEntity> repositoryEntities)
+    public static IReadOnlyList<BookResponse> ToResponses(this IEnumerable<BookEntity> repositoryEntities)
     {
-        return repositoryEntities.Select(repositoryEntity => repositoryEntity.ToResponse());
+        return [.. repositoryEntities.Select(repositoryEntity => repositoryEntity.ToResponse())];
+    }
+
+    /// <summary>
+    /// Converts <paramref name="repositoryEntities"/> to a paginated collection of <see cref="BookResponse"/>.
+    /// </summary>
+    /// <param name="repositoryEntities">The paginated repository entities to be converted.</param>
+    /// <returns>The converted paginated responses.</returns>
+    public static PaginatedResponse<BookResponse> ToResponses(this PaginatedResultDto<BookEntity> repositoryEntities)
+    {
+        return new PaginatedResponse<BookResponse>
+        {
+            Data = repositoryEntities.Data.ToResponses(),
+            CurrentPage = repositoryEntities.CurrentPage,
+            PerPage = repositoryEntities.PerPage,
+            Count = repositoryEntities.Count,
+            NumberOfPages = repositoryEntities.NumberOfPages
+        };
+    }
+
+    /// <summary>
+    /// Converts <paramref name="repositoryEntity"/> to <see cref="BookLiteResponse"/>.
+    /// </summary>
+    /// <param name="repositoryEntity">The repository entity to be converted.</param>
+    /// <returns>The converted response entity.</returns>
+    public static BookLiteResponse ToLiteResponse(this BookEntity repositoryEntity)
+    {
+        return new BookLiteResponse(
+            repositoryEntity.Id,
+            repositoryEntity.Title,
+            repositoryEntity.ReReleaseYear ?? repositoryEntity.OriginalReleaseYear,
+            // TODO: populate from the book cover when cover support is implemented
+            null
+        );
+    }
+
+    /// <summary>
+    /// Converts <paramref name="repositoryEntities"/> to a collection of <see cref="BookLiteResponse"/>.
+    /// </summary>
+    /// <param name="repositoryEntities">The repository entities to be converted.</param>
+    /// <returns>The converted reponses.</returns>
+    public static IReadOnlyList<BookLiteResponse> ToLiteResponses(this IEnumerable<BookEntity> repositoryEntities)
+    {
+        return [.. repositoryEntities.Select(repositoryEntity => repositoryEntity.ToLiteResponse())];
+    }
+
+    /// <summary>
+    /// Converts <paramref name="repositoryEntities"/> to a paginated collection of <see cref="BookLiteResponse"/>.
+    /// </summary>
+    /// <param name="repositoryEntities">The paginated repository entities to be converted.</param>
+    /// <returns>The converted paginated responses.</returns>
+    public static PaginatedResponse<BookLiteResponse> ToLiteResponses(this PaginatedResultDto<BookEntity> repositoryEntities)
+    {
+        return new PaginatedResponse<BookLiteResponse>
+        {
+            Data = repositoryEntities.Data.ToLiteResponses(),
+            CurrentPage = repositoryEntities.CurrentPage,
+            PerPage = repositoryEntities.PerPage,
+            Count = repositoryEntities.Count,
+            NumberOfPages = repositoryEntities.NumberOfPages
+        };
     }
 }

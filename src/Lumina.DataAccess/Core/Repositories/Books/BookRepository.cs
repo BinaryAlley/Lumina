@@ -1,11 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Application.Common.DataAccess.Repositories.Books;
 using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Application.Common.DataAccess.Repositories.Books;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
+using Lumina.Application.Common.Specifications;
+using Lumina.DataAccess.Core.Repositories.Books.Specifications;
 using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Lumina.Domain.Common.Errors;
+using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -54,8 +59,8 @@ internal sealed class BookRepository : IBookRepository
             .ToListAsync(cancellationToken).ConfigureAwait(false);
 
         // replace tags and genres in the book with existing ones
-        book.Tags = new HashSet<TagEntity>(book.Tags.Select(tag => existingTags.FirstOrDefault(existingTag => existingTag.Name == tag.Name) ?? tag));
-        book.Genres = new HashSet<GenreEntity>(book.Genres.Select(genre => existingGenres.FirstOrDefault(existingGenre => existingGenre.Name == genre.Name) ?? genre));
+        book.Tags = [.. book.Tags.Select(tag => existingTags.FirstOrDefault(existingTag => existingTag.Name == tag.Name) ?? tag)];
+        book.Genres = [.. book.Genres.Select(genre => existingGenres.FirstOrDefault(existingGenre => existingGenre.Name == genre.Name) ?? genre)];
 
         _luminaDbContext.Books.Add(book);
         return Result.Created;
@@ -88,6 +93,73 @@ internal sealed class BookRepository : IBookRepository
             .Include(book => book.Genres)
             .Include(book => book.ISBNs)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Gets paginated books.
+    /// </summary>
+    /// <typeparam name="TFilter">The type of the filter used for filtering the data.</typeparam>
+    /// <param name="paginationData">The pagination data that includes the current page and the number of items per page to retrieve. If <see langword="null"/>, all matching books are returned.</param>
+    /// <param name="sortBy">The name of the fields by which to sort the results.</param>
+    /// <param name="sortOrder">The direction in which to sort the results.</param>
+    /// <param name="filterModel">The model containing the parameters used to filter the results.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="PaginatedResultDto{BookEntity}"/>, or an error.</returns>
+    public async Task<Result<PaginatedResultDto<BookEntity>>> GetPaginatedAsync<TFilter>(PaginationDataDto? paginationData, string? sortBy = null, SortOrder? sortOrder = null, TFilter? filterModel = null, CancellationToken cancellationToken = default) where TFilter : BaseFilterDto
+    {
+        IQueryable<BookEntity> booksQuery = _luminaDbContext.Books
+            .Include(book => book.Tags)
+            .Include(book => book.Genres)
+            .Include(book => book.ISBNs)
+            .Include(book => book.Ratings)
+            .AsNoTracking();
+
+        // books should always be retrieved only per owning libraries
+        if (filterModel is not LibraryFilterDto libraryFilter || libraryFilter.LibraryId == Guid.Empty)
+            return Errors.Library.FilterMustIncludeLibraryId;
+
+        booksQuery = booksQuery.Where(book => book.LibraryId == libraryFilter.LibraryId);
+
+        FilterSpecification<BookEntity>? filterSpecification = BuildFilterSpecification(libraryFilter.SearchTerm);
+        // apply filtering
+        if (filterSpecification is not null)
+            booksQuery = booksQuery.Where(filterSpecification.ToExpression());
+
+        // apply sorting based on the specified sortBy and sortOrder parameters
+        booksQuery = ApplySorting(booksQuery, sortBy, sortOrder ?? SortOrder.Ascending);
+
+        // if no pagination was requested, return all the books of the library
+        if (paginationData is null)
+        {
+            IReadOnlyList<BookEntity> allBooks = await booksQuery.ToListAsync(cancellationToken).ConfigureAwait(false);
+            return new PaginatedResultDto<BookEntity>
+            {
+                Data = allBooks,
+                CurrentPage = 1,
+                PerPage = allBooks.Count,
+                Count = allBooks.Count,
+                NumberOfPages = 1
+            };
+        }
+
+        int count = await booksQuery.Select(book => book.Id).CountAsync(cancellationToken).ConfigureAwait(false);
+        int numberOfPages = (int)Math.Ceiling((double)count / paginationData.PerPage);
+        int currentPage = Math.Min(paginationData.CurrentPage, Math.Max(1, numberOfPages)); // make sure current page doesn't exceed maximum number of pages
+
+        // apply pagination
+        IReadOnlyList<BookEntity> paginatedResult = await booksQuery
+            .Skip((currentPage - 1) * paginationData.PerPage)
+            .Take(paginationData.PerPage)
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
+
+        return new PaginatedResultDto<BookEntity>
+        {
+            Data = paginatedResult,
+            CurrentPage = currentPage,
+            PerPage = paginationData.PerPage,
+            Count = count,
+            NumberOfPages = numberOfPages
+        };
     }
 
     /// <summary>
@@ -175,5 +247,46 @@ internal sealed class BookRepository : IBookRepository
         // update the scalar properties of the book
         _luminaDbContext.Entry(foundBook).CurrentValues.SetValues(data);
         return Result.Updated;
+    }
+
+    /// <summary>
+    /// Sorts a books query by the given field name, defaulting to <see cref="BookEntity.Title"/>.
+    /// </summary>
+    /// <param name="booksQuery">The query to sort.</param>
+    /// <param name="sortBy">The field to sort by (case-insensitive).</param>
+    /// <param name="sortOrder">The direction of the sorting.</param>
+    private static IOrderedQueryable<BookEntity> ApplySorting(IQueryable<BookEntity> booksQuery, string? sortBy, SortOrder sortOrder)
+    {
+        return sortBy?.ToLower() switch
+        {
+            "languagecode" => sortOrder == SortOrder.Descending
+                ? booksQuery.OrderByDescending(book => book.LanguageCode)
+                : booksQuery.OrderBy(book => book.LanguageCode),
+            "format" => sortOrder == SortOrder.Descending
+                ? booksQuery.OrderBy(book => book.Format == null).ThenByDescending(book => book.Format)
+                : booksQuery.OrderBy(book => book.Format == null).ThenBy(book => book.Format),
+            "metadataprovider" => sortOrder == SortOrder.Descending
+                ? booksQuery.OrderByDescending(book => book.MetadataProvider)
+                : booksQuery.OrderBy(book => book.MetadataProvider),
+            _ => sortOrder == SortOrder.Descending
+                ? booksQuery.OrderByDescending(book => book.Title)
+                : booksQuery.OrderBy(book => book.Title),
+        };
+    }
+
+    /// <summary>
+    /// Builds a filter specification for querying books.
+    /// </summary>
+    /// <param name="searchTerm">The search term used to filter results.</param>
+    /// <returns>A filter specification that can be used to query books matching the provided criteria.</returns>
+    private static FilterSpecification<BookEntity>? BuildFilterSpecification(string? searchTerm)
+    {
+        FilterSpecification<BookEntity>? filterSpecification = null;
+        
+        // include the search term filter here, if provided
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+            filterSpecification = new BookSearchSpecification(searchTerm);
+
+        return filterSpecification;
     }
 }
