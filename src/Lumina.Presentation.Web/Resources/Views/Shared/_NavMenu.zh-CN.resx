@@ -177,8 +177,8 @@
   <data name="Music" xml:space="preserve">
     <value>音乐</value>
   </data>
-  <data name="Options" xml:space="preserve">
-    <value>选项</value>
+  <data name="Settings" xml:space="preserve">
+    <value>设置</value>
   </data>
   <data name="Profile" xml:space="preserve">
     <value>个人资料</value>

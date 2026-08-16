@@ -177,8 +177,8 @@
   <data name="Music" xml:space="preserve">
     <value>Música</value>
   </data>
-  <data name="Options" xml:space="preserve">
-    <value>Opciones</value>
+  <data name="Settings" xml:space="preserve">
+    <value>Configuración</value>
   </data>
   <data name="Profile" xml:space="preserve">
     <value>Perfil</value>

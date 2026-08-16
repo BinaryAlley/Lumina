@@ -177,8 +177,8 @@
   <data name="Music" xml:space="preserve">
     <value>音楽</value>
   </data>
-  <data name="Options" xml:space="preserve">
-    <value>オプション</value>
+  <data name="Settings" xml:space="preserve">
+    <value>設定</value>
   </data>
   <data name="Profile" xml:space="preserve">
     <value>プロフィール</value>

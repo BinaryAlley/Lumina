@@ -106,7 +106,7 @@
                     @_localizer["Tools"]
                 </div>
                 <ul>
-                    <li><a href="tools/options" class="nav-link"><span>@_localizer["Options"]</span></a></li>
+                    <li><a href="@_urlService.GetAbsoluteUrl("Index", "Settings")" class="nav-link"><span>@_localizer["Settings"]</span></a></li>
                 </ul>
             }
             <div class="mobile-menu-heading">
@@ -211,7 +211,7 @@
                 </li>
                 @if (User?.Identity?.IsAuthenticated == true)
                 {
-                    <li><a href="tools/options" class="nav-link">@_localizer["Options"]</a></li>
+                    <li><a href="@_urlService.GetAbsoluteUrl("Index", "Settings")" class="nav-link">@_localizer["Settings"]</a></li>
                 }
             </ul>
         </li>

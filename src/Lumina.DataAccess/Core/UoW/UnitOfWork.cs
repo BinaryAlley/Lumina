@@ -39,6 +39,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     private ILibraryMetadataProviderConfigurationRepository? _libraryMetadataProviderConfigurationRepository;
     private IPluginRepository? _pluginRepository;
     private IUserRepository? _userRepository;
+    private IUserSettingsRepository? _userSettingsRepository;
 
     /// <summary>
     /// Gets the permission repository.
@@ -193,6 +194,18 @@ public class UnitOfWork : IUnitOfWork, IDisposable
         {
             _userRepository ??= new UserRepository(_luminaDbContext);
             return _userRepository;
+        }
+    }
+
+    /// <summary>
+    /// Gets the user settings repository.
+    /// </summary>
+    public IUserSettingsRepository UserSettingsRepository
+    {
+        get
+        {
+            _userSettingsRepository ??= new UserSettingsRepository(_luminaDbContext);
+            return _userSettingsRepository;
         }
     }
 

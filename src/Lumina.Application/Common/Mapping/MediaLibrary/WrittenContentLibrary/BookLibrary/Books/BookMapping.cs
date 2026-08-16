@@ -4,7 +4,6 @@ using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
 using System;
-using System.Linq;
 #endregion
 
 namespace Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
@@ -41,8 +40,8 @@ public static class BookMapping
             OriginalLanguageCode = domainEntity.Metadata.OriginalLanguage.HasValue ? domainEntity.Metadata.OriginalLanguage.Value.LanguageCode : null,
             OriginalLanguageName = domainEntity.Metadata.OriginalLanguage.HasValue ? domainEntity.Metadata.OriginalLanguage.Value.LanguageName : null,
             OriginalLanguageNativeName = domainEntity.Metadata.OriginalLanguage.HasValue ? domainEntity.Metadata.OriginalLanguage.Value.NativeName.Value : null,
-            Tags = domainEntity.Metadata.Tags.ToRepositoryEntities().ToHashSet(),
-            Genres = domainEntity.Metadata.Genres.ToRepositoryEntities().ToHashSet(),
+            Tags = [.. domainEntity.Metadata.Tags.ToRepositoryEntities()],
+            Genres = [.. domainEntity.Metadata.Genres.ToRepositoryEntities()],
             Publisher = domainEntity.Metadata.Publisher.HasValue ? domainEntity.Metadata.Publisher.Value : null,
             PageCount = domainEntity.Metadata.PageCount.HasValue ? domainEntity.Metadata.PageCount.Value : null,
             Format = domainEntity.Format.HasValue ? domainEntity.Format.Value : null,
@@ -57,8 +56,8 @@ public static class BookMapping
             GoogleBooksId = domainEntity.GoogleBooksId.HasValue ? domainEntity.GoogleBooksId.Value : null,
             BarnesAndNobleId = domainEntity.BarnesAndNobleId.HasValue ? domainEntity.BarnesAndNobleId.Value : null,
             AppleBooksId = domainEntity.AppleBooksId.HasValue ? domainEntity.AppleBooksId.Value : null,
-            ISBNs = domainEntity.ISBNs.ToRepositoryEntities().ToList(),
-            Ratings = domainEntity.Ratings.ToRepositoryEntities().ToList(),
+            ISBNs = [.. domainEntity.ISBNs.ToRepositoryEntities()],
+            Ratings = [.. domainEntity.Ratings.ToRepositoryEntities()],
             MetadataStatus = domainEntity.MetadataStatus,
             LastMetadataUpdateUtc = domainEntity.LastMetadataUpdateUtc.HasValue ? domainEntity.LastMetadataUpdateUtc.Value : null,
             MetadataProvider = domainEntity.MetadataProvider.HasValue ? domainEntity.MetadataProvider.Value : null,

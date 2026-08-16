@@ -177,8 +177,8 @@
   <data name="Music" xml:space="preserve">
     <value>Muzică</value>
   </data>
-  <data name="Options" xml:space="preserve">
-    <value>Opțiuni</value>
+  <data name="Settings" xml:space="preserve">
+    <value>Setări</value>
   </data>
   <data name="Profile" xml:space="preserve">
     <value>Profil</value>

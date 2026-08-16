@@ -862,6 +862,52 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
+            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.UsersManagement.UserSettingsEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(0);
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(6);
+
+                    b.Property<DateTime>("CreatedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(5);
+
+                    b.Property<bool>("IgnoreThePrefixForAlphaPicker")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(4);
+
+                    b.Property<bool>("IsPaginationEnabled")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(2);
+
+                    b.Property<int>("ItemsPerPage")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(3);
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(8);
+
+                    b.Property<DateTime?>("UpdatedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(7);
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(1);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("UserSettings", (string)null);
+                });
+
             modelBuilder.Entity("BookGenres", b =>
                 {
                     b.HasOne("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary.BookEntity", null)
@@ -1114,6 +1160,15 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.Navigation("ISBNs");
 
                     b.Navigation("Ratings");
+                });
+
+            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.UsersManagement.UserSettingsEntity", b =>
+                {
+                    b.HasOne("Lumina.Application.Common.DataAccess.Entities.UsersManagement.UserEntity", null)
+                        .WithOne()
+                        .HasForeignKey("Lumina.Application.Common.DataAccess.Entities.UsersManagement.UserSettingsEntity", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.Authorization.PermissionEntity", b =>
