@@ -7,10 +7,12 @@ using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.DomainEvents;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
+using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Domain.Common.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -65,6 +67,12 @@ public class CancelLibraryScanCommandHandler : ICommandHandler<CancelLibraryScan
         if (validationResult.Count > 0)
             return validationResult;
 
+        // an authenticated request must always carry a user identity
+        Guid? currentUserId = _currentUserService.UserId;
+        if (currentUserId is null)
+            return ApplicationErrors.Authorization.NotAuthorized;
+        Guid userId = currentUserId.Value;
+
         // get the library scan from the repository
         Result<LibraryScanEntity?> getLibraryScansResult = await _unitOfWork.LibraryScanRepository.GetByIdAsync(command.ScanId, cancellationToken).ConfigureAwait(false);
         if (getLibraryScansResult.IsFailure)
@@ -72,9 +80,10 @@ public class CancelLibraryScanCommandHandler : ICommandHandler<CancelLibraryScan
         if (getLibraryScansResult.Value is null)
             return DomainErrors.LibraryScanning.LibraryScanNotFound;
 
-        // if the user that wants to scan the library is not an Admin or is not the owner of the library, they do not have the right to scan it
-        if (getLibraryScansResult.Value.UserId != _currentUserService.UserId ||
-            !await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false))
+        // admins can cancel any library scan; for everyone else, only the ones of the libraries they own
+        bool canAccessLibrary = await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
+            userId, new LibraryOwnershipPolicyContext(getLibraryScansResult.Value.LibraryId), cancellationToken).ConfigureAwait(false);
+        if (!canAccessLibrary)
             return ApplicationErrors.Authorization.NotAuthorized;
 
         // convert the repository scan to a domain object

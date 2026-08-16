@@ -34,13 +34,14 @@ public interface IAuthorizationService
     Task<bool> IsInRoleAsync(Guid userId, string role, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Evaluates whether the specified user meets the conditions defined in the specified authorization policy.
+    /// Evaluates whether the specified user meets the conditions defined in the specified authorization policy, against the resource described by <paramref name="context"/>.
     /// </summary>
     /// <typeparam name="TAuthorizationPolicy">The type of authorization policy to evaluate.</typeparam>
     /// <param name="userId">The unique identifier of the user for whom to evaluate the policy.</param>
+    /// <param name="context">The context describing the resource against which the policy is evaluated. Can be <see langword="null"/> for policies that do not require a resource.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns><see langword="true"/> if the user satisfies the policy, <see langword="false"/> otherwise.</returns>
-    Task<bool> EvaluatePolicyAsync<TAuthorizationPolicy>(Guid userId, CancellationToken cancellationToken) where TAuthorizationPolicy : IAuthorizationPolicy;
+    Task<bool> EvaluatePolicyAsync<TAuthorizationPolicy>(Guid userId, PolicyContext? context, CancellationToken cancellationToken) where TAuthorizationPolicy : IAuthorizationPolicy;
 
     /// <summary>
     /// Retrieves all authorization roles and permissions of a user identified by <paramref name="userId"/>.

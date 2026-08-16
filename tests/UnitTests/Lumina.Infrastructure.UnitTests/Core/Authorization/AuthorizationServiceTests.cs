@@ -4,6 +4,7 @@ using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.Common.Base;
+using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
@@ -280,19 +281,20 @@ public class AuthorizationServiceTests
     {
         // Arrange
         Guid userId = Guid.NewGuid();
+        PolicyContext context = new LibraryOwnershipPolicyContext(Guid.NewGuid());
         IAuthorizationPolicy mockPolicy = Substitute.For<IAuthorizationPolicy>();
-        mockPolicy.EvaluateAsync(userId, Arg.Any<CancellationToken>())
+        mockPolicy.EvaluateAsync(userId, context, Arg.Any<CancellationToken>())
             .Returns(true);
 
         _mockAuthorizationPolicyFactory.CreatePolicy<IAuthorizationPolicy>()
             .Returns(mockPolicy);
 
         // Act
-        bool result = await _sut.EvaluatePolicyAsync<IAuthorizationPolicy>(userId, CancellationToken.None);
+        bool result = await _sut.EvaluatePolicyAsync<IAuthorizationPolicy>(userId, context, CancellationToken.None);
 
         // Assert
         Assert.True(result);
-        await mockPolicy.Received(1).EvaluateAsync(userId, Arg.Any<CancellationToken>());
+        await mockPolicy.Received(1).EvaluateAsync(userId, context, Arg.Any<CancellationToken>());
         _mockAuthorizationPolicyFactory.Received(1).CreatePolicy<IAuthorizationPolicy>();
     }
 
@@ -301,19 +303,20 @@ public class AuthorizationServiceTests
     {
         // Arrange
         Guid userId = Guid.NewGuid();
+        PolicyContext context = new LibraryOwnershipPolicyContext(Guid.NewGuid());
         IAuthorizationPolicy mockPolicy = Substitute.For<IAuthorizationPolicy>();
-        mockPolicy.EvaluateAsync(userId, Arg.Any<CancellationToken>())
+        mockPolicy.EvaluateAsync(userId, context, Arg.Any<CancellationToken>())
             .Returns(false);
 
         _mockAuthorizationPolicyFactory.CreatePolicy<IAuthorizationPolicy>()
             .Returns(mockPolicy);
 
         // Act
-        bool result = await _sut.EvaluatePolicyAsync<IAuthorizationPolicy>(userId, CancellationToken.None);
+        bool result = await _sut.EvaluatePolicyAsync<IAuthorizationPolicy>(userId, context, CancellationToken.None);
 
         // Assert
         Assert.False(result);
-        await mockPolicy.Received(1).EvaluateAsync(userId, Arg.Any<CancellationToken>());
+        await mockPolicy.Received(1).EvaluateAsync(userId, context, Arg.Any<CancellationToken>());
         _mockAuthorizationPolicyFactory.Received(1).CreatePolicy<IAuthorizationPolicy>();
     }
 
@@ -322,20 +325,21 @@ public class AuthorizationServiceTests
     {
         // Arrange
         Guid userId = Guid.NewGuid();
+        PolicyContext context = new LibraryOwnershipPolicyContext(Guid.NewGuid());
         IAuthorizationPolicy mockPolicy = Substitute.For<IAuthorizationPolicy>();
-        mockPolicy.EvaluateAsync(userId, Arg.Any<CancellationToken>())
+        mockPolicy.EvaluateAsync(userId, context, Arg.Any<CancellationToken>())
             .Throws(new InvalidOperationException("Policy evaluation failed"));
 
         _mockAuthorizationPolicyFactory.CreatePolicy<IAuthorizationPolicy>()
             .Returns(mockPolicy);
 
         // Act
-        Func<Task> act = async () => await _sut.EvaluatePolicyAsync<IAuthorizationPolicy>(userId, CancellationToken.None);
+        Func<Task> act = async () => await _sut.EvaluatePolicyAsync<IAuthorizationPolicy>(userId, context, CancellationToken.None);
 
         // Assert
         InvalidOperationException exception = await Assert.ThrowsAsync<InvalidOperationException>(act);
         Assert.Equal("Policy evaluation failed", exception.Message);
-        await mockPolicy.Received(1).EvaluateAsync(userId, Arg.Any<CancellationToken>());
+        await mockPolicy.Received(1).EvaluateAsync(userId, context, Arg.Any<CancellationToken>());
         _mockAuthorizationPolicyFactory.Received(1).CreatePolicy<IAuthorizationPolicy>();
     }
 
@@ -344,11 +348,12 @@ public class AuthorizationServiceTests
     {
         // Arrange
         Guid userId = Guid.NewGuid();
+        PolicyContext context = new LibraryOwnershipPolicyContext(Guid.NewGuid());
         _mockAuthorizationPolicyFactory.CreatePolicy<IAuthorizationPolicy>()
             .Throws(new InvalidOperationException("Policy creation failed"));
 
         // Act
-        Func<Task> act = async () => await _sut.EvaluatePolicyAsync<IAuthorizationPolicy>(userId, CancellationToken.None);
+        Func<Task> act = async () => await _sut.EvaluatePolicyAsync<IAuthorizationPolicy>(userId, context, CancellationToken.None);
 
         // Assert
         InvalidOperationException exception = await Assert.ThrowsAsync<InvalidOperationException>(act);
@@ -361,6 +366,7 @@ public class AuthorizationServiceTests
     {
         // Arrange
         Guid userId = Guid.NewGuid();
+        PolicyContext context = new LibraryOwnershipPolicyContext(Guid.NewGuid());
         IAuthorizationPolicy mockPolicy = Substitute.For<IAuthorizationPolicy>();
         CancellationToken cancellationToken = new(true);
 
@@ -368,10 +374,10 @@ public class AuthorizationServiceTests
             .Returns(mockPolicy);
 
         // Act
-        await _sut.EvaluatePolicyAsync<IAuthorizationPolicy>(userId, cancellationToken);
+        await _sut.EvaluatePolicyAsync<IAuthorizationPolicy>(userId, context, cancellationToken);
 
         // Assert
-        await mockPolicy.Received(1).EvaluateAsync(userId, cancellationToken);
+        await mockPolicy.Received(1).EvaluateAsync(userId, context, cancellationToken);
         _mockAuthorizationPolicyFactory.Received(1).CreatePolicy<IAuthorizationPolicy>();
     }
 
@@ -380,19 +386,20 @@ public class AuthorizationServiceTests
     {
         // Arrange
         Guid userId = Guid.NewGuid();
+        PolicyContext context = new LibraryOwnershipPolicyContext(Guid.NewGuid());
         IAuthorizationPolicy mockPolicy = Substitute.For<ITestAuthorizationPolicy>();
-        mockPolicy.EvaluateAsync(userId, Arg.Any<CancellationToken>())
+        mockPolicy.EvaluateAsync(userId, context, Arg.Any<CancellationToken>())
             .Returns(true);
 
         _mockAuthorizationPolicyFactory.CreatePolicy<ITestAuthorizationPolicy>()
             .Returns(mockPolicy);
 
         // Act
-        bool result = await _sut.EvaluatePolicyAsync<ITestAuthorizationPolicy>(userId, CancellationToken.None);
+        bool result = await _sut.EvaluatePolicyAsync<ITestAuthorizationPolicy>(userId, context, CancellationToken.None);
 
         // Assert
         Assert.True(result);
-        await mockPolicy.Received(1).EvaluateAsync(userId, Arg.Any<CancellationToken>());
+        await mockPolicy.Received(1).EvaluateAsync(userId, context, Arg.Any<CancellationToken>());
         _mockAuthorizationPolicyFactory.Received(1).CreatePolicy<ITestAuthorizationPolicy>();
     }
 

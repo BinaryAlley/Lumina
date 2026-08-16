@@ -7,6 +7,7 @@ using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.DomainEvents;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
+using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
@@ -16,6 +17,7 @@ using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.Library
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -71,6 +73,12 @@ public class ScanLibraryCommandHandler : ICommandHandler<ScanLibraryCommand, Res
         if (validationResult.Count > 0)
             return validationResult;
 
+        // an authenticated request must always carry a user identity
+        Guid? currentUserId = _currentUserService.UserId;
+        if (currentUserId is null)
+            return ApplicationErrors.Authorization.NotAuthorized;
+        Guid userId = currentUserId.Value;
+
         // get the media library from the persistence medium
         Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository.GetByIdAsync(command.Id, cancellationToken).ConfigureAwait(false);
         if (getLibraryResult.IsFailure)
@@ -79,9 +87,10 @@ public class ScanLibraryCommandHandler : ICommandHandler<ScanLibraryCommand, Res
         if (getLibraryResult.Value is null)
             return DomainErrors.Library.LibraryNotFound;
 
-        // if the user that wants to scan the library is not an Admin or is not the owner of the library, they do not have the right to scan it
-        if (getLibraryResult.Value.UserId != _currentUserService.UserId ||
-            !await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false))
+        // admins can scan any library; for everyone else, only the libraries they own
+        bool canAccessLibrary = await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
+            userId, new LibraryOwnershipPolicyContext(command.Id), cancellationToken).ConfigureAwait(false);
+        if (!canAccessLibrary)
             return ApplicationErrors.Authorization.NotAuthorized;
 
         // check if the library is enabled and unlocked, before scanning it
@@ -110,7 +119,7 @@ public class ScanLibraryCommandHandler : ICommandHandler<ScanLibraryCommand, Res
         // queue the media library scan
         Result<LibraryScan> libraryScanResult = LibraryScan.Create(
             LibraryId.Create(command.Id), 
-            UserId.Create(_currentUserService.UserId!.Value),
+            UserId.Create(userId),
             [.. pastLibraryScansDomainResult.Select(pastLibraryScanDomainResult => pastLibraryScanDomainResult.Value)]
         );
         if (libraryScanResult.IsFailure)

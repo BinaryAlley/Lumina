@@ -7,6 +7,7 @@ using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.DomainEvents;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
+using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
@@ -82,6 +83,12 @@ public class UpdateLibraryCommandHandler : ICommandHandler<UpdateLibraryCommand,
         if (validationResult.Count > 0)
             return validationResult;
 
+        // an authenticated request must always carry a user identity
+        Guid? currentUserId = _currentUserService.UserId;
+        if (currentUserId is null)
+            return ApplicationErrors.Authorization.NotAuthorized;
+        Guid userId = currentUserId.Value;
+
         // make sure the file is an actual supported image
         if (command.CoverImage is not null)
         {
@@ -103,10 +110,11 @@ public class UpdateLibraryCommandHandler : ICommandHandler<UpdateLibraryCommand,
         else if (getLibraryResult.Value is null)
             return DomainErrors.Library.LibraryNotFound;
 
-        // if the user that made the request is not an Admin or is not the owner of the library, they do not have the right to update it
-        if (getLibraryResult.Value.UserId != _currentUserService.UserId || 
-            (!await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false) &&
-             !await _authorizationService.HasPermissionAsync(_currentUserService.UserId!.Value, AuthorizationPermission.CanCreateLibraries, cancellationToken)))
+        // admins or users with the permission to manage media libraries can update any library; other users can only update the libraries they own
+        bool hasManagePermission = await _authorizationService.HasPermissionAsync(userId, AuthorizationPermission.CanCreateLibraries, cancellationToken).ConfigureAwait(false);
+        bool canAccessLibrary = await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
+            userId, new LibraryOwnershipPolicyContext(command.Id), cancellationToken).ConfigureAwait(false);
+        if (!hasManagePermission && !canAccessLibrary)
             return ApplicationErrors.Authorization.NotAuthorized;
 
         // create a domain library object
