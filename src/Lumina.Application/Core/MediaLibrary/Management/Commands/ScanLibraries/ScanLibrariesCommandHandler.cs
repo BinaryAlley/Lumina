@@ -8,12 +8,14 @@ using Lumina.Application.Common.DomainEvents;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
+using Lumina.Application.Common.Errors;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
 using Lumina.Domain.Common.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -59,6 +61,12 @@ public class ScanLibrariesCommandHandler : ICommandHandler<ScanLibrariesCommand,
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<IEnumerable<MediaLibraryScanResponse>>> HandleAsync(ScanLibrariesCommand command, CancellationToken cancellationToken)
     {
+        // an authenticated request must always carry a user identity
+        Guid? currentUserId = _currentUserService.UserId;
+        if (currentUserId is null)
+            return Errors.Authorization.NotAuthorized;
+        Guid userId = currentUserId.Value;
+
         // get all media libraries that are enabled and unlocked from the persistence medium
         Result<IEnumerable<LibraryEntity>> getLibrariesResult = await _unitOfWork.LibraryRepository.GetAllEnabledAndUnlockedAsync(cancellationToken).ConfigureAwait(false);
         if (getLibrariesResult.IsFailure)
@@ -68,8 +76,8 @@ public class ScanLibrariesCommandHandler : ICommandHandler<ScanLibrariesCommand,
         IEnumerable<Result<Library>> domainEntitiesResult = getLibrariesResult.Value.ToDomainEntities();
 
         // if the current user is not an admin, they can only scan the libraries that belong to them
-        if (!await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false))
-            domainEntitiesResult = domainEntitiesResult.Where(libraryResult => libraryResult.Value.UserId.Value == _currentUserService.UserId!.Value);
+        if (!await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false))
+            domainEntitiesResult = domainEntitiesResult.Where(libraryResult => libraryResult.Value.UserId.Value == userId);
 
         List<MediaLibraryScanResponse> responses = [];
         List<IDomainEvent> domainEvents = [];
@@ -95,7 +103,7 @@ public class ScanLibrariesCommandHandler : ICommandHandler<ScanLibrariesCommand,
             // start the media library scan
             Result<LibraryScan> libraryScanResult = LibraryScan.Create(
                 LibraryId.Create(domainLibraryResult.Value.Id.Value),
-                UserId.Create(_currentUserService.UserId!.Value),
+                UserId.Create(userId),
                 [.. pastLibraryScansDomainResult.Select(pastLibraryScanDomainResult => pastLibraryScanDomainResult.Value)]
             );
             if (libraryScanResult.IsFailure)

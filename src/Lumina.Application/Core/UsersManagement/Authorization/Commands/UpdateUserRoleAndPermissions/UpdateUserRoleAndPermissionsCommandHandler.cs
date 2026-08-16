@@ -60,8 +60,14 @@ public class UpdateUserRoleAndPermissionsCommandHandler : ICommandHandler<Update
         if (validationResult.Count > 0)
             return validationResult;
 
+        // an authenticated request must always carry a user identity
+        Guid? currentUserId = _currentUserService.UserId;
+        if (currentUserId is null)
+            return ApplicationErrors.Authorization.NotAuthorized;
+        Guid userId = currentUserId.Value;
+
         // only admins can update user authorizations
-        bool isAdmin = await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false);
+        bool isAdmin = await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false);
         if (!isAdmin)
             return ApplicationErrors.Authorization.NotAuthorized;
 

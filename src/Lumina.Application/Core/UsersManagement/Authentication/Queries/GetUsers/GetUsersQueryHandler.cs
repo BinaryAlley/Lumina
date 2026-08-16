@@ -10,6 +10,7 @@ using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Mapping.Authorization;
 using Lumina.Application.Common.Mapping.UsersManagement.Users;
 using Lumina.Contracts.Responses.UsersManagement.Users;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -49,8 +50,14 @@ public class GetUsersQueryHandler : IQueryHandler<GetUsersQuery, Result<IEnumera
     /// </returns>
     public async Task<Result<IEnumerable<UserResponse>>> HandleAsync(GetUsersQuery query, CancellationToken cancellationToken)
     {
+        // an authenticated request must always carry a user identity
+        Guid? currentUserId = _currentUserService.UserId;
+        if (currentUserId is null)
+            return Errors.Authorization.NotAuthorized;
+        Guid userId = currentUserId.Value;
+
         // only admins can see the list of users
-        bool isAdmin = await _authorizationService.IsInRoleAsync(_currentUserService.UserId!.Value, "Admin", cancellationToken).ConfigureAwait(false);
+        bool isAdmin = await _authorizationService.IsInRoleAsync(userId, "Admin", cancellationToken).ConfigureAwait(false);
         if (!isAdmin)
             return Errors.Authorization.NotAuthorized;
         Result<IEnumerable<UserEntity>> getRolesResult = await _unitOfWork.UserRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
