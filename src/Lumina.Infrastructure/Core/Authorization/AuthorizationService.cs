@@ -1,13 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.Common.Base;
-using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using Lumina.Domain.Common.Errors;
+using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using Lumina.Infrastructure.Core.Authorization.Policies.Common.Factory;
 using System;
 using System.Collections.Generic;
@@ -117,7 +116,7 @@ public class AuthorizationService : IAuthorizationService
             .ToHashSet();
 
         // combine all permissions
-        HashSet<AuthorizationPermission> allPermissions = rolePermissions is not null ? directPermissions.Union(rolePermissions).ToHashSet() : directPermissions;
+        HashSet<AuthorizationPermission> allPermissions = rolePermissions is not null ? [.. directPermissions.Union(rolePermissions)] : directPermissions;
 
         return new UserAuthorizationEntity
         {

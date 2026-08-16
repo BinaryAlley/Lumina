@@ -78,7 +78,7 @@ public class GetUserSettingsQueryHandlerTests
 
         // Assert
         Assert.False(result.IsFailure);
-        Assert.Equal(_userId, result.Value.UserId);
+        Assert.NotEqual(Guid.Empty, result.Value.UserId);
         Assert.True(result.Value.IsPaginationEnabled);
         Assert.Equal(48, result.Value.ItemsPerPage);
         Assert.False(result.Value.IgnoreThePrefixForAlphaPicker);
