@@ -81,6 +81,11 @@ public interface IUnitOfWork
     IUserRepository UserRepository { get; }
 
     /// <summary>
+    /// Gets the user settings repository.
+    /// </summary>
+    IUserSettingsRepository UserSettingsRepository { get; }
+
+    /// <summary>
     /// Saves all changes made to the database.
     /// </summary>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>

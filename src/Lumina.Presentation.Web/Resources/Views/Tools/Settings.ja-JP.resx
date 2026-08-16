@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Settings" xml:space="preserve">
+    <value>設定</value>
+  </data>
+  <data name="EnablePagination" xml:space="preserve">
+    <value>ページネーションを有効にする</value>
+  </data>
+  <data name="ItemsPerPage" xml:space="preserve">
+    <value>ページあたりの項目数</value>
+  </data>
+  <data name="IgnoreThePrefixForAlphaPicker" xml:space="preserve">
+    <value>アルファピッカーで「The」の接頭辞を無視する</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>保存</value>
+  </data>
+  <data name="SettingsSaved" xml:space="preserve">
+    <value>設定を保存しました</value>
+  </data>
+  <data name="DescriptionEnablePagination" xml:space="preserve">
+    <value>ライブラリの項目をページに分割するかどうかを制御します。</value>
+  </data>
+  <data name="DescriptionItemsPerPage" xml:space="preserve">
+    <value>ページネーションが有効な場合に各ページに表示されるライブラリの項目数。</value>
+  </data>
+  <data name="DescriptionIgnoreThePrefixForAlphaPicker" xml:space="preserve">
+    <value>有効にすると、タイトルが「The」で始まるライブラリの項目は、アルファピッカーで次の単語の最初の文字の下にグループ化されます。たとえば「The Rasmus」は「R」の下に表示されます。</value>
+  </data>
+</root>

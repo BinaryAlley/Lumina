@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Settings" xml:space="preserve">
+    <value>设置</value>
+  </data>
+  <data name="EnablePagination" xml:space="preserve">
+    <value>启用分页</value>
+  </data>
+  <data name="ItemsPerPage" xml:space="preserve">
+    <value>每页项目数</value>
+  </data>
+  <data name="IgnoreThePrefixForAlphaPicker" xml:space="preserve">
+    <value>在字母选择器中忽略“The”前缀</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>保存</value>
+  </data>
+  <data name="SettingsSaved" xml:space="preserve">
+    <value>设置已保存</value>
+  </data>
+  <data name="DescriptionEnablePagination" xml:space="preserve">
+    <value>控制是否将库项目分页显示。</value>
+  </data>
+  <data name="DescriptionItemsPerPage" xml:space="preserve">
+    <value>启用分页时每页显示的库项目数。</value>
+  </data>
+  <data name="DescriptionIgnoreThePrefixForAlphaPicker" xml:space="preserve">
+    <value>启用后，标题以"The"开头的库项目将在字母选择器中按后一个词的首字母分组，例如"The Rasmus"会列在R下。</value>
+  </data>
+</root>
