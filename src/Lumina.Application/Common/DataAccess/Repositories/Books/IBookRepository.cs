@@ -18,7 +18,8 @@ public interface IBookRepository : IRepository<BookEntity>,
                                    IInsertRepositoryAction<BookEntity>,
                                    IUpdateRepositoryAction<BookEntity>,
                                    IGetByIdRepositoryAction<BookEntity, Guid>,
-                                   IGetAllRepositoryAction<BookEntity>
+                                   IGetAllRepositoryAction<BookEntity>,
+                                   IGetPaginatedRepositoryAction<BookEntity>
 {
     /// <summary>
     /// Gets all the books of the media library identified by <paramref name="libraryId"/>.

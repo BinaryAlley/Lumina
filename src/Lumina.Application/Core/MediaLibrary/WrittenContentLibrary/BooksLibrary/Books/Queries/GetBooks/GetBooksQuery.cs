@@ -1,6 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.CQRS;
-using System;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
+using Lumina.Domain.SharedKernel.Common.Enums.Common;
 #endregion
 
 namespace Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Queries.GetBooks;
@@ -8,7 +10,13 @@ namespace Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrar
 /// <summary>
 /// Query for getting all the books of a media library.
 /// </summary>
-/// <param name="LibraryId">The Id of the media library whose books are retrieved.</param>
+/// <param name="PaginationData">The object containing the requested pagination data.</param>
+/// <param name="Filter">The object containing the criteria used to filter the results.</param>
+/// <param name="SortBy">The name of the field by which to sort the results.</param>
+/// <param name="SortOrder">The direction in which to sort the results.</param>
 public record GetBooksQuery(
-    Guid LibraryId
+    PaginationDataDto? PaginationData,
+    LibraryFilterDto Filter,
+    string? SortBy,
+    SortOrder? SortOrder
 ) : IQuery;

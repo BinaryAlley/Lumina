@@ -1,9 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Contracts.Responses.Common;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
@@ -334,5 +336,102 @@ public class BookEntityMappingTests
         // Assert
         Assert.NotNull(results);
         Assert.Equal(bookEntities.Count, results.Count());
+    }
+
+    [Fact]
+    public void ToResponses_WhenMappingPaginatedBookEntities_ShouldMapAllPropertiesCorrectly()
+    {
+        // Arrange
+        List<BookEntity> bookEntities = _bookEntityFixture.CreateMany(2);
+        PaginatedResultDto<BookEntity> paginatedBookEntities = new()
+        {
+            Data = bookEntities,
+            CurrentPage = 1,
+            PerPage = 10,
+            Count = 2,
+            NumberOfPages = 1
+        };
+
+        // Act
+        PaginatedResponse<BookResponse> result = paginatedBookEntities.ToResponses();
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(paginatedBookEntities.Data.Count(), result.Data.Count());
+        Assert.Equal(paginatedBookEntities.CurrentPage, result.CurrentPage);
+        Assert.Equal(paginatedBookEntities.PerPage, result.PerPage);
+        Assert.Equal(paginatedBookEntities.Count, result.Count);
+        Assert.Equal(paginatedBookEntities.NumberOfPages, result.NumberOfPages);
+    }
+
+    [Fact]
+    public void ToLiteResponse_WhenMappingBookEntity_ShouldMapIdTitleAndReleaseYear()
+    {
+        // Arrange
+        BookEntity bookEntity = _bookEntityFixture.Create();
+
+        // Act
+        BookLiteResponse result = bookEntity.ToLiteResponse();
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(bookEntity.Id, result.Id);
+        Assert.Equal(bookEntity.Title, result.Title);
+        Assert.Equal(bookEntity.ReReleaseYear ?? bookEntity.OriginalReleaseYear, result.ReleaseYear);
+        Assert.Null(result.CoverPath);
+    }
+
+    [Fact]
+    public void ToLiteResponse_WhenBookHasNoReReleaseYear_ShouldFallBackToOriginalReleaseYear()
+    {
+        // Arrange
+        BookEntity bookEntity = _bookEntityFixture.Create();
+        bookEntity.ReReleaseYear = null;
+
+        // Act
+        BookLiteResponse result = bookEntity.ToLiteResponse();
+
+        // Assert
+        Assert.Equal(bookEntity.OriginalReleaseYear, result.ReleaseYear);
+    }
+
+    [Fact]
+    public void ToLiteResponses_WhenMappingMultipleBookEntities_ShouldMapAllCorrectly()
+    {
+        // Arrange
+        List<BookEntity> bookEntities = _bookEntityFixture.CreateMany(2);
+
+        // Act
+        IReadOnlyList<BookLiteResponse> results = bookEntities.ToLiteResponses();
+
+        // Assert
+        Assert.NotNull(results);
+        Assert.Equal(bookEntities.Count, results.Count());
+    }
+
+    [Fact]
+    public void ToLiteResponses_WhenMappingPaginatedBookEntities_ShouldMapAllPropertiesCorrectly()
+    {
+        // Arrange
+        List<BookEntity> bookEntities = _bookEntityFixture.CreateMany(2);
+        PaginatedResultDto<BookEntity> paginatedBookEntities = new()
+        {
+            Data = bookEntities,
+            CurrentPage = 1,
+            PerPage = 10,
+            Count = 2,
+            NumberOfPages = 1
+        };
+
+        // Act
+        PaginatedResponse<BookLiteResponse> result = paginatedBookEntities.ToLiteResponses();
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(paginatedBookEntities.Data.Count(), result.Data.Count());
+        Assert.Equal(paginatedBookEntities.CurrentPage, result.CurrentPage);
+        Assert.Equal(paginatedBookEntities.PerPage, result.PerPage);
+        Assert.Equal(paginatedBookEntities.Count, result.Count);
+        Assert.Equal(paginatedBookEntities.NumberOfPages, result.NumberOfPages);
     }
 }

@@ -12,6 +12,7 @@ public static partial class ApiRoutes
     {
         public const string GET_BOOK_BY_ID = "/books/{id}";
         public const string GET_BOOKS = "/books";
+        public const string GET_BOOKS_LITE = "/books/lite";
         public const string ADD_BOOK = "/books";
     }
 }
