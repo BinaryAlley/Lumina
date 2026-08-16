@@ -120,7 +120,7 @@ internal sealed class BookRepository : IBookRepository
 
         booksQuery = booksQuery.Where(book => book.LibraryId == libraryFilter.LibraryId);
 
-        FilterSpecification<BookEntity>? filterSpecification = BuildFilterSpecification(libraryFilter.SearchTerm);
+        FilterSpecification<BookEntity>? filterSpecification = BuildFilterSpecification(libraryFilter);
         // apply filtering
         if (filterSpecification is not null)
             booksQuery = booksQuery.Where(filterSpecification.ToExpression());
@@ -277,15 +277,24 @@ internal sealed class BookRepository : IBookRepository
     /// <summary>
     /// Builds a filter specification for querying books.
     /// </summary>
-    /// <param name="searchTerm">The search term used to filter results.</param>
+    /// <param name="libraryFilter">The model containing the parameters used to filter the results.</param>
     /// <returns>A filter specification that can be used to query books matching the provided criteria.</returns>
-    private static FilterSpecification<BookEntity>? BuildFilterSpecification(string? searchTerm)
+    private static FilterSpecification<BookEntity>? BuildFilterSpecification(LibraryFilterDto libraryFilter)
     {
         FilterSpecification<BookEntity>? filterSpecification = null;
-        
-        // include the search term filter here, if provided
-        if (!string.IsNullOrWhiteSpace(searchTerm))
-            filterSpecification = new BookSearchSpecification(searchTerm);
+
+        // include the search term filter, if provided
+        if (!string.IsNullOrWhiteSpace(libraryFilter.SearchTerm))
+            filterSpecification = new BookSearchSpecification(libraryFilter.SearchTerm);
+
+        // include the alpha key filter, if provided
+        if (libraryFilter.FilterAlphaKey is not null)
+        {
+            BookAlphaFilterSpecification alphaFilterSpecification = new(libraryFilter.FilterAlphaKey, libraryFilter.IgnoreThePrefixForAlphaPicker);
+            filterSpecification = filterSpecification is null
+                ? alphaFilterSpecification
+                : filterSpecification.And(alphaFilterSpecification);
+        }
 
         return filterSpecification;
     }

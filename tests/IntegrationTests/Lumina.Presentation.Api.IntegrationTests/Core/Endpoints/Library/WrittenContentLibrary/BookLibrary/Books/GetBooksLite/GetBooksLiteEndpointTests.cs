@@ -83,6 +83,121 @@ public class GetBooksLiteEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     }
 
     [Fact]
+    public async Task GetBooksLite_WhenCalledWithFilterAlphaKeyLetter_ShouldReturnOnlyBooksStartingWithThatLetter()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        Guid libraryId = Guid.NewGuid();
+        await SeedLibraryAsync(libraryId, userId);
+        await SeedBookAsync(libraryId, "Quiet Place");
+        await SeedBookAsync(libraryId, "The Quiet");
+        await SeedBookAsync(libraryId, "Racing");
+
+        // Act
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/books/lite?libraryId={libraryId}&filterAlphaKey=q");
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        PaginatedResponse<BookLiteResponse>? paginatedBooks = await response.Content.ReadFromJsonAsync<PaginatedResponse<BookLiteResponse>>(_jsonOptions);
+        Assert.NotNull(paginatedBooks);
+        BookLiteResponse book = Assert.Single(paginatedBooks!.Data);
+        Assert.Equal("Quiet Place", book.Title);
+        Assert.Equal(1, paginatedBooks.Count);
+    }
+
+    [Fact]
+    public async Task GetBooksLite_WhenCalledWithFilterAlphaKeyLetterAndIgnoreThePrefix_ShouldIncludeThePrefixedTitles()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        Guid libraryId = Guid.NewGuid();
+        await SeedLibraryAsync(libraryId, userId);
+        await SeedBookAsync(libraryId, "Quiet Place");
+        await SeedBookAsync(libraryId, "The Quiet");
+        await SeedBookAsync(libraryId, "Racing");
+
+        // Act
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/books/lite?libraryId={libraryId}&filterAlphaKey=q&ignoreThePrefixForAlphaPicker=true");
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        PaginatedResponse<BookLiteResponse>? paginatedBooks = await response.Content.ReadFromJsonAsync<PaginatedResponse<BookLiteResponse>>(_jsonOptions);
+        Assert.NotNull(paginatedBooks);
+        Assert.Equal(2, paginatedBooks!.Count);
+        Assert.Contains(paginatedBooks.Data, book => book.Title == "Quiet Place");
+        Assert.Contains(paginatedBooks.Data, book => book.Title == "The Quiet");
+    }
+
+    [Fact]
+    public async Task GetBooksLite_WhenCalledWithFilterAlphaKeyNumber_ShouldReturnOnlyBooksStartingWithADigit()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        Guid libraryId = Guid.NewGuid();
+        await SeedLibraryAsync(libraryId, userId);
+        await SeedBookAsync(libraryId, "1984");
+        await SeedBookAsync(libraryId, "7 Habits of Highly Effective People");
+        await SeedBookAsync(libraryId, "Brave New World");
+
+        // Act
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/books/lite?libraryId={libraryId}&filterAlphaKey=%23");
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        PaginatedResponse<BookLiteResponse>? paginatedBooks = await response.Content.ReadFromJsonAsync<PaginatedResponse<BookLiteResponse>>(_jsonOptions);
+        Assert.NotNull(paginatedBooks);
+        Assert.Equal(2, paginatedBooks!.Count);
+        Assert.Contains(paginatedBooks.Data, book => book.Title == "1984");
+        Assert.Contains(paginatedBooks.Data, book => book.Title == "7 Habits of Highly Effective People");
+    }
+
+    [Fact]
+    public async Task GetBooksLite_WhenCalledWithFilterAlphaKeySymbol_ShouldReturnOnlyBooksStartingWithASymbol()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        Guid libraryId = Guid.NewGuid();
+        await SeedLibraryAsync(libraryId, userId);
+        await SeedBookAsync(libraryId, "!Important");
+        await SeedBookAsync(libraryId, "1984");
+        await SeedBookAsync(libraryId, "Alpha");
+
+        // Act
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/books/lite?libraryId={libraryId}&filterAlphaKey=%2A");
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        PaginatedResponse<BookLiteResponse>? paginatedBooks = await response.Content.ReadFromJsonAsync<PaginatedResponse<BookLiteResponse>>(_jsonOptions);
+        Assert.NotNull(paginatedBooks);
+        BookLiteResponse book = Assert.Single(paginatedBooks!.Data);
+        Assert.Equal("!Important", book.Title);
+        Assert.Equal(1, paginatedBooks.Count);
+    }
+
+    [Fact]
+    public async Task GetBooksLite_WhenTitleIsEmptyAndFilterAlphaKeyIsProvided_ShouldUseOriginalTitle()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        Guid libraryId = Guid.NewGuid();
+        await SeedLibraryAsync(libraryId, userId);
+        await SeedBookAsync(libraryId, "", "Rendezvous");
+        await SeedBookAsync(libraryId, "Racing");
+        await SeedBookAsync(libraryId, "Quiet Place");
+
+        // Act
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/books/lite?libraryId={libraryId}&filterAlphaKey=r");
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        PaginatedResponse<BookLiteResponse>? paginatedBooks = await response.Content.ReadFromJsonAsync<PaginatedResponse<BookLiteResponse>>(_jsonOptions);
+        Assert.NotNull(paginatedBooks);
+        Assert.Equal(2, paginatedBooks!.Count);
+        Assert.Contains(paginatedBooks.Data, book => book.Title == ""); // the empty title book matches the filter through its original title
+        Assert.Contains(paginatedBooks.Data, book => book.Title == "Racing");
+    }
+
+    [Fact]
     public async Task GetBooksLite_WhenCalledWithSearchTerm_ShouldReturnOnlyMatchingBooks()
     {
         // Arrange
@@ -204,8 +319,9 @@ public class GetBooksLiteEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     /// </summary>
     /// <param name="libraryId">The Id of the media library the book belongs to.</param>
     /// <param name="title">The title of the book.</param>
+    /// <param name="originalTitle">Optional. The original title of the book.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    private async Task SeedBookAsync(Guid libraryId, string title)
+    private async Task SeedBookAsync(Guid libraryId, string title, string? originalTitle = null)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
@@ -215,6 +331,7 @@ public class GetBooksLiteEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
             LibraryId = libraryId,
             Path = $"/books/{Guid.NewGuid()}.epub",
             Title = title,
+            OriginalTitle = originalTitle,
             CreatedBy = Guid.NewGuid(),
             CreatedOnUtc = DateTime.UtcNow,
             UpdatedBy = null

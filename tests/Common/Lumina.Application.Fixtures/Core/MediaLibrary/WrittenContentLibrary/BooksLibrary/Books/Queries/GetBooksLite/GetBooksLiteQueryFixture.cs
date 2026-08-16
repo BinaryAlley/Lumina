@@ -26,6 +26,8 @@ public class GetBooksLiteQueryFixture
     /// <param name="libraryId">Optional. The Id of the media library whose books are retrieved.</param>
     /// <param name="paginationData">Optional. The pagination data of the query.</param>
     /// <param name="searchTerm">Optional. The search term used to filter results.</param>
+    /// <param name="filterAlphaKey">Optional. The alpha key used to filter the results by the first character of their title, for the alpha picker.</param>
+    /// <param name="ignoreThePrefixForAlphaPicker">Optional. Whether the leading "The " prefix of a title should be ignored when computing the alpha key, or not.</param>
     /// <param name="sortBy">Optional. The name of the field by which to sort the results.</param>
     /// <param name="sortOrder">Optional. The direction in which to sort the results.</param>
     /// <returns>The created query to get the lightweight details of books.</returns>
@@ -33,6 +35,8 @@ public class GetBooksLiteQueryFixture
         Guid? libraryId = null,
         PaginationDataDto? paginationData = null,
         string? searchTerm = null,
+        string? filterAlphaKey = null,
+        bool ignoreThePrefixForAlphaPicker = false,
         string? sortBy = null,
         SortOrder? sortOrder = null)
     {
@@ -45,7 +49,9 @@ public class GetBooksLiteQueryFixture
             new LibraryFilterDto
             {
                 LibraryId = libraryId ?? _faker.Random.Guid(),
-                SearchTerm = searchTerm
+                SearchTerm = searchTerm,
+                FilterAlphaKey = filterAlphaKey,
+                IgnoreThePrefixForAlphaPicker = ignoreThePrefixForAlphaPicker
             },
             sortBy,
             sortOrder ?? _faker.PickRandom<SortOrder>()

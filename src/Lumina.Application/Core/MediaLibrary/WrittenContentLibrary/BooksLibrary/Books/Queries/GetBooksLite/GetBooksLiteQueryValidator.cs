@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Application.Common.DTO.Filtering;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Utilities;
 using Lumina.Domain.Common.Errors;
@@ -22,5 +23,14 @@ public class GetBooksLiteQueryValidator : AbstractValidator<GetBooksLiteQuery>
             .WithError(Errors.Library.LibraryIdCannotBeEmpty)
             .Must(id => id != Guid.Empty)
             .WithError(Errors.Library.LibraryIdCannotBeEmpty);
+
+        // the alpha key must be exactly one of the three picker bucket kinds, so that the filter specification can
+        // derive the key of a title unambiguously: no filter, a number bucket, a symbol bucket, or a single ASCII letter
+        RuleFor(query => query.Filter.FilterAlphaKey)
+            .Must(alphaKey => alphaKey is null
+                || alphaKey == LibraryItemAlphaKeys.NUMBER
+                || alphaKey == LibraryItemAlphaKeys.SYMBOL
+                || (alphaKey.Length == 1 && char.IsAsciiLetter(alphaKey[0])))
+            .WithError(Errors.Library.InvalidFilterAlphaKey);
     }
 }
