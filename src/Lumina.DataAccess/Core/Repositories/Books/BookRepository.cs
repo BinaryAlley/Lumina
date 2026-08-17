@@ -15,6 +15,8 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -26,6 +28,10 @@ namespace Lumina.DataAccess.Core.Repositories.Books;
 /// </summary>
 internal sealed class BookRepository : IBookRepository
 {
+    private static readonly MethodInfo s_toLowerMethod = typeof(string).GetMethod(nameof(string.ToLower), Type.EmptyTypes)!;
+    private static readonly MethodInfo s_startsWithMethod = typeof(string).GetMethod(nameof(string.StartsWith), [typeof(string)])!;
+    private static readonly MethodInfo s_substringMethod = typeof(string).GetMethod(nameof(string.Substring), [typeof(int)])!;
+
     private readonly LuminaDbContext _luminaDbContext;
 
     /// <summary>
@@ -126,7 +132,7 @@ internal sealed class BookRepository : IBookRepository
             booksQuery = booksQuery.Where(filterSpecification.ToExpression());
 
         // apply sorting based on the specified sortBy and sortOrder parameters
-        booksQuery = ApplySorting(booksQuery, sortBy, sortOrder ?? SortOrder.Ascending);
+        booksQuery = ApplySorting(booksQuery, sortBy, sortOrder ?? SortOrder.Ascending, libraryFilter.IgnoreThePrefixForAlphaPicker);
 
         // if no pagination was requested, return all the books of the library
         if (paginationData is null)
@@ -255,7 +261,8 @@ internal sealed class BookRepository : IBookRepository
     /// <param name="booksQuery">The query to sort.</param>
     /// <param name="sortBy">The field to sort by (case-insensitive).</param>
     /// <param name="sortOrder">The direction of the sorting.</param>
-    private static IOrderedQueryable<BookEntity> ApplySorting(IQueryable<BookEntity> booksQuery, string? sortBy, SortOrder sortOrder)
+    /// <param name="ignoreThePrefixForAlphaPicker">Whether a leading "the " prefix of a title is ignored when deriving the title sort key, or not.</param>
+    private static IOrderedQueryable<BookEntity> ApplySorting(IQueryable<BookEntity> booksQuery, string? sortBy, SortOrder sortOrder, bool ignoreThePrefixForAlphaPicker)
     {
         return sortBy?.ToLower() switch
         {
@@ -269,9 +276,44 @@ internal sealed class BookRepository : IBookRepository
                 ? booksQuery.OrderByDescending(book => book.MetadataProvider)
                 : booksQuery.OrderBy(book => book.MetadataProvider),
             _ => sortOrder == SortOrder.Descending
-                ? booksQuery.OrderByDescending(book => book.Title)
-                : booksQuery.OrderBy(book => book.Title),
+                ? booksQuery.OrderByDescending(BuildTitleSortKey(ignoreThePrefixForAlphaPicker))
+                : booksQuery.OrderBy(BuildTitleSortKey(ignoreThePrefixForAlphaPicker)),
         };
+    }
+
+    /// <summary>
+    /// Builds the expression that derives the title sort key of a book, matching the effective title used by the alpha filter:
+    /// the title lowercased, falling back to the original title when the title is <see langword="null"/> or empty, and optionally
+    /// stripped of a leading "the " prefix.
+    /// </summary>
+    /// <param name="ignoreThePrefixForAlphaPicker">Whether a leading "the " prefix of a title is ignored when deriving the title sort key, or not.</param>
+    /// <returns>An expression that evaluates to the title sort key of a book.</returns>
+    private static Expression<Func<BookEntity, string>> BuildTitleSortKey(bool ignoreThePrefixForAlphaPicker)
+    {
+        ParameterExpression book = Expression.Parameter(typeof(BookEntity), "book");
+
+        Expression titleProperty = Expression.Property(book, nameof(BookEntity.Title));
+
+        // the raw title: the title, unless it is null or empty, in which case the original title (or an empty string) is used
+        BinaryExpression isTitleMissing = Expression.OrElse(
+            Expression.Equal(titleProperty, Expression.Constant(null, typeof(string))),
+            Expression.Equal(titleProperty, Expression.Constant(string.Empty)));
+        Expression rawTitle = Expression.Condition(isTitleMissing,
+            Expression.Coalesce(Expression.Property(book, nameof(BookEntity.OriginalTitle)), Expression.Constant(string.Empty)),
+            titleProperty);
+
+        MethodCallExpression lowerTitle = Expression.Call(rawTitle, s_toLowerMethod);
+
+        // when ignoring the "The " prefix, strip a leading "the " from the lowercased title
+        Expression effectiveTitle = lowerTitle;
+        if (ignoreThePrefixForAlphaPicker)
+        {
+            MethodCallExpression startsWithThe = Expression.Call(lowerTitle, s_startsWithMethod, Expression.Constant("the "));
+            MethodCallExpression strippedTitle = Expression.Call(lowerTitle, s_substringMethod, Expression.Constant(4));
+            effectiveTitle = Expression.Condition(startsWithThe, strippedTitle, lowerTitle);
+        }
+
+        return Expression.Lambda<Func<BookEntity, string>>(effectiveTitle, book);
     }
 
     /// <summary>

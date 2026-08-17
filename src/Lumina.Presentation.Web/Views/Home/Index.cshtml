@@ -27,11 +27,15 @@
     <script type="text/javascript" data-form="@scriptId" defer>
         // create cleanup registry for this view
         const cleanupFunctions = [];
+        let isInitialized = false;
 
         const librariesContainer = document.getElementById('libraries-container');
         const noLibrariesMessage = document.getElementById('no-libraries');
 
-        const documentLoaded = async function () {
+        async function InitializeAsync() {
+            if (isInitialized)
+                return;
+            isInitialized = true;
             // get the media libraries 
             // TODO: add setting check whether the user desires this feature or not
             const data = await callApiGetAsync('@_urlService.GetAbsoluteUrl("GetEnabledLibraries", "LibraryManagement")');
@@ -40,33 +44,43 @@
                 librariesContainer.classList.replace('justify-center', 'justify-start');
                 // populate media library items
                 data.forEach((library) => {
-                    const libraryDiv = document.createElement('div');
-                    libraryDiv.className = 'media-panel';
+                    // book libraries are browsable, so their panel is rendered as a link to their browse page
+                    const isBrowsable = library.libraryType === 'Book';
+                    const browseUrl = isBrowsable
+                        ? '@_urlService.GetAbsoluteUrl("Index", "Books")' + '?libraryId=' + library.id
+                        : null;
+
+                    const libraryElement = isBrowsable ? document.createElement('a') : document.createElement('div');
+                    libraryElement.className = isBrowsable ? 'media-panel nav-link no-underline' : 'media-panel';
+                    if (browseUrl)
+                        libraryElement.href = browseUrl;
 
                     // the cover image is optional, so it is only rendered when the library has one
                     const coverImageHtml = library.coverImage
                         ? `<img src="${globalConfiguration.serverBasePath}/media/libraries/${library.id}/${library.coverImage.substring(library.coverImage.lastIndexOf('cover.'))}" />`
                         : '';
 
-                    libraryDiv.innerHTML = `
+                    libraryElement.innerHTML = `
                         ${coverImageHtml}
                         <span class="text-light-two"><strong>${library.title}</strong></span>
                     `;
 
-                    librariesContainer.appendChild(libraryDiv);
+                    librariesContainer.appendChild(libraryElement);
                 });
+                // bind the AJAX navigation behavior to the library links, which were created after the initial navigation binding
+                bindNavigationLinks();
             } else {
                  noLibrariesMessage.classList.replace('hidden', 'block');
                  librariesContainer.classList.replace('justify-start', 'justify-center');
             }
-        };
+        }
 
         // add listeners
-        document.addEventListener('DOMContentLoaded', documentLoaded);
+        document.addEventListener('DOMContentLoaded', InitializeAsync);
 
         // register cleanup for these listeners
         cleanupFunctions.push(() => {
-            document.removeEventListener('click', documentLoaded);
+            document.removeEventListener('DOMContentLoaded', InitializeAsync);
         });
 
         // store all cleanups for this view on window object using the scriptId
