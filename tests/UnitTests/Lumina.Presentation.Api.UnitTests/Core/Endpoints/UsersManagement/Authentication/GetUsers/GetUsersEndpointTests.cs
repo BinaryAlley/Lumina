@@ -47,7 +47,7 @@ public class GetUsersEndpointTests
             .Returns(Result.From(expectedResponse));
 
         // Act
-        IResult result = await _sut.ExecuteAsync(new EmptyRequest(), cancellationToken);
+        IResult result = await _sut.ExecuteAsync(EmptyRequest.Instance, cancellationToken);
 
         // Assert
         Ok<IEnumerable<UserResponse>> okResult = Assert.IsType<Ok<IEnumerable<UserResponse>>>(result);
@@ -64,7 +64,7 @@ public class GetUsersEndpointTests
             .Returns(expectedError);
 
         // Act
-        IResult result = await _sut.ExecuteAsync(new EmptyRequest(), cancellationToken);
+        IResult result = await _sut.ExecuteAsync(EmptyRequest.Instance, cancellationToken);
 
         // Assert
         ProblemHttpResult problemResult = Assert.IsType<ProblemHttpResult>(result);
@@ -88,7 +88,7 @@ public class GetUsersEndpointTests
             .Returns(Result.From(Array.Empty<UserResponse>() as IEnumerable<UserResponse>));
 
         // Act
-        await _sut.ExecuteAsync(new EmptyRequest(), cancellationToken);
+        await _sut.ExecuteAsync(EmptyRequest.Instance, cancellationToken);
 
         // Assert
         await _mockHandler.Received(1).HandleAsync(
@@ -114,7 +114,7 @@ public class GetUsersEndpointTests
             }, info.Arg<CancellationToken>()));
 
         // Act
-        Task<IResult> operationTask = _sut.ExecuteAsync(new EmptyRequest(), cts.Token);
+        Task<IResult> operationTask = _sut.ExecuteAsync(EmptyRequest.Instance, cts.Token);
         await operationStarted.Task;
         cts.Cancel();
         cancellationRequested.SetResult(true);
