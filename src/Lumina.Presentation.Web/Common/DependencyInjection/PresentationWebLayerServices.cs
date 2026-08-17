@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
+using FastEndpoints;
+using FastEndpoints.Swagger;
 using FluentValidation;
 using Lumina.Presentation.Web.Common.Api;
 using Lumina.Presentation.Web.Common.Authorization;
+using Lumina.Presentation.Web.Common.Enums.Authorization;
 using Lumina.Presentation.Web.Common.Exceptions;
-using Lumina.Presentation.Web.Common.Filters.ActionFilters;
-using Lumina.Presentation.Web.Common.Filters.AuthorizationFilters;
 using Lumina.Presentation.Web.Common.Http;
-using Lumina.Presentation.Web.Common.MiddlewareFilters;
-using Lumina.Presentation.Web.Common.Models.Authorization;
+using Lumina.Presentation.Web.Common.Localization;
 using Lumina.Presentation.Web.Common.Security;
 using Lumina.Presentation.Web.Common.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Localization.Routing;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
@@ -49,11 +50,7 @@ public static class PresentationWebLayerServices
     /// <returns>The updated <see cref="IServiceCollection"/>.</returns>
     public static IServiceCollection AddPresentationWebLayerServices(this IServiceCollection services)
     {
-        services.AddControllersWithViews(mvcOptions =>
-        {
-            mvcOptions.Filters.Add(new MiddlewareFilterAttribute(typeof(LocalizationPipeline))); // add localization middleware filter
-            mvcOptions.Filters.Add<StoreLastViewFilter>();
-        })
+        services.AddControllersWithViews()
         .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
         .AddDataAnnotationsLocalization()
         .AddJsonOptions(jsonOptions =>
@@ -62,11 +59,50 @@ public static class PresentationWebLayerServices
             jsonOptions.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; // needed because file system API responses can have very nested structures
             jsonOptions.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
+
+        // configure the locations where the Razor view engine looks for views and layouts, since the views live under the Core directory
+        services.Configure<RazorViewEngineOptions>(razorViewEngineOptions =>
+        {
+            razorViewEngineOptions.ViewLocationFormats.Clear();
+            razorViewEngineOptions.ViewLocationFormats.Add("/Core/Views/{1}/{0}.cshtml");
+            razorViewEngineOptions.ViewLocationFormats.Add("/Core/Views/Shared/{0}.cshtml");
+        });
+
+        // configure the JSON serialization settings used by Results.Json, so that the JSON responses of the endpoints match the MVC responses they replace
+        services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(jsonOptions =>
+        {
+            jsonOptions.SerializerOptions.MaxDepth = 256;
+            jsonOptions.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; // needed because file system API responses can have very nested structures
+            jsonOptions.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        });
+
+        // register the FastEndpoints library, which replaces the MVC controllers for handling the application routes
+        services.AddFastEndpoints();
+        // add OpenAPI document generation, so that the endpoints exposed by the web application are discoverable and their contracts are visible
+        services.AddOpenApi();
+        services.SwaggerDocument(documentOptions =>
+        {
+            documentOptions.SerializerSettings = jsonSerializerOptions =>
+            {
+                jsonSerializerOptions.PropertyNamingPolicy = null;
+                jsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+            };
+            documentOptions.DocumentSettings = aspNetCoreOpenApiDocumentGeneratorSettings =>
+            {
+                aspNetCoreOpenApiDocumentGeneratorSettings.DocumentName = "v1";
+                aspNetCoreOpenApiDocumentGeneratorSettings.Title = "Lumina Web";
+                aspNetCoreOpenApiDocumentGeneratorSettings.Version = "v1";
+            };
+            documentOptions.RemoveEmptyRequestSchema = true;
+            documentOptions.ShortSchemaNames = true;
+        });
         // configure URL-based localization 
         services.AddLocalization(localizationOptions =>
         {
-            localizationOptions.ResourcesPath = "Resources";
+            localizationOptions.ResourcesPath = "Core/Resources";
         });
+        // resolve the resources of the views that live under the Core/Views directory
+        services.AddSingleton<IHtmlLocalizerFactory, CoreHtmlLocalizerFactory>();
 
         services.Configure<RequestLocalizationOptions>(requestLocalizationOptions =>
         {
@@ -190,9 +226,12 @@ public static class PresentationWebLayerServices
                 };
             });
 
-        // add an authorization policy that ensures application is initialized with super admin account before allowing access
+        // add authorization policies that ensure the application is initialized with the super admin account before allowing access,
+        // and that restrict access based on the roles and permissions retrieved from the remote API
         services.AddAuthorizationBuilder()
-            .AddPolicy("RequireInitialization", authorizationPolicyBuilder => authorizationPolicyBuilder.Requirements.Add(new InitializationRequirement()));
+            .AddPolicy(AuthorizationPolicies.REQUIRE_INITIALIZATION, authorizationPolicyBuilder => authorizationPolicyBuilder.Requirements.Add(new InitializationRequirement()))
+            .AddPolicy(AuthorizationPolicies.REQUIRE_ADMIN_ROLE, authorizationPolicyBuilder => authorizationPolicyBuilder.Requirements.Add(new RoleRequirement("Admin")))
+            .AddPolicy(AuthorizationPolicies.REQUIRE_CREATE_LIBRARIES_PERMISSION, authorizationPolicyBuilder => authorizationPolicyBuilder.Requirements.Add(new PermissionRequirement(AuthorizationPermission.CanCreateLibraries)));
 
         // add forwarded headers middleware to handle reverse proxy scenarios
         services.Configure<ForwardedHeadersOptions>(forwardedHeadersOptions =>
@@ -237,13 +276,13 @@ public static class PresentationWebLayerServices
             .AddPolicyHandler(circuitBreakerPolicy);
 
         services.AddScoped<CachedAuthorizationHandler>();
-        services.AddScoped<ApiAuthorizationFilter>();
-        services.AddScoped<AuthorizationRequirementModel>();
 
         // enable access to the current HTTP context in non-controller classes
         services.AddHttpContextAccessor();
 
         services.AddScoped<IAuthorizationHandler, InitializationHandler>();
+        services.AddScoped<IAuthorizationHandler, RoleAuthorizationHandler>();
+        services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
         services.AddScoped<Authorization.IAuthorizationService, AuthorizationService>();
         services.AddSingleton<ICryptographyService, CryptographyService>();
         services.AddSingleton<IUrlService, UrlService>();

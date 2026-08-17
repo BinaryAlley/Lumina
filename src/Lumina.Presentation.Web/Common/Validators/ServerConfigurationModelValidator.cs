@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using FluentValidation;
-using Lumina.Presentation.Web.Common.Models.Configuration;
+using Lumina.Presentation.Web.Common.DTO.Configuration;
 #endregion
 
 namespace Lumina.Presentation.Web.Common.Validators;
@@ -8,7 +8,7 @@ namespace Lumina.Presentation.Web.Common.Validators;
 /// <summary>
 /// Validates the needed validation rules for the ServerConfiguration application configuration settings section.
 /// </summary>
-public class ServerConfigurationModelValidator : AbstractValidator<ServerConfigurationModel>
+public class ServerConfigurationModelValidator : AbstractValidator<ServerConfigurationDto>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="ServerConfigurationModelValidator"/> class.

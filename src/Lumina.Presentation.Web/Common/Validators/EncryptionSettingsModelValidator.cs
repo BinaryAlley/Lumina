@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using FluentValidation;
-using Lumina.Presentation.Web.Common.Models.Configuration;
+using Lumina.Presentation.Web.Common.DTO.Configuration;
 using System;
 using System.Buffers.Text;
 #endregion
@@ -10,7 +10,7 @@ namespace Lumina.Presentation.Web.Common.Validators;
 /// <summary>
 /// Validates the needed validation rules for the EncryptionSettings application configuration settings section.
 /// </summary>
-public class EncryptionSettingsModelValidator : AbstractValidator<EncryptionSettingsModel>
+public class EncryptionSettingsModelValidator : AbstractValidator<EncryptionSettingsDto>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="EncryptionSettingsModelValidator"/> class.

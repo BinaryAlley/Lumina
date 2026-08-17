@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Common.Api;
 using Lumina.Presentation.Web.Common.Http;
-using Lumina.Presentation.Web.Common.Models.UsersManagement;
+using Lumina.Presentation.Web.Common.Responses.UsersManagement;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
@@ -28,17 +28,17 @@ public class InitializationHandler : AuthorizationHandler<InitializationRequirem
     /// <summary>
     /// Checks the application initialization status and authorizes the requirement if initialized.
     /// </summary>
-    /// <param name="context">The authorization context.</param>
-    /// <param name="requirement">The initialization requirement to be evaluated.</param>
-    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, InitializationRequirement requirement)
+    /// <param name="authorizationHandlerContext">The authorization context.</param>
+    /// <param name="initializationRequirement">The initialization requirement to be evaluated.</param>
+    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext authorizationHandlerContext, InitializationRequirement initializationRequirement)
     {
-        InitializationModel result = await _apiHttpClient.GetAsync<InitializationModel>("initialization/").ConfigureAwait(false);
-        HttpContext? httpContext = context.Resource as HttpContext;
+        InitializationResponse result = await _apiHttpClient.GetAsync<InitializationResponse>("initialization/").ConfigureAwait(false);
+        HttpContext? httpContext = authorizationHandlerContext.Resource as HttpContext;
         if (result.IsInitialized)
         {
             // admin account was registered, remove this requirement from the session
             httpContext?.Session.Remove(HttpContextItemKeys.PENDING_SUPER_ADMIN_SETUP);
-            context.Succeed(requirement);
+            authorizationHandlerContext.Succeed(initializationRequirement);
         }
         else // store in session that super admin setup is needed
             httpContext?.Session.SetString(HttpContextItemKeys.PENDING_SUPER_ADMIN_SETUP, "true");

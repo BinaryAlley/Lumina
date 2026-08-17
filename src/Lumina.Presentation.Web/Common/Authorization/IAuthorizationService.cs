@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Common.Enums.Authorization;
-using Lumina.Presentation.Web.Common.Models.Authorization;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -27,19 +26,4 @@ public interface IAuthorizationService
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns><see langword="true"/> if the currently logged in user is in the specified role, <see langword="false"/> otherwise.</returns>
     Task<bool> IsInRoleAsync(string role, CancellationToken cancellationToken);
-
-    /// <summary>
-    /// Evaluates whether the currently logged in user meets the conditions defined in the specified authorization policy.
-    /// </summary>
-    /// <typeparam name="TAuthorizationPolicy">The type of authorization policy to evaluate.</typeparam>
-    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns><see langword="true"/> if the currently logged in user satisfies the policy, <see langword="false"/> otherwise.</returns>
-    Task<bool> EvaluatePolicyAsync<TAuthorizationPolicy>(CancellationToken cancellationToken);
-
-    /// <summary>
-    /// Evaluates whether the currently logged in user meets the conditions defined in the specified authorization requirement.
-    /// </summary>
-    /// <param name="requirement">The authorization requirements to check.</param>
-    /// <returns><see langword="true"/> if the currently logged in user satisfies the requirement, <see langword="false"/> otherwise.</returns>
-    Task<bool> EvaluateAuthorizationAsync(AuthorizationRequirementModel requirement);
 }

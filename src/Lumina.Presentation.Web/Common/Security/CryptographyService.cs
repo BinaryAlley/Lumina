@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Models.Configuration;
+using Lumina.Presentation.Web.Common.DTO.Configuration;
 using Microsoft.Extensions.Options;
 using System;
 using System.Security.Cryptography;
@@ -18,10 +18,10 @@ public sealed class CryptographyService : ICryptographyService, IDisposable
     /// <summary>
     /// Initializes a new instance of the <see cref="CryptographyService"/> class.
     /// </summary>
-    /// <param name="encryptionSettingsModelOptions">Injected service for retrieving <see cref="EncryptionSettingsModel"/>.</param>
-    public CryptographyService(IOptions<EncryptionSettingsModel> encryptionSettingsModelOptions)
+    /// <param name="encryptionSettingsOptions">Injected service for retrieving <see cref="EncryptionSettingsDto"/>.</param>
+    public CryptographyService(IOptions<EncryptionSettingsDto> encryptionSettingsOptions)
     {
-        _key = Convert.FromBase64String(encryptionSettingsModelOptions.Value.SecretKey);
+        _key = Convert.FromBase64String(encryptionSettingsOptions.Value.SecretKey);
     }
 
     /// <summary>

@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Presentation.Web.Common.DTO.Common;
+using Lumina.Presentation.Web.Common.DTO.Configuration;
+using Lumina.Presentation.Web.Common.DTO.FileSystemManagement;
 using Lumina.Presentation.Web.Common.Exceptions;
-using Lumina.Presentation.Web.Common.Models.Common;
-using Lumina.Presentation.Web.Common.Models.Configuration;
-using Lumina.Presentation.Web.Common.Models.FileSystemManagement;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using System;
@@ -35,13 +35,13 @@ public class ApiHttpClient : IApiHttpClient
     /// <param name="httpClient">Injected HttpClient for interacting with the API.</param>
     /// <param name="httpContextAccessor">Injected service for providing the current HTTP context.</param>
     /// <param name="serverConfigurationOptions">Injected server configuration application settings.</param>
-    public ApiHttpClient(HttpClient httpClient, IHttpContextAccessor httpContextAccessor, IOptionsSnapshot<ServerConfigurationModel> serverConfigurationOptions)
+    public ApiHttpClient(HttpClient httpClient, IHttpContextAccessor httpContextAccessor, IOptionsSnapshot<ServerConfigurationDto> serverConfigurationOptions)
     {
         _httpClient = httpClient;
         _httpContext = httpContextAccessor.HttpContext;
         // read the API server configuration values from the configuration, and assign them to the injected client
-        ServerConfigurationModel serverConfigurationModel = serverConfigurationOptions.Value;
-        httpClient.BaseAddress = new Uri($"{serverConfigurationModel.BaseAddress}:{serverConfigurationModel.Port}/api/v{serverConfigurationModel.ApiVersion}/");
+        ServerConfigurationDto serverConfiguration = serverConfigurationOptions.Value;
+        httpClient.BaseAddress = new Uri($"{serverConfiguration.BaseAddress}:{serverConfiguration.Port}/api/v{serverConfiguration.ApiVersion}/");
 
         httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
@@ -101,7 +101,7 @@ public class ApiHttpClient : IApiHttpClient
     /// <param name="endpoint">The API endpoint where the request is being sent.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>A model containing the deserialized blob.</returns>
-    public async Task<BlobDataModel> GetBlobAsync(string endpoint, CancellationToken cancellationToken = default)
+    public async Task<BlobDataDto> GetBlobAsync(string endpoint, CancellationToken cancellationToken = default)
     {
         using HttpRequestMessage request = new(HttpMethod.Get, endpoint);
         AuthenticationHeaderValue? authenticationHeader = GetAuthenticationHeader();
@@ -112,10 +112,10 @@ public class ApiHttpClient : IApiHttpClient
         {
             // read the content as a string, for error messages
             string content = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-            ProblemDetailsModel? problemDetails = null;
+            ProblemDetailsDto? problemDetails = null;
             try
             {
-                problemDetails = JsonSerializer.Deserialize<ProblemDetailsModel>(content, _jsonOptions);
+                problemDetails = JsonSerializer.Deserialize<ProblemDetailsDto>(content, _jsonOptions);
             }
             catch { /* if we can't deserialize to ProblemDetails, we'll just use the status code */ }
             throw new ApiException(problemDetails, response.StatusCode);
@@ -123,7 +123,7 @@ public class ApiHttpClient : IApiHttpClient
         // if the response is successful, read it as a byte array
         byte[] responseContent = await response.Content.ReadAsByteArrayAsync(cancellationToken).ConfigureAwait(false);
         string contentType = response.Content.Headers.ContentType?.ToString() ?? "application/octet-stream";
-        return new BlobDataModel { Data = responseContent, ContentType = contentType };
+        return new BlobDataDto { Data = responseContent, ContentType = contentType };
     }
 
     /// <summary>
@@ -142,12 +142,12 @@ public class ApiHttpClient : IApiHttpClient
         HttpResponseMessage response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode)
         {
-            ProblemDetailsModel? problemDetails = null;
+            ProblemDetailsDto? problemDetails = null;
             string content = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-            // attempt to deserialize the response content to ProblemDetailsModel if the request fails
+            // attempt to deserialize the response content to ProblemDetailsDto if the request fails
             try
             {
-                problemDetails = JsonSerializer.Deserialize<ProblemDetailsModel>(content, _jsonOptions);
+                problemDetails = JsonSerializer.Deserialize<ProblemDetailsDto>(content, _jsonOptions);
             }
             catch { /* if we can't deserialize to ProblemDetails, we'll just use the status code */ }
             throw new ApiException(problemDetails, response.StatusCode, request.RequestUri?.AbsolutePath);
@@ -194,13 +194,13 @@ public class ApiHttpClient : IApiHttpClient
 
     /// <summary>
     /// Sends an HTTP request and deserializes the response into the specified type if the request is successful.
-    /// If the request fails, it attempts to deserialize the response content into a <see cref="ProblemDetailsModel"/> and throws an <see cref="ApiException"/>.
+    /// If the request fails, it attempts to deserialize the response content into a <see cref="ProblemDetailsDto"/> and throws an <see cref="ApiException"/>.
     /// </summary>
     /// <typeparam name="TResponse">The expected type of the response content.</typeparam>
     /// <param name="request">The <see cref="HttpRequestMessage"/> to be sent.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>The deserialized response content as an object of type <typeparamref name="TResponse"/>.</returns>
-    /// <exception cref="ApiException">Thrown if the response is not successful, with the <see cref="ProblemDetailsModel"/> if available.</exception>
+    /// <exception cref="ApiException">Thrown if the response is not successful, with the <see cref="ProblemDetailsDto"/> if available.</exception>
     private async Task<TResponse> SendRequestAsync<TResponse>(HttpRequestMessage request, CancellationToken cancellationToken)
     {
         // send the HTTP request and read the response
@@ -216,11 +216,11 @@ public class ApiHttpClient : IApiHttpClient
         }
         else
         {
-            ProblemDetailsModel? problemDetails = null;
-            // attempt to deserialize the response content to ProblemDetailsModel if the request fails
+            ProblemDetailsDto? problemDetails = null;
+            // attempt to deserialize the response content to ProblemDetailsDto if the request fails
             try
             {
-                problemDetails = JsonSerializer.Deserialize<ProblemDetailsModel>(content, _jsonOptions);
+                problemDetails = JsonSerializer.Deserialize<ProblemDetailsDto>(content, _jsonOptions);
             }
             catch { /* if we can't deserialize to ProblemDetails, we'll just use the status code */ }
             throw new ApiException(problemDetails, response.StatusCode, request.RequestUri?.AbsolutePath);

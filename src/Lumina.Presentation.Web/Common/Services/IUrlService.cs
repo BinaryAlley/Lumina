@@ -1,16 +1,15 @@
 namespace Lumina.Presentation.Web.Common.Services;
 
 /// <summary>
-/// Interface for the service for generating URLs from action and controller names, with URL localization.
+/// Interface for the service for generating absolute URLs from the application route templates, with URL localization.
 /// </summary>
 public interface IUrlService
 {
     /// <summary>
-    /// Generates an absolute URL for the specified controller action.
+    /// Generates an absolute URL for the specified route template.
     /// </summary>
-    /// <param name="action">The action name within the controller.</param>
-    /// <param name="controller">The controller name.</param>
-    /// <param name="additionalRouteValues">Optional additional route values, like query parameters.</param>
-    /// <returns>An absolute URL to the specified action.</returns>
-    string? GetAbsoluteUrl(string action, string controller, object? additionalRouteValues = null);
+    /// <param name="routeTemplate">The route template of the target page or endpoint, taken from the <see cref="Lumina.Presentation.Web.Common.Routes.WebRoutes"/> constants.</param>
+    /// <param name="additionalRouteValues">Optional additional route values, like route parameters.</param>
+    /// <returns>An absolute URL to the specified route.</returns>
+    string? GetAbsoluteUrl(string routeTemplate, object? additionalRouteValues = null);
 }

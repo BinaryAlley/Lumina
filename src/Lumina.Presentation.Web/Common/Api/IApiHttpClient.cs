@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Models.FileSystemManagement;
+using Lumina.Presentation.Web.Common.DTO.FileSystemManagement;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -36,7 +36,7 @@ public interface IApiHttpClient
     /// <param name="endpoint">The API endpoint where the request is being sent.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>A model containing the deserialized blob.</returns>
-    Task<BlobDataModel> GetBlobAsync(string endpoint, CancellationToken cancellationToken = default);
+    Task<BlobDataDto> GetBlobAsync(string endpoint, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Sends a DELETE request to the specified <paramref name="endpoint"/> as an asynchronous operation.
