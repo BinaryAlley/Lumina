@@ -2,6 +2,7 @@
 using Lumina.Contracts.Fixtures.Core.Responses.FileSystemManagement.Common;
 using Lumina.Presentation.Api.Fixtures.Core.Endpoints.FileSystemManagement;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Xunit;
 #endregion
@@ -12,6 +13,7 @@ namespace Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 /// Marks a test to be skipped when the file system does not support the <see cref="FileAttributes.Hidden"/> attribute.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method)]
+[ExcludeFromCodeCoverage]
 public sealed class SkipWhenHiddenAttributeNotSupportedFactAttribute : FactAttribute
 {
     /// <summary>

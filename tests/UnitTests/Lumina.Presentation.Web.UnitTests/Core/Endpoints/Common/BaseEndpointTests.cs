@@ -5,6 +5,7 @@ using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.Fixtures.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
@@ -14,6 +15,7 @@ namespace Lumina.Presentation.Web.UnitTests.Core.Endpoints.Common;
 /// <summary>
 /// Contains unit tests for the <see cref="Lumina.Presentation.Web.Core.Endpoints.Common.BaseEndpoint"/> class.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class BaseEndpointTests
 {
     private readonly BaseEndpointFixture _sut;

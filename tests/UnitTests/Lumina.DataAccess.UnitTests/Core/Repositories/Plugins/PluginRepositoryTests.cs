@@ -7,6 +7,7 @@ using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,6 +18,7 @@ namespace Lumina.DataAccess.UnitTests.Core.Repositories.Plugins;
 /// <summary>
 /// Contains unit tests for the <see cref="PluginRepository"/> class.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class PluginRepositoryTests
 {
     private readonly LuminaDbContext _mockContext;

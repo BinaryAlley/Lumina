@@ -2,6 +2,7 @@
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Domain.Common.Primitives;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 #endregion
 
 namespace Lumina.Application.UnitTests.Common.Setup;
@@ -9,6 +10,7 @@ namespace Lumina.Application.UnitTests.Common.Setup;
 /// <summary>
 /// Validator extension methods for <see cref="IValidator{TRequest}"/> for unit tests.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public static class ValidatorTestExtensions
 {
     /// <summary>
