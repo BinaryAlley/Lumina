@@ -1,0 +1,477 @@
+@*
+/library/manage/item/{id:guid}
+*@
+
+@using Lumina.Presentation.Web.Common.DTO.Libraries
+@using Lumina.Presentation.Web.Common.Services
+@using Microsoft.AspNetCore.Mvc.Localization
+
+@{
+    var id = Context.Request.RouteValues["id"] as string;
+    // generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler
+    var scriptId = ScriptIdentifierHelper.GenerateScriptId();
+}
+
+@inject IUrlService _urlService
+@inject IViewLocalizer _localizer
+
+@model LibraryDto
+
+@await Component.InvokeAsync("FileSystemBrowser")
+
+<div style="display: grid; grid-template-rows: auto 1fr;"><!--container with two rows, one fixed, one filling remaining space-->
+    <div style="min-height: 1rem;"></div><!--the first row is a dummy row for "margin", because setting a margin on the next row would offset the parent's position-->
+    <div class="enlightenment-panel shadow-effect mx-auto panel w-50 mb-10" style="min-width: 320px;">
+        <div class="shine-effect"></div>
+        <form method="post" id="add-media-library-form" class="inline">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" value="@id" />
+            <input type="hidden" asp-for="UserId" value="@Model.UserId"/>
+            <div class="form-row">
+                <h1 class="text-light-two w-100 text-center pt-0 pb-0 engraved-title">
+                    @(_localizer[id is not null ? "EditLibrary" : "AddNewLibrary"])
+                </h1>
+            </div>
+            <div class="form-container">
+                <h3 class="text-light-two">@_localizer["GeneralInformation"]</h3>
+                <!-- Title -->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label asp-for="Title">@_localizer["Title"]</label>
+                        <span class="mandatory-field">*</span>:
+                    </div>
+                    <div class="form-field">
+                        <input asp-for="Title" class="enlightenment-input" />
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionTitle"]</small>
+                </div>
+                <!-- Library Type -->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label asp-for="LibraryType">@_localizer["LibraryType"]</label>
+                        <span class="mandatory-field">*</span>:
+                    </div>
+                    <div class="form-field">
+                        <div class="enlightenment-combobox inline-block w-100">
+                            <div class="shine-effect" style="top: 1px;"></div>
+                            <input type="checkbox" class="enlightenment-toggle-checkbox" id="library-type" />
+                            <label class="enlightenment-toggle" for="library-type">
+                                <span id="library-selected-item" class="enlightenment-selected-text" data-value="@(Model.LibraryType ?? "Book")">@(Model.LibraryType ?? _localizer["Book"].Value)</span>
+                            </label>
+                            <div class="enlightenment-dropdown">
+                                <div class="shine-effect" style="top: -4px;"></div>
+                                <div class="enlightenment-option first-option disabled">@_localizer["WrittenContent"]</div>
+                                <div class="enlightenment-option" data-value="Book">@_localizer["Book"]</div>
+                                <div class="enlightenment-option" data-value="EBook">@_localizer["EBook"]</div>
+                                <div class="enlightenment-option" data-value="BookSeries">@_localizer["BookSeries"]</div>
+                                <div class="enlightenment-option" data-value="ComicBook">@_localizer["ComicBook"]</div>
+                                <div class="enlightenment-option" data-value="ComicSeries">@_localizer["ComicSeries"]</div>
+                                <div class="enlightenment-option" data-value="Magazine">@_localizer["Magazine"]</div>
+                                <div class="enlightenment-option" data-value="Manga">@_localizer["Manga"]</div>
+                                <div class="enlightenment-option" data-value="GraphicNovel">@_localizer["GraphicNovel"]</div>
+                                <div class="enlightenment-option" data-value="AcademicPaper">@_localizer["AcademicPaper"]</div>
+                                <div class="enlightenment-option" data-value="SheetMusic">@_localizer["SheetMusic"]</div>
+                                <div class="enlightenment-option" data-value="Screenplay">@_localizer["Screenplay"]</div>
+                                <div class="enlightenment-option disabled">@_localizer["VideoContent"]</div>
+                                <div class="enlightenment-option" data-value="TvShow">@_localizer["TvShow"]</div>
+                                <div class="enlightenment-option" data-value="Movie">@_localizer["Movie"]</div>
+                                <div class="enlightenment-option" data-value="FilmSeries">@_localizer["FilmSeries"]</div>
+                                <div class="enlightenment-option" data-value="FilmFranchise">@_localizer["FilmFranchise"]</div>
+                                <div class="enlightenment-option" data-value="Concert">@_localizer["Concert"]</div>
+                                <div class="enlightenment-option" data-value="Documentary">@_localizer["Documentary"]</div>
+                                <div class="enlightenment-option" data-value="Tutorial">@_localizer["Tutorial"]</div>
+                                <div class="enlightenment-option" data-value="Personal">@_localizer["Personal"]</div>
+                                <div class="enlightenment-option" data-value="Anime">@_localizer["Anime"]</div>
+                                <div class="enlightenment-option" data-value="Youtube">@_localizer["Youtube"]</div>
+                                <div class="enlightenment-option" data-value="Videoclip">@_localizer["Videoclip"]</div>
+                                <div class="enlightenment-option disabled">@_localizer["AudioContent"]</div>
+                                <div class="enlightenment-option" data-value="Music">@_localizer["Music"]</div>
+                                <div class="enlightenment-option" data-value="AudioBook">@_localizer["AudioBook"]</div>
+                                <div class="enlightenment-option" data-value="LivePerformance">@_localizer["LivePerformance"]</div>
+                                <div class="enlightenment-option" data-value="Interview">@_localizer["Interview"]</div>
+                                <div class="enlightenment-option" data-value="Cover">@_localizer["Cover"]</div>
+                                <div class="enlightenment-option" data-value="Remix">@_localizer["Remix"]</div>
+                                <div class="enlightenment-option" data-value="Soundeffect">@_localizer["Soundeffect"]</div>
+                                <div class="enlightenment-option" data-value="Podcast">@_localizer["Podcast"]</div>
+                                <div class="enlightenment-option" data-value="RadioShow">@_localizer["RadioShow"]</div>
+                                <div class="enlightenment-option disabled">@_localizer["VisualContent"]</div>
+                                <div class="enlightenment-option" data-value="PhotoAlbum">@_localizer["PhotoAlbum"]</div>
+                                <div class="enlightenment-option disabled">@_localizer["MiscellaneousContent"]</div>
+                                <div class="enlightenment-option last-option" data-value="Other">@_localizer["Other"]</div>
+                            </div>
+                        </div>
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionLibraryType"]</small>
+                </div>
+                <!-- Cover -->
+                <div class="form-row mt-10">
+                    <div class="form-label">
+                        <label asp-for="CoverImage">@_localizer["CoverImage"]</label>:
+                        <img src="~/images/ui/add-file.svg" alt="@_localizer["AddImage"]" id="add-media-cover" title="@_localizer["AddImage"]" class="add-form-table-row-icon ml-5" />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div id="add-media-cover-form-table" class="form-table w-100">
+                        @if (Model.CoverImage is not null)
+                        {
+                        <div class="form-table-row">
+                            <span title="@Model.CoverImage">@Model.CoverImage</span>
+                            <img src="~/images/ui/delete.svg" alt="@_localizer["Remove"]" title="@_localizer["Remove"]" class="remove-form-table-row-icon" />
+                        </div>
+                        }
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionCover"]</small>
+                </div>
+                <!-- Directories -->
+                <div class="form-row mt-10">
+                    <div class="form-label">
+                        <label asp-for="ContentLocations">@_localizer["Directories"]</label>
+                        <span class="mandatory-field">*</span>:
+                        <img src="~/images/ui/add-directory.svg" alt="@_localizer["AddDirectory"]" id="add-media-directory" title="@_localizer["AddDirectory"]" class="add-form-table-row-icon ml-5" />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div id="add-media-directory-form-table" class="form-table w-100">
+                        @for (int i = 0; i < Model.ContentLocations.Count; i++)
+                        {
+                            <div class="form-table-row">
+                                <span title="@Model.ContentLocations[i]">@Model.ContentLocations[i]</span>
+                                <img src="~/images/ui/delete.svg" alt="@_localizer["Remove"]" title="@_localizer["Remove"]" class="remove-form-table-row-icon" />
+                            </div>
+                        }
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionDirectories"]</small>
+                </div>
+
+                <h3 class="text-light-two">@_localizer["AdvancedSettings"]</h3>
+                <div class="form-row">
+                    <div class="form-label">
+                        <label asp-for="IsEnabled">@_localizer["Enabled"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <label class="enlightenment-checkbox-label">
+                            <input type="checkbox" asp-for="IsEnabled" class="enlightenment-checkbox-hidden" />
+                            <span class="enlightenment-checkbox"></span>
+                        </label>
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionEnabled"]</small>
+                </div>
+                <div class="form-row">
+                    <div class="form-label">
+                        <label asp-for="IsLocked">@_localizer["Locked"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <label class="enlightenment-checkbox-label">
+                            <input type="checkbox" asp-for="IsLocked" class="enlightenment-checkbox-hidden" />
+                            <span class="enlightenment-checkbox"></span>
+                        </label>
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionLocked"]</small>
+                </div>
+                <div class="form-row">
+                    <div class="form-label">
+                        <label asp-for="DownloadMetadataFromWeb">@_localizer["DownloadMetadataFromWeb"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <label class="enlightenment-checkbox-label">
+                            <input type="checkbox" asp-for="DownloadMetadataFromWeb" class="enlightenment-checkbox-hidden"/>
+                            <span class="enlightenment-checkbox"></span>
+                        </label>
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionDownloadMetadataFromWeb"]</small>
+                </div>
+                <div class="form-row">
+                    <div class="form-label">
+                        <label asp-for="ShouldSaveMetadataInMediaDirectories">@_localizer["ShouldSaveMetadataInMediaDirectories"]:</label>
+                    </div>
+                    <div class="form-field">
+                        <label class="enlightenment-checkbox-label">
+                            <input type="checkbox" asp-for="ShouldSaveMetadataInMediaDirectories" class="enlightenment-checkbox-hidden" />
+                            <span class="enlightenment-checkbox"></span>
+                        </label>
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionShouldSaveMetadataInMediaDirectories"]</small>
+                </div>
+                <div class="form-row">
+                    <div class="form-label">
+                        <label asp-for="ShouldSkipUnchangedDirectoriesDuringScan">@_localizer["ShouldSkipUnchangedDirectoriesDuringScan"]:</label>
+                    </div>
+                    <div class="form-field">
+                        <label class="enlightenment-checkbox-label">
+                            <input type="checkbox" asp-for="ShouldSkipUnchangedDirectoriesDuringScan" class="enlightenment-checkbox-hidden" />
+                            <span class="enlightenment-checkbox"></span>
+                        </label>
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionShouldSkipUnchangedDirectoriesDuringScan"]</small>
+                </div>
+                @if (id is not null)
+                {
+                    <h3 class="text-light-two">@_localizer["MetadataProviders"]</h3>
+                    <div class="form-row">
+                        <table id="metadata-providers-table" class="w-100">
+                            <thead>
+                                <tr>
+                                    <th class="w-50">@_localizer["Name"]</th>
+                                    <th class="w-15 text-center">@_localizer["Enabled"]</th>
+                                    <th class="w-35 text-center">@_localizer["Order"]</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- metadata providers will be populated here -->
+                            </tbody>
+                        </table>
+                        <small class="form-label text-disabled form-description">@_localizer["DescriptionMetadataProviders"]</small>
+                    </div>
+                }
+                <div class="form-row">
+                    <button type="submit" class="confirm-button w-100px">@_localizer["Save"]</button>
+                </div>
+            </div>
+        </form>
+        <!-- section success -->
+        <div class="text-center w-100">
+            <p id="save-success" class="text-light-one w-100 hidden">@_localizer["LibrarySaved"]</p>
+            <button id="btn-back-to-libraries" type="button" class="abort-button h-22px w-180px mx-auto mt-10 hidden">@_localizer["BackToLibraries"]</button>
+            <button id="btn-add-new-library" type="button" class="confirm-button h-22px w-180px mx-auto mt-10 hidden">@_localizer["AddNewLibrary"]</button>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script type="text/javascript" data-form="@scriptId" defer>
+        // create cleanup registry for this view
+        const cleanupFunctions = [];
+
+        const saveSuccess = document.getElementById('save-success');
+        const btnBackToLibraries = document.getElementById('btn-back-to-libraries');
+        const btnAddNewLibrary = document.getElementById('btn-add-new-library');
+        const form = document.getElementById('add-media-library-form');
+        const imgAddMediaDirectory = document.getElementById('add-media-directory');
+        const imgAddCover = document.getElementById('add-media-cover');
+        const mediaCoverFormTable = document.getElementById('add-media-cover-form-table');
+        const mediaDirectoriesFormTable = document.getElementById('add-media-directory-form-table');
+        const chkIsEnabled = form.querySelector('[name="IsEnabled"]');
+        const chkIsLocked = form.querySelector('[name="IsLocked"]');
+        const chkDownloadMetadataFromWeb = form.querySelector('[name="DownloadMetadataFromWeb"]');
+        const chkShouldSaveMetadataInMediaDirectories = form.querySelector('[name="ShouldSaveMetadataInMediaDirectories"]');
+        const chkShouldSkipUnchangedDirectoriesDuringScan = form.querySelector('[name="ShouldSkipUnchangedDirectoriesDuringScan"]');
+
+        // create new or update existing media library
+        async function handleAddMediaLibraryAsync() {
+            const formData = {
+                Id: form.querySelector('[name="Id"]').value || null,
+                UserId: form.querySelector('[name="UserId"]').value || null,
+                Title: form.querySelector('[name="Title"]').value,
+                LibraryType: form.querySelector('#library-selected-item').getAttribute('data-value'),
+                ContentLocations: Array.from(mediaDirectoriesFormTable.querySelectorAll('.form-table-row span'))
+                    .map(span => span.textContent),
+                CoverImage: (() => {
+                    // get the first (and only) span in the mediaCoverFormTable, if it exists
+                    const coverSpan = mediaCoverFormTable.querySelector('.form-table-row span');
+                    return coverSpan ? coverSpan.textContent : null; // return null if no cover image is selected
+                })(),
+                IsEnabled: chkIsEnabled.checked,
+                IsLocked: chkIsLocked.checked,
+                DownloadMetadataFromWeb: chkDownloadMetadataFromWeb.checked,
+                ShouldSaveMetadataInMediaDirectories: chkShouldSaveMetadataInMediaDirectories.checked,
+                ShouldSkipUnchangedDirectoriesDuringScan: chkShouldSkipUnchangedDirectoriesDuringScan.checked
+            };
+            const data = await callApiPostAsync('@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.SAVE_LIBRARY)', formData);
+            if (data) {
+                form.classList.replace('inline', 'hidden');
+                saveSuccess.classList.replace('hidden', 'inline');
+                btnAddNewLibrary.classList.replace('hidden', 'block');
+                btnBackToLibraries.classList.replace('hidden', 'block');
+            }
+        }
+
+        function addMediaLibraryDirectories(selectedPaths) {
+            // process the selected paths (remove quotes and split by comma)
+            const paths = selectedPaths.slice(1, -1).split('","');
+            // add each path as a new row
+            paths.forEach(path => {
+                // normalize the path for comparison
+                const normalizedPath = path.replace(/\\\\/g, '\\');
+                // use querySelectorAll and compare explicitly, so that duplicates are not permitted 
+                const existingPaths = Array.from(mediaDirectoriesFormTable.querySelectorAll('span[title]'));
+                const isDuplicate = existingPaths.some(span => span.getAttribute('title') === normalizedPath);
+                if (!isDuplicate) {
+                    mediaDirectoriesFormTable.insertAdjacentHTML('beforeend', `
+                        <div class="form-table-row">
+                            <span title="${normalizedPath}">${normalizedPath}</span>
+                            <img src="/images/ui/delete.svg" alt="@_localizer["Remove"]" title="@_localizer["Remove"]" class="remove-form-table-row-icon" onclick="this.closest('.form-table-row').remove();" />
+                        </div>
+                    `);
+                }
+            });
+        }
+
+        function addMediaLibraryCoverImage(selectedPaths) {
+            // process the selected paths
+            const paths = selectedPaths.slice(1, -1).split('","');
+            // ensure only one row is allowed by first clearing all previous rows
+            mediaCoverFormTable.innerHTML = ''; 
+            // add the first valid path (if any) as a new row
+            if (paths.length > 0) {
+                const path = paths[0]; // only use the first path
+                mediaCoverFormTable.insertAdjacentHTML('beforeend', `
+                    <div class="form-table-row">
+                        <span title="${path}">${path}</span>
+                        <img src="/images/ui/delete.svg" alt="@_localizer["Remove"]" title="@_localizer["Remove"]" class="remove-form-table-row-icon" onclick="this.closest('.form-table-row').remove();" />
+                    </div>
+                `);
+            }
+        }
+
+        // on Enter key pressed
+        const handleEnterKey = async function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                await handleAddMediaLibraryAsync();
+            }
+        };
+
+        // on form submit event
+        const handleSubmit = async function(e) {
+            e.preventDefault();
+            await handleAddMediaLibraryAsync();
+        };
+
+        // on back to libraries button click
+        const handleBtnBackToLibrariesClick = function() {
+            window.location.href = '@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.INDEX)';
+        };
+
+        // on add new library button click
+        const handleBtnAddNewLibraryClick = function() {
+            window.location.href = '@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.EDIT_LIBRARY)';
+        };
+
+        // on add media directory image click
+        const handleImgAddMediaDirectoryClick = async function() {
+            await showFileSystemBrowserDialogAsync('C:\\Users\\', true, false, addMediaLibraryDirectories); // TODO: take path and include hidden elements from settings
+        };
+
+        // on add cover image click
+        const handleImgAddCoverClick = async function() {
+            await showFileSystemBrowserDialogAsync('C:\\Users\\', true, true, addMediaLibraryCoverImage); // TODO: take path and include hidden elements from settings
+        };
+
+        // on remove row icon click
+        const handleRowRemoval = (e) => {
+            if (e.target.matches('.remove-form-table-row-icon')) 
+                e.target.parentElement.remove();
+        };
+
+        const id = '@id';
+        const metadataProvidersTable = document.getElementById('metadata-providers-table');
+        const metadataProvidersTbody = metadataProvidersTable ? metadataProvidersTable.querySelector('tbody') : null;
+
+        // loads the metadata providers configured for the library, when editing an existing library
+        async function loadMetadataProvidersAsync() {
+            if (!id || !metadataProvidersTbody) return;
+            const url = '@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.GET_METADATA_PROVIDERS, new { libraryId = default(Guid) })'
+                .replace('/@(default(Guid))', `/${id}`); // libraryId needs to be replaced here, because GetAbsoluteUrl is server side, libraryId is client side
+            const response = await callApiGetAsync(url);
+            if (response && response.length > 0) {
+                metadataProvidersTbody.innerHTML = response.map((provider, index) => renderMetadataProviderRow(provider, index, response.length)).join('');
+            }
+        }
+
+        // renders a metadata provider row of the library
+        function renderMetadataProviderRow(provider, index, count) {
+            return `
+                <tr data-provider-plugin-id="${provider.pluginId}">
+                    <td>${provider.name}</td>
+                    <td class="text-center">
+                        <input type="checkbox" class="metadata-provider-enabled" ${provider.isEnabled ? 'checked' : ''} />
+                    </td>
+                    <td class="text-center">
+                        <button type="button" class="metadata-provider-move-up confirm-button f-12 h-20px" ${index === 0 ? 'disabled' : ''}>@_localizer["MoveUp"]</button>
+                        <button type="button" class="metadata-provider-move-down abort-button f-12 h-20px" ${index === count - 1 ? 'disabled' : ''}>@_localizer["MoveDown"]</button>
+                    </td>
+                </tr>`;
+        }
+
+        // on metadata provider move button click, reorders the providers and persists the new order
+        async function handleMetadataProviderReorderAsync(e) {
+            const button = e.target.closest('.metadata-provider-move-up, .metadata-provider-move-down');
+            if (!button || !metadataProvidersTbody) return;
+            const row = button.closest('tr');
+            if (button.classList.contains('metadata-provider-move-up')) {
+                const previousRow = row.previousElementSibling;
+                if (previousRow) metadataProvidersTbody.insertBefore(row, previousRow);
+            } else {
+                const nextRow = row.nextElementSibling;
+                if (nextRow) metadataProvidersTbody.insertBefore(nextRow, row);
+            }
+            await saveMetadataProviderOrderAsync();
+        }
+
+        // persists the current order of the metadata providers of the library
+        async function saveMetadataProviderOrderAsync() {
+            if (!id || !metadataProvidersTbody) return;
+            const pluginIds = Array.from(metadataProvidersTbody.querySelectorAll('tr[data-provider-plugin-id]'))
+                .map(row => row.getAttribute('data-provider-plugin-id'));
+            const result = await callApiPutAsync('@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.REORDER_METADATA_PROVIDERS)', { libraryId: id, pluginIds: pluginIds });
+            if (result.success) {
+                notificationService.show('@_localizer["OrderSaved"]', NotificationType.SUCCESS);
+            }
+        }
+
+        // on metadata provider enabled checkbox change, persists the new state
+        async function handleMetadataProviderEnabledChangeAsync(e) {
+            if (e.target.matches('.metadata-provider-enabled')) {
+                const row = e.target.closest('tr');
+                const pluginId = row.getAttribute('data-provider-plugin-id');
+                const isEnabled = e.target.checked;
+                const result = await callApiPutAsync('@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.SET_METADATA_PROVIDER_ENABLED)', { libraryId: id, pluginId: pluginId, isEnabled: isEnabled });
+                if (!result.success) {
+                    e.target.checked = !isEnabled;
+                }
+            }
+        };
+
+        // add listeners
+        form.addEventListener('keypress', handleEnterKey);
+        form.addEventListener('submit', handleSubmit);
+        btnBackToLibraries.addEventListener('click', handleBtnBackToLibrariesClick);
+        btnAddNewLibrary.addEventListener('click', handleBtnAddNewLibraryClick);
+        imgAddMediaDirectory.addEventListener('click', handleImgAddMediaDirectoryClick);
+        imgAddCover.addEventListener('click', handleImgAddCoverClick);
+        mediaCoverFormTable.addEventListener('click', handleRowRemoval);
+        mediaDirectoriesFormTable.addEventListener('click', handleRowRemoval);
+        if (metadataProvidersTbody) {
+            metadataProvidersTbody.addEventListener('click', handleMetadataProviderReorderAsync);
+            metadataProvidersTbody.addEventListener('change', handleMetadataProviderEnabledChangeAsync);
+        }
+
+        // register cleanup for these listeners
+        cleanupFunctions.push(() => {
+            form.removeEventListener('keypress', handleEnterKey);
+            form.removeEventListener('submit', handleSubmit);
+            btnBackToLibraries.removeEventListener('click', handleBtnBackToLibrariesClick);
+            btnAddNewLibrary.removeEventListener('click', handleBtnAddNewLibraryClick);
+            imgAddMediaDirectory.removeEventListener('click', handleImgAddMediaDirectoryClick);
+            imgAddCover.removeEventListener('click', handleImgAddCoverClick);
+            mediaCoverFormTable.removeEventListener('click', handleRowRemoval);
+            mediaDirectoriesFormTable.removeEventListener('click', handleRowRemoval);
+            if (metadataProvidersTbody) {
+                metadataProvidersTbody.removeEventListener('click', handleMetadataProviderReorderAsync);
+                metadataProvidersTbody.removeEventListener('change', handleMetadataProviderEnabledChangeAsync);
+            }
+        });
+
+        // load the metadata providers when editing an existing library
+        if (id) {
+            loadMetadataProvidersAsync();
+        }
+
+        // store all cleanups for this view on window object using the scriptId
+        window.viewCleanups = window.viewCleanups || {};
+        window.viewCleanups['@scriptId'] = () => {
+            cleanupFunctions.forEach(cleanup => cleanup());
+            console.log(`Unloaded @scriptId`);
+        };
+        console.log(`Loaded @scriptId`);
+    </script>
+}

@@ -6,6 +6,7 @@ using Lumina.DataAccess.Core.Repositories.Plugins;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Primitives;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,6 +17,7 @@ namespace Lumina.DataAccess.UnitTests.Core.Repositories.Plugins;
 /// <summary>
 /// Contains unit tests for the <see cref="LibraryMetadataProviderConfigurationRepository"/> class.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class LibraryMetadataProviderConfigurationRepositoryTests
 {
     private readonly LuminaDbContext _mockContext;

@@ -7,6 +7,7 @@ using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.Boo
 using Lumina.Domain.Fixtures.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using System;
+using System.Diagnostics.CodeAnalysis;
 #endregion
 
 namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
@@ -14,6 +15,7 @@ namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.WrittenConten
 /// <summary>
 /// Contains unit tests for the <see cref="BookMetadataDtoMapping"/> class.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class BookMetadataDtoMappingTests
 {
     private readonly BookFixture _bookFixture = new();

@@ -42,7 +42,7 @@ public class AddRoleEndpoint : BaseEndpoint<AddRoleRequest, IResult>
     }
 
     /// <summary>
-    /// Creates a new authorization role.
+    /// Adds a new authorization role.
     /// </summary>
     /// <param name="request">The request containing the authorization role to be created.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>

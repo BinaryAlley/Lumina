@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Models.Common;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Hybrid;
 using System;
@@ -53,7 +52,7 @@ public class CachedAuthorizationHandler : DelegatingHandler
             return await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
         }
         // otherwise, check the hybrid cache to see if there is a cached authorization
-        CachedResponseModel response = await _hybridCache.GetOrCreateAsync(
+        CachedResponse response = await _hybridCache.GetOrCreateAsync(
             cacheKey,
             async (cancellationToken) =>
             {
@@ -61,7 +60,7 @@ public class CachedAuthorizationHandler : DelegatingHandler
                 HttpResponseMessage result = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
                 string content = await result.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
                 // cache both status code and content
-                return new CachedResponseModel
+                return new CachedResponse
                 {
                     Content = content,
                     StatusCode = result.StatusCode

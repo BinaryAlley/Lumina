@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Models.Common;
+using Lumina.Presentation.Web.Common.DTO.Common;
 using System;
 using System.Net;
 #endregion
@@ -19,7 +19,7 @@ public class ApiException : Exception
     /// <summary>
     /// Gets or sets the problem details represented by this exception.
     /// </summary>
-    public ProblemDetailsModel? ProblemDetails { get; }
+    public ProblemDetailsDto? ProblemDetails { get; }
 
     /// <summary>
     /// Gets or sets the absolute path of the API endpoint that produced this exception.
@@ -32,7 +32,7 @@ public class ApiException : Exception
     /// <param name="problemDetails">The problem details object returned by the API.</param>
     /// <param name="httpStatusCode">The HTTP status code returned by the API.</param>
     /// <param name="requestPath">The absolute path of the API endpoint that produced this exception.</param>
-    public ApiException(ProblemDetailsModel? problemDetails, HttpStatusCode httpStatusCode, string? requestPath = null) : base(problemDetails?.Title ?? "An error occurred.")
+    public ApiException(ProblemDetailsDto? problemDetails, HttpStatusCode httpStatusCode, string? requestPath = null) : base(problemDetails?.Title ?? "An error occurred.")
     {
         ProblemDetails = problemDetails;
         HttpStatusCode = httpStatusCode;

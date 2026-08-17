@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Models.Configuration;
+using Lumina.Presentation.Web.Common.DTO.Configuration;
 using Lumina.Presentation.Web.Common.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,13 +26,13 @@ internal static class PresentationWebLayerConfiguration
         configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
         configuration.AddJsonFile("appsettings.development.json", optional: true, reloadOnChange: true);
         
-        serviceCollection.AddOptions<ServerConfigurationModel>()
-                         .Bind(configuration.GetRequiredSection(ServerConfigurationModel.SECTION_NAME))
+        serviceCollection.AddOptions<ServerConfigurationDto>()
+                         .Bind(configuration.GetRequiredSection(ServerConfigurationDto.SECTION_NAME))
                          .ValidateFluently()
                          .ValidateOnStart();
 
-        serviceCollection.AddOptions<EncryptionSettingsModel>()
-                         .Bind(configuration.GetRequiredSection(EncryptionSettingsModel.SECTION_NAME))
+        serviceCollection.AddOptions<EncryptionSettingsDto>()
+                         .Bind(configuration.GetRequiredSection(EncryptionSettingsDto.SECTION_NAME))
                          .ValidateFluently()
                          .ValidateOnStart();
 

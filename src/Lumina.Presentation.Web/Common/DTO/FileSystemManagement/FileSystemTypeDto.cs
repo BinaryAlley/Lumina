@@ -1,0 +1,18 @@
+#region ========================================================================= USING =====================================================================================
+using Lumina.Presentation.Web.Common.Enums.FileSystem;
+using System.Diagnostics;
+#endregion
+
+namespace Lumina.Presentation.Web.Common.DTO.FileSystemManagement;
+
+/// <summary>
+/// Data transfer object containing the file system platform type.
+/// </summary>`
+[DebuggerDisplay("PlatformType: {PlatformType}")]
+public class FileSystemTypeDto
+{
+    /// <summary>
+    /// Gets or sets the file system platform type.
+    /// </summary>
+    public PlatformType PlatformType { get; set; }
+}

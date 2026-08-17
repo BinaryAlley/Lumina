@@ -1,71 +1,73 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Presentation.Web.Common.Routes;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Controllers;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Routing;
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Reflection;
 #endregion
 
 namespace Lumina.Presentation.Web.Common.Services;
 
 /// <summary>
-/// Service for generating URLs from action and controller names, with URL localization.
+/// Service for generating absolute URLs for the application routes, with URL localization.
 /// </summary>
 public class UrlService : IUrlService
 {
-    private readonly LinkGenerator _linkGenerator;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IActionDescriptorCollectionProvider _actionDescriptorCollectionProvider;
+
+    /// <summary>
+    /// The collection of route templates defined in the <see cref="WebRoutes"/> constants, used to validate the requested routes.
+    /// </summary>
+    private static readonly HashSet<string> s_knownRouteTemplates = GetKnownRouteTemplates();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UrlService"/> class.
     /// </summary>
-    /// <param name="linkGenerator">The ASP.NET Core link generator service.</param>
     /// <param name="httpContextAccessor">Provides access to the current HTTP context.</param>
-    /// <param name="actionDescriptorCollectionProvider">The <see cref="IActionDescriptorCollectionProvider"/> used to retrieve information about the application's routes and actions.</param>
-    public UrlService(LinkGenerator linkGenerator, IHttpContextAccessor httpContextAccessor, IActionDescriptorCollectionProvider actionDescriptorCollectionProvider)
+    public UrlService(IHttpContextAccessor httpContextAccessor)
     {
-        _linkGenerator = linkGenerator;
         _httpContextAccessor = httpContextAccessor;
-        _actionDescriptorCollectionProvider = actionDescriptorCollectionProvider;
     }
 
     /// <summary>
-    /// Generates an absolute URL for the specified controller action.
+    /// Generates an absolute URL for the specified route template.
     /// </summary>
-    /// <param name="action">The action name within the controller.</param>
-    /// <param name="controller">The controller name.</param>
-    /// <param name="additionalRouteValues">Optional additional route values, like query parameters.</param>
-    /// <returns>An absolute URL to the specified action.</returns>
-    public string? GetAbsoluteUrl(string action, string controller, object? additionalRouteValues = null)
+    /// <param name="routeTemplate">The route template of the target page or endpoint, taken from the <see cref="WebRoutes"/> constants.</param>
+    /// <param name="additionalRouteValues">Optional additional route values, like route parameters.</param>
+    /// <returns>An absolute URL to the specified route.</returns>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="routeTemplate"/> is not one of the route templates defined in the <see cref="WebRoutes"/> constants.</exception>
+    public string? GetAbsoluteUrl(string routeTemplate, object? additionalRouteValues = null)
     {
+        // fail fast when the route template is not one of the ones defined in the WebRoutes constants, instead of silently generating a broken URL
+        if (!s_knownRouteTemplates.Contains(routeTemplate))
+            throw new ArgumentException($"The route template '{routeTemplate}' is not defined in the WebRoutes constants.", nameof(routeTemplate));
+
         HttpContext? httpContext = _httpContextAccessor.HttpContext;
         if (httpContext is null)
             return null;
-        string scheme = httpContext.Request.Scheme;
         string culture = httpContext.Request.RouteValues["culture"]?.ToString() ?? "en-US";
-        // find the controller's route template
-        ControllerActionDescriptor? controllerActionDescriptor = _actionDescriptorCollectionProvider
-            .ActionDescriptors.Items
-            .OfType<ControllerActionDescriptor>()
-            .FirstOrDefault(controllerActionDescription =>
-                controllerActionDescription.ControllerName.Equals(controller, StringComparison.OrdinalIgnoreCase) &&
-                controllerActionDescription.ActionName.Equals(action, StringComparison.OrdinalIgnoreCase));
-        if (controllerActionDescriptor is null)
-            return null;
-        // check if the route template contains {culture}
-        string? routeTemplate = controllerActionDescriptor.AttributeRouteInfo?.Template;
-        bool needsCulture = routeTemplate?.Contains("{culture}") == true;
-        // merge culture and additional values
-        RouteValueDictionary routeValues = [];
-        if (needsCulture)
-            routeValues.Add("culture", culture);
+        string path = routeTemplate.Replace("{culture}", culture, StringComparison.OrdinalIgnoreCase);
         if (additionalRouteValues is not null)
-            foreach (PropertyInfo prop in additionalRouteValues.GetType().GetProperties())
-                routeValues.Add(prop.Name, prop.GetValue(additionalRouteValues));
+            foreach (PropertyInfo property in additionalRouteValues.GetType().GetProperties())
+                path = path.Replace($"{{{property.Name}}}", property.GetValue(additionalRouteValues)?.ToString(), StringComparison.OrdinalIgnoreCase);
+        // ensure the path starts with a slash, so that it is relative to the server root when concatenated with the host and the path base
+        if (!path.StartsWith('/'))
+            path = "/" + path;
+        // build the absolute URL from the request's scheme, host and path base
+        return $"{httpContext.Request.Scheme}://{httpContext.Request.Host}{httpContext.Request.PathBase}{path}";
+    }
 
-        return _linkGenerator.GetUriByAction(httpContext: httpContext, action: action, controller: controller, values: routeValues, scheme: scheme);
+    /// <summary>
+    /// Collects the values of all route template constants defined in the <see cref="WebRoutes"/> class.
+    /// </summary>
+    /// <returns>The set of the route templates defined in the <see cref="WebRoutes"/> constants.</returns>
+    private static HashSet<string> GetKnownRouteTemplates()
+    {
+        HashSet<string> routeTemplates = [];
+        foreach (Type nestedType in typeof(WebRoutes).GetNestedTypes())
+            foreach (FieldInfo field in nestedType.GetFields(BindingFlags.Public | BindingFlags.Static))
+                if (field.IsLiteral && field.FieldType == typeof(string))
+                    routeTemplates.Add((string)field.GetValue(null)!);
+        return routeTemplates;
     }
 }
