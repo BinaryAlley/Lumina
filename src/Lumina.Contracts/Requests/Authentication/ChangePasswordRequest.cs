@@ -1,3 +1,7 @@
+#region ========================================================================= USING =====================================================================================
+using System.Diagnostics;
+#endregion
+
 namespace Lumina.Contracts.Requests.Authentication;
 
 /// <summary>
@@ -7,6 +11,7 @@ namespace Lumina.Contracts.Requests.Authentication;
 /// <param name="CurrentPassword">The current password of the account. Required.</param>
 /// <param name="NewPassword">The new password of the account. Required.</param>
 /// <param name="NewPasswordConfirm">The confirmation of the new password of the account. Required.</param>
+[DebuggerDisplay("Username: {Username}")]
 public record ChangePasswordRequest(
     string? Username,
     string? CurrentPassword,

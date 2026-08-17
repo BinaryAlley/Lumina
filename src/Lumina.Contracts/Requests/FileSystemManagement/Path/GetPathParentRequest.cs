@@ -6,9 +6,9 @@ using System.Text.Json.Serialization;
 namespace Lumina.Contracts.Requests.FileSystemManagement.Path;
 
 /// <summary>
-/// Represents a request to get the root of a file system path.
+/// Represents the request for retrieving the parent path of a file system path.
 /// </summary>
-/// <param name="Path">The file system path for which to get the root. Required.</param>
+/// <param name="Path">The path for which the parent path is retrieved.</param>
 [DebuggerDisplay("Path: {Path}")]
 public record GetPathParentRequest(
     string? Path
