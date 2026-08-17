@@ -1,0 +1,197 @@
+@*
+/auth/register/
+*@
+
+@using Lumina.Presentation.Web.Common.Requests.UsersManagement
+@using Lumina.Presentation.Web.Common.Services
+@using Microsoft.AspNetCore.Mvc.Localization
+
+@{
+    string? registrationType = ViewData["RegistrationType"] as string;
+    // generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler
+    var scriptId = ScriptIdentifierHelper.GenerateScriptId();
+}
+
+@inject IUrlService _urlService
+@inject IViewLocalizer _localizer
+
+@model RegisterRequest
+
+<div style="display: grid; grid-template-rows: auto 1fr;"><!--container with two rows, one fixed, one filling remaining space-->
+    <div style="min-height: 1rem;"></div><!--the first row is a dummy row for "margin", because setting a margin on the next row would offset the parent's position-->
+    <div class="enlightenment-panel shadow-effect p-2 mx-auto panel w-50 mb-10" style="min-width: 320px;">
+        <div class="shine-effect"></div>
+        <form method="post" id="register-account-form" class="inline">
+            @Html.AntiForgeryToken()
+            <!-- section for determining registration type (regular user/admin) -->
+            <input type="hidden" name="RegistrationType" value="@registrationType" />
+            <div class="form-container">
+                @if (registrationType == "Admin")
+                {
+                    <div class="form-row">
+                        <p class="invalid-feedback w-95 text-center f-18">@_localizer["AdminAccountRegistration"]</p>
+                    </div>
+                }
+                <!-- Username -->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label asp-for="Username">@_localizer["Username"]</label>
+                        <span class="mandatory-field">*</span>:
+                    </div>
+                    <div class="form-field">
+                        <input asp-for="Username" autocomplete="username" class="enlightenment-input" />
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionUsername"]</small>
+                </div>
+                <!-- Password -->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label asp-for="Password">@_localizer["Password"]</label>
+                        <span class="mandatory-field">*</span>:
+                    </div>
+                    <div class="form-field">
+                        <input type="password" asp-for="Password" autocomplete="new-password" class="enlightenment-input" />
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionPassword"]</small>
+                </div>
+                <!-- Password Confirm-->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label asp-for="PasswordConfirm">@_localizer["PasswordConfirm"]</label>
+                        <span class="mandatory-field">*</span>:
+                    </div>
+                    <div class="form-field">
+                        <input type="password" asp-for="PasswordConfirm" autocomplete="new-password" class="enlightenment-input" />
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionPasswordConfirm"]</small>
+                </div>
+                <!-- 2FA -->
+                <input type="hidden" id="hidden-use-two-fa" name="use2fa" value="true">
+                <div class="form-row">
+                    <div class="form-field">
+                        <label class="enlightenment-checkbox-label">
+                            <input type="checkbox" asp-for="Use2fa" class="enlightenment-checkbox-hidden" value="true" checked/>
+                            <span class="enlightenment-checkbox"></span>
+                            @_localizer["EnableTwoFactorAuthentication"]
+                        </label>
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["Description2Fa"]</small>
+                </div>
+                <div class="form-row">
+                    <span id="register-two-fa-attention" class="invalid-feedback w-95 text-center hidden">@_localizer["DisclaimerTwoFactor"]</span>
+                </div>
+                <div class="form-row" style="justify-content: center;">
+                    <button type="submit" class="confirm-button h-22px">@_localizer["RegisterKey"]</button>
+                </div>
+            </div>
+        </form>
+        <!-- section registration success -->
+        <div class="text-center w-100">
+            <p id="register-success" class="text-light-one w-100 hidden">@_localizer["AccountCreated"]</p>
+            <img id="totp-image" class="w-200px h-200px h-align-m mx-auto mt-10 hidden" />
+            <p id="totp-message" class="text-light-one w-100 hidden">@_localizer["ScanTotpCode"]</p>
+            @if (User?.Identity?.IsAuthenticated == false)
+            {
+                <button id="btn-login" type="button" class="confirm-button h-22px mx-auto mt-10 hidden">@_localizer["Login"]</button>
+            }
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script type="text/javascript" data-form="@scriptId" defer>
+        // create cleanup registry for this view
+        const cleanupFunctions = [];
+
+        const form = document.getElementById('register-account-form');
+        const txtUsername = form.querySelector('[name="Username"]');
+        const txtPassword = form.querySelector('[name="Password"]');
+        const txtPasswordConfirm = form.querySelector('[name="PasswordConfirm"]');
+        const chkUse2FA = form.querySelector('[name="Use2fa"]');
+        const registerSuccess = document.getElementById('register-success');
+        const totpMessage = document.querySelector('#totp-message');
+        const totpImage = document.querySelector('#totp-image');
+        const btnLogin = document.getElementById('btn-login');
+        const spnTwoFaAttention = document.getElementById('register-two-fa-attention');
+        const useTwoFaInput = document.getElementById('hidden-use-two-fa');
+
+        // perform the account registration
+        async function handleRegisterAccountAsync() {
+            const formData = {
+                Username: txtUsername.value,
+                Password: txtPassword.value,
+                PasswordConfirm: txtPasswordConfirm.value,
+                Use2fa: chkUse2FA.checked,
+                RegistrationType: form.querySelector('[name="RegistrationType"]').value
+            };
+            const data = await callApiPostAsync('@_urlService.GetAbsoluteUrl(WebRoutes.Authentication.REGISTER)', formData);
+            if (data) {
+                txtUsername.value = '';
+                txtPassword.value = '';
+                txtPasswordConfirm.value = '';
+                form.classList.replace('inline', 'hidden');
+                registerSuccess.classList.replace('hidden', 'inline');
+                if (btnLogin)
+                    btnLogin.classList.replace('hidden', 'block');
+                if (chkUse2FA.checked) {
+                    totpMessage.classList.remove('hidden');
+                    totpMessage.classList.add('block');
+
+                    totpImage.classList.remove('hidden');
+                    totpImage.classList.add('block');
+                    totpImage.setAttribute('src', data.totpSecret);
+                }
+            }
+        }
+
+        // on Enter key pressed
+        const handleEnterKey = async function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                await handleRegisterAccountAsync();
+            }
+        };
+
+        // on form submit event
+        const handleSubmit = async function(e) {
+            e.preventDefault();
+            await handleRegisterAccountAsync();
+        };
+
+        // on use 2FA change event
+        const handleChkUse2FAChange = function() {
+            const isChecked = this.checked;
+            spnTwoFaAttention.classList.replace(
+                isChecked ? 'inline' : 'hidden',
+                isChecked ? 'hidden' : 'inline'
+            );
+            useTwoFaInput.value = isChecked.toString();
+        };
+
+        // on login button click
+        const handleBtnLoginClick = function() {
+            window.location.href = '@_urlService.GetAbsoluteUrl(WebRoutes.Authentication.LOGIN_VIEW)';
+        };
+
+        // add listeners
+        form.addEventListener('keypress', handleEnterKey);
+        form.addEventListener('submit', handleSubmit);
+        chkUse2FA.addEventListener('click', handleChkUse2FAChange);
+        btnLogin.addEventListener('click', handleBtnLoginClick);
+
+        // register cleanup for these listeners
+        cleanupFunctions.push(() => {
+            form.removeEventListener('keypress', handleEnterKey);
+            form.removeEventListener('submit', handleSubmit);
+            chkUse2FA.removeEventListener('click', handleChkUse2FAChange);
+            btnLogin.removeEventListener('click', handleBtnLoginClick);
+        });
+
+        // store all cleanups for this view on window object using the scriptId
+        window.viewCleanups = window.viewCleanups || {};
+        window.viewCleanups['@scriptId'] = () => {
+            cleanupFunctions.forEach(cleanup => cleanup());
+            console.log(`Unloaded @scriptId`);
+        };
+        console.log(`Loaded @scriptId`);
+    </script>
+}

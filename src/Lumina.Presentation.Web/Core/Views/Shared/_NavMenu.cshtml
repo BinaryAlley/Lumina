@@ -1,0 +1,226 @@
+@using Lumina.Presentation.Web.Common.Authorization
+@using Lumina.Presentation.Web.Common.Enums.Authorization
+@using Lumina.Presentation.Web.Common.Services
+@using Microsoft.AspNetCore.Mvc.Localization
+@using System.Threading
+
+@inject IUrlService _urlService
+@inject IViewLocalizer _localizer
+@inject IAuthorizationService _auth
+
+<input type="checkbox" id="hamburger-input" class="burger-shower" />
+<label id="hamburger-menu" for="hamburger-input">
+    <span></span>
+    <span></span>
+    <span></span>
+    <nav id="mobile-menu">
+        <div id="mobile-menu-content">
+            <div class="mobile-menu-heading">
+                Lumina
+            </div>
+            <ul>                
+                <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Home.INDEX_CULTURED)"><span>@_localizer["Home"]</span></a></li>
+            </ul>
+            <div class="mobile-menu-heading">
+                @_localizer["Account"]
+            </div>
+            <ul>
+                @if (User?.Identity?.IsAuthenticated == false)
+                {
+                    <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Authentication.LOGIN_VIEW)"><span>@_localizer["Login"]</span></a></li>
+                    <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Authentication.LOGIN_VIEW)"><span>@_localizer["RecoverPassword"]</span></a></li>
+                }
+                else
+                {
+                    <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Authentication.LOGOUT)"><span>@_localizer["Logout"]</span></a></li>
+                }
+                @if (User?.Identity?.IsAuthenticated == true)
+                {
+                    <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Authentication.REGISTER_VIEW)" class="nav-link"><span>@_localizer["Register"]</span></a></li>
+                    <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Authentication.CHANGE_PASSWORD_VIEW)" class="nav-link"><span>@_localizer["ChangePassword"]</span></a></li>
+                    <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Authentication.PROFILE_VIEW)" class="nav-link"><span>@_localizer["Profile"]</span></a></li>
+                }
+            </ul>
+            @if (User?.Identity?.IsAuthenticated == true)
+            {
+                @if (await _auth.IsInRoleAsync("Admin", CancellationToken.None))
+                {
+                    <div class="mobile-menu-heading">
+                        @_localizer["Administrator"]
+                    </div>
+                    <ul>
+                        <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Admin.MANAGE_ROLES)" class="nav-link"><span>@_localizer["ManageRoles"]</span></a></li>
+                        <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Admin.MANAGE_PERMISSIONS)" class="nav-link"><span>@_localizer["ManagePermissions"]</span></a></li>
+                        <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Plugins.INDEX)" class="nav-link"><span>@_localizer["Plugins"]</span></a></li>
+                    </ul>
+                }
+                <div class="mobile-menu-heading">
+                    @_localizer["Library"]
+                </div>
+                <ul>
+                    <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.INDEX)" class="nav-link"><span>@_localizer["ManageLibraries"]</span></a></li>
+                    @if (await _auth.IsInRoleAsync("Admin", CancellationToken.None) || await _auth.HasPermissionAsync(AuthorizationPermission.CanCreateLibraries, CancellationToken.None))
+                    {
+                        <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.ADD_LIBRARY)" class="nav-link"><span>@_localizer["AddNewLibrary"]</span></a></li>
+                    }
+                </ul>
+                <div class="mobile-menu-heading">
+                    @_localizer["WrittenContent"]
+                </div>
+                <ul>
+                    <li><a href="library/written-content-library/books-library/books" class="nav-link"><span>@_localizer["Books"]</span></a></li>
+                    <li><a href="library/written-content/magazines" class="nav-link"><span>@_localizer["Magazines"]</span></a></li>
+                </ul>
+                <div class="mobile-menu-heading">
+                    @_localizer["Audio"]
+                </div>
+                <ul>
+                    <li><a href="library/audio/music" class="nav-link"><span>@_localizer["Music"]</span></a></li>
+                    <li><a href="library/audio/interviews" class="nav-link"><span>@_localizer["Interviews"]</span></a></li>
+                </ul>
+                <div class="mobile-menu-heading">
+                    @_localizer["Video"]
+                </div>
+                <ul>
+                    <li><a href="library/video/movies" class="nav-link"><span>@_localizer["Movies"]</span></a></li>
+                    <li><a href="library/video/tvshows" class="nav-link"><span>@_localizer["TvShows"]</span></a></li>
+                </ul>
+            }
+            <div class="mobile-menu-heading">
+                @_localizer["Language"]
+            </div>
+            <ul>
+                <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Language.SET_LANGUAGE)?newCulture=zh-cn&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set"><span>简体中文</span></a></li><!--CN-->
+                <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Language.SET_LANGUAGE)?newCulture=de-de&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set"><span>Deutsch</span></a></li><!--DE-->
+                <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Language.SET_LANGUAGE)?newCulture=en-us&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set"><span>English</span></a></li><!--EN-->
+                <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Language.SET_LANGUAGE)?newCulture=es-es&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set"><span>Español</span></a></li><!--ES-->
+                <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Language.SET_LANGUAGE)?newCulture=fr-fr&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set"><span>Français</span></a></li><!--FR-->
+                <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Language.SET_LANGUAGE)?newCulture=it-it&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set"><span>Italiano</span></a></li><!--IT-->
+                <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Language.SET_LANGUAGE)?newCulture=ja-jp&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set"><span>日本語</span></a></li><!--JP-->
+                <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Language.SET_LANGUAGE)?newCulture=ro-ro&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set"><span>Română</span></a></li><!--RO-->
+                <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Language.SET_LANGUAGE)?newCulture=ru-ru&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set"><span>Русский</span></a></li><!--RU-->
+            </ul>
+            @if (User?.Identity?.IsAuthenticated == true)
+            {
+                <div class="mobile-menu-heading">
+                    @_localizer["Tools"]
+                </div>
+                <ul>
+                    <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Settings.INDEX)" class="nav-link"><span>@_localizer["Settings"]</span></a></li>
+                </ul>
+            }
+            <div class="mobile-menu-heading">
+                @_localizer["Help"]
+            </div>
+            <ul>
+                <li><a href="help/documentation" class="nav-link"><span>@_localizer["Documentation"]</span></a></li>
+                <li><a href="help/about" class="nav-link"><span>@_localizer["About"]</span></a></li>
+            </ul>
+        </div>
+    </nav>
+</label>
+<nav class="menubar">
+    <ul>
+        <li tabindex="0" class="top-level-menuitem">
+            <label for="account-menu">Lumina</label>
+            <ul>
+                <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Home.INDEX_CULTURED)">@_localizer["Home"]</a></li>
+            </ul>
+        </li>
+        <li tabindex="0" class="top-level-menuitem">
+            <label for="account-menu">@_localizer["Account"]</label>
+            <ul>
+                @if (User?.Identity?.IsAuthenticated == false)
+                {
+                    <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Authentication.LOGIN_VIEW)">@_localizer["Login"]</a></li>
+                    <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Authentication.RECOVER_PASSWORD_VIEW)">@_localizer["RecoverPassword"]</a></li>
+                }
+                else
+                {
+                    <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Authentication.LOGOUT)">@_localizer["Logout"]</a></li>
+                }
+                @if (User?.Identity?.IsAuthenticated == true)
+                {
+                    <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Authentication.REGISTER_VIEW)" class="nav-link">@_localizer["Register"]</a></li>
+                    <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Authentication.CHANGE_PASSWORD_VIEW)" class="nav-link">@_localizer["ChangePassword"]</a></li>
+                    <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Authentication.PROFILE_VIEW)" class="nav-link">@_localizer["Profile"]</a></li>
+                }
+            </ul>
+        </li>
+        @if (User?.Identity?.IsAuthenticated == true)
+        {
+            @if (await _auth.IsInRoleAsync("Admin", CancellationToken.None))
+            {
+                <li tabindex="1" class="top-level-menuitem">
+                    <label for="administrator-menu">@_localizer["Administrator"]</label>
+                    <ul>
+                        <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Admin.MANAGE_ROLES)" class="nav-link">@_localizer["ManageRoles"]</a></li>
+                        <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Admin.MANAGE_PERMISSIONS)" class="nav-link">@_localizer["ManagePermissions"]</a></li>
+                        <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Plugins.INDEX)" class="nav-link">@_localizer["Plugins"]</a></li>
+                    </ul>
+                </li>
+            }
+            <li tabindex="2" class="top-level-menuitem">
+                <label for="library-menu">@_localizer["Library"]</label>
+                <ul>
+                    <li tabindex="0"><a href="@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.INDEX)" class="nav-link">@_localizer["ManageLibraries"]</a></li>
+                    @if (await _auth.IsInRoleAsync("Admin", CancellationToken.None) || await _auth.HasPermissionAsync(AuthorizationPermission.CanCreateLibraries, CancellationToken.None))
+                    {
+                        <li tabindex="0"><a href="@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.ADD_LIBRARY)" class="nav-link">@_localizer["AddNewLibrary"]</a></li>
+                    }
+                    <li class="has-submenu" tabindex="0">
+                        <label>@_localizer["WrittenContent"]</label>
+                        <ul>
+                            <li><a href="library/written-content-library/books-library/books" class="nav-link">@_localizer["Books"]</a></li>
+                            <li><a href="library/written-content/magazines" class="nav-link">@_localizer["Magazines"]</a></li>
+                        </ul>
+                    </li>
+                    <li class="has-submenu" tabindex="0">
+                        <label>@_localizer["Audio"]</label>
+                        <ul>
+                            <li><a href="library/audio/music" class="nav-link">@_localizer["Music"]</a></li>
+                            <li><a href="library/audio/interviews" class="nav-link">@_localizer["Interviews"]</a></li>
+                        </ul>
+                    </li>
+                    <li class="has-submenu" tabindex="0">
+                        <label>@_localizer["Video"]</label>
+                        <ul>
+                            <li><a href="library/video/movies" class="nav-link">@_localizer["Movies"]</a></li>
+                            <li><a href="library/video/tvshows" class="nav-link">@_localizer["TvShows"]</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        }
+        <li tabindex="3" class="top-level-menuitem">
+            <label for="tools-menu">@_localizer["Tools"]</label>
+            <ul>
+                <li class="has-submenu" tabindex="0">
+                    <label>@_localizer["Language"]</label>
+                    <ul>
+                        <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Language.SET_LANGUAGE)?newCulture=zh-cn&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set">简体中文</a></li><!--CN-->
+                        <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Language.SET_LANGUAGE)?newCulture=de-de&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set">Deutsch</a></li><!--DE-->
+                        <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Language.SET_LANGUAGE)?newCulture=en-us&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set">English</a></li><!--EN-->
+                        <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Language.SET_LANGUAGE)?newCulture=es-es&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set">Español</a></li><!--ES-->
+                        <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Language.SET_LANGUAGE)?newCulture=fr-fr&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set">Français</a></li><!--FR-->
+                        <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Language.SET_LANGUAGE)?newCulture=it-it&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set">Italiano</a></li><!--IT-->
+                        <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Language.SET_LANGUAGE)?newCulture=ja-jp&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set">日本語</a></li><!--JP-->
+                        <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Language.SET_LANGUAGE)?newCulture=ro-ro&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set">Română</a></li><!--RO-->
+                        <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Language.SET_LANGUAGE)?newCulture=ru-ru&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set">Русский</a></li><!--RU-->
+                    </ul>
+                </li>
+                @if (User?.Identity?.IsAuthenticated == true)
+                {
+                    <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Settings.INDEX)" class="nav-link">@_localizer["Settings"]</a></li>
+                }
+            </ul>
+        </li>
+        <li tabindex="4" class="top-level-menuitem">
+            <label for="help-menu">@_localizer["Help"]</label>
+            <ul>
+                <li><a href="help/documentation" class="nav-link">@_localizer["Documentation"]</a></li>
+                <li><a href="help/about" class="nav-link">@_localizer["About"]</a></li>
+            </ul>
+        </li>
+    </ul>
+</nav>

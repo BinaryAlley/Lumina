@@ -1,0 +1,317 @@
+@*
+/library/written-content-library/books-library/books?libraryId=...
+*@
+
+@using Lumina.Presentation.Web.Common.DTO.Libraries
+@using Lumina.Presentation.Web.Common.Services
+@using Microsoft.AspNetCore.Mvc.Localization
+
+@{
+    // generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler
+    var scriptId = ScriptIdentifierHelper.GenerateScriptId();
+}
+
+@inject IViewLocalizer _localizer
+@inject IUrlService _urlService
+
+@model LibraryDto
+
+<div class="cotton-candy">
+    <div style="display: grid; grid-template-rows: auto 1fr;">
+        <!--container with two rows, one fixed, one filling remaining space-->
+        <div style="min-height: 1rem;"></div><!--the first row is a dummy row for "margin", because setting a margin on the next row would offset the parent's position-->
+        <div class="pl-10 pr-10 pb-10">
+            <div class="text-center">
+                <h1 class="text-light-two engraved-title">@(Model.Title ?? string.Empty)</h1>
+            </div>
+            <div class="form-row">
+                <input id="search-input" type="text" class="enlightenment-input w-200px" placeholder="@_localizer["Search"]" />
+                <button id="search-button" type="button" class="confirm-button">@_localizer["Search"]</button>
+                <button id="sort-toggle" type="button" class="confirm-button">@_localizer["SortAscending"]</button>
+                <span id="count-label" class="text-light-two"></span>
+            </div>
+            <div style="display: flex; align-items: flex-start;">
+                <div id="books-container" class="cards-container justify-start h-100" style="flex: 1; min-width: 0;">
+                    <p id="no-items" class="hidden text-light-two">@_localizer["NoItems"]</p>
+                    <p id="no-items-matching" class="hidden text-light-two">@_localizer["NoItemsMatchFilters"]</p>
+                </div>
+                <div id="alpha-picker" class="alpha-picker"></div>
+            </div>
+            <div id="pagination" class="form-row mx-auto w-25 hidden" style="justify-content: center;">
+                <button id="prev-page" type="button" class="abort-button">@_localizer["Previous"]</button>
+                <span id="page-indicator" class="text-light-two"></span>
+                <button id="next-page" type="button" class="confirm-button">@_localizer["Next"]</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script type="text/javascript" data-form="@scriptId" defer>
+        // create cleanup registry for this view
+        const cleanupFunctions = [];
+        let isInitialized = false;
+        let requestSequence = 0;
+
+        const libraryId = '@(Model.Id ?? Guid.Empty)';
+        const booksContainer = document.getElementById('books-container');
+        const noItemsMessage = document.getElementById('no-items');
+        const noItemsMatchingMessage = document.getElementById('no-items-matching');
+        const searchInput = document.getElementById('search-input');
+        const searchButton = document.getElementById('search-button');
+        const sortToggle = document.getElementById('sort-toggle');
+        const countLabel = document.getElementById('count-label');
+        const alphaPicker = document.getElementById('alpha-picker');
+        const pagination = document.getElementById('pagination');
+        const prevPageButton = document.getElementById('prev-page');
+        const nextPageButton = document.getElementById('next-page');
+        const pageIndicator = document.getElementById('page-indicator');
+
+        // the special alpha keys for numbers and symbols, followed by the letters
+        const alphaKeys = ['#', '*', ...Array.from({ length: 26 }, (_, index) => String.fromCharCode(65 + index))];
+
+        const state = {
+            currentPage: 1,
+            perPage: null,
+            searchTerm: '',
+            alphaKey: null,
+            ignoreThePrefix: false,
+            sortOrder: 'Ascending'
+        };
+
+        const jsLocalizedStrings = {
+            all: '@_localizer["All"]',
+            items: '@_localizer["Items"]',
+            of: '@_localizer["Of"]',
+            page: '@_localizer["Page"]',
+            sortAscending: '@_localizer["SortAscending"]',
+            sortDescending: '@_localizer["SortDescending"]'
+        };
+
+        // builds the URL of the retrieval endpoint, from the current state
+        function buildItemsUrl() {
+            const url = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.GET_LIBRARY_ITEMS)';
+            const params = new URLSearchParams();
+            params.set('libraryId', libraryId);
+            if (state.perPage !== null) {
+                params.set('currentPage', state.currentPage);
+                params.set('perPage', state.perPage);
+            }
+            if (state.searchTerm !== '')
+                params.set('searchTerm', state.searchTerm);
+            if (state.alphaKey !== null)
+                params.set('filterAlphaKey', state.alphaKey);
+            params.set('ignoreThePrefixForAlphaPicker', state.ignoreThePrefix);
+            params.set('sortOrder', state.sortOrder);
+            return `${url}?${params.toString()}`;
+        }
+
+        // retrieves the books and renders them, ignoring stale responses of earlier requests
+        async function loadItemsAsync() {
+            const requestId = ++requestSequence;
+            const response = await callApiGetAsync(buildItemsUrl());
+            if (requestId !== requestSequence)
+                return;
+            if (response)
+                renderItems(response);
+        }
+
+        // renders the retrieved books, the count label and the pagination controls
+        function renderItems(response) {
+            booksContainer.querySelectorAll('.media-panel').forEach(card => card.remove());
+
+            const hasActiveFilters = state.searchTerm !== '' || state.alphaKey !== null;
+            if (response.count === 0) {
+                booksContainer.classList.add('justify-center');
+                noItemsMessage.classList.toggle('hidden', hasActiveFilters);
+                noItemsMatchingMessage.classList.toggle('hidden', !hasActiveFilters);
+            } else {
+                booksContainer.classList.remove('justify-center');
+                noItemsMessage.classList.add('hidden');
+                noItemsMatchingMessage.classList.add('hidden');
+                response.data.forEach(book => booksContainer.appendChild(createBookCard(book)));
+            }
+
+            updateCountLabel(response);
+            updatePagination(response);
+        }
+
+        // creates a portrait card for a book, with its cover image (or a placeholder) and its title
+        function createBookCard(book) {
+            const card = document.createElement('div');
+            card.className = 'media-panel';
+            card.style.width = '160px';
+            card.style.height = '240px';
+
+            const image = document.createElement('img');
+            image.src = book.coverPath
+                ? `${globalConfiguration.serverBasePath}${book.coverPath}`
+                : `/images/ui/book-placeholder.svg`;
+            image.alt = book.title;
+
+            const titleSpan = document.createElement('span');
+            titleSpan.className = 'text-light-two';
+            const title = document.createElement('strong');
+            title.textContent = book.title;
+            titleSpan.appendChild(title);
+
+            card.appendChild(image);
+            card.appendChild(titleSpan);
+            return card;
+        }
+
+        // updates the count label: total items when pagination is off, displayed range out of total when it is on
+        function updateCountLabel(response) {
+            if (state.perPage === null)
+                countLabel.textContent = `${response.count} ${jsLocalizedStrings.items}`;
+            else if (response.count === 0)
+                countLabel.textContent = `0 ${jsLocalizedStrings.items}`;
+            else {
+                const start = (response.currentPage - 1) * response.perPage + 1;
+                const end = Math.min(response.currentPage * response.perPage, response.count);
+                countLabel.textContent = `${start}-${end} ${jsLocalizedStrings.of} ${response.count}`;
+            }
+        }
+
+        // updates the pagination controls, which are only visible when pagination is enabled
+        function updatePagination(response) {
+            if (state.perPage === null) {
+                pagination.classList.add('hidden');
+                return;
+            }
+            const totalPages = Math.max(1, response.numberOfPages);
+            pagination.classList.remove('hidden');
+            pageIndicator.textContent = `${jsLocalizedStrings.page} ${response.currentPage} ${jsLocalizedStrings.of} ${totalPages}`;
+            prevPageButton.disabled = response.currentPage <= 1;
+            nextPageButton.disabled = response.currentPage >= totalPages;
+        }
+
+        // builds the alpha picker column, with the "All" key followed by the numbers, symbols and letters keys
+        function buildAlphaPicker() {
+            const allKey = document.createElement('span');
+            allKey.className = 'alpha-key';
+            allKey.dataset.alphaKey = '';
+            allKey.textContent = jsLocalizedStrings.all;
+            allKey.addEventListener('click', () => handleAlphaKeyClick(null));
+            alphaPicker.appendChild(allKey);
+
+            alphaKeys.forEach(key => {
+                const alphaKey = document.createElement('span');
+                alphaKey.className = 'alpha-key';
+                alphaKey.dataset.alphaKey = key;
+                alphaKey.textContent = key;
+                alphaKey.addEventListener('click', () => handleAlphaKeyClick(key));
+                alphaPicker.appendChild(alphaKey);
+            });
+
+            updateAlphaPickerActiveState();
+        }
+
+        // highlights the currently active key of the alpha picker
+        function updateAlphaPickerActiveState() {
+            alphaPicker.querySelectorAll('.alpha-key').forEach(key => {
+                const keyValue = key.dataset.alphaKey === '' ? null : key.dataset.alphaKey;
+                key.classList.toggle('alpha-key-active', keyValue === state.alphaKey);
+            });
+        }
+
+        // applies the given alpha key (null clears the alpha filter) and reloads the books
+        function handleAlphaKeyClick(key) {
+            state.alphaKey = key;
+            state.currentPage = 1;
+            updateAlphaPickerActiveState();
+            loadItemsAsync();
+        }
+
+        // applies the search term and reloads the books
+        function handleSearch() {
+            state.searchTerm = searchInput.value.trim();
+            state.currentPage = 1;
+            loadItemsAsync();
+        }
+
+        // triggers the search when the Enter key is pressed in the search input
+        function handleSearchKeydown(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                handleSearch();
+            }
+        }
+
+        // toggles the sort direction and reloads the books
+        function handleSortToggle() {
+            state.sortOrder = state.sortOrder === 'Ascending' ? 'Descending' : 'Ascending';
+            sortToggle.textContent = state.sortOrder === 'Ascending' ? jsLocalizedStrings.sortAscending : jsLocalizedStrings.sortDescending;
+            state.currentPage = 1;
+            loadItemsAsync();
+        }
+
+        // applies an alpha filter when a letter is pressed while the search input does not have focus; Escape clears the alpha filter
+        function handleAlphaKeydown(event) {
+            if (document.activeElement === searchInput)
+                return;
+            if (event.key.length === 1 && /[a-zA-Z]/.test(event.key))
+                handleAlphaKeyClick(event.key.toUpperCase());
+            else if (event.key === 'Escape')
+                handleAlphaKeyClick(null);
+        }
+
+        // loads the settings of the current user, which drive pagination and the alpha picker prefix handling
+        async function loadSettingsAsync() {
+            const data = await callApiGetAsync('@_urlService.GetAbsoluteUrl(WebRoutes.Settings.GET_USER_SETTINGS)');
+            if (data) {
+                state.ignoreThePrefix = data.ignoreThePrefixForAlphaPicker === true;
+                state.perPage = data.isPaginationEnabled === true ? data.itemsPerPage : null;
+            }
+        }
+
+        // navigates to the previous page
+        function handlePrevPageClick() {
+            state.currentPage = Math.max(1, state.currentPage - 1);
+            loadItemsAsync();
+        }
+
+        // navigates to the next page
+        function handleNextPageClick() {
+            state.currentPage = state.currentPage + 1;
+            loadItemsAsync();
+        }
+
+        // add listeners
+        searchButton.addEventListener('click', handleSearch);
+        searchInput.addEventListener('keydown', handleSearchKeydown);
+        sortToggle.addEventListener('click', handleSortToggle);
+        prevPageButton.addEventListener('click', handlePrevPageClick);
+        nextPageButton.addEventListener('click', handleNextPageClick);
+        document.addEventListener('keydown', handleAlphaKeydown);
+        document.addEventListener('DOMContentLoaded', InitializeAsync);
+
+        // register cleanup for these listeners
+        cleanupFunctions.push(() => {
+            searchButton.removeEventListener('click', handleSearch);
+            searchInput.removeEventListener('keydown', handleSearchKeydown);
+            sortToggle.removeEventListener('click', handleSortToggle);
+            prevPageButton.removeEventListener('click', handlePrevPageClick);
+            nextPageButton.removeEventListener('click', handleNextPageClick);
+            document.removeEventListener('keydown', handleAlphaKeydown);
+            document.removeEventListener('DOMContentLoaded', InitializeAsync);
+        });
+
+        async function InitializeAsync() {
+            if (isInitialized)
+                return;
+            isInitialized = true;
+            sortToggle.textContent = jsLocalizedStrings.sortAscending;
+            buildAlphaPicker();
+            await loadSettingsAsync();
+            await loadItemsAsync();
+        }
+
+        // store all cleanups for this view on window object using the scriptId
+        window.viewCleanups = window.viewCleanups || {};
+        window.viewCleanups['@scriptId'] = () => {
+            cleanupFunctions.forEach(cleanup => cleanup());
+            console.log(`Unloaded @scriptId`);
+        };
+        console.log(`Loaded @scriptId`);
+    </script>
+}

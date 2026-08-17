@@ -19,12 +19,16 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="FastEndpoints" Version="8.2.0" />
+        <PackageReference Include="FastEndpoints.Swagger" Version="8.2.0" />
         <PackageReference Include="FluentValidation" Version="12.1.1" />
         <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.11" />
         <PackageReference Include="Microsoft.Extensions.Caching.Hybrid" Version="10.9.0" />
         <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="10.0.11" />
         <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.23.0" />
         <PackageReference Include="Polly" Version="8.7.0" />
+        <PackageReference Include="Scalar.AspNetCore" Version="2.16.20" />
         <PackageReference Include="Serilog" Version="4.4.0" />
         <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
         <PackageReference Include="Serilog.Settings.Configuration" Version="10.0.1" />
@@ -33,326 +37,331 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Update="Resources\Views\Auth\ChangePassword.Designer.cs">
+      <Compile Update="Core\Resources\Views\Auth\ChangePassword.Designer.cs">
         <DesignTime>True</DesignTime>
         <AutoGen>True</AutoGen>
         <DependentUpon>ChangePassword.resx</DependentUpon>
       </Compile>
-      <Compile Update="Resources\Views\Auth\Login.Designer.cs">
+      <Compile Update="Core\Resources\Views\Auth\Login.Designer.cs">
         <DesignTime>True</DesignTime>
         <AutoGen>True</AutoGen>
         <DependentUpon>Login.resx</DependentUpon>
       </Compile>
-      <Compile Update="Resources\Views\Auth\RecoverPassword.Designer.cs">
+      <Compile Update="Core\Resources\Views\Auth\RecoverPassword.Designer.cs">
         <DesignTime>True</DesignTime>
         <AutoGen>True</AutoGen>
         <DependentUpon>RecoverPassword.resx</DependentUpon>
       </Compile>
-      <Compile Update="Resources\Views\Auth\Register.Designer.cs">
+      <Compile Update="Core\Resources\Views\Auth\Register.Designer.cs">
         <DesignTime>True</DesignTime>
         <AutoGen>True</AutoGen>
         <DependentUpon>Register.resx</DependentUpon>
       </Compile>
-      <Compile Update="Resources\Views\Library\Management\Item.Designer.cs">
+      <Compile Update="Core\Resources\Views\Library\Management\Item.Designer.cs">
         <DesignTime>True</DesignTime>
         <AutoGen>True</AutoGen>
         <DependentUpon>Item.resx</DependentUpon>
       </Compile>
+      <Compile Update="Core\Resources\Views\Plugins\Index.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>Index.resx</DependentUpon>
+      </Compile>
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Update="Resources\Common\Middlewares\ExceptionHandlingMiddleware.de-DE.resx">
+      <EmbeddedResource Update="Core\Resources\Common\Middlewares\ExceptionHandlingMiddleware.de-DE.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Common\Middlewares\ExceptionHandlingMiddleware.en-US.resx">
+      <EmbeddedResource Update="Core\Resources\Common\Middlewares\ExceptionHandlingMiddleware.en-US.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Common\Middlewares\ExceptionHandlingMiddleware.es-ES.resx">
+      <EmbeddedResource Update="Core\Resources\Common\Middlewares\ExceptionHandlingMiddleware.es-ES.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Common\Middlewares\ExceptionHandlingMiddleware.fr-FR.resx">
+      <EmbeddedResource Update="Core\Resources\Common\Middlewares\ExceptionHandlingMiddleware.fr-FR.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Common\Middlewares\ExceptionHandlingMiddleware.it-IT.resx">
+      <EmbeddedResource Update="Core\Resources\Common\Middlewares\ExceptionHandlingMiddleware.it-IT.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Common\Middlewares\ExceptionHandlingMiddleware.ja-JP.resx">
+      <EmbeddedResource Update="Core\Resources\Common\Middlewares\ExceptionHandlingMiddleware.ja-JP.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Common\Middlewares\ExceptionHandlingMiddleware.ro-RO.resx">
+      <EmbeddedResource Update="Core\Resources\Common\Middlewares\ExceptionHandlingMiddleware.ro-RO.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Common\Middlewares\ExceptionHandlingMiddleware.ru-RU.resx">
+      <EmbeddedResource Update="Core\Resources\Common\Middlewares\ExceptionHandlingMiddleware.ru-RU.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Common\Middlewares\ExceptionHandlingMiddleware.zh-CN.resx">
+      <EmbeddedResource Update="Core\Resources\Common\Middlewares\ExceptionHandlingMiddleware.zh-CN.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\ChangePassword.de-DE.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\ChangePassword.de-DE.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\ChangePassword.en-US.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\ChangePassword.en-US.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\ChangePassword.es-ES.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\ChangePassword.es-ES.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\ChangePassword.fr-FR.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\ChangePassword.fr-FR.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\ChangePassword.it-IT.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\ChangePassword.it-IT.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\ChangePassword.ja-JP.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\ChangePassword.ja-JP.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\ChangePassword.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\ChangePassword.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
         <LastGenOutput>ChangePassword.Designer.cs</LastGenOutput>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\ChangePassword.ro-RO.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\ChangePassword.ro-RO.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\ChangePassword.ru-RU.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\ChangePassword.ru-RU.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\ChangePassword.zh-CN.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\ChangePassword.zh-CN.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\Login.de-DE.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\Login.de-DE.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\Login.en-US.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\Login.en-US.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\Login.es-ES.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\Login.es-ES.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\Login.fr-FR.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\Login.fr-FR.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\Login.it-IT.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\Login.it-IT.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\Login.ja-JP.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\Login.ja-JP.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\Login.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\Login.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
         <LastGenOutput>Login.Designer.cs</LastGenOutput>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\Login.ro-RO.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\Login.ro-RO.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\Login.ru-RU.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\Login.ru-RU.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\Login.zh-CN.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\Login.zh-CN.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\RecoverPassword.de-DE.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\RecoverPassword.de-DE.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\RecoverPassword.en-US.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\RecoverPassword.en-US.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\RecoverPassword.es-ES.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\RecoverPassword.es-ES.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\RecoverPassword.fr-FR.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\RecoverPassword.fr-FR.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\RecoverPassword.it-IT.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\RecoverPassword.it-IT.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\RecoverPassword.ja-JP.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\RecoverPassword.ja-JP.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\RecoverPassword.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\RecoverPassword.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
         <LastGenOutput>RecoverPassword.Designer.cs</LastGenOutput>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\RecoverPassword.ro-RO.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\RecoverPassword.ro-RO.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\RecoverPassword.ru-RU.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\RecoverPassword.ru-RU.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\RecoverPassword.zh-CN.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\RecoverPassword.zh-CN.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\Register.de-DE.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\Register.de-DE.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\Register.en-US.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\Register.en-US.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\Register.es-ES.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\Register.es-ES.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\Register.fr-FR.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\Register.fr-FR.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\Register.it-IT.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\Register.it-IT.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\Register.ja-JP.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\Register.ja-JP.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\Register.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\Register.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
         <LastGenOutput>Register.Designer.cs</LastGenOutput>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\Register.ro-RO.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\Register.ro-RO.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\Register.ru-RU.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\Register.ru-RU.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Auth\Register.zh-CN.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\Register.zh-CN.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Library\Management\Item.de-DE.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Library\Management\Item.de-DE.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Library\Management\Item.en-US.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Library\Management\Item.en-US.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Library\Management\Item.es-ES.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Library\Management\Item.es-ES.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Library\Management\Item.fr-FR.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Library\Management\Item.fr-FR.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Library\Management\Item.it-IT.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Library\Management\Item.it-IT.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Library\Management\Item.ja-JP.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Library\Management\Item.ja-JP.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Library\Management\Item.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Library\Management\Item.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
         <LastGenOutput>Item.Designer.cs</LastGenOutput>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Library\Management\Item.ro-RO.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Library\Management\Item.ro-RO.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Library\Management\Item.ru-RU.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Library\Management\Item.ru-RU.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Library\Management\Item.zh-CN.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Library\Management\Item.zh-CN.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Shared\Components\FileSystemBrowser\Default.de-DE.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Shared\Components\FileSystemBrowser\Default.de-DE.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Shared\Components\FileSystemBrowser\Default.en-US.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Shared\Components\FileSystemBrowser\Default.en-US.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Shared\Components\FileSystemBrowser\Default.es-ES.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Shared\Components\FileSystemBrowser\Default.es-ES.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Shared\Components\FileSystemBrowser\Default.fr-FR.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Shared\Components\FileSystemBrowser\Default.fr-FR.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Shared\Components\FileSystemBrowser\Default.it-IT.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Shared\Components\FileSystemBrowser\Default.it-IT.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Shared\Components\FileSystemBrowser\Default.ja-JP.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Shared\Components\FileSystemBrowser\Default.ja-JP.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Shared\Components\FileSystemBrowser\Default.ro-RO.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Shared\Components\FileSystemBrowser\Default.ro-RO.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Shared\Components\FileSystemBrowser\Default.ru-RU.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Shared\Components\FileSystemBrowser\Default.ru-RU.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Shared\Components\FileSystemBrowser\Default.zh-CN.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Shared\Components\FileSystemBrowser\Default.zh-CN.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Shared\_Layout.de-DE.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Shared\_Layout.de-DE.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Shared\_Layout.en-US.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Shared\_Layout.en-US.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Shared\_Layout.es-ES.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Shared\_Layout.es-ES.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Shared\_Layout.fr-FR.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Shared\_Layout.fr-FR.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Shared\_Layout.it-IT.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Shared\_Layout.it-IT.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Shared\_Layout.ja-JP.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Shared\_Layout.ja-JP.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Shared\_Layout.ro-RO.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Shared\_Layout.ro-RO.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Shared\_Layout.ru-RU.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Shared\_Layout.ru-RU.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Shared\_Layout.zh-CN.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Shared\_Layout.zh-CN.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Shared\_NavMenu.de-DE.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Shared\_NavMenu.de-DE.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Shared\_NavMenu.en-US.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Shared\_NavMenu.en-US.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Shared\_NavMenu.es-ES.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Shared\_NavMenu.es-ES.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Shared\_NavMenu.fr-FR.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Shared\_NavMenu.fr-FR.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Shared\_NavMenu.it-IT.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Shared\_NavMenu.it-IT.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Shared\_NavMenu.ja-JP.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Shared\_NavMenu.ja-JP.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Shared\_NavMenu.ro-RO.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Shared\_NavMenu.ro-RO.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Shared\_NavMenu.ru-RU.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Shared\_NavMenu.ru-RU.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Shared\_NavMenu.zh-CN.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Shared\_NavMenu.zh-CN.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Plugins\Index.de-DE.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Plugins\Index.de-DE.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Plugins\Index.en-US.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Plugins\Index.en-US.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Plugins\Index.es-ES.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Plugins\Index.es-ES.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Plugins\Index.fr-FR.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Plugins\Index.fr-FR.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Plugins\Index.it-IT.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Plugins\Index.it-IT.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Plugins\Index.ja-JP.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Plugins\Index.ja-JP.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Plugins\Index.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Plugins\Index.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
         <LastGenOutput>Index.Designer.cs</LastGenOutput>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Plugins\Index.ro-RO.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Plugins\Index.ro-RO.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Plugins\Index.ru-RU.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Plugins\Index.ru-RU.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Plugins\Index.zh-CN.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Plugins\Index.zh-CN.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
     </ItemGroup>

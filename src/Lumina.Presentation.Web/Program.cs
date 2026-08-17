@@ -1,13 +1,14 @@
 #region ========================================================================= USING =====================================================================================
+using FastEndpoints;
 using Lumina.Presentation.Web.Common.DependencyInjection;
 using Lumina.Presentation.Web.Common.Utilities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing.Constraints;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Primitives;
+using Scalar.AspNetCore;
 using Serilog;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -92,6 +93,8 @@ public class Program
         app.UseCultureRedirect(); // if the user attempts to go to a localized route without providing a culture, redirect to default culture
         app.UseApiExceptionHandling(); // handle any problem details returned by the API
         app.UseRouting();
+        app.UseAntiforgeryFE(additionalContentTypes: ["application/json"]); // validate the antiforgery token of the JSON requests, sent via the RequestVerificationToken header
+        app.UseRequestLocalization(); // set the culture from the localized routes
         app.UseSession();
         app.UseAuthentication();
         app.UseAuthorization();
@@ -105,17 +108,18 @@ public class Program
             return next();
         });
 
-        // use localized routes for those that need localization
-        app.MapControllerRoute(
-            name: "localized",
-            pattern: "{culture}/{*catchall}",
-            constraints: new { culture = new RegexRouteConstraint("^[a-z]{2}(?:-[A-Z]{2})?$") }
-        );
-        // for the rest, use default routing
-        app.MapControllerRoute(
-            name: "default",
-            pattern: "{*catchall}"
-        );
+        app.UseFastEndpoints();
+
+        // add API documentation (OpenApi/Scalar), so that the endpoints exposed by the web application are discoverable and their contracts are visible
+        app.MapOpenApi();
+        app.UseOpenApi(openApiDocumentMiddlewareSettings => openApiDocumentMiddlewareSettings.Path = "/openapi/{documentName}.json");
+        app.MapScalarApiReference(scalarOptions =>
+        {
+            scalarOptions.WithTitle("Lumina Web")
+                .WithTheme(ScalarTheme.BluePlanet)
+                .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient)
+                .WithDotNetFlag(true);
+        });
 
         await app.RunAsync();
     }
