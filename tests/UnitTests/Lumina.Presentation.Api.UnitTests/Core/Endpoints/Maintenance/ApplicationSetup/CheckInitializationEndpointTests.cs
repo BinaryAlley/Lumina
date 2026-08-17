@@ -43,7 +43,7 @@ public class CheckInitializationEndpointTests
             .Returns(expectedResponse);
 
         // Act
-        IResult result = await _sut.ExecuteAsync(new EmptyRequest(), cancellationToken);
+        IResult result = await _sut.ExecuteAsync(EmptyRequest.Instance, cancellationToken);
 
         // Assert
         Ok<InitializationResponse> okResult = Assert.IsType<Ok<InitializationResponse>>(result);
@@ -59,7 +59,7 @@ public class CheckInitializationEndpointTests
             .Returns(new InitializationResponse(IsInitialized: true));
 
         // Act
-        await _sut.ExecuteAsync(new EmptyRequest(), cancellationToken);
+        await _sut.ExecuteAsync(EmptyRequest.Instance, cancellationToken);
 
         // Assert
         await _mockHandler.Received(1).HandleAsync(
@@ -85,7 +85,7 @@ public class CheckInitializationEndpointTests
             }, callInfo.Arg<CancellationToken>()));
 
         // Act
-        Task<IResult> operationTask = _sut.ExecuteAsync(new EmptyRequest(), cts.Token);
+        Task<IResult> operationTask = _sut.ExecuteAsync(EmptyRequest.Instance, cts.Token);
         await operationStarted.Task;
         cts.Cancel();
         cancellationRequested.SetResult(true);

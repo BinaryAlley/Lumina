@@ -30,7 +30,9 @@ public static class GetBooksLiteRequestMapping
         LibraryFilterDto libraryFilter = new()
         {
             LibraryId = request.LibraryId,
-            SearchTerm = request.SearchTerm
+            SearchTerm = request.SearchTerm,
+            FilterAlphaKey = request.FilterAlphaKey,
+            IgnoreThePrefixForAlphaPicker = request.IgnoreThePrefixForAlphaPicker
         };
 
         return new GetBooksLiteQuery(paginationData, libraryFilter, request.SortBy, request.SortOrder);

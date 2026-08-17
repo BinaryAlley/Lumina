@@ -46,4 +46,46 @@ public class GetBooksLiteQueryValidatorTests
         // Assert
         result.ShouldNotHaveAnyValidationErrors();
     }
+
+    [Fact]
+    public void Validate_WhenFilterAlphaKeyIsNotASingleLetterOrSpecialKey_ShouldHaveValidationError()
+    {
+        // Arrange
+        GetBooksLiteQuery query = _getBooksLiteQueryFixture.Create();
+        query = query with { Filter = query.Filter with { FilterAlphaKey = "AB" } };
+
+        // Act
+        List<Error> result = _validator.TestValidate(query);
+
+        // Assert
+        result.ShouldHaveValidationError(Errors.Library.InvalidFilterAlphaKey);
+    }
+
+    [Fact]
+    public void Validate_WhenFilterAlphaKeyIsASingleLetter_ShouldNotHaveValidationError()
+    {
+        // Arrange
+        GetBooksLiteQuery query = _getBooksLiteQueryFixture.Create();
+        query = query with { Filter = query.Filter with { FilterAlphaKey = "Q" } };
+
+        // Act
+        List<Error> result = _validator.TestValidate(query);
+
+        // Assert
+        result.ShouldNotHaveAnyValidationErrors();
+    }
+
+    [Fact]
+    public void Validate_WhenFilterAlphaKeyIsNumberOrSymbol_ShouldNotHaveValidationError()
+    {
+        // Arrange
+        GetBooksLiteQuery query = _getBooksLiteQueryFixture.Create();
+        query = query with { Filter = query.Filter with { FilterAlphaKey = "#" } };
+
+        // Act
+        List<Error> result = _validator.TestValidate(query);
+
+        // Assert
+        result.ShouldNotHaveAnyValidationErrors();
+    }
 }

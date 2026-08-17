@@ -25,6 +25,8 @@ public class GetBooksLiteRequestFixture
     /// <param name="currentPage">Optional. The page of results to retrieve.</param>
     /// <param name="perPage">Optional. The maximum number of books to retrieve per page.</param>
     /// <param name="searchTerm">Optional. The search term used to filter results.</param>
+    /// <param name="filterAlphaKey">Optional. The alpha key used to filter the results by the first character of their title, for the alpha picker.</param>
+    /// <param name="ignoreThePrefixForAlphaPicker">Optional. Whether the leading "The " prefix of a title should be ignored when computing the alpha key, or not.</param>
     /// <param name="sortBy">Optional. The name of the field by which to sort the results.</param>
     /// <param name="sortOrder">Optional. The direction in which to sort the results.</param>
     /// <returns>The created <see cref="GetBooksLiteRequest"/>.</returns>
@@ -33,6 +35,8 @@ public class GetBooksLiteRequestFixture
         int? currentPage = null,
         int? perPage = null,
         string? searchTerm = null,
+        string? filterAlphaKey = null,
+        bool ignoreThePrefixForAlphaPicker = false,
         string? sortBy = null,
         SortOrder? sortOrder = null)
     {
@@ -41,6 +45,8 @@ public class GetBooksLiteRequestFixture
             CurrentPage: currentPage ?? _faker.Random.Number(1, 100),
             PerPage: perPage ?? _faker.Random.Number(1, 200),
             SearchTerm: searchTerm ?? _faker.Lorem.Word(),
+            FilterAlphaKey: filterAlphaKey,
+            IgnoreThePrefixForAlphaPicker: ignoreThePrefixForAlphaPicker,
             SortBy: sortBy ?? _faker.Lorem.Word(),
             SortOrder: sortOrder ?? _faker.PickRandom<SortOrder>()
         );

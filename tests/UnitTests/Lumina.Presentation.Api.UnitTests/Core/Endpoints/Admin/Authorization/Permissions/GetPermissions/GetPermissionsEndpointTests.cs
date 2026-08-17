@@ -52,7 +52,7 @@ public class GetPermissionsEndpointTests
             .Returns(Result.From(expectedResponse));
 
         // Act
-        IResult result = await _sut.ExecuteAsync(new EmptyRequest(), cancellationToken);
+        IResult result = await _sut.ExecuteAsync(EmptyRequest.Instance, cancellationToken);
 
         // Assert
         Ok<IEnumerable<PermissionResponse>> okResult = Assert.IsType<Ok<IEnumerable<PermissionResponse>>>(result);
@@ -69,7 +69,7 @@ public class GetPermissionsEndpointTests
             .Returns(expectedError);
 
         // Act
-        IResult result = await _sut.ExecuteAsync(new EmptyRequest(), cancellationToken);
+        IResult result = await _sut.ExecuteAsync(EmptyRequest.Instance, cancellationToken);
 
         // Assert
         ProblemHttpResult problemResult = Assert.IsType<ProblemHttpResult>(result);
@@ -94,7 +94,7 @@ public class GetPermissionsEndpointTests
             .Returns(Result.From(response));
 
         // Act
-        await _sut.ExecuteAsync(new EmptyRequest(), cancellationToken);
+        await _sut.ExecuteAsync(EmptyRequest.Instance, cancellationToken);
 
         // Assert
         await _mockHandler.Received(1).HandleAsync(
@@ -120,7 +120,7 @@ public class GetPermissionsEndpointTests
             }, info.Arg<CancellationToken>()));
 
         // Act
-        Task<IResult> operationTask = _sut.ExecuteAsync(new EmptyRequest(), cts.Token);
+        Task<IResult> operationTask = _sut.ExecuteAsync(EmptyRequest.Instance, cts.Token);
         await operationStarted.Task;
         cts.Cancel();
         cancellationRequested.SetResult(true);

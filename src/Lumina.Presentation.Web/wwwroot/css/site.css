@@ -1488,6 +1488,25 @@ th, td {
     margin-left: auto !important;
 }
 
+.alpha-picker {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    overflow-y: auto;
+}
+
+.alpha-key {
+    padding: 0 0.6rem;
+    cursor: pointer;
+    text-align: center;
+    user-select: none;
+}
+
+    .alpha-key:hover,
+    .alpha-key.alpha-key-active {
+        background-color: #00000066;
+    }
+
 /* For phones */
 @media only screen and (max-width: 768px) {
     main {

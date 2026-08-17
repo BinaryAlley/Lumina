@@ -48,7 +48,7 @@ public class GetDrivesEndpointTests
             .Returns(Result.From(expectedResponses.AsEnumerable()));
 
         // Act
-        IResult result = await _sut.ExecuteAsync(new EmptyRequest(), cancellationToken);
+        IResult result = await _sut.ExecuteAsync(EmptyRequest.Instance, cancellationToken);
 
         // Assert
         Ok<IEnumerable<FileSystemTreeNodeResponse>> okResult = Assert.IsType<Ok<IEnumerable<FileSystemTreeNodeResponse>>>(result);
@@ -65,7 +65,7 @@ public class GetDrivesEndpointTests
             .Returns(expectedError);
 
         // Act
-        IResult result = await _sut.ExecuteAsync(new EmptyRequest(), cancellationToken);
+        IResult result = await _sut.ExecuteAsync(EmptyRequest.Instance, cancellationToken);
 
         // Assert
         ProblemHttpResult problemDetails = Assert.IsType<ProblemHttpResult>(result);
@@ -89,7 +89,7 @@ public class GetDrivesEndpointTests
             .Returns(Result.From(Enumerable.Empty<FileSystemTreeNodeResponse>()));
 
         // Act
-        await _sut.ExecuteAsync(new EmptyRequest(), cancellationToken);
+        await _sut.ExecuteAsync(EmptyRequest.Instance, cancellationToken);
 
         // Assert
         await _mockHandler.Received(1).HandleAsync(Arg.Any<GetDrivesQuery>(), Arg.Is(cancellationToken));
@@ -113,7 +113,7 @@ public class GetDrivesEndpointTests
             }, callInfo.Arg<CancellationToken>()));
 
         // Act
-        Task<IResult> operationTask = _sut.ExecuteAsync(new EmptyRequest(), cts.Token);
+        Task<IResult> operationTask = _sut.ExecuteAsync(EmptyRequest.Instance, cts.Token);
         await operationStarted.Task;
         cts.Cancel();
         cancellationRequested.SetResult(true);

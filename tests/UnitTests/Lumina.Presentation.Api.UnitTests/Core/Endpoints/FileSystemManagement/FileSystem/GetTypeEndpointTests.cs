@@ -44,7 +44,7 @@ public class GetTypeEndpointTests
             .Returns(expectedResponse);
 
         // Act
-        IResult result = await _sut.ExecuteAsync(new EmptyRequest(), cancellationToken);
+        IResult result = await _sut.ExecuteAsync(EmptyRequest.Instance, cancellationToken);
 
         // Assert
         Ok<FileSystemTypeResponse> okResult = Assert.IsType<Ok<FileSystemTypeResponse>>(result);
@@ -63,7 +63,7 @@ public class GetTypeEndpointTests
             .Returns(expectedResponse);
 
         // Act
-        IResult result = await _sut.ExecuteAsync(new EmptyRequest(), cancellationToken);
+        IResult result = await _sut.ExecuteAsync(EmptyRequest.Instance, cancellationToken);
 
         // Assert
         Ok<FileSystemTypeResponse> okResult = Assert.IsType<Ok<FileSystemTypeResponse>>(result);
@@ -79,7 +79,7 @@ public class GetTypeEndpointTests
             .Returns(new FileSystemTypeResponse(PlatformType.Windows));
 
         // Act
-        await _sut.ExecuteAsync(new EmptyRequest(), cancellationToken);
+        await _sut.ExecuteAsync(EmptyRequest.Instance, cancellationToken);
 
         // Assert
         await _mockHandler.Received(1).HandleAsync(Arg.Any<GetFileSystemQuery>(), Arg.Is(cancellationToken));
@@ -103,7 +103,7 @@ public class GetTypeEndpointTests
             }, callInfo.Arg<CancellationToken>()));
 
         // Act
-        Task<IResult> operationTask = _sut.ExecuteAsync(new EmptyRequest(), cts.Token);
+        Task<IResult> operationTask = _sut.ExecuteAsync(EmptyRequest.Instance, cts.Token);
         await operationStarted.Task;
         cts.Cancel();
         cancellationRequested.SetResult(true);

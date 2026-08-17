@@ -44,7 +44,7 @@ public class GetUserSettingsEndpointTests
             .Returns(Result.From(expectedResponse));
 
         // Act
-        IResult result = await _sut.ExecuteAsync(new EmptyRequest(), cancellationToken);
+        IResult result = await _sut.ExecuteAsync(EmptyRequest.Instance, cancellationToken);
 
         // Assert
         Ok<UserSettingsResponse> okResult = Assert.IsType<Ok<UserSettingsResponse>>(result);
@@ -61,7 +61,7 @@ public class GetUserSettingsEndpointTests
             .Returns(expectedError);
 
         // Act
-        IResult result = await _sut.ExecuteAsync(new EmptyRequest(), cancellationToken);
+        IResult result = await _sut.ExecuteAsync(EmptyRequest.Instance, cancellationToken);
 
         // Assert
         ProblemHttpResult problemResult = Assert.IsType<ProblemHttpResult>(result);
@@ -82,7 +82,7 @@ public class GetUserSettingsEndpointTests
             .Returns(Result.From(new UserSettingsResponse(Guid.NewGuid(), true, 48, false)));
 
         // Act
-        await _sut.ExecuteAsync(new EmptyRequest(), cancellationToken);
+        await _sut.ExecuteAsync(EmptyRequest.Instance, cancellationToken);
 
         // Assert
         await _mockHandler.Received(1).HandleAsync(
@@ -108,7 +108,7 @@ public class GetUserSettingsEndpointTests
             }, info.Arg<CancellationToken>()));
 
         // Act
-        Task<IResult> operationTask = _sut.ExecuteAsync(new EmptyRequest(), cts.Token);
+        Task<IResult> operationTask = _sut.ExecuteAsync(EmptyRequest.Instance, cts.Token);
         await operationStarted.Task;
         cts.Cancel();
         cancellationRequested.SetResult(true);
