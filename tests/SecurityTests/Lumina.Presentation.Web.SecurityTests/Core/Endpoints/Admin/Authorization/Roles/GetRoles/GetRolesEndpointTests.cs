@@ -1,4 +1,4 @@
-#region ========================================================================= USING =====================================================================================
+﻿#region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Common.DTO.Authorization;
 using Lumina.Presentation.Web.Common.Responses.Authorization;
 using Lumina.Presentation.Web.Core.Endpoints.Admin.Authorization.Roles.GetRoles;
@@ -8,7 +8,6 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http;
-using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
@@ -32,23 +31,18 @@ public class GetRolesEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Fact]
-    public async Task GetRoles_WhenCalledWithoutAuthentication_ShouldNotExposeRoleData()
+    public async Task GetRoles_WhenCalledWithoutAuthentication_ShouldRedirectToLogin()
     {
         // Arrange
         _apiFactory.ApiClientStub.Reset();
-        RoleDto[] unexpectedRoles = [new RoleDto(Guid.NewGuid(), "Admin")];
-        _apiFactory.ApiClientStub.RegisterGetResponse("auth/roles", unexpectedRoles);
         HttpClient client = WebTestHelpers.CreateAnonymousClient(_apiFactory);
 
         // Act
         HttpResponseMessage response = await client.GetAsync("/en-us/admin/api-get-roles");
-        string content = await response.Content.ReadAsStringAsync();
 
         // Assert
-        using JsonDocument json = JsonDocument.Parse(content);
-        Assert.False(json.RootElement.GetProperty("success").GetBoolean());
-        Assert.DoesNotContain("Admin", content);
-        Assert.DoesNotContain("AdminRole", content);
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+        Assert.Contains("auth/login", response.Headers.Location!.ToString());
     }
 
     [Fact]
@@ -85,3 +79,4 @@ public class GetRolesEndpointTests : IClassFixture<LuminaWebFactory>
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 }
+

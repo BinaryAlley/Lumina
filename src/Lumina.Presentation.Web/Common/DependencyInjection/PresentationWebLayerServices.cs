@@ -230,8 +230,16 @@ public static class PresentationWebLayerServices
         // and that restrict access based on the roles and permissions retrieved from the remote API
         services.AddAuthorizationBuilder()
             .AddPolicy(AuthorizationPolicies.REQUIRE_INITIALIZATION, authorizationPolicyBuilder => authorizationPolicyBuilder.Requirements.Add(new InitializationRequirement()))
-            .AddPolicy(AuthorizationPolicies.REQUIRE_ADMIN_ROLE, authorizationPolicyBuilder => authorizationPolicyBuilder.Requirements.Add(new RoleRequirement("Admin")))
-            .AddPolicy(AuthorizationPolicies.REQUIRE_CREATE_LIBRARIES_PERMISSION, authorizationPolicyBuilder => authorizationPolicyBuilder.Requirements.Add(new PermissionRequirement(AuthorizationPermission.CanCreateLibraries)));
+            .AddPolicy(AuthorizationPolicies.REQUIRE_ADMIN_ROLE, authorizationPolicyBuilder =>
+            {
+                authorizationPolicyBuilder.Requirements.Add(new RoleRequirement("Admin"));
+                authorizationPolicyBuilder.RequireAuthenticatedUser();
+            })
+            .AddPolicy(AuthorizationPolicies.REQUIRE_CREATE_LIBRARIES_PERMISSION, authorizationPolicyBuilder =>
+            {
+                authorizationPolicyBuilder.Requirements.Add(new PermissionRequirement(AuthorizationPermission.CanCreateLibraries));
+                authorizationPolicyBuilder.RequireAuthenticatedUser();
+            });
 
         // add forwarded headers middleware to handle reverse proxy scenarios
         services.Configure<ForwardedHeadersOptions>(forwardedHeadersOptions =>
