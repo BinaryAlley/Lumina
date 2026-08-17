@@ -1,14 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
 using Lumina.Presentation.Web.Common.Requests.Tools;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Common.Services;
 using Lumina.Presentation.Web.Core.Endpoints.Tools.Language.SetLanguage;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Localization;
-using NSubstitute;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,7 +19,6 @@ namespace Lumina.Presentation.Web.UnitTests.Core.Endpoints.Tools.Language.SetLan
 [ExcludeFromCodeCoverage]
 public class SetLanguageEndpointTests
 {
-    private readonly IUrlService _mockUrlService;
     private readonly SetLanguageEndpoint _sut;
 
     /// <summary>
@@ -30,8 +26,7 @@ public class SetLanguageEndpointTests
     /// </summary>
     public SetLanguageEndpointTests()
     {
-        _mockUrlService = Substitute.For<IUrlService>();
-        _sut = Factory.Create<SetLanguageEndpoint>(_mockUrlService);
+        _sut = Factory.Create<SetLanguageEndpoint>();
     }
 
     [Fact]
@@ -39,14 +34,13 @@ public class SetLanguageEndpointTests
     {
         // Arrange
         TestHttpContextFactory.ConfigureCulture(_sut.HttpContext, "en-us");
-        _mockUrlService.GetAbsoluteUrl(WebRoutes.Home.INDEX_CULTURED).Returns("http://localhost/en-us/");
 
         // Act
         IResult result = await _sut.ExecuteAsync(new SetLanguageRequest("de-DE", null), CancellationToken.None);
 
         // Assert
         RedirectHttpResult redirectResult = Assert.IsType<RedirectHttpResult>(result);
-        Assert.Equal("http://localhost/de-de/", redirectResult.Url);
+        Assert.Equal("/de-de", redirectResult.Url);
         Assert.True(redirectResult.AcceptLocalUrlOnly);
         string setCookieHeader = _sut.HttpContext.Response.Headers.SetCookie.ToString();
         Assert.Contains(CookieRequestCultureProvider.DefaultCookieName, setCookieHeader);

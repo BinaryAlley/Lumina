@@ -2,7 +2,6 @@
 using FastEndpoints;
 using Lumina.Presentation.Web.Common.Requests.Tools;
 using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Common.Services;
 using Lumina.Presentation.Web.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -20,17 +19,6 @@ namespace Lumina.Presentation.Web.Core.Endpoints.Tools.Language.SetLanguage;
 /// </summary>
 public class SetLanguageEndpoint : BaseEndpoint<SetLanguageRequest, IResult>
 {
-    private readonly IUrlService _urlService;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="SetLanguageEndpoint"/> class.
-    /// </summary>
-    /// <param name="urlService">Injected service for generating URLs from action and controller names, with localization.</param>
-    public SetLanguageEndpoint(IUrlService urlService)
-    {
-        _urlService = urlService;
-    }
-
     /// <summary>
     /// Configures the endpoint.
     /// </summary>
@@ -62,24 +50,25 @@ public class SetLanguageEndpoint : BaseEndpoint<SetLanguageRequest, IResult>
                 Path = "/" // ensure the cookie works across all paths
             }
         );
-        // ensure the return URL includes the correct culture
-        string returnUrl = string.IsNullOrEmpty(request.ReturnUrl) ? _urlService.GetAbsoluteUrl(WebRoutes.Home.INDEX_CULTURED)! : request.ReturnUrl;
-        // handle the culture replacement in the return URL
+        // determine the URL to return to, defaulting to the localized home page when no return URL is supplied
+        string newCulture = request.NewCulture!;
+        string returnUrl = string.IsNullOrEmpty(request.ReturnUrl) ? $"/{newCulture.ToLower()}" : request.ReturnUrl;
         string currentCulture = Culture;
-        string culturePath = $"/{currentCulture.ToLower()}/";
-        string newCulturePath = $"/{request.NewCulture!.ToLower()}/";
 
-        // handle the base path if present
+        // handle the base path, so that the culture replacement matches the URL
         if (!string.IsNullOrEmpty(HttpContext.Request.PathBase))
             returnUrl = returnUrl.Replace(HttpContext.Request.PathBase.Value!, string.Empty, StringComparison.OrdinalIgnoreCase);
-        // replace the culture in the URL
-        returnUrl = returnUrl.Replace(culturePath, newCulturePath, StringComparison.OrdinalIgnoreCase);
+        // replace the current culture segment of the URL with the new one, whether or not a trailing slash is present
+        string currentCultureSegment = $"/{currentCulture.ToLower()}";
+        string newCultureSegment = $"/{newCulture.ToLower()}";
+        if (returnUrl.StartsWith(currentCultureSegment, StringComparison.OrdinalIgnoreCase))
+            returnUrl = newCultureSegment + returnUrl[currentCultureSegment.Length..];
 
         // re-apply the base path if present
         if (!string.IsNullOrEmpty(HttpContext.Request.PathBase))
             returnUrl = HttpContext.Request.PathBase.Value + returnUrl;
 
-        // redirect to the original page
+        // redirect to the target page
         return Results.LocalRedirect(returnUrl);
     }
 }

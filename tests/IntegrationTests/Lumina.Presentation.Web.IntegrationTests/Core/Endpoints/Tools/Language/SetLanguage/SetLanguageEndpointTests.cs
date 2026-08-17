@@ -46,6 +46,21 @@ public class SetLanguageEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Fact]
+    public async Task SetLanguage_WhenCalledByAuthenticatedUserWithoutReturnUrl_ShouldRedirectToHomePageWithNewCulture()
+    {
+        // Arrange
+        AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
+
+        // Act
+        HttpResponseMessage response = await webClient.Client.GetAsync("/en-us/tools/language/set-language?newCulture=de-DE");
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+        Assert.Equal("/de-de", response.Headers.Location!.ToString());
+        Assert.Contains("de-DE", response.Headers.GetValues("Set-Cookie").First());
+    }
+
+    [Fact]
     public async Task SetLanguage_WhenCalledWithoutAuthentication_ShouldRedirectToLogin()
     {
         // Arrange
