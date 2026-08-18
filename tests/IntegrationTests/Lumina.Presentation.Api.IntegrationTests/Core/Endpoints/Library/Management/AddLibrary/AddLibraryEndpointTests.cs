@@ -143,6 +143,6 @@ public class AddLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
 
         await dbContext.SaveChangesAsync();
 
-        _apiFactory.Dispose();
+        await _apiFactory.RemoveTestUserAsync();
     }
 }

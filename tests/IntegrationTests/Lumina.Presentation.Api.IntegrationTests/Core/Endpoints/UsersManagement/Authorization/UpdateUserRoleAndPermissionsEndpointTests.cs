@@ -255,6 +255,6 @@ public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<Authentic
 
         await dbContext.SaveChangesAsync();
 
-        _apiFactory.Dispose();
+        await _apiFactory.RemoveTestUserAsync();
     }
 }

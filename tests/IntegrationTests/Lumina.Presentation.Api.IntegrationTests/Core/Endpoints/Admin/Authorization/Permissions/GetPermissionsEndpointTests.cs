@@ -117,7 +117,7 @@ public class GetPermissionsEndpointTests : IClassFixture<AuthenticatedLuminaApiF
     /// </summary>
     public async Task DisposeAsync()
     {
-        _apiFactory.Dispose();
+        await _apiFactory.RemoveTestUserAsync();
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();

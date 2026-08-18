@@ -165,8 +165,38 @@ public class AuthenticatedLuminaApiFactory : LuminaApiFactory, IDisposable
     }
 
     /// <summary>
+    /// Removes the currently created test user from the database.
+    /// </summary>
+    /// <remarks>
+    /// Test classes must call this in their per-test <c>DisposeAsync</c> instead of <see cref="Dispose"/>. The
+    /// factory is a shared <see cref="IClassFixture{TFixture}"/>, created once per test class and disposed by
+    /// xUnit only after all tests in the class have run. Calling <see cref="Dispose"/> from a per-test
+    /// <c>DisposeAsync</c> would dispose the web host and its service provider after the first test, making
+    /// every subsequent test in the class fail with an <see cref="ObjectDisposedException"/> when it resolves
+    /// services. <see cref="Dispose"/> is therefore reserved for xUnit's own class-teardown and must never be
+    /// invoked from a test.
+    /// </remarks>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    public async Task RemoveTestUserAsync()
+    {
+        using IServiceScope scope = Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+
+        UserEntity? user = dbContext.Users.FirstOrDefault(u => u.Username == TestUsername);
+        if (user is not null)
+        {
+            dbContext.Users.Remove(user);
+            await dbContext.SaveChangesAsync();
+        }
+    }
+
+    /// <summary>
     /// Disposes API factory resources.
     /// </summary>
+    /// <remarks>
+    /// Called by xUnit when the test class completes. Do not call from tests; per-test cleanup must use
+    /// <see cref="RemoveTestUserAsync"/>. See that method for the details.
+    /// </remarks>
     public new void Dispose()
     {
         using IServiceScope scope = Services.CreateScope();

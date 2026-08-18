@@ -140,6 +140,6 @@ public class GetPluginsEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
                 dbContext.Plugins.Remove(plugin);
         }
         await dbContext.SaveChangesAsync();
-        _apiFactory.Dispose();
+        await _apiFactory.RemoveTestUserAsync();
     }
 }

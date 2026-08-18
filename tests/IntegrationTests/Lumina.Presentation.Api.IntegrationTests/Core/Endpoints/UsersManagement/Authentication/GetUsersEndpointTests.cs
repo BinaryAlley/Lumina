@@ -134,6 +134,6 @@ public class GetUsersEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
 
         await dbContext.SaveChangesAsync();
 
-        _apiFactory.Dispose();
+        await _apiFactory.RemoveTestUserAsync();
     }
 }

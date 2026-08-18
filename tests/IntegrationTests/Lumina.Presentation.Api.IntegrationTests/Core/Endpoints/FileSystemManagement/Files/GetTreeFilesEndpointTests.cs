@@ -256,9 +256,8 @@ public class GetTreeFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     /// <summary>
     /// Disposes API factory resources.
     /// </summary>
-    public Task DisposeAsync()
+    public async Task DisposeAsync()
     {
-        _apiFactory.Dispose();
-        return Task.CompletedTask;
+        await _apiFactory.RemoveTestUserAsync();
     }
 }

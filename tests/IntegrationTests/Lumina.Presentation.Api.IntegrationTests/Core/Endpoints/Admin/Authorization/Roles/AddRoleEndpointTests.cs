@@ -182,6 +182,6 @@ public class AddRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
 
         await dbContext.SaveChangesAsync();
 
-        _apiFactory.Dispose();
+        await _apiFactory.RemoveTestUserAsync();
     }
 }

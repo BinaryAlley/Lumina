@@ -130,6 +130,6 @@ public class GetRolesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
 
         await dbContext.SaveChangesAsync();
 
-        _apiFactory.Dispose();
+        await _apiFactory.RemoveTestUserAsync();
     }
 }

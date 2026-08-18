@@ -151,9 +151,8 @@ public class UpdatePluginSettingsEndpointTests : IClassFixture<AuthenticatedLumi
     /// <summary>
     /// Disposes API factory resources.
     /// </summary>
-    public Task DisposeAsync()
+    public async Task DisposeAsync()
     {
-        _apiFactory.Dispose();
-        return Task.CompletedTask;
+        await _apiFactory.RemoveTestUserAsync();
     }
 }
