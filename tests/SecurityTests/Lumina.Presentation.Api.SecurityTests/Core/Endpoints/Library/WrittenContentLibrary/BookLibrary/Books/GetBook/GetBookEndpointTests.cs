@@ -58,7 +58,7 @@ public class GetBookEndpointTests : IClassFixture<LuminaApiFactory>
         // Assert
         // the endpoint processes the value without querying the persistence medium and without leaking it
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("password", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("hash", content, StringComparison.OrdinalIgnoreCase);

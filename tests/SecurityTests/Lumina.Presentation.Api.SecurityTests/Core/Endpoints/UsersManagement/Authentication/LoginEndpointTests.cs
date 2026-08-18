@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.Infrastructure.Security;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.DataAccess.Core.UoW;
@@ -8,6 +9,7 @@ using Lumina.Infrastructure.Core.Authentication;
 using Lumina.Infrastructure.Core.Security;
 using Lumina.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics.CodeAnalysis;
 using System.IdentityModel.Tokens.Jwt;
@@ -26,6 +28,7 @@ namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.UsersManagement.A
 public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
 {
     private readonly PasswordHashService _hashService = new();
+    private readonly UserEntityFixture _userEntityFixture = new();
     private readonly ICryptographyService _cryptographyService;
     private readonly TotpTokenGenerator _totpTokenGenerator = new();
     private readonly LuminaApiFactory _apiFactory;
@@ -197,6 +200,11 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
         Assert.DoesNotContain("Exception", content);
         Assert.DoesNotContain(legitimateUser.Username, content); // shouldn't expose other usernames
         Assert.DoesNotContain(legitimateUser.Password, content); // shouldn't expose password hashes
+
+        // the injected statement must never be executed: the Users table and the seeded user must still be there
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        Assert.NotNull(await dbContext.Users.FirstOrDefaultAsync(user => user.Id == legitimateUser.Id));
     }
 
     [Fact]
@@ -255,16 +263,7 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
 
-        UserEntity user = new()
-        {
-            Username = _testUsername,
-            Password = _hashService.HashString("TestPass123!"),
-            Libraries = [],
-            UserPermissions = [],
-            UserRole = null,
-            CreatedBy = Guid.NewGuid(),
-            CreatedOnUtc = DateTime.UtcNow
-        };
+        UserEntity user = _userEntityFixture.Create(username: _testUsername, password: _hashService.HashString("TestPass123!"));
 
         dbContext.Users.Add(user);
         await dbContext.SaveChangesAsync();

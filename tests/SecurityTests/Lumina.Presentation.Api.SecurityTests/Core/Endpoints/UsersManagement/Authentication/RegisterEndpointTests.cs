@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Infrastructure.Core.Security;
@@ -22,6 +23,7 @@ namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.UsersManagement.A
 public class RegisterEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
 {
     private readonly PasswordHashService _hashService = new();
+    private readonly UserEntityFixture _userEntityFixture = new();
     private readonly LuminaApiFactory _apiFactory;
     private readonly HttpClient _client;
     private readonly JsonSerializerOptions _jsonOptions = new()
@@ -110,6 +112,8 @@ public class RegisterEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
     public async Task Register_WithSQLInjectionAttempt_ShouldRemainSecure(string maliciousUsername)
     {
         // Arrange
+        // note: the register validator rejects these usernames (invalid username format) with 422 before any DB access,
+        // so the malicious username never reaches a query; the 422 assertion below is the security guarantee
         RegistrationRequest request = new(
             Username: maliciousUsername,
             Password: "TestPass123!",
@@ -210,16 +214,7 @@ public class RegisterEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
 
-        UserEntity user = new()
-        {
-            Username = _testUsername,
-            Password = _hashService.HashString("TestPass123!"),
-            Libraries = [],
-            UserPermissions = [],
-            UserRole = null,
-            CreatedBy = Guid.NewGuid(),
-            CreatedOnUtc = DateTime.UtcNow
-        };
+        UserEntity user = _userEntityFixture.Create(username: _testUsername, password: _hashService.HashString("TestPass123!"));
 
         dbContext.Users.Add(user);
         await dbContext.SaveChangesAsync();

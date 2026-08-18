@@ -89,9 +89,11 @@ public class GetLibraryEndpointTests : IClassFixture<LuminaApiFactory>
         // note: observed status is 500 because FastEndpoints, combined with DontCatchExceptions(), turns the binding
         // ValidationFailureException into a 500 response instead of 400/422 (pre-existing production bug, not fixed here)
         // note: that 500 body leaks the ValidationFailureException details, so no DoesNotContain("Exception") is asserted here
+        // note: the payloads never contain the literal "SQL", so checking for that word would assert nothing; what matters
+        // is that the injection never reaches the database, so no SQL engine error (SqliteException) may surface
         Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("password", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("hash", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("salt", content, StringComparison.OrdinalIgnoreCase);

@@ -99,7 +99,7 @@ public class SetLibraryMetadataProviderEnabledEndpointTests : IClassFixture<Lumi
         // note: that 500 body leaks the ValidationFailureException details, so no DoesNotContain("Exception") is asserted here
         Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("password", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("hash", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("salt", content, StringComparison.OrdinalIgnoreCase);

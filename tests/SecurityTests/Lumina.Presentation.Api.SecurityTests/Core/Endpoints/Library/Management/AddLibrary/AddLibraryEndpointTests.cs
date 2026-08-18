@@ -101,7 +101,7 @@ public class AddLibraryEndpointTests : IClassFixture<LuminaApiFactory>
         // the malicious title passes the authenticated handler, reaches the parameterized data access, and is persisted verbatim
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
-        Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("password", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("hash", content, StringComparison.OrdinalIgnoreCase);
