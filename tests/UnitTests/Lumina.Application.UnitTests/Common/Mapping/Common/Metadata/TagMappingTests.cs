@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.Mapping.Common.Metadata;
-using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
+using Lumina.Domain.Fixtures.Common.ValueObjects.Metadata;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -16,13 +16,13 @@ namespace Lumina.Application.UnitTests.Common.Mapping.Common.Metadata;
 [ExcludeFromCodeCoverage]
 public class TagMappingTests
 {
+    private readonly TagFixture _tagFixture = new();
+
     [Fact]
     public void ToRepositoryEntity_WhenMappingTag_ShouldMapCorrectly()
     {
         // Arrange
-        Result<Tag> createResult = Tag.Create("indie");
-        Assert.False(createResult.IsFailure);
-        Tag tag = createResult.Value;
+        Tag tag = _tagFixture.Create("indie");
 
         // Act
         TagEntity result = tag.ToRepositoryEntity();
@@ -41,9 +41,7 @@ public class TagMappingTests
     public void ToRepositoryEntity_WhenMappingDifferentTags_ShouldMapCorrectly(string name)
     {
         // Arrange
-        Result<Tag> createResult = Tag.Create(name);
-        Assert.False(createResult.IsFailure);
-        Tag tag = createResult.Value;
+        Tag tag = _tagFixture.Create(name);
 
         // Act
         TagEntity result = tag.ToRepositoryEntity();
@@ -59,11 +57,11 @@ public class TagMappingTests
         // Arrange
         List<Tag> tags =
         [
-            Tag.Create("indie").Value,
-            Tag.Create("electronic").Value,
-            Tag.Create("instrumental").Value,
-            Tag.Create("live").Value,
-            Tag.Create("acoustic").Value
+            _tagFixture.Create("indie"),
+            _tagFixture.Create("electronic"),
+            _tagFixture.Create("instrumental"),
+            _tagFixture.Create("live"),
+            _tagFixture.Create("acoustic")
         ];
 
         // Act

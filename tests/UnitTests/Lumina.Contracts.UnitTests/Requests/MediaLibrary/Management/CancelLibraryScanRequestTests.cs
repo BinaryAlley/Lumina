@@ -1,0 +1,53 @@
+#region ========================================================================= USING =====================================================================================
+using Lumina.Contracts.Requests.MediaLibrary.Management;
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
+#endregion
+
+namespace Lumina.Contracts.UnitTests.Requests.MediaLibrary.Management;
+
+/// <summary>
+/// Contains unit tests for the <see cref="CancelLibraryScanRequest"/> record.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class CancelLibraryScanRequestTests
+{
+    private readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
+    [Fact]
+    public void RoundTrip_WhenSerializingCancelLibraryScanRequest_ShouldPreserveValues()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        Guid scanId = Guid.NewGuid();
+        CancelLibraryScanRequest expected = new(libraryId, scanId);
+
+        // Act
+        string json = JsonSerializer.Serialize(expected, _jsonOptions);
+        CancelLibraryScanRequest? actual = JsonSerializer.Deserialize<CancelLibraryScanRequest>(json, _jsonOptions);
+
+        // Assert
+        Assert.NotNull(actual);
+        Assert.Equal(expected, actual);
+    }
+
+    [Fact]
+    public void Equality_WhenTwoInstancesHaveSameValues_ShouldBeEqual()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        Guid scanId = Guid.NewGuid();
+        CancelLibraryScanRequest first = new(libraryId, scanId);
+        CancelLibraryScanRequest second = new(libraryId, scanId);
+
+        // Act
+        bool areEqual = first == second;
+
+        // Assert
+        Assert.True(areEqual);
+    }
+}

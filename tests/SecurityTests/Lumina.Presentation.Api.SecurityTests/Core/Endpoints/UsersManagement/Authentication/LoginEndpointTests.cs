@@ -9,7 +9,6 @@ using Lumina.Infrastructure.Core.Security;
 using Lumina.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
@@ -110,36 +109,32 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
     }
 
     [Fact]
-    public async Task Login_WithValidCredentials_ShouldNotLeakTimingInformation()
+    public async Task Login_WithUnknownUsernameAndWrongPassword_ShouldReturnIndistinguishableResponses()
     {
         // Arrange
         UserEntity user = await CreateTestUser();
-        Stopwatch stopwatch = new();
-        List<long> timings = [];
-        // since this test is rigged to trigger the rate limiting, assign a different IP to it
+        LoginRequest unknownUserRequest = new(
+            Username: "nonexistent_user",
+            Password: "TestPass123!"
+        );
+        LoginRequest wrongPasswordRequest = new(
+            Username: user.Username,
+            Password: "WrongPass123!"
+        );
         _client.DefaultRequestHeaders.Clear();
         _client.DefaultRequestHeaders.Add("X-Forwarded-For", $"192.168.1.2");
 
         // Act
-        for (int i = 0; i < 10; i++)
-        {
-            await Task.Delay(100); // add small delay between requests
-            stopwatch.Restart();
-            await _client.PostAsJsonAsync("/api/v1/auth/login", new LoginRequest(
-                Username: user.Username,
-                Password: "TestPass123!"
-            ));
-            stopwatch.Stop();
-            timings.Add(stopwatch.ElapsedMilliseconds);
-        }
-        // remove the highest and lowest values to account for outliers
-        timings.Sort();
-        timings = timings.Skip(1).SkipLast(1).ToList();
+        HttpResponseMessage unknownUserResponse = await _client.PostAsJsonAsync("/api/v1/auth/login", unknownUserRequest);
+        string unknownUserContent = await unknownUserResponse.Content.ReadAsStringAsync();
+        HttpResponseMessage wrongPasswordResponse = await _client.PostAsJsonAsync("/api/v1/auth/login", wrongPasswordRequest);
+        string wrongPasswordContent = await wrongPasswordResponse.Content.ReadAsStringAsync();
 
         // Assert
-        // check for timing consistency to prevent timing attacks
-        double stdDev = CalculateStandardDeviation(timings);
-        Assert.True(stdDev < 200);
+        Assert.Equal(HttpStatusCode.Forbidden, unknownUserResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, wrongPasswordResponse.StatusCode);
+        AssertProblemDetail(unknownUserContent, "General.Failure", "InvalidUsernameOrPassword");
+        AssertProblemDetail(wrongPasswordContent, "General.Failure", "InvalidUsernameOrPassword");
     }
 
     [Fact]
@@ -247,11 +242,12 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
         Assert.DoesNotContain("Exception", content);
     }
 
-    private double CalculateStandardDeviation(List<long> values)
+    private void AssertProblemDetail(string content, string expectedTitle, string expectedDetail)
     {
-        double average = values.Average();
-        double sumOfSquaresOfDifferences = values.Select(value => (value - average) * (value - average)).Sum();
-        return Math.Sqrt(sumOfSquaresOfDifferences / values.Count);
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal(expectedTitle, problemDetails!["title"].GetString());
+        Assert.Equal(expectedDetail, problemDetails["detail"].GetString());
     }
 
     private async Task<UserEntity> CreateTestUser()

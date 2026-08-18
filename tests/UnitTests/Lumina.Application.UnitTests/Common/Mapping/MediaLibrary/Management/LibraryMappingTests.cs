@@ -5,9 +5,9 @@ using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
-using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -21,24 +21,23 @@ namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.Management;
 [ExcludeFromCodeCoverage]
 public class LibraryMappingTests
 {
+    private readonly LibraryFixture _libraryFixture = new();
+
     [Fact]
     public void ToRepositoryEntity_WhenMappingValidLibrary_ShouldMapCorrectly()
     {
         // Arrange
-        Result<Library> libraryResult = Library.Create(
-            UserId.CreateUnique(),
-            "Test Library",
-            LibraryType.Book,
-            ["C:/Books", "D:/Media/Books"],
-            "D:/myPoster.jpg",
-            true,
-            false,
-            true,
-            false,
-            false,
-            [ScanId.CreateUnique()]
-        );
-        Library library = libraryResult.Value;
+        Library library = _libraryFixture.Create(
+            title: "Test Library",
+            libraryType: LibraryType.Book,
+            contentLocations: ["C:/Books", "D:/Media/Books"],
+            coverImage: "D:/myPoster.jpg",
+            isEnabled: true,
+            isLocked: false,
+            downloadMetadataFromWeb: true,
+            shouldSaveMetadataInMediaDirectories: false,
+            shouldSkipUnchangedDirectoriesDuringScan: false,
+            scanIds: [Guid.NewGuid()]);
 
         // Act
         LibraryEntity result = library.ToRepositoryEntity();
@@ -64,20 +63,11 @@ public class LibraryMappingTests
     public void ToRepositoryEntity_WhenMappingLibraryWithEmptyContentLocations_ShouldMapCorrectly()
     {
         // Arrange
-        Result<Library> libraryResult = Library.Create(
-            UserId.CreateUnique(),
-            "Empty Library",
-            LibraryType.Book,
-            [],
-            "D:/myPoster.jpg",
-            true,
-            false,
-            true,
-            false,
-            false,
-            [ScanId.CreateUnique()]
-        );
-        Library library = libraryResult.Value;
+        Library library = _libraryFixture.Create(
+            title: "Empty Library",
+            libraryType: LibraryType.Book,
+            contentLocations: [],
+            coverImage: "D:/myPoster.jpg");
 
         // Act
         LibraryEntity result = library.ToRepositoryEntity();
@@ -96,20 +86,15 @@ public class LibraryMappingTests
     public void ToRepositoryEntity_WhenMappingDifferentLibraryTypes_ShouldMapCorrectly(LibraryType libraryType)
     {
         // Arrange
-        Result<Library> libraryResult = Library.Create(
-            UserId.CreateUnique(),
-            "Test Library",
-            libraryType,
-            ["C:/Media"],
-            "D:/myPoster.jpg",
-            true,
-            false,
-            true,
-            false,
-            false,
-            [ScanId.CreateUnique()]
-        );
-        Library library = libraryResult.Value;
+        Library library = _libraryFixture.Create(
+            title: "Test Library",
+            libraryType: libraryType,
+            contentLocations: ["C:/Media"],
+            coverImage: "D:/myPoster.jpg",
+            isEnabled: true,
+            isLocked: false,
+            downloadMetadataFromWeb: true,
+            shouldSaveMetadataInMediaDirectories: false);
 
         // Act
         LibraryEntity result = library.ToRepositoryEntity();
@@ -136,20 +121,11 @@ public class LibraryMappingTests
             "F:/Reading Material"
         ];
 
-        Result<Library> libraryResult = Library.Create(
-            UserId.CreateUnique(),
-            "Test Library",
-            LibraryType.Book,
-            contentLocations,
-            "D:/myPoster.jpg",
-            true,
-            false,
-            true,
-            false,
-            false,
-            [ScanId.CreateUnique()]
-        );
-        Library library = libraryResult.Value;
+        Library library = _libraryFixture.Create(
+            title: "Test Library",
+            libraryType: LibraryType.Book,
+            contentLocations: contentLocations,
+            coverImage: "D:/myPoster.jpg");
 
         // Act
         LibraryEntity result = library.ToRepositoryEntity();
@@ -170,20 +146,11 @@ public class LibraryMappingTests
             "D:/Books"
         ];
 
-        Result<Library> libraryResult = Library.Create(
-            UserId.CreateUnique(),
-            "Test Library",
-            LibraryType.Book,
-            contentLocations,
-            null,
-            true,
-            false,
-            true,
-            false,
-            false,
-            [ScanId.CreateUnique()]
-        );
-        Library library = libraryResult.Value;
+        Library library = _libraryFixture.Create(
+            title: "Test Library",
+            libraryType: LibraryType.Book,
+            contentLocations: contentLocations,
+            includeCoverImage: false);
 
         // Act
         LibraryEntity result = library.ToRepositoryEntity();
@@ -204,20 +171,12 @@ public class LibraryMappingTests
             "D:/Books"
         ];
 
-        Result<Library> libraryResult = Library.Create(
-            UserId.CreateUnique(),
-            "Test Library",
-            LibraryType.Book,
-            contentLocations,
-            null,
-            true,
-            false,
-            true,
-            false,
-            false,
-            []
-        );
-        Library library = libraryResult.Value;
+        Library library = _libraryFixture.Create(
+            title: "Test Library",
+            libraryType: LibraryType.Book,
+            contentLocations: contentLocations,
+            includeCoverImage: false,
+            scanIds: []);
 
         // Act
         LibraryEntity result = library.ToRepositoryEntity();

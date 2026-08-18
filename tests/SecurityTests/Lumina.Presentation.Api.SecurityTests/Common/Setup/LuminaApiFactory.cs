@@ -1,6 +1,11 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Application.Common.DataAccess.Entities.Authorization;
+using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Contracts.Requests.Authentication;
+using Lumina.Contracts.Responses.Authentication;
 using Lumina.DataAccess.Common.Interceptors;
 using Lumina.DataAccess.Core.UoW;
+using Lumina.Infrastructure.Core.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -10,7 +15,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Diagnostics.CodeAnalysis;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Text;
+using System.Text.Json;
 #endregion
 
 namespace Lumina.Presentation.Api.SecurityTests.Common.Setup;
@@ -22,6 +31,11 @@ namespace Lumina.Presentation.Api.SecurityTests.Common.Setup;
 public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
 {
     private readonly SqliteConnection _connection;
+    private readonly PasswordHashService _hashService = new();
+    private readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
     private const string TEST_ENCRYPTION_KEY = "MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=";
     
     /// <summary>
@@ -93,6 +107,66 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
                 dbContext.Database.Migrate();
             }
         });
+    }
+
+    /// <summary>
+    /// Creates a test user with the Admin role, authenticates it on <paramref name="client"/>, and returns its Id.
+    /// </summary>
+    /// <param name="client">The HTTP client to configure with authentication headers.</param>
+    /// <returns>The Id of the created admin test user.</returns>
+    public async Task<Guid> CreateAndAuthenticateAdminUserAsync(HttpClient client)
+    {
+        // a unique X-Forwarded-For isolates rate limiting state per test
+        client.DefaultRequestHeaders.Clear();
+        client.DefaultRequestHeaders.Add("X-Forwarded-For", $"192.168.1.{Random.Shared.Next(1, 255)}");
+
+        using IServiceScope scope = Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+
+        Guid userId = Guid.NewGuid();
+        string username = $"testuser_{Guid.NewGuid()}";
+        UserEntity user = new()
+        {
+            Id = userId,
+            Username = username,
+            Password = _hashService.HashString("TestPass123!"),
+            Libraries = [],
+            UserPermissions = [],
+            UserRole = null,
+            CreatedBy = userId,
+            CreatedOnUtc = DateTime.UtcNow
+        };
+        dbContext.Users.Add(user);
+        await dbContext.SaveChangesAsync();
+
+        // seed a dedicated Admin role for this test user, keeping each test isolated in the shared in-memory database
+        Guid roleId = Guid.NewGuid();
+        RoleEntity role = new()
+        {
+            Id = roleId,
+            RoleName = "Admin",
+            CreatedBy = userId,
+            CreatedOnUtc = DateTime.UtcNow
+        };
+        dbContext.Roles.Add(role);
+        dbContext.UserRoles.Add(new UserRoleEntity
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            User = user,
+            RoleId = roleId,
+            Role = role,
+            CreatedBy = userId,
+            CreatedOnUtc = DateTime.UtcNow
+        });
+        await dbContext.SaveChangesAsync();
+
+        HttpResponseMessage loginResponse = await client.PostAsJsonAsync("/api/v1/auth/login", new LoginRequest(username, "TestPass123!"));
+        string content = await loginResponse.Content.ReadAsStringAsync();
+        LoginResponse? loginResult = JsonSerializer.Deserialize<LoginResponse>(content, _jsonOptions);
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginResult!.Token);
+
+        return userId;
     }
 
     /// <summary>

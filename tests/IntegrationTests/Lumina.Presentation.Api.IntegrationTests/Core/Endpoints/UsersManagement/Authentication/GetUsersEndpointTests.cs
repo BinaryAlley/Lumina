@@ -97,7 +97,7 @@ public class GetUsersEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
         Assert.Equal("/api/v1/auth/users", problemDetails["instance"].GetString());
         Assert.NotNull(problemDetails["traceId"].GetString());
-        Assert.NotEmpty(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
     }
 
     [Fact]

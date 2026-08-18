@@ -3,6 +3,7 @@ using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -16,6 +17,8 @@ namespace Lumina.Domain.UnitTests.Core.BoundedContexts.FileSystemManagementBound
 [ExcludeFromCodeCoverage]
 public class UnixRootItemTests
 {
+    private readonly UnixRootItemFixture _unixRootItemFixture = new();
+
     [Fact]
     public void Create_WhenCalledWithDefaultStatus_ShouldReturnSuccessfulResult()
     {
@@ -55,9 +58,7 @@ public class UnixRootItemTests
     public void Items_WhenAccessed_ShouldReturnEmptyReadOnlyCollection()
     {
         // Arrange
-        Result<UnixRootItem> createResult = UnixRootItem.Create();
-        Assert.False(createResult.IsFailure);
-        UnixRootItem unixRootItem = createResult.Value;
+        UnixRootItem unixRootItem = _unixRootItemFixture.Create();
 
         // Act
         IReadOnlyCollection<FileSystemItem> items = unixRootItem.Items;
@@ -71,9 +72,7 @@ public class UnixRootItemTests
     public void SetStatus_WhenCalledWithNewStatus_ShouldUpdateStatus()
     {
         // Arrange
-        Result<UnixRootItem> createResult = UnixRootItem.Create();
-        Assert.False(createResult.IsFailure);
-        UnixRootItem unixRootItem = createResult.Value;
+        UnixRootItem unixRootItem = _unixRootItemFixture.Create();
         FileSystemItemStatus newStatus = FileSystemItemStatus.Accessible;
 
         // Act
@@ -88,9 +87,7 @@ public class UnixRootItemTests
     public void SetParent_WhenCalledWithNullParent_ShouldReturnError()
     {
         // Arrange
-        Result<UnixRootItem> createResult = UnixRootItem.Create();
-        Assert.False(createResult.IsFailure);
-        UnixRootItem unixRootItem = createResult.Value;
+        UnixRootItem unixRootItem = _unixRootItemFixture.Create();
 
         // Act
         Result<Updated> result = unixRootItem.SetParent(null!);

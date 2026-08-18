@@ -4,6 +4,7 @@ using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Queries.GetBooks;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
 using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Lumina.Contracts.Fixtures.Core.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Contracts.Responses.Common;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
@@ -32,6 +33,7 @@ public class GetBooksEndpointTests
     private readonly IQueryHandler<GetBooksQuery, Result<PaginatedResponse<BookResponse>>> _mockHandler;
     private readonly GetBooksEndpoint _sut;
     private readonly GetBooksRequestFixture _getBooksRequestFixture = new();
+    private readonly BookResponseFixture _bookResponseFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetBooksEndpointTests"/> class.
@@ -48,7 +50,7 @@ public class GetBooksEndpointTests
         // Arrange
         GetBooksRequest request = _getBooksRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
-        PaginatedResponse<BookResponse> expectedResponse = CreatePaginatedResponse(bookCount: 2);
+        PaginatedResponse<BookResponse> expectedResponse = CreatePaginatedResponse(bookCount: 2, _bookResponseFixture);
         _mockHandler.HandleAsync(Arg.Any<GetBooksQuery>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(expectedResponse));
 
@@ -119,7 +121,7 @@ public class GetBooksEndpointTests
         GetBooksRequest request = _getBooksRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<GetBooksQuery>(), Arg.Any<CancellationToken>())
-            .Returns(Result.From(CreatePaginatedResponse(bookCount: 0)));
+            .Returns(Result.From(CreatePaginatedResponse(bookCount: 0, _bookResponseFixture)));
 
         // Act
         await _sut.ExecuteAsync(request, cancellationToken);
@@ -151,7 +153,7 @@ public class GetBooksEndpointTests
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return Result.From(CreatePaginatedResponse(bookCount: 0));
+                return Result.From(CreatePaginatedResponse(bookCount: 0, _bookResponseFixture));
             }, callInfo.Arg<CancellationToken>()));
 
         // Act
@@ -169,11 +171,11 @@ public class GetBooksEndpointTests
     /// </summary>
     /// <param name="bookCount">The number of book responses to include in the data collection.</param>
     /// <returns>A configured paginated response instance.</returns>
-    private static PaginatedResponse<BookResponse> CreatePaginatedResponse(int bookCount)
+    private static PaginatedResponse<BookResponse> CreatePaginatedResponse(int bookCount, BookResponseFixture bookResponseFixture)
     {
         List<BookResponse> books = [];
         for (int index = 0; index < bookCount; index++)
-            books.Add(CreateBookResponse());
+            books.Add(bookResponseFixture.Create());
 
         return new PaginatedResponse<BookResponse>
         {
@@ -183,51 +185,5 @@ public class GetBooksEndpointTests
             Count = bookCount,
             NumberOfPages = bookCount > 0 ? 1 : 0
         };
-    }
-
-    /// <summary>
-    /// Creates a minimal valid <see cref="BookResponse"/>.
-    /// </summary>
-    /// <returns>A configured book response instance.</returns>
-    private static BookResponse CreateBookResponse()
-    {
-        return new BookResponse(
-            Id: Guid.NewGuid(),
-            LibraryId: Guid.NewGuid(),
-            Path: "/books/test.epub",
-            Metadata: new WrittenContentMetadataDto(
-                Title: "Test Book",
-                OriginalTitle: null,
-                Description: null,
-                ReleaseInfo: null,
-                Genres: null,
-                Tags: null,
-                Language: null,
-                OriginalLanguage: null,
-                Publisher: null,
-                PageCount: null
-            ),
-            Format: null,
-            Edition: null,
-            VolumeNumber: null,
-            Series: null,
-            ASIN: null,
-            GoodreadsId: null,
-            LCCN: null,
-            OCLCNumber: null,
-            OpenLibraryId: null,
-            LibraryThingId: null,
-            GoogleBooksId: null,
-            BarnesAndNobleId: null,
-            AppleBooksId: null,
-            ISBNs: null,
-            Contributors: null,
-            Ratings: null,
-            MetadataStatus: MetadataStatus.Pending,
-            LastMetadataUpdateUtc: null,
-            MetadataProvider: null,
-            CreatedOnUtc: DateTime.UtcNow,
-            UpdatedOnUtc: null
-        );
     }
 }

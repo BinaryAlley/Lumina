@@ -115,7 +115,7 @@ public class AddRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
         Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
         Assert.Equal("/api/v1/auth/roles", problemDetails["instance"].GetString());
         Assert.NotNull(problemDetails["traceId"].GetString());
-        Assert.NotEmpty(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
     }
 
     [Fact]
@@ -142,7 +142,7 @@ public class AddRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
         Assert.Equal("RoleAlreadyExists", problemDetails["detail"].GetString());
         Assert.Equal("/api/v1/auth/roles", problemDetails["instance"].GetString());
         Assert.NotNull(problemDetails["traceId"].GetString());
-        Assert.NotEmpty(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
     }
 
     [Fact]

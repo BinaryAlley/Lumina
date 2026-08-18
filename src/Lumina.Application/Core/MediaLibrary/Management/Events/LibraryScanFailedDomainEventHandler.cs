@@ -55,15 +55,15 @@ public class LibraryScanFailedDomainEventHandler : IDomainEventHandler<LibrarySc
     public async ValueTask HandleAsync(LibraryScanFailedDomainEvent domainEvent, CancellationToken cancellationToken)
     {
         // get the library scan from the repository
-        Result<LibraryScanEntity?> getLibraryScansResult = await _unitOfWork.LibraryScanRepository.GetByIdAsync(
+        Result<LibraryScanEntity?> getLibraryScanResult = await _unitOfWork.LibraryScanRepository.GetByIdAsync(
             domainEvent.MediaLibraryScanCompositeId.ScanId.Value, cancellationToken).ConfigureAwait(false);
-        if (getLibraryScansResult.IsFailure)
-            throw new EventualConsistencyException(getLibraryScansResult.FirstError, getLibraryScansResult.Errors);
-        if (getLibraryScansResult.Value is null)
+        if (getLibraryScanResult.IsFailure)
+            throw new EventualConsistencyException(getLibraryScanResult.FirstError, getLibraryScanResult.Errors);
+        if (getLibraryScanResult.Value is null)
             throw new EventualConsistencyException(Errors.LibraryScanning.LibraryScanNotFound);
 
         // convert the repository scan to a domain object
-        Result<LibraryScan> libraryScanDomainResult = getLibraryScansResult.Value.ToDomainEntity();
+        Result<LibraryScan> libraryScanDomainResult = getLibraryScanResult.Value.ToDomainEntity();
         if (libraryScanDomainResult.IsFailure)
             throw new EventualConsistencyException(libraryScanDomainResult.FirstError, libraryScanDomainResult.Errors);
 

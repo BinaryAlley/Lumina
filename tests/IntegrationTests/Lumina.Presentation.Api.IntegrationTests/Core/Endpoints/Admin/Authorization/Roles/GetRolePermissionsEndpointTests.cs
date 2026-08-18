@@ -110,7 +110,7 @@ public class GetRolePermissionsEndpointTests : IClassFixture<AuthenticatedLumina
         Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
         Assert.Equal($"/api/v1/auth/roles/{role.Id}/permissions", problemDetails["instance"].GetString());
         Assert.NotNull(problemDetails["traceId"].GetString());
-        Assert.NotEmpty(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
     }
 
     [Fact]
@@ -132,7 +132,7 @@ public class GetRolePermissionsEndpointTests : IClassFixture<AuthenticatedLumina
         Assert.Equal("RoleNotFound", problemDetails["detail"].GetString());
         Assert.Equal($"/api/v1/auth/roles/{invalidRoleId}/permissions", problemDetails["instance"].GetString());
         Assert.NotNull(problemDetails["traceId"].GetString());
-        Assert.NotEmpty(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
     }
 
     [Fact]

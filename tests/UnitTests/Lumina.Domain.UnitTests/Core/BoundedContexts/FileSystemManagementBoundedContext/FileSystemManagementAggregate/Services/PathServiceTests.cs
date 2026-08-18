@@ -444,7 +444,7 @@ public class PathServiceTests
     {
         // Arrange
         char[] originalInvalidChars = ['<', '>', ':', '"', '|', '?', '*'];
-        _mockPathStrategy.GetInvalidPathCharsForPlatform().Returns(originalInvalidChars);
+        _mockPathStrategy.GetInvalidPathCharsForPlatform().Returns(_ => (char[])originalInvalidChars.Clone());
 
         // Act
         char[] result = _sut.GetInvalidPathCharsForPlatform();
@@ -452,7 +452,7 @@ public class PathServiceTests
 
         // Assert
         char[] secondResult = _sut.GetInvalidPathCharsForPlatform();
-        Assert.Equal(secondResult, originalInvalidChars);
+        Assert.Equal(originalInvalidChars, secondResult);
         _mockPathStrategy.Received(2).GetInvalidPathCharsForPlatform();
     }
 

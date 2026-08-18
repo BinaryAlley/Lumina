@@ -2,6 +2,7 @@
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
@@ -19,13 +20,20 @@ namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.WrittenConten
 public class BookMetadataDtoMappingTests
 {
     private readonly BookFixture _bookFixture = new();
+    private readonly BookMetadataDtoFixture _bookMetadataDtoFixture = new();
 
     [Fact]
     public void ApplyMetadata_WhenCalledWithValidMetadata_ShouldApplyItAndMarkTheBookAsEnriched()
     {
         // Arrange
         Book book = _bookFixture.Create();
-        BookMetadataDto metadata = CreateBookMetadata("The Fellowship of the Ring", "3");
+        BookMetadataDto metadata = _bookMetadataDtoFixture.Create(
+            title: "The Fellowship of the Ring",
+            description: "The first part of J.R.R. Tolkien's epic adventure.",
+            goodreadsId: "3",
+            format: BookFormat.Paperback,
+            publisher: "Houghton Mifflin",
+            pageCount: 398);
 
         // Act
         Result<Success> result = book.ApplyMetadata(metadata, "Goodreads", DateTime.UtcNow);
@@ -47,7 +55,9 @@ public class BookMetadataDtoMappingTests
     {
         // Arrange
         Book book = _bookFixture.Create();
-        BookMetadataDto metadata = CreateBookMetadata("The Fellowship of the Ring", "3") with
+        BookMetadataDto metadata = _bookMetadataDtoFixture.Create(
+            title: "The Fellowship of the Ring",
+            goodreadsId: "3") with
         {
             Genres = [new GenreDto("")]
         };
@@ -58,45 +68,5 @@ public class BookMetadataDtoMappingTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(MetadataStatus.Pending, book.MetadataStatus);
-    }
-
-    private static BookMetadataDto CreateBookMetadata(string title, string goodreadsId)
-    {
-        return new BookMetadataDto(
-            Title: title,
-            OriginalTitle: title,
-            Description: "The first part of J.R.R. Tolkien's epic adventure.",
-            ReleaseInfo: new ReleaseInfoDto(
-                OriginalReleaseDate: new DateOnly(1954, 7, 29),
-                OriginalReleaseYear: 1954,
-                ReReleaseDate: null,
-                ReReleaseYear: null,
-                ReleaseCountry: "uk",
-                ReleaseVersion: null
-            ),
-            Genres: [new GenreDto("fantasy")],
-            Tags: [new TagDto("epic fantasy")],
-            Language: new LanguageInfoDto("en", "English", "English"),
-            OriginalLanguage: null,
-            Publisher: "Houghton Mifflin",
-            PageCount: 398,
-            Format: BookFormat.Paperback,
-            Edition: null,
-            VolumeNumber: 1,
-            Series: null,
-            ASIN: null,
-            GoodreadsId: goodreadsId,
-            LCCN: null,
-            OCLCNumber: null,
-            OpenLibraryId: null,
-            LibraryThingId: null,
-            GoogleBooksId: null,
-            BarnesAndNobleId: null,
-            AppleBooksId: null,
-            Isbns: null,
-            Contributors: null,
-            Ratings: null,
-            CoverImageUrl: null
-        );
     }
 }

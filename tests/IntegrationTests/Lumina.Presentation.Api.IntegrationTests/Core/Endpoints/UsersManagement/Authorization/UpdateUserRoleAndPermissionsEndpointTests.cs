@@ -139,7 +139,7 @@ public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<Authentic
         Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
         Assert.Equal($"/api/v1/auth/users/{request.UserId}/role-and-permissions", problemDetails["instance"].GetString());
         Assert.NotNull(problemDetails["traceId"].GetString());
-        Assert.NotEmpty(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
     }
 
     [Fact]
@@ -184,7 +184,7 @@ public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<Authentic
         Assert.Equal("CannotRemoveLastAdmin", problemDetails["detail"].GetString());
         Assert.Equal($"/api/v1/auth/users/{request.UserId}/role-and-permissions", problemDetails["instance"].GetString());
         Assert.NotNull(problemDetails["traceId"].GetString());
-        Assert.NotEmpty(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
     }
 
     [Fact]
@@ -213,7 +213,7 @@ public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<Authentic
         Assert.Equal("UserDoesNotExist", problemDetails["detail"].GetString());
         Assert.Equal($"/api/v1/auth/users/{nonExistentUserId}/role-and-permissions", problemDetails["instance"].GetString());
         Assert.NotNull(problemDetails["traceId"].GetString());
-        Assert.NotEmpty(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
     }
 
     [Fact]

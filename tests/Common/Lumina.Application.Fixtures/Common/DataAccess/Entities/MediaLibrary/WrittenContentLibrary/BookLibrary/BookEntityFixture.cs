@@ -23,18 +23,28 @@ public class BookEntityFixture
     /// <summary>
     /// Creates a random valid <see cref="BookEntity"/>.
     /// </summary>
+    /// <param name="id">Optional. The Id of the book.</param>
+    /// <param name="libraryId">Optional. The Id of the media library that owns the book.</param>
+    /// <param name="path">Optional. The file system path of the book.</param>
+    /// <param name="title">Optional. The title of the book.</param>
+    /// <param name="originalTitle">Optional. The original title of the book.</param>
     /// <returns>The created <see cref="BookEntity"/>.</returns>
-    public BookEntity Create()
+    public BookEntity Create(
+        Guid? id = null,
+        Guid? libraryId = null,
+        string? path = null,
+        string? title = null,
+        string? originalTitle = null)
     {
         int releaseYear = _random.Next(2000, 2010);
         int reReleaseYear = _random.Next(2010, 2020);
 
         return new Faker<BookEntity>()
-            .RuleFor(x => x.Id, f => f.Random.Guid())
-            .RuleFor(x => x.LibraryId, f => f.Random.Guid())
-            .RuleFor(x => x.Path, f => f.System.FilePath())
-            .RuleFor(x => x.Title, f => f.Random.String2(f.Random.Number(1, 255)))
-            .RuleFor(x => x.OriginalTitle, f => f.Random.String2(f.Random.Number(1, 255)))
+            .RuleFor(x => x.Id, f => id ?? f.Random.Guid())
+            .RuleFor(x => x.LibraryId, f => libraryId ?? f.Random.Guid())
+            .RuleFor(x => x.Path, f => path ?? f.System.FilePath())
+            .RuleFor(x => x.Title, f => title ?? f.Random.String2(f.Random.Number(1, 255)))
+            .RuleFor(x => x.OriginalTitle, f => originalTitle ?? f.Random.String2(f.Random.Number(1, 255)))
             .RuleFor(x => x.Description, f => f.Random.String2(f.Random.Number(1, 2000)))
             .RuleFor(x => x.OriginalReleaseDate, _faker.DateOnlyBetween(new DateOnly(releaseYear, 1, 1), new DateOnly(releaseYear, 12, 31)))
             .RuleFor(x => x.OriginalReleaseYear, releaseYear)

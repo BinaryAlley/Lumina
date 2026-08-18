@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.Mapping.Common.Metadata;
-using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
+using Lumina.Domain.Fixtures.Common.ValueObjects.Metadata;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -16,13 +16,13 @@ namespace Lumina.Application.UnitTests.Common.Mapping.Common.Metadata;
 [ExcludeFromCodeCoverage]
 public class GenreMappingTests
 {
+    private readonly GenreFixture _genreFixture = new();
+
     [Fact]
     public void ToRepositoryEntity_WhenMappingGenre_ShouldMapCorrectly()
     {
         // Arrange
-        Result<Genre> createResult = Genre.Create("Rock");
-        Assert.False(createResult.IsFailure);
-        Genre genre = createResult.Value;
+        Genre genre = _genreFixture.Create("Rock");
 
         // Act
         GenreEntity result = genre.ToRepositoryEntity();
@@ -40,9 +40,7 @@ public class GenreMappingTests
     public void ToRepositoryEntity_WhenMappingDifferentGenres_ShouldMapCorrectly(string name)
     {
         // Arrange
-        Result<Genre> createResult = Genre.Create(name);
-        Assert.False(createResult.IsFailure);
-        Genre genre = createResult.Value;
+        Genre genre = _genreFixture.Create(name);
 
         // Act
         GenreEntity result = genre.ToRepositoryEntity();
@@ -58,10 +56,10 @@ public class GenreMappingTests
         // Arrange
         List<Genre> genres =
         [
-            Genre.Create("Rock").Value,
-            Genre.Create("Jazz").Value,
-            Genre.Create("Classical").Value,
-            Genre.Create("Pop").Value
+            _genreFixture.Create("Rock"),
+            _genreFixture.Create("Jazz"),
+            _genreFixture.Create("Classical"),
+            _genreFixture.Create("Pop")
         ];
 
         // Act

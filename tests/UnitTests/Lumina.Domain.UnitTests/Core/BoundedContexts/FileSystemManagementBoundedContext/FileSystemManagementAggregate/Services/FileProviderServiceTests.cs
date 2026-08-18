@@ -261,7 +261,7 @@ public class FileProviderServiceTests
             byte[] expectedContents = [1, 2, 3, 4, 5];
             File.WriteAllBytes(tempFilePath, expectedContents);
 
-            FileSystemPathId path = FileSystemPathId.Create(tempFilePath).Value;
+            FileSystemPathId path = _fileSystemPathIdFixture.Create(tempFilePath);
             _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadContents).Returns(true);
 
             // We need to update the _fileSystem mock to use the real file system for this method
@@ -303,7 +303,7 @@ public class FileProviderServiceTests
         string tempFilePath = Path.GetTempFileName();
         try
         {
-            FileSystemPathId path = FileSystemPathId.Create(tempFilePath).Value;
+            FileSystemPathId path = _fileSystemPathIdFixture.Create(tempFilePath);
             _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadContents).Returns(true);
 
             // Act
@@ -328,7 +328,7 @@ public class FileProviderServiceTests
         try
         {
             File.WriteAllText(tempFilePath, "Test content");
-            FileSystemPathId path = FileSystemPathId.Create(tempFilePath).Value;
+            FileSystemPathId path = _fileSystemPathIdFixture.Create(tempFilePath);
             DateTime expectedDateTime = File.GetLastWriteTime(tempFilePath);
 
             _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties).Returns(true);
@@ -371,7 +371,7 @@ public class FileProviderServiceTests
         try
         {
             File.WriteAllText(tempFilePath, "Test content");
-            FileSystemPathId path = FileSystemPathId.Create(tempFilePath).Value;
+            FileSystemPathId path = _fileSystemPathIdFixture.Create(tempFilePath);
             DateTime expectedDateTime = File.GetCreationTime(tempFilePath);
 
             _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties).Returns(true);
@@ -415,7 +415,7 @@ public class FileProviderServiceTests
         {
             string content = "Test content";
             File.WriteAllText(tempFilePath, content);
-            FileSystemPathId path = FileSystemPathId.Create(tempFilePath).Value;
+            FileSystemPathId path = _fileSystemPathIdFixture.Create(tempFilePath);
             long expectedSize = new FileInfo(tempFilePath).Length;
 
             _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties).Returns(true);
@@ -455,7 +455,7 @@ public class FileProviderServiceTests
     {
         // Arrange
         string nonExistentFilePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-        FileSystemPathId path = FileSystemPathId.Create(nonExistentFilePath).Value;
+        FileSystemPathId path = _fileSystemPathIdFixture.Create(nonExistentFilePath);
 
         _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties).Returns(true);
         _mockFileSystem.FileInfo.New(path.Path).Returns((IFileInfo)null!);
@@ -875,7 +875,7 @@ public class FileProviderServiceTests
         _mockFileSystem.Path.Combine(parentPath, newName).Returns(newPath);
 
         // Mock successful creation of parent directory FileSystemPathId
-        Result<FileSystemPathId> parentDirectoryPathId = FileSystemPathId.Create(parentPath);
+        FileSystemPathId parentDirectoryPathId = _fileSystemPathIdFixture.Create(parentPath);
         _mockFileSystem.Path.GetDirectoryName(path.Path).Returns(parentPath);
 
         // Mock permissions: executable for the file, but not writable for the parent directory

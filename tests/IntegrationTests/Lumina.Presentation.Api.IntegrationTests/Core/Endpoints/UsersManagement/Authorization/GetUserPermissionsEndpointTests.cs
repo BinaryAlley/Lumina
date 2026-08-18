@@ -121,7 +121,7 @@ public class GetUserPermissionsEndpointTests : IClassFixture<AuthenticatedLumina
         Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
         Assert.Equal($"/api/v1/auth/users/{user!.Id}/permissions", problemDetails["instance"].GetString());
         Assert.NotNull(problemDetails["traceId"].GetString());
-        Assert.NotEmpty(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
     }
 
     [Fact]
@@ -145,7 +145,7 @@ public class GetUserPermissionsEndpointTests : IClassFixture<AuthenticatedLumina
         Assert.Equal("UsernameDoesNotExist", problemDetails["detail"].GetString());
         Assert.Equal($"/api/v1/auth/users/{nonExistentUserId}/permissions", problemDetails["instance"].GetString());
         Assert.NotNull(problemDetails["traceId"].GetString());
-        Assert.NotEmpty(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
     }
 
     [Fact]

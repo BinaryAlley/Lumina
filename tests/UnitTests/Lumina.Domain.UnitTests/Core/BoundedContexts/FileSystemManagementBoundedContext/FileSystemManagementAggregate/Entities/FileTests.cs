@@ -3,6 +3,8 @@ using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -16,6 +18,9 @@ namespace Lumina.Domain.UnitTests.Core.BoundedContexts.FileSystemManagementBound
 [ExcludeFromCodeCoverage]
 public class FileTests
 {
+    private readonly FileSystemPathIdFixture _fileSystemPathIdFixture = new();
+    private readonly FileFixture _fileFixture = new();
+
     [Fact]
     public void Create_WhenCalledWithValidParameters_ShouldReturnSuccessfulResult()
     {
@@ -61,9 +66,7 @@ public class FileTests
     public void Create_WhenCalledWithFileSystemPathId_ShouldReturnSuccessfulResult()
     {
         // Arrange
-        Result<FileSystemPathId> pathIdResult = FileSystemPathId.Create("/valid/path/file.txt");
-        Assert.False(pathIdResult.IsFailure);
-        FileSystemPathId pathId = pathIdResult.Value;
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path: "/valid/path/file.txt");
         string name = "file.txt";
         Optional<DateTime> dateCreated = DateTime.Now;
         Optional<DateTime> dateModified = DateTime.Now;
@@ -87,9 +90,12 @@ public class FileTests
     public void UpdateLastModified_WhenCalled_ShouldUpdateDateModified()
     {
         // Arrange
-        Result<File> fileResult = File.Create("/valid/path/file.txt", "file.txt", Optional<DateTime>.None(), Optional<DateTime>.None(), 1024);
-        Assert.False(fileResult.IsFailure);
-        File file = fileResult.Value;
+        File file = _fileFixture.Create(
+            path: "/valid/path/file.txt",
+            name: "file.txt",
+            dateCreated: Optional<DateTime>.None(),
+            dateModified: Optional<DateTime>.None(),
+            size: 1024);
         DateTime newDate = DateTime.Now;
 
         // Act
@@ -104,9 +110,12 @@ public class FileTests
     public void UpdateSize_WhenCalled_ShouldUpdateFileSize()
     {
         // Arrange
-        Result<File> fileResult = File.Create("/valid/path/file.txt", "file.txt", Optional<DateTime>.None(), Optional<DateTime>.None(), 1024);
-        Assert.False(fileResult.IsFailure);
-        File file = fileResult.Value;
+        File file = _fileFixture.Create(
+            path: "/valid/path/file.txt",
+            name: "file.txt",
+            dateCreated: Optional<DateTime>.None(),
+            dateModified: Optional<DateTime>.None(),
+            size: 1024);
         long newSize = 2048;
 
         // Act
@@ -121,9 +130,12 @@ public class FileTests
     public void Rename_WhenCalledWithValidName_ShouldUpdateFileName()
     {
         // Arrange
-        Result<File> fileResult = File.Create("/valid/path/file.txt", "file.txt", Optional<DateTime>.None(), Optional<DateTime>.None(), 1024);
-        Assert.False(fileResult.IsFailure);
-        File file = fileResult.Value;
+        File file = _fileFixture.Create(
+            path: "/valid/path/file.txt",
+            name: "file.txt",
+            dateCreated: Optional<DateTime>.None(),
+            dateModified: Optional<DateTime>.None(),
+            size: 1024);
         string newName = "newfile.txt";
 
         // Act
@@ -138,9 +150,12 @@ public class FileTests
     public void Rename_WhenCalledWithEmptyName_ShouldReturnError()
     {
         // Arrange
-        Result<File> fileResult = File.Create("/valid/path/file.txt", "file.txt", Optional<DateTime>.None(), Optional<DateTime>.None(), 1024);
-        Assert.False(fileResult.IsFailure);
-        File file = fileResult.Value;
+        File file = _fileFixture.Create(
+            path: "/valid/path/file.txt",
+            name: "file.txt",
+            dateCreated: Optional<DateTime>.None(),
+            dateModified: Optional<DateTime>.None(),
+            size: 1024);
         string emptyName = "";
 
         // Act

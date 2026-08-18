@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.FileSystemManagement.Paths;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
-using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -16,13 +16,13 @@ namespace Lumina.Application.UnitTests.Common.Mapping.FileSystemManagement.Paths
 [ExcludeFromCodeCoverage]
 public class PathSegmentMappingTests
 {
+    private readonly PathSegmentFixture _pathSegmentFixture = new();
+
     [Fact]
     public void ToResponse_WhenMappingPathSegment_ShouldMapCorrectly()
     {
         // Arrange
-        Result<PathSegment> createResult = PathSegment.Create("TestSegment", true, false);
-        Assert.False(createResult.IsFailure);
-        PathSegment pathSegment = createResult.Value;
+        PathSegment pathSegment = _pathSegmentFixture.Create(name: "TestSegment", isDirectory: true, isDrive: false);
 
         // Act
         PathSegmentResponse result = pathSegment.ToResponse();
@@ -39,9 +39,7 @@ public class PathSegmentMappingTests
     public void ToResponse_WhenMappingDifferentPathSegmentTypes_ShouldMapCorrectly(string name, bool isDirectory, bool isDrive)
     {
         // Arrange
-        Result<PathSegment> createResult = PathSegment.Create(name, isDirectory, isDrive);
-        Assert.False(createResult.IsFailure);
-        PathSegment pathSegment = createResult.Value;
+        PathSegment pathSegment = _pathSegmentFixture.Create(name: name, isDirectory: isDirectory, isDrive: isDrive);
 
         // Act
         PathSegmentResponse result = pathSegment.ToResponse();
@@ -57,10 +55,10 @@ public class PathSegmentMappingTests
         // Arrange
         List<PathSegment> pathSegments =
         [
-            PathSegment.Create("C:", false, true).Value,
-            PathSegment.Create("Users", true, false).Value,
-            PathSegment.Create("Documents", true, false).Value,
-            PathSegment.Create("file.txt", false, false).Value
+            _pathSegmentFixture.Create(name: "C:", isDirectory: false, isDrive: true),
+            _pathSegmentFixture.Create(name: "Users", isDirectory: true, isDrive: false),
+            _pathSegmentFixture.Create(name: "Documents", isDirectory: true, isDrive: false),
+            _pathSegmentFixture.Create(name: "file.txt", isDirectory: false, isDrive: false)
         ];
 
         // Act

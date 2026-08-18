@@ -178,5 +178,7 @@ public class AuthenticatedLuminaApiFactory : LuminaApiFactory, IDisposable
             dbContext.Users.Remove(user);
             dbContext.SaveChanges();
         }
+
+        base.Dispose();
     }
 }

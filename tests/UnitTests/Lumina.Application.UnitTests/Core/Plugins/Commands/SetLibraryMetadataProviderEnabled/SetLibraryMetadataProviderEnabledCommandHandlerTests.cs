@@ -4,6 +4,7 @@ using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.Plugins.Commands.SetLibraryMetadataProviderEnabled;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using NSubstitute;
 using System;
@@ -23,6 +24,7 @@ public class SetLibraryMetadataProviderEnabledCommandHandlerTests
 {
     private readonly IUnitOfWork _mockUnitOfWork;
     private readonly ILibraryMetadataProviderConfigurationRepository _mockConfigurationRepository;
+    private readonly IValidator<SetLibraryMetadataProviderEnabledCommand> _mockValidator;
     private readonly SetLibraryMetadataProviderEnabledCommandHandler _sut;
 
     /// <summary>
@@ -33,10 +35,10 @@ public class SetLibraryMetadataProviderEnabledCommandHandlerTests
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
         _mockConfigurationRepository = Substitute.For<ILibraryMetadataProviderConfigurationRepository>();
         _mockUnitOfWork.LibraryMetadataProviderConfigurationRepository.Returns(_mockConfigurationRepository);
-        IValidator<SetLibraryMetadataProviderEnabledCommand> mockValidator = Substitute.For<IValidator<SetLibraryMetadataProviderEnabledCommand>>();
-        mockValidator.Validate(Arg.Any<SetLibraryMetadataProviderEnabledCommand>())
+        _mockValidator = Substitute.For<IValidator<SetLibraryMetadataProviderEnabledCommand>>();
+        _mockValidator.Validate(Arg.Any<SetLibraryMetadataProviderEnabledCommand>())
             .Returns([]);
-        _sut = new SetLibraryMetadataProviderEnabledCommandHandler(_mockUnitOfWork, mockValidator);
+        _sut = new SetLibraryMetadataProviderEnabledCommandHandler(_mockUnitOfWork, _mockValidator);
     }
 
     [Fact]
@@ -90,5 +92,24 @@ public class SetLibraryMetadataProviderEnabledCommandHandlerTests
         await _mockConfigurationRepository.Received(1).UpsertAsync(
             Arg.Is<LibraryMetadataProviderConfigurationEntity>(configuration => configuration.IsEnabled && configuration.Rank == 2),
             Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenValidationFails_ShouldReturnValidationErrorsWithoutPersisting()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        Guid pluginId = Guid.NewGuid();
+        _mockValidator.Validate(Arg.Any<SetLibraryMetadataProviderEnabledCommand>()).Returns([Errors.Plugins.PluginIdCannotBeEmpty]);
+
+        // Act
+        Result<Success> result = await _sut.HandleAsync(new SetLibraryMetadataProviderEnabledCommand(libraryId, pluginId, true), CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Plugins.PluginIdCannotBeEmpty, result.FirstError);
+        await _mockConfigurationRepository.DidNotReceive().GetByLibraryAndPluginIdAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockConfigurationRepository.DidNotReceive().UpsertAsync(Arg.Any<LibraryMetadataProviderConfigurationEntity>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 }

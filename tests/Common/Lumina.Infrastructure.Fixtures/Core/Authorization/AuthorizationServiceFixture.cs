@@ -22,7 +22,7 @@ public class AuthorizationServiceFixture
     /// <param name="directPermissions">Direct permissions to assign to the user.</param>
     /// <param name="rolePermissions">Permissions to assign through roles.</param>
     /// <returns>The created user entity.</returns>
-    public static UserEntity CreateUserWithPermissions(
+    public UserEntity CreateUserWithPermissions(
         IEnumerable<AuthorizationPermission>? directPermissions = null,
         Dictionary<string, IEnumerable<AuthorizationPermission>>? rolePermissions = null)
     {

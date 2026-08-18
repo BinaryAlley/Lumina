@@ -6,9 +6,9 @@ using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.Common.Base;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Infrastructure.Core.Authorization.Policies.LibraryOwnership;
 using Lumina.Infrastructure.Fixtures.Core.Authorization;
 using NSubstitute;
@@ -31,6 +31,8 @@ public class LibraryOwnershipPolicyTests
     private readonly IUserRepository _mockUserRepository;
     private readonly ILibraryRepository _mockLibraryRepository;
     private readonly LibraryOwnershipPolicy _sut;
+    private readonly AuthorizationServiceFixture _authorizationServiceFixture = new();
+    private readonly LibraryEntityFixture _libraryEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LibraryOwnershipPolicyTests"/> class.
@@ -99,7 +101,7 @@ public class LibraryOwnershipPolicyTests
     public async Task EvaluateAsync_WhenUserIsAdmin_ShouldReturnTrue()
     {
         // Arrange
-        UserEntity adminUser = AuthorizationServiceFixture.CreateUserWithPermissions(
+        UserEntity adminUser = _authorizationServiceFixture.CreateUserWithPermissions(
             rolePermissions: new Dictionary<string, IEnumerable<AuthorizationPermission>>
             {
                 { "Admin", [] }
@@ -121,7 +123,7 @@ public class LibraryOwnershipPolicyTests
     {
         // Arrange
         Guid userId = Guid.NewGuid();
-        UserEntity regularUser = AuthorizationServiceFixture.CreateUserWithPermissions();
+        UserEntity regularUser = _authorizationServiceFixture.CreateUserWithPermissions();
         LibraryOwnershipPolicyContext context = new(Guid.NewGuid());
         _mockUserRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(regularUser));
@@ -140,7 +142,7 @@ public class LibraryOwnershipPolicyTests
     {
         // Arrange
         Guid userId = Guid.NewGuid();
-        UserEntity regularUser = AuthorizationServiceFixture.CreateUserWithPermissions();
+        UserEntity regularUser = _authorizationServiceFixture.CreateUserWithPermissions();
         LibraryOwnershipPolicyContext context = new(Guid.NewGuid());
         _mockUserRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(regularUser));
@@ -159,8 +161,8 @@ public class LibraryOwnershipPolicyTests
     {
         // Arrange
         Guid userId = Guid.NewGuid();
-        UserEntity regularUser = AuthorizationServiceFixture.CreateUserWithPermissions();
-        LibraryEntity library = CreateLibrary(userId);
+        UserEntity regularUser = _authorizationServiceFixture.CreateUserWithPermissions();
+        LibraryEntity library = _libraryEntityFixture.Create(userId: userId);
         LibraryOwnershipPolicyContext context = new(library.Id);
         _mockUserRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(regularUser));
@@ -179,8 +181,8 @@ public class LibraryOwnershipPolicyTests
     {
         // Arrange
         Guid userId = Guid.NewGuid();
-        UserEntity regularUser = AuthorizationServiceFixture.CreateUserWithPermissions();
-        LibraryEntity library = CreateLibrary(Guid.NewGuid());
+        UserEntity regularUser = _authorizationServiceFixture.CreateUserWithPermissions();
+        LibraryEntity library = _libraryEntityFixture.Create(userId: Guid.NewGuid());
         LibraryOwnershipPolicyContext context = new(library.Id);
         _mockUserRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(regularUser));
@@ -192,25 +194,5 @@ public class LibraryOwnershipPolicyTests
 
         // Assert
         Assert.False(result);
-    }
-
-    /// <summary>
-    /// Creates a library entity owned by <paramref name="ownerId"/>.
-    /// </summary>
-    /// <param name="ownerId">The Id of the user owning the library.</param>
-    /// <returns>The created library entity.</returns>
-    private static LibraryEntity CreateLibrary(Guid ownerId)
-    {
-        return new LibraryEntity
-        {
-            Id = Guid.NewGuid(),
-            UserId = ownerId,
-            Title = "Test Library",
-            LibraryType = LibraryType.Book,
-            ContentLocations = [],
-            CreatedBy = ownerId,
-            CreatedOnUtc = DateTime.UtcNow,
-            UpdatedBy = null
-        };
     }
 }

@@ -1,0 +1,127 @@
+#region ========================================================================= USING =====================================================================================
+using Lumina.Application.Common.CQRS;
+using Lumina.Application.Core.MediaLibrary.Management.Commands.CancelLibraryScan;
+using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.Management;
+using Lumina.Contracts.Requests.MediaLibrary.Management;
+using Lumina.Domain.Common.Primitives;
+using Lumina.Presentation.Api.Core.Endpoints.Library.Management.CancelLibraryScan;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+using NSubstitute;
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Threading;
+using System.Threading.Tasks;
+#endregion
+
+namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Library.Management.CancelLibraryScan;
+
+/// <summary>
+/// Contains unit tests for the <see cref="CancelLibraryScanEndpoint"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class CancelLibraryScanEndpointTests
+{
+    private readonly ICommandHandler<CancelLibraryScanCommand, Result<Success>> _mockHandler;
+    private readonly CancelLibraryScanEndpoint _sut;
+    private readonly CancelLibraryScanRequestFixture _cancelLibraryScanRequestFixture = new();
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CancelLibraryScanEndpointTests"/> class.
+    /// </summary>
+    public CancelLibraryScanEndpointTests()
+    {
+        _mockHandler = Substitute.For<ICommandHandler<CancelLibraryScanCommand, Result<Success>>>();
+        _sut = FastEndpoints.Factory.Create<CancelLibraryScanEndpoint>(_mockHandler);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenSuccessful_ShouldReturnNoContent()
+    {
+        // Arrange
+        CancelLibraryScanRequest request = _cancelLibraryScanRequestFixture.Create();
+        CancellationToken cancellationToken = CancellationToken.None;
+        _mockHandler.HandleAsync(Arg.Any<CancelLibraryScanCommand>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From(Result.Success));
+
+        // Act
+        IResult result = await _sut.ExecuteAsync(request, cancellationToken);
+
+        // Assert
+        Assert.IsType<NoContent>(result);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
+    {
+        // Arrange
+        CancelLibraryScanRequest request = _cancelLibraryScanRequestFixture.Create();
+        CancellationToken cancellationToken = CancellationToken.None;
+        Error expectedError = Error.NotFound("LibraryScan.NotFound", "The requested library scan was not found.");
+        _mockHandler.HandleAsync(Arg.Any<CancelLibraryScanCommand>(), Arg.Any<CancellationToken>())
+            .Returns(expectedError);
+
+        // Act
+        IResult result = await _sut.ExecuteAsync(request, cancellationToken);
+
+        // Assert
+        ProblemHttpResult problemDetails = Assert.IsType<ProblemHttpResult>(result);
+        Assert.Equal(StatusCodes.Status404NotFound, problemDetails.StatusCode);
+        Assert.Equal("application/problem+json", problemDetails.ContentType);
+        Assert.IsType<Microsoft.AspNetCore.Mvc.ProblemDetails>(problemDetails.ProblemDetails);
+
+        Assert.Equal("LibraryScan.NotFound", problemDetails.ProblemDetails.Title);
+        Assert.Equal("The requested library scan was not found.", problemDetails.ProblemDetails.Detail);
+        Assert.Equal(StatusCodes.Status404NotFound, problemDetails.ProblemDetails.Status);
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.5", problemDetails.ProblemDetails.Type);
+        Assert.NotNull(problemDetails.ProblemDetails.Extensions["traceId"]);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenCalled_ShouldSendCancelLibraryScanCommandToSender()
+    {
+        // Arrange
+        CancelLibraryScanRequest request = _cancelLibraryScanRequestFixture.Create();
+        CancellationToken cancellationToken = CancellationToken.None;
+        _mockHandler.HandleAsync(Arg.Any<CancelLibraryScanCommand>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From(Result.Success));
+
+        // Act
+        await _sut.ExecuteAsync(request, cancellationToken);
+
+        // Assert
+        await _mockHandler.Received(1).HandleAsync(
+            Arg.Is<CancelLibraryScanCommand>(command =>
+                command.LibraryId == request.LibraryId &&
+                command.ScanId == request.ScanId),
+            Arg.Is(cancellationToken));
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenCancellationRequested_ShouldCancelOperation()
+    {
+        // Arrange
+        CancelLibraryScanRequest request = _cancelLibraryScanRequestFixture.Create();
+        CancellationTokenSource cts = new();
+        TaskCompletionSource<bool> operationStarted = new();
+        TaskCompletionSource<bool> cancellationRequested = new();
+
+        _mockHandler.HandleAsync(Arg.Any<CancelLibraryScanCommand>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo => Task.Run(async () =>
+            {
+                operationStarted.SetResult(true);
+                await cancellationRequested.Task;
+                callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
+                return Result.From(Result.Success);
+            }, callInfo.Arg<CancellationToken>()));
+
+        // Act
+        Task<IResult> operationTask = _sut.ExecuteAsync(request, cts.Token);
+        await operationStarted.Task;
+        cts.Cancel();
+        cancellationRequested.SetResult(true);
+
+        // Assert
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => operationTask);
+    }
+}

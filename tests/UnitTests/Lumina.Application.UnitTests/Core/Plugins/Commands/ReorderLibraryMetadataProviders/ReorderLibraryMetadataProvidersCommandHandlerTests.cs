@@ -5,6 +5,7 @@ using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.Plugins.Commands.ReorderLibraryMetadataProviders;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Plugins;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using NSubstitute;
 using System;
@@ -24,6 +25,7 @@ public class ReorderLibraryMetadataProvidersCommandHandlerTests
 {
     private readonly IUnitOfWork _mockUnitOfWork;
     private readonly ILibraryMetadataProviderConfigurationRepository _mockConfigurationRepository;
+    private readonly IValidator<ReorderLibraryMetadataProvidersCommand> _mockValidator;
     private readonly ReorderLibraryMetadataProvidersCommandHandler _sut;
 
     /// <summary>
@@ -34,10 +36,10 @@ public class ReorderLibraryMetadataProvidersCommandHandlerTests
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
         _mockConfigurationRepository = Substitute.For<ILibraryMetadataProviderConfigurationRepository>();
         _mockUnitOfWork.LibraryMetadataProviderConfigurationRepository.Returns(_mockConfigurationRepository);
-        IValidator<ReorderLibraryMetadataProvidersCommand> mockValidator = Substitute.For<IValidator<ReorderLibraryMetadataProvidersCommand>>();
-        mockValidator.Validate(Arg.Any<ReorderLibraryMetadataProvidersCommand>())
+        _mockValidator = Substitute.For<IValidator<ReorderLibraryMetadataProvidersCommand>>();
+        _mockValidator.Validate(Arg.Any<ReorderLibraryMetadataProvidersCommand>())
             .Returns([]);
-        _sut = new ReorderLibraryMetadataProvidersCommandHandler(_mockUnitOfWork, mockValidator);
+        _sut = new ReorderLibraryMetadataProvidersCommandHandler(_mockUnitOfWork, _mockValidator);
     }
 
     [Fact]
@@ -64,5 +66,23 @@ public class ReorderLibraryMetadataProvidersCommandHandlerTests
         await _mockConfigurationRepository.Received(1).UpsertAsync(
             Arg.Is<LibraryMetadataProviderConfigurationEntity>(configuration => configuration.PluginId == firstProvider.PluginId && configuration.Rank == 2),
             Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenValidationFails_ShouldReturnValidationErrorsWithoutPersisting()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        _mockValidator.Validate(Arg.Any<ReorderLibraryMetadataProvidersCommand>()).Returns([Errors.Plugins.PluginIdsListCannotBeEmpty]);
+
+        // Act
+        Result<Success> result = await _sut.HandleAsync(new ReorderLibraryMetadataProvidersCommand(libraryId, [Guid.NewGuid()]), CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Plugins.PluginIdsListCannotBeEmpty, result.FirstError);
+        await _mockConfigurationRepository.DidNotReceive().GetByLibraryIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockConfigurationRepository.DidNotReceive().UpsertAsync(Arg.Any<LibraryMetadataProviderConfigurationEntity>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 }

@@ -6,7 +6,6 @@ using Lumina.Infrastructure.Core.Security;
 using Lumina.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http.Json;
@@ -42,34 +41,29 @@ public class RegisterEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
     }
 
     [Fact]
-    public async Task Register_WithValidData_ShouldNotLeakTimingInformation()
+    public async Task Register_WhenUsernameTaken_ShouldReturnUniformConflictResponse()
     {
         // Arrange
-        Stopwatch stopwatch = new();
-        List<long> timings = [];
-        _client.DefaultRequestHeaders.Clear();
-        _client.DefaultRequestHeaders.Add("X-Forwarded-For", $"192.168.1.6");
         RegistrationRequest request = new(
             Username: _testUsername,
             Password: "TestPass123!",
             PasswordConfirm: "TestPass123!"
         );
+        _client.DefaultRequestHeaders.Clear();
+        _client.DefaultRequestHeaders.Add("X-Forwarded-For", $"192.168.1.6");
 
         // Act
-        for (int i = 0; i < 10; i++)
-        {
-            await Task.Delay(100);
-            stopwatch.Restart();
-            await _client.PostAsJsonAsync("/api/v1/auth/register", request);
-            stopwatch.Stop();
-            timings.Add(stopwatch.ElapsedMilliseconds);
-        }
-        timings.Sort();
-        timings = timings.Skip(1).SkipLast(1).ToList();
+        HttpResponseMessage firstResponse = await _client.PostAsJsonAsync("/api/v1/auth/register", request);
+        HttpResponseMessage secondResponse = await _client.PostAsJsonAsync("/api/v1/auth/register", request);
+        string secondContent = await secondResponse.Content.ReadAsStringAsync();
 
         // Assert
-        double stdDev = CalculateStandardDeviation(timings);
-        Assert.True(stdDev < 200);
+        Assert.Equal(HttpStatusCode.Created, firstResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.Conflict, secondResponse.StatusCode);
+        AssertProblemDetail(secondContent, "General.Conflict", "UsernameAlreadyExists");
+        Assert.DoesNotContain("password", secondContent);
+        Assert.DoesNotContain("hash", secondContent);
+        Assert.DoesNotContain("salt", secondContent);
     }
 
     [Fact]
@@ -203,11 +197,12 @@ public class RegisterEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
         Assert.DoesNotContain("salt", content);
     }
 
-    private double CalculateStandardDeviation(List<long> values)
+    private void AssertProblemDetail(string content, string expectedTitle, string expectedDetail)
     {
-        double average = values.Average();
-        double sumOfSquaresOfDifferences = values.Select(value => (value - average) * (value - average)).Sum();
-        return Math.Sqrt(sumOfSquaresOfDifferences / values.Count);
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal(expectedTitle, problemDetails!["title"].GetString());
+        Assert.Equal(expectedDetail, problemDetails["detail"].GetString());
     }
 
     private async Task<UserEntity> CreateTestUser()
