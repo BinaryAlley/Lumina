@@ -95,7 +95,7 @@ public class GetPermissionsEndpointTests : IClassFixture<AuthenticatedLuminaApiF
         Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
         Assert.Equal("/api/v1/auth/permissions", problemDetails["instance"].GetString());
         Assert.NotNull(problemDetails["traceId"].GetString());
-        Assert.NotEmpty(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
     }
 
     [Fact]
@@ -117,7 +117,7 @@ public class GetPermissionsEndpointTests : IClassFixture<AuthenticatedLuminaApiF
     /// </summary>
     public async Task DisposeAsync()
     {
-        _apiFactory.Dispose();
+        await _apiFactory.RemoveTestUserAsync();
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();

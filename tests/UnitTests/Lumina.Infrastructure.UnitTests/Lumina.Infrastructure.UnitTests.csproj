@@ -24,6 +24,7 @@
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="2.3.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.11" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
         <PackageReference Include="NSubstitute" Version="6.2.0" />
@@ -40,7 +41,10 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\src\Lumina.Infrastructure\Lumina.Infrastructure.csproj" />
+        <ProjectReference Include="..\..\Common\Lumina.Domain.Fixtures\Lumina.Domain.Fixtures.csproj" />
+        <ProjectReference Include="..\..\Common\Lumina.Application.Fixtures\Lumina.Application.Fixtures.csproj" />
         <ProjectReference Include="..\..\Common\Lumina.Infrastructure.Fixtures\Lumina.Infrastructure.Fixtures.csproj" />
+        <ProjectReference Include="..\..\Common\Lumina.TestPlugin\Lumina.TestPlugin.csproj" />
     </ItemGroup>
 
 </Project>

@@ -6,7 +6,7 @@ using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookL
 using Lumina.Application.Common.Mapping.UsersManagement.Users;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate;
-using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -20,14 +20,13 @@ namespace Lumina.Application.UnitTests.Common.Mapping.UserManagement.Users;
 [ExcludeFromCodeCoverage]
 public class UserMappingTests
 {
+    private readonly UserFixture _userFixture = new();
+
     [Fact]
     public void ToRepositoryEntity_WhenMappingValidUser_ShouldOnlyUpdateUsername()
     {
         // Arrange
-        User domainEntity = User.Create(
-            UserId.Create(Guid.NewGuid()),
-            "newusername"
-        ).Value;
+        User domainEntity = _userFixture.Create(username: "newusername");
 
         UserEntity repositoryEntity = new()
         {
@@ -72,10 +71,7 @@ public class UserMappingTests
     public void ToRepositoryEntity_WhenMappingDifferentUsernames_ShouldUpdateCorrectly(string newUsername)
     {
         // Arrange
-        User domainEntity = User.Create(
-            UserId.Create(Guid.NewGuid()),
-            newUsername
-        ).Value;
+        User domainEntity = _userFixture.Create(username: newUsername);
 
         UserEntity repositoryEntity = new()
         {
@@ -102,10 +98,7 @@ public class UserMappingTests
     public void ToRepositoryEntity_WhenRepositoryEntityHasLibraries_ShouldPreserveLibraries()
     {
         // Arrange
-        User domainEntity = User.Create(
-            UserId.Create(Guid.NewGuid()),
-            "newusername"
-        ).Value;
+        User domainEntity = _userFixture.Create(username: "newusername");
 
         List<LibraryEntity> libraries =
         [

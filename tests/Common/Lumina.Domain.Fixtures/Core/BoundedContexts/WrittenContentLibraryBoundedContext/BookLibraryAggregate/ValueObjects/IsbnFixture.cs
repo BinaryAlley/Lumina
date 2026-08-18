@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using System;
@@ -19,13 +20,23 @@ public class IsbnFixture
     /// <summary>
     /// Creates a valid <see cref="Isbn"/> with a random or explicitly requested format.
     /// </summary>
+    /// <param name="value">Optional. The ISBN value to use. If not provided, a random valid value is generated for the requested format.</param>
     /// <param name="format">Optional. The requested <see cref="IsbnFormat"/>. If not provided, a random format is selected.</param>
     /// <returns>The created <see cref="Isbn"/>.</returns>
-    public Isbn Create(IsbnFormat? format = null)
+    public Isbn Create(string? value = null, IsbnFormat? format = null)
     {
-        IsbnFormat targetFormat = format ?? (_random.Next(2) == 0 ? IsbnFormat.Isbn10 : IsbnFormat.Isbn13);
-        string isbn = targetFormat == IsbnFormat.Isbn10 ? GenerateValidIsbn10() : GenerateValidIsbn13();
-        return Isbn.Create(isbn, targetFormat).Value;
+        if (value is not null)
+        {
+            IsbnFormat targetFormat = format ?? IsbnFormat.Isbn10;
+            Result<Isbn> result = Isbn.Create(value, targetFormat);
+            if (result.IsFailure)
+                throw new InvalidOperationException("Failed to create Isbn: " + string.Join(", ", result.Errors));
+            return result.Value;
+        }
+
+        IsbnFormat requestedFormat = format ?? (_random.Next(2) == 0 ? IsbnFormat.Isbn10 : IsbnFormat.Isbn13);
+        string isbn = requestedFormat == IsbnFormat.Isbn10 ? GenerateValidIsbn10() : GenerateValidIsbn13();
+        return Isbn.Create(isbn, requestedFormat).Value;
     }
 
     /// <summary>

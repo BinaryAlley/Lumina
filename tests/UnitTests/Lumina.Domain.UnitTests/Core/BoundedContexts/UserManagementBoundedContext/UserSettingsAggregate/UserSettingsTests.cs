@@ -3,6 +3,8 @@ using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserSettingsAggregate;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.UserManagementBoundedContext.UserSettingsAggregate;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
@@ -15,11 +17,14 @@ namespace Lumina.Domain.UnitTests.Core.BoundedContexts.UserManagementBoundedCont
 [ExcludeFromCodeCoverage]
 public class UserSettingsTests
 {
+    private readonly UserIdFixture _userIdFixture = new();
+    private readonly UserSettingsFixture _userSettingsFixture = new();
+
     [Fact]
     public void Create_WhenCalledWithoutValues_ShouldCreateSettingsWithDefaultValues()
     {
         // Arrange
-        UserId userId = UserId.CreateUnique();
+        UserId userId = _userIdFixture.Create();
 
         // Act
         Result<UserSettings> result = UserSettings.Create(userId);
@@ -64,7 +69,7 @@ public class UserSettingsTests
     public void Create_WhenCalledWithValidValues_ShouldCreateSettings()
     {
         // Arrange
-        UserId userId = UserId.CreateUnique();
+        UserId userId = _userIdFixture.Create();
 
         // Act
         Result<UserSettings> result = UserSettings.Create(userId, isPaginationEnabled: false, itemsPerPage: 24, ignoreThePrefixForAlphaPicker: true);
@@ -81,7 +86,7 @@ public class UserSettingsTests
     public void Create_WhenCalledWithValidValues_ShouldGenerateDistinctSettingsIdFromUserId()
     {
         // Arrange
-        UserId userId = UserId.CreateUnique();
+        UserId userId = _userIdFixture.Create();
 
         // Act
         Result<UserSettings> result = UserSettings.Create(userId);
@@ -97,7 +102,7 @@ public class UserSettingsTests
     public void Create_WhenItemsPerPageIsNotPositive_ShouldReturnError(int itemsPerPage)
     {
         // Arrange
-        UserId userId = UserId.CreateUnique();
+        UserId userId = _userIdFixture.Create();
 
         // Act
         Result<UserSettings> result = UserSettings.Create(userId, isPaginationEnabled: true, itemsPerPage: itemsPerPage, ignoreThePrefixForAlphaPicker: false);
@@ -111,16 +116,16 @@ public class UserSettingsTests
     public void UpdateSettings_WhenCalledWithValidValues_ShouldUpdateSettings()
     {
         // Arrange
-        Result<UserSettings> createResult = UserSettings.Create(UserId.CreateUnique());
+        UserSettings userSettings = _userSettingsFixture.Create();
 
         // Act
-        Result<Updated> result = createResult.Value.UpdateSettings(isPaginationEnabled: false, itemsPerPage: 12, ignoreThePrefixForAlphaPicker: true);
+        Result<Updated> result = userSettings.UpdateSettings(isPaginationEnabled: false, itemsPerPage: 12, ignoreThePrefixForAlphaPicker: true);
 
         // Assert
         Assert.False(result.IsFailure);
-        Assert.False(createResult.Value.IsPaginationEnabled);
-        Assert.Equal(12, createResult.Value.ItemsPerPage);
-        Assert.True(createResult.Value.IgnoreThePrefixForAlphaPicker);
+        Assert.False(userSettings.IsPaginationEnabled);
+        Assert.Equal(12, userSettings.ItemsPerPage);
+        Assert.True(userSettings.IgnoreThePrefixForAlphaPicker);
     }
 
     [Theory]
@@ -129,10 +134,10 @@ public class UserSettingsTests
     public void UpdateSettings_WhenItemsPerPageIsNotPositive_ShouldReturnError(int itemsPerPage)
     {
         // Arrange
-        Result<UserSettings> createResult = UserSettings.Create(UserId.CreateUnique());
+        UserSettings userSettings = _userSettingsFixture.Create();
 
         // Act
-        Result<Updated> result = createResult.Value.UpdateSettings(isPaginationEnabled: true, itemsPerPage: itemsPerPage, ignoreThePrefixForAlphaPicker: false);
+        Result<Updated> result = userSettings.UpdateSettings(isPaginationEnabled: true, itemsPerPage: itemsPerPage, ignoreThePrefixForAlphaPicker: false);
 
         // Assert
         Assert.True(result.IsFailure);

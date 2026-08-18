@@ -4,7 +4,8 @@ using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -18,6 +19,10 @@ namespace Lumina.Domain.UnitTests.Core.BoundedContexts.FileSystemManagementBound
 [ExcludeFromCodeCoverage]
 public class DirectoryTests
 {
+    private readonly FileSystemPathIdFixture _fileSystemPathIdFixture = new();
+    private readonly DirectoryFixture _directoryFixture = new();
+    private readonly FileFixture _fileFixture = new();
+
     [Fact]
     public void Create_WhenCalledWithValidParameters_ShouldReturnSuccessfulResult()
     {
@@ -60,9 +65,7 @@ public class DirectoryTests
     public void Create_WhenCalledWithFileSystemPathId_ShouldReturnSuccessfulResult()
     {
         // Arrange
-        Result<FileSystemPathId> pathIdResult = FileSystemPathId.Create("/valid/path");
-        Assert.False(pathIdResult.IsFailure);
-        FileSystemPathId pathId = pathIdResult.Value;
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path: "/valid/path");
         string name = "TestDirectory";
         Optional<DateTime> dateCreated = DateTime.Now;
         Optional<DateTime> dateModified = DateTime.Now;
@@ -84,9 +87,11 @@ public class DirectoryTests
     public void UpdateLastModified_WhenCalled_ShouldUpdateDateModified()
     {
         // Arrange
-        Result<Directory> directoryResult = Directory.Create("/valid/path", "TestDirectory", Optional<DateTime>.None(), Optional<DateTime>.None());
-        Assert.False(directoryResult.IsFailure);
-        Directory directory = directoryResult.Value;
+        Directory directory = _directoryFixture.Create(
+            path: "/valid/path",
+            name: "TestDirectory",
+            dateCreated: Optional<DateTime>.None(),
+            dateModified: Optional<DateTime>.None());
         DateTime newDate = DateTime.Now;
 
         // Act
@@ -101,10 +106,12 @@ public class DirectoryTests
     public void AddItem_WhenCalled_ShouldAddItemToCollection()
     {
         // Arrange
-        Result<Directory> directoryResult = Directory.Create("/valid/path", "TestDirectory", Optional<DateTime>.None(), Optional<DateTime>.None());
-        Assert.False(directoryResult.IsFailure);
-        Directory directory = directoryResult.Value;
-        FileSystemItem item = new FileSystemItemFixture(FileSystemPathId.Create("/mock/path").Value, "MockItem", FileSystemItemType.File);
+        Directory directory = _directoryFixture.Create(
+            path: "/valid/path",
+            name: "TestDirectory",
+            dateCreated: Optional<DateTime>.None(),
+            dateModified: Optional<DateTime>.None());
+        File item = _fileFixture.Create(path: "/mock/path", name: "MockItem");
 
         // Act
         Result<Updated> result = directory.AddItem(item);
@@ -118,10 +125,12 @@ public class DirectoryTests
     public void RemoveItem_WhenCalledWithExistingItem_ShouldRemoveItemFromCollection()
     {
         // Arrange
-        Result<Directory> directoryResult = Directory.Create("/valid/path", "TestDirectory", Optional<DateTime>.None(), Optional<DateTime>.None());
-        Assert.False(directoryResult.IsFailure);
-        Directory directory = directoryResult.Value;
-        FileSystemItem item = new FileSystemItemFixture(FileSystemPathId.Create("/mock/path").Value, "MockItem", FileSystemItemType.File);
+        Directory directory = _directoryFixture.Create(
+            path: "/valid/path",
+            name: "TestDirectory",
+            dateCreated: Optional<DateTime>.None(),
+            dateModified: Optional<DateTime>.None());
+        File item = _fileFixture.Create(path: "/mock/path", name: "MockItem");
         directory.AddItem(item);
 
         // Act

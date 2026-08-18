@@ -21,8 +21,10 @@ public class UserEntityFixture
     /// Creates a random valid <see cref="UserEntity"/>.
     /// </summary>
     /// <param name="libraryCount">Number of libraries to generate. Default is 0.</param>
+    /// <param name="username">Optional username to pin, or <see langword="null"/> to generate a random one.</param>
+    /// <param name="password">Optional password to pin, or <see langword="null"/> to generate a random one.</param>
     /// <returns>The created user entity.</returns>
-    public UserEntity Create(int libraryCount = 0)
+    public UserEntity Create(int libraryCount = 0, string? username = null, string? password = null)
     {
         Guid userId = Guid.NewGuid();
         List<LibraryEntity> libraries = libraryCount > 0
@@ -42,8 +44,8 @@ public class UserEntityFixture
                 UserRole = null,
                 CreatedBy = userId
             })
-            .RuleFor(x => x.Username, f => f.Internet.UserName())
-            .RuleFor(x => x.Password, f => Uri.EscapeDataString(f.Internet.Password()))
+            .RuleFor(x => x.Username, f => username ?? f.Internet.UserName())
+            .RuleFor(x => x.Password, f => password ?? Uri.EscapeDataString(f.Internet.Password()))
             .RuleFor(x => x.CreatedOnUtc, f => f.Date.Past())
             .RuleFor(x => x.TotpSecret, f => f.Random.Bool() ? f.Random.String2(32) : null)
             .Generate();

@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.FileSystemManagement.FileSystem;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
-using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using System.Diagnostics.CodeAnalysis;
 #endregion
@@ -15,13 +15,13 @@ namespace Lumina.Application.UnitTests.Common.Mapping.FileSystemManagement.FileS
 [ExcludeFromCodeCoverage]
 public class UnixRootItemMappingTests
 {
+    private readonly UnixRootItemFixture _unixRootItemFixture = new();
+
     [Fact]
     public void ToTreeNodeResponse_WhenMappingUnixRootItem_ShouldMapCorrectly()
     {
         // Arrange
-        Result<UnixRootItem> createResult = UnixRootItem.Create();
-        Assert.False(createResult.IsFailure);
-        UnixRootItem domainModel = createResult.Value;
+        UnixRootItem domainModel = _unixRootItemFixture.Create();
 
         // Act
         FileSystemTreeNodeResponse result = domainModel.ToTreeNodeResponse();

@@ -152,7 +152,7 @@ public class SetupApplicationEndpointTests : IClassFixture<AuthenticatedLuminaAp
         Assert.Equal("AdminAccountAlreadyCreated", problemDetails["detail"].GetString());
         Assert.Equal("/api/v1/initialization", problemDetails["instance"].GetString());
         Assert.NotNull(problemDetails["traceId"].GetString());
-        Assert.NotEmpty(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
     }
 
     [Fact]

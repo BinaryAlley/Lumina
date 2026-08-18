@@ -24,7 +24,7 @@ public class IsbnMappingTests
     public void ToRepositoryEntity_WhenMappingIsbn10_ShouldMapCorrectly()
     {
         // Arrange
-        Isbn isbn = _isbnFixture.Create(IsbnFormat.Isbn10);
+        Isbn isbn = _isbnFixture.Create(format: IsbnFormat.Isbn10);
 
         // Act
         IsbnEntity result = isbn.ToRepositoryEntity();
@@ -39,7 +39,7 @@ public class IsbnMappingTests
     public void ToRepositoryEntity_WhenMappingIsbn13_ShouldMapCorrectly()
     {
         // Arrange
-        Isbn isbn = _isbnFixture.Create(IsbnFormat.Isbn13);
+        Isbn isbn = _isbnFixture.Create(format: IsbnFormat.Isbn13);
 
         // Act
         IsbnEntity result = isbn.ToRepositoryEntity();
@@ -56,9 +56,9 @@ public class IsbnMappingTests
         // Arrange
         List<Isbn> isbns =
         [
-            _isbnFixture.Create(IsbnFormat.Isbn10),
-            _isbnFixture.Create(IsbnFormat.Isbn13),
-            _isbnFixture.Create(IsbnFormat.Isbn10)
+            _isbnFixture.Create(format: IsbnFormat.Isbn10),
+            _isbnFixture.Create(format: IsbnFormat.Isbn13),
+            _isbnFixture.Create(format: IsbnFormat.Isbn10)
         ];
 
         // Act

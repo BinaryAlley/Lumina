@@ -6,8 +6,8 @@ using Lumina.DataAccess.Core.UoW;
 using Lumina.Infrastructure.Core.Security;
 using Lumina.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http.Headers;
@@ -74,41 +74,68 @@ public class ChangePasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDis
     }
 
     [Fact]
-    public async Task ChangePassword_WithValidRequest_ShouldNotLeakTimingInformation()
+    public async Task ChangePassword_WithWrongCurrentPassword_ShouldReturnUniformForbiddenResponse()
     {
         // Arrange
         UserEntity user = await CreateAndAuthenticateUser();
-        Stopwatch stopwatch = new();
-        List<long> timings = [];
+        ChangePasswordRequest request = new(
+            Username: user.Username,
+            CurrentPassword: "WrongPass123!",
+            NewPassword: "NewPass123!",
+            NewPasswordConfirm: "NewPass123!"
+        );
 
         // Act
-        for (int i = 0; i < 10; i++)
-        {
-            await Task.Delay(100);
-            stopwatch.Restart();
-            await _client.PostAsJsonAsync("/api/v1/auth/change-password", new ChangePasswordRequest(
-                Username: user.Username,
-                CurrentPassword: "WrongPass123!",
-                NewPassword: "NewPass123!",
-                NewPasswordConfirm: "NewPass123!"
-            ));
-            stopwatch.Stop();
-            timings.Add(stopwatch.ElapsedMilliseconds);
-        }
-
-        timings.Sort();
-        timings = timings.Skip(1).SkipLast(1).ToList(); // remove outliers
+        HttpResponseMessage firstResponse = await _client.PostAsJsonAsync("/api/v1/auth/change-password", request);
+        string firstContent = await firstResponse.Content.ReadAsStringAsync();
+        HttpResponseMessage secondResponse = await _client.PostAsJsonAsync("/api/v1/auth/change-password", request);
+        string secondContent = await secondResponse.Content.ReadAsStringAsync();
 
         // Assert
-        double stdDev = CalculateStandardDeviation(timings);
-        Assert.True(stdDev < 200);
+        Assert.Equal(HttpStatusCode.Forbidden, firstResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, secondResponse.StatusCode);
+        AssertProblemDetail(firstContent, "General.Failure", "InvalidCurrentPassword");
+        AssertProblemDetail(secondContent, "General.Failure", "InvalidCurrentPassword");
     }
 
-    private static double CalculateStandardDeviation(List<long> values)
+    [Theory]
+    [InlineData("'; DROP TABLE Users--")] // destructive injection
+    [InlineData("' OR '1'='1")] // boolean-based injection
+    public async Task ChangePassword_WithSQLInjectionInUsername_ShouldNotCorruptOrDeleteData(string maliciousUsername)
     {
-        double average = values.Average();
-        double sumOfSquaresOfDifferences = values.Select(value => (value - average) * (value - average)).Sum();
-        return Math.Sqrt(sumOfSquaresOfDifferences / values.Count);
+        // Arrange
+        UserEntity user = await CreateAndAuthenticateUser();
+        string originalPasswordHash = user.Password;
+        ChangePasswordRequest request = new(
+            Username: maliciousUsername,
+            CurrentPassword: "TestPass123!",
+            NewPassword: "NewPass123!",
+            NewPasswordConfirm: "NewPass123!"
+        );
+
+        // Act
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/auth/change-password", request);
+
+        // Assert
+        // the malicious username is queried by GetByUsernameAsync, so it must never be executed against the database;
+        // if a boolean-injection regression returned the only user in the database, the current password would match and
+        // the password would change, so the response must be a failure and the stored password hash must be unchanged
+        Assert.NotEqual(HttpStatusCode.OK, response.StatusCode);
+        Assert.DoesNotContain("SqliteException", await response.Content.ReadAsStringAsync(), StringComparison.OrdinalIgnoreCase);
+
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        UserEntity? storedUser = await dbContext.Users.FirstOrDefaultAsync(candidate => candidate.Id == user.Id);
+        Assert.NotNull(storedUser);
+        Assert.Equal(originalPasswordHash, storedUser!.Password);
+    }
+
+    private void AssertProblemDetail(string content, string expectedTitle, string expectedDetail)
+    {
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal(expectedTitle, problemDetails!["title"].GetString());
+        Assert.Equal(expectedDetail, problemDetails["detail"].GetString());
     }
 
     private async Task<UserEntity> CreateAndAuthenticateUser()

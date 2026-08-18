@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Seed;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.DataAccess.Common.Dapper;
 using Lumina.DataAccess.Common.Interceptors;
 using Lumina.DataAccess.Core.Seed;
 using Lumina.DataAccess.Core.UoW;
@@ -27,6 +28,9 @@ public static class DataAccessLayerServices
     /// <returns>The updated <see cref="IServiceCollection"/>.</returns>
     public static void AddDataAccessLayerServices(this IServiceCollection services)
     {
+        // Type handlers are global static state, not DI services, and must be registered before any Dapper query executes;
+        // the composition root runs at startup, before any query, so this is the correct place for the application.
+        DapperTypeHandlers.Register();
         string? basePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         if (!Directory.Exists(basePath))
             throw new DirectoryNotFoundException($"The base path '{basePath}' does not exist.");

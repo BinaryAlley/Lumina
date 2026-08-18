@@ -32,6 +32,7 @@ public class AuthorizationServiceTests
     private readonly IUserRepository _mockUserRepository;
     private readonly IAuthorizationPolicyFactory _mockAuthorizationPolicyFactory;
     private readonly AuthorizationService _sut;
+    private readonly AuthorizationServiceFixture _authorizationServiceFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AuthorizationServiceTests"/> class.
@@ -84,7 +85,7 @@ public class AuthorizationServiceTests
     public async Task HasPermissionAsync_WhenUserHasDirectPermission_ShouldReturnTrue()
     {
         // Arrange
-        UserEntity user = AuthorizationServiceFixture.CreateUserWithPermissions(
+        UserEntity user = _authorizationServiceFixture.CreateUserWithPermissions(
             directPermissions: [AuthorizationPermission.CanViewUsers]);
 
         _mockUserRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>())
@@ -107,7 +108,7 @@ public class AuthorizationServiceTests
             { "Admin", new[] { AuthorizationPermission.CanViewUsers } }
         };
 
-        UserEntity user = AuthorizationServiceFixture.CreateUserWithPermissions(
+        UserEntity user = _authorizationServiceFixture.CreateUserWithPermissions(
             rolePermissions: rolePermissions);
 
         _mockUserRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>())
@@ -125,7 +126,7 @@ public class AuthorizationServiceTests
     public async Task HasPermissionAsync_WhenUserHasNoPermissions_ShouldReturnFalse()
     {
         // Arrange
-        UserEntity user = AuthorizationServiceFixture.CreateUserWithPermissions();
+        UserEntity user = _authorizationServiceFixture.CreateUserWithPermissions();
 
         _mockUserRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(user));
@@ -142,7 +143,7 @@ public class AuthorizationServiceTests
     public async Task HasPermissionAsync_WhenUserHasDifferentPermission_ShouldReturnFalse()
     {
         // Arrange
-        UserEntity user = AuthorizationServiceFixture.CreateUserWithPermissions(
+        UserEntity user = _authorizationServiceFixture.CreateUserWithPermissions(
             directPermissions: [AuthorizationPermission.CanDeleteUsers]);
 
         _mockUserRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>())
@@ -165,7 +166,7 @@ public class AuthorizationServiceTests
             { "Admin", new[] { AuthorizationPermission.CanViewUsers } }
         };
 
-        UserEntity user = AuthorizationServiceFixture.CreateUserWithPermissions(
+        UserEntity user = _authorizationServiceFixture.CreateUserWithPermissions(
             directPermissions: [AuthorizationPermission.CanViewUsers],
             rolePermissions: rolePermissions);
 
@@ -222,7 +223,7 @@ public class AuthorizationServiceTests
             { "Admin", Array.Empty<AuthorizationPermission>() }
         };
 
-        UserEntity user = AuthorizationServiceFixture.CreateUserWithPermissions(
+        UserEntity user = _authorizationServiceFixture.CreateUserWithPermissions(
             rolePermissions: rolePermissions);
 
         _mockUserRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>())
@@ -245,7 +246,7 @@ public class AuthorizationServiceTests
             { "", Array.Empty<AuthorizationPermission>() }
         };
 
-        UserEntity user = AuthorizationServiceFixture.CreateUserWithPermissions(
+        UserEntity user = _authorizationServiceFixture.CreateUserWithPermissions(
             rolePermissions: rolePermissions);
 
         _mockUserRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>())
@@ -263,7 +264,7 @@ public class AuthorizationServiceTests
     public async Task IsInRoleAsync_WhenUserHasNoRoles_ShouldReturnFalse()
     {
         // Arrange
-        UserEntity user = AuthorizationServiceFixture.CreateUserWithPermissions();
+        UserEntity user = _authorizationServiceFixture.CreateUserWithPermissions();
 
         _mockUserRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(user));
@@ -442,7 +443,7 @@ public class AuthorizationServiceTests
     public async Task GetUserAuthorizationAsync_WhenUserHasNoRolesOrPermissions_ShouldReturnEmptySets()
     {
         // Arrange
-        UserEntity user = AuthorizationServiceFixture.CreateUserWithPermissions();
+        UserEntity user = _authorizationServiceFixture.CreateUserWithPermissions();
         _mockUserRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(user));
 
@@ -461,7 +462,7 @@ public class AuthorizationServiceTests
     public async Task GetUserAuthorizationAsync_WhenUserHasOnlyDirectPermissions_ShouldReturnCorrectPermissions()
     {
         // Arrange
-        UserEntity user = AuthorizationServiceFixture.CreateUserWithPermissions(
+        UserEntity user = _authorizationServiceFixture.CreateUserWithPermissions(
             directPermissions:
             [
                 AuthorizationPermission.CanViewUsers,
@@ -495,7 +496,7 @@ public class AuthorizationServiceTests
             }
         };
 
-        UserEntity user = AuthorizationServiceFixture.CreateUserWithPermissions(
+        UserEntity user = _authorizationServiceFixture.CreateUserWithPermissions(
             rolePermissions: rolePermissions);
 
         _mockUserRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>())
@@ -525,7 +526,7 @@ public class AuthorizationServiceTests
             }
         };
 
-        UserEntity user = AuthorizationServiceFixture.CreateUserWithPermissions(
+        UserEntity user = _authorizationServiceFixture.CreateUserWithPermissions(
             directPermissions: [AuthorizationPermission.CanRegisterUsers],
             rolePermissions: rolePermissions);
 

@@ -128,7 +128,7 @@ public class UpdateRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
         Assert.Equal("/api/v1/auth/roles", problemDetails["instance"].GetString());
         Assert.NotNull(problemDetails["traceId"].GetString());
-        Assert.NotEmpty(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
     }
 
     [Fact]
@@ -157,7 +157,7 @@ public class UpdateRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         Assert.Equal("RoleNotFound", problemDetails["detail"].GetString());
         Assert.Equal("/api/v1/auth/roles", problemDetails["instance"].GetString());
         Assert.NotNull(problemDetails["traceId"].GetString());
-        Assert.NotEmpty(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
     }
 
     [Fact]
@@ -198,6 +198,6 @@ public class UpdateRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
 
         await dbContext.SaveChangesAsync();
 
-        _apiFactory.Dispose();
+        await _apiFactory.RemoveTestUserAsync();
     }
 }

@@ -3,6 +3,7 @@ using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.Plugins.Commands.UpdatePluginSettings;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using NSubstitute;
 using System;
@@ -22,6 +23,7 @@ public class UpdatePluginSettingsCommandHandlerTests
 {
     private readonly IUnitOfWork _mockUnitOfWork;
     private readonly IPluginRepository _mockPluginRepository;
+    private readonly IValidator<UpdatePluginSettingsCommand> _mockValidator;
     private readonly UpdatePluginSettingsCommandHandler _sut;
 
     /// <summary>
@@ -32,10 +34,10 @@ public class UpdatePluginSettingsCommandHandlerTests
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
         _mockPluginRepository = Substitute.For<IPluginRepository>();
         _mockUnitOfWork.PluginRepository.Returns(_mockPluginRepository);
-        IValidator<UpdatePluginSettingsCommand> mockValidator = Substitute.For<IValidator<UpdatePluginSettingsCommand>>();
-        mockValidator.Validate(Arg.Any<UpdatePluginSettingsCommand>())
+        _mockValidator = Substitute.For<IValidator<UpdatePluginSettingsCommand>>();
+        _mockValidator.Validate(Arg.Any<UpdatePluginSettingsCommand>())
             .Returns([]);
-        _sut = new UpdatePluginSettingsCommandHandler(_mockUnitOfWork, mockValidator);
+        _sut = new UpdatePluginSettingsCommandHandler(_mockUnitOfWork, _mockValidator);
     }
 
     [Fact]
@@ -54,5 +56,23 @@ public class UpdatePluginSettingsCommandHandlerTests
         Assert.False(result.IsFailure);
         await _mockPluginRepository.Received(1).UpdateSettingsAsync(pluginId, Arg.Any<string?>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenValidationFails_ShouldReturnValidationErrorsWithoutPersisting()
+    {
+        // Arrange
+        Guid pluginId = Guid.NewGuid();
+        Dictionary<string, string> settings = new() { ["preferredLanguage"] = "fr" };
+        _mockValidator.Validate(Arg.Any<UpdatePluginSettingsCommand>()).Returns([Errors.Plugins.PluginIdCannotBeEmpty]);
+
+        // Act
+        Result<Success> result = await _sut.HandleAsync(new UpdatePluginSettingsCommand(pluginId, settings), CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Plugins.PluginIdCannotBeEmpty, result.FirstError);
+        await _mockPluginRepository.DidNotReceive().UpdateSettingsAsync(Arg.Any<Guid>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 }

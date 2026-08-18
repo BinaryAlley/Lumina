@@ -4,6 +4,8 @@ using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -17,6 +19,9 @@ namespace Lumina.Domain.UnitTests.Core.BoundedContexts.FileSystemManagementBound
 [ExcludeFromCodeCoverage]
 public class WindowsRootItemTests
 {
+    private readonly FileSystemPathIdFixture _fileSystemPathIdFixture = new();
+    private readonly WindowsRootItemFixture _windowsRootItemFixture = new();
+
     [Fact]
     public void Create_WhenCalledWithValidParameters_ShouldReturnSuccessfulResult()
     {
@@ -76,9 +81,7 @@ public class WindowsRootItemTests
     public void Create_WhenCalledWithFileSystemPathId_ShouldReturnSuccessfulResult()
     {
         // Arrange
-        Result<FileSystemPathId> pathIdResult = FileSystemPathId.Create("E:\\");
-        Assert.False(pathIdResult.IsFailure);
-        FileSystemPathId pathId = pathIdResult.Value;
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path: "E:\\");
         string name = "E:";
 
         // Act
@@ -97,9 +100,7 @@ public class WindowsRootItemTests
     public void Items_WhenAccessed_ShouldReturnEmptyReadOnlyCollection()
     {
         // Arrange
-        Result<WindowsRootItem> createResult = WindowsRootItem.Create("F:\\", "F:");
-        Assert.False(createResult.IsFailure);
-        WindowsRootItem windowsRootItem = createResult.Value;
+        WindowsRootItem windowsRootItem = _windowsRootItemFixture.Create();
 
         // Act
         IReadOnlyCollection<FileSystemItem> items = windowsRootItem.Items;
@@ -113,9 +114,7 @@ public class WindowsRootItemTests
     public void SetStatus_WhenCalledWithNewStatus_ShouldUpdateStatus()
     {
         // Arrange
-        Result<WindowsRootItem> createResult = WindowsRootItem.Create("G:\\", "G:");
-        Assert.False(createResult.IsFailure);
-        WindowsRootItem windowsRootItem = createResult.Value;
+        WindowsRootItem windowsRootItem = _windowsRootItemFixture.Create();
         FileSystemItemStatus newStatus = FileSystemItemStatus.Accessible;
 
         // Act
@@ -130,10 +129,8 @@ public class WindowsRootItemTests
     public void SetParent_WhenCalledWithNullParent_ShouldReturnError()
     {
         // Arrange
-        Result<WindowsRootItem> createResult = WindowsRootItem.Create("H:\\", "H:");
-        Assert.False(createResult.IsFailure);
-        WindowsRootItem windowsRootItem = createResult.Value;
-        
+        WindowsRootItem windowsRootItem = _windowsRootItemFixture.Create();
+
         // Act
         Result<Updated> result = windowsRootItem.SetParent(null!);
 

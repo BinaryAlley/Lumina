@@ -91,7 +91,7 @@ public class CombinePathEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         Assert.Equal("OneOrMoreValidationErrorsOccurred", problemDetails["detail"].GetString());
         Assert.Equal("https://tools.ietf.org/html/rfc4918#section-11.2", problemDetails["type"].GetString());
         Assert.NotNull(problemDetails["traceId"].GetString());
-        Assert.NotEmpty(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
 
         Dictionary<string, string[]>? errors = problemDetails["errors"].Deserialize<Dictionary<string, string[]>>(_jsonOptions);
         Assert.NotNull(errors);
@@ -134,9 +134,8 @@ public class CombinePathEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     /// <summary>
     /// Disposes API factory resources.
     /// </summary>
-    public Task DisposeAsync()
+    public async Task DisposeAsync()
     {
-        _apiFactory.Dispose();
-        return Task.CompletedTask;
+        await _apiFactory.RemoveTestUserAsync();
     }
 }

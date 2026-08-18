@@ -32,6 +32,7 @@ public class LibraryFixture
     /// <param name="libraryType">Optional. The library type.</param>
     /// <param name="contentLocations">Optional. The content locations of the library.</param>
     /// <param name="coverImage">Optional. The cover image of the library.</param>
+    /// <param name="includeCoverImage">Whether to include a cover image or not.</param>
     /// <param name="isEnabled">Whether the library is enabled.</param>
     /// <param name="isLocked">Whether the library is locked.</param>
     /// <param name="downloadMetadataFromWeb">Whether metadata download from the web is enabled.</param>
@@ -46,6 +47,7 @@ public class LibraryFixture
         LibraryType? libraryType = null,
         IEnumerable<string>? contentLocations = null,
         string? coverImage = null,
+        bool includeCoverImage = true,
         bool isEnabled = true,
         bool isLocked = false,
         bool downloadMetadataFromWeb = true,
@@ -62,6 +64,7 @@ public class LibraryFixture
         ];
 
         List<ScanId> resolvedScanIds = scanIds is null ? [ScanId.CreateUnique(), ScanId.CreateUnique()] : [.. scanIds.Select(scanId => ScanId.Create(scanId))];
+        string? resolvedCoverImage = includeCoverImage ? (coverImage ?? _faker.System.FilePath()) : null;
 
         Result<Library> library = id is null ?
             Library.Create(
@@ -69,7 +72,7 @@ public class LibraryFixture
                 title ?? _faker.Random.String2(_faker.Random.Number(1, 50)),
                 libraryType ?? _faker.PickRandom<LibraryType>(),
                 contentLocations ?? validPaths.Take(_random.Next(1, validPaths.Count)),
-                coverImage ?? _faker.System.FilePath(),
+                resolvedCoverImage,
                 isEnabled,
                 isLocked,
                 downloadMetadataFromWeb,
@@ -83,7 +86,7 @@ public class LibraryFixture
                 title ?? _faker.Random.String2(_faker.Random.Number(1, 50)),
                 libraryType ?? _faker.PickRandom<LibraryType>(),
                 contentLocations ?? validPaths.Take(_random.Next(1, validPaths.Count)),
-                coverImage ?? _faker.System.FilePath(),
+                resolvedCoverImage,
                 isEnabled,
                 isLocked,
                 downloadMetadataFromWeb,

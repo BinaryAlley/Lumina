@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.FileSystemManagement.FileSystem;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
-using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using System.Diagnostics.CodeAnalysis;
 #endregion
@@ -15,15 +15,13 @@ namespace Lumina.Application.UnitTests.Common.Mapping.FileSystemManagement.FileS
 [ExcludeFromCodeCoverage]
 public class WindowsRootItemMappingTests
 {
+    private readonly WindowsRootItemFixture _windowsRootItemFixture = new();
+
     [Fact]
     public void ToTreeNodeResponse_WhenMappingWindowsRootItem_ShouldMapCorrectly()
     {
         // Arrange
-        string path = "C:\\";
-        string name = "C:";
-        Result<WindowsRootItem> createResult = WindowsRootItem.Create(path, name);
-        Assert.False(createResult.IsFailure);
-        WindowsRootItem domainModel = createResult.Value;
+        WindowsRootItem domainModel = _windowsRootItemFixture.Create(path: "C:\\", name: "C:");
 
         // Act
         FileSystemTreeNodeResponse result = domainModel.ToTreeNodeResponse();
@@ -42,12 +40,7 @@ public class WindowsRootItemMappingTests
     public void ToTreeNodeResponse_WhenMappingWindowsRootItemWithCustomStatus_ShouldMapCorrectly()
     {
         // Arrange
-        string path = "D:\\";
-        string name = "D:";
-        FileSystemItemStatus customStatus = FileSystemItemStatus.Inaccessible;
-        Result<WindowsRootItem> createResult = WindowsRootItem.Create(path, name, customStatus);
-        Assert.False(createResult.IsFailure);
-        WindowsRootItem domainModel = createResult.Value;
+        WindowsRootItem domainModel = _windowsRootItemFixture.Create(path: "D:\\", name: "D:", status: FileSystemItemStatus.Inaccessible);
 
         // Act
         FileSystemTreeNodeResponse result = domainModel.ToTreeNodeResponse();

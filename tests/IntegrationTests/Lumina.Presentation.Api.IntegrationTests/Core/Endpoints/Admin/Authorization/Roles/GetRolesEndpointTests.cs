@@ -94,7 +94,7 @@ public class GetRolesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
         Assert.Equal("/api/v1/auth/roles", problemDetails["instance"].GetString());
         Assert.NotNull(problemDetails["traceId"].GetString());
-        Assert.NotEmpty(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
     }
 
     [Fact]
@@ -130,6 +130,6 @@ public class GetRolesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
 
         await dbContext.SaveChangesAsync();
 
-        _apiFactory.Dispose();
+        await _apiFactory.RemoveTestUserAsync();
     }
 }

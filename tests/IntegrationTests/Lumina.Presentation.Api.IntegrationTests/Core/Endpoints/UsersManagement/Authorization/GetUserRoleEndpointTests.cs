@@ -102,7 +102,7 @@ public class GetUserRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
         Assert.Equal($"/api/v1/auth/users/{user!.Id}/role", problemDetails["instance"].GetString());
         Assert.NotNull(problemDetails["traceId"].GetString());
-        Assert.NotEmpty(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
     }
 
     [Fact]
@@ -126,7 +126,7 @@ public class GetUserRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         Assert.Equal("UsernameDoesNotExist", problemDetails["detail"].GetString());
         Assert.Equal($"/api/v1/auth/users/{nonExistentUserId}/role", problemDetails["instance"].GetString());
         Assert.NotNull(problemDetails["traceId"].GetString());
-        Assert.NotEmpty(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
     }
 
     [Fact]
@@ -167,6 +167,6 @@ public class GetUserRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
 
         await dbContext.SaveChangesAsync();
 
-        _apiFactory.Dispose();
+        await _apiFactory.RemoveTestUserAsync();
     }
 }

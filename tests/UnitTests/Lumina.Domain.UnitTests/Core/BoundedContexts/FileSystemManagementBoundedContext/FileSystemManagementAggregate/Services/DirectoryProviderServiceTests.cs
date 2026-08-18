@@ -792,7 +792,7 @@ public class DirectoryProviderServiceTests
         _mockFileSystem.Directory.Exists(destDir).Returns(true);
 
         // Act
-        _sut.MoveDirectory(FileSystemPathId.Create(sourceDir).Value, FileSystemPathId.Create(destDir).Value, overwrite);
+        _sut.MoveDirectory(_fileSystemPathIdFixture.Create(sourceDir), _fileSystemPathIdFixture.Create(destDir), overwrite);
 
         // Assert
         _mockFileSystem.Directory.Received(1).Delete(sourceDir);

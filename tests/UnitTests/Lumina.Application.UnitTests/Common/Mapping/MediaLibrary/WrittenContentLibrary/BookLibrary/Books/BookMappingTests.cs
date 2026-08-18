@@ -6,6 +6,7 @@ using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookL
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 #endregion
 
 namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
@@ -45,8 +46,8 @@ public class BookMappingTests
         Assert.Equal(book.Metadata.OriginalLanguage.HasValue ? book.Metadata.OriginalLanguage.Value.LanguageCode : null, result.OriginalLanguageCode);
         Assert.Equal(book.Metadata.OriginalLanguage.HasValue ? book.Metadata.OriginalLanguage.Value.LanguageName : null, result.OriginalLanguageName);
         Assert.Equal(book.Metadata.OriginalLanguage.HasValue ? book.Metadata.OriginalLanguage.Value.NativeName.Value : null, result.OriginalLanguageNativeName);
-        Assert.Equal(book.Metadata.Tags.ToRepositoryEntities(), result.Tags);
-        Assert.Equal(book.Metadata.Genres.ToRepositoryEntities(), result.Genres);
+        Assert.Equal(book.Metadata.Tags.ToRepositoryEntities().OrderBy(tag => tag.Name), result.Tags.OrderBy(tag => tag.Name));
+        Assert.Equal(book.Metadata.Genres.ToRepositoryEntities().OrderBy(genre => genre.Name), result.Genres.OrderBy(genre => genre.Name));
         Assert.Equal(book.Metadata.Publisher.HasValue ? book.Metadata.Publisher.Value : null, result.Publisher);
         Assert.Equal(book.Metadata.PageCount.HasValue ? book.Metadata.PageCount.Value : null, result.PageCount);
         Assert.Equal(book.Format.HasValue ? book.Format.Value : null, result.Format);

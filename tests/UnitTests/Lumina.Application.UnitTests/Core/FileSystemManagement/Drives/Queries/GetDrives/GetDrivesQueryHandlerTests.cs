@@ -6,6 +6,7 @@ using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using NSubstitute;
 using System.Collections.Generic;
@@ -26,6 +27,7 @@ public class GetDrivesQueryHandlerTests
     private readonly IDriveService _mockDriveService;
     private readonly GetDrivesQueryHandler _sut;
     private readonly GetDrivesQueryFixture _getDrivesQueryFixture = new();
+    private readonly WindowsRootItemFixture _windowsRootItemFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetDrivesQueryHandlerTests"/> class.
@@ -44,8 +46,8 @@ public class GetDrivesQueryHandlerTests
 
         IEnumerable<FileSystemItem> drives =
         [
-            WindowsRootItem.Create("C:\\", "C:").Value,
-            WindowsRootItem.Create("D:\\", "D:").Value
+            _windowsRootItemFixture.Create(path: "C:\\", name: "C:"),
+            _windowsRootItemFixture.Create(path: "D:\\", name: "D:")
         ];
 
         _mockDriveService.GetDrives()

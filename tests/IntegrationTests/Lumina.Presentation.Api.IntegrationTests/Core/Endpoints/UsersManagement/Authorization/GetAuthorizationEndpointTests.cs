@@ -117,7 +117,7 @@ public class GetAuthorizationEndpointTests : IClassFixture<AuthenticatedLuminaAp
         Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
         Assert.Equal("/api/v1/auth/get-authorization", problemDetails["instance"].GetString());
         Assert.NotNull(problemDetails["traceId"].GetString());
-        Assert.NotEmpty(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
     }
 
     [Fact]
@@ -141,7 +141,7 @@ public class GetAuthorizationEndpointTests : IClassFixture<AuthenticatedLuminaAp
         Assert.Equal("OneOrMoreValidationErrorsOccurred", problemDetails["detail"].GetString());
         Assert.Equal("/api/v1/auth/get-authorization", problemDetails["instance"].GetString());
         Assert.NotNull(problemDetails["traceId"].GetString());
-        Assert.NotEmpty(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
 
         Dictionary<string, string[]>? errors = problemDetails["errors"].Deserialize<Dictionary<string, string[]>>(_jsonOptions);
         Assert.NotNull(errors);

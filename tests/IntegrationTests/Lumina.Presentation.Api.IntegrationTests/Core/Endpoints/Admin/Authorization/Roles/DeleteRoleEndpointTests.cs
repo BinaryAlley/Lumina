@@ -103,7 +103,7 @@ public class DeleteRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
         Assert.Equal($"/api/v1/auth/roles/{roleId}", problemDetails["instance"].GetString());
         Assert.NotNull(problemDetails["traceId"].GetString());
-        Assert.NotEmpty(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
     }
 
     [Fact]
@@ -130,7 +130,7 @@ public class DeleteRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         Assert.Equal("AdminRoleCannotBeDeleted", problemDetails["detail"].GetString());
         Assert.Equal($"/api/v1/auth/roles/{adminRole!.Id}", problemDetails["instance"].GetString());
         Assert.NotNull(problemDetails["traceId"].GetString());
-        Assert.NotEmpty(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
     }
 
     [Fact]
@@ -154,7 +154,7 @@ public class DeleteRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         Assert.Equal("RoleNotFound", problemDetails["detail"].GetString());
         Assert.Equal($"/api/v1/auth/roles/{nonExistentRoleId}", problemDetails["instance"].GetString());
         Assert.NotNull(problemDetails["traceId"].GetString());
-        Assert.NotEmpty(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
     }
 
     [Fact]
@@ -192,6 +192,6 @@ public class DeleteRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
 
         await dbContext.SaveChangesAsync();
 
-        _apiFactory.Dispose();
+        await _apiFactory.RemoveTestUserAsync();
     }
 }

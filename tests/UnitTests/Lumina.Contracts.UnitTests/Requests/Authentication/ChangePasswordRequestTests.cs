@@ -1,0 +1,67 @@
+#region ========================================================================= USING =====================================================================================
+using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
+using Lumina.Contracts.Requests.Authentication;
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
+#endregion
+
+namespace Lumina.Contracts.UnitTests.Requests.Authentication;
+
+/// <summary>
+/// Contains unit tests for the <see cref="ChangePasswordRequest"/> record.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class ChangePasswordRequestTests
+{
+    private readonly ChangePasswordRequestFixture _changePasswordRequestFixture = new();
+
+    private readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
+    [Fact]
+    public void Create_WhenCalled_ShouldReturnValidChangePasswordRequest()
+    {
+        // Act
+        ChangePasswordRequest sut = _changePasswordRequestFixture.Create();
+
+        // Assert
+        Assert.NotNull(sut);
+        Assert.False(string.IsNullOrWhiteSpace(sut.Username));
+        Assert.False(string.IsNullOrWhiteSpace(sut.CurrentPassword));
+        Assert.False(string.IsNullOrWhiteSpace(sut.NewPassword));
+        Assert.Equal(sut.NewPassword, sut.NewPasswordConfirm);
+    }
+
+    [Fact]
+    public void RoundTrip_WhenSerializingChangePasswordRequest_ShouldPreserveValues()
+    {
+        // Arrange
+        ChangePasswordRequest expected = _changePasswordRequestFixture.Create();
+
+        // Act
+        string json = JsonSerializer.Serialize(expected, _jsonOptions);
+        ChangePasswordRequest? actual = JsonSerializer.Deserialize<ChangePasswordRequest>(json, _jsonOptions);
+
+        // Assert
+        Assert.NotNull(actual);
+        Assert.Equal(expected, actual);
+    }
+
+    [Fact]
+    public void Deconstruct_WhenCalled_ShouldReturnAllProperties()
+    {
+        // Arrange
+        ChangePasswordRequest sut = _changePasswordRequestFixture.Create();
+
+        // Act
+        (string? username, string? currentPassword, string? newPassword, string? newPasswordConfirm) = sut;
+
+        // Assert
+        Assert.Equal(sut.Username, username);
+        Assert.Equal(sut.CurrentPassword, currentPassword);
+        Assert.Equal(sut.NewPassword, newPassword);
+        Assert.Equal(sut.NewPasswordConfirm, newPasswordConfirm);
+    }
+}
