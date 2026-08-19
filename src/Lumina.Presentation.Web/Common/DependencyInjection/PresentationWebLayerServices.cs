@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
 using FastEndpoints.Swagger;
-using FluentValidation;
 using Lumina.Presentation.Web.Common.Api;
 using Lumina.Presentation.Web.Common.Authorization;
 using Lumina.Presentation.Web.Common.Enums.Authorization;
@@ -10,10 +9,12 @@ using Lumina.Presentation.Web.Common.Http;
 using Lumina.Presentation.Web.Common.Localization;
 using Lumina.Presentation.Web.Common.Security;
 using Lumina.Presentation.Web.Common.Services;
+using Lumina.Presentation.Web.Common.Validation;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Localization.Routing;
@@ -51,14 +52,14 @@ public static class PresentationWebLayerServices
     public static IServiceCollection AddPresentationWebLayerServices(this IServiceCollection services)
     {
         services.AddControllersWithViews()
-        .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
-        .AddDataAnnotationsLocalization()
-        .AddJsonOptions(jsonOptions =>
-        {
-            jsonOptions.JsonSerializerOptions.MaxDepth = 256;
-            jsonOptions.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; // needed because file system API responses can have very nested structures
-            jsonOptions.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-        });
+            .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
+            .AddDataAnnotationsLocalization()
+            .AddJsonOptions(jsonOptions =>
+            {
+                jsonOptions.JsonSerializerOptions.MaxDepth = 256;
+                jsonOptions.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; // needed because file system API responses can have very nested structures
+                jsonOptions.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
 
         // configure the locations where the Razor view engine looks for views and layouts, since the views live under the Core directory
         services.Configure<RazorViewEngineOptions>(razorViewEngineOptions =>
@@ -97,10 +98,7 @@ public static class PresentationWebLayerServices
             documentOptions.ShortSchemaNames = true;
         });
         // configure URL-based localization 
-        services.AddLocalization(localizationOptions =>
-        {
-            localizationOptions.ResourcesPath = "Core/Resources";
-        });
+        services.AddLocalization(localizationOptions => localizationOptions.ResourcesPath = "Core/Resources");
         // resolve the resources of the views that live under the Core/Views directory
         services.AddSingleton<IHtmlLocalizerFactory, CoreHtmlLocalizerFactory>();
 
@@ -257,8 +255,21 @@ public static class PresentationWebLayerServices
             sessionOptions.Cookie.IsEssential = true; // mark session cookie as essential, for GDPR compliance
         });
 
-        // scan the current assembly for validators and register them to the DI container
-        services.AddValidatorsFromAssemblyContaining<Program>(ServiceLifetime.Singleton);
+        // scan the current assembly for validators and register them as singletons in the DI container
+        foreach (Type validatorType in typeof(Program).Assembly.GetTypes())
+        {
+            if (validatorType.IsInterface || validatorType.IsAbstract || validatorType.IsGenericTypeDefinition)
+                continue;
+
+            foreach (Type contract in validatorType.GetInterfaces())
+            {
+                if (contract.IsGenericType && contract.GetGenericTypeDefinition() == typeof(Validation.IValidator<>))
+                {
+                    services.AddSingleton(contract, validatorType);
+                    break;
+                }
+            }
+        }
 
         // handle transient errors like network timeouts or intermittent failures
         AsyncRetryPolicy<HttpResponseMessage> retryPolicy = Policy<HttpResponseMessage>
@@ -287,6 +298,7 @@ public static class PresentationWebLayerServices
 
         // enable access to the current HTTP context in non-controller classes
         services.AddHttpContextAccessor();
+        services.Configure<FormOptions>(options => options.MultipartBodyLengthLimit = 10 * 1024 * 1024);
 
         services.AddScoped<IAuthorizationHandler, InitializationHandler>();
         services.AddScoped<IAuthorizationHandler, RoleAuthorizationHandler>();
