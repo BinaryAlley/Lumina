@@ -1,21 +1,22 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation;
-using FluentValidation.Results;
 using Lumina.Presentation.Web.Common.DTO.Configuration;
+using Lumina.Presentation.Web.Common.Primitives;
 using Lumina.Presentation.Web.Common.Validators;
+using Lumina.Presentation.Web.UnitTests.Common.Setup;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
 namespace Lumina.Presentation.Web.UnitTests.Common.Validators;
 
 /// <summary>
-/// Contains unit tests for the <see cref="EncryptionSettingsModelValidator"/> class.
+/// Contains unit tests for the <see cref="EncryptionSettingsDtoValidator"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class EncryptionSettingsModelValidatorTests
 {
     private const string VALID_BASE64_KEY = "FLYO0QRo6u2VzoFOgNkkEwYNGtqhJ3QGZd7iAHNEJeM=";
-    private readonly EncryptionSettingsModelValidator _validator = new();
+    private readonly EncryptionSettingsDtoValidator _validator = new();
 
     [Fact]
     public void Validate_WhenSecretKeyIsEmpty_ShouldHaveValidationError()
@@ -24,11 +25,10 @@ public class EncryptionSettingsModelValidatorTests
         EncryptionSettingsDto settings = new() { SecretKey = string.Empty };
 
         // Act
-        ValidationResult result = _validator.Validate(settings);
+        List<Error> result = _validator.TestValidate(settings);
 
         // Assert
-        Assert.False(result.IsValid);
-        Assert.Contains(result.Errors, error => error.PropertyName == nameof(EncryptionSettingsDto.SecretKey) && error.ErrorMessage == "Encryption secret key cannot be empty!");
+        result.ShouldHaveValidationError(Error.Validation(description: "Encryption secret key cannot be empty!"));
     }
 
     [Fact]
@@ -38,11 +38,10 @@ public class EncryptionSettingsModelValidatorTests
         EncryptionSettingsDto settings = new() { SecretKey = "not-base64-key!" };
 
         // Act
-        ValidationResult result = _validator.Validate(settings);
+        List<Error> result = _validator.TestValidate(settings);
 
         // Assert
-        Assert.False(result.IsValid);
-        Assert.Contains(result.Errors, error => error.PropertyName == nameof(EncryptionSettingsDto.SecretKey) && error.ErrorMessage == "Encryption secret key must be a base64 string!");
+        result.ShouldHaveValidationError(Error.Validation(description: "Encryption secret key must be a base64 string!"));
     }
 
     [Fact]
@@ -52,9 +51,9 @@ public class EncryptionSettingsModelValidatorTests
         EncryptionSettingsDto settings = new() { SecretKey = VALID_BASE64_KEY };
 
         // Act
-        ValidationResult result = _validator.Validate(settings);
+        List<Error> result = _validator.TestValidate(settings);
 
         // Assert
-        Assert.True(result.IsValid);
+        result.ShouldNotHaveAnyValidationErrors();
     }
 }

@@ -1,17 +1,18 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation;
+using Lumina.Presentation.Web.Common.Primitives;
 using Microsoft.Extensions.Options;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 #endregion
 
 namespace Lumina.Presentation.Web.Common.Validation;
 
 /// <summary>
-/// Provides options for fluent validation of a specific options type.
+/// Provides options validation for a specific options type using the validation framework.
 /// </summary>
 /// <typeparam name="TOptions">The type of options being validated.</typeparam>
-public class FluentValidationOptions<TOptions> : IValidateOptions<TOptions> where TOptions : class
+public class ValidationOptions<TOptions> : IValidateOptions<TOptions> where TOptions : class
 {
     private readonly IValidator<TOptions> _validator;
 
@@ -21,11 +22,11 @@ public class FluentValidationOptions<TOptions> : IValidateOptions<TOptions> wher
     public string? Name { get; }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="FluentValidationOptions{TOptions}"/> class.
+    /// Initializes a new instance of the <see cref="ValidationOptions{TOptions}"/> class.
     /// </summary>
     /// <param name="name">The name of the options being validated. This can be <see langword="null"/>.</param>
     /// <param name="validator">The validator instance used to validate the options.</param>
-    public FluentValidationOptions(string? name, IValidator<TOptions> validator)
+    public ValidationOptions(string? name, IValidator<TOptions> validator)
     {
         Name = name;
         _validator = validator;
@@ -45,15 +46,14 @@ public class FluentValidationOptions<TOptions> : IValidateOptions<TOptions> wher
 
         ArgumentNullException.ThrowIfNull(options, nameof(options)); // don't go further if the options are null
 
-        FluentValidation.Results.ValidationResult validationResult = _validator.Validate(options); // validate the options using the validator
+        List<Error> validationResult = _validator.Validate(options); // validate the options using the validator
 
         // return a response based on the validation result
-        if (validationResult.IsValid)
+        if (validationResult.Count == 0)
             return ValidateOptionsResult.Success;
 
         // if the validation fails, collect the error messages
-        string[] errors = validationResult.Errors.Select(x => $"Options validation failed for '{x.PropertyName}' with error: '{x.ErrorMessage}'")
-                                                 .ToArray();
+        string[] errors = [.. validationResult.Select(error => $"Options validation failed for '{error.Code}' with error: '{error.Description}'")];
 
         // and return them with a failure result
         return ValidateOptionsResult.Fail(errors);

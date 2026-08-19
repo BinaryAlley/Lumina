@@ -1,20 +1,21 @@
 #region ========================================================================= USING =====================================================================================
-using FluentValidation;
-using FluentValidation.Results;
 using Lumina.Presentation.Web.Common.DTO.Configuration;
+using Lumina.Presentation.Web.Common.Primitives;
 using Lumina.Presentation.Web.Common.Validators;
+using Lumina.Presentation.Web.UnitTests.Common.Setup;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
 namespace Lumina.Presentation.Web.UnitTests.Common.Validators;
 
 /// <summary>
-/// Contains unit tests for the <see cref="ServerConfigurationModelValidator"/> class.
+/// Contains unit tests for the <see cref="ServerConfigurationDtoValidator"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class ServerConfigurationModelValidatorTests
 {
-    private readonly ServerConfigurationModelValidator _validator = new();
+    private readonly ServerConfigurationDtoValidator _validator = new();
 
     [Fact]
     public void Validate_WhenBaseAddressIsEmpty_ShouldHaveValidationError()
@@ -23,11 +24,10 @@ public class ServerConfigurationModelValidatorTests
         ServerConfigurationDto configuration = new() { ApiVersion = '1', BaseAddress = string.Empty, Port = 5214 };
 
         // Act
-        ValidationResult result = _validator.Validate(configuration);
+        List<Error> result = _validator.TestValidate(configuration);
 
         // Assert
-        Assert.False(result.IsValid);
-        Assert.Contains(result.Errors, error => error.PropertyName == nameof(ServerConfigurationDto.BaseAddress) && error.ErrorMessage == "Base address cannot be empty!");
+        result.ShouldHaveValidationError(Error.Validation(description: "Base address cannot be empty!"));
     }
 
     [Theory]
@@ -39,10 +39,10 @@ public class ServerConfigurationModelValidatorTests
         ServerConfigurationDto configuration = new() { ApiVersion = '1', BaseAddress = "http://localhost", Port = port };
 
         // Act
-        ValidationResult result = _validator.Validate(configuration);
+        List<Error> result = _validator.TestValidate(configuration);
 
         // Assert
-        Assert.True(result.IsValid);
+        result.ShouldNotHaveAnyValidationErrors();
     }
 
     [Theory]
@@ -54,10 +54,10 @@ public class ServerConfigurationModelValidatorTests
         ServerConfigurationDto configuration = new() { ApiVersion = apiVersion, BaseAddress = "http://localhost", Port = 5214 };
 
         // Act
-        ValidationResult result = _validator.Validate(configuration);
+        List<Error> result = _validator.TestValidate(configuration);
 
         // Assert
-        Assert.True(result.IsValid);
+        result.ShouldNotHaveAnyValidationErrors();
     }
 
     [Fact]
@@ -67,9 +67,9 @@ public class ServerConfigurationModelValidatorTests
         ServerConfigurationDto configuration = new() { ApiVersion = '1', BaseAddress = "http://localhost", Port = 5214 };
 
         // Act
-        ValidationResult result = _validator.Validate(configuration);
+        List<Error> result = _validator.TestValidate(configuration);
 
         // Assert
-        Assert.True(result.IsValid);
+        result.ShouldNotHaveAnyValidationErrors();
     }
 }
