@@ -36,6 +36,11 @@ internal static class PresentationWebLayerConfiguration
                          .ValidateFluently()
                          .ValidateOnStart();
 
+        serviceCollection.AddOptions<ThemeEngineOptionsDto>()
+                        .Bind(configuration.GetRequiredSection(ThemeEngineOptionsDto.SECTION_NAME))
+                        .ValidateFluently()
+                        .ValidateOnStart();
+
         return serviceCollection;
     }
 }

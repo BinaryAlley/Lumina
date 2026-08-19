@@ -41,10 +41,7 @@ public class Program
         if (Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true")
         {
             logPath = Environment.GetEnvironmentVariable("LOG_PATH") ?? "/logs"; // use docker volume path
-            builder.WebHost.ConfigureKestrel(options =>
-            {
-                options.ListenAnyIP(5012); // HTTP only
-            });
+            builder.WebHost.ConfigureKestrel(options => options.ListenAnyIP(5012)); // HTTP only
         }
         else
             logPath = Path.Combine(AppContext.BaseDirectory, "logs"); // use local binary path
@@ -103,6 +100,8 @@ public class Program
         // handle path base from reverse proxies
         app.Use((context, next) =>
         {
+            context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+            context.Response.Headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
             if (context.Request.Headers.TryGetValue("X-Forwarded-Prefix", out StringValues pathBase))
                 context.Request.PathBase = pathBase.ToString();
             return next();
