@@ -10,6 +10,7 @@ using Lumina.Presentation.Web.Common.Localization;
 using Lumina.Presentation.Web.Common.Security;
 using Lumina.Presentation.Web.Common.Services;
 using Lumina.Presentation.Web.Common.Validation;
+using Lumina.Presentation.Web.Core.Themes;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -299,6 +300,11 @@ public static class PresentationWebLayerServices
         // enable access to the current HTTP context in non-controller classes
         services.AddHttpContextAccessor();
         services.Configure<FormOptions>(options => options.MultipartBodyLengthLimit = 10 * 1024 * 1024);
+
+        services.AddSingleton<ThemeSettingsStore>();
+        services.AddSingleton<ThemeService>();
+        services.AddSingleton<ThemeTemplateEngine>();
+        services.AddSingleton<ThemePageRenderer>();
 
         services.AddScoped<IAuthorizationHandler, InitializationHandler>();
         services.AddScoped<IAuthorizationHandler, RoleAuthorizationHandler>();
