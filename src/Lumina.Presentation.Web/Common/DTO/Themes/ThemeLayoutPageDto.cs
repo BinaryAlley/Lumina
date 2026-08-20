@@ -5,12 +5,14 @@ using System.Diagnostics;
 namespace Lumina.Presentation.Web.Common.DTO.Themes;
 
 /// <summary>
-/// Data transfer object for the rendered sections of a themed page, served through the shared themed view.
+/// Data transfer object for the page content handed to the layout renderer, which wraps it in the themed shell.
 /// </summary>
+/// <param name="Title">The title of the page, displayed by the themed shell.</param>
 /// <param name="Content">The rendered HTML content of the page section.</param>
 /// <param name="Script">The rendered script element of the page section, when the template defines one.</param>
-[DebuggerDisplay("Content length: {Content.Length}, Script length: {Script.Length}")]
-public sealed record ThemeViewDto(
+[DebuggerDisplay("Title: {Title}")]
+public sealed record ThemeLayoutPageDto(
+    string Title,
     string Content,
     string Script
 );

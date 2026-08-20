@@ -1,12 +1,5 @@
 @model Lumina.Presentation.Web.Common.DTO.Themes.ThemeViewDto
 
-@section Head {
-    @if (!string.IsNullOrEmpty(Model.AssetBase))
-    {
-        <link rel="stylesheet" href="@Model.AssetBase/theme.css" />
-    }
-}
-
 @Html.Raw(Model.Content)
 
 @section Scripts {

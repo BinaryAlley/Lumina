@@ -1,0 +1,17 @@
+@using Microsoft.Extensions.Localization
+
+@inject IStringLocalizerFactory _stringLocalizerFactory
+
+@{
+    IStringLocalizer localizer = _stringLocalizerFactory.Create("Lumina.Presentation.Web.Views.Shared._Layout", "Lumina.Presentation.Web");
+}
+
+<div class="audio-player-container">
+    <video controls
+           preload="auto"
+           height="50" width="600">
+        <source src="https://samplelib.com/lib/preview/mp4/sample-5s.mp4" type="video/mp4">
+    </video>
+    <a id="audio-player-full-height-toggle">@localizer["ToggleFullHeight"]</a>
+    <a id="audio-player-close">@localizer["ToggleVisibility"]</a>
+</div>

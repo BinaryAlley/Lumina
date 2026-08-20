@@ -304,6 +304,9 @@ public static class PresentationWebLayerServices
         services.AddScoped<ThemeService>();
         services.AddSingleton<ThemeTemplateEngine>();
         services.AddScoped<ThemePageRenderer>();
+        services.AddScoped<RazorViewToStringRenderer>();
+        services.AddScoped<ThemeNavBuilder>();
+        services.AddScoped<ThemeLayoutRenderer>();
 
         services.AddScoped<IAuthorizationHandler, InitializationHandler>();
         services.AddScoped<IAuthorizationHandler, RoleAuthorizationHandler>();

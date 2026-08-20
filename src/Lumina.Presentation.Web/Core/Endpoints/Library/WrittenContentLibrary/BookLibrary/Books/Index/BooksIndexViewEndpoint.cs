@@ -89,10 +89,13 @@ public class BooksIndexViewEndpoint : BaseEndpoint<GetBooksViewRequest, IResult>
             }
         };
 
-        Result<ThemePageRenderResultDto> renderResult = await _themePageRenderer.RenderAsync(pageModel, requestedThemeId: null, cancellationToken).ConfigureAwait(false);
-        if (renderResult.IsFailure)
+        Result<ThemePageRenderResultDto> sectionResult = await _themePageRenderer.RenderAsync(pageModel, requestedThemeId: null, cancellationToken).ConfigureAwait(false);
+        if (sectionResult.IsFailure)
             return View("/Core/Views/Library/WrittenContentLibrary/BookLibrary/Books/Index.cshtml", library);
 
-        return View("/Core/Views/Shared/_ThemedView.cshtml", new ThemeViewDto(renderResult.Value.Content, renderResult.Value.Script, pageModel.AssetBase));
+        return View(
+            "/Core/Views/Shared/_ThemedView.cshtml",
+            new ThemeViewDto(sectionResult.Value.Content, sectionResult.Value.Script),
+            new Dictionary<string, object?> { ["Title"] = pageModel.Title });
     }
 }

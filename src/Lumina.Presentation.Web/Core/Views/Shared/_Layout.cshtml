@@ -1,89 +1,71 @@
-@using Lumina.Presentation.Web.Common.DTO.Configuration
-@using Microsoft.AspNetCore.Mvc.Localization
-@using Microsoft.Extensions.Options
+@using Lumina.Presentation.Web.Common.DTO.Themes
+@using Lumina.Presentation.Web.Common.Primitives
+@using Lumina.Presentation.Web.Core.Themes
+@using Microsoft.AspNetCore.Html
+@using System.IO
+@using System.Text.Encodings.Web
 
-@inject IViewLocalizer _localizer
-@inject IOptions<ServerConfigurationDto> _serverConfigurationModel
+@inject ThemeLayoutRenderer _themeLayoutRenderer
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Lumina</title>
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/button.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/checkbox.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/combobox.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/file-system-browser.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/file-system-tree-view-node.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/navigation-menu.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/notification.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/dialog.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/textbox.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Lumina.Presentation.Web.styles.css" asp-append-version="true" />
-    @await RenderSectionAsync("Head", required: false) <!--needed for themes templates css files-->
-</head>
-<body>
-    <div id="page">
-        <header>
-            @await Html.PartialAsync("_NavMenu")
-        </header>
-        <main role="main" style="@(User?.Identity?.IsAuthenticated == false ? "bottom: 0px;" : string.Empty)">
-            <article class="h-100"> <!--needs to be 100% height so that child pages that require full height as well, can stretch-->
-                @RenderBody()
-                <div id="modal-background-article"></div>
-                <div class="dialog-container"></div>
-            </article>
-        </main>
-        @if (User?.Identity?.IsAuthenticated == true)
-        {
-            <!--Audio player-->
-            <div class="audio-player-container">
-                <video controls
-                       preload="auto"
-                       height="50" width="600">
-                    <source src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
-                </video>
-                <a id="audio-player-full-height-toggle">@_localizer["ToggleFullHeight"]</a>
-                <a id="audio-player-close">@_localizer["ToggleVisibility"]</a>
-            </div>
-        }
-    </div>
-    <!--Modal grid background-->
-    <div id="modal-background-menu"></div>
+@{
+    string bodyHtml;
+    using (StringWriter bodyWriter = new())
+    {
+        IHtmlContent bodyContent = RenderBody();
+        bodyContent.WriteTo(bodyWriter, HtmlEncoder.Default);
+        bodyHtml = bodyWriter.ToString();
+    }
 
-    <script>
-        var globalConfiguration = {
-            serverBasePath: '@(_serverConfigurationModel.Value.BaseAddress):@(_serverConfigurationModel.Value.Port)',
-            apiBasePath: '@(_serverConfigurationModel.Value.BaseAddress):@(_serverConfigurationModel.Value.Port)/api/v@(_serverConfigurationModel.Value.ApiVersion)',
-        };
-        var jsLocalizedMessages = {
-            navigationFailed: '@_localizer["NavigationFailed"]',
-        };
-        var jsLocalizedDialogs = {
-            // button texts
-            ok: '@_localizer["Ok"]',
-            cancel: '@_localizer["Cancel"]',
-            yes: '@_localizer["Yes"]',
-            no: '@_localizer["No"]',
-            retry: '@_localizer["Retry"]',
-            abort: '@_localizer["Abort"]',
-            ignore: '@_localizer["Ignore"]',
-            // default titles
-            confirmation: '@_localizer["Confirmation"]',
-            warning: '@_localizer["Warning"]',
-            error: '@_localizer["Error"]',
-            information: '@_localizer["Information"]'
-        };
+    string scriptsHtml;
+    using (StringWriter scriptsWriter = new())
+    {
+        TextWriter originalWriter = ViewContext.Writer;
+        ViewContext.Writer = scriptsWriter;
+        await RenderSectionAsync("Scripts", required: false);
+        ViewContext.Writer = originalWriter;
+        scriptsHtml = scriptsWriter.ToString();
+    }
 
-    </script>
-    <script src="~/libs/microsoft-signalr/signalr.min.js" asp-append-version="true"></script>
-    <script defer src="~/js/notifications.js" asp-append-version="true"></script>
-    <script defer src="~/js/dialogs.js" asp-append-version="true"></script>
-    <script defer src="~/js/site.js" asp-append-version="true"></script>
-    <div data-section="scripts">
-        @await RenderSectionAsync("Scripts", required: false)
-    </div>
-</body>
-</html>
+    string title = ViewData["Title"]?.ToString() ?? string.Empty;
+    Result<string> themedResult = await _themeLayoutRenderer.RenderAsync(new ThemeLayoutPageDto(title, bodyHtml, scriptsHtml), cancellationToken: ViewContext.HttpContext.RequestAborted);
+}
+
+@if (themedResult.IsSuccess)
+{
+    @Html.Raw(themedResult.Value)
+}
+else
+{
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>@ViewData["Title"] - Lumina</title>
+        @await Html.PartialAsync("_ThemeLayoutHead")
+    </head>
+    <body>
+        <div id="page">
+            <header>
+                @await Html.PartialAsync("_NavMenu")
+            </header>
+            <main role="main" style="@(User?.Identity?.IsAuthenticated == false ? "bottom: 0px;" : string.Empty)">
+                <article class="h-100">
+                    @Html.Raw(bodyHtml)
+                    <div id="modal-background-article"></div>
+                    <div class="dialog-container"></div>
+                </article>
+            </main>
+            @if (User?.Identity?.IsAuthenticated == true)
+            {
+                @await Html.PartialAsync("_AudioPlayer")
+            }
+        </div>
+        <div id="modal-background-menu"></div>
+        @await Html.PartialAsync("_ThemeLayoutScripts")
+        <div data-section="scripts">
+            @Html.Raw(scriptsHtml)
+        </div>
+    </body>
+    </html>
+}
