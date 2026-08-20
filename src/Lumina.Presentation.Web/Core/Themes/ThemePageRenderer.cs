@@ -36,11 +36,7 @@ public sealed class ThemePageRenderer
     /// <returns>An <see cref="Result{TValue}"/> containing either the rendered HTML, or an error.</returns>
     public async Task<Result<string>> RenderAsync(ThemePageDto model, string? requestedThemeId = null, CancellationToken cancellationToken = default)
     {
-        Result<ThemeRenderDocumentDto> documentResult = await _themeService.GetRenderDocumentAsync(model.PageKey, requestedThemeId, cancellationToken);
-        if (documentResult.IsFailure)
-            return Result<string>.Failure(documentResult.Errors);
-
-        ThemeRenderDocumentDto document = documentResult.Value;
+        ThemeRenderDocumentDto document = await _themeService.GetRenderDocumentAsync(model.PageKey, requestedThemeId, cancellationToken);
 
         model.ThemeId = document.Theme.Id;
         model.ThemeName = document.Theme.Name;

@@ -35,11 +35,6 @@ public static class SharedConfiguration
         configuration.AddEnvironmentVariables(); // environment variables should override the configuration files
 
         // bind the appsettings sections
-        services.AddOptions<CommonSettingsDto>()
-                .Bind(configuration.GetRequiredSection(CommonSettingsDto.SECTION_NAME))
-                .ValidateFluently()
-                .ValidateOnStart();
-
         services.AddOptions<DatabaseSettingsDto>()
                 .Bind(configuration.GetRequiredSection(DatabaseSettingsDto.SECTION_NAME))
                 .ValidateFluently()
@@ -67,6 +62,11 @@ public static class SharedConfiguration
 
         services.AddOptions<EncryptionSettingsDto>()
                 .Bind(configuration.GetRequiredSection(EncryptionSettingsDto.SECTION_NAME))
+                .ValidateFluently()
+                .ValidateOnStart();
+
+        services.AddOptions<ThemeEngineOptionsDto>()
+                .Bind(configuration.GetRequiredSection(ThemeEngineOptionsDto.SECTION_NAME))
                 .ValidateFluently()
                 .ValidateOnStart();
 

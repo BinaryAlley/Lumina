@@ -12,7 +12,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Lumina.Infrastructure.UnitTests.Common.Validators;
 
 /// <summary>
-/// Contains unit tests for the <see cref="CommonSettingsDtoValidator"/> class.
+/// Contains unit tests for the <see cref="DatabaseSettingsDtoValidator"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class DatabaseSettingsDtoValidatorTests
@@ -21,7 +21,7 @@ public class DatabaseSettingsDtoValidatorTests
     private readonly IFixture _fixture;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="CommonSettingsDtoValidatorTests"/> class.
+    /// Initializes a new instance of the <see cref="DatabaseSettingsDtoValidatorTests"/> class.
     /// </summary>
     public DatabaseSettingsDtoValidatorTests()
     {

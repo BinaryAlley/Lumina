@@ -321,6 +321,9 @@
   <data name="LanguageNativeNameMustBeMaximum50CharactersLong" xml:space="preserve">
     <value>Исходное название языка не должно превышать 50 символов!</value>
   </data>
+  <data name="LastBundledThemeCannotBeDeleted" xml:space="preserve">
+    <value>Последнюю встроенную тему нельзя удалить!</value>
+  </data>
   <data name="LibraryAlreadyExists" xml:space="preserve">
     <value>Библиотека уже существует!</value>
   </data>
@@ -377,6 +380,9 @@
   </data>
   <data name="PageCountMustBeGreaterThanZero" xml:space="preserve">
     <value>Количество страниц должно быть больше нуля!</value>
+  </data>
+  <data name="PageKeyCannotBeEmpty" xml:space="preserve">
+    <value>Ключ страницы не может быть пустым!</value>
   </data>
   <data name="ParentNodeCannotBeNull" xml:space="preserve">
     <value>Родительский узел не может быть пустым!</value>
@@ -488,6 +494,30 @@
   </data>
   <data name="TheBookIsNotInTheSeries" xml:space="preserve">
     <value>Книга не входит в серию!</value>
+  </data>
+  <data name="ThemeArchiveCannotBeNull" xml:space="preserve">
+    <value>Архив темы не может быть пустым!</value>
+  </data>
+  <data name="ThemeArchiveNotReadable" xml:space="preserve">
+    <value>Не удалось прочитать архив темы!</value>
+  </data>
+  <data name="ThemeAssetPathCannotBeEmpty" xml:space="preserve">
+    <value>Путь к ресурсу темы не может быть пустым!</value>
+  </data>
+  <data name="ThemeCannotBeDeleted" xml:space="preserve">
+    <value>Тему нельзя удалить!</value>
+  </data>
+  <data name="ThemeFilesUnreadable" xml:space="preserve">
+    <value>Не удалось прочитать файлы темы!</value>
+  </data>
+  <data name="ThemeIdCannotBeEmpty" xml:space="preserve">
+    <value>Идентификатор темы не может быть пустым!</value>
+  </data>
+  <data name="ThemeNotAvailable" xml:space="preserve">
+    <value>Тема недоступна!</value>
+  </data>
+  <data name="ThemeNotFound" xml:space="preserve">
+    <value>Указанная тема не найдена!</value>
   </data>
   <data name="TitleCannotBeEmpty" xml:space="preserve">
     <value>Название не может быть пустым!</value>

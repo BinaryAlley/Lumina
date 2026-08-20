@@ -301,7 +301,6 @@ public static class PresentationWebLayerServices
         services.AddHttpContextAccessor();
         services.Configure<FormOptions>(options => options.MultipartBodyLengthLimit = 10 * 1024 * 1024);
 
-        services.AddSingleton<ThemeSettingsStore>();
         services.AddSingleton<ThemeService>();
         services.AddSingleton<ThemeTemplateEngine>();
         services.AddSingleton<ThemePageRenderer>();

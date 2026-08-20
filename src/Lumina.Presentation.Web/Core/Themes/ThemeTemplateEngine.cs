@@ -36,7 +36,7 @@ public sealed class ThemeTemplateEngine
         int cursor = 0;
         Result<IReadOnlyList<ThemeTemplateNodeDto>> parseResult = ParseNodes(template, ref cursor, expectedClosingName: null, depth: 0);
         if (parseResult.IsFailure)
-            return Result<Success>.Failure(parseResult.Errors);
+            return parseResult.Errors;
 
         return Result.Success;
     }
@@ -55,12 +55,12 @@ public sealed class ThemeTemplateEngine
         int cursor = 0;
         Result<IReadOnlyList<ThemeTemplateNodeDto>> parseResult = ParseNodes(template, ref cursor, expectedClosingName: null, depth: 0);
         if (parseResult.IsFailure)
-            return Result<string>.Failure(parseResult.Errors);
+            return parseResult.Errors;
 
         StringBuilder output = new(Math.Min(template.Length * 2, 256 * 1024));
         Result<Success> renderResult = RenderNodes(parseResult.Value, new ThemeRenderScopeDto(model, Parent: null), output);
         if (renderResult.IsFailure)
-            return Result<string>.Failure(renderResult.Errors);
+            return renderResult.Errors;
 
         return output.ToString();
     }
@@ -103,7 +103,7 @@ public sealed class ThemeTemplateEngine
                 string expression = template[(opening + 3)..closing].Trim();
                 Result<Success> expressionResult = ValidateExpression(expression);
                 if (expressionResult.IsFailure)
-                    return Result<IReadOnlyList<ThemeTemplateNodeDto>>.Failure(expressionResult.Errors);
+                    return expressionResult.Errors;
 
                 nodes.Add(new ThemeVariableNodeDto(expression, ShouldBeEscaped: false));
                 cursor = closing + 3;
@@ -129,11 +129,11 @@ public sealed class ThemeTemplateEngine
                         string expression = tag[1..].Trim();
                         Result<Success> sectionExpressionResult = ValidateExpression(expression);
                         if (sectionExpressionResult.IsFailure)
-                            return Result<IReadOnlyList<ThemeTemplateNodeDto>>.Failure(sectionExpressionResult.Errors);
+                            return sectionExpressionResult.Errors;
 
                         Result<IReadOnlyList<ThemeTemplateNodeDto>> childrenResult = ParseNodes(template, ref cursor, expression, depth + 1);
                         if (childrenResult.IsFailure)
-                            return Result<IReadOnlyList<ThemeTemplateNodeDto>>.Failure(childrenResult.Errors);
+                            return childrenResult.Errors;
 
                         nodes.Add(new ThemeSectionNodeDto(expression, Inverted: tag[0] == '^', Children: childrenResult.Value));
                         break;
@@ -143,7 +143,7 @@ public sealed class ThemeTemplateEngine
                         string closingName = tag[1..].Trim();
                         Result<Success> closingNameResult = ValidateExpression(closingName);
                         if (closingNameResult.IsFailure)
-                            return Result<IReadOnlyList<ThemeTemplateNodeDto>>.Failure(closingNameResult.Errors);
+                            return closingNameResult.Errors;
 
                         if (expectedClosingName is null)
                             return TemplateInvalid($"Closing section '{closingName}' has no matching opening section.");
@@ -158,7 +158,7 @@ public sealed class ThemeTemplateEngine
                         string expression = tag[1..].Trim();
                         Result<Success> unescapedExpressionResult = ValidateExpression(expression);
                         if (unescapedExpressionResult.IsFailure)
-                            return Result<IReadOnlyList<ThemeTemplateNodeDto>>.Failure(unescapedExpressionResult.Errors);
+                            return unescapedExpressionResult.Errors;
 
                         nodes.Add(new ThemeVariableNodeDto(expression, ShouldBeEscaped: false));
                         break;
@@ -167,7 +167,7 @@ public sealed class ThemeTemplateEngine
                     {
                         Result<Success> variableResult = ValidateExpression(tag);
                         if (variableResult.IsFailure)
-                            return Result<IReadOnlyList<ThemeTemplateNodeDto>>.Failure(variableResult.Errors);
+                            return variableResult.Errors;
 
                         nodes.Add(new ThemeVariableNodeDto(tag, ShouldBeEscaped: true));
                         break;
@@ -198,7 +198,7 @@ public sealed class ThemeTemplateEngine
                     {
                         Result<Success> textResult = AppendChecked(output, text.Value);
                         if (textResult.IsFailure)
-                            return Result<Success>.Failure(textResult.Errors);
+                            return textResult.Errors;
 
                         break;
                     }
@@ -208,7 +208,7 @@ public sealed class ThemeTemplateEngine
                         string value = ConvertToString(resolved);
                         Result<Success> variableResult = AppendChecked(output, variable.ShouldBeEscaped ? HtmlEncoder.Default.Encode(value) : value);
                         if (variableResult.IsFailure)
-                            return Result<Success>.Failure(variableResult.Errors);
+                            return variableResult.Errors;
 
                         break;
                     }
@@ -216,7 +216,7 @@ public sealed class ThemeTemplateEngine
                     {
                         Result<Success> sectionResult = RenderSection(section, scope, output);
                         if (sectionResult.IsFailure)
-                            return Result<Success>.Failure(sectionResult.Errors);
+                            return sectionResult.Errors;
 
                         break;
                     }
@@ -257,7 +257,7 @@ public sealed class ThemeTemplateEngine
             {
                 Result<Success> itemResult = RenderNodes(section.Children, new ThemeRenderScopeDto(item, scope), output);
                 if (itemResult.IsFailure)
-                    return Result<Success>.Failure(itemResult.Errors);
+                    return itemResult.Errors;
             }
 
             return Result.Success;

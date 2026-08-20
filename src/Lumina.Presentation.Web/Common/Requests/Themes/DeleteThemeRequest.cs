@@ -1,0 +1,14 @@
+#region ========================================================================= USING =====================================================================================
+using System.Diagnostics;
+#endregion
+
+namespace Lumina.Presentation.Web.Common.Requests.Themes;
+
+/// <summary>
+/// Represents a request to delete a theme.
+/// </summary>
+/// <param name="ThemeId">The manifest id of the theme to delete.</param>
+[DebuggerDisplay("ThemeId: {ThemeId}")]
+public record DeleteThemeRequest(
+    string? ThemeId
+);

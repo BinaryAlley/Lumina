@@ -7,6 +7,7 @@ using Lumina.Application.Common.Infrastructure.Authorization.Policies.Over18;
 using Lumina.Application.Common.Infrastructure.Models.DTO.Configuration;
 using Lumina.Application.Common.Infrastructure.Plugins;
 using Lumina.Application.Common.Infrastructure.Security;
+using Lumina.Application.Common.Infrastructure.Themes;
 using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.MediaLibrary.Management.Progress;
@@ -29,6 +30,7 @@ using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Progress;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Queue;
 using Lumina.Infrastructure.Core.Plugins;
 using Lumina.Infrastructure.Core.Security;
+using Lumina.Infrastructure.Core.Themes;
 using Lumina.Infrastructure.Core.Time;
 using Lumina.Plugins.Contracts.Core.Plugins;
 using Microsoft.Extensions.Configuration;
@@ -112,6 +114,10 @@ public static class InfrastructureLayerServices
             pluginLoadResult.Errors,
             serviceProvider.GetRequiredService<ILogger<PluginDetectionSyncJob>>()));
         services.AddHostedService(serviceProvider => serviceProvider.GetRequiredService<PluginDetectionSyncJob>());
+
+        // themes: the theme service stores and serves theme packs, and the detection job seeds the bundled themes at startup
+        services.AddSingleton<IThemeService, ThemeService>();
+        services.AddHostedService<ThemeDetectionSyncJob>();
 
         return services;
     }

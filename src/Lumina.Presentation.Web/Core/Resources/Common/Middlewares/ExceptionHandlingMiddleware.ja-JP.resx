@@ -321,6 +321,9 @@
   <data name="LanguageNativeNameMustBeMaximum50CharactersLong" xml:space="preserve">
     <value>言語の固有名は最大50文字までです！</value>
   </data>
+  <data name="LastBundledThemeCannotBeDeleted" xml:space="preserve">
+    <value>最後の同梱テーマは削除できません！</value>
+  </data>
   <data name="LibraryAlreadyExists" xml:space="preserve">
     <value>ライブラリはすでに存在します！</value>
   </data>
@@ -377,6 +380,9 @@
   </data>
   <data name="PageCountMustBeGreaterThanZero" xml:space="preserve">
     <value>ページ数は0より大きくなければなりません！</value>
+  </data>
+  <data name="PageKeyCannotBeEmpty" xml:space="preserve">
+    <value>ページキーは空にできません！</value>
   </data>
   <data name="ParentNodeCannotBeNull" xml:space="preserve">
     <value>親ノードをnullにすることはできません!</value>
@@ -488,6 +494,30 @@
   </data>
   <data name="TheBookIsNotInTheSeries" xml:space="preserve">
     <value>この本はシリーズに含まれていません！</value>
+  </data>
+  <data name="ThemeArchiveCannotBeNull" xml:space="preserve">
+    <value>テーマアーカイブは null にできません！</value>
+  </data>
+  <data name="ThemeArchiveNotReadable" xml:space="preserve">
+    <value>テーマアーカイブを読み取れませんでした！</value>
+  </data>
+  <data name="ThemeAssetPathCannotBeEmpty" xml:space="preserve">
+    <value>テーマアセットのパスは空にできません！</value>
+  </data>
+  <data name="ThemeCannotBeDeleted" xml:space="preserve">
+    <value>テーマは削除できません！</value>
+  </data>
+  <data name="ThemeFilesUnreadable" xml:space="preserve">
+    <value>テーマのファイルを読み取れませんでした！</value>
+  </data>
+  <data name="ThemeIdCannotBeEmpty" xml:space="preserve">
+    <value>テーマ ID は空にできません！</value>
+  </data>
+  <data name="ThemeNotAvailable" xml:space="preserve">
+    <value>テーマを利用できません！</value>
+  </data>
+  <data name="ThemeNotFound" xml:space="preserve">
+    <value>指定されたテーマが見つかりませんでした！</value>
   </data>
   <data name="TitleCannotBeEmpty" xml:space="preserve">
     <value>タイトルを空にすることはできません！</value>
