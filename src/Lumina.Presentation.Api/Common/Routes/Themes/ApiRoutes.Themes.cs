@@ -12,7 +12,7 @@ public static partial class ApiRoutes
         public const string GET_THEME_SETTINGS = "/themes/settings";
         public const string GET_CURRENT_THEME = "/themes/current";
         public const string SET_CURRENT_THEME = "/themes/current";
-        public const string GET_THEME_TEMPLATE = "/themes/{themeId}/templates/{pageKey}";
+        public const string GET_THEME_TEMPLATE = "/themes/{themeId}/templates/{*pageKey}";
         public const string GET_THEME_ASSET = "/themes/{themeId}/assets/{*assetPath}";
         public const string GET_THEME_ARCHIVE = "/themes/{themeId}/archive";
         public const string DELETE_THEME = "/themes/{themeId}";

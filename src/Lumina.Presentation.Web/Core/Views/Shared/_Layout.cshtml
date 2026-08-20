@@ -22,6 +22,7 @@
     <link rel="stylesheet" href="~/css/dialog.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/textbox.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Lumina.Presentation.Web.styles.css" asp-append-version="true" />
+    @await RenderSectionAsync("Head", required: false) <!--needed for themes templates css files-->
 </head>
 <body>
     <div id="page">

@@ -99,9 +99,12 @@ internal sealed class ThemeDetectionSyncJob : BackgroundService
             Result<Created> insertResult = await unitOfWork.ThemeRepository.InsertAsync(themeEntity, stoppingToken);
             if (insertResult.IsFailure)
                 _logger.LogWarning("Failed to persist the detection of theme '{ThemeId}': {Error}", manifestResult.Value.Id, insertResult.FirstError.Description);
+            else
+                themes.Add(themeEntity);
         }
 
         await CleanUpMissingThemePacksAsync(unitOfWork, themes, stoppingToken);
+        await EnsureCurrentThemeExistsAsync(unitOfWork, themes, stoppingToken);
 
         await unitOfWork.SaveChangesAsync(stoppingToken);
     }
@@ -112,12 +115,12 @@ internal sealed class ThemeDetectionSyncJob : BackgroundService
     /// <param name="unitOfWork">The unit of work for interacting with the theme repository.</param>
     /// <param name="themes">The installed themes read from the storage medium.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    private async Task CleanUpMissingThemePacksAsync(IUnitOfWork unitOfWork, List<ThemeEntity> themes, CancellationToken cancellationToken)
+    private async Task CleanUpMissingThemePacksAsync(IUnitOfWork unitOfWork, IReadOnlyList<ThemeEntity> themes, CancellationToken cancellationToken)
     {
         // a soft deleted theme was deleted intentionally from the admin interface, so it must never be restored
         // automatically; only a theme that was not deleted, but whose files went missing, was corrupted or removed
         // externally, and is the only case where the files are restored
-        List<ThemeEntity> brokenThemes = [.. themes.Where(theme => !theme.IsDeleted && !_themeService.HasThemePack(theme.ThemeId))];
+        IReadOnlyList<ThemeEntity> brokenThemes = [.. themes.Where(theme => !theme.IsDeleted && !_themeService.HasThemePack(theme.ThemeId))];
         if (brokenThemes.Count is 0)
             return;
 
@@ -151,22 +154,30 @@ internal sealed class ThemeDetectionSyncJob : BackgroundService
                     _logger.LogWarning("Failed to delete theme '{ThemeId}': {Error}", brokenTheme.ThemeId, deleteResult.FirstError.Description);
             }
         }
+    }
 
-        // if the deleted theme was the active one, switch to another available theme, preferring the configured default
+    /// <summary>
+    /// Activates the configured default theme when no theme is currently active, so the application always has an active theme.
+    /// </summary>
+    /// <param name="unitOfWork">The unit of work for interacting with the theme repository.</param>
+    /// <param name="themes">The installed themes read from the storage medium.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    private async Task EnsureCurrentThemeExistsAsync(IUnitOfWork unitOfWork, IReadOnlyList<ThemeEntity> themes, CancellationToken cancellationToken)
+    {
         if (themes.Any(theme => !theme.IsDeleted && theme.IsCurrent == true))
             return;
 
-        ThemeEntity? replacementTheme = themes
+        ThemeEntity? defaultTheme = themes
             .Where(theme => !theme.IsDeleted && _themeService.HasThemePack(theme.ThemeId))
             .OrderBy(theme => string.Equals(theme.ThemeId, _themeService.DefaultThemeId, StringComparison.OrdinalIgnoreCase) ? 0 : 1)
             .ThenBy(theme => theme.ThemeId, StringComparer.OrdinalIgnoreCase)
             .FirstOrDefault();
-        if (replacementTheme is null)
+        if (defaultTheme is null)
             return;
 
-        replacementTheme.IsCurrent = true;
-        replacementTheme.UpdatedOnUtc = DateTime.UtcNow;
-        replacementTheme.UpdatedBy = default;
-        await unitOfWork.ThemeRepository.UpdateAsync(replacementTheme, cancellationToken);
+        defaultTheme.IsCurrent = true;
+        defaultTheme.UpdatedOnUtc = DateTime.UtcNow;
+        defaultTheme.UpdatedBy = default;
+        await unitOfWork.ThemeRepository.UpdateAsync(defaultTheme, cancellationToken);
     }
 }

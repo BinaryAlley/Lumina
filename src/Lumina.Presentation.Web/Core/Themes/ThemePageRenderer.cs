@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Common.DTO.Themes;
 using Lumina.Presentation.Web.Common.Primitives;
-using System;
+using Lumina.Presentation.Web.Common.Services;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -11,7 +11,7 @@ namespace Lumina.Presentation.Web.Core.Themes;
 /// <summary>
 /// Renders a theme template against a page model, populating the theme metadata before rendering.
 /// </summary>
-public sealed class ThemePageRenderer
+public class ThemePageRenderer
 {
     private readonly ThemeService _themeService;
     private readonly ThemeTemplateEngine _templateEngine;
@@ -28,22 +28,20 @@ public sealed class ThemePageRenderer
     }
 
     /// <summary>
-    /// Renders the page model with the theme selected for the requested theme identifier.
+    /// Renders the page model with the theme selected for the requested theme identifier, producing the content and script sections of the page.
     /// </summary>
     /// <param name="model">The page model to render.</param>
     /// <param name="requestedThemeId">The optional unique identifier of the theme to render with, falling back to the current theme when <see langword="null"/>.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="Result{TValue}"/> containing either the rendered HTML, or an error.</returns>
-    public async Task<Result<string>> RenderAsync(ThemePageDto model, string? requestedThemeId = null, CancellationToken cancellationToken = default)
+    /// <returns>An <see cref="Result{TValue}"/> containing either the rendered page, or an error.</returns>
+    public virtual async Task<Result<ThemePageRenderResultDto>> RenderAsync(ThemePageDto model, string? requestedThemeId = null, CancellationToken cancellationToken = default)
     {
         ThemeRenderDocumentDto document = await _themeService.GetRenderDocumentAsync(model.PageKey, requestedThemeId, cancellationToken);
 
         model.ThemeId = document.Theme.Id;
-        model.ThemeName = document.Theme.Name;
-        model.ThemeVersion = document.Theme.Version;
         model.AssetBase = $"/theme-assets/{document.Theme.Id}/assets";
-        model.CurrentYear = DateTime.UtcNow.Year;
+        model.ScriptId = ScriptIdentifierHelper.GenerateScriptId();
 
-        return _templateEngine.Render(document.Template, model);
+        return _templateEngine.RenderPage(document.Template, model);
     }
 }

@@ -110,7 +110,7 @@ public sealed class ThemeService
             themeId = requestedThemeId;
 
         ThemeTemplateResponseDto response = await _apiHttpClient.GetAsync<ThemeTemplateResponseDto>(
-            ApiRoutes.Themes.GET_THEME_TEMPLATE.Replace("{themeId}", themeId).Replace("{pageKey}", pageKey), cancellationToken).ConfigureAwait(false);
+            ApiRoutes.Themes.GET_THEME_TEMPLATE.Replace("{themeId}", themeId).Replace("{*pageKey}", pageKey), cancellationToken).ConfigureAwait(false);
         return new ThemeRenderDocumentDto(ToThemeInfo(response.Theme), response.Template);
     }
 

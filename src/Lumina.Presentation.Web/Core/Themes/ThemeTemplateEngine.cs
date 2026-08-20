@@ -26,28 +26,12 @@ public sealed class ThemeTemplateEngine
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
     /// <summary>
-    /// Validates the structure and expressions of a theme template.
-    /// </summary>
-    /// <param name="template">The template source to validate.</param>
-    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
-    public Result<Success> Validate(string template)
-    {
-        ArgumentNullException.ThrowIfNull(template);
-        int cursor = 0;
-        Result<IReadOnlyList<ThemeTemplateNodeDto>> parseResult = ParseNodes(template, ref cursor, expectedClosingName: null, depth: 0);
-        if (parseResult.IsFailure)
-            return parseResult.Errors;
-
-        return Result.Success;
-    }
-
-    /// <summary>
-    /// Renders a theme template against the provided model.
+    /// Renders a theme template against the provided model, splitting the reserved top-level <c>scripts</c> section from the page content.
     /// </summary>
     /// <param name="template">The template source to render.</param>
     /// <param name="model">The model the template expressions resolve against.</param>
-    /// <returns>An <see cref="Result{TValue}"/> containing either the rendered output, or an error.</returns>
-    public Result<string> Render(string template, object model)
+    /// <returns>An <see cref="Result{TValue}"/> containing either the rendered page, or an error.</returns>
+    public Result<ThemePageRenderResultDto> RenderPage(string template, object model)
     {
         ArgumentNullException.ThrowIfNull(template);
         ArgumentNullException.ThrowIfNull(model);
@@ -57,12 +41,38 @@ public sealed class ThemeTemplateEngine
         if (parseResult.IsFailure)
             return parseResult.Errors;
 
-        StringBuilder output = new(Math.Min(template.Length * 2, 256 * 1024));
-        Result<Success> renderResult = RenderNodes(parseResult.Value, new ThemeRenderScopeDto(model, Parent: null), output);
-        if (renderResult.IsFailure)
-            return renderResult.Errors;
+        // the reserved top-level 'scripts' section holds the script of the page and is rendered separately, mirroring the
+        // 'Scripts' section of a Razor view, so that the layout can host it in the scripts container of the navigator;
+        // every other top-level node is the content of the page section
+        List<ThemeTemplateNodeDto> contentNodes = [];
+        ThemeSectionNodeDto? scriptsSection = null;
+        foreach (ThemeTemplateNodeDto node in parseResult.Value)
+        {
+            if (node is ThemeSectionNodeDto { Inverted: false } section
+                && scriptsSection is null
+                && string.Equals(section.Expression, "scripts", StringComparison.OrdinalIgnoreCase))
+            {
+                scriptsSection = section;
+                continue;
+            }
 
-        return output.ToString();
+            contentNodes.Add(node);
+        }
+
+        StringBuilder contentOutput = new(Math.Min(template.Length * 2, 256 * 1024));
+        Result<Success> contentResult = RenderNodes(contentNodes, new ThemeRenderScopeDto(model, Parent: null), contentOutput);
+        if (contentResult.IsFailure)
+            return contentResult.Errors;
+
+        StringBuilder scriptOutput = new(64 * 1024);
+        if (scriptsSection is not null)
+        {
+            Result<Success> scriptResult = RenderNodes(scriptsSection.Children, new ThemeRenderScopeDto(model, Parent: null), scriptOutput);
+            if (scriptResult.IsFailure)
+                return scriptResult.Errors;
+        }
+
+        return new ThemePageRenderResultDto(contentOutput.ToString(), scriptOutput.ToString());
     }
 
     /// <summary>

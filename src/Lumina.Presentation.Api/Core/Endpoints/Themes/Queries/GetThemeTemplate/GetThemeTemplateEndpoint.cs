@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Api.Core.Endpoints.Themes.Queries.GetThemeTemplate;
 
 /// <summary>
-/// API endpoint for the <c>/themes/{themeId}/templates/{pageKey}</c> route.
+/// API endpoint for the <c>/themes/{themeId}/templates/{*pageKey}</c> route.
 /// </summary>
 public class GetThemeTemplateEndpoint : BaseEndpoint<GetThemeTemplateRequest, IResult>
 {

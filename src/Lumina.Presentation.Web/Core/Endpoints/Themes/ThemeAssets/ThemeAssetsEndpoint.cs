@@ -52,7 +52,7 @@ public class ThemeAssetsEndpoint : BaseEndpoint<GetThemeAssetRequest, IResult>
             return Results.Problem(statusCode: StatusCodes.Status400BadRequest, detail: "The theme id and the asset path are required.");
 
         BlobDataDto blob = await _apiHttpClient.GetBlobAsync(
-            ApiRoutes.Themes.GET_THEME_ASSET.Replace("{themeId}", request.ThemeId).Replace("{assetPath}", request.Path), cancellationToken).ConfigureAwait(false);
+            ApiRoutes.Themes.GET_THEME_ASSET.Replace("{themeId}", request.ThemeId).Replace("{*assetPath}", request.Path), cancellationToken).ConfigureAwait(false);
         return Results.File(blob.Data, blob.ContentType);
     }
 }

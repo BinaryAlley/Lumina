@@ -56,7 +56,7 @@ public class GetThemeTemplateEndpointSummary : Summary<GetThemeTemplateEndpoint,
                 title = "General.Validation",
                 status = 422,
                 detail = "OneOrMoreValidationErrorsOccurred",
-                instance = "/api/v1/themes/{themeId}/templates/{pageKey}",
+                instance = "/api/v1/themes/{themeId}/templates/{*pageKey}",
                 errors = new Dictionary<string, string[]>
                 {
                     {
@@ -78,7 +78,7 @@ public class GetThemeTemplateEndpointSummary : Summary<GetThemeTemplateEndpoint,
                 title = "General.Failure",
                 status = 403,
                 detail = "ThemeNotAvailable",
-                instance = "/api/v1/themes/{themeId}/templates/{pageKey}",
+                instance = "/api/v1/themes/{themeId}/templates/{*pageKey}",
                 traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
             }
         );
@@ -90,7 +90,7 @@ public class GetThemeTemplateEndpointSummary : Summary<GetThemeTemplateEndpoint,
                 title = "General.NotFound",
                 status = 404,
                 detail = "ThemeNotFound",
-                instance = "/api/v1/themes/{themeId}/templates/{pageKey}",
+                instance = "/api/v1/themes/{themeId}/templates/{*pageKey}",
                 traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
             }
         );

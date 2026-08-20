@@ -260,10 +260,13 @@ public sealed class ThemeService : IThemeService
             return manifestResult.Errors;
 
         ThemeManifestDto manifest = manifestResult.Value;
-        if (!manifest.Templates.TryGetValue(pageKey, out string? templatePath))
-            templatePath = manifest.Templates["default"]; // the manifest validation guarantees a default template
+        string themePath = ResolveThemePath(themeId);
+        string? templatePath = manifest.Templates.TryGetValue(pageKey, out string? explicitPath)
+            ? explicitPath
+            : ResolveMirroredTemplatePath(themePath, pageKey);
+        templatePath ??= manifest.Templates["default"]; // the manifest validation guarantees a default template
 
-        Result<string> fullPathResult = ResolveContainedPath(ResolveThemePath(themeId), templatePath);
+        Result<string> fullPathResult = ResolveContainedPath(themePath, templatePath);
         if (fullPathResult.IsFailure)
             return fullPathResult.Errors;
 
@@ -275,6 +278,33 @@ public sealed class ThemeService : IThemeService
             template = StripScriptElements(template);
 
         return template;
+    }
+
+    /// <summary>
+    /// Resolves the mirrored template path of a page key, walking up the scopes of the path when the exact mirror does not exist.
+    /// </summary>
+    /// <param name="themePath">The absolute path of the theme pack directory.</param>
+    /// <param name="pageKey">The page key that selects the template.</param>
+    /// <returns>The mirrored template path, or <see langword="null"/> when no mirrored template exists.</returns>
+    private static string? ResolveMirroredTemplatePath(string themePath, string pageKey)
+    {
+        string? candidate = pageKey;
+        while (candidate is not null)
+        {
+            // normalize the mirrored candidate so that malicious page keys cannot escape the theme pack
+            Result<string> normalizedResult = NormalizeRelativePath($"templates/{candidate}.html");
+            if (normalizedResult.IsSuccess)
+            {
+                Result<string> fullPathResult = ResolveContainedPath(themePath, normalizedResult.Value);
+                if (fullPathResult.IsSuccess && File.Exists(fullPathResult.Value))
+                    return normalizedResult.Value;
+            }
+
+            int lastSlash = candidate.LastIndexOf('/');
+            candidate = lastSlash < 0 ? null : candidate[..lastSlash];
+        }
+
+        return null;
     }
 
     /// <summary>
