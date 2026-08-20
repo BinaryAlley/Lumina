@@ -5,6 +5,7 @@ using Lumina.Application.Common.DataAccess.Repositories.Themes;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Errors;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -82,6 +83,23 @@ internal sealed class ThemeRepository : IThemeRepository
     {
         return await _luminaDbContext.Themes
             .FirstOrDefaultAsync(theme => theme.ThemeId == themeId, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Deletes a theme identified by <paramref name="id"/> from the storage medium.
+    /// </summary>
+    /// <param name="id">The id of the theme to delete.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Deleted>> DeleteByIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        ThemeEntity? foundTheme = await _luminaDbContext.Themes
+            .FirstOrDefaultAsync(theme => theme.Id == id, cancellationToken).ConfigureAwait(false);
+        if (foundTheme is null)
+            return Errors.Themes.ThemeNotFound;
+
+        _luminaDbContext.Themes.Remove(foundTheme);
+        return Result.Deleted;
     }
 
     /// <summary>

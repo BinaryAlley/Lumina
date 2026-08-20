@@ -112,11 +112,22 @@ public class DeleteThemeCommandHandler : ICommandHandler<DeleteThemeCommand, Res
             await _unitOfWork.ThemeRepository.UpdateAsync(replacementTheme, cancellationToken).ConfigureAwait(false);
         }
 
-        theme.IsDeleted = true;
-        theme.IsCurrent = null;
-        theme.UpdatedOnUtc = DateTime.UtcNow;
-        theme.UpdatedBy = userId;
-        await _unitOfWork.ThemeRepository.UpdateAsync(theme, cancellationToken).ConfigureAwait(false);
+        if (theme.InstallSource == ThemeInstallSource.Bundled)
+        {
+            // bundled themes are soft deleted, so they can be restored automatically later, as long as the user did not delete them
+            theme.IsDeleted = true;
+            theme.IsCurrent = null;
+            theme.UpdatedOnUtc = DateTime.UtcNow;
+            theme.UpdatedBy = userId;
+            await _unitOfWork.ThemeRepository.UpdateAsync(theme, cancellationToken).ConfigureAwait(false);
+        }
+        else
+        {
+            // user themes are removed entirely, because their files are not shipped with the application and could never be restored
+            Result<Deleted> deleteResult = await _unitOfWork.ThemeRepository.DeleteByIdAsync(theme.Id, cancellationToken).ConfigureAwait(false);
+            if (deleteResult.IsFailure)
+                return deleteResult.Errors;
+        }
 
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 

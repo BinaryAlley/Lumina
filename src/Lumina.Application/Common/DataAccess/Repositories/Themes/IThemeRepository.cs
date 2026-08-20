@@ -1,8 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.Themes;
 using Lumina.Application.Common.DataAccess.Repositories.Common.Actions;
 using Lumina.Application.Common.DataAccess.Repositories.Common.Base;
+using Lumina.Domain.Common.Primitives;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -15,7 +16,8 @@ namespace Lumina.Application.Common.DataAccess.Repositories.Themes;
 public interface IThemeRepository : IRepository<ThemeEntity>,
                                     IGetAllRepositoryAction<ThemeEntity>,
                                     IInsertRepositoryAction<ThemeEntity>,
-                                    IUpdateRepositoryAction<ThemeEntity>
+                                    IUpdateRepositoryAction<ThemeEntity>,
+                                    IDeleteByIdRepositoryAction<Guid>
 {
     /// <summary>
     /// Gets a theme identified by its manifest <paramref name="themeId"/> from the storage medium.

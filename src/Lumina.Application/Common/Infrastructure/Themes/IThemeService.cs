@@ -96,6 +96,13 @@ public interface IThemeService
     Task<Result<Success>> RestoreBundledThemeAsync(string themeId, CancellationToken cancellationToken);
 
     /// <summary>
+    /// Checks whether the stored pack files of a theme still exist.
+    /// </summary>
+    /// <param name="themeId">The manifest id of the theme.</param>
+    /// <returns><see langword="true"/> when the theme pack files exist, <see langword="false"/> otherwise.</returns>
+    bool HasThemePack(string themeId);
+
+    /// <summary>
     /// Gets the paths of the theme pack archives shipped with the application.
     /// </summary>
     /// <returns>The list of bundled theme archive paths.</returns>

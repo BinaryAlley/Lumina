@@ -106,6 +106,17 @@ public sealed class ThemeService : IThemeService
     }
 
     /// <summary>
+    /// Checks whether the stored pack files of a theme still exist.
+    /// </summary>
+    /// <param name="themeId">The manifest id of the theme.</param>
+    /// <returns><see langword="true"/> when the theme pack files exist, <see langword="false"/> otherwise.</returns>
+    public bool HasThemePack(string themeId)
+    {
+        string themePath = ResolveThemePath(themeId);
+        return Directory.Exists(themePath) && File.Exists(Path.Combine(themePath, MANIFEST_FILE_NAME));
+    }
+
+    /// <summary>
     /// Installs a theme pack from the provided archive, replacing the files of an existing theme with the same manifest id.
     /// </summary>
     /// <param name="archive">The ZIP archive stream of the theme pack.</param>
