@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.Core.Endpoints.Plugins.Index;
 
 /// <summary>
-/// API endpoint for the <c>/{culture}/plugins</c> route.
+/// API endpoint for the <c>/{culture}/admin/manage-plugins</c> route.
 /// </summary>
 public class PluginsIndexViewEndpoint : BaseEndpoint<EmptyRequest, IResult>
 {
@@ -57,6 +57,6 @@ public class PluginsIndexViewEndpoint : BaseEndpoint<EmptyRequest, IResult>
             if (plugin.LoadStatus == Lumina.Presentation.Web.Common.Enums.Plugins.PluginLoadStatus.Loaded)
                 settingsByPluginId[plugin.Id] = await _apiHttpClient.GetAsync<PluginSettingsDto>(ApiRoutes.Plugins.GET_PLUGIN_SETTINGS.Replace("{pluginId}", plugin.Id.ToString()), cancellationToken).ConfigureAwait(false);
         Dictionary<string, object?> viewData = new() { ["pluginSettings"] = settingsByPluginId };
-        return View("/Core/Views/Plugins/Index.cshtml", plugins, viewData);
+        return View("/Core/Views/Admin/Plugins.cshtml", plugins, viewData);
     }
 }

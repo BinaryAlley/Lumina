@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.Core.Endpoints.Plugins.GetPlugins;
 
 /// <summary>
-/// API endpoint for the <c>/{culture}/plugins/api-get-plugins</c> route.
+/// API endpoint for the <c>/{culture}/admin/manage-plugins/api-get-plugins</c> route.
 /// </summary>
 public class GetPluginsEndpoint : BaseEndpoint<EmptyRequest, IResult>
 {
