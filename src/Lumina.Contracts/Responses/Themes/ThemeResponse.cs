@@ -19,6 +19,7 @@ namespace Lumina.Contracts.Responses.Themes;
 /// <param name="InstallSource">The source the theme was installed from.</param>
 /// <param name="IsCurrent">Whether the theme is the currently active one.</param>
 /// <param name="InstalledAtUtc">The UTC timestamp at which the theme was installed.</param>
+/// <param name="IsDeleted">Whether the theme was deleted by the user, which is only possible for bundled themes.</param>
 [DebuggerDisplay("ThemeId: {ThemeId}, Name: {Name}")]
 public record ThemeResponse(
     Guid Id,
@@ -30,5 +31,6 @@ public record ThemeResponse(
     string? PreviewPath,
     ThemeInstallSource InstallSource,
     bool? IsCurrent,
-    DateTime InstalledAtUtc
+    DateTime InstalledAtUtc,
+    bool IsDeleted
 );

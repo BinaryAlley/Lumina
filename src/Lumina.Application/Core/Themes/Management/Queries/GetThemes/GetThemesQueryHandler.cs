@@ -45,10 +45,11 @@ public class GetThemesQueryHandler : IQueryHandler<GetThemesQuery, Result<IReadO
         if (getThemesResult.IsFailure)
             return getThemesResult.Errors;
 
+        // deleted bundled themes are returned as well, so the administration page can offer to restore them
         return Result.From<IReadOnlyList<ThemeResponse>>([.. getThemesResult.Value
-            .Where(theme => !theme.IsDeleted)
+            .OrderBy(theme => theme.IsDeleted)
             // the shipped bundled themes are listed before the user themes, so the defaults stay the most visible
-            .OrderByDescending(theme => theme.InstallSource == ThemeInstallSource.Bundled)
+            .ThenByDescending(theme => theme.InstallSource == ThemeInstallSource.Bundled)
             .ThenBy(theme => theme.Name, StringComparer.OrdinalIgnoreCase)
             .Select(theme => theme.ToResponse())]);
     }

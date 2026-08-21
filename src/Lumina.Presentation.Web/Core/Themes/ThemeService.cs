@@ -95,6 +95,16 @@ public sealed class ThemeService
     }
 
     /// <summary>
+    /// Restores a soft deleted bundled theme from its shipped archive.
+    /// </summary>
+    /// <param name="themeId">The identifier of the bundled theme to restore.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    public async Task RestoreThemeAsync(string themeId, CancellationToken cancellationToken = default)
+    {
+        await _apiHttpClient.PostAsync<ThemeResponseDto, object>(ApiRoutes.Themes.RESTORE_THEME.Replace("{themeId}", themeId), new { }, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
     /// Gets the theme and raw template source selected for a page key.
     /// </summary>
     /// <param name="pageKey">The page key that selects the template to render.</param>
@@ -134,6 +144,6 @@ public sealed class ThemeService
     private static ThemeInfoDto ToThemeInfo(ThemeResponseDto theme)
     {
         string previewUrl = string.IsNullOrWhiteSpace(theme.PreviewPath) ? "/admin/theme-placeholder.svg" : $"/theme-assets/{theme.ThemeId}/{theme.PreviewPath}";
-        return new ThemeInfoDto(theme.ThemeId, theme.Name, theme.Description, theme.Author, theme.Version, previewUrl, theme.InstallSource == ThemeInstallSource.Bundled);
+        return new ThemeInfoDto(theme.ThemeId, theme.Name, theme.Description, theme.Author, theme.Version, previewUrl, theme.InstallSource == ThemeInstallSource.Bundled, theme.IsDeleted);
     }
 }

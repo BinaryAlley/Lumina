@@ -33,6 +33,7 @@ public class ThemeResponseFixture
     /// <param name="isCurrent">Optional. Whether the theme is the currently active one.</param>
     /// <param name="includeIsCurrent">Whether to set <paramref name="isCurrent"/>, or <see langword="null"/> when <see langword="false"/>.</param>
     /// <param name="installedAtUtc">Optional. The UTC timestamp when the theme was installed.</param>
+    /// <param name="isDeleted">Optional. Whether the theme was deleted by the user.</param>
     /// <returns>The created <see cref="ThemeResponse"/>.</returns>
     public ThemeResponse Create(
         Guid? id = null,
@@ -46,7 +47,8 @@ public class ThemeResponseFixture
         ThemeInstallSource? installSource = null,
         bool? isCurrent = null,
         bool includeIsCurrent = false,
-        DateTime? installedAtUtc = null)
+        DateTime? installedAtUtc = null,
+        bool? isDeleted = null)
     {
         return new ThemeResponse(
             id ?? Guid.NewGuid(),
@@ -58,7 +60,8 @@ public class ThemeResponseFixture
             includePreviewPath ? (previewPath ?? (_faker.Random.Bool() ? _faker.System.FilePath() : null)) : null,
             installSource ?? _faker.PickRandom<ThemeInstallSource>(),
             includeIsCurrent ? (isCurrent ?? (_faker.Random.Bool() ? true : null)) : null,
-            installedAtUtc ?? _faker.Date.Recent().ToUniversalTime());
+            installedAtUtc ?? _faker.Date.Recent().ToUniversalTime(),
+            isDeleted ?? _faker.Random.Bool());
     }
 
     /// <summary>

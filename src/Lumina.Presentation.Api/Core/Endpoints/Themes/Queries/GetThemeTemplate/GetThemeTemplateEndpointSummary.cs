@@ -44,7 +44,8 @@ public class GetThemeTemplateEndpointSummary : Summary<GetThemeTemplateEndpoint,
                     PreviewPath: "preview.png",
                     InstallSource: ThemeInstallSource.Bundled,
                     IsCurrent: true,
-                    InstalledAtUtc: DateTime.UtcNow
+                    InstalledAtUtc: DateTime.UtcNow,
+                    IsDeleted: false
                 ),
                 "<html><body><div class=\"content\">{{content}}</div></body></html>"
             ));

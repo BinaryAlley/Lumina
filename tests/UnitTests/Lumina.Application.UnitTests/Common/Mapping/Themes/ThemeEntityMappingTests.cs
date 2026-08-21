@@ -48,6 +48,7 @@ public class ThemeEntityMappingTests
         Assert.Equal(theme.InstallSource, result.InstallSource);
         Assert.Equal(theme.IsCurrent, result.IsCurrent);
         Assert.Equal(theme.InstalledAtUtc, result.InstalledAtUtc);
+        Assert.Equal(theme.IsDeleted, result.IsDeleted);
     }
 
     [Fact]

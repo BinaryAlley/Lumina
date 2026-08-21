@@ -31,6 +31,7 @@ public class ThemeResponseDtoFixture
     /// <param name="isCurrent">Optional value indicating whether the theme is the active one.</param>
     /// <param name="includeIsCurrent">Whether to set <paramref name="isCurrent"/>, or <see langword="null"/> when <see langword="false"/>.</param>
     /// <param name="installedAtUtc">Optional UTC timestamp at which the theme was installed.</param>
+    /// <param name="isDeleted">Optional value indicating whether the theme was deleted by the user.</param>
     /// <returns>A configured <see cref="ThemeResponseDto"/> instance.</returns>
     public ThemeResponseDto Create(
         Guid? id = null,
@@ -44,7 +45,8 @@ public class ThemeResponseDtoFixture
         ThemeInstallSource? installSource = null,
         bool? isCurrent = null,
         bool includeIsCurrent = false,
-        DateTime? installedAtUtc = null)
+        DateTime? installedAtUtc = null,
+        bool? isDeleted = null)
     {
         Faker faker = new();
         return new ThemeResponseDto(
@@ -57,7 +59,8 @@ public class ThemeResponseDtoFixture
             PreviewPath: includePreviewPath ? (previewPath ?? (faker.Random.Bool() ? faker.System.FilePath() : null)) : null,
             InstallSource: installSource ?? ThemeInstallSource.Uploaded,
             IsCurrent: includeIsCurrent ? (isCurrent ?? (faker.Random.Bool() ? true : null)) : null,
-            InstalledAtUtc: installedAtUtc ?? faker.Date.Recent()
+            InstalledAtUtc: installedAtUtc ?? faker.Date.Recent(),
+            IsDeleted: isDeleted ?? faker.Random.Bool()
         );
     }
 

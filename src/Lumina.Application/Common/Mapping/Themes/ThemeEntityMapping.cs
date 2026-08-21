@@ -27,6 +27,7 @@ public static class ThemeEntityMapping
             theme.PreviewPath,
             theme.InstallSource,
             theme.IsCurrent,
-            theme.InstalledAtUtc);
+            theme.InstalledAtUtc,
+            theme.IsDeleted);
     }
 }

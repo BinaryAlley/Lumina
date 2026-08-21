@@ -14,6 +14,7 @@ namespace Lumina.Presentation.Web.Common.DTO.Themes;
 /// <param name="Version">The version of the theme, using semantic version form.</param>
 /// <param name="PreviewUrl">The URL of the theme preview image.</param>
 /// <param name="IsBundled">Whether the theme ships with the application or noy.</param>
+/// <param name="IsDeleted">Whether the theme was deleted by the user, which is only possible for bundled themes.</param>
 [DebuggerDisplay("Id: {Id}, Name: {Name}")]
 public sealed record ThemeInfoDto(
     string Id,
@@ -22,5 +23,6 @@ public sealed record ThemeInfoDto(
     string Author,
     string Version,
     string PreviewUrl,
-    bool IsBundled
+    bool IsBundled,
+    bool IsDeleted
 );

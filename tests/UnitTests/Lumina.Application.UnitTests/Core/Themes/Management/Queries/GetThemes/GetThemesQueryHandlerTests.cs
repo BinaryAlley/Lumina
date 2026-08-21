@@ -41,7 +41,7 @@ public class GetThemesQueryHandlerTests
     }
 
     [Fact]
-    public async Task HandleAsync_WhenCalled_ShouldReturnAllAvailableThemesOrderedBundledFirstThenByName()
+    public async Task HandleAsync_WhenCalled_ShouldReturnAllThemesOrderedAvailableBundledFirstThenByNameWithDeletedLast()
     {
         // Arrange
         GetThemesQuery query = _getThemesQueryFixture.Create();
@@ -57,13 +57,15 @@ public class GetThemesQueryHandlerTests
 
         // Assert
         Assert.False(result.IsFailure);
-        Assert.Equal(3, result.Value.Count);
+        Assert.Equal(4, result.Value.Count);
         Assert.Equal(bundledLowerTheme.Id, result.Value[0].Id);
         Assert.Equal(bundledUpperTheme.Id, result.Value[1].Id);
         Assert.Equal(uploadedTheme.Id, result.Value[2].Id);
+        Assert.Equal(deletedTheme.Id, result.Value[3].Id);
         Assert.Equal(ThemeInstallSource.Bundled, result.Value[0].InstallSource);
         Assert.Equal(ThemeInstallSource.Bundled, result.Value[1].InstallSource);
         Assert.Equal(ThemeInstallSource.Uploaded, result.Value[2].InstallSource);
+        Assert.True(result.Value[3].IsDeleted);
     }
 
     [Fact]

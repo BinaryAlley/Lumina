@@ -144,6 +144,9 @@
   <data name="Download" xml:space="preserve">
     <value>Scarica</value>
   </data>
+  <data name="Restore" xml:space="preserve">
+    <value>Ripristina</value>
+  </data>
   <data name="Upload" xml:space="preserve">
     <value>Carica</value>
   </data>

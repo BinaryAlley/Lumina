@@ -34,7 +34,8 @@ public class GetThemesEndpointSummary : Summary<GetThemesEndpoint, EmptyRequest>
                 PreviewPath: "preview.png",
                 InstallSource: ThemeInstallSource.Bundled,
                 IsCurrent: true,
-                InstalledAtUtc: DateTime.UtcNow
+                InstalledAtUtc: DateTime.UtcNow,
+                IsDeleted: false
             ),
             new (
                 Id: Guid.NewGuid(),
@@ -46,7 +47,8 @@ public class GetThemesEndpointSummary : Summary<GetThemesEndpoint, EmptyRequest>
                 PreviewPath: "preview.jpg",
                 InstallSource: ThemeInstallSource.Uploaded,
                 IsCurrent: null,
-                InstalledAtUtc: DateTime.UtcNow
+                InstalledAtUtc: DateTime.UtcNow,
+                IsDeleted: false
             )
         });
 

@@ -25,6 +25,7 @@ public class ThemeInfoDtoFixture
     /// <param name="version">Optional semantic version of the theme.</param>
     /// <param name="previewUrl">Optional URL of the theme preview image.</param>
     /// <param name="isBundled">Whether the theme ships with the application.</param>
+    /// <param name="isDeleted">Whether the theme was deleted by the user.</param>
     /// <returns>A configured <see cref="ThemeInfoDto"/> instance.</returns>
     public ThemeInfoDto Create(
         string? id = null,
@@ -33,7 +34,8 @@ public class ThemeInfoDtoFixture
         string? author = null,
         string? version = null,
         string? previewUrl = null,
-        bool? isBundled = null)
+        bool? isBundled = null,
+        bool? isDeleted = null)
     {
         Faker faker = new();
         return new ThemeInfoDto(
@@ -43,7 +45,8 @@ public class ThemeInfoDtoFixture
             Author: author ?? faker.Name.FullName(),
             Version: version ?? faker.System.Semver(),
             PreviewUrl: previewUrl ?? $"/theme-assets/{faker.Lorem.Word()}/preview.png",
-            IsBundled: isBundled ?? faker.Random.Bool()
+            IsBundled: isBundled ?? faker.Random.Bool(),
+            IsDeleted: isDeleted ?? faker.Random.Bool()
         );
     }
 

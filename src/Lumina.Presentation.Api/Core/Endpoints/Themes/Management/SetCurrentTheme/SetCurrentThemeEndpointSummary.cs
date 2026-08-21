@@ -41,7 +41,8 @@ public class SetCurrentThemeEndpointSummary : Summary<SetCurrentThemeEndpoint, S
                 PreviewPath: "preview.png",
                 InstallSource: ThemeInstallSource.Bundled,
                 IsCurrent: true,
-                InstalledAtUtc: DateTime.UtcNow
+                InstalledAtUtc: DateTime.UtcNow,
+                IsDeleted: false
             ));
 
         Response(401, "Authentication required.", "application/problem+json",

@@ -1,42 +1,34 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Contracts.Responses.Themes;
-using Lumina.Domain.SharedKernel.Common.Enums.Themes;
+using Lumina.Contracts.Requests.Themes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Themes.Management.InstallTheme;
+namespace Lumina.Presentation.Api.Core.Endpoints.Themes.Management.RestoreTheme;
 
 /// <summary>
-/// Class used for providing a textual description for the <see cref="InstallThemeEndpoint"/> API endpoint, for OpenAPI.
+/// Class used for providing a textual description for the <see cref="RestoreThemeEndpoint"/> API endpoint, for OpenAPI.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class InstallThemeEndpointSummary : Summary<InstallThemeEndpoint, EmptyRequest>
+public class RestoreThemeEndpointSummary : Summary<RestoreThemeEndpoint, RestoreThemeRequest>
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="InstallThemeEndpointSummary"/> class.
+    /// Initializes a new instance of the <see cref="RestoreThemeEndpointSummary"/> class.
     /// </summary>
-    public InstallThemeEndpointSummary()
+    public RestoreThemeEndpointSummary()
     {
-        Summary = "Installs a theme pack.";
-        Description = "Installs the theme pack uploaded in the multipart form of the request, replacing the files of an existing theme with the same manifest id.";
+        Summary = "Restores a deleted bundled theme.";
+        Description = "Restores the files and reactivates a bundled theme that was soft deleted by the user, restoring the pack from the shipped archive.";
 
-        Response(200, "The theme was successfully installed.",
-            example: new ThemeResponse(
-                Id: Guid.NewGuid(),
-                ThemeId: "lumina-default",
-                Name: "Lumina Default",
-                Description: "A clean, readable theme.",
-                Author: "Lumina Team",
-                Version: "1.2.0",
-                PreviewPath: "preview.png",
-                InstallSource: ThemeInstallSource.Uploaded,
-                IsCurrent: null,
-                InstalledAtUtc: DateTime.UtcNow,
-                IsDeleted: false
-            ));
+        ExampleRequest = new RestoreThemeRequest(
+            ThemeId: "editorial-paper"
+        );
+
+        RequestParam(r => r.ThemeId, "The manifest id of the bundled theme to restore. Required.");
+
+        Response(204, "The theme was successfully restored.");
 
         Response(401, "Authentication required.", "application/problem+json",
             example: new[]
@@ -47,7 +39,7 @@ public class InstallThemeEndpointSummary : Summary<InstallThemeEndpoint, EmptyRe
                     status = 401,
                     title = "Unauthorized",
                     detail = "You are not authorized",
-                    instance = "/api/v1/themes"
+                    instance = "/api/v1/themes/{themeId}/restore"
                 },
                 new
                 {
@@ -55,7 +47,7 @@ public class InstallThemeEndpointSummary : Summary<InstallThemeEndpoint, EmptyRe
                     status = 401,
                     title = "Unauthorized",
                     detail = "Invalid token: The token expired at '01/01/2024 01:00:00'",
-                    instance = "/api/v1/themes"
+                    instance = "/api/v1/themes/{themeId}/restore"
                 },
                 new
                 {
@@ -63,12 +55,12 @@ public class InstallThemeEndpointSummary : Summary<InstallThemeEndpoint, EmptyRe
                     status = 401,
                     title = "Unauthorized",
                     detail = "The token is invalid",
-                    instance = "/api/v1/themes"
+                    instance = "/api/v1/themes/{themeId}/restore"
                 }
             }
         );
 
-        Response(403, "The request failed because the user is not an Admin, or the uploaded theme pack is not readable.", "application/problem+json",
+        Response(403, "The request failed because the user is not an Admin or the theme is not a soft deleted bundled theme.", "application/problem+json",
             example: new[]
             {
                 new
@@ -77,7 +69,7 @@ public class InstallThemeEndpointSummary : Summary<InstallThemeEndpoint, EmptyRe
                     title = "General.Failure",
                     status = 403,
                     detail = "NotAuthorized",
-                    instance = "/api/v1/themes",
+                    instance = "/api/v1/themes/{themeId}/restore",
                     traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
                 },
                 new
@@ -85,19 +77,22 @@ public class InstallThemeEndpointSummary : Summary<InstallThemeEndpoint, EmptyRe
                     type = "https://tools.ietf.org/html/rfc9110#section-15.5.4",
                     title = "General.Failure",
                     status = 403,
-                    detail = "ThemeArchiveNotReadable",
-                    instance = "/api/v1/themes",
-                    traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
-                },
-                new
-                {
-                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.4",
-                    title = "General.Failure",
-                    status = 403,
-                    detail = "ThemeFilesUnreadable",
-                    instance = "/api/v1/themes",
+                    detail = "ThemeCannotBeRestored",
+                    instance = "/api/v1/themes/{themeId}/restore",
                     traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
                 }
+            }
+        );
+
+        Response(404, "The request failed because the provided theme does not exist.", "application/problem+json",
+            example: new
+            {
+                type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
+                title = "General.NotFound",
+                status = 404,
+                detail = "ThemeNotFound",
+                instance = "/api/v1/themes/{themeId}/restore",
+                traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
             }
         );
 
@@ -108,13 +103,13 @@ public class InstallThemeEndpointSummary : Summary<InstallThemeEndpoint, EmptyRe
                 title = "General.Validation",
                 status = 422,
                 detail = "OneOrMoreValidationErrorsOccurred",
-                instance = "/api/v1/themes",
+                instance = "/api/v1/themes/{themeId}/restore",
                 errors = new Dictionary<string, string[]>
                 {
                     {
                         "General.Validation", new[]
                         {
-                            "ThemeArchiveCannotBeNull"
+                            "ThemeIdCannotBeEmpty"
                         }
                     }
                 },

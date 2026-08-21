@@ -33,7 +33,8 @@ public class GetCurrentThemeEndpointSummary : Summary<GetCurrentThemeEndpoint, E
                 PreviewPath: "preview.png",
                 InstallSource: ThemeInstallSource.Bundled,
                 IsCurrent: true,
-                InstalledAtUtc: DateTime.UtcNow
+                InstalledAtUtc: DateTime.UtcNow,
+                IsDeleted: false
             ));
     }
 }

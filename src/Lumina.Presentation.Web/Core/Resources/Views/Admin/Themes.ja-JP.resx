@@ -144,6 +144,9 @@
   <data name="Download" xml:space="preserve">
     <value>ダウンロード</value>
   </data>
+  <data name="Restore" xml:space="preserve">
+    <value>復元</value>
+  </data>
   <data name="Upload" xml:space="preserve">
     <value>アップロード</value>
   </data>

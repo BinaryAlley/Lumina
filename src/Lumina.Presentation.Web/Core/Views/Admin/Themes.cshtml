@@ -5,6 +5,7 @@
 @using Lumina.Presentation.Web.Common.DTO.Themes
 @using Lumina.Presentation.Web.Common.Services
 @using Microsoft.AspNetCore.Mvc.Localization
+@using System.Linq
 
 @{
     var themes = ViewData["themes"] as IReadOnlyList<ThemeInfoDto>;
@@ -14,7 +15,7 @@
     int bundledThemeCount = 0;
     if (themes is not null)
         foreach (ThemeInfoDto theme in themes)
-            if (theme.IsBundled)
+            if (theme.IsBundled && !theme.IsDeleted)
                 bundledThemeCount++;
 }
 
@@ -109,7 +110,7 @@
                         @foreach (ThemeInfoDto theme in themes)
                         {
                             bool isCurrent = theme.Id == currentThemeId;
-                            bool isLastRemaining = themes.Count <= 1 || (theme.IsBundled && bundledThemeCount == 1);
+                            bool isLastRemaining = themes.Count(theme => !theme.IsDeleted) <= 1 || (theme.IsBundled && bundledThemeCount == 1);
                             <tr data-theme-id="@theme.Id">
                                 <td class="text-center">
                                     <button type="button" class="theme-preview-button" data-preview-url="@theme.PreviewUrl" data-preview-title="@theme.Name" title="@_localizer["Preview"]">
@@ -122,9 +123,16 @@
                                 <td>@(theme.IsBundled ? _localizer["Bundled"] : _localizer["UserProvided"])</td>
                                 <td class="text-end">
                                     <div class="form-row">
-                                        <button type="button" class="confirm-button activate-theme-button" data-url="@_urlService.GetAbsoluteUrl(WebRoutes.Themes.SET_CURRENT_THEME)" @(isCurrent ? "disabled" : null)>@_localizer["Activate"]</button>
-                                        <button type="button" class="confirm-button download-theme-button" data-url="@_urlService.GetAbsoluteUrl(WebRoutes.Themes.DOWNLOAD_THEME, new { themeId = theme.Id })">@_localizer["Download"]</button>
-                                        <button type="button" class="abort-button delete-theme-button" data-url="@_urlService.GetAbsoluteUrl(WebRoutes.Themes.DELETE_THEME, new { themeId = theme.Id })" @(isLastRemaining ? "disabled" : null)>@_localizer["Delete"]</button>
+                                        @if (theme.IsDeleted)
+                                        {
+                                            <button type="button" class="confirm-button restore-theme-button" data-url="@_urlService.GetAbsoluteUrl(WebRoutes.Themes.RESTORE_THEME, new { themeId = theme.Id })">@_localizer["Restore"]</button>
+                                        }
+                                        else
+                                        {
+                                            <button type="button" class="confirm-button activate-theme-button" data-url="@_urlService.GetAbsoluteUrl(WebRoutes.Themes.SET_CURRENT_THEME)" @(isCurrent ? "disabled" : null)>@_localizer["Activate"]</button>
+                                            <button type="button" class="confirm-button download-theme-button" data-url="@_urlService.GetAbsoluteUrl(WebRoutes.Themes.DOWNLOAD_THEME, new { themeId = theme.Id })">@_localizer["Download"]</button>
+                                            <button type="button" class="abort-button delete-theme-button" data-url="@_urlService.GetAbsoluteUrl(WebRoutes.Themes.DELETE_THEME, new { themeId = theme.Id })" @(isLastRemaining ? "disabled" : null)>@_localizer["Delete"]</button>
+                                        }
                                     </div>
                                 </td>
                             </tr>
@@ -169,6 +177,16 @@
                 await callApiDeleteAsync(button.dataset.url);
                 reloadPage();
             }
+        }
+
+        // restores the soft deleted bundled theme of the clicked row
+        async function handleRestoreClick(event) {
+            const button = event.target.closest('.restore-theme-button');
+            if (!button)
+                return;
+            // an empty JSON body is sent so the antiforgery-protected POST request binds the route theme id without a JsonException
+            await callApiPostAsync(button.dataset.url, {});
+            reloadPage();
         }
 
         // downloads the archive of the theme of the clicked row
@@ -227,6 +245,7 @@
         document.addEventListener('click', handleActivateClick);
         document.addEventListener('click', handleDownloadClick);
         document.addEventListener('click', handleDeleteClick);
+        document.addEventListener('click', handleRestoreClick);
         document.addEventListener('click', handlePreviewClick);
 
         // register cleanup for these listeners
@@ -236,6 +255,7 @@
             document.removeEventListener('click', handleActivateClick);
             document.removeEventListener('click', handleDownloadClick);
             document.removeEventListener('click', handleDeleteClick);
+            document.removeEventListener('click', handleRestoreClick);
             document.removeEventListener('click', handlePreviewClick);
         });
 

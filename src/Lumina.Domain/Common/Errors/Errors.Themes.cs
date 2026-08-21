@@ -18,6 +18,7 @@ public static partial class Errors
         public static Error ThemeArchiveCannotBeNull => Error.Validation(description: nameof(ThemeArchiveCannotBeNull));
         public static Error LastBundledThemeCannotBeDeleted => Error.Forbidden(description: nameof(LastBundledThemeCannotBeDeleted));
         public static Error ThemeCannotBeDeleted => Error.Forbidden(description: nameof(ThemeCannotBeDeleted));
+        public static Error ThemeCannotBeRestored => Error.Forbidden(description: nameof(ThemeCannotBeRestored));
         public static Error ThemeArchiveNotReadable => Error.Failure(description: nameof(ThemeArchiveNotReadable));
         public static Error ThemeFilesUnreadable => Error.Failure(description: nameof(ThemeFilesUnreadable));
         public static Error ThemeNotAvailable => Error.Failure(description: nameof(ThemeNotAvailable));
