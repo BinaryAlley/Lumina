@@ -7,6 +7,7 @@ using Lumina.Infrastructure.Common.Models.DTO.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -61,8 +62,14 @@ public sealed class ThemeService : IThemeService
     private readonly string _storageRoot;
     private readonly string _stagingRoot;
     private readonly string _bundledRoot;
-    // serializes theme pack mutations, so concurrent installs and deletes cannot race on the same files
-    private readonly SemaphoreSlim _mutationGate = new(1, 1);
+    // serializes theme pack mutations, so concurrent installs and deletes cannot race on the same files; the gate is
+    // shared by every instance that writes to the same storage root, because several hosts can run against the same
+    // storage directory at once (for example the parallel in-memory hosts started by the test factories). A per-instance
+    // gate is NOT enough: concurrent hosts raced on the shared staging cleanup and one host's directory move failed with
+    // an access denied exception, which crashed that host and disposed its service provider. Keep the gate keyed on the
+    // resolved storage root.
+    private static readonly ConcurrentDictionary<string, SemaphoreSlim> s_storageGates = new(StringComparer.Ordinal);
+    private readonly SemaphoreSlim _mutationGate;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ThemeService"/> class.
@@ -77,6 +84,7 @@ public sealed class ThemeService : IThemeService
         _storageRoot = ResolvePath(basePath, _options.StoragePath);
         _stagingRoot = Path.Combine(_storageRoot, ".staging");
         _bundledRoot = ResolvePath(basePath, _options.BundledThemesPath);
+        _mutationGate = s_storageGates.GetOrAdd(_storageRoot, static _ => new SemaphoreSlim(1, 1));
     }
 
     /// <summary>
@@ -153,10 +161,7 @@ public sealed class ThemeService : IThemeService
 
                 // install means replace: the files of an existing theme with the same manifest id are swapped with the new pack
                 string destination = Path.Combine(_storageRoot, manifestResult.Value.Id);
-                if (Directory.Exists(destination))
-                    Directory.Delete(destination, recursive: true);
-
-                Directory.Move(extractionPath, destination);
+                await SwapIntoDestinationAsync(extractionPath, destination, cancellationToken);
                 return manifestResult.Value;
             }
             catch (InvalidDataException exception)
@@ -814,6 +819,39 @@ public sealed class ThemeService : IThemeService
             catch (IOException exception)
             {
                 _logger.LogDebug(exception, "Could not remove stale theme staging path {StagingPath}.", path);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Moves an extracted theme pack into the storage directory, replacing an existing pack with the same manifest id.
+    /// </summary>
+    /// <remarks>
+    /// The move is retried on transient file system errors, because a concurrent process may briefly hold a file of the
+    /// destination directory open (for example another host serving a template while this installation replaces the pack).
+    /// Without the retry, that transient contention aborts the install and, when triggered by the startup job, crashes the
+    /// whole host.
+    /// </remarks>
+    /// <param name="extractionPath">The directory of the extracted theme pack in the staging area.</param>
+    /// <param name="destination">The storage directory the theme pack is moved to.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    private static async Task SwapIntoDestinationAsync(string extractionPath, string destination, CancellationToken cancellationToken)
+    {
+        const int maxAttempts = 10;
+        for (int attempt = 1; ; attempt++)
+        {
+            try
+            {
+                if (Directory.Exists(destination))
+                    Directory.Delete(destination, recursive: true);
+
+                Directory.Move(extractionPath, destination);
+                return;
+            }
+            catch (IOException) when (attempt < maxAttempts)
+            {
+                await Task.Delay(100 * attempt, cancellationToken);
             }
         }
     }
