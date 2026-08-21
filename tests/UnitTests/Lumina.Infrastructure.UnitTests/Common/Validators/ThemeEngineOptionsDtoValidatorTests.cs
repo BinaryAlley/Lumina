@@ -3,6 +3,7 @@ using Lumina.Domain.Common.Primitives;
 using Lumina.Infrastructure.Common.Errors;
 using Lumina.Infrastructure.Common.Models.DTO.Configuration;
 using Lumina.Infrastructure.Common.Validators;
+using Lumina.Infrastructure.Fixtures.Common.Models.DTO.Configuration;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
@@ -16,12 +17,13 @@ namespace Lumina.Infrastructure.UnitTests.Common.Validators;
 public class ThemeEngineOptionsDtoValidatorTests
 {
     private readonly ThemeEngineOptionsDtoValidator _validator = new();
+    private readonly ThemeEngineOptionsDtoFixture _themeEngineOptionsDtoFixture = new();
 
     [Fact]
     public void Validate_WhenAllPropertiesValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        ThemeEngineOptionsDto options = new();
+        ThemeEngineOptionsDto options = _themeEngineOptionsDtoFixture.Create();
 
         // Act
         List<Error> result = _validator.Validate(options);
@@ -34,7 +36,7 @@ public class ThemeEngineOptionsDtoValidatorTests
     public void Validate_WhenStoragePathIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        ThemeEngineOptionsDto options = new() { StoragePath = string.Empty };
+        ThemeEngineOptionsDto options = _themeEngineOptionsDtoFixture.Create(storagePath: string.Empty);
 
         // Act
         List<Error> result = _validator.Validate(options);
@@ -48,7 +50,7 @@ public class ThemeEngineOptionsDtoValidatorTests
     public void Validate_WhenBundledThemesPathIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        ThemeEngineOptionsDto options = new() { BundledThemesPath = string.Empty };
+        ThemeEngineOptionsDto options = _themeEngineOptionsDtoFixture.Create(bundledThemesPath: string.Empty);
 
         // Act
         List<Error> result = _validator.Validate(options);
@@ -62,7 +64,7 @@ public class ThemeEngineOptionsDtoValidatorTests
     public void Validate_WhenDefaultThemeIdIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        ThemeEngineOptionsDto options = new() { DefaultThemeId = string.Empty };
+        ThemeEngineOptionsDto options = _themeEngineOptionsDtoFixture.Create(defaultThemeId: string.Empty);
 
         // Act
         List<Error> result = _validator.Validate(options);
@@ -78,7 +80,7 @@ public class ThemeEngineOptionsDtoValidatorTests
     public void Validate_WhenMaxArchiveBytesIsNotPositive_ShouldHaveValidationError(long maxArchiveBytes)
     {
         // Arrange
-        ThemeEngineOptionsDto options = new() { MaxArchiveBytes = maxArchiveBytes };
+        ThemeEngineOptionsDto options = _themeEngineOptionsDtoFixture.Create(maxArchiveBytes: maxArchiveBytes);
 
         // Act
         List<Error> result = _validator.Validate(options);
@@ -94,7 +96,7 @@ public class ThemeEngineOptionsDtoValidatorTests
     public void Validate_WhenMaxExpandedBytesIsNotPositive_ShouldHaveValidationError(long maxExpandedBytes)
     {
         // Arrange
-        ThemeEngineOptionsDto options = new() { MaxExpandedBytes = maxExpandedBytes };
+        ThemeEngineOptionsDto options = _themeEngineOptionsDtoFixture.Create(maxExpandedBytes: maxExpandedBytes);
 
         // Act
         List<Error> result = _validator.Validate(options);
@@ -110,7 +112,7 @@ public class ThemeEngineOptionsDtoValidatorTests
     public void Validate_WhenMaxSingleFileBytesIsNotPositive_ShouldHaveValidationError(long maxSingleFileBytes)
     {
         // Arrange
-        ThemeEngineOptionsDto options = new() { MaxSingleFileBytes = maxSingleFileBytes };
+        ThemeEngineOptionsDto options = _themeEngineOptionsDtoFixture.Create(maxSingleFileBytes: maxSingleFileBytes);
 
         // Act
         List<Error> result = _validator.Validate(options);
@@ -126,7 +128,7 @@ public class ThemeEngineOptionsDtoValidatorTests
     public void Validate_WhenMaxEntriesIsNotPositive_ShouldHaveValidationError(int maxEntries)
     {
         // Arrange
-        ThemeEngineOptionsDto options = new() { MaxEntries = maxEntries };
+        ThemeEngineOptionsDto options = _themeEngineOptionsDtoFixture.Create(maxEntries: maxEntries);
 
         // Act
         List<Error> result = _validator.Validate(options);
