@@ -51,7 +51,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="Themes\Bundled\*.zip">
+        <Content Include="Core\Themes\Bundled\*.zip">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
             <Link>themes\bundled\%(Filename)%(Extension)</Link>

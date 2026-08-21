@@ -57,7 +57,8 @@ $RECYCLE.BIN/
 
 # Archives
 *.zip
-!src/Lumina.Presentation.Api/Themes/Bundled/*.zip # bundled themes should be tracked
+# bundled themes should be tracked
+!src/Lumina.Presentation.Api/Core/Themes/Bundled/*.zip
 *.tar.gz
 *.rar
 
