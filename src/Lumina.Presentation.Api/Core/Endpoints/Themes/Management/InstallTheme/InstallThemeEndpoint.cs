@@ -6,6 +6,7 @@ using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Common.Routes.Themes;
 using Lumina.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -47,7 +48,20 @@ public class InstallThemeEndpoint : BaseEndpoint<FastEndpoints.EmptyRequest, IRe
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(FastEndpoints.EmptyRequest request, CancellationToken cancellationToken)
     {
-        IFormFile? archive = HttpContext.Request.Form.Files.FirstOrDefault();
+        // a multipart body without any part cannot be parsed as a form, so a malformed upload is treated as a missing archive
+        IFormFile? archive = null;
+        if (HttpContext.Request.HasFormContentType)
+        {
+            try
+            {
+                archive = HttpContext.Request.Form.Files.FirstOrDefault();
+            }
+            catch (InvalidDataException)
+            {
+                archive = null;
+            }
+        }
+
         InstallThemeCommand command = new(archive?.OpenReadStream(), archive?.FileName);
         Result<ThemeResponse> result = await _installThemeCommandHandler.HandleAsync(command, cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
