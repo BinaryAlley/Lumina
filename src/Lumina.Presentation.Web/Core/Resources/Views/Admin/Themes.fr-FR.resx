@@ -156,4 +156,16 @@
   <data name="Preview" xml:space="preserve">
     <value>Aperçu</value>
   </data>
+  <data name="ThemeTrustWarning" xml:space="preserve">
+    <value>Les thèmes sont des contenus tiers et peuvent exécuter du code, y compris du JavaScript, dans votre navigateur. N'installez que des thèmes provenant de sources fiables. Les thèmes fournis avec l'application sont vérifiés et sûrs.</value>
+  </data>
+  <data name="Source" xml:space="preserve">
+    <value>Source</value>
+  </data>
+  <data name="Bundled" xml:space="preserve">
+    <value>Intégré</value>
+  </data>
+  <data name="UserProvided" xml:space="preserve">
+    <value>Utilisateur</value>
+  </data>
 </root>

@@ -47,6 +47,27 @@
     #themes-table td {
         vertical-align: middle;
     }
+
+    .theme-trust-warning {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #b8860b;
+        border-radius: 4px;
+        background-color: rgba(184, 134, 11, 0.15);
+        color: var(--text-foreground);
+        font-family: monospace;
+        font-size: 0.85rem;
+    }
+
+    .theme-trust-warning-icon {
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+        margin-top: 1px;
+    }
 </style>
 
 <div style="display: grid; grid-template-rows: auto 1fr;">
@@ -60,6 +81,12 @@
             <button id="btn-upload-theme" type="button" class="confirm-button">@_localizer["Upload"]</button>
             <input id="theme-upload-input" type="file" accept=".zip" hidden />
         </div>
+        <div class="form-row" style="margin-bottom: 0.75rem;">
+            <div class="theme-trust-warning">
+                <img class="theme-trust-warning-icon" src="~/images/ui/warning.svg" alt="" />
+                <span>@_localizer["ThemeTrustWarning"]</span>
+            </div>
+        </div>
         <div class="form-row">
             @if (themes is null || themes.Count == 0)
             {
@@ -71,10 +98,11 @@
                     <thead class="text-light-two">
                         <tr>
                             <th class="w-10">@_localizer["Preview"]</th>
-                            <th class="w-25">@_localizer["Name"]</th>
+                            <th class="w-20">@_localizer["Name"]</th>
                             <th class="w-15">@_localizer["Version"]</th>
-                            <th class="w-25">@_localizer["Author"]</th>
-                            <th class="w-25">@_localizer["Actions"]</th>
+                            <th class="w-20">@_localizer["Author"]</th>
+                            <th class="w-15">@_localizer["Source"]</th>
+                            <th class="w-20">@_localizer["Actions"]</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -91,6 +119,7 @@
                                 <td>@theme.Name</td>
                                 <td>@theme.Version</td>
                                 <td>@theme.Author</td>
+                                <td>@(theme.IsBundled ? _localizer["Bundled"] : _localizer["UserProvided"])</td>
                                 <td class="text-end">
                                     <div class="form-row">
                                         <button type="button" class="confirm-button activate-theme-button" data-url="@_urlService.GetAbsoluteUrl(WebRoutes.Themes.SET_CURRENT_THEME)" @(isCurrent ? "disabled" : null)>@_localizer["Activate"]</button>

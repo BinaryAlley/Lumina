@@ -156,4 +156,16 @@
   <data name="Preview" xml:space="preserve">
     <value>预览</value>
   </data>
+  <data name="ThemeTrustWarning" xml:space="preserve">
+    <value>主题是第三方内容，可能在您的浏览器中执行代码（包括 JavaScript）。请只安装来自可信来源的主题。随应用程序附带的主题已经过审查，是安全的。</value>
+  </data>
+  <data name="Source" xml:space="preserve">
+    <value>来源</value>
+  </data>
+  <data name="Bundled" xml:space="preserve">
+    <value>内置</value>
+  </data>
+  <data name="UserProvided" xml:space="preserve">
+    <value>用户</value>
+  </data>
 </root>
