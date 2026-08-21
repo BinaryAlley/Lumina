@@ -90,11 +90,13 @@ public class Program
         app.UseCultureRedirect(); // if the user attempts to go to a localized route without providing a culture, redirect to default culture
         app.UseApiExceptionHandling(); // handle any problem details returned by the API
         app.UseRouting();
-        app.UseAntiforgeryFE(additionalContentTypes: ["application/json"]); // validate the antiforgery token of the JSON requests, sent via the RequestVerificationToken header
         app.UseRequestLocalization(); // set the culture from the localized routes
         app.UseSession();
         app.UseAuthentication();
         app.UseAuthorization();
+        // validate the antiforgery token after authentication, because the token is bound to the authenticated user and
+        // validating it before the user is known would reject every request made by a logged-in user
+        app.UseAntiforgeryFE(additionalContentTypes: ["application/json"]);
         app.UseForwardedHeaders();
 
         // handle path base from reverse proxies
