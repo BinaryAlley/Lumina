@@ -18,6 +18,7 @@ namespace Lumina.Presentation.Web.Core.Themes;
 /// </summary>
 public sealed class ThemeTemplateEngine
 {
+    // bound template nesting and rendered output, so a single theme cannot exhaust the server memory
     private const int MAX_NESTING_DEPTH = 32;
     private const int MAX_RENDERED_CHARACTERS = 4 * 1024 * 1024;
 

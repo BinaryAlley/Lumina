@@ -37,6 +37,7 @@ public class GetThemeSettingsEndpoint : BaseEndpoint<EmptyRequest, IResult>
         Verbs(Http.GET);
         Routes(ApiRoutes.Themes.GET_THEME_SETTINGS);
         Version(1);
+        // theme content is public, since the web renders themed pages for anonymous visitors too (i.e.: login page); only install and manage operations are admin-gated
         AllowAnonymous();
         DontCatchExceptions();
     }

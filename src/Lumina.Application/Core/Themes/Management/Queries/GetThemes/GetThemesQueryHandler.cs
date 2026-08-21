@@ -47,6 +47,7 @@ public class GetThemesQueryHandler : IQueryHandler<GetThemesQuery, Result<IReadO
 
         return Result.From<IReadOnlyList<ThemeResponse>>([.. getThemesResult.Value
             .Where(theme => !theme.IsDeleted)
+            // the shipped bundled themes are listed before the user themes, so the defaults stay the most visible
             .OrderByDescending(theme => theme.InstallSource == ThemeInstallSource.Bundled)
             .ThenBy(theme => theme.Name, StringComparer.OrdinalIgnoreCase)
             .Select(theme => theme.ToResponse())]);

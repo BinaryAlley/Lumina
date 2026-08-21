@@ -17,6 +17,7 @@ public static class ThemePageDataFactory
     /// <returns>The localized strings keyed by their resource names.</returns>
     public static Dictionary<string, object?> CreateLocalizedStrings(IStringLocalizer localizer)
     {
+        // expose the page's full resource set, so templates can pull any localized string without the page enumerating keys
         Dictionary<string, object?> strings = [];
         foreach (LocalizedString localizedString in localizer.GetAllStrings(includeParentCultures: true))
             strings[localizedString.Name] = localizedString.Value;

@@ -51,6 +51,7 @@ public class ThemeAssetsEndpoint : BaseEndpoint<GetThemeAssetRequest, IResult>
         if (string.IsNullOrWhiteSpace(request.ThemeId) || string.IsNullOrWhiteSpace(request.Path))
             return Results.Problem(statusCode: StatusCodes.Status400BadRequest, detail: "The theme id and the asset path are required.");
 
+        // the API route token is a catch-all ("{*assetPath}"), so the replace target must include the star to match it
         BlobDataDto blob = await _apiHttpClient.GetBlobAsync(
             ApiRoutes.Themes.GET_THEME_ASSET.Replace("{themeId}", request.ThemeId).Replace("{*assetPath}", request.Path), cancellationToken).ConfigureAwait(false);
         return Results.File(blob.Data, blob.ContentType);

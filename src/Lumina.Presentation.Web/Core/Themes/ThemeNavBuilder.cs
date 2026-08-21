@@ -60,6 +60,8 @@ public sealed class ThemeNavBuilder
         string returnUrl = Uri.EscapeDataString(GetCurrentRequestUrl());
         ThemeNavEntryDto[] languages = CreateLanguageEntries(returnUrl);
 
+        // the mobile and desktop menus arrange the same sections differently, notably the language switcher, which is
+        // its own mobile heading but a submenu under Tools on the desktop, so each menu gets its own section list
         List<ThemeNavSectionDto> mobileSections = [];
         mobileSections.Add(CreateSiteSection());
         mobileSections.Add(CreateAccountSection(isAuthenticated));

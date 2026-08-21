@@ -40,6 +40,7 @@ public class ThemePageRenderer
 
         model.ThemeId = document.Theme.Id;
         model.AssetBase = $"/theme-assets/{document.Theme.Id}/assets";
+        // a fresh script id per render lets the AJAX navigator unload this view's script when navigating away
         model.ScriptId = ScriptIdentifierHelper.GenerateScriptId();
 
         return _templateEngine.RenderPage(document.Template, model);

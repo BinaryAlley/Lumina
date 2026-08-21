@@ -49,6 +49,7 @@ public sealed class RazorViewToStringRenderer
     /// <returns>The rendered HTML of the partial.</returns>
     public async Task<string> RenderPartialAsync(string partialName, CancellationToken cancellationToken = default)
     {
+        // the theme shell reuses the application's Razor chrome as strings, so the same markup stays in one place
         HttpContext httpContext = _httpContextAccessor.HttpContext ?? throw new InvalidOperationException("The current HTTP context is unavailable.");
         ActionContext actionContext = new(httpContext, httpContext.GetRouteData() ?? new RouteData(), new ActionDescriptor());
         IView view = _viewEngine.FindView(actionContext, partialName, isMainPage: false).View

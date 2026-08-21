@@ -61,6 +61,7 @@ public sealed class ThemeService : IThemeService
     private readonly string _storageRoot;
     private readonly string _stagingRoot;
     private readonly string _bundledRoot;
+    // serializes theme pack mutations, so concurrent installs and deletes cannot race on the same files
     private readonly SemaphoreSlim _mutationGate = new(1, 1);
 
     /// <summary>
@@ -484,6 +485,7 @@ public sealed class ThemeService : IThemeService
             if (entry.Length > _options.MaxSingleFileBytes)
                 return Error.Validation(code: "Theme.File.TooLarge", description: $"Theme file '{normalizedPath}' is too large.");
 
+            // guard the total decompressed size, so a tiny archive cannot expand into a decompression bomb
             expandedBytes += entry.Length;
             if (expandedBytes > _options.MaxExpandedBytes)
                 return Error.Validation(code: "Theme.Archive.ExpandedTooLarge", description: "The expanded theme archive is too large.");
@@ -506,6 +508,7 @@ public sealed class ThemeService : IThemeService
                 if (read == 0)
                     break;
 
+                // enforce the per-file limit while streaming, because the declared entry size is not trustworthy
                 entryBytes += read;
                 if (entryBytes > _options.MaxSingleFileBytes)
                     return Error.Validation(code: "Theme.File.TooLarge", description: $"Theme file '{normalizedPath}' is too large.");
