@@ -153,4 +153,7 @@
   <data name="DeleteThemeConfirm" xml:space="preserve">
     <value>Sigur doriți să ștergeți tema specificată?</value>
   </data>
+  <data name="Preview" xml:space="preserve">
+    <value>Previzualizare</value>
+  </data>
 </root>

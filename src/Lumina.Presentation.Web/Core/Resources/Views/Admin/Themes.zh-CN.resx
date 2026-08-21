@@ -153,4 +153,7 @@
   <data name="DeleteThemeConfirm" xml:space="preserve">
     <value>确定要删除指定的主题吗？</value>
   </data>
+  <data name="Preview" xml:space="preserve">
+    <value>预览</value>
+  </data>
 </root>

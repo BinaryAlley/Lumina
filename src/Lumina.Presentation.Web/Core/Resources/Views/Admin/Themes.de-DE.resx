@@ -153,4 +153,7 @@
   <data name="DeleteThemeConfirm" xml:space="preserve">
     <value>Möchten Sie das angegebene Thema wirklich löschen?</value>
   </data>
+  <data name="Preview" xml:space="preserve">
+    <value>Vorschau</value>
+  </data>
 </root>

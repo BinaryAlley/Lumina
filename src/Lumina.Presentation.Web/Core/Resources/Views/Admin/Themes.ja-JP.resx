@@ -153,4 +153,7 @@
   <data name="DeleteThemeConfirm" xml:space="preserve">
     <value>指定されたテーマを削除しますか？</value>
   </data>
+  <data name="Preview" xml:space="preserve">
+    <value>プレビュー</value>
+  </data>
 </root>

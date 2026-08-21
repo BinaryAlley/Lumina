@@ -1,0 +1,146 @@
+.image-viewer-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1001;
+    background-color: rgba(0, 0, 0, 0.85);
+    align-items: center;
+    justify-content: center;
+}
+
+.image-viewer-overlay.open {
+    display: flex;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.image-viewer-stage {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 92%;
+    max-height: 92%;
+}
+
+.image-viewer-image {
+    max-width: 100%;
+    max-height: 88vh;
+    object-fit: contain;
+    opacity: 0;
+    border: 1px solid #505050;
+    background-color: #000;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+}
+
+.image-viewer-image.loaded {
+    opacity: 1;
+    transition: opacity 0.2s ease-out;
+}
+
+.image-viewer-caption {
+    margin-top: 12px;
+    color: var(--text-foreground);
+    font-family: monospace;
+    font-size: 0.95rem;
+    text-align: center;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.image-viewer-spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 40px;
+    height: 40px;
+    margin: -20px 0 0 -20px;
+    border: 4px solid rgba(255, 255, 255, 0.25);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: image-viewer-spin 0.8s linear infinite;
+}
+
+@keyframes image-viewer-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.image-viewer-button {
+    position: absolute;
+    width: 44px;
+    height: 44px;
+    border: 1px solid #505050;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.image-viewer-button:hover {
+    border-color: var(--text-foreground);
+    background-color: rgba(0, 0, 0, 0.75);
+}
+
+.image-viewer-button:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+.image-viewer-close {
+    top: 18px;
+    right: 18px;
+}
+
+.image-viewer-close::before,
+.image-viewer-close::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 2px;
+    background-color: var(--text-foreground);
+}
+
+.image-viewer-close::before {
+    transform: rotate(45deg);
+}
+
+.image-viewer-close::after {
+    transform: rotate(-45deg);
+}
+
+.image-viewer-prev {
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.image-viewer-prev::before {
+    content: '';
+    width: 12px;
+    height: 12px;
+    margin-left: 5px;
+    border-left: 3px solid var(--text-foreground);
+    border-bottom: 3px solid var(--text-foreground);
+    transform: rotate(45deg);
+}
+
+.image-viewer-next {
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.image-viewer-next::before {
+    content: '';
+    width: 12px;
+    height: 12px;
+    margin-right: 5px;
+    border-right: 3px solid var(--text-foreground);
+    border-top: 3px solid var(--text-foreground);
+    transform: rotate(45deg);
+}

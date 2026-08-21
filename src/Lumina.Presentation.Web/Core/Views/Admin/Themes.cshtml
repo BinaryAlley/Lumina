@@ -23,6 +23,32 @@
 
 @Html.AntiForgeryToken()
 
+<style>
+    .theme-preview-button {
+        border: 1px solid #505050;
+        border-radius: 3px;
+        background-color: #000;
+        padding: 2px;
+        line-height: 0;
+        cursor: pointer;
+    }
+
+    .theme-preview-button:hover {
+        border-color: var(--text-foreground);
+        box-shadow: 0 0 4px var(--shadow-color);
+    }
+
+    .theme-preview-thumb {
+        width: 64px;
+        height: 40px;
+        object-fit: cover;
+    }
+
+    #themes-table td {
+        vertical-align: middle;
+    }
+</style>
+
 <div style="display: grid; grid-template-rows: auto 1fr;">
     <div style="min-height: 1rem;"></div>
     <div class="enlightenment-panel shadow-effect mx-auto panel w-75 mb-10" style="min-width: 320px;">
@@ -30,7 +56,7 @@
         <div class="form-row">
             <h1 class="text-light-two w-100 text-center pt-0 pb-0 engraved-title">@_localizer["Themes"]</h1>
         </div>
-        <div class="form-row">
+        <div class="form-row" style="margin-bottom: 0.75rem;">
             <button id="btn-upload-theme" type="button" class="confirm-button">@_localizer["Upload"]</button>
             <input id="theme-upload-input" type="file" accept=".zip" hidden />
         </div>
@@ -44,10 +70,11 @@
                 <table id="themes-table">
                     <thead class="text-light-two">
                         <tr>
-                            <th class="w-30">@_localizer["Name"]</th>
+                            <th class="w-10">@_localizer["Preview"]</th>
+                            <th class="w-25">@_localizer["Name"]</th>
                             <th class="w-15">@_localizer["Version"]</th>
                             <th class="w-25">@_localizer["Author"]</th>
-                            <th class="w-30">@_localizer["Actions"]</th>
+                            <th class="w-25">@_localizer["Actions"]</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -56,13 +83,20 @@
                             bool isCurrent = theme.Id == currentThemeId;
                             bool isLastRemaining = themes.Count <= 1 || (theme.IsBundled && bundledThemeCount == 1);
                             <tr data-theme-id="@theme.Id">
+                                <td class="text-center">
+                                    <button type="button" class="theme-preview-button" data-preview-url="@theme.PreviewUrl" data-preview-title="@theme.Name" title="@_localizer["Preview"]">
+                                        <img class="theme-preview-thumb" src="@theme.PreviewUrl" alt="@theme.Name" loading="lazy" />
+                                    </button>
+                                </td>
                                 <td>@theme.Name</td>
                                 <td>@theme.Version</td>
                                 <td>@theme.Author</td>
-                                <td class="form-row">
-                                    <button type="button" class="confirm-button activate-theme-button" data-url="@_urlService.GetAbsoluteUrl(WebRoutes.Themes.SET_CURRENT_THEME)" @(isCurrent ? "disabled" : null)>@_localizer["Activate"]</button>
-                                    <button type="button" class="confirm-button download-theme-button" data-url="@_urlService.GetAbsoluteUrl(WebRoutes.Themes.DOWNLOAD_THEME, new { themeId = theme.Id })">@_localizer["Download"]</button>
-                                    <button type="button" class="abort-button delete-theme-button" data-url="@_urlService.GetAbsoluteUrl(WebRoutes.Themes.DELETE_THEME, new { themeId = theme.Id })" @(isLastRemaining ? "disabled" : null)>@_localizer["Delete"]</button>
+                                <td class="text-end">
+                                    <div class="form-row">
+                                        <button type="button" class="confirm-button activate-theme-button" data-url="@_urlService.GetAbsoluteUrl(WebRoutes.Themes.SET_CURRENT_THEME)" @(isCurrent ? "disabled" : null)>@_localizer["Activate"]</button>
+                                        <button type="button" class="confirm-button download-theme-button" data-url="@_urlService.GetAbsoluteUrl(WebRoutes.Themes.DOWNLOAD_THEME, new { themeId = theme.Id })">@_localizer["Download"]</button>
+                                        <button type="button" class="abort-button delete-theme-button" data-url="@_urlService.GetAbsoluteUrl(WebRoutes.Themes.DELETE_THEME, new { themeId = theme.Id })" @(isLastRemaining ? "disabled" : null)>@_localizer["Delete"]</button>
+                                    </div>
                                 </td>
                             </tr>
                         }
@@ -115,6 +149,25 @@
                 window.location.href = button.dataset.url;
         }
 
+        // opens the image viewer with the preview of the clicked theme
+        function handlePreviewClick(event) {
+            const button = event.target.closest('.theme-preview-button');
+            if (button)
+                imageViewer.open([{ src: button.dataset.previewUrl, title: button.dataset.previewTitle }]);
+        }
+
+        // falls back to the placeholder image when the preview of a theme is missing or fails to load
+        function attachPreviewErrorFallbacks() {
+            const placeholderUrl = '@Url.Content("~/admin/theme-placeholder.svg")';
+            document.querySelectorAll('.theme-preview-thumb').forEach(img => {
+                img.addEventListener('error', function handlePreviewError() {
+                    img.removeEventListener('error', handlePreviewError);
+                    img.src = placeholderUrl;
+                });
+            });
+        }
+        attachPreviewErrorFallbacks();
+
         // uploads the selected theme archive as a multipart request, keeping the antiforgery token
         async function handleUploadInputChange() {
             const file = uploadInput.files[0];
@@ -145,6 +198,7 @@
         document.addEventListener('click', handleActivateClick);
         document.addEventListener('click', handleDownloadClick);
         document.addEventListener('click', handleDeleteClick);
+        document.addEventListener('click', handlePreviewClick);
 
         // register cleanup for these listeners
         cleanupFunctions.push(() => {
@@ -153,6 +207,7 @@
             document.removeEventListener('click', handleActivateClick);
             document.removeEventListener('click', handleDownloadClick);
             document.removeEventListener('click', handleDeleteClick);
+            document.removeEventListener('click', handlePreviewClick);
         });
 
         // store all cleanups for this view on window object using the scriptId

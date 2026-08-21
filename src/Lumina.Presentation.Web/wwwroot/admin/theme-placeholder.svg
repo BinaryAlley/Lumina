@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="120" viewBox="0 0 200 120">
+  <rect width="200" height="120" fill="#232323"/>
+  <rect x="0" y="0" width="200" height="3" fill="#404040"/>
+  <rect x="70" y="30" width="60" height="46" rx="4" fill="none" stroke="#404040" stroke-width="4"/>
+  <circle cx="90" cy="44" r="5" fill="#404040"/>
+  <polygon points="70,76 100,50 116,66 130,54 140,76" fill="#404040"/>
+  <text x="100" y="104" font-family="monospace" font-size="10" fill="#6DCBFE" text-anchor="middle">No preview</text>
+</svg>
