@@ -10,7 +10,7 @@ namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.GetPa
 /// Class used for providing a textual description for the <see cref="GetPathSeparatorEndpoint"/> API endpoint, for OpenAPI.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetPathSeparatorEndpointSummary : Summary<GetPathSeparatorEndpoint>
+public class GetPathSeparatorEndpointSummary : Summary<GetPathSeparatorEndpoint, EmptyRequest>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="GetPathSeparatorEndpointSummary"/> class.

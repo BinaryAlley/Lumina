@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
+using Lumina.Contracts.Requests.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Library.Management.ScanLibrary;
 /// Class used for providing a textual description for the <see cref="ScanLibraryEndpoint"/> API endpoint, for OpenAPI.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class ScanLibraryEndpointSummary : Summary<ScanLibraryEndpoint, EmptyRequest>
+public class ScanLibraryEndpointSummary : Summary<ScanLibraryEndpoint, ScanLibraryRequest>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="ScanLibraryEndpointSummary"/> class.
@@ -21,6 +22,12 @@ public class ScanLibraryEndpointSummary : Summary<ScanLibraryEndpoint, EmptyRequ
     {
         Summary = "Triggers the scan of a media library.";
         Description = "Starts the scanning process of a media library of a user.";
+
+        ExampleRequest = new ScanLibraryRequest(
+            Id: Guid.NewGuid()
+        );
+
+        RequestParam(r => r.Id, "The unique identifier of the media library to be scanned. Required.");
 
         Response(200, "The media library scan was successfully started.",
             example: new MediaLibraryScanResponse(

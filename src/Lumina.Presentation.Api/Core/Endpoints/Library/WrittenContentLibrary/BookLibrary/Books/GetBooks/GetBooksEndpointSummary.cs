@@ -3,9 +3,11 @@ using FastEndpoints;
 using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Contracts.Responses.Common;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -17,7 +19,7 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.B
 /// Class used for providing a textual description for the <see cref="GetBooksEndpoint"/> API endpoint, for OpenAPI.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetBooksEndpointSummary : Summary<GetBooksEndpoint>
+public class GetBooksEndpointSummary : Summary<GetBooksEndpoint, GetBooksRequest>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="GetBooksEndpointSummary"/> class.
@@ -27,6 +29,21 @@ public class GetBooksEndpointSummary : Summary<GetBooksEndpoint>
         Summary = "Retrieves the list of books.";
         Description = "Returns the entire list of books.";
 
+        ExampleRequest = new GetBooksRequest(
+            LibraryId: Guid.NewGuid(),
+            CurrentPage: 1,
+            PerPage: 48,
+            SearchTerm: "fellowship",
+            SortBy: "title",
+            SortOrder: SortOrder.Ascending
+        );
+
+        RequestParam(r => r.LibraryId, "The Id of the media library whose books are retrieved. Required.");
+        RequestParam(r => r.CurrentPage, "The page of results to retrieve. Optional.");
+        RequestParam(r => r.PerPage, "The maximum number of books to retrieve per page. Optional.");
+        RequestParam(r => r.SearchTerm, "The search term used to filter results. Optional.");
+        RequestParam(r => r.SortBy, "The name of the field by which to sort the results. Optional.");
+        RequestParam(r => r.SortOrder, "The direction in which to sort the results. Optional.");
 
         Response(200, "The paginated list of books is returned.",
             example: new PaginatedResponse<BookResponse>

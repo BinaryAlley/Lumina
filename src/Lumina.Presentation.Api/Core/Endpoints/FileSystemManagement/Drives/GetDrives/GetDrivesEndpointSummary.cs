@@ -2,7 +2,6 @@
 using FastEndpoints;
 using Lumina.Contracts.Responses.FileSystemManagement.Common;
 using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -12,7 +11,7 @@ namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Drives.Get
 /// Class used for providing a textual description for the <see cref="GetDrivesEndpoint"/> API endpoint, for OpenAPI.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetDrivesEndpointSummary : Summary<GetDrivesEndpoint>
+public class GetDrivesEndpointSummary : Summary<GetDrivesEndpoint, EmptyRequest>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="GetDrivesEndpointSummary"/> class.

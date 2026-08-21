@@ -10,7 +10,7 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Maintenance.ApplicationSetup;
 /// Class used for providing a textual description for the <see cref="CheckInitializationEndpoint"/> API endpoint, for OpenAPI.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class CheckInitializationEndpointSummary : Summary<CheckInitializationEndpoint>
+public class CheckInitializationEndpointSummary : Summary<CheckInitializationEndpoint, EmptyRequest>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="CheckInitializationEndpointSummary"/> class.
