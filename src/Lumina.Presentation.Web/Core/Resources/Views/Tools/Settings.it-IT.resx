@@ -39,4 +39,10 @@
   <data name="DescriptionIgnoreThePrefixForAlphaPicker" xml:space="preserve">
     <value>Se abilitato, gli elementi della libreria il cui titolo inizia con "The" vengono raggruppati sotto la prima lettera della parola successiva nel selettore alfabetico, ad esempio "The Rasmus" è elencato sotto R.</value>
   </data>
+  <data name="EnableThemeCaching" xml:space="preserve">
+    <value>Abilita la cache dei temi</value>
+  </data>
+  <data name="DescriptionEnableThemeCaching" xml:space="preserve">
+    <value>Controlla se i file dei temi serviti dall'applicazione vengono memorizzati nella cache. Disattivalo mentre modifichi i file dei temi affinché le modifiche appaiano immediatamente.</value>
+  </data>
 </root>

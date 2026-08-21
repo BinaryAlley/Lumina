@@ -72,7 +72,7 @@ public class UserSettingsTests
         UserId userId = _userIdFixture.Create();
 
         // Act
-        Result<UserSettings> result = UserSettings.Create(userId, isPaginationEnabled: false, itemsPerPage: 24, ignoreThePrefixForAlphaPicker: true);
+        Result<UserSettings> result = UserSettings.Create(userId, isPaginationEnabled: false, itemsPerPage: 24, ignoreThePrefixForAlphaPicker: true, isThemeCachingEnabled: true);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -80,6 +80,7 @@ public class UserSettingsTests
         Assert.False(result.Value.IsPaginationEnabled);
         Assert.Equal(24, result.Value.ItemsPerPage);
         Assert.True(result.Value.IgnoreThePrefixForAlphaPicker);
+        Assert.True(result.Value.IsThemeCachingEnabled);
     }
 
     [Fact]
@@ -105,7 +106,7 @@ public class UserSettingsTests
         UserId userId = _userIdFixture.Create();
 
         // Act
-        Result<UserSettings> result = UserSettings.Create(userId, isPaginationEnabled: true, itemsPerPage: itemsPerPage, ignoreThePrefixForAlphaPicker: false);
+        Result<UserSettings> result = UserSettings.Create(userId, isPaginationEnabled: true, itemsPerPage: itemsPerPage, ignoreThePrefixForAlphaPicker: false, isThemeCachingEnabled: true);
 
         // Assert
         Assert.True(result.IsFailure);
@@ -119,13 +120,14 @@ public class UserSettingsTests
         UserSettings userSettings = _userSettingsFixture.Create();
 
         // Act
-        Result<Updated> result = userSettings.UpdateSettings(isPaginationEnabled: false, itemsPerPage: 12, ignoreThePrefixForAlphaPicker: true);
+        Result<Updated> result = userSettings.UpdateSettings(isPaginationEnabled: false, itemsPerPage: 12, ignoreThePrefixForAlphaPicker: true, isThemeCachingEnabled: false);
 
         // Assert
         Assert.False(result.IsFailure);
         Assert.False(userSettings.IsPaginationEnabled);
         Assert.Equal(12, userSettings.ItemsPerPage);
         Assert.True(userSettings.IgnoreThePrefixForAlphaPicker);
+        Assert.False(userSettings.IsThemeCachingEnabled);
     }
 
     [Theory]
@@ -137,7 +139,7 @@ public class UserSettingsTests
         UserSettings userSettings = _userSettingsFixture.Create();
 
         // Act
-        Result<Updated> result = userSettings.UpdateSettings(isPaginationEnabled: true, itemsPerPage: itemsPerPage, ignoreThePrefixForAlphaPicker: false);
+        Result<Updated> result = userSettings.UpdateSettings(isPaginationEnabled: true, itemsPerPage: itemsPerPage, ignoreThePrefixForAlphaPicker: false, isThemeCachingEnabled: true);
 
         // Assert
         Assert.True(result.IsFailure);

@@ -30,4 +30,9 @@ public class UserSettingsDto
     /// Gets or sets whether the "The" prefix of library item titles is ignored by the alpha picker, or not.
     /// </summary>
     public bool IgnoreThePrefixForAlphaPicker { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the theme data served to this user is cached, or not.
+    /// </summary>
+    public bool IsThemeCachingEnabled { get; set; } = true;
 }

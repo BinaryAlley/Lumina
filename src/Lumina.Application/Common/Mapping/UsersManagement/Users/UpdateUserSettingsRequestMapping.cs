@@ -20,6 +20,7 @@ public static class UpdateUserSettingsRequestMapping
         return new UpdateUserSettingsCommand(
             request.IsPaginationEnabled,
             request.ItemsPerPage,
-            request.IgnoreThePrefixForAlphaPicker);
+            request.IgnoreThePrefixForAlphaPicker,
+            request.IsThemeCachingEnabled);
     }
 }

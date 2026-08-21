@@ -59,7 +59,8 @@ public class UpdateUserSettingsEndpointTests : IClassFixture<AuthenticatedLumina
         UpdateUserSettingsRequest request = new(
             IsPaginationEnabled: false,
             ItemsPerPage: 24,
-            IgnoreThePrefixForAlphaPicker: true
+            IgnoreThePrefixForAlphaPicker: true,
+            IsThemeCachingEnabled: false
         );
 
         // Act
@@ -77,6 +78,7 @@ public class UpdateUserSettingsEndpointTests : IClassFixture<AuthenticatedLumina
         Assert.False(storedSettings.IsPaginationEnabled);
         Assert.Equal(24, storedSettings.ItemsPerPage);
         Assert.True(storedSettings.IgnoreThePrefixForAlphaPicker);
+        Assert.False(storedSettings.IsThemeCachingEnabled);
     }
 
     [Fact]
@@ -86,7 +88,8 @@ public class UpdateUserSettingsEndpointTests : IClassFixture<AuthenticatedLumina
         UpdateUserSettingsRequest request = new(
             IsPaginationEnabled: true,
             ItemsPerPage: 0,
-            IgnoreThePrefixForAlphaPicker: false
+            IgnoreThePrefixForAlphaPicker: false,
+            IsThemeCachingEnabled: true
         );
 
         // Act
@@ -118,7 +121,8 @@ public class UpdateUserSettingsEndpointTests : IClassFixture<AuthenticatedLumina
         UpdateUserSettingsRequest request = new(
             IsPaginationEnabled: true,
             ItemsPerPage: 48,
-            IgnoreThePrefixForAlphaPicker: false
+            IgnoreThePrefixForAlphaPicker: false,
+            IsThemeCachingEnabled: true
         );
 
         // Act

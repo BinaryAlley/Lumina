@@ -21,7 +21,7 @@ public class UpdateUserSettingsRequestTests
     public void RoundTrip_WhenSerializingUpdateUserSettingsRequest_ShouldPreserveValues()
     {
         // Arrange
-        UpdateUserSettingsRequest expected = new(true, 50, true);
+        UpdateUserSettingsRequest expected = new(true, 50, true, true);
 
         // Act
         string json = JsonSerializer.Serialize(expected, _jsonOptions);
@@ -36,14 +36,15 @@ public class UpdateUserSettingsRequestTests
     public void Deconstruct_WhenCalled_ShouldReturnAllProperties()
     {
         // Arrange
-        UpdateUserSettingsRequest sut = new(false, 25, false);
+        UpdateUserSettingsRequest sut = new(false, 25, false, false);
 
         // Act
-        (bool isPaginationEnabled, int itemsPerPage, bool ignoreThePrefixForAlphaPicker) = sut;
+        (bool isPaginationEnabled, int itemsPerPage, bool ignoreThePrefixForAlphaPicker, bool isThemeCachingEnabled) = sut;
 
         // Assert
         Assert.Equal(sut.IsPaginationEnabled, isPaginationEnabled);
         Assert.Equal(sut.ItemsPerPage, itemsPerPage);
         Assert.Equal(sut.IgnoreThePrefixForAlphaPicker, ignoreThePrefixForAlphaPicker);
+        Assert.Equal(sut.IsThemeCachingEnabled, isThemeCachingEnabled);
     }
 }

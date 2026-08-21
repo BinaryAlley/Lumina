@@ -37,7 +37,7 @@ public class UpdateUserSettingsEndpointTests
     public async Task ExecuteAsync_WhenSuccessful_ShouldReturnOkResultWithUpdatedMarker()
     {
         // Arrange
-        UpdateUserSettingsRequest request = new(true, 48, false);
+        UpdateUserSettingsRequest request = new(true, 48, false, true);
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<UpdateUserSettingsCommand>(), Arg.Any<CancellationToken>())
             .Returns(Result.Updated);
@@ -54,7 +54,7 @@ public class UpdateUserSettingsEndpointTests
     public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
     {
         // Arrange
-        UpdateUserSettingsRequest request = new(true, 0, false);
+        UpdateUserSettingsRequest request = new(true, 0, false, true);
         CancellationToken cancellationToken = CancellationToken.None;
         Error expectedError = Error.Validation("UserSettings.ItemsPerPageMustBeGreaterThanZero", "ItemsPerPage must be greater than zero.");
         _mockHandler.HandleAsync(Arg.Any<UpdateUserSettingsCommand>(), Arg.Any<CancellationToken>())
@@ -76,7 +76,7 @@ public class UpdateUserSettingsEndpointTests
     public async Task ExecuteAsync_WhenCalled_ShouldSendUpdateUserSettingsCommandToHandler()
     {
         // Arrange
-        UpdateUserSettingsRequest request = new(true, 24, true);
+        UpdateUserSettingsRequest request = new(true, 24, true, true);
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<UpdateUserSettingsCommand>(), Arg.Any<CancellationToken>())
             .Returns(Result.Updated);
@@ -89,7 +89,8 @@ public class UpdateUserSettingsEndpointTests
             Arg.Is<UpdateUserSettingsCommand>(command =>
                 command.IsPaginationEnabled == request.IsPaginationEnabled &&
                 command.ItemsPerPage == request.ItemsPerPage &&
-                command.IgnoreThePrefixForAlphaPicker == request.IgnoreThePrefixForAlphaPicker),
+                command.IgnoreThePrefixForAlphaPicker == request.IgnoreThePrefixForAlphaPicker &&
+                command.IsThemeCachingEnabled == request.IsThemeCachingEnabled),
             Arg.Is(cancellationToken));
     }
 
@@ -111,7 +112,7 @@ public class UpdateUserSettingsEndpointTests
             }, info.Arg<CancellationToken>()));
 
         // Act
-        Task<IResult> operationTask = _sut.ExecuteAsync(new UpdateUserSettingsRequest(true, 48, false), cts.Token);
+        Task<IResult> operationTask = _sut.ExecuteAsync(new UpdateUserSettingsRequest(true, 48, false, true), cts.Token);
         await operationStarted.Task;
         cts.Cancel();
         cancellationRequested.SetResult(true);

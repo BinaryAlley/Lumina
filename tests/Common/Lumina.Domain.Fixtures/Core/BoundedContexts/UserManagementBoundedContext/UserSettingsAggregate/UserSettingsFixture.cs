@@ -23,18 +23,21 @@ public class UserSettingsFixture
     /// <param name="isPaginationEnabled">Whether pagination is enabled for the user.</param>
     /// <param name="itemsPerPage">The number of library items displayed per page when pagination is enabled.</param>
     /// <param name="ignoreThePrefixForAlphaPicker">Whether the "The" prefix of library item titles is ignored by the alpha picker.</param>
+    /// <param name="isThemeCachingEnabled">Whether the theme data served to this user is cached.</param>
     /// <returns>The created <see cref="UserSettings"/>.</returns>
     public UserSettings Create(
         Guid? userId = null,
         bool isPaginationEnabled = true,
         int itemsPerPage = 48,
-        bool ignoreThePrefixForAlphaPicker = false)
+        bool ignoreThePrefixForAlphaPicker = false,
+        bool isThemeCachingEnabled = true)
     {
         Result<UserSettings> settings = UserSettings.Create(
             userId is null ? UserId.CreateUnique() : UserId.Create(userId.Value),
             isPaginationEnabled,
             itemsPerPage,
-            ignoreThePrefixForAlphaPicker);
+            ignoreThePrefixForAlphaPicker,
+            isThemeCachingEnabled);
         return settings.Value;
     }
 

@@ -38,6 +38,11 @@ public class UserSettingsEntity : IStorageEntity, IAuditableEntity
     public bool IgnoreThePrefixForAlphaPicker { get; set; }
 
     /// <summary>
+    /// Gets or sets whether the theme data served to this user is cached, or not.
+    /// </summary>
+    public bool IsThemeCachingEnabled { get; set; } = true;
+
+    /// <summary>
     /// Gets or sets the time and date when the entity was added.
     /// </summary>
     public DateTime CreatedOnUtc { get; set; }

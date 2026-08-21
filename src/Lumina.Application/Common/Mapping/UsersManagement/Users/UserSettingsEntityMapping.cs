@@ -28,7 +28,8 @@ public static class UserSettingsEntityMapping
             UserId.Create(repositoryEntity.UserId),
             repositoryEntity.IsPaginationEnabled,
             repositoryEntity.ItemsPerPage,
-            repositoryEntity.IgnoreThePrefixForAlphaPicker);
+            repositoryEntity.IgnoreThePrefixForAlphaPicker,
+            repositoryEntity.IsThemeCachingEnabled);
     }
 
     /// <summary>
@@ -42,6 +43,7 @@ public static class UserSettingsEntityMapping
             repositoryEntity.UserId,
             repositoryEntity.IsPaginationEnabled,
             repositoryEntity.ItemsPerPage,
-            repositoryEntity.IgnoreThePrefixForAlphaPicker);
+            repositoryEntity.IgnoreThePrefixForAlphaPicker,
+            repositoryEntity.IsThemeCachingEnabled);
     }
 }

@@ -39,7 +39,7 @@ public class GetUserSettingsEndpointTests
     {
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;
-        UserSettingsResponse expectedResponse = new(Guid.NewGuid(), true, 48, false);
+        UserSettingsResponse expectedResponse = new(Guid.NewGuid(), true, 48, false, true);
         _mockHandler.HandleAsync(Arg.Any<GetUserSettingsQuery>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(expectedResponse));
 
@@ -79,7 +79,7 @@ public class GetUserSettingsEndpointTests
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<GetUserSettingsQuery>(), Arg.Any<CancellationToken>())
-            .Returns(Result.From(new UserSettingsResponse(Guid.NewGuid(), true, 48, false)));
+            .Returns(Result.From(new UserSettingsResponse(Guid.NewGuid(), true, 48, false, true)));
 
         // Act
         await _sut.ExecuteAsync(EmptyRequest.Instance, cancellationToken);
@@ -104,7 +104,7 @@ public class GetUserSettingsEndpointTests
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 info.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return Result.From(new UserSettingsResponse(Guid.NewGuid(), true, 48, false));
+                return Result.From(new UserSettingsResponse(Guid.NewGuid(), true, 48, false, true));
             }, info.Arg<CancellationToken>()));
 
         // Act

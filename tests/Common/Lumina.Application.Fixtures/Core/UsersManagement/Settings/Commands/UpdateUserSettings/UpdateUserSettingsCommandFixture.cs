@@ -20,17 +20,20 @@ public class UpdateUserSettingsCommandFixture
     /// <param name="isPaginationEnabled">Optional. Whether pagination is enabled for the user, or not.</param>
     /// <param name="itemsPerPage">Optional. The number of library items displayed per page when pagination is enabled.</param>
     /// <param name="ignoreThePrefixForAlphaPicker">Optional. Whether the "The" prefix is ignored by the alpha picker, or not.</param>
+    /// <param name="isThemeCachingEnabled">Optional. Whether the theme data served to this user is cached, or not.</param>
     /// <returns>The created command.</returns>
     public UpdateUserSettingsCommand Create(
         bool? isPaginationEnabled = null,
         int? itemsPerPage = null,
-        bool? ignoreThePrefixForAlphaPicker = null)
+        bool? ignoreThePrefixForAlphaPicker = null,
+        bool? isThemeCachingEnabled = null)
     {
         return new Faker<UpdateUserSettingsCommand>()
-            .CustomInstantiator(f => new UpdateUserSettingsCommand(default, default, default))
+            .CustomInstantiator(f => new UpdateUserSettingsCommand(default, default, default, default))
             .RuleFor(x => x.IsPaginationEnabled, f => isPaginationEnabled ?? f.Random.Bool())
             .RuleFor(x => x.ItemsPerPage, f => itemsPerPage ?? f.Random.Int(1, 100))
             .RuleFor(x => x.IgnoreThePrefixForAlphaPicker, f => ignoreThePrefixForAlphaPicker ?? f.Random.Bool())
+            .RuleFor(x => x.IsThemeCachingEnabled, f => isThemeCachingEnabled ?? f.Random.Bool())
             .Generate();
     }
 

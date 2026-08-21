@@ -65,6 +65,19 @@
                     </div>
                     <small class="form-label text-disabled form-description">@_localizer["DescriptionIgnoreThePrefixForAlphaPicker"]</small>
                 </div>
+                <!-- Theme caching -->
+                <div class="form-row">
+                    <div class="form-label">
+                        <label asp-for="IsThemeCachingEnabled">@_localizer["EnableThemeCaching"]</label>:
+                    </div>
+                    <div class="form-field">
+                        <label class="enlightenment-checkbox-label">
+                            <input type="checkbox" asp-for="IsThemeCachingEnabled" class="enlightenment-checkbox-hidden" />
+                            <span class="enlightenment-checkbox"></span>
+                        </label>
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionEnableThemeCaching"]</small>
+                </div>
                 <div class="form-row" style="justify-content: center;">
                     <button type="submit" class="confirm-button h-22px">@_localizer["Save"]</button>
                 </div>
@@ -82,6 +95,7 @@
         const checkboxIsPaginationEnabled = document.getElementById('IsPaginationEnabled');
         const inputItemsPerPage = document.getElementById('ItemsPerPage');
         const checkboxIgnoreThePrefixForAlphaPicker = document.getElementById('IgnoreThePrefixForAlphaPicker');
+        const checkboxIsThemeCachingEnabled = document.getElementById('IsThemeCachingEnabled');
 
         // toggle the enabled state of the items per page input based on the pagination checkbox
         function updateItemsPerPageEnabledState() {
@@ -95,6 +109,7 @@
                 checkboxIsPaginationEnabled.checked = data.isPaginationEnabled === true;
                 inputItemsPerPage.value = data.itemsPerPage;
                 checkboxIgnoreThePrefixForAlphaPicker.checked = data.ignoreThePrefixForAlphaPicker === true;
+                checkboxIsThemeCachingEnabled.checked = data.isThemeCachingEnabled === true;
                 updateItemsPerPageEnabledState();
             }
         }
@@ -104,7 +119,8 @@
             const formData = {
                 IsPaginationEnabled: checkboxIsPaginationEnabled.checked,
                 ItemsPerPage: Number(inputItemsPerPage.value),
-                IgnoreThePrefixForAlphaPicker: checkboxIgnoreThePrefixForAlphaPicker.checked
+                IgnoreThePrefixForAlphaPicker: checkboxIgnoreThePrefixForAlphaPicker.checked,
+                IsThemeCachingEnabled: checkboxIsThemeCachingEnabled.checked
             };
             const data = await callApiPostAsync('@_urlService.GetAbsoluteUrl(WebRoutes.Settings.UPDATE_USER_SETTINGS)', formData);
             if (data && data.isUpdated === true)

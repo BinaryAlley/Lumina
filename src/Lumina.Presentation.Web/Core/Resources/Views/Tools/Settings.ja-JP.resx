@@ -39,4 +39,10 @@
   <data name="DescriptionIgnoreThePrefixForAlphaPicker" xml:space="preserve">
     <value>有効にすると、タイトルが「The」で始まるライブラリの項目は、アルファピッカーで次の単語の最初の文字の下にグループ化されます。たとえば「The Rasmus」は「R」の下に表示されます。</value>
   </data>
+  <data name="EnableThemeCaching" xml:space="preserve">
+    <value>テーマキャッシュを有効にする</value>
+  </data>
+  <data name="DescriptionEnableThemeCaching" xml:space="preserve">
+    <value>アプリケーションが提供するテーマファイルをキャッシュするかどうかを制御します。テーマファイルを編集している間はオフにして、変更がすぐに反映されるようにします。</value>
+  </data>
 </root>

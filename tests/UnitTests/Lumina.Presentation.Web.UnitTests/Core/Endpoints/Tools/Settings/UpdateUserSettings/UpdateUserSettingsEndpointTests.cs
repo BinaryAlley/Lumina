@@ -3,10 +3,13 @@ using FastEndpoints;
 using Lumina.Presentation.Web.Common.Api;
 using Lumina.Presentation.Web.Common.DTO.UsersManagement;
 using Lumina.Presentation.Web.Common.Routes;
+using Lumina.Presentation.Web.Common.Services;
 using Lumina.Presentation.Web.Core.Endpoints.Tools.Settings.UpdateUserSettings;
 using Lumina.Presentation.Web.Fixtures.Common.DTO.UsersManagement;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Hybrid;
+using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
@@ -32,7 +35,14 @@ public class UpdateUserSettingsEndpointTests
     public UpdateUserSettingsEndpointTests()
     {
         _mockApiHttpClient = Substitute.For<IApiHttpClient>();
-        _sut = Factory.Create<UpdateUserSettingsEndpoint>(_mockApiHttpClient);
+        _sut = Factory.Create<UpdateUserSettingsEndpoint>(_mockApiHttpClient, CreateThemeCachePreferenceService());
+    }
+
+    private static ThemeCachePreferenceService CreateThemeCachePreferenceService()
+    {
+        ServiceCollection services = new();
+        services.AddHybridCache();
+        return new ThemeCachePreferenceService(services.BuildServiceProvider().GetRequiredService<HybridCache>());
     }
 
     [Fact]

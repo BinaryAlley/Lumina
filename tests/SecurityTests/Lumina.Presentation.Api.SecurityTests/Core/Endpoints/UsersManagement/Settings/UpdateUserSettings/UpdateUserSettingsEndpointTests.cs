@@ -50,7 +50,8 @@ public class UpdateUserSettingsEndpointTests : IClassFixture<LuminaApiFactory>
         UpdateUserSettingsRequest request = new(
             IsPaginationEnabled: true,
             ItemsPerPage: 48,
-            IgnoreThePrefixForAlphaPicker: false
+            IgnoreThePrefixForAlphaPicker: false,
+            IsThemeCachingEnabled: true
         );
 
         // Act
@@ -79,7 +80,8 @@ public class UpdateUserSettingsEndpointTests : IClassFixture<LuminaApiFactory>
         UpdateUserSettingsRequest request = new(
             IsPaginationEnabled: true,
             ItemsPerPage: int.MaxValue,
-            IgnoreThePrefixForAlphaPicker: false
+            IgnoreThePrefixForAlphaPicker: false,
+            IsThemeCachingEnabled: true
         );
 
         // Act
@@ -101,7 +103,8 @@ public class UpdateUserSettingsEndpointTests : IClassFixture<LuminaApiFactory>
         UpdateUserSettingsRequest request = new(
             IsPaginationEnabled: true,
             ItemsPerPage: int.MinValue,
-            IgnoreThePrefixForAlphaPicker: false
+            IgnoreThePrefixForAlphaPicker: false,
+            IsThemeCachingEnabled: true
         );
 
         // Act

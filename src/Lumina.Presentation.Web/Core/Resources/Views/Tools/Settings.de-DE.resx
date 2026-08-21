@@ -39,4 +39,10 @@
   <data name="DescriptionIgnoreThePrefixForAlphaPicker" xml:space="preserve">
     <value>Wenn aktiviert, werden Bibliothekselemente, deren Titel mit "The" beginnt, in der Alpha-Auswahl unter dem ersten Buchstaben des folgenden Wortes gruppiert, z. B. wird "The Rasmus" unter R aufgeführt.</value>
   </data>
+  <data name="EnableThemeCaching" xml:space="preserve">
+    <value>Themencache aktivieren</value>
+  </data>
+  <data name="DescriptionEnableThemeCaching" xml:space="preserve">
+    <value>Gibt an, ob die von der Anwendung bereitgestellten Themendateien zwischengespeichert werden. Deaktivieren Sie diese Option beim Bearbeiten von Themendateien, damit die Änderungen sofort erscheinen.</value>
+  </data>
 </root>

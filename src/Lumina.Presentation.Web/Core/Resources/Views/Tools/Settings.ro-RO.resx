@@ -39,4 +39,10 @@
   <data name="DescriptionIgnoreThePrefixForAlphaPicker" xml:space="preserve">
     <value>Când este activată, elementele bibliotecii al căror titlu începe cu "The" sunt grupate sub prima literă a cuvântului următor în selectorul alfabetic, de exemplu "The Rasmus" este listat sub R.</value>
   </data>
+  <data name="EnableThemeCaching" xml:space="preserve">
+    <value>Activează cache-ul temelor</value>
+  </data>
+  <data name="DescriptionEnableThemeCaching" xml:space="preserve">
+    <value>Controlează dacă fișierele temelor servite de aplicație sunt puse în cache. Dezactivați această opțiune în timp ce editați fișierele temelor, pentru ca modificările să apară imediat.</value>
+  </data>
 </root>

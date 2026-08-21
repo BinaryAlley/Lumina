@@ -47,6 +47,10 @@ public class UserSettingsConfiguration : IEntityTypeConfiguration<UserSettingsEn
             .IsRequired()
             .HasColumnOrder(4);
 
+        builder.Property(settings => settings.IsThemeCachingEnabled)
+            .IsRequired()
+            .HasColumnOrder(9);
+
         // audit
         builder.Property(settings => settings.CreatedOnUtc)
             .IsRequired()
