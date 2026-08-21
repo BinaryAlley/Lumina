@@ -159,6 +159,11 @@
             window.location.reload();
         }
 
+        // refreshes the current page content without reloading the page, so the media player keeps playing
+        function refreshPageContent() {
+            updateContentAsync(window.location.href, false);
+        }
+
         // activates the theme of the clicked row
         async function handleActivateClick(event) {
             const button = event.target.closest('.activate-theme-button');
@@ -175,7 +180,7 @@
                 return;
             if (await dialogService.show('@_localizer["DeleteThemeConfirm"]', jsLocalizedDialogs.confirmation, DialogButtons.YES_NO, DialogIcon.QUESTION) === DialogButton.YES) {
                 await callApiDeleteAsync(button.dataset.url);
-                reloadPage();
+                refreshPageContent();
             }
         }
 
@@ -186,7 +191,7 @@
                 return;
             // an empty JSON body is sent so the antiforgery-protected POST request binds the route theme id without a JsonException
             await callApiPostAsync(button.dataset.url, {});
-            reloadPage();
+            refreshPageContent();
         }
 
         // downloads the archive of the theme of the clicked row
@@ -229,7 +234,7 @@
                 body: formData
             });
             if (response.ok)
-                reloadPage();
+                refreshPageContent();
             else
                 notificationService.show('@_localizer["UploadFailed"]', NotificationType.ERROR);
         }
