@@ -12,6 +12,7 @@ public static partial class WebRoutes
     {
         public const string MANAGE_ROLES = "{culture}/admin/manage-roles";
         public const string MANAGE_PERMISSIONS = "{culture}/admin/manage-permissions";
+        public const string MANAGE_THEMES = "{culture}/admin/manage-themes";
         public const string GET_PERMISSIONS_BY_ROLE_ID = "{culture}/admin/api-get-permissions-by-role-id/{roleId}";
         public const string GET_PERMISSIONS_BY_USER_ID = "{culture}/admin/api-get-permissions-by-user-id/{userId}";
         public const string GET_ROLE_BY_USER_ID = "{culture}/admin/api-get-role-by-user-id/{userId}";

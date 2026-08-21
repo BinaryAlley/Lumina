@@ -192,6 +192,9 @@
   <data name="ManagePermissions" xml:space="preserve">
     <value>管理权限</value>
   </data>
+  <data name="Themes" xml:space="preserve">
+    <value>主题</value>
+  </data>
   <data name="Tools" xml:space="preserve">
     <value>工具</value>
   </data>

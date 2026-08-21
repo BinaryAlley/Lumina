@@ -133,7 +133,8 @@ public sealed class ThemeNavBuilder
             [
                 new ThemeNavEntryDto(Localize("ManageRoles"), _urlService.GetAbsoluteUrl(WebRoutes.Admin.MANAGE_ROLES), "nav-link", []),
                 new ThemeNavEntryDto(Localize("ManagePermissions"), _urlService.GetAbsoluteUrl(WebRoutes.Admin.MANAGE_PERMISSIONS), "nav-link", []),
-                new ThemeNavEntryDto(Localize("Plugins"), _urlService.GetAbsoluteUrl(WebRoutes.Plugins.INDEX), "nav-link", [])
+                new ThemeNavEntryDto(Localize("Plugins"), _urlService.GetAbsoluteUrl(WebRoutes.Plugins.INDEX), "nav-link", []),
+                new ThemeNavEntryDto(Localize("Themes"), _urlService.GetAbsoluteUrl(WebRoutes.Admin.MANAGE_THEMES), "nav-link", [])
             ]);
     }
 

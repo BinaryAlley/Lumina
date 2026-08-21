@@ -192,6 +192,9 @@
   <data name="ManagePermissions" xml:space="preserve">
     <value>Administrar permisos</value>
   </data>
+  <data name="Themes" xml:space="preserve">
+    <value>Temas</value>
+  </data>
   <data name="Tools" xml:space="preserve">
     <value>Herramientas</value>
   </data>
