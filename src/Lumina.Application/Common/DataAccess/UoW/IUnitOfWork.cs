@@ -3,6 +3,7 @@ using Lumina.Application.Common.DataAccess.Repositories.Authorization;
 using Lumina.Application.Common.DataAccess.Repositories.Books;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
+using Lumina.Application.Common.DataAccess.Repositories.Themes;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using System.Threading;
 using System.Threading.Tasks;
@@ -74,6 +75,11 @@ public interface IUnitOfWork
     /// Gets the plugin repository.
     /// </summary>
     IPluginRepository PluginRepository { get; }
+
+    /// <summary>
+    /// Gets the theme repository.
+    /// </summary>
+    IThemeRepository ThemeRepository { get; }
 
     /// <summary>
     /// Gets the user repository.

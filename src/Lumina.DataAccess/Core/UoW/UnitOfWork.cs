@@ -3,12 +3,14 @@ using Lumina.Application.Common.DataAccess.Repositories.Authorization;
 using Lumina.Application.Common.DataAccess.Repositories.Books;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
+using Lumina.Application.Common.DataAccess.Repositories.Themes;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.DataAccess.Core.Repositories.Authorization;
 using Lumina.DataAccess.Core.Repositories.Books;
 using Lumina.DataAccess.Core.Repositories.Libraries;
 using Lumina.DataAccess.Core.Repositories.Plugins;
+using Lumina.DataAccess.Core.Repositories.Themes;
 using Lumina.DataAccess.Core.Repositories.Users;
 using Microsoft.EntityFrameworkCore.Storage;
 using System;
@@ -38,6 +40,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     private ILibraryScanStagingResultsRepository? _libraryScanStagingResultsRepository;
     private ILibraryMetadataProviderConfigurationRepository? _libraryMetadataProviderConfigurationRepository;
     private IPluginRepository? _pluginRepository;
+    private IThemeRepository? _themeRepository;
     private IUserRepository? _userRepository;
     private IUserSettingsRepository? _userSettingsRepository;
 
@@ -182,6 +185,18 @@ public class UnitOfWork : IUnitOfWork, IDisposable
         {
             _pluginRepository ??= new PluginRepository(_luminaDbContext);
             return _pluginRepository;
+        }
+    }
+
+    /// <summary>
+    /// Gets the theme repository.
+    /// </summary>
+    public IThemeRepository ThemeRepository
+    {
+        get
+        {
+            _themeRepository ??= new ThemeRepository(_luminaDbContext);
+            return _themeRepository;
         }
     }
 

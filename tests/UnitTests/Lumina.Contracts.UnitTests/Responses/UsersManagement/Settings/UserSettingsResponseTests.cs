@@ -23,7 +23,7 @@ public class UserSettingsResponseTests
     {
         // Arrange
         Guid userId = Guid.NewGuid();
-        UserSettingsResponse expected = new(userId, true, 50, true);
+        UserSettingsResponse expected = new(userId, true, 50, true, true);
 
         // Act
         string json = JsonSerializer.Serialize(expected, _jsonOptions);
@@ -39,15 +39,16 @@ public class UserSettingsResponseTests
     {
         // Arrange
         Guid userId = Guid.NewGuid();
-        UserSettingsResponse sut = new(userId, false, 25, false);
+        UserSettingsResponse sut = new(userId, false, 25, false, false);
 
         // Act
-        (Guid sutUserId, bool isPaginationEnabled, int itemsPerPage, bool ignoreThePrefixForAlphaPicker) = sut;
+        (Guid sutUserId, bool isPaginationEnabled, int itemsPerPage, bool ignoreThePrefixForAlphaPicker, bool isThemeCachingEnabled) = sut;
 
         // Assert
         Assert.Equal(sut.UserId, sutUserId);
         Assert.Equal(sut.IsPaginationEnabled, isPaginationEnabled);
         Assert.Equal(sut.ItemsPerPage, itemsPerPage);
         Assert.Equal(sut.IgnoreThePrefixForAlphaPicker, ignoreThePrefixForAlphaPicker);
+        Assert.Equal(sut.IsThemeCachingEnabled, isThemeCachingEnabled);
     }
 }

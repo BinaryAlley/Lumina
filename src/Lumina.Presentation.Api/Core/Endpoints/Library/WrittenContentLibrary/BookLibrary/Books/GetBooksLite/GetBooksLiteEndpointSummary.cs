@@ -1,7 +1,9 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
+using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Contracts.Responses.Common;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -13,7 +15,7 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.B
 /// Class used for providing a textual description for the <see cref="GetBooksLiteEndpoint"/> API endpoint, for OpenAPI.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetBooksLiteEndpointSummary : Summary<GetBooksLiteEndpoint>
+public class GetBooksLiteEndpointSummary : Summary<GetBooksLiteEndpoint, GetBooksLiteRequest>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="GetBooksLiteEndpointSummary"/> class.
@@ -22,6 +24,26 @@ public class GetBooksLiteEndpointSummary : Summary<GetBooksLiteEndpoint>
     {
         Summary = "Retrieves the lightweight details of the list of books.";
         Description = "Returns a paginated list of the lightweight details of the books of the media library, suitable for card-style navigation.";
+
+        ExampleRequest = new GetBooksLiteRequest(
+            LibraryId: Guid.NewGuid(),
+            CurrentPage: 1,
+            PerPage: 48,
+            SearchTerm: "fellowship",
+            FilterAlphaKey: "f",
+            IgnoreThePrefixForAlphaPicker: true,
+            SortBy: "title",
+            SortOrder: SortOrder.Ascending
+        );
+
+        RequestParam(r => r.LibraryId, "The Id of the media library whose books are retrieved. Required.");
+        RequestParam(r => r.CurrentPage, "The page of results to retrieve. Optional.");
+        RequestParam(r => r.PerPage, "The maximum number of books to retrieve per page. Optional.");
+        RequestParam(r => r.SearchTerm, "The search term used to filter results. Optional.");
+        RequestParam(r => r.FilterAlphaKey, "The alpha key used to filter the results by the first character of their title, for the alpha picker. Optional.");
+        RequestParam(r => r.IgnoreThePrefixForAlphaPicker, "Whether the leading \"The \" prefix of a title should be ignored when computing the alpha key, or not. Required.");
+        RequestParam(r => r.SortBy, "The name of the field by which to sort the results. Optional.");
+        RequestParam(r => r.SortOrder, "The direction in which to sort the results. Optional.");
 
         Response(200, "The paginated list of lightweight book details is returned.",
             example: new PaginatedResponse<BookLiteResponse>

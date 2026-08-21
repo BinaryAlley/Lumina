@@ -321,6 +321,9 @@
   <data name="LanguageNativeNameMustBeMaximum50CharactersLong" xml:space="preserve">
     <value>¡El nombre nativo del idioma debe tener máximo 50 caracteres!</value>
   </data>
+  <data name="LastBundledThemeCannotBeDeleted" xml:space="preserve">
+    <value>¡El último tema incluido no se puede eliminar!</value>
+  </data>
   <data name="LibraryAlreadyExists" xml:space="preserve">
     <value>¡La biblioteca ya existe!</value>
   </data>
@@ -377,6 +380,9 @@
   </data>
   <data name="PageCountMustBeGreaterThanZero" xml:space="preserve">
     <value>¡El número de páginas debe ser mayor que cero!</value>
+  </data>
+  <data name="PageKeyCannotBeEmpty" xml:space="preserve">
+    <value>¡La clave de página no puede estar vacía!</value>
   </data>
   <data name="ParentNodeCannotBeNull" xml:space="preserve">
     <value>¡El nodo padre no puede ser nulo!</value>
@@ -488,6 +494,30 @@
   </data>
   <data name="TheBookIsNotInTheSeries" xml:space="preserve">
     <value>¡El libro no está en la serie!</value>
+  </data>
+  <data name="ThemeArchiveCannotBeNull" xml:space="preserve">
+    <value>¡El archivo del tema no puede ser nulo!</value>
+  </data>
+  <data name="ThemeArchiveNotReadable" xml:space="preserve">
+    <value>¡No se pudo leer el archivo del tema!</value>
+  </data>
+  <data name="ThemeAssetPathCannotBeEmpty" xml:space="preserve">
+    <value>¡La ruta del recurso del tema no puede estar vacía!</value>
+  </data>
+  <data name="ThemeCannotBeDeleted" xml:space="preserve">
+    <value>¡El tema no se puede eliminar!</value>
+  </data>
+  <data name="ThemeFilesUnreadable" xml:space="preserve">
+    <value>¡No se pudieron leer los archivos del tema!</value>
+  </data>
+  <data name="ThemeIdCannotBeEmpty" xml:space="preserve">
+    <value>¡El id del tema no puede estar vacío!</value>
+  </data>
+  <data name="ThemeNotAvailable" xml:space="preserve">
+    <value>¡El tema no está disponible!</value>
+  </data>
+  <data name="ThemeNotFound" xml:space="preserve">
+    <value>¡El tema especificado no fue encontrado!</value>
   </data>
   <data name="TitleCannotBeEmpty" xml:space="preserve">
     <value>¡El título no puede estar vacío!</value>

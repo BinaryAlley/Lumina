@@ -19,7 +19,7 @@
                 Lumina
             </div>
             <ul>                
-                <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Home.INDEX_CULTURED)"><span>@_localizer["Home"]</span></a></li>
+                <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Home.INDEX_CULTURED)" class="nav-link"><span>@_localizer["Home"]</span></a></li>
             </ul>
             <div class="mobile-menu-heading">
                 @_localizer["Account"]
@@ -52,6 +52,7 @@
                         <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Admin.MANAGE_ROLES)" class="nav-link"><span>@_localizer["ManageRoles"]</span></a></li>
                         <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Admin.MANAGE_PERMISSIONS)" class="nav-link"><span>@_localizer["ManagePermissions"]</span></a></li>
                         <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Plugins.INDEX)" class="nav-link"><span>@_localizer["Plugins"]</span></a></li>
+                        <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Admin.MANAGE_THEMES)" class="nav-link"><span>@_localizer["Themes"]</span></a></li>
                     </ul>
                 }
                 <div class="mobile-menu-heading">
@@ -124,7 +125,7 @@
         <li tabindex="0" class="top-level-menuitem">
             <label for="account-menu">Lumina</label>
             <ul>
-                <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Home.INDEX_CULTURED)">@_localizer["Home"]</a></li>
+                <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Home.INDEX_CULTURED)" class="nav-link">@_localizer["Home"]</a></li>
             </ul>
         </li>
         <li tabindex="0" class="top-level-menuitem">
@@ -157,6 +158,7 @@
                         <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Admin.MANAGE_ROLES)" class="nav-link">@_localizer["ManageRoles"]</a></li>
                         <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Admin.MANAGE_PERMISSIONS)" class="nav-link">@_localizer["ManagePermissions"]</a></li>
                         <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Plugins.INDEX)" class="nav-link">@_localizer["Plugins"]</a></li>
+                        <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Admin.MANAGE_THEMES)" class="nav-link">@_localizer["Themes"]</a></li>
                     </ul>
                 </li>
             }

@@ -72,7 +72,8 @@ public class UpdateUserSettingsCommandHandler : ICommandHandler<UpdateUserSettin
                 UserId.Create(userId),
                 command.IsPaginationEnabled,
                 command.ItemsPerPage,
-                command.IgnoreThePrefixForAlphaPicker);
+                command.IgnoreThePrefixForAlphaPicker,
+                command.IsThemeCachingEnabled);
             if (createSettingsResult.IsFailure)
                 return createSettingsResult.Errors;
 
@@ -90,7 +91,8 @@ public class UpdateUserSettingsCommandHandler : ICommandHandler<UpdateUserSettin
             Result<Updated> updateSettingsResult = toDomainEntityResult.Value.UpdateSettings(
                 command.IsPaginationEnabled,
                 command.ItemsPerPage,
-                command.IgnoreThePrefixForAlphaPicker);
+                command.IgnoreThePrefixForAlphaPicker,
+                command.IsThemeCachingEnabled);
             if (updateSettingsResult.IsFailure)
                 return updateSettingsResult.Errors;
 

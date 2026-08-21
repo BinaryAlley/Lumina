@@ -23,11 +23,6 @@ public sealed class ThemeAdminDto
     public required string CurrentThemeId { get; init; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether theme templates may load script files.
-    /// </summary>
-    public required bool AllowThemeScripts { get; init; }
-
-    /// <summary>
     /// Gets or sets the maximum allowed size of a theme archive, in bytes.
     /// </summary>
     public required long MaxArchiveBytes { get; init; }

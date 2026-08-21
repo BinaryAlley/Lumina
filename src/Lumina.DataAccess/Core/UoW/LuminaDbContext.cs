@@ -3,6 +3,7 @@ using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
+using Lumina.Application.Common.DataAccess.Entities.Themes;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Microsoft.EntityFrameworkCore;
 #endregion
@@ -32,6 +33,7 @@ public class LuminaDbContext : DbContext
     public virtual DbSet<RolePermissionEntity> RolePermissions { get; set; } = null!;
     public virtual DbSet<PluginEntity> Plugins { get; set; } = null!;
     public virtual DbSet<LibraryMetadataProviderConfigurationEntity> LibraryMetadataProviderConfigurations { get; set; } = null!;
+    public virtual DbSet<ThemeEntity> Themes { get; set; } = null!;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LuminaDbContext"/> class.

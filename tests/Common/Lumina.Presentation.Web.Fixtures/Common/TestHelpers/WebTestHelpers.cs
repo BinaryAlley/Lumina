@@ -18,7 +18,7 @@ namespace Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 /// Represents an HTTP client that has been authenticated through the real login flow of the Web application.
 /// </summary>
 /// <param name="Client">The authenticated HTTP client.</param>
-/// <param name="AntiforgeryToken">The antiforgery token captured before the login, valid for subsequent mutating requests.</param>
+/// <param name="AntiforgeryToken">The antiforgery token captured after the login, valid for subsequent mutating requests made by the authenticated user.</param>
 [ExcludeFromCodeCoverage]
 public record AuthenticatedWebClient(HttpClient Client, string AntiforgeryToken);
 
@@ -30,6 +30,8 @@ public static partial class WebTestHelpers
 {
     private const string LOGIN_PAGE_PATH = "/en-us/auth/login";
     private const string LOGIN_ENDPOINT_PATH = "/en-us/auth/api-login";
+    // the change password page renders an antiforgery token for the authenticated user without calling the remote API
+    private const string AUTHENTICATED_TOKEN_PAGE_PATH = "/en-us/auth/change-password";
 
     [GeneratedRegex("name=\"__RequestVerificationToken\"[^>]*value=\"([^\"]*)\"")]
     private static partial Regex AntiforgeryTokenRegex();
@@ -61,7 +63,11 @@ public static partial class WebTestHelpers
         });
         string antiforgeryToken = await GetAntiforgeryTokenAsync(client);
         await LoginAsync(client, username!, password!, antiforgeryToken);
-        return new AuthenticatedWebClient(client, antiforgeryToken);
+        // the antiforgery token is bound to the authenticated user, because the antiforgery middleware runs after
+        // authentication; the token captured from the anonymous login page is rejected with a 400 for authenticated
+        // mutating requests, so a fresh token must be captured after the login
+        string authenticatedAntiforgeryToken = await GetAntiforgeryTokenAsync(client, AUTHENTICATED_TOKEN_PAGE_PATH);
+        return new AuthenticatedWebClient(client, authenticatedAntiforgeryToken);
     }
 
     /// <summary>
@@ -86,18 +92,19 @@ public static partial class WebTestHelpers
     }
 
     /// <summary>
-    /// Retrieves the antiforgery token and cookie by requesting the login page.
+    /// Retrieves the antiforgery token and cookie by requesting a page that renders an antiforgery token.
     /// </summary>
     /// <param name="client">The HTTP client to retrieve the token through.</param>
+    /// <param name="pagePath">The page that renders the antiforgery token, defaults to the login page.</param>
     /// <returns>The antiforgery token value.</returns>
-    public static async Task<string> GetAntiforgeryTokenAsync(HttpClient client)
+    public static async Task<string> GetAntiforgeryTokenAsync(HttpClient client, string? pagePath = null)
     {
-        HttpResponseMessage loginPageResponse = await client.GetAsync(LOGIN_PAGE_PATH);
+        HttpResponseMessage loginPageResponse = await client.GetAsync(pagePath ?? LOGIN_PAGE_PATH);
         loginPageResponse.EnsureSuccessStatusCode();
         string loginPageHtml = await loginPageResponse.Content.ReadAsStringAsync();
         Match match = AntiforgeryTokenRegex().Match(loginPageHtml);
         if (!match.Success)
-            throw new InvalidOperationException("Could not find the antiforgery token on the login page.");
+            throw new InvalidOperationException("Could not find the antiforgery token on the page.");
         return System.Net.WebUtility.HtmlDecode(match.Groups[1].Value);
     }
 

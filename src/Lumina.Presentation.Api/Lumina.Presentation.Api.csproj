@@ -51,6 +51,14 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Content Include="Core\Themes\Bundled\*.zip">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+            <Link>themes\bundled\%(Filename)%(Extension)</Link>
+        </Content>
+    </ItemGroup>
+
+    <ItemGroup>
         <ProjectReference Include="..\Lumina.Contracts\Lumina.Contracts.csproj" />
         <ProjectReference Include="..\Lumina.Application\Lumina.Application.csproj" />
         <ProjectReference Include="..\Lumina.Contracts\Lumina.Contracts.csproj" />

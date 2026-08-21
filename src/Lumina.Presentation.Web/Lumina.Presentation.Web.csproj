@@ -35,6 +35,11 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Compile Update="Core\Resources\Views\Admin\Plugins.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>Plugins.resx</DependentUpon>
+      </Compile>
       <Compile Update="Core\Resources\Views\Auth\ChangePassword.Designer.cs">
         <DesignTime>True</DesignTime>
         <AutoGen>True</AutoGen>
@@ -59,11 +64,6 @@
         <DesignTime>True</DesignTime>
         <AutoGen>True</AutoGen>
         <DependentUpon>Item.resx</DependentUpon>
-      </Compile>
-      <Compile Update="Core\Resources\Views\Plugins\Index.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>Index.resx</DependentUpon>
       </Compile>
     </ItemGroup>
 
@@ -331,35 +331,35 @@
       <EmbeddedResource Update="Core\Resources\Views\Shared\_NavMenu.zh-CN.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Core\Resources\Views\Plugins\Index.de-DE.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Admin\Plugins.de-DE.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Core\Resources\Views\Plugins\Index.en-US.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Admin\Plugins.en-US.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Core\Resources\Views\Plugins\Index.es-ES.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Admin\Plugins.es-ES.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Core\Resources\Views\Plugins\Index.fr-FR.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Admin\Plugins.fr-FR.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Core\Resources\Views\Plugins\Index.it-IT.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Admin\Plugins.it-IT.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Core\Resources\Views\Plugins\Index.ja-JP.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Admin\Plugins.ja-JP.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Core\Resources\Views\Plugins\Index.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Admin\Plugins.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
-        <LastGenOutput>Index.Designer.cs</LastGenOutput>
+        <LastGenOutput>Plugins.Designer.cs</LastGenOutput>
       </EmbeddedResource>
-      <EmbeddedResource Update="Core\Resources\Views\Plugins\Index.ro-RO.resx">
-        <Generator>PublicResXFileCodeGenerator</Generator>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Core\Resources\Views\Plugins\Index.ru-RU.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Admin\Plugins.ro-RO.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Core\Resources\Views\Plugins\Index.zh-CN.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Admin\Plugins.ru-RU.resx">
+        <Generator>PublicResXFileCodeGenerator</Generator>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Core\Resources\Views\Admin\Plugins.zh-CN.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
     </ItemGroup>

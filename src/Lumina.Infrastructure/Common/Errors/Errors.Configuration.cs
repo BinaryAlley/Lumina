@@ -11,7 +11,6 @@ public static partial class Errors
 {
     public static class Configuration
     {
-        public static Error ApplicationThemeCannotBeEmpty => Error.Validation(description: nameof(ApplicationThemeCannotBeEmpty));
         public static Error DatabaseConnectionStringCannotBeEmpty => Error.Validation(description: nameof(DatabaseConnectionStringCannotBeEmpty));
         public static Error MediaRootDirectoryCannotBeEmpty => Error.Validation(description: nameof(MediaRootDirectoryCannotBeEmpty));
         public static Error MediaLibrariesDirectoryCannotBeEmpty => Error.Validation(description: nameof(MediaLibrariesDirectoryCannotBeEmpty));
@@ -25,5 +24,12 @@ public static partial class Errors
         public static Error CorsOriginsCannotBeEmpty => Error.Validation(description: nameof(CorsOriginsCannotBeEmpty));
         public static Error CorsOriginIsInvalid => Error.Validation(description: nameof(CorsOriginIsInvalid));
         public static Error PluginsDirectoryCannotBeEmpty => Error.Validation(description: nameof(PluginsDirectoryCannotBeEmpty));
+        public static Error ThemeStoragePathCannotBeEmpty => Error.Validation(description: nameof(ThemeStoragePathCannotBeEmpty));
+        public static Error ThemeBundledThemesPathCannotBeEmpty => Error.Validation(description: nameof(ThemeBundledThemesPathCannotBeEmpty));
+        public static Error ThemeDefaultThemeIdCannotBeEmpty => Error.Validation(description: nameof(ThemeDefaultThemeIdCannotBeEmpty));
+        public static Error ThemeMaxArchiveBytesMustBePositive => Error.Validation(description: nameof(ThemeMaxArchiveBytesMustBePositive));
+        public static Error ThemeMaxExpandedBytesMustBePositive => Error.Validation(description: nameof(ThemeMaxExpandedBytesMustBePositive));
+        public static Error ThemeMaxSingleFileBytesMustBePositive => Error.Validation(description: nameof(ThemeMaxSingleFileBytesMustBePositive));
+        public static Error ThemeMaxEntriesMustBePositive => Error.Validation(description: nameof(ThemeMaxEntriesMustBePositive));
     }
 }

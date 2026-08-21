@@ -18,6 +18,7 @@ namespace Lumina.Presentation.Web.Core.Themes;
 /// </summary>
 public sealed class ThemeTemplateEngine
 {
+    // bound template nesting and rendered output, so a single theme cannot exhaust the server memory
     private const int MAX_NESTING_DEPTH = 32;
     private const int MAX_RENDERED_CHARACTERS = 4 * 1024 * 1024;
 
@@ -26,28 +27,12 @@ public sealed class ThemeTemplateEngine
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
     /// <summary>
-    /// Validates the structure and expressions of a theme template.
-    /// </summary>
-    /// <param name="template">The template source to validate.</param>
-    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
-    public Result<Success> Validate(string template)
-    {
-        ArgumentNullException.ThrowIfNull(template);
-        int cursor = 0;
-        Result<IReadOnlyList<ThemeTemplateNodeDto>> parseResult = ParseNodes(template, ref cursor, expectedClosingName: null, depth: 0);
-        if (parseResult.IsFailure)
-            return Result<Success>.Failure(parseResult.Errors);
-
-        return Result.Success;
-    }
-
-    /// <summary>
-    /// Renders a theme template against the provided model.
+    /// Renders a theme template against the provided model, splitting the reserved top-level <c>scripts</c> section from the page content.
     /// </summary>
     /// <param name="template">The template source to render.</param>
     /// <param name="model">The model the template expressions resolve against.</param>
-    /// <returns>An <see cref="Result{TValue}"/> containing either the rendered output, or an error.</returns>
-    public Result<string> Render(string template, object model)
+    /// <returns>An <see cref="Result{TValue}"/> containing either the rendered page, or an error.</returns>
+    public Result<ThemePageRenderResultDto> RenderPage(string template, object model)
     {
         ArgumentNullException.ThrowIfNull(template);
         ArgumentNullException.ThrowIfNull(model);
@@ -55,14 +40,40 @@ public sealed class ThemeTemplateEngine
         int cursor = 0;
         Result<IReadOnlyList<ThemeTemplateNodeDto>> parseResult = ParseNodes(template, ref cursor, expectedClosingName: null, depth: 0);
         if (parseResult.IsFailure)
-            return Result<string>.Failure(parseResult.Errors);
+            return parseResult.Errors;
 
-        StringBuilder output = new(Math.Min(template.Length * 2, 256 * 1024));
-        Result<Success> renderResult = RenderNodes(parseResult.Value, new ThemeRenderScopeDto(model, Parent: null), output);
-        if (renderResult.IsFailure)
-            return Result<string>.Failure(renderResult.Errors);
+        // the reserved top-level 'scripts' section holds the script of the page and is rendered separately, mirroring the
+        // 'Scripts' section of a Razor view, so that the layout can host it in the scripts container of the navigator;
+        // every other top-level node is the content of the page section
+        List<ThemeTemplateNodeDto> contentNodes = [];
+        ThemeSectionNodeDto? scriptsSection = null;
+        foreach (ThemeTemplateNodeDto node in parseResult.Value)
+        {
+            if (node is ThemeSectionNodeDto { Inverted: false } section
+                && scriptsSection is null
+                && string.Equals(section.Expression, "scripts", StringComparison.OrdinalIgnoreCase))
+            {
+                scriptsSection = section;
+                continue;
+            }
 
-        return output.ToString();
+            contentNodes.Add(node);
+        }
+
+        StringBuilder contentOutput = new(Math.Min(template.Length * 2, 256 * 1024));
+        Result<Success> contentResult = RenderNodes(contentNodes, new ThemeRenderScopeDto(model, Parent: null), contentOutput);
+        if (contentResult.IsFailure)
+            return contentResult.Errors;
+
+        StringBuilder scriptOutput = new(64 * 1024);
+        if (scriptsSection is not null)
+        {
+            Result<Success> scriptResult = RenderNodes(scriptsSection.Children, new ThemeRenderScopeDto(model, Parent: null), scriptOutput);
+            if (scriptResult.IsFailure)
+                return scriptResult.Errors;
+        }
+
+        return new ThemePageRenderResultDto(contentOutput.ToString(), scriptOutput.ToString());
     }
 
     /// <summary>
@@ -103,7 +114,7 @@ public sealed class ThemeTemplateEngine
                 string expression = template[(opening + 3)..closing].Trim();
                 Result<Success> expressionResult = ValidateExpression(expression);
                 if (expressionResult.IsFailure)
-                    return Result<IReadOnlyList<ThemeTemplateNodeDto>>.Failure(expressionResult.Errors);
+                    return expressionResult.Errors;
 
                 nodes.Add(new ThemeVariableNodeDto(expression, ShouldBeEscaped: false));
                 cursor = closing + 3;
@@ -129,11 +140,11 @@ public sealed class ThemeTemplateEngine
                         string expression = tag[1..].Trim();
                         Result<Success> sectionExpressionResult = ValidateExpression(expression);
                         if (sectionExpressionResult.IsFailure)
-                            return Result<IReadOnlyList<ThemeTemplateNodeDto>>.Failure(sectionExpressionResult.Errors);
+                            return sectionExpressionResult.Errors;
 
                         Result<IReadOnlyList<ThemeTemplateNodeDto>> childrenResult = ParseNodes(template, ref cursor, expression, depth + 1);
                         if (childrenResult.IsFailure)
-                            return Result<IReadOnlyList<ThemeTemplateNodeDto>>.Failure(childrenResult.Errors);
+                            return childrenResult.Errors;
 
                         nodes.Add(new ThemeSectionNodeDto(expression, Inverted: tag[0] == '^', Children: childrenResult.Value));
                         break;
@@ -143,7 +154,7 @@ public sealed class ThemeTemplateEngine
                         string closingName = tag[1..].Trim();
                         Result<Success> closingNameResult = ValidateExpression(closingName);
                         if (closingNameResult.IsFailure)
-                            return Result<IReadOnlyList<ThemeTemplateNodeDto>>.Failure(closingNameResult.Errors);
+                            return closingNameResult.Errors;
 
                         if (expectedClosingName is null)
                             return TemplateInvalid($"Closing section '{closingName}' has no matching opening section.");
@@ -158,7 +169,7 @@ public sealed class ThemeTemplateEngine
                         string expression = tag[1..].Trim();
                         Result<Success> unescapedExpressionResult = ValidateExpression(expression);
                         if (unescapedExpressionResult.IsFailure)
-                            return Result<IReadOnlyList<ThemeTemplateNodeDto>>.Failure(unescapedExpressionResult.Errors);
+                            return unescapedExpressionResult.Errors;
 
                         nodes.Add(new ThemeVariableNodeDto(expression, ShouldBeEscaped: false));
                         break;
@@ -167,7 +178,7 @@ public sealed class ThemeTemplateEngine
                     {
                         Result<Success> variableResult = ValidateExpression(tag);
                         if (variableResult.IsFailure)
-                            return Result<IReadOnlyList<ThemeTemplateNodeDto>>.Failure(variableResult.Errors);
+                            return variableResult.Errors;
 
                         nodes.Add(new ThemeVariableNodeDto(tag, ShouldBeEscaped: true));
                         break;
@@ -198,7 +209,7 @@ public sealed class ThemeTemplateEngine
                     {
                         Result<Success> textResult = AppendChecked(output, text.Value);
                         if (textResult.IsFailure)
-                            return Result<Success>.Failure(textResult.Errors);
+                            return textResult.Errors;
 
                         break;
                     }
@@ -208,7 +219,7 @@ public sealed class ThemeTemplateEngine
                         string value = ConvertToString(resolved);
                         Result<Success> variableResult = AppendChecked(output, variable.ShouldBeEscaped ? HtmlEncoder.Default.Encode(value) : value);
                         if (variableResult.IsFailure)
-                            return Result<Success>.Failure(variableResult.Errors);
+                            return variableResult.Errors;
 
                         break;
                     }
@@ -216,7 +227,7 @@ public sealed class ThemeTemplateEngine
                     {
                         Result<Success> sectionResult = RenderSection(section, scope, output);
                         if (sectionResult.IsFailure)
-                            return Result<Success>.Failure(sectionResult.Errors);
+                            return sectionResult.Errors;
 
                         break;
                     }
@@ -257,7 +268,7 @@ public sealed class ThemeTemplateEngine
             {
                 Result<Success> itemResult = RenderNodes(section.Children, new ThemeRenderScopeDto(item, scope), output);
                 if (itemResult.IsFailure)
-                    return Result<Success>.Failure(itemResult.Errors);
+                    return itemResult.Errors;
             }
 
             return Result.Success;

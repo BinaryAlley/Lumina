@@ -189,7 +189,8 @@ async function callApiDeleteAsync(url, options = {}) {
         // make the request
         const response = await fetch(url, {
             method: 'DELETE',
-            headers: headers
+            headers: headers,
+            body: '{}' // FastEndpoints parses the JSON body when the content type is application/json, so an empty body would fail to deserialize
         });
         if (response.redirected) // if a redirect is requested, perform it
             window.location.href = response.url;

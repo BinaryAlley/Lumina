@@ -321,6 +321,9 @@
   <data name="LanguageNativeNameMustBeMaximum50CharactersLong" xml:space="preserve">
     <value>Numele nativ al limbii trebuie să aibă maximum 50 caractere!</value>
   </data>
+  <data name="LastBundledThemeCannotBeDeleted" xml:space="preserve">
+    <value>Ultima temă inclusă nu poate fi ștearsă!</value>
+  </data>
   <data name="LibraryAlreadyExists" xml:space="preserve">
     <value>Biblioteca există deja!</value>
   </data>
@@ -377,6 +380,9 @@
   </data>
   <data name="PageCountMustBeGreaterThanZero" xml:space="preserve">
     <value>Numărul de pagini trebuie să fie mai mare decât zero!</value>
+  </data>
+  <data name="PageKeyCannotBeEmpty" xml:space="preserve">
+    <value>Cheia de pagină nu poate fi goală!</value>
   </data>
   <data name="ParentNodeCannotBeNull" xml:space="preserve">
     <value>Nodul părinte nu poate fi nul!</value>
@@ -488,6 +494,30 @@
   </data>
   <data name="TheBookIsNotInTheSeries" xml:space="preserve">
     <value>Cartea nu este în serie!</value>
+  </data>
+  <data name="ThemeArchiveCannotBeNull" xml:space="preserve">
+    <value>Arhiva temei nu poate fi nulă!</value>
+  </data>
+  <data name="ThemeArchiveNotReadable" xml:space="preserve">
+    <value>Arhiva temei nu a putut fi citită!</value>
+  </data>
+  <data name="ThemeAssetPathCannotBeEmpty" xml:space="preserve">
+    <value>Calea resursei temei nu poate fi goală!</value>
+  </data>
+  <data name="ThemeCannotBeDeleted" xml:space="preserve">
+    <value>Tema nu poate fi ștearsă!</value>
+  </data>
+  <data name="ThemeFilesUnreadable" xml:space="preserve">
+    <value>Fișierele temei nu au putut fi citite!</value>
+  </data>
+  <data name="ThemeIdCannotBeEmpty" xml:space="preserve">
+    <value>Id-ul temei nu poate fi gol!</value>
+  </data>
+  <data name="ThemeNotAvailable" xml:space="preserve">
+    <value>Tema nu este disponibilă!</value>
+  </data>
+  <data name="ThemeNotFound" xml:space="preserve">
+    <value>Tema specificată nu a fost găsită!</value>
   </data>
   <data name="TitleCannotBeEmpty" xml:space="preserve">
     <value>Titlul nu poate fi gol!</value>

@@ -1,0 +1,38 @@
+@using Lumina.Presentation.Web.Common.DTO.Configuration
+@using Microsoft.Extensions.Localization
+@using Microsoft.Extensions.Options
+
+@inject IStringLocalizerFactory _stringLocalizerFactory
+@inject IOptions<ServerConfigurationDto> _serverConfigurationModel
+
+@{
+    IStringLocalizer localizer = _stringLocalizerFactory.Create("Lumina.Presentation.Web.Views.Shared._Layout", "Lumina.Presentation.Web");
+}
+
+<script>
+    var globalConfiguration = {
+        serverBasePath: '@(_serverConfigurationModel.Value.BaseAddress):@(_serverConfigurationModel.Value.Port)',
+        apiBasePath: '@(_serverConfigurationModel.Value.BaseAddress):@(_serverConfigurationModel.Value.Port)/api/v@(_serverConfigurationModel.Value.ApiVersion)',
+    };
+    var jsLocalizedMessages = {
+        navigationFailed: '@localizer["NavigationFailed"]',
+    };
+    var jsLocalizedDialogs = {
+        ok: '@localizer["Ok"]',
+        cancel: '@localizer["Cancel"]',
+        yes: '@localizer["Yes"]',
+        no: '@localizer["No"]',
+        retry: '@localizer["Retry"]',
+        abort: '@localizer["Abort"]',
+        ignore: '@localizer["Ignore"]',
+        confirmation: '@localizer["Confirmation"]',
+        warning: '@localizer["Warning"]',
+        error: '@localizer["Error"]',
+        information: '@localizer["Information"]'
+    };
+</script>
+<script src="~/libs/microsoft-signalr/signalr.min.js" asp-append-version="true"></script>
+<script defer src="~/js/notifications.js" asp-append-version="true"></script>
+<script defer src="~/js/dialogs.js" asp-append-version="true"></script>
+<script defer src="~/js/image-viewer.js" asp-append-version="true"></script>
+<script defer src="~/js/site.js" asp-append-version="true"></script>

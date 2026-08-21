@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Common.DTO.Themes;
 using Lumina.Presentation.Web.Common.Primitives;
+using Lumina.Presentation.Web.Common.Services;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,7 +12,7 @@ namespace Lumina.Presentation.Web.Core.Themes;
 /// <summary>
 /// Renders a theme template against a page model, populating the theme metadata before rendering.
 /// </summary>
-public sealed class ThemePageRenderer
+public class ThemePageRenderer
 {
     private readonly ThemeService _themeService;
     private readonly ThemeTemplateEngine _templateEngine;
@@ -28,26 +29,35 @@ public sealed class ThemePageRenderer
     }
 
     /// <summary>
-    /// Renders the page model with the theme selected for the requested theme identifier.
+    /// Renders the page model with the theme selected for the requested theme identifier, producing the content and script sections of the page.
     /// </summary>
     /// <param name="model">The page model to render.</param>
     /// <param name="requestedThemeId">The optional unique identifier of the theme to render with, falling back to the current theme when <see langword="null"/>.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>An <see cref="Result{TValue}"/> containing either the rendered HTML, or an error.</returns>
-    public async Task<Result<string>> RenderAsync(ThemePageDto model, string? requestedThemeId = null, CancellationToken cancellationToken = default)
+    /// <returns>An <see cref="Result{TValue}"/> containing either the rendered page, or an error.</returns>
+    public virtual async Task<Result<ThemePageRenderResultDto>> RenderAsync(ThemePageDto model, string? requestedThemeId = null, CancellationToken cancellationToken = default)
     {
-        Result<ThemeRenderDocumentDto> documentResult = await _themeService.GetRenderDocumentAsync(model.PageKey, requestedThemeId, cancellationToken);
-        if (documentResult.IsFailure)
-            return Result<string>.Failure(documentResult.Errors);
+        try
+        {
+            ThemeRenderDocumentDto document = await _themeService.GetRenderDocumentAsync(model.PageKey, requestedThemeId, cancellationToken);
 
-        ThemeRenderDocumentDto document = documentResult.Value;
+            model.ThemeId = document.Theme.Id;
+            model.AssetBase = $"/theme-assets/{document.Theme.Id}/assets";
+            // a fresh script id per render lets the AJAX navigator unload this view's script when navigating away
+            model.ScriptId = ScriptIdentifierHelper.GenerateScriptId();
 
-        model.ThemeId = document.Theme.Id;
-        model.ThemeName = document.Theme.Name;
-        model.ThemeVersion = document.Theme.Version;
-        model.AssetBase = $"/theme-assets/{document.Theme.Id}/assets";
-        model.CurrentYear = DateTime.UtcNow.Year;
-
-        return _templateEngine.Render(document.Template, model);
+            return _templateEngine.RenderPage(document.Template, model);
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception)
+        {
+            // themed rendering is best effort: when the active theme cannot be loaded, the caller falls back to the Razor
+            // view. The exception must not propagate, otherwise the exception handling middleware turns the page into a
+            // JSON error instead of the Razor fallback, so any themed page breaks whenever the theme API is unavailable.
+            return Error.NotFound(code: "Theme.Template.Unavailable", description: "The active theme could not be loaded.");
+        }
     }
 }

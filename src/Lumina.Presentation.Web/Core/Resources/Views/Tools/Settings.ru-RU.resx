@@ -39,4 +39,10 @@
   <data name="DescriptionIgnoreThePrefixForAlphaPicker" xml:space="preserve">
     <value>При включении элементы библиотеки, название которых начинается с "The", группируются в алфавитном указателе под первой буквой следующего слова, например "The Rasmus" отображается под буквой R.</value>
   </data>
+  <data name="EnableThemeCaching" xml:space="preserve">
+    <value>Включить кэширование тем</value>
+  </data>
+  <data name="DescriptionEnableThemeCaching" xml:space="preserve">
+    <value>Определяет, кэшируются ли файлы тем, предоставляемые приложением. Отключите эту опцию при редактировании файлов тем, чтобы изменения отображались сразу.</value>
+  </data>
 </root>

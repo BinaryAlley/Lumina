@@ -292,19 +292,24 @@ public static class PresentationWebLayerServices
         // register the HTTP typed client used for the API interaction
         services.AddHttpClient<IApiHttpClient, ApiHttpClient>()
             .AddHttpMessageHandler<CachedAuthorizationHandler>()
+            .AddHttpMessageHandler<CachedThemeHandler>()
             .AddPolicyHandler(retryPolicy)
             .AddPolicyHandler(circuitBreakerPolicy);
 
         services.AddScoped<CachedAuthorizationHandler>();
+        services.AddScoped<CachedThemeHandler>();
+        services.AddScoped<ThemeCachePreferenceService>();
 
         // enable access to the current HTTP context in non-controller classes
         services.AddHttpContextAccessor();
         services.Configure<FormOptions>(options => options.MultipartBodyLengthLimit = 10 * 1024 * 1024);
 
-        services.AddSingleton<ThemeSettingsStore>();
-        services.AddSingleton<ThemeService>();
+        services.AddScoped<ThemeService>();
         services.AddSingleton<ThemeTemplateEngine>();
-        services.AddSingleton<ThemePageRenderer>();
+        services.AddScoped<ThemePageRenderer>();
+        services.AddScoped<RazorViewToStringRenderer>();
+        services.AddScoped<ThemeNavBuilder>();
+        services.AddScoped<ThemeLayoutRenderer>();
 
         services.AddScoped<IAuthorizationHandler, InitializationHandler>();
         services.AddScoped<IAuthorizationHandler, RoleAuthorizationHandler>();
@@ -312,7 +317,7 @@ public static class PresentationWebLayerServices
         services.AddScoped<Authorization.IAuthorizationService, AuthorizationService>();
         services.AddSingleton<ICryptographyService, CryptographyService>();
         services.AddSingleton<IUrlService, UrlService>();
-        services.AddHybridCache(); // used for caching authorization roles, permissions and policies
+        services.AddHybridCache(); // used for caching authorization roles, permissions, policies and theme data
 
         return services;
     }

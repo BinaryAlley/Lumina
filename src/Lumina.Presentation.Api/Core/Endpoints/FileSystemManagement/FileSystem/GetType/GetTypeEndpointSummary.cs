@@ -11,7 +11,7 @@ namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.FileSystem
 /// Class used for providing a textual description for the <see cref="GetTypeEndpoint"/> API endpoint, for OpenAPI.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetTypeEndpointSummary : Summary<GetTypeEndpoint, FileSystemTypeResponse>
+public class GetTypeEndpointSummary : Summary<GetTypeEndpoint, EmptyRequest>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="GetTypeEndpointSummary"/> class.

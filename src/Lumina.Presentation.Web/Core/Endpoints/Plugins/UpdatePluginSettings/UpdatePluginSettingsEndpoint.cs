@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.Core.Endpoints.Plugins.UpdatePluginSettings;
 
 /// <summary>
-/// API endpoint for the <c>/{culture}/plugins/api-update-plugin-settings</c> route.
+/// API endpoint for the <c>/{culture}/admin/manage-plugins/api-update-plugin-settings</c> route.
 /// </summary>
 public class UpdatePluginSettingsEndpoint : BaseEndpoint<UpdatePluginSettingsRequest, IResult>
 {

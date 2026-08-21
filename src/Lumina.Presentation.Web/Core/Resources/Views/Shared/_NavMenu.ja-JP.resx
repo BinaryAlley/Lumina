@@ -192,6 +192,9 @@
   <data name="ManagePermissions" xml:space="preserve">
     <value>権限を管理する</value>
   </data>
+  <data name="Themes" xml:space="preserve">
+    <value>テーマ</value>
+  </data>
   <data name="Tools" xml:space="preserve">
     <value>ツール</value>
   </data>

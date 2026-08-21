@@ -9,6 +9,7 @@ using Lumina.Presentation.Web.Common.Routes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -232,6 +233,24 @@ public class StubApiHttpClient : IApiHttpClient
         if (_putResponseFactories.TryGetValue(endpoint, out Func<object, object>? responseFactory))
             return Task.FromResult((TResponse)responseFactory(data!));
         throw new InvalidOperationException($"No PUT response is registered for the endpoint '{endpoint}'.");
+    }
+
+    /// <summary>
+    /// Sends a POST request with a multipart form containing a single file to the specified <paramref name="endpoint"/> as an asynchronous operation and returns the result.
+    /// </summary>
+    /// <typeparam name="TResponse">The expected type of the response content.</typeparam>
+    /// <param name="endpoint">The API endpoint where the request is being sent.</param>
+    /// <param name="fileStream">The stream of the file to upload.</param>
+    /// <param name="fileName">The name of the file to upload.</param>
+    /// <param name="fieldName">The name of the form field carrying the file.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>The deserialized response containing the result of the POST request.</returns>
+    public Task<TResponse> PostMultipartAsync<TResponse>(string endpoint, Stream fileStream, string fileName, string fieldName, CancellationToken cancellationToken = default)
+    {
+        PostRequests.Add((endpoint, fileName));
+        if (_postResponseFactories.TryGetValue(endpoint, out Func<object, object>? responseFactory))
+            return Task.FromResult((TResponse)responseFactory(fileName));
+        throw new InvalidOperationException($"No POST response is registered for the endpoint '{endpoint}'.");
     }
 
     /// <summary>

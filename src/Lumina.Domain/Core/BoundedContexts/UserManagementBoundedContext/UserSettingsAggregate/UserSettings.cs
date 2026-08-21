@@ -19,6 +19,7 @@ public class UserSettings : AggregateRoot<UserSettingsId>
     private const bool DEFAULT_IS_PAGINATION_ENABLED = true;
     private const int DEFAULT_ITEMS_PER_PAGE = 48;
     private const bool DEFAULT_IGNORE_THE_PREFIX_FOR_ALPHA_PICKER = false;
+    private const bool DEFAULT_IS_THEME_CACHING_ENABLED = true;
 
     /// <summary>
     /// Gets the object representing the unique identifier of the user that owns these settings.
@@ -41,6 +42,11 @@ public class UserSettings : AggregateRoot<UserSettingsId>
     public bool IgnoreThePrefixForAlphaPicker { get; private set; }
 
     /// <summary>
+    /// Gets whether the theme data served to this user is cached, or not.
+    /// </summary>
+    public bool IsThemeCachingEnabled { get; private set; }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="UserSettings"/> class.
     /// </summary>
     /// <param name="id">The object representing the unique identifier of these settings.</param>
@@ -48,17 +54,20 @@ public class UserSettings : AggregateRoot<UserSettingsId>
     /// <param name="isPaginationEnabled">Whether pagination is enabled for the user, or not.</param>
     /// <param name="itemsPerPage">The number of library items displayed per page when pagination is enabled.</param>
     /// <param name="ignoreThePrefixForAlphaPicker">Whether the "The" prefix of library item titles is ignored by the alpha picker, or not.</param>
+    /// <param name="isThemeCachingEnabled">Whether the theme data served to this user is cached, or not.</param>
     private UserSettings(
         UserSettingsId id,
         UserId userId,
         bool isPaginationEnabled,
         int itemsPerPage,
-        bool ignoreThePrefixForAlphaPicker) : base(id)
+        bool ignoreThePrefixForAlphaPicker,
+        bool isThemeCachingEnabled) : base(id)
     {
         UserId = userId;
         IsPaginationEnabled = isPaginationEnabled;
         ItemsPerPage = itemsPerPage;
         IgnoreThePrefixForAlphaPicker = ignoreThePrefixForAlphaPicker;
+        IsThemeCachingEnabled = isThemeCachingEnabled;
     }
 
     /// <summary>
@@ -69,7 +78,7 @@ public class UserSettings : AggregateRoot<UserSettingsId>
     /// </returns>
     public static Result<UserSettings> Create()
     {
-        return Create(UserId.CreateUnique(), DEFAULT_IS_PAGINATION_ENABLED, DEFAULT_ITEMS_PER_PAGE, DEFAULT_IGNORE_THE_PREFIX_FOR_ALPHA_PICKER);
+        return Create(UserId.CreateUnique(), DEFAULT_IS_PAGINATION_ENABLED, DEFAULT_ITEMS_PER_PAGE, DEFAULT_IGNORE_THE_PREFIX_FOR_ALPHA_PICKER, DEFAULT_IS_THEME_CACHING_ENABLED);
     }
 
     /// <summary>
@@ -81,7 +90,7 @@ public class UserSettings : AggregateRoot<UserSettingsId>
     /// </returns>
     public static Result<UserSettings> Create(UserId userId)
     {
-        return Create(userId, DEFAULT_IS_PAGINATION_ENABLED, DEFAULT_ITEMS_PER_PAGE, DEFAULT_IGNORE_THE_PREFIX_FOR_ALPHA_PICKER);
+        return Create(userId, DEFAULT_IS_PAGINATION_ENABLED, DEFAULT_ITEMS_PER_PAGE, DEFAULT_IGNORE_THE_PREFIX_FOR_ALPHA_PICKER, DEFAULT_IS_THEME_CACHING_ENABLED);
     }
 
     /// <summary>
@@ -91,6 +100,7 @@ public class UserSettings : AggregateRoot<UserSettingsId>
     /// <param name="isPaginationEnabled">Whether pagination is enabled for the user, or not.</param>
     /// <param name="itemsPerPage">The number of library items displayed per page when pagination is enabled.</param>
     /// <param name="ignoreThePrefixForAlphaPicker">Whether the "The" prefix of library item titles is ignored by the alpha picker, or not.</param>
+    /// <param name="isThemeCachingEnabled">Whether the theme data served to this user is cached, or not.</param>
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="UserSettings"/>, or an error message.
     /// </returns>
@@ -98,7 +108,8 @@ public class UserSettings : AggregateRoot<UserSettingsId>
         UserId userId,
         bool isPaginationEnabled,
         int itemsPerPage,
-        bool ignoreThePrefixForAlphaPicker)
+        bool ignoreThePrefixForAlphaPicker,
+        bool isThemeCachingEnabled)
     {
         if (itemsPerPage <= 0)
             return Errors.UserSettings.ItemsPerPageMustBeGreaterThanZero;
@@ -108,7 +119,8 @@ public class UserSettings : AggregateRoot<UserSettingsId>
             userId,
             isPaginationEnabled,
             itemsPerPage,
-            ignoreThePrefixForAlphaPicker);
+            ignoreThePrefixForAlphaPicker,
+            isThemeCachingEnabled);
     }
 
     /// <summary>
@@ -119,6 +131,7 @@ public class UserSettings : AggregateRoot<UserSettingsId>
     /// <param name="isPaginationEnabled">Whether pagination is enabled for the user, or not.</param>
     /// <param name="itemsPerPage">The number of library items displayed per page when pagination is enabled.</param>
     /// <param name="ignoreThePrefixForAlphaPicker">Whether the "The" prefix of library item titles is ignored by the alpha picker, or not.</param>
+    /// <param name="isThemeCachingEnabled">Whether the theme data served to this user is cached, or not.</param>
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="UserSettings"/>, or an error message.
     /// </returns>
@@ -127,12 +140,13 @@ public class UserSettings : AggregateRoot<UserSettingsId>
         UserId userId,
         bool isPaginationEnabled,
         int itemsPerPage,
-        bool ignoreThePrefixForAlphaPicker)
+        bool ignoreThePrefixForAlphaPicker,
+        bool isThemeCachingEnabled)
     {
         if (itemsPerPage <= 0)
             return Errors.UserSettings.ItemsPerPageMustBeGreaterThanZero;
 
-        return new UserSettings(id, userId, isPaginationEnabled, itemsPerPage, ignoreThePrefixForAlphaPicker);
+        return new UserSettings(id, userId, isPaginationEnabled, itemsPerPage, ignoreThePrefixForAlphaPicker, isThemeCachingEnabled);
     }
 
     /// <summary>
@@ -141,11 +155,13 @@ public class UserSettings : AggregateRoot<UserSettingsId>
     /// <param name="isPaginationEnabled">Whether pagination is enabled for the user, or not.</param>
     /// <param name="itemsPerPage">The number of library items displayed per page when pagination is enabled.</param>
     /// <param name="ignoreThePrefixForAlphaPicker">Whether the "The" prefix of library item titles is ignored by the alpha picker, or not.</param>
+    /// <param name="isThemeCachingEnabled">Whether the theme data served to this user is cached, or not.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful update, or an error.</returns>
     public Result<Updated> UpdateSettings(
         bool isPaginationEnabled,
         int itemsPerPage,
-        bool ignoreThePrefixForAlphaPicker)
+        bool ignoreThePrefixForAlphaPicker,
+        bool isThemeCachingEnabled)
     {
         if (itemsPerPage <= 0)
             return Errors.UserSettings.ItemsPerPageMustBeGreaterThanZero;
@@ -153,6 +169,7 @@ public class UserSettings : AggregateRoot<UserSettingsId>
         IsPaginationEnabled = isPaginationEnabled;
         ItemsPerPage = itemsPerPage;
         IgnoreThePrefixForAlphaPicker = ignoreThePrefixForAlphaPicker;
+        IsThemeCachingEnabled = isThemeCachingEnabled;
         return Result.Updated;
     }
 }

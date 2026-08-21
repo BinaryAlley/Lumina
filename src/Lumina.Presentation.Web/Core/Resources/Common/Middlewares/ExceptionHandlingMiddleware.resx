@@ -321,6 +321,9 @@
   <data name="LanguageNativeNameMustBeMaximum50CharactersLong" xml:space="preserve">
     <value>Language native name must be maximum 50 characters long!</value>
   </data>
+  <data name="LastBundledThemeCannotBeDeleted" xml:space="preserve">
+    <value>The last bundled theme cannot be deleted!</value>
+  </data>
   <data name="LibraryAlreadyExists" xml:space="preserve">
     <value>Library already exists!</value>
   </data>
@@ -377,6 +380,9 @@
   </data>
   <data name="PageCountMustBeGreaterThanZero" xml:space="preserve">
     <value>Page count must be greater than zero!</value>
+  </data>
+  <data name="PageKeyCannotBeEmpty" xml:space="preserve">
+    <value>Page key cannot be empty!</value>
   </data>
   <data name="ParentNodeCannotBeNull" xml:space="preserve">
     <value>Parent node cannot be null!</value>
@@ -488,6 +494,30 @@
   </data>
   <data name="TheBookIsNotInTheSeries" xml:space="preserve">
     <value>The book is not in the series!</value>
+  </data>
+  <data name="ThemeArchiveCannotBeNull" xml:space="preserve">
+    <value>Theme archive cannot be null!</value>
+  </data>
+  <data name="ThemeArchiveNotReadable" xml:space="preserve">
+    <value>The theme archive could not be read!</value>
+  </data>
+  <data name="ThemeAssetPathCannotBeEmpty" xml:space="preserve">
+    <value>Theme asset path cannot be empty!</value>
+  </data>
+  <data name="ThemeCannotBeDeleted" xml:space="preserve">
+    <value>The theme cannot be deleted!</value>
+  </data>
+  <data name="ThemeFilesUnreadable" xml:space="preserve">
+    <value>The theme files could not be read!</value>
+  </data>
+  <data name="ThemeIdCannotBeEmpty" xml:space="preserve">
+    <value>Theme id cannot be empty!</value>
+  </data>
+  <data name="ThemeNotAvailable" xml:space="preserve">
+    <value>The theme is not available!</value>
+  </data>
+  <data name="ThemeNotFound" xml:space="preserve">
+    <value>The specified theme was not found!</value>
   </data>
   <data name="TitleCannotBeEmpty" xml:space="preserve">
     <value>Title cannot be empty!</value>

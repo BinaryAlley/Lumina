@@ -259,7 +259,7 @@
                                     <div class="action-icons">
                                         <img src="/images/ui/stop.svg" alt="@_localizer["CancelScan"]" title="@_localizer["CancelScan"]" class="hidden action-icon" />
                                         <img src="/images/ui/trigger.svg" alt="@_localizer["Scan"]" title="@_localizer["Scan"]" class="action-icon" />
-                                        <a href="${editUrl}">
+                                        <a href="${editUrl}" class="nav-link">
                                             <img src="/images/ui/edit.svg" alt="@_localizer["Edit"]" title="@_localizer["Edit"]" class="action-icon" />
                                         </a>
                                         <img src="/images/ui/delete.svg" alt="@_localizer["Remove"]" title="@_localizer["Remove"]" class="mr-5 action-icon" />
@@ -269,6 +269,7 @@
                         </tr>
                     `;
                 }).join('');
+                bindNavigationLinks(); // bind the dynamically created edit links, so that editing keeps the persistent chrome running
             } else {
                 btnScanAllLibraries.style.display = 'none';
                 table.style.display = 'none';

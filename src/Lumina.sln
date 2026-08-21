@@ -246,6 +246,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lumina.Plugins.OpenLibrary.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lumina.TestPlugin", "..\tests\Common\Lumina.TestPlugin\Lumina.TestPlugin.csproj", "{65AA7896-2DE2-4F07-A1B2-C1E1774521C2}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "theming", "theming", "{2872042D-061F-4C76-8017-0A518A7E28A7}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\technical\theming\Theming.md = ..\docs\technical\theming\Theming.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -736,6 +741,7 @@ Global
 		{FEC00EBD-6A64-4280-B0F7-1EC5321C294A} = {53B1231B-37F5-44BA-80D5-DBA979775F5C}
 		{16F65859-93AB-499F-A0BE-9EC05E20435F} = {7E8A2D6B-3F4C-4E5F-9A6B-1C2D3E4F5A6B}
 		{65AA7896-2DE2-4F07-A1B2-C1E1774521C2} = {7E8A2D6B-3F4C-4E5F-9A6B-1C2D3E4F5A6B}
+		{2872042D-061F-4C76-8017-0A518A7E28A7} = {0C0E5A56-AD29-4D0B-AB87-E865F8B933E2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4A55A28E-C657-4A0B-95EA-2931AE66004E}

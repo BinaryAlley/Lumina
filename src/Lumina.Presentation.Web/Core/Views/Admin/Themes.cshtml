@@ -1,0 +1,275 @@
+@*
+/admin/manage-themes/
+*@
+
+@using Lumina.Presentation.Web.Common.DTO.Themes
+@using Lumina.Presentation.Web.Common.Services
+@using Microsoft.AspNetCore.Mvc.Localization
+@using System.Linq
+
+@{
+    var themes = ViewData["themes"] as IReadOnlyList<ThemeInfoDto>;
+    var currentThemeId = ViewData["currentThemeId"] as string;
+    // generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler
+    var scriptId = ScriptIdentifierHelper.GenerateScriptId();
+    int bundledThemeCount = 0;
+    if (themes is not null)
+        foreach (ThemeInfoDto theme in themes)
+            if (theme.IsBundled && !theme.IsDeleted)
+                bundledThemeCount++;
+}
+
+@inject IViewLocalizer _localizer
+@inject IUrlService _urlService
+
+@Html.AntiForgeryToken()
+
+<style>
+    .theme-preview-button {
+        border: 1px solid #505050;
+        border-radius: 3px;
+        background-color: #000;
+        padding: 2px;
+        line-height: 0;
+        cursor: pointer;
+    }
+
+    .theme-preview-button:hover {
+        border-color: var(--text-foreground);
+        box-shadow: 0 0 4px var(--shadow-color);
+    }
+
+    .theme-preview-thumb {
+        width: 64px;
+        height: 40px;
+        object-fit: cover;
+    }
+
+    #themes-table td {
+        vertical-align: middle;
+    }
+
+    .theme-trust-warning {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #b8860b;
+        border-radius: 4px;
+        background-color: rgba(184, 134, 11, 0.15);
+        color: var(--text-foreground);
+        font-family: monospace;
+        font-size: 0.85rem;
+    }
+
+    .theme-trust-warning-icon {
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+        margin-top: 1px;
+    }
+</style>
+
+<div style="display: grid; grid-template-rows: auto 1fr;">
+    <div style="min-height: 1rem;"></div>
+    <div class="enlightenment-panel shadow-effect mx-auto panel w-75 mb-10" style="min-width: 320px;">
+        <div class="shine-effect"></div>
+        <div class="form-row">
+            <h1 class="text-light-two w-100 text-center pt-0 pb-0 engraved-title">@_localizer["Themes"]</h1>
+        </div>
+        <div class="form-row" style="margin-bottom: 0.75rem;">
+            <button id="btn-upload-theme" type="button" class="confirm-button">@_localizer["Upload"]</button>
+            <input id="theme-upload-input" type="file" accept=".zip" hidden />
+        </div>
+        <div class="form-row" style="margin-bottom: 0.75rem;">
+            <div class="theme-trust-warning">
+                <img class="theme-trust-warning-icon" src="~/images/ui/warning.svg" alt="" />
+                <span>@_localizer["ThemeTrustWarning"]</span>
+            </div>
+        </div>
+        <div class="form-row">
+            @if (themes is null || themes.Count == 0)
+            {
+                <p class="text-center">@_localizer["NoThemes"]</p>
+            }
+            else
+            {
+                <table id="themes-table">
+                    <thead class="text-light-two">
+                        <tr>
+                            <th class="w-10">@_localizer["Preview"]</th>
+                            <th class="w-20">@_localizer["Name"]</th>
+                            <th class="w-15">@_localizer["Version"]</th>
+                            <th class="w-20">@_localizer["Author"]</th>
+                            <th class="w-15">@_localizer["Source"]</th>
+                            <th class="w-20">@_localizer["Actions"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (ThemeInfoDto theme in themes)
+                        {
+                            bool isCurrent = theme.Id == currentThemeId;
+                            bool isLastRemaining = themes.Count(theme => !theme.IsDeleted) <= 1 || (theme.IsBundled && bundledThemeCount == 1);
+                            <tr data-theme-id="@theme.Id">
+                                <td class="text-center">
+                                    <button type="button" class="theme-preview-button" data-preview-url="@theme.PreviewUrl" data-preview-title="@theme.Name" title="@_localizer["Preview"]">
+                                        <img class="theme-preview-thumb" src="@theme.PreviewUrl" alt="@theme.Name" loading="lazy" />
+                                    </button>
+                                </td>
+                                <td>@theme.Name</td>
+                                <td>@theme.Version</td>
+                                <td>@theme.Author</td>
+                                <td>@(theme.IsBundled ? _localizer["Bundled"] : _localizer["UserProvided"])</td>
+                                <td class="text-end">
+                                    <div class="form-row">
+                                        @if (theme.IsDeleted)
+                                        {
+                                            <button type="button" class="confirm-button restore-theme-button" data-url="@_urlService.GetAbsoluteUrl(WebRoutes.Themes.RESTORE_THEME, new { themeId = theme.Id })">@_localizer["Restore"]</button>
+                                        }
+                                        else
+                                        {
+                                            <button type="button" class="confirm-button activate-theme-button" data-url="@_urlService.GetAbsoluteUrl(WebRoutes.Themes.SET_CURRENT_THEME)" @(isCurrent ? "disabled" : null)>@_localizer["Activate"]</button>
+                                            <button type="button" class="confirm-button download-theme-button" data-url="@_urlService.GetAbsoluteUrl(WebRoutes.Themes.DOWNLOAD_THEME, new { themeId = theme.Id })">@_localizer["Download"]</button>
+                                            <button type="button" class="abort-button delete-theme-button" data-url="@_urlService.GetAbsoluteUrl(WebRoutes.Themes.DELETE_THEME, new { themeId = theme.Id })" @(isLastRemaining ? "disabled" : null)>@_localizer["Delete"]</button>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript" data-form="@scriptId" defer>
+        // create cleanup registry for this view
+        const cleanupFunctions = [];
+        let isInitialized = false;
+
+        const uploadButton = document.getElementById('btn-upload-theme');
+        const uploadInput = document.getElementById('theme-upload-input');
+        const installUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Themes.INSTALL_THEME)';
+
+        // reloads the page after a theme mutation, so the new theme state and the themed shell are re-rendered
+        function reloadPage() {
+            window.location.reload();
+        }
+
+        // refreshes the current page content without reloading the page, so the media player keeps playing
+        function refreshPageContent() {
+            updateContentAsync(window.location.href, false);
+        }
+
+        // activates the theme of the clicked row
+        async function handleActivateClick(event) {
+            const button = event.target.closest('.activate-theme-button');
+            if (!button)
+                return;
+            await callApiPutAsync(button.dataset.url, { themeId: button.closest('tr').dataset.themeId });
+            reloadPage();
+        }
+
+        // deletes the theme of the clicked row after confirmation
+        async function handleDeleteClick(event) {
+            const button = event.target.closest('.delete-theme-button');
+            if (!button)
+                return;
+            if (await dialogService.show('@_localizer["DeleteThemeConfirm"]', jsLocalizedDialogs.confirmation, DialogButtons.YES_NO, DialogIcon.QUESTION) === DialogButton.YES) {
+                await callApiDeleteAsync(button.dataset.url);
+                refreshPageContent();
+            }
+        }
+
+        // restores the soft deleted bundled theme of the clicked row
+        async function handleRestoreClick(event) {
+            const button = event.target.closest('.restore-theme-button');
+            if (!button)
+                return;
+            // an empty JSON body is sent so the antiforgery-protected POST request binds the route theme id without a JsonException
+            await callApiPostAsync(button.dataset.url, {});
+            refreshPageContent();
+        }
+
+        // downloads the archive of the theme of the clicked row
+        function handleDownloadClick(event) {
+            const button = event.target.closest('.download-theme-button');
+            if (button)
+                window.location.href = button.dataset.url;
+        }
+
+        // opens the image viewer with the preview of the clicked theme
+        function handlePreviewClick(event) {
+            const button = event.target.closest('.theme-preview-button');
+            if (button)
+                imageViewer.open([{ src: button.dataset.previewUrl, title: button.dataset.previewTitle }]);
+        }
+
+        // falls back to the placeholder image when the preview of a theme is missing or fails to load
+        function attachPreviewErrorFallbacks() {
+            const placeholderUrl = '@Url.Content("~/admin/theme-placeholder.svg")';
+            document.querySelectorAll('.theme-preview-thumb').forEach(img => {
+                img.addEventListener('error', function handlePreviewError() {
+                    img.removeEventListener('error', handlePreviewError);
+                    img.src = placeholderUrl;
+                });
+            });
+        }
+        attachPreviewErrorFallbacks();
+
+        // uploads the selected theme archive as a multipart request, keeping the antiforgery token
+        async function handleUploadInputChange() {
+            const file = uploadInput.files[0];
+            if (!file)
+                return;
+            const formData = new FormData();
+            formData.append('archive', file);
+            formData.append('__RequestVerificationToken', document.querySelector('input[name="__RequestVerificationToken"]')?.value ?? '');
+            const response = await fetch(installUrl, {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                body: formData
+            });
+            if (response.ok)
+                refreshPageContent();
+            else
+                notificationService.show('@_localizer["UploadFailed"]', NotificationType.ERROR);
+        }
+
+        // opens the file picker when the upload button is clicked
+        function handleUploadButtonClick() {
+            uploadInput.click();
+        }
+
+        // add listeners
+        uploadButton.addEventListener('click', handleUploadButtonClick);
+        uploadInput.addEventListener('change', handleUploadInputChange);
+        document.addEventListener('click', handleActivateClick);
+        document.addEventListener('click', handleDownloadClick);
+        document.addEventListener('click', handleDeleteClick);
+        document.addEventListener('click', handleRestoreClick);
+        document.addEventListener('click', handlePreviewClick);
+
+        // register cleanup for these listeners
+        cleanupFunctions.push(() => {
+            uploadButton.removeEventListener('click', handleUploadButtonClick);
+            uploadInput.removeEventListener('change', handleUploadInputChange);
+            document.removeEventListener('click', handleActivateClick);
+            document.removeEventListener('click', handleDownloadClick);
+            document.removeEventListener('click', handleDeleteClick);
+            document.removeEventListener('click', handleRestoreClick);
+            document.removeEventListener('click', handlePreviewClick);
+        });
+
+        // store all cleanups for this view on window object using the scriptId
+        window.viewCleanups = window.viewCleanups || {};
+        window.viewCleanups['@scriptId'] = () => {
+            cleanupFunctions.forEach(cleanup => cleanup());
+            console.log(`Unloaded @scriptId`);
+        };
+        console.log(`Loaded @scriptId`);
+    </script>
+}

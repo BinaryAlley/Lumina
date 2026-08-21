@@ -39,4 +39,10 @@
   <data name="DescriptionIgnoreThePrefixForAlphaPicker" xml:space="preserve">
     <value>启用后，标题以"The"开头的库项目将在字母选择器中按后一个词的首字母分组，例如"The Rasmus"会列在R下。</value>
   </data>
+  <data name="EnableThemeCaching" xml:space="preserve">
+    <value>启用主题缓存</value>
+  </data>
+  <data name="DescriptionEnableThemeCaching" xml:space="preserve">
+    <value>控制应用程序提供的主题文件是否缓存。编辑主题文件时请关闭此选项，以便更改立即生效。</value>
+  </data>
 </root>
