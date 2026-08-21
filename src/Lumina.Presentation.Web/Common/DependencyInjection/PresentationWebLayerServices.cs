@@ -292,10 +292,13 @@ public static class PresentationWebLayerServices
         // register the HTTP typed client used for the API interaction
         services.AddHttpClient<IApiHttpClient, ApiHttpClient>()
             .AddHttpMessageHandler<CachedAuthorizationHandler>()
+            .AddHttpMessageHandler<CachedThemeHandler>()
             .AddPolicyHandler(retryPolicy)
             .AddPolicyHandler(circuitBreakerPolicy);
 
         services.AddScoped<CachedAuthorizationHandler>();
+        services.AddScoped<CachedThemeHandler>();
+        services.AddScoped<ThemeCachePreferenceService>();
 
         // enable access to the current HTTP context in non-controller classes
         services.AddHttpContextAccessor();
@@ -314,7 +317,7 @@ public static class PresentationWebLayerServices
         services.AddScoped<Authorization.IAuthorizationService, AuthorizationService>();
         services.AddSingleton<ICryptographyService, CryptographyService>();
         services.AddSingleton<IUrlService, UrlService>();
-        services.AddHybridCache(); // used for caching authorization roles, permissions and policies
+        services.AddHybridCache(); // used for caching authorization roles, permissions, policies and theme data
 
         return services;
     }
