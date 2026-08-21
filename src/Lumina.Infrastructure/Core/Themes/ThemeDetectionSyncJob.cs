@@ -72,35 +72,49 @@ internal sealed class ThemeDetectionSyncJob : BackgroundService
             if (knownThemeIds.Contains(manifestResult.Value.Id))
                 continue;
 
-            await using FileStream archive = File.OpenRead(archivePath);
-            Result<ThemeManifestDto> installResult = await _themeService.InstallAsync(archive, stoppingToken);
-            if (installResult.IsFailure)
+            // installing a bundled theme at startup is best effort: a file system failure here must never crash the host,
+            // because the default BackgroundServiceExceptionBehavior (StopHost) shuts down the whole application and
+            // disposes its service provider, making every later request fail
+            try
             {
-                _logger.LogWarning("Failed to install bundled theme '{ThemeId}': {Error}", manifestResult.Value.Id, installResult.FirstError.Description);
-                continue;
+                await using FileStream archive = File.OpenRead(archivePath);
+                Result<ThemeManifestDto> installResult = await _themeService.InstallAsync(archive, stoppingToken);
+                if (installResult.IsFailure)
+                {
+                    _logger.LogWarning("Failed to install bundled theme '{ThemeId}': {Error}", manifestResult.Value.Id, installResult.FirstError.Description);
+                    continue;
+                }
+
+                ThemeEntity themeEntity = new()
+                {
+                    Id = Guid.NewGuid(),
+                    ThemeId = manifestResult.Value.Id,
+                    Name = manifestResult.Value.Name,
+                    Description = manifestResult.Value.Description,
+                    Author = manifestResult.Value.Author,
+                    Version = manifestResult.Value.Version,
+                    PreviewPath = manifestResult.Value.Preview,
+                    InstallSource = ThemeInstallSource.Bundled,
+                    InstalledAtUtc = DateTime.UtcNow,
+                    CreatedOnUtc = DateTime.UtcNow,
+                    CreatedBy = default,
+                    UpdatedBy = default
+                };
+
+                Result<Created> insertResult = await unitOfWork.ThemeRepository.InsertAsync(themeEntity, stoppingToken);
+                if (insertResult.IsFailure)
+                    _logger.LogWarning("Failed to persist the detection of theme '{ThemeId}': {Error}", manifestResult.Value.Id, insertResult.FirstError.Description);
+                else
+                    themes.Add(themeEntity);
             }
-
-            ThemeEntity themeEntity = new()
+            catch (IOException exception)
             {
-                Id = Guid.NewGuid(),
-                ThemeId = manifestResult.Value.Id,
-                Name = manifestResult.Value.Name,
-                Description = manifestResult.Value.Description,
-                Author = manifestResult.Value.Author,
-                Version = manifestResult.Value.Version,
-                PreviewPath = manifestResult.Value.Preview,
-                InstallSource = ThemeInstallSource.Bundled,
-                InstalledAtUtc = DateTime.UtcNow,
-                CreatedOnUtc = DateTime.UtcNow,
-                CreatedBy = default,
-                UpdatedBy = default
-            };
-
-            Result<Created> insertResult = await unitOfWork.ThemeRepository.InsertAsync(themeEntity, stoppingToken);
-            if (insertResult.IsFailure)
-                _logger.LogWarning("Failed to persist the detection of theme '{ThemeId}': {Error}", manifestResult.Value.Id, insertResult.FirstError.Description);
-            else
-                themes.Add(themeEntity);
+                _logger.LogWarning(exception, "Failed to install bundled theme '{ThemeId}': the theme files could not be written.", manifestResult.Value.Id);
+            }
+            catch (UnauthorizedAccessException exception)
+            {
+                _logger.LogWarning(exception, "Failed to install bundled theme '{ThemeId}': access to the theme files was denied.", manifestResult.Value.Id);
+            }
         }
 
         await CleanUpMissingThemePacksAsync(unitOfWork, themes, stoppingToken);
