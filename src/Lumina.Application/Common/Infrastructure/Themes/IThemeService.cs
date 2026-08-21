@@ -15,11 +15,6 @@ namespace Lumina.Application.Common.Infrastructure.Themes;
 public interface IThemeService
 {
     /// <summary>
-    /// Gets a value indicating whether theme templates may contain script elements and theme assets may include script files.
-    /// </summary>
-    bool AllowThemeScripts { get; }
-
-    /// <summary>
     /// Gets the maximum allowed size of a theme archive, in bytes.
     /// </summary>
     long MaxArchiveBytes { get; }

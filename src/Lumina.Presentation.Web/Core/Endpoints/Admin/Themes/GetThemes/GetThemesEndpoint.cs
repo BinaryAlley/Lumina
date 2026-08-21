@@ -58,7 +58,6 @@ public class GetThemesEndpoint : BaseEndpoint<EmptyRequest, IResult>
         {
             Themes = themes,
             CurrentThemeId = currentTheme.Id,
-            AllowThemeScripts = settings.AllowThemeScripts,
             MaxArchiveBytes = settings.MaxArchiveBytes
         };
         return JsonSuccess(themeAdmin);

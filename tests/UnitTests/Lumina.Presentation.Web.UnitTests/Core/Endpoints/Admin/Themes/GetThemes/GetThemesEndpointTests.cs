@@ -53,7 +53,7 @@ public class GetThemesEndpointTests
         _mockApiHttpClient.GetAsync<ThemeResponseDto>(ApiRoutes.Themes.GET_CURRENT_THEME, Arg.Any<CancellationToken>())
             .Returns(currentTheme);
         _mockApiHttpClient.GetAsync<ThemeSettingsResponseDto>(ApiRoutes.Themes.GET_THEME_SETTINGS, Arg.Any<CancellationToken>())
-            .Returns(_themeSettingsResponseDtoFixture.Create(maxArchiveBytes: 10 * 1024 * 1024, allowThemeScripts: true));
+            .Returns(_themeSettingsResponseDtoFixture.Create(maxArchiveBytes: 10 * 1024 * 1024));
 
         // Act
         IResult result = await _sut.ExecuteAsync(EmptyRequest.Instance, CancellationToken.None);
@@ -67,7 +67,6 @@ public class GetThemesEndpointTests
             Assert.Equal(2, data.GetProperty("themes").GetArrayLength());
             Assert.Equal("editorial-paper", data.GetProperty("themes")[0].GetProperty("id").GetString());
             Assert.Equal("lumina-default", data.GetProperty("currentThemeId").GetString());
-            Assert.True(data.GetProperty("allowThemeScripts").GetBoolean());
             Assert.Equal(10 * 1024 * 1024, data.GetProperty("maxArchiveBytes").GetInt64());
             Assert.Equal(10.0, data.GetProperty("maxArchiveMegabytes").GetDouble());
         }

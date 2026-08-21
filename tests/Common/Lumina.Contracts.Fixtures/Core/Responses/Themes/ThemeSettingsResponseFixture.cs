@@ -20,17 +20,14 @@ public class ThemeSettingsResponseFixture
     /// Creates a random valid <see cref="ThemeSettingsResponse"/>.
     /// </summary>
     /// <param name="maxArchiveBytes">Optional. The maximum allowed size of a theme archive, in bytes.</param>
-    /// <param name="allowThemeScripts">Optional. Whether theme templates may contain script elements.</param>
     /// <param name="defaultThemeId">Optional. The identifier of the default theme.</param>
     /// <returns>The created <see cref="ThemeSettingsResponse"/>.</returns>
     public ThemeSettingsResponse Create(
         long? maxArchiveBytes = null,
-        bool? allowThemeScripts = null,
         string? defaultThemeId = null)
     {
         return new ThemeSettingsResponse(
             maxArchiveBytes ?? _faker.Random.Long(1_000_000, 100_000_000),
-            allowThemeScripts ?? _faker.Random.Bool(),
             defaultThemeId ?? _faker.Lorem.Slug(2));
     }
 

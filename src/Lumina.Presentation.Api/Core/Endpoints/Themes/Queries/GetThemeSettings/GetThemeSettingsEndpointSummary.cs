@@ -19,12 +19,11 @@ public class GetThemeSettingsEndpointSummary : Summary<GetThemeSettingsEndpoint,
     public GetThemeSettingsEndpointSummary()
     {
         Summary = "Retrieves the theme engine settings.";
-        Description = "Retrieves the settings of the theme engine, including whether theme scripts are allowed and the maximum archive size.";
+        Description = "Retrieves the settings of the theme engine, including the maximum archive size.";
 
         Response(200, "The theme engine settings are returned.",
             example: new ThemeSettingsResponse(
                 MaxArchiveBytes: 8388608,
-                AllowThemeScripts: false,
                 DefaultThemeId: "lumina-default"
             ));
     }

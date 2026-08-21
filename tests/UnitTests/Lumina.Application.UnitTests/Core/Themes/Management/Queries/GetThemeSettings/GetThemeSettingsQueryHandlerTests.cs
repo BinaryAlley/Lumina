@@ -37,10 +37,8 @@ public class GetThemeSettingsQueryHandlerTests
         // Arrange
         GetThemeSettingsQuery query = _getThemeSettingsQueryFixture.Create();
         long maxArchiveBytes = 50_000_000;
-        bool allowThemeScripts = false;
         string defaultThemeId = "default-theme";
         _mockThemeService.MaxArchiveBytes.Returns(maxArchiveBytes);
-        _mockThemeService.AllowThemeScripts.Returns(allowThemeScripts);
         _mockThemeService.DefaultThemeId.Returns(defaultThemeId);
 
         // Act
@@ -49,7 +47,6 @@ public class GetThemeSettingsQueryHandlerTests
         // Assert
         Assert.False(result.IsFailure);
         Assert.Equal(maxArchiveBytes, result.Value.MaxArchiveBytes);
-        Assert.Equal(allowThemeScripts, result.Value.AllowThemeScripts);
         Assert.Equal(defaultThemeId, result.Value.DefaultThemeId);
     }
 }

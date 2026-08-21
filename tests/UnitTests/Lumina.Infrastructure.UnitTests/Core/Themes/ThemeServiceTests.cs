@@ -51,8 +51,7 @@ public class ThemeServiceTests : IDisposable
             maxArchiveBytes: 8 * 1024 * 1024,
             maxExpandedBytes: 24 * 1024 * 1024,
             maxSingleFileBytes: 6 * 1024 * 1024,
-            maxEntries: 250,
-            allowThemeScripts: false);
+            maxEntries: 250);
         _sut = CreateSut(_options);
     }
 
@@ -77,52 +76,6 @@ public class ThemeServiceTests : IDisposable
     }
 
     [Fact]
-    public void AllowThemeScripts_WhenConfiguredFalse_ShouldReturnFalse()
-    {
-        // Arrange
-        ThemeEngineOptionsDto options = _themeEngineOptionsDtoFixture.Create(
-            storagePath: Path.Combine(_testRootPath, "themes"),
-            bundledThemesPath: Path.Combine(_testRootPath, "bundled"),
-            defaultThemeId: "lumina-default",
-            maxArchiveBytes: 8 * 1024 * 1024,
-            maxExpandedBytes: 24 * 1024 * 1024,
-            maxSingleFileBytes: 6 * 1024 * 1024,
-            maxEntries: 250,
-            allowThemeScripts: false);
-        options.AllowThemeScripts = false;
-        ThemeService sut = CreateSut(options);
-
-        // Act
-        bool result = sut.AllowThemeScripts;
-
-        // Assert
-        Assert.False(result);
-    }
-
-    [Fact]
-    public void AllowThemeScripts_WhenConfiguredTrue_ShouldReturnTrue()
-    {
-        // Arrange
-        ThemeEngineOptionsDto options = _themeEngineOptionsDtoFixture.Create(
-            storagePath: Path.Combine(_testRootPath, "themes"),
-            bundledThemesPath: Path.Combine(_testRootPath, "bundled"),
-            defaultThemeId: "lumina-default",
-            maxArchiveBytes: 8 * 1024 * 1024,
-            maxExpandedBytes: 24 * 1024 * 1024,
-            maxSingleFileBytes: 6 * 1024 * 1024,
-            maxEntries: 250,
-            allowThemeScripts: false);
-        options.AllowThemeScripts = true;
-        ThemeService sut = CreateSut(options);
-
-        // Act
-        bool result = sut.AllowThemeScripts;
-
-        // Assert
-        Assert.True(result);
-    }
-
-    [Fact]
     public void MaxArchiveBytes_WhenConfigured_ShouldReturnConfiguredValue()
     {
         // Arrange
@@ -133,8 +86,7 @@ public class ThemeServiceTests : IDisposable
             maxArchiveBytes: 8 * 1024 * 1024,
             maxExpandedBytes: 24 * 1024 * 1024,
             maxSingleFileBytes: 6 * 1024 * 1024,
-            maxEntries: 250,
-            allowThemeScripts: false);
+            maxEntries: 250);
         options.MaxArchiveBytes = 12345;
         ThemeService sut = CreateSut(options);
 
@@ -156,8 +108,7 @@ public class ThemeServiceTests : IDisposable
             maxArchiveBytes: 8 * 1024 * 1024,
             maxExpandedBytes: 24 * 1024 * 1024,
             maxSingleFileBytes: 6 * 1024 * 1024,
-            maxEntries: 250,
-            allowThemeScripts: false);
+            maxEntries: 250);
         options.DefaultThemeId = "custom-default";
         ThemeService sut = CreateSut(options);
 
@@ -288,8 +239,7 @@ public class ThemeServiceTests : IDisposable
             maxArchiveBytes: 8 * 1024 * 1024,
             maxExpandedBytes: 24 * 1024 * 1024,
             maxSingleFileBytes: 6 * 1024 * 1024,
-            maxEntries: 250,
-            allowThemeScripts: false);
+            maxEntries: 250);
         options.MaxArchiveBytes = 128;
         ThemeService sut = CreateSut(options);
         byte[] archive = _themePackFixture.Create();
@@ -453,8 +403,7 @@ public class ThemeServiceTests : IDisposable
             maxArchiveBytes: 8 * 1024 * 1024,
             maxExpandedBytes: 24 * 1024 * 1024,
             maxSingleFileBytes: 6 * 1024 * 1024,
-            maxEntries: 250,
-            allowThemeScripts: false);
+            maxEntries: 250);
         options.MaxEntries = 2;
         ThemeService sut = CreateSut(options);
         byte[] archive = _themePackFixture.Create();
@@ -478,8 +427,7 @@ public class ThemeServiceTests : IDisposable
             maxArchiveBytes: 8 * 1024 * 1024,
             maxExpandedBytes: 24 * 1024 * 1024,
             maxSingleFileBytes: 6 * 1024 * 1024,
-            maxEntries: 250,
-            allowThemeScripts: false);
+            maxEntries: 250);
         options.MaxSingleFileBytes = 10;
         ThemeService sut = CreateSut(options);
         string manifestJson = _themePackFixture.CreateManifestJson();
@@ -506,8 +454,7 @@ public class ThemeServiceTests : IDisposable
             maxArchiveBytes: 8 * 1024 * 1024,
             maxExpandedBytes: 24 * 1024 * 1024,
             maxSingleFileBytes: 6 * 1024 * 1024,
-            maxEntries: 250,
-            allowThemeScripts: false);
+            maxEntries: 250);
         options.MaxSingleFileBytes = 400;
         options.MaxExpandedBytes = 300;
         ThemeService sut = CreateSut(options);
@@ -1040,48 +987,6 @@ public class ThemeServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task GetTemplateAsync_WhenScriptsAreDisabled_ShouldStripScriptElements()
-    {
-        // Arrange
-        byte[] archive = _themePackFixture.Create(defaultTemplateContent: "<script>alert('xss')</script><p>safe content</p>");
-        await InstallValidThemeAsync(archive);
-
-        // Act
-        Result<string> result = await _sut.GetTemplateAsync("test-theme", "unknown-page", CancellationToken.None);
-
-        // Assert
-        Assert.True(result.IsSuccess);
-        Assert.Equal("<p>safe content</p>", result.Value);
-    }
-
-    [Fact]
-    public async Task GetTemplateAsync_WhenScriptsAreEnabled_ShouldPreserveScriptElements()
-    {
-        // Arrange
-        ThemeEngineOptionsDto options = _themeEngineOptionsDtoFixture.Create(
-            storagePath: Path.Combine(_testRootPath, "themes"),
-            bundledThemesPath: Path.Combine(_testRootPath, "bundled"),
-            defaultThemeId: "lumina-default",
-            maxArchiveBytes: 8 * 1024 * 1024,
-            maxExpandedBytes: 24 * 1024 * 1024,
-            maxSingleFileBytes: 6 * 1024 * 1024,
-            maxEntries: 250,
-            allowThemeScripts: false);
-        options.AllowThemeScripts = true;
-        ThemeService sut = CreateSut(options);
-        const string TEMPLATE_WITH_SCRIPT = "<script>alert('xss')</script><p>safe content</p>";
-        byte[] archive = _themePackFixture.Create(defaultTemplateContent: TEMPLATE_WITH_SCRIPT);
-        await InstallValidThemeAsync(archive, sut);
-
-        // Act
-        Result<string> result = await sut.GetTemplateAsync("test-theme", "unknown-page", CancellationToken.None);
-
-        // Assert
-        Assert.True(result.IsSuccess);
-        Assert.Equal(TEMPLATE_WITH_SCRIPT, result.Value);
-    }
-
-    [Fact]
     public async Task GetAssetAsync_WhenAssetExists_ShouldReturnFileBytesAndContentType()
     {
         // Arrange
@@ -1146,7 +1051,7 @@ public class ThemeServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task GetAssetAsync_WhenScriptsAreDisabledAndAssetIsJavaScript_ShouldReturnThemeFilesUnreadable()
+    public async Task GetAssetAsync_WhenAssetIsJavaScript_ShouldReturnJavaScriptContentType()
     {
         // Arrange
         byte[] archive = _themePackFixture.Create(additionalFiles: new Dictionary<string, string>
@@ -1157,35 +1062,6 @@ public class ThemeServiceTests : IDisposable
 
         // Act
         Result<ThemeAssetDto> result = await _sut.GetAssetAsync("test-theme", "assets/app.js", CancellationToken.None);
-
-        // Assert
-        Assert.True(result.IsFailure);
-        Assert.Equal("ThemeFilesUnreadable", result.FirstError.Description);
-    }
-
-    [Fact]
-    public async Task GetAssetAsync_WhenScriptsAreEnabledAndAssetIsJavaScript_ShouldReturnJavaScriptContentType()
-    {
-        // Arrange
-        ThemeEngineOptionsDto options = _themeEngineOptionsDtoFixture.Create(
-            storagePath: Path.Combine(_testRootPath, "themes"),
-            bundledThemesPath: Path.Combine(_testRootPath, "bundled"),
-            defaultThemeId: "lumina-default",
-            maxArchiveBytes: 8 * 1024 * 1024,
-            maxExpandedBytes: 24 * 1024 * 1024,
-            maxSingleFileBytes: 6 * 1024 * 1024,
-            maxEntries: 250,
-            allowThemeScripts: false);
-        options.AllowThemeScripts = true;
-        ThemeService sut = CreateSut(options);
-        byte[] archive = _themePackFixture.Create(additionalFiles: new Dictionary<string, string>
-        {
-            ["assets/app.js"] = "console.log('hello');"
-        });
-        await InstallValidThemeAsync(archive, sut);
-
-        // Act
-        Result<ThemeAssetDto> result = await sut.GetAssetAsync("test-theme", "assets/app.js", CancellationToken.None);
 
         // Assert
         Assert.True(result.IsSuccess);

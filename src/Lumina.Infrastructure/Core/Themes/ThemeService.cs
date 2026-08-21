@@ -45,12 +45,6 @@ public sealed class ThemeService : IThemeService
         "^[A-Za-z0-9][A-Za-z0-9._ -]*$",
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
-    // strips every script element from a template, both the inline content and the src attribute variants,
-    // so that no script bundled in a theme is executed in any client when scripts are disabled
-    private static readonly Regex s_scriptElementPattern = new(
-        "<script\\b[^>]*>[\\s\\S]*?</script\\s*>",
-        RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
-
     private static readonly JsonSerializerOptions s_manifestJsonOptions = new(JsonSerializerDefaults.Web)
     {
         PropertyNameCaseInsensitive = true,
@@ -86,11 +80,6 @@ public sealed class ThemeService : IThemeService
         _bundledRoot = ResolvePath(basePath, _options.BundledThemesPath);
         _mutationGate = s_storageGates.GetOrAdd(_storageRoot, static _ => new SemaphoreSlim(1, 1));
     }
-
-    /// <summary>
-    /// Gets a value indicating whether theme templates may contain script elements and theme assets may include script files.
-    /// </summary>
-    public bool AllowThemeScripts => _options.AllowThemeScripts;
 
     /// <summary>
     /// Gets the maximum allowed size of a theme archive, in bytes.
@@ -280,8 +269,6 @@ public sealed class ThemeService : IThemeService
             return Errors.Themes.ThemeFilesUnreadable;
 
         string template = await File.ReadAllTextAsync(fullPathResult.Value, cancellationToken);
-        if (!AllowThemeScripts)
-            template = StripScriptElements(template);
 
         return template;
     }
@@ -329,10 +316,6 @@ public sealed class ThemeService : IThemeService
         string normalizedPath = normalizedResult.Value;
         if (!normalizedPath.StartsWith("assets/", StringComparison.Ordinal))
             return PackageInvalid("The requested asset is not located under the assets directory.");
-
-        // scripts in theme assets are gated globally: when disabled, script files are not served at all
-        if (!AllowThemeScripts && string.Equals(Path.GetExtension(normalizedPath), ".js", StringComparison.OrdinalIgnoreCase))
-            return Errors.Themes.ThemeFilesUnreadable;
 
         Result<string> fullPathResult = ResolveContainedPath(ResolveThemePath(themeId), normalizedPath);
         if (fullPathResult.IsFailure)
@@ -780,16 +763,6 @@ public sealed class ThemeService : IThemeService
     private static Error PackageInvalid(string description)
     {
         return Error.Validation(code: "Theme.Package.Invalid", description: description);
-    }
-
-    /// <summary>
-    /// Removes every script element from a theme template, so that no script bundled in the theme runs when scripts are disabled.
-    /// </summary>
-    /// <param name="template">The template content to strip script elements from.</param>
-    /// <returns>The template content without script elements.</returns>
-    private static string StripScriptElements(string template)
-    {
-        return s_scriptElementPattern.Replace(template, string.Empty);
     }
 
     /// <summary>

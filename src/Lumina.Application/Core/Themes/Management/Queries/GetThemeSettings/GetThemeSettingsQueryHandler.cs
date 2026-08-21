@@ -35,7 +35,7 @@ public class GetThemeSettingsQueryHandler : IQueryHandler<GetThemeSettingsQuery,
     /// </returns>
     public Task<Result<ThemeSettingsResponse>> HandleAsync(GetThemeSettingsQuery query, CancellationToken cancellationToken)
     {
-        ThemeSettingsResponse response = new(_themeService.MaxArchiveBytes, _themeService.AllowThemeScripts, _themeService.DefaultThemeId);
+        ThemeSettingsResponse response = new(_themeService.MaxArchiveBytes, _themeService.DefaultThemeId);
         return Task.FromResult(Result.From(response));
     }
 }

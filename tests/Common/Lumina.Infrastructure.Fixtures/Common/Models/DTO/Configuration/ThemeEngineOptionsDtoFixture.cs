@@ -25,7 +25,6 @@ public class ThemeEngineOptionsDtoFixture
     /// <param name="maxExpandedBytes">Optional maximum total size of an extracted theme pack, in bytes.</param>
     /// <param name="maxSingleFileBytes">Optional maximum size of a single file within a theme pack, in bytes.</param>
     /// <param name="maxEntries">Optional maximum number of entries in a theme pack archive.</param>
-    /// <param name="allowThemeScripts">Optional value indicating whether script elements are allowed.</param>
     /// <returns>A configured <see cref="ThemeEngineOptionsDto"/> instance.</returns>
     public ThemeEngineOptionsDto Create(
         string? storagePath = null,
@@ -34,8 +33,7 @@ public class ThemeEngineOptionsDtoFixture
         long? maxArchiveBytes = null,
         long? maxExpandedBytes = null,
         long? maxSingleFileBytes = null,
-        int? maxEntries = null,
-        bool? allowThemeScripts = null)
+        int? maxEntries = null)
     {
         Faker faker = new();
         return new ThemeEngineOptionsDto
@@ -46,8 +44,7 @@ public class ThemeEngineOptionsDtoFixture
             MaxArchiveBytes = maxArchiveBytes ?? faker.Random.Long(1_000_000, 100_000_000),
             MaxExpandedBytes = maxExpandedBytes ?? faker.Random.Long(10_000_000, 500_000_000),
             MaxSingleFileBytes = maxSingleFileBytes ?? faker.Random.Long(1_000_000, 50_000_000),
-            MaxEntries = maxEntries ?? faker.Random.Int(1, 1000),
-            AllowThemeScripts = allowThemeScripts ?? faker.Random.Bool()
+            MaxEntries = maxEntries ?? faker.Random.Int(1, 1000)
         };
     }
 

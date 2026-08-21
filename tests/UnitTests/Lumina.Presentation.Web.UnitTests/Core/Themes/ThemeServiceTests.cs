@@ -103,7 +103,7 @@ public class ThemeServiceTests
     public async Task GetThemeSettingsAsync_WhenApiReturnsSettings_ShouldReturnSettings()
     {
         // Arrange
-        ThemeSettingsResponseDto settings = _themeSettingsResponseDtoFixture.Create(maxArchiveBytes: 10 * 1024 * 1024, allowThemeScripts: true);
+        ThemeSettingsResponseDto settings = _themeSettingsResponseDtoFixture.Create(maxArchiveBytes: 10 * 1024 * 1024);
         _mockApiHttpClient.GetAsync<ThemeSettingsResponseDto>(ApiRoutes.Themes.GET_THEME_SETTINGS, Arg.Any<CancellationToken>())
             .Returns(settings);
 

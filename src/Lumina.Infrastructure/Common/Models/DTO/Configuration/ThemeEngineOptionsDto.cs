@@ -46,9 +46,4 @@ public sealed class ThemeEngineOptionsDto
     /// Gets or sets the maximum allowed number of entries in a theme pack archive.
     /// </summary>
     public int MaxEntries { get; set; } = 250;
-
-    /// <summary>
-    /// Gets or sets a value indicating whether script elements in theme templates and script files in theme assets are allowed to be served.
-    /// </summary>
-    public bool AllowThemeScripts { get; set; }
 }
