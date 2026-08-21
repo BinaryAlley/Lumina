@@ -2,6 +2,7 @@
 using Lumina.Presentation.Web.Common.DTO.Themes;
 using Lumina.Presentation.Web.Common.Primitives;
 using Microsoft.AspNetCore.Http;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -49,31 +50,45 @@ public class ThemeLayoutRenderer
     /// <returns>An <see cref="Result{TValue}"/> containing either the full page HTML, or an error.</returns>
     public virtual async Task<Result<string>> RenderAsync(ThemeLayoutPageDto page, string? requestedThemeId = null, CancellationToken cancellationToken = default)
     {
-        ThemeRenderDocumentDto layoutDocument = await _themeService.GetRenderDocumentAsync(LAYOUT_PAGE_KEY, requestedThemeId, cancellationToken);
-        string themeId = layoutDocument.Theme.Id;
-        bool isAuthenticated = _httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated == true;
+        try
+        {
+            ThemeRenderDocumentDto layoutDocument = await _themeService.GetRenderDocumentAsync(LAYOUT_PAGE_KEY, requestedThemeId, cancellationToken);
+            string themeId = layoutDocument.Theme.Id;
+            bool isAuthenticated = _httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated == true;
 
-        string appHead = await _viewRenderer.RenderPartialAsync("_ThemeLayoutHead", cancellationToken);
-        string nav = await RenderNavAsync(themeId, cancellationToken);
-        string audioPlayer = isAuthenticated ? await _viewRenderer.RenderPartialAsync("_AudioPlayer", cancellationToken) : string.Empty;
-        string appScripts = await _viewRenderer.RenderPartialAsync("_ThemeLayoutScripts", cancellationToken);
+            string appHead = await _viewRenderer.RenderPartialAsync("_ThemeLayoutHead", cancellationToken);
+            string nav = await RenderNavAsync(themeId, cancellationToken);
+            string audioPlayer = isAuthenticated ? await _viewRenderer.RenderPartialAsync("_AudioPlayer", cancellationToken) : string.Empty;
+            string appScripts = await _viewRenderer.RenderPartialAsync("_ThemeLayoutScripts", cancellationToken);
 
-        ThemeLayoutModelDto layoutModel = new(
-            page.Title,
-            $"/theme-assets/{themeId}/assets",
-            appHead,
-            nav,
-            page.Content,
-            audioPlayer,
-            appScripts,
-            page.Script,
-            isAuthenticated ? string.Empty : "bottom: 0px;");
+            ThemeLayoutModelDto layoutModel = new(
+                page.Title,
+                $"/theme-assets/{themeId}/assets",
+                appHead,
+                nav,
+                page.Content,
+                audioPlayer,
+                appScripts,
+                page.Script,
+                isAuthenticated ? string.Empty : "bottom: 0px;");
 
-        Result<ThemePageRenderResultDto> renderResult = _templateEngine.RenderPage(layoutDocument.Template, layoutModel);
-        if (renderResult.IsFailure)
-            return renderResult.Errors;
+            Result<ThemePageRenderResultDto> renderResult = _templateEngine.RenderPage(layoutDocument.Template, layoutModel);
+            if (renderResult.IsFailure)
+                return renderResult.Errors;
 
-        return renderResult.Value.Content;
+            return renderResult.Value.Content;
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception)
+        {
+            // the themed shell is best effort: when the active theme cannot be loaded, the application layout renders the
+            // page instead. The exception must not propagate, otherwise the exception handling middleware turns the page
+            // into a JSON error instead of the fallback layout, so any page breaks whenever the theme API is unavailable.
+            return Error.NotFound(code: "Theme.Template.Unavailable", description: "The active theme could not be loaded.");
+        }
     }
 
     /// <summary>

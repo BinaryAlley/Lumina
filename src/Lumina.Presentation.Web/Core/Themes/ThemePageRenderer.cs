@@ -2,6 +2,7 @@
 using Lumina.Presentation.Web.Common.DTO.Themes;
 using Lumina.Presentation.Web.Common.Primitives;
 using Lumina.Presentation.Web.Common.Services;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -36,13 +37,27 @@ public class ThemePageRenderer
     /// <returns>An <see cref="Result{TValue}"/> containing either the rendered page, or an error.</returns>
     public virtual async Task<Result<ThemePageRenderResultDto>> RenderAsync(ThemePageDto model, string? requestedThemeId = null, CancellationToken cancellationToken = default)
     {
-        ThemeRenderDocumentDto document = await _themeService.GetRenderDocumentAsync(model.PageKey, requestedThemeId, cancellationToken);
+        try
+        {
+            ThemeRenderDocumentDto document = await _themeService.GetRenderDocumentAsync(model.PageKey, requestedThemeId, cancellationToken);
 
-        model.ThemeId = document.Theme.Id;
-        model.AssetBase = $"/theme-assets/{document.Theme.Id}/assets";
-        // a fresh script id per render lets the AJAX navigator unload this view's script when navigating away
-        model.ScriptId = ScriptIdentifierHelper.GenerateScriptId();
+            model.ThemeId = document.Theme.Id;
+            model.AssetBase = $"/theme-assets/{document.Theme.Id}/assets";
+            // a fresh script id per render lets the AJAX navigator unload this view's script when navigating away
+            model.ScriptId = ScriptIdentifierHelper.GenerateScriptId();
 
-        return _templateEngine.RenderPage(document.Template, model);
+            return _templateEngine.RenderPage(document.Template, model);
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception)
+        {
+            // themed rendering is best effort: when the active theme cannot be loaded, the caller falls back to the Razor
+            // view. The exception must not propagate, otherwise the exception handling middleware turns the page into a
+            // JSON error instead of the Razor fallback, so any themed page breaks whenever the theme API is unavailable.
+            return Error.NotFound(code: "Theme.Template.Unavailable", description: "The active theme could not be loaded.");
+        }
     }
 }
