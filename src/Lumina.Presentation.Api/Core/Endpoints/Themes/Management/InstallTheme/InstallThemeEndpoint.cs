@@ -1,8 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.Mapping.Themes;
 using Lumina.Application.Core.Themes.Management.Commands.InstallTheme;
-using Lumina.Contracts.Requests.Themes;
 using Lumina.Contracts.Responses.Themes;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Common.Routes.Themes;
@@ -18,7 +16,7 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Themes.Management.InstallTheme;
 /// <summary>
 /// API endpoint for the <c>/themes</c> route.
 /// </summary>
-public class InstallThemeEndpoint : BaseEndpoint<InstallThemeRequest, IResult>
+public class InstallThemeEndpoint : BaseEndpoint<FastEndpoints.EmptyRequest, IResult>
 {
     private readonly ICommandHandler<InstallThemeCommand, Result<ThemeResponse>> _installThemeCommandHandler;
 
@@ -47,10 +45,11 @@ public class InstallThemeEndpoint : BaseEndpoint<InstallThemeRequest, IResult>
     /// </summary>
     /// <param name="request">The request object.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    public override async Task<IResult> ExecuteAsync(InstallThemeRequest request, CancellationToken cancellationToken)
+    public override async Task<IResult> ExecuteAsync(FastEndpoints.EmptyRequest request, CancellationToken cancellationToken)
     {
         IFormFile? archive = HttpContext.Request.Form.Files.FirstOrDefault();
-        Result<ThemeResponse> result = await _installThemeCommandHandler.HandleAsync(request.ToCommand(archive?.OpenReadStream(), archive?.FileName), cancellationToken).ConfigureAwait(false);
+        InstallThemeCommand command = new(archive?.OpenReadStream(), archive?.FileName);
+        Result<ThemeResponse> result = await _installThemeCommandHandler.HandleAsync(command, cancellationToken).ConfigureAwait(false);
         return result.Match(success => TypedResults.Ok(success), Problem);
     }
 }

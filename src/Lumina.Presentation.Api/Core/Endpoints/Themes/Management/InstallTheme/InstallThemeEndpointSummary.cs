@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Contracts.Requests.Themes;
 using Lumina.Contracts.Responses.Themes;
 using Lumina.Domain.SharedKernel.Common.Enums.Themes;
 using System;
@@ -14,7 +13,7 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Themes.Management.InstallTheme;
 /// Class used for providing a textual description for the <see cref="InstallThemeEndpoint"/> API endpoint, for OpenAPI.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class InstallThemeEndpointSummary : Summary<InstallThemeEndpoint, InstallThemeRequest>
+public class InstallThemeEndpointSummary : Summary<InstallThemeEndpoint, EmptyRequest>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="InstallThemeEndpointSummary"/> class.
