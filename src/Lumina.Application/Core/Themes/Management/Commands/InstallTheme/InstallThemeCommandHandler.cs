@@ -103,7 +103,8 @@ public class InstallThemeCommandHandler : ICommandHandler<InstallThemeCommand, R
                 PreviewPath = manifest.Preview,
                 InstallSource = existingTheme.InstallSource,
                 IsCurrent = existingTheme.IsCurrent,
-                IsDeleted = existingTheme.IsDeleted,
+                // reinstalling a theme must bring it back even if it was soft deleted before, so the uploaded pack becomes visible again
+                IsDeleted = false,
                 InstalledAtUtc = DateTime.UtcNow,
                 CreatedOnUtc = existingTheme.CreatedOnUtc,
                 CreatedBy = existingTheme.CreatedBy,
