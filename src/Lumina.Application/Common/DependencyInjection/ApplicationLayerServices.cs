@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Application.Common.Telemetry;
 using Lumina.Domain.Common.Events;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -46,9 +47,18 @@ public static class ApplicationLayerServices
                 continue;
 
             if (registration.Contract.GetGenericTypeDefinition() == typeof(Infrastructure.Validation.IValidator<>))
+            {
                 services.AddSingleton(registration.Contract, registration.Implementation);
-            else
-                services.AddScoped(registration.Contract, registration.Implementation);
+                continue;
+            }
+
+            // wrap query, command, and domain event handlers in their telemetry decorator, so that every invocation emits traces, metrics, and structured logs
+            services.AddScoped(registration.Contract, serviceProvider =>
+            {
+                object handler = ActivatorUtilities.GetServiceOrCreateInstance(serviceProvider, registration.Implementation);
+                Type decoratorType = TelemetryDecoratorFactory.GetDecoratorType(registration.Contract);
+                return ActivatorUtilities.CreateInstance(serviceProvider, decoratorType, handler);
+            });
         }
 
         return services;
