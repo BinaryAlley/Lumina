@@ -26,6 +26,7 @@ public class GetLibrariesEndpointTests
     private readonly IApiHttpClient _mockApiHttpClient;
     private readonly GetLibrariesEndpoint _sut;
     private readonly LibraryDtoFixture _libraryDtoFixture = new();
+    private readonly JsonSerializerOptions _jsonOptions = new() { PropertyNameCaseInsensitive = true };
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetLibrariesEndpointTests"/> class.
@@ -51,7 +52,7 @@ public class GetLibrariesEndpointTests
         // Assert
         using JsonDocument jsonDocument = JsonDocument.Parse(body);
         Assert.True(jsonDocument.RootElement.GetProperty("success").GetBoolean());
-        LibraryDto[]? returnedLibraries = jsonDocument.RootElement.GetProperty("data").Deserialize<LibraryDto[]>(new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        LibraryDto[]? returnedLibraries = jsonDocument.RootElement.GetProperty("data").Deserialize<LibraryDto[]>(_jsonOptions);
         Assert.Equal(expectedLibraries.Select(library => library.Title), returnedLibraries!.Select(library => library.Title));
     }
 
