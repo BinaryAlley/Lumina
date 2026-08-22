@@ -34,19 +34,26 @@ namespace Lumina.Presentation.Api.SecurityTests.Common.Setup;
 public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
 {
     private readonly SqliteConnection _connection;
+    private readonly string _sharedInMemoryConnectionString;
     private readonly PasswordHashService _hashService = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
     };
     private const string TEST_ENCRYPTION_KEY = "MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=";
+    private const string SHARED_IN_MEMORY_CONNECTION_STRING_PREFIX = "Data Source=lumina-tests-{0};Mode=Memory;Cache=Shared";
     
     /// <summary>
     /// Initializes a new instance of the <see cref="LuminaApiFactory"/> class.
     /// </summary>
     public LuminaApiFactory()
     {
-        _connection = new SqliteConnection("DataSource=:memory:");
+        // each factory gets its own uniquely named shared in-memory database, so that parallel test classes remain isolated from one another;
+        // the shared cache allows each DbContext to open its own pooled connection to the same database, instead of sharing a single connection,
+        // which would otherwise serialize every request on one connection and cause nested transaction errors between requests
+        _sharedInMemoryConnectionString = string.Format(SHARED_IN_MEMORY_CONNECTION_STRING_PREFIX, Guid.NewGuid());
+        // keep a single anchor connection open, so that the shared in-memory database it refers to is not dropped
+        _connection = new SqliteConnection(_sharedInMemoryConnectionString);
         _connection.Open();
     }
 
@@ -84,7 +91,7 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
             // add SQLite DbContext configuration
             services.AddDbContext<LuminaDbContext>((serviceProvider, options) =>
             {
-                options.UseSqlite(_connection);
+                options.UseSqlite(_sharedInMemoryConnectionString);
                 options.AddInterceptors(serviceProvider.GetRequiredService<UpdateAuditableEntitiesInterceptor>());
             });
             // configure JWT authentication for testing

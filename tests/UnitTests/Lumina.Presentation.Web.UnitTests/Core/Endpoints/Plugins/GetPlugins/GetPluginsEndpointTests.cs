@@ -25,6 +25,7 @@ public class GetPluginsEndpointTests
 {
     private readonly IApiHttpClient _mockApiHttpClient;
     private readonly GetPluginsEndpoint _sut;
+    private readonly JsonSerializerOptions _jsonOptions = new() { PropertyNameCaseInsensitive = true };
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetPluginsEndpointTests"/> class.
@@ -50,7 +51,7 @@ public class GetPluginsEndpointTests
         // Assert
         using JsonDocument jsonDocument = JsonDocument.Parse(body);
         Assert.True(jsonDocument.RootElement.GetProperty("success").GetBoolean());
-        PluginDto[]? returnedPlugins = jsonDocument.RootElement.GetProperty("data").Deserialize<PluginDto[]>(new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        PluginDto[]? returnedPlugins = jsonDocument.RootElement.GetProperty("data").Deserialize<PluginDto[]>(_jsonOptions);
         Assert.Equal(expectedPlugins.Select(plugin => plugin.Name), returnedPlugins!.Select(plugin => plugin.Name));
     }
 

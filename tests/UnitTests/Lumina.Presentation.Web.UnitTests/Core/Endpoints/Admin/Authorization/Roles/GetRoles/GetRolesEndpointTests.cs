@@ -26,6 +26,7 @@ public class GetRolesEndpointTests
     private readonly IApiHttpClient _mockApiHttpClient;
     private readonly GetRolesEndpoint _sut;
     private readonly RoleDtoFixture _roleDtoFixture = new();
+    private readonly JsonSerializerOptions _jsonOptions = new() { PropertyNameCaseInsensitive = true };
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetRolesEndpointTests"/> class.
@@ -51,13 +52,8 @@ public class GetRolesEndpointTests
         // Assert
         using JsonDocument jsonDocument = JsonDocument.Parse(body);
         Assert.True(jsonDocument.RootElement.GetProperty("success").GetBoolean());
-        RoleDto[]? returnedRoles = jsonDocument.RootElement.GetProperty("data").Deserialize<RoleDto[]>(CreateCaseInsensitiveOptions());
+        RoleDto[]? returnedRoles = jsonDocument.RootElement.GetProperty("data").Deserialize<RoleDto[]>(_jsonOptions);
         Assert.Equal(expectedRoles.Select(role => role.RoleName), returnedRoles!.Select(role => role.RoleName));
-    }
-
-    private static JsonSerializerOptions CreateCaseInsensitiveOptions()
-    {
-        return new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
     }
 
     [Fact]

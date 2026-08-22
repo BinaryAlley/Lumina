@@ -10,6 +10,7 @@ using Lumina.Infrastructure.Common.DependencyInjection;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Progress;
 using Lumina.Presentation.Api.Common.DependencyInjection;
 using Lumina.Presentation.Api.Common.Middlewares;
+using Lumina.Presentation.Api.Common.Utilities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Data.Sqlite;
@@ -107,7 +108,7 @@ public class Program
         app.UseRouting();
         app.UseCors("SecurePolicy");
 
-        //app.UseExceptionHandler("/error"); // uses a middleware which re-executes the request to the error path
+        app.UseApiExceptionHandling(); // catches any unhandled exception and returns a ProblemDetails response
 
         //app.UseHttpsRedirection();
 
