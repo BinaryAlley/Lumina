@@ -1600,7 +1600,10 @@
         }
     });
 
-    // expose the functions that need to be accessed globally
+    // expose the functions and DOM elements that need to be accessed globally
     window.initFileSystemBrowser = initFileSystemBrowser;
     window.showFileSystemBrowserDialogAsync = showFileSystemBrowserDialogAsync;
+    window.addressBar = addressBar;
+    window.reattachDropdown = reattachDropdown;
+    window.adjustDropdownPosition = adjustDropdownPosition;
 })();

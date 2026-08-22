@@ -77,9 +77,9 @@ public class FileService : IFileService
             Result<Optional<DateTime>> dateModifiedResult = _environmentContext.FileProviderService.GetLastWriteTime(filePath);
             Result<Optional<DateTime>> dateCreatedResult = _environmentContext.FileProviderService.GetCreationTime(filePath);
             Result<long?> sizeResult = _environmentContext.FileProviderService.GetSize(filePath);
-            long size = sizeResult.Value ?? 0;
+            long size = !sizeResult.IsFailure ? sizeResult.Value ?? 0 : 0;
             // if any of the details returned an error, set inaccessible status
-            if (fileNameResult.IsFailure || dateModifiedResult.IsFailure || dateCreatedResult.IsFailure)
+            if (fileNameResult.IsFailure || dateModifiedResult.IsFailure || dateCreatedResult.IsFailure || sizeResult.IsFailure)
             {
                 Result<File> errorFileResult = File.Create(filePath, !fileNameResult.IsFailure ? fileNameResult.Value : null!,
                     !dateCreatedResult.IsFailure ? dateCreatedResult.Value : Optional<DateTime>.None(),
@@ -149,9 +149,9 @@ public class FileService : IFileService
             Result<Optional<DateTime>> dateModifiedResult = _environmentContext.FileProviderService.GetLastWriteTime(copyFileResult.Value);
             Result<Optional<DateTime>> dateCreatedResult = _environmentContext.FileProviderService.GetCreationTime(copyFileResult.Value);
             Result<long?> sizeResult = _environmentContext.FileProviderService.GetSize(copyFileResult.Value);
-            long size = sizeResult.Value ?? 0;
+            long size = !sizeResult.IsFailure ? sizeResult.Value ?? 0 : 0;
             // if any of the details returned an error, set inaccessible status
-            if (fileNameResult.IsFailure || dateModifiedResult.IsFailure || dateCreatedResult.IsFailure)
+            if (fileNameResult.IsFailure || dateModifiedResult.IsFailure || dateCreatedResult.IsFailure || sizeResult.IsFailure)
             {
                 Result<File> errorFileResult = File.Create(copyFileResult.Value, !fileNameResult.IsFailure ? fileNameResult.Value : null!,
                     !dateCreatedResult.IsFailure ? dateCreatedResult.Value : Optional<DateTime>.None(),
@@ -215,9 +215,9 @@ public class FileService : IFileService
             Result<Optional<DateTime>> dateModifiedResult = _environmentContext.FileProviderService.GetLastWriteTime(moveFileResult.Value);
             Result<Optional<DateTime>> dateCreatedResult = _environmentContext.FileProviderService.GetCreationTime(moveFileResult.Value);
             Result<long?> sizeResult = _environmentContext.FileProviderService.GetSize(moveFileResult.Value);
-            long size = sizeResult.Value ?? 0;
+            long size = !sizeResult.IsFailure ? sizeResult.Value ?? 0 : 0;
             // if any of the details returned an error, set inaccessible status
-            if (fileNameResult.IsFailure || dateModifiedResult.IsFailure || dateCreatedResult.IsFailure)
+            if (fileNameResult.IsFailure || dateModifiedResult.IsFailure || dateCreatedResult.IsFailure || sizeResult.IsFailure)
             {
                 Result<File> errorFileResult = File.Create(moveFileResult.Value, !fileNameResult.IsFailure ? fileNameResult.Value : null!,
                     !dateCreatedResult.IsFailure ? dateCreatedResult.Value : Optional<DateTime>.None(),
@@ -275,9 +275,9 @@ public class FileService : IFileService
             Result<Optional<DateTime>> dateModifiedResult = _environmentContext.FileProviderService.GetLastWriteTime(newFilePathResult.Value);
             Result<Optional<DateTime>> dateCreatedResult = _environmentContext.FileProviderService.GetCreationTime(newFilePathResult.Value);
             Result<long?> sizeResult = _environmentContext.FileProviderService.GetSize(newFilePathResult.Value);
-            long size = sizeResult.Value ?? 0;
+            long size = !sizeResult.IsFailure ? sizeResult.Value ?? 0 : 0;
             // if any of the details returned an error, set inaccessible status
-            if (fileNameResult.IsFailure || dateModifiedResult.IsFailure || dateCreatedResult.IsFailure)
+            if (fileNameResult.IsFailure || dateModifiedResult.IsFailure || dateCreatedResult.IsFailure || sizeResult.IsFailure)
             {
                 Result<File> errorFileResult = File.Create(newFilePathResult.Value, !fileNameResult.IsFailure ? fileNameResult.Value : null!,
                     !dateCreatedResult.IsFailure ? dateCreatedResult.Value : Optional<DateTime>.None(),
