@@ -1,6 +1,10 @@
 # This stage is used when running from VS in fast mode (Default for Debug configuration)
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
-RUN mkdir /logs && chown -R app:app /logs
+# curl is used by the container healthcheck to probe the /health endpoints
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && mkdir /logs && chown -R app:app /logs
 USER app
 WORKDIR /app
 EXPOSE 5214
@@ -18,8 +22,10 @@ COPY ["Lumina.Presentation.Api/Lumina.Presentation.Api.csproj", "Lumina.Presenta
 COPY ["Lumina.Application/Lumina.Application.csproj", "Lumina.Application/"]
 COPY ["Lumina.Contracts/Lumina.Contracts.csproj", "Lumina.Contracts/"]
 COPY ["Lumina.Domain/Lumina.Domain.csproj", "Lumina.Domain/"]
+COPY ["Lumina.Domain.SharedKernel/Lumina.Domain.SharedKernel.csproj", "Lumina.Domain.SharedKernel/"]
 COPY ["Lumina.Infrastructure/Lumina.Infrastructure.csproj", "Lumina.Infrastructure/"]
 COPY ["Lumina.DataAccess/Lumina.DataAccess.csproj", "Lumina.DataAccess/"]
+COPY ["Lumina.Plugins.Contracts/Lumina.Plugins.Contracts.csproj", "Lumina.Plugins.Contracts/"]
 
 RUN dotnet restore "./Lumina.Presentation.Api/Lumina.Presentation.Api.csproj" /p:BaseOutputPath=/app/publish/
 
@@ -49,6 +55,8 @@ FROM base AS final
 WORKDIR /app
 
 COPY --from=publish /app/publish .
+# The HTTP port is controlled per run mode: launchSettings.json for local development, ASPNETCORE_HTTP_PORTS here for
+# Docker, and for a published DLL run directly on a host, ASPNETCORE_URLS (or ASPNETCORE_HTTP_PORTS) must be set
 ENV ASPNETCORE_HTTP_PORTS=5214
 EXPOSE 5214
 ENTRYPOINT ["dotnet", "Lumina.Presentation.Api.dll"]

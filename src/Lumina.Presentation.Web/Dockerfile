@@ -1,6 +1,10 @@
 # This stage is used when running from VS in fast mode (Default for Debug configuration)
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
-RUN mkdir /logs && chown -R app:app /logs
+# curl is used by the container healthcheck to probe the /health endpoints
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && mkdir /logs && chown -R app:app /logs
 USER app
 WORKDIR /app
 EXPOSE 5012
@@ -40,6 +44,8 @@ FROM base AS final
 WORKDIR /app
 
 COPY --from=publish /app/publish .
+# The HTTP port is controlled per run mode: launchSettings.json for local development, ASPNETCORE_HTTP_PORTS here for
+# Docker, and for a published DLL run directly on a host, ASPNETCORE_URLS (or ASPNETCORE_HTTP_PORTS) must be set
 ENV ASPNETCORE_HTTP_PORTS=5012
 EXPOSE 5012
 ENTRYPOINT ["dotnet", "Lumina.Presentation.Web.dll"]

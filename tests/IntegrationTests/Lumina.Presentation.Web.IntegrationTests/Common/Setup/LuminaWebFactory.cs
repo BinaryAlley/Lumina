@@ -1,11 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web;
 using Lumina.Presentation.Web.Common.Api;
+using Lumina.Presentation.Web.Common.HealthChecks;
 using Lumina.Presentation.Web.Fixtures.Common.Api;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -58,6 +60,11 @@ public class LuminaWebFactory : WebApplicationFactory<Program>, IDisposable
             foreach (ServiceDescriptor descriptor in apiClientDescriptors)
                 services.Remove(descriptor);
             services.AddSingleton<IApiHttpClient>(ApiClientStub);
+
+            // the API reachability health check resolves ApiReachabilityHealthCheck from DI when it runs; replace its
+            // registration with a healthy subclass, since no real API exists during these tests
+            services.RemoveAll<ApiReachabilityHealthCheck>();
+            services.AddScoped<ApiReachabilityHealthCheck, HealthyApiReachabilityHealthCheck>();
         });
     }
 }

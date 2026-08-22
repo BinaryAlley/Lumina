@@ -3,6 +3,7 @@ using FastEndpoints;
 using FastEndpoints.Swagger;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Presentation.Api.Common.Authentication;
+using Lumina.Presentation.Api.Common.HealthChecks;
 using MessagePack;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -38,6 +40,10 @@ public static class PresentationApiLayerServices
     {
         services.AddMemoryCache(); // used for the tracking involved in authentication rate limiting
         services.AddProblemDetails();
+
+        // the readiness health check verifies that the database can be reached, and is probed by container orchestrators and load balancers
+        services.AddHealthChecks()
+            .AddCheck<DatabaseHealthCheck>("database", HealthStatus.Unhealthy, ["ready"]);
 
         services.Configure<JsonOptions>(jsonOptions =>
         {

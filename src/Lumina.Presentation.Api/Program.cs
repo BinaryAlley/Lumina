@@ -12,11 +12,14 @@ using Lumina.Presentation.Api.Common.DependencyInjection;
 using Lumina.Presentation.Api.Common.Middlewares;
 using Lumina.Presentation.Api.Common.Utilities;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Scalar.AspNetCore;
@@ -24,6 +27,7 @@ using Serilog;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 #endregion
 
@@ -47,6 +51,7 @@ public class Program
         builder.Services.BindPresentationApiLayerConfiguration(builder.Configuration);
 
         builder.Services.AddPresentationApiLayerServices(builder.Configuration);
+        builder.Services.AddPresentationApiTelemetryServices(builder.Configuration, builder.Environment);
         builder.Services.AddApplicationLayerServices();
         builder.Services.AddInfrastructureLayerServices(builder.Configuration);
         builder.Services.AddDataAccessLayerServices();
@@ -137,8 +142,9 @@ public class Program
                 .WithDotNetFlag(true);
         });
 
-        // add the middleware that fires domain events and ensures eventual transactional consistency, but NOT for long-polling/WebSockets stuff like SignalR, which would keep the db locked
-        app.UseWhen(ctx => !ctx.Request.Path.StartsWithSegments("/scanProgressHub"), app => app.UseMiddleware<EventualConsistencyMiddleware>());
+        // add the middleware that fires domain events and ensures eventual transactional consistency, but NOT for long-polling/WebSockets stuff like SignalR, which would keep the db locked,
+        // and NOT for the health probes, which would otherwise begin a database transaction on every probe
+        app.UseWhen(ctx => !ctx.Request.Path.StartsWithSegments("/scanProgressHub") && !ctx.Request.Path.StartsWithSegments("/health"), app => app.UseMiddleware<EventualConsistencyMiddleware>());
 
         // create a directory relative to the application's startup directory, and use it to store static files that are served at the /media route on the API
         string mediaRootDirectoryPathSetting = app.Configuration.GetValue<string>("MediaSettings:RootDirectory") ?? string.Empty;
@@ -165,6 +171,38 @@ public class Program
 
         app.MapHub<MediaLibraryScanProgressHub>("/scanProgressHub");
 
+        // the liveness probe reports whether the process is running, while the readiness probe also verifies that the database is reachable
+        app.MapHealthChecks("/health/live", new HealthCheckOptions
+        {
+            Predicate = _ => false,
+            ResponseWriter = WriteHealthCheckResponseAsync
+        });
+        app.MapHealthChecks("/health/ready", new HealthCheckOptions
+        {
+            Predicate = healthCheck => healthCheck.Tags.Contains("ready"),
+            ResponseWriter = WriteHealthCheckResponseAsync
+        });
+
         await app.RunAsync().ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Writes the health report as a JSON response.
+    /// </summary>
+    /// <param name="httpContext">The current HTTP context.</param>
+    /// <param name="healthReport">The health report to write.</param>
+    private static async Task WriteHealthCheckResponseAsync(HttpContext httpContext, HealthReport healthReport)
+    {
+        httpContext.Response.ContentType = "application/json";
+        await httpContext.Response.WriteAsJsonAsync(new
+        {
+            status = healthReport.Status.ToString(),
+            checks = healthReport.Entries.Select(entry => new
+            {
+                name = entry.Key,
+                status = entry.Value.Status.ToString(),
+                description = entry.Value.Description
+            })
+        });
     }
 }

@@ -1,11 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
 using Lumina.Presentation.Web.Common.DependencyInjection;
+using Lumina.Presentation.Web.Common.HealthChecks;
 using Lumina.Presentation.Web.Common.Utilities;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Primitives;
 using Scalar.AspNetCore;
@@ -35,6 +38,9 @@ public class Program
 
         builder.Services.BindConfiguration(builder.Configuration);
         builder.Services.AddPresentationWebLayerServices();
+        builder.Services.AddPresentationWebTelemetryServices(builder.Configuration, builder.Environment);
+        builder.Services.AddHealthChecks()
+            .AddCheck<ApiReachabilityHealthCheck>("api", HealthStatus.Unhealthy, ["ready"]);
 
         // determine log path based on environment
         string logPath;
@@ -121,6 +127,11 @@ public class Program
                 .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient)
                 .WithDotNetFlag(true);
         });
+
+        // liveness and readiness probes, probed by container orchestrators and load balancers; the readiness probe also
+        // verifies that the API is reachable, so the web application is only reported ready when it can actually serve requests
+        app.MapHealthChecks("/health/live", new HealthCheckOptions { Predicate = _ => false });
+        app.MapHealthChecks("/health/ready", new HealthCheckOptions { Predicate = healthCheck => healthCheck.Tags.Contains("ready") });
 
         await app.RunAsync();
     }

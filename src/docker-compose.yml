@@ -7,6 +7,20 @@ services:
       dockerfile: Lumina.Presentation.Api/Dockerfile
     environment:
       - LOG_PATH=/logs
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+      # The API validates JwtSettings:SecretKey and EncryptionSettings:SecretKey with ValidateOnStart(). In the
+      # Development environment they come from appsettings.development.json; for any non-development run they must be
+      # supplied here, otherwise the API crashes on startup:
+      # - JwtSettings__SecretKey=<secret>
+      # - EncryptionSettings__SecretKey=<base64 secret>
+    depends_on:
+      - otel-collector
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:5214/health/ready || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
 
   lumina-web:
     container_name: lumina-web
@@ -16,3 +30,64 @@ services:
       dockerfile: Lumina.Presentation.Web/Dockerfile
     environment:
       - LOG_PATH=/logs
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+      - ServerConfiguration__BaseAddress=http://lumina-api
+    depends_on:
+      - otel-collector
+      - lumina-api
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:5012/health/ready || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+
+  otel-collector:
+    container_name: otel-collector
+    image: otel/opentelemetry-collector-contrib:0.159.0
+    command:
+      - "--config=/etc/otelcol/config.yml"
+    volumes:
+      - ./otel-collector/otel-collector-config.yml:/etc/otelcol/config.yml:ro
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+      - "8889:8889"
+    depends_on:
+      - jaeger
+    restart: unless-stopped
+
+  jaeger:
+    container_name: jaeger
+    image: jaegertracing/all-in-one:1.76.0
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    ports:
+      - "16686:16686"
+    restart: unless-stopped
+
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:v3
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    depends_on:
+      - otel-collector
+    restart: unless-stopped
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:13.0.7-ubuntu-slim
+    environment:
+      # dev-only stack: set a non-default admin password (override GRAFANA_ADMIN_PASSWORD in real deployments)
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-lumina-admin}
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      - prometheus
+    restart: unless-stopped

@@ -29,6 +29,7 @@ internal static class PresentationApiLayerConfiguration
         configuration.SetBasePath(basePath);
         configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
         configuration.AddJsonFile("appsettings.development.json", optional: true, reloadOnChange: true);
+        configuration.AddEnvironmentVariables(); // environment variables should override the configuration files
 
         return services;
     }
