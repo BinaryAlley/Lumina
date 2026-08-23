@@ -28,3 +28,12 @@ README.md
 !.git/config
 !.git/packed-refs
 !.git/refs/heads/**
+
+# AI
+**/AGENTS.[Mm][Dd]
+**/agents.[Mm][Dd]
+**/SKILL.[Mm][Dd]
+**/skill.[Mm][Dd]
+
+# Six Labors license key file: must always be present for build-time license validation
+!**/sixlabors.lic
