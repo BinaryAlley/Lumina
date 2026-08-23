@@ -4,10 +4,10 @@ using Lumina.Presentation.Web.Common.Api;
 using Lumina.Presentation.Web.Common.DTO.Plugins;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Core.Endpoints.Plugins.GetPlugins;
+using Lumina.Presentation.Web.Fixtures.Common.DTO.Plugins;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.Json;
@@ -25,6 +25,7 @@ public class GetPluginsEndpointTests
 {
     private readonly IApiHttpClient _mockApiHttpClient;
     private readonly GetPluginsEndpoint _sut;
+    private readonly PluginDtoFixture _pluginDtoFixture = new();
     private readonly JsonSerializerOptions _jsonOptions = new() { PropertyNameCaseInsensitive = true };
 
     /// <summary>
@@ -40,7 +41,7 @@ public class GetPluginsEndpointTests
     public async Task ExecuteAsync_WhenApiReturnsPlugins_ShouldReturnSuccessJsonWithPlugins()
     {
         // Arrange
-        PluginDto[] expectedPlugins = [new PluginDto { Id = Guid.NewGuid(), Name = "OpenLibrary", Author = "Test Author", Version = "1.0.0" }];
+        PluginDto[] expectedPlugins = [_pluginDtoFixture.Create(name: "OpenLibrary")];
         _mockApiHttpClient.GetAsync<PluginDto[]>(ApiRoutes.Plugins.GET_PLUGINS, Arg.Any<CancellationToken>())
             .Returns(expectedPlugins);
 
@@ -60,7 +61,7 @@ public class GetPluginsEndpointTests
     {
         // Arrange
         _mockApiHttpClient.GetAsync<PluginDto[]>(ApiRoutes.Plugins.GET_PLUGINS, Arg.Any<CancellationToken>())
-            .Returns([new PluginDto { Id = Guid.NewGuid(), Name = "OpenLibrary" }]);
+            .Returns([_pluginDtoFixture.Create(name: "OpenLibrary")]);
 
         // Act
         await _sut.ExecuteAsync(EmptyRequest.Instance, CancellationToken.None);

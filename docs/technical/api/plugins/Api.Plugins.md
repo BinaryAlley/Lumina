@@ -2,6 +2,9 @@
 
 - [Lumina API](#lumina-api)
   - [Plugins](#plugins)
+    - [Install Plugin](#install-plugin)
+      - [Install Plugin Request](#install-plugin-request)
+      - [Install Plugin Response](#install-plugin-response)
     - [Get Plugins](#get-plugins)
       - [Get Plugins Request](#get-plugins-request)
       - [Get Plugins Response](#get-plugins-response)
@@ -22,6 +25,22 @@
       - [Reorder Library Metadata Providers Response](#reorder-library-metadata-providers-response)
 
 ## Plugins
+
+### Install Plugin
+
+#### Install Plugin Request
+
+```js
+POST api/v1/plugins
+```
+
+Uploads the plugin as a `multipart/form-data` request. The first file part of the form is used as the plugin archive, which can be either a single `.dll` assembly or a `.zip` archive containing the plugin assembly and its dependencies. The assemblies are placed into the plugin storage directory of the API and are loaded at the next API startup.
+
+#### Install Plugin Response
+
+```js
+200 Ok
+```
 
 ### Get Plugins
 

@@ -1,0 +1,10 @@
+POST {{host}}/api/v1/plugins
+Authorization: Bearer {{ACCESS_TOKEN}}
+Content-Type: multipart/form-data; boundary=----LuminaBoundary
+
+------LuminaBoundary
+Content-Disposition: form-data; name="archive"; filename="my-plugin.zip"
+Content-Type: application/octet-stream
+
+< ./my-plugin.zip
+------LuminaBoundary--

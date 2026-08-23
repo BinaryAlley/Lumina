@@ -156,4 +156,13 @@
   <data name="SettingsSaved" xml:space="preserve">
     <value>Configuración guardada</value>
   </data>
+  <data name="PluginUploadedRestartRequired" xml:space="preserve">
+    <value>Plugin subido. La API lo cargará en su próximo reinicio.</value>
+  </data>
+  <data name="Upload" xml:space="preserve">
+    <value>Subir</value>
+  </data>
+  <data name="UploadFailed" xml:space="preserve">
+    <value>Error al subir</value>
+  </data>
 </root>

@@ -128,6 +128,16 @@ public class StubApiHttpClient : IApiHttpClient
     }
 
     /// <summary>
+    /// Registers the exception thrown when the specified PUT endpoint is called.
+    /// </summary>
+    /// <param name="endpoint">The API endpoint for which to register the exception.</param>
+    /// <param name="exception">The exception to throw.</param>
+    public void RegisterPutException(string endpoint, ApiException exception)
+    {
+        _putResponseFactories[endpoint] = _ => throw exception;
+    }
+
+    /// <summary>
     /// Registers the response returned when the specified PUT endpoint is called.
     /// </summary>
     /// <typeparam name="TResponse">The type of the response.</typeparam>
@@ -136,6 +146,16 @@ public class StubApiHttpClient : IApiHttpClient
     public void RegisterPutResponse<TResponse>(string endpoint, TResponse response) where TResponse : class
     {
         _putResponseFactories[endpoint] = _ => response;
+    }
+
+    /// <summary>
+    /// Registers the response factory invoked when the specified PUT endpoint is called.
+    /// </summary>
+    /// <param name="endpoint">The API endpoint for which to register the response factory.</param>
+    /// <param name="responseFactory">The factory that produces the response from the request payload.</param>
+    public void RegisterPutResponseFactory(string endpoint, Func<object, object> responseFactory)
+    {
+        _putResponseFactories[endpoint] = responseFactory;
     }
 
     /// <summary>

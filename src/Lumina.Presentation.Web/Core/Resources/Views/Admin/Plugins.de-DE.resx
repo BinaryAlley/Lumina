@@ -156,4 +156,13 @@
   <data name="SettingsSaved" xml:space="preserve">
     <value>Einstellungen gespeichert</value>
   </data>
+  <data name="PluginUploadedRestartRequired" xml:space="preserve">
+    <value>Plugin hochgeladen. Die API lädt es beim nächsten Neustart.</value>
+  </data>
+  <data name="Upload" xml:space="preserve">
+    <value>Hochladen</value>
+  </data>
+  <data name="UploadFailed" xml:space="preserve">
+    <value>Upload fehlgeschlagen</value>
+  </data>
 </root>

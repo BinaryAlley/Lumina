@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -155,5 +155,14 @@
   </data>
   <data name="SettingsSaved" xml:space="preserve">
     <value>تم حفظ الإعدادات</value>
+  </data>
+  <data name="PluginUploadedRestartRequired" xml:space="preserve">
+    <value>تم رفع المكوّن الإضافي. سيقوم API بتحميله عند إعادة التشغيل التالية.</value>
+  </data>
+  <data name="Upload" xml:space="preserve">
+    <value>رفع</value>
+  </data>
+  <data name="UploadFailed" xml:space="preserve">
+    <value>فشل الرفع</value>
   </data>
 </root>
