@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
@@ -12,10 +12,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AutoFixture" Version="5.0.0-preview0011" />
-        <PackageReference Include="AutoFixture.AutoNSubstitute" Version="5.0.0-preview0011" />
-        <PackageReference Include="AutoFixture.Xunit2" Version="5.0.0-preview0011" />
-        <PackageReference Include="Bogus" Version="35.6.5" />
+        <PackageReference Include="AutoFixture" />
+        <PackageReference Include="AutoFixture.AutoNSubstitute" />
+        <PackageReference Include="AutoFixture.Xunit2" />
+        <PackageReference Include="Bogus" />
     </ItemGroup>
 
     <ItemGroup>
