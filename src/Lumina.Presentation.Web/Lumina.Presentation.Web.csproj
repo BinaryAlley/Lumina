@@ -75,6 +75,9 @@
     </ItemGroup>
 
     <ItemGroup>
+      <EmbeddedResource Update="Core\Resources\Common\Middlewares\ExceptionHandlingMiddleware.ar-SA.resx">
+        <Generator>PublicResXFileCodeGenerator</Generator>
+      </EmbeddedResource>
       <EmbeddedResource Update="Core\Resources\Common\Middlewares\ExceptionHandlingMiddleware.de-DE.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
@@ -100,6 +103,9 @@
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
       <EmbeddedResource Update="Core\Resources\Common\Middlewares\ExceptionHandlingMiddleware.zh-CN.resx">
+        <Generator>PublicResXFileCodeGenerator</Generator>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Core\Resources\Views\Auth\ChangePassword.ar-SA.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
       <EmbeddedResource Update="Core\Resources\Views\Auth\ChangePassword.de-DE.resx">
@@ -133,6 +139,9 @@
       <EmbeddedResource Update="Core\Resources\Views\Auth\ChangePassword.zh-CN.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
+      <EmbeddedResource Update="Core\Resources\Views\Auth\Login.ar-SA.resx">
+        <Generator>PublicResXFileCodeGenerator</Generator>
+      </EmbeddedResource>
       <EmbeddedResource Update="Core\Resources\Views\Auth\Login.de-DE.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
@@ -162,6 +171,9 @@
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
       <EmbeddedResource Update="Core\Resources\Views\Auth\Login.zh-CN.resx">
+        <Generator>PublicResXFileCodeGenerator</Generator>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Core\Resources\Views\Auth\RecoverPassword.ar-SA.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
       <EmbeddedResource Update="Core\Resources\Views\Auth\RecoverPassword.de-DE.resx">
@@ -195,6 +207,9 @@
       <EmbeddedResource Update="Core\Resources\Views\Auth\RecoverPassword.zh-CN.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
+      <EmbeddedResource Update="Core\Resources\Views\Auth\Register.ar-SA.resx">
+        <Generator>PublicResXFileCodeGenerator</Generator>
+      </EmbeddedResource>
       <EmbeddedResource Update="Core\Resources\Views\Auth\Register.de-DE.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
@@ -224,6 +239,9 @@
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
       <EmbeddedResource Update="Core\Resources\Views\Auth\Register.zh-CN.resx">
+        <Generator>PublicResXFileCodeGenerator</Generator>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Core\Resources\Views\Library\Management\Item.ar-SA.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
       <EmbeddedResource Update="Core\Resources\Views\Library\Management\Item.de-DE.resx">
@@ -257,6 +275,9 @@
       <EmbeddedResource Update="Core\Resources\Views\Library\Management\Item.zh-CN.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
+      <EmbeddedResource Update="Core\Resources\Views\Shared\Components\FileSystemBrowser\Default.ar-SA.resx">
+        <Generator>PublicResXFileCodeGenerator</Generator>
+      </EmbeddedResource>
       <EmbeddedResource Update="Core\Resources\Views\Shared\Components\FileSystemBrowser\Default.de-DE.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
@@ -282,6 +303,9 @@
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
       <EmbeddedResource Update="Core\Resources\Views\Shared\Components\FileSystemBrowser\Default.zh-CN.resx">
+        <Generator>PublicResXFileCodeGenerator</Generator>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Core\Resources\Views\Shared\_Layout.ar-SA.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
       <EmbeddedResource Update="Core\Resources\Views\Shared\_Layout.de-DE.resx">
@@ -311,6 +335,9 @@
       <EmbeddedResource Update="Core\Resources\Views\Shared\_Layout.zh-CN.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
+      <EmbeddedResource Update="Core\Resources\Views\Shared\_NavMenu.ar-SA.resx">
+        <Generator>PublicResXFileCodeGenerator</Generator>
+      </EmbeddedResource>
       <EmbeddedResource Update="Core\Resources\Views\Shared\_NavMenu.de-DE.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
@@ -336,6 +363,9 @@
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
       <EmbeddedResource Update="Core\Resources\Views\Shared\_NavMenu.zh-CN.resx">
+        <Generator>PublicResXFileCodeGenerator</Generator>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Core\Resources\Views\Admin\Plugins.ar-SA.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
       <EmbeddedResource Update="Core\Resources\Views\Admin\Plugins.de-DE.resx">

@@ -91,6 +91,7 @@
                 @_localizer["Language"]
             </div>
             <ul>
+                <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Language.SET_LANGUAGE)?newCulture=ar-sa&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set"><span>العربية</span></a></li><!--AR-->
                 <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Language.SET_LANGUAGE)?newCulture=zh-cn&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set"><span>简体中文</span></a></li><!--CN-->
                 <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Language.SET_LANGUAGE)?newCulture=de-de&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set"><span>Deutsch</span></a></li><!--DE-->
                 <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Language.SET_LANGUAGE)?newCulture=en-us&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set"><span>English</span></a></li><!--EN-->
@@ -200,6 +201,7 @@
                 <li class="has-submenu" tabindex="0">
                     <label>@_localizer["Language"]</label>
                     <ul>
+                        <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Language.SET_LANGUAGE)?newCulture=ar-sa&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set">العربية</a></li><!--AR-->
                         <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Language.SET_LANGUAGE)?newCulture=zh-cn&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set">简体中文</a></li><!--CN-->
                         <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Language.SET_LANGUAGE)?newCulture=de-de&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set">Deutsch</a></li><!--DE-->
                         <li><a href="@_urlService.GetAbsoluteUrl(WebRoutes.Language.SET_LANGUAGE)?newCulture=en-us&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="lang-set">English</a></li><!--EN-->
