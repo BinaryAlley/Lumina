@@ -117,22 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="BackToLogin" xml:space="preserve">
-    <value>Вернуться Ко Входу</value>
-  </data>
-  <data name="Login" xml:space="preserve">
-    <value>Вход</value>
-  </data>
-  <data name="PasswordTemporarilyReset" xml:space="preserve">
-    <value>Пароль Временно Сброшен</value>
-  </data>
-  <data name="TotpCode" xml:space="preserve">
-    <value>Временный Код (TOTP)</value>
-  </data>
-  <data name="Username" xml:space="preserve">
-    <value>Имя пользователя</value>
-  </data>
-  <data name="ValidateCode" xml:space="preserve">
-    <value>Подтвердить Код</value>
+  <data name="NotAllowedToAccessResource" xml:space="preserve">
+    <value>У вас немає прав для перегляду цього ресурсу!</value>
   </data>
 </root>

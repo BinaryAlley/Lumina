@@ -117,34 +117,43 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="CanCreateLibraries" xml:space="preserve">
-    <value>Может создавать библиотеки</value>
+    <data name="Plugins" xml:space="preserve">
+    <value>Плагіни</value>
   </data>
-  <data name="CanDeleteUsers" xml:space="preserve">
-    <value>Может удалять пользователей</value>
+  <data name="Name" xml:space="preserve">
+    <value>Ім'я</value>
   </data>
-  <data name="CanRegisterUsers" xml:space="preserve">
-    <value>Может регистрировать пользователей</value>
+  <data name="Author" xml:space="preserve">
+    <value>Автор</value>
   </data>
-  <data name="CanViewUsers" xml:space="preserve">
-    <value>Может просматривать пользователей</value>
+  <data name="Version" xml:space="preserve">
+    <value>Версія</value>
   </data>
-  <data name="Roles" xml:space="preserve">
-    <value>Роли</value>
+  <data name="Description" xml:space="preserve">
+    <value>Опис</value>
   </data>
-  <data name="SelectARole" xml:space="preserve">
-    <value>Выберите роль</value>
+  <data name="LoadStatus" xml:space="preserve">
+    <value>Статус завантаження</value>
   </data>
-  <data name="SelectAUser" xml:space="preserve">
-    <value>Выбрать пользователя</value>
+  <data name="Loaded" xml:space="preserve">
+    <value>Завантажено</value>
   </data>
-  <data name="Update" xml:space="preserve">
-    <value>Обновить</value>
+  <data name="FailedToLoad" xml:space="preserve">
+    <value>Не вдалося завантажити</value>
   </data>
-  <data name="UserAuthorizationUpdated" xml:space="preserve">
-    <value>Авторизация пользователя обновлена!</value>
+  <data name="LoadError" xml:space="preserve">
+    <value>Помилка завантаження</value>
   </data>
-  <data name="Users" xml:space="preserve">
-    <value>Пользователи</value>
+  <data name="Settings" xml:space="preserve">
+    <value>Налаштування</value>
+  </data>
+  <data name="NoPlugins" xml:space="preserve">
+    <value>Плагіни не виявлено.</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Зберегти</value>
+  </data>
+  <data name="SettingsSaved" xml:space="preserve">
+    <value>Налаштування збережено</value>
   </data>
 </root>

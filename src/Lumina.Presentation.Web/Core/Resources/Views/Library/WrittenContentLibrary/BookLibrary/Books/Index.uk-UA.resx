@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -13,36 +13,36 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Search" xml:space="preserve">
-    <value>Поиск</value>
+    <value>Пошук</value>
   </data>
   <data name="SortAscending" xml:space="preserve">
-    <value>Сортировка: А-Я</value>
+    <value>Сортування: А-Я</value>
   </data>
   <data name="SortDescending" xml:space="preserve">
-    <value>Сортировка: Я-А</value>
+    <value>Сортування: Я-А</value>
   </data>
   <data name="Items" xml:space="preserve">
-    <value>элементов</value>
+    <value>елементів</value>
   </data>
   <data name="Of" xml:space="preserve">
-    <value>из</value>
+    <value>з</value>
   </data>
   <data name="Page" xml:space="preserve">
-    <value>Страница</value>
+    <value>Сторінка</value>
   </data>
   <data name="Previous" xml:space="preserve">
     <value>Назад</value>
   </data>
   <data name="Next" xml:space="preserve">
-    <value>Вперёд</value>
+    <value>Вперед</value>
   </data>
   <data name="All" xml:space="preserve">
-    <value>Все</value>
+    <value>Всі</value>
   </data>
   <data name="NoItems" xml:space="preserve">
-    <value>В этой библиотеке нет элементов</value>
+    <value>У цій бібліотеці немає елементів</value>
   </data>
   <data name="NoItemsMatchFilters" xml:space="preserve">
-    <value>Ни один элемент не соответствует текущим фильтрам</value>
+    <value>Жоден елемент не відповідає поточним фільтрам</value>
   </data>
 </root>

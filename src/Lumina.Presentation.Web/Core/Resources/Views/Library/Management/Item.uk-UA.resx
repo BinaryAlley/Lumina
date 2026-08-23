@@ -118,40 +118,43 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AcademicPaper" xml:space="preserve">
-    <value>Научная Статья</value>
+    <value>Наукова стаття</value>
   </data>
-  <data name="Actions" xml:space="preserve">
-    <value>Действия</value>
+  <data name="AddDirectory" xml:space="preserve">
+    <value>Додати каталог</value>
+  </data>
+  <data name="AddImage" xml:space="preserve">
+    <value>Додати зображення</value>
+  </data>
+  <data name="AddNewLibrary" xml:space="preserve">
+    <value>Додати нову бібліотеку</value>
+  </data>
+  <data name="AdvancedSettings" xml:space="preserve">
+    <value>Розширені налаштування</value>
   </data>
   <data name="Anime" xml:space="preserve">
-    <value>Аниме</value>
+    <value>Аніме</value>
   </data>
   <data name="AudioBook" xml:space="preserve">
-    <value>Аудиокнига</value>
+    <value>Аудіокнига</value>
+  </data>
+  <data name="AudioContent" xml:space="preserve">
+    <value>Аудіоконтент</value>
+  </data>
+  <data name="BackToLibraries" xml:space="preserve">
+    <value>Повернення до бібліотек</value>
   </data>
   <data name="Book" xml:space="preserve">
     <value>Книга</value>
   </data>
   <data name="BookSeries" xml:space="preserve">
-    <value>Книжная Серия</value>
-  </data>
-  <data name="Canceled" xml:space="preserve">
-    <value>Отменено</value>
-  </data>
-  <data name="CancelScan" xml:space="preserve">
-    <value>Отменить Сканирование</value>
+    <value>Книжкова серія</value>
   </data>
   <data name="ComicBook" xml:space="preserve">
-    <value>Комикс</value>
+    <value>Комікс</value>
   </data>
   <data name="ComicSeries" xml:space="preserve">
-    <value>Серия Комиксов</value>
-  </data>
-  <data name="ComparingFileHashes" xml:space="preserve">
-    <value>Сравнение хешей файлов...</value>
-  </data>
-  <data name="Completed" xml:space="preserve">
-    <value>Завершено</value>
+    <value>Серія коміксів</value>
   </data>
   <data name="Concert" xml:space="preserve">
     <value>Концерт</value>
@@ -159,59 +162,80 @@
   <data name="Cover" xml:space="preserve">
     <value>Кавер</value>
   </data>
-  <data name="DeleteLibraryConfirm" xml:space="preserve">
-    <value>Вы уверены, что хотите удалить указанную библиотеку?</value>
+  <data name="CoverImage" xml:space="preserve">
+    <value>Обкладинка</value>
   </data>
-  <data name="DiscoveringFiles" xml:space="preserve">
-    <value>Обнаружение файлов...</value>
+  <data name="DescriptionCover" xml:space="preserve">
+    <value>Виберіть файл зображення, який буде використовуватися як обкладинка для цієї бібліотеки</value>
+  </data>
+  <data name="DescriptionDirectories" xml:space="preserve">
+    <value>Виберіть папки, що містять медіафайли цієї бібліотеки</value>
+  </data>
+  <data name="DescriptionDownloadMetadataFromWeb" xml:space="preserve">
+    <value>Чи повинна ця медіатека отримувати метадані своїх елементів шляхом завантаження з Інтернету чи ні.</value>
+  </data>
+  <data name="DescriptionEnabled" xml:space="preserve">
+    <value>Чи вимкнена ця медіатека чи ні. Вимкнена бібліотека не відображається користувачам, не сканується, не оновлюється тощо.</value>
+  </data>
+  <data name="DescriptionLibraryType" xml:space="preserve">
+    <value>Виберіть тип медіаконтенту, який міститиме ця бібліотека</value>
+  </data>
+  <data name="DescriptionLocked" xml:space="preserve">
+    <value>Чи заблокована ця медіатека чи ні. Заблокована бібліотека відображається користувачам, але ніколи не сканується, не оновлюється, не змінюється тощо.</value>
+  </data>
+  <data name="DescriptionShouldSaveMetadataInMediaDirectories" xml:space="preserve">
+    <value>Чи зберігати копію завантажених метаданих у каталогах вмісту медіатеки чи ні. Це діє лише якщо активне завантаження метаданих з інтернету.</value>
+  </data>
+  <data name="DescriptionShouldSkipUnchangedDirectoriesDuringScan" xml:space="preserve">
+    <value>Під час увімкнення цієї опції використовуються метадані каталогів, щоб пропускати каталоги, які не змінювалися з моменту останнього сканування. Це може _значно_ прискорити сканування, але врахуйте, що метадані каталогів _не_ змінюються/оновлюються під час редагування наявних файлів, а лише під час додавання нових або видалення наявних. Вмикайте цю опцію лише в тому випадку, якщо ви не змінюєте наявні файли.</value>
+  </data>
+  <data name="DescriptionTitle" xml:space="preserve">
+    <value>Назва для цієї бібліотеки</value>
+  </data>
+  <data name="Directories" xml:space="preserve">
+    <value>Каталоги</value>
   </data>
   <data name="Documentary" xml:space="preserve">
-    <value>Документальный Фильм</value>
+    <value>Документальний фільм</value>
+  </data>
+  <data name="DownloadMetadataFromWeb" xml:space="preserve">
+    <value>Завантажити метадані з Інтернету</value>
   </data>
   <data name="EBook" xml:space="preserve">
-    <value>Электронная Книга</value>
+    <value>Електронна книга</value>
   </data>
-  <data name="Edit" xml:space="preserve">
-    <value>Редактировать</value>
+  <data name="EditLibrary" xml:space="preserve">
+    <value>Редагувати бібліотеку</value>
   </data>
   <data name="Enabled" xml:space="preserve">
-    <value>Включено</value>
-  </data>
-  <data name="Failed" xml:space="preserve">
-    <value>Ошибка</value>
+    <value>Увімкнено</value>
   </data>
   <data name="FilmFranchise" xml:space="preserve">
-    <value>Кинофраншиза</value>
+    <value>Кінофраншиза</value>
   </data>
   <data name="FilmSeries" xml:space="preserve">
-    <value>Киносерия</value>
+    <value>Кіносерія</value>
   </data>
-  <data name="EnrichingMetadata" xml:space="preserve">
-    <value>Обогащение метаданных...</value>
-  </data>
-  <data name="HashingFileContents" xml:space="preserve">
-    <value>Вычисление хешей файлов...</value>
+  <data name="GeneralInformation" xml:space="preserve">
+    <value>Загальна інформація</value>
   </data>
   <data name="GraphicNovel" xml:space="preserve">
-    <value>Графический Роман</value>
+    <value>Графічний роман</value>
   </data>
   <data name="Interview" xml:space="preserve">
-    <value>Интервью</value>
+    <value>Інтерв'ю</value>
   </data>
-  <data name="Libraries" xml:space="preserve">
-    <value>Библиотеки</value>
-  </data>
-  <data name="LibraryDeleted" xml:space="preserve">
-    <value>Библиотека удалена!</value>
+  <data name="LibrarySaved" xml:space="preserve">
+    <value>Бібліотеку збережено</value>
   </data>
   <data name="LibraryType" xml:space="preserve">
-    <value>Тип Библиотеки</value>
+    <value>Тип бібліотеки</value>
   </data>
   <data name="LivePerformance" xml:space="preserve">
-    <value>Живое Выступление</value>
+    <value>Живий виступ</value>
   </data>
   <data name="Locked" xml:space="preserve">
-    <value>Заблокировано</value>
+    <value>Заблоковано</value>
   </data>
   <data name="Magazine" xml:space="preserve">
     <value>Журнал</value>
@@ -219,23 +243,20 @@
   <data name="Manga" xml:space="preserve">
     <value>Манга</value>
   </data>
+  <data name="MiscellaneousContent" xml:space="preserve">
+    <value>Різний вміст</value>
+  </data>
   <data name="Movie" xml:space="preserve">
-    <value>Фильм</value>
+    <value>Фільм</value>
   </data>
   <data name="Music" xml:space="preserve">
-    <value>Музыка</value>
-  </data>
-  <data name="No" xml:space="preserve">
-    <value>Нет</value>
-  </data>
-  <data name="NoLibraries" xml:space="preserve">
-    <value>Нет библиотек</value>
+    <value>Музика</value>
   </data>
   <data name="Other" xml:space="preserve">
-    <value>Другой</value>
+    <value>Інше</value>
   </data>
   <data name="Personal" xml:space="preserve">
-    <value>Личный</value>
+    <value>Особистий</value>
   </data>
   <data name="PhotoAlbum" xml:space="preserve">
     <value>Фотоальбом</value>
@@ -244,48 +265,75 @@
     <value>Подкаст</value>
   </data>
   <data name="RadioShow" xml:space="preserve">
-    <value>Радиопередача</value>
+    <value>Радіопередача</value>
   </data>
   <data name="Remix" xml:space="preserve">
-    <value>Ремикс</value>
+    <value>Ремікс</value>
   </data>
   <data name="Remove" xml:space="preserve">
-    <value>Удалить</value>
+    <value>Видалити</value>
   </data>
-  <data name="SavingScanData" xml:space="preserve">
-    <value>Сохранение данных сканирования...</value>
+  <data name="Save" xml:space="preserve">
+    <value>Зберегти</value>
   </data>
-  <data name="Scan" xml:space="preserve">
-    <value>Сканировать</value>
+  <data name="ShouldSaveMetadataInMediaDirectories" xml:space="preserve">
+    <value>Зберігати метадані в каталогах медіафайлів</value>
   </data>
-  <data name="ScanAllLibraries" xml:space="preserve">
-    <value>Сканировать Все Библиотеки</value>
+  <data name="ShouldSkipUnchangedDirectoriesDuringScan" xml:space="preserve">
+    <value>Пропускати незмінені папки під час сканування</value>
   </data>
   <data name="Screenplay" xml:space="preserve">
-    <value>Сценарий</value>
+    <value>Сценарій</value>
   </data>
   <data name="SheetMusic" xml:space="preserve">
-    <value>Нотная Запись</value>
+    <value>Нотний запис</value>
   </data>
   <data name="Soundeffect" xml:space="preserve">
-    <value>Звуковой Эффект</value>
+    <value>Звуковий ефект</value>
   </data>
   <data name="Title" xml:space="preserve">
     <value>Заголовок</value>
   </data>
   <data name="Tutorial" xml:space="preserve">
-    <value>Учебник</value>
+    <value>Підручник</value>
   </data>
   <data name="TvShow" xml:space="preserve">
-    <value>Телесериал</value>
+    <value>Телесеріал</value>
   </data>
   <data name="Videoclip" xml:space="preserve">
-    <value>Видеоролик</value>
+    <value>Відеоролик</value>
   </data>
-  <data name="Yes" xml:space="preserve">
-    <value>Да</value>
+  <data name="VideoContent" xml:space="preserve">
+    <value>Відеоконтент</value>
+  </data>
+  <data name="VisualContent" xml:space="preserve">
+    <value>Візуальний контент</value>
+  </data>
+  <data name="WrittenContent" xml:space="preserve">
+    <value>Письмовий контент</value>
   </data>
   <data name="YouTube" xml:space="preserve">
     <value>Ютуб</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Ім'я</value>
+  </data>
+  <data name="MetadataProviders" xml:space="preserve">
+    <value>Постачальники метаданих</value>
+  </data>
+  <data name="Order" xml:space="preserve">
+    <value>Порядок</value>
+  </data>
+  <data name="MoveUp" xml:space="preserve">
+    <value>Вгору</value>
+  </data>
+  <data name="MoveDown" xml:space="preserve">
+    <value>Вниз</value>
+  </data>
+  <data name="OrderSaved" xml:space="preserve">
+    <value>Порядок збережено</value>
+  </data>
+  <data name="DescriptionMetadataProviders" xml:space="preserve">
+    <value>Постачальники метаданих, які використовуються для збагачення елементів цієї бібліотеки, у порядку, в якому вони випробовуються.</value>
   </data>
 </root>

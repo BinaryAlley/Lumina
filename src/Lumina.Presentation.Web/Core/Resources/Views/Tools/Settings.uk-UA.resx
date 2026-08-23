@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Settings" xml:space="preserve">
+    <value>Налаштування</value>
+  </data>
+  <data name="EnablePagination" xml:space="preserve">
+    <value>Увімкнути розбивку на сторінки</value>
+  </data>
+  <data name="ItemsPerPage" xml:space="preserve">
+    <value>Елементів на сторінці</value>
+  </data>
+  <data name="IgnoreThePrefixForAlphaPicker" xml:space="preserve">
+    <value>Ігнорувати префікс "The" в алфавітному покажчику</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Зберегти</value>
+  </data>
+  <data name="SettingsSaved" xml:space="preserve">
+    <value>Налаштування збережено</value>
+  </data>
+  <data name="DescriptionEnablePagination" xml:space="preserve">
+    <value>Керує розподілом елементів бібліотеки на сторінки.</value>
+  </data>
+  <data name="DescriptionItemsPerPage" xml:space="preserve">
+    <value>Кількість елементів бібліотеки, що відображаються на кожній сторінці за увімкненої розбивки на сторінки.</value>
+  </data>
+  <data name="DescriptionIgnoreThePrefixForAlphaPicker" xml:space="preserve">
+    <value>За увімкнення елементи бібліотеки, назва яких починається з "The", групуються в алфавітному покажчику під першою літерою наступного слова, наприклад "The Rasmus" відображається під літерою R.</value>
+  </data>
+  <data name="EnableThemeCaching" xml:space="preserve">
+    <value>Увімкнути кешування тем</value>
+  </data>
+  <data name="DescriptionEnableThemeCaching" xml:space="preserve">
+    <value>Визначає, чи кешуються файли тем, що надаються застосунком. Вимкніть цю опцію під час редагування файлів тем, щоб зміни відображалися одразу.</value>
+  </data>
+</root>

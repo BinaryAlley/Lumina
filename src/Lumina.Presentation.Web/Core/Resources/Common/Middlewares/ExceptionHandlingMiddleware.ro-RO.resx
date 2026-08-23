@@ -120,8 +120,14 @@
   <data name="AdminAccountAlreadyCreated" xml:space="preserve">
     <value>Contul de administrator a fost deja creat!</value>
   </data>
+  <data name="AdminAccountNotFound" xml:space="preserve">
+    <value>Contul de administrator nu a fost gasit!</value>
+  </data>
   <data name="AdminRoleCannotBeDeleted" xml:space="preserve">
     <value>Rolul de administrator nu poate fi șters!</value>
+  </data>
+  <data name="AdminRoleNotFound" xml:space="preserve">
+    <value>Rolul de administrator nu a fost gasit!</value>
   </data>
   <data name="Application theme cannot be empty!" xml:space="preserve">
     <value>Tema aplicației nu poate fi goală!</value>
@@ -138,14 +144,53 @@
   <data name="BookAlreadyExists" xml:space="preserve">
     <value>Cartea există deja!</value>
   </data>
+  <data name="BookLibraryCannotBeNull" xml:space="preserve">
+    <value>Biblioteca de carti nu poate fi nula!</value>
+  </data>
+  <data name="BookNotFound" xml:space="preserve">
+    <value>Cartea nu a fost gasita!</value>
+  </data>
+  <data name="BookPathCannotBeEmpty" xml:space="preserve">
+    <value>Calea cartii nu poate fi goala!</value>
+  </data>
   <data name="CannotNavigateUp" xml:space="preserve">
     <value>Nu se poate naviga în sus!</value>
   </data>
   <data name="CannotRemoveLastAdmin" xml:space="preserve">
     <value>Nu se poate elimina ultimul rol de Admin atribuit unui utilizator!</value>
   </data>
+  <data name="CannotScanDisabledLibrary" xml:space="preserve">
+    <value>Nu se poate scana o bibliotecă dezactivată!</value>
+  </data>
+  <data name="CannotScanLockedLibrary" xml:space="preserve">
+    <value>Nu se poate scana o bibliotecă blocată!</value>
+  </data>
+  <data name="CanOnlyCancelRunningScans" xml:space="preserve">
+    <value>Se pot anula doar scanările în curs!</value>
+  </data>
+  <data name="CanOnlyCompleteRunningScans" xml:space="preserve">
+    <value>Pot fi finalizate doar scanarile in curs!</value>
+  </data>
+  <data name="CanOnlyFailRunningScans" xml:space="preserve">
+    <value>Pot fi marcate ca esuate doar scanarile in curs!</value>
+  </data>
+  <data name="CanOnlyStartPendingScans" xml:space="preserve">
+    <value>Se pot porni doar scanări în așteptare!</value>
+  </data>
   <data name="CodecCannotBeEmpty" xml:space="preserve">
     <value>Codecul nu poate fi gol!</value>
+  </data>
+  <data name="CompletedScanJobItemsCountCantExceedTotalScanJobItemsCount" xml:space="preserve">
+    <value>Numărul de elemente scanate complet nu poate depăși numărul total de elemente de scanat!</value>
+  </data>
+  <data name="CompletedScanJobItemsCountMustBePositive" xml:space="preserve">
+    <value>Numărul de elemente scanate complet trebuie să fie pozitiv!</value>
+  </data>
+  <data name="CompletedScanJobsCountCantExceedTotalScanJobsCount" xml:space="preserve">
+    <value>Numărul de job-uri de scanare completate nu poate depăși numărul total de job-uri de scanare!</value>
+  </data>
+  <data name="CompletedScanJobsCountMustBePositive" xml:space="preserve">
+    <value>Numărul de job-uri de scanare completate trebuie să fie pozitiv!</value>
   </data>
   <data name="ContributorDisplayNameCannotBeEmpty" xml:space="preserve">
     <value>Numele de afișare al contributorului nu poate fi gol!</value>
@@ -165,8 +210,17 @@
   <data name="ContributorsListCannotBeNull" xml:space="preserve">
     <value>Lista contributorilor nu poate fi nulă!</value>
   </data>
+  <data name="CorsOriginIsInvalid" xml:space="preserve">
+    <value>Origine CORS invalidă!</value>
+  </data>
+  <data name="CorsOriginsCannotBeEmpty" xml:space="preserve">
+    <value>Originile CORS nu pot fi goale!</value>
+  </data>
   <data name="CountryCodeMustBe2CharactersLong" xml:space="preserve">
     <value>Codul țării trebuie să aibă 2 caractere!</value>
+  </data>
+  <data name="CoverFileMustBeAnImage" xml:space="preserve">
+    <value>Fișierul copertă trebuie să fie o imagine!</value>
   </data>
   <data name="CurrentPasswordCannotBeEmpty" xml:space="preserve">
     <value>Parola curentă nu poate fi goală!</value>
@@ -207,6 +261,9 @@
   <data name="ExtensionCannotBeEmpty" xml:space="preserve">
     <value>Extensia nu poate fi goală!</value>
   </data>
+  <data name="FailedToCreateScanJobProgress" xml:space="preserve">
+    <value>Nu s-a putut crea progresul lucrarii de scanare!</value>
+  </data>
   <data name="FileAlreadyExists" xml:space="preserve">
     <value>Fișierul există deja!</value>
   </data>
@@ -218,6 +275,12 @@
   </data>
   <data name="FileNotFound" xml:space="preserve">
     <value>Fișierul nu a fost găsit!</value>
+  </data>
+  <data name="FilterMustIncludeLibraryId" xml:space="preserve">
+    <value>Filtrul trebuie sa includa un Id de biblioteca!</value>
+  </data>
+  <data name="Forbidden" xml:space="preserve">
+    <value>Nu aveți autorizația necesară pentru vizualizarea aceastei resurse!</value>
   </data>
   <data name="General.Validation" xml:space="preserve">
     <value>Validare</value>
@@ -248,6 +311,9 @@
   </data>
   <data name="InvalidCurrentPassword" xml:space="preserve">
     <value>Parola curentă invalidă!</value>
+  </data>
+  <data name="InvalidFilterAlphaKey" xml:space="preserve">
+    <value>Cheie alfa de filtru invalida!</value>
   </data>
   <data name="InvalidGoogleBooksIdFormat" xml:space="preserve">
     <value>Format invalid pentru ID-ul Google Books!</value>
@@ -291,13 +357,16 @@
   <data name="IsbnValueCannotBeEmpty" xml:space="preserve">
     <value>Valoarea ISBN nu poate fi goală!</value>
   </data>
+  <data name="ItemsPerPageMustBeGreaterThanZero" xml:space="preserve">
+    <value>Elementele per pagina trebuie sa fie mai mari decat zero!</value>
+  </data>
   <data name="JwtAudienceCannotBeEmpty" xml:space="preserve">
     <value>Audiența JWT nu poate fi goală!</value>
   </data>
   <data name="JwtExpiryMinutesMustBePositive" xml:space="preserve">
     <value>Minutele de expirare JWT trebuie să fie pozitive!</value>
   </data>
-  <data name="JwtIssuerCannotBeEmptyc" xml:space="preserve">
+  <data name="JwtIssuerCannotBeEmpty" xml:space="preserve">
     <value>Emitentul JWT nu poate fi gol!</value>
   </data>
   <data name="JwtSecretKeyCannotBeEmpty" xml:space="preserve">
@@ -324,20 +393,38 @@
   <data name="LastBundledThemeCannotBeDeleted" xml:space="preserve">
     <value>Ultima temă inclusă nu poate fi ștearsă!</value>
   </data>
+  <data name="LibraryAlreadyBeingScanned" xml:space="preserve">
+    <value>Biblioteca este deja în curs de scanare!</value>
+  </data>
   <data name="LibraryAlreadyExists" xml:space="preserve">
     <value>Biblioteca există deja!</value>
   </data>
   <data name="LibraryIdCannotBeEmpty" xml:space="preserve">
     <value>ID-ul bibliotecii nu poate fi gol!</value>
   </data>
+  <data name="LibraryMetadataProviderConfigurationNotFound" xml:space="preserve">
+    <value>Configuratia furnizorului de metadate al bibliotecii nu a fost gasita!</value>
+  </data>
   <data name="LibraryNotFound" xml:space="preserve">
     <value>Biblioteca nu a fost găsită!</value>
+  </data>
+  <data name="LibraryScanAlreadyExists" xml:space="preserve">
+    <value>O scanare a bibliotecii exista deja!</value>
+  </data>
+  <data name="LibraryScanIdCannotBeEmpty" xml:space="preserve">
+    <value>ID-ul de scanare al bibliotecii nu poate fi gol!</value>
+  </data>
+  <data name="LibraryScanNotFound" xml:space="preserve">
+    <value>Scanarea bibliotecii nu a fost gasita!</value>
   </data>
   <data name="LibraryThingIdMustBeMaximum50CharactersLong" xml:space="preserve">
     <value>ID-ul LibraryThing trebuie să aibă maximum 50 caractere!</value>
   </data>
   <data name="LibraryTypeCannotBeNull" xml:space="preserve">
     <value>Tipul bibliotecii nu poate fi nul!</value>
+  </data>
+  <data name="MediaLibrariesDirectoryCannotBeEmpty" xml:space="preserve">
+    <value>Directorul bibliotecilor media nu poate fi gol!</value>
   </data>
   <data name="MediaRootDirectoryCannotBeEmpty" xml:space="preserve">
     <value>Dosarul rădăcină media nu poate fi gol!</value>
@@ -353,9 +440,6 @@
   </data>
   <data name="NewPasswordConfirmCannotBeEmpty" xml:space="preserve">
     <value>Confirmarea noii parole nu poate fi goală!</value>
-  </data>
-  <data name="Forbidden" xml:space="preserve">
-    <value>Nu aveți autorizația necesară pentru vizualizarea aceastei resurse!</value>
   </data>
   <data name="NotAuthorized" xml:space="preserve">
     <value>Nu sunteți autorizat să efectuați această operațiune!</value>
@@ -411,11 +495,35 @@
   <data name="PathsListCannotBeNull" xml:space="preserve">
     <value>Lista de căi nu poate fi nulă!</value>
   </data>
+  <data name="PermissionAlreadyExists" xml:space="preserve">
+    <value>Permisiunea exista deja!</value>
+  </data>
+  <data name="PermissionIdCannotBeEmpty" xml:space="preserve">
+    <value>Id-ul permisiunii nu poate fi gol!</value>
+  </data>
   <data name="PermissionsListCannotBeEmpty" xml:space="preserve">
     <value>Lista de permisiuni nu poate fi goală!</value>
   </data>
   <data name="PermissionsListCannotBeNull" xml:space="preserve">
     <value>Lista de permisiuni nu poate fi nulă!</value>
+  </data>
+  <data name="PluginIdCannotBeEmpty" xml:space="preserve">
+    <value>Id-ul pluginului nu poate fi gol!</value>
+  </data>
+  <data name="PluginIdsListCannotBeEmpty" xml:space="preserve">
+    <value>Lista Id-urilor de pluginuri nu poate fi goala!</value>
+  </data>
+  <data name="PluginIdsListCannotBeNull" xml:space="preserve">
+    <value>Lista Id-urilor de pluginuri nu poate fi nula!</value>
+  </data>
+  <data name="PluginNotFound" xml:space="preserve">
+    <value>Pluginul nu a fost gasit!</value>
+  </data>
+  <data name="PluginsDirectoryCannotBeEmpty" xml:space="preserve">
+    <value>Directorul de pluginuri nu poate fi gol!</value>
+  </data>
+  <data name="PluginSettingsCannotBeNull" xml:space="preserve">
+    <value>Setarile pluginului nu pot fi nule!</value>
   </data>
   <data name="PublisherMustBeMaximum100CharactersLong" xml:space="preserve">
     <value>Editura trebuie să aibă maximum 100 caractere!</value>
@@ -468,11 +576,20 @@
   <data name="RoleNameCannotBeEmpty" xml:space="preserve">
     <value>Numele rolului nu poate fi gol!</value>
   </data>
+  <data name="RoleNameCannotBeNull" xml:space="preserve">
+    <value>Numele rolului nu poate fi nul!</value>
+  </data>
   <data name="RoleNameMustBeMaximum50CharactersLong" xml:space="preserve">
     <value>Numele rolului trebuie să aibă maximum 50 caractere!</value>
   </data>
   <data name="RoleNotFound" xml:space="preserve">
     <value>Rolul nu a fost găsit</value>
+  </data>
+  <data name="ScanIdCannotBeEmpty" xml:space="preserve">
+    <value>ID-ul de scanare nu poate fi gol!</value>
+  </data>
+  <data name="ScanJobCurrentOperationCannotBeEmpty" xml:space="preserve">
+    <value>Operația curentă de scanare nu poate fi goală!</value>
   </data>
   <data name="StreamIdCannotBeEmpty" xml:space="preserve">
     <value>ID-ul fluxului nu poate fi gol!</value>
@@ -504,8 +621,17 @@
   <data name="ThemeAssetPathCannotBeEmpty" xml:space="preserve">
     <value>Calea resursei temei nu poate fi goală!</value>
   </data>
+  <data name="ThemeBundledThemesPathCannotBeEmpty" xml:space="preserve">
+    <value>Calea temelor incluse nu poate fi goala!</value>
+  </data>
   <data name="ThemeCannotBeDeleted" xml:space="preserve">
     <value>Tema nu poate fi ștearsă!</value>
+  </data>
+  <data name="ThemeCannotBeRestored" xml:space="preserve">
+    <value>Tema nu poate fi restaurata!</value>
+  </data>
+  <data name="ThemeDefaultThemeIdCannotBeEmpty" xml:space="preserve">
+    <value>Id-ul temei implicite nu poate fi gol!</value>
   </data>
   <data name="ThemeFilesUnreadable" xml:space="preserve">
     <value>Fișierele temei nu au putut fi citite!</value>
@@ -513,11 +639,26 @@
   <data name="ThemeIdCannotBeEmpty" xml:space="preserve">
     <value>Id-ul temei nu poate fi gol!</value>
   </data>
+  <data name="ThemeMaxArchiveBytesMustBePositive" xml:space="preserve">
+    <value>Bytii maximi ai arhivei temei trebuie sa fie pozitivi!</value>
+  </data>
+  <data name="ThemeMaxEntriesMustBePositive" xml:space="preserve">
+    <value>Numarul maxim de intrari ale temei trebuie sa fie pozitiv!</value>
+  </data>
+  <data name="ThemeMaxExpandedBytesMustBePositive" xml:space="preserve">
+    <value>Bytii maximi extinsi ai temei trebuie sa fie pozitivi!</value>
+  </data>
+  <data name="ThemeMaxSingleFileBytesMustBePositive" xml:space="preserve">
+    <value>Bytii maximi ai unui singur fisier trebuie sa fie pozitivi!</value>
+  </data>
   <data name="ThemeNotAvailable" xml:space="preserve">
     <value>Tema nu este disponibilă!</value>
   </data>
   <data name="ThemeNotFound" xml:space="preserve">
     <value>Tema specificată nu a fost găsită!</value>
+  </data>
+  <data name="ThemeStoragePathCannotBeEmpty" xml:space="preserve">
+    <value>Calea de stocare a temei nu poate fi goala!</value>
   </data>
   <data name="TitleCannotBeEmpty" xml:space="preserve">
     <value>Titlul nu poate fi gol!</value>
@@ -527,6 +668,12 @@
   </data>
   <data name="TooManyRequests" xml:space="preserve">
     <value>Prea multe cereri! Vă rugăm să încercați din nou în 15 minute!</value>
+  </data>
+  <data name="TotalScanJobItemsCountMustBePositive" xml:space="preserve">
+    <value>Numărul total de elemente de scanat trebuie să fie pozitiv!</value>
+  </data>
+  <data name="TotalScanJobsCountMustBePositive" xml:space="preserve">
+    <value>Numărul total de job-uri de scanare trebuie să fie pozitiv!</value>
   </data>
   <data name="TotpCannotBeEmpty" xml:space="preserve">
     <value>Codul TOTP nu poate fi gol!</value>
@@ -567,58 +714,13 @@
   <data name="UsernameMustBeBetween3And255CharactersLong" xml:space="preserve">
     <value>Numele de utilizator trebuie să aibă între 3 și 255 caractere!</value>
   </data>
+  <data name="UserSettingsAlreadyExists" xml:space="preserve">
+    <value>Setarile utilizatorului exista deja!</value>
+  </data>
+  <data name="UserSettingsNotFound" xml:space="preserve">
+    <value>Setarile utilizatorului nu au fost gasite!</value>
+  </data>
   <data name="VolumeNumberMustBeGreaterThanZero" xml:space="preserve">
     <value>Numărul volumului trebuie să fie mai mare decât zero!</value>
-  </data>
-  <data name="CoverFileMustBeAnImage" xml:space="preserve">
-    <value>Fișierul copertă trebuie să fie o imagine!</value>
-  </data>
-  <data name="CannotScanDisabledLibrary" xml:space="preserve">
-    <value>Nu se poate scana o bibliotecă dezactivată!</value>
-  </data>
-  <data name="CannotScanLockedLibrary" xml:space="preserve">
-    <value>Nu se poate scana o bibliotecă blocată!</value>
-  </data>
-  <data name="CanOnlyStartPendingScans" xml:space="preserve">
-    <value>Se pot porni doar scanări în așteptare!</value>
-  </data>
-  <data name="CanOnlyCancelRunningScans" xml:space="preserve">
-    <value>Se pot anula doar scanările în curs!</value>
-  </data>
-  <data name="ScanIdCannotBeEmpty" xml:space="preserve">
-    <value>ID-ul de scanare nu poate fi gol!</value>
-  </data>
-  <data name="LibraryAlreadyBeingScanned" xml:space="preserve">
-    <value>Biblioteca este deja în curs de scanare!</value>
-  </data>
-  <data name="TotalScanJobItemsCountMustBePositive" xml:space="preserve">
-    <value>Numărul total de elemente de scanat trebuie să fie pozitiv!</value>
-  </data>
-  <data name="CompletedScanJobItemsCountMustBePositive" xml:space="preserve">
-    <value>Numărul de elemente scanate complet trebuie să fie pozitiv!</value>
-  </data>
-  <data name="CompletedScanJobItemsCountCantExceedTotalScanJobItemsCount" xml:space="preserve">
-    <value>Numărul de elemente scanate complet nu poate depăși numărul total de elemente de scanat!</value>
-  </data>
-  <data name="ScanJobCurrentOperationCannotBeEmpty" xml:space="preserve">
-    <value>Operația curentă de scanare nu poate fi goală!</value>
-  </data>
-  <data name="LibraryScanIdCannotBeEmpty" xml:space="preserve">
-    <value>ID-ul de scanare al bibliotecii nu poate fi gol!</value>
-  </data>
-  <data name="TotalScanJobsCountMustBePositive" xml:space="preserve">
-    <value>Numărul total de job-uri de scanare trebuie să fie pozitiv!</value>
-  </data>
-  <data name="CompletedScanJobsCountMustBePositive" xml:space="preserve">
-    <value>Numărul de job-uri de scanare completate trebuie să fie pozitiv!</value>
-  </data>
-  <data name="CompletedScanJobsCountCantExceedTotalScanJobsCount" xml:space="preserve">
-    <value>Numărul de job-uri de scanare completate nu poate depăși numărul total de job-uri de scanare!</value>
-  </data>
-  <data name="CorsOriginsCannotBeEmpty" xml:space="preserve">
-    <value>Originile CORS nu pot fi goale!</value>
-  </data>
-  <data name="CorsOriginIsInvalid" xml:space="preserve">
-    <value>Origine CORS invalidă!</value>
   </data>
 </root>
