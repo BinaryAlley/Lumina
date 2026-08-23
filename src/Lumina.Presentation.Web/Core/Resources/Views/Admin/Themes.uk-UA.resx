@@ -117,7 +117,58 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="NotAllowedToAccessResource" xml:space="preserve">
-    <value>У вас нет прав для просмотра этого ресурса!</value>
+  <data name="Themes" xml:space="preserve">
+    <value>Теми</value>
+  </data>
+  <data name="NoThemes" xml:space="preserve">
+    <value>Не встановлено жодної теми.</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Ім'я</value>
+  </data>
+  <data name="Version" xml:space="preserve">
+    <value>Версія</value>
+  </data>
+  <data name="Author" xml:space="preserve">
+    <value>Автор</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>Дії</value>
+  </data>
+  <data name="Activate" xml:space="preserve">
+    <value>Активувати</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Видалити</value>
+  </data>
+  <data name="Download" xml:space="preserve">
+    <value>Завантажити</value>
+  </data>
+  <data name="Restore" xml:space="preserve">
+    <value>Відновити</value>
+  </data>
+  <data name="Upload" xml:space="preserve">
+    <value>Завантажити</value>
+  </data>
+  <data name="UploadFailed" xml:space="preserve">
+    <value>Не вдалося завантажити архів теми.</value>
+  </data>
+  <data name="DeleteThemeConfirm" xml:space="preserve">
+    <value>Ви впевнені, що хочете видалити вказану тему?</value>
+  </data>
+  <data name="Preview" xml:space="preserve">
+    <value>Попередній перегляд</value>
+  </data>
+  <data name="ThemeTrustWarning" xml:space="preserve">
+    <value>Теми є стороннім вмістом і можуть виконувати код, зокрема JavaScript, у вашому браузері. Встановлюйте лише теми з надійних джерел. Теми, що постачаються разом із застосунком, перевірені та безпечні.</value>
+  </data>
+  <data name="Source" xml:space="preserve">
+    <value>Джерело</value>
+  </data>
+  <data name="Bundled" xml:space="preserve">
+    <value>Вбудований</value>
+  </data>
+  <data name="UserProvided" xml:space="preserve">
+    <value>Користувач</value>
   </data>
 </root>

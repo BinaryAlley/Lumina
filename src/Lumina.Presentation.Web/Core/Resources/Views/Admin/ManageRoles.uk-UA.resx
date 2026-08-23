@@ -118,45 +118,45 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="CanCreateLibraries" xml:space="preserve">
-    <value>Может создавать библиотеки</value>
+    <value>Може створювати бібліотеки</value>
   </data>
   <data name="CanDeleteUsers" xml:space="preserve">
-    <value>Может удалять пользователей</value>
+    <value>Може видаляти користувачів</value>
   </data>
   <data name="CanRegisterUsers" xml:space="preserve">
-    <value>Может регистрировать пользователей</value>
+    <value>Може реєструвати користувачів</value>
   </data>
   <data name="CanViewUsers" xml:space="preserve">
-    <value>Может просматривать пользователей</value>
+    <value>Може переглядати користувачів</value>
   </data>
   <data name="CreateRole" xml:space="preserve">
-    <value>Создать роль</value>
+    <value>Створити роль</value>
   </data>
   <data name="DeleteRole" xml:space="preserve">
-    <value>Удалить роль</value>
+    <value>Видалити роль</value>
   </data>
   <data name="DeleteRoleConfirm" xml:space="preserve">
-    <value>Вы уверены, что хотите удалить выбранную роль?</value>
+    <value>Ви впевнені, що хочете видалити вибрану роль?</value>
   </data>
   <data name="RoleCreated" xml:space="preserve">
-    <value>Роль была создана!</value>
+    <value>Роль було створено!</value>
   </data>
   <data name="RoleDeleted" xml:space="preserve">
-    <value>Роль была удалена!</value>
+    <value>Роль було видалено!</value>
   </data>
   <data name="RoleName" xml:space="preserve">
-    <value>Название роли</value>
+    <value>Назва ролі</value>
   </data>
   <data name="Roles" xml:space="preserve">
-    <value>Роли</value>
+    <value>Ролі</value>
   </data>
   <data name="RoleUpdated" xml:space="preserve">
-    <value>Роль была обновлена!</value>
+    <value>Роль було оновлено!</value>
   </data>
   <data name="SelectARole" xml:space="preserve">
-    <value>Выберите роль</value>
+    <value>Виберіть роль</value>
   </data>
   <data name="UpdateRole" xml:space="preserve">
-    <value>Обновить роль</value>
+    <value>Оновити роль</value>
   </data>
 </root>

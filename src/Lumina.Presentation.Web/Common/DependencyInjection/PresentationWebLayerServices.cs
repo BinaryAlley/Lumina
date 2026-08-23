@@ -114,7 +114,7 @@ public static class PresentationWebLayerServices
                 new CultureInfo("it-IT"),
                 new CultureInfo("ja-JP"),
                 new CultureInfo("ro-RO"),
-                new CultureInfo("ru-RU"),
+                new CultureInfo("uk-UA"),
                 new CultureInfo("zh-CN"),
             ];
             requestLocalizationOptions.DefaultRequestCulture = new RequestCulture("en-US");

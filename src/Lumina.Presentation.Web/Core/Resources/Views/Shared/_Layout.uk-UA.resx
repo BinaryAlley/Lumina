@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -117,43 +117,46 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-    <data name="Plugins" xml:space="preserve">
-    <value>Плагины</value>
+  <data name="Abort" xml:space="preserve">
+    <value>Перервати</value>
   </data>
-  <data name="Name" xml:space="preserve">
-    <value>Имя</value>
+  <data name="Cancel" xml:space="preserve">
+    <value>Скасувати</value>
   </data>
-  <data name="Author" xml:space="preserve">
-    <value>Автор</value>
+  <data name="Confirmation" xml:space="preserve">
+    <value>Підтвердження</value>
   </data>
-  <data name="Version" xml:space="preserve">
-    <value>Версия</value>
+  <data name="Error" xml:space="preserve">
+    <value>Помилка</value>
   </data>
-  <data name="Description" xml:space="preserve">
-    <value>Описание</value>
+  <data name="Ignore" xml:space="preserve">
+    <value>Ігнорувати</value>
   </data>
-  <data name="LoadStatus" xml:space="preserve">
-    <value>Статус загрузки</value>
+  <data name="Information" xml:space="preserve">
+    <value>Інформація</value>
   </data>
-  <data name="Loaded" xml:space="preserve">
-    <value>Загружен</value>
+  <data name="NavigationFailed" xml:space="preserve">
+    <value>Навігація не вдалася!</value>
   </data>
-  <data name="FailedToLoad" xml:space="preserve">
-    <value>Не удалось загрузить</value>
+  <data name="No" xml:space="preserve">
+    <value>Ні</value>
   </data>
-  <data name="LoadError" xml:space="preserve">
-    <value>Ошибка загрузки</value>
+  <data name="Ok" xml:space="preserve">
+    <value>OK</value>
   </data>
-  <data name="Settings" xml:space="preserve">
-    <value>Настройки</value>
+  <data name="Retry" xml:space="preserve">
+    <value>Повторити</value>
   </data>
-  <data name="NoPlugins" xml:space="preserve">
-    <value>Плагины не обнаружены.</value>
+  <data name="ToggleFullHeight" xml:space="preserve">
+    <value>Перемкнути Повну Висоту</value>
   </data>
-  <data name="Save" xml:space="preserve">
-    <value>Сохранить</value>
+  <data name="ToggleVisibility" xml:space="preserve">
+    <value>Перемкнути Видимість</value>
   </data>
-  <data name="SettingsSaved" xml:space="preserve">
-    <value>Настройки сохранены</value>
+  <data name="Warning" xml:space="preserve">
+    <value>Попередження</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>Так</value>
   </data>
 </root>

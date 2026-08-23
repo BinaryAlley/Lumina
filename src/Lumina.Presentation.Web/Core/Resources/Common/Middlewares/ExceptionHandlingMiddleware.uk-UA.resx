@@ -118,609 +118,609 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AdminAccountAlreadyCreated" xml:space="preserve">
-    <value>管理者アカウントは既に作成されています!</value>
+    <value>Обліковий запис адміністратора вже створено!</value>
   </data>
   <data name="AdminAccountNotFound" xml:space="preserve">
-    <value>管理者アカウントが見つかりませんでした。</value>
+    <value>Обліковий запис адміністратора не знайдено!</value>
   </data>
   <data name="AdminRoleCannotBeDeleted" xml:space="preserve">
-    <value>管理者ロールは削除できません！</value>
+    <value>Роль адміністратора не можна видалити!</value>
   </data>
   <data name="AdminRoleNotFound" xml:space="preserve">
-    <value>管理者ロールが見つかりませんでした。</value>
+    <value>Роль адміністратора не знайдено!</value>
   </data>
   <data name="Application theme cannot be empty!" xml:space="preserve">
-    <value>アプリケーションのテーマを選択してください!</value>
+    <value>Тема застосунку не може бути порожньою!</value>
   </data>
   <data name="AsinMustBe10CharactersLong" xml:space="preserve">
-    <value>ASINは10文字でなければなりません！</value>
+    <value>ASIN має містити 10 символів!</value>
   </data>
   <data name="BarnesAndNoblesIdMustBe10CharactersLong" xml:space="preserve">
-    <value>Barnes&amp;NobleのIDは10文字でなければなりません！</value>
+    <value>Ідентифікатор Barnes&amp;Noble має містити 10 символів!</value>
   </data>
   <data name="BitrateMustBeAPositiveNumber" xml:space="preserve">
-    <value>ビットレートは正の数でなければなりません！</value>
+    <value>Бітрейт має бути додатним числом!</value>
   </data>
   <data name="BookAlreadyExists" xml:space="preserve">
-    <value>本はすでに存在します！</value>
+    <value>Книга вже існує!</value>
   </data>
   <data name="BookLibraryCannotBeNull" xml:space="preserve">
-    <value>本のライブラリを null にすることはできません。</value>
+    <value>Бібліотека книг не може бути порожньою!</value>
   </data>
   <data name="BookNotFound" xml:space="preserve">
-    <value>本が見つかりませんでした。</value>
+    <value>Книгу не знайдено!</value>
   </data>
   <data name="BookPathCannotBeEmpty" xml:space="preserve">
-    <value>本のパスを空にすることはできません。</value>
+    <value>Шлях до книги не може бути порожнім!</value>
   </data>
   <data name="CannotNavigateUp" xml:space="preserve">
-    <value>上の階層に移動できません！</value>
+    <value>Неможливо перейти на рівень вище!</value>
   </data>
   <data name="CannotRemoveLastAdmin" xml:space="preserve">
-    <value>最後の管理者権限を削除できません！</value>
+    <value>Неможливо видалити останню роль адміністратора, призначену користувачу!</value>
   </data>
   <data name="CannotScanDisabledLibrary" xml:space="preserve">
-    <value>無効化されたライブラリはスキャンできません！</value>
+    <value>Неможливо сканувати вимкнену бібліотеку!</value>
   </data>
   <data name="CannotScanLockedLibrary" xml:space="preserve">
-    <value>ロックされたライブラリはスキャンできません！</value>
+    <value>Неможливо сканувати заблоковану бібліотеку!</value>
   </data>
   <data name="CanOnlyCancelRunningScans" xml:space="preserve">
-    <value>実行中のスキャンのみキャンセル可能です！</value>
+    <value>Скасувати можна лише запущені сканування!</value>
   </data>
   <data name="CanOnlyCompleteRunningScans" xml:space="preserve">
-    <value>実行中のスキャンのみ完了できます。</value>
+    <value>Завершувати можна лише запущені сканування!</value>
   </data>
   <data name="CanOnlyFailRunningScans" xml:space="preserve">
-    <value>実行中のスキャンのみ失敗にできます。</value>
+    <value>Позначати як невдалі можна лише запущені сканування!</value>
   </data>
   <data name="CanOnlyStartPendingScans" xml:space="preserve">
-    <value>保留中のスキャンのみ開始できます！</value>
+    <value>Запускати можна лише очікуючі сканування!</value>
   </data>
   <data name="CodecCannotBeEmpty" xml:space="preserve">
-    <value>コーデックを空にすることはできません！</value>
+    <value>Кодек не може бути порожнім!</value>
   </data>
   <data name="CompletedScanJobItemsCountCantExceedTotalScanJobItemsCount" xml:space="preserve">
-    <value>完了したスキャン項目数は合計スキャン項目数を超えることはできません！</value>
+    <value>Кількість завершених елементів сканування не може перевищувати загальну кількість елементів сканування!</value>
   </data>
   <data name="CompletedScanJobItemsCountMustBePositive" xml:space="preserve">
-    <value>完了したスキャン項目数は正の値でなければなりません！</value>
+    <value>Кількість завершених елементів сканування має бути додатною!</value>
   </data>
   <data name="CompletedScanJobsCountCantExceedTotalScanJobsCount" xml:space="preserve">
-    <value>完了したスキャンジョブ数は合計スキャンジョブ数を超えることはできません！</value>
+    <value>Кількість завершених завдань сканування не може перевищувати загальну кількість завдань сканування!</value>
   </data>
   <data name="CompletedScanJobsCountMustBePositive" xml:space="preserve">
-    <value>完了したスキャンジョブ数は正の値でなければなりません！</value>
+    <value>Кількість завершених завдань сканування має бути додатною!</value>
   </data>
   <data name="ContributorDisplayNameCannotBeEmpty" xml:space="preserve">
-    <value>出演者の表示名を空にすることはできません！</value>
+    <value>Відображуване ім&apos;я учасника не може бути порожнім!</value>
   </data>
   <data name="ContributorDisplayNameMustBeMaximum100CharactersLong" xml:space="preserve">
-    <value>出演者の表示名は最大100文字までです！</value>
+    <value>Відображуване ім&apos;я учасника не має перевищувати 100 символів!</value>
   </data>
   <data name="ContributorLegalNameMustBeMaximum100CharactersLong" xml:space="preserve">
-    <value>出演者の本名は最大100文字までです！</value>
+    <value>Офіційне ім&apos;я учасника не має перевищувати 100 символів!</value>
   </data>
   <data name="ContributorNameCannotBeEmpty" xml:space="preserve">
-    <value>出演者名を空にすることはできません！</value>
+    <value>Ім&apos;я учасника не може бути порожнім!</value>
   </data>
   <data name="ContributorRoleCannotBeNull" xml:space="preserve">
-    <value>出演者の役割をnullにすることはできません！</value>
+    <value>Роль учасника не може бути порожньою!</value>
   </data>
   <data name="ContributorsListCannotBeNull" xml:space="preserve">
-    <value>出演者リストをnullにすることはできません！</value>
+    <value>Список учасників не може бути порожнім!</value>
   </data>
   <data name="CorsOriginIsInvalid" xml:space="preserve">
-    <value>CORSオリジンが無効です！</value>
+    <value>Недійсне джерело CORS!</value>
   </data>
   <data name="CorsOriginsCannotBeEmpty" xml:space="preserve">
-    <value>CORSオリジンは空ではいけません！</value>
+    <value>Список джерел CORS не може бути порожнім!</value>
   </data>
   <data name="CountryCodeMustBe2CharactersLong" xml:space="preserve">
-    <value>国コードは2文字でなければなりません！</value>
+    <value>Код країни має містити 2 символи!</value>
   </data>
   <data name="CoverFileMustBeAnImage" xml:space="preserve">
-    <value>カバーファイルは画像である必要があります！</value>
+    <value>Файл обкладинки має бути зображенням!</value>
   </data>
   <data name="CurrentPasswordCannotBeEmpty" xml:space="preserve">
-    <value>現在のパスワードを入力してください!</value>
+    <value>Поточний пароль не може бути порожнім!</value>
   </data>
   <data name="DatabaseConnectionStringCannotBeEmpty" xml:space="preserve">
-    <value>データベース接続文字列を入力してください!</value>
+    <value>Рядок підключення до бази даних не може бути порожнім!</value>
   </data>
   <data name="DescriptionMustBeMaximum2000CharactersLong" xml:space="preserve">
-    <value>説明文は最大2000文字までです！</value>
+    <value>Опис не має перевищувати 2000 символів!</value>
   </data>
   <data name="DirectoryAlreadyExists" xml:space="preserve">
-    <value>ディレクトリはすでに存在します！</value>
+    <value>Каталог вже існує!</value>
   </data>
   <data name="DirectoryCopyError" xml:space="preserve">
-    <value>ディレクトリのコピーに失敗しました！</value>
+    <value>Помилка копіювання каталогу!</value>
   </data>
   <data name="DirectoryMoveError" xml:space="preserve">
-    <value>ディレクトリの移動に失敗しました！</value>
+    <value>Помилка переміщення каталогу!</value>
   </data>
   <data name="DirectoryNotFound" xml:space="preserve">
-    <value>ディレクトリが見つかりません！</value>
+    <value>Каталог не знайдено!</value>
   </data>
   <data name="EditionMustBeMaximum50CharactersLong" xml:space="preserve">
-    <value>版の名称は最大50文字までです！</value>
+    <value>Назва видання не має перевищувати 50 символів!</value>
   </data>
   <data name="EncryptionSecretKeyCannotBeEmpty" xml:space="preserve">
-    <value>暗号化シークレットキーを入力してください!</value>
+    <value>Секретний ключ шифрування не може бути порожнім!</value>
   </data>
   <data name="EncryptionSecretKeyMustBeABase64String" xml:space="preserve">
-    <value>暗号化シークレットキーはBase64形式の文字列である必要があります!</value>
+    <value>Секретний ключ шифрування має бути рядком у форматі Base64!</value>
   </data>
   <data name="ErrorPersistingAuthorizationRole" xml:space="preserve">
-    <value>認可ロールの保存中にエラーが発生しました！</value>
+    <value>Помилка збереження ролі авторизації!</value>
   </data>
   <data name="ErrorPersistingMediaLibrary" xml:space="preserve">
-    <value>メディアライブラリの保存に失敗しました!</value>
+    <value>Помилка збереження медіатеки!</value>
   </data>
   <data name="ExtensionCannotBeEmpty" xml:space="preserve">
-    <value>ファイルの拡張子を空にすることはできません！</value>
+    <value>Розширення файлу не може бути порожнім!</value>
   </data>
   <data name="FailedToCreateScanJobProgress" xml:space="preserve">
-    <value>スキャンジョブの進捗を作成できませんでした。</value>
+    <value>Не вдалося створити прогрес завдання сканування!</value>
   </data>
   <data name="FileAlreadyExists" xml:space="preserve">
-    <value>ファイルはすでに存在します！</value>
+    <value>Файл вже існує!</value>
   </data>
   <data name="FileCopyError" xml:space="preserve">
-    <value>ファイルのコピーに失敗しました！</value>
+    <value>Помилка копіювання файлу!</value>
   </data>
   <data name="FileMoveError" xml:space="preserve">
-    <value>ファイルの移動に失敗しました！</value>
+    <value>Помилка переміщення файлу!</value>
   </data>
   <data name="FileNotFound" xml:space="preserve">
-    <value>ファイルが見つかりません！</value>
+    <value>Файл не знайдено!</value>
   </data>
   <data name="FilterMustIncludeLibraryId" xml:space="preserve">
-    <value>フィルターにはライブラリ ID を含める必要があります。</value>
+    <value>Фільтр має містити ідентифікатор бібліотеки!</value>
   </data>
   <data name="Forbidden" xml:space="preserve">
-    <value>このリソースを表示する権限がありません！</value>
+    <value>У вас немає прав для перегляду цього ресурсу!</value>
   </data>
   <data name="General.Validation" xml:space="preserve">
-    <value>検証</value>
+    <value>Перевірка</value>
   </data>
   <data name="GenreNameCannotBeEmpty" xml:space="preserve">
-    <value>ジャンル名を空にすることはできません！</value>
+    <value>Назва жанру не може бути порожньою!</value>
   </data>
   <data name="GenreNameMustBeMaximum50CharactersLong" xml:space="preserve">
-    <value>ジャンル名は最大50文字までです！</value>
+    <value>Назва жанру не має перевищувати 50 символів!</value>
   </data>
   <data name="GenresListCannotBeNull" xml:space="preserve">
-    <value>ジャンルリストをnullにすることはできません！</value>
+    <value>Список жанрів не може бути порожнім!</value>
   </data>
   <data name="GoodreadsIdMustBeNumeric" xml:space="preserve">
-    <value>GoodreadsのIDは数値でなければなりません！</value>
+    <value>Ідентифікатор Goodreads має бути числовим!</value>
   </data>
   <data name="GoogleBooksIdMustBe12CharactersLong" xml:space="preserve">
-    <value>Google BooksのIDは12文字でなければなりません！</value>
+    <value>Ідентифікатор Google Books має містити 12 символів!</value>
   </data>
   <data name="ImageQualityMustBeBetweenZeroAndOneHundred" xml:space="preserve">
-    <value>画質は0から100の間でなければなりません！</value>
+    <value>Якість зображення має бути між 0 і 100!</value>
   </data>
   <data name="InvalidAppleBooksIdFormat" xml:space="preserve">
-    <value>Apple BooksのID形式が無効です！</value>
+    <value>Недійсний формат ідентифікатора Apple Books!</value>
   </data>
   <data name="InvalidBarnesAndNoblesIdFormat" xml:space="preserve">
-    <value>Barnes&amp;NobleのID形式が無効です！</value>
+    <value>Недійсний формат ідентифікатора Barnes&amp;Noble!</value>
   </data>
   <data name="InvalidCurrentPassword" xml:space="preserve">
-    <value>現在のパスワードが無効です!</value>
+    <value>Недійсний поточний пароль!</value>
   </data>
   <data name="InvalidFilterAlphaKey" xml:space="preserve">
-    <value>フィルターのアルファキーが無効です。</value>
+    <value>Недійсний альфа-ключ фільтра!</value>
   </data>
   <data name="InvalidGoogleBooksIdFormat" xml:space="preserve">
-    <value>Google BooksのID形式が無効です！</value>
+    <value>Недійсний формат ідентифікатора Google Books!</value>
   </data>
   <data name="InvalidIsbn10Format" xml:space="preserve">
-    <value>無効なISBN10形式です！</value>
+    <value>Недійсний формат ISBN10!</value>
   </data>
   <data name="InvalidIsbn13Format" xml:space="preserve">
-    <value>無効なISBN13形式です！</value>
+    <value>Недійсний формат ISBN13!</value>
   </data>
   <data name="InvalidIsoCode" xml:space="preserve">
-    <value>無効なISOコードです！</value>
+    <value>Недійсний ISO-код!</value>
   </data>
   <data name="InvalidLccnFormat" xml:space="preserve">
-    <value>無効なLCCN形式です！</value>
+    <value>Недійсний формат LCCN!</value>
   </data>
   <data name="InvalidOclcFormat" xml:space="preserve">
-    <value>無効なOCLC形式です！</value>
+    <value>Недійсний формат OCLC!</value>
   </data>
   <data name="InvalidOpenLibraryId" xml:space="preserve">
-    <value>OpenLibraryのIDが無効です！</value>
+    <value>Недійсний ідентифікатор OpenLibrary!</value>
   </data>
   <data name="InvalidPassword" xml:space="preserve">
-    <value>パスワードが無効です!</value>
+    <value>Недійсний пароль!</value>
   </data>
   <data name="InvalidPath" xml:space="preserve">
-    <value>無効なパスです！</value>
+    <value>Недопустимий шлях!</value>
   </data>
   <data name="InvalidTotpCode" xml:space="preserve">
-    <value>TOTPコードが無効です!</value>
+    <value>Недійсний код TOTP!</value>
   </data>
   <data name="InvalidUsername" xml:space="preserve">
-    <value>ユーザー名が無効です!</value>
+    <value>Недійсне ім&apos;я користувача!</value>
   </data>
   <data name="InvalidUsernameOrPassword" xml:space="preserve">
-    <value>ユーザー名またはパスワードが無効です!</value>
+    <value>Недійсне ім&apos;я користувача або пароль!</value>
   </data>
   <data name="IsbnListCannotBeNull" xml:space="preserve">
-    <value>ISBNリストをnullにすることはできません！</value>
+    <value>Список ISBN не може бути порожнім!</value>
   </data>
   <data name="IsbnValueCannotBeEmpty" xml:space="preserve">
-    <value>ISBN値を空にすることはできません！</value>
+    <value>Значення ISBN не може бути порожнім!</value>
   </data>
   <data name="ItemsPerPageMustBeGreaterThanZero" xml:space="preserve">
-    <value>1 ページあたりの項目数は 0 より大きくなければなりません。</value>
+    <value>Кількість елементів на сторінці має бути більшою за нуль!</value>
   </data>
   <data name="JwtAudienceCannotBeEmpty" xml:space="preserve">
-    <value>JWT対象者を入力してください!</value>
+    <value>Цільова аудиторія JWT не може бути порожньою!</value>
   </data>
   <data name="JwtExpiryMinutesMustBePositive" xml:space="preserve">
-    <value>JWT有効期限（分）は正の値である必要があります!</value>
+    <value>Час дії JWT у хвилинах має бути додатним!</value>
   </data>
   <data name="JwtIssuerCannotBeEmpty" xml:space="preserve">
-    <value>JWT発行者を入力してください!</value>
+    <value>Видавець JWT не може бути порожнім!</value>
   </data>
   <data name="JwtSecretKeyCannotBeEmpty" xml:space="preserve">
-    <value>JWT秘密鍵を入力してください!</value>
+    <value>Секретний ключ JWT не може бути порожнім!</value>
   </data>
   <data name="JwtSecretKeyTooShort" xml:space="preserve">
-    <value>JWT秘密鍵が短すぎます!</value>
+    <value>Секретний ключ JWT занадто короткий!</value>
   </data>
   <data name="LanguageCodeCannotBeEmpty" xml:space="preserve">
-    <value>言語コードを空にすることはできません！</value>
+    <value>Код мови не може бути порожнім!</value>
   </data>
   <data name="LanguageCodeMustBe2CharactersLong" xml:space="preserve">
-    <value>言語コードは2文字でなければなりません！</value>
+    <value>Код мови має містити 2 символи!</value>
   </data>
   <data name="LanguageNameCannotBeEmpty" xml:space="preserve">
-    <value>言語名を空にすることはできません！</value>
+    <value>Назва мови не може бути порожньою!</value>
   </data>
   <data name="LanguageNameMustBeMaximum50CharactersLong" xml:space="preserve">
-    <value>言語名は最大50文字までです！</value>
+    <value>Назва мови не має перевищувати 50 символів!</value>
   </data>
   <data name="LanguageNativeNameMustBeMaximum50CharactersLong" xml:space="preserve">
-    <value>言語の固有名は最大50文字までです！</value>
+    <value>Власна назва мови не має перевищувати 50 символів!</value>
   </data>
   <data name="LastBundledThemeCannotBeDeleted" xml:space="preserve">
-    <value>最後の同梱テーマは削除できません！</value>
+    <value>Останню вбудовану тему не можна видалити!</value>
   </data>
   <data name="LibraryAlreadyBeingScanned" xml:space="preserve">
-    <value>ライブラリは既にスキャン中です！</value>
+    <value>Бібліотека вже сканується!</value>
   </data>
   <data name="LibraryAlreadyExists" xml:space="preserve">
-    <value>ライブラリはすでに存在します！</value>
+    <value>Бібліотека вже існує!</value>
   </data>
   <data name="LibraryIdCannotBeEmpty" xml:space="preserve">
-    <value>ライブラリIDを空にすることはできません！</value>
+    <value>Ідентифікатор бібліотеки не може бути порожнім!</value>
   </data>
   <data name="LibraryMetadataProviderConfigurationNotFound" xml:space="preserve">
-    <value>ライブラリのメタデータプロバイダー構成が見つかりませんでした。</value>
+    <value>Конфігурацію постачальника метаданих бібліотеки не знайдено!</value>
   </data>
   <data name="LibraryNotFound" xml:space="preserve">
-    <value>ライブラリが見つかりません！</value>
+    <value>Бібліотеку не знайдено!</value>
   </data>
   <data name="LibraryScanAlreadyExists" xml:space="preserve">
-    <value>ライブラリスキャンは既に存在します。</value>
+    <value>Сканування бібліотеки вже існує!</value>
   </data>
   <data name="LibraryScanIdCannotBeEmpty" xml:space="preserve">
-    <value>ライブラリスキャンIDを空にすることはできません！</value>
+    <value>Ідентифікатор сканування бібліотеки не може бути порожнім!</value>
   </data>
   <data name="LibraryScanNotFound" xml:space="preserve">
-    <value>ライブラリスキャンが見つかりませんでした。</value>
+    <value>Сканування бібліотеки не знайдено!</value>
   </data>
   <data name="LibraryThingIdMustBeMaximum50CharactersLong" xml:space="preserve">
-    <value>LibraryThingのIDは最大50文字までです！</value>
+    <value>Ідентифікатор LibraryThing не має перевищувати 50 символів!</value>
   </data>
   <data name="LibraryTypeCannotBeNull" xml:space="preserve">
-    <value>ライブラリタイプをnullにすることはできません！</value>
+    <value>Тип бібліотеки не може бути порожнім!</value>
   </data>
   <data name="MediaLibrariesDirectoryCannotBeEmpty" xml:space="preserve">
-    <value>メディアライブラリのディレクトリを空にすることはできません。</value>
+    <value>Каталог медіатек не може бути порожнім!</value>
   </data>
   <data name="MediaRootDirectoryCannotBeEmpty" xml:space="preserve">
-    <value>メディアのルートディレクトリを入力してください!</value>
+    <value>Коренева папка медіафайлів не може бути порожньою!</value>
   </data>
   <data name="MetadataCannotBeNull" xml:space="preserve">
-    <value>メタデータをnullにすることはできません！</value>
+    <value>Метадані не можуть бути порожніми!</value>
   </data>
   <data name="NameCannotBeEmpty" xml:space="preserve">
-    <value>名前を空にすることはできません！</value>
+    <value>Ім&apos;я не може бути порожнім!</value>
   </data>
   <data name="NewPasswordCannotBeEmpty" xml:space="preserve">
-    <value>新しいパスワードを入力してください!</value>
+    <value>Новий пароль не може бути порожнім!</value>
   </data>
   <data name="NewPasswordConfirmCannotBeEmpty" xml:space="preserve">
-    <value>新しいパスワードの確認を入力してください!</value>
+    <value>Підтвердження нового пароля не може бути порожнім!</value>
   </data>
   <data name="NotAuthorized" xml:space="preserve">
-    <value>この操作を実行する権限がありません!</value>
+    <value>У вас немає прав для виконання цієї операції!</value>
   </data>
   <data name="NotFound" xml:space="preserve">
-    <value>指定されたリソースが見つかりませんでした！</value>
+    <value>Вказаний ресурс не знайдено!</value>
   </data>
   <data name="NoThumbnail" xml:space="preserve">
-    <value>サムネイルがありません！</value>
+    <value>Немає мініатюри!</value>
   </data>
   <data name="OneOrMoreValidationErrorsOccurred" xml:space="preserve">
-    <value>一つ以上の検証エラーが発生しました</value>
+    <value>Виявлено одну або кілька помилок перевірки</value>
   </data>
   <data name="OriginalReleaseDateAndYearMustMatch" xml:space="preserve">
-    <value>公開日と公開年が一致しなければなりません！</value>
+    <value>Дата та рік першого випуску мають збігатися!</value>
   </data>
   <data name="OriginalReleaseYearMustBeBetween1And9999" xml:space="preserve">
-    <value>公開年は1から9999の間でなければなりません！</value>
+    <value>Рік першого випуску має бути між 1 і 9999!</value>
   </data>
   <data name="OriginalTitleMustBeMaximum255CharactersLong" xml:space="preserve">
-    <value>原題は最大255文字までです！</value>
+    <value>Оригінальна назва не має перевищувати 255 символів!</value>
   </data>
   <data name="PageCountMustBeGreaterThanZero" xml:space="preserve">
-    <value>ページ数は0より大きくなければなりません！</value>
+    <value>Кількість сторінок має бути більшою за нуль!</value>
   </data>
   <data name="PageKeyCannotBeEmpty" xml:space="preserve">
-    <value>ページキーは空にできません！</value>
+    <value>Ключ сторінки не може бути порожнім!</value>
   </data>
   <data name="ParentNodeCannotBeNull" xml:space="preserve">
-    <value>親ノードをnullにすることはできません!</value>
+    <value>Батьківський вузол не може бути порожнім!</value>
   </data>
   <data name="PasswordCannotBeEmpty" xml:space="preserve">
-    <value>パスワードを入力してください!</value>
+    <value>Пароль не може бути порожнім!</value>
   </data>
   <data name="PasswordConfirmCannotBeEmpty" xml:space="preserve">
-    <value>パスワード確認を入力してください!</value>
+    <value>Підтвердження пароля не може бути порожнім!</value>
   </data>
   <data name="PasswordResetAlreadyRequested" xml:space="preserve">
-    <value>パスワードリセットは既に申請済みです!</value>
+    <value>Скидання пароля вже запрошено!</value>
   </data>
   <data name="PasswordsNotMatch" xml:space="preserve">
-    <value>パスワードが一致しません!</value>
+    <value>Паролі не збігаються!</value>
   </data>
   <data name="PathCannotBeEmpty" xml:space="preserve">
-    <value>パスを空にすることはできません！</value>
+    <value>Шлях не може бути порожнім!</value>
   </data>
   <data name="PathMustBeMaximum260CharactersLong" xml:space="preserve">
-    <value>パスは最大260文字までです!</value>
+    <value>Шлях не має перевищувати 260 символів!</value>
   </data>
   <data name="PathsListCannotBeEmpty" xml:space="preserve">
-    <value>パスリストを空にすることはできません！</value>
+    <value>Список шляхів не може бути порожнім!</value>
   </data>
   <data name="PathsListCannotBeNull" xml:space="preserve">
-    <value>パスリストをnullにすることはできません！</value>
+    <value>Список шляхів не може бути порожнім!</value>
   </data>
   <data name="PermissionAlreadyExists" xml:space="preserve">
-    <value>権限は既に存在します。</value>
+    <value>Дозвіл вже існує!</value>
   </data>
   <data name="PermissionIdCannotBeEmpty" xml:space="preserve">
-    <value>権限 ID を空にすることはできません。</value>
+    <value>Ідентифікатор дозволу не може бути порожнім!</value>
   </data>
   <data name="PermissionsListCannotBeEmpty" xml:space="preserve">
-    <value>権限リストは空にできません！</value>
+    <value>Список дозволів не може бути порожнім!</value>
   </data>
   <data name="PermissionsListCannotBeNull" xml:space="preserve">
-    <value>権限リストはnullにできません！</value>
+    <value>Список дозволів не може бути порожнім!</value>
   </data>
   <data name="PluginIdCannotBeEmpty" xml:space="preserve">
-    <value>プラグイン ID を空にすることはできません。</value>
+    <value>Ідентифікатор плагіна не може бути порожнім!</value>
   </data>
   <data name="PluginIdsListCannotBeEmpty" xml:space="preserve">
-    <value>プラグイン ID のリストを空にすることはできません。</value>
+    <value>Список ідентифікаторів плагінів не може бути порожнім!</value>
   </data>
   <data name="PluginIdsListCannotBeNull" xml:space="preserve">
-    <value>プラグイン ID のリストを null にすることはできません。</value>
+    <value>Список ідентифікаторів плагінів не може бути порожнім!</value>
   </data>
   <data name="PluginNotFound" xml:space="preserve">
-    <value>プラグインが見つかりませんでした。</value>
+    <value>Плагін не знайдено!</value>
   </data>
   <data name="PluginsDirectoryCannotBeEmpty" xml:space="preserve">
-    <value>プラグインディレクトリを空にすることはできません。</value>
+    <value>Каталог плагінів не може бути порожнім!</value>
   </data>
   <data name="PluginSettingsCannotBeNull" xml:space="preserve">
-    <value>プラグイン設定を null にすることはできません。</value>
+    <value>Налаштування плагіна не можуть бути порожніми!</value>
   </data>
   <data name="PublisherMustBeMaximum100CharactersLong" xml:space="preserve">
-    <value>出版社名は最大100文字までです！</value>
+    <value>Назва видавництва не має перевищувати 100 символів!</value>
   </data>
   <data name="RatingMaxValueMustBePositive" xml:space="preserve">
-    <value>評価の最大値は正の数でなければなりません！</value>
+    <value>Максимальне значення рейтингу має бути додатним!</value>
   </data>
   <data name="RatingsListCannotBeNull" xml:space="preserve">
-    <value>評価リストをnullにすることはできません！</value>
+    <value>Список рейтингів не може бути порожнім!</value>
   </data>
   <data name="RatingValueCannotBeGreaterThanMaxValue" xml:space="preserve">
-    <value>評価値は最大値を超えることはできません！</value>
+    <value>Значення рейтингу не може бути більшим за максимальне значення!</value>
   </data>
   <data name="RatingValueMustBePositive" xml:space="preserve">
-    <value>評価値は正の数でなければなりません！</value>
+    <value>Значення рейтингу має бути додатним!</value>
   </data>
   <data name="RatingVoteCountMustBePositive" xml:space="preserve">
-    <value>評価の投票数は正の数でなければなりません！</value>
+    <value>Кількість голосів рейтингу має бути додатною!</value>
   </data>
   <data name="ReleaseInfoCannotBeNull" xml:space="preserve">
-    <value>リリース情報をnullにすることはできません！</value>
+    <value>Інформація про випуск не може бути порожньою!</value>
   </data>
   <data name="ReleaseVersionMustBeMaximum50CharactersLong" xml:space="preserve">
-    <value>リリースバージョンは最大50文字までです！</value>
+    <value>Версія релізу не має перевищувати 50 символів!</value>
   </data>
   <data name="ReReleaseDateAndYearMustMatch" xml:space="preserve">
-    <value>再公開日と再公開年が一致しなければなりません！</value>
+    <value>Дата та рік перевидання мають збігатися!</value>
   </data>
   <data name="ReReleaseDateCannotBeEarlierThanOriginalReleaseDate" xml:space="preserve">
-    <value>再公開日は公開日より前であってはなりません！</value>
+    <value>Дата перевидання не може бути ранішою за дату першого випуску!</value>
   </data>
   <data name="ReReleaseYearCannotBeEarlierThanOriginalReleaseYear" xml:space="preserve">
-    <value>再公開年は公開年より前であってはなりません！</value>
+    <value>Рік перевидання не може бути ранішим за рік першого випуску!</value>
   </data>
   <data name="ReReleaseYearMustBeBetween1And9999" xml:space="preserve">
-    <value>再公開年は1から9999の間でなければなりません！</value>
+    <value>Рік перевидання має бути між 1 і 9999!</value>
   </data>
   <data name="RoleAlreadyExists" xml:space="preserve">
-    <value>ロールはすでに存在します！</value>
+    <value>Роль вже існує!</value>
   </data>
   <data name="RoleCategoryCannotBeEmpty" xml:space="preserve">
-    <value>役割カテゴリを空にすることはできません！</value>
+    <value>Категорія ролі не може бути порожньою!</value>
   </data>
   <data name="RoleCategoryMustBeMaximum50CharactersLong" xml:space="preserve">
-    <value>役割カテゴリは最大50文字までです！</value>
+    <value>Категорія ролі не має перевищувати 50 символів!</value>
   </data>
   <data name="RoleIdCannotBeEmpty" xml:space="preserve">
-    <value>ロールIDは空にできません！</value>
+    <value>Ідентифікатор ролі не може бути порожнім!</value>
   </data>
   <data name="RoleNameCannotBeEmpty" xml:space="preserve">
-    <value>役割名を空にすることはできません！</value>
+    <value>Назва ролі не може бути порожньою!</value>
   </data>
   <data name="RoleNameCannotBeNull" xml:space="preserve">
-    <value>ロール名を null にすることはできません。</value>
+    <value>Назва ролі не може бути порожньою!</value>
   </data>
   <data name="RoleNameMustBeMaximum50CharactersLong" xml:space="preserve">
-    <value>役割名は最大50文字までです！</value>
+    <value>Назва ролі не має перевищувати 50 символів!</value>
   </data>
   <data name="RoleNotFound" xml:space="preserve">
-    <value>ロールが見つかりません</value>
+    <value>Роль не знайдено</value>
   </data>
   <data name="ScanIdCannotBeEmpty" xml:space="preserve">
-    <value>スキャンIDを空にすることはできません！</value>
+    <value>Ідентифікатор сканування не може бути порожнім!</value>
   </data>
   <data name="ScanJobCurrentOperationCannotBeEmpty" xml:space="preserve">
-    <value>スキャンの現在の操作を空にすることはできません！</value>
+    <value>Поточна операція сканування не може бути порожньою!</value>
   </data>
   <data name="StreamIdCannotBeEmpty" xml:space="preserve">
-    <value>ストリームIDを空にすることはできません！</value>
+    <value>Ідентифікатор потоку не може бути порожнім!</value>
   </data>
   <data name="TagNameCannotBeEmpty" xml:space="preserve">
-    <value>タグ名を空にすることはできません！</value>
+    <value>Назва тега не може бути порожньою!</value>
   </data>
   <data name="TagNameMustBeMaximum50CharactersLong" xml:space="preserve">
-    <value>タグ名は最大50文字までです！</value>
+    <value>Назва тега не має перевищувати 50 символів!</value>
   </data>
   <data name="TagsListCannotBeNull" xml:space="preserve">
-    <value>タグリストをnullにすることはできません！</value>
+    <value>Список тегів не може бути порожнім!</value>
   </data>
   <data name="TempPasswordExpired" xml:space="preserve">
-    <value>仮パスワードの有効期限が切れました!</value>
+    <value>Тимчасовий пароль закінчився!</value>
   </data>
   <data name="TheBookIsAlreadyInTheSeries" xml:space="preserve">
-    <value>この本はすでにシリーズに含まれています！</value>
+    <value>Книга вже входить до серії!</value>
   </data>
   <data name="TheBookIsNotInTheSeries" xml:space="preserve">
-    <value>この本はシリーズに含まれていません！</value>
+    <value>Книга не входить до серії!</value>
   </data>
   <data name="ThemeArchiveCannotBeNull" xml:space="preserve">
-    <value>テーマアーカイブは null にできません！</value>
+    <value>Архів теми не може бути порожнім!</value>
   </data>
   <data name="ThemeArchiveNotReadable" xml:space="preserve">
-    <value>テーマアーカイブを読み取れませんでした！</value>
+    <value>Не вдалося прочитати архів теми!</value>
   </data>
   <data name="ThemeAssetPathCannotBeEmpty" xml:space="preserve">
-    <value>テーマアセットのパスは空にできません！</value>
+    <value>Шлях до ресурсу теми не може бути порожнім!</value>
   </data>
   <data name="ThemeBundledThemesPathCannotBeEmpty" xml:space="preserve">
-    <value>バンドルされたテーマのパスを空にすることはできません。</value>
+    <value>Шлях до вбудованих тем не може бути порожнім!</value>
   </data>
   <data name="ThemeCannotBeDeleted" xml:space="preserve">
-    <value>テーマは削除できません！</value>
+    <value>Тему не можна видалити!</value>
   </data>
   <data name="ThemeCannotBeRestored" xml:space="preserve">
-    <value>テーマを復元できません。</value>
+    <value>Тему не можна відновити!</value>
   </data>
   <data name="ThemeDefaultThemeIdCannotBeEmpty" xml:space="preserve">
-    <value>既定のテーマ ID を空にすることはできません。</value>
+    <value>Ідентифікатор теми за замовчуванням не може бути порожнім!</value>
   </data>
   <data name="ThemeFilesUnreadable" xml:space="preserve">
-    <value>テーマのファイルを読み取れませんでした！</value>
+    <value>Не вдалося прочитати файли теми!</value>
   </data>
   <data name="ThemeIdCannotBeEmpty" xml:space="preserve">
-    <value>テーマ ID は空にできません！</value>
+    <value>Ідентифікатор теми не може бути порожнім!</value>
   </data>
   <data name="ThemeMaxArchiveBytesMustBePositive" xml:space="preserve">
-    <value>テーマアーカイブの最大バイト数は正でなければなりません。</value>
+    <value>Максимальний розмір архіву теми має бути додатним!</value>
   </data>
   <data name="ThemeMaxEntriesMustBePositive" xml:space="preserve">
-    <value>テーマの最大エントリ数は正でなければなりません。</value>
+    <value>Максимальна кількість записів теми має бути додатною!</value>
   </data>
   <data name="ThemeMaxExpandedBytesMustBePositive" xml:space="preserve">
-    <value>テーマの展開後の最大バイト数は正でなければなりません。</value>
+    <value>Максимальний розмір розпакованої теми має бути додатним!</value>
   </data>
   <data name="ThemeMaxSingleFileBytesMustBePositive" xml:space="preserve">
-    <value>単一ファイルの最大バイト数は正でなければなりません。</value>
+    <value>Максимальний розмір одного файлу має бути додатним!</value>
   </data>
   <data name="ThemeNotAvailable" xml:space="preserve">
-    <value>テーマを利用できません！</value>
+    <value>Тема недоступна!</value>
   </data>
   <data name="ThemeNotFound" xml:space="preserve">
-    <value>指定されたテーマが見つかりませんでした！</value>
+    <value>Вказану тему не знайдено!</value>
   </data>
   <data name="ThemeStoragePathCannotBeEmpty" xml:space="preserve">
-    <value>テーマの保存パスを空にすることはできません。</value>
+    <value>Шлях зберігання теми не може бути порожнім!</value>
   </data>
   <data name="TitleCannotBeEmpty" xml:space="preserve">
-    <value>タイトルを空にすることはできません！</value>
+    <value>Назва не може бути порожньою!</value>
   </data>
   <data name="TitleMustBeMaximum255CharactersLong" xml:space="preserve">
-    <value>タイトルは最大255文字までです！</value>
+    <value>Назва не має перевищувати 255 символів!</value>
   </data>
   <data name="TooManyRequests" xml:space="preserve">
-    <value>リクエストが多すぎます！15分後にもう一度お試しください！</value>
+    <value>Занадто багато запитів! Спробуйте, будь ласка, знову через 15 хвилин!</value>
   </data>
   <data name="TotalScanJobItemsCountMustBePositive" xml:space="preserve">
-    <value>スキャン項目の合計数は正の値でなければなりません！</value>
+    <value>Загальна кількість елементів для сканування має бути додатною!</value>
   </data>
   <data name="TotalScanJobsCountMustBePositive" xml:space="preserve">
-    <value>スキャンジョブの合計数は正の値でなければなりません！</value>
+    <value>Загальна кількість завдань сканування має бути додатною!</value>
   </data>
   <data name="TotpCannotBeEmpty" xml:space="preserve">
-    <value>TOTPコードを入力してください!</value>
+    <value>Код TOTP не може бути порожнім!</value>
   </data>
   <data name="UnauthorizedAccess" xml:space="preserve">
-    <value>このリソースにアクセスする権限がありません！</value>
+    <value>У вас немає прав доступу до цього ресурсу!</value>
   </data>
   <data name="UnknownBookFormat" xml:space="preserve">
-    <value>不明な書籍フォーマットです！</value>
+    <value>Невідомий формат книги!</value>
   </data>
   <data name="UnknownIsbnFormat" xml:space="preserve">
-    <value>不明なISBN形式です！</value>
+    <value>Невідомий формат ISBN!</value>
   </data>
   <data name="UnknownLibraryType" xml:space="preserve">
-    <value>ライブラリタイプが不明です！</value>
+    <value>Невідомий тип бібліотеки!</value>
   </data>
   <data name="UserAlreadyExists" xml:space="preserve">
-    <value>ユーザーはすでに存在します！</value>
+    <value>Користувач вже існує!</value>
   </data>
   <data name="UserDoesNotExist" xml:space="preserve">
-    <value>ユーザーが存在しません！</value>
+    <value>Користувача не існує!</value>
   </data>
   <data name="UserIdCannotBeEmpty" xml:space="preserve">
-    <value>ユーザーIDを空にすることはできません！</value>
+    <value>Ідентифікатор користувача не може бути порожнім!</value>
   </data>
   <data name="UserMustHaveRoleOrDirectPermissions" xml:space="preserve">
-    <value>ユーザーにはロール権限か直接権限のいずれかが必要です！</value>
+    <value>Користувач має мати дозволи ролі або прямі дозволи!</value>
   </data>
   <data name="UsernameAlreadyExists" xml:space="preserve">
-    <value>このユーザー名は既に使用されています!</value>
+    <value>Ім&apos;я користувача вже існує!</value>
   </data>
   <data name="UsernameCannotBeEmpty" xml:space="preserve">
-    <value>ユーザー名を入力してください!</value>
+    <value>Ім&apos;я користувача не може бути порожнім!</value>
   </data>
   <data name="UsernameDoesNotExist" xml:space="preserve">
-    <value>このユーザー名は存在しません!</value>
+    <value>Ім&apos;я користувача не існує!</value>
   </data>
   <data name="UsernameMustBeBetween3And255CharactersLong" xml:space="preserve">
-    <value>ユーザー名は3文字から255文字の間で入力してください!</value>
+    <value>Ім&apos;я користувача має містити від 3 до 255 символів!</value>
   </data>
   <data name="UserSettingsAlreadyExists" xml:space="preserve">
-    <value>ユーザー設定は既に存在します。</value>
+    <value>Налаштування користувача вже існують!</value>
   </data>
   <data name="UserSettingsNotFound" xml:space="preserve">
-    <value>ユーザー設定が見つかりませんでした。</value>
+    <value>Налаштування користувача не знайдено!</value>
   </data>
   <data name="VolumeNumberMustBeGreaterThanZero" xml:space="preserve">
-    <value>巻数は0より大きくなければなりません！</value>
+    <value>Номер тому має бути більшим за нуль!</value>
   </data>
 </root>

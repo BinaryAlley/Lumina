@@ -120,8 +120,14 @@
   <data name="AdminAccountAlreadyCreated" xml:space="preserve">
     <value>L'account amministratore è già stato creato!</value>
   </data>
+  <data name="AdminAccountNotFound" xml:space="preserve">
+    <value>Account amministratore non trovato!</value>
+  </data>
   <data name="AdminRoleCannotBeDeleted" xml:space="preserve">
     <value>Il ruolo di amministratore non può essere eliminato!</value>
+  </data>
+  <data name="AdminRoleNotFound" xml:space="preserve">
+    <value>Ruolo amministratore non trovato!</value>
   </data>
   <data name="Application theme cannot be empty!" xml:space="preserve">
     <value>Il tema dell'applicazione non può essere vuoto!</value>
@@ -138,14 +144,53 @@
   <data name="BookAlreadyExists" xml:space="preserve">
     <value>Il libro esiste già!</value>
   </data>
+  <data name="BookLibraryCannotBeNull" xml:space="preserve">
+    <value>La libreria dei libri non può essere nulla!</value>
+  </data>
+  <data name="BookNotFound" xml:space="preserve">
+    <value>Il libro non è stato trovato!</value>
+  </data>
+  <data name="BookPathCannotBeEmpty" xml:space="preserve">
+    <value>Il percorso del libro non può essere vuoto!</value>
+  </data>
   <data name="CannotNavigateUp" xml:space="preserve">
     <value>Impossibile navigare verso l'alto!</value>
   </data>
   <data name="CannotRemoveLastAdmin" xml:space="preserve">
     <value>Impossibile rimuovere l'ultimo ruolo Admin assegnato all'utente!</value>
   </data>
+  <data name="CannotScanDisabledLibrary" xml:space="preserve">
+    <value>Impossibile scansionare una libreria disabilitata!</value>
+  </data>
+  <data name="CannotScanLockedLibrary" xml:space="preserve">
+    <value>Impossibile scansionare una libreria bloccata!</value>
+  </data>
+  <data name="CanOnlyCancelRunningScans" xml:space="preserve">
+    <value>È possibile annullare solo le scansioni in esecuzione!</value>
+  </data>
+  <data name="CanOnlyCompleteRunningScans" xml:space="preserve">
+    <value>Possono essere completate solo scansioni in corso!</value>
+  </data>
+  <data name="CanOnlyFailRunningScans" xml:space="preserve">
+    <value>Possono essere segnate come fallite solo scansioni in corso!</value>
+  </data>
+  <data name="CanOnlyStartPendingScans" xml:space="preserve">
+    <value>È possibile avviare solo le scansioni in sospeso!</value>
+  </data>
   <data name="CodecCannotBeEmpty" xml:space="preserve">
     <value>Il codec non può essere vuoto!</value>
+  </data>
+  <data name="CompletedScanJobItemsCountCantExceedTotalScanJobItemsCount" xml:space="preserve">
+    <value>Il numero di elementi scansionati completati non può superare il numero totale di elementi da scansionare!</value>
+  </data>
+  <data name="CompletedScanJobItemsCountMustBePositive" xml:space="preserve">
+    <value>Il numero di elementi scansionati completati deve essere positivo!</value>
+  </data>
+  <data name="CompletedScanJobsCountCantExceedTotalScanJobsCount" xml:space="preserve">
+    <value>Il numero dei lavori di scansione completati non può superare il numero totale dei lavori di scansione!</value>
+  </data>
+  <data name="CompletedScanJobsCountMustBePositive" xml:space="preserve">
+    <value>Il numero dei lavori di scansione completati deve essere positivo!</value>
   </data>
   <data name="ContributorDisplayNameCannotBeEmpty" xml:space="preserve">
     <value>Il nome visualizzato del contributore non può essere vuoto!</value>
@@ -165,8 +210,17 @@
   <data name="ContributorsListCannotBeNull" xml:space="preserve">
     <value>La lista dei contributori non può essere nulla!</value>
   </data>
+  <data name="CorsOriginIsInvalid" xml:space="preserve">
+    <value>Origine CORS non valida!</value>
+  </data>
+  <data name="CorsOriginsCannotBeEmpty" xml:space="preserve">
+    <value>Le origini CORS non possono essere vuote!</value>
+  </data>
   <data name="CountryCodeMustBe2CharactersLong" xml:space="preserve">
     <value>Il codice paese deve essere lungo 2 caratteri!</value>
+  </data>
+  <data name="CoverFileMustBeAnImage" xml:space="preserve">
+    <value>Il file di copertina deve essere un'immagine!</value>
   </data>
   <data name="CurrentPasswordCannotBeEmpty" xml:space="preserve">
     <value>La password attuale non può essere vuota!</value>
@@ -207,6 +261,9 @@
   <data name="ExtensionCannotBeEmpty" xml:space="preserve">
     <value>L'estensione non può essere vuota!</value>
   </data>
+  <data name="FailedToCreateScanJobProgress" xml:space="preserve">
+    <value>Impossibile creare l'avanzamento del lavoro di scansione!</value>
+  </data>
   <data name="FileAlreadyExists" xml:space="preserve">
     <value>Il file esiste già!</value>
   </data>
@@ -218,6 +275,12 @@
   </data>
   <data name="FileNotFound" xml:space="preserve">
     <value>File non trovato!</value>
+  </data>
+  <data name="FilterMustIncludeLibraryId" xml:space="preserve">
+    <value>Il filtro deve includere un Id di libreria!</value>
+  </data>
+  <data name="Forbidden" xml:space="preserve">
+    <value>Non sei autorizzato a visualizzare questa risorsa!</value>
   </data>
   <data name="General.Validation" xml:space="preserve">
     <value>Convalida</value>
@@ -248,6 +311,9 @@
   </data>
   <data name="InvalidCurrentPassword" xml:space="preserve">
     <value>Password attuale non valida!</value>
+  </data>
+  <data name="InvalidFilterAlphaKey" xml:space="preserve">
+    <value>Chiave alfa del filtro non valida!</value>
   </data>
   <data name="InvalidGoogleBooksIdFormat" xml:space="preserve">
     <value>Formato ID Google Books non valido!</value>
@@ -291,13 +357,16 @@
   <data name="IsbnValueCannotBeEmpty" xml:space="preserve">
     <value>Il valore ISBN non può essere vuoto!</value>
   </data>
+  <data name="ItemsPerPageMustBeGreaterThanZero" xml:space="preserve">
+    <value>Gli elementi per pagina devono essere maggiori di zero!</value>
+  </data>
   <data name="JwtAudienceCannotBeEmpty" xml:space="preserve">
     <value>Il destinatario JWT non può essere vuoto!</value>
   </data>
   <data name="JwtExpiryMinutesMustBePositive" xml:space="preserve">
     <value>I minuti di scadenza JWT devono essere positivi!</value>
   </data>
-  <data name="JwtIssuerCannotBeEmptyc" xml:space="preserve">
+  <data name="JwtIssuerCannotBeEmpty" xml:space="preserve">
     <value>L'emittente JWT non può essere vuoto!</value>
   </data>
   <data name="JwtSecretKeyCannotBeEmpty" xml:space="preserve">
@@ -324,20 +393,38 @@
   <data name="LastBundledThemeCannotBeDeleted" xml:space="preserve">
     <value>L'ultimo tema incluso non può essere eliminato!</value>
   </data>
+  <data name="LibraryAlreadyBeingScanned" xml:space="preserve">
+    <value>La libreria è già in fase di scansione!</value>
+  </data>
   <data name="LibraryAlreadyExists" xml:space="preserve">
     <value>La libreria esiste già!</value>
   </data>
   <data name="LibraryIdCannotBeEmpty" xml:space="preserve">
     <value>L'ID della libreria non può essere vuoto!</value>
   </data>
+  <data name="LibraryMetadataProviderConfigurationNotFound" xml:space="preserve">
+    <value>La configurazione del provider di metadati della libreria non è stata trovata!</value>
+  </data>
   <data name="LibraryNotFound" xml:space="preserve">
     <value>Libreria non trovata!</value>
+  </data>
+  <data name="LibraryScanAlreadyExists" xml:space="preserve">
+    <value>Esiste già una scansione della libreria!</value>
+  </data>
+  <data name="LibraryScanIdCannotBeEmpty" xml:space="preserve">
+    <value>L'ID della scansione della libreria non può essere vuoto!</value>
+  </data>
+  <data name="LibraryScanNotFound" xml:space="preserve">
+    <value>La scansione della libreria non è stata trovata!</value>
   </data>
   <data name="LibraryThingIdMustBeMaximum50CharactersLong" xml:space="preserve">
     <value>L'ID LibraryThing deve essere lungo al massimo 50 caratteri!</value>
   </data>
   <data name="LibraryTypeCannotBeNull" xml:space="preserve">
     <value>Il tipo di libreria non può essere nullo!</value>
+  </data>
+  <data name="MediaLibrariesDirectoryCannotBeEmpty" xml:space="preserve">
+    <value>La directory delle librerie multimediali non può essere vuota!</value>
   </data>
   <data name="MediaRootDirectoryCannotBeEmpty" xml:space="preserve">
     <value>La directory principale dei media non può essere vuota!</value>
@@ -353,9 +440,6 @@
   </data>
   <data name="NewPasswordConfirmCannotBeEmpty" xml:space="preserve">
     <value>La conferma della nuova password non può essere vuota!</value>
-  </data>
-  <data name="Forbidden" xml:space="preserve">
-    <value>Non sei autorizzato a visualizzare questa risorsa!</value>
   </data>
   <data name="NotAuthorized" xml:space="preserve">
     <value>Non sei autorizzato a eseguire questa operazione!</value>
@@ -411,11 +495,35 @@
   <data name="PathsListCannotBeNull" xml:space="preserve">
     <value>La lista dei percorsi non può essere nulla!</value>
   </data>
+  <data name="PermissionAlreadyExists" xml:space="preserve">
+    <value>Il permesso esiste già!</value>
+  </data>
+  <data name="PermissionIdCannotBeEmpty" xml:space="preserve">
+    <value>L'Id del permesso non può essere vuoto!</value>
+  </data>
   <data name="PermissionsListCannotBeEmpty" xml:space="preserve">
     <value>L'elenco dei permessi non può essere vuoto!</value>
   </data>
   <data name="PermissionsListCannotBeNull" xml:space="preserve">
     <value>L'elenco dei permessi non può essere nullo!</value>
+  </data>
+  <data name="PluginIdCannotBeEmpty" xml:space="preserve">
+    <value>L'Id del plugin non può essere vuoto!</value>
+  </data>
+  <data name="PluginIdsListCannotBeEmpty" xml:space="preserve">
+    <value>L'elenco degli Id dei plugin non può essere vuoto!</value>
+  </data>
+  <data name="PluginIdsListCannotBeNull" xml:space="preserve">
+    <value>L'elenco degli Id dei plugin non può essere nullo!</value>
+  </data>
+  <data name="PluginNotFound" xml:space="preserve">
+    <value>Il plugin non è stato trovato!</value>
+  </data>
+  <data name="PluginsDirectoryCannotBeEmpty" xml:space="preserve">
+    <value>La directory dei plugin non può essere vuota!</value>
+  </data>
+  <data name="PluginSettingsCannotBeNull" xml:space="preserve">
+    <value>Le impostazioni del plugin non possono essere nulle!</value>
   </data>
   <data name="PublisherMustBeMaximum100CharactersLong" xml:space="preserve">
     <value>Il nome dell'editore deve essere lungo al massimo 100 caratteri!</value>
@@ -468,11 +576,20 @@
   <data name="RoleNameCannotBeEmpty" xml:space="preserve">
     <value>Il nome del ruolo non può essere vuoto!</value>
   </data>
+  <data name="RoleNameCannotBeNull" xml:space="preserve">
+    <value>Il nome del ruolo non può essere nullo!</value>
+  </data>
   <data name="RoleNameMustBeMaximum50CharactersLong" xml:space="preserve">
     <value>Il nome del ruolo deve essere lungo al massimo 50 caratteri!</value>
   </data>
   <data name="RoleNotFound" xml:space="preserve">
     <value>Ruolo non trovato</value>
+  </data>
+  <data name="ScanIdCannotBeEmpty" xml:space="preserve">
+    <value>L'ID della scansione non può essere vuoto!</value>
+  </data>
+  <data name="ScanJobCurrentOperationCannotBeEmpty" xml:space="preserve">
+    <value>L'operazione corrente della scansione non può essere vuota!</value>
   </data>
   <data name="StreamIdCannotBeEmpty" xml:space="preserve">
     <value>L'ID del flusso non può essere vuoto!</value>
@@ -504,8 +621,17 @@
   <data name="ThemeAssetPathCannotBeEmpty" xml:space="preserve">
     <value>Il percorso della risorsa del tema non può essere vuoto!</value>
   </data>
+  <data name="ThemeBundledThemesPathCannotBeEmpty" xml:space="preserve">
+    <value>Il percorso dei temi integrati non può essere vuoto!</value>
+  </data>
   <data name="ThemeCannotBeDeleted" xml:space="preserve">
     <value>Il tema non può essere eliminato!</value>
+  </data>
+  <data name="ThemeCannotBeRestored" xml:space="preserve">
+    <value>Il tema non può essere ripristinato!</value>
+  </data>
+  <data name="ThemeDefaultThemeIdCannotBeEmpty" xml:space="preserve">
+    <value>L'Id del tema predefinito non può essere vuoto!</value>
   </data>
   <data name="ThemeFilesUnreadable" xml:space="preserve">
     <value>I file del tema non possono essere letti!</value>
@@ -513,11 +639,26 @@
   <data name="ThemeIdCannotBeEmpty" xml:space="preserve">
     <value>L'id del tema non può essere vuoto!</value>
   </data>
+  <data name="ThemeMaxArchiveBytesMustBePositive" xml:space="preserve">
+    <value>I byte massimi dell'archivio del tema devono essere positivi!</value>
+  </data>
+  <data name="ThemeMaxEntriesMustBePositive" xml:space="preserve">
+    <value>Il numero massimo di voci del tema deve essere positivo!</value>
+  </data>
+  <data name="ThemeMaxExpandedBytesMustBePositive" xml:space="preserve">
+    <value>I byte massimi espansi del tema devono essere positivi!</value>
+  </data>
+  <data name="ThemeMaxSingleFileBytesMustBePositive" xml:space="preserve">
+    <value>I byte massimi per singolo file devono essere positivi!</value>
+  </data>
   <data name="ThemeNotAvailable" xml:space="preserve">
     <value>Il tema non è disponibile!</value>
   </data>
   <data name="ThemeNotFound" xml:space="preserve">
     <value>Il tema specificato non è stato trovato!</value>
+  </data>
+  <data name="ThemeStoragePathCannotBeEmpty" xml:space="preserve">
+    <value>Il percorso di archiviazione del tema non può essere vuoto!</value>
   </data>
   <data name="TitleCannotBeEmpty" xml:space="preserve">
     <value>Il titolo non può essere vuoto!</value>
@@ -527,6 +668,12 @@
   </data>
   <data name="TooManyRequests" xml:space="preserve">
     <value>Troppe richieste! Si prega di riprovare tra 15 minuti!</value>
+  </data>
+  <data name="TotalScanJobItemsCountMustBePositive" xml:space="preserve">
+    <value>Il numero totale degli elementi da scansionare deve essere positivo!</value>
+  </data>
+  <data name="TotalScanJobsCountMustBePositive" xml:space="preserve">
+    <value>Il numero totale dei lavori di scansione deve essere positivo!</value>
   </data>
   <data name="TotpCannotBeEmpty" xml:space="preserve">
     <value>Il codice TOTP non può essere vuoto!</value>
@@ -567,58 +714,13 @@
   <data name="UsernameMustBeBetween3And255CharactersLong" xml:space="preserve">
     <value>Il nome utente deve essere compreso tra 3 e 255 caratteri!</value>
   </data>
+  <data name="UserSettingsAlreadyExists" xml:space="preserve">
+    <value>Le impostazioni utente esistono già!</value>
+  </data>
+  <data name="UserSettingsNotFound" xml:space="preserve">
+    <value>Le impostazioni utente non sono state trovate!</value>
+  </data>
   <data name="VolumeNumberMustBeGreaterThanZero" xml:space="preserve">
     <value>Il numero del volume deve essere maggiore di zero!</value>
-  </data>
-  <data name="CoverFileMustBeAnImage" xml:space="preserve">
-    <value>Il file di copertina deve essere un'immagine!</value>
-  </data>
-  <data name="CannotScanDisabledLibrary" xml:space="preserve">
-    <value>Impossibile scansionare una libreria disabilitata!</value>
-  </data>
-  <data name="CannotScanLockedLibrary" xml:space="preserve">
-    <value>Impossibile scansionare una libreria bloccata!</value>
-  </data>
-  <data name="CanOnlyStartPendingScans" xml:space="preserve">
-    <value>È possibile avviare solo le scansioni in sospeso!</value>
-  </data>
-  <data name="CanOnlyCancelRunningScans" xml:space="preserve">
-    <value>È possibile annullare solo le scansioni in esecuzione!</value>
-  </data>
-  <data name="ScanIdCannotBeEmpty" xml:space="preserve">
-    <value>L'ID della scansione non può essere vuoto!</value>
-  </data>
-  <data name="LibraryAlreadyBeingScanned" xml:space="preserve">
-    <value>La libreria è già in fase di scansione!</value>
-  </data>
-  <data name="TotalScanJobItemsCountMustBePositive" xml:space="preserve">
-    <value>Il numero totale degli elementi da scansionare deve essere positivo!</value>
-  </data>
-  <data name="CompletedScanJobItemsCountMustBePositive" xml:space="preserve">
-    <value>Il numero di elementi scansionati completati deve essere positivo!</value>
-  </data>
-  <data name="CompletedScanJobItemsCountCantExceedTotalScanJobItemsCount" xml:space="preserve">
-    <value>Il numero di elementi scansionati completati non può superare il numero totale di elementi da scansionare!</value>
-  </data>
-  <data name="ScanJobCurrentOperationCannotBeEmpty" xml:space="preserve">
-    <value>L'operazione corrente della scansione non può essere vuota!</value>
-  </data>
-  <data name="LibraryScanIdCannotBeEmpty" xml:space="preserve">
-    <value>L'ID della scansione della libreria non può essere vuoto!</value>
-  </data>
-  <data name="TotalScanJobsCountMustBePositive" xml:space="preserve">
-    <value>Il numero totale dei lavori di scansione deve essere positivo!</value>
-  </data>
-  <data name="CompletedScanJobsCountMustBePositive" xml:space="preserve">
-    <value>Il numero dei lavori di scansione completati deve essere positivo!</value>
-  </data>
-  <data name="CompletedScanJobsCountCantExceedTotalScanJobsCount" xml:space="preserve">
-    <value>Il numero dei lavori di scansione completati non può superare il numero totale dei lavori di scansione!</value>
-  </data>
-  <data name="CorsOriginsCannotBeEmpty" xml:space="preserve">
-    <value>Le origini CORS non possono essere vuote!</value>
-  </data>
-  <data name="CorsOriginIsInvalid" xml:space="preserve">
-    <value>Origine CORS non valida!</value>
   </data>
 </root>

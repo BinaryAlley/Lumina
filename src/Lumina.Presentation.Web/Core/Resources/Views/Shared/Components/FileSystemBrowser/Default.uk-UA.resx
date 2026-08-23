@@ -121,69 +121,69 @@
     <value>Назад</value>
   </data>
   <data name="Cancel" xml:space="preserve">
-    <value>Отмена</value>
+    <value>Скасувати</value>
   </data>
   <data name="Confirm" xml:space="preserve">
-    <value>Подтвердить</value>
+    <value>Підтвердити</value>
   </data>
   <data name="DetailsView" xml:space="preserve">
-    <value>Подробный вид</value>
+    <value>Детальний вигляд</value>
   </data>
   <data name="Directory" xml:space="preserve">
     <value>Папка</value>
   </data>
   <data name="EditPath" xml:space="preserve">
-    <value>Изменить Путь</value>
+    <value>Змінити шлях</value>
   </data>
   <data name="EnterNewDirectoryName" xml:space="preserve">
-    <value>Введите имя новой папки:</value>
+    <value>Введіть назву нової папки:</value>
   </data>
   <data name="ExtraLargeIconsView" xml:space="preserve">
-    <value>Очень крупные значки</value>
+    <value>Дуже великі значки</value>
   </data>
   <data name="FavoriteDirectory" xml:space="preserve">
-    <value>Избранная Папка</value>
+    <value>Обрана папка</value>
   </data>
   <data name="Forward" xml:space="preserve">
-    <value>Вперёд</value>
+    <value>Вперед</value>
   </data>
   <data name="Large Icons View" xml:space="preserve">
-    <value>Крупные значки</value>
+    <value>Великі значки</value>
   </data>
   <data name="ListView" xml:space="preserve">
     <value>Список</value>
   </data>
   <data name="MediumIconsView" xml:space="preserve">
-    <value>Средние значки</value>
+    <value>Середні значки</value>
   </data>
   <data name="Name" xml:space="preserve">
-    <value>Имя</value>
+    <value>Ім'я</value>
   </data>
   <data name="Navigate" xml:space="preserve">
     <value>Перейти</value>
   </data>
   <data name="NewDirectory" xml:space="preserve">
-    <value>Новая Папка</value>
+    <value>Нова папка</value>
   </data>
   <data name="Open" xml:space="preserve">
-    <value>Открыть</value>
+    <value>Відкрити</value>
   </data>
   <data name="SmallIconsView" xml:space="preserve">
-    <value>Мелкие значки</value>
+    <value>Дрібні значки</value>
   </data>
   <data name="ToggleHiddenItems" xml:space="preserve">
-    <value>Показать/Скрыть Скрытые Элементы</value>
+    <value>Показати/Сховати приховані елементи</value>
   </data>
   <data name="ToggleSelectionMode" xml:space="preserve">
-    <value>Переключить Режим Выделения</value>
+    <value>Перемкнути режим виділення</value>
   </data>
   <data name="ToggleThumbanils" xml:space="preserve">
-    <value>Переключить Эскизы</value>
+    <value>Перемкнути ескізи</value>
   </data>
   <data name="ToggleTreeView" xml:space="preserve">
-    <value>Развернуть/Свернуть Дерево</value>
+    <value>Розгорнути/Згорнути дерево</value>
   </data>
   <data name="UpOneLevel" xml:space="preserve">
-    <value>На Уровень Выше</value>
+    <value>На рівень вище</value>
   </data>
 </root>

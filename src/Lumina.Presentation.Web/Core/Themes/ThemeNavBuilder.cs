@@ -219,7 +219,7 @@ public sealed class ThemeNavBuilder
             ("it-it", "Italiano"),
             ("ja-jp", "日本語"),
             ("ro-ro", "Română"),
-            ("ru-ru", "Русский")
+            ("uk-ua", "Українська")
         ];
 
         ThemeNavEntryDto[] entries = new ThemeNavEntryDto[cultures.Length];

@@ -117,10 +117,46 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="PageNotFound" xml:space="preserve">
-    <value>Не пытайся найти эту страницу. Это невозможно. Вместо этого... попытайся осознать истину:</value>
+  <data name="AccountCreated" xml:space="preserve">
+    <value>Обліковий запис створено</value>
   </data>
-  <data name="ThereIsNoPage" xml:space="preserve">
-    <value>Страницы не существует!</value>
+  <data name="AdminAccountRegistration" xml:space="preserve">
+    <value>Реєстрація облікового запису адміністратора</value>
+  </data>
+  <data name="Description2Fa" xml:space="preserve">
+    <value>Рекомендується для безпеки облікового запису і потрібна для відновлення пароля</value>
+  </data>
+  <data name="DescriptionPassword" xml:space="preserve">
+    <value>Пароль має містити щонайменше 8 символів і включати літери, цифри та спеціальні знаки</value>
+  </data>
+  <data name="DescriptionPasswordConfirm" xml:space="preserve">
+    <value>Введіть пароль повторно для перевірки збігу</value>
+  </data>
+  <data name="DescriptionUsername" xml:space="preserve">
+    <value>Виберіть унікальне ім'я користувача для облікового запису (3-255 символів)</value>
+  </data>
+  <data name="DisclaimerTwoFactor" xml:space="preserve">
+    <value>Відновлення пароля можливе лише за увімкненої двофакторної аутентифікації!</value>
+  </data>
+  <data name="EnableTwoFactorAuthentication" xml:space="preserve">
+    <value>Увімкнути двофакторну аутентифікацію</value>
+  </data>
+  <data name="Login" xml:space="preserve">
+    <value>Вхід</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Пароль</value>
+  </data>
+  <data name="PasswordConfirm" xml:space="preserve">
+    <value>Підтвердження пароля</value>
+  </data>
+  <data name="RegisterKey" xml:space="preserve">
+    <value>Реєстрація</value>
+  </data>
+  <data name="ScanTotpCode" xml:space="preserve">
+    <value>Сканувати TOTP-код</value>
+  </data>
+  <data name="Username" xml:space="preserve">
+    <value>Ім'я користувача</value>
   </data>
 </root>

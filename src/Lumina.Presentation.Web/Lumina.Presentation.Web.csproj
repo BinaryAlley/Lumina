@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
         <Nullable>enable</Nullable>
@@ -96,7 +96,7 @@
       <EmbeddedResource Update="Core\Resources\Common\Middlewares\ExceptionHandlingMiddleware.ro-RO.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Core\Resources\Common\Middlewares\ExceptionHandlingMiddleware.ru-RU.resx">
+      <EmbeddedResource Update="Core\Resources\Common\Middlewares\ExceptionHandlingMiddleware.uk-UA.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
       <EmbeddedResource Update="Core\Resources\Common\Middlewares\ExceptionHandlingMiddleware.zh-CN.resx">
@@ -127,7 +127,7 @@
       <EmbeddedResource Update="Core\Resources\Views\Auth\ChangePassword.ro-RO.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Core\Resources\Views\Auth\ChangePassword.ru-RU.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\ChangePassword.uk-UA.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
       <EmbeddedResource Update="Core\Resources\Views\Auth\ChangePassword.zh-CN.resx">
@@ -158,7 +158,7 @@
       <EmbeddedResource Update="Core\Resources\Views\Auth\Login.ro-RO.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Core\Resources\Views\Auth\Login.ru-RU.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\Login.uk-UA.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
       <EmbeddedResource Update="Core\Resources\Views\Auth\Login.zh-CN.resx">
@@ -189,7 +189,7 @@
       <EmbeddedResource Update="Core\Resources\Views\Auth\RecoverPassword.ro-RO.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Core\Resources\Views\Auth\RecoverPassword.ru-RU.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\RecoverPassword.uk-UA.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
       <EmbeddedResource Update="Core\Resources\Views\Auth\RecoverPassword.zh-CN.resx">
@@ -220,7 +220,7 @@
       <EmbeddedResource Update="Core\Resources\Views\Auth\Register.ro-RO.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Core\Resources\Views\Auth\Register.ru-RU.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Auth\Register.uk-UA.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
       <EmbeddedResource Update="Core\Resources\Views\Auth\Register.zh-CN.resx">
@@ -251,7 +251,7 @@
       <EmbeddedResource Update="Core\Resources\Views\Library\Management\Item.ro-RO.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Core\Resources\Views\Library\Management\Item.ru-RU.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Library\Management\Item.uk-UA.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
       <EmbeddedResource Update="Core\Resources\Views\Library\Management\Item.zh-CN.resx">
@@ -278,7 +278,7 @@
       <EmbeddedResource Update="Core\Resources\Views\Shared\Components\FileSystemBrowser\Default.ro-RO.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Core\Resources\Views\Shared\Components\FileSystemBrowser\Default.ru-RU.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Shared\Components\FileSystemBrowser\Default.uk-UA.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
       <EmbeddedResource Update="Core\Resources\Views\Shared\Components\FileSystemBrowser\Default.zh-CN.resx">
@@ -305,7 +305,7 @@
       <EmbeddedResource Update="Core\Resources\Views\Shared\_Layout.ro-RO.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Core\Resources\Views\Shared\_Layout.ru-RU.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Shared\_Layout.uk-UA.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
       <EmbeddedResource Update="Core\Resources\Views\Shared\_Layout.zh-CN.resx">
@@ -332,7 +332,7 @@
       <EmbeddedResource Update="Core\Resources\Views\Shared\_NavMenu.ro-RO.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Core\Resources\Views\Shared\_NavMenu.ru-RU.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Shared\_NavMenu.uk-UA.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
       <EmbeddedResource Update="Core\Resources\Views\Shared\_NavMenu.zh-CN.resx">
@@ -363,7 +363,7 @@
       <EmbeddedResource Update="Core\Resources\Views\Admin\Plugins.ro-RO.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Core\Resources\Views\Admin\Plugins.ru-RU.resx">
+      <EmbeddedResource Update="Core\Resources\Views\Admin\Plugins.uk-UA.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
       <EmbeddedResource Update="Core\Resources\Views\Admin\Plugins.zh-CN.resx">

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -117,58 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-    <data name="Themes" xml:space="preserve">
-    <value>Темы</value>
-  </data>
-  <data name="NoThemes" xml:space="preserve">
-    <value>Не установлено ни одной темы.</value>
-  </data>
-  <data name="Name" xml:space="preserve">
-    <value>Имя</value>
-  </data>
-  <data name="Version" xml:space="preserve">
-    <value>Версия</value>
-  </data>
-  <data name="Author" xml:space="preserve">
-    <value>Автор</value>
-  </data>
-  <data name="Actions" xml:space="preserve">
-    <value>Действия</value>
-  </data>
-  <data name="Activate" xml:space="preserve">
-    <value>Активировать</value>
-  </data>
-  <data name="Delete" xml:space="preserve">
-    <value>Удалить</value>
-  </data>
-  <data name="Download" xml:space="preserve">
-    <value>Скачать</value>
-  </data>
-  <data name="Restore" xml:space="preserve">
-    <value>Восстановить</value>
-  </data>
-  <data name="Upload" xml:space="preserve">
-    <value>Загрузить</value>
-  </data>
-  <data name="UploadFailed" xml:space="preserve">
-    <value>Не удалось загрузить архив темы.</value>
-  </data>
-  <data name="DeleteThemeConfirm" xml:space="preserve">
-    <value>Вы уверены, что хотите удалить указанную тему?</value>
-  </data>
-  <data name="Preview" xml:space="preserve">
-    <value>Предпросмотр</value>
-  </data>
-  <data name="ThemeTrustWarning" xml:space="preserve">
-    <value>Темы являются сторонним содержимым и могут выполнять код, включая JavaScript, в вашем браузере. Устанавливайте только темы из надежных источников. Темы, поставляемые с приложением, проверены и безопасны.</value>
-  </data>
-  <data name="Source" xml:space="preserve">
-    <value>Источник</value>
-  </data>
-  <data name="Bundled" xml:space="preserve">
-    <value>Встроенный</value>
-  </data>
-  <data name="UserProvided" xml:space="preserve">
-    <value>Пользователь</value>
+  <data name="NoLibraries" xml:space="preserve">
+    <value>Немає бібліотек</value>
   </data>
 </root>
