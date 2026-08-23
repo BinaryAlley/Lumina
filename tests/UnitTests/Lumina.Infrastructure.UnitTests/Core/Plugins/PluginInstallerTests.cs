@@ -73,6 +73,40 @@ public class PluginInstallerTests : IDisposable
     }
 
     [Fact]
+    public async Task InstallAsync_WhenUploadingZipWithBackslashTraversalEntry_ShouldFlattenItInsidePluginsDirectory()
+    {
+        // Arrange
+        await using MemoryStream zipStream = new();
+        // a backslash is not a directory separator on non-Windows platforms, so it must be neutralized explicitly
+        CreateZipArchive(zipStream, [(@"..\evil.dll", ReadTestAssembly())]);
+        zipStream.Position = 0;
+
+        // Act
+        Result<Success> result = await _sut.InstallAsync(zipStream, "plugin.zip", CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.True(File.Exists(Path.Combine(_pluginsDirectory, "evil.dll")));
+        Assert.False(File.Exists(Path.Combine(AppContext.BaseDirectory, "evil.dll")));
+    }
+
+    [Fact]
+    public async Task InstallAsync_WhenUploadingSingleAssemblyWithTraversalFileName_ShouldFlattenItInsidePluginsDirectory()
+    {
+        // Arrange
+        const string TRAVERSAL_FILE_NAME = "traversal-test-plugin.dll";
+        await using FileStream stream = File.OpenRead(Path.Combine(AppContext.BaseDirectory, "Lumina.TestPlugin.dll"));
+
+        // Act
+        Result<Success> result = await _sut.InstallAsync(stream, $@"..\{TRAVERSAL_FILE_NAME}", CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.True(File.Exists(Path.Combine(_pluginsDirectory, TRAVERSAL_FILE_NAME)));
+        Assert.False(File.Exists(Path.Combine(AppContext.BaseDirectory, TRAVERSAL_FILE_NAME)));
+    }
+
+    [Fact]
     public async Task InstallAsync_WhenUploadingUnsupportedFileType_ShouldReturnError()
     {
         // Arrange

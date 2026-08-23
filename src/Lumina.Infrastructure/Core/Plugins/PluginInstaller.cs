@@ -9,7 +9,6 @@ using System;
 using System.Collections.Concurrent;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -56,7 +55,10 @@ internal sealed class PluginInstaller : IPluginInstaller
             string extension = Path.GetExtension(fileName);
             if (string.Equals(extension, ".dll", StringComparison.OrdinalIgnoreCase))
             {
-                await CopySingleAssemblyAsync(archive, Path.GetFileName(fileName), cancellationToken).ConfigureAwait(false);
+                string? safeFileName = GetSafeFileName(fileName);
+                if (safeFileName is null)
+                    return Errors.Plugins.PluginFileNameCannotBeEmpty;
+                await CopySingleAssemblyAsync(archive, safeFileName, cancellationToken).ConfigureAwait(false);
                 return Result.Success;
             }
 
@@ -105,21 +107,37 @@ internal sealed class PluginInstaller : IPluginInstaller
     private async Task<Result<Success>> ExtractZipArchiveAsync(Stream archive, CancellationToken cancellationToken)
     {
         using ZipArchive zipArchive = new(archive);
-        ZipArchiveEntry[] assemblyEntries = [.. zipArchive.Entries.Where(entry => string.Equals(Path.GetExtension(entry.FullName), ".dll", StringComparison.OrdinalIgnoreCase))];
-        if (assemblyEntries.Length == 0)
-            return Errors.Plugins.PluginArchiveContainsNoAssemblies;
-
         Directory.CreateDirectory(_pluginsDirectory);
-        foreach (ZipArchiveEntry entry in assemblyEntries)
+        bool foundAssembly = false;
+        foreach (ZipArchiveEntry entry in zipArchive.Entries)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            // flatten the archive structure and use only the file name, so no entry can escape the plugin storage directory
-            string destinationPath = Path.Combine(_pluginsDirectory, Path.GetFileName(entry.FullName));
+            string? safeFileName = GetSafeFileName(entry.FullName);
+            if (safeFileName is null || !string.Equals(Path.GetExtension(safeFileName), ".dll", StringComparison.OrdinalIgnoreCase))
+                continue;
+            foundAssembly = true;
+            string destinationPath = Path.Combine(_pluginsDirectory, safeFileName);
             await using Stream entryStream = entry.Open();
             await using FileStream outputStream = new(destinationPath, FileMode.Create, FileAccess.Write, FileShare.None);
             await entryStream.CopyToAsync(outputStream, cancellationToken).ConfigureAwait(false);
         }
 
+        if (!foundAssembly)
+            return Errors.Plugins.PluginArchiveContainsNoAssemblies;
         return Result.Success;
+    }
+
+    /// <summary>
+    /// Extracts the bare file name of an uploaded plugin file or archive entry, stripping every directory component,
+    /// so that a path traversal attempt cannot write outside the plugin storage directory on any platform.
+    /// </summary>
+    /// <param name="path">The file path to sanitize.</param>
+    /// <returns>The bare file name, or <see langword="null"/> when the path contains no usable file name.</returns>
+    private static string? GetSafeFileName(string path)
+    {
+        // a backslash is not a directory separator on non-Windows platforms, so it is normalized to '/' first,
+        // after which Path.GetFileName can strip any directory component on every platform
+        string fileName = Path.GetFileName(path.Replace('\\', '/'));
+        return fileName is "" or "." or ".." ? null : fileName;
     }
 }
