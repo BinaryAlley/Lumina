@@ -2,8 +2,8 @@ POST {{host}}/api/v1/books
 Content-Type: application/json
 
 {
-  "libraryId": "00000000-0000-0000-0000-000000000000",
-  "path": "/books/the-fellowship-of-the-ring.epub",
+  "libraryId": "3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a",
+  "path": "/books/the-fellowship-of-the-ring.pdf",
   "metadata": {
     "title": "The Fellowship of the Ring",
     "originalTitle": "The Fellowship of the Ring",

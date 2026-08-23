@@ -27,6 +27,6 @@ GET api/v1/file-system/get-type
 
 ```json
 {
-  "PlatformType": "Unix"
+  "platformType": "Unix"
 }
 ```

@@ -1,0 +1,7 @@
+PUT {{host}}/api/v1/themes/current
+Authorization: Bearer {{ACCESS_TOKEN}}
+Content-Type: application/json
+
+{
+  "themeId": "my-theme"
+}

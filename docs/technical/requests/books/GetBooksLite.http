@@ -1,0 +1,2 @@
+GET {{host}}/api/v1/books/lite?libraryId={{$guid}}&currentPage=1&perPage=10
+Authorization: Bearer {{ACCESS_TOKEN}}

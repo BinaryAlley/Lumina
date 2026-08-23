@@ -1,0 +1,10 @@
+POST {{host}}/api/v1/themes
+Authorization: Bearer {{ACCESS_TOKEN}}
+Content-Type: multipart/form-data; boundary=----LuminaBoundary
+
+------LuminaBoundary
+Content-Disposition: form-data; name="file"; filename="theme.zip"
+Content-Type: application/zip
+
+< ./theme.zip
+------LuminaBoundary--

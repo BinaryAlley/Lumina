@@ -3,9 +3,9 @@ Authorization: Bearer {{ACCESS_TOKEN}}
 Content-Type: application/json
 
 {
-  "RoleId": "73d204e2-5922-441d-83d8-8d4d8fc29eaa",
-  "RoleName": "Editor",
-  "Permissions": [
+  "roleId": "73d204e2-5922-441d-83d8-8d4d8fc29eaa",
+  "roleName": "Editor",
+  "permissions": [
     "ac113d18-69bb-4162-8c05-ff7a5559059a",
     "3c2fd936-8d4a-4963-b237-9f8d3aeeab26"
   ]

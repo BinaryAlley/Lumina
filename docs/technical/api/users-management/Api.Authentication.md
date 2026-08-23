@@ -14,6 +14,9 @@
     - [Change Password](#change-password)
       - [Change Password Request](#change-password-request)
       - [Change Password Response](#change-password-response)
+    - [Get Users](#get-users)
+      - [Get Users Request](#get-users-request)
+      - [Get Users Response](#get-users-response)
 
 ## Authentication
 
@@ -27,10 +30,10 @@ POST api/v1/auth/register
 
 ```json
 {
-  "Username": "JohnDoe",
-  "Password": "Abcd123$",
-  "PasswordConfirm": "Abcd123$",
-  "Use2fa": true
+  "username": "JohnDoe",
+  "password": "Abcd123$",
+  "passwordConfirm": "Abcd123$",
+  "use2fa": true
 }
 ```
 
@@ -42,9 +45,9 @@ POST api/v1/auth/register
 
 ```json
 {
-  "Id": "c8ec9858-ed98-4936-a893-cddfe40edf5c",
-  "Username": "JohnDoe",
-  "TotpSecret": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABCQAAAQkAQAAAACN7fKkAAAFW0lEQVR4nO3bQW4cOQwF0L6B73/L3MABjCp/ilR1BphkFAl..."
+  "id": "c8ec9858-ed98-4936-a893-cddfe40edf5c",
+  "username": "JohnDoe",
+  "totpSecret": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABCQAAAQkAQAAAACN7fKkAAAFW0lEQVR4nO3bQW4cOQwF0L6B73/L3MABjCp/ilR1BphkFAl..."
 }
 ```
 
@@ -58,9 +61,9 @@ POST api/v1/auth/login
 
 ```json
 {
-  "Username": "JohnDoe",
-  "Password": "Abcd123$",
-  "TotpCode": "123456"
+  "username": "JohnDoe",
+  "password": "Abcd123$",
+  "totpCode": "123456"
 }
 ```
 
@@ -72,10 +75,10 @@ POST api/v1/auth/login
 
 ```json
 {
-  "Id": "e5ea6c64-992b-4173-9c1c-46d5786e4226",
-  "Username": "JohnDoe",
-  "Token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwNzE2Y2E1ZC1hZjhkLT...",
-  "UsesTotp": true
+  "id": "e5ea6c64-992b-4173-9c1c-46d5786e4226",
+  "username": "JohnDoe",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwNzE2Y2E1ZC1hZjhkLT...",
+  "usesTotp": true
 }
 ```
 
@@ -89,8 +92,8 @@ POST api/v1/auth/recover-password
 
 ```json
 {
-  "Username": "JohnDoe",
-  "TotpCode": "123456"
+  "username": "JohnDoe",
+  "totpCode": "123456"
 }
 ```
 
@@ -102,7 +105,7 @@ POST api/v1/auth/recover-password
 
 ```json
 {
-  "IsPasswordReset": true
+  "isPasswordReset": true
 }
 ```
 
@@ -116,10 +119,10 @@ POST api/v1/auth/change-password
 
 ```json
 {
-  "Username": "JohnDoe",
-  "CurrentPassword": "Abcd123$",
-  "NewPassword": "123$Abcd",
-  "NewPasswordConfirm": "123$Abcd"
+  "username": "JohnDoe",
+  "currentPassword": "Abcd123$",
+  "newPassword": "123$Abcd",
+  "newPasswordConfirm": "123$Abcd"
 }
 ```
 
@@ -131,6 +134,37 @@ POST api/v1/auth/change-password
 
 ```json
 {
-  "IsPasswordChanged": true
+  "isPasswordChanged": true
 }
+```
+
+### Get Users
+
+#### Get Users Request
+
+```js
+GET api/v1/auth/users
+```
+
+#### Get Users Response
+
+```js
+200 Ok
+```
+
+```json
+[
+  {
+    "id": "c8ec9858-ed98-4936-a893-cddfe40edf5c",
+    "username": "JohnDoe",
+    "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
+    "updatedOnUtc": null
+  },
+  {
+    "id": "e5ea6c64-992b-4173-9c1c-46d5786e4226",
+    "username": "JaneDoe",
+    "createdOnUtc": "2025-01-02T12:00:00.0000000Z",
+    "updatedOnUtc": "2025-01-03T12:00:00.0000000Z"
+  }
+]
 ```

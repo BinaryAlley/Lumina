@@ -1,0 +1,10 @@
+PUT {{host}}/api/v1/users/me/settings
+Authorization: Bearer {{ACCESS_TOKEN}}
+Content-Type: application/json
+
+{
+  "isPaginationEnabled": true,
+  "itemsPerPage": 50,
+  "ignoreThePrefixForAlphaPicker": true,
+  "isThemeCachingEnabled": true
+}

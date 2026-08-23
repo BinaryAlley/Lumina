@@ -21,7 +21,7 @@
       - [Split Path](#split-path)
         - [Split Path Request](#split-path-request)
         - [Split Path Response](#split-path-response)
-      - [Split Path](#split-path)
+      - [Validate Path](#validate-path)
         - [Validate Path Request](#validate-path-request)
         - [Validate Path Response](#validate-path-response)
 
@@ -45,7 +45,7 @@ GET api/v1/path/check-path-exists?path=C%3A%5CUsers%5C&includeHiddenElements=tru
 
 ```json
 {
-  "Exists": true
+  "exists": true
 }
 ```
 
@@ -65,7 +65,7 @@ GET api/v1/path/combine?originalPath=C%3A%5C&newPath=Users
 
 ```json
 {
-  "Path": "C:\\Users\\"
+  "path": "C:\\Users\\"
 }
 ```
 
@@ -86,7 +86,7 @@ GET api/v1/path/get-path-parent?path=C%3A%5CUsers%5C
 ```json
 [
   {
-    "Path": "C:"
+    "path": "C:"
   }
 ]
 ```
@@ -106,11 +106,9 @@ GET api/v1/path/get-path-root?path=C%3A%5CUsers%5C
 ```
 
 ```json
-[
-  {
-    "Path": "C:\\"
-  }
-]
+{
+  "path": "C:\\"
+}
 ```
 
 #### Get Path Separator
@@ -128,14 +126,12 @@ GET api/v1/path/get-path-separator
 ```
 
 ```json
-[
-  {
-    "Separator": "\\"
-  }
-]
+{
+  "separator": "\\"
+}
 ```
 
-#### Split Path 
+#### Split Path
 
 ##### Split Path Request
 
@@ -152,15 +148,15 @@ GET api/v1/path/split?path=C%3A%5CUsers%5C
 ```json
 [
   {
-    "Path": "C:\\"
+    "path": "C:\\"
   },
   {
-    "Path": "Users"
+    "path": "Users"
   }
 ]
 ```
 
-#### Validate Path 
+#### Validate Path
 
 ##### Validate Path Request
 
@@ -176,6 +172,6 @@ GET api/v1/path/validate?path=C%3A%5CUsers%5C
 
 ```json
 {
-  "IsValid": true
+  "isValid": true
 }
 ```
