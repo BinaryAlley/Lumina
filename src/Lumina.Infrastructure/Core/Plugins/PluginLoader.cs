@@ -24,7 +24,7 @@ internal static class PluginLoader
     public static PluginLoadResultDto LoadPlugins(string pluginsDirectory, IServiceCollection services)
     {
         List<IPlugin> plugins = [];
-        List<string> errors = [];
+        List<PluginLoadErrorDto> errors = [];
 
         if (!Directory.Exists(pluginsDirectory))
             return new PluginLoadResultDto(plugins, errors);
@@ -50,7 +50,7 @@ internal static class PluginLoader
             }
             catch (Exception exception)
             {
-                errors.Add($"Failed to load plugin assembly '{Path.GetFileName(assemblyPath)}': {exception.Message}");
+                errors.Add(new PluginLoadErrorDto(Path.GetFileNameWithoutExtension(assemblyPath), $"Failed to load plugin assembly '{Path.GetFileName(assemblyPath)}': {exception.Message}"));
             }
         }
 

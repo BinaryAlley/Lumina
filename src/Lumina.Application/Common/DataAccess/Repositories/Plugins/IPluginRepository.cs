@@ -15,7 +15,8 @@ namespace Lumina.Application.Common.DataAccess.Repositories.Plugins;
 /// </summary>
 public interface IPluginRepository : IRepository<PluginEntity>,
                                      IGetByIdRepositoryAction<PluginEntity, Guid>,
-                                     IGetAllRepositoryAction<PluginEntity>
+                                     IGetAllRepositoryAction<PluginEntity>,
+                                     IDeleteByIdRepositoryAction<Guid>
 {
     /// <summary>
     /// Inserts the provided <paramref name="plugin"/> into the storage medium, or updates it when it already exists.
