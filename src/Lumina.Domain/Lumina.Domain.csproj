@@ -23,4 +23,28 @@
       <ProjectReference Include="..\Lumina.Domain.SharedKernel\Lumina.Domain.SharedKernel.csproj" />
     </ItemGroup>
 
+    <Target Name="CheckSixLaborsLicense" BeforeTargets="SixLabors_ValidateLicense" Condition="Exists('$(MSBuildThisFileDirectory)sixlabors.lic')">
+        <PropertyGroup>
+            <_SixLaborsLic>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)sixlabors.lic'))</_SixLaborsLic>
+            <_SixLaborsExpiryStart>$([MSBuild]::Add($(_SixLaborsLic.IndexOf('ExpiryDateUtc=')), 14))</_SixLaborsExpiryStart>
+            <_SixLaborsExpiryEnd>$(_SixLaborsLic.IndexOf(';', $(_SixLaborsExpiryStart)))</_SixLaborsExpiryEnd>
+            <_SixLaborsExpiryLength>$([MSBuild]::Subtract($(_SixLaborsExpiryEnd), $(_SixLaborsExpiryStart)))</_SixLaborsExpiryLength>
+            <_SixLaborsExpiry>$(_SixLaborsLic.Substring($(_SixLaborsExpiryStart), $(_SixLaborsExpiryLength)))</_SixLaborsExpiry>
+            <_SixLaborsExpiryTicks>$([System.DateTime]::Parse($(_SixLaborsExpiry)).Ticks)</_SixLaborsExpiryTicks>
+            <_SixLaborsNowTicks>$([System.DateTime]::UtcNow.Ticks)</_SixLaborsNowTicks>
+            <_SixLaborsLicenseCheckWindows><![CDATA[
+powershell -NoProfile -ExecutionPolicy Bypass -Command "try{$l=Get-Content -Raw '$(MSBuildThisFileDirectory)sixlabors.lic';$m=[regex]::Match($l,'ExpiryDateUtc=([^;]+)');if($m.Success){$d=[datetime]::Parse($m.Groups[1].Value);$n=[int][math]::Ceiling(($d-[datetime]::UtcNow).TotalDays);if($n -ge 0 -and $n -le 30){Write-Host ('WARNING: Six Labors license expires in '+$n+' days on '+$d.ToString('yyyy-MM-dd')+'. Email licensing.sixlabors.com now - renewal takes a few days. Update the SIXLABORS_LICENSE_KEY GitHub secret and src/Lumina.Domain/sixlabors.lic when you receive the new key.')}}}catch{}"
+            ]]></_SixLaborsLicenseCheckWindows>
+            <_SixLaborsLicenseCheckLinux><![CDATA[
+bash -c 'lic="$(cat "$(MSBuildThisFileDirectory)sixlabors.lic")"; e="${lic#*ExpiryDateUtc=}"; e="${e%%;*}"; if date -d "$e" +%s >/dev/null 2>&1; then es="$(date -d "$e" +%s)"; else es="$(date -j -f "%Y-%m-%dT%H:%M:%S" "${e%%.*}" +%s)"; fi; if [ -z "$es" ]; then exit 0; fi; now="$(date +%s)"; d=$(( (es-now)/86400 )); if [ "$d" -ge 0 ] && [ "$d" -le 30 ]; then echo "WARNING: Six Labors license expires in ${d} days on ${e}. Email licensing.sixlabors.com now - renewal takes a few days. Update the SIXLABORS_LICENSE_KEY GitHub secret and src/Lumina.Domain/sixlabors.lic when you receive the new key."; fi; true'
+            ]]></_SixLaborsLicenseCheckLinux>
+        </PropertyGroup>
+        <Error Condition="'$(_SixLaborsExpiryTicks)' &lt; '$(_SixLaborsNowTicks)' And '$(SixLaborsLicenseEnforceBuild)' == 'true'"
+               Text="Six Labors license expired on $(_SixLaborsExpiry). Renew it, then update the SIXLABORS_LICENSE_KEY GitHub secret and src/Lumina.Domain/sixlabors.lic. Pass -p:SixLaborsLicenseEnforceBuild=false to keep building during the renewal." />
+        <Warning Condition="'$(_SixLaborsExpiryTicks)' &lt; '$(_SixLaborsNowTicks)' And '$(SixLaborsLicenseEnforceBuild)' != 'true'"
+                 Text="Six Labors license EXPIRED on $(_SixLaborsExpiry). Renew at licensing.sixlabors.com now - renewal takes a few days. This build still works so development is not blocked. When you receive the new key, update the SIXLABORS_LICENSE_KEY GitHub secret and src/Lumina.Domain/sixlabors.lic." />
+        <Exec Condition="'$(_SixLaborsExpiryTicks)' &gt;= '$(_SixLaborsNowTicks)' And '$(OS)' == 'Windows_NT'" Command="$(_SixLaborsLicenseCheckWindows)" />
+        <Exec Condition="'$(_SixLaborsExpiryTicks)' &gt;= '$(_SixLaborsNowTicks)' And '$(OS)' != 'Windows_NT'" Command="$(_SixLaborsLicenseCheckLinux)" />
+    </Target>
+
 </Project>
