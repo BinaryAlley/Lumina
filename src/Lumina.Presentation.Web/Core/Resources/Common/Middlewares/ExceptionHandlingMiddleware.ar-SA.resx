@@ -1,0 +1,726 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AdminAccountAlreadyCreated" xml:space="preserve">
+    <value>تم إنشاء حساب المسؤول بالفعل!</value>
+  </data>
+  <data name="AdminAccountNotFound" xml:space="preserve">
+    <value>لم يتم العثور على حساب المسؤول!</value>
+  </data>
+  <data name="AdminRoleCannotBeDeleted" xml:space="preserve">
+    <value>لا يمكن حذف دور المسؤول!</value>
+  </data>
+  <data name="AdminRoleNotFound" xml:space="preserve">
+    <value>لم يتم العثور على دور المسؤول!</value>
+  </data>
+  <data name="Application theme cannot be empty!" xml:space="preserve">
+    <value>لا يمكن أن تكون سمة التطبيق فارغة!</value>
+  </data>
+  <data name="AsinMustBe10CharactersLong" xml:space="preserve">
+    <value>يجب أن يتكون رقم ASIN من 10 أحرف!</value>
+  </data>
+  <data name="BarnesAndNoblesIdMustBe10CharactersLong" xml:space="preserve">
+    <value>يجب أن يتكون معرف Barnes&amp;Noble من 10 أحرف!</value>
+  </data>
+  <data name="BitrateMustBeAPositiveNumber" xml:space="preserve">
+    <value>يجب أن يكون معدل البت رقمًا موجبًا!</value>
+  </data>
+  <data name="BookAlreadyExists" xml:space="preserve">
+    <value>الكتاب موجود بالفعل!</value>
+  </data>
+  <data name="BookLibraryCannotBeNull" xml:space="preserve">
+    <value>لا يمكن أن تكون مكتبة الكتب فارغة!</value>
+  </data>
+  <data name="BookNotFound" xml:space="preserve">
+    <value>لم يتم العثور على الكتاب!</value>
+  </data>
+  <data name="BookPathCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون مسار الكتاب فارغًا!</value>
+  </data>
+  <data name="CannotNavigateUp" xml:space="preserve">
+    <value>لا يمكن التنقل إلى مستوى أعلى!</value>
+  </data>
+  <data name="CannotRemoveLastAdmin" xml:space="preserve">
+    <value>لا يمكن إزالة آخر دور مسؤول معين لمستخدم!</value>
+  </data>
+  <data name="CannotScanDisabledLibrary" xml:space="preserve">
+    <value>لا يمكن فحص مكتبة معطلة!</value>
+  </data>
+  <data name="CannotScanLockedLibrary" xml:space="preserve">
+    <value>لا يمكن فحص مكتبة مقفلة!</value>
+  </data>
+  <data name="CanOnlyCancelRunningScans" xml:space="preserve">
+    <value>يمكن إلغاء عمليات الفحص الجارية فقط!</value>
+  </data>
+  <data name="CanOnlyCompleteRunningScans" xml:space="preserve">
+    <value>يمكن إكمال عمليات الفحص الجارية فقط!</value>
+  </data>
+  <data name="CanOnlyFailRunningScans" xml:space="preserve">
+    <value>يمكن تعليم عمليات الفحص الجارية فقط على أنها فاشلة!</value>
+  </data>
+  <data name="CanOnlyStartPendingScans" xml:space="preserve">
+    <value>يمكن بدء عمليات الفحص المعلقة فقط!</value>
+  </data>
+  <data name="CodecCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون الترميز فارغًا!</value>
+  </data>
+  <data name="CompletedScanJobItemsCountCantExceedTotalScanJobItemsCount" xml:space="preserve">
+    <value>لا يمكن أن يتجاوز عدد عناصر الفحص المكتملة العدد الإجمالي لعناصر الفحص!</value>
+  </data>
+  <data name="CompletedScanJobItemsCountMustBePositive" xml:space="preserve">
+    <value>يجب أن يكون عدد عناصر الفحص المكتملة موجبًا!</value>
+  </data>
+  <data name="CompletedScanJobsCountCantExceedTotalScanJobsCount" xml:space="preserve">
+    <value>لا يمكن أن يتجاوز عدد مهام الفحص المكتملة العدد الإجمالي لمهام الفحص!</value>
+  </data>
+  <data name="CompletedScanJobsCountMustBePositive" xml:space="preserve">
+    <value>يجب أن يكون عدد مهام الفحص المكتملة موجبًا!</value>
+  </data>
+  <data name="ContributorDisplayNameCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون الاسم المعروض للمساهم فارغًا!</value>
+  </data>
+  <data name="ContributorDisplayNameMustBeMaximum100CharactersLong" xml:space="preserve">
+    <value>يجب ألا يتجاوز الاسم المعروض للمساهم 100 حرف!</value>
+  </data>
+  <data name="ContributorLegalNameMustBeMaximum100CharactersLong" xml:space="preserve">
+    <value>يجب ألا يتجاوز الاسم القانوني للمساهم 100 حرف!</value>
+  </data>
+  <data name="ContributorNameCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون اسم المساهم فارغًا!</value>
+  </data>
+  <data name="ContributorRoleCannotBeNull" xml:space="preserve">
+    <value>لا يمكن أن يكون دور المساهم فارغًا!</value>
+  </data>
+  <data name="ContributorsListCannotBeNull" xml:space="preserve">
+    <value>لا يمكن أن تكون قائمة المساهمين فارغة!</value>
+  </data>
+  <data name="CorsOriginIsInvalid" xml:space="preserve">
+    <value>أصل CORS غير صالح!</value>
+  </data>
+  <data name="CorsOriginsCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن تكون قائمة أصول CORS فارغة!</value>
+  </data>
+  <data name="CountryCodeMustBe2CharactersLong" xml:space="preserve">
+    <value>يجب أن يتكون رمز الدولة من حرفين!</value>
+  </data>
+  <data name="CoverFileMustBeAnImage" xml:space="preserve">
+    <value>يجب أن يكون ملف الغلاف صورة!</value>
+  </data>
+  <data name="CurrentPasswordCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن تكون كلمة المرور الحالية فارغة!</value>
+  </data>
+  <data name="DatabaseConnectionStringCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون سلسلة اتصال قاعدة البيانات فارغة!</value>
+  </data>
+  <data name="DescriptionMustBeMaximum2000CharactersLong" xml:space="preserve">
+    <value>يجب ألا يتجاوز الوصف 2000 حرف!</value>
+  </data>
+  <data name="DirectoryAlreadyExists" xml:space="preserve">
+    <value>الدليل موجود بالفعل!</value>
+  </data>
+  <data name="DirectoryCopyError" xml:space="preserve">
+    <value>خطأ في نسخ الدليل!</value>
+  </data>
+  <data name="DirectoryMoveError" xml:space="preserve">
+    <value>خطأ في نقل الدليل!</value>
+  </data>
+  <data name="DirectoryNotFound" xml:space="preserve">
+    <value>لم يتم العثور على الدليل!</value>
+  </data>
+  <data name="EditionMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>يجب ألا يتجاوز اسم الطبعة 50 حرفًا!</value>
+  </data>
+  <data name="EncryptionSecretKeyCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون مفتاح التشفير السري فارغًا!</value>
+  </data>
+  <data name="EncryptionSecretKeyMustBeABase64String" xml:space="preserve">
+    <value>يجب أن يكون مفتاح التشفير السري سلسلة بصيغة Base64!</value>
+  </data>
+  <data name="ErrorPersistingAuthorizationRole" xml:space="preserve">
+    <value>خطأ في حفظ دور التفويض!</value>
+  </data>
+  <data name="ErrorPersistingMediaLibrary" xml:space="preserve">
+    <value>خطأ في حفظ مكتبة الوسائط!</value>
+  </data>
+  <data name="ExtensionCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون امتداد الملف فارغًا!</value>
+  </data>
+  <data name="FailedToCreateScanJobProgress" xml:space="preserve">
+    <value>تعذر إنشاء تقدم مهمة الفحص!</value>
+  </data>
+  <data name="FileAlreadyExists" xml:space="preserve">
+    <value>الملف موجود بالفعل!</value>
+  </data>
+  <data name="FileCopyError" xml:space="preserve">
+    <value>خطأ في نسخ الملف!</value>
+  </data>
+  <data name="FileMoveError" xml:space="preserve">
+    <value>خطأ في نقل الملف!</value>
+  </data>
+  <data name="FileNotFound" xml:space="preserve">
+    <value>لم يتم العثور على الملف!</value>
+  </data>
+  <data name="FilterMustIncludeLibraryId" xml:space="preserve">
+    <value>يجب أن يتضمن الفلتر معرف مكتبة!</value>
+  </data>
+  <data name="Forbidden" xml:space="preserve">
+    <value>ليس لديك إذن لعرض هذا المورد!</value>
+  </data>
+  <data name="General.Validation" xml:space="preserve">
+    <value>التحقق</value>
+  </data>
+  <data name="GenreNameCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون اسم النوع فارغًا!</value>
+  </data>
+  <data name="GenreNameMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>يجب ألا يتجاوز اسم النوع 50 حرفًا!</value>
+  </data>
+  <data name="GenresListCannotBeNull" xml:space="preserve">
+    <value>لا يمكن أن تكون قائمة الأنواع فارغة!</value>
+  </data>
+  <data name="GoodreadsIdMustBeNumeric" xml:space="preserve">
+    <value>يجب أن يكون معرف Goodreads رقميًا!</value>
+  </data>
+  <data name="GoogleBooksIdMustBe12CharactersLong" xml:space="preserve">
+    <value>يجب أن يتكون معرف Google Books من 12 حرفًا!</value>
+  </data>
+  <data name="ImageQualityMustBeBetweenZeroAndOneHundred" xml:space="preserve">
+    <value>يجب أن تكون جودة الصورة بين 0 و100!</value>
+  </data>
+  <data name="InvalidAppleBooksIdFormat" xml:space="preserve">
+    <value>تنسيق معرف Apple Books غير صالح!</value>
+  </data>
+  <data name="InvalidBarnesAndNoblesIdFormat" xml:space="preserve">
+    <value>تنسيق معرف Barnes&amp;Noble غير صالح!</value>
+  </data>
+  <data name="InvalidCurrentPassword" xml:space="preserve">
+    <value>كلمة المرور الحالية غير صالحة!</value>
+  </data>
+  <data name="InvalidFilterAlphaKey" xml:space="preserve">
+    <value>مفتاح الفلتر الأبجدي غير صالح!</value>
+  </data>
+  <data name="InvalidGoogleBooksIdFormat" xml:space="preserve">
+    <value>تنسيق معرف Google Books غير صالح!</value>
+  </data>
+  <data name="InvalidIsbn10Format" xml:space="preserve">
+    <value>تنسيق ISBN10 غير صالح!</value>
+  </data>
+  <data name="InvalidIsbn13Format" xml:space="preserve">
+    <value>تنسيق ISBN13 غير صالح!</value>
+  </data>
+  <data name="InvalidIsoCode" xml:space="preserve">
+    <value>رمز ISO غير صالح!</value>
+  </data>
+  <data name="InvalidLccnFormat" xml:space="preserve">
+    <value>تنسيق LCCN غير صالح!</value>
+  </data>
+  <data name="InvalidOclcFormat" xml:space="preserve">
+    <value>تنسيق OCLC غير صالح!</value>
+  </data>
+  <data name="InvalidOpenLibraryId" xml:space="preserve">
+    <value>معرف OpenLibrary غير صالح!</value>
+  </data>
+  <data name="InvalidPassword" xml:space="preserve">
+    <value>كلمة المرور غير صالحة!</value>
+  </data>
+  <data name="InvalidPath" xml:space="preserve">
+    <value>المسار غير صالح!</value>
+  </data>
+  <data name="InvalidTotpCode" xml:space="preserve">
+    <value>رمز TOTP غير صالح!</value>
+  </data>
+  <data name="InvalidUsername" xml:space="preserve">
+    <value>اسم المستخدم غير صالح!</value>
+  </data>
+  <data name="InvalidUsernameOrPassword" xml:space="preserve">
+    <value>اسم المستخدم أو كلمة المرور غير صالحة!</value>
+  </data>
+  <data name="IsbnListCannotBeNull" xml:space="preserve">
+    <value>لا يمكن أن تكون قائمة ISBN فارغة!</value>
+  </data>
+  <data name="IsbnValueCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن تكون قيمة ISBN فارغة!</value>
+  </data>
+  <data name="ItemsPerPageMustBeGreaterThanZero" xml:space="preserve">
+    <value>يجب أن يكون عدد العناصر في الصفحة أكبر من الصفر!</value>
+  </data>
+  <data name="JwtAudienceCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون جمهور JWT فارغًا!</value>
+  </data>
+  <data name="JwtExpiryMinutesMustBePositive" xml:space="preserve">
+    <value>يجب أن تكون مدة صلاحية JWT بالدقائق موجبة!</value>
+  </data>
+  <data name="JwtIssuerCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون مُصدر JWT فارغًا!</value>
+  </data>
+  <data name="JwtSecretKeyCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون المفتاح السري لـ JWT فارغًا!</value>
+  </data>
+  <data name="JwtSecretKeyTooShort" xml:space="preserve">
+    <value>المفتاح السري لـ JWT قصير جدًا!</value>
+  </data>
+  <data name="LanguageCodeCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون رمز اللغة فارغًا!</value>
+  </data>
+  <data name="LanguageCodeMustBe2CharactersLong" xml:space="preserve">
+    <value>يجب أن يتكون رمز اللغة من حرفين!</value>
+  </data>
+  <data name="LanguageNameCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون اسم اللغة فارغًا!</value>
+  </data>
+  <data name="LanguageNameMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>يجب ألا يتجاوز اسم اللغة 50 حرفًا!</value>
+  </data>
+  <data name="LanguageNativeNameMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>يجب ألا يتجاوز الاسم الأصلي للغة 50 حرفًا!</value>
+  </data>
+  <data name="LastBundledThemeCannotBeDeleted" xml:space="preserve">
+    <value>لا يمكن حذف آخر سمة مدمجة!</value>
+  </data>
+  <data name="LibraryAlreadyBeingScanned" xml:space="preserve">
+    <value>المكتبة قيد الفحص بالفعل!</value>
+  </data>
+  <data name="LibraryAlreadyExists" xml:space="preserve">
+    <value>المكتبة موجودة بالفعل!</value>
+  </data>
+  <data name="LibraryIdCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون معرف المكتبة فارغًا!</value>
+  </data>
+  <data name="LibraryMetadataProviderConfigurationNotFound" xml:space="preserve">
+    <value>لم يتم العثور على تكوين مزود البيانات الوصفية للمكتبة!</value>
+  </data>
+  <data name="LibraryNotFound" xml:space="preserve">
+    <value>لم يتم العثور على المكتبة!</value>
+  </data>
+  <data name="LibraryScanAlreadyExists" xml:space="preserve">
+    <value>فحص المكتبة موجود بالفعل!</value>
+  </data>
+  <data name="LibraryScanIdCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون معرف فحص المكتبة فارغًا!</value>
+  </data>
+  <data name="LibraryScanNotFound" xml:space="preserve">
+    <value>لم يتم العثور على فحص المكتبة!</value>
+  </data>
+  <data name="LibraryThingIdMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>يجب ألا يتجاوز معرف LibraryThing 50 حرفًا!</value>
+  </data>
+  <data name="LibraryTypeCannotBeNull" xml:space="preserve">
+    <value>لا يمكن أن يكون نوع المكتبة فارغًا!</value>
+  </data>
+  <data name="MediaLibrariesDirectoryCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون دليل مكتبات الوسائط فارغًا!</value>
+  </data>
+  <data name="MediaRootDirectoryCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون مجلد الوسائط الجذر فارغًا!</value>
+  </data>
+  <data name="MetadataCannotBeNull" xml:space="preserve">
+    <value>لا يمكن أن تكون البيانات الوصفية فارغة!</value>
+  </data>
+  <data name="NameCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون الاسم فارغًا!</value>
+  </data>
+  <data name="NewPasswordCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن تكون كلمة المرور الجديدة فارغة!</value>
+  </data>
+  <data name="NewPasswordConfirmCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون تأكيد كلمة المرور الجديدة فارغًا!</value>
+  </data>
+  <data name="NotAuthorized" xml:space="preserve">
+    <value>ليس لديك إذن لتنفيذ هذه العملية!</value>
+  </data>
+  <data name="NotFound" xml:space="preserve">
+    <value>لم يتم العثور على المورد المحدد!</value>
+  </data>
+  <data name="NoThumbnail" xml:space="preserve">
+    <value>لا توجد صورة مصغرة!</value>
+  </data>
+  <data name="OneOrMoreValidationErrorsOccurred" xml:space="preserve">
+    <value>حدث خطأ تحقق واحد أو أكثر</value>
+  </data>
+  <data name="OriginalReleaseDateAndYearMustMatch" xml:space="preserve">
+    <value>يجب أن يتطابق تاريخ وسنة الإصدار الأصلي!</value>
+  </data>
+  <data name="OriginalReleaseYearMustBeBetween1And9999" xml:space="preserve">
+    <value>يجب أن تكون سنة الإصدار الأصلي بين 1 و9999!</value>
+  </data>
+  <data name="OriginalTitleMustBeMaximum255CharactersLong" xml:space="preserve">
+    <value>يجب ألا يتجاوز العنوان الأصلي 255 حرفًا!</value>
+  </data>
+  <data name="PageCountMustBeGreaterThanZero" xml:space="preserve">
+    <value>يجب أن يكون عدد الصفحات أكبر من الصفر!</value>
+  </data>
+  <data name="PageKeyCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون مفتاح الصفحة فارغًا!</value>
+  </data>
+  <data name="ParentNodeCannotBeNull" xml:space="preserve">
+    <value>لا يمكن أن تكون العقدة الأصلية فارغة!</value>
+  </data>
+  <data name="PasswordCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن تكون كلمة المرور فارغة!</value>
+  </data>
+  <data name="PasswordConfirmCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون تأكيد كلمة المرور فارغًا!</value>
+  </data>
+  <data name="PasswordResetAlreadyRequested" xml:space="preserve">
+    <value>تم طلب إعادة تعيين كلمة المرور بالفعل!</value>
+  </data>
+  <data name="PasswordsNotMatch" xml:space="preserve">
+    <value>كلمتا المرور غير متطابقتين!</value>
+  </data>
+  <data name="PathCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون المسار فارغًا!</value>
+  </data>
+  <data name="PathMustBeMaximum260CharactersLong" xml:space="preserve">
+    <value>يجب ألا يتجاوز المسار 260 حرفًا!</value>
+  </data>
+  <data name="PathsListCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن تكون قائمة المسارات فارغة!</value>
+  </data>
+  <data name="PathsListCannotBeNull" xml:space="preserve">
+    <value>لا يمكن أن تكون قائمة المسارات فارغة!</value>
+  </data>
+  <data name="PermissionAlreadyExists" xml:space="preserve">
+    <value>الإذن موجود بالفعل!</value>
+  </data>
+  <data name="PermissionIdCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون معرف الإذن فارغًا!</value>
+  </data>
+  <data name="PermissionsListCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن تكون قائمة الأذونات فارغة!</value>
+  </data>
+  <data name="PermissionsListCannotBeNull" xml:space="preserve">
+    <value>لا يمكن أن تكون قائمة الأذونات فارغة!</value>
+  </data>
+  <data name="PluginIdCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون معرف الإضافة فارغًا!</value>
+  </data>
+  <data name="PluginIdsListCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن تكون قائمة معرفات الإضافات فارغة!</value>
+  </data>
+  <data name="PluginIdsListCannotBeNull" xml:space="preserve">
+    <value>لا يمكن أن تكون قائمة معرفات الإضافات فارغة!</value>
+  </data>
+  <data name="PluginNotFound" xml:space="preserve">
+    <value>لم يتم العثور على الإضافة!</value>
+  </data>
+  <data name="PluginsDirectoryCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون دليل الإضافات فارغًا!</value>
+  </data>
+  <data name="PluginSettingsCannotBeNull" xml:space="preserve">
+    <value>لا يمكن أن تكون إعدادات الإضافة فارغة!</value>
+  </data>
+  <data name="PublisherMustBeMaximum100CharactersLong" xml:space="preserve">
+    <value>يجب ألا يتجاوز اسم الناشر 100 حرف!</value>
+  </data>
+  <data name="RatingMaxValueMustBePositive" xml:space="preserve">
+    <value>يجب أن تكون القيمة القصوى للتقييم موجبة!</value>
+  </data>
+  <data name="RatingsListCannotBeNull" xml:space="preserve">
+    <value>لا يمكن أن تكون قائمة التقييمات فارغة!</value>
+  </data>
+  <data name="RatingValueCannotBeGreaterThanMaxValue" xml:space="preserve">
+    <value>لا يمكن أن تكون قيمة التقييم أكبر من القيمة القصوى!</value>
+  </data>
+  <data name="RatingValueMustBePositive" xml:space="preserve">
+    <value>يجب أن تكون قيمة التقييم موجبة!</value>
+  </data>
+  <data name="RatingVoteCountMustBePositive" xml:space="preserve">
+    <value>يجب أن يكون عدد أصوات التقييم موجبًا!</value>
+  </data>
+  <data name="ReleaseInfoCannotBeNull" xml:space="preserve">
+    <value>لا يمكن أن تكون معلومات الإصدار فارغة!</value>
+  </data>
+  <data name="ReleaseVersionMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>يجب ألا يتجاوز إصدار الإصدار 50 حرفًا!</value>
+  </data>
+  <data name="ReReleaseDateAndYearMustMatch" xml:space="preserve">
+    <value>يجب أن يتطابق تاريخ وسنة إعادة الإصدار!</value>
+  </data>
+  <data name="ReReleaseDateCannotBeEarlierThanOriginalReleaseDate" xml:space="preserve">
+    <value>لا يمكن أن يكون تاريخ إعادة الإصدار أقدم من تاريخ الإصدار الأصلي!</value>
+  </data>
+  <data name="ReReleaseYearCannotBeEarlierThanOriginalReleaseYear" xml:space="preserve">
+    <value>لا يمكن أن تكون سنة إعادة الإصدار أقدم من سنة الإصدار الأصلي!</value>
+  </data>
+  <data name="ReReleaseYearMustBeBetween1And9999" xml:space="preserve">
+    <value>يجب أن تكون سنة إعادة الإصدار بين 1 و9999!</value>
+  </data>
+  <data name="RoleAlreadyExists" xml:space="preserve">
+    <value>الدور موجود بالفعل!</value>
+  </data>
+  <data name="RoleCategoryCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن تكون فئة الدور فارغة!</value>
+  </data>
+  <data name="RoleCategoryMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>يجب ألا تتجاوز فئة الدور 50 حرفًا!</value>
+  </data>
+  <data name="RoleIdCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون معرف الدور فارغًا!</value>
+  </data>
+  <data name="RoleNameCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون اسم الدور فارغًا!</value>
+  </data>
+  <data name="RoleNameCannotBeNull" xml:space="preserve">
+    <value>لا يمكن أن يكون اسم الدور فارغًا!</value>
+  </data>
+  <data name="RoleNameMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>يجب ألا يتجاوز اسم الدور 50 حرفًا!</value>
+  </data>
+  <data name="RoleNotFound" xml:space="preserve">
+    <value>لم يتم العثور على الدور</value>
+  </data>
+  <data name="ScanIdCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون معرف الفحص فارغًا!</value>
+  </data>
+  <data name="ScanJobCurrentOperationCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن تكون عملية الفحص الحالية فارغة!</value>
+  </data>
+  <data name="StreamIdCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون معرف الدفق فارغًا!</value>
+  </data>
+  <data name="TagNameCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون اسم الوسم فارغًا!</value>
+  </data>
+  <data name="TagNameMustBeMaximum50CharactersLong" xml:space="preserve">
+    <value>يجب ألا يتجاوز اسم الوسم 50 حرفًا!</value>
+  </data>
+  <data name="TagsListCannotBeNull" xml:space="preserve">
+    <value>لا يمكن أن تكون قائمة الوسوم فارغة!</value>
+  </data>
+  <data name="TempPasswordExpired" xml:space="preserve">
+    <value>انتهت صلاحية كلمة المرور المؤقتة!</value>
+  </data>
+  <data name="TheBookIsAlreadyInTheSeries" xml:space="preserve">
+    <value>الكتاب موجود بالفعل في السلسلة!</value>
+  </data>
+  <data name="TheBookIsNotInTheSeries" xml:space="preserve">
+    <value>الكتاب غير موجود في السلسلة!</value>
+  </data>
+  <data name="ThemeArchiveCannotBeNull" xml:space="preserve">
+    <value>لا يمكن أن يكون أرشيف السمة فارغًا!</value>
+  </data>
+  <data name="ThemeArchiveNotReadable" xml:space="preserve">
+    <value>تعذر قراءة أرشيف السمة!</value>
+  </data>
+  <data name="ThemeAssetPathCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون مسار مورد السمة فارغًا!</value>
+  </data>
+  <data name="ThemeBundledThemesPathCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون مسار السمات المدمجة فارغًا!</value>
+  </data>
+  <data name="ThemeCannotBeDeleted" xml:space="preserve">
+    <value>لا يمكن حذف السمة!</value>
+  </data>
+  <data name="ThemeCannotBeRestored" xml:space="preserve">
+    <value>لا يمكن استعادة السمة!</value>
+  </data>
+  <data name="ThemeDefaultThemeIdCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون معرف السمة الافتراضية فارغًا!</value>
+  </data>
+  <data name="ThemeFilesUnreadable" xml:space="preserve">
+    <value>تعذر قراءة ملفات السمة!</value>
+  </data>
+  <data name="ThemeIdCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون معرف السمة فارغًا!</value>
+  </data>
+  <data name="ThemeMaxArchiveBytesMustBePositive" xml:space="preserve">
+    <value>يجب أن يكون الحد الأقصى لحجم أرشيف السمة موجبًا!</value>
+  </data>
+  <data name="ThemeMaxEntriesMustBePositive" xml:space="preserve">
+    <value>يجب أن يكون الحد الأقصى لعدد إدخالات السمة موجبًا!</value>
+  </data>
+  <data name="ThemeMaxExpandedBytesMustBePositive" xml:space="preserve">
+    <value>يجب أن يكون الحد الأقصى لحجم السمة بعد فك الضغط موجبًا!</value>
+  </data>
+  <data name="ThemeMaxSingleFileBytesMustBePositive" xml:space="preserve">
+    <value>يجب أن يكون الحد الأقصى لحجم الملف الواحد موجبًا!</value>
+  </data>
+  <data name="ThemeNotAvailable" xml:space="preserve">
+    <value>السمة غير متوفرة!</value>
+  </data>
+  <data name="ThemeNotFound" xml:space="preserve">
+    <value>لم يتم العثور على السمة المحددة!</value>
+  </data>
+  <data name="ThemeStoragePathCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون مسار تخزين السمة فارغًا!</value>
+  </data>
+  <data name="TitleCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون العنوان فارغًا!</value>
+  </data>
+  <data name="TitleMustBeMaximum255CharactersLong" xml:space="preserve">
+    <value>يجب ألا يتجاوز العنوان 255 حرفًا!</value>
+  </data>
+  <data name="TooManyRequests" xml:space="preserve">
+    <value>طلبات كثيرة جدًا! يرجى المحاولة مرة أخرى بعد 15 دقيقة!</value>
+  </data>
+  <data name="TotalScanJobItemsCountMustBePositive" xml:space="preserve">
+    <value>يجب أن يكون العدد الإجمالي لعناصر الفحص موجبًا!</value>
+  </data>
+  <data name="TotalScanJobsCountMustBePositive" xml:space="preserve">
+    <value>يجب أن يكون العدد الإجمالي لمهام الفحص موجبًا!</value>
+  </data>
+  <data name="TotpCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون رمز TOTP فارغًا!</value>
+  </data>
+  <data name="UnauthorizedAccess" xml:space="preserve">
+    <value>ليس لديك إذن للوصول إلى هذا المورد!</value>
+  </data>
+  <data name="UnknownBookFormat" xml:space="preserve">
+    <value>تنسيق كتاب غير معروف!</value>
+  </data>
+  <data name="UnknownIsbnFormat" xml:space="preserve">
+    <value>تنسيق ISBN غير معروف!</value>
+  </data>
+  <data name="UnknownLibraryType" xml:space="preserve">
+    <value>نوع مكتبة غير معروف!</value>
+  </data>
+  <data name="UserAlreadyExists" xml:space="preserve">
+    <value>المستخدم موجود بالفعل!</value>
+  </data>
+  <data name="UserDoesNotExist" xml:space="preserve">
+    <value>المستخدم غير موجود!</value>
+  </data>
+  <data name="UserIdCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون معرف المستخدم فارغًا!</value>
+  </data>
+  <data name="UserMustHaveRoleOrDirectPermissions" xml:space="preserve">
+    <value>يجب أن يمتلك المستخدم أذونات من دور أو أذونات مباشرة!</value>
+  </data>
+  <data name="UsernameAlreadyExists" xml:space="preserve">
+    <value>اسم المستخدم موجود بالفعل!</value>
+  </data>
+  <data name="UsernameCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون اسم المستخدم فارغًا!</value>
+  </data>
+  <data name="UsernameDoesNotExist" xml:space="preserve">
+    <value>اسم المستخدم غير موجود!</value>
+  </data>
+  <data name="UsernameMustBeBetween3And255CharactersLong" xml:space="preserve">
+    <value>يجب أن يتكون اسم المستخدم من 3 إلى 255 حرفًا!</value>
+  </data>
+  <data name="UserSettingsAlreadyExists" xml:space="preserve">
+    <value>إعدادات المستخدم موجودة بالفعل!</value>
+  </data>
+  <data name="UserSettingsNotFound" xml:space="preserve">
+    <value>لم يتم العثور على إعدادات المستخدم!</value>
+  </data>
+  <data name="VolumeNumberMustBeGreaterThanZero" xml:space="preserve">
+    <value>يجب أن يكون رقم المجلد أكبر من الصفر!</value>
+  </data>
+</root>

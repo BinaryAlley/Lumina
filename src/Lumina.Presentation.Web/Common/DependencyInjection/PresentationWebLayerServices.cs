@@ -107,6 +107,7 @@ public static class PresentationWebLayerServices
         {
             CultureInfo[] supportedCultures = 
             [
+                new CultureInfo("ar-SA"),
                 new CultureInfo("de-DE"),
                 new CultureInfo("en-US"),
                 new CultureInfo("es-ES"),

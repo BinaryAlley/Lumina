@@ -211,6 +211,7 @@ public sealed class ThemeNavBuilder
         string baseUrl = _urlService.GetAbsoluteUrl(WebRoutes.Language.SET_LANGUAGE) ?? string.Empty;
         (string Culture, string DisplayName)[] cultures =
         [
+            ("ar-sa", "العربية"),
             ("zh-cn", "简体中文"),
             ("de-de", "Deutsch"),
             ("en-us", "English"),
