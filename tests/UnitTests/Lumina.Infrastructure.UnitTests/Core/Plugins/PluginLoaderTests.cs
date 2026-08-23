@@ -45,8 +45,9 @@ public class PluginLoaderTests
 
         // Assert
         Assert.Empty(result.Plugins);
-        string error = Assert.Single(result.Errors);
-        Assert.Contains("invalid.dll", error);
+        PluginLoadErrorDto error = Assert.Single(result.Errors);
+        Assert.Equal("invalid", error.AssemblyName);
+        Assert.Contains("invalid.dll", error.ErrorMessage);
     }
 
     [Fact]

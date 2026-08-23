@@ -383,7 +383,10 @@
                 <tr data-provider-plugin-id="${provider.pluginId}">
                     <td>${provider.name}</td>
                     <td class="text-center">
-                        <input type="checkbox" class="metadata-provider-enabled" ${provider.isEnabled ? 'checked' : ''} />
+                        <label class="enlightenment-checkbox-label">
+                            <input type="checkbox" class="enlightenment-checkbox-hidden metadata-provider-enabled" ${provider.isEnabled ? 'checked' : ''} />
+                            <span class="enlightenment-checkbox"></span>
+                        </label>
                     </td>
                     <td class="text-center">
                         <button type="button" class="metadata-provider-move-up confirm-button f-12 h-20px" ${index === 0 ? 'disabled' : ''}>@_localizer["MoveUp"]</button>

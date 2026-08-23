@@ -10,4 +10,7 @@ namespace Lumina.Infrastructure.Common.Models.DTO.Plugins;
 /// </summary>
 /// <param name="Plugins">The plugins that were loaded successfully.</param>
 /// <param name="Errors">The errors that occurred while loading the plugins.</param>
-internal sealed record PluginLoadResultDto(IReadOnlyList<IPlugin> Plugins, IReadOnlyList<string> Errors);
+internal sealed record PluginLoadResultDto(
+    IReadOnlyList<IPlugin> Plugins, 
+    IReadOnlyList<PluginLoadErrorDto> Errors
+);

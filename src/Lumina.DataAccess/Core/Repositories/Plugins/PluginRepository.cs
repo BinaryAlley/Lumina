@@ -78,6 +78,22 @@ internal sealed class PluginRepository : IPluginRepository
     }
 
     /// <summary>
+    /// Deletes a plugin identified by <paramref name="id"/> from the storage medium.
+    /// </summary>
+    /// <param name="id">The id of the plugin to be deleted.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Deleted>> DeleteByIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        PluginEntity? plugin = await _luminaDbContext.Plugins
+            .FirstOrDefaultAsync(repositoryPlugin => repositoryPlugin.Id == id, cancellationToken).ConfigureAwait(false);
+        if (plugin is null)
+            return Errors.Plugins.PluginNotFound;
+        _luminaDbContext.Plugins.Remove(plugin);
+        return Result.Deleted;
+    }
+
+    /// <summary>
     /// Updates the settings of the plugin identified by <paramref name="pluginId"/>.
     /// </summary>
     /// <param name="pluginId">The Id of the plugin whose settings are updated.</param>
