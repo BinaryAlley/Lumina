@@ -1,0 +1,11 @@
+PUT {{host}}/api/v1/plugins/{{$guid}}/settings
+Authorization: Bearer {{ACCESS_TOKEN}}
+Content-Type: application/json
+
+{
+  "pluginId": "{{$guid}}",
+  "settings": {
+    "language": "en",
+    "includeSeries": "true"
+  }
+}

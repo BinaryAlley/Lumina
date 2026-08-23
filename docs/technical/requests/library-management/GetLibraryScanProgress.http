@@ -1,0 +1,2 @@
+GET {{host}}/api/v1/libraries/{{$guid}}/scans/{{$guid}}/progress
+Authorization: Bearer {{ACCESS_TOKEN}}

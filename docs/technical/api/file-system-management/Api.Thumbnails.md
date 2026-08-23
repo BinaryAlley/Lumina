@@ -24,3 +24,5 @@ GET api/v1/thumbnails/get-thumbnail?path=C%3A%5CUsers%5C&quality=75
 ```js
 200 Ok
 ```
+
+Returns the thumbnail as a binary image file whose `Content-Type` depends on the requested image type (`Png`, `Jpeg`, `Webp`, `Gif`, `Bmp` or `Tiff`).

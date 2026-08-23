@@ -1,0 +1,2 @@
+POST {{host}}/api/v1/libraries/{{$guid}}/scans
+Authorization: Bearer {{ACCESS_TOKEN}}

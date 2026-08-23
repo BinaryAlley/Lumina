@@ -31,18 +31,18 @@ GET api/v1/files/get-files?path=C%3A%5CUsers%5C&includeHiddenElements=true
 ```json
 [
   {
-    "Size": 754045401,
-    "Path": "/media/movies/The Matrix (1999)/The Matrix.mkv",
-    "Name": "The Matrix.mkv",
-    "DateCreated": "2025-01-01T13:50:38.3143711Z",
-    "DateModified": "2025-01-01T13:40:38.3143719Z"
+    "size": 754045401,
+    "path": "/media/movies/The Matrix (1999)/The Matrix.mkv",
+    "name": "The Matrix.mkv",
+    "dateCreated": "2025-01-01T13:50:38.3143711Z",
+    "dateModified": "2025-01-01T13:40:38.3143719Z"
   },
   {
-    "Size": 6897,
-    "Path": "/media/movies/The Matrix (1999)/The Matrix.en.srt",
-    "Name": "The Matrix.en.srt",
-    "DateCreated": "2025-01-01T13:50:38.3145606Z",
-    "DateModified": "2025-01-01T13:40:38.3145609Z"
+    "size": 6897,
+    "path": "/media/movies/The Matrix (1999)/The Matrix.en.srt",
+    "name": "The Matrix.en.srt",
+    "dateCreated": "2025-01-01T13:50:38.3145606Z",
+    "dateModified": "2025-01-01T13:40:38.3145609Z"
   }
 ]
 ```
@@ -52,7 +52,7 @@ GET api/v1/files/get-files?path=C%3A%5CUsers%5C&includeHiddenElements=true
 ##### Get Tree Files Request
 
 ```js
-GET api/v1/get-tree-files?path=C%3A%5CUsers%5C&includeHiddenElements=true
+GET api/v1/files/get-tree-files?path=C%3A%5CUsers%5C&includeHiddenElements=true
 ```
 
 ##### Get Tree Files Response
@@ -64,28 +64,28 @@ GET api/v1/get-tree-files?path=C%3A%5CUsers%5C&includeHiddenElements=true
 ```json
 [
   {
-    "Path": "/media/movies/The Matrix (1999)/The Matrix.mkv",
-    "Name": "The Matrix.mkv",
-    "ItemType": "File",
-    "IsExpanded": false,
-    "ChildrenLoaded": false,
-    "Children": []
+    "path": "/media/movies/The Matrix (1999)/The Matrix.mkv",
+    "name": "The Matrix.mkv",
+    "itemType": "File",
+    "isExpanded": false,
+    "childrenLoaded": false,
+    "children": []
   },
   {
-    "Path": "/media/movies/The Matrix (1999)/The Matrix.en.srt",
-    "Name": "The Matrix.en.srt",
-    "ItemType": "File",
-    "IsExpanded": false,
-    "ChildrenLoaded": false,
-    "Children": []
+    "path": "/media/movies/The Matrix (1999)/The Matrix.en.srt",
+    "name": "The Matrix.en.srt",
+    "itemType": "File",
+    "isExpanded": false,
+    "childrenLoaded": false,
+    "children": []
   },
   {
-    "Path": "/media/movies/The Matrix (1999)/poster.jpg",
-    "Name": "poster.jpg",
-    "ItemType": "File",
-    "IsExpanded": false,
-    "ChildrenLoaded": false,
-    "Children": []
+    "path": "/media/movies/The Matrix (1999)/poster.jpg",
+    "name": "poster.jpg",
+    "itemType": "File",
+    "isExpanded": false,
+    "childrenLoaded": false,
+    "children": []
   }
 ]
 ```

@@ -1,0 +1,19 @@
+PUT {{host}}/api/v1/libraries/{{$guid}}
+Authorization: Bearer {{ACCESS_TOKEN}}
+Content-Type: application/json
+
+{
+  "id": "{{$guid}}",
+  "userId": "{{$guid}}",
+  "title": "Books",
+  "libraryType": "Book",
+  "contentLocations": [
+    "/media/books"
+  ],
+  "coverImage": null,
+  "isEnabled": true,
+  "isLocked": false,
+  "downloadMetadataFromWeb": true,
+  "shouldSaveMetadataInMediaDirectories": true,
+  "shouldSkipUnchangedDirectoriesDuringScan": true
+}

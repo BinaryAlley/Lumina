@@ -1,0 +1,9 @@
+PUT {{host}}/api/v1/libraries/{{$guid}}/metadata-providers/{{$guid}}/enabled
+Authorization: Bearer {{ACCESS_TOKEN}}
+Content-Type: application/json
+
+{
+  "libraryId": "{{$guid}}",
+  "pluginId": "{{$guid}}",
+  "isEnabled": true
+}

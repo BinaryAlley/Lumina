@@ -19,7 +19,7 @@
 GET api/v1/drives/get-drives
 ```
 
-##### Get Directories Response
+##### Get Drives Response
 
 ```js
 200 Ok
@@ -28,20 +28,20 @@ GET api/v1/drives/get-drives
 ```json
 [
   {
-    "Path": "C:\\",
-    "Name": "C:\\",
-    "ItemType": "Root",
-    "IsExpanded": false,
-    "ChildrenLoaded": false,
-    "Children": []
+    "path": "C:\\",
+    "name": "C:\\",
+    "itemType": "Root",
+    "isExpanded": false,
+    "childrenLoaded": false,
+    "children": []
   },
   {
-    "Path": "D:\\",
-    "Name": "D:\\",
-    "ItemType": "Root",
-    "IsExpanded": false,
-    "ChildrenLoaded": false,
-    "Children": []
+    "path": "D:\\",
+    "name": "D:\\",
+    "itemType": "Root",
+    "isExpanded": false,
+    "childrenLoaded": false,
+    "children": []
   }
 ]
 ```

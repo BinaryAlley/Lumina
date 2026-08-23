@@ -1,0 +1,2 @@
+GET {{host}}/api/v1/themes/my-theme/archive
+Authorization: Bearer {{ACCESS_TOKEN}}

@@ -1,8 +1,8 @@
-POST {{host}}/api/v1/auth/register
+POST {{host}}/api/v1/initialization
 Content-Type: application/json
 
 {
-  "username": "JohnDoe",
+  "username": "admin",
   "password": "Abcd123$",
   "passwordConfirm": "Abcd123$",
   "use2fa": true

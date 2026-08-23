@@ -28,18 +28,18 @@ GET api/v1/directories/get-directories?path=C%3A%5CUsers%5C&includeHiddenElement
 ```json
 [
   {
-    "Items": [],
-    "Path": "/media/movies/The Matrix (1999)/",
-    "Name": "The Matrix",
-    "DateCreated": "2025-01-01T13:50:38.3183787Z",
-    "DateModified": "2025-01-01T13:40:38.3183791Z"
+    "items": [],
+    "path": "/media/movies/The Matrix (1999)/",
+    "name": "The Matrix",
+    "dateCreated": "2025-01-01T13:50:38.3183787Z",
+    "dateModified": "2025-01-01T13:40:38.3183791Z"
   },
   {
-    "Items": [],
-    "Path": "/media/movies/The Lord of the Rings - The Fellowship of the Ring (2001)/",
-    "Name": "The Lord of the Rings - The Fellowship of the Ring (2001)",
-    "DateCreated": "2025-01-01T13:50:38.3184681Z",
-    "DateModified": "2025-01-01T13:40:38.3184683Z"
+    "items": [],
+    "path": "/media/movies/The Lord of the Rings - The Fellowship of the Ring (2001)/",
+    "name": "The Lord of the Rings - The Fellowship of the Ring (2001)",
+    "dateCreated": "2025-01-01T13:50:38.3184681Z",
+    "dateModified": "2025-01-01T13:40:38.3184683Z"
   }
 ]
 ```

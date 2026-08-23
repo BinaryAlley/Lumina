@@ -1,0 +1,2 @@
+GET {{host}}/api/v1/libraries
+Authorization: Bearer {{ACCESS_TOKEN}}
