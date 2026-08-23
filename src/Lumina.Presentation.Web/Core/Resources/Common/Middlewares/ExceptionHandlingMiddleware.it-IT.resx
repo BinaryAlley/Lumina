@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -722,5 +722,20 @@
   </data>
   <data name="VolumeNumberMustBeGreaterThanZero" xml:space="preserve">
     <value>Il numero del volume deve essere maggiore di zero!</value>
+  </data>
+  <data name="PluginArchiveContainsNoAssemblies" xml:space="preserve">
+    <value>L'archivio del plugin caricato non contiene assembly!</value>
+  </data>
+  <data name="PluginArchiveCannotBeNull" xml:space="preserve">
+    <value>L'archivio del plugin non può essere nullo!</value>
+  </data>
+  <data name="PluginFileNameCannotBeEmpty" xml:space="preserve">
+    <value>Il nome del file del plugin non può essere vuoto!</value>
+  </data>
+  <data name="UnsupportedPluginFileType" xml:space="preserve">
+    <value>Il tipo di file del plugin caricato non è supportato!</value>
+  </data>
+  <data name="PluginArchiveNotReadable" xml:space="preserve">
+    <value>Non è stato possibile leggere l archivio del plugin caricato!</value>
   </data>
 </root>

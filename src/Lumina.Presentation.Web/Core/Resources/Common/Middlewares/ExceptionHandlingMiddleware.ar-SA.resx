@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -722,5 +722,20 @@
   </data>
   <data name="VolumeNumberMustBeGreaterThanZero" xml:space="preserve">
     <value>يجب أن يكون رقم المجلد أكبر من الصفر!</value>
+  </data>
+  <data name="PluginArchiveContainsNoAssemblies" xml:space="preserve">
+    <value>أرشيف المكوّن الإضافي المرفوع لا يحتوي على تجميعات!</value>
+  </data>
+  <data name="PluginArchiveCannotBeNull" xml:space="preserve">
+    <value>لا يمكن أن يكون أرشيف المكوّن الإضافي فارغاً!</value>
+  </data>
+  <data name="PluginFileNameCannotBeEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون اسم ملف المكوّن الإضافي فارغاً!</value>
+  </data>
+  <data name="UnsupportedPluginFileType" xml:space="preserve">
+    <value>نوع ملف المكوّن الإضافي المرفوع غير مدعوم!</value>
+  </data>
+  <data name="PluginArchiveNotReadable" xml:space="preserve">
+    <value>تعذّرت قراءة أرشيف المكوّن الإضافي المرفوع!</value>
   </data>
 </root>

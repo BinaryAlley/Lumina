@@ -108,6 +108,7 @@ public static class InfrastructureLayerServices
         PluginLoadResultDto pluginLoadResult = PluginLoader.LoadPlugins(pluginsDirectory, services);
         services.AddSingleton<IPluginManager>(new PluginManager(pluginLoadResult.Plugins));
         services.AddScoped<IPluginSettingsStore, PluginSettingsStore>();
+        services.AddScoped<IPluginInstaller, PluginInstaller>();
         services.AddSingleton(serviceProvider => new PluginDetectionSyncJob(
             serviceProvider.GetRequiredService<IServiceScopeFactory>(),
             serviceProvider.GetRequiredService<IPluginManager>(),

@@ -13,5 +13,6 @@ public static partial class ApiRoutes
         public const string GET_PLUGINS = "/plugins";
         public const string GET_PLUGIN_SETTINGS = "/plugins/{pluginId}/settings";
         public const string UPDATE_PLUGIN_SETTINGS = "/plugins/{pluginId}/settings";
+        public const string INSTALL_PLUGIN = "/plugins";
     }
 }

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -722,5 +722,20 @@
   </data>
   <data name="VolumeNumberMustBeGreaterThanZero" xml:space="preserve">
     <value>Bandnummer muss größer als null sein!</value>
+  </data>
+  <data name="PluginArchiveContainsNoAssemblies" xml:space="preserve">
+    <value>Das hochgeladene Plugin-Archiv enthält keine Assemblys!</value>
+  </data>
+  <data name="PluginArchiveCannotBeNull" xml:space="preserve">
+    <value>Das Plugin-Archiv darf nicht null sein!</value>
+  </data>
+  <data name="PluginFileNameCannotBeEmpty" xml:space="preserve">
+    <value>Der Dateiname des Plugins darf nicht leer sein!</value>
+  </data>
+  <data name="UnsupportedPluginFileType" xml:space="preserve">
+    <value>Der Dateityp des hochgeladenen Plugins wird nicht unterstützt!</value>
+  </data>
+  <data name="PluginArchiveNotReadable" xml:space="preserve">
+    <value>Das hochgeladene Plugin-Archiv konnte nicht gelesen werden!</value>
   </data>
 </root>

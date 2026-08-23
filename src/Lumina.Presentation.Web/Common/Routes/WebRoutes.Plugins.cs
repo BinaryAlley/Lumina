@@ -14,5 +14,6 @@ public static partial class WebRoutes
         public const string GET_PLUGINS = "{culture}/admin/manage-plugins/api-get-plugins";
         public const string GET_PLUGIN_SETTINGS = "{culture}/admin/manage-plugins/api-get-plugin-settings/{pluginId}";
         public const string UPDATE_PLUGIN_SETTINGS = "{culture}/admin/manage-plugins/api-update-plugin-settings";
+        public const string INSTALL_PLUGIN = "{culture}/admin/manage-plugins/api-install-plugin";
     }
 }

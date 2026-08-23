@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -722,5 +722,20 @@
   </data>
   <data name="VolumeNumberMustBeGreaterThanZero" xml:space="preserve">
     <value>卷号必须大于零！</value>
+  </data>
+  <data name="PluginArchiveContainsNoAssemblies" xml:space="preserve">
+    <value>上传的插件存档中不包含程序集!</value>
+  </data>
+  <data name="PluginArchiveCannotBeNull" xml:space="preserve">
+    <value>插件存档不能为空!</value>
+  </data>
+  <data name="PluginFileNameCannotBeEmpty" xml:space="preserve">
+    <value>插件文件名不能为空!</value>
+  </data>
+  <data name="UnsupportedPluginFileType" xml:space="preserve">
+    <value>不支持上传的插件文件类型!</value>
+  </data>
+  <data name="PluginArchiveNotReadable" xml:space="preserve">
+    <value>无法读取上传的插件存档!</value>
   </data>
 </root>

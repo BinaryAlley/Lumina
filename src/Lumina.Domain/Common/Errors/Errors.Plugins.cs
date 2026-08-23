@@ -18,5 +18,10 @@ public static partial class Errors
         public static Error PluginIdsListCannotBeNull => Error.Validation(description: nameof(PluginIdsListCannotBeNull));
         public static Error PluginIdsListCannotBeEmpty => Error.Validation(description: nameof(PluginIdsListCannotBeEmpty));
         public static Error LibraryMetadataProviderConfigurationNotFound => Error.NotFound(description: nameof(LibraryMetadataProviderConfigurationNotFound));
+        public static Error PluginArchiveCannotBeNull => Error.Validation(description: nameof(PluginArchiveCannotBeNull));
+        public static Error PluginFileNameCannotBeEmpty => Error.Validation(description: nameof(PluginFileNameCannotBeEmpty));
+        public static Error UnsupportedPluginFileType => Error.Validation(description: nameof(UnsupportedPluginFileType));
+        public static Error PluginArchiveNotReadable => Error.Failure(description: nameof(PluginArchiveNotReadable));
+        public static Error PluginArchiveContainsNoAssemblies => Error.Failure(description: nameof(PluginArchiveContainsNoAssemblies));
     }
 }

@@ -27,6 +27,10 @@
                 @_localizer["Plugins"]
             </h1>
         </div>
+        <div class="form-row" style="margin-bottom: 0.75rem;">
+            <button id="btn-upload-plugin" type="button" class="confirm-button">@_localizer["Upload"]</button>
+            <input id="plugin-upload-input" type="file" accept=".zip,.dll" hidden />
+        </div>
         @if (Model.Length > 0)
         {
             <table class="w-100 text-light-two">
@@ -179,14 +183,48 @@
             }
         };
 
+        const uploadButton = document.getElementById('btn-upload-plugin');
+        const uploadInput = document.getElementById('plugin-upload-input');
+        const installUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Plugins.INSTALL_PLUGIN)';
+
+        // uploads the selected plugin archive as a multipart request, keeping the antiforgery token
+        async function handleUploadInputChange() {
+            const file = uploadInput.files[0];
+            if (!file)
+                return;
+            const formData = new FormData();
+            formData.append('archive', file);
+            formData.append('__RequestVerificationToken', document.querySelector('input[name="__RequestVerificationToken"]')?.value ?? '');
+            const response = await fetch(installUrl, {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                body: formData
+            });
+            if (response.ok) {
+                notificationService.show('@_localizer["PluginUploadedRestartRequired"]', NotificationType.SUCCESS);
+                uploadInput.value = '';
+            } else {
+                notificationService.show('@_localizer["UploadFailed"]', NotificationType.ERROR);
+            }
+        }
+
+        // opens the file picker when the upload button is clicked
+        function handleUploadButtonClick() {
+            uploadInput.click();
+        }
+
         // add listeners
         document.addEventListener('click', handleSettingsToggleClick);
         document.addEventListener('click', handleSavePluginSettingsClick);
+        uploadButton.addEventListener('click', handleUploadButtonClick);
+        uploadInput.addEventListener('change', handleUploadInputChange);
 
         // register cleanup for these listeners
         cleanupFunctions.push(() => {
             document.removeEventListener('click', handleSettingsToggleClick);
             document.removeEventListener('click', handleSavePluginSettingsClick);
+            uploadButton.removeEventListener('click', handleUploadButtonClick);
+            uploadInput.removeEventListener('change', handleUploadInputChange);
         });
 
         // store all cleanups for this view on window object using the scriptId

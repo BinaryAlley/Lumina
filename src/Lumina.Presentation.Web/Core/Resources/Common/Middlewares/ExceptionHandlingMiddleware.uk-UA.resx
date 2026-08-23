@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -722,5 +722,20 @@
   </data>
   <data name="VolumeNumberMustBeGreaterThanZero" xml:space="preserve">
     <value>Номер тому має бути більшим за нуль!</value>
+  </data>
+  <data name="PluginArchiveContainsNoAssemblies" xml:space="preserve">
+    <value>Архів завантаженого плагіна не містить збірок!</value>
+  </data>
+  <data name="PluginArchiveCannotBeNull" xml:space="preserve">
+    <value>Архів плагіна не може бути null!</value>
+  </data>
+  <data name="PluginFileNameCannotBeEmpty" xml:space="preserve">
+    <value>Ім'я файлу плагіна не може бути порожнім!</value>
+  </data>
+  <data name="UnsupportedPluginFileType" xml:space="preserve">
+    <value>Тип файлу завантаженого плагіна не підтримується!</value>
+  </data>
+  <data name="PluginArchiveNotReadable" xml:space="preserve">
+    <value>Не вдалося прочитати архів завантаженого плагіна!</value>
   </data>
 </root>
