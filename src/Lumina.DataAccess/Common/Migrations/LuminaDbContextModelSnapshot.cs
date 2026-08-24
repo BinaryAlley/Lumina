@@ -270,6 +270,12 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnOrder(0);
 
+                    b.Property<bool>("CanDownloadMetadataFromWeb")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(true)
+                        .HasColumnOrder(6);
+
                     b.Property<string>("CoverImage")
                         .HasMaxLength(255)
                         .HasColumnType("TEXT")
@@ -282,12 +288,6 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.Property<DateTime>("CreatedOnUtc")
                         .HasColumnType("TEXT")
                         .HasColumnOrder(9);
-
-                    b.Property<bool>("DownloadMetadataFromWeb")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
-                        .HasDefaultValue(true)
-                        .HasColumnOrder(6);
 
                     b.Property<bool>("IsEnabled")
                         .ValueGeneratedOnAdd()
@@ -535,6 +535,9 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnOrder(28);
 
+                    b.Property<string>("CoverImagePath")
+                        .HasColumnType("TEXT");
+
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("TEXT")
                         .HasColumnOrder(33);
@@ -685,8 +688,8 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnOrder(34);
 
-                    b.Property<int?>("VolumeNumber")
-                        .HasColumnType("INTEGER")
+                    b.Property<float?>("VolumeNumber")
+                        .HasColumnType("REAL")
                         .HasColumnOrder(20);
 
                     b.HasKey("Id");
@@ -696,6 +699,51 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.HasIndex("LibraryId", "Path");
 
                     b.ToTable("Books", (string)null);
+                });
+
+            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.Plugins.LibraryArtworkProviderConfigurationEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(0);
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(6);
+
+                    b.Property<DateTime>("CreatedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(5);
+
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(3);
+
+                    b.Property<Guid>("LibraryId")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(1);
+
+                    b.Property<Guid>("PluginId")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(2);
+
+                    b.Property<int>("Rank")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(4);
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(8);
+
+                    b.Property<DateTime?>("UpdatedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(7);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LibraryId", "PluginId");
+
+                    b.ToTable("LibraryArtworkProviderConfigurations", (string)null);
                 });
 
             modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.Plugins.LibraryMetadataProviderConfigurationEntity", b =>
@@ -964,10 +1012,6 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnOrder(5);
 
-                    b.Property<bool>("IgnoreThePrefixForAlphaPicker")
-                        .HasColumnType("INTEGER")
-                        .HasColumnOrder(4);
-
                     b.Property<bool>("IsPaginationEnabled")
                         .HasColumnType("INTEGER")
                         .HasColumnOrder(2);
@@ -979,6 +1023,14 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.Property<int>("ItemsPerPage")
                         .HasColumnType("INTEGER")
                         .HasColumnOrder(3);
+
+                    b.Property<bool>("ShouldAggregateMetadataWhenMissing")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(10);
+
+                    b.Property<bool>("ShouldIgnoreThePrefixForAlphaPicker")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(4);
 
                     b.Property<Guid?>("UpdatedBy")
                         .HasColumnType("TEXT")

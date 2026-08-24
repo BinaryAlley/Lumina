@@ -154,7 +154,8 @@ public class GetBooksEndpointSummary : Summary<GetBooksEndpoint, GetBooksRequest
                         LastMetadataUpdateUtc: default,
                         MetadataProvider: default,
                         CreatedOnUtc: DateTime.UtcNow,
-                        UpdatedOnUtc: default
+                        UpdatedOnUtc: default,
+                        CoverPath: null
                     ),
                     new(
                         Id: Guid.NewGuid(),
@@ -260,7 +261,8 @@ public class GetBooksEndpointSummary : Summary<GetBooksEndpoint, GetBooksRequest
                         LastMetadataUpdateUtc: default,
                         MetadataProvider: default,
                         CreatedOnUtc: DateTime.UtcNow,
-                        UpdatedOnUtc: default
+                        UpdatedOnUtc: default,
+                        CoverPath: null
                     )
                 ],
                 CurrentPage = 1,

@@ -137,7 +137,7 @@ public class BookDto
     /// <summary>
     /// Gets the volume or book number in the series, if applicable.
     /// </summary>
-    public int? VolumeNumber { get; init; }
+    public float? VolumeNumber { get; init; }
 
     /// <summary>
     /// Gets the series id, if the book is part of a series.

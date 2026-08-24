@@ -5,7 +5,6 @@ using Lumina.Presentation.Web.Common.DTO.Libraries;
 using Lumina.Presentation.Web.Common.Requests.Libraries;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Core.Endpoints.Common;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Text;
@@ -71,7 +70,7 @@ public class GetLibraryItemsEndpoint : BaseEndpoint<GetBooksLiteRequest, IResult
             endpoint.Append($"&searchTerm={Uri.EscapeDataString(query.SearchTerm)}");
         if (!string.IsNullOrWhiteSpace(query.FilterAlphaKey))
             endpoint.Append($"&filterAlphaKey={Uri.EscapeDataString(query.FilterAlphaKey)}");
-        endpoint.Append($"&ignoreThePrefixForAlphaPicker={query.IgnoreThePrefixForAlphaPicker}");
+        endpoint.Append($"&shouldIgnoreThePrefixForAlphaPicker={query.ShouldIgnoreThePrefixForAlphaPicker}");
         if (!string.IsNullOrWhiteSpace(query.SortBy))
             endpoint.Append($"&sortBy={Uri.EscapeDataString(query.SortBy)}");
         if (query.SortOrder is not null)

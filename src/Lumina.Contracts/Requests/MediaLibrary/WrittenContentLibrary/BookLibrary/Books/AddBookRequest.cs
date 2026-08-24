@@ -39,7 +39,7 @@ public record AddBookRequest(
     WrittenContentMetadataDto? Metadata,
     BookFormat? Format,
     string? Edition,
-    int? VolumeNumber,
+    float? VolumeNumber,
     BookSeriesDto? Series,
     string? ASIN,
     string? GoodreadsId,
