@@ -30,7 +30,7 @@ internal static partial class OpenLibraryMapper
     /// <summary>
     /// Matches a volume number in a series or volume string.
     /// </summary>
-    [GeneratedRegex(@"\b(?:volume|vol\.?|book|no\.?|#)\s*(?<number>\d+)\b", RegexOptions.IgnoreCase)]
+    [GeneratedRegex(@"\b(?:volume|vol\.?|book|no\.?|#)\s*(?<number>\d+(?:\.\d+)?)\b", RegexOptions.IgnoreCase)]
     private static partial Regex VolumePattern();
 
     /// <summary>
@@ -111,8 +111,8 @@ internal static partial class OpenLibraryMapper
                     editionRelease.Date?.Year ?? editionRelease.Year,
                     NullIfWhiteSpace(releaseCountry),
                     NullIfWhiteSpace(releaseVersion)),
-                genreNames.Select(name => new GenreDto(name)).ToList(),
-                subjects.Select(name => new TagDto(name)).ToList(),
+                [.. genreNames.Select(name => new GenreDto(name))],
+                [.. subjects.Select(name => new TagDto(name))],
                 MapLanguage(currentLanguageCode),
                 MapLanguage(originalLanguageCode),
                 edition?.Publishers.FirstOrDefault() ?? fallback?.Publishers.FirstOrDefault(),
@@ -347,14 +347,14 @@ internal static partial class OpenLibraryMapper
     /// </summary>
     /// <param name="candidates">The strings that may contain a volume number.</param>
     /// <returns>The parsed volume number, or <see langword="null"/> when no candidate contains one.</returns>
-    private static int? ParseVolumeNumber(params string?[] candidates)
+    private static float? ParseVolumeNumber(params string?[] candidates)
     {
         foreach (string? candidate in candidates)
         {
             if (string.IsNullOrWhiteSpace(candidate))
                 continue;
             Match match = VolumePattern().Match(candidate);
-            if (match.Success && int.TryParse(match.Groups["number"].Value, out int number))
+            if (match.Success && float.TryParse(match.Groups["number"].Value, NumberStyles.Float, CultureInfo.InvariantCulture, out float number))
                 return number;
         }
         return null;

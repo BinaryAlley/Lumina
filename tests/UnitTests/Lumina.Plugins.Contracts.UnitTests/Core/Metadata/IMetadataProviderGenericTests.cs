@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Contracts.Fixtures.Core.DTO.Common;
 using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Plugins.Contracts.Core.Metadata;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -15,13 +15,14 @@ using System.Threading.Tasks;
 namespace Lumina.Plugins.Contracts.UnitTests.Core.Metadata;
 
 /// <summary>
-/// Contains unit tests for the <see cref="IRemoteMetadataProvider{TLookup, TMetadata}"/> interface.
+/// Contains unit tests for the <see cref="IMetadataProvider{TLookup, TMetadata}"/> interface.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class IRemoteMetadataProviderGenericTests
+public class IMetadataProviderGenericTests
 {
     private readonly BookMetadataLookupDtoFixture _bookMetadataLookupDtoFixture = new();
     private readonly BookMetadataDtoFixture _bookMetadataDtoFixture = new();
+    private readonly OtherMetadataLookupDtoFixture _otherMetadataLookupDtoFixture = new();
 
     [Fact]
     public async Task GetSearchResultsAsync_WhenCalledThroughBaseInterface_ShouldForwardToTypedImplementation()
@@ -31,7 +32,7 @@ public class IRemoteMetadataProviderGenericTests
         CancellationToken cancellationToken = CancellationToken.None;
         BookMetadataDto expectedMetadata = _bookMetadataDtoFixture.Create(title: "Search Result", includeOptionalProperties: false);
         TestBookMetadataProvider provider = new(expectedMetadata);
-        IRemoteMetadataProvider baseProvider = provider;
+        IMetadataProvider baseProvider = provider;
 
         // Act
         IReadOnlyList<MetadataDto> result = await baseProvider.GetSearchResultsAsync(lookup, cancellationToken);
@@ -51,7 +52,7 @@ public class IRemoteMetadataProviderGenericTests
         CancellationToken cancellationToken = CancellationToken.None;
         BookMetadataDto expectedMetadata = _bookMetadataDtoFixture.Create(title: "Exact Result", includeOptionalProperties: false);
         TestBookMetadataProvider provider = new(expectedMetadata);
-        IRemoteMetadataProvider baseProvider = provider;
+        IMetadataProvider baseProvider = provider;
 
         // Act
         MetadataDto? result = await baseProvider.GetMetadataAsync(lookup, cancellationToken);
@@ -66,9 +67,9 @@ public class IRemoteMetadataProviderGenericTests
     public async Task GetSearchResultsAsync_WhenLookupIsOfAnotherRuntimeType_ShouldThrowInvalidCastException()
     {
         // Arrange
-        MetadataLookupDto otherLookup = new OtherMetadataLookupDto();
+        MetadataLookupDto otherLookup = _otherMetadataLookupDtoFixture.Create();
         TestBookMetadataProvider provider = new(_bookMetadataDtoFixture.Create(title: "Search Result", includeOptionalProperties: false));
-        IRemoteMetadataProvider baseProvider = provider;
+        IMetadataProvider baseProvider = provider;
 
         // Act
         async Task Act()
@@ -85,9 +86,9 @@ public class IRemoteMetadataProviderGenericTests
     public async Task GetMetadataAsync_WhenLookupIsOfAnotherRuntimeType_ShouldThrowInvalidCastException()
     {
         // Arrange
-        MetadataLookupDto otherLookup = new OtherMetadataLookupDto();
+        MetadataLookupDto otherLookup = _otherMetadataLookupDtoFixture.Create();
         TestBookMetadataProvider provider = new(_bookMetadataDtoFixture.Create(title: "Exact Result", includeOptionalProperties: false));
-        IRemoteMetadataProvider baseProvider = provider;
+        IMetadataProvider baseProvider = provider;
 
         // Act
         async Task Act()
@@ -104,7 +105,7 @@ public class IRemoteMetadataProviderGenericTests
     /// Test double for the typed metadata provider interface that records the forwarded arguments.
     /// </summary>
     [ExcludeFromCodeCoverage]
-    private sealed class TestBookMetadataProvider : IRemoteMetadataProvider<BookMetadataLookupDto, BookMetadataDto>
+    private sealed class TestBookMetadataProvider : IMetadataProvider<BookMetadataLookupDto, BookMetadataDto>
     {
         private readonly BookMetadataDto _metadata;
 
@@ -131,7 +132,7 @@ public class IRemoteMetadataProviderGenericTests
         public string Name => "Test Provider";
 
         /// <inheritdoc/>
-        public LibraryType SupportedLibraryType => LibraryType.Book;
+        public IReadOnlyList<LibraryType> SupportedLibraryTypes => [LibraryType.Book];
 
         /// <inheritdoc/>
         public bool RequiresWebAccess => false;
@@ -152,10 +153,4 @@ public class IRemoteMetadataProviderGenericTests
             return Task.FromResult<BookMetadataDto?>(_metadata);
         }
     }
-
-    /// <summary>
-    /// Test double deriving from <see cref="MetadataLookupDto"/> for a runtime type other than <see cref="BookMetadataLookupDto"/>.
-    /// </summary>
-    [ExcludeFromCodeCoverage]
-    private sealed record OtherMetadataLookupDto : MetadataLookupDto;
 }

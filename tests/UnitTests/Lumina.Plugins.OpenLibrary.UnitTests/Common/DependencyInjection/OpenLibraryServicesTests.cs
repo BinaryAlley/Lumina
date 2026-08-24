@@ -60,8 +60,8 @@ public class OpenLibraryServicesTests
         ServiceProvider serviceProvider = services.BuildServiceProvider();
 
         // Assert
-        Assert.NotNull(serviceProvider.GetKeyedService<IRemoteMetadataProvider>(pluginId));
-        Assert.Null(serviceProvider.GetKeyedService<IRemoteMetadataProvider>(Guid.NewGuid()));
+        Assert.NotNull(serviceProvider.GetKeyedService<IMetadataProvider>(pluginId));
+        Assert.Null(serviceProvider.GetKeyedService<IMetadataProvider>(Guid.NewGuid()));
     }
 
     [Fact]
@@ -79,7 +79,7 @@ public class OpenLibraryServicesTests
     }
 
     [Fact]
-    public void AddOpenLibraryBookMetadataProvider_WhenSettingsCallbackIsProvided_ShouldApplyTheCallbackToTheRuntimeSettings()
+    public async Task AddOpenLibraryBookMetadataProvider_WhenSettingsCallbackIsProvided_ShouldApplyTheCallbackToTheRuntimeSettings()
     {
         // Arrange
         ServiceCollection services = new();
@@ -88,16 +88,17 @@ public class OpenLibraryServicesTests
         services.AddOpenLibraryBookMetadataProvider(
             pluginId: Guid.NewGuid(),
             settingsCallback: settings => settings.ContactEmail = "callback@example.com");
-        ServiceProvider serviceProvider = services.BuildServiceProvider();
+        using ServiceProvider serviceProvider = services.BuildServiceProvider();
 
         // Assert
-        OpenLibrarySettingsDto settings = serviceProvider.GetRequiredService<OpenLibrarySettingsDto>();
+        OpenLibrarySettingsProvider settingsProvider = serviceProvider.GetRequiredService<OpenLibrarySettingsProvider>();
+        OpenLibrarySettingsDto settings = await settingsProvider.GetAsync(CancellationToken.None);
         Assert.Equal("callback@example.com", settings.ContactEmail);
         Assert.Equal(10, settings.SearchResultLimit);
     }
 
     [Fact]
-    public void AddOpenLibraryBookMetadataProvider_WhenASettingsStoreIsRegistered_ShouldApplyTheStoredSettings()
+    public async Task AddOpenLibraryBookMetadataProvider_WhenASettingsStoreIsRegistered_ShouldApplyTheStoredSettings()
     {
         // Arrange
         Guid pluginId = Guid.NewGuid();
@@ -112,16 +113,17 @@ public class OpenLibraryServicesTests
 
         // Act
         services.AddOpenLibraryBookMetadataProvider(pluginId: pluginId);
-        ServiceProvider serviceProvider = services.BuildServiceProvider();
+        using ServiceProvider serviceProvider = services.BuildServiceProvider();
 
         // Assert
-        OpenLibrarySettingsDto settings = serviceProvider.GetRequiredService<OpenLibrarySettingsDto>();
+        OpenLibrarySettingsProvider settingsProvider = serviceProvider.GetRequiredService<OpenLibrarySettingsProvider>();
+        OpenLibrarySettingsDto settings = await settingsProvider.GetAsync(CancellationToken.None);
         Assert.Equal(25, settings.SearchResultLimit);
         Assert.Equal(50, settings.WorkEditionLimit);
     }
 
     [Fact]
-    public void AddOpenLibraryBookMetadataProvider_WhenTheSettingsStoreReturnsNull_ShouldKeepTheDefaultSettings()
+    public async Task AddOpenLibraryBookMetadataProvider_WhenTheSettingsStoreReturnsNull_ShouldKeepTheDefaultSettings()
     {
         // Arrange
         Guid pluginId = Guid.NewGuid();
@@ -133,27 +135,30 @@ public class OpenLibraryServicesTests
 
         // Act
         services.AddOpenLibraryBookMetadataProvider(pluginId: pluginId);
-        ServiceProvider serviceProvider = services.BuildServiceProvider();
+        using ServiceProvider serviceProvider = services.BuildServiceProvider();
 
         // Assert
-        OpenLibrarySettingsDto settings = serviceProvider.GetRequiredService<OpenLibrarySettingsDto>();
+        OpenLibrarySettingsProvider settingsProvider = serviceProvider.GetRequiredService<OpenLibrarySettingsProvider>();
+        OpenLibrarySettingsDto settings = await settingsProvider.GetAsync(CancellationToken.None);
         Assert.Equal(10, settings.SearchResultLimit);
         Assert.Equal(50, settings.WorkEditionLimit);
     }
 
     [Fact]
-    public void AddOpenLibraryBookMetadataProvider_WhenResolvedAcrossScopes_ShouldReturnDistinctRuntimeSettingsInstances()
+    public async Task AddOpenLibraryBookMetadataProvider_WhenResolvedAcrossScopes_ShouldReturnDistinctRuntimeSettingsInstances()
     {
         // Arrange
         ServiceCollection services = new();
         services.AddOpenLibraryBookMetadataProvider(pluginId: Guid.NewGuid());
-        ServiceProvider serviceProvider = services.BuildServiceProvider();
+        using ServiceProvider serviceProvider = services.BuildServiceProvider();
 
         // Act
         using IServiceScope firstScope = serviceProvider.CreateScope();
         using IServiceScope secondScope = serviceProvider.CreateScope();
-        OpenLibrarySettingsDto first = firstScope.ServiceProvider.GetRequiredService<OpenLibrarySettingsDto>();
-        OpenLibrarySettingsDto second = secondScope.ServiceProvider.GetRequiredService<OpenLibrarySettingsDto>();
+        OpenLibrarySettingsProvider firstProvider = firstScope.ServiceProvider.GetRequiredService<OpenLibrarySettingsProvider>();
+        OpenLibrarySettingsProvider secondProvider = secondScope.ServiceProvider.GetRequiredService<OpenLibrarySettingsProvider>();
+        OpenLibrarySettingsDto first = await firstProvider.GetAsync(CancellationToken.None);
+        OpenLibrarySettingsDto second = await secondProvider.GetAsync(CancellationToken.None);
 
         // Assert
         Assert.NotSame(first, second);
