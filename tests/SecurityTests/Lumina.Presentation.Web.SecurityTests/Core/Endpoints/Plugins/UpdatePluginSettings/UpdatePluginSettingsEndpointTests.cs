@@ -1,18 +1,15 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Common;
 using Lumina.Presentation.Web.Common.Exceptions;
 using Lumina.Presentation.Web.Common.Requests.Plugins;
 using Lumina.Presentation.Web.Core.Endpoints.Plugins.UpdatePluginSettings;
+using Lumina.Presentation.Web.Fixtures.Common.DTO.Common;
 using Lumina.Presentation.Web.Fixtures.Common.Requests.Plugins;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.SecurityTests.Common.Setup;
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Plugins.UpdatePluginSettings;
@@ -24,6 +21,7 @@ namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Plugins.UpdatePlu
 public class UpdatePluginSettingsEndpointTests : IClassFixture<LuminaWebFactory>
 {
     private readonly LuminaWebFactory _apiFactory;
+    private readonly ProblemDetailsDtoFixture _problemDetailsDtoFixture = new();
     private readonly UpdatePluginSettingsRequestFixture _updatePluginSettingsRequestFixture = new();
 
     /// <summary>
@@ -89,7 +87,7 @@ public class UpdatePluginSettingsEndpointTests : IClassFixture<LuminaWebFactory>
         UpdatePluginSettingsRequest request = _updatePluginSettingsRequestFixture.Create();
         string endpoint = $"plugins/{request.PluginId}/settings";
         _apiFactory.ApiClientStub.RegisterPutException(endpoint, new ApiException(
-            new ProblemDetailsDto { Title = "General.Failure", Detail = "PluginNotFound" },
+            _problemDetailsDtoFixture.Create(title: "General.Failure", detail: "PluginNotFound"),
             HttpStatusCode.NotFound));
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
         HttpRequestMessage updateRequest = new(HttpMethod.Put, "/en-us/admin/manage-plugins/api-update-plugin-settings")

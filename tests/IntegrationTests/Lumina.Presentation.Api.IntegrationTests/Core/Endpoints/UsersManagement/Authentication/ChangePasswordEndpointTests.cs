@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.DataAccess.Core.UoW;
@@ -29,6 +30,7 @@ public class ChangePasswordEndpointTests : IClassFixture<AuthenticatedLuminaApiF
 {
     private HttpClient _client;
     private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly ChangePasswordRequestFixture _changePasswordRequestFixture = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -57,11 +59,11 @@ public class ChangePasswordEndpointTests : IClassFixture<AuthenticatedLuminaApiF
     public async Task ChangePassword_WhenCalledWithValidRequest_ShouldChangePasswordSuccessfully()
     {
         // Arrange
-        ChangePasswordRequest request = new(
-            Username: _apiFactory.TestUsername,
-            CurrentPassword: "TestPass123!",
-            NewPassword: "NewPass123!",
-            NewPasswordConfirm: "NewPass123!"
+        ChangePasswordRequest request = _changePasswordRequestFixture.Create(
+            username: _apiFactory.TestUsername,
+            currentPassword: "TestPass123!",
+            newPassword: "NewPass123!",
+            newPasswordConfirm: "NewPass123!"
         );
 
         // Act
@@ -82,11 +84,11 @@ public class ChangePasswordEndpointTests : IClassFixture<AuthenticatedLuminaApiF
     public async Task ChangePassword_WhenPasswordsDoNotMatch_ShouldReturnValidationError()
     {
         // Arrange
-        ChangePasswordRequest request = new(
-            Username: _apiFactory.TestUsername,
-            CurrentPassword: "OldPass123!",
-            NewPassword: "NewPass123!",
-            NewPasswordConfirm: "DifferentPass123!"
+        ChangePasswordRequest request = _changePasswordRequestFixture.Create(
+            username: _apiFactory.TestUsername,
+            currentPassword: "OldPass123!",
+            newPassword: "NewPass123!",
+            newPasswordConfirm: "DifferentPass123!"
         );
 
         // Act
@@ -116,11 +118,11 @@ public class ChangePasswordEndpointTests : IClassFixture<AuthenticatedLuminaApiF
     public async Task ChangePassword_WhenUserDoesNotExist_ShouldReturnNotFound()
     {
         // Arrange
-        ChangePasswordRequest request = new(
-            Username: "nonexistentuser",
-            CurrentPassword: "OldPass123!",
-            NewPassword: "NewPass123!",
-            NewPasswordConfirm: "NewPass123!"
+        ChangePasswordRequest request = _changePasswordRequestFixture.Create(
+            username: "nonexistentuser",
+            currentPassword: "OldPass123!",
+            newPassword: "NewPass123!",
+            newPasswordConfirm: "NewPass123!"
         );
 
         // Act
@@ -145,11 +147,11 @@ public class ChangePasswordEndpointTests : IClassFixture<AuthenticatedLuminaApiF
     public async Task ChangePassword_WhenCurrentPasswordIsIncorrect_ShouldReturnForbiddenResult()
     {
         // Arrange
-        ChangePasswordRequest request = new(
-            Username: _apiFactory.TestUsername,
-            CurrentPassword: "WrongPass123!",
-            NewPassword: "NewPass123!",
-            NewPasswordConfirm: "NewPass123!"
+        ChangePasswordRequest request = _changePasswordRequestFixture.Create(
+            username: _apiFactory.TestUsername,
+            currentPassword: "WrongPass123!",
+            newPassword: "NewPass123!",
+            newPasswordConfirm: "NewPass123!"
         );
 
         // Act
@@ -206,11 +208,11 @@ public class ChangePasswordEndpointTests : IClassFixture<AuthenticatedLuminaApiF
     public async Task ChangePassword_WhenCancellationRequested_ShouldThrowTaskCanceledException()
     {
         // Arrange
-        ChangePasswordRequest request = new(
-            Username: _apiFactory.TestUsername,
-            CurrentPassword: "OldPass123!",
-            NewPassword: "NewPass123!",
-            NewPasswordConfirm: "NewPass123!"
+        ChangePasswordRequest request = _changePasswordRequestFixture.Create(
+            username: _apiFactory.TestUsername,
+            currentPassword: "OldPass123!",
+            newPassword: "NewPass123!",
+            newPasswordConfirm: "NewPass123!"
         );
         using CancellationTokenSource cts = new();
 

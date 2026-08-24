@@ -7,13 +7,13 @@ using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Core.MediaLibrary.Management.Queries.GetLibraries;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Lumina.Application.Fixtures.Core.MediaLibrary.Management.Queries.GetLibraries;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
 using Lumina.Domain.Common.Primitives;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -31,6 +31,7 @@ public class GetLibrariesQueryHandlerTests
     private readonly IAuthorizationService _mockAuthorizationService;
     private readonly ICurrentUserService _mockCurrentUserService;
     private readonly GetLibrariesQueryHandler _sut;
+    private readonly GetLibrariesQueryFixture _getLibrariesQueryFixture = new();
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
     private readonly Guid _userId;
 
@@ -65,7 +66,7 @@ public class GetLibrariesQueryHandlerTests
         _mockLibraryRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(Result.From<IEnumerable<LibraryEntity>>(libraries));
 
         // Act
-        Result<LibraryResponse[]> result = await _sut.HandleAsync(new GetLibrariesQuery(), CancellationToken.None);
+        Result<LibraryResponse[]> result = await _sut.HandleAsync(_getLibrariesQueryFixture.Create(), CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -88,7 +89,7 @@ public class GetLibrariesQueryHandlerTests
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>()).Returns(false);
 
         // Act
-        Result<LibraryResponse[]> result = await _sut.HandleAsync(new GetLibrariesQuery(), CancellationToken.None);
+        Result<LibraryResponse[]> result = await _sut.HandleAsync(_getLibrariesQueryFixture.Create(), CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -103,7 +104,7 @@ public class GetLibrariesQueryHandlerTests
         _mockCurrentUserService.UserId.Returns((Guid?)null);
 
         // Act
-        Result<LibraryResponse[]> result = await _sut.HandleAsync(new GetLibrariesQuery(), CancellationToken.None);
+        Result<LibraryResponse[]> result = await _sut.HandleAsync(_getLibrariesQueryFixture.Create(), CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
@@ -119,7 +120,7 @@ public class GetLibrariesQueryHandlerTests
             .Returns(Error.Failure(description: "Failed to get libraries"));
 
         // Act
-        Result<LibraryResponse[]> result = await _sut.HandleAsync(new GetLibrariesQuery(), CancellationToken.None);
+        Result<LibraryResponse[]> result = await _sut.HandleAsync(_getLibrariesQueryFixture.Create(), CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);

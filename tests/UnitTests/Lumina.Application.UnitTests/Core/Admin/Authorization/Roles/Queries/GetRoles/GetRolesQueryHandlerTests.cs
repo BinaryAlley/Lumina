@@ -6,6 +6,7 @@ using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Core.Admin.Authorization.Roles.Queries.GetRoles;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Fixtures.Core.Admin.Authorization.Roles.Queries.GetRoles;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.Domain.Common.Primitives;
@@ -31,6 +32,7 @@ public class GetRolesQueryHandlerTests
     private readonly IRoleRepository _mockRoleRepository;
     private readonly GetRolesQueryHandler _sut;
     private readonly GetRolesQueryFixture _getRolesQueryFixture = new();
+    private readonly RoleEntityFixture _roleEntityFixture = new();
     private readonly Guid _userId;
 
     /// <summary>
@@ -114,8 +116,8 @@ public class GetRolesQueryHandlerTests
         GetRolesQuery query = _getRolesQueryFixture.Create();
         IEnumerable<RoleEntity> roles =
         [
-            new RoleEntity { Id = Guid.NewGuid(), RoleName = "Admin" },
-            new RoleEntity { Id = Guid.NewGuid(), RoleName = "User" }
+            _roleEntityFixture.Create(roleName: "Admin"),
+            _roleEntityFixture.Create(roleName: "User")
         ];
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())

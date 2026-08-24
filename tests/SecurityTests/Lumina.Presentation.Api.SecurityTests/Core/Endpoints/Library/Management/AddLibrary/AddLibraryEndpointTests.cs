@@ -1,19 +1,16 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.Management;
 using Lumina.Contracts.Requests.MediaLibrary.Management;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
-using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Library.Management.AddLibrary;
@@ -26,6 +23,7 @@ public class AddLibraryEndpointTests : IClassFixture<LuminaApiFactory>
 {
     private readonly HttpClient _client;
     private readonly LuminaApiFactory _apiFactory;
+    private readonly AddLibraryRequestFixture _addLibraryRequestFixture = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
@@ -45,16 +43,16 @@ public class AddLibraryEndpointTests : IClassFixture<LuminaApiFactory>
     public async Task AddLibrary_WhenUnauthorized_ShouldReturnUnauthorizedResult()
     {
         // Arrange
-        AddLibraryRequest request = new(
-            Title: "New Library",
-            LibraryType: "EBook",
-            ContentLocations: ["C:/Media"],
-            CoverImage: null,
-            IsEnabled: true,
-            IsLocked: false,
-            DownloadMetadataFromWeb: true,
-            ShouldSaveMetadataInMediaDirectories: false,
-            ShouldSkipUnchangedDirectoriesDuringScan: true
+        AddLibraryRequest request = _addLibraryRequestFixture.Create(
+            title: "New Library",
+            libraryType: "EBook",
+            contentLocations: ["C:/Media"],
+            coverImage: null,
+            isEnabled: true,
+            isLocked: false,
+            canDownloadMetadataFromWeb: true,
+            shouldSaveMetadataInMediaDirectories: false,
+            shouldSkipUnchangedDirectoriesDuringScan: true
         );
 
         // Act
@@ -82,16 +80,16 @@ public class AddLibraryEndpointTests : IClassFixture<LuminaApiFactory>
         // Arrange
         HttpClient client = _apiFactory.CreateClient();
         await _apiFactory.CreateAndAuthenticateAdminUserAsync(client);
-        AddLibraryRequest request = new(
-            Title: maliciousTitle,
-            LibraryType: "EBook",
-            ContentLocations: ["C:/Media"],
-            CoverImage: null,
-            IsEnabled: true,
-            IsLocked: false,
-            DownloadMetadataFromWeb: true,
-            ShouldSaveMetadataInMediaDirectories: false,
-            ShouldSkipUnchangedDirectoriesDuringScan: true
+        AddLibraryRequest request = _addLibraryRequestFixture.Create(
+            title: maliciousTitle,
+            libraryType: "EBook",
+            contentLocations: ["C:/Media"],
+            coverImage: null,
+            isEnabled: true,
+            isLocked: false,
+            canDownloadMetadataFromWeb: true,
+            shouldSaveMetadataInMediaDirectories: false,
+            shouldSkipUnchangedDirectoriesDuringScan: true
         );
 
         // Act

@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
 using Lumina.Presentation.Web.Common.DTO.Themes;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -15,6 +14,8 @@ namespace Lumina.Presentation.Web.Fixtures.Common.DTO.Themes;
 [ExcludeFromCodeCoverage]
 public class ThemePageDtoFixture
 {
+    private readonly Faker _faker = new();
+
     /// <summary>
     /// Creates a new <see cref="ThemePageDto"/> instance with randomized test data.
     /// </summary>
@@ -29,12 +30,11 @@ public class ThemePageDtoFixture
         string? description = null,
         IReadOnlyDictionary<string, object?>? pageData = null)
     {
-        Faker faker = new();
         return new ThemePageDto
         {
-            PageKey = pageKey ?? faker.Lorem.Word(),
-            Title = title ?? faker.Lorem.Sentence(),
-            Description = description ?? faker.Lorem.Sentence(),
+            PageKey = pageKey ?? _faker.Lorem.Word(),
+            Title = title ?? _faker.Lorem.Sentence(),
+            Description = description ?? _faker.Lorem.Sentence(),
             PageData = pageData ?? new Dictionary<string, object?>()
         };
     }

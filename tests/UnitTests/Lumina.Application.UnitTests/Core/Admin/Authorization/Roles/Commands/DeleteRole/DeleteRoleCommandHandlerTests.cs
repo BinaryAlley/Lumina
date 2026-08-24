@@ -7,6 +7,7 @@ using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.Admin.Authorization.Roles.Commands.DeleteRole;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Fixtures.Core.Admin.Authorization.Roles.Commands.DeleteRole;
 using Lumina.Domain.Common.Primitives;
 using NSubstitute;
@@ -30,6 +31,7 @@ public class DeleteRoleCommandHandlerTests
     private readonly IRoleRepository _mockRoleRepository;
     private readonly DeleteRoleCommandHandler _sut;
     private readonly DeleteRoleCommandFixture _deleteRoleCommandFixture = new();
+    private readonly RoleEntityFixture _roleEntityFixture = new();
     private readonly Guid _userId;
 
     /// <summary>
@@ -115,7 +117,7 @@ public class DeleteRoleCommandHandlerTests
     {
         // Arrange
         DeleteRoleCommand command = _deleteRoleCommandFixture.Create();
-        RoleEntity adminRole = new() { Id = command.RoleId, RoleName = "Admin" };
+        RoleEntity adminRole = _roleEntityFixture.Create(id: command.RoleId, roleName: "Admin");
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(true);
@@ -157,7 +159,7 @@ public class DeleteRoleCommandHandlerTests
     {
         // Arrange
         DeleteRoleCommand command = _deleteRoleCommandFixture.Create();
-        RoleEntity role = new() { Id = command.RoleId, RoleName = "TestRole" };
+        RoleEntity role = _roleEntityFixture.Create(id: command.RoleId, roleName: "TestRole");
         Error error = Error.Failure("Database.Error", "Failed to delete role");
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
@@ -181,7 +183,7 @@ public class DeleteRoleCommandHandlerTests
     {
         // Arrange
         DeleteRoleCommand command = _deleteRoleCommandFixture.Create();
-        RoleEntity role = new() { Id = command.RoleId, RoleName = "TestRole" };
+        RoleEntity role = _roleEntityFixture.Create(id: command.RoleId, roleName: "TestRole");
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(true);

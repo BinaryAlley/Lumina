@@ -1,6 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
+using Lumina.Contracts.Fixtures.Core.Requests.Authorization;
+using Lumina.Contracts.Fixtures.Core.Responses.Authorization;
 using Lumina.Contracts.Requests.Authorization;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.Domain.Common.Primitives;
@@ -27,6 +29,8 @@ public class UpdateUserRoleAndPermissionsEndpointTests
 {
     private readonly ICommandHandler<UpdateUserRoleAndPermissionsCommand, Result<AuthorizationResponse>> _mockHandler;
     private readonly UpdateUserRoleAndPermissionsEndpoint _sut;
+    private readonly UpdateUserRoleAndPermissionsRequestFixture _updateUserRoleAndPermissionsRequestFixture = new();
+    private readonly AuthorizationResponseFixture _authorizationResponseFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UpdateUserRoleAndPermissionsEndpointTests"/> class.
@@ -41,16 +45,11 @@ public class UpdateUserRoleAndPermissionsEndpointTests
     public async Task ExecuteAsync_WhenSuccessful_ShouldReturnOkResultWithAuthorization()
     {
         // Arrange
-        UpdateUserRoleAndPermissionsRequest request = new(
-            Guid.NewGuid(),
-            Guid.NewGuid(),
-            [Guid.NewGuid()]
-        );
+        UpdateUserRoleAndPermissionsRequest request = _updateUserRoleAndPermissionsRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
-        AuthorizationResponse expectedResponse = new(
-            Guid.NewGuid(),
-            "Admin",
-            new HashSet<AuthorizationPermission> { AuthorizationPermission.CanViewUsers }
+        AuthorizationResponse expectedResponse = _authorizationResponseFixture.Create(
+            role: "Admin",
+            permissions: new HashSet<AuthorizationPermission> { AuthorizationPermission.CanViewUsers }
         );
         _mockHandler.HandleAsync(Arg.Any<UpdateUserRoleAndPermissionsCommand>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(expectedResponse));
@@ -67,11 +66,7 @@ public class UpdateUserRoleAndPermissionsEndpointTests
     public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
     {
         // Arrange
-        UpdateUserRoleAndPermissionsRequest request = new(
-            Guid.NewGuid(),
-            Guid.NewGuid(),
-            [Guid.NewGuid()]
-        );
+        UpdateUserRoleAndPermissionsRequest request = _updateUserRoleAndPermissionsRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
         Error expectedError = Error.Failure("Authorization.Update.Failed", "Failed to update user role and permissions.");
         _mockHandler.HandleAsync(Arg.Any<UpdateUserRoleAndPermissionsCommand>(), Arg.Any<CancellationToken>())
@@ -97,17 +92,12 @@ public class UpdateUserRoleAndPermissionsEndpointTests
     public async Task ExecuteAsync_WhenCalled_ShouldSendUpdateUserRoleAndPermissionsCommandToSender()
     {
         // Arrange
-        UpdateUserRoleAndPermissionsRequest request = new(
-            Guid.NewGuid(),
-            Guid.NewGuid(),
-            [Guid.NewGuid()]
-        );
+        UpdateUserRoleAndPermissionsRequest request = _updateUserRoleAndPermissionsRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<UpdateUserRoleAndPermissionsCommand>(), Arg.Any<CancellationToken>())
-            .Returns(Result.From(new AuthorizationResponse(
-                Guid.NewGuid(),
-                "Admin",
-                new HashSet<AuthorizationPermission> { AuthorizationPermission.CanViewUsers }
+            .Returns(Result.From(_authorizationResponseFixture.Create(
+                role: "Admin",
+                permissions: new HashSet<AuthorizationPermission> { AuthorizationPermission.CanViewUsers }
             )));
 
         // Act
@@ -136,16 +126,15 @@ public class UpdateUserRoleAndPermissionsEndpointTests
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 info.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return Result.From(new AuthorizationResponse(
-                    Guid.NewGuid(),
-                    "Admin",
-                    new HashSet<AuthorizationPermission> { AuthorizationPermission.CanViewUsers }
+                return Result.From(_authorizationResponseFixture.Create(
+                    role: "Admin",
+                    permissions: new HashSet<AuthorizationPermission> { AuthorizationPermission.CanViewUsers }
                 ));
             }, info.Arg<CancellationToken>()));
 
         // Act
         Task<IResult> operationTask = _sut.ExecuteAsync(
-            new UpdateUserRoleAndPermissionsRequest(Guid.NewGuid(), Guid.NewGuid(), [Guid.NewGuid()]),
+            _updateUserRoleAndPermissionsRequestFixture.Create(),
             cts.Token);
         await operationStarted.Task;
         cts.Cancel();

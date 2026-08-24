@@ -30,6 +30,9 @@ public class UserRepositoryTests
     private readonly UserRepository _sut;
     private readonly UserEntityFixture _userEntityFixture = new();
     private readonly PermissionEntityFixture _permissionEntityFixture = new();
+    private readonly RoleEntityFixture _roleEntityFixture = new();
+    private readonly UserRoleEntityFixture _userRoleEntityFixture = new();
+    private readonly UserPermissionEntityFixture _userPermissionEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UserRepositoryTests"/> class.
@@ -143,20 +146,11 @@ public class UserRepositoryTests
         await _mockContext.SaveChangesAsync();
 
         // Create updated user with same Id but different properties
-        UserEntity updatedUser = new()
-        {
-            Id = existingUser.Id,
-            Username = existingUser.Username, // Keep username as it's used for lookup
-            Password = "NewPassword123",
-            TempPassword = "TempPass456",
-            TotpSecret = "NewSecret",
-            Libraries = [],
-            UserRole = null,
-            UserPermissions = [],
-            CreatedBy = existingUser.Id,
-            CreatedOnUtc = existingUser.CreatedOnUtc,
-            UpdatedOnUtc = DateTime.UtcNow
-        };
+        UserEntity updatedUser = _userEntityFixture.Create(id: existingUser.Id, username: existingUser.Username, password: "NewPassword123");
+        updatedUser.TempPassword = "TempPass456";
+        updatedUser.TotpSecret = "NewSecret";
+        updatedUser.CreatedOnUtc = existingUser.CreatedOnUtc;
+        updatedUser.UpdatedOnUtc = DateTime.UtcNow;
 
         // Act
         Result<Updated> result = await _sut.UpdateAsync(updatedUser, CancellationToken.None);
@@ -235,30 +229,13 @@ public class UserRepositoryTests
         _mockContext.Permissions.Add(newPermission);
         await _mockContext.SaveChangesAsync();
 
-        UserEntity updatedUser = new()
-        {
-            Id = existingUser.Id,
-            Username = existingUser.Username,
-            Password = "NewPassword",
-            Libraries = [],
-            UserRole = null,
-            UserPermissions =
-            [
-                new()
-                {
-                    Id = Guid.NewGuid(),
-                    UserId = existingUser.Id,
-                    User = existingUser,
-                    PermissionId = newPermission.Id,
-                    Permission = newPermission,
-                    CreatedOnUtc = DateTime.UtcNow,
-                    CreatedBy = existingUser.Id
-                }
-            ],
-            CreatedBy = existingUser.CreatedBy,
-            CreatedOnUtc = existingUser.CreatedOnUtc,
-            UpdatedOnUtc = DateTime.UtcNow
-        };
+        UserPermissionEntity newUserPermission = _userPermissionEntityFixture.Create(existingUser, newPermission);
+        newUserPermission.CreatedOnUtc = DateTime.UtcNow;
+
+        UserEntity updatedUser = _userEntityFixture.Create(id: existingUser.Id, username: existingUser.Username, password: "NewPassword", userPermissions: [newUserPermission], includeUserPermissions: true);
+        updatedUser.CreatedBy = existingUser.CreatedBy;
+        updatedUser.CreatedOnUtc = existingUser.CreatedOnUtc;
+        updatedUser.UpdatedOnUtc = DateTime.UtcNow;
 
         // Act
         Result<Updated> result = await _sut.UpdateAsync(updatedUser, CancellationToken.None);
@@ -280,50 +257,24 @@ public class UserRepositoryTests
     public async Task UpdateAsync_WhenUserHasExistingPermissions_ShouldRemoveOldPermissionsAndAddNew()
     {
         // Arrange
-        UserEntityFixture userFixture = new();
-        PermissionEntityFixture permissionFixture = new();
-        UserPermissionEntityFixture userPermissionFixture = new();
+        UserEntity existingUser = _userEntityFixture.Create();
+        PermissionEntity oldPermission = _permissionEntityFixture.Create();
+        PermissionEntity newPermission = _permissionEntityFixture.Create();
 
-        UserEntity existingUser = userFixture.Create();
-        PermissionEntity oldPermission = permissionFixture.Create();
-        PermissionEntity newPermission = permissionFixture.Create();
-
-        UserEntity userWithPermissions = new()
-        {
-            Id = existingUser.Id,
-            Username = existingUser.Username,
-            Password = existingUser.Password,
-            Libraries = existingUser.Libraries,
-            UserRole = null,
-            UserPermissions =
-            [
-                userPermissionFixture.Create(existingUser, oldPermission)
-            ],
-            CreatedOnUtc = existingUser.CreatedOnUtc,
-            CreatedBy = existingUser.CreatedBy,
-            UpdatedOnUtc = existingUser.UpdatedOnUtc,
-            UpdatedBy = existingUser.UpdatedBy
-        };
+        UserEntity userWithPermissions = _userEntityFixture.Create(id: existingUser.Id, username: existingUser.Username, password: existingUser.Password, userPermissions: [_userPermissionEntityFixture.Create(existingUser, oldPermission)], includeUserPermissions: true);
+        userWithPermissions.CreatedOnUtc = existingUser.CreatedOnUtc;
+        userWithPermissions.CreatedBy = existingUser.CreatedBy;
+        userWithPermissions.UpdatedOnUtc = existingUser.UpdatedOnUtc;
+        userWithPermissions.UpdatedBy = existingUser.UpdatedBy;
 
         _mockContext.Users.Add(userWithPermissions);
         await _mockContext.SaveChangesAsync();
 
-        UserEntity updatedUser = new()
-        {
-            Id = existingUser.Id,
-            Username = existingUser.Username,
-            Password = existingUser.Password,
-            Libraries = existingUser.Libraries,
-            UserRole = null,
-            UserPermissions =
-            [
-                userPermissionFixture.Create(existingUser, newPermission)
-            ],
-            CreatedBy = existingUser.CreatedBy,
-            CreatedOnUtc = existingUser.CreatedOnUtc,
-            UpdatedOnUtc = DateTime.UtcNow,
-            UpdatedBy = existingUser.Id
-        };
+        UserEntity updatedUser = _userEntityFixture.Create(id: existingUser.Id, username: existingUser.Username, password: existingUser.Password, userPermissions: [_userPermissionEntityFixture.Create(existingUser, newPermission)], includeUserPermissions: true);
+        updatedUser.CreatedBy = existingUser.CreatedBy;
+        updatedUser.CreatedOnUtc = existingUser.CreatedOnUtc;
+        updatedUser.UpdatedOnUtc = DateTime.UtcNow;
+        updatedUser.UpdatedBy = existingUser.Id;
 
         // Act
         Result<Updated> result = await _sut.UpdateAsync(updatedUser, CancellationToken.None);
@@ -349,84 +300,40 @@ public class UserRepositoryTests
     public async Task UpdateAsync_WhenUserRoleChanges_ShouldRemoveOldRoleAndAddNew()
     {
         // Arrange
-        RoleEntity oldRole = new()
-        {
-            Id = Guid.NewGuid(),
-            RoleName = "OldRole",
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = Guid.NewGuid()
-        };
+        RoleEntity oldRole = _roleEntityFixture.Create(roleName: "OldRole");
+        oldRole.CreatedOnUtc = DateTime.UtcNow;
+        oldRole.CreatedBy = Guid.NewGuid();
 
-        RoleEntity newRole = new()
-        {
-            Id = Guid.NewGuid(),
-            RoleName = "NewRole",
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = Guid.NewGuid()
-        };
+        RoleEntity newRole = _roleEntityFixture.Create(roleName: "NewRole");
+        newRole.CreatedOnUtc = DateTime.UtcNow;
+        newRole.CreatedBy = Guid.NewGuid();
 
-        UserEntity existingUser = new()
-        {
-            Id = Guid.NewGuid(),
-            Username = "TestUser",
-            Password = "TestPass",
-            Libraries = [],
-            UserRole = null,
-            UserPermissions = [],
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = Guid.NewGuid()
-        };
+        UserEntity existingUser = _userEntityFixture.Create(username: "TestUser", password: "TestPass");
+        existingUser.CreatedOnUtc = DateTime.UtcNow;
+        existingUser.CreatedBy = Guid.NewGuid();
 
-        UserRoleEntity oldUserRole = new()
-        {
-            Id = Guid.NewGuid(),
-            UserId = existingUser.Id,
-            User = existingUser,
-            RoleId = oldRole.Id,
-            Role = oldRole,
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = Guid.NewGuid()
-        };
+        UserRoleEntity oldUserRole = _userRoleEntityFixture.Create(userId: existingUser.Id, user: existingUser, roleId: oldRole.Id, role: oldRole);
+        oldUserRole.CreatedOnUtc = DateTime.UtcNow;
+        oldUserRole.CreatedBy = Guid.NewGuid();
 
-        existingUser = new()
-        {
-            Id = existingUser.Id,
-            Username = existingUser.Username,
-            Password = existingUser.Password,
-            Libraries = [],
-            UserRole = oldUserRole,
-            UserPermissions = [],
-            CreatedOnUtc = existingUser.CreatedOnUtc,
-            CreatedBy = existingUser.CreatedBy
-        };
+        DateTime originalCreatedOnUtc = existingUser.CreatedOnUtc;
+        Guid originalCreatedBy = existingUser.CreatedBy;
+        existingUser = _userEntityFixture.Create(id: existingUser.Id, username: existingUser.Username, password: existingUser.Password, userRole: oldUserRole, includeUserRole: true);
+        existingUser.CreatedOnUtc = originalCreatedOnUtc;
+        existingUser.CreatedBy = originalCreatedBy;
 
         _mockContext.Users.Add(existingUser);
         await _mockContext.SaveChangesAsync();
 
-        UserRoleEntity newUserRole = new()
-        {
-            Id = Guid.NewGuid(),
-            UserId = existingUser.Id,
-            User = existingUser,
-            RoleId = newRole.Id,
-            Role = newRole,
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = existingUser.Id
-        };
+        UserRoleEntity newUserRole = _userRoleEntityFixture.Create(userId: existingUser.Id, user: existingUser, roleId: newRole.Id, role: newRole);
+        newUserRole.CreatedOnUtc = DateTime.UtcNow;
+        newUserRole.CreatedBy = existingUser.Id;
 
-        UserEntity updatedUser = new()
-        {
-            Id = existingUser.Id,
-            Username = existingUser.Username,
-            Password = existingUser.Password,
-            Libraries = [],
-            UserRole = newUserRole,
-            UserPermissions = [],
-            CreatedBy = existingUser.CreatedBy,
-            CreatedOnUtc = existingUser.CreatedOnUtc,
-            UpdatedOnUtc = DateTime.UtcNow,
-            UpdatedBy = existingUser.Id
-        };
+        UserEntity updatedUser = _userEntityFixture.Create(id: existingUser.Id, username: existingUser.Username, password: existingUser.Password, userRole: newUserRole, includeUserRole: true);
+        updatedUser.CreatedBy = existingUser.CreatedBy;
+        updatedUser.CreatedOnUtc = existingUser.CreatedOnUtc;
+        updatedUser.UpdatedOnUtc = DateTime.UtcNow;
+        updatedUser.UpdatedBy = existingUser.Id;
 
         // Act
         Result<Updated> result = await _sut.UpdateAsync(updatedUser, CancellationToken.None);
@@ -454,39 +361,20 @@ public class UserRepositoryTests
     public async Task UpdateAsync_WhenRemovingUserRole_ShouldRemoveRoleAndNotAddNew()
     {
         // Arrange
-        UserEntityFixture userFixture = new();
-        UserRoleEntityFixture userRoleFixture = new();
+        UserRoleEntity oldUserRole = _userRoleEntityFixture.Create();
 
-        UserRoleEntity oldUserRole = userRoleFixture.Create();
-
-        UserEntity existingUser = new()
-        {
-            Id = Guid.NewGuid(),
-            Username = "TestUser",
-            Password = "TestPass",
-            Libraries = [],
-            UserRole = oldUserRole,
-            UserPermissions = [],
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = Guid.NewGuid()
-        };
+        UserEntity existingUser = _userEntityFixture.Create(username: "TestUser", password: "TestPass", userRole: oldUserRole, includeUserRole: true);
+        existingUser.CreatedOnUtc = DateTime.UtcNow;
+        existingUser.CreatedBy = Guid.NewGuid();
 
         _mockContext.Users.Add(existingUser);
         await _mockContext.SaveChangesAsync();
 
-        UserEntity updatedUser = new()
-        {
-            Id = existingUser.Id,
-            Username = existingUser.Username,
-            Password = existingUser.Password,
-            Libraries = [],
-            UserRole = null,
-            UserPermissions = [],
-            CreatedBy = existingUser.CreatedBy,
-            CreatedOnUtc = existingUser.CreatedOnUtc,
-            UpdatedOnUtc = DateTime.UtcNow,
-            UpdatedBy = existingUser.Id
-        };
+        UserEntity updatedUser = _userEntityFixture.Create(id: existingUser.Id, username: existingUser.Username, password: existingUser.Password);
+        updatedUser.CreatedBy = existingUser.CreatedBy;
+        updatedUser.CreatedOnUtc = existingUser.CreatedOnUtc;
+        updatedUser.UpdatedOnUtc = DateTime.UtcNow;
+        updatedUser.UpdatedBy = existingUser.Id;
 
         // Act
         Result<Updated> result = await _sut.UpdateAsync(updatedUser, CancellationToken.None);

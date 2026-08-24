@@ -7,6 +7,7 @@ using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetUserRole;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Fixtures.Core.UsersManagement.Authorization.Queries.GetUserRole;
 using Lumina.Contracts.Responses.Authorization;
@@ -32,6 +33,8 @@ public class GetUserRoleQueryHandlerTests
     private readonly IUserRepository _mockUserRepository;
     private readonly GetUserRoleQueryHandler _sut;
     private readonly UserEntityFixture _userEntityFixture = new();
+    private readonly UserRoleEntityFixture _userRoleEntityFixture = new();
+    private readonly RoleEntityFixture _roleEntityFixture = new();
     private readonly GetUserRoleQueryFixture _getUserRoleQueryFixture = new();
     private readonly Guid _userId;
 
@@ -157,23 +160,14 @@ public class GetUserRoleQueryHandlerTests
     {
         // Arrange
         GetUserRoleQuery query = _getUserRoleQueryFixture.Create();
-        UserEntity user = new()
-        {
-            Id = query.UserId!.Value,
-            Username = "testUser",
-            Password = "hashedPassword",
-            Libraries = [],
-            UserPermissions = [],
-            UserRole = new()
-            {
-                UserId = query.UserId!.Value,
-                RoleId = Guid.NewGuid(),
-                User = null!,
-                Role = new() { Id = Guid.NewGuid(), RoleName = "TestRole" }
-            },
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = query.UserId!.Value
-        };
+        UserEntity user = _userEntityFixture.Create(
+            username: "testUser",
+            password: "hashedPassword",
+            id: query.UserId!.Value,
+            userRole: _userRoleEntityFixture.Create(
+                userId: query.UserId!.Value,
+                role: _roleEntityFixture.Create(roleName: "TestRole")),
+            includeUserRole: true);
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(true);

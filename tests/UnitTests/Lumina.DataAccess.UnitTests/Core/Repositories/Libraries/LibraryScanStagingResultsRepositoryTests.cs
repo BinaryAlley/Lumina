@@ -4,6 +4,7 @@ using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.Infrastructure.Models.DTO.MediaLibraryScanJobPayloads;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Application.Fixtures.Common.Infrastructure.Models.DTO.MediaLibraryScanJobPayloads;
 using Lumina.DataAccess.Core.Repositories.Libraries;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Primitives;
@@ -39,6 +40,7 @@ public class LibraryScanStagingResultsRepositoryTests : IDisposable
     private readonly UserEntityFixture _userEntityFixture = new();
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
     private readonly LibraryScanEntityFixture _libraryScanEntityFixture = new();
+    private readonly HashedFileSystemFileDtoFixture _hashedFileSystemFileDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LibraryScanStagingResultsRepositoryTests"/> class.
@@ -235,8 +237,8 @@ public class LibraryScanStagingResultsRepositoryTests : IDisposable
 
         List<HashedFileSystemFileDto> hashedFiles =
         [
-            new HashedFileSystemFileDto { Path = "/books/a.epub", Size = 10, Ticks = 100, CurrentHash = 999, OldHash = 0 },
-            new HashedFileSystemFileDto { Path = "/books/b.epub", Size = 20, Ticks = 200, CurrentHash = 888, OldHash = 0 }
+            _hashedFileSystemFileDtoFixture.Create(path: "/books/a.epub", size: 10, ticks: 100, currentHash: 999, oldHash: 0),
+            _hashedFileSystemFileDtoFixture.Create(path: "/books/b.epub", size: 20, ticks: 200, currentHash: 888, oldHash: 0)
         ];
 
         // Act

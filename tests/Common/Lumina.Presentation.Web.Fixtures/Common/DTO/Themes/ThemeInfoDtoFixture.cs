@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
 using Lumina.Presentation.Web.Common.DTO.Themes;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -15,6 +14,8 @@ namespace Lumina.Presentation.Web.Fixtures.Common.DTO.Themes;
 [ExcludeFromCodeCoverage]
 public class ThemeInfoDtoFixture
 {
+    private readonly Faker _faker = new();
+
     /// <summary>
     /// Creates a new <see cref="ThemeInfoDto"/> instance with randomized test data.
     /// </summary>
@@ -37,16 +38,15 @@ public class ThemeInfoDtoFixture
         bool? isBundled = null,
         bool? isDeleted = null)
     {
-        Faker faker = new();
         return new ThemeInfoDto(
-            Id: id ?? faker.Lorem.Word(),
-            Name: name ?? faker.Commerce.ProductName(),
-            Description: description ?? faker.Lorem.Sentence(),
-            Author: author ?? faker.Name.FullName(),
-            Version: version ?? faker.System.Semver(),
-            PreviewUrl: previewUrl ?? $"/theme-assets/{faker.Lorem.Word()}/preview.png",
-            IsBundled: isBundled ?? faker.Random.Bool(),
-            IsDeleted: isDeleted ?? faker.Random.Bool()
+            Id: id ?? _faker.Lorem.Word(),
+            Name: name ?? _faker.Commerce.ProductName(),
+            Description: description ?? _faker.Lorem.Sentence(),
+            Author: author ?? _faker.Name.FullName(),
+            Version: version ?? _faker.System.Semver(),
+            PreviewUrl: previewUrl ?? $"/theme-assets/{_faker.Lorem.Word()}/preview.png",
+            IsBundled: isBundled ?? _faker.Random.Bool(),
+            IsDeleted: isDeleted ?? _faker.Random.Bool()
         );
     }
 

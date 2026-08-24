@@ -1,8 +1,9 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
 using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Presentation.Api.Core.Endpoints.Library.Management.DeleteLibrary;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
@@ -35,6 +36,8 @@ public class DeleteLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
         PropertyNameCaseInsensitive = true,
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
+    private readonly LibraryEntityFixture _libraryEntityFixture = new();
+    private readonly UserEntityFixture _userEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DeleteLibraryEndpointTests"/> class.
@@ -134,17 +137,7 @@ public class DeleteLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
         Guid userId = Guid.NewGuid();
-        dbContext.Users.Add(new UserEntity
-        {
-            Id = userId,
-            Username = $"otheruser_{Guid.NewGuid()}",
-            Password = "TestPass123!",
-            Libraries = [],
-            UserPermissions = [],
-            UserRole = null,
-            CreatedBy = userId,
-            CreatedOnUtc = DateTime.UtcNow
-        });
+        dbContext.Users.Add(_userEntityFixture.Create(id: userId, username: $"otheruser_{Guid.NewGuid()}", password: "TestPass123!"));
         await dbContext.SaveChangesAsync();
         return userId;
     }
@@ -159,17 +152,7 @@ public class DeleteLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
-        dbContext.Libraries.Add(new LibraryEntity
-        {
-            Id = libraryId,
-            UserId = userId,
-            Title = "Test Library",
-            LibraryType = LibraryType.EBook,
-            ContentLocations = [],
-            CreatedBy = userId,
-            CreatedOnUtc = DateTime.UtcNow,
-            UpdatedBy = null
-        });
+        dbContext.Libraries.Add(_libraryEntityFixture.Create(id: libraryId, userId: userId, title: "Test Library", libraryType: LibraryType.EBook, contentLocations: []));
         await dbContext.SaveChangesAsync();
     }
 

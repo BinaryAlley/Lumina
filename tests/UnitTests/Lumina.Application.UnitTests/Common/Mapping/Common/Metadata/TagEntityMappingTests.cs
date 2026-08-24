@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.Mapping.Common.Metadata;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Common;
 using Lumina.Contracts.DTO.Common;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
@@ -18,11 +19,13 @@ namespace Lumina.Application.UnitTests.Common.Mapping.Common.Metadata;
 [ExcludeFromCodeCoverage]
 public class TagEntityMappingTests
 {
+    private readonly TagEntityFixture _tagEntityFixture = new();
+
     [Fact]
     public void ToResponse_WhenMappingValidTagEntity_ShouldMapCorrectly()
     {
         // Arrange
-        TagEntity entity = new("Fantasy");
+        TagEntity entity = _tagEntityFixture.Create(name: "Fantasy");
 
         // Act
         TagDto result = entity.ToResponse();
@@ -40,7 +43,7 @@ public class TagEntityMappingTests
     public void ToResponse_WhenMappingDifferentValidTagEntities_ShouldMapCorrectly(string name)
     {
         // Arrange
-        TagEntity entity = new(name);
+        TagEntity entity = _tagEntityFixture.Create(name: name);
 
         // Act
         TagDto result = entity.ToResponse();
@@ -57,7 +60,7 @@ public class TagEntityMappingTests
     public void ToResponse_WhenMappingInvalidTagEntity_ShouldMapToDefault(string? invalidName)
     {
         // Arrange
-        TagEntity entity = new(invalidName);
+        TagEntity entity = _tagEntityFixture.Create(name: invalidName, includeName: invalidName is not null);
 
         // Act
         TagDto result = entity.ToResponse();
@@ -70,7 +73,7 @@ public class TagEntityMappingTests
     public void ToDomainEntity_WhenMappingValidTagEntity_ShouldMapCorrectly()
     {
         // Arrange
-        TagEntity entity = new("Fantasy");
+        TagEntity entity = _tagEntityFixture.Create(name: "Fantasy");
 
         // Act
         Result<Tag> result = entity.ToDomainEntity();
@@ -88,7 +91,7 @@ public class TagEntityMappingTests
     public void ToDomainEntity_WhenMappingInvalidTagEntity_ShouldMapToDefault(string? invalidName)
     {
         // Arrange
-        TagEntity entity = new(invalidName);
+        TagEntity entity = _tagEntityFixture.Create(name: invalidName, includeName: invalidName is not null);
 
         // Act
         Result<Tag> result = entity.ToDomainEntity();
@@ -104,10 +107,10 @@ public class TagEntityMappingTests
         // Arrange
         List<TagEntity> entities =
         [
-            new TagEntity("Fantasy"),
-            new TagEntity("Young Adult"),
-            new TagEntity("Historical"),
-            new TagEntity("Coming of Age")
+            _tagEntityFixture.Create(name: "Fantasy"),
+            _tagEntityFixture.Create(name: "Young Adult"),
+            _tagEntityFixture.Create(name: "Historical"),
+            _tagEntityFixture.Create(name: "Coming of Age")
         ];
 
         // Act
@@ -131,10 +134,10 @@ public class TagEntityMappingTests
         // Arrange
         List<TagEntity> entities =
         [
-            new TagEntity("Fantasy"),
-            new TagEntity("Young Adult"),
-            new TagEntity("Historical"),
-            new TagEntity("Coming of Age")
+            _tagEntityFixture.Create(name: "Fantasy"),
+            _tagEntityFixture.Create(name: "Young Adult"),
+            _tagEntityFixture.Create(name: "Historical"),
+            _tagEntityFixture.Create(name: "Coming of Age")
         ];
 
         // Act

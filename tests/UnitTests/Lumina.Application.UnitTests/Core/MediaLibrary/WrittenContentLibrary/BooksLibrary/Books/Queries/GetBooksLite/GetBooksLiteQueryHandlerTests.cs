@@ -2,12 +2,15 @@
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.Books;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.DTO.Filtering;
+using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Queries.GetBooksLite;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Application.Fixtures.Common.DTO.Pagination;
 using Lumina.Application.Fixtures.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Queries.GetBooksLite;
 using Lumina.Contracts.Responses.Common;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
@@ -18,12 +21,9 @@ using NSubstitute;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using Lumina.Application.Common.DTO.Filtering;
-using Lumina.Application.Common.DTO.Pagination;
 #endregion
 
 namespace Lumina.Application.UnitTests.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Queries.GetBooksLite;
@@ -43,6 +43,7 @@ public class GetBooksLiteQueryHandlerTests
     private readonly Guid _userId;
     private readonly BookEntityFixture _bookEntityFixture = new();
     private readonly GetBooksLiteQueryFixture _getBooksLiteQueryFixture = new();
+    private readonly PaginatedResultDtoFixture<BookEntity> _paginatedResultDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetBooksLiteQueryHandlerTests"/> class.
@@ -73,14 +74,7 @@ public class GetBooksLiteQueryHandlerTests
         GetBooksLiteQuery query = _getBooksLiteQueryFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
         List<BookEntity> bookEntities = _bookEntityFixture.CreateMany(2);
-        PaginatedResultDto<BookEntity> paginatedBooks = new()
-        {
-            Data = bookEntities,
-            CurrentPage = 1,
-            PerPage = 10,
-            Count = 2,
-            NumberOfPages = 1
-        };
+        PaginatedResultDto<BookEntity> paginatedBooks = _paginatedResultDtoFixture.Create(data: bookEntities, currentPage: 1, perPage: 10, count: 2, numberOfPages: 1);
         _mockBookRepository.GetPaginatedAsync(
                 Arg.Any<PaginationDataDto?>(),
                 Arg.Any<string?>(),
@@ -106,14 +100,7 @@ public class GetBooksLiteQueryHandlerTests
     {
         // Arrange
         GetBooksLiteQuery query = _getBooksLiteQueryFixture.Create();
-        PaginatedResultDto<BookEntity> paginatedBooks = new()
-        {
-            Data = [],
-            CurrentPage = 1,
-            PerPage = 10,
-            Count = 0,
-            NumberOfPages = 0
-        };
+        PaginatedResultDto<BookEntity> paginatedBooks = _paginatedResultDtoFixture.Create(data: [], currentPage: 1, perPage: 10, count: 0, numberOfPages: 0);
         _mockBookRepository.GetPaginatedAsync(
                 Arg.Any<PaginationDataDto?>(),
                 Arg.Any<string?>(),
@@ -157,14 +144,7 @@ public class GetBooksLiteQueryHandlerTests
         // Arrange
         GetBooksLiteQuery query = _getBooksLiteQueryFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
-        PaginatedResultDto<BookEntity> paginatedBooks = new()
-        {
-            Data = [],
-            CurrentPage = 1,
-            PerPage = 10,
-            Count = 0,
-            NumberOfPages = 0
-        };
+        PaginatedResultDto<BookEntity> paginatedBooks = _paginatedResultDtoFixture.Create(data: [], currentPage: 1, perPage: 10, count: 0, numberOfPages: 0);
         _mockBookRepository.GetPaginatedAsync(
                 Arg.Any<PaginationDataDto?>(),
                 Arg.Any<string?>(),
@@ -190,20 +170,8 @@ public class GetBooksLiteQueryHandlerTests
     public async Task HandleAsync_WhenQueryHasNoPaginationData_ShouldQueryRepositoryWithoutPagination()
     {
         // Arrange
-        GetBooksLiteQuery query = new(
-            PaginationData: null,
-            Filter: new LibraryFilterDto { LibraryId = Guid.NewGuid() },
-            SortBy: null,
-            SortOrder: SortOrder.Ascending
-        );
-        PaginatedResultDto<BookEntity> paginatedBooks = new()
-        {
-            Data = [],
-            CurrentPage = 1,
-            PerPage = 10,
-            Count = 0,
-            NumberOfPages = 0
-        };
+        GetBooksLiteQuery query = _getBooksLiteQueryFixture.Create(includePaginationData: false, libraryId: Guid.NewGuid(), sortOrder: SortOrder.Ascending);
+        PaginatedResultDto<BookEntity> paginatedBooks = _paginatedResultDtoFixture.Create(data: [], currentPage: 1, perPage: 10, count: 0, numberOfPages: 0);
         _mockBookRepository.GetPaginatedAsync(
                 Arg.Any<PaginationDataDto?>(),
                 Arg.Any<string?>(),

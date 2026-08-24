@@ -41,7 +41,10 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\src\Lumina.Presentation.Api\Lumina.Presentation.Api.csproj" />
+        <ProjectReference Include="..\..\..\src\Lumina.Application\Lumina.Application.csproj" />
+        <ProjectReference Include="..\..\..\plugins\Lumina.Plugins.Calibre\Lumina.Plugins.Calibre.csproj" />
         <ProjectReference Include="..\..\Common\Lumina.Application.Fixtures\Lumina.Application.Fixtures.csproj" />
         <ProjectReference Include="..\..\Common\Lumina.Contracts.Fixtures\Lumina.Contracts.Fixtures.csproj" />
+        <ProjectReference Include="..\..\Common\Lumina.Domain.Fixtures\Lumina.Domain.Fixtures.csproj" />
     </ItemGroup>
 </Project>

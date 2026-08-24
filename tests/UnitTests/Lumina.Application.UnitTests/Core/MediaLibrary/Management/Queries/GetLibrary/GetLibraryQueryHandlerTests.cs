@@ -7,6 +7,7 @@ using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.MediaLibrary.Management.Queries.GetLibrary;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Fixtures.Core.MediaLibrary.Management.Queries.GetLibrary;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
 using Lumina.Domain.Common.Errors;
@@ -14,7 +15,6 @@ using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using NSubstitute;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
@@ -38,6 +38,7 @@ public class GetLibraryQueryHandlerTests
     private readonly GetLibraryQueryHandler _sut;
     private readonly Guid _userId;
     private readonly GetLibraryQueryFixture _getLibraryQueryFixture = new();
+    private readonly LibraryEntityFixture _libraryEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetLibraryQueryHandlerTests"/> class.
@@ -57,17 +58,7 @@ public class GetLibraryQueryHandlerTests
         _mockAuthorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(_userId, Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>())
             .Returns(true);
         _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
-            .Returns(Result.From((LibraryEntity?)new LibraryEntity
-            {
-                Id = Guid.NewGuid(),
-                UserId = _userId,
-                Title = "Test Library",
-                LibraryType = LibraryType.EBook,
-                ContentLocations = [],
-                CreatedBy = _userId,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedBy = null
-            }));
+            .Returns(Result.From((LibraryEntity?)_libraryEntityFixture.Create(userId: _userId, title: "Test Library", libraryType: LibraryType.EBook, contentLocations: [])));
         _mockValidator.Validate(Arg.Any<GetLibraryQuery>()).Returns([]);
 
         _sut = new GetLibraryQueryHandler(_mockAuthorizationService, _mockCurrentUserService, _mockUnitOfWork, _mockValidator);

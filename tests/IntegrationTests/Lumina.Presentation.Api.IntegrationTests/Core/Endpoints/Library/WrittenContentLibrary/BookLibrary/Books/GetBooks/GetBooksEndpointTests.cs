@@ -1,8 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Common;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Common;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Contracts.Responses.Common;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.DataAccess.Core.UoW;
@@ -38,6 +40,13 @@ public class GetBooksEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         PropertyNameCaseInsensitive = true,
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
+    private readonly BookEntityFixture _bookEntityFixture = new();
+    private readonly BookRatingEntityFixture _bookRatingEntityFixture = new();
+    private readonly GenreEntityFixture _genreEntityFixture = new();
+    private readonly IsbnEntityFixture _isbnEntityFixture = new();
+    private readonly LibraryEntityFixture _libraryEntityFixture = new();
+    private readonly TagEntityFixture _tagEntityFixture = new();
+    private readonly UserEntityFixture _userEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetBooksEndpointTests"/> class.
@@ -270,35 +279,14 @@ public class GetBooksEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
-        BookEntity book = new()
-        {
-            Id = Guid.NewGuid(),
-            LibraryId = libraryId,
-            Path = $"/books/{Guid.NewGuid()}.epub",
-            Title = title,
-            Tags = [new TagEntity($"Tag-{Guid.NewGuid()}")],
-            Genres = [new GenreEntity($"Genre-{Guid.NewGuid()}")],
-            ISBNs = [new IsbnEntity("9780395272237", IsbnFormat.Isbn13)],
-            Ratings = [new BookRatingEntity(4.5M, 5, BookRatingSource.Goodreads, 100)],
-            CreatedBy = Guid.NewGuid(),
-            CreatedOnUtc = DateTime.UtcNow,
-            UpdatedBy = null
-        };
+        BookEntity book = _bookEntityFixture.Create(libraryId: libraryId, title: title, path: $"/books/{Guid.NewGuid()}.epub", includeMetadata: false);
+        book.Tags = [_tagEntityFixture.Create(name: $"Tag-{Guid.NewGuid()}")];
+        book.Genres = [_genreEntityFixture.Create(name: $"Genre-{Guid.NewGuid()}")];
+        book.ISBNs = [_isbnEntityFixture.Create(value: "9780395272237", format: IsbnFormat.Isbn13)];
+        book.Ratings = [_bookRatingEntityFixture.Create(value: 4.5M, maxValue: 5, source: BookRatingSource.Goodreads, voteCount: 100)];
         dbContext.Books.Add(book);
         await dbContext.SaveChangesAsync();
         return book;
-    }
-
-    /// <summary>
-    /// Gets the Id of the currently authenticated test user.
-    /// </summary>
-    /// <returns>The Id of the authenticated test user.</returns>
-    private Guid GetCurrentUserId()
-    {
-        using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
-        UserEntity user = dbContext.Users.First(user => user.Username == _apiFactory.TestUsername);
-        return user.Id;
     }
 
     /// <summary>
@@ -311,17 +299,7 @@ public class GetBooksEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
-        dbContext.Libraries.Add(new LibraryEntity
-        {
-            Id = libraryId,
-            UserId = userId,
-            Title = "Test Library",
-            LibraryType = LibraryType.EBook,
-            ContentLocations = [],
-            CreatedBy = userId,
-            CreatedOnUtc = DateTime.UtcNow,
-            UpdatedBy = null
-        });
+        dbContext.Libraries.Add(_libraryEntityFixture.Create(id: libraryId, userId: userId, title: "Test Library", libraryType: LibraryType.EBook, contentLocations: []));
         await dbContext.SaveChangesAsync();
     }
 
@@ -334,19 +312,21 @@ public class GetBooksEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
         Guid userId = Guid.NewGuid();
-        dbContext.Users.Add(new UserEntity
-        {
-            Id = userId,
-            Username = $"otheruser_{Guid.NewGuid()}",
-            Password = "TestPass123!",
-            Libraries = [],
-            UserPermissions = [],
-            UserRole = null,
-            CreatedBy = userId,
-            CreatedOnUtc = DateTime.UtcNow
-        });
+        dbContext.Users.Add(_userEntityFixture.Create(id: userId, username: $"otheruser_{Guid.NewGuid()}", password: "TestPass123!"));
         await dbContext.SaveChangesAsync();
         return userId;
+    }
+
+    /// <summary>
+    /// Gets the Id of the currently authenticated test user.
+    /// </summary>
+    /// <returns>The Id of the authenticated test user.</returns>
+    private Guid GetCurrentUserId()
+    {
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        UserEntity user = dbContext.Users.First(user => user.Username == _apiFactory.TestUsername);
+        return user.Id;
     }
 
     /// <summary>

@@ -1,14 +1,12 @@
-﻿#region ========================================================================= USING =====================================================================================
+#region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Common.DTO.Authorization;
-using Lumina.Presentation.Web.Common.Responses.Authorization;
 using Lumina.Presentation.Web.Core.Endpoints.Admin.Authorization.Roles.GetRoles;
+using Lumina.Presentation.Web.Fixtures.Common.DTO.Authorization;
+using Lumina.Presentation.Web.Fixtures.Common.Responses.Authorization;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.SecurityTests.Common.Setup;
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Admin.Authorization.Roles.GetRoles;
@@ -20,6 +18,8 @@ namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Admin.Authorizati
 public class GetRolesEndpointTests : IClassFixture<LuminaWebFactory>
 {
     private readonly LuminaWebFactory _apiFactory;
+    private readonly GetAuthorizationResponseFixture _getAuthorizationResponseFixture = new();
+    private readonly RoleDtoFixture _roleDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetRolesEndpointTests"/> class.
@@ -50,7 +50,7 @@ public class GetRolesEndpointTests : IClassFixture<LuminaWebFactory>
     {
         // Arrange
         _apiFactory.ApiClientStub.Reset();
-        _apiFactory.ApiClientStub.AuthorizationResponse = new GetAuthorizationResponse(Guid.NewGuid(), "User", []);
+        _apiFactory.ApiClientStub.AuthorizationResponse = _getAuthorizationResponseFixture.Create(userId: Guid.NewGuid(), role: "User", permissions: []);
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
 
         // Act
@@ -66,8 +66,8 @@ public class GetRolesEndpointTests : IClassFixture<LuminaWebFactory>
     {
         // Arrange
         _apiFactory.ApiClientStub.Reset();
-        _apiFactory.ApiClientStub.AuthorizationResponse = new GetAuthorizationResponse(Guid.NewGuid(), "Admin", []);
-        RoleDto[] expectedRoles = [new RoleDto(Guid.NewGuid(), "Admin")];
+        _apiFactory.ApiClientStub.AuthorizationResponse = _getAuthorizationResponseFixture.Create(userId: Guid.NewGuid(), role: "Admin", permissions: []);
+        RoleDto[] expectedRoles = [_roleDtoFixture.Create(id: Guid.NewGuid(), roleName: "Admin")];
         _apiFactory.ApiClientStub.RegisterGetResponse("auth/roles", expectedRoles);
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
 

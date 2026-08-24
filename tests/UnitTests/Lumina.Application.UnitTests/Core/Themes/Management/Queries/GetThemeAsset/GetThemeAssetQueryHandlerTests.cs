@@ -2,19 +2,17 @@
 using Lumina.Application.Common.DataAccess.Entities.Themes;
 using Lumina.Application.Common.DataAccess.Repositories.Themes;
 using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.Infrastructure.Models.DTO.Themes;
 using Lumina.Application.Common.Infrastructure.Themes;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.Themes.Management.Queries.GetThemeAsset;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Themes;
+using Lumina.Application.Fixtures.Common.Infrastructure.Models.DTO.Themes;
 using Lumina.Application.Fixtures.Core.Themes.Management.Queries.GetThemeAsset;
 using Lumina.Contracts.Responses.Themes;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.Themes;
 using NSubstitute;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Threading;
@@ -36,6 +34,7 @@ public class GetThemeAssetQueryHandlerTests
     private readonly GetThemeAssetQueryHandler _sut;
     private readonly GetThemeAssetQueryFixture _getThemeAssetQueryFixture = new();
     private readonly ThemeEntityFixture _themeEntityFixture = new();
+    private readonly ThemeAssetDtoFixture _themeAssetDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetThemeAssetQueryHandlerTests"/> class.
@@ -135,7 +134,7 @@ public class GetThemeAssetQueryHandlerTests
         _mockThemeRepository.GetByThemeIdAsync(query.ThemeId!, Arg.Any<CancellationToken>())
             .Returns(Result.From<ThemeEntity?>(theme));
         _mockThemeService.GetAssetAsync(theme.ThemeId, query.AssetPath!, Arg.Any<CancellationToken>())
-            .Returns(Result.From(new ThemeAssetDto(bytes, contentType)));
+            .Returns(Result.From(_themeAssetDtoFixture.Create(bytes: bytes, contentType: contentType)));
 
         // Act
         Result<ThemeAssetResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
@@ -203,7 +202,7 @@ public class GetThemeAssetQueryHandlerTests
         _mockThemeRepository.GetByThemeIdAsync(query.ThemeId!, Arg.Any<CancellationToken>())
             .Returns(Result.From<ThemeEntity?>(theme));
         _mockThemeService.GetAssetAsync(theme.ThemeId, query.AssetPath!, Arg.Any<CancellationToken>())
-            .Returns(assetError, Result.From(new ThemeAssetDto(restoredBytes, contentType)));
+            .Returns(assetError, Result.From(_themeAssetDtoFixture.Create(bytes: restoredBytes, contentType: contentType)));
         _mockThemeService.RestoreBundledThemeAsync(theme.ThemeId, Arg.Any<CancellationToken>())
             .Returns(Result.Success);
 

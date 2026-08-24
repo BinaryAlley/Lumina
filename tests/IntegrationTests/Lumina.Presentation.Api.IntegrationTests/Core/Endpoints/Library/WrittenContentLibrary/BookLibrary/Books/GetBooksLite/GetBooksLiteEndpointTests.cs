@@ -1,10 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Contracts.Responses.Common;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.DataAccess.Core.UoW;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,9 +18,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading;
 using System.Threading.Tasks;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 #endregion
 
 namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.GetBooksLite;
@@ -36,6 +36,9 @@ public class GetBooksLiteEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         PropertyNameCaseInsensitive = true,
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
+    private readonly BookEntityFixture _bookEntityFixture = new();
+    private readonly LibraryEntityFixture _libraryEntityFixture = new();
+    private readonly UserEntityFixture _userEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetBooksLiteEndpointTests"/> class.
@@ -117,7 +120,7 @@ public class GetBooksLiteEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         await SeedBookAsync(libraryId, "Racing");
 
         // Act
-        HttpResponseMessage response = await _client.GetAsync($"/api/v1/books/lite?libraryId={libraryId}&filterAlphaKey=q&ignoreThePrefixForAlphaPicker=true");
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/books/lite?libraryId={libraryId}&filterAlphaKey=q&shouldIgnoreThePrefixForAlphaPicker=true");
 
         // Assert
         response.EnsureSuccessStatusCode();
@@ -325,30 +328,8 @@ public class GetBooksLiteEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
-        dbContext.Books.Add(new BookEntity
-        {
-            Id = Guid.NewGuid(),
-            LibraryId = libraryId,
-            Path = $"/books/{Guid.NewGuid()}.epub",
-            Title = title,
-            OriginalTitle = originalTitle,
-            CreatedBy = Guid.NewGuid(),
-            CreatedOnUtc = DateTime.UtcNow,
-            UpdatedBy = null
-        });
+        dbContext.Books.Add(_bookEntityFixture.Create(libraryId: libraryId, title: title, originalTitle: originalTitle, path: $"/books/{Guid.NewGuid()}.epub", includeMetadata: false));
         await dbContext.SaveChangesAsync();
-    }
-
-    /// <summary>
-    /// Gets the Id of the currently authenticated test user.
-    /// </summary>
-    /// <returns>The Id of the authenticated test user.</returns>
-    private Guid GetCurrentUserId()
-    {
-        using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
-        UserEntity user = dbContext.Users.First(user => user.Username == _apiFactory.TestUsername);
-        return user.Id;
     }
 
     /// <summary>
@@ -361,17 +342,7 @@ public class GetBooksLiteEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
-        dbContext.Libraries.Add(new LibraryEntity
-        {
-            Id = libraryId,
-            UserId = userId,
-            Title = "Test Library",
-            LibraryType = LibraryType.EBook,
-            ContentLocations = [],
-            CreatedBy = userId,
-            CreatedOnUtc = DateTime.UtcNow,
-            UpdatedBy = null
-        });
+        dbContext.Libraries.Add(_libraryEntityFixture.Create(id: libraryId, userId: userId, title: "Test Library", libraryType: LibraryType.EBook, contentLocations: []));
         await dbContext.SaveChangesAsync();
     }
 
@@ -384,19 +355,21 @@ public class GetBooksLiteEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
         Guid userId = Guid.NewGuid();
-        dbContext.Users.Add(new UserEntity
-        {
-            Id = userId,
-            Username = $"otheruser_{Guid.NewGuid()}",
-            Password = "TestPass123!",
-            Libraries = [],
-            UserPermissions = [],
-            UserRole = null,
-            CreatedBy = userId,
-            CreatedOnUtc = DateTime.UtcNow
-        });
+        dbContext.Users.Add(_userEntityFixture.Create(id: userId, username: $"otheruser_{Guid.NewGuid()}", password: "TestPass123!"));
         await dbContext.SaveChangesAsync();
         return userId;
+    }
+
+    /// <summary>
+    /// Gets the Id of the currently authenticated test user.
+    /// </summary>
+    /// <returns>The Id of the authenticated test user.</returns>
+    private Guid GetCurrentUserId()
+    {
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        UserEntity user = dbContext.Users.First(user => user.Username == _apiFactory.TestUsername);
+        return user.Id;
     }
 
     /// <summary>

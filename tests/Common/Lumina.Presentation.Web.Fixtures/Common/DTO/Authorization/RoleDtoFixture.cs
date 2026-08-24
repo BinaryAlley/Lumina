@@ -15,6 +15,8 @@ namespace Lumina.Presentation.Web.Fixtures.Common.DTO.Authorization;
 [ExcludeFromCodeCoverage]
 public class RoleDtoFixture
 {
+    private readonly Faker _faker = new();
+
     /// <summary>
     /// Creates a new <see cref="RoleDto"/> instance with randomized test data.
     /// </summary>
@@ -23,10 +25,9 @@ public class RoleDtoFixture
     /// <returns>A configured <see cref="RoleDto"/> instance.</returns>
     public RoleDto Create(Guid? id = null, string? roleName = null)
     {
-        Faker faker = new();
         return new RoleDto(
             Id: id ?? Guid.NewGuid(),
-            RoleName: roleName ?? faker.Commerce.Department()
+            RoleName: roleName ?? _faker.Commerce.Department()
         );
     }
 

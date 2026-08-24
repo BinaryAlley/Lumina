@@ -4,10 +4,11 @@ using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
 using Lumina.Application.Common.Mapping.UsersManagement.Users;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate;
-using System;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
@@ -21,6 +22,8 @@ namespace Lumina.Application.UnitTests.Common.Mapping.UserManagement.Users;
 public class UserMappingTests
 {
     private readonly UserFixture _userFixture = new();
+    private readonly UserEntityFixture _userEntityFixture = new();
+    private readonly LibraryEntityFixture _libraryEntityFixture = new();
 
     [Fact]
     public void ToRepositoryEntity_WhenMappingValidUser_ShouldOnlyUpdateUsername()
@@ -28,19 +31,7 @@ public class UserMappingTests
         // Arrange
         User domainEntity = _userFixture.Create(username: "newusername");
 
-        UserEntity repositoryEntity = new()
-        {
-            Id = Guid.NewGuid(),
-            Username = "oldusername",
-            Password = "hashedpassword",
-            TotpSecret = "totpsecret",
-            Libraries = [],
-            UserPermissions = [],
-            UserRole = null,
-            CreatedBy = Guid.NewGuid(),
-            CreatedOnUtc = DateTime.UtcNow,
-            UpdatedOnUtc = null
-        };
+        UserEntity repositoryEntity = _userEntityFixture.Create(username: "oldusername", password: "hashedpassword");
 
         // Act
         UserEntity result = domainEntity.ToRepositoryEntity(repositoryEntity);
@@ -73,18 +64,7 @@ public class UserMappingTests
         // Arrange
         User domainEntity = _userFixture.Create(username: newUsername);
 
-        UserEntity repositoryEntity = new()
-        {
-            Id = Guid.NewGuid(),
-            Username = "oldusername",
-            Password = "hashedpassword",
-            Libraries = [],
-            UserPermissions = [],
-            UserRole = null,
-            CreatedBy = Guid.NewGuid(),
-            CreatedOnUtc = DateTime.UtcNow,
-            UpdatedOnUtc = null
-        };
+        UserEntity repositoryEntity = _userEntityFixture.Create(username: "oldusername", password: "hashedpassword");
 
         // Act
         UserEntity result = domainEntity.ToRepositoryEntity(repositoryEntity);
@@ -102,44 +82,14 @@ public class UserMappingTests
 
         List<LibraryEntity> libraries =
         [
-            new()
-            {
-                Id = Guid.NewGuid(),
-                UserId = Guid.NewGuid(),
-                Title = "Library 1",
-                LibraryType = LibraryType.Book,
-                ContentLocations = [],
-                CreatedOnUtc = DateTime.UtcNow,
-                CreatedBy = Guid.NewGuid(),
-                UpdatedOnUtc = null,
-                UpdatedBy = null
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                UserId = Guid.NewGuid(),
-                Title = "Library 2",
-                LibraryType = LibraryType.Movie,
-                ContentLocations = [],
-                CreatedOnUtc = DateTime.UtcNow,
-                CreatedBy = Guid.NewGuid(),
-                UpdatedOnUtc = null,
-                UpdatedBy = null
-            }
+            _libraryEntityFixture.Create(title: "Library 1", libraryType: LibraryType.Book, contentLocations: []),
+            _libraryEntityFixture.Create(title: "Library 2", libraryType: LibraryType.Movie, contentLocations: [])
         ];
 
-        UserEntity repositoryEntity = new()
-        {
-            Id = Guid.NewGuid(),
-            Username = "oldusername",
-            Password = "hashedpassword",
-            Libraries = libraries,
-            UserPermissions = [],
-            UserRole = null,
-            CreatedBy = Guid.NewGuid(),
-            CreatedOnUtc = DateTime.UtcNow,
-            UpdatedOnUtc = null
-        };
+        UserEntity repositoryEntity = _userEntityFixture.Create(
+            username: "oldusername",
+            password: "hashedpassword",
+            libraries: libraries);
 
         // Act
         UserEntity result = domainEntity.ToRepositoryEntity(repositoryEntity);

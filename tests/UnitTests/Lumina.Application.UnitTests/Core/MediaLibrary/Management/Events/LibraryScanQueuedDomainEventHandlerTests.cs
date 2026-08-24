@@ -5,8 +5,8 @@ using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.DomainEvents;
 using Lumina.Application.Core.MediaLibrary.Management.Events;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Domain.Common.Exceptions;
 using Lumina.Domain.Common.Events;
+using Lumina.Domain.Common.Exceptions;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
@@ -14,13 +14,12 @@ using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.Library
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
 using NSubstitute;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
+using DomainErrors = Lumina.Domain.Common.Errors.Errors;
 #endregion
 
 namespace Lumina.Application.UnitTests.Core.MediaLibrary.Management.Events;
@@ -52,7 +51,7 @@ public class LibraryScanQueuedDomainEventHandlerTests
         _mockDomainEventsQueue = Substitute.For<IDomainEventsQueue>();
 
         // default stubs: the scanning service starts the scan successfully
-        _mockMediaLibraryScanningService.StartScanAsync(Arg.Any<LibraryScan>(), Arg.Any<LibraryType>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+        _mockMediaLibraryScanningService.StartScanAsync(Arg.Any<LibraryScan>(), Arg.Any<LibraryType>(), Arg.Any<CancellationToken>())
             .Returns(Result.Success);
 
         _sut = new LibraryScanQueuedDomainEventHandler(_mockMediaLibraryScanningService, _mockDomainEventsQueue, _mockUnitOfWork);
@@ -74,7 +73,6 @@ public class LibraryScanQueuedDomainEventHandlerTests
         await _mockMediaLibraryScanningService.Received(1).StartScanAsync(
             Arg.Is<LibraryScan>(libraryScan => libraryScan.Id.Value == scan.Id),
             scan.Library.LibraryType,
-            scan.Library.DownloadMetadataFromWeb,
             Arg.Any<CancellationToken>());
     }
 
@@ -93,7 +91,7 @@ public class LibraryScanQueuedDomainEventHandlerTests
 
         // Assert
         Assert.Equal(error, exception.EventualConsistencyError);
-        await _mockMediaLibraryScanningService.DidNotReceive().StartScanAsync(Arg.Any<LibraryScan>(), Arg.Any<LibraryType>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
+        await _mockMediaLibraryScanningService.DidNotReceive().StartScanAsync(Arg.Any<LibraryScan>(), Arg.Any<LibraryType>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -110,7 +108,7 @@ public class LibraryScanQueuedDomainEventHandlerTests
 
         // Assert
         Assert.Equal(DomainErrors.LibraryScanning.LibraryScanNotFound, exception.EventualConsistencyError);
-        await _mockMediaLibraryScanningService.DidNotReceive().StartScanAsync(Arg.Any<LibraryScan>(), Arg.Any<LibraryType>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
+        await _mockMediaLibraryScanningService.DidNotReceive().StartScanAsync(Arg.Any<LibraryScan>(), Arg.Any<LibraryType>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -122,7 +120,7 @@ public class LibraryScanQueuedDomainEventHandlerTests
         _mockLibraryScanRepository.GetByIdAsync(scan.Id, Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryScanEntity?>(scan));
         Error error = Error.Failure(description: "Failed to start scan");
-        _mockMediaLibraryScanningService.StartScanAsync(Arg.Any<LibraryScan>(), Arg.Any<LibraryType>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+        _mockMediaLibraryScanningService.StartScanAsync(Arg.Any<LibraryScan>(), Arg.Any<LibraryType>(), Arg.Any<CancellationToken>())
             .Returns(error);
 
         // Act

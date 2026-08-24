@@ -3,6 +3,7 @@ using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.UsersManagement.Authentication.Queries.LoginUser;
 using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
+using Lumina.Contracts.Fixtures.Core.Responses.Authentication;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.Domain.Common.Primitives;
@@ -27,6 +28,7 @@ public class LoginEndpointTests
     private readonly IQueryHandler<LoginUserQuery, Result<LoginResponse>> _mockHandler;
     private readonly LoginEndpoint _sut;
     private readonly LoginRequestFixture _loginRequestFixture = new();
+    private readonly LoginResponseFixture _loginResponseFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LoginEndpointTests"/> class.
@@ -43,7 +45,7 @@ public class LoginEndpointTests
         // Arrange
         LoginRequest request = _loginRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
-        LoginResponse expectedResponse = new(Guid.NewGuid(), "testUser", "jwt_token", true);
+        LoginResponse expectedResponse = _loginResponseFixture.Create(username: "testUser", token: "jwt_token", usesTotp: true);
         _mockHandler.HandleAsync(Arg.Any<LoginUserQuery>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(expectedResponse));
 
@@ -87,7 +89,7 @@ public class LoginEndpointTests
         LoginRequest request = _loginRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<LoginUserQuery>(), Arg.Any<CancellationToken>())
-            .Returns(Result.From(new LoginResponse(Guid.NewGuid(), "testUser", "jwt_token", true)));
+            .Returns(Result.From(_loginResponseFixture.Create(username: "testUser", token: "jwt_token", usesTotp: true)));
 
         // Act
         await _sut.ExecuteAsync(request, cancellationToken);
@@ -116,7 +118,7 @@ public class LoginEndpointTests
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return Result.From(new LoginResponse(Guid.NewGuid(), "testUser", "jwt_token", true));
+                return Result.From(_loginResponseFixture.Create(username: "testUser", token: "jwt_token", usesTotp: true));
             }, callInfo.Arg<CancellationToken>()));
 
         // Act

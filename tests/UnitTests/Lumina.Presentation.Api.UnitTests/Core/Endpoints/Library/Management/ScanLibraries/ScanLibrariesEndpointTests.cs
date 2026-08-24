@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.MediaLibrary.Management.Commands.ScanLibraries;
+using Lumina.Contracts.Fixtures.Core.Responses.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Core.Endpoints.Library.Management.ScanLibraries;
@@ -25,6 +26,7 @@ public class ScanLibrariesEndpointTests
 {
     private readonly ICommandHandler<ScanLibrariesCommand, Result<IEnumerable<MediaLibraryScanResponse>>> _mockHandler;
     private readonly ScanLibrariesEndpoint _sut;
+    private readonly MediaLibraryScanResponseFixture _mediaLibraryScanResponseFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ScanLibrariesEndpointTests"/> class.
@@ -42,8 +44,8 @@ public class ScanLibrariesEndpointTests
         CancellationToken cancellationToken = CancellationToken.None;
         IEnumerable<MediaLibraryScanResponse> expectedResponses =
         [
-            new MediaLibraryScanResponse(Guid.NewGuid(), Guid.NewGuid()),
-            new MediaLibraryScanResponse(Guid.NewGuid(), Guid.NewGuid())
+            _mediaLibraryScanResponseFixture.Create(),
+            _mediaLibraryScanResponseFixture.Create()
         ];
         _mockHandler.HandleAsync(Arg.Any<ScanLibrariesCommand>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(expectedResponses));

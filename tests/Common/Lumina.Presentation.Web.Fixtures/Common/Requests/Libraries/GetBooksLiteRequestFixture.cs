@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using Bogus;
 using Lumina.Presentation.Web.Common.Enums.Common;
 using Lumina.Presentation.Web.Common.Requests.Libraries;
 using System;
@@ -24,7 +23,7 @@ public class GetBooksLiteRequestFixture
     /// <param name="perPage">Optional number of books to retrieve per page.</param>
     /// <param name="searchTerm">Optional search term used to filter results.</param>
     /// <param name="filterAlphaKey">Optional alpha key used to filter the results.</param>
-    /// <param name="ignoreThePrefixForAlphaPicker">Whether the leading "The " prefix is ignored by the alpha picker.</param>
+    /// <param name="shouldIgnoreThePrefixForAlphaPicker">Whether the leading "The " prefix is ignored by the alpha picker.</param>
     /// <param name="sortBy">Optional name of the field by which to sort the results.</param>
     /// <param name="sortOrder">Optional direction in which to sort the results.</param>
     /// <returns>A configured <see cref="GetBooksLiteRequest"/> instance.</returns>
@@ -34,7 +33,7 @@ public class GetBooksLiteRequestFixture
         int? perPage = null,
         string? searchTerm = null,
         string? filterAlphaKey = null,
-        bool ignoreThePrefixForAlphaPicker = false,
+        bool shouldIgnoreThePrefixForAlphaPicker = false,
         string? sortBy = null,
         SortOrder? sortOrder = null)
     {
@@ -45,7 +44,7 @@ public class GetBooksLiteRequestFixture
             PerPage = perPage,
             SearchTerm = searchTerm,
             FilterAlphaKey = filterAlphaKey,
-            IgnoreThePrefixForAlphaPicker = ignoreThePrefixForAlphaPicker,
+            ShouldIgnoreThePrefixForAlphaPicker = shouldIgnoreThePrefixForAlphaPicker,
             SortBy = sortBy,
             SortOrder = sortOrder
         };

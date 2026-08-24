@@ -8,8 +8,8 @@ using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook;
 using Lumina.Application.Fixtures.Common.Setup;
 using Lumina.Application.Fixtures.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook;
-using Lumina.Contracts.DTO.Common;
-using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Contracts.Fixtures.Core.DTO.Common;
+using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
@@ -34,6 +34,12 @@ public class AddBookCommandHandlerTests
     private readonly IBookRepository _mockBookRepository;
     private readonly AddBookCommandHandler _sut;
     private readonly AddBookCommandFixture _commandBookFixture = new();
+    private readonly IsbnDtoFixture _isbnDtoFixture = new();
+    private readonly BookRatingDtoFixture _bookRatingDtoFixture = new();
+    private readonly GenreDtoFixture _genreDtoFixture = new();
+    private readonly TagDtoFixture _tagDtoFixture = new();
+    private readonly ReleaseInfoDtoFixture _releaseInfoDtoFixture = new();
+    private readonly LanguageInfoDtoFixture _languageInfoDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AddBookCommandHandlerTests"/> class.
@@ -98,7 +104,7 @@ public class AddBookCommandHandlerTests
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.Create();
-        bookCommand = bookCommand with { ISBNs = [new IsbnDto("invalid", IsbnFormat.Isbn13)] };
+        bookCommand = bookCommand with { ISBNs = [_isbnDtoFixture.Create(value: "invalid", format: IsbnFormat.Isbn13)] };
 
         // Act
         Result<BookResponse> result = await _sut.HandleAsync(bookCommand, CancellationToken.None);
@@ -115,7 +121,7 @@ public class AddBookCommandHandlerTests
     {
         // Arrange
         AddBookCommand bookCommand = _commandBookFixture.Create();
-        bookCommand = bookCommand with { Ratings = [new BookRatingDto(-1, 5, null, null)] };
+        bookCommand = bookCommand with { Ratings = [_bookRatingDtoFixture.Create(value: -1, maxValue: 5, includeOptionalProperties: false)] };
 
         // Act
         Result<BookResponse> result = await _sut.HandleAsync(bookCommand, CancellationToken.None);
@@ -136,7 +142,7 @@ public class AddBookCommandHandlerTests
         {
             Metadata = bookCommand.Metadata! with
             {
-                Genres = [new GenreDto("")]
+                Genres = [_genreDtoFixture.Create(name: "")]
             }
         };
 
@@ -159,7 +165,7 @@ public class AddBookCommandHandlerTests
         {
             Metadata = bookCommand.Metadata! with
             {
-                Tags = [new TagDto("")]
+                Tags = [_tagDtoFixture.Create(name: "")]
             }
         };
 
@@ -182,14 +188,9 @@ public class AddBookCommandHandlerTests
         {
             Metadata = bookCommand.Metadata! with
             {
-                ReleaseInfo = new ReleaseInfoDto(
-                    OriginalReleaseDate: new DateOnly(2025, 1, 1),
-                    ReReleaseDate: new DateOnly(2024, 1, 1),
-                    OriginalReleaseYear: null,
-                    ReReleaseYear: null,
-                    ReleaseCountry: null,
-                    ReleaseVersion: null
-                )
+                ReleaseInfo = _releaseInfoDtoFixture.Create(
+                    originalReleaseDate: new DateOnly(2025, 1, 1),
+                    reReleaseDate: new DateOnly(2024, 1, 1))
             }
         };
 
@@ -212,7 +213,7 @@ public class AddBookCommandHandlerTests
         {
             Metadata = bookCommand.Metadata! with
             {
-                Language = new LanguageInfoDto("", "English", null)
+                Language = _languageInfoDtoFixture.Create(languageCode: "", languageName: "English")
             }
         };
 
@@ -235,7 +236,7 @@ public class AddBookCommandHandlerTests
         {
             Metadata = bookCommand.Metadata! with
             {
-                OriginalLanguage = new LanguageInfoDto("", "English", null)
+                OriginalLanguage = _languageInfoDtoFixture.Create(languageCode: "", languageName: "English")
             }
         };
 

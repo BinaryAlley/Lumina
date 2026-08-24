@@ -1,7 +1,9 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.Admin.Authorization.Roles.Queries.GetRolePermissions;
-using Lumina.Contracts.DTO.Authentication;
+using Lumina.Contracts.Fixtures.Core.DTO.Authentication;
+using Lumina.Contracts.Fixtures.Core.Requests.Authorization;
+using Lumina.Contracts.Fixtures.Core.Responses.Authorization;
 using Lumina.Contracts.Requests.Authorization;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.Domain.Common.Primitives;
@@ -26,6 +28,10 @@ public class GetRolePermissionsEndpointTests
 {
     private readonly IQueryHandler<GetRolePermissionsQuery, Result<RolePermissionsResponse>> _mockHandler;
     private readonly GetRolePermissionsEndpoint _sut;
+    private readonly RolePermissionsResponseFixture _rolePermissionsResponseFixture = new();
+    private readonly RoleDtoFixture _roleDtoFixture = new();
+    private readonly PermissionDtoFixture _permissionDtoFixture = new();
+    private readonly GetRolePermissionsRequestFixture _getRolePermissionsRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetRolePermissionsEndpointTests"/> class.
@@ -40,11 +46,11 @@ public class GetRolePermissionsEndpointTests
     public async Task ExecuteAsync_WhenSuccessful_ShouldReturnOkResultWithPermissions()
     {
         // Arrange
-        GetRolePermissionsRequest request = new(Guid.NewGuid());
+        GetRolePermissionsRequest request = _getRolePermissionsRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
-        RolePermissionsResponse expectedResponse = new(
-            new RoleDto(Guid.NewGuid(), "Admin"),
-            [new PermissionDto(Guid.NewGuid(), AuthorizationPermission.CanViewUsers)]
+        RolePermissionsResponse expectedResponse = _rolePermissionsResponseFixture.Create(
+            role: _roleDtoFixture.Create(roleName: "Admin"),
+            permissions: [_permissionDtoFixture.Create(permissionName: AuthorizationPermission.CanViewUsers)]
         );
         _mockHandler.HandleAsync(Arg.Any<GetRolePermissionsQuery>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(expectedResponse));
@@ -61,7 +67,7 @@ public class GetRolePermissionsEndpointTests
     public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
     {
         // Arrange
-        GetRolePermissionsRequest request = new(Guid.NewGuid());
+        GetRolePermissionsRequest request = _getRolePermissionsRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
         Error expectedError = Error.Failure("Role.Permissions.NotFound", "Role permissions not found.");
         _mockHandler.HandleAsync(Arg.Any<GetRolePermissionsQuery>(), Arg.Any<CancellationToken>())
@@ -88,12 +94,12 @@ public class GetRolePermissionsEndpointTests
     {
         // Arrange
         Guid roleId = Guid.NewGuid();
-        GetRolePermissionsRequest request = new(roleId);
+        GetRolePermissionsRequest request = _getRolePermissionsRequestFixture.Create(roleId: roleId);
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<GetRolePermissionsQuery>(), Arg.Any<CancellationToken>())
-            .Returns(Result.From(new RolePermissionsResponse(
-                new RoleDto(Guid.NewGuid(), "Admin"),
-                []
+            .Returns(Result.From(_rolePermissionsResponseFixture.Create(
+                role: _roleDtoFixture.Create(roleName: "Admin"),
+                permissions: []
             )));
 
         // Act
@@ -119,14 +125,14 @@ public class GetRolePermissionsEndpointTests
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 info.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return Result.From(new RolePermissionsResponse(
-                    new RoleDto(Guid.NewGuid(), "Admin"),
-                    []
+                return Result.From(_rolePermissionsResponseFixture.Create(
+                    role: _roleDtoFixture.Create(roleName: "Admin"),
+                    permissions: []
                 ));
             }, info.Arg<CancellationToken>()));
 
         // Act
-        Task<IResult> operationTask = _sut.ExecuteAsync(new GetRolePermissionsRequest(Guid.NewGuid()), cts.Token);
+        Task<IResult> operationTask = _sut.ExecuteAsync(_getRolePermissionsRequestFixture.Create(), cts.Token);
         await operationStarted.Task;
         cts.Cancel();
         cancellationRequested.SetResult(true);

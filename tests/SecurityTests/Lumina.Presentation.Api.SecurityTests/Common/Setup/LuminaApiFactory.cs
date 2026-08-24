@@ -1,9 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Contracts.Requests.Authentication;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.DataAccess.Common.Interceptors;
 using Lumina.DataAccess.Core.UoW;
@@ -18,7 +20,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Diagnostics.CodeAnalysis;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
@@ -36,10 +37,16 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
     private readonly SqliteConnection _connection;
     private readonly string _sharedInMemoryConnectionString;
     private readonly PasswordHashService _hashService = new();
+    private readonly LoginRequestFixture _loginRequestFixture = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
     };
+    private readonly UserEntityFixture _userEntityFixture = new();
+    private readonly RoleEntityFixture _roleEntityFixture = new();
+    private readonly UserRoleEntityFixture _userRoleEntityFixture = new();
+    private readonly LibraryEntityFixture _libraryEntityFixture = new();
+    private readonly BookEntityFixture _bookEntityFixture = new();
     private const string TEST_ENCRYPTION_KEY = "MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=";
     private const string SHARED_IN_MEMORY_CONNECTION_STRING_PREFIX = "Data Source=lumina-tests-{0};Mode=Memory;Cache=Shared";
     
@@ -145,43 +152,19 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
 
         Guid userId = Guid.NewGuid();
         string username = $"testuser_{Guid.NewGuid()}";
-        UserEntity user = new()
-        {
-            Id = userId,
-            Username = username,
-            Password = _hashService.HashString("TestPass123!"),
-            Libraries = [],
-            UserPermissions = [],
-            UserRole = null,
-            CreatedBy = userId,
-            CreatedOnUtc = DateTime.UtcNow
-        };
+        UserEntity user = _userEntityFixture.Create(id: userId, username: username, password: _hashService.HashString("TestPass123!"));
+        user.TotpSecret = null;
         dbContext.Users.Add(user);
         await dbContext.SaveChangesAsync();
 
         // seed a dedicated Admin role for this test user, keeping each test isolated in the shared in-memory database
         Guid roleId = Guid.NewGuid();
-        RoleEntity role = new()
-        {
-            Id = roleId,
-            RoleName = "Admin",
-            CreatedBy = userId,
-            CreatedOnUtc = DateTime.UtcNow
-        };
+        RoleEntity role = _roleEntityFixture.Create(id: roleId, roleName: "Admin", createdBy: userId, createdOnUtc: DateTime.UtcNow);
         dbContext.Roles.Add(role);
-        dbContext.UserRoles.Add(new UserRoleEntity
-        {
-            Id = Guid.NewGuid(),
-            UserId = userId,
-            User = user,
-            RoleId = roleId,
-            Role = role,
-            CreatedBy = userId,
-            CreatedOnUtc = DateTime.UtcNow
-        });
+        dbContext.UserRoles.Add(_userRoleEntityFixture.Create(userId: userId, user: user, roleId: roleId, role: role));
         await dbContext.SaveChangesAsync();
 
-        HttpResponseMessage loginResponse = await client.PostAsJsonAsync("/api/v1/auth/login", new LoginRequest(username, "TestPass123!"));
+        HttpResponseMessage loginResponse = await client.PostAsJsonAsync("/api/v1/auth/login", _loginRequestFixture.Create(username: username, password: "TestPass123!"));
         string content = await loginResponse.Content.ReadAsStringAsync();
         LoginResponse? loginResult = JsonSerializer.Deserialize<LoginResponse>(content, _jsonOptions);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginResult!.Token);
@@ -205,21 +188,12 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
 
         Guid userId = Guid.NewGuid();
         string username = $"testuser_{Guid.NewGuid()}";
-        UserEntity user = new()
-        {
-            Id = userId,
-            Username = username,
-            Password = _hashService.HashString("TestPass123!"),
-            Libraries = [],
-            UserPermissions = [],
-            UserRole = null,
-            CreatedBy = userId,
-            CreatedOnUtc = DateTime.UtcNow
-        };
+        UserEntity user = _userEntityFixture.Create(id: userId, username: username, password: _hashService.HashString("TestPass123!"));
+        user.TotpSecret = null;
         dbContext.Users.Add(user);
         await dbContext.SaveChangesAsync();
 
-        HttpResponseMessage loginResponse = await client.PostAsJsonAsync("/api/v1/auth/login", new LoginRequest(username, "TestPass123!"));
+        HttpResponseMessage loginResponse = await client.PostAsJsonAsync("/api/v1/auth/login", _loginRequestFixture.Create(username: username, password: "TestPass123!"));
         string content = await loginResponse.Content.ReadAsStringAsync();
         LoginResponse? loginResult = JsonSerializer.Deserialize<LoginResponse>(content, _jsonOptions);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginResult!.Token);
@@ -277,17 +251,7 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
     {
         using IServiceScope scope = Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
-        dbContext.Libraries.Add(new LibraryEntity
-        {
-            Id = libraryId,
-            UserId = userId,
-            Title = "Test Library",
-            LibraryType = LibraryType.EBook,
-            ContentLocations = [],
-            CreatedBy = userId,
-            CreatedOnUtc = DateTime.UtcNow,
-            UpdatedBy = null
-        });
+        dbContext.Libraries.Add(_libraryEntityFixture.Create(id: libraryId, userId: userId, title: "Test Library", libraryType: LibraryType.EBook, contentLocations: []));
         await dbContext.SaveChangesAsync();
     }
 
@@ -300,16 +264,7 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
     {
         using IServiceScope scope = Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
-        dbContext.Books.Add(new BookEntity
-        {
-            Id = Guid.NewGuid(),
-            LibraryId = libraryId,
-            Path = $"/books/{Guid.NewGuid()}.epub",
-            Title = title,
-            CreatedBy = Guid.NewGuid(),
-            CreatedOnUtc = DateTime.UtcNow,
-            UpdatedBy = null
-        });
+        dbContext.Books.Add(_bookEntityFixture.Create(libraryId: libraryId, title: title, path: $"/books/{Guid.NewGuid()}.epub", includeMetadata: false));
         await dbContext.SaveChangesAsync();
     }
 

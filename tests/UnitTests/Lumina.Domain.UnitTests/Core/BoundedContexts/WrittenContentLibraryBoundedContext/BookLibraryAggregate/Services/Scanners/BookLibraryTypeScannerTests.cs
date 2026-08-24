@@ -1,8 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
-using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Services.Jobs;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Services.Scanners;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
@@ -42,33 +40,7 @@ public class BookLibraryTypeScannerTests
     }
 
     [Fact]
-    public void CreateScanJobsForLibrary_WhenDownloadMetadataFromWebIsFalse_ShouldCreateJobChainWithoutMetadataEnrichment()
-    {
-        // Arrange
-        LibraryId libraryId = _libraryIdFixture.Create();
-        TestScanJob discoveryJob = CreateJob<IBooksFileSystemDiscoveryJob>();
-        TestScanJob diffJob = CreateJob<IMediaLibraryScanDiffJob>();
-        TestScanJob hashJob = CreateJob<IMediaLibraryScanHashJob>();
-        TestScanJob saveJob = CreateJob<IMediaLibraryScanResultsSaveJob>();
-        BookLibraryTypeScanner sut = new(_mockJobFactory);
-
-        // Act
-        List<IMediaLibraryScanJob> rootJobs = [.. sut.CreateScanJobsForLibrary(libraryId, downloadMetadataFromWeb: false)];
-
-        // Assert
-        IMediaLibraryScanJob rootJob = Assert.Single(rootJobs);
-        Assert.Same(discoveryJob, rootJob);
-        Assert.Contains(diffJob, discoveryJob.Children);
-        Assert.Contains(discoveryJob, diffJob.Parents);
-        Assert.Contains(hashJob, diffJob.Children);
-        Assert.Contains(diffJob, hashJob.Parents);
-        Assert.Contains(saveJob, hashJob.Children);
-        Assert.Contains(hashJob, saveJob.Parents);
-        _mockJobFactory.DidNotReceive().CreateJob<IMediaLibraryScanMetadataEnrichmentJob>(Arg.Any<LibraryId>());
-    }
-
-    [Fact]
-    public void CreateScanJobsForLibrary_WhenDownloadMetadataFromWebIsTrue_ShouldCreateJobChainWithMetadataEnrichment()
+    public void CreateScanJobsForLibrary_WhenCalled_ShouldCreateJobChainWithMetadataEnrichment()
     {
         // Arrange
         LibraryId libraryId = _libraryIdFixture.Create();
@@ -80,12 +52,17 @@ public class BookLibraryTypeScannerTests
         BookLibraryTypeScanner sut = new(_mockJobFactory);
 
         // Act
-        List<IMediaLibraryScanJob> rootJobs = [.. sut.CreateScanJobsForLibrary(libraryId, downloadMetadataFromWeb: true)];
+        List<IMediaLibraryScanJob> rootJobs = [.. sut.CreateScanJobsForLibrary(libraryId)];
 
         // Assert
         IMediaLibraryScanJob rootJob = Assert.Single(rootJobs);
         Assert.Same(discoveryJob, rootJob);
+        Assert.Contains(diffJob, discoveryJob.Children);
+        Assert.Contains(discoveryJob, diffJob.Parents);
+        Assert.Contains(hashJob, diffJob.Children);
+        Assert.Contains(diffJob, hashJob.Parents);
         Assert.Contains(saveJob, hashJob.Children);
+        Assert.Contains(hashJob, saveJob.Parents);
         Assert.Contains(enrichmentJob, saveJob.Children);
         Assert.Contains(saveJob, enrichmentJob.Parents);
         _mockJobFactory.Received(1).CreateJob<IMediaLibraryScanMetadataEnrichmentJob>(libraryId);
@@ -100,16 +77,18 @@ public class BookLibraryTypeScannerTests
         CreateJob<IMediaLibraryScanDiffJob>();
         CreateJob<IMediaLibraryScanHashJob>();
         CreateJob<IMediaLibraryScanResultsSaveJob>();
+        CreateJob<IMediaLibraryScanMetadataEnrichmentJob>();
         BookLibraryTypeScanner sut = new(_mockJobFactory);
 
         // Act
-        _ = sut.CreateScanJobsForLibrary(libraryId, downloadMetadataFromWeb: false).ToList();
+        _ = sut.CreateScanJobsForLibrary(libraryId).ToList();
 
         // Assert
         _mockJobFactory.Received(1).CreateJob<IBooksFileSystemDiscoveryJob>(libraryId);
         _mockJobFactory.Received(1).CreateJob<IMediaLibraryScanDiffJob>(libraryId);
         _mockJobFactory.Received(1).CreateJob<IMediaLibraryScanHashJob>(libraryId);
         _mockJobFactory.Received(1).CreateJob<IMediaLibraryScanResultsSaveJob>(libraryId);
+        _mockJobFactory.Received(1).CreateJob<IMediaLibraryScanMetadataEnrichmentJob>(libraryId);
     }
 
     private TestScanJob CreateJob<TJob>() where TJob : class, IMediaLibraryScanJob

@@ -8,6 +8,7 @@ using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Fixtures.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
 using Lumina.Contracts.Responses.Authorization;
@@ -40,7 +41,11 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
     private readonly IPermissionRepository _mockPermissionRepository;
     private readonly UpdateUserRoleAndPermissionsCommandHandler _sut;
     private readonly UserEntityFixture _userEntityFixture = new();
+    private readonly RoleEntityFixture _roleEntityFixture = new();
+    private readonly UserRoleEntityFixture _userRoleEntityFixture = new();
+    private readonly UserPermissionEntityFixture _userPermissionEntityFixture = new();
     private readonly UpdateUserRoleAndPermissionsCommandFixture _updateUserRoleAndPermissionsCommandFixture = new();
+    private readonly PermissionEntityFixture _permissionEntityFixture = new();
     private readonly Guid _userId;
 
     /// <summary>
@@ -150,28 +155,18 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
     {
         // Arrange
         UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.Create(roleId: Guid.NewGuid());
-        RoleEntity adminRole = new() { RoleName = "Admin" };
+        RoleEntity adminRole = _roleEntityFixture.Create(roleName: "Admin");
         Guid userId = Guid.NewGuid();
+        UserRoleEntity userRole = _userRoleEntityFixture.Create(userId: userId, role: adminRole);
 
-        UserEntity user = new()
-        {
-            Id = userId,
-            Username = "testAdmin",
-            Password = "hashedPassword",
-            Libraries = [],
-            UserPermissions = [],
-            UserRole = new UserRoleEntity
-            {
-                UserId = userId,
-                RoleId = Guid.NewGuid(),
-                User = null!,
-                Role = adminRole
-            },
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = userId
-        };
+        UserEntity user = _userEntityFixture.Create(
+            id: userId,
+            username: "testAdmin",
+            password: "hashedPassword",
+            userRole: userRole,
+            includeUserRole: true);
 
-        RoleEntity newRole = new() { RoleName = "User" };
+        RoleEntity newRole = _roleEntityFixture.Create(roleName: "User");
         IEnumerable<UserEntity> users = [user];
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
@@ -197,9 +192,9 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
         // Arrange
         UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.Create(roleId: Guid.NewGuid());
         UserEntity user = _userEntityFixture.Create();
-        RoleEntity role = new() { RoleName = "TestRole" };
-        IEnumerable<PermissionEntity> permissions = command.Permissions.Select(p =>
-            new PermissionEntity { Id = p, PermissionName = AuthorizationPermission.CanViewUsers });
+        RoleEntity role = _roleEntityFixture.Create(roleName: "TestRole");
+        IEnumerable<PermissionEntity> permissions = command.Permissions.Select(permissionId =>
+            _permissionEntityFixture.Create(id: permissionId, permissionName: AuthorizationPermission.CanViewUsers));
         Error error = Error.Failure("Database.Error", "Failed to update user");
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
@@ -227,30 +222,18 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
     {
         // Arrange
         UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.Create(roleId: Guid.NewGuid());
-        UserEntity user = new()
-        {
-            Id = command.UserId,
-            Username = "testUser",
-            Password = "hashedPassword",
-            Libraries = [],
-            UserPermissions = [.. command.Permissions.Select((p, i) => new UserPermissionEntity
-            {
-                UserId = command.UserId,
-                PermissionId = p,
-                User = null!,
-                Permission = new PermissionEntity
-                {
-                    Id = p,
-                    PermissionName = (AuthorizationPermission)(i + 1) 
-                }
-            })],
-            UserRole = null,
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = command.UserId
-        };
-        RoleEntity role = new() { RoleName = "TestRole" };
-        IEnumerable<PermissionEntity> permissions = command.Permissions.Select((p, i) =>
-            new PermissionEntity { Id = p, PermissionName = (AuthorizationPermission)(i + 1) });
+        UserEntity user = _userEntityFixture.Create(id: command.UserId, username: "testUser", password: "hashedPassword");
+
+        List<UserPermissionEntity> userPermissions = [.. command.Permissions.Select((permissionId, index) =>
+            _userPermissionEntityFixture.Create(
+                user: user,
+                permission: _permissionEntityFixture.Create(id: permissionId, permissionName: (AuthorizationPermission)(index + 1))))];
+        foreach (UserPermissionEntity userPermission in userPermissions)
+            user.UserPermissions.Add(userPermission);
+
+        RoleEntity role = _roleEntityFixture.Create(roleName: "TestRole");
+        IEnumerable<PermissionEntity> permissions = command.Permissions.Select((permissionId, index) =>
+            _permissionEntityFixture.Create(id: permissionId, permissionName: (AuthorizationPermission)(index + 1)));
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(true);
@@ -279,23 +262,16 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
     {
         // Arrange
         UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.Create(roleId: Guid.NewGuid());
-        UserEntity user = new()
-        {
-            Id = command.UserId,
-            Username = "testUser",
-            Password = "hashedPassword",
-            Libraries = [],
-            UserPermissions = [],
-            UserRole = new UserRoleEntity
-            {
-                UserId = command.UserId,
-                RoleId = Guid.NewGuid(),
-                User = null!,
-                Role = new RoleEntity { RoleName = "Admin" }
-            },
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = command.UserId
-        };
+        RoleEntity adminRole = _roleEntityFixture.Create(roleName: "Admin");
+        UserRoleEntity userRole = _userRoleEntityFixture.Create(userId: command.UserId, role: adminRole);
+
+        UserEntity user = _userEntityFixture.Create(
+            id: command.UserId,
+            username: "testUser",
+            password: "hashedPassword",
+            userRole: userRole,
+            includeUserRole: true);
+
         Error error = Error.Failure("Database.Error", "Failed to get users");
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
@@ -303,7 +279,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
         _mockUserRepository.GetByIdAsync(command.UserId, Arg.Any<CancellationToken>())
             .Returns(user);
         _mockRoleRepository.GetByIdAsync(command.RoleId!.Value, Arg.Any<CancellationToken>())
-            .Returns(new RoleEntity { RoleName = "User" });
+            .Returns(_roleEntityFixture.Create(roleName: "User"));
         _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
             .Returns(error);
 
@@ -320,17 +296,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
     {
         // Arrange
         UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.Create(roleId: Guid.NewGuid());
-        UserEntity user = new()
-        {
-            Id = command.UserId,
-            Username = "testUser",
-            Password = "hashedPassword",
-            Libraries = [],
-            UserPermissions = [],
-            UserRole = null,
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = command.UserId
-        };
+        UserEntity user = _userEntityFixture.Create(id: command.UserId, username: "testUser", password: "hashedPassword");
         Error error = Error.Failure("Database.Error", "Failed to get permissions");
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
@@ -338,7 +304,7 @@ public class UpdateUserRoleAndPermissionsCommandHandlerTests
         _mockUserRepository.GetByIdAsync(command.UserId, Arg.Any<CancellationToken>())
             .Returns(user);
         _mockRoleRepository.GetByIdAsync(command.RoleId!.Value, Arg.Any<CancellationToken>())
-            .Returns(new RoleEntity { RoleName = "User" });
+            .Returns(_roleEntityFixture.Create(roleName: "User"));
         _mockPermissionRepository.GetByIdsAsync(command.Permissions, Arg.Any<CancellationToken>())
             .Returns(error);
 

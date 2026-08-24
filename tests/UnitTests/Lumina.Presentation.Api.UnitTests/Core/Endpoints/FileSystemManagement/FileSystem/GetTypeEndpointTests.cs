@@ -2,8 +2,9 @@
 using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.FileSystemManagement.FileSystem.Queries.GetFileSystem;
-using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
+using Lumina.Contracts.Fixtures.Core.Responses.FileSystemManagement.FileSystem;
 using Lumina.Contracts.Responses.FileSystemManagement.FileSystem;
+using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.FileSystem.GetType;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -24,6 +25,7 @@ public class GetTypeEndpointTests
 {
     private readonly IQueryHandler<GetFileSystemQuery, FileSystemTypeResponse> _mockHandler;
     private readonly GetTypeEndpoint _sut;
+    private readonly FileSystemTypeResponseFixture _fileSystemTypeResponseFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetTypeEndpointTests"/> class.
@@ -39,7 +41,7 @@ public class GetTypeEndpointTests
     {
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;
-        FileSystemTypeResponse expectedResponse = new(PlatformType.Windows);
+        FileSystemTypeResponse expectedResponse = _fileSystemTypeResponseFixture.Create(platformType: PlatformType.Windows);
         _mockHandler.HandleAsync(Arg.Any<GetFileSystemQuery>(), Arg.Any<CancellationToken>())
             .Returns(expectedResponse);
 
@@ -58,7 +60,7 @@ public class GetTypeEndpointTests
     {
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;
-        FileSystemTypeResponse expectedResponse = new(platformType);
+        FileSystemTypeResponse expectedResponse = _fileSystemTypeResponseFixture.Create(platformType: platformType);
         _mockHandler.HandleAsync(Arg.Any<GetFileSystemQuery>(), Arg.Any<CancellationToken>())
             .Returns(expectedResponse);
 
@@ -76,7 +78,7 @@ public class GetTypeEndpointTests
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<GetFileSystemQuery>(), Arg.Any<CancellationToken>())
-            .Returns(new FileSystemTypeResponse(PlatformType.Windows));
+            .Returns(_fileSystemTypeResponseFixture.Create(platformType: PlatformType.Windows));
 
         // Act
         await _sut.ExecuteAsync(EmptyRequest.Instance, cancellationToken);
@@ -99,7 +101,7 @@ public class GetTypeEndpointTests
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return new FileSystemTypeResponse(PlatformType.Windows);
+                return _fileSystemTypeResponseFixture.Create(platformType: PlatformType.Windows);
             }, callInfo.Arg<CancellationToken>()));
 
         // Act

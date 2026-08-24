@@ -2,6 +2,7 @@
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Plugins;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Infrastructure.Core.Plugins;
 using Microsoft.Extensions.Logging;
@@ -26,6 +27,7 @@ public class PluginSettingsStoreTests
     private readonly IPluginRepository _mockPluginRepository;
     private readonly ILogger<PluginSettingsStore> _mockLogger;
     private readonly PluginSettingsStore _sut;
+    private readonly PluginEntityFixture _pluginEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PluginSettingsStoreTests"/> class.
@@ -46,7 +48,7 @@ public class PluginSettingsStoreTests
         // Arrange
         Guid pluginId = Guid.NewGuid();
         Dictionary<string, string> expectedSettings = new() { ["ApiKey"] = "test-key", ["Enabled"] = "true" };
-        PluginEntity pluginEntity = CreatePluginEntity(pluginId, JsonSerializer.Serialize(expectedSettings));
+        PluginEntity pluginEntity = _pluginEntityFixture.Create(id: pluginId, settingsJson: JsonSerializer.Serialize(expectedSettings));
         _mockPluginRepository.GetByIdAsync(pluginId, Arg.Any<CancellationToken>())
             .Returns(Result.From<PluginEntity?>(pluginEntity));
 
@@ -63,7 +65,7 @@ public class PluginSettingsStoreTests
     {
         // Arrange
         Guid pluginId = Guid.NewGuid();
-        PluginEntity pluginEntity = CreatePluginEntity(pluginId, settingsJson: null);
+        PluginEntity pluginEntity = _pluginEntityFixture.Create(id: pluginId, includeSettingsJson: false);
         _mockPluginRepository.GetByIdAsync(pluginId, Arg.Any<CancellationToken>())
             .Returns(Result.From<PluginEntity?>(pluginEntity));
 
@@ -102,27 +104,5 @@ public class PluginSettingsStoreTests
 
         // Assert
         Assert.Null(result);
-    }
-
-    /// <summary>
-    /// Creates a plugin entity with the provided identity and serialized settings.
-    /// </summary>
-    /// <param name="id">The Id of the plugin.</param>
-    /// <param name="settingsJson">The serialized settings of the plugin.</param>
-    /// <returns>The created plugin entity.</returns>
-    private static PluginEntity CreatePluginEntity(Guid id, string? settingsJson)
-    {
-        return new PluginEntity
-        {
-            Id = id,
-            Name = "Test Plugin",
-            Author = "Test Author",
-            Version = "1.0.0",
-            Description = "Test plugin description",
-            SettingsJson = settingsJson,
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = Guid.Empty,
-            UpdatedBy = null
-        };
     }
 }

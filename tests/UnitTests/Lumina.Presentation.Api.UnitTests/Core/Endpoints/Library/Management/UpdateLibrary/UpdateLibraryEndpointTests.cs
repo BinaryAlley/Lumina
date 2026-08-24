@@ -6,7 +6,6 @@ using Lumina.Contracts.Fixtures.Core.Responses.MediaLibrary.Management;
 using Lumina.Contracts.Requests.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
 using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Presentation.Api.Core.Endpoints.Library.Management.UpdateLibrary;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -106,7 +105,7 @@ public class UpdateLibraryEndpointTests
                 command.CoverImage == request.CoverImage &&
                 command.IsEnabled == request.IsEnabled &&
                 command.IsLocked == request.IsLocked &&
-                command.DownloadMetadataFromWeb == request.DownloadMetadataFromWeb &&
+                command.CanDownloadMetadataFromWeb == request.CanDownloadMetadataFromWeb &&
                 command.ShouldSaveMetadataInMediaDirectories == request.ShouldSaveMetadataInMediaDirectories &&
                 command.ShouldSkipUnchangedDirectoriesDuringScan == request.ShouldSkipUnchangedDirectoriesDuringScan),
             Arg.Is(cancellationToken));

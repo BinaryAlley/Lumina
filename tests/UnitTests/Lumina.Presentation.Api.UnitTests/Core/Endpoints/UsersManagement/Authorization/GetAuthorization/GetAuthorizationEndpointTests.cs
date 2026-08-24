@@ -3,6 +3,7 @@ using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetAuthorization;
 using Lumina.Contracts.Fixtures.Core.Requests.Authorization;
+using Lumina.Contracts.Fixtures.Core.Responses.Authorization;
 using Lumina.Contracts.Requests.Authorization;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.Domain.Common.Primitives;
@@ -30,6 +31,7 @@ public class GetAuthorizationEndpointTests
     private readonly IQueryHandler<GetAuthorizationQuery, Result<AuthorizationResponse>> _mockHandler;
     private readonly GetAuthorizationEndpoint _sut;
     private readonly GetAuthorizationRequestFixture _getAuthorizationRequestFixture = new();
+    private readonly AuthorizationResponseFixture _authorizationResponseFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetAuthorizationEndpointTests"/> class.
@@ -46,10 +48,10 @@ public class GetAuthorizationEndpointTests
         // Arrange
         GetAuthorizationRequest request = _getAuthorizationRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
-        AuthorizationResponse expectedResponse = new(
-            request.UserId!.Value,
-            "Admin",
-            new HashSet<AuthorizationPermission> { AuthorizationPermission.CanViewUsers });
+        AuthorizationResponse expectedResponse = _authorizationResponseFixture.Create(
+            userId: request.UserId!.Value,
+            role: "Admin",
+            permissions: new HashSet<AuthorizationPermission> { AuthorizationPermission.CanViewUsers });
 
         _mockHandler.HandleAsync(Arg.Any<GetAuthorizationQuery>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(expectedResponse));
@@ -97,7 +99,7 @@ public class GetAuthorizationEndpointTests
         CancellationToken cancellationToken = CancellationToken.None;
 
         _mockHandler.HandleAsync(Arg.Any<GetAuthorizationQuery>(), Arg.Any<CancellationToken>())
-            .Returns(Result.From(new AuthorizationResponse(
+            .Returns(Result.From(_authorizationResponseFixture.Create(
                 request.UserId!.Value,
                 string.Empty,
                 new HashSet<AuthorizationPermission>().ToHashSet()
@@ -128,7 +130,7 @@ public class GetAuthorizationEndpointTests
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return Result.From(new AuthorizationResponse(
+                return Result.From(_authorizationResponseFixture.Create(
                     request.UserId!.Value,
                     string.Empty,
                     new HashSet<AuthorizationPermission>().ToHashSet()

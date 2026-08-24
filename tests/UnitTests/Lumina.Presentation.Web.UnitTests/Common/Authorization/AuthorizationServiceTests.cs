@@ -3,6 +3,7 @@ using Lumina.Presentation.Web.Common.Api;
 using Lumina.Presentation.Web.Common.Authorization;
 using Lumina.Presentation.Web.Common.Enums.Authorization;
 using Lumina.Presentation.Web.Common.Responses.Authorization;
+using Lumina.Presentation.Web.Fixtures.Common.Responses.Authorization;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
 using System;
@@ -23,6 +24,7 @@ public class AuthorizationServiceTests
     private readonly IApiHttpClient _mockApiHttpClient;
     private readonly AuthorizationService _sut;
     private readonly Guid _userId;
+    private readonly GetAuthorizationResponseFixture _getAuthorizationResponseFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AuthorizationServiceTests"/> class.
@@ -43,7 +45,7 @@ public class AuthorizationServiceTests
     {
         // Arrange
         _mockApiHttpClient.GetAsync<GetAuthorizationResponse>(Arg.Any<string>(), Arg.Any<CancellationToken>())
-            .Returns(new GetAuthorizationResponse(_userId, "Admin", [AuthorizationPermission.CanCreateLibraries]));
+            .Returns(_getAuthorizationResponseFixture.Create(userId: _userId, role: "Admin", permissions: [AuthorizationPermission.CanCreateLibraries]));
 
         // Act
         bool result = await _sut.HasPermissionAsync(AuthorizationPermission.CanCreateLibraries, CancellationToken.None);
@@ -57,7 +59,7 @@ public class AuthorizationServiceTests
     {
         // Arrange
         _mockApiHttpClient.GetAsync<GetAuthorizationResponse>(Arg.Any<string>(), Arg.Any<CancellationToken>())
-            .Returns(new GetAuthorizationResponse(_userId, "Admin", [AuthorizationPermission.CanViewUsers]));
+            .Returns(_getAuthorizationResponseFixture.Create(userId: _userId, role: "Admin", permissions: [AuthorizationPermission.CanViewUsers]));
 
         // Act
         bool result = await _sut.HasPermissionAsync(AuthorizationPermission.CanCreateLibraries, CancellationToken.None);
@@ -71,7 +73,7 @@ public class AuthorizationServiceTests
     {
         // Arrange
         _mockApiHttpClient.GetAsync<GetAuthorizationResponse>(Arg.Any<string>(), Arg.Any<CancellationToken>())
-            .Returns(new GetAuthorizationResponse(_userId, "Admin", []));
+            .Returns(_getAuthorizationResponseFixture.Create(userId: _userId, role: "Admin", permissions: []));
 
         // Act
         bool result = await _sut.IsInRoleAsync("Admin", CancellationToken.None);
@@ -85,7 +87,7 @@ public class AuthorizationServiceTests
     {
         // Arrange
         _mockApiHttpClient.GetAsync<GetAuthorizationResponse>(Arg.Any<string>(), Arg.Any<CancellationToken>())
-            .Returns(new GetAuthorizationResponse(_userId, "User", []));
+            .Returns(_getAuthorizationResponseFixture.Create(userId: _userId, role: "User", permissions: []));
 
         // Act
         bool result = await _sut.IsInRoleAsync("Admin", CancellationToken.None);
@@ -99,7 +101,7 @@ public class AuthorizationServiceTests
     {
         // Arrange
         _mockApiHttpClient.GetAsync<GetAuthorizationResponse>(Arg.Any<string>(), Arg.Any<CancellationToken>())
-            .Returns(new GetAuthorizationResponse(_userId, "Admin", []));
+            .Returns(_getAuthorizationResponseFixture.Create(userId: _userId, role: "Admin", permissions: []));
 
         // Act
         await _sut.HasPermissionAsync(AuthorizationPermission.CanViewUsers, CancellationToken.None);

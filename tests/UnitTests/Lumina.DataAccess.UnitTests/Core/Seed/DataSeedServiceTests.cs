@@ -6,6 +6,7 @@ using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Time;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
 using Lumina.DataAccess.Core.Seed;
 using Lumina.Domain.Common.Primitives;
@@ -31,6 +32,9 @@ public class DataSeedServiceTests
     private readonly IPermissionRepository _mockPermissionRepository;
     private readonly DataSeedService _sut;
     private readonly DateTime _fixedUtcNow;
+    private readonly UserEntityFixture _userEntityFixture = new();
+    private readonly RoleEntityFixture _roleEntityFixture = new();
+    private readonly PermissionEntityFixture _permissionEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DataSeedServiceTests"/> class.
@@ -226,12 +230,12 @@ public class DataSeedServiceTests
     {
         // Arrange
         Guid userId = Guid.NewGuid();
-        RoleEntity adminRole = new() { Id = Guid.NewGuid(), RoleName = "Admin" };
+        RoleEntity adminRole = _roleEntityFixture.Create(roleName: "Admin");
         List<PermissionEntity> permissions =
         [
-            new() { Id = Guid.NewGuid(), PermissionName = AuthorizationPermission.CanViewUsers },
-            new() { Id = Guid.NewGuid(), PermissionName = AuthorizationPermission.CanDeleteUsers },
-            new() { Id = Guid.NewGuid(), PermissionName = AuthorizationPermission.CanRegisterUsers }
+            _permissionEntityFixture.Create(permissionName: AuthorizationPermission.CanViewUsers),
+            _permissionEntityFixture.Create(permissionName: AuthorizationPermission.CanDeleteUsers),
+            _permissionEntityFixture.Create(permissionName: AuthorizationPermission.CanRegisterUsers)
         ];
 
         IRoleRepository mockRoleRepository = Substitute.For<IRoleRepository>();
@@ -291,7 +295,7 @@ public class DataSeedServiceTests
     {
         // Arrange
         Guid userId = Guid.NewGuid();
-        RoleEntity adminRole = new() { Id = Guid.NewGuid(), RoleName = "Admin" };
+        RoleEntity adminRole = _roleEntityFixture.Create(roleName: "Admin");
         Error expectedError = Error.Failure("Permissions.NotFound", "Failed to retrieve permissions");
 
         IRoleRepository mockRoleRepository = Substitute.For<IRoleRepository>();
@@ -318,8 +322,8 @@ public class DataSeedServiceTests
     {
         // Arrange
         Guid userId = Guid.NewGuid();
-        RoleEntity adminRole = new() { Id = Guid.NewGuid(), RoleName = "Admin" };
-        List<PermissionEntity> permissions = [new() { Id = Guid.NewGuid(), PermissionName = AuthorizationPermission.CanViewUsers }];
+        RoleEntity adminRole = _roleEntityFixture.Create(roleName: "Admin");
+        List<PermissionEntity> permissions = [_permissionEntityFixture.Create(permissionName: AuthorizationPermission.CanViewUsers)];
         Error expectedError = Error.Failure("RolePermission.InsertFailed", "Failed to insert role permission");
 
         IRoleRepository mockRoleRepository = Substitute.For<IRoleRepository>();
@@ -373,9 +377,8 @@ public class DataSeedServiceTests
     {
         // Arrange
         Guid userId = Guid.NewGuid();
-        RoleEntity adminRole = new() { Id = Guid.NewGuid(), RoleName = "Admin" };
-        UserEntityFixture userFixture = new();
-        UserEntity adminUser = userFixture.Create();
+        RoleEntity adminRole = _roleEntityFixture.Create(roleName: "Admin");
+        UserEntity adminUser = _userEntityFixture.Create();
         // Use the adminUser.Id instead of the randomly generated userId
         userId = adminUser.Id;
 
@@ -437,7 +440,7 @@ public class DataSeedServiceTests
     {
         // Arrange
         Guid userId = Guid.NewGuid();
-        RoleEntity adminRole = new() { Id = Guid.NewGuid(), RoleName = "Admin" };
+        RoleEntity adminRole = _roleEntityFixture.Create(roleName: "Admin");
 
         IRoleRepository mockRoleRepository = Substitute.For<IRoleRepository>();
         IUserRepository mockUserRepository = Substitute.For<IUserRepository>();
@@ -463,8 +466,8 @@ public class DataSeedServiceTests
     {
         // Arrange
         Guid userId = Guid.NewGuid();
-        RoleEntity adminRole = new() { Id = Guid.NewGuid(), RoleName = "Admin" };
-        UserEntity adminUser = new UserEntityFixture().Create();
+        RoleEntity adminRole = _roleEntityFixture.Create(roleName: "Admin");
+        UserEntity adminUser = _userEntityFixture.Create();
 
         Error expectedError = Error.Failure("UserRole.InsertFailed", "Failed to insert user role");
 
@@ -519,7 +522,7 @@ public class DataSeedServiceTests
     {
         // Arrange
         Guid userId = Guid.NewGuid();
-        RoleEntity adminRole = new() { Id = Guid.NewGuid(), RoleName = "Admin" };
+        RoleEntity adminRole = _roleEntityFixture.Create(roleName: "Admin");
         Error expectedError = Error.Failure("User.NotFound", "Failed to retrieve user");
 
         IRoleRepository mockRoleRepository = Substitute.For<IRoleRepository>();

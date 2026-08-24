@@ -11,7 +11,6 @@ using Lumina.Presentation.Web.Fixtures.Common.DTO.Themes;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
@@ -46,6 +45,9 @@ public class ThemeLayoutRendererTests
     private readonly IView _mockAudioPlayerView;
     private readonly IView _mockScriptsView;
     private readonly IView _mockNavMenuView;
+    private readonly ThemeResponseDtoFixture _themeResponseDtoFixture = new();
+    private readonly ThemeTemplateResponseDtoFixture _themeTemplateResponseDtoFixture = new();
+    private readonly ThemeLayoutPageDtoFixture _themeLayoutPageDtoFixture = new();
     private readonly ThemeLayoutRenderer _sut;
 
     /// <summary>
@@ -90,9 +92,9 @@ public class ThemeLayoutRendererTests
     {
         // Arrange
         _mockHttpContextAccessor.HttpContext.Returns(TestHttpContextFactory.Create(user: TestHttpContextFactory.CreateAuthenticatedUser()));
-        ThemeResponseDto theme = new ThemeResponseDtoFixture().Create(themeId: "editorial");
+        ThemeResponseDto theme = _themeResponseDtoFixture.Create(themeId: "editorial");
         SetupRenderDocuments(theme, layoutTemplate: "{{title}}|{{assetBase}}|{{{appHead}}}|{{{nav}}}|{{{content}}}|{{{audioPlayer}}}|{{{appScripts}}}|{{{scripts}}}|{{mainStyle}}", navTemplate: "nav:{{siteName}}");
-        ThemeLayoutPageDto page = new("My Page", "<main>", "<page-script>");
+        ThemeLayoutPageDto page = _themeLayoutPageDtoFixture.Create(title: "My Page", content: "<main>", script: "<page-script>");
 
         // Act
         Result<string> result = await _sut.RenderAsync(page, "editorial", CancellationToken.None);
@@ -107,9 +109,9 @@ public class ThemeLayoutRendererTests
     {
         // Arrange
         _mockHttpContextAccessor.HttpContext.Returns(TestHttpContextFactory.Create(user: null));
-        ThemeResponseDto theme = new ThemeResponseDtoFixture().Create(themeId: "editorial");
+        ThemeResponseDto theme = _themeResponseDtoFixture.Create(themeId: "editorial");
         SetupRenderDocuments(theme, layoutTemplate: "{{title}}|{{assetBase}}|{{{appHead}}}|{{{nav}}}|{{{content}}}|{{{audioPlayer}}}|{{{appScripts}}}|{{{scripts}}}|{{mainStyle}}", navTemplate: "nav:{{siteName}}");
-        ThemeLayoutPageDto page = new("My Page", "<main>", "<page-script>");
+        ThemeLayoutPageDto page = _themeLayoutPageDtoFixture.Create(title: "My Page", content: "<main>", script: "<page-script>");
 
         // Act
         Result<string> result = await _sut.RenderAsync(page, "editorial", CancellationToken.None);
@@ -124,9 +126,9 @@ public class ThemeLayoutRendererTests
     {
         // Arrange
         _mockHttpContextAccessor.HttpContext.Returns(TestHttpContextFactory.Create(user: null));
-        ThemeResponseDto theme = new ThemeResponseDtoFixture().Create(themeId: "editorial");
+        ThemeResponseDto theme = _themeResponseDtoFixture.Create(themeId: "editorial");
         SetupRenderDocuments(theme, layoutTemplate: "{{title}}|{{{nav}}}", navTemplate: "{{#unclosed}}");
-        ThemeLayoutPageDto page = new("My Page", "<main>", string.Empty);
+        ThemeLayoutPageDto page = _themeLayoutPageDtoFixture.Create(title: "My Page", content: "<main>", script: string.Empty);
 
         // Act
         Result<string> result = await _sut.RenderAsync(page, "editorial", CancellationToken.None);
@@ -142,9 +144,9 @@ public class ThemeLayoutRendererTests
     {
         // Arrange
         _mockHttpContextAccessor.HttpContext.Returns(TestHttpContextFactory.Create(user: null));
-        ThemeResponseDto theme = new ThemeResponseDtoFixture().Create(themeId: "editorial");
+        ThemeResponseDto theme = _themeResponseDtoFixture.Create(themeId: "editorial");
         SetupRenderDocuments(theme, layoutTemplate: "{{title}}", navTemplate: "nav:{{siteName}}");
-        ThemeLayoutPageDto page = new("My Page", "<main>", string.Empty);
+        ThemeLayoutPageDto page = _themeLayoutPageDtoFixture.Create(title: "My Page", content: "<main>", script: string.Empty);
         string layoutEndpoint = ApiRoutes.Themes.GET_THEME_TEMPLATE
             .Replace("{themeId}", "editorial")
             .Replace("{*pageKey}", "shared/layout");
@@ -160,6 +162,12 @@ public class ThemeLayoutRendererTests
         await _mockApiHttpClient.Received(1).GetAsync<ThemeTemplateResponseDto>(navEndpoint, Arg.Any<CancellationToken>());
     }
 
+    /// <summary>
+    /// Stubs the API responses that return the layout and navigation menu templates of the given theme.
+    /// </summary>
+    /// <param name="theme">The theme whose layout and navigation menu templates are stubbed.</param>
+    /// <param name="layoutTemplate">The template returned for the layout document.</param>
+    /// <param name="navTemplate">The template returned for the navigation menu document.</param>
     private void SetupRenderDocuments(ThemeResponseDto theme, string layoutTemplate, string navTemplate)
     {
         string layoutEndpoint = ApiRoutes.Themes.GET_THEME_TEMPLATE
@@ -169,11 +177,16 @@ public class ThemeLayoutRendererTests
             .Replace("{themeId}", theme.ThemeId)
             .Replace("{*pageKey}", "shared/nav-menu");
         _mockApiHttpClient.GetAsync<ThemeTemplateResponseDto>(layoutEndpoint, Arg.Any<CancellationToken>())
-            .Returns(new ThemeTemplateResponseDto(theme, layoutTemplate));
+            .Returns(_themeTemplateResponseDtoFixture.Create(theme: theme, template: layoutTemplate));
         _mockApiHttpClient.GetAsync<ThemeTemplateResponseDto>(navEndpoint, Arg.Any<CancellationToken>())
-            .Returns(new ThemeTemplateResponseDto(theme, navTemplate));
+            .Returns(_themeTemplateResponseDtoFixture.Create(theme: theme, template: navTemplate));
     }
 
+    /// <summary>
+    /// Creates a substitute view that renders the given markup.
+    /// </summary>
+    /// <param name="markup">The markup rendered by the view.</param>
+    /// <returns>The created substitute view.</returns>
     private static IView CreateView(string markup)
     {
         IView view = Substitute.For<IView>();
@@ -186,6 +199,10 @@ public class ThemeLayoutRendererTests
         return view;
     }
 
+    /// <summary>
+    /// Creates a substitute string localizer that returns a string prefixed with "Localized-".
+    /// </summary>
+    /// <returns>The created substitute string localizer.</returns>
     private static IStringLocalizer CreateLocalizer()
     {
         IStringLocalizer localizer = Substitute.For<IStringLocalizer>();
