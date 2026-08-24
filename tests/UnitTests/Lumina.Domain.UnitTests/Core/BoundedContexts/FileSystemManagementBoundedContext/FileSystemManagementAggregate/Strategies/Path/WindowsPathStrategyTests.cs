@@ -626,6 +626,39 @@ public class WindowsPathStrategyTests
     }
 
     [Fact]
+    public void GetInvalidPathSegmentCharsForPlatform_WhenCalled_ShouldReturnExpectedCharacters()
+    {
+        // Act
+        char[] result = _sut.GetInvalidPathSegmentCharsForPlatform();
+
+        // Assert
+        Assert.Equal(['<', '>', '"', '/', '|', '?', '*', ':'], result);
+    }
+
+    [Fact]
+    public void GetInvalidPathSegmentCharsForPlatform_WhenCalled_ShouldContainTheColon()
+    {
+        // Act
+        char[] result = _sut.GetInvalidPathSegmentCharsForPlatform();
+
+        // Assert
+        Assert.Contains(':', result);
+        Assert.DoesNotContain('\\', result);
+        Assert.DoesNotContain('\0', result);
+    }
+
+    [Fact]
+    public void GetInvalidPathSegmentCharsForPlatform_WhenCalled_ShouldReturnSameResultOnMultipleCalls()
+    {
+        // Act
+        char[] result1 = _sut.GetInvalidPathSegmentCharsForPlatform();
+        char[] result2 = _sut.GetInvalidPathSegmentCharsForPlatform();
+
+        // Assert
+        Assert.Equal(result1, result2);
+    }
+
+    [Fact]
     public void GetPathRoot_WithValidWindowsPath_ShouldReturnRootSegment()
     {
         // Arrange

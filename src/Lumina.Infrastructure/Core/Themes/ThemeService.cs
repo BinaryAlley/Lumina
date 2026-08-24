@@ -3,6 +3,8 @@ using Lumina.Application.Common.Infrastructure.Models.DTO.Themes;
 using Lumina.Application.Common.Infrastructure.Themes;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Infrastructure.Common.Models.DTO.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -12,7 +14,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -41,10 +42,6 @@ public sealed class ThemeService : IThemeService
         "^[0-9]+\\.[0-9]+\\.[0-9]+(?:[-+][A-Za-z0-9.-]+)?$",
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
-    private static readonly Regex s_pathSegmentPattern = new(
-        "^[A-Za-z0-9][A-Za-z0-9._ -]*$",
-        RegexOptions.Compiled | RegexOptions.CultureInvariant);
-
     private static readonly JsonSerializerOptions s_manifestJsonOptions = new(JsonSerializerDefaults.Web)
     {
         PropertyNameCaseInsensitive = true,
@@ -64,16 +61,19 @@ public sealed class ThemeService : IThemeService
     // resolved storage root.
     private static readonly ConcurrentDictionary<string, SemaphoreSlim> s_storageGates = new(StringComparer.Ordinal);
     private readonly SemaphoreSlim _mutationGate;
+    private readonly IPathService _pathService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ThemeService"/> class.
     /// </summary>
     /// <param name="options">The theme engine configuration options.</param>
     /// <param name="logger">The logger for this service.</param>
-    public ThemeService(IOptions<ThemeEngineOptionsDto> options, ILogger<ThemeService> logger)
+    /// <param name="pathService">The service used to validate the path segments of the theme packages.</param>
+    public ThemeService(IOptions<ThemeEngineOptionsDto> options, ILogger<ThemeService> logger, IPathService pathService)
     {
         _options = options.Value;
         _logger = logger;
+        _pathService = pathService;
         string basePath = AppContext.BaseDirectory;
         _storageRoot = ResolvePath(basePath, _options.StoragePath);
         _stagingRoot = Path.Combine(_storageRoot, ".staging");
@@ -279,7 +279,7 @@ public sealed class ThemeService : IThemeService
     /// <param name="themePath">The absolute path of the theme pack directory.</param>
     /// <param name="pageKey">The page key that selects the template.</param>
     /// <returns>The mirrored template path, or <see langword="null"/> when no mirrored template exists.</returns>
-    private static string? ResolveMirroredTemplatePath(string themePath, string pageKey)
+    private string? ResolveMirroredTemplatePath(string themePath, string pageKey)
     {
         string? candidate = pageKey;
         while (candidate is not null)
@@ -516,7 +516,7 @@ public sealed class ThemeService : IThemeService
     /// </summary>
     /// <param name="themeRoot">The absolute path of the theme pack directory.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either the parsed manifest, or an error.</returns>
-    private static Result<ThemeManifestDto> LoadManifestFromDirectory(string themeRoot)
+    private Result<ThemeManifestDto> LoadManifestFromDirectory(string themeRoot)
     {
         string manifestPath = Path.Combine(themeRoot, MANIFEST_FILE_NAME);
         if (!File.Exists(manifestPath))
@@ -580,7 +580,7 @@ public sealed class ThemeService : IThemeService
     /// <param name="themeRoot">The absolute path of the theme pack directory.</param>
     /// <param name="manifest">The manifest to validate.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
-    private static Result<Success> ValidateManifest(string themeRoot, ThemeManifestDto manifest)
+    private Result<Success> ValidateManifest(string themeRoot, ThemeManifestDto manifest)
     {
         if (manifest.SchemaVersion != 1)
             return PackageInvalid("Only theme schemaVersion 1 is supported.");
@@ -700,7 +700,7 @@ public sealed class ThemeService : IThemeService
     /// <param name="path">The package-relative path to normalize.</param>
     /// <param name="allowTrailingSlash">Whether a trailing slash, used for directory entries, is permitted.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either the normalized path, or an error.</returns>
-    private static Result<string> NormalizeRelativePath(string path, bool allowTrailingSlash = false)
+    private Result<string> NormalizeRelativePath(string path, bool allowTrailingSlash = false)
     {
         if (string.IsNullOrWhiteSpace(path) || path.Length > 240 || path.Contains('\\') || path.Contains('\0') || path.StartsWith('/') || path.Contains("//"))
             return PackageInvalid("The theme contains an invalid path.");
@@ -714,8 +714,15 @@ public sealed class ThemeService : IThemeService
             return PackageInvalid("A theme path is nested too deeply.");
 
         foreach (string segment in segments)
-            if (segment is "." or ".." || segment.Length > 80 || segment.EndsWith(' ') || segment.EndsWith('.') || !s_pathSegmentPattern.IsMatch(segment))
+        {
+            if (segment is "." or ".." || segment.Length > 80 || segment.EndsWith(' ') || segment.EndsWith('.'))
                 return PackageInvalid($"Theme path segment '{segment}' is invalid.");
+
+            // a theme path segment must be already safe, meaning that sanitizing it would leave it unchanged
+            Result<PathSegment> sanitizeResult = _pathService.SanitizeSegment(segment);
+            if (sanitizeResult.IsFailure || !string.Equals(sanitizeResult.Value.Name, segment, StringComparison.Ordinal))
+                return PackageInvalid($"Theme path segment '{segment}' is invalid.");
+        }
 
         return string.Join('/', segments);
     }
@@ -811,7 +818,7 @@ public sealed class ThemeService : IThemeService
     /// <returns>A task representing the asynchronous operation.</returns>
     private static async Task SwapIntoDestinationAsync(string extractionPath, string destination, CancellationToken cancellationToken)
     {
-        const int maxAttempts = 10;
+        const int MAX_ATTEMPTS = 10;
         for (int attempt = 1; ; attempt++)
         {
             try
@@ -822,7 +829,7 @@ public sealed class ThemeService : IThemeService
                 Directory.Move(extractionPath, destination);
                 return;
             }
-            catch (IOException) when (attempt < maxAttempts)
+            catch (IOException) when (attempt < MAX_ATTEMPTS)
             {
                 await Task.Delay(100 * attempt, cancellationToken);
             }
