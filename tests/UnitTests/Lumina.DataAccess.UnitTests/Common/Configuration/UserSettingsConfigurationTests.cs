@@ -52,7 +52,7 @@ public class UserSettingsConfigurationTests
         IProperty userIdProperty = entityType.GetProperty(nameof(UserSettingsEntity.UserId));
         IProperty isPaginationEnabledProperty = entityType.GetProperty(nameof(UserSettingsEntity.IsPaginationEnabled));
         IProperty itemsPerPageProperty = entityType.GetProperty(nameof(UserSettingsEntity.ItemsPerPage));
-        IProperty ignoreThePrefixProperty = entityType.GetProperty(nameof(UserSettingsEntity.IgnoreThePrefixForAlphaPicker));
+        IProperty ignoreThePrefixProperty = entityType.GetProperty(nameof(UserSettingsEntity.ShouldIgnoreThePrefixForAlphaPicker));
 
         // Assert
         Assert.False(userIdProperty.IsNullable);

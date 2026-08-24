@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.UsersManagement.Users;
 using Lumina.Application.Core.UsersManagement.Settings.Commands.UpdateUserSettings;
+using Lumina.Contracts.Fixtures.Core.Requests.UsersManagement.Settings;
 using Lumina.Contracts.Requests.UsersManagement.Settings;
 using System.Diagnostics.CodeAnalysis;
 #endregion
@@ -13,11 +14,19 @@ namespace Lumina.Application.UnitTests.Common.Mapping.UsersManagement.Users;
 [ExcludeFromCodeCoverage]
 public class UpdateUserSettingsRequestMappingTests
 {
+    private readonly UpdateUserSettingsRequestFixture _requestFixture = new();
+
     [Fact]
     public void ToCommand_WhenMappingValidRequest_ShouldMapCorrectly()
     {
         // Arrange
-        UpdateUserSettingsRequest request = new(IsPaginationEnabled: true, ItemsPerPage: 48, IgnoreThePrefixForAlphaPicker: false, IsThemeCachingEnabled: true);
+        UpdateUserSettingsRequest request = _requestFixture.Create(
+            isPaginationEnabled: true,
+            itemsPerPage: 48,
+            shouldIgnoreThePrefixForAlphaPicker: false,
+            isThemeCachingEnabled: true,
+            shouldAggregateMetadataWhenMissing: false
+        );
 
         // Act
         UpdateUserSettingsCommand result = request.ToCommand();
@@ -26,7 +35,7 @@ public class UpdateUserSettingsRequestMappingTests
         Assert.NotNull(result);
         Assert.Equal(request.IsPaginationEnabled, result.IsPaginationEnabled);
         Assert.Equal(request.ItemsPerPage, result.ItemsPerPage);
-        Assert.Equal(request.IgnoreThePrefixForAlphaPicker, result.IgnoreThePrefixForAlphaPicker);
+        Assert.Equal(request.ShouldIgnoreThePrefixForAlphaPicker, result.ShouldIgnoreThePrefixForAlphaPicker);
         Assert.Equal(request.IsThemeCachingEnabled, result.IsThemeCachingEnabled);
     }
 }

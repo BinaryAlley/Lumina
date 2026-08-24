@@ -2,6 +2,7 @@
 using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.UsersManagement.Settings.Queries.GetUserSettings;
+using Lumina.Contracts.Fixtures.Core.Responses.UsersManagement.Settings;
 using Lumina.Contracts.Responses.UsersManagement.Settings;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Settings.GetUserSettings;
@@ -24,6 +25,7 @@ public class GetUserSettingsEndpointTests
 {
     private readonly IQueryHandler<GetUserSettingsQuery, Result<UserSettingsResponse>> _mockHandler;
     private readonly GetUserSettingsEndpoint _sut;
+    private readonly UserSettingsResponseFixture _userSettingsResponseFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetUserSettingsEndpointTests"/> class.
@@ -39,7 +41,7 @@ public class GetUserSettingsEndpointTests
     {
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;
-        UserSettingsResponse expectedResponse = new(Guid.NewGuid(), true, 48, false, true);
+        UserSettingsResponse expectedResponse = _userSettingsResponseFixture.Create(isPaginationEnabled: true, itemsPerPage: 48, shouldIgnoreThePrefixForAlphaPicker: false, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: false);
         _mockHandler.HandleAsync(Arg.Any<GetUserSettingsQuery>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(expectedResponse));
 
@@ -79,7 +81,7 @@ public class GetUserSettingsEndpointTests
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<GetUserSettingsQuery>(), Arg.Any<CancellationToken>())
-            .Returns(Result.From(new UserSettingsResponse(Guid.NewGuid(), true, 48, false, true)));
+            .Returns(Result.From(_userSettingsResponseFixture.Create(isPaginationEnabled: true, itemsPerPage: 48, shouldIgnoreThePrefixForAlphaPicker: false, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: false)));
 
         // Act
         await _sut.ExecuteAsync(EmptyRequest.Instance, cancellationToken);
@@ -104,7 +106,7 @@ public class GetUserSettingsEndpointTests
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 info.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return Result.From(new UserSettingsResponse(Guid.NewGuid(), true, 48, false, true));
+                return Result.From(_userSettingsResponseFixture.Create(isPaginationEnabled: true, itemsPerPage: 48, shouldIgnoreThePrefixForAlphaPicker: false, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: false));
             }, info.Arg<CancellationToken>()));
 
         // Act

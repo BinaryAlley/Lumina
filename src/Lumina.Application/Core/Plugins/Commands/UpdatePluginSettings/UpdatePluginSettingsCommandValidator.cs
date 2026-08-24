@@ -2,6 +2,7 @@
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Utilities;
 using Lumina.Domain.Common.Errors;
+using System;
 #endregion
 
 namespace Lumina.Application.Core.Plugins.Commands.UpdatePluginSettings;
@@ -18,6 +19,8 @@ public class UpdatePluginSettingsCommandValidator : AbstractValidator<UpdatePlug
     {
         RuleFor(command => command.PluginId)
             .NotEmpty()
+            .WithError(Errors.Plugins.PluginIdCannotBeEmpty)
+            .Must(id => id != Guid.Empty)
             .WithError(Errors.Plugins.PluginIdCannotBeEmpty);
     }
 }

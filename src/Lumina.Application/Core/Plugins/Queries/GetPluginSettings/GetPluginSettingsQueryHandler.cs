@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
-using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Plugins;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Mapping.Plugins;
 using Lumina.Contracts.Responses.Plugins;
 using Lumina.Domain.Common.Errors;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Plugins.Contracts.Core.Plugins;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,16 +24,19 @@ public class GetPluginSettingsQueryHandler : IQueryHandler<GetPluginSettingsQuer
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IPluginManager _pluginManager;
+    private readonly IValidator<GetPluginSettingsQuery> _validator;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetPluginSettingsQueryHandler"/> class.
     /// </summary>
     /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
     /// <param name="pluginManager">Injected manager of the plugins loaded by the host application.</param>
-    public GetPluginSettingsQueryHandler(IUnitOfWork unitOfWork, IPluginManager pluginManager)
+    /// <param name="validator">Injected validator for application validation rules.</param>
+    public GetPluginSettingsQueryHandler(IUnitOfWork unitOfWork, IPluginManager pluginManager, IValidator<GetPluginSettingsQuery> validator)
     {
         _unitOfWork = unitOfWork;
         _pluginManager = pluginManager;
+        _validator = validator;
     }
 
     /// <summary>
@@ -46,6 +49,10 @@ public class GetPluginSettingsQueryHandler : IQueryHandler<GetPluginSettingsQuer
     /// </returns>
     public async Task<Result<PluginSettingsResponse>> HandleAsync(GetPluginSettingsQuery query, CancellationToken cancellationToken)
     {
+        List<Error> validationResult = _validator.Validate(query);
+        if (validationResult.Count > 0)
+            return validationResult;
+
         Result<PluginEntity?> getPluginResult = await _unitOfWork.PluginRepository.GetByIdAsync(query.PluginId, cancellationToken).ConfigureAwait(false);
         if (getPluginResult.IsFailure)
             return getPluginResult.Errors;

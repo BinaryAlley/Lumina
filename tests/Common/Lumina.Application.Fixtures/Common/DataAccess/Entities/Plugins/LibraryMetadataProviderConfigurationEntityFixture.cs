@@ -21,14 +21,19 @@ public class LibraryMetadataProviderConfigurationEntityFixture
     /// <param name="libraryId">The Id of the media library the configuration belongs to.</param>
     /// <param name="pluginId">The Id of the plugin providing the metadata.</param>
     /// <param name="rank">The rank of the metadata provider, determining the order in which providers are tried.</param>
+    /// <param name="isEnabled">Whether the metadata provider is enabled or not.</param>
     /// <returns>The created <see cref="LibraryMetadataProviderConfigurationEntity"/>.</returns>
-    public LibraryMetadataProviderConfigurationEntity Create(Guid libraryId, Guid pluginId, int rank)
+    public LibraryMetadataProviderConfigurationEntity Create(
+        Guid libraryId, 
+        Guid pluginId, 
+        int rank, 
+        bool isEnabled = true)
     {
         return new Faker<LibraryMetadataProviderConfigurationEntity>()
             .RuleFor(configuration => configuration.Id, faker => faker.Random.Guid())
             .RuleFor(configuration => configuration.LibraryId, libraryId)
             .RuleFor(configuration => configuration.PluginId, pluginId)
-            .RuleFor(configuration => configuration.IsEnabled, faker => faker.Random.Bool())
+            .RuleFor(configuration => configuration.IsEnabled, isEnabled)
             .RuleFor(configuration => configuration.Rank, rank)
             .RuleFor(configuration => configuration.CreatedOnUtc, faker => faker.Date.Past())
             .RuleFor(configuration => configuration.CreatedBy, faker => faker.Random.Guid())

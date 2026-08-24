@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
@@ -29,11 +29,11 @@ public static class LibraryEntityMapping
             repositoryEntity.UserId,
             repositoryEntity.Title,
             repositoryEntity.LibraryType,
-            repositoryEntity.ContentLocations.Select(location => location.Path).ToList(),
+            [.. repositoryEntity.ContentLocations.Select(location => location.Path)],
             repositoryEntity.CoverImage,
             repositoryEntity.IsEnabled,
             repositoryEntity.IsLocked,
-            repositoryEntity.DownloadMetadataFromWeb,
+            repositoryEntity.CanDownloadMetadataFromWeb,
             repositoryEntity.ShouldSaveMetadataInMediaDirectories,
             repositoryEntity.ShouldSkipUnchangedDirectoriesDuringScan,
             repositoryEntity.CreatedOnUtc,
@@ -59,10 +59,10 @@ public static class LibraryEntityMapping
             repositoryEntity.CoverImage,
             repositoryEntity.IsEnabled,
             repositoryEntity.IsLocked,
-            repositoryEntity.DownloadMetadataFromWeb,
+            repositoryEntity.CanDownloadMetadataFromWeb,
             repositoryEntity.ShouldSaveMetadataInMediaDirectories,
             repositoryEntity.ShouldSkipUnchangedDirectoriesDuringScan,
-            repositoryEntity.LibraryScans.Select(libraryScan => ScanId.Create(libraryScan.Id)).ToList()
+            [.. repositoryEntity.LibraryScans.Select(libraryScan => ScanId.Create(libraryScan.Id))]
         );
     }
 

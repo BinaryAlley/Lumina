@@ -2,10 +2,15 @@
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Common.Infrastructure.Authentication;
+using Lumina.Application.Common.Infrastructure.Authorization;
+using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
+using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.Plugins.Queries.GetLibraryMetadataProviders;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Fixtures.Core.Plugins.Queries.GetLibraryMetadataProviders;
 using Lumina.Contracts.Responses.Plugins;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using NSubstitute;
 using System;
@@ -13,6 +18,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
+using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
 #endregion
 
 namespace Lumina.Application.UnitTests.Core.Plugins.Queries.GetLibraryMetadataProviders;
@@ -26,10 +32,14 @@ public class GetLibraryMetadataProvidersQueryHandlerTests
     private readonly IUnitOfWork _mockUnitOfWork;
     private readonly ILibraryMetadataProviderConfigurationRepository _mockLibraryMetadataProviderConfigurationRepository;
     private readonly IPluginRepository _mockPluginRepository;
+    private readonly IAuthorizationService _mockAuthorizationService;
+    private readonly ICurrentUserService _mockCurrentUserService;
+    private readonly IValidator<GetLibraryMetadataProvidersQuery> _mockValidator;
     private readonly GetLibraryMetadataProvidersQueryHandler _sut;
     private readonly GetLibraryMetadataProvidersQueryFixture _getLibraryMetadataProvidersQueryFixture = new();
     private readonly LibraryMetadataProviderConfigurationEntityFixture _configurationEntityFixture = new();
     private readonly PluginEntityFixture _pluginEntityFixture = new();
+    private readonly Guid _userId;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetLibraryMetadataProvidersQueryHandlerTests"/> class.
@@ -41,8 +51,34 @@ public class GetLibraryMetadataProvidersQueryHandlerTests
         _mockPluginRepository = Substitute.For<IPluginRepository>();
         _mockUnitOfWork.LibraryMetadataProviderConfigurationRepository.Returns(_mockLibraryMetadataProviderConfigurationRepository);
         _mockUnitOfWork.PluginRepository.Returns(_mockPluginRepository);
+        _mockAuthorizationService = Substitute.For<IAuthorizationService>();
+        _mockCurrentUserService = Substitute.For<ICurrentUserService>();
+        _mockValidator = Substitute.For<IValidator<GetLibraryMetadataProvidersQuery>>();
+        _userId = Guid.NewGuid();
 
-        _sut = new GetLibraryMetadataProvidersQueryHandler(_mockUnitOfWork);
+        // default stubs: the current user is authenticated and the library ownership policy allows access
+        _mockCurrentUserService.UserId.Returns(_userId);
+        _mockAuthorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(_userId, Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>())
+            .Returns(true);
+        _mockValidator.Validate(Arg.Any<GetLibraryMetadataProvidersQuery>()).Returns([]);
+
+        _sut = new GetLibraryMetadataProvidersQueryHandler(_mockAuthorizationService, _mockCurrentUserService, _mockUnitOfWork, _mockValidator);
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenLibraryIdIsEmpty_ShouldReturnValidationError()
+    {
+        // Arrange
+        GetLibraryMetadataProvidersQuery query = _getLibraryMetadataProvidersQueryFixture.Create();
+        _mockValidator.Validate(Arg.Any<GetLibraryMetadataProvidersQuery>()).Returns([Errors.Plugins.LibraryIdCannotBeEmpty]);
+
+        // Act
+        Result<IReadOnlyList<LibraryMetadataProviderResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Plugins.LibraryIdCannotBeEmpty, result.FirstError);
+        await _mockLibraryMetadataProviderConfigurationRepository.DidNotReceive().GetByLibraryIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -154,5 +190,42 @@ public class GetLibraryMetadataProvidersQueryHandlerTests
 
         // Assert
         Assert.True(result.IsFailure);
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenOwnershipPolicyDeniesAccess_ShouldReturnNotAuthorizedError()
+    {
+        // Arrange
+        GetLibraryMetadataProvidersQuery query = _getLibraryMetadataProvidersQueryFixture.Create();
+        _mockAuthorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(_userId, Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>())
+            .Returns(false);
+
+        // Act
+        Result<IReadOnlyList<LibraryMetadataProviderResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
+        await _mockAuthorizationService.Received(1).EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
+            _userId, Arg.Is<LibraryOwnershipPolicyContext>(context => context.LibraryId == query.LibraryId), Arg.Any<CancellationToken>());
+        await _mockLibraryMetadataProviderConfigurationRepository.DidNotReceive().GetByLibraryIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockPluginRepository.DidNotReceive().GetAllAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenUserIsNotAuthenticated_ShouldReturnNotAuthorizedError()
+    {
+        // Arrange
+        GetLibraryMetadataProvidersQuery query = _getLibraryMetadataProvidersQueryFixture.Create();
+        _mockCurrentUserService.UserId.Returns((Guid?)null);
+
+        // Act
+        Result<IReadOnlyList<LibraryMetadataProviderResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
+        await _mockAuthorizationService.DidNotReceive().EvaluatePolicyAsync<ILibraryOwnershipPolicy>(Arg.Any<Guid>(), Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>());
+        await _mockLibraryMetadataProviderConfigurationRepository.DidNotReceive().GetByLibraryIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
     }
 }

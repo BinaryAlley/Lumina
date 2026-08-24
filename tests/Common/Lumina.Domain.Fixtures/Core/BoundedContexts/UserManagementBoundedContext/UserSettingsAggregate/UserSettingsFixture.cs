@@ -22,22 +22,25 @@ public class UserSettingsFixture
     /// <param name="userId">Optional. The Id of the user that owns the settings.</param>
     /// <param name="isPaginationEnabled">Whether pagination is enabled for the user.</param>
     /// <param name="itemsPerPage">The number of library items displayed per page when pagination is enabled.</param>
-    /// <param name="ignoreThePrefixForAlphaPicker">Whether the "The" prefix of library item titles is ignored by the alpha picker.</param>
+    /// <param name="shouldIgnoreThePrefixForAlphaPicker">Whether the "The" prefix of library item titles is ignored by the alpha picker.</param>
     /// <param name="isThemeCachingEnabled">Whether the theme data served to this user is cached.</param>
+    /// <param name="shouldAggregateMetadataWhenMissing">Whether the metadata of the media library items is aggregated from multiple providers, when fields are missing.</param>
     /// <returns>The created <see cref="UserSettings"/>.</returns>
     public UserSettings Create(
         Guid? userId = null,
         bool isPaginationEnabled = true,
         int itemsPerPage = 48,
-        bool ignoreThePrefixForAlphaPicker = false,
-        bool isThemeCachingEnabled = true)
+        bool shouldIgnoreThePrefixForAlphaPicker = false,
+        bool isThemeCachingEnabled = true,
+        bool shouldAggregateMetadataWhenMissing = false)
     {
         Result<UserSettings> settings = UserSettings.Create(
             userId is null ? UserId.CreateUnique() : UserId.Create(userId.Value),
             isPaginationEnabled,
             itemsPerPage,
-            ignoreThePrefixForAlphaPicker,
-            isThemeCachingEnabled);
+            shouldIgnoreThePrefixForAlphaPicker,
+            isThemeCachingEnabled,
+            shouldAggregateMetadataWhenMissing);
         return settings.Value;
     }
 

@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 #endregion
@@ -38,23 +37,41 @@ internal class FileSystemStructureSeedService : IFileSystemStructureSeedService
         if (rootPathIdResult.IsFailure)
             return rootPathIdResult.Errors;
 
-        // create the libraries directory
-        Result<string> librariesPathResult = _pathService.CombinePath(rootPath, "libraries"); 
-        if (librariesPathResult.IsFailure)
-            return librariesPathResult.Errors;
+        Result<Created> createLibrariesDirectoryResult = EnsureDirectory(rootPathIdResult.Value, "libraries");
+        if (createLibrariesDirectoryResult.IsFailure)
+            return createLibrariesDirectoryResult.Errors;
 
-        Result<FileSystemPathId> libraryPathIdResult = FileSystemPathId.Create(librariesPathResult.Value);
-        if (libraryPathIdResult.IsFailure)
-            return libraryPathIdResult.Errors;
+        Result<Created> createBooksDirectoryResult = EnsureDirectory(rootPathIdResult.Value, "books");
+        if (createBooksDirectoryResult.IsFailure)
+            return createBooksDirectoryResult.Errors;
 
-        Result<bool> librariesDirectoryExistsResult = _environmentContext.DirectoryProviderService.DirectoryExists(libraryPathIdResult.Value);
-        if (librariesDirectoryExistsResult.IsFailure)
-            return librariesDirectoryExistsResult.Errors;
+        return Result.Created;
+    }
+
+    /// <summary>
+    /// Creates the directory with the provided <paramref name="directoryName"/> under the <paramref name="rootPathId"/>, when it does not already exist.
+    /// </summary>
+    /// <param name="rootPathId">The id of the root path under which the directory is created.</param>
+    /// <param name="directoryName">The name of the directory to create.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    private Result<Created> EnsureDirectory(FileSystemPathId rootPathId, string directoryName)
+    {
+        Result<string> directoryPathResult = _pathService.CombinePath(rootPathId.Path, directoryName);
+        if (directoryPathResult.IsFailure)
+            return directoryPathResult.Errors;
+
+        Result<FileSystemPathId> directoryPathIdResult = FileSystemPathId.Create(directoryPathResult.Value);
+        if (directoryPathIdResult.IsFailure)
+            return directoryPathIdResult.Errors;
+
+        Result<bool> directoryExistsResult = _environmentContext.DirectoryProviderService.DirectoryExists(directoryPathIdResult.Value);
+        if (directoryExistsResult.IsFailure)
+            return directoryExistsResult.Errors;
 
         // only create it if it doesn't already exist
-        if (!librariesDirectoryExistsResult.Value)
+        if (!directoryExistsResult.Value)
         {
-            Result<FileSystemPathId> createDirectoryResult = _environmentContext.DirectoryProviderService.CreateDirectory(rootPathIdResult.Value, "libraries");
+            Result<FileSystemPathId> createDirectoryResult = _environmentContext.DirectoryProviderService.CreateDirectory(rootPathId, directoryName);
             if (createDirectoryResult.IsFailure)
                 return createDirectoryResult.Errors;
         }

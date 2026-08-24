@@ -39,6 +39,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     private ILibraryScanSnapshotRepository? _libraryScanSnapshotRepository;
     private ILibraryScanStagingResultsRepository? _libraryScanStagingResultsRepository;
     private ILibraryMetadataProviderConfigurationRepository? _libraryMetadataProviderConfigurationRepository;
+    private IArtworkProviderConfigurationRepository? _artworkProviderConfigurationRepository;
     private IPluginRepository? _pluginRepository;
     private IThemeRepository? _themeRepository;
     private IUserRepository? _userRepository;
@@ -177,6 +178,18 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     }
 
     /// <summary>
+    /// Gets the library artwork provider configuration repository.
+    /// </summary>
+    public IArtworkProviderConfigurationRepository ArtworkProviderConfigurationRepository
+    {
+        get
+        {
+            _artworkProviderConfigurationRepository ??= new ArtworkProviderConfigurationRepository(_luminaDbContext);
+            return _artworkProviderConfigurationRepository;
+        }
+    }
+
+    /// <summary>
     /// Gets the plugin repository.
     /// </summary>
     public IPluginRepository PluginRepository
@@ -240,6 +253,14 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     public async Task SaveChangesAsync(CancellationToken cancellationToken)
     {
         await _luminaDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Detaches all the entities tracked by the unit of work, freeing the memory they occupy.
+    /// </summary>
+    public void ClearTrackedEntities()
+    {
+        _luminaDbContext.ChangeTracker.Clear();
     }
 
     /// <summary>

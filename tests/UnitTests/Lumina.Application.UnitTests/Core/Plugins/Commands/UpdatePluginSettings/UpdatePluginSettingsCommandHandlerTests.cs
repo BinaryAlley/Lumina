@@ -3,14 +3,15 @@ using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.Plugins.Commands.UpdatePluginSettings;
+using Lumina.Application.Fixtures.Core.Plugins.Commands.UpdatePluginSettings;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Diagnostics.CodeAnalysis;
 #endregion
 
 namespace Lumina.Application.UnitTests.Core.Plugins.Commands.UpdatePluginSettings;
@@ -25,6 +26,7 @@ public class UpdatePluginSettingsCommandHandlerTests
     private readonly IPluginRepository _mockPluginRepository;
     private readonly IValidator<UpdatePluginSettingsCommand> _mockValidator;
     private readonly UpdatePluginSettingsCommandHandler _sut;
+    private readonly UpdatePluginSettingsCommandFixture _updatePluginSettingsCommandFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UpdatePluginSettingsCommandHandlerTests"/> class.
@@ -50,7 +52,7 @@ public class UpdatePluginSettingsCommandHandlerTests
             .Returns(Result.Updated);
 
         // Act
-        Result<Success> result = await _sut.HandleAsync(new UpdatePluginSettingsCommand(pluginId, settings), CancellationToken.None);
+        Result<Success> result = await _sut.HandleAsync(_updatePluginSettingsCommandFixture.Create(pluginId: pluginId, settings: settings), CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -67,7 +69,7 @@ public class UpdatePluginSettingsCommandHandlerTests
         _mockValidator.Validate(Arg.Any<UpdatePluginSettingsCommand>()).Returns([Errors.Plugins.PluginIdCannotBeEmpty]);
 
         // Act
-        Result<Success> result = await _sut.HandleAsync(new UpdatePluginSettingsCommand(pluginId, settings), CancellationToken.None);
+        Result<Success> result = await _sut.HandleAsync(_updatePluginSettingsCommandFixture.Create(pluginId: pluginId, settings: settings), CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);

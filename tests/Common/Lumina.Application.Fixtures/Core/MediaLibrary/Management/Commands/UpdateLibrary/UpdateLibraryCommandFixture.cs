@@ -27,7 +27,7 @@ public class UpdateLibraryCommandFixture
     /// <param name="coverImage">Optional. The cover image path of the media library.</param>
     /// <param name="isEnabled">Whether the media library is enabled or not.</param>
     /// <param name="isLocked">Whether the media library is locked or not.</param>
-    /// <param name="downloadMetadataFromWeb">Whether the media library should download metadata from the web or not.</param>
+    /// <param name="canDownloadMetadataFromWeb">Whether the media library should download metadata from the web or not.</param>
     /// <param name="shouldSaveMetadataInMediaDirectories">Whether the metadata should be saved in the media directories or not.</param>
     /// <param name="shouldSkipUnchangedDirectoriesDuringScan">Whether unchanged directories should be skipped during a scan or not.</param>
     /// <returns>The created command.</returns>
@@ -40,7 +40,7 @@ public class UpdateLibraryCommandFixture
         string? coverImage = null,
         bool isEnabled = true,
         bool isLocked = false,
-        bool downloadMetadataFromWeb = true,
+        bool canDownloadMetadataFromWeb = true,
         bool shouldSaveMetadataInMediaDirectories = true,
         bool shouldSkipUnchangedDirectoriesDuringScan = false)
     {
@@ -66,7 +66,7 @@ public class UpdateLibraryCommandFixture
             .RuleFor(x => x.CoverImage, f => coverImage ?? f.System.FilePath())
             .RuleFor(x => x.IsEnabled, isEnabled)
             .RuleFor(x => x.IsLocked, isLocked)
-            .RuleFor(x => x.DownloadMetadataFromWeb, downloadMetadataFromWeb)
+            .RuleFor(x => x.CanDownloadMetadataFromWeb, canDownloadMetadataFromWeb)
             .RuleFor(x => x.ShouldSaveMetadataInMediaDirectories, shouldSaveMetadataInMediaDirectories)
             .RuleFor(x => x.ShouldSkipUnchangedDirectoriesDuringScan, shouldSkipUnchangedDirectoriesDuringScan)
             .Generate();

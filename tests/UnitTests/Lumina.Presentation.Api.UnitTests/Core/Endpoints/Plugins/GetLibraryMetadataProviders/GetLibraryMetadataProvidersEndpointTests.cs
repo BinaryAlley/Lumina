@@ -3,6 +3,7 @@ using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.Plugins.Queries.GetLibraryMetadataProviders;
 using Lumina.Contracts.Fixtures.Core.Requests.Plugins;
+using Lumina.Contracts.Fixtures.Core.Responses.Plugins;
 using Lumina.Contracts.Requests.Plugins;
 using Lumina.Contracts.Responses.Plugins;
 using Lumina.Domain.Common.Primitives;
@@ -28,6 +29,7 @@ public class GetLibraryMetadataProvidersEndpointTests
     private readonly IQueryHandler<GetLibraryMetadataProvidersQuery, Result<IReadOnlyList<LibraryMetadataProviderResponse>>> _mockHandler;
     private readonly GetLibraryMetadataProvidersEndpoint _sut;
     private readonly GetLibraryMetadataProvidersRequestFixture _getLibraryMetadataProvidersRequestFixture = new();
+    private readonly LibraryMetadataProviderResponseFixture _libraryMetadataProviderResponseFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetLibraryMetadataProvidersEndpointTests"/> class.
@@ -46,8 +48,8 @@ public class GetLibraryMetadataProvidersEndpointTests
         CancellationToken cancellationToken = CancellationToken.None;
         IReadOnlyList<LibraryMetadataProviderResponse> expectedResponses =
         [
-            new LibraryMetadataProviderResponse(Guid.NewGuid(), "Provider A", true, 1),
-            new LibraryMetadataProviderResponse(Guid.NewGuid(), "Provider B", false, 2)
+            _libraryMetadataProviderResponseFixture.Create(name: "Provider A", isEnabled: true, rank: 1),
+            _libraryMetadataProviderResponseFixture.Create(name: "Provider B", isEnabled: false, rank: 2)
         ];
         _mockHandler.HandleAsync(Arg.Any<GetLibraryMetadataProvidersQuery>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(expectedResponses));

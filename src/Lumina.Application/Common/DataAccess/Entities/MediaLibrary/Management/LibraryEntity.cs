@@ -63,7 +63,7 @@ public class LibraryEntity : IStorageEntity, IAuditableEntity
     /// <summary>
     /// Gets whether this media library should update the metadata of its elements from the web, or not.
     /// </summary>
-    public bool DownloadMetadataFromWeb { get; init; }
+    public bool CanDownloadMetadataFromWeb { get; init; }
 
     /// <summary>
     /// Gets whether this media library should copy the downloaded metadata into the media library content locations, or not.

@@ -26,8 +26,9 @@ public class GetUserSettingsEndpointSummary : Summary<GetUserSettingsEndpoint, E
                 UserId: Guid.NewGuid(),
                 IsPaginationEnabled: true,
                 ItemsPerPage: 48,
-                IgnoreThePrefixForAlphaPicker: false,
-                IsThemeCachingEnabled: true
+                ShouldIgnoreThePrefixForAlphaPicker: false,
+                IsThemeCachingEnabled: true,
+                ShouldAggregateMetadataWhenMissing: false
             ));
 
         Response(401, "Authentication required.", "application/problem+json",

@@ -23,5 +23,9 @@ public class MediaSettingsDtoValidator : AbstractValidator<MediaSettingsDto>
         RuleFor(settings => settings.LibrariesDirectory)
             .NotEmpty()
             .WithError(Errors.Errors.Configuration.MediaLibrariesDirectoryCannotBeEmpty);
+
+        RuleFor(settings => settings.BooksDirectory)
+            .NotEmpty()
+            .WithError(Errors.Errors.Configuration.MediaBooksDirectoryCannotBeEmpty);
     }
 }

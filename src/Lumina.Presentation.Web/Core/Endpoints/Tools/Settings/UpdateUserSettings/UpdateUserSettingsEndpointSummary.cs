@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
 using Lumina.Presentation.Web.Common.DTO.UsersManagement;
-using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -23,7 +22,7 @@ public class UpdateUserSettingsEndpointSummary : Summary<UpdateUserSettingsEndpo
         RequestParam(r => r.UserId, "The unique identifier of the user that owns the settings. Optional.");
         RequestParam(r => r.IsPaginationEnabled, "Whether pagination is enabled for the user, or not. Optional.");
         RequestParam(r => r.ItemsPerPage, "The number of library items displayed per page when pagination is enabled. Optional.");
-        RequestParam(r => r.IgnoreThePrefixForAlphaPicker, "Whether the leading 'The' prefix of library item titles is ignored by the alpha picker, or not. Optional.");
+        RequestParam(r => r.ShouldIgnoreThePrefixForAlphaPicker, "Whether the leading 'The' prefix of library item titles is ignored by the alpha picker, or not. Optional.");
 
         ExampleRequest = new UserSettingsDto();
 

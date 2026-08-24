@@ -4,7 +4,10 @@ using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DTO.Filtering;
 using Lumina.Application.Common.DTO.Pagination;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Common;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Application.Fixtures.Common.DTO.Filtering;
+using Lumina.Application.Fixtures.Common.DTO.Pagination;
 using Lumina.DataAccess.Core.Repositories.Books;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Errors;
@@ -32,6 +35,13 @@ public class BookRepositoryTests
     private readonly LuminaDbContext _mockContext;
     private readonly BookRepository _sut;
     private readonly BookEntityFixture _bookEntityFixture = new();
+    private readonly BookRatingEntityFixture _bookRatingEntityFixture = new();
+    private readonly TagEntityFixture _tagEntityFixture = new();
+    private readonly GenreEntityFixture _genreEntityFixture = new();
+    private readonly IsbnEntityFixture _isbnEntityFixture = new();
+    private readonly PaginationDataDtoFixture _paginationDataDtoFixture = new();
+    private readonly LibraryFilterDtoFixture _libraryFilterDtoFixture = new();
+    private readonly BaseFilterDtoFixture _baseFilterDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BookRepositoryTests"/> class.
@@ -83,12 +93,12 @@ public class BookRepositoryTests
     public async Task InsertAsync_WhenExistingTagsFound_ShouldReplaceTagsWithExistingOnes()
     {
         // Arrange
-        TagEntity existingTag = new("Existing");
+        TagEntity existingTag = _tagEntityFixture.Create(name: "Existing");
         _mockContext.Set<TagEntity>().Add(existingTag);
         await _mockContext.SaveChangesAsync();
 
         BookEntity bookModel = _bookEntityFixture.Create();
-        bookModel.Tags = [new("Existing"), new("New")];
+        bookModel.Tags = [_tagEntityFixture.Create(name: "Existing"), _tagEntityFixture.Create(name: "New")];
 
         // Act
         Result<Created> result = await _sut.InsertAsync(bookModel, CancellationToken.None);
@@ -110,12 +120,12 @@ public class BookRepositoryTests
     public async Task InsertAsync_WhenExistingGenresFound_ShouldReplaceGenresWithExistingOnes()
     {
         // Arrange
-        GenreEntity existingGenre = new("Existing");
+        GenreEntity existingGenre = _genreEntityFixture.Create(name: "Existing");
         _mockContext.Set<GenreEntity>().Add(existingGenre);
         await _mockContext.SaveChangesAsync();
 
         BookEntity bookModel = _bookEntityFixture.Create();
-        bookModel.Genres = [new("Existing"), new("New")];
+        bookModel.Genres = [_genreEntityFixture.Create(name: "Existing"), _genreEntityFixture.Create(name: "New")];
 
         // Act
         Result<Created> result = await _sut.InsertAsync(bookModel, CancellationToken.None);
@@ -168,9 +178,9 @@ public class BookRepositoryTests
     {
         // Arrange
         BookEntity book = _bookEntityFixture.Create();
-        book.Tags = [new TagEntity("Tag1"), new TagEntity("Tag2")];
-        book.Genres = [new GenreEntity("Genre1"), new GenreEntity("Genre2")];
-        book.ISBNs = [new IsbnEntity("1234567890", IsbnFormat.Isbn10), new IsbnEntity("1234567890123", IsbnFormat.Isbn13)];
+        book.Tags = [_tagEntityFixture.Create(name: "Tag1"), _tagEntityFixture.Create(name: "Tag2")];
+        book.Genres = [_genreEntityFixture.Create(name: "Genre1"), _genreEntityFixture.Create(name: "Genre2")];
+        book.ISBNs = [_isbnEntityFixture.Create(value: "1234567890", format: IsbnFormat.Isbn10), _isbnEntityFixture.Create(value: "1234567890123", format: IsbnFormat.Isbn13)];
         _mockContext.Books.Add(book);
         await _mockContext.SaveChangesAsync();
 
@@ -341,8 +351,8 @@ public class BookRepositoryTests
         _mockContext.Books.AddRange(books);
         await _mockContext.SaveChangesAsync();
 
-        PaginationDataDto paginationData = new() { CurrentPage = 1, PerPage = 10 };
-        LibraryFilterDto filter = new() { LibraryId = libraryId };
+        PaginationDataDto paginationData = _paginationDataDtoFixture.Create(currentPage: 1, perPage: 10);
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId);
 
         // Act
         Result<PaginatedResultDto<BookEntity>> result = await _sut.GetPaginatedAsync(paginationData, null, null, filter, CancellationToken.None);
@@ -360,8 +370,8 @@ public class BookRepositoryTests
     public async Task GetPaginatedAsync_WhenFilterDoesNotIncludeLibraryId_ShouldReturnError()
     {
         // Arrange
-        PaginationDataDto paginationData = new() { CurrentPage = 1, PerPage = 10 };
-        BaseFilterDto filter = new();
+        PaginationDataDto paginationData = _paginationDataDtoFixture.Create(currentPage: 1, perPage: 10);
+        BaseFilterDto filter = _baseFilterDtoFixture.Create();
 
         // Act
         Result<PaginatedResultDto<BookEntity>> result = await _sut.GetPaginatedAsync(paginationData, null, null, filter, CancellationToken.None);
@@ -375,8 +385,8 @@ public class BookRepositoryTests
     public async Task GetPaginatedAsync_WhenFilterLibraryIdIsEmpty_ShouldReturnError()
     {
         // Arrange
-        PaginationDataDto paginationData = new() { CurrentPage = 1, PerPage = 10 };
-        LibraryFilterDto filter = new() { LibraryId = Guid.Empty };
+        PaginationDataDto paginationData = _paginationDataDtoFixture.Create(currentPage: 1, perPage: 10);
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: Guid.Empty);
 
         // Act
         Result<PaginatedResultDto<BookEntity>> result = await _sut.GetPaginatedAsync(paginationData, null, null, filter, CancellationToken.None);
@@ -397,7 +407,7 @@ public class BookRepositoryTests
         _mockContext.Books.AddRange(books);
         await _mockContext.SaveChangesAsync();
 
-        LibraryFilterDto filter = new() { LibraryId = libraryId };
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId);
 
         // Act
         Result<PaginatedResultDto<BookEntity>> result = await _sut.GetPaginatedAsync(null, null, null, filter, CancellationToken.None);
@@ -425,8 +435,8 @@ public class BookRepositoryTests
         _mockContext.Books.AddRange(fellowshipBook, towersBook);
         await _mockContext.SaveChangesAsync();
 
-        PaginationDataDto paginationData = new() { CurrentPage = 1, PerPage = 10 };
-        LibraryFilterDto filter = new() { LibraryId = libraryId, SearchTerm = "Fellowship" };
+        PaginationDataDto paginationData = _paginationDataDtoFixture.Create(currentPage: 1, perPage: 10);
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId, searchTerm: "Fellowship");
 
         // Act
         Result<PaginatedResultDto<BookEntity>> result = await _sut.GetPaginatedAsync(paginationData, null, null, filter, CancellationToken.None);
@@ -449,8 +459,8 @@ public class BookRepositoryTests
         _mockContext.Books.AddRange(books);
         await _mockContext.SaveChangesAsync();
 
-        PaginationDataDto paginationData = new() { CurrentPage = 2, PerPage = 2 };
-        LibraryFilterDto filter = new() { LibraryId = libraryId };
+        PaginationDataDto paginationData = _paginationDataDtoFixture.Create(currentPage: 2, perPage: 2);
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId);
 
         // Act
         Result<PaginatedResultDto<BookEntity>> result = await _sut.GetPaginatedAsync(paginationData, null, null, filter, CancellationToken.None);
@@ -478,8 +488,8 @@ public class BookRepositoryTests
         _mockContext.Books.AddRange(bookA, bookB);
         await _mockContext.SaveChangesAsync();
 
-        PaginationDataDto paginationData = new() { CurrentPage = 1, PerPage = 10 };
-        LibraryFilterDto filter = new() { LibraryId = libraryId };
+        PaginationDataDto paginationData = _paginationDataDtoFixture.Create(currentPage: 1, perPage: 10);
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId);
 
         // Act
         Result<PaginatedResultDto<BookEntity>> result = await _sut.GetPaginatedAsync(paginationData, "title", SortOrder.Descending, filter, CancellationToken.None);
@@ -496,15 +506,15 @@ public class BookRepositoryTests
         Guid libraryId = Guid.NewGuid();
         BookEntity book = _bookEntityFixture.Create();
         book.LibraryId = libraryId;
-        book.Tags = [new TagEntity("Tag1"), new TagEntity("Tag2")];
-        book.Genres = [new GenreEntity("Genre1"), new GenreEntity("Genre2")];
-        book.ISBNs = [new IsbnEntity("1234567890", IsbnFormat.Isbn10), new IsbnEntity("1234567890123", IsbnFormat.Isbn13)];
-        book.Ratings = [new BookRatingEntity(4.5M, 5, BookRatingSource.Goodreads, 100)];
+        book.Tags = [_tagEntityFixture.Create(name: "Tag1"), _tagEntityFixture.Create(name: "Tag2")];
+        book.Genres = [_genreEntityFixture.Create(name: "Genre1"), _genreEntityFixture.Create(name: "Genre2")];
+        book.ISBNs = [_isbnEntityFixture.Create(value: "1234567890", format: IsbnFormat.Isbn10), _isbnEntityFixture.Create(value: "1234567890123", format: IsbnFormat.Isbn13)];
+        book.Ratings = [_bookRatingEntityFixture.Create(value: 4.5M, maxValue: 5, source: BookRatingSource.Goodreads, voteCount: 100)];
         _mockContext.Books.Add(book);
         await _mockContext.SaveChangesAsync();
 
-        PaginationDataDto paginationData = new() { CurrentPage = 1, PerPage = 10 };
-        LibraryFilterDto filter = new() { LibraryId = libraryId };
+        PaginationDataDto paginationData = _paginationDataDtoFixture.Create(currentPage: 1, perPage: 10);
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId);
 
         // Act
         Result<PaginatedResultDto<BookEntity>> result = await _sut.GetPaginatedAsync(paginationData, null, null, filter, CancellationToken.None);

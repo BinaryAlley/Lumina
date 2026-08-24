@@ -21,7 +21,7 @@
   <data name="ItemsPerPage" xml:space="preserve">
     <value>Items per page</value>
   </data>
-  <data name="IgnoreThePrefixForAlphaPicker" xml:space="preserve">
+  <data name="ShouldIgnoreThePrefixForAlphaPicker" xml:space="preserve">
     <value>Ignore "The" prefix for the alpha picker</value>
   </data>
   <data name="Save" xml:space="preserve">
@@ -36,7 +36,7 @@
   <data name="DescriptionItemsPerPage" xml:space="preserve">
     <value>The number of library items displayed on each page when pagination is enabled.</value>
   </data>
-  <data name="DescriptionIgnoreThePrefixForAlphaPicker" xml:space="preserve">
+  <data name="DescriptionShouldIgnoreThePrefixForAlphaPicker" xml:space="preserve">
     <value>When enabled, library items whose title begins with "The" are grouped under the first letter of the following word in the alpha picker, e.g. "The Rasmus" is listed under R.</value>
   </data>
   <data name="EnableThemeCaching" xml:space="preserve">

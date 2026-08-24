@@ -24,8 +24,9 @@ public static class UserSettingsMapping
             UserId = domainEntity.UserId.Value,
             IsPaginationEnabled = domainEntity.IsPaginationEnabled,
             ItemsPerPage = domainEntity.ItemsPerPage,
-            IgnoreThePrefixForAlphaPicker = domainEntity.IgnoreThePrefixForAlphaPicker,
-            IsThemeCachingEnabled = domainEntity.IsThemeCachingEnabled
+            ShouldIgnoreThePrefixForAlphaPicker = domainEntity.ShouldIgnoreThePrefixForAlphaPicker,
+            IsThemeCachingEnabled = domainEntity.IsThemeCachingEnabled,
+            ShouldAggregateMetadataWhenMissing = domainEntity.ShouldAggregateMetadataWhenMissing
         };
     }
 
@@ -40,7 +41,9 @@ public static class UserSettingsMapping
             domainEntity.UserId.Value,
             domainEntity.IsPaginationEnabled,
             domainEntity.ItemsPerPage,
-            domainEntity.IgnoreThePrefixForAlphaPicker,
-            domainEntity.IsThemeCachingEnabled);
+            domainEntity.ShouldIgnoreThePrefixForAlphaPicker,
+            domainEntity.IsThemeCachingEnabled,
+            domainEntity.ShouldAggregateMetadataWhenMissing
+        );
     }
 }

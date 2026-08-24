@@ -1,8 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Plugins;
+using Lumina.Contracts.Fixtures.Core.Requests.Plugins;
 using Lumina.Contracts.Requests.Plugins;
 using Lumina.DataAccess.Core.UoW;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Presentation.Api.Core.Endpoints.Plugins.ReorderLibraryMetadataProviders;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.EntityFrameworkCore;
@@ -14,8 +18,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 #endregion
 
@@ -29,6 +31,9 @@ public class ReorderLibraryMetadataProvidersEndpointTests : IClassFixture<Authen
 {
     private HttpClient _client;
     private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly LibraryEntityFixture _libraryEntityFixture = new();
+    private readonly LibraryMetadataProviderConfigurationEntityFixture _libraryMetadataProviderConfigurationEntityFixture = new();
+    private readonly ReorderLibraryMetadataProvidersRequestFixture _reorderLibraryMetadataProvidersRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ReorderLibraryMetadataProvidersEndpointTests"/> class.
@@ -52,15 +57,16 @@ public class ReorderLibraryMetadataProvidersEndpointTests : IClassFixture<Authen
     public async Task ReorderLibraryMetadataProviders_WhenCalledWithValidData_ShouldReorderTheProviders()
     {
         // Arrange
-        Guid libraryId = Guid.NewGuid();
         Guid userId = GetCurrentUserId();
+        Guid libraryId = Guid.NewGuid();
+        await SeedLibraryAsync(libraryId, userId);
         Guid pluginIdA = Guid.NewGuid();
         Guid pluginIdB = Guid.NewGuid();
-        await SeedConfigurationAsync(libraryId, pluginIdA, userId, rank: 1);
-        await SeedConfigurationAsync(libraryId, pluginIdB, userId, rank: 2);
-        ReorderLibraryMetadataProvidersRequest request = new(
-            LibraryId: libraryId,
-            PluginIds: [pluginIdB, pluginIdA]
+        await SeedConfigurationAsync(libraryId, pluginIdA, rank: 1);
+        await SeedConfigurationAsync(libraryId, pluginIdB, rank: 2);
+        ReorderLibraryMetadataProvidersRequest request = _reorderLibraryMetadataProvidersRequestFixture.Create(
+            libraryId: libraryId,
+            pluginIds: [pluginIdB, pluginIdA]
         );
 
         // Act
@@ -84,28 +90,31 @@ public class ReorderLibraryMetadataProvidersEndpointTests : IClassFixture<Authen
     }
 
     /// <summary>
+    /// Seeds a <see cref="Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management.LibraryEntity"/> owned by <paramref name="userId"/>.
+    /// </summary>
+    /// <param name="libraryId">The Id of the library to seed.</param>
+    /// <param name="userId">The Id of the user that owns the library.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    private async Task SeedLibraryAsync(Guid libraryId, Guid userId)
+    {
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        dbContext.Libraries.Add(_libraryEntityFixture.Create(id: libraryId, userId: userId, title: "Test Library", libraryType: LibraryType.EBook, contentLocations: []));
+        await dbContext.SaveChangesAsync();
+    }
+
+    /// <summary>
     /// Seeds a <see cref="LibraryMetadataProviderConfigurationEntity"/> in the database.
     /// </summary>
     /// <param name="libraryId">The Id of the media library.</param>
     /// <param name="pluginId">The Id of the plugin.</param>
-    /// <param name="userId">The Id of the user that owns the data.</param>
     /// <param name="rank">The rank of the provider.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    private async Task SeedConfigurationAsync(Guid libraryId, Guid pluginId, Guid userId, int rank)
+    private async Task SeedConfigurationAsync(Guid libraryId, Guid pluginId, int rank)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
-        dbContext.LibraryMetadataProviderConfigurations.Add(new LibraryMetadataProviderConfigurationEntity
-        {
-            Id = Guid.NewGuid(),
-            LibraryId = libraryId,
-            PluginId = pluginId,
-            IsEnabled = true,
-            Rank = rank,
-            CreatedBy = userId,
-            CreatedOnUtc = DateTime.UtcNow,
-            UpdatedBy = null
-        });
+        dbContext.LibraryMetadataProviderConfigurations.Add(_libraryMetadataProviderConfigurationEntityFixture.Create(libraryId: libraryId, pluginId: pluginId, rank: rank));
         await dbContext.SaveChangesAsync();
     }
 

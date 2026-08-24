@@ -15,23 +15,34 @@ namespace Lumina.Presentation.Web.Fixtures.Common.DTO.UsersManagement;
 [ExcludeFromCodeCoverage]
 public class UserSettingsDtoFixture
 {
+    private readonly Faker _faker = new();
+
     /// <summary>
     /// Creates a new <see cref="UserSettingsDto"/> instance with randomized test data.
     /// </summary>
     /// <param name="userId">Optional identifier of the user that owns the settings.</param>
     /// <param name="isPaginationEnabled">Whether pagination is enabled for the user.</param>
     /// <param name="itemsPerPage">Number of library items displayed per page.</param>
-    /// <param name="ignoreThePrefixForAlphaPicker">Whether the "The" prefix is ignored by the alpha picker.</param>
+    /// <param name="shouldIgnoreThePrefixForAlphaPicker">Whether the "The" prefix is ignored by the alpha picker.</param>
+    /// <param name="isThemeCachingEnabled">Whether the theme data served to this user is cached.</param>
+    /// <param name="shouldAggregateMetadataWhenMissing">Whether the metadata of the media library items is aggregated from multiple providers, when fields are missing.</param>
     /// <returns>A configured <see cref="UserSettingsDto"/> instance.</returns>
-    public UserSettingsDto Create(Guid? userId = null, bool? isPaginationEnabled = null, int? itemsPerPage = null, bool? ignoreThePrefixForAlphaPicker = null)
+    public UserSettingsDto Create(
+        Guid? userId = null, 
+        bool? isPaginationEnabled = null, 
+        int? itemsPerPage = null, 
+        bool? shouldIgnoreThePrefixForAlphaPicker = null, 
+        bool? isThemeCachingEnabled = null, 
+        bool? shouldAggregateMetadataWhenMissing = null)
     {
-        Faker faker = new();
         return new UserSettingsDto
         {
             UserId = userId ?? Guid.NewGuid(),
-            IsPaginationEnabled = isPaginationEnabled ?? faker.Random.Bool(),
-            ItemsPerPage = itemsPerPage ?? faker.Random.Int(1, 200),
-            IgnoreThePrefixForAlphaPicker = ignoreThePrefixForAlphaPicker ?? faker.Random.Bool()
+            IsPaginationEnabled = isPaginationEnabled ?? _faker.Random.Bool(),
+            ItemsPerPage = itemsPerPage ?? _faker.Random.Int(1, 200),
+            ShouldIgnoreThePrefixForAlphaPicker = shouldIgnoreThePrefixForAlphaPicker ?? _faker.Random.Bool(),
+            IsThemeCachingEnabled = isThemeCachingEnabled ?? _faker.Random.Bool(),
+            ShouldAggregateMetadataWhenMissing = shouldAggregateMetadataWhenMissing ?? _faker.Random.Bool()
         };
     }
 

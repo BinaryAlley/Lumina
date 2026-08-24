@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Application.Core.MediaLibrary.Management.Commands.AddLibrary;
+using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.Management;
 using Lumina.Contracts.Requests.MediaLibrary.Management;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System.Diagnostics.CodeAnalysis;
@@ -14,20 +15,22 @@ namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.Management;
 [ExcludeFromCodeCoverage]
 public class AddMediaLibraryRequestMappingTests
 {
+    private readonly AddLibraryRequestFixture _addLibraryRequestFixture = new();
+
     [Fact]
     public void ToCommand_WhenMappingValidRequest_ShouldMapCorrectly()
     {
         // Arrange
-        AddLibraryRequest request = new(
-            "My Library",
-            "Book",
-            ["C:/Books", "D:/Media/Books"],
-            "D:/poster.jpg",
-            true,
-            false,
-            true,
-            false,
-            false
+        AddLibraryRequest request = _addLibraryRequestFixture.Create(
+            title: "My Library",
+            libraryType: "Book",
+            contentLocations: ["C:/Books", "D:/Media/Books"],
+            coverImage: "D:/poster.jpg",
+            isEnabled: true,
+            isLocked: false,
+            canDownloadMetadataFromWeb: true,
+            shouldSaveMetadataInMediaDirectories: false,
+            shouldSkipUnchangedDirectoriesDuringScan: false
         );
 
         // Act
@@ -41,7 +44,7 @@ public class AddMediaLibraryRequestMappingTests
         Assert.Equal(request.CoverImage, result.CoverImage);
         Assert.Equal(request.IsEnabled, result.IsEnabled);
         Assert.Equal(request.IsLocked, result.IsLocked);
-        Assert.Equal(request.DownloadMetadataFromWeb, result.DownloadMetadataFromWeb);
+        Assert.Equal(request.CanDownloadMetadataFromWeb, result.CanDownloadMetadataFromWeb);
         Assert.Equal(request.ShouldSaveMetadataInMediaDirectories, result.ShouldSaveMetadataInMediaDirectories);
     }
 
@@ -53,16 +56,16 @@ public class AddMediaLibraryRequestMappingTests
     public void ToCommand_WhenMappingDifferentLibraryTypes_ShouldMapCorrectly(LibraryType libraryType)
     {
         // Arrange
-        AddLibraryRequest request = new(
-            "My Library",
-            libraryType.ToString(),
-            ["C:/Media"],
-            "D:/poster.jpg",
-            true,
-            false,
-            true,
-            false,
-            false
+        AddLibraryRequest request = _addLibraryRequestFixture.Create(
+            title: "My Library",
+            libraryType: libraryType.ToString(),
+            contentLocations: ["C:/Media"],
+            coverImage: "D:/poster.jpg",
+            isEnabled: true,
+            isLocked: false,
+            canDownloadMetadataFromWeb: true,
+            shouldSaveMetadataInMediaDirectories: false,
+            shouldSkipUnchangedDirectoriesDuringScan: false
         );
 
         // Act
@@ -76,7 +79,7 @@ public class AddMediaLibraryRequestMappingTests
         Assert.Equal(request.CoverImage, result.CoverImage);
         Assert.Equal(request.IsEnabled, result.IsEnabled);
         Assert.Equal(request.IsLocked, result.IsLocked);
-        Assert.Equal(request.DownloadMetadataFromWeb, result.DownloadMetadataFromWeb);
+        Assert.Equal(request.CanDownloadMetadataFromWeb, result.CanDownloadMetadataFromWeb);
         Assert.Equal(request.ShouldSaveMetadataInMediaDirectories, result.ShouldSaveMetadataInMediaDirectories);
     }
 
@@ -92,16 +95,16 @@ public class AddMediaLibraryRequestMappingTests
             "F:/Reading Material"
         ];
 
-        AddLibraryRequest request = new(
-            "My Library",
-            "Book",
-            contentLocations,
-            "D:/poster.jpg",
-            true,
-            false,
-            true,
-            false,
-            false
+        AddLibraryRequest request = _addLibraryRequestFixture.Create(
+            title: "My Library",
+            libraryType: "Book",
+            contentLocations: contentLocations,
+            coverImage: "D:/poster.jpg",
+            isEnabled: true,
+            isLocked: false,
+            canDownloadMetadataFromWeb: true,
+            shouldSaveMetadataInMediaDirectories: false,
+            shouldSkipUnchangedDirectoriesDuringScan: false
         );
 
         // Act
@@ -122,16 +125,16 @@ public class AddMediaLibraryRequestMappingTests
             "D:/Books"
         ];
 
-        AddLibraryRequest request = new(
-            "My Library",
-            "Book",
-            contentLocations,
-            null,
-            true,
-            false,
-            true,
-            false,
-            false
+        AddLibraryRequest request = _addLibraryRequestFixture.Create(
+            title: "My Library",
+            libraryType: "Book",
+            contentLocations: contentLocations,
+            coverImage: null,
+            isEnabled: true,
+            isLocked: false,
+            canDownloadMetadataFromWeb: true,
+            shouldSaveMetadataInMediaDirectories: false,
+            shouldSkipUnchangedDirectoriesDuringScan: false
         );
 
         // Act

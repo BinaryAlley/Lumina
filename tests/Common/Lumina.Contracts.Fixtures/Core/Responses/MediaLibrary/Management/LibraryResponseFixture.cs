@@ -29,7 +29,7 @@ public class LibraryResponseFixture
     /// <param name="coverImage">Optional. The path of the image file used as the cover of the library.</param>
     /// <param name="isEnabled">Optional. Whether the media library is enabled.</param>
     /// <param name="isLocked">Optional. Whether the media library is locked.</param>
-    /// <param name="downloadMetadataFromWeb">Optional. Whether metadata should be downloaded from the web.</param>
+    /// <param name="canDownloadMetadataFromWeb">Optional. Whether metadata should be downloaded from the web.</param>
     /// <param name="shouldSaveMetadataInMediaDirectories">Optional. Whether metadata should be saved in the media directories.</param>
     /// <param name="shouldSkipUnchangedDirectoriesDuringScan">Optional. Whether unchanged directories should be skipped during scan.</param>
     /// <param name="createdOnUtc">Optional. The date and time when the library was created.</param>
@@ -44,7 +44,7 @@ public class LibraryResponseFixture
         string? coverImage = null,
         bool? isEnabled = null,
         bool? isLocked = null,
-        bool? downloadMetadataFromWeb = null,
+        bool? canDownloadMetadataFromWeb = null,
         bool? shouldSaveMetadataInMediaDirectories = null,
         bool? shouldSkipUnchangedDirectoriesDuringScan = null,
         DateTime? createdOnUtc = null,
@@ -59,7 +59,7 @@ public class LibraryResponseFixture
             coverImage,
             isEnabled ?? _faker.Random.Bool(),
             isLocked ?? _faker.Random.Bool(),
-            downloadMetadataFromWeb ?? _faker.Random.Bool(),
+            canDownloadMetadataFromWeb ?? _faker.Random.Bool(),
             shouldSaveMetadataInMediaDirectories ?? _faker.Random.Bool(),
             shouldSkipUnchangedDirectoriesDuringScan ?? _faker.Random.Bool(),
             createdOnUtc ?? _faker.Date.Past().ToUniversalTime(),

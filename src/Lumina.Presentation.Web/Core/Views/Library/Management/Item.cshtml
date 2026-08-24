@@ -170,15 +170,15 @@
                 </div>
                 <div class="form-row">
                     <div class="form-label">
-                        <label asp-for="DownloadMetadataFromWeb">@_localizer["DownloadMetadataFromWeb"]</label>:
+                        <label asp-for="CanDownloadMetadataFromWeb">@_localizer["CanDownloadMetadataFromWeb"]</label>:
                     </div>
                     <div class="form-field">
                         <label class="enlightenment-checkbox-label">
-                            <input type="checkbox" asp-for="DownloadMetadataFromWeb" class="enlightenment-checkbox-hidden"/>
+                            <input type="checkbox" asp-for="CanDownloadMetadataFromWeb" class="enlightenment-checkbox-hidden"/>
                             <span class="enlightenment-checkbox"></span>
                         </label>
                     </div>
-                    <small class="form-label text-disabled form-description">@_localizer["DescriptionDownloadMetadataFromWeb"]</small>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionCanDownloadMetadataFromWeb"]</small>
                 </div>
                 <div class="form-row">
                     <div class="form-label">
@@ -251,7 +251,7 @@
         const mediaDirectoriesFormTable = document.getElementById('add-media-directory-form-table');
         const chkIsEnabled = form.querySelector('[name="IsEnabled"]');
         const chkIsLocked = form.querySelector('[name="IsLocked"]');
-        const chkDownloadMetadataFromWeb = form.querySelector('[name="DownloadMetadataFromWeb"]');
+        const chkCanDownloadMetadataFromWeb = form.querySelector('[name="CanDownloadMetadataFromWeb"]');
         const chkShouldSaveMetadataInMediaDirectories = form.querySelector('[name="ShouldSaveMetadataInMediaDirectories"]');
         const chkShouldSkipUnchangedDirectoriesDuringScan = form.querySelector('[name="ShouldSkipUnchangedDirectoriesDuringScan"]');
 
@@ -271,7 +271,7 @@
                 })(),
                 IsEnabled: chkIsEnabled.checked,
                 IsLocked: chkIsLocked.checked,
-                DownloadMetadataFromWeb: chkDownloadMetadataFromWeb.checked,
+                CanDownloadMetadataFromWeb: chkCanDownloadMetadataFromWeb.checked,
                 ShouldSaveMetadataInMediaDirectories: chkShouldSaveMetadataInMediaDirectories.checked,
                 ShouldSkipUnchangedDirectoriesDuringScan: chkShouldSkipUnchangedDirectoriesDuringScan.checked
             };
