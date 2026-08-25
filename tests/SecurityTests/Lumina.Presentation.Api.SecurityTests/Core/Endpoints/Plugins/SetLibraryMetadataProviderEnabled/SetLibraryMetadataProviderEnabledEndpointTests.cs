@@ -1,21 +1,17 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Common.DataAccess.Entities.Plugins;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Plugins;
+using Lumina.Contracts.Fixtures.Core.Requests.Plugins;
 using Lumina.Contracts.Requests.Plugins;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
-using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Plugins.SetLibraryMetadataProviderEnabled;
@@ -32,6 +28,9 @@ public class SetLibraryMetadataProviderEnabledEndpointTests : IClassFixture<Lumi
     {
         PropertyNameCaseInsensitive = true
     };
+    private readonly LibraryEntityFixture _libraryEntityFixture = new();
+    private readonly LibraryMetadataProviderConfigurationEntityFixture _libraryMetadataProviderConfigurationEntityFixture = new();
+    private readonly SetLibraryMetadataProviderEnabledRequestFixture _setLibraryMetadataProviderEnabledRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SetLibraryMetadataProviderEnabledEndpointTests"/> class.
@@ -49,11 +48,7 @@ public class SetLibraryMetadataProviderEnabledEndpointTests : IClassFixture<Lumi
         // Arrange
         string libraryId = Guid.NewGuid().ToString();
         string pluginId = Guid.NewGuid().ToString();
-        SetLibraryMetadataProviderEnabledRequest request = new(
-            LibraryId: Guid.NewGuid(),
-            PluginId: Guid.NewGuid(),
-            IsEnabled: true
-        );
+        SetLibraryMetadataProviderEnabledRequest request = _setLibraryMetadataProviderEnabledRequestFixture.Create();
 
         // Act
         HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}/metadata-providers/{pluginId}/enabled", request);
@@ -82,12 +77,8 @@ public class SetLibraryMetadataProviderEnabledEndpointTests : IClassFixture<Lumi
         HttpClient client = _apiFactory.CreateClient();
         Guid userId = await _apiFactory.CreateAndAuthenticateAdminUserAsync(client);
         Guid libraryId = await SeedLibraryAsync(userId);
-        await SeedConfigurationAsync(libraryId, userId);
-        SetLibraryMetadataProviderEnabledRequest request = new(
-            LibraryId: libraryId,
-            PluginId: Guid.NewGuid(),
-            IsEnabled: true
-        );
+        await SeedConfigurationAsync(libraryId);
+        SetLibraryMetadataProviderEnabledRequest request = _setLibraryMetadataProviderEnabledRequestFixture.Create(libraryId: libraryId, pluginId: Guid.NewGuid(), isEnabled: true);
 
         // Act
         HttpResponseMessage response = await client.PutAsJsonAsync($"/api/v1/libraries/{Uri.EscapeDataString(maliciousId)}/metadata-providers/{Guid.NewGuid()}/enabled", request);
@@ -115,17 +106,7 @@ public class SetLibraryMetadataProviderEnabledEndpointTests : IClassFixture<Lumi
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
         Guid libraryId = Guid.NewGuid();
-        dbContext.Libraries.Add(new LibraryEntity
-        {
-            Id = libraryId,
-            UserId = userId,
-            Title = "Test Library",
-            LibraryType = LibraryType.EBook,
-            ContentLocations = [],
-            CreatedBy = userId,
-            CreatedOnUtc = DateTime.UtcNow,
-            UpdatedBy = null
-        });
+        dbContext.Libraries.Add(_libraryEntityFixture.Create(id: libraryId, userId: userId, title: "Test Library", libraryType: LibraryType.EBook, contentLocations: []));
         await dbContext.SaveChangesAsync();
         return libraryId;
     }
@@ -134,23 +115,12 @@ public class SetLibraryMetadataProviderEnabledEndpointTests : IClassFixture<Lumi
     /// Seeds a <see cref="LibraryMetadataProviderConfigurationEntity"/> for the library identified by <paramref name="libraryId"/>.
     /// </summary>
     /// <param name="libraryId">The Id of the media library.</param>
-    /// <param name="userId">The Id of the user that owns the data.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    private async Task SeedConfigurationAsync(Guid libraryId, Guid userId)
+    private async Task SeedConfigurationAsync(Guid libraryId)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
-        dbContext.LibraryMetadataProviderConfigurations.Add(new LibraryMetadataProviderConfigurationEntity
-        {
-            Id = Guid.NewGuid(),
-            LibraryId = libraryId,
-            PluginId = Guid.NewGuid(),
-            IsEnabled = false,
-            Rank = 1,
-            CreatedBy = userId,
-            CreatedOnUtc = DateTime.UtcNow,
-            UpdatedBy = null
-        });
+        dbContext.LibraryMetadataProviderConfigurations.Add(_libraryMetadataProviderConfigurationEntityFixture.Create(libraryId: libraryId, pluginId: Guid.NewGuid(), rank: 1, isEnabled: false));
         await dbContext.SaveChangesAsync();
     }
 }

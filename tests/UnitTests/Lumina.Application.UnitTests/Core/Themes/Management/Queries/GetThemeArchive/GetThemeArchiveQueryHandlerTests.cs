@@ -2,18 +2,16 @@
 using Lumina.Application.Common.DataAccess.Entities.Themes;
 using Lumina.Application.Common.DataAccess.Repositories.Themes;
 using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.Infrastructure.Models.DTO.Themes;
 using Lumina.Application.Common.Infrastructure.Themes;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.Themes.Management.Queries.GetThemeArchive;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Themes;
+using Lumina.Application.Fixtures.Common.Infrastructure.Models.DTO.Themes;
 using Lumina.Application.Fixtures.Core.Themes.Management.Queries.GetThemeArchive;
 using Lumina.Contracts.Responses.Themes;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using NSubstitute;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Threading;
@@ -35,6 +33,7 @@ public class GetThemeArchiveQueryHandlerTests
     private readonly GetThemeArchiveQueryHandler _sut;
     private readonly GetThemeArchiveQueryFixture _getThemeArchiveQueryFixture = new();
     private readonly ThemeEntityFixture _themeEntityFixture = new();
+    private readonly ThemeArchiveDtoFixture _themeArchiveDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetThemeArchiveQueryHandlerTests"/> class.
@@ -136,7 +135,7 @@ public class GetThemeArchiveQueryHandlerTests
         _mockThemeRepository.GetByThemeIdAsync(query.ThemeId!, Arg.Any<CancellationToken>())
             .Returns(Result.From<ThemeEntity?>(theme));
         _mockThemeService.BuildArchiveAsync(theme.ThemeId, Arg.Any<CancellationToken>())
-            .Returns(Result.From(new ThemeArchiveDto(bytes, fileName, contentType)));
+            .Returns(Result.From(_themeArchiveDtoFixture.Create(bytes: bytes, fileName: fileName, contentType: contentType)));
 
         // Act
         Result<ThemeArchiveResponse> result = await _sut.HandleAsync(query, CancellationToken.None);

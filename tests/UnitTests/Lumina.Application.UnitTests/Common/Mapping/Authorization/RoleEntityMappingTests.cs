@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.Mapping.Authorization;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using System;
@@ -17,15 +18,15 @@ namespace Lumina.Application.UnitTests.Common.Mapping.Authorization;
 [ExcludeFromCodeCoverage]
 public class RoleEntityMappingTests
 {
+    private readonly RoleEntityFixture _roleEntityFixture = new();
+    private readonly RolePermissionEntityFixture _rolePermissionEntityFixture = new();
+    private readonly PermissionEntityFixture _permissionEntityFixture = new();
+
     [Fact]
     public void ToResponse_WhenMappingValidEntity_ShouldMapCorrectly()
     {
         // Arrange
-        RoleEntity entity = new()
-        {
-            Id = Guid.NewGuid(),
-            RoleName = "Admin"
-        };
+        RoleEntity entity = _roleEntityFixture.Create(roleName: "Admin");
 
         // Act
         RoleResponse result = entity.ToResponse();
@@ -41,36 +42,18 @@ public class RoleEntityMappingTests
     {
         // Arrange
         Guid roleId = Guid.NewGuid();
-        RoleEntity role = new()
-        {
-            Id = roleId,
-            RoleName = "Admin"
-        };
+        RoleEntity role = _roleEntityFixture.Create(id: roleId, roleName: "Admin");
 
         role.RolePermissions =
         [
-            new()
-            {
-                PermissionId = Guid.NewGuid(),
-                RoleId = roleId,
-                Role = role,
-                Permission = new()
-                {
-                    Id = Guid.NewGuid(),
-                    PermissionName = AuthorizationPermission.CanViewUsers
-                }
-            },
-            new()
-            {
-                PermissionId = Guid.NewGuid(),
-                RoleId = roleId,
-                Role = role,
-                Permission = new()
-                {
-                    Id = Guid.NewGuid(),
-                    PermissionName = AuthorizationPermission.CanDeleteUsers
-                }
-            }
+            _rolePermissionEntityFixture.Create(
+                roleId: roleId,
+                role: role,
+                permission: _permissionEntityFixture.Create(permissionName: AuthorizationPermission.CanViewUsers)),
+            _rolePermissionEntityFixture.Create(
+                roleId: roleId,
+                role: role,
+                permission: _permissionEntityFixture.Create(permissionName: AuthorizationPermission.CanDeleteUsers))
         ];
 
         // Act
@@ -89,9 +72,9 @@ public class RoleEntityMappingTests
         // Arrange
         List<RoleEntity> entities =
         [
-            new() { Id = Guid.NewGuid(), RoleName = "Admin" },
-            new() { Id = Guid.NewGuid(), RoleName = "User" },
-            new() { Id = Guid.NewGuid(), RoleName = "Guest" }
+            _roleEntityFixture.Create(roleName: "Admin"),
+            _roleEntityFixture.Create(roleName: "User"),
+            _roleEntityFixture.Create(roleName: "Guest")
         ];
 
         // Act
@@ -100,7 +83,7 @@ public class RoleEntityMappingTests
         // Assert
         Assert.NotNull(results);
         Assert.Equal(3, results.Count());
-        List<RoleResponse> resultList = results.ToList();
+        List<RoleResponse> resultList = [.. results];
         for (int i = 0; i < entities.Count; i++)
         {
             Assert.Equal(entities[i].Id, resultList[i].Id);
@@ -129,11 +112,7 @@ public class RoleEntityMappingTests
     public void ToResponse_WhenMappingDifferentRoleNames_ShouldMapCorrectly(string roleName)
     {
         // Arrange
-        RoleEntity entity = new()
-        {
-            Id = Guid.NewGuid(),
-            RoleName = roleName
-        };
+        RoleEntity entity = _roleEntityFixture.Create(roleName: roleName);
 
         // Act
         RoleResponse result = entity.ToResponse();
@@ -151,11 +130,7 @@ public class RoleEntityMappingTests
     public void ToResponse_WhenMappingDifferentIds_ShouldMapCorrectly(string idString)
     {
         // Arrange
-        RoleEntity entity = new()
-        {
-            Id = Guid.Parse(idString),
-            RoleName = "Admin"
-        };
+        RoleEntity entity = _roleEntityFixture.Create(id: Guid.Parse(idString), roleName: "Admin");
 
         // Act
         RoleResponse result = entity.ToResponse();

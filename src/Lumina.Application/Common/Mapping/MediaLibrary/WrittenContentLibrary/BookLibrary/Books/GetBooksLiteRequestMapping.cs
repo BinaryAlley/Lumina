@@ -21,18 +21,19 @@ public static class GetBooksLiteRequestMapping
     {
         PaginationDataDto? paginationData = null;
         if (request.CurrentPage is not null || request.PerPage is not null)
+        {
             paginationData = new PaginationDataDto
             {
                 CurrentPage = request.CurrentPage ?? 1,
                 PerPage = request.PerPage ?? 200
             };
-
+        }
         LibraryFilterDto libraryFilter = new()
         {
             LibraryId = request.LibraryId,
             SearchTerm = request.SearchTerm,
             FilterAlphaKey = request.FilterAlphaKey,
-            IgnoreThePrefixForAlphaPicker = request.IgnoreThePrefixForAlphaPicker
+            ShouldIgnoreThePrefixForAlphaPicker = request.ShouldIgnoreThePrefixForAlphaPicker
         };
 
         return new GetBooksLiteQuery(paginationData, libraryFilter, request.SortBy, request.SortOrder);

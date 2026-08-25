@@ -5,6 +5,7 @@ using Lumina.Presentation.Web.Common.DTO.FileSystemManagement;
 using Lumina.Presentation.Web.Common.Requests.FileSystemManagement.Path;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Core.Endpoints.FileSystemManagement.Path.ValidatePath;
+using Lumina.Presentation.Web.Fixtures.Common.DTO.FileSystemManagement;
 using Lumina.Presentation.Web.Fixtures.Common.Requests.FileSystemManagement.Path;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Http;
@@ -27,6 +28,7 @@ public class ValidatePathEndpointTests
     private readonly IApiHttpClient _mockApiHttpClient;
     private readonly ValidatePathEndpoint _sut;
     private readonly ValidatePathRequestFixture _validatePathRequestFixture = new();
+    private readonly PathValidDtoFixture _pathValidDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ValidatePathEndpointTests"/> class.
@@ -43,7 +45,7 @@ public class ValidatePathEndpointTests
         // Arrange
         ValidatePathRequest request = _validatePathRequestFixture.Create(path: "/media/books");
         _mockApiHttpClient.GetAsync<PathValidDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
-            .Returns(new PathValidDto(true));
+            .Returns(_pathValidDtoFixture.Create(isValid: true));
 
         // Act
         IResult result = await _sut.ExecuteAsync(request, CancellationToken.None);
@@ -63,7 +65,7 @@ public class ValidatePathEndpointTests
         // Arrange
         ValidatePathRequest request = _validatePathRequestFixture.Create(path: "C:/invalid|path");
         _mockApiHttpClient.GetAsync<PathValidDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
-            .Returns(new PathValidDto(false));
+            .Returns(_pathValidDtoFixture.Create(isValid: false));
 
         // Act
         IResult result = await _sut.ExecuteAsync(request, CancellationToken.None);

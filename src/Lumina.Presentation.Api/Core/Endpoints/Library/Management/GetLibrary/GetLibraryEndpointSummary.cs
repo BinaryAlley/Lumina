@@ -38,7 +38,7 @@ public class GetLibraryEndpointSummary : Summary<GetLibraryEndpoint, GetLibraryR
         ResponseParam<LibraryResponse>(r => r.CoverImage, "The path of the image file used as the cover for the library.");
         ResponseParam<LibraryResponse>(r => r.IsEnabled, "Whether this media library is enabled or not. A disabled media library is never shown or changed.");
         ResponseParam<LibraryResponse>(r => r.IsLocked, "Whether this media library is locked or not. A locked media library is displayed, but is never changed or updated.");
-        ResponseParam<LibraryResponse>(r => r.DownloadMetadataFromWeb, "Whether this media library should update the metadata of its elements from the web, or not.");
+        ResponseParam<LibraryResponse>(r => r.CanDownloadMetadataFromWeb, "Whether this media library should update the metadata of its elements from the web, or not.");
         ResponseParam<LibraryResponse>(r => r.ShouldSaveMetadataInMediaDirectories, "Whether this media library should copy the downloaded metadata into the media library content locations, or not.");
         ResponseParam<LibraryResponse>(r => r.ShouldSkipUnchangedDirectoriesDuringScan, "Whether this media library should skip the directories whose contents have not changed since the last scan, during the scan, or not.");
         ResponseParam<LibraryResponse>(r => r.CreatedOnUtc, "The date and time when the entity was created.");
@@ -53,7 +53,7 @@ public class GetLibraryEndpointSummary : Summary<GetLibraryEndpoint, GetLibraryR
             CoverImage: "/media/myPoster.jpg",
             IsEnabled: true,
             IsLocked: false,
-            DownloadMetadataFromWeb: true,
+            CanDownloadMetadataFromWeb: true,
             ShouldSaveMetadataInMediaDirectories: false,
             ShouldSkipUnchangedDirectoriesDuringScan: false,
             CreatedOnUtc: DateTime.UtcNow,

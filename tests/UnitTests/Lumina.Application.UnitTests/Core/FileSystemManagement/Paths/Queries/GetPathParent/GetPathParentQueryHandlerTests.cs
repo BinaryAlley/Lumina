@@ -4,6 +4,7 @@ using AutoFixture.AutoNSubstitute;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.FileSystemManagement.Paths.Queries.GetPathParent;
 using Lumina.Application.Fixtures.Core.FileSystemManagement.Paths.Queries.GetPathParent;
+using Lumina.Contracts.Fixtures.Core.Responses.FileSystemManagement.Path;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
@@ -30,6 +31,7 @@ public class GetPathParentQueryHandlerTests
     private readonly GetPathParentQueryHandler _sut;
     private readonly PathSegmentFixture _pathSegmentFixture = new();
     private readonly GetPathParentQueryFixture _getPathParentQueryFixture = new();
+    private readonly PathSegmentResponseFixture _pathSegmentResponseFixture = new();
 
     public GetPathParentQueryHandlerTests()
     {
@@ -50,7 +52,7 @@ public class GetPathParentQueryHandlerTests
         IEnumerable<PathSegment> pathSegments = _pathSegmentFixture.CreateMany();
 
         // Create PathSegmentResponses based on the PathSegments
-        IEnumerable<PathSegmentResponse> pathSegmentResponses = pathSegments.Select(segment => new PathSegmentResponse(segment.Name));
+        IEnumerable<PathSegmentResponse> pathSegmentResponses = pathSegments.Select(segment => _pathSegmentResponseFixture.Create(path: segment.Name));
 
         _mockPathService.GoUpOneLevel(query.Path!)
             .Returns(Result.From(pathSegments));
@@ -60,7 +62,7 @@ public class GetPathParentQueryHandlerTests
 
         // Assert
         Assert.False(result.IsFailure);
-        Assert.IsAssignableFrom<IEnumerable<PathSegmentResponse>>(result.Value);
+        Assert.IsType<IEnumerable<PathSegmentResponse>>(result.Value, exactMatch: false);
         Assert.Equal(pathSegmentResponses, result.Value);
         _mockPathService.Received(1).GoUpOneLevel(query.Path!);
     }

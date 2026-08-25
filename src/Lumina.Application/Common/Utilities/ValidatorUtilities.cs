@@ -94,6 +94,33 @@ public static class ValidatorUtilities
     }
 
     /// <summary>
+    /// Defines a validation rule that ensures the float property is greater than the specified value.
+    /// </summary>
+    /// <typeparam name="TRequest">The type of the request being validated.</typeparam>
+    /// <param name="ruleBuilder">The rule builder instance.</param>
+    /// <param name="valueToCompare">The value that the property must be greater than.</param>
+    /// <returns>The current <see cref="IRuleBuilder{TRequest, TProperty}"/> instance for method chaining.</returns>
+    public static IRuleBuilder<TRequest, float> GreaterThan<TRequest>(this IRuleBuilder<TRequest, float> ruleBuilder, float valueToCompare)
+    {
+        return ruleBuilder.Must(value => value > valueToCompare);
+    }
+
+    /// <summary>
+    /// Defines a validation rule that ensures the nullable float property is greater than the specified value.
+    /// </summary>
+    /// <remarks>
+    /// If the property is <see langword="null"/>, this rule passes (use <see cref="NotNull{TRequest, TProperty}(IRuleBuilder{TRequest, TProperty})"/> to check for missing values).
+    /// </remarks>
+    /// <typeparam name="TRequest">The type of the request being validated.</typeparam>
+    /// <param name="ruleBuilder">The rule builder instance.</param>
+    /// <param name="valueToCompare">The value that the property must be greater than.</param>
+    /// <returns>The current <see cref="IRuleBuilder{TRequest, TProperty}"/> instance for method chaining.</returns>
+    public static IRuleBuilder<TRequest, float?> GreaterThan<TRequest>(this IRuleBuilder<TRequest, float?> ruleBuilder, float valueToCompare)
+    {
+        return ruleBuilder.Must(value => !value.HasValue || value.Value > valueToCompare);
+    }
+
+    /// <summary>
     /// Defines a validation rule that ensures the time span property is greater than the specified value.
     /// </summary>
     /// <typeparam name="TRequest">The type of the request being validated.</typeparam>

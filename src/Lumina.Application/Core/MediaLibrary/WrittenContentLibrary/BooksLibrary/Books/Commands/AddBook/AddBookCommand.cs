@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.CQRS;
+using Lumina.Contracts.DTO.MediaContributors;
+using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
+using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Lumina.Contracts.DTO.MediaContributors;
-using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
-using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 #endregion
 
 namespace Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook;
@@ -40,7 +40,7 @@ public record AddBookCommand(
     WrittenContentMetadataDto? Metadata,
     BookFormat? Format,
     string? Edition,
-    int? VolumeNumber,
+    float? VolumeNumber,
     BookSeriesDto? Series,
     string? ASIN,
     string? GoodreadsId,

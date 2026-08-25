@@ -1,6 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.DataAccess.Core.UoW;
@@ -32,6 +34,8 @@ public class SetupApplicationEndpointTests : IClassFixture<AuthenticatedLuminaAp
 {
     private HttpClient _client;
     private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly UserEntityFixture _userEntityFixture = new();
+    private readonly RegistrationRequestFixture _registrationRequestFixture = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -63,11 +67,11 @@ public class SetupApplicationEndpointTests : IClassFixture<AuthenticatedLuminaAp
     public async Task SetupApplication_WhenCalledWithValidRequestAnd2FA_ShouldSetupApplicationSuccessfully()
     {
         // Arrange
-        RegistrationRequest request = new(
-            Username: _testUsername,
-            Password: "TestPass123!",
-            PasswordConfirm: "TestPass123!",
-            Use2fa: true
+        RegistrationRequest request = _registrationRequestFixture.Create(
+            username: _testUsername,
+            password: "TestPass123!",
+            passwordConfirm: "TestPass123!",
+            use2fa: true
         );
         await _apiFactory.ResetDatabaseAsync();
 
@@ -97,11 +101,11 @@ public class SetupApplicationEndpointTests : IClassFixture<AuthenticatedLuminaAp
     public async Task SetupApplication_WhenCalledWithValidRequestWithout2FA_ShouldSetupApplicationSuccessfully()
     {
         // Arrange
-        RegistrationRequest request = new(
-            Username: _testUsername,
-            Password: "TestPass123!",
-            PasswordConfirm: "TestPass123!",
-            Use2fa: false
+        RegistrationRequest request = _registrationRequestFixture.Create(
+            username: _testUsername,
+            password: "TestPass123!",
+            passwordConfirm: "TestPass123!",
+            use2fa: false
         );
         await _apiFactory.ResetDatabaseAsync();
 
@@ -130,11 +134,11 @@ public class SetupApplicationEndpointTests : IClassFixture<AuthenticatedLuminaAp
     {
         // Arrange
         await CreateTestUser();
-        RegistrationRequest request = new(
-            Username: "another_admin",
-            Password: "TestPass123!",
-            PasswordConfirm: "TestPass123!",
-            Use2fa: false
+        RegistrationRequest request = _registrationRequestFixture.Create(
+            username: "another_admin",
+            password: "TestPass123!",
+            passwordConfirm: "TestPass123!",
+            use2fa: false
         );
 
         // Act
@@ -212,17 +216,9 @@ public class SetupApplicationEndpointTests : IClassFixture<AuthenticatedLuminaAp
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
 
-        UserEntity user = new()
-        {
-            Id = Guid.NewGuid(),
-            Username = _testUsername,
-            Password = new PasswordHashService().HashString("TestPass123!"),
-            Libraries = [],
-            UserPermissions = [],
-            UserRole = null, // TODO: test default role and permissions?
-            CreatedBy = Guid.NewGuid(),
-            CreatedOnUtc = DateTime.UtcNow
-        };
+        // TODO: test default role and permissions?
+        UserEntity user = _userEntityFixture.Create(username: _testUsername, password: new PasswordHashService().HashString("TestPass123!"));
+        user.TotpSecret = null;
 
         dbContext.Users.Add(user);
         await dbContext.SaveChangesAsync();

@@ -4,7 +4,6 @@ using Lumina.Domain.Common.Models.Core;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserSettingsAggregate.ValueObjects;
-using System;
 using System.Diagnostics;
 #endregion
 
@@ -20,6 +19,7 @@ public class UserSettings : AggregateRoot<UserSettingsId>
     private const int DEFAULT_ITEMS_PER_PAGE = 48;
     private const bool DEFAULT_IGNORE_THE_PREFIX_FOR_ALPHA_PICKER = false;
     private const bool DEFAULT_IS_THEME_CACHING_ENABLED = true;
+    private const bool DEFAULT_AGGREGATE_METADATA_WHEN_MISSING = false;
 
     /// <summary>
     /// Gets the object representing the unique identifier of the user that owns these settings.
@@ -39,12 +39,17 @@ public class UserSettings : AggregateRoot<UserSettingsId>
     /// <summary>
     /// Gets whether the "The" prefix of library item titles is ignored by the alpha picker, or not.
     /// </summary>
-    public bool IgnoreThePrefixForAlphaPicker { get; private set; }
+    public bool ShouldIgnoreThePrefixForAlphaPicker { get; private set; }
 
     /// <summary>
     /// Gets whether the theme data served to this user is cached, or not.
     /// </summary>
     public bool IsThemeCachingEnabled { get; private set; }
+
+    /// <summary>
+    /// Gets whether the metadata of the media library items is aggregated from multiple providers, when fields are missing, or not.
+    /// </summary>
+    public bool ShouldAggregateMetadataWhenMissing { get; private set; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UserSettings"/> class.
@@ -53,21 +58,24 @@ public class UserSettings : AggregateRoot<UserSettingsId>
     /// <param name="userId">The object representing the unique identifier of the user that owns these settings.</param>
     /// <param name="isPaginationEnabled">Whether pagination is enabled for the user, or not.</param>
     /// <param name="itemsPerPage">The number of library items displayed per page when pagination is enabled.</param>
-    /// <param name="ignoreThePrefixForAlphaPicker">Whether the "The" prefix of library item titles is ignored by the alpha picker, or not.</param>
+    /// <param name="shouldIgnoreThePrefixForAlphaPicker">Whether the "The" prefix of library item titles is ignored by the alpha picker, or not.</param>
     /// <param name="isThemeCachingEnabled">Whether the theme data served to this user is cached, or not.</param>
+    /// <param name="shouldAggregateMetadataWhenMissing">Whether the metadata of the media library items is aggregated from multiple providers, when fields are missing, or not.</param>
     private UserSettings(
         UserSettingsId id,
         UserId userId,
         bool isPaginationEnabled,
         int itemsPerPage,
-        bool ignoreThePrefixForAlphaPicker,
-        bool isThemeCachingEnabled) : base(id)
+        bool shouldIgnoreThePrefixForAlphaPicker,
+        bool isThemeCachingEnabled,
+        bool shouldAggregateMetadataWhenMissing) : base(id)
     {
         UserId = userId;
         IsPaginationEnabled = isPaginationEnabled;
         ItemsPerPage = itemsPerPage;
-        IgnoreThePrefixForAlphaPicker = ignoreThePrefixForAlphaPicker;
+        ShouldIgnoreThePrefixForAlphaPicker = shouldIgnoreThePrefixForAlphaPicker;
         IsThemeCachingEnabled = isThemeCachingEnabled;
+        ShouldAggregateMetadataWhenMissing = shouldAggregateMetadataWhenMissing;
     }
 
     /// <summary>
@@ -78,7 +86,7 @@ public class UserSettings : AggregateRoot<UserSettingsId>
     /// </returns>
     public static Result<UserSettings> Create()
     {
-        return Create(UserId.CreateUnique(), DEFAULT_IS_PAGINATION_ENABLED, DEFAULT_ITEMS_PER_PAGE, DEFAULT_IGNORE_THE_PREFIX_FOR_ALPHA_PICKER, DEFAULT_IS_THEME_CACHING_ENABLED);
+        return Create(UserId.CreateUnique(), DEFAULT_IS_PAGINATION_ENABLED, DEFAULT_ITEMS_PER_PAGE, DEFAULT_IGNORE_THE_PREFIX_FOR_ALPHA_PICKER, DEFAULT_IS_THEME_CACHING_ENABLED, DEFAULT_AGGREGATE_METADATA_WHEN_MISSING);
     }
 
     /// <summary>
@@ -90,7 +98,7 @@ public class UserSettings : AggregateRoot<UserSettingsId>
     /// </returns>
     public static Result<UserSettings> Create(UserId userId)
     {
-        return Create(userId, DEFAULT_IS_PAGINATION_ENABLED, DEFAULT_ITEMS_PER_PAGE, DEFAULT_IGNORE_THE_PREFIX_FOR_ALPHA_PICKER, DEFAULT_IS_THEME_CACHING_ENABLED);
+        return Create(userId, DEFAULT_IS_PAGINATION_ENABLED, DEFAULT_ITEMS_PER_PAGE, DEFAULT_IGNORE_THE_PREFIX_FOR_ALPHA_PICKER, DEFAULT_IS_THEME_CACHING_ENABLED, DEFAULT_AGGREGATE_METADATA_WHEN_MISSING);
     }
 
     /// <summary>
@@ -99,8 +107,9 @@ public class UserSettings : AggregateRoot<UserSettingsId>
     /// <param name="userId">The object representing the unique identifier of the user that owns these settings.</param>
     /// <param name="isPaginationEnabled">Whether pagination is enabled for the user, or not.</param>
     /// <param name="itemsPerPage">The number of library items displayed per page when pagination is enabled.</param>
-    /// <param name="ignoreThePrefixForAlphaPicker">Whether the "The" prefix of library item titles is ignored by the alpha picker, or not.</param>
+    /// <param name="shouldIgnoreThePrefixForAlphaPicker">Whether the "The" prefix of library item titles is ignored by the alpha picker, or not.</param>
     /// <param name="isThemeCachingEnabled">Whether the theme data served to this user is cached, or not.</param>
+    /// <param name="shouldAggregateMetadataWhenMissing">Whether the metadata of the media library items is aggregated from multiple providers, when fields are missing, or not.</param>
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="UserSettings"/>, or an error message.
     /// </returns>
@@ -108,8 +117,9 @@ public class UserSettings : AggregateRoot<UserSettingsId>
         UserId userId,
         bool isPaginationEnabled,
         int itemsPerPage,
-        bool ignoreThePrefixForAlphaPicker,
-        bool isThemeCachingEnabled)
+        bool shouldIgnoreThePrefixForAlphaPicker,
+        bool isThemeCachingEnabled,
+        bool shouldAggregateMetadataWhenMissing)
     {
         if (itemsPerPage <= 0)
             return Errors.UserSettings.ItemsPerPageMustBeGreaterThanZero;
@@ -119,8 +129,9 @@ public class UserSettings : AggregateRoot<UserSettingsId>
             userId,
             isPaginationEnabled,
             itemsPerPage,
-            ignoreThePrefixForAlphaPicker,
-            isThemeCachingEnabled);
+            shouldIgnoreThePrefixForAlphaPicker,
+            isThemeCachingEnabled,
+            shouldAggregateMetadataWhenMissing);
     }
 
     /// <summary>
@@ -130,8 +141,9 @@ public class UserSettings : AggregateRoot<UserSettingsId>
     /// <param name="userId">The object representing the unique identifier of the user that owns these settings.</param>
     /// <param name="isPaginationEnabled">Whether pagination is enabled for the user, or not.</param>
     /// <param name="itemsPerPage">The number of library items displayed per page when pagination is enabled.</param>
-    /// <param name="ignoreThePrefixForAlphaPicker">Whether the "The" prefix of library item titles is ignored by the alpha picker, or not.</param>
+    /// <param name="shouldIgnoreThePrefixForAlphaPicker">Whether the "The" prefix of library item titles is ignored by the alpha picker, or not.</param>
     /// <param name="isThemeCachingEnabled">Whether the theme data served to this user is cached, or not.</param>
+    /// <param name="shouldAggregateMetadataWhenMissing">Whether the metadata of the media library items is aggregated from multiple providers, when fields are missing, or not.</param>
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="UserSettings"/>, or an error message.
     /// </returns>
@@ -140,13 +152,14 @@ public class UserSettings : AggregateRoot<UserSettingsId>
         UserId userId,
         bool isPaginationEnabled,
         int itemsPerPage,
-        bool ignoreThePrefixForAlphaPicker,
-        bool isThemeCachingEnabled)
+        bool shouldIgnoreThePrefixForAlphaPicker,
+        bool isThemeCachingEnabled,
+        bool shouldAggregateMetadataWhenMissing)
     {
         if (itemsPerPage <= 0)
             return Errors.UserSettings.ItemsPerPageMustBeGreaterThanZero;
 
-        return new UserSettings(id, userId, isPaginationEnabled, itemsPerPage, ignoreThePrefixForAlphaPicker, isThemeCachingEnabled);
+        return new UserSettings(id, userId, isPaginationEnabled, itemsPerPage, shouldIgnoreThePrefixForAlphaPicker, isThemeCachingEnabled, shouldAggregateMetadataWhenMissing);
     }
 
     /// <summary>
@@ -154,22 +167,25 @@ public class UserSettings : AggregateRoot<UserSettingsId>
     /// </summary>
     /// <param name="isPaginationEnabled">Whether pagination is enabled for the user, or not.</param>
     /// <param name="itemsPerPage">The number of library items displayed per page when pagination is enabled.</param>
-    /// <param name="ignoreThePrefixForAlphaPicker">Whether the "The" prefix of library item titles is ignored by the alpha picker, or not.</param>
+    /// <param name="shouldIgnoreThePrefixForAlphaPicker">Whether the "The" prefix of library item titles is ignored by the alpha picker, or not.</param>
     /// <param name="isThemeCachingEnabled">Whether the theme data served to this user is cached, or not.</param>
+    /// <param name="shouldAggregateMetadataWhenMissing">Whether the metadata of the media library items is aggregated from multiple providers, when fields are missing, or not.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful update, or an error.</returns>
     public Result<Updated> UpdateSettings(
         bool isPaginationEnabled,
         int itemsPerPage,
-        bool ignoreThePrefixForAlphaPicker,
-        bool isThemeCachingEnabled)
+        bool shouldIgnoreThePrefixForAlphaPicker,
+        bool isThemeCachingEnabled,
+        bool shouldAggregateMetadataWhenMissing)
     {
         if (itemsPerPage <= 0)
             return Errors.UserSettings.ItemsPerPageMustBeGreaterThanZero;
 
         IsPaginationEnabled = isPaginationEnabled;
         ItemsPerPage = itemsPerPage;
-        IgnoreThePrefixForAlphaPicker = ignoreThePrefixForAlphaPicker;
+        ShouldIgnoreThePrefixForAlphaPicker = shouldIgnoreThePrefixForAlphaPicker;
         IsThemeCachingEnabled = isThemeCachingEnabled;
+        ShouldAggregateMetadataWhenMissing = shouldAggregateMetadataWhenMissing;
         return Result.Updated;
     }
 }

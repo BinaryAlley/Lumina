@@ -155,6 +155,15 @@ public class UnixPathStrategy : IUnixPathStrategy
     }
 
     /// <summary>
+    /// Returns a collection of characters that are invalid for a single path segment.
+    /// </summary>
+    /// <returns>A collection of characters that are invalid in the context of a single path segment.</returns>
+    public char[] GetInvalidPathSegmentCharsForPlatform()
+    {
+        return ['\0'];
+    }
+
+    /// <summary>
     /// Returns the root portion of the given path.
     /// </summary>
     /// <param name="path">The path for which to get the root.</param>

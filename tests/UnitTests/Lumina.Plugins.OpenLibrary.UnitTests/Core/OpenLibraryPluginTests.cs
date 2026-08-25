@@ -2,7 +2,6 @@
 using Lumina.Domain.SharedKernel.Common.Enums.Plugins;
 using Lumina.Plugins.Contracts.Common.Models.DTO.Settings;
 using Lumina.Plugins.Contracts.Core.Metadata;
-using Lumina.Plugins.OpenLibrary.Common.DependencyInjection;
 using Lumina.Plugins.OpenLibrary.Core;
 using Lumina.Plugins.OpenLibrary.Core.Api;
 using Lumina.Plugins.OpenLibrary.Core.Settings;
@@ -10,7 +9,6 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 #endregion
 
 namespace Lumina.Plugins.OpenLibrary.UnitTests.Core;
@@ -131,7 +129,7 @@ public class OpenLibraryPluginTests
         ServiceProvider serviceProvider = services.BuildServiceProvider();
 
         // Assert
-        Assert.NotNull(serviceProvider.GetKeyedService<IRemoteMetadataProvider>(OpenLibraryPlugin.s_pluginId));
+        Assert.NotNull(serviceProvider.GetKeyedService<IMetadataProvider>(OpenLibraryPlugin.s_pluginId));
         Assert.NotNull(serviceProvider.GetService<OpenLibraryHttpClient>());
     }
 }

@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
@@ -30,6 +31,7 @@ public class GetUserPermissionsEndpointTests : IClassFixture<AuthenticatedLumina
 {
     private HttpClient _client;
     private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly UserPermissionEntityFixture _userPermissionEntityFixture = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -65,15 +67,7 @@ public class GetUserPermissionsEndpointTests : IClassFixture<AuthenticatedLumina
 
         // Add a direct user permission
         PermissionEntity permission = dbContext.Permissions.First();
-        UserPermissionEntity userPermission = new()
-        {
-            UserId = user!.Id,
-            PermissionId = permission.Id,
-            CreatedBy = user.Id,
-            CreatedOnUtc = DateTime.UtcNow,
-            User = user,
-            Permission = permission,
-        };
+        UserPermissionEntity userPermission = _userPermissionEntityFixture.Create(user, permission);
         dbContext.UserPermissions.Add(userPermission);
         await dbContext.SaveChangesAsync();
 

@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Contracts.Fixtures.Core.DTO.Common;
 using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
@@ -21,6 +21,7 @@ public class BookMetadataDtoMappingTests
 {
     private readonly BookFixture _bookFixture = new();
     private readonly BookMetadataDtoFixture _bookMetadataDtoFixture = new();
+    private readonly GenreDtoFixture _genreDtoFixture = new();
 
     [Fact]
     public void ApplyMetadata_WhenCalledWithValidMetadata_ShouldApplyItAndMarkTheBookAsEnriched()
@@ -59,7 +60,7 @@ public class BookMetadataDtoMappingTests
             title: "The Fellowship of the Ring",
             goodreadsId: "3") with
         {
-            Genres = [new GenreDto("")]
+            Genres = [_genreDtoFixture.Create(name: "")]
         };
 
         // Act

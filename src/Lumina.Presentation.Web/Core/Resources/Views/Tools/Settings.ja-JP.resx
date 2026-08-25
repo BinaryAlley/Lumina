@@ -21,7 +21,7 @@
   <data name="ItemsPerPage" xml:space="preserve">
     <value>ページあたりの項目数</value>
   </data>
-  <data name="IgnoreThePrefixForAlphaPicker" xml:space="preserve">
+  <data name="ShouldIgnoreThePrefixForAlphaPicker" xml:space="preserve">
     <value>アルファピッカーで「The」の接頭辞を無視する</value>
   </data>
   <data name="Save" xml:space="preserve">
@@ -36,7 +36,7 @@
   <data name="DescriptionItemsPerPage" xml:space="preserve">
     <value>ページネーションが有効な場合に各ページに表示されるライブラリの項目数。</value>
   </data>
-  <data name="DescriptionIgnoreThePrefixForAlphaPicker" xml:space="preserve">
+  <data name="DescriptionShouldIgnoreThePrefixForAlphaPicker" xml:space="preserve">
     <value>有効にすると、タイトルが「The」で始まるライブラリの項目は、アルファピッカーで次の単語の最初の文字の下にグループ化されます。たとえば「The Rasmus」は「R」の下に表示されます。</value>
   </data>
   <data name="EnableThemeCaching" xml:space="preserve">

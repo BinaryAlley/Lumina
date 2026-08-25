@@ -1,21 +1,18 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Contracts.Requests.Authentication;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Infrastructure.Core.Security;
 using Lumina.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
-using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Library.Management.GetRunningLibraryScans;
@@ -33,6 +30,8 @@ public class GetRunningLibraryScansEndpointTests : IClassFixture<LuminaApiFactor
     {
         PropertyNameCaseInsensitive = true
     };
+    private readonly UserEntityFixture _userEntityFixture = new();
+    private readonly LoginRequestFixture _loginRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetRunningLibraryScansEndpointTests"/> class.
@@ -97,20 +96,12 @@ public class GetRunningLibraryScansEndpointTests : IClassFixture<LuminaApiFactor
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
         Guid userId = Guid.NewGuid();
         string username = $"testuser_{Guid.NewGuid()}";
-        dbContext.Users.Add(new UserEntity
-        {
-            Id = userId,
-            Username = username,
-            Password = _hashService.HashString("TestPass123!"),
-            Libraries = [],
-            UserPermissions = [],
-            UserRole = null,
-            CreatedBy = userId,
-            CreatedOnUtc = DateTime.UtcNow
-        });
+        UserEntity user = _userEntityFixture.Create(id: userId, username: username, password: _hashService.HashString("TestPass123!"));
+        user.TotpSecret = null;
+        dbContext.Users.Add(user);
         await dbContext.SaveChangesAsync();
 
-        HttpResponseMessage loginResponse = await client.PostAsJsonAsync("/api/v1/auth/login", new LoginRequest(username, "TestPass123!"));
+        HttpResponseMessage loginResponse = await client.PostAsJsonAsync("/api/v1/auth/login", _loginRequestFixture.Create(username: username, password: "TestPass123!"));
         string content = await loginResponse.Content.ReadAsStringAsync();
         LoginResponse? loginResult = JsonSerializer.Deserialize<LoginResponse>(content, _jsonOptions);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginResult!.Token);

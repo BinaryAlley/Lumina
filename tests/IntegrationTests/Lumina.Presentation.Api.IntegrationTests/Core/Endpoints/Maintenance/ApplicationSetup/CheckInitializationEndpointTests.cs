@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Contracts.Responses.UsersManagement;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Infrastructure.Core.Security;
@@ -25,6 +26,7 @@ public class CheckInitializationEndpointTests : IClassFixture<AuthenticatedLumin
 {
     private HttpClient _client;
     private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly UserEntityFixture _userEntityFixture = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -117,17 +119,8 @@ public class CheckInitializationEndpointTests : IClassFixture<AuthenticatedLumin
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
 
-        UserEntity user = new()
-        {
-            Id = Guid.NewGuid(),
-            Username = _testUsername,
-            Password = new PasswordHashService().HashString("TestPass123!"),
-            Libraries = [],
-            UserPermissions = [],
-            UserRole = null,
-            CreatedBy = Guid.NewGuid(),
-            CreatedOnUtc = DateTime.UtcNow
-        };
+        UserEntity user = _userEntityFixture.Create(username: _testUsername, password: new PasswordHashService().HashString("TestPass123!"));
+        user.TotpSecret = null;
 
         dbContext.Users.Add(user);
         await dbContext.SaveChangesAsync();

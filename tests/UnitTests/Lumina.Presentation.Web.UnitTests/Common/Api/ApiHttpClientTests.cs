@@ -5,6 +5,7 @@ using Lumina.Presentation.Web.Common.DTO.Configuration;
 using Lumina.Presentation.Web.Common.DTO.FileSystemManagement;
 using Lumina.Presentation.Web.Common.Exceptions;
 using Lumina.Presentation.Web.Fixtures.Common.Api;
+using Lumina.Presentation.Web.Fixtures.Common.DTO.Configuration;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -26,7 +27,7 @@ namespace Lumina.Presentation.Web.UnitTests.Common.Api;
 [ExcludeFromCodeCoverage]
 public class ApiHttpClientTests
 {
-    private const string TEST_ENCRYPTION_KEY = "FLYO0QRo6u2VzoFOgNkkEwYNGtqhJ3QGZd7iAHNEJeM=";
+    private readonly ServerConfigurationDtoFixture _serverConfigurationDtoFixture = new();
 
     [Fact]
     public async Task GetAsync_WhenApiReturnsSuccess_ShouldDeserializeResponseContent()
@@ -36,7 +37,7 @@ public class ApiHttpClientTests
         ApiHttpClient sut = CreateSut(messageHandler);
 
         // Act
-        Lumina.Presentation.Web.Common.DTO.Libraries.LibraryDto[] result = await sut.GetAsync<Lumina.Presentation.Web.Common.DTO.Libraries.LibraryDto[]>("libraries", CancellationToken.None);
+        Web.Common.DTO.Libraries.LibraryDto[] result = await sut.GetAsync<Web.Common.DTO.Libraries.LibraryDto[]>("libraries", CancellationToken.None);
 
         // Assert
         Assert.Single(result);
@@ -152,21 +153,35 @@ public class ApiHttpClientTests
         Assert.Equal("image/png", blob.ContentType);
     }
 
-    private static ApiHttpClient CreateSut(TestApiHttpMessageHandler messageHandler, string? token = null)
+    /// <summary>
+    /// Creates the system under test configured with the provided message handler.
+    /// </summary>
+    /// <param name="messageHandler">The message handler backing the inner <see cref="HttpClient"/>.</param>
+    /// <param name="token">Optional token claim to place on the current HTTP context user.</param>
+    /// <returns>The created <see cref="ApiHttpClient"/>.</returns>
+    private ApiHttpClient CreateSut(TestApiHttpMessageHandler messageHandler, string? token = null)
     {
         HttpClient httpClient = new(messageHandler);
         IHttpContextAccessor httpContextAccessor = Substitute.For<IHttpContextAccessor>();
         if (token is not null)
         {
-            DefaultHttpContext httpContext = new();
-            httpContext.User = new ClaimsPrincipal(new ClaimsIdentity([new Claim("Token", token)], "TestAuthentication"));
+            DefaultHttpContext httpContext = new()
+            {
+                User = new ClaimsPrincipal(new ClaimsIdentity([new Claim("Token", token)], "TestAuthentication"))
+            };
             httpContextAccessor.HttpContext.Returns(httpContext);
         }
         IOptionsSnapshot<ServerConfigurationDto> serverConfigurationOptions = Substitute.For<IOptionsSnapshot<ServerConfigurationDto>>();
-        serverConfigurationOptions.Value.Returns(new ServerConfigurationDto { ApiVersion = '1', BaseAddress = "http://localhost", Port = 5214 });
+        serverConfigurationOptions.Value.Returns(_serverConfigurationDtoFixture.Create(apiVersion: '1', baseAddress: "http://localhost", port: 5214));
         return new ApiHttpClient(httpClient, httpContextAccessor, serverConfigurationOptions);
     }
 
+    /// <summary>
+    /// Creates an <see cref="HttpResponseMessage"/> with the given status code and JSON body.
+    /// </summary>
+    /// <param name="statusCode">The HTTP status code of the response.</param>
+    /// <param name="json">The JSON payload of the response body.</param>
+    /// <returns>The created <see cref="HttpResponseMessage"/>.</returns>
     private static HttpResponseMessage CreateJsonResponse(HttpStatusCode statusCode, string json)
     {
         return new HttpResponseMessage(statusCode)

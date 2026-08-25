@@ -3,6 +3,7 @@ using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.FileSystemManagement.Paths.Queries.ValidatePath;
 using Lumina.Contracts.Fixtures.Core.Requests.FileSystemManagement.Path;
+using Lumina.Contracts.Fixtures.Core.Responses.FileSystemManagement.Path;
 using Lumina.Contracts.Requests.FileSystemManagement.Path;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
 using Lumina.Domain.Common.Primitives;
@@ -27,6 +28,7 @@ public class ValidatePathEndpointTests
     private readonly IQueryHandler<ValidatePathQuery, Result<PathValidResponse>> _mockHandler;
     private readonly ValidatePathEndpoint _sut;
     private readonly ValidatePathRequestFixture _validatePathRequestFixture = new();
+    private readonly PathValidResponseFixture _pathValidResponseFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ValidatePathEndpointTests"/> class.
@@ -43,7 +45,7 @@ public class ValidatePathEndpointTests
         // Arrange
         ValidatePathRequest request = _validatePathRequestFixture.Create(@"C:\Users\TestUser\Documents");
         CancellationToken cancellationToken = CancellationToken.None;
-        PathValidResponse expectedResponse = new(true);
+        PathValidResponse expectedResponse = _pathValidResponseFixture.Create(isValid: true);
         _mockHandler.HandleAsync(Arg.Any<ValidatePathQuery>(), Arg.Any<CancellationToken>())
             .Returns(expectedResponse);
 
@@ -62,7 +64,7 @@ public class ValidatePathEndpointTests
         ValidatePathRequest request = _validatePathRequestFixture.Create(@"C:\Users\TestUser\Documents");
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<ValidatePathQuery>(), Arg.Any<CancellationToken>())
-            .Returns(new PathValidResponse(true));
+            .Returns(_pathValidResponseFixture.Create(isValid: true));
 
         // Act
         await _sut.ExecuteAsync(request, cancellationToken);
@@ -114,7 +116,7 @@ public class ValidatePathEndpointTests
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return Result.From(new PathValidResponse(true));
+                return Result.From(_pathValidResponseFixture.Create(isValid: true));
             }, callInfo.Arg<CancellationToken>()));
 
         // Act

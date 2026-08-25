@@ -1,6 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
+using Lumina.Contracts.Fixtures.Core.Requests.Authorization;
 using Lumina.Contracts.Requests.Authorization;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.DataAccess.Core.UoW;
@@ -34,6 +36,11 @@ public class GetAuthorizationEndpointTests : IClassFixture<AuthenticatedLuminaAp
     private readonly JsonSerializerOptions _jsonOptions;
     private HttpClient _client;
     private readonly string _testUsername;
+    private readonly RoleEntityFixture _roleEntityFixture = new();
+    private readonly PermissionEntityFixture _permissionEntityFixture = new();
+    private readonly RolePermissionEntityFixture _rolePermissionEntityFixture = new();
+    private readonly UserRoleEntityFixture _userRoleEntityFixture = new();
+    private readonly GetAuthorizationRequestFixture _getAuthorizationRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetAuthorizationEndpointTests"/> class.
@@ -78,7 +85,7 @@ public class GetAuthorizationEndpointTests : IClassFixture<AuthenticatedLuminaAp
                 .ThenInclude(userPermission => userPermission.Permission)
             .FirstAsync(user => user.Username == _apiFactory.TestUsername);
         await AddRolesAndPermissionsToUser(user, dbContext);
-        GetAuthorizationRequest request = new(user.Id);
+        GetAuthorizationRequest request = _getAuthorizationRequestFixture.Create(userId: user.Id);
 
         // Act
         HttpResponseMessage response = await _client.GetAsync($"/api/v1/auth/get-authorization?userId={request.UserId}");
@@ -100,7 +107,7 @@ public class GetAuthorizationEndpointTests : IClassFixture<AuthenticatedLuminaAp
     public async Task GetAuthorization_WhenUserDoesNotExist_ShouldReturnForbiddenResult()
     {
         // Arrange
-        GetAuthorizationRequest request = new(Guid.NewGuid());
+        GetAuthorizationRequest request = _getAuthorizationRequestFixture.Create(userId: Guid.NewGuid());
 
         // Act
         HttpResponseMessage response = await _client.GetAsync($"/api/v1/auth/get-authorization?userId={request.UserId}");
@@ -124,7 +131,7 @@ public class GetAuthorizationEndpointTests : IClassFixture<AuthenticatedLuminaAp
     public async Task GetAuthorization_WhenUserIdIsEmpty_ShouldReturnValidationError()
     {
         // Arrange
-        GetAuthorizationRequest request = new(Guid.Empty);
+        GetAuthorizationRequest request = _getAuthorizationRequestFixture.Create(userId: Guid.Empty);
 
         // Act
         HttpResponseMessage response = await _client.GetAsync($"/api/v1/auth/get-authorization?userId={request.UserId}");
@@ -153,7 +160,7 @@ public class GetAuthorizationEndpointTests : IClassFixture<AuthenticatedLuminaAp
     public async Task GetAuthorization_WhenCancellationRequested_ShouldThrowTaskCanceledException()
     {
         // Arrange
-        GetAuthorizationRequest request = new(Guid.NewGuid());
+        GetAuthorizationRequest request = _getAuthorizationRequestFixture.Create(userId: Guid.NewGuid());
         CancellationTokenSource cts = new();
 
         // Act & Assert
@@ -165,40 +172,18 @@ public class GetAuthorizationEndpointTests : IClassFixture<AuthenticatedLuminaAp
         Assert.IsType<TaskCanceledException>(exception);
     }
 
-    private static async Task<UserEntity> AddRolesAndPermissionsToUser(UserEntity existingUser, LuminaDbContext dbContext)
+    private async Task<UserEntity> AddRolesAndPermissionsToUser(UserEntity existingUser, LuminaDbContext dbContext)
     {
         // create and save role and permission first
-        RoleEntity adminRole = new()
-        {
-            Id = Guid.NewGuid(),
-            RoleName = "Admin",
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = Guid.NewGuid()
-        };
-
-        PermissionEntity viewUsersPermission = new()
-        {
-            Id = Guid.NewGuid(),
-            PermissionName = AuthorizationPermission.CanViewUsers,
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = Guid.NewGuid()
-        };
+        RoleEntity adminRole = _roleEntityFixture.Create(roleName: "Admin");
+        PermissionEntity viewUsersPermission = _permissionEntityFixture.Create(permissionName: AuthorizationPermission.CanViewUsers);
 
         await dbContext.Roles.AddAsync(adminRole);
         await dbContext.Permissions.AddAsync(viewUsersPermission);
         await dbContext.SaveChangesAsync();
 
         // create role permission
-        RolePermissionEntity rolePermission = new()
-        {
-            Id = Guid.NewGuid(),
-            Permission = viewUsersPermission,
-            PermissionId = viewUsersPermission.Id,
-            Role = adminRole,
-            RoleId = adminRole.Id,
-            CreatedBy = existingUser.Id,
-            CreatedOnUtc = DateTime.UtcNow
-        };
+        RolePermissionEntity rolePermission = _rolePermissionEntityFixture.Create(role: adminRole, permission: viewUsersPermission);
         await dbContext.RolePermissions.AddAsync(rolePermission);
         await dbContext.SaveChangesAsync();
 
@@ -207,16 +192,7 @@ public class GetAuthorizationEndpointTests : IClassFixture<AuthenticatedLuminaAp
             dbContext.UserRoles.Remove(existingUser.UserRole);
 
         // add new user role
-        UserRoleEntity userRole = new()
-        {
-            Id = Guid.NewGuid(),
-            User = existingUser,
-            UserId = existingUser.Id,
-            Role = adminRole,
-            RoleId = adminRole.Id,
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = Guid.NewGuid()
-        };
+        UserRoleEntity userRole = _userRoleEntityFixture.Create(user: existingUser, role: adminRole);
         await dbContext.UserRoles.AddAsync(userRole);
         await dbContext.SaveChangesAsync();
 

@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
@@ -28,6 +29,7 @@ public class DeleteRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
 {
     private HttpClient _client;
     private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly RoleEntityFixture _roleEntityFixture = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -60,13 +62,7 @@ public class DeleteRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
 
         // Create a test role first
-        RoleEntity role = new()
-        {
-            Id = Guid.NewGuid(),
-            RoleName = "TestRole",
-            CreatedBy = Guid.NewGuid(),
-            CreatedOnUtc = DateTime.UtcNow
-        };
+        RoleEntity role = _roleEntityFixture.Create(roleName: "TestRole");
         dbContext.Roles.Add(role);
         await dbContext.SaveChangesAsync();
 

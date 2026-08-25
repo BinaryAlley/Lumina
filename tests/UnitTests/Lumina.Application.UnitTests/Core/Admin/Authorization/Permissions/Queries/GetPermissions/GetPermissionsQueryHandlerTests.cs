@@ -6,6 +6,8 @@ using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Core.Admin.Authorization.Permissions.Queries.GetPermissions;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
+using Lumina.Application.Fixtures.Core.Admin.Authorization.Permissions.Queries.GetPermissions;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
@@ -32,6 +34,8 @@ public class GetPermissionsQueryHandlerTests
     private readonly IUnitOfWork _mockUnitOfWork;
     private readonly GetPermissionsQueryHandler _sut;
     private readonly Guid _userId;
+    private readonly GetPermissionsQueryFixture _getPermissionsQueryFixture = new();
+    private readonly PermissionEntityFixture _permissionEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetPermissionsQueryHandlerTests"/> class.
@@ -57,11 +61,11 @@ public class GetPermissionsQueryHandlerTests
     public async Task HandleAsync_WhenUserIsAdmin_ShouldReturnPermissions()
     {
         // Arrange
-        GetPermissionsQuery query = new();
+        GetPermissionsQuery query = _getPermissionsQueryFixture.Create();
         IEnumerable<PermissionEntity> permissions =
         [
-            new PermissionEntity { Id = Guid.NewGuid(), PermissionName = AuthorizationPermission.CanViewUsers },
-            new PermissionEntity { Id = Guid.NewGuid(), PermissionName = AuthorizationPermission.CanDeleteUsers }
+            _permissionEntityFixture.Create(permissionName: AuthorizationPermission.CanViewUsers),
+            _permissionEntityFixture.Create(permissionName: AuthorizationPermission.CanDeleteUsers)
         ];
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
@@ -83,7 +87,7 @@ public class GetPermissionsQueryHandlerTests
     public async Task HandleAsync_WhenUserIsNotAdmin_ShouldReturnNotAuthorizedError()
     {
         // Arrange
-        GetPermissionsQuery query = new();
+        GetPermissionsQuery query = _getPermissionsQueryFixture.Create();
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(false);
@@ -102,7 +106,7 @@ public class GetPermissionsQueryHandlerTests
     public async Task HandleAsync_WhenUserIsNotAuthenticated_ShouldReturnNotAuthorizedError()
     {
         // Arrange
-        GetPermissionsQuery query = new();
+        GetPermissionsQuery query = _getPermissionsQueryFixture.Create();
         _mockCurrentUserService.UserId.Returns((Guid?)null);
 
         // Act
@@ -119,7 +123,7 @@ public class GetPermissionsQueryHandlerTests
     public async Task HandleAsync_WhenGetAllPermissionsReturnsError_ShouldReturnError()
     {
         // Arrange
-        GetPermissionsQuery query = new();
+        GetPermissionsQuery query = _getPermissionsQueryFixture.Create();
         Error error = Error.Failure("Database.Error", "Failed to retrieve permissions");
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
@@ -141,10 +145,10 @@ public class GetPermissionsQueryHandlerTests
     public async Task HandleAsync_WhenCancellationRequested_ShouldStillCompleteOperation()
     {
         // Arrange
-        GetPermissionsQuery query = new();
+        GetPermissionsQuery query = _getPermissionsQueryFixture.Create();
         IEnumerable<PermissionEntity> permissions =
         [
-            new PermissionEntity { Id = Guid.NewGuid(), PermissionName = AuthorizationPermission.CanViewUsers }
+            _permissionEntityFixture.Create(permissionName: AuthorizationPermission.CanViewUsers)
         ];
         CancellationToken cancellationToken = new(true);
 

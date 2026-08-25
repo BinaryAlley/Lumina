@@ -166,7 +166,13 @@ public class Program
         app.UseStaticFiles(new StaticFileOptions
         {
             FileProvider = new PhysicalFileProvider(mediaRootPath),
-            RequestPath = "/media"
+            RequestPath = "/media",
+            OnPrepareResponse = staticFileContext =>
+            {
+                // the served media must not run as active content, so that attacker-influenced files (e.g. SVG covers) cannot execute scripts on the API origin
+                staticFileContext.Context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+                staticFileContext.Context.Response.Headers["Content-Security-Policy"] = "default-src 'none'; script-src 'none'; style-src 'unsafe-inline'; img-src 'self' data:";
+            }
         });
 
         app.MapHub<MediaLibraryScanProgressHub>("/scanProgressHub");

@@ -72,6 +72,11 @@ public interface IUnitOfWork
     ILibraryMetadataProviderConfigurationRepository LibraryMetadataProviderConfigurationRepository { get; }
 
     /// <summary>
+    /// Gets the library artwork provider configuration repository.
+    /// </summary>
+    IArtworkProviderConfigurationRepository ArtworkProviderConfigurationRepository { get; }
+
+    /// <summary>
     /// Gets the plugin repository.
     /// </summary>
     IPluginRepository PluginRepository { get; }
@@ -96,6 +101,11 @@ public interface IUnitOfWork
     /// </summary>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     Task SaveChangesAsync(CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Detaches all the entities tracked by the unit of work, freeing the memory they occupy.
+    /// </summary>
+    void ClearTrackedEntities();
 
     /// <summary>
     /// Begins a new database transaction.

@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.Mapping.Common.Metadata;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Common;
 using Lumina.Contracts.DTO.Common;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
@@ -18,11 +19,13 @@ namespace Lumina.Application.UnitTests.Common.Mapping.Common.Metadata;
 [ExcludeFromCodeCoverage]
 public class GenreEntityMappingTests
 {
+    private readonly GenreEntityFixture _genreEntityFixture = new();
+
     [Fact]
     public void ToResponse_WhenMappingValidGenreEntity_ShouldMapCorrectly()
     {
         // Arrange
-        GenreEntity entity = new("Fiction");
+        GenreEntity entity = _genreEntityFixture.Create(name: "Fiction");
 
         // Act
         GenreDto result = entity.ToResponse();
@@ -40,7 +43,7 @@ public class GenreEntityMappingTests
     public void ToResponse_WhenMappingDifferentValidGenreEntities_ShouldMapCorrectly(string name)
     {
         // Arrange
-        GenreEntity entity = new(name);
+        GenreEntity entity = _genreEntityFixture.Create(name: name);
 
         // Act
         GenreDto result = entity.ToResponse();
@@ -57,7 +60,7 @@ public class GenreEntityMappingTests
     public void ToResponse_WhenMappingInvalidGenreEntity_ShouldMapToDefault(string? invalidName)
     {
         // Arrange
-        GenreEntity entity = new(invalidName);
+        GenreEntity entity = _genreEntityFixture.Create(name: invalidName, includeName: invalidName is not null);
 
         // Act
         GenreDto result = entity.ToResponse();
@@ -70,7 +73,7 @@ public class GenreEntityMappingTests
     public void ToDomainEntity_WhenMappingValidGenreEntity_ShouldMapCorrectly()
     {
         // Arrange
-        GenreEntity entity = new("Fiction");
+        GenreEntity entity = _genreEntityFixture.Create(name: "Fiction");
 
         // Act
         Result<Genre> result = entity.ToDomainEntity();
@@ -88,7 +91,7 @@ public class GenreEntityMappingTests
     public void ToDomainEntity_WhenMappingInvalidGenreEntity_ShouldMapToDefault(string? invalidName)
     {
         // Arrange
-        GenreEntity entity = new(invalidName);
+        GenreEntity entity = _genreEntityFixture.Create(name: invalidName, includeName: invalidName is not null);
 
         // Act
         Result<Genre> result = entity.ToDomainEntity();
@@ -104,10 +107,10 @@ public class GenreEntityMappingTests
         // Arrange
         List<GenreEntity> entities =
         [
-            new GenreEntity("Fiction"),
-            new GenreEntity("Mystery"),
-            new GenreEntity("Romance"),
-            new GenreEntity("Thriller")
+            _genreEntityFixture.Create(name: "Fiction"),
+            _genreEntityFixture.Create(name: "Mystery"),
+            _genreEntityFixture.Create(name: "Romance"),
+            _genreEntityFixture.Create(name: "Thriller")
         ];
 
         // Act
@@ -131,10 +134,10 @@ public class GenreEntityMappingTests
         // Arrange
         List<GenreEntity> entities =
         [
-            new GenreEntity("Fiction"),
-            new GenreEntity("Mystery"),
-            new GenreEntity("Romance"),
-            new GenreEntity("Thriller")
+            _genreEntityFixture.Create(name: "Fiction"),
+            _genreEntityFixture.Create(name: "Mystery"),
+            _genreEntityFixture.Create(name: "Romance"),
+            _genreEntityFixture.Create(name: "Thriller")
         ];
 
         // Act

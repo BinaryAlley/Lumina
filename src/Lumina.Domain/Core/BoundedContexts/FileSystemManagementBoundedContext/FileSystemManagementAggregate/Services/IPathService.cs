@@ -60,6 +60,13 @@ public interface IPathService
     char[] GetInvalidPathCharsForPlatform();
 
     /// <summary>
+    /// Sanitizes a human-readable <paramref name="name"/> into a safe path segment.
+    /// </summary>
+    /// <param name="name">The human-readable name to sanitize.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing the sanitized path segment, or an error.</returns>
+    Result<PathSegment> SanitizeSegment(string name);
+
+    /// <summary>
     /// Returns the root portion of the given path.
     /// </summary>
     /// <param name="path">The path for which to get the root.</param>

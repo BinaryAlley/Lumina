@@ -31,7 +31,7 @@ public class GetBooksLiteEndpointSummary : Summary<GetBooksLiteEndpoint, GetBook
             PerPage: 48,
             SearchTerm: "fellowship",
             FilterAlphaKey: "f",
-            IgnoreThePrefixForAlphaPicker: true,
+            ShouldIgnoreThePrefixForAlphaPicker: true,
             SortBy: "title",
             SortOrder: SortOrder.Ascending
         );
@@ -41,7 +41,7 @@ public class GetBooksLiteEndpointSummary : Summary<GetBooksLiteEndpoint, GetBook
         RequestParam(r => r.PerPage, "The maximum number of books to retrieve per page. Optional.");
         RequestParam(r => r.SearchTerm, "The search term used to filter results. Optional.");
         RequestParam(r => r.FilterAlphaKey, "The alpha key used to filter the results by the first character of their title, for the alpha picker. Optional.");
-        RequestParam(r => r.IgnoreThePrefixForAlphaPicker, "Whether the leading \"The \" prefix of a title should be ignored when computing the alpha key, or not. Required.");
+        RequestParam(r => r.ShouldIgnoreThePrefixForAlphaPicker, "Whether the leading \"The \" prefix of a title should be ignored when computing the alpha key, or not. Required.");
         RequestParam(r => r.SortBy, "The name of the field by which to sort the results. Optional.");
         RequestParam(r => r.SortOrder, "The direction in which to sort the results. Optional.");
 

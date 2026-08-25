@@ -35,12 +35,17 @@ public class UserSettingsEntity : IStorageEntity, IAuditableEntity
     /// <summary>
     /// Gets or sets whether the "The" prefix of library item titles is ignored by the alpha picker, or not.
     /// </summary>
-    public bool IgnoreThePrefixForAlphaPicker { get; set; }
+    public bool ShouldIgnoreThePrefixForAlphaPicker { get; set; }
 
     /// <summary>
     /// Gets or sets whether the theme data served to this user is cached, or not.
     /// </summary>
     public bool IsThemeCachingEnabled { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets whether the metadata of the media library items is aggregated from multiple providers, when fields are missing, or not.
+    /// </summary>
+    public bool ShouldAggregateMetadataWhenMissing { get; set; }
 
     /// <summary>
     /// Gets or sets the time and date when the entity was added.

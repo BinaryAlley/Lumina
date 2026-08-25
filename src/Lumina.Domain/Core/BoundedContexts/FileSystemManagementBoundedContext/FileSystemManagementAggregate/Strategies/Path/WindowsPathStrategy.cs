@@ -113,7 +113,7 @@ public class WindowsPathStrategy : IWindowsPathStrategy
                 // handle UNC path
                 yield return PathSegment.Create(@"\\", isDirectory: false, isDrive: true);
 
-                string[] segments = path.Path[2..].Split(new[] { PathSeparator }, StringSplitOptions.RemoveEmptyEntries);
+                string[] segments = path.Path[2..].Split([PathSeparator], StringSplitOptions.RemoveEmptyEntries);
                 for (int i = 0; i < segments.Length; i++)
                     yield return CreatePathSegment(segments[i], i, segments.Length);
             }
@@ -122,7 +122,7 @@ public class WindowsPathStrategy : IWindowsPathStrategy
                 // the drive segment
                 yield return PathSegment.Create(path.Path[..2], isDirectory: false, isDrive: true);
                 // extract the other segments
-                string[] segments = path.Path[3..].Split(new[] { PathSeparator }, StringSplitOptions.RemoveEmptyEntries);
+                string[] segments = path.Path[3..].Split([PathSeparator], StringSplitOptions.RemoveEmptyEntries);
                 for (int i = 0; i < segments.Length; i++)
                 {
                     string segment = segments[i];
@@ -188,6 +188,15 @@ public class WindowsPathStrategy : IWindowsPathStrategy
     public char[] GetInvalidPathCharsForPlatform()
     {
         return ['<', '>', '"', '/', '|', '?', '*'];
+    }
+
+    /// <summary>
+    /// Returns a collection of characters that are invalid for a single path segment.
+    /// </summary>
+    /// <returns>A collection of characters that are invalid in the context of a single path segment.</returns>
+    public char[] GetInvalidPathSegmentCharsForPlatform()
+    {
+        return ['<', '>', '"', '/', '|', '?', '*', ':'];
     }
 
     /// <summary>

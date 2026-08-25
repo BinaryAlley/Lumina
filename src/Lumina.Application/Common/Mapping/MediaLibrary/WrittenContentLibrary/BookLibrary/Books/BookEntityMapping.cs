@@ -110,14 +110,14 @@ public static class BookEntityMapping
 
         Optional<BookFormat> bookFormat = Optional<BookFormat>.FromNullable(repositoryEntity.Format);
 
-        return Book.Create(
+        Result<Book> bookResult = Book.Create(
             BookId.Create(repositoryEntity.Id),
             LibraryId.Create(repositoryEntity.LibraryId),
             repositoryEntity.Path,
             writtenContentMetadataResult.Value,
             bookFormat,
             Optional<string>.FromNullable(repositoryEntity.Edition),
-            Optional<int>.FromNullable(repositoryEntity.VolumeNumber),
+            Optional<float>.FromNullable(repositoryEntity.VolumeNumber),
             Optional<BookSeries>.None(),
             Optional<string>.FromNullable(repositoryEntity.ASIN),
             Optional<string>.FromNullable(repositoryEntity.GoodreadsId),
@@ -133,6 +133,13 @@ public static class BookEntityMapping
             [.. isbnsResult.Select(isbn => isbn.Value)],
             [],
             [.. bookRatingsResult.Select(bookRating => bookRating.Value)]);
+        if (bookResult.IsFailure)
+            return bookResult.Errors;
+
+        if (repositoryEntity.CoverImagePath is not null)
+            bookResult.Value.SetBookCoverImagePath(repositoryEntity.CoverImagePath);
+
+        return bookResult;
     }
 
     /// <summary>
@@ -217,7 +224,8 @@ public static class BookEntityMapping
             repositoryEntity.LastMetadataUpdateUtc,
             repositoryEntity.MetadataProvider,
             repositoryEntity.CreatedOnUtc,
-            repositoryEntity.UpdatedOnUtc
+            repositoryEntity.UpdatedOnUtc,
+            repositoryEntity.CoverImagePath
         );
     }
 
@@ -259,8 +267,7 @@ public static class BookEntityMapping
             repositoryEntity.Id,
             repositoryEntity.Title,
             repositoryEntity.ReReleaseYear ?? repositoryEntity.OriginalReleaseYear,
-            // TODO: populate from the book cover when cover support is implemented
-            null
+            repositoryEntity.CoverImagePath
         );
     }
 

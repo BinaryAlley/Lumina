@@ -14,6 +14,7 @@ namespace Lumina.Presentation.Web.Fixtures.Common.DTO.Themes;
 [ExcludeFromCodeCoverage]
 public class ThemeRenderDocumentDtoFixture
 {
+    private readonly Faker _faker = new();
     private readonly ThemeInfoDtoFixture _themeInfoDtoFixture = new();
 
     /// <summary>
@@ -22,12 +23,13 @@ public class ThemeRenderDocumentDtoFixture
     /// <param name="theme">Optional metadata of the resolved theme.</param>
     /// <param name="template">Optional raw template source to render.</param>
     /// <returns>A configured <see cref="ThemeRenderDocumentDto"/> instance.</returns>
-    public ThemeRenderDocumentDto Create(ThemeInfoDto? theme = null, string? template = null)
+    public ThemeRenderDocumentDto Create(
+        ThemeInfoDto? theme = null, 
+        string? template = null)
     {
-        Faker faker = new();
         return new ThemeRenderDocumentDto(
             Theme: theme ?? _themeInfoDtoFixture.Create(),
-            Template: template ?? faker.Lorem.Paragraph()
+            Template: template ?? _faker.Lorem.Paragraph()
         );
     }
 

@@ -1,8 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.DomainEvents;
 using Lumina.Application.Common.Infrastructure.Authentication;
@@ -10,14 +8,15 @@ using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
-using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
 using Lumina.Domain.Common.Events;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
+using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -113,7 +112,7 @@ public class AddLibraryCommandHandler : ICommandHandler<AddLibraryCommand, Resul
             command.CoverImage,
             command.IsEnabled,
             command.IsLocked,
-            command.DownloadMetadataFromWeb,
+            command.CanDownloadMetadataFromWeb,
             command.ShouldSaveMetadataInMediaDirectories,
             command.ShouldSkipUnchangedDirectoriesDuringScan,
             []

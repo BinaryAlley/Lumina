@@ -18,7 +18,7 @@ namespace Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibra
 /// Can be <see langword="null"/> to disable alpha filtering, a single ASCII letter (case-insensitive) to filter by that letter,
 /// "#" to filter by titles whose first character is a digit, or "*" to filter by titles whose first character is neither a letter nor a digit.
 /// </param>
-/// <param name="IgnoreThePrefixForAlphaPicker">Whether the leading "The " prefix of a title should be ignored when computing the alpha key, or not.</param>
+/// <param name="ShouldIgnoreThePrefixForAlphaPicker">Whether the leading "The " prefix of a title should be ignored when computing the alpha key, or not.</param>
 /// <param name="SortBy">The name of the field by which to sort the results. Optional.</param>
 /// <param name="SortOrder">The direction in which to sort the results. Optional.</param>
 [DebuggerDisplay("LibraryId: {LibraryId}")]
@@ -28,7 +28,7 @@ public record GetBooksLiteRequest(
     int? PerPage,
     string? SearchTerm,
     string? FilterAlphaKey,
-    bool IgnoreThePrefixForAlphaPicker,
+    bool ShouldIgnoreThePrefixForAlphaPicker,
     string? SortBy,
     SortOrder? SortOrder
 );

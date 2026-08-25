@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
@@ -84,7 +83,7 @@ public class AddBookRequestTests
         AddBookRequest sut = _addBookRequestFixture.Create();
 
         // Act
-        (Guid libraryId, string path, WrittenContentMetadataDto? metadata, BookFormat? format, string? edition, int? volumeNumber, BookSeriesDto? series, string? asin, string? goodreadsId, string? lccn, string? oclcNumber, string? openLibraryId, string? libraryThingId, string? googleBooksId, string? barnesAndNobleId, string? appleBooksId, List<IsbnDto>? isbns, List<MediaContributorDto>? contributors, List<BookRatingDto>? ratings) = sut;
+        (Guid libraryId, string path, WrittenContentMetadataDto? metadata, BookFormat? format, string? edition, float? volumeNumber, BookSeriesDto? series, string? asin, string? goodreadsId, string? lccn, string? oclcNumber, string? openLibraryId, string? libraryThingId, string? googleBooksId, string? barnesAndNobleId, string? appleBooksId, List<IsbnDto>? isbns, List<MediaContributorDto>? contributors, List<BookRatingDto>? ratings) = sut;
 
         // Assert
         Assert.Equal(sut.LibraryId, libraryId);

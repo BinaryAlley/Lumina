@@ -1,15 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Common.DTO.Libraries;
 using Lumina.Presentation.Web.Core.Endpoints.Library.Management.SaveLibrary;
+using Lumina.Presentation.Web.Fixtures.Common.DTO.Libraries;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.SecurityTests.Common.Setup;
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.Management.SaveLibrary;
@@ -21,6 +19,7 @@ namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.Managemen
 public class SaveLibraryEndpointTests : IClassFixture<LuminaWebFactory>
 {
     private readonly LuminaWebFactory _apiFactory;
+    private readonly LibraryDtoFixture _libraryDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SaveLibraryEndpointTests"/> class.
@@ -37,7 +36,7 @@ public class SaveLibraryEndpointTests : IClassFixture<LuminaWebFactory>
         // Arrange
         _apiFactory.ApiClientStub.Reset();
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
-        HttpRequestMessage saveRequest = CreateSaveRequest(new LibraryDto { Title = "New Books Library", LibraryType = "Book" });
+        HttpRequestMessage saveRequest = CreateSaveRequest(_libraryDtoFixture.Create(title: "New Books Library", libraryType: "Book"));
 
         // Act
         HttpResponseMessage response = await webClient.Client.SendAsync(saveRequest);
@@ -53,7 +52,7 @@ public class SaveLibraryEndpointTests : IClassFixture<LuminaWebFactory>
         // Arrange
         _apiFactory.ApiClientStub.Reset();
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
-        HttpRequestMessage saveRequest = CreateSaveRequest(new LibraryDto { Title = "New Books Library", LibraryType = "Book" });
+        HttpRequestMessage saveRequest = CreateSaveRequest(_libraryDtoFixture.Create(title: "New Books Library", libraryType: "Book"));
         saveRequest.Headers.Remove("RequestVerificationToken");
         saveRequest.Headers.Add("RequestVerificationToken", "invalid-antiforgery-token");
 
@@ -70,8 +69,9 @@ public class SaveLibraryEndpointTests : IClassFixture<LuminaWebFactory>
     {
         // Arrange
         _apiFactory.ApiClientStub.Reset();
-        LibraryDto request = new() { Title = "'; DROP TABLE Libraries--", LibraryType = "Book" };
-        _apiFactory.ApiClientStub.RegisterPostResponse("libraries", new LibraryDto { Id = Guid.NewGuid(), Title = request.Title, LibraryType = request.LibraryType });
+        LibraryDto request = _libraryDtoFixture.Create(title: "'; DROP TABLE Libraries--", libraryType: "Book");
+        request.Id = null;
+        _apiFactory.ApiClientStub.RegisterPostResponse("libraries", _libraryDtoFixture.Create(id: Guid.NewGuid(), title: request.Title, libraryType: request.LibraryType));
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
         HttpRequestMessage saveRequest = CreateSaveRequest(request);
         saveRequest.Headers.Add("RequestVerificationToken", webClient.AntiforgeryToken);
@@ -86,6 +86,11 @@ public class SaveLibraryEndpointTests : IClassFixture<LuminaWebFactory>
         Assert.DoesNotContain("Exception", content);
     }
 
+    /// <summary>
+    /// Builds the save request that sends the given <paramref name="request"/> to the library save endpoint.
+    /// </summary>
+    /// <param name="request">The library data to send.</param>
+    /// <returns>The configured save request.</returns>
     private static HttpRequestMessage CreateSaveRequest(LibraryDto request)
     {
         HttpRequestMessage saveRequest = new(HttpMethod.Post, "/en-us/libraries/manage/api-item")

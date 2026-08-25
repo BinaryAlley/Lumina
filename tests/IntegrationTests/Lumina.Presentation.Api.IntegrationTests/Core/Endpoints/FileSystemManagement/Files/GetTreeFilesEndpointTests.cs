@@ -26,6 +26,7 @@ public class GetTreeFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
 {
     private HttpClient _client;
     private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly FileSystemStructureFixture _fileSystemStructureFixture = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         ReferenceHandler = ReferenceHandler.Preserve,
@@ -56,8 +57,7 @@ public class GetTreeFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     public async Task GetTreeFiles_WhenCalledWithValidPathAndNotIncludeHiddenElements_ShouldReturnTreeFilesWithoutHiddenElements()
     {
         // Arrange
-        FileSystemStructureFixture fileSystemFixture = new();
-        string testPath = fileSystemFixture.CreateFileSystemStructure();
+        string testPath = _fileSystemStructureFixture.CreateFileSystemStructure();
         testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath;
         bool includeHiddenElements = false;
         try
@@ -85,7 +85,7 @@ public class GetTreeFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         }
         finally
         {
-            fileSystemFixture.CleanupFileSystemStructure();
+            _fileSystemStructureFixture.CleanupFileSystemStructure();
         }
     }
 
@@ -93,8 +93,7 @@ public class GetTreeFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     public async Task GetTreeFiles_WhenCalledWithValidPathAndHiddenChildrenAndNotIncludeHiddenElements_ShouldReturnNoTreeFiles()
     {
         // Arrange
-        FileSystemStructureFixture fileSystemFixture = new();
-        string testPath = fileSystemFixture.CreateFileSystemStructure();
+        string testPath = _fileSystemStructureFixture.CreateFileSystemStructure();
         testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath;
         testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath; // two levels to get to the element that has a hidden element as child
         bool includeHiddenElements = false;
@@ -118,7 +117,7 @@ public class GetTreeFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         }
         finally
         {
-            fileSystemFixture.CleanupFileSystemStructure();
+            _fileSystemStructureFixture.CleanupFileSystemStructure();
         }
     }
 
@@ -126,8 +125,7 @@ public class GetTreeFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     public async Task GetTreeFiles_WhenCalledWithValidPathAndWithIncludeHiddenElements_ShouldReturnTreeFilesWithHiddenElements()
     {
         // Arrange
-        FileSystemStructureFixture fileSystemFixture = new();
-        string testPath = fileSystemFixture.CreateFileSystemStructure();
+        string testPath = _fileSystemStructureFixture.CreateFileSystemStructure();
         testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath;
         testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath; // two levels to get to the element that has a hidden element as child
         bool includeHiddenElements = true;
@@ -159,7 +157,7 @@ public class GetTreeFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         }
         finally
         {
-            fileSystemFixture.CleanupFileSystemStructure();
+            _fileSystemStructureFixture.CleanupFileSystemStructure();
         }
     }
     [Fact]

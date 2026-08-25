@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Presentation.Api.Core.Endpoints.Library.Management.GetLibraryScanProgress;
@@ -33,6 +33,7 @@ public class GetLibraryScanProgressEndpointTests : IClassFixture<AuthenticatedLu
         PropertyNameCaseInsensitive = true,
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
+    private readonly LibraryEntityFixture _libraryEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetLibraryScanProgressEndpointTests"/> class.
@@ -114,17 +115,7 @@ public class GetLibraryScanProgressEndpointTests : IClassFixture<AuthenticatedLu
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
-        dbContext.Libraries.Add(new LibraryEntity
-        {
-            Id = libraryId,
-            UserId = userId,
-            Title = "Test Library",
-            LibraryType = LibraryType.EBook,
-            ContentLocations = [],
-            CreatedBy = userId,
-            CreatedOnUtc = DateTime.UtcNow,
-            UpdatedBy = null
-        });
+        dbContext.Libraries.Add(_libraryEntityFixture.Create(id: libraryId, userId: userId, title: "Test Library", libraryType: LibraryType.EBook, contentLocations: []));
         await dbContext.SaveChangesAsync();
     }
 

@@ -1881,4 +1881,18 @@ public class AddBookCommandValidatorTests
         // Assert
         result.ShouldNotHaveValidationError(Errors.Metadata.RatingVoteCountMustBePositive);
     }
+
+    [Fact]
+    public void Validate_WhenLibraryIdIsEmpty_ShouldHaveValidationError()
+    {
+        // Arrange
+        AddBookCommand bookCommand = _commandBookFixture.Create();
+        bookCommand = bookCommand with { LibraryId = Guid.Empty };
+
+        // Act
+        List<Error> result = _validator.TestValidate(bookCommand);
+
+        // Assert
+        result.ShouldHaveValidationError(Errors.WrittenContent.BookLibraryCannotBeNull);
+    }
 }

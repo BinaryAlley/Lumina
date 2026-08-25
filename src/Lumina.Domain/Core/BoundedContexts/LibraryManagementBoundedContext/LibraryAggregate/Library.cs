@@ -63,7 +63,7 @@ public class Library : AggregateRoot<LibraryId>
     /// <summary>
     /// Gets whether this media library should update the metadata of its elements from the web, or not.
     /// </summary>
-    public bool DownloadMetadataFromWeb { get; private set; } = true;
+    public bool CanDownloadMetadataFromWeb { get; private set; } = true;
 
     /// <summary>
     /// Gets whether this media library should copy the downloaded metadata into the media library content locations, or not.
@@ -97,7 +97,7 @@ public class Library : AggregateRoot<LibraryId>
     /// <param name="coverImage">The path of the image file used as the cover for the library.</param>
     /// <param name="isEnabled">Whether this media library is enabled or not. A disabled media library is never shown or changed.</param>
     /// <param name="isLocked">Whether this media library is locked or not. A locked media library is displayed, but is never changed or updated.</param>
-    /// <param name="downloadMetadataFromWeb">Whether this media library should update the metadata of its elements from the web, or not.</param>
+    /// <param name="canDownloadMetadataFromWeb">Whether this media library should update the metadata of its elements from the web, or not.</param>
     /// <param name="shouldSaveMetadataInMediaDirectories">Whether this media library should copy the downloaded metadata into the media library content locations, or not.</param>
     /// <param name="shouldSkipUnchangedDirectoriesDuringScan">Whether this media library should skip the directories whose contents have not changed since the last scan, during the scan, or not.</param>
     /// <param name="scanIds">The list of objects representing the unique identifier of scans of the media library.</param>
@@ -110,7 +110,7 @@ public class Library : AggregateRoot<LibraryId>
         string? coverImage,
         bool isEnabled,
         bool isLocked,
-        bool downloadMetadataFromWeb,
+        bool canDownloadMetadataFromWeb,
         bool shouldSaveMetadataInMediaDirectories,
         bool shouldSkipUnchangedDirectoriesDuringScan,
         List<ScanId> scanIds) : base(id)
@@ -122,7 +122,7 @@ public class Library : AggregateRoot<LibraryId>
         CoverImage = coverImage;
         IsEnabled = isEnabled;
         IsLocked = isLocked;
-        DownloadMetadataFromWeb = downloadMetadataFromWeb;
+        CanDownloadMetadataFromWeb = canDownloadMetadataFromWeb;
         ShouldSaveMetadataInMediaDirectories = shouldSaveMetadataInMediaDirectories;
         ShouldSkipUnchangedDirectoriesDuringScan = shouldSkipUnchangedDirectoriesDuringScan;
         _scanIds = scanIds;
@@ -138,7 +138,7 @@ public class Library : AggregateRoot<LibraryId>
     /// <param name="coverImageSourcePath">The path of the image file chosen by the user to be used as the cover for the library.</param>
     /// <param name="isEnabled">Whether this media library is enabled or not. A disabled media library is never shown or changed.</param>
     /// <param name="isLocked">Whether this media library is locked or not. A locked media library is displayed, but is never changed or updated.</param>
-    /// <param name="downloadMetadataFromWeb">Whether this media library should update the metadata of its elements from the web, or not.</param>
+    /// <param name="canDownloadMetadataFromWeb">Whether this media library should update the metadata of its elements from the web, or not.</param>
     /// <param name="shouldSaveMetadataInMediaDirectories">Whether this media library should copy the downloaded metadata into the media library content locations, or not.</param>
     /// <param name="shouldSkipUnchangedDirectoriesDuringScan">Whether this media library should skip the directories whose contents have not changed since the last scan, during the scan, or not.</param>
     /// <param name="scanIds">The list of objects representing the unique identifier of scans of the media library.</param>
@@ -153,7 +153,7 @@ public class Library : AggregateRoot<LibraryId>
         string? coverImageSourcePath,
         bool isEnabled,
         bool isLocked,
-        bool downloadMetadataFromWeb,
+        bool canDownloadMetadataFromWeb,
         bool shouldSaveMetadataInMediaDirectories,
         bool shouldSkipUnchangedDirectoriesDuringScan,
         List<ScanId> scanIds)
@@ -176,7 +176,7 @@ public class Library : AggregateRoot<LibraryId>
             coverImageSourcePath,
             isEnabled,
             isLocked,
-            downloadMetadataFromWeb,
+            canDownloadMetadataFromWeb,
             shouldSaveMetadataInMediaDirectories,
             shouldSkipUnchangedDirectoriesDuringScan,
             scanIds
@@ -194,7 +194,7 @@ public class Library : AggregateRoot<LibraryId>
     /// <param name="coverImageSourcePath">The path of the image file chosen by the user to be used as the cover for the library.</param>
     /// <param name="isEnabled">Whether this media library is enabled or not. A disabled media library is never shown or changed.</param>
     /// <param name="isLocked">Whether this media library is locked or not. A locked media library is displayed, but is never changed or updated.</param>
-    /// <param name="downloadMetadataFromWeb">Whether this media library should update the metadata of its elements from the web, or not.</param>
+    /// <param name="canDownloadMetadataFromWeb">Whether this media library should update the metadata of its elements from the web, or not.</param>
     /// <param name="shouldSaveMetadataInMediaDirectories">Whether this media library should copy the downloaded metadata into the media library content locations, or not.</param>
     /// <param name="shouldSkipUnchangedDirectoriesDuringScan">Whether this media library should skip the directories whose contents have not changed since the last scan, during the scan, or not.</param>
     /// <param name="scanIds">The list of objects representing the unique identifier of scans of the media library.</param>
@@ -210,7 +210,7 @@ public class Library : AggregateRoot<LibraryId>
         string? coverImageSourcePath,
         bool isEnabled,
         bool isLocked,
-        bool downloadMetadataFromWeb,
+        bool canDownloadMetadataFromWeb,
         bool shouldSaveMetadataInMediaDirectories,
         bool shouldSkipUnchangedDirectoriesDuringScan,
         List<ScanId> scanIds)
@@ -233,7 +233,7 @@ public class Library : AggregateRoot<LibraryId>
             coverImageSourcePath,
             isEnabled,
             isLocked,
-            downloadMetadataFromWeb,
+            canDownloadMetadataFromWeb,
             shouldSaveMetadataInMediaDirectories,
             shouldSkipUnchangedDirectoriesDuringScan,
             scanIds

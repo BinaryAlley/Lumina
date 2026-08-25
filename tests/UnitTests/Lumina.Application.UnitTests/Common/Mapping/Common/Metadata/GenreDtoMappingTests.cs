@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Contracts.DTO.Common;
+using Lumina.Contracts.Fixtures.Core.DTO.Common;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using System.Collections.Generic;
@@ -16,11 +17,13 @@ namespace Lumina.Application.UnitTests.Common.Mapping.Common.Metadata;
 [ExcludeFromCodeCoverage]
 public class GenreDtoMappingTests
 {
+    private readonly GenreDtoFixture _genreDtoFixture = new();
+
     [Fact]
     public void ToDomainEntity_WhenMappingValidGenreDto_ShouldMapCorrectly()
     {
         // Arrange
-        GenreDto genreDto = new("Rock");
+        GenreDto genreDto = _genreDtoFixture.Create(name: "Rock");
 
         // Act
         Result<Genre> result = genreDto.ToDomainEntity();
@@ -39,7 +42,7 @@ public class GenreDtoMappingTests
     public void ToDomainEntity_WhenMappingDifferentValidGenreDtos_ShouldMapCorrectly(string name)
     {
         // Arrange
-        GenreDto genreDto = new(name);
+        GenreDto genreDto = _genreDtoFixture.Create(name: name);
 
         // Act
         Result<Genre> result = genreDto.ToDomainEntity();
@@ -57,7 +60,7 @@ public class GenreDtoMappingTests
     public void ToDomainEntity_WhenMappingInvalidGenreDto_ShouldReturnError(string? invalidName)
     {
         // Arrange
-        GenreDto genreDto = new(invalidName);
+        GenreDto genreDto = _genreDtoFixture.Create(name: invalidName, includeName: invalidName is not null);
 
         // Act
         Result<Genre> result = genreDto.ToDomainEntity();
@@ -72,10 +75,10 @@ public class GenreDtoMappingTests
         // Arrange
         List<GenreDto> genreDtos =
         [
-            new GenreDto("Rock"),
-            new GenreDto("Jazz"),
-            new GenreDto("Classical"),
-            new GenreDto("Pop")
+            _genreDtoFixture.Create(name: "Rock"),
+            _genreDtoFixture.Create(name: "Jazz"),
+            _genreDtoFixture.Create(name: "Classical"),
+            _genreDtoFixture.Create(name: "Pop")
         ];
 
         // Act
@@ -99,10 +102,10 @@ public class GenreDtoMappingTests
         // Arrange
         List<GenreDto> genreDtos =
         [
-            new GenreDto("Rock"),
-            new GenreDto(""),
-            new GenreDto("Jazz"),
-            new GenreDto(" ")
+            _genreDtoFixture.Create(name: "Rock"),
+            _genreDtoFixture.Create(name: ""),
+            _genreDtoFixture.Create(name: "Jazz"),
+            _genreDtoFixture.Create(name: " ")
         ];
 
         // Act

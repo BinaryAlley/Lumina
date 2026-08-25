@@ -4,6 +4,7 @@ using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Core.Maintenance.ApplicationSetup.Queries.CheckInitialization;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Application.Fixtures.Core.Maintenance.ApplicationSetup.Queries.CheckInitialization;
 using Lumina.Contracts.Responses.UsersManagement;
 using Lumina.Domain.Common.Primitives;
 using NSubstitute;
@@ -25,6 +26,7 @@ public class CheckInitializationQueryHandlerTests
     private readonly IUnitOfWork _mockUnitOfWork;
     private readonly IUserRepository _mockUserRepository;
     private readonly CheckInitializationQueryHandler _sut;
+    private readonly CheckInitializationQueryFixture _checkInitializationQueryFixture = new();
     private readonly UserEntityFixture _userEntityFixture = new();
 
     /// <summary>
@@ -49,7 +51,7 @@ public class CheckInitializationQueryHandlerTests
             .Returns(Result.From(users.AsEnumerable()));
 
         // Act
-        InitializationResponse result = await _sut.HandleAsync(new CheckInitializationQuery(), CancellationToken.None);
+        InitializationResponse result = await _sut.HandleAsync(_checkInitializationQueryFixture.Create(), CancellationToken.None);
 
         // Assert
         Assert.True(result.IsInitialized);
@@ -64,7 +66,7 @@ public class CheckInitializationQueryHandlerTests
             .Returns(Result.From(Enumerable.Empty<UserEntity>()));
 
         // Act
-        InitializationResponse result = await _sut.HandleAsync(new CheckInitializationQuery(), CancellationToken.None);
+        InitializationResponse result = await _sut.HandleAsync(_checkInitializationQueryFixture.Create(), CancellationToken.None);
 
         // Assert
         Assert.False(result.IsInitialized);
@@ -80,7 +82,7 @@ public class CheckInitializationQueryHandlerTests
             .Returns(error);
 
         // Act
-        InitializationResponse result = await _sut.HandleAsync(new CheckInitializationQuery(), CancellationToken.None);
+        InitializationResponse result = await _sut.HandleAsync(_checkInitializationQueryFixture.Create(), CancellationToken.None);
 
         // Assert
         Assert.False(result.IsInitialized);

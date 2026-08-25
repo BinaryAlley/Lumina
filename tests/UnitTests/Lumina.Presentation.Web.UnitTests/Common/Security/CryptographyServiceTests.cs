@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Common.DTO.Configuration;
 using Lumina.Presentation.Web.Common.Security;
+using Lumina.Presentation.Web.Fixtures.Common.DTO.Configuration;
 using Microsoft.Extensions.Options;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -15,6 +16,7 @@ namespace Lumina.Presentation.Web.UnitTests.Common.Security;
 public class CryptographyServiceTests
 {
     private const string TEST_ENCRYPTION_KEY = "FLYO0QRo6u2VzoFOgNkkEwYNGtqhJ3QGZd7iAHNEJeM=";
+    private readonly EncryptionSettingsDtoFixture _encryptionSettingsDtoFixture = new();
     private readonly CryptographyService _sut;
 
     /// <summary>
@@ -22,7 +24,7 @@ public class CryptographyServiceTests
     /// </summary>
     public CryptographyServiceTests()
     {
-        EncryptionSettingsDto settings = new() { SecretKey = TEST_ENCRYPTION_KEY };
+        EncryptionSettingsDto settings = _encryptionSettingsDtoFixture.Create(secretKey: TEST_ENCRYPTION_KEY);
         _sut = new CryptographyService(Options.Create(settings));
     }
 
@@ -30,25 +32,25 @@ public class CryptographyServiceTests
     public void Encrypt_WhenCalled_ShouldReturnCiphertextThatDecryptsToPlaintext()
     {
         // Arrange
-        const string plaintext = "sensitive-data";
+        const string PLAINTEXT = "sensitive-data";
 
         // Act
-        string ciphertext = _sut.Encrypt(plaintext);
+        string ciphertext = _sut.Encrypt(PLAINTEXT);
 
         // Assert
-        Assert.NotEqual(plaintext, ciphertext);
-        Assert.Equal(plaintext, _sut.Decrypt(ciphertext));
+        Assert.NotEqual(PLAINTEXT, ciphertext);
+        Assert.Equal(PLAINTEXT, _sut.Decrypt(ciphertext));
     }
 
     [Fact]
     public void Encrypt_WhenCalledTwice_ShouldReturnDifferentCiphertexts()
     {
         // Arrange
-        const string plaintext = "sensitive-data";
+        const string PLAINTEXT = "sensitive-data";
 
         // Act
-        string firstCiphertext = _sut.Encrypt(plaintext);
-        string secondCiphertext = _sut.Encrypt(plaintext);
+        string firstCiphertext = _sut.Encrypt(PLAINTEXT);
+        string secondCiphertext = _sut.Encrypt(PLAINTEXT);
 
         // Assert
         Assert.NotEqual(firstCiphertext, secondCiphertext);

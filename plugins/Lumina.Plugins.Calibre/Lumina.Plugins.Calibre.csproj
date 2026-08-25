@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <BaseOutputPath>$(SolutionDir)..\bin\plugins\</BaseOutputPath>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <WarningsNotAsErrors>$(WarningsNotAsErrors);NU1901;NU1902;NU1903;NU1904</WarningsNotAsErrors>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="..\..\src\AssemblyInfo_Shared.cs" Link="Properties\AssemblyInfo_Shared.cs" />
+    </ItemGroup>
+
+    <Target Name="CopyToPluginsFolder" AfterTargets="Build">
+        <MakeDir Directories="$(SolutionDir)..\bin\api\$(Configuration)\$(TargetFramework)\plugins\" />
+        <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(SolutionDir)..\bin\api\$(Configuration)\$(TargetFramework)\plugins\" />
+    </Target>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Lumina.Plugins.Contracts\Lumina.Plugins.Contracts.csproj">
+            <Private>false</Private>
+            <ExcludeAssets>runtime</ExcludeAssets>
+        </ProjectReference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+</Project>

@@ -520,4 +520,241 @@ public class PathServiceTests
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
         _mockPathStrategy.DidNotReceive().GetPathRoot(Arg.Any<FileSystemPathId>());
     }
+
+    [Fact]
+    public void SanitizeSegment_WithValidName_ShouldReturnTheNameAsASegment()
+    {
+        // Arrange
+        char[] invalidChars = ['<', '>', ':', '"', '|', '?', '*'];
+        _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(invalidChars);
+
+        // Act
+        Result<PathSegment> result = _sut.SanitizeSegment("Valid Name");
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal("Valid Name", result.Value.Name);
+        _mockPathStrategy.Received(1).GetInvalidPathSegmentCharsForPlatform();
+    }
+
+    [Fact]
+    public void SanitizeSegment_WithLeadingAndTrailingWhitespace_ShouldTrimTheName()
+    {
+        // Arrange
+        _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(['<', '>', ':', '"', '|', '?', '*']);
+
+        // Act
+        Result<PathSegment> result = _sut.SanitizeSegment("  Valid Name  ");
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal("Valid Name", result.Value.Name);
+    }
+
+    [Fact]
+    public void SanitizeSegment_WithInvalidCharacters_ShouldReplaceThemWithSpaces()
+    {
+        // Arrange
+        char[] invalidChars = ['<', '>', ':', '"', '|', '?', '*'];
+        _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(invalidChars);
+
+        // Act
+        Result<PathSegment> result = _sut.SanitizeSegment("Bad<Name>");
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal("Bad Name", result.Value.Name);
+    }
+
+    [Fact]
+    public void SanitizeSegment_WithConsecutiveWhitespace_ShouldCollapseItIntoASingleSpace()
+    {
+        // Arrange
+        _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(['<', '>', ':', '"', '|', '?', '*']);
+
+        // Act
+        Result<PathSegment> result = _sut.SanitizeSegment("Name   with   spaces");
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal("Name with spaces", result.Value.Name);
+    }
+
+    [Fact]
+    public void SanitizeSegment_WithDotSegment_ShouldReturnInvalidPath()
+    {
+        // Arrange
+        _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(['<', '>', ':', '"', '|', '?', '*']);
+
+        // Act
+        Result<PathSegment> result = _sut.SanitizeSegment(".");
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
+    }
+
+    [Fact]
+    public void SanitizeSegment_WithDotDotSegment_ShouldReturnInvalidPath()
+    {
+        // Arrange
+        _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(['<', '>', ':', '"', '|', '?', '*']);
+
+        // Act
+        Result<PathSegment> result = _sut.SanitizeSegment("..");
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
+    }
+
+    [Fact]
+    public void SanitizeSegment_WithForwardSlash_ShouldReturnInvalidPath()
+    {
+        // Arrange
+        // the forward slash is not an invalid character for a segment on Unix-like platforms, so only the path service can reject it
+        _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(['\0']);
+
+        // Act
+        Result<PathSegment> result = _sut.SanitizeSegment("a/b");
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
+    }
+
+    [Fact]
+    public void SanitizeSegment_WithBackslash_ShouldReturnInvalidPath()
+    {
+        // Arrange
+        // the backslash is not an invalid character for a segment on Windows platforms, so only the path service can reject it
+        _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(['<', '>', '"', '|', '?', '*', ':']);
+
+        // Act
+        Result<PathSegment> result = _sut.SanitizeSegment("a\\b");
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
+    }
+
+    [Theory]
+    [InlineData("../..")] // parent directory escape
+    [InlineData("a/../b")] // embedded parent directory escape
+    [InlineData("..\\..")] // Windows parent directory escape
+    [InlineData("a\\..\\b")] // embedded Windows parent directory escape
+    public void SanitizeSegment_WithPathTraversal_ShouldReturnInvalidPath(string name)
+    {
+        // Arrange
+        _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(['\0']);
+
+        // Act
+        Result<PathSegment> result = _sut.SanitizeSegment(name);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
+    }
+
+    [Fact]
+    public void SanitizeSegment_WithAColon_WhenTheColonIsValidForThePlatform_ShouldKeepTheColon()
+    {
+        // Arrange
+        // the colon is not an invalid character for a segment on Unix-like platforms, so it must be preserved
+        _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(['\0']);
+
+        // Act
+        Result<PathSegment> result = _sut.SanitizeSegment("Name:WithColon");
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal("Name:WithColon", result.Value.Name);
+    }
+
+    [Fact]
+    public void SanitizeSegment_WithAColon_WhenTheColonIsInvalidForThePlatform_ShouldReplaceItWithASpace()
+    {
+        // Arrange
+        // the colon is an invalid character for a segment on Windows platforms, so it must be replaced
+        _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(['<', '>', '"', '|', '?', '*', ':']);
+
+        // Act
+        Result<PathSegment> result = _sut.SanitizeSegment("Name:WithColon");
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal("Name WithColon", result.Value.Name);
+    }
+
+    [Fact]
+    public void SanitizeSegment_WithEmptyName_ShouldReturnNameCannotBeEmpty()
+    {
+        // Arrange
+        _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(['<', '>', ':', '"', '|', '?', '*']);
+
+        // Act
+        Result<PathSegment> result = _sut.SanitizeSegment(string.Empty);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.NameCannotBeEmpty, result.FirstError);
+        _mockPathStrategy.DidNotReceive().GetInvalidPathSegmentCharsForPlatform();
+    }
+
+    [Fact]
+    public void SanitizeSegment_WithWhitespaceOnlyName_ShouldReturnNameCannotBeEmpty()
+    {
+        // Arrange
+        _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(['<', '>', ':', '"', '|', '?', '*']);
+
+        // Act
+        Result<PathSegment> result = _sut.SanitizeSegment("   ");
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.NameCannotBeEmpty, result.FirstError);
+    }
+
+    [Fact]
+    public void SanitizeSegment_WithNameMadeOnlyOfInvalidCharacters_ShouldReturnInvalidPath()
+    {
+        // Arrange
+        _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(['<', '>', ':', '"', '|', '?', '*']);
+
+        // Act
+        Result<PathSegment> result = _sut.SanitizeSegment("***");
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
+    }
+
+    [Fact]
+    public void SanitizeSegment_WithNameLongerThanTheMaximumLength_ShouldCapTheSegment()
+    {
+        // Arrange
+        _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(['<', '>', ':', '"', '|', '?', '*']);
+
+        // Act
+        Result<PathSegment> result = _sut.SanitizeSegment(new string('a', 150));
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(100, result.Value.Name.Length);
+        Assert.Equal(new string('a', 100), result.Value.Name);
+    }
+
+    [Fact]
+    public void SanitizeSegment_WithNameLongerThanTheMaximumLengthAndTrailingWhitespace_ShouldTrimAfterCapping()
+    {
+        // Arrange
+        _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(['<', '>', ':', '"', '|', '?', '*']);
+
+        // Act
+        Result<PathSegment> result = _sut.SanitizeSegment(new string('a', 110) + new string(' ', 50));
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(100, result.Value.Name.Length);
+    }
 }

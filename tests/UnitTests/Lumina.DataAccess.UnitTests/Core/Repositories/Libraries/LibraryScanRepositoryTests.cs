@@ -149,19 +149,9 @@ public class LibraryScanRepositoryTests
         _mockContext.LibraryScans.Add(libraryScan);
         await _mockContext.SaveChangesAsync();
 
-        LibraryScanEntity updatedScan = new()
-        {
-            Id = libraryScan.Id,
-            LibraryId = libraryScan.LibraryId,
-            UserId = libraryScan.UserId,
-            Status = LibraryScanJobStatus.Completed,
-            Library = libraryScan.Library,
-            User = libraryScan.User,
-            CreatedOnUtc = libraryScan.CreatedOnUtc,
-            CreatedBy = libraryScan.CreatedBy,
-            UpdatedOnUtc = DateTime.UtcNow,
-            UpdatedBy = libraryScan.UserId
-        };
+        LibraryScanEntity updatedScan = _libraryScanEntityFixture.Create(id: libraryScan.Id, libraryId: libraryScan.LibraryId, userId: libraryScan.UserId, status: LibraryScanJobStatus.Completed, libraryEntity: libraryScan.Library, createdOnUtc: libraryScan.CreatedOnUtc);
+        updatedScan.UpdatedOnUtc = DateTime.UtcNow;
+        updatedScan.UpdatedBy = libraryScan.UserId;
 
         // Act
         Result<Updated> result = await _sut.UpdateAsync(updatedScan, CancellationToken.None);

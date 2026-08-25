@@ -7,6 +7,7 @@ using Lumina.Plugins.OpenLibrary.Common.Models.Contracts.Responses;
 using Lumina.Plugins.OpenLibrary.Common.Models.DTO.Settings;
 using Lumina.Plugins.OpenLibrary.Core.Api;
 using Lumina.Plugins.OpenLibrary.Core.Mapping;
+using Lumina.Plugins.OpenLibrary.Core.Settings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,10 +20,10 @@ namespace Lumina.Plugins.OpenLibrary.Core;
 /// <summary>
 /// Provides book metadata from the Open Library by resolving lookups into book metadata DTOs.
 /// </summary>
-internal sealed class OpenLibraryBookMetadataProvider : IRemoteMetadataProvider<BookMetadataLookupDto, BookMetadataDto>
+internal sealed class OpenLibraryBookMetadataProvider : IMetadataProvider<BookMetadataLookupDto, BookMetadataDto>
 {
     private readonly OpenLibraryHttpClient _openLibraryHttpClient;
-    private readonly OpenLibrarySettingsDto _openLibrarySettings;
+    private readonly OpenLibrarySettingsProvider _settingsProvider;
 
     /// <summary>
     /// Gets the display name of the metadata provider.
@@ -30,9 +31,9 @@ internal sealed class OpenLibraryBookMetadataProvider : IRemoteMetadataProvider<
     public string Name => "Open Library";
 
     /// <summary>
-    /// Gets the media library type this metadata provider supports.
+    /// Gets the media library types this metadata provider supports.
     /// </summary>
-    public LibraryType SupportedLibraryType => LibraryType.Book;
+    public IReadOnlyList<LibraryType> SupportedLibraryTypes => [LibraryType.Book];
 
     /// <summary>
     /// Gets a value indicating whether this metadata provider requires access to the web to retrieve metadata.
@@ -43,11 +44,11 @@ internal sealed class OpenLibraryBookMetadataProvider : IRemoteMetadataProvider<
     /// Initializes a new instance of the <see cref="OpenLibraryBookMetadataProvider"/> class.
     /// </summary>
     /// <param name="openLibraryHttpClient">The HTTP client used to call the Open Library API.</param>
-    /// <param name="openLibrarySettings">The settings that configure the Open Library API requests.</param>
-    public OpenLibraryBookMetadataProvider(OpenLibraryHttpClient openLibraryHttpClient, OpenLibrarySettingsDto openLibrarySettings)
+    /// <param name="settingsProvider">The provider of the settings that configure the Open Library API requests.</param>
+    public OpenLibraryBookMetadataProvider(OpenLibraryHttpClient openLibraryHttpClient, OpenLibrarySettingsProvider settingsProvider)
     {
         _openLibraryHttpClient = openLibraryHttpClient;
-        _openLibrarySettings = openLibrarySettings;
+        _settingsProvider = settingsProvider;
     }
 
     /// <summary>
@@ -59,6 +60,8 @@ internal sealed class OpenLibraryBookMetadataProvider : IRemoteMetadataProvider<
     public async Task<IReadOnlyList<BookMetadataDto>> GetSearchResultsAsync(BookMetadataLookupDto bookMetadataLookup, CancellationToken cancellationToken)
     {
         ValidateLookup(bookMetadataLookup);
+
+        OpenLibrarySettingsDto settings = await _settingsProvider.GetAsync(cancellationToken).ConfigureAwait(false);
 
         if (!string.IsNullOrWhiteSpace(bookMetadataLookup.Isbn) || !string.IsNullOrWhiteSpace(bookMetadataLookup.OpenLibraryId))
         {
@@ -90,11 +93,11 @@ internal sealed class OpenLibraryBookMetadataProvider : IRemoteMetadataProvider<
                 exactBookRequestMatch.ISBNs,
                 exactBookRequestMatch.Contributors,
                 exactBookRequestMatch.Ratings,
-                CoverImageUrl: null
+                CoverImagePath: null
             )];
         }
 
-        IReadOnlyList<OpenLibrarySearchDocumentResponse> openLibrarySearchDocuments = await _openLibraryHttpClient.SearchAsync(bookMetadataLookup, _openLibrarySettings.SearchResultLimit, cancellationToken).ConfigureAwait(false);
+        IReadOnlyList<OpenLibrarySearchDocumentResponse> openLibrarySearchDocuments = await _openLibraryHttpClient.SearchAsync(bookMetadataLookup, settings.SearchResultLimit, cancellationToken).ConfigureAwait(false);
 
         return [.. openLibrarySearchDocuments
             .Where(openLibrarySearchDocument => !string.IsNullOrWhiteSpace(openLibrarySearchDocument.Title))
@@ -128,7 +131,7 @@ internal sealed class OpenLibraryBookMetadataProvider : IRemoteMetadataProvider<
                     addBookRequest.ISBNs,
                     addBookRequest.Contributors,
                     addBookRequest.Ratings,
-                    CoverImageUrl: null
+                    CoverImagePath: null
                 );
             })];
     }
@@ -169,7 +172,7 @@ internal sealed class OpenLibraryBookMetadataProvider : IRemoteMetadataProvider<
             exactBookRequestMatch.ISBNs,
             exactBookRequestMatch.Contributors,
             exactBookRequestMatch.Ratings,
-            CoverImageUrl: null
+            CoverImagePath: null
         );
     }
 
@@ -182,6 +185,8 @@ internal sealed class OpenLibraryBookMetadataProvider : IRemoteMetadataProvider<
     public async Task<AddBookRequest?> GetBookAsync(BookMetadataLookupDto bookMetadataLookup, CancellationToken cancellationToken = default)
     {
         ValidateLookup(bookMetadataLookup);
+
+        OpenLibrarySettingsDto settings = await _settingsProvider.GetAsync(cancellationToken).ConfigureAwait(false);
 
         OpenLibraryEditionResponse? openLibraryEditionResponse = null;
         OpenLibraryWorkResponse? openLibraryWorkResponse = null;
@@ -199,7 +204,7 @@ internal sealed class OpenLibraryBookMetadataProvider : IRemoteMetadataProvider<
                 // A work has no publisher-specific details on its own (no ISBN, page count, etc.), so we still need to pull it for its work-level fields (e.g. description, subjects).
                 openLibraryWorkResponse = await _openLibraryHttpClient.GetWorkAsync(olid, cancellationToken).ConfigureAwait(false);
                 // A work can have many editions; SelectEdition picks the one that best matches the lookup criteria (language, format, etc.) instead of assuming the first result is right.
-                openLibraryEditionResponse = SelectEdition(await _openLibraryHttpClient.GetEditionsAsync(olid, _openLibrarySettings.WorkEditionLimit, cancellationToken).ConfigureAwait(false), bookMetadataLookup);
+                openLibraryEditionResponse = SelectEdition(await _openLibraryHttpClient.GetEditionsAsync(olid, settings.WorkEditionLimit, cancellationToken).ConfigureAwait(false), bookMetadataLookup);
             }
             else
                 throw new ArgumentException("A book Open Library ID must be a work ID ending in W or an edition ID ending in M.", nameof(bookMetadataLookup));
@@ -221,7 +226,7 @@ internal sealed class OpenLibraryBookMetadataProvider : IRemoteMetadataProvider<
             if (workId is not null)
             {
                 openLibraryWorkResponse = await _openLibraryHttpClient.GetWorkAsync(workId, cancellationToken).ConfigureAwait(false);
-                openLibraryEditionResponse = SelectEdition(await _openLibraryHttpClient.GetEditionsAsync(workId, _openLibrarySettings.WorkEditionLimit, cancellationToken).ConfigureAwait(false), bookMetadataLookup);
+                openLibraryEditionResponse = SelectEdition(await _openLibraryHttpClient.GetEditionsAsync(workId, settings.WorkEditionLimit, cancellationToken).ConfigureAwait(false), bookMetadataLookup);
             }
 
             if (openLibraryEditionResponse is null && searchResults[0].EditionKeys.Count > 0)

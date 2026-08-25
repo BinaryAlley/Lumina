@@ -2,6 +2,7 @@
 using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.Maintenance.ApplicationSetup.Queries.CheckInitialization;
+using Lumina.Contracts.Fixtures.Core.Responses.UsersManagement;
 using Lumina.Contracts.Responses.UsersManagement;
 using Lumina.Presentation.Api.Core.Endpoints.Maintenance.ApplicationSetup;
 using Microsoft.AspNetCore.Http;
@@ -23,6 +24,7 @@ public class CheckInitializationEndpointTests
 {
     private readonly IQueryHandler<CheckInitializationQuery, InitializationResponse> _mockHandler;
     private readonly CheckInitializationEndpoint _sut;
+    private readonly InitializationResponseFixture _initializationResponseFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CheckInitializationEndpointTests"/> class.
@@ -38,7 +40,7 @@ public class CheckInitializationEndpointTests
     {
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;
-        InitializationResponse expectedResponse = new(IsInitialized: true);
+        InitializationResponse expectedResponse = _initializationResponseFixture.Create(isInitialized: true);
         _mockHandler.HandleAsync(Arg.Any<CheckInitializationQuery>(), Arg.Any<CancellationToken>())
             .Returns(expectedResponse);
 
@@ -56,7 +58,7 @@ public class CheckInitializationEndpointTests
         // Arrange
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<CheckInitializationQuery>(), Arg.Any<CancellationToken>())
-            .Returns(new InitializationResponse(IsInitialized: true));
+            .Returns(_initializationResponseFixture.Create(isInitialized: true));
 
         // Act
         await _sut.ExecuteAsync(EmptyRequest.Instance, cancellationToken);
@@ -81,7 +83,7 @@ public class CheckInitializationEndpointTests
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return new InitializationResponse(IsInitialized: true);
+                return _initializationResponseFixture.Create(isInitialized: true);
             }, callInfo.Arg<CancellationToken>()));
 
         // Act

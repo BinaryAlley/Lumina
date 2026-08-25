@@ -132,7 +132,7 @@ internal sealed class BookRepository : IBookRepository
             booksQuery = booksQuery.Where(filterSpecification.ToExpression());
 
         // apply sorting based on the specified sortBy and sortOrder parameters
-        booksQuery = ApplySorting(booksQuery, sortBy, sortOrder ?? SortOrder.Ascending, libraryFilter.IgnoreThePrefixForAlphaPicker);
+        booksQuery = ApplySorting(booksQuery, sortBy, sortOrder ?? SortOrder.Ascending, libraryFilter.ShouldIgnoreThePrefixForAlphaPicker);
 
         // if no pagination was requested, return all the books of the library
         if (paginationData is null)
@@ -261,8 +261,8 @@ internal sealed class BookRepository : IBookRepository
     /// <param name="booksQuery">The query to sort.</param>
     /// <param name="sortBy">The field to sort by (case-insensitive).</param>
     /// <param name="sortOrder">The direction of the sorting.</param>
-    /// <param name="ignoreThePrefixForAlphaPicker">Whether a leading "the " prefix of a title is ignored when deriving the title sort key, or not.</param>
-    private static IOrderedQueryable<BookEntity> ApplySorting(IQueryable<BookEntity> booksQuery, string? sortBy, SortOrder sortOrder, bool ignoreThePrefixForAlphaPicker)
+    /// <param name="shouldIgnoreThePrefixForAlphaPicker">Whether a leading "the " prefix of a title is ignored when deriving the title sort key, or not.</param>
+    private static IOrderedQueryable<BookEntity> ApplySorting(IQueryable<BookEntity> booksQuery, string? sortBy, SortOrder sortOrder, bool shouldIgnoreThePrefixForAlphaPicker)
     {
         return sortBy?.ToLower() switch
         {
@@ -276,8 +276,8 @@ internal sealed class BookRepository : IBookRepository
                 ? booksQuery.OrderByDescending(book => book.MetadataProvider)
                 : booksQuery.OrderBy(book => book.MetadataProvider),
             _ => sortOrder == SortOrder.Descending
-                ? booksQuery.OrderByDescending(BuildTitleSortKey(ignoreThePrefixForAlphaPicker))
-                : booksQuery.OrderBy(BuildTitleSortKey(ignoreThePrefixForAlphaPicker)),
+                ? booksQuery.OrderByDescending(BuildTitleSortKey(shouldIgnoreThePrefixForAlphaPicker))
+                : booksQuery.OrderBy(BuildTitleSortKey(shouldIgnoreThePrefixForAlphaPicker)),
         };
     }
 
@@ -286,9 +286,9 @@ internal sealed class BookRepository : IBookRepository
     /// the title lowercased, falling back to the original title when the title is <see langword="null"/> or empty, and optionally
     /// stripped of a leading "the " prefix.
     /// </summary>
-    /// <param name="ignoreThePrefixForAlphaPicker">Whether a leading "the " prefix of a title is ignored when deriving the title sort key, or not.</param>
+    /// <param name="shouldIgnoreThePrefixForAlphaPicker">Whether a leading "the " prefix of a title is ignored when deriving the title sort key, or not.</param>
     /// <returns>An expression that evaluates to the title sort key of a book.</returns>
-    private static Expression<Func<BookEntity, string>> BuildTitleSortKey(bool ignoreThePrefixForAlphaPicker)
+    private static Expression<Func<BookEntity, string>> BuildTitleSortKey(bool shouldIgnoreThePrefixForAlphaPicker)
     {
         ParameterExpression book = Expression.Parameter(typeof(BookEntity), "book");
 
@@ -306,7 +306,7 @@ internal sealed class BookRepository : IBookRepository
 
         // when ignoring the "The " prefix, strip a leading "the " from the lowercased title
         Expression effectiveTitle = lowerTitle;
-        if (ignoreThePrefixForAlphaPicker)
+        if (shouldIgnoreThePrefixForAlphaPicker)
         {
             MethodCallExpression startsWithThe = Expression.Call(lowerTitle, s_startsWithMethod, Expression.Constant("the "));
             MethodCallExpression strippedTitle = Expression.Call(lowerTitle, s_substringMethod, Expression.Constant(4));
@@ -332,7 +332,7 @@ internal sealed class BookRepository : IBookRepository
         // include the alpha key filter, if provided
         if (libraryFilter.FilterAlphaKey is not null)
         {
-            BookAlphaFilterSpecification alphaFilterSpecification = new(libraryFilter.FilterAlphaKey, libraryFilter.IgnoreThePrefixForAlphaPicker);
+            BookAlphaFilterSpecification alphaFilterSpecification = new(libraryFilter.FilterAlphaKey, libraryFilter.ShouldIgnoreThePrefixForAlphaPicker);
             filterSpecification = filterSpecification is null
                 ? alphaFilterSpecification
                 : filterSpecification.And(alphaFilterSpecification);

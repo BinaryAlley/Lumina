@@ -2,15 +2,14 @@
 using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Queries.GetBooks;
-using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
 using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Contracts.Fixtures.Core.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Lumina.Contracts.Fixtures.Responses.Common;
 using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Contracts.Responses.Common;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.Errors;
-using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.GetBooks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -34,6 +33,7 @@ public class GetBooksEndpointTests
     private readonly GetBooksEndpoint _sut;
     private readonly GetBooksRequestFixture _getBooksRequestFixture = new();
     private readonly BookResponseFixture _bookResponseFixture = new();
+    private readonly PaginatedResponseFixture<BookResponse> _paginatedResponseFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetBooksEndpointTests"/> class.
@@ -171,19 +171,12 @@ public class GetBooksEndpointTests
     /// </summary>
     /// <param name="bookCount">The number of book responses to include in the data collection.</param>
     /// <returns>A configured paginated response instance.</returns>
-    private static PaginatedResponse<BookResponse> CreatePaginatedResponse(int bookCount, BookResponseFixture bookResponseFixture)
+    private PaginatedResponse<BookResponse> CreatePaginatedResponse(int bookCount, BookResponseFixture bookResponseFixture)
     {
         List<BookResponse> books = [];
         for (int index = 0; index < bookCount; index++)
             books.Add(bookResponseFixture.Create());
 
-        return new PaginatedResponse<BookResponse>
-        {
-            Data = books,
-            CurrentPage = 1,
-            PerPage = 10,
-            Count = bookCount,
-            NumberOfPages = bookCount > 0 ? 1 : 0
-        };
+        return _paginatedResponseFixture.Create(data: books, currentPage: 1, perPage: 10, count: bookCount, numberOfPages: bookCount > 0 ? 1 : 0);
     }
 }

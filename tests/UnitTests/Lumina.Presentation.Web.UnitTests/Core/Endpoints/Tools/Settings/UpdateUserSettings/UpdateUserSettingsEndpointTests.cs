@@ -38,6 +38,10 @@ public class UpdateUserSettingsEndpointTests
         _sut = Factory.Create<UpdateUserSettingsEndpoint>(_mockApiHttpClient, CreateThemeCachePreferenceService());
     }
 
+    /// <summary>
+    /// Creates a <see cref="ThemeCachePreferenceService"/> backed by an in-memory hybrid cache.
+    /// </summary>
+    /// <returns>The created theme cache preference service.</returns>
     private static ThemeCachePreferenceService CreateThemeCachePreferenceService()
     {
         ServiceCollection services = new();
@@ -50,15 +54,15 @@ public class UpdateUserSettingsEndpointTests
     {
         // Arrange
         UserSettingsDto request = _userSettingsDtoFixture.Create();
-        _mockApiHttpClient.PutAsync<Lumina.Presentation.Web.Common.Requests.Common.EmptyRequest, UserSettingsDto>(Arg.Any<string>(), Arg.Any<UserSettingsDto>(), Arg.Any<CancellationToken>())
-            .Returns(new Lumina.Presentation.Web.Common.Requests.Common.EmptyRequest());
+        _mockApiHttpClient.PutAsync<Web.Common.Requests.Common.EmptyRequest, UserSettingsDto>(Arg.Any<string>(), Arg.Any<UserSettingsDto>(), Arg.Any<CancellationToken>())
+            .Returns(new Web.Common.Requests.Common.EmptyRequest());
 
         // Act
         IResult result = await _sut.ExecuteAsync(request, CancellationToken.None);
         string body = await JsonResultTestHelper.GetResponseBodyAsync(result);
 
         // Assert
-        await _mockApiHttpClient.Received(1).PutAsync<Lumina.Presentation.Web.Common.Requests.Common.EmptyRequest, UserSettingsDto>(
+        await _mockApiHttpClient.Received(1).PutAsync<Web.Common.Requests.Common.EmptyRequest, UserSettingsDto>(
             ApiRoutes.Users.UPDATE_USER_SETTINGS,
             Arg.Is<UserSettingsDto>(settings => settings.ItemsPerPage == request.ItemsPerPage && settings.IsPaginationEnabled == request.IsPaginationEnabled),
             Arg.Any<CancellationToken>());

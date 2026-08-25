@@ -42,7 +42,7 @@ public class GetBooksLiteRequest
     /// <summary>
     /// Gets or sets whether the leading "The " prefix of a title is ignored when computing the alpha key, or not.
     /// </summary>
-    public bool IgnoreThePrefixForAlphaPicker { get; set; }
+    public bool ShouldIgnoreThePrefixForAlphaPicker { get; set; }
 
     /// <summary>
     /// Gets or sets the name of the field by which to sort the results.

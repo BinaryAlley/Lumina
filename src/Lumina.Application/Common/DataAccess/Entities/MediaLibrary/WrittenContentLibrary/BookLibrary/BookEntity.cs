@@ -138,7 +138,7 @@ public class BookEntity : IStorageEntity, IAuditableEntity
     /// <summary>
     /// Gets or sets the volume or book number in the series, if applicable.
     /// </summary>
-    public int? VolumeNumber { get; set; }
+    public float? VolumeNumber { get; set; }
     // TODO: uncomment when series is implemented
     /// <summary>
     /// Gets or sets the series id, if the book is part of a series.
@@ -189,6 +189,11 @@ public class BookEntity : IStorageEntity, IAuditableEntity
     /// Gets or sets the Apple Books ID of the book.
     /// </summary>
     public string? AppleBooksId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the file system path of the cover image of the book, if applicable.
+    /// </summary>
+    public string? CoverImagePath { get; set; }
 
     /// <summary>
     /// Gets or sets the list of ISBN (International Standard Book Number) of the book.

@@ -11,6 +11,7 @@ using Lumina.Application.Common.Infrastructure.Themes;
 using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.MediaLibrary.Management.Progress;
+using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Artwork;
 using Lumina.Domain.Common.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Cancellation;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
@@ -28,6 +29,7 @@ using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Common;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.WrittenContent.Books;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Progress;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Queue;
+using Lumina.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Artwork;
 using Lumina.Infrastructure.Core.Plugins;
 using Lumina.Infrastructure.Core.Security;
 using Lumina.Infrastructure.Core.Themes;
@@ -101,6 +103,10 @@ public static class InfrastructureLayerServices
 
 
         services.AddSingleton<IMediaLibraryScanProgressNotifier, DebouncedMediaLibraryScanProgressNotifier>();
+
+        // book artwork: stores the artwork of the books into the internal media directory
+        services.AddHttpClient();
+        services.AddScoped<IBookArtworkService, BookArtworkService>();
 
         // plugins: load the plugin assemblies from the plugins directory, register their services and provide the plugin manager
         string pluginsDirectorySetting = configuration.GetSection(PluginsSettingsDto.SECTION_NAME)["Directory"] ?? "plugins";

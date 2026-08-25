@@ -171,7 +171,7 @@
   <data name="DescriptionDirectories" xml:space="preserve">
     <value>このライブラリのメディアファイルを含むフォルダを選択してください</value>
   </data>
-  <data name="DescriptionDownloadMetadataFromWeb" xml:space="preserve">
+  <data name="DescriptionCanDownloadMetadataFromWeb" xml:space="preserve">
     <value>このメディアライブラリの要素のメタデータをインターネットからダウンロードして取得するかどうか。</value>
   </data>
   <data name="DescriptionEnabled" xml:space="preserve">
@@ -198,7 +198,7 @@
   <data name="Documentary" xml:space="preserve">
     <value>ドキュメンタリー</value>
   </data>
-  <data name="DownloadMetadataFromWeb" xml:space="preserve">
+  <data name="CanDownloadMetadataFromWeb" xml:space="preserve">
     <value>ウェブからメタデータをダウンロード</value>
   </data>
   <data name="EBook" xml:space="preserve">

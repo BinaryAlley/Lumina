@@ -74,7 +74,7 @@ public class UpdateUserSettingsCommandHandlerTests
                 settings.UserId == _userId &&
                 settings.IsPaginationEnabled == command.IsPaginationEnabled &&
                 settings.ItemsPerPage == command.ItemsPerPage &&
-                settings.IgnoreThePrefixForAlphaPicker == command.IgnoreThePrefixForAlphaPicker),
+                settings.ShouldIgnoreThePrefixForAlphaPicker == command.ShouldIgnoreThePrefixForAlphaPicker),
             Arg.Any<CancellationToken>());
         await _mockUserSettingsRepository.DidNotReceive().UpdateAsync(Arg.Any<UserSettingsEntity>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
@@ -102,7 +102,7 @@ public class UpdateUserSettingsCommandHandlerTests
                 settings.UserId == _userId &&
                 settings.IsPaginationEnabled == command.IsPaginationEnabled &&
                 settings.ItemsPerPage == command.ItemsPerPage &&
-                settings.IgnoreThePrefixForAlphaPicker == command.IgnoreThePrefixForAlphaPicker),
+                settings.ShouldIgnoreThePrefixForAlphaPicker == command.ShouldIgnoreThePrefixForAlphaPicker),
             Arg.Any<CancellationToken>());
         await _mockUserSettingsRepository.DidNotReceive().InsertAsync(Arg.Any<UserSettingsEntity>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());

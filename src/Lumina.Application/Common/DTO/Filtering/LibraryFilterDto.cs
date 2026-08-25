@@ -25,5 +25,5 @@ public record LibraryFilterDto : BaseFilterDto
     /// <summary>
     /// Whether the leading "The " prefix of a title should be ignored when computing the alpha key, or not.
     /// </summary>
-    public bool IgnoreThePrefixForAlphaPicker { get; init; }
+    public bool ShouldIgnoreThePrefixForAlphaPicker { get; init; }
 }

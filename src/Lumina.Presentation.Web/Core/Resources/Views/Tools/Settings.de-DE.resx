@@ -21,7 +21,7 @@
   <data name="ItemsPerPage" xml:space="preserve">
     <value>Elemente pro Seite</value>
   </data>
-  <data name="IgnoreThePrefixForAlphaPicker" xml:space="preserve">
+  <data name="ShouldIgnoreThePrefixForAlphaPicker" xml:space="preserve">
     <value>"The"-Präfix für die Alpha-Auswahl ignorieren</value>
   </data>
   <data name="Save" xml:space="preserve">
@@ -36,7 +36,7 @@
   <data name="DescriptionItemsPerPage" xml:space="preserve">
     <value>Die Anzahl der Bibliothekselemente, die bei aktivierter Seitennummerierung auf jeder Seite angezeigt werden.</value>
   </data>
-  <data name="DescriptionIgnoreThePrefixForAlphaPicker" xml:space="preserve">
+  <data name="DescriptionShouldIgnoreThePrefixForAlphaPicker" xml:space="preserve">
     <value>Wenn aktiviert, werden Bibliothekselemente, deren Titel mit "The" beginnt, in der Alpha-Auswahl unter dem ersten Buchstaben des folgenden Wortes gruppiert, z. B. wird "The Rasmus" unter R aufgeführt.</value>
   </data>
   <data name="EnableThemeCaching" xml:space="preserve">

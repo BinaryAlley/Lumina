@@ -15,19 +15,22 @@ namespace Lumina.Presentation.Web.Fixtures.Common.Requests.Plugins;
 [ExcludeFromCodeCoverage]
 public class UpdatePluginSettingsRequestFixture
 {
+    private readonly Faker _faker = new();
+
     /// <summary>
     /// Creates a new <see cref="UpdatePluginSettingsRequest"/> instance with randomized test data.
     /// </summary>
     /// <param name="pluginId">Optional identifier of the plugin.</param>
     /// <param name="settings">Optional dictionary of settings.</param>
     /// <returns>A configured <see cref="UpdatePluginSettingsRequest"/> instance.</returns>
-    public UpdatePluginSettingsRequest Create(Guid? pluginId = null, Dictionary<string, string>? settings = null)
+    public UpdatePluginSettingsRequest Create(
+        Guid? pluginId = null, 
+        Dictionary<string, string>? settings = null)
     {
-        Faker faker = new();
         return new UpdatePluginSettingsRequest
         {
             PluginId = pluginId ?? Guid.NewGuid(),
-            Settings = settings ?? new Dictionary<string, string> { [faker.Lorem.Word()] = faker.Lorem.Word() }
+            Settings = settings ?? new Dictionary<string, string> { [_faker.Lorem.Word()] = _faker.Lorem.Word() }
         };
     }
 

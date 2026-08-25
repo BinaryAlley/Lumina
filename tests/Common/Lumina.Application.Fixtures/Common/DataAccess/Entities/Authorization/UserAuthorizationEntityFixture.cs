@@ -20,16 +20,22 @@ public class UserAuthorizationEntityFixture
     /// </summary>
     /// <param name="userId">Optional. The user Id to use. If null, a random GUID will be generated.</param>
     /// <param name="isAdmin">Whether the user should have admin role.</param>
+    /// <param name="role">Optional. The role associated to the user. If null, it is derived from the <paramref name="isAdmin"/> flag.</param>
+    /// <param name="permissions">Optional. The permissions associated to the user. If null, a default set is generated.</param>
     /// <returns>The created entity.</returns>
-    public UserAuthorizationEntity Create(Guid? userId = null, bool isAdmin = false)
+    public UserAuthorizationEntity Create(
+        Guid? userId = null,
+        bool isAdmin = false,
+        string? role = null,
+        IReadOnlySet<AuthorizationPermission>? permissions = null)
     {
-        string role = isAdmin ? "Admin" : string.Empty;
+        string resolvedRole = role ?? (isAdmin ? "Admin" : string.Empty);
 
         return new UserAuthorizationEntity
         {
             UserId = userId ?? Guid.NewGuid(),
-            Role = role,
-            Permissions = new HashSet<AuthorizationPermission>
+            Role = resolvedRole,
+            Permissions = permissions ?? new HashSet<AuthorizationPermission>
             {
                 AuthorizationPermission.CanViewUsers,
                 AuthorizationPermission.CanRegisterUsers

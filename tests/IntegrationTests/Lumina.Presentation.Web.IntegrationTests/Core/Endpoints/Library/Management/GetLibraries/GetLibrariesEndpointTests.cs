@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Common.DTO.Libraries;
 using Lumina.Presentation.Web.Core.Endpoints.Library.Management.GetLibraries;
+using Lumina.Presentation.Web.Fixtures.Common.DTO.Libraries;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
 using System;
@@ -20,6 +21,7 @@ namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.Manage
 public class GetLibrariesEndpointTests : IClassFixture<LuminaWebFactory>
 {
     private readonly LuminaWebFactory _apiFactory;
+    private readonly LibraryDtoFixture _libraryDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetLibrariesEndpointTests"/> class.
@@ -37,8 +39,8 @@ public class GetLibrariesEndpointTests : IClassFixture<LuminaWebFactory>
         _apiFactory.ApiClientStub.Reset();
         LibraryDto[] expectedLibraries =
         [
-            new LibraryDto { Id = Guid.NewGuid(), Title = "Books", LibraryType = "Book" },
-            new LibraryDto { Id = Guid.NewGuid(), Title = "Movies", LibraryType = "Video" }
+            _libraryDtoFixture.Create(id: Guid.NewGuid(), title: "Books", libraryType: "Book"),
+            _libraryDtoFixture.Create(id: Guid.NewGuid(), title: "Movies", libraryType: "Video")
         ];
         _apiFactory.ApiClientStub.RegisterGetResponse("libraries", expectedLibraries);
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);

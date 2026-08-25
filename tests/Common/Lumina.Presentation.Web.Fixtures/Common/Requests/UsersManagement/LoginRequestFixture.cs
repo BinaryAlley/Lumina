@@ -14,6 +14,8 @@ namespace Lumina.Presentation.Web.Fixtures.Common.Requests.UsersManagement;
 [ExcludeFromCodeCoverage]
 public class LoginRequestFixture
 {
+    private readonly Faker _faker = new();
+
     /// <summary>
     /// Creates a new <see cref="LoginRequest"/> instance with randomized test data.
     /// </summary>
@@ -22,12 +24,15 @@ public class LoginRequestFixture
     /// <param name="totpCode">Optional TOTP code.</param>
     /// <param name="returnUrl">Optional URL to return to, after login.</param>
     /// <returns>A configured <see cref="LoginRequest"/> instance.</returns>
-    public LoginRequest Create(string? username = null, string? password = null, string? totpCode = null, string? returnUrl = null)
+    public LoginRequest Create(
+        string? username = null, 
+        string? password = null, 
+        string? totpCode = null, 
+        string? returnUrl = null)
     {
-        Faker faker = new();
         return new LoginRequest(
-            Username: username ?? faker.Internet.UserName(),
-            Password: password ?? faker.Internet.Password(12),
+            Username: username ?? _faker.Internet.UserName(),
+            Password: password ?? _faker.Internet.Password(12),
             TotpCode: totpCode,
             ReturnUrl: returnUrl
         );

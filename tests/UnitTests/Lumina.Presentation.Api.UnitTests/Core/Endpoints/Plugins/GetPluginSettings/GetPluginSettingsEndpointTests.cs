@@ -3,6 +3,7 @@ using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.Plugins.Queries.GetPluginSettings;
 using Lumina.Contracts.Fixtures.Core.Requests.Plugins;
+using Lumina.Contracts.Fixtures.Core.Responses.Plugins;
 using Lumina.Contracts.Requests.Plugins;
 using Lumina.Contracts.Responses.Plugins;
 using Lumina.Domain.Common.Primitives;
@@ -27,6 +28,7 @@ public class GetPluginSettingsEndpointTests
     private readonly IQueryHandler<GetPluginSettingsQuery, Result<PluginSettingsResponse>> _mockHandler;
     private readonly GetPluginSettingsEndpoint _sut;
     private readonly GetPluginSettingsRequestFixture _getPluginSettingsRequestFixture = new();
+    private readonly PluginSettingsResponseFixture _pluginSettingsResponseFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetPluginSettingsEndpointTests"/> class.
@@ -43,10 +45,10 @@ public class GetPluginSettingsEndpointTests
         // Arrange
         GetPluginSettingsRequest request = _getPluginSettingsRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
-        PluginSettingsResponse expectedResponse = new(
-            PluginId: request.PluginId,
-            Schema: [],
-            Settings: null
+        PluginSettingsResponse expectedResponse = _pluginSettingsResponseFixture.Create(
+            pluginId: request.PluginId,
+            schema: [],
+            settings: null
         );
         _mockHandler.HandleAsync(Arg.Any<GetPluginSettingsQuery>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(expectedResponse));
@@ -92,7 +94,7 @@ public class GetPluginSettingsEndpointTests
         GetPluginSettingsRequest request = _getPluginSettingsRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<GetPluginSettingsQuery>(), Arg.Any<CancellationToken>())
-            .Returns(Result.From(new PluginSettingsResponse(request.PluginId, [], null)));
+            .Returns(Result.From(_pluginSettingsResponseFixture.Create(pluginId: request.PluginId, schema: [], settings: null)));
 
         // Act
         await _sut.ExecuteAsync(request, cancellationToken);
@@ -118,7 +120,7 @@ public class GetPluginSettingsEndpointTests
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return Result.From(new PluginSettingsResponse(request.PluginId, [], null));
+                return Result.From(_pluginSettingsResponseFixture.Create(pluginId: request.PluginId, schema: [], settings: null));
             }, callInfo.Arg<CancellationToken>()));
 
         // Act

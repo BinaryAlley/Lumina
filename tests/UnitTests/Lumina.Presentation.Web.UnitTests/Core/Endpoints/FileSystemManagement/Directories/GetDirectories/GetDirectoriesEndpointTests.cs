@@ -5,6 +5,7 @@ using Lumina.Presentation.Web.Common.DTO.FileSystemManagement;
 using Lumina.Presentation.Web.Common.Requests.FileSystemManagement.Directories;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Core.Endpoints.FileSystemManagement.Directories.GetDirectories;
+using Lumina.Presentation.Web.Fixtures.Common.DTO.FileSystemManagement;
 using Lumina.Presentation.Web.Fixtures.Common.Requests.FileSystemManagement.Directories;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Http;
@@ -27,6 +28,7 @@ public class GetDirectoriesEndpointTests
     private readonly IApiHttpClient _mockApiHttpClient;
     private readonly GetDirectoriesEndpoint _sut;
     private readonly GetDirectoriesRequestFixture _getDirectoriesRequestFixture = new();
+    private readonly DirectoryDtoFixture _directoryDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetDirectoriesEndpointTests"/> class.
@@ -42,7 +44,7 @@ public class GetDirectoriesEndpointTests
     {
         // Arrange
         GetDirectoriesRequest request = _getDirectoriesRequestFixture.Create(path: "/media", includeHiddenElements: true);
-        DirectoryDto[] expectedDirectories = [new DirectoryDto { Path = "/media/books", Name = "books" }];
+        DirectoryDto[] expectedDirectories = [_directoryDtoFixture.Create(path: "/media/books", name: "books")];
         _mockApiHttpClient.GetAsync<DirectoryDto[]>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(expectedDirectories);
 

@@ -508,6 +508,40 @@ public class UnixPathStrategyTests
     }
 
     [Fact]
+    public void GetInvalidPathSegmentCharsForPlatform_WhenCalled_ShouldReturnOnlyNullCharacter()
+    {
+        // Act
+        char[] result = _sut.GetInvalidPathSegmentCharsForPlatform();
+
+        // Assert
+        Assert.Single(result);
+        Assert.Contains('\0', result);
+    }
+
+    [Fact]
+    public void GetInvalidPathSegmentCharsForPlatform_WhenCalled_ShouldNotContainTheColon()
+    {
+        // Act
+        char[] result = _sut.GetInvalidPathSegmentCharsForPlatform();
+
+        // Assert
+        Assert.DoesNotContain(':', result);
+        Assert.DoesNotContain('/', result);
+        Assert.DoesNotContain('\\', result);
+    }
+
+    [Fact]
+    public void GetInvalidPathSegmentCharsForPlatform_WhenCalled_ShouldReturnSameResultOnMultipleCalls()
+    {
+        // Act
+        char[] result1 = _sut.GetInvalidPathSegmentCharsForPlatform();
+        char[] result2 = _sut.GetInvalidPathSegmentCharsForPlatform();
+
+        // Assert
+        Assert.Equal(result1, result2);
+    }
+
+    [Fact]
     public void GetPathRoot_WithValidUnixPath_ShouldReturnRootSegment()
     {
         // Arrange

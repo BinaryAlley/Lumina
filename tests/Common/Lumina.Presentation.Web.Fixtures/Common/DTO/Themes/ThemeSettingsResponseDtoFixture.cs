@@ -14,6 +14,8 @@ namespace Lumina.Presentation.Web.Fixtures.Common.DTO.Themes;
 [ExcludeFromCodeCoverage]
 public class ThemeSettingsResponseDtoFixture
 {
+    private readonly Faker _faker = new();
+
     /// <summary>
     /// Creates a new <see cref="ThemeSettingsResponseDto"/> instance with randomized test data.
     /// </summary>
@@ -24,10 +26,9 @@ public class ThemeSettingsResponseDtoFixture
         long? maxArchiveBytes = null, 
         string? defaultThemeId = null)
     {
-        Faker faker = new();
         return new ThemeSettingsResponseDto(
-            MaxArchiveBytes: maxArchiveBytes ?? faker.Random.Long(1024 * 1024, 256 * 1024 * 1024),
-            DefaultThemeId: defaultThemeId ?? faker.Lorem.Word()
+            MaxArchiveBytes: maxArchiveBytes ?? _faker.Random.Long(1024 * 1024, 256 * 1024 * 1024),
+            DefaultThemeId: defaultThemeId ?? _faker.Lorem.Word()
         );
     }
 

@@ -1,9 +1,22 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
+using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Books;
+using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
+using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Artwork;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Plugins;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Contracts.DTO.Common;
+using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Contracts.Fixtures.Core.DTO.Common;
+using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.Common.Events;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
@@ -13,14 +26,17 @@ using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggreg
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
+using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Common;
+using Lumina.Plugins.Contracts.Core.Metadata;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -45,6 +61,13 @@ public class MediaLibraryScanMetadataEnrichmentJobTests
     private readonly ScanIdFixture _scanIdFixture = new();
     private readonly UserIdFixture _userIdFixture = new();
     private readonly LibraryIdFixture _libraryIdFixture = new();
+    private readonly LibraryMetadataProviderConfigurationEntityFixture _configurationEntityFixture = new();
+    private readonly LibraryArtworkProviderConfigurationEntityFixture _artworkConfigurationEntityFixture = new();
+    private readonly UserSettingsEntityFixture _userSettingsEntityFixture = new();
+    private readonly BookMetadataDtoFixture _bookMetadataDtoFixture = new();
+    private readonly ArtworkDtoFixture _artworkDtoFixture = new();
+    private readonly BookEntityFixture _bookEntityFixture = new();
+    private readonly LibraryEntityFixture _libraryEntityFixture = new();
     private readonly ScanId _scanId;
     private readonly UserId _userId;
     private readonly LibraryId _libraryId;
@@ -107,6 +130,51 @@ public class MediaLibraryScanMetadataEnrichmentJobTests
     }
 
     [Fact]
+    public async Task ExecuteAsync_WhenNoMetadataProviderIsConfigured_ShouldSkipEnrichmentWithoutMarkingBooksAsFailed()
+    {
+        // Arrange
+        _mockConfigurationRepository.GetByLibraryIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>([]));
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        // a library without metadata providers must not mark its books as failed to enrich, so the book repositories are not touched
+        Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
+        await _mockBookRepository.DidNotReceive().GetBooksNeedingMetadataCountAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockBookRepository.DidNotReceive().GetBooksNeedingMetadataAsync(Arg.Any<Guid>(), Arg.Any<string?>(), Arg.Any<int>(), Arg.Any<CancellationToken>());
+        await _mockBookRepository.DidNotReceive().UpdateAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenABookPageIsProcessed_ShouldDetachTheTrackedEntitiesAfterSaving()
+    {
+        // Arrange
+        Guid firstPluginId = Guid.NewGuid();
+        IMetadataProvider firstProvider = Substitute.For<IMetadataProvider>();
+        firstProvider.Name.Returns("First Provider");
+        firstProvider.SupportedLibraryTypes.Returns([LibraryType.Book]);
+        firstProvider.GetMetadataAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>())
+            .Returns(_bookMetadataDtoFixture.Create(title: "First Title"));
+
+        SetupRealServiceProviderForProviders(firstPluginId, firstProvider, shouldAggregateMetadataWhenMissing: false);
+        BookEntity book = _bookEntityFixture.Create(libraryId: _libraryId.Value, path: "/books/test.epub");
+        SetupSingleBookPage(book, firstPluginId);
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        // the tracked entities of the page are detached after saving, so that the peak memory stays bounded regardless of the library size
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+        _mockUnitOfWork.Received(1).ClearTrackedEntities();
+        Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
+    }
+
+    [Fact]
     public async Task ExecuteAsync_WhenGettingConfigurationsFails_ShouldMarkJobAsFailedAndPublishFailureEvent()
     {
         // Arrange
@@ -138,5 +206,372 @@ public class MediaLibraryScanMetadataEnrichmentJobTests
         // Assert
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() => operation);
         Assert.Equal(LibraryScanJobStatus.Canceled, _sut.Status);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenAggregateMetadataIsEnabled_ShouldFeedTheEarlierProvidersFindingsToTheLaterOnes()
+    {
+        // Arrange
+        Guid firstPluginId = Guid.NewGuid();
+        Guid secondPluginId = Guid.NewGuid();
+        IMetadataProvider firstProvider = Substitute.For<IMetadataProvider>();
+        IMetadataProvider secondProvider = Substitute.For<IMetadataProvider>();
+        firstProvider.Name.Returns("First Provider");
+        firstProvider.SupportedLibraryTypes.Returns([LibraryType.Book]);
+        firstProvider.GetMetadataAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>())
+            .Returns(_bookMetadataDtoFixture.Create(title: "First Title", openLibraryId: "OL123", description: "First Description"));
+        secondProvider.Name.Returns("Second Provider");
+        secondProvider.SupportedLibraryTypes.Returns([LibraryType.Book]);
+        secondProvider.GetMetadataAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>())
+            .Returns(_bookMetadataDtoFixture.Create(title: "Second Title", publisher: "Second Publisher"));
+
+        SetupRealServiceProviderForProviders(firstPluginId, firstProvider, secondPluginId, secondProvider, shouldAggregateMetadataWhenMissing: true);
+        BookEntity book = _bookEntityFixture.Create(libraryId: _libraryId.Value, path: "/books/test.epub");
+        // the book has no known identifiers of its own, so the findings of the first provider are fed to the second one
+        book.OpenLibraryId = null;
+        SetupSingleBookPage(book, firstPluginId, secondPluginId);
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        // the second provider receives the lookup enriched with the open library Id discovered by the first provider
+        await secondProvider.Received(1).GetMetadataAsync(
+            Arg.Is<MetadataLookupDto>(lookup => lookup is BookMetadataLookupDto && ((BookMetadataLookupDto)lookup).OpenLibraryId == "OL123"),
+            Arg.Any<CancellationToken>());
+        Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenAggregateMetadataIsDisabled_ShouldOnlyApplyTheFirstUsableProviderMetadata()
+    {
+        // Arrange
+        Guid firstPluginId = Guid.NewGuid();
+        Guid secondPluginId = Guid.NewGuid();
+        IMetadataProvider firstProvider = Substitute.For<IMetadataProvider>();
+        IMetadataProvider secondProvider = Substitute.For<IMetadataProvider>();
+        firstProvider.Name.Returns("First Provider");
+        firstProvider.SupportedLibraryTypes.Returns([LibraryType.Book]);
+        firstProvider.GetMetadataAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>())
+            .Returns(_bookMetadataDtoFixture.Create(title: "First Title", publisher: "First Publisher"));
+        secondProvider.Name.Returns("Second Provider");
+        secondProvider.SupportedLibraryTypes.Returns([LibraryType.Book]);
+        secondProvider.GetMetadataAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>())
+            .Returns(_bookMetadataDtoFixture.Create(title: "Second Title", publisher: "Second Publisher"));
+
+        SetupRealServiceProviderForProviders(firstPluginId, firstProvider, secondPluginId, secondProvider, shouldAggregateMetadataWhenMissing: false);
+        BookEntity book = _bookEntityFixture.Create(libraryId: _libraryId.Value, path: "/books/test.epub");
+        SetupSingleBookPage(book, firstPluginId, secondPluginId);
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        // the second provider is not queried when the aggregation is disabled and the first provider returned usable metadata
+        await secondProvider.DidNotReceive().GetMetadataAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>());
+        Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenNoProviderReturnsUsableMetadata_ShouldMarkTheBookAsFailedToEnrich()
+    {
+        // Arrange
+        Guid firstPluginId = Guid.NewGuid();
+        IMetadataProvider firstProvider = Substitute.For<IMetadataProvider>();
+        firstProvider.Name.Returns("First Provider");
+        firstProvider.SupportedLibraryTypes.Returns([LibraryType.Book]);
+        firstProvider.GetMetadataAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>())
+            .Returns(_bookMetadataDtoFixture.Create(includeTitle: false));
+
+        SetupRealServiceProviderForProviders(firstPluginId, firstProvider, shouldAggregateMetadataWhenMissing: true);
+        BookEntity book = _bookEntityFixture.Create(libraryId: _libraryId.Value, path: "/books/test.epub");
+        _mockConfigurationRepository.GetByLibraryIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>([
+                _configurationEntityFixture.Create(_libraryId.Value, firstPluginId, 1)
+            ]));
+        _mockBookRepository.GetBooksNeedingMetadataCountAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From(1));
+        _mockBookRepository.GetBooksNeedingMetadataAsync(_libraryId.Value, Arg.Any<string?>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<BookEntity>>([book]), Result.From<IReadOnlyList<BookEntity>>([]));
+        _mockBookRepository.UpdateAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Updated);
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        await _mockBookRepository.Received(1).UpdateAsync(
+            Arg.Is<BookEntity>(entity => entity.MetadataStatus == MetadataStatus.Failed),
+            Arg.Any<CancellationToken>());
+        Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenArtworkConfigurationRepositoryReturnsFailure_ShouldStillEnrichTheMetadata()
+    {
+        // Arrange
+        Guid firstPluginId = Guid.NewGuid();
+        IMetadataProvider firstProvider = Substitute.For<IMetadataProvider>();
+        firstProvider.Name.Returns("First Provider");
+        firstProvider.SupportedLibraryTypes.Returns([LibraryType.Book]);
+        firstProvider.GetMetadataAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>())
+            .Returns(_bookMetadataDtoFixture.Create(title: "First Title"));
+
+        SetupRealServiceProviderForProviders(firstPluginId, firstProvider, shouldAggregateMetadataWhenMissing: true);
+        BookEntity book = _bookEntityFixture.Create(libraryId: _libraryId.Value, path: "/books/test.epub");
+        SetupSingleBookPage(book, firstPluginId);
+
+        IArtworkProviderConfigurationRepository mockArtworkConfigurationRepository = Substitute.For<IArtworkProviderConfigurationRepository>();
+        mockArtworkConfigurationRepository.GetByLibraryIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+            .Returns(Error.Failure(description: "Failed to get the artwork provider configurations"));
+        _mockUnitOfWork.ArtworkProviderConfigurationRepository.Returns(mockArtworkConfigurationRepository);
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
+        await _mockBookRepository.Received(1).UpdateAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenAnArtworkProviderReturnsArtwork_ShouldStoreItAndSetTheBookCoverPath()
+    {
+        // Arrange
+        Guid firstPluginId = Guid.NewGuid();
+        Guid artworkPluginId = Guid.NewGuid();
+        IMetadataProvider firstProvider = Substitute.For<IMetadataProvider>();
+        firstProvider.Name.Returns("First Provider");
+        firstProvider.SupportedLibraryTypes.Returns([LibraryType.Book]);
+        firstProvider.GetMetadataAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>())
+            .Returns(_bookMetadataDtoFixture.Create(title: "First Title"));
+
+        IArtworkProvider artworkProvider = Substitute.For<IArtworkProvider>();
+        artworkProvider.Name.Returns("Artwork Provider");
+        artworkProvider.SupportedLibraryTypes.Returns([LibraryType.Book]);
+        artworkProvider.GetArtworkAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>())
+            .Returns(_artworkDtoFixture.Create(localPath: "/some/cover.jpg"));
+
+        IBookArtworkService mockBookArtworkService = Substitute.For<IBookArtworkService>();
+        mockBookArtworkService.SaveBookArtworkAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<ArtworkDto>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From("\\media\\books\\Library\\Author\\Title\\cover.jpeg"));
+
+        ServiceCollection services = new();
+        services.AddKeyedSingleton(firstPluginId, firstProvider);
+        services.AddKeyedSingleton(artworkPluginId, artworkProvider);
+        services.AddSingleton(_mockUnitOfWork);
+        services.AddSingleton(_mockDomainEventPublisher);
+        services.AddSingleton(mockBookArtworkService);
+        using ServiceProvider realServiceProvider = services.BuildServiceProvider();
+        AsyncServiceScope asyncServiceScope = realServiceProvider.CreateAsyncScope();
+        _mockServiceScopeFactory.CreateAsyncScope().Returns(asyncServiceScope);
+
+        IUserSettingsRepository mockUserSettingsRepository = Substitute.For<IUserSettingsRepository>();
+        mockUserSettingsRepository.GetByUserIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From<UserSettingsEntity?>(_userSettingsEntityFixture.Create(shouldAggregateMetadataWhenMissing: false)));
+        _mockUnitOfWork.UserSettingsRepository.Returns(mockUserSettingsRepository);
+
+        IArtworkProviderConfigurationRepository mockArtworkConfigurationRepository = Substitute.For<IArtworkProviderConfigurationRepository>();
+        mockArtworkConfigurationRepository.GetByLibraryIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<LibraryArtworkProviderConfigurationEntity>>([_artworkConfigurationEntityFixture.Create(_libraryId.Value, artworkPluginId, 1)]));
+        _mockUnitOfWork.ArtworkProviderConfigurationRepository.Returns(mockArtworkConfigurationRepository);
+
+        BookEntity book = _bookEntityFixture.Create(libraryId: _libraryId.Value, path: "/books/test.epub");
+        SetupSingleBookPage(book, firstPluginId);
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        await mockBookArtworkService.Received(1).SaveBookArtworkAsync(
+            _libraryId.Value,
+            book.Id,
+            Arg.Any<string>(),
+            Arg.Any<string>(),
+            "First Title",
+            Arg.Any<ArtworkDto>(),
+            Arg.Any<CancellationToken>());
+        await _mockBookRepository.Received(1).UpdateAsync(
+            Arg.Is<BookEntity>(entity => entity.CoverImagePath == "\\media\\books\\Library\\Author\\Title\\cover.jpeg"),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenTheLibraryForbidsWebDownloads_ShouldNotUseMetadataProvidersThatRequireWebAccess()
+    {
+        // Arrange
+        Guid localPluginId = Guid.NewGuid();
+        Guid webPluginId = Guid.NewGuid();
+        IMetadataProvider localProvider = Substitute.For<IMetadataProvider>();
+        localProvider.Name.Returns("Local Provider");
+        localProvider.SupportedLibraryTypes.Returns([LibraryType.Book]);
+        localProvider.RequiresWebAccess.Returns(false);
+        localProvider.GetMetadataAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>())
+            .Returns(_bookMetadataDtoFixture.Create(includeTitle: false));
+        IMetadataProvider webProvider = Substitute.For<IMetadataProvider>();
+        webProvider.Name.Returns("Web Provider");
+        webProvider.SupportedLibraryTypes.Returns([LibraryType.Book]);
+        webProvider.RequiresWebAccess.Returns(true);
+        webProvider.GetMetadataAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>())
+            .Returns(_bookMetadataDtoFixture.Create(title: "Web Title"));
+
+        SetupRealServiceProviderForProviders(localPluginId, localProvider, webPluginId, webProvider, shouldAggregateMetadataWhenMissing: false);
+        ILibraryRepository mockLibraryRepository = Substitute.For<ILibraryRepository>();
+        mockLibraryRepository.GetByIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(_libraryEntityFixture.Create(title: "My Library", canDownloadMetadataFromWeb: false)));
+        _mockUnitOfWork.LibraryRepository.Returns(mockLibraryRepository);
+
+        BookEntity book = _bookEntityFixture.Create(libraryId: _libraryId.Value, path: "/books/test.epub");
+        SetupSingleBookPage(book, localPluginId, webPluginId);
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        // the local provider is used, but the provider requiring access to the web is skipped, so the book cannot be enriched
+        await localProvider.Received(1).GetMetadataAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>());
+        await webProvider.DidNotReceive().GetMetadataAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>());
+        Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenTheLibraryPermitsWebDownloads_ShouldUseMetadataProvidersThatRequireWebAccess()
+    {
+        // Arrange
+        Guid localPluginId = Guid.NewGuid();
+        Guid webPluginId = Guid.NewGuid();
+        IMetadataProvider localProvider = Substitute.For<IMetadataProvider>();
+        localProvider.Name.Returns("Local Provider");
+        localProvider.SupportedLibraryTypes.Returns([LibraryType.Book]);
+        localProvider.RequiresWebAccess.Returns(false);
+        localProvider.GetMetadataAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>())
+            .Returns(_bookMetadataDtoFixture.Create(includeTitle: false));
+        IMetadataProvider webProvider = Substitute.For<IMetadataProvider>();
+        webProvider.Name.Returns("Web Provider");
+        webProvider.SupportedLibraryTypes.Returns([LibraryType.Book]);
+        webProvider.RequiresWebAccess.Returns(true);
+        webProvider.GetMetadataAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>())
+            .Returns(_bookMetadataDtoFixture.Create(title: "Web Title"));
+
+        SetupRealServiceProviderForProviders(localPluginId, localProvider, webPluginId, webProvider, shouldAggregateMetadataWhenMissing: false);
+        ILibraryRepository mockLibraryRepository = Substitute.For<ILibraryRepository>();
+        mockLibraryRepository.GetByIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(_libraryEntityFixture.Create(title: "My Library", canDownloadMetadataFromWeb: true)));
+        _mockUnitOfWork.LibraryRepository.Returns(mockLibraryRepository);
+
+        BookEntity book = _bookEntityFixture.Create(libraryId: _libraryId.Value, path: "/books/test.epub");
+        SetupSingleBookPage(book, localPluginId, webPluginId);
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        // the provider requiring access to the web is used when the library permits downloading data from the web
+        await webProvider.Received(1).GetMetadataAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>());
+        Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenTheLibraryForbidsWebDownloads_ShouldNotUseArtworkProvidersThatRequireWebAccess()
+    {
+        // Arrange
+        Guid localPluginId = Guid.NewGuid();
+        Guid artworkPluginId = Guid.NewGuid();
+        IMetadataProvider localProvider = Substitute.For<IMetadataProvider>();
+        localProvider.Name.Returns("Local Provider");
+        localProvider.SupportedLibraryTypes.Returns([LibraryType.Book]);
+        localProvider.RequiresWebAccess.Returns(false);
+        localProvider.GetMetadataAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>())
+            .Returns(_bookMetadataDtoFixture.Create(title: "Local Title"));
+
+        IArtworkProvider artworkProvider = Substitute.For<IArtworkProvider>();
+        artworkProvider.Name.Returns("Web Artwork Provider");
+        artworkProvider.SupportedLibraryTypes.Returns([LibraryType.Book]);
+        artworkProvider.RequiresWebAccess.Returns(true);
+        artworkProvider.GetArtworkAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>())
+            .Returns(_artworkDtoFixture.Create(localPath: "/some/cover.jpg"));
+
+        ServiceCollection services = new();
+        services.AddKeyedSingleton(localPluginId, localProvider);
+        services.AddKeyedSingleton(artworkPluginId, artworkProvider);
+        services.AddSingleton(_mockUnitOfWork);
+        services.AddSingleton(_mockDomainEventPublisher);
+        // the provider is intentionally not disposed here, so that the async service scope used by the job stays alive for the whole test
+        using ServiceProvider realServiceProvider = services.BuildServiceProvider();
+        AsyncServiceScope asyncServiceScope = realServiceProvider.CreateAsyncScope();
+        _mockServiceScopeFactory.CreateAsyncScope().Returns(asyncServiceScope);
+
+        IUserSettingsRepository mockUserSettingsRepository = Substitute.For<IUserSettingsRepository>();
+        mockUserSettingsRepository.GetByUserIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From<UserSettingsEntity?>(_userSettingsEntityFixture.Create(shouldAggregateMetadataWhenMissing: false)));
+        _mockUnitOfWork.UserSettingsRepository.Returns(mockUserSettingsRepository);
+
+        ILibraryRepository mockLibraryRepository = Substitute.For<ILibraryRepository>();
+        mockLibraryRepository.GetByIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(_libraryEntityFixture.Create(title: "My Library", canDownloadMetadataFromWeb: false)));
+        _mockUnitOfWork.LibraryRepository.Returns(mockLibraryRepository);
+
+        IArtworkProviderConfigurationRepository mockArtworkConfigurationRepository = Substitute.For<IArtworkProviderConfigurationRepository>();
+        mockArtworkConfigurationRepository.GetByLibraryIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<LibraryArtworkProviderConfigurationEntity>>([_artworkConfigurationEntityFixture.Create(_libraryId.Value, artworkPluginId, 1)]));
+        _mockUnitOfWork.ArtworkProviderConfigurationRepository.Returns(mockArtworkConfigurationRepository);
+
+        BookEntity book = _bookEntityFixture.Create(libraryId: _libraryId.Value, path: "/books/test.epub");
+        SetupSingleBookPage(book, localPluginId);
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        // the artwork provider requiring access to the web is skipped when the library does not permit downloading data from the web
+        await artworkProvider.DidNotReceive().GetArtworkAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>());
+        Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
+    }
+
+    /// <summary>
+    /// Wires a real service provider with the given metadata providers, so that the job resolves them from the dependency injection container.
+    /// </summary>
+    /// <param name="firstPluginId">The Id of the plugin providing the first metadata provider.</param>
+    /// <param name="firstProvider">The first metadata provider to resolve.</param>
+    /// <param name="secondPluginId">The Id of the plugin providing the second metadata provider, if any.</param>
+    /// <param name="secondProvider">The second metadata provider to resolve, if any.</param>
+    /// <param name="shouldAggregateMetadataWhenMissing">Whether the user settings enable aggregating metadata from multiple providers when fields are missing.</param>
+    private void SetupRealServiceProviderForProviders(Guid firstPluginId, IMetadataProvider firstProvider, Guid? secondPluginId = null, IMetadataProvider? secondProvider = null, bool shouldAggregateMetadataWhenMissing = false)
+    {
+        ServiceCollection services = new();
+        services.AddKeyedSingleton(firstPluginId, firstProvider);
+        if (secondPluginId is not null && secondProvider is not null)
+            services.AddKeyedSingleton(secondPluginId.Value, secondProvider);
+        services.AddSingleton(_mockUnitOfWork);
+        services.AddSingleton(_mockDomainEventPublisher);
+        // the provider is intentionally not disposed here, so that the async service scope used by the job stays alive for the whole test
+        ServiceProvider realServiceProvider = services.BuildServiceProvider();
+        AsyncServiceScope asyncServiceScope = realServiceProvider.CreateAsyncScope();
+        _mockServiceScopeFactory.CreateAsyncScope().Returns(asyncServiceScope);
+
+        IUserSettingsRepository mockUserSettingsRepository = Substitute.For<IUserSettingsRepository>();
+        mockUserSettingsRepository.GetByUserIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From<UserSettingsEntity?>(_userSettingsEntityFixture.Create(shouldAggregateMetadataWhenMissing: shouldAggregateMetadataWhenMissing)));
+        _mockUnitOfWork.UserSettingsRepository.Returns(mockUserSettingsRepository);
+    }
+
+    /// <summary>
+    /// Stubs the repositories so that the job processes a single page containing the given book, configured with the given metadata providers.
+    /// </summary>
+    /// <param name="book">The book the job must enrich.</param>
+    /// <param name="configuredPluginIds">The Ids of the plugins configured as metadata providers for the library.</param>
+    private void SetupSingleBookPage(BookEntity book, params Guid[] configuredPluginIds)
+    {
+        _mockConfigurationRepository.GetByLibraryIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>(
+                configuredPluginIds.Select((pluginId, index) => _configurationEntityFixture.Create(_libraryId.Value, pluginId, index + 1)).ToList()));
+        _mockBookRepository.GetBooksNeedingMetadataCountAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From(1));
+        _mockBookRepository.GetBooksNeedingMetadataAsync(_libraryId.Value, Arg.Any<string?>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<BookEntity>>([book]), Result.From<IReadOnlyList<BookEntity>>([]));
+        _mockBookRepository.UpdateAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Updated);
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
     }
 }

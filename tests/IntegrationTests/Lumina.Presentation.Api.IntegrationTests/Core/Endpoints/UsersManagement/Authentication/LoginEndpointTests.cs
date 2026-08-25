@@ -1,6 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.Infrastructure.Security;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.DataAccess.Core.UoW;
@@ -33,6 +35,8 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
     private HttpClient _client;
     private readonly AuthenticatedLuminaApiFactory _apiFactory;
     private readonly PasswordHashService _hashService = new();
+    private readonly UserEntityFixture _userEntityFixture = new();
+    private readonly LoginRequestFixture _loginRequestFixture = new();
     private readonly ICryptographyService _cryptographyService;
     private readonly TotpTokenGenerator _totpTokenGenerator = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
@@ -70,9 +74,9 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
     {
         // Arrange
         UserEntity user = await CreateTestUser();
-        LoginRequest request = new(
-            Username: user.Username,
-            Password: "TestPass123!"
+        LoginRequest request = _loginRequestFixture.Create(
+            username: user.Username,
+            password: "TestPass123!"
         );
 
         // Act
@@ -101,10 +105,10 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
         Totp totp = new(totpSecret);
         string validTotpCode = totp.ComputeTotp(DateTime.UtcNow);
 
-        LoginRequest request = new(
-            Username: user.Username,
-            Password: "TestPass123!",
-            TotpCode: validTotpCode
+        LoginRequest request = _loginRequestFixture.Create(
+            username: user.Username,
+            password: "TestPass123!",
+            totpCode: validTotpCode
         );
 
         // Act
@@ -129,9 +133,9 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
     {
         // Arrange
         UserEntity user = await CreateTestUserWithTempPassword();
-        LoginRequest request = new(
-            Username: user.Username,
-            Password: "TempPass123!"
+        LoginRequest request = _loginRequestFixture.Create(
+            username: user.Username,
+            password: "TempPass123!"
         );
 
         // Act
@@ -155,9 +159,9 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
     {
         // Arrange
         UserEntity user = await CreateTestUserWithExpiredTempPassword();
-        LoginRequest request = new(
-            Username: user.Username,
-            Password: "TempPass123!"
+        LoginRequest request = _loginRequestFixture.Create(
+            username: user.Username,
+            password: "TempPass123!"
         );
 
         // Act
@@ -183,9 +187,9 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
     {
         // Arrange
         UserEntity user = await CreateTestUser();
-        LoginRequest request = new(
-            Username: user.Username,
-            Password: "WrongPass123!"
+        LoginRequest request = _loginRequestFixture.Create(
+            username: user.Username,
+            password: "WrongPass123!"
         );
 
         // Act
@@ -211,10 +215,10 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
     {
         // Arrange
         UserEntity user = await CreateTestUserWithTotp();
-        LoginRequest request = new(
-            Username: user.Username,
-            Password: "TestPass123!",
-            TotpCode: "000000"
+        LoginRequest request = _loginRequestFixture.Create(
+            username: user.Username,
+            password: "TestPass123!",
+            totpCode: "000000"
         );
 
         // Act
@@ -240,94 +244,73 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
         Assert.Contains("InvalidTotpCode", errors["General.Validation"]);
     }
    
+    /// <summary>
+    /// Creates a test user without a TOTP secret in the database and returns it.
+    /// </summary>
+    /// <returns>The created user entity.</returns>
     private async Task<UserEntity> CreateTestUser()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
 
-        UserEntity user = new()
-        {
-            Id = Guid.NewGuid(),
-            Username = _testUsername,
-            Password = _hashService.HashString("TestPass123!"),
-            Libraries = [],
-            UserPermissions = [],
-            UserRole = null,
-            CreatedBy = Guid.NewGuid(),
-            CreatedOnUtc = DateTime.UtcNow
-        };
+        UserEntity user = _userEntityFixture.Create(username: _testUsername, password: _hashService.HashString("TestPass123!"));
+        user.TotpSecret = null;
 
         dbContext.Users.Add(user);
         await dbContext.SaveChangesAsync();
         return user;
     }
 
+    /// <summary>
+    /// Creates a test user with a TOTP secret in the database and returns it.
+    /// </summary>
+    /// <returns>The created user entity.</returns>
     private async Task<UserEntity> CreateTestUserWithTotp()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
 
         byte[] totpSecret = _totpTokenGenerator.GenerateSecret();
-        UserEntity user = new()
-        {
-            Id = Guid.NewGuid(),
-            Username = _testUsername,
-            Password = _hashService.HashString("TestPass123!"),
-            TotpSecret = _cryptographyService.Encrypt(Convert.ToBase64String(totpSecret)),
-            Libraries = [],
-            UserPermissions = [],
-            UserRole = null,
-            CreatedBy = Guid.NewGuid(),
-            CreatedOnUtc = DateTime.UtcNow
-        };
+        UserEntity user = _userEntityFixture.Create(username: _testUsername, password: _hashService.HashString("TestPass123!"));
+        user.TotpSecret = _cryptographyService.Encrypt(Convert.ToBase64String(totpSecret));
 
         dbContext.Users.Add(user);
         await dbContext.SaveChangesAsync();
         return user;
     }
 
+    /// <summary>
+    /// Creates a test user with a temporary password in the database and returns it.
+    /// </summary>
+    /// <returns>The created user entity.</returns>
     private async Task<UserEntity> CreateTestUserWithTempPassword()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
 
-        UserEntity user = new()
-        {
-            Id = Guid.NewGuid(),
-            Username = _testUsername,
-            Password = _hashService.HashString("TestPass123!"),
-            TempPassword = Uri.EscapeDataString(_hashService.HashString("TempPass123!")),
-            TempPasswordCreated = DateTime.UtcNow,
-            Libraries = [],
-            UserPermissions = [],
-            UserRole = null,
-            CreatedBy = Guid.NewGuid(),
-            CreatedOnUtc = DateTime.UtcNow
-        };
+        UserEntity user = _userEntityFixture.Create(username: _testUsername, password: _hashService.HashString("TestPass123!"));
+        user.TotpSecret = null;
+        user.TempPassword = Uri.EscapeDataString(_hashService.HashString("TempPass123!"));
+        user.TempPasswordCreated = DateTime.UtcNow;
 
         dbContext.Users.Add(user);
         await dbContext.SaveChangesAsync();
         return user;
     }
 
+    /// <summary>
+    /// Creates a test user with an expired temporary password in the database and returns it.
+    /// </summary>
+    /// <returns>The created user entity.</returns>
     private async Task<UserEntity> CreateTestUserWithExpiredTempPassword()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
 
-        UserEntity user = new()
-        {
-            Id = Guid.NewGuid(),
-            Username = _testUsername,
-            Password = _hashService.HashString("TestPass123!"),
-            TempPassword = Uri.EscapeDataString(_hashService.HashString("TempPass123!")),
-            TempPasswordCreated = DateTime.UtcNow.AddMinutes(-16), // expired (> 15 minutes old)
-            Libraries = [],
-            UserPermissions = [],
-            UserRole = null,
-            CreatedBy = Guid.NewGuid(),
-            CreatedOnUtc = DateTime.UtcNow
-        };
+        UserEntity user = _userEntityFixture.Create(username: _testUsername, password: _hashService.HashString("TestPass123!"));
+        user.TotpSecret = null;
+        user.TempPassword = Uri.EscapeDataString(_hashService.HashString("TempPass123!"));
+        user.TempPasswordCreated = DateTime.UtcNow.AddMinutes(-16); // expired (> 15 minutes old)
 
         dbContext.Users.Add(user);
         await dbContext.SaveChangesAsync();

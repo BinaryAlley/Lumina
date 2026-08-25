@@ -36,7 +36,7 @@ namespace Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 /// <param name="Isbns">The list of ISBN (International Standard Book Number) of the book.</param>
 /// <param name="Contributors">The list of media contributors of the book.</param>
 /// <param name="Ratings">The list of ratings for the book.</param>
-/// <param name="CoverImageUrl">The URL of the cover image of the book, if applicable.</param>
+/// <param name="CoverImagePath">The path of the cover image of the book, if applicable.</param>
 public sealed record BookMetadataDto(
     string? Title,
     string? OriginalTitle,
@@ -50,7 +50,7 @@ public sealed record BookMetadataDto(
     int? PageCount,
     BookFormat? Format,
     string? Edition,
-    int? VolumeNumber,
+    float? VolumeNumber,
     BookSeriesDto? Series,
     string? ASIN,
     string? GoodreadsId,
@@ -64,5 +64,5 @@ public sealed record BookMetadataDto(
     List<IsbnDto>? Isbns,
     List<MediaContributorDto>? Contributors,
     List<BookRatingDto>? Ratings,
-    string? CoverImageUrl
+    string? CoverImagePath
 ) : MetadataDto;

@@ -38,6 +38,7 @@ namespace Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibr
 /// <param name="MetadataProvider">The name of the plugin that enriched the metadata of the book, if applicable.</param>
 /// <param name="CreatedOnUtc">The date and time when the book was created.</param>
 /// <param name="UpdatedOnUtc">The optional date and time when the book was updated.</param>
+/// <param name="CoverPath">The path of the cover image of the book, if available.</param>
 [DebuggerDisplay("Title: {Metadata.Title}")]
 public record BookResponse(
     Guid Id,
@@ -46,7 +47,7 @@ public record BookResponse(
     WrittenContentMetadataDto Metadata,
     BookFormat? Format,
     string? Edition,
-    int? VolumeNumber,
+    float? VolumeNumber,
     BookSeriesDto? Series,
     string? ASIN,
     string? GoodreadsId,
@@ -64,5 +65,6 @@ public record BookResponse(
     DateTime? LastMetadataUpdateUtc,
     string? MetadataProvider,
     DateTime CreatedOnUtc,
-    DateTime? UpdatedOnUtc
+    DateTime? UpdatedOnUtc,
+    string? CoverPath
 );

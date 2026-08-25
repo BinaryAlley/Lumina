@@ -4,6 +4,7 @@ using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.Book
 using Lumina.Plugins.OpenLibrary.Common.Models.Contracts.Responses;
 using Lumina.Plugins.OpenLibrary.Common.Models.DTO.Settings;
 using Lumina.Plugins.OpenLibrary.Core.Api;
+using Lumina.Plugins.OpenLibrary.Core.Settings;
 using Lumina.Plugins.OpenLibrary.Fixtures.Common.Models.DTO.Settings;
 using Lumina.Plugins.OpenLibrary.Fixtures.Common.Setup;
 using System;
@@ -35,7 +36,7 @@ public class OpenLibraryHttpClientTests
         HttpClient httpClient = new(new StubOpenLibraryHttpMessageHandler());
 
         // Act
-        _ = new OpenLibraryHttpClient(httpClient, _settingsFixture.Create());
+        _ = new OpenLibraryHttpClient(httpClient, new OpenLibrarySettingsProvider(null, Guid.NewGuid(), _settingsFixture.Create()));
 
         // Assert
         Assert.Equal(new Uri("https://openlibrary.org/"), httpClient.BaseAddress);
@@ -52,61 +53,72 @@ public class OpenLibraryHttpClientTests
         };
 
         // Act
-        _ = new OpenLibraryHttpClient(httpClient, _settingsFixture.Create());
+        _ = new OpenLibraryHttpClient(httpClient, new OpenLibrarySettingsProvider(null, Guid.NewGuid(), _settingsFixture.Create()));
 
         // Assert
         Assert.Equal(existingBaseAddress, httpClient.BaseAddress);
     }
 
     [Fact]
-    public void Constructor_WhenHttpClientHasNoUserAgent_ShouldAddTheConfiguredUserAgent()
+    public async Task GetEditionAsync_WhenHttpClientHasNoUserAgent_ShouldAddTheConfiguredUserAgent()
     {
         // Arrange
-        HttpClient httpClient = new(new StubOpenLibraryHttpMessageHandler());
-        OpenLibrarySettingsDto settings = _settingsFixture.Create(userAgent: "CustomAgent/2.0");
+        StubOpenLibraryHttpMessageHandler handler = new();
+        handler.MapPath("/books/OL1M.json", """{"key":"/books/OL1M","title":"Edition Title"}""");
+        HttpClient httpClient = new(handler);
+        OpenLibraryHttpClient sut = new(httpClient, new OpenLibrarySettingsProvider(null, Guid.NewGuid(), _settingsFixture.Create(userAgent: "CustomAgent/2.0")));
 
         // Act
-        _ = new OpenLibraryHttpClient(httpClient, settings);
+        await sut.GetEditionAsync("OL1M", CancellationToken.None);
 
         // Assert
         Assert.Equal("CustomAgent/2.0", httpClient.DefaultRequestHeaders.UserAgent.ToString());
     }
 
     [Fact]
-    public void Constructor_WhenHttpClientAlreadyHasUserAgent_ShouldKeepTheExistingUserAgent()
+    public async Task GetEditionAsync_WhenHttpClientAlreadyHasUserAgent_ShouldKeepTheExistingUserAgent()
     {
         // Arrange
-        HttpClient httpClient = new(new StubOpenLibraryHttpMessageHandler());
+        StubOpenLibraryHttpMessageHandler handler = new();
+        handler.MapPath("/books/OL1M.json", """{"key":"/books/OL1M","title":"Edition Title"}""");
+        HttpClient httpClient = new(handler);
         httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("ExistingAgent/1.0");
+        OpenLibraryHttpClient sut = new(httpClient, new OpenLibrarySettingsProvider(null, Guid.NewGuid(), _settingsFixture.Create(userAgent: "ConfiguredAgent/2.0")));
 
         // Act
-        _ = new OpenLibraryHttpClient(httpClient, _settingsFixture.Create(userAgent: "ConfiguredAgent/2.0"));
+        await sut.GetEditionAsync("OL1M", CancellationToken.None);
 
         // Assert
         Assert.Equal("ExistingAgent/1.0", httpClient.DefaultRequestHeaders.UserAgent.ToString());
     }
 
     [Fact]
-    public void Constructor_WhenContactEmailIsConfigured_ShouldSetTheFromHeader()
+    public async Task GetEditionAsync_WhenContactEmailIsConfigured_ShouldSetTheFromHeader()
     {
         // Arrange
-        HttpClient httpClient = new(new StubOpenLibraryHttpMessageHandler());
+        StubOpenLibraryHttpMessageHandler handler = new();
+        handler.MapPath("/books/OL1M.json", """{"key":"/books/OL1M","title":"Edition Title"}""");
+        HttpClient httpClient = new(handler);
+        OpenLibraryHttpClient sut = new(httpClient, new OpenLibrarySettingsProvider(null, Guid.NewGuid(), _settingsFixture.Create(contactEmail: "contact@example.com")));
 
         // Act
-        _ = new OpenLibraryHttpClient(httpClient, _settingsFixture.Create(contactEmail: "contact@example.com"));
+        await sut.GetEditionAsync("OL1M", CancellationToken.None);
 
         // Assert
         Assert.Equal("contact@example.com", httpClient.DefaultRequestHeaders.From);
     }
 
     [Fact]
-    public void Constructor_WhenContactEmailIsNotConfigured_ShouldNotSetTheFromHeader()
+    public async Task GetEditionAsync_WhenContactEmailIsNotConfigured_ShouldNotSetTheFromHeader()
     {
         // Arrange
-        HttpClient httpClient = new(new StubOpenLibraryHttpMessageHandler());
+        StubOpenLibraryHttpMessageHandler handler = new();
+        handler.MapPath("/books/OL1M.json", """{"key":"/books/OL1M","title":"Edition Title"}""");
+        HttpClient httpClient = new(handler);
+        OpenLibraryHttpClient sut = new(httpClient, new OpenLibrarySettingsProvider(null, Guid.NewGuid(), _settingsFixture.Create(contactEmail: null)));
 
         // Act
-        _ = new OpenLibraryHttpClient(httpClient, _settingsFixture.Create(contactEmail: null));
+        await sut.GetEditionAsync("OL1M", CancellationToken.None);
 
         // Assert
         Assert.Null(httpClient.DefaultRequestHeaders.From);
@@ -541,9 +553,16 @@ public class OpenLibraryHttpClientTests
         await Assert.ThrowsAnyAsync<OperationCanceledException>(Act);
     }
 
+    /// <summary>
+    /// Creates the Open Library HTTP client under test backed by the given handler and settings.
+    /// </summary>
+    /// <param name="handler">The stub HTTP message handler used to serve responses.</param>
+    /// <param name="settings">Optional. The Open Library settings used by the client. When omitted, randomized settings are used.</param>
+    /// <returns>The created <see cref="OpenLibraryHttpClient"/>.</returns>
     private OpenLibraryHttpClient CreateSut(StubOpenLibraryHttpMessageHandler handler, OpenLibrarySettingsDto? settings = null)
     {
         HttpClient httpClient = new(handler);
-        return new OpenLibraryHttpClient(httpClient, settings ?? _settingsFixture.Create(minimumRequestInterval: TimeSpan.Zero));
+        OpenLibrarySettingsProvider settingsProvider = new(null, Guid.NewGuid(), settings ?? _settingsFixture.Create(minimumRequestInterval: TimeSpan.Zero));
+        return new OpenLibraryHttpClient(httpClient, settingsProvider);
     }
 }

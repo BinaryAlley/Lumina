@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Contracts.Responses.UsersManagement.Settings;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserSettingsAggregate;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserSettingsAggregate.ValueObjects;
@@ -28,8 +28,10 @@ public static class UserSettingsEntityMapping
             UserId.Create(repositoryEntity.UserId),
             repositoryEntity.IsPaginationEnabled,
             repositoryEntity.ItemsPerPage,
-            repositoryEntity.IgnoreThePrefixForAlphaPicker,
-            repositoryEntity.IsThemeCachingEnabled);
+            repositoryEntity.ShouldIgnoreThePrefixForAlphaPicker,
+            repositoryEntity.IsThemeCachingEnabled,
+            repositoryEntity.ShouldAggregateMetadataWhenMissing
+        );
     }
 
     /// <summary>
@@ -43,7 +45,9 @@ public static class UserSettingsEntityMapping
             repositoryEntity.UserId,
             repositoryEntity.IsPaginationEnabled,
             repositoryEntity.ItemsPerPage,
-            repositoryEntity.IgnoreThePrefixForAlphaPicker,
-            repositoryEntity.IsThemeCachingEnabled);
+            repositoryEntity.ShouldIgnoreThePrefixForAlphaPicker,
+            repositoryEntity.IsThemeCachingEnabled,
+            repositoryEntity.ShouldAggregateMetadataWhenMissing
+        );
     }
 }

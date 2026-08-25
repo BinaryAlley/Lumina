@@ -5,19 +5,19 @@ using Lumina.Presentation.Web.Common.DTO.Libraries;
 using Lumina.Presentation.Web.Common.DTO.Themes;
 using Lumina.Presentation.Web.Common.Http;
 using Lumina.Presentation.Web.Common.Primitives;
-using Lumina.Presentation.Web.Common.Requests.Library.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Common.Services;
 using Lumina.Presentation.Web.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.Index;
 using Lumina.Presentation.Web.Core.Themes;
 using Lumina.Presentation.Web.Fixtures.Common.DTO.Libraries;
+using Lumina.Presentation.Web.Fixtures.Common.DTO.Themes;
+using Lumina.Presentation.Web.Fixtures.Common.Requests.Library.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Localization;
 using NSubstitute;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
@@ -38,6 +38,8 @@ public class BooksIndexViewEndpointTests
     private readonly IStringLocalizer _mockStringLocalizer;
     private readonly BooksIndexViewEndpoint _sut;
     private readonly LibraryDtoFixture _libraryDtoFixture = new();
+    private readonly GetBooksViewRequestFixture _getBooksViewRequestFixture = new();
+    private readonly ThemePageRenderResultDtoFixture _themePageRenderResultDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BooksIndexViewEndpointTests"/> class.
@@ -63,7 +65,7 @@ public class BooksIndexViewEndpointTests
         _mockUrlService.GetAbsoluteUrl(WebRoutes.Home.INDEX_CULTURED).Returns("http://localhost/en-us");
 
         // Act
-        IResult result = await _sut.ExecuteAsync(new GetBooksViewRequest(null), CancellationToken.None);
+        IResult result = await _sut.ExecuteAsync(_getBooksViewRequestFixture.Create(libraryId: null), CancellationToken.None);
 
         // Assert
         RedirectHttpResult redirectResult = Assert.IsType<RedirectHttpResult>(result);
@@ -82,10 +84,10 @@ public class BooksIndexViewEndpointTests
         _mockUrlService.GetAbsoluteUrl(WebRoutes.Books.GET_LIBRARY_ITEMS).Returns("http://localhost/en-us/library/written-content-library/books-library/books/api-get-library-items");
         _mockUrlService.GetAbsoluteUrl(WebRoutes.Settings.GET_USER_SETTINGS).Returns("http://localhost/en-us/tools/settings/api-get-user-settings");
         _mockThemePageRenderer.RenderAsync(Arg.Any<ThemePageDto>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
-            .Returns(Result.From(new ThemePageRenderResultDto("<section>content</section>", "<script>script</script>")));
+            .Returns(Result.From(_themePageRenderResultDtoFixture.Create(content: "<section>content</section>", script: "<script>script</script>")));
 
         // Act
-        IResult result = await _sut.ExecuteAsync(new GetBooksViewRequest(expectedLibrary.Id), CancellationToken.None);
+        IResult result = await _sut.ExecuteAsync(_getBooksViewRequestFixture.Create(libraryId: expectedLibrary.Id), CancellationToken.None);
 
         // Assert
         Assert.IsType<RazorViewResult>(result);
@@ -115,7 +117,7 @@ public class BooksIndexViewEndpointTests
             .Returns(Result<ThemePageRenderResultDto>.Failure(Error.Failure("Theme.Render", "The page could not be rendered.")));
 
         // Act
-        IResult result = await _sut.ExecuteAsync(new GetBooksViewRequest(expectedLibrary.Id), CancellationToken.None);
+        IResult result = await _sut.ExecuteAsync(_getBooksViewRequestFixture.Create(libraryId: expectedLibrary.Id), CancellationToken.None);
 
         // Assert
         Assert.IsType<RazorViewResult>(result);

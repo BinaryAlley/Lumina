@@ -2,6 +2,7 @@
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.UsersManagement.Authentication.Commands.RegisterUser;
 using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
+using Lumina.Contracts.Fixtures.Core.Responses.Authentication;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.Domain.Common.Primitives;
@@ -26,6 +27,7 @@ public class RegisterEndpointTests
     private readonly ICommandHandler<RegisterUserCommand, Result<RegistrationResponse>> _mockHandler;
     private readonly RegisterEndpoint _sut;
     private readonly RegistrationRequestFixture _registrationRequestFixture = new();
+    private readonly RegistrationResponseFixture _registrationResponseFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RegisterEndpointTests"/> class.
@@ -42,7 +44,7 @@ public class RegisterEndpointTests
         // Arrange
         RegistrationRequest request = _registrationRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
-        RegistrationResponse expectedResponse = new(Guid.NewGuid(), "testUser", "TOTP123");
+        RegistrationResponse expectedResponse = _registrationResponseFixture.Create(username: "testUser", totpSecret: "TOTP123");
         _mockHandler.HandleAsync(Arg.Any<RegisterUserCommand>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(expectedResponse));
 
@@ -87,7 +89,7 @@ public class RegisterEndpointTests
         RegistrationRequest request = _registrationRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<RegisterUserCommand>(), Arg.Any<CancellationToken>())
-            .Returns(Result.From(new RegistrationResponse(Guid.NewGuid(), "testUser", "TOTP123")));
+            .Returns(Result.From(_registrationResponseFixture.Create(username: "testUser", totpSecret: "TOTP123")));
 
         // Act
         await _sut.ExecuteAsync(request, cancellationToken);
@@ -117,7 +119,7 @@ public class RegisterEndpointTests
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return Result.From(new RegistrationResponse(Guid.NewGuid(), "testUser", "TOTP123"));
+                return Result.From(_registrationResponseFixture.Create(username: "testUser", totpSecret: "TOTP123"));
             }, callInfo.Arg<CancellationToken>()));
 
         // Act

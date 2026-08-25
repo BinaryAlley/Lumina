@@ -35,7 +35,7 @@ public class LibraryFixture
     /// <param name="includeCoverImage">Whether to include a cover image or not.</param>
     /// <param name="isEnabled">Whether the library is enabled.</param>
     /// <param name="isLocked">Whether the library is locked.</param>
-    /// <param name="downloadMetadataFromWeb">Whether metadata download from the web is enabled.</param>
+    /// <param name="canDownloadMetadataFromWeb">Whether metadata download from the web is enabled.</param>
     /// <param name="shouldSaveMetadataInMediaDirectories">Whether metadata should be saved in the media directories.</param>
     /// <param name="shouldSkipUnchangedDirectoriesDuringScan">Whether unchanged directories should be skipped during scan.</param>
     /// <param name="scanIds">Optional. The scan Ids associated with the library.</param>
@@ -50,7 +50,7 @@ public class LibraryFixture
         bool includeCoverImage = true,
         bool isEnabled = true,
         bool isLocked = false,
-        bool downloadMetadataFromWeb = true,
+        bool canDownloadMetadataFromWeb = true,
         bool shouldSaveMetadataInMediaDirectories = false,
         bool shouldSkipUnchangedDirectoriesDuringScan = false,
         IEnumerable<Guid>? scanIds = null)
@@ -75,7 +75,7 @@ public class LibraryFixture
                 resolvedCoverImage,
                 isEnabled,
                 isLocked,
-                downloadMetadataFromWeb,
+                canDownloadMetadataFromWeb,
                 shouldSaveMetadataInMediaDirectories,
                 shouldSkipUnchangedDirectoriesDuringScan,
                 resolvedScanIds
@@ -89,7 +89,7 @@ public class LibraryFixture
                 resolvedCoverImage,
                 isEnabled,
                 isLocked,
-                downloadMetadataFromWeb,
+                canDownloadMetadataFromWeb,
                 shouldSaveMetadataInMediaDirectories,
                 shouldSkipUnchangedDirectoriesDuringScan,
                 resolvedScanIds

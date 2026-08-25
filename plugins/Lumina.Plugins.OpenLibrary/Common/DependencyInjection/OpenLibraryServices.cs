@@ -8,8 +8,6 @@ using Lumina.Plugins.OpenLibrary.Core.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
-using System.Collections.Generic;
-using System.Threading;
 #endregion
 
 namespace Lumina.Plugins.OpenLibrary.Common.DependencyInjection;
@@ -30,27 +28,20 @@ internal static class OpenLibraryServices
     {
         ArgumentNullException.ThrowIfNull(services);
 
-        // Build the runtime settings per scope, overlaying the settings persisted by the host over the defaults and the optional callback.
+        // Build the runtime settings provider per scope, overlaying the settings persisted by the host over the defaults and the optional callback.
         services.TryAddScoped(serviceProvider =>
         {
-            OpenLibrarySettingsDto openLibrarySettings = new();
-            settingsCallback?.Invoke(openLibrarySettings);
+            OpenLibrarySettingsDto defaults = new();
+            settingsCallback?.Invoke(defaults);
 
             IPluginSettingsStore? settingsStore = serviceProvider.GetService<IPluginSettingsStore>();
-            if (settingsStore is not null)
-            {
-                IReadOnlyDictionary<string, string>? storedSettings = settingsStore.GetSettingsAsync(pluginId, CancellationToken.None).GetAwaiter().GetResult();
-                if (storedSettings is not null)
-                    OpenLibrarySettingsLoader.Apply(openLibrarySettings, storedSettings);
-            }
-
-            return openLibrarySettings;
+            return new OpenLibrarySettingsProvider(settingsStore, pluginId, defaults);
         });
 
         services.AddHttpClient<OpenLibraryHttpClient>();
 
-        // Register the metadata provider as a keyed by pluginId transient service, so it can be resolved specifically among other IRemoteMetadataProvider implementations.
-        services.AddKeyedTransient<IRemoteMetadataProvider, OpenLibraryBookMetadataProvider>(pluginId);
+        // Register the metadata provider as a keyed by pluginId transient service, so it can be resolved specifically among other IMetadataProvider implementations.
+        services.AddKeyedTransient<IMetadataProvider, OpenLibraryBookMetadataProvider>(pluginId);
 
         return services;
     }

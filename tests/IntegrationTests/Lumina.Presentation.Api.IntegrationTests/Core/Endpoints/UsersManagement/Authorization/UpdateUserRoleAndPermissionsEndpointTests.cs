@@ -1,6 +1,9 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Contracts.Fixtures.Core.Requests.Authorization;
 using Lumina.Contracts.Requests.Authorization;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
@@ -31,6 +34,9 @@ public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<Authentic
 {
     private HttpClient _client;
     private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly RoleEntityFixture _roleEntityFixture = new();
+    private readonly UserEntityFixture _userEntityFixture = new();
+    private readonly UpdateUserRoleAndPermissionsRequestFixture _updateUserRoleAndPermissionsRequestFixture = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -63,37 +69,22 @@ public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<Authentic
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
 
         // create a non-admin role first
-        RoleEntity editorRole = new()
-        {
-            Id = Guid.NewGuid(),
-            RoleName = "Editor",
-            CreatedBy = Guid.NewGuid(),
-            CreatedOnUtc = DateTime.UtcNow
-        };
+        RoleEntity editorRole = _roleEntityFixture.Create(roleName: "Editor");
         dbContext.Roles.Add(editorRole);
         await dbContext.SaveChangesAsync();
 
         // create test user
-        UserEntity user = new()
-        {
-            Id = Guid.NewGuid(),
-            Username = "TestUser",
-            Password = "HashedPassword",
-            UserRole = null,
-            UserPermissions = [],
-            Libraries = [],
-            CreatedBy = Guid.NewGuid(),
-            CreatedOnUtc = DateTime.UtcNow
-        };
+        UserEntity user = _userEntityFixture.Create(username: "TestUser", password: "HashedPassword");
+        user.TotpSecret = null;
         dbContext.Users.Add(user);
         await dbContext.SaveChangesAsync();
 
         PermissionEntity[] permissions = [.. dbContext.Permissions.Take(2)];
 
-        UpdateUserRoleAndPermissionsRequest request = new(
-            UserId: user.Id,
-            RoleId: editorRole.Id,
-            Permissions: permissions.Select(p => p.Id).ToList()
+        UpdateUserRoleAndPermissionsRequest request = _updateUserRoleAndPermissionsRequestFixture.Create(
+            userId: user.Id,
+            roleId: editorRole.Id,
+            permissions: permissions.Select(p => p.Id).ToList()
         );
 
         // Act
@@ -118,10 +109,10 @@ public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<Authentic
     {
         // Arrange
         _client = await _apiFactory.CreateAuthenticatedClientAsync();
-        UpdateUserRoleAndPermissionsRequest request = new(
-            UserId: Guid.NewGuid(),
-            RoleId: Guid.NewGuid(),
-            Permissions: [Guid.NewGuid()]
+        UpdateUserRoleAndPermissionsRequest request = _updateUserRoleAndPermissionsRequestFixture.Create(
+            userId: Guid.NewGuid(),
+            roleId: Guid.NewGuid(),
+            permissions: [Guid.NewGuid()]
         );
 
         // Act
@@ -150,23 +141,17 @@ public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<Authentic
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
 
         // create Editor role
-        RoleEntity editorRole = new()
-        {
-            Id = Guid.NewGuid(),
-            RoleName = "Editor",
-            CreatedBy = Guid.NewGuid(),
-            CreatedOnUtc = DateTime.UtcNow
-        };
+        RoleEntity editorRole = _roleEntityFixture.Create(roleName: "Editor");
         dbContext.Roles.Add(editorRole);
         await dbContext.SaveChangesAsync();
 
         // get the admin user that was created by CreateAuthenticatedAdminClientAsync
         UserEntity? adminUser = dbContext.Users.FirstOrDefault(u => u.UserRole!.Role.RoleName == "Admin");
         Assert.NotNull(adminUser);
-        UpdateUserRoleAndPermissionsRequest request = new(
-            UserId: adminUser!.Id,
-            RoleId: editorRole.Id,
-            Permissions: []
+        UpdateUserRoleAndPermissionsRequest request = _updateUserRoleAndPermissionsRequestFixture.Create(
+            userId: adminUser!.Id,
+            roleId: editorRole.Id,
+            permissions: []
         );
 
         // Act
@@ -192,10 +177,10 @@ public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<Authentic
     {
         // Arrange
         Guid nonExistentUserId = Guid.NewGuid();
-        UpdateUserRoleAndPermissionsRequest request = new(
-            UserId: nonExistentUserId,
-            RoleId: Guid.NewGuid(),
-            Permissions: [Guid.NewGuid()]
+        UpdateUserRoleAndPermissionsRequest request = _updateUserRoleAndPermissionsRequestFixture.Create(
+            userId: nonExistentUserId,
+            roleId: Guid.NewGuid(),
+            permissions: [Guid.NewGuid()]
         );
 
         // Act
@@ -221,10 +206,10 @@ public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<Authentic
     {
         // Arrange
         using CancellationTokenSource cts = new();
-        UpdateUserRoleAndPermissionsRequest request = new(
-            UserId: Guid.NewGuid(),
-            RoleId: Guid.NewGuid(),
-            Permissions: [Guid.NewGuid()]
+        UpdateUserRoleAndPermissionsRequest request = _updateUserRoleAndPermissionsRequestFixture.Create(
+            userId: Guid.NewGuid(),
+            roleId: Guid.NewGuid(),
+            permissions: [Guid.NewGuid()]
         );
 
         // Act & Assert

@@ -2,13 +2,10 @@
 using Lumina.Presentation.Web.Core.Endpoints.Library.Management.DeleteLibrary;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.SecurityTests.Common.Setup;
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
-using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.Management.DeleteLibrary;
@@ -67,6 +64,11 @@ public class DeleteLibraryEndpointTests : IClassFixture<LuminaWebFactory>
         Assert.DoesNotContain(_apiFactory.ApiClientStub.DeleteEndpointsCalled, endpoint => endpoint == $"libraries/{libraryId}");
     }
 
+    /// <summary>
+    /// Builds the delete request for the library identified by <paramref name="libraryId"/>.
+    /// </summary>
+    /// <param name="libraryId">The Id of the library to delete.</param>
+    /// <returns>The configured delete request.</returns>
     private static HttpRequestMessage CreateDeleteRequest(Guid libraryId)
     {
         HttpRequestMessage deleteRequest = new(HttpMethod.Delete, $"/en-us/libraries/manage/api-item/{libraryId}")

@@ -3,7 +3,9 @@ using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Platform;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 #endregion
 
 namespace Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
@@ -13,6 +15,8 @@ namespace Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.
 /// </summary>
 public class PathService : IPathService
 {
+    private const int MAX_DIRECTORY_SEGMENT_LENGTH = 100;
+
     private readonly IPlatformContext _platformContext;
 
     /// <summary>
@@ -108,6 +112,51 @@ public class PathService : IPathService
     public char[] GetInvalidPathCharsForPlatform()
     {
         return _platformContext.PathStrategy.GetInvalidPathCharsForPlatform();
+    }
+
+    /// <summary>
+    /// Sanitizes a human-readable <paramref name="name"/> into a safe path segment, replacing the characters that are invalid for the current platform, and rejecting the segments that could escape the directory.
+    /// </summary>
+    /// <param name="name">The human-readable name to sanitize.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing the sanitized path segment, or an error.</returns>
+    public Result<PathSegment> SanitizeSegment(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            return Errors.FileSystemManagement.NameCannotBeEmpty;
+
+        char[] invalidChars = _platformContext.PathStrategy.GetInvalidPathSegmentCharsForPlatform();
+        char[] sanitizedChars = [.. name.Trim().Select(character => Array.IndexOf(invalidChars, character) >= 0 ? ' ' : character)];
+
+        // collapse the consecutive whitespace into a single space, so that the segment does not contain ragged spacing
+        List<char> collapsedChars = [];
+        bool previousWasWhitespace = false;
+        foreach (char character in sanitizedChars)
+        {
+            if (char.IsWhiteSpace(character))
+            {
+                if (!previousWasWhitespace)
+                    collapsedChars.Add(' ');
+                previousWasWhitespace = true;
+            }
+            else
+            {
+                collapsedChars.Add(character);
+                previousWasWhitespace = false;
+            }
+        }
+
+        string sanitized = new string([.. collapsedChars]).Trim();
+        if (string.Equals(sanitized, ".", StringComparison.Ordinal) || string.Equals(sanitized, "..", StringComparison.Ordinal))
+            return Errors.FileSystemManagement.InvalidPath;
+        // a segment must never contain a path separator, otherwise the segment could escape its directory or nest additional directories
+        if (sanitized.Contains('/') || sanitized.Contains('\\'))
+            return Errors.FileSystemManagement.InvalidPath;
+        if (sanitized.Length > MAX_DIRECTORY_SEGMENT_LENGTH)
+            sanitized = sanitized[..MAX_DIRECTORY_SEGMENT_LENGTH].TrimEnd();
+        if (sanitized.Length == 0)
+            return Errors.FileSystemManagement.InvalidPath;
+
+        return PathSegment.Create(sanitized, isDirectory: true, isDrive: false);
     }
 
     /// <summary>

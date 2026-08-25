@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Infrastructure.Models.DTO.Configuration;
-using Lumina.Application.Common.Infrastructure.Plugins;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Infrastructure.Core.Plugins;
+using Lumina.Infrastructure.Fixtures.Common.Models.DTO.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -27,6 +27,7 @@ public class PluginInstallerTests : IDisposable
 {
     private readonly string _pluginsDirectory;
     private readonly PluginInstaller _sut;
+    private readonly PluginsSettingsDtoFixture _pluginsSettingsDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PluginInstallerTests"/> class.
@@ -36,7 +37,7 @@ public class PluginInstallerTests : IDisposable
         _pluginsDirectory = Path.Combine(AppContext.BaseDirectory, $".test-plugins-{Guid.NewGuid():N}");
         ILogger<PluginInstaller> mockLogger = Substitute.For<ILogger<PluginInstaller>>();
         IOptions<PluginsSettingsDto> mockOptions = Substitute.For<IOptions<PluginsSettingsDto>>();
-        mockOptions.Value.Returns(new PluginsSettingsDto { Directory = Path.GetFileName(_pluginsDirectory) });
+        mockOptions.Value.Returns(_pluginsSettingsDtoFixture.Create(directory: Path.GetFileName(_pluginsDirectory)));
         _sut = new PluginInstaller(mockOptions, mockLogger);
     }
 

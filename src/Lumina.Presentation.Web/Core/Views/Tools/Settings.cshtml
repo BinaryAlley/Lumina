@@ -55,15 +55,15 @@
                 <!-- Alpha picker -->
                 <div class="form-row">
                     <div class="form-label">
-                        <label asp-for="IgnoreThePrefixForAlphaPicker">@_localizer["IgnoreThePrefixForAlphaPicker"]</label>:
+                        <label asp-for="ShouldIgnoreThePrefixForAlphaPicker">@_localizer["ShouldIgnoreThePrefixForAlphaPicker"]</label>:
                     </div>
                     <div class="form-field">
                         <label class="enlightenment-checkbox-label">
-                            <input type="checkbox" asp-for="IgnoreThePrefixForAlphaPicker" class="enlightenment-checkbox-hidden" />
+                            <input type="checkbox" asp-for="ShouldIgnoreThePrefixForAlphaPicker" class="enlightenment-checkbox-hidden" />
                             <span class="enlightenment-checkbox"></span>
                         </label>
                     </div>
-                    <small class="form-label text-disabled form-description">@_localizer["DescriptionIgnoreThePrefixForAlphaPicker"]</small>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionShouldIgnoreThePrefixForAlphaPicker"]</small>
                 </div>
                 <!-- Theme caching -->
                 <div class="form-row">
@@ -94,8 +94,9 @@
         const form = document.getElementById('user-settings-form');
         const checkboxIsPaginationEnabled = document.getElementById('IsPaginationEnabled');
         const inputItemsPerPage = document.getElementById('ItemsPerPage');
-        const checkboxIgnoreThePrefixForAlphaPicker = document.getElementById('IgnoreThePrefixForAlphaPicker');
+        const checkboxShouldIgnoreThePrefixForAlphaPicker = document.getElementById('ShouldIgnoreThePrefixForAlphaPicker');
         const checkboxIsThemeCachingEnabled = document.getElementById('IsThemeCachingEnabled');
+        let shouldAggregateMetadataWhenMissing = false;
 
         // toggle the enabled state of the items per page input based on the pagination checkbox
         function updateItemsPerPageEnabledState() {
@@ -108,8 +109,9 @@
             if (data) {
                 checkboxIsPaginationEnabled.checked = data.isPaginationEnabled === true;
                 inputItemsPerPage.value = data.itemsPerPage;
-                checkboxIgnoreThePrefixForAlphaPicker.checked = data.ignoreThePrefixForAlphaPicker === true;
+                checkboxShouldIgnoreThePrefixForAlphaPicker.checked = data.shouldIgnoreThePrefixForAlphaPicker === true;
                 checkboxIsThemeCachingEnabled.checked = data.isThemeCachingEnabled === true;
+                shouldAggregateMetadataWhenMissing = data.shouldAggregateMetadataWhenMissing === true;
                 updateItemsPerPageEnabledState();
             }
         }
@@ -119,8 +121,9 @@
             const formData = {
                 IsPaginationEnabled: checkboxIsPaginationEnabled.checked,
                 ItemsPerPage: Number(inputItemsPerPage.value),
-                IgnoreThePrefixForAlphaPicker: checkboxIgnoreThePrefixForAlphaPicker.checked,
-                IsThemeCachingEnabled: checkboxIsThemeCachingEnabled.checked
+                ShouldIgnoreThePrefixForAlphaPicker: checkboxShouldIgnoreThePrefixForAlphaPicker.checked,
+                IsThemeCachingEnabled: checkboxIsThemeCachingEnabled.checked,
+                ShouldAggregateMetadataWhenMissing: shouldAggregateMetadataWhenMissing
             };
             const data = await callApiPostAsync('@_urlService.GetAbsoluteUrl(WebRoutes.Settings.UPDATE_USER_SETTINGS)', formData);
             if (data && data.isUpdated === true)

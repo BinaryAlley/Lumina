@@ -4,13 +4,14 @@ using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Core.Plugins.Queries.GetPlugins;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Plugins;
+using Lumina.Application.Fixtures.Core.Plugins.Queries.GetPlugins;
 using Lumina.Contracts.Responses.Plugins;
 using Lumina.Domain.Common.Primitives;
 using NSubstitute;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Diagnostics.CodeAnalysis;
 #endregion
 
 namespace Lumina.Application.UnitTests.Core.Plugins.Queries.GetPlugins;
@@ -24,6 +25,8 @@ public class GetPluginsQueryHandlerTests
     private readonly IUnitOfWork _mockUnitOfWork;
     private readonly IPluginRepository _mockPluginRepository;
     private readonly GetPluginsQueryHandler _sut;
+    private readonly GetPluginsQueryFixture _getPluginsQueryFixture = new();
+    private readonly PluginEntityFixture _pluginEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetPluginsQueryHandlerTests"/> class.
@@ -40,12 +43,11 @@ public class GetPluginsQueryHandlerTests
     public async Task HandleAsync_WhenCalled_ShouldReturnAllDetectedPlugins()
     {
         // Arrange
-        PluginEntityFixture pluginFixture = new();
-        List<PluginEntity> plugins = [pluginFixture.Create(), pluginFixture.Create()];
+        List<PluginEntity> plugins = [_pluginEntityFixture.Create(), _pluginEntityFixture.Create()];
         _mockPluginRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(plugins);
 
         // Act
-        Result<IReadOnlyList<PluginResponse>> result = await _sut.HandleAsync(new GetPluginsQuery(), CancellationToken.None);
+        Result<IReadOnlyList<PluginResponse>> result = await _sut.HandleAsync(_getPluginsQueryFixture.Create(), CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -62,7 +64,7 @@ public class GetPluginsQueryHandlerTests
             .Returns(Error.Failure(description: "Failed to get plugins"));
 
         // Act
-        Result<IReadOnlyList<PluginResponse>> result = await _sut.HandleAsync(new GetPluginsQuery(), CancellationToken.None);
+        Result<IReadOnlyList<PluginResponse>> result = await _sut.HandleAsync(_getPluginsQueryFixture.Create(), CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);

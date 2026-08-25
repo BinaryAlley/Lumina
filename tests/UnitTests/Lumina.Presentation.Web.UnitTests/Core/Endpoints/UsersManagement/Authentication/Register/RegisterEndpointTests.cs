@@ -6,6 +6,7 @@ using Lumina.Presentation.Web.Common.Responses.UsersManagement;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Core.Endpoints.UsersManagement.Authentication.Register;
 using Lumina.Presentation.Web.Fixtures.Common.Requests.UsersManagement;
+using Lumina.Presentation.Web.Fixtures.Common.Responses.UsersManagement;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
@@ -26,6 +27,7 @@ public class RegisterEndpointTests
     private readonly IApiHttpClient _mockApiHttpClient;
     private readonly RegisterEndpoint _sut;
     private readonly RegisterRequestFixture _registerRequestFixture = new();
+    private readonly RegisterResponseFixture _registerResponseFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RegisterEndpointTests"/> class.
@@ -42,7 +44,7 @@ public class RegisterEndpointTests
         // Arrange
         RegisterRequest request = _registerRequestFixture.Create(registrationType: "Admin");
         _mockApiHttpClient.PostAsync<RegisterResponse, RegisterRequest>(Arg.Any<string>(), Arg.Any<RegisterRequest>(), Arg.Any<CancellationToken>())
-            .Returns(new RegisterResponse(request.Username, null));
+            .Returns(_registerResponseFixture.Create(username: request.Username));
 
         // Act
         IResult result = await _sut.ExecuteAsync(request, CancellationToken.None);
@@ -63,7 +65,7 @@ public class RegisterEndpointTests
         // Arrange
         RegisterRequest request = _registerRequestFixture.Create(registrationType: "User");
         _mockApiHttpClient.PostAsync<RegisterResponse, RegisterRequest>(Arg.Any<string>(), Arg.Any<RegisterRequest>(), Arg.Any<CancellationToken>())
-            .Returns(new RegisterResponse(request.Username, null));
+            .Returns(_registerResponseFixture.Create(username: request.Username));
 
         // Act
         IResult result = await _sut.ExecuteAsync(request, CancellationToken.None);

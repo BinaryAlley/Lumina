@@ -3,6 +3,7 @@ using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Plugins.OpenLibrary.Common.Models.Contracts.Responses;
 using Lumina.Plugins.OpenLibrary.Common.Models.DTO.Settings;
 using Lumina.Plugins.OpenLibrary.Core.Mapping;
+using Lumina.Plugins.OpenLibrary.Core.Settings;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -25,7 +26,7 @@ namespace Lumina.Plugins.OpenLibrary.Core.Api;
 internal sealed class OpenLibraryHttpClient
 {
     private readonly HttpClient _httpClient;
-    private readonly OpenLibrarySettingsDto _openLibrarySettings;
+    private readonly OpenLibrarySettingsProvider _settingsProvider;
     private readonly SemaphoreSlim _requestGate = new(1, 1);
     private DateTimeOffset _lastRequestAt = DateTimeOffset.MinValue;
 
@@ -44,18 +45,26 @@ internal sealed class OpenLibraryHttpClient
     /// Initializes a new instance of the <see cref="OpenLibraryHttpClient"/> class.
     /// </summary>
     /// <param name="httpClient">The <see cref="HttpClient"/> used to send requests to the Open Library API.</param>
-    /// <param name="openLibrarySettings">The settings that configure the Open Library API requests.</param>
-    public OpenLibraryHttpClient(HttpClient httpClient, OpenLibrarySettingsDto openLibrarySettings)
+    /// <param name="settingsProvider">The provider of the settings that configure the Open Library API requests.</param>
+    public OpenLibraryHttpClient(HttpClient httpClient, OpenLibrarySettingsProvider settingsProvider)
     {
         _httpClient = httpClient;
-        _openLibrarySettings = openLibrarySettings;
+        _settingsProvider = settingsProvider;
 
         _httpClient.BaseAddress ??= new("https://openlibrary.org/");
-        if (_httpClient.DefaultRequestHeaders.UserAgent.Count == 0)
-            _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(openLibrarySettings.UserAgent);
+    }
 
-        if (!string.IsNullOrWhiteSpace(openLibrarySettings.ContactEmail) && _httpClient.DefaultRequestHeaders.From is null)
-            _httpClient.DefaultRequestHeaders.From = openLibrarySettings.ContactEmail!;
+    /// <summary>
+    /// Applies the request headers configured in the <paramref name="settings"/> onto the underlying HTTP client, unless they are already set.
+    /// </summary>
+    /// <param name="settings">The settings that configure the Open Library API requests.</param>
+    private void EnsureRequestHeaders(OpenLibrarySettingsDto settings)
+    {
+        if (_httpClient.DefaultRequestHeaders.UserAgent.Count == 0)
+            _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(settings.UserAgent);
+
+        if (!string.IsNullOrWhiteSpace(settings.ContactEmail) && _httpClient.DefaultRequestHeaders.From is null)
+            _httpClient.DefaultRequestHeaders.From = settings.ContactEmail!;
     }
 
     /// <summary>
@@ -214,10 +223,13 @@ internal sealed class OpenLibraryHttpClient
     /// <returns>The HTTP response message for the request.</returns>
     private async Task<HttpResponseMessage> SendAsync(string relativeUrl, CancellationToken cancellationToken)
     {
+        OpenLibrarySettingsDto settings = await _settingsProvider.GetAsync(cancellationToken).ConfigureAwait(false);
+        EnsureRequestHeaders(settings);
+
         await _requestGate.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
-            DateTimeOffset earliestNextRequest = _lastRequestAt + _openLibrarySettings.MinimumRequestInterval;
+            DateTimeOffset earliestNextRequest = _lastRequestAt + settings.MinimumRequestInterval;
             TimeSpan delay = earliestNextRequest - DateTimeOffset.UtcNow;
             if (delay > TimeSpan.Zero)
                 await Task.Delay(delay, cancellationToken).ConfigureAwait(false);

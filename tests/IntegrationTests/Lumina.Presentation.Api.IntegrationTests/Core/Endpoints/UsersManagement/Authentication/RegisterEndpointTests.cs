@@ -1,5 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.DataAccess.Core.UoW;
@@ -29,6 +31,8 @@ public class RegisterEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
 {
     private HttpClient _client;
     private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly UserEntityFixture _userEntityFixture = new();
+    private readonly RegistrationRequestFixture _registrationRequestFixture = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -60,11 +64,11 @@ public class RegisterEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     public async Task Register_WhenCalledWithValidRequest_ShouldRegisterUserSuccessfully()
     {
         // Arrange
-        RegistrationRequest request = new(
-            Username: _testUsername,
-            Password: "TestPass123!",
-            PasswordConfirm: "TestPass123!",
-            Use2fa: false
+        RegistrationRequest request = _registrationRequestFixture.Create(
+            username: _testUsername,
+            password: "TestPass123!",
+            passwordConfirm: "TestPass123!",
+            use2fa: false
         );
 
         // Act
@@ -88,11 +92,11 @@ public class RegisterEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     public async Task Register_WhenCalledWithValidRequestAnd2FA_ShouldRegisterUserWithTotp()
     {
         // Arrange
-        RegistrationRequest request = new(
-            Username: _testUsername,
-            Password: "TestPass123!",
-            PasswordConfirm: "TestPass123!",
-            Use2fa: true
+        RegistrationRequest request = _registrationRequestFixture.Create(
+            username: _testUsername,
+            password: "TestPass123!",
+            passwordConfirm: "TestPass123!",
+            use2fa: true
         );
 
         // Act
@@ -116,11 +120,11 @@ public class RegisterEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         await CreateTestUser();
-        RegistrationRequest request = new(
-            Username: _testUsername,
-            Password: "TestPass123!",
-            PasswordConfirm: "TestPass123!",
-            Use2fa: false
+        RegistrationRequest request = _registrationRequestFixture.Create(
+            username: _testUsername,
+            password: "TestPass123!",
+            passwordConfirm: "TestPass123!",
+            use2fa: false
         );
 
         // Act
@@ -141,11 +145,11 @@ public class RegisterEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     public async Task Register_WhenPasswordsDoNotMatch_ShouldReturnValidationError()
     {
         // Arrange
-        RegistrationRequest request = new(
-            Username: _testUsername,
-            Password: "TestPass123!",
-            PasswordConfirm: "DifferentPass123!",
-            Use2fa: false
+        RegistrationRequest request = _registrationRequestFixture.Create(
+            username: _testUsername,
+            password: "TestPass123!",
+            passwordConfirm: "DifferentPass123!",
+            use2fa: false
         );
 
         // Act
@@ -186,22 +190,17 @@ public class RegisterEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         Assert.Contains("PasswordConfirmCannotBeEmpty", errors["General.Validation"]);
     }
 
+    /// <summary>
+    /// Creates a test user in the database and returns it.
+    /// </summary>
+    /// <returns>The created user entity.</returns>
     private async Task<UserEntity> CreateTestUser()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
 
-        UserEntity user = new()
-        {
-            Id = Guid.NewGuid(),
-            Username = _testUsername,
-            Password = new PasswordHashService().HashString("TestPass123!"),
-            Libraries = [],
-            UserPermissions = [],
-            UserRole = null,
-            CreatedBy = Guid.NewGuid(),
-            CreatedOnUtc = DateTime.UtcNow
-        };
+        UserEntity user = _userEntityFixture.Create(username: _testUsername, password: new PasswordHashService().HashString("TestPass123!"));
+        user.TotpSecret = null;
 
         dbContext.Users.Add(user);
         await dbContext.SaveChangesAsync();

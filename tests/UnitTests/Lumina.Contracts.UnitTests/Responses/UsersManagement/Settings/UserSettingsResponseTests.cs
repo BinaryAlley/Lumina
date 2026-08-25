@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Contracts.Fixtures.Core.Responses.UsersManagement.Settings;
 using Lumina.Contracts.Responses.UsersManagement.Settings;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -13,6 +14,7 @@ namespace Lumina.Contracts.UnitTests.Responses.UsersManagement.Settings;
 [ExcludeFromCodeCoverage]
 public class UserSettingsResponseTests
 {
+    private readonly UserSettingsResponseFixture _userSettingsResponseFixture = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
@@ -23,7 +25,14 @@ public class UserSettingsResponseTests
     {
         // Arrange
         Guid userId = Guid.NewGuid();
-        UserSettingsResponse expected = new(userId, true, 50, true, true);
+        UserSettingsResponse expected = _userSettingsResponseFixture.Create(
+            userId: userId,
+            isPaginationEnabled: true,
+            itemsPerPage: 50,
+            shouldIgnoreThePrefixForAlphaPicker: true,
+            isThemeCachingEnabled: true,
+            shouldAggregateMetadataWhenMissing: false
+        );
 
         // Act
         string json = JsonSerializer.Serialize(expected, _jsonOptions);
@@ -39,16 +48,24 @@ public class UserSettingsResponseTests
     {
         // Arrange
         Guid userId = Guid.NewGuid();
-        UserSettingsResponse sut = new(userId, false, 25, false, false);
+        UserSettingsResponse sut = _userSettingsResponseFixture.Create(
+            userId: userId,
+            isPaginationEnabled: false,
+            itemsPerPage: 25,
+            shouldIgnoreThePrefixForAlphaPicker: false,
+            isThemeCachingEnabled: false,
+            shouldAggregateMetadataWhenMissing: false
+        );
 
         // Act
-        (Guid sutUserId, bool isPaginationEnabled, int itemsPerPage, bool ignoreThePrefixForAlphaPicker, bool isThemeCachingEnabled) = sut;
+        (Guid sutUserId, bool isPaginationEnabled, int itemsPerPage, bool shouldIgnoreThePrefixForAlphaPicker, bool isThemeCachingEnabled, bool shouldAggregateMetadataWhenMissing) = sut;
 
         // Assert
         Assert.Equal(sut.UserId, sutUserId);
         Assert.Equal(sut.IsPaginationEnabled, isPaginationEnabled);
         Assert.Equal(sut.ItemsPerPage, itemsPerPage);
-        Assert.Equal(sut.IgnoreThePrefixForAlphaPicker, ignoreThePrefixForAlphaPicker);
+        Assert.Equal(sut.ShouldIgnoreThePrefixForAlphaPicker, shouldIgnoreThePrefixForAlphaPicker);
         Assert.Equal(sut.IsThemeCachingEnabled, isThemeCachingEnabled);
+        Assert.Equal(sut.ShouldAggregateMetadataWhenMissing, shouldAggregateMetadataWhenMissing);
     }
 }

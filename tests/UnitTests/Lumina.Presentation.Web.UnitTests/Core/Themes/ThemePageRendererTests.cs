@@ -6,7 +6,6 @@ using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Core.Themes;
 using Lumina.Presentation.Web.Fixtures.Common.DTO.Themes;
 using NSubstitute;
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,6 +23,7 @@ public class ThemePageRendererTests
     private readonly ThemePageRenderer _sut;
     private readonly ThemeResponseDtoFixture _themeResponseDtoFixture = new();
     private readonly ThemePageDtoFixture _themePageDtoFixture = new();
+    private readonly ThemeTemplateResponseDtoFixture _themeTemplateResponseDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ThemePageRendererTests"/> class.
@@ -46,7 +46,7 @@ public class ThemePageRendererTests
             .Replace("{themeId}", "editorial-paper")
             .Replace("{*pageKey}", pageKey);
         _mockApiHttpClient.GetAsync<ThemeTemplateResponseDto>(expectedEndpoint, Arg.Any<CancellationToken>())
-            .Returns(new ThemeTemplateResponseDto(theme, template));
+            .Returns(_themeTemplateResponseDtoFixture.Create(theme: theme, template: template));
         ThemePageDto model = _themePageDtoFixture.Create(pageKey: pageKey, title: "Home");
 
         // Act
@@ -74,7 +74,7 @@ public class ThemePageRendererTests
         _mockApiHttpClient.GetAsync<ThemeResponseDto>(ApiRoutes.Themes.GET_CURRENT_THEME, Arg.Any<CancellationToken>())
             .Returns(currentTheme);
         _mockApiHttpClient.GetAsync<ThemeTemplateResponseDto>(expectedEndpoint, Arg.Any<CancellationToken>())
-            .Returns(new ThemeTemplateResponseDto(currentTheme, "{{title}}"));
+            .Returns(_themeTemplateResponseDtoFixture.Create(theme: currentTheme, template: "{{title}}"));
         ThemePageDto model = _themePageDtoFixture.Create(pageKey: pageKey, title: "Home");
 
         // Act
@@ -97,7 +97,7 @@ public class ThemePageRendererTests
             .Replace("{themeId}", "editorial-paper")
             .Replace("{*pageKey}", pageKey);
         _mockApiHttpClient.GetAsync<ThemeTemplateResponseDto>(expectedEndpoint, Arg.Any<CancellationToken>())
-            .Returns(new ThemeTemplateResponseDto(theme, "{{#unclosed}}"));
+            .Returns(_themeTemplateResponseDtoFixture.Create(theme: theme, template: "{{#unclosed}}"));
         ThemePageDto model = _themePageDtoFixture.Create(pageKey: pageKey, title: "Home");
 
         // Act

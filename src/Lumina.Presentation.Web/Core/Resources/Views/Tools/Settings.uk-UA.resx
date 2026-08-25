@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -21,7 +21,7 @@
   <data name="ItemsPerPage" xml:space="preserve">
     <value>Елементів на сторінці</value>
   </data>
-  <data name="IgnoreThePrefixForAlphaPicker" xml:space="preserve">
+  <data name="ShouldIgnoreThePrefixForAlphaPicker" xml:space="preserve">
     <value>Ігнорувати префікс "The" в алфавітному покажчику</value>
   </data>
   <data name="Save" xml:space="preserve">
@@ -36,7 +36,7 @@
   <data name="DescriptionItemsPerPage" xml:space="preserve">
     <value>Кількість елементів бібліотеки, що відображаються на кожній сторінці за увімкненої розбивки на сторінки.</value>
   </data>
-  <data name="DescriptionIgnoreThePrefixForAlphaPicker" xml:space="preserve">
+  <data name="DescriptionShouldIgnoreThePrefixForAlphaPicker" xml:space="preserve">
     <value>За увімкнення елементи бібліотеки, назва яких починається з "The", групуються в алфавітному покажчику під першою літерою наступного слова, наприклад "The Rasmus" відображається під літерою R.</value>
   </data>
   <data name="EnableThemeCaching" xml:space="preserve">

@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
-
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Entities;
@@ -30,9 +29,9 @@ public static class BookMetadataDtoMapping
     public static Result<Success> ApplyMetadata(this Book book, BookMetadataDto metadata, string providerName, DateTime lastUpdateUtc)
     {
         if (string.IsNullOrWhiteSpace(metadata.Title))
-            return Lumina.Domain.Common.Errors.Errors.Metadata.TitleCannotBeEmpty;
+            return Domain.Common.Errors.Errors.Metadata.TitleCannotBeEmpty;
         if (metadata.ReleaseInfo is null)
-            return Lumina.Domain.Common.Errors.Errors.Metadata.ReleaseInfoCannotBeNull;
+            return Domain.Common.Errors.Errors.Metadata.ReleaseInfoCannotBeNull;
 
         Result<ReleaseInfo> releaseInfoResult = ReleaseInfo.Create(
             Optional<DateOnly>.FromNullable(metadata.ReleaseInfo.OriginalReleaseDate),
@@ -115,7 +114,7 @@ public static class BookMetadataDtoMapping
             writtenContentMetadataResult.Value,
             Optional<BookFormat>.FromNullable(metadata.Format.HasValue ? (BookFormat)(int)metadata.Format.Value : (BookFormat?)null),
             Optional<string>.FromNullable(metadata.Edition),
-            Optional<int>.FromNullable(metadata.VolumeNumber),
+            Optional<float>.FromNullable(metadata.VolumeNumber),
             Optional<BookSeries>.None(),
             Optional<string>.FromNullable(metadata.ASIN),
             Optional<string>.FromNullable(metadata.GoodreadsId),
@@ -131,6 +130,9 @@ public static class BookMetadataDtoMapping
             providerName,
             lastUpdateUtc
         );
+
+        if (!string.IsNullOrWhiteSpace(metadata.CoverImagePath))
+            book.SetBookCoverImagePath(metadata.CoverImagePath);
 
         return Result.Success;
     }

@@ -1,13 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.DTO.FileSystemManagement;
 using Lumina.Presentation.Web.Common.DTO.Themes;
 using Lumina.Presentation.Web.Common.Enums.Themes;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Core.Themes;
+using Lumina.Presentation.Web.Fixtures.Common.DTO.FileSystemManagement;
 using Lumina.Presentation.Web.Fixtures.Common.DTO.Themes;
 using NSubstitute;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -28,6 +27,7 @@ public class ThemeServiceTests
     private readonly ThemeResponseDtoFixture _themeResponseDtoFixture = new();
     private readonly ThemeSettingsResponseDtoFixture _themeSettingsResponseDtoFixture = new();
     private readonly ThemeTemplateResponseDtoFixture _themeTemplateResponseDtoFixture = new();
+    private readonly BlobDataDtoFixture _blobDataDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ThemeServiceTests"/> class.
@@ -226,7 +226,7 @@ public class ThemeServiceTests
         string themeId = "editorial-paper";
         byte[] data = [0x50, 0x4B, 0x03, 0x04];
         _mockApiHttpClient.GetBlobAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
-            .Returns(new BlobDataDto { Data = data, ContentType = "application/zip" });
+            .Returns(_blobDataDtoFixture.Create(data: data, contentType: "application/zip"));
         string expectedEndpoint = ApiRoutes.Themes.GET_THEME_ARCHIVE.Replace("{themeId}", themeId);
 
         // Act

@@ -15,6 +15,8 @@ namespace Lumina.Infrastructure.Fixtures.Common.Models.DTO.Configuration;
 [ExcludeFromCodeCoverage]
 public class ThemeEngineOptionsDtoFixture
 {
+    private readonly Faker _faker = new();
+
     /// <summary>
     /// Creates a random valid <see cref="ThemeEngineOptionsDto"/>.
     /// </summary>
@@ -35,16 +37,15 @@ public class ThemeEngineOptionsDtoFixture
         long? maxSingleFileBytes = null,
         int? maxEntries = null)
     {
-        Faker faker = new();
         return new ThemeEngineOptionsDto
         {
-            StoragePath = storagePath ?? faker.System.DirectoryPath(),
-            BundledThemesPath = bundledThemesPath ?? faker.System.DirectoryPath(),
-            DefaultThemeId = defaultThemeId ?? faker.Lorem.Word(),
-            MaxArchiveBytes = maxArchiveBytes ?? faker.Random.Long(1_000_000, 100_000_000),
-            MaxExpandedBytes = maxExpandedBytes ?? faker.Random.Long(10_000_000, 500_000_000),
-            MaxSingleFileBytes = maxSingleFileBytes ?? faker.Random.Long(1_000_000, 50_000_000),
-            MaxEntries = maxEntries ?? faker.Random.Int(1, 1000)
+            StoragePath = storagePath ?? _faker.System.DirectoryPath(),
+            BundledThemesPath = bundledThemesPath ?? _faker.System.DirectoryPath(),
+            DefaultThemeId = defaultThemeId ?? _faker.Lorem.Word(),
+            MaxArchiveBytes = maxArchiveBytes ?? _faker.Random.Long(1_000_000, 100_000_000),
+            MaxExpandedBytes = maxExpandedBytes ?? _faker.Random.Long(10_000_000, 500_000_000),
+            MaxSingleFileBytes = maxSingleFileBytes ?? _faker.Random.Long(1_000_000, 50_000_000),
+            MaxEntries = maxEntries ?? _faker.Random.Int(1, 1000)
         };
     }
 

@@ -15,6 +15,8 @@ namespace Lumina.Presentation.Web.Fixtures.Common.DTO.Libraries;
 [ExcludeFromCodeCoverage]
 public class LibraryDtoFixture
 {
+    private readonly Faker _faker = new();
+
     /// <summary>
     /// Creates a new <see cref="LibraryDto"/> instance with randomized test data.
     /// </summary>
@@ -26,16 +28,15 @@ public class LibraryDtoFixture
     /// <returns>A configured <see cref="LibraryDto"/> instance.</returns>
     public LibraryDto Create(Guid? id = null, string? title = null, string? libraryType = null, bool? isEnabled = null, List<string>? contentLocations = null)
     {
-        Faker faker = new();
         return new LibraryDto
         {
             Id = id ?? Guid.NewGuid(),
             UserId = Guid.NewGuid(),
-            Title = title ?? faker.Commerce.Department(),
-            LibraryType = libraryType ?? faker.PickRandom("Book", "Video", "Photo"),
-            CoverImage = faker.Image.PicsumUrl(),
-            ContentLocations = contentLocations ?? [faker.System.DirectoryPath()],
-            IsEnabled = isEnabled ?? faker.Random.Bool()
+            Title = title ?? _faker.Commerce.Department(),
+            LibraryType = libraryType ?? _faker.PickRandom("Book", "Video", "Photo"),
+            CoverImage = _faker.Image.PicsumUrl(),
+            ContentLocations = contentLocations ?? [_faker.System.DirectoryPath()],
+            IsEnabled = isEnabled ?? _faker.Random.Bool()
         };
     }
 

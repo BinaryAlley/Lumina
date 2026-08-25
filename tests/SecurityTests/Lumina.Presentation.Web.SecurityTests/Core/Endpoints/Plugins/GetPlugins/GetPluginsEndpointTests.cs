@@ -1,15 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Common;
 using Lumina.Presentation.Web.Common.Exceptions;
 using Lumina.Presentation.Web.Core.Endpoints.Plugins.GetPlugins;
+using Lumina.Presentation.Web.Fixtures.Common.DTO.Common;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.SecurityTests.Common.Setup;
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Plugins.GetPlugins;
@@ -21,6 +18,7 @@ namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Plugins.GetPlugin
 public class GetPluginsEndpointTests : IClassFixture<LuminaWebFactory>
 {
     private readonly LuminaWebFactory _apiFactory;
+    private readonly ProblemDetailsDtoFixture _problemDetailsDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetPluginsEndpointTests"/> class.
@@ -55,7 +53,7 @@ public class GetPluginsEndpointTests : IClassFixture<LuminaWebFactory>
         // Arrange
         _apiFactory.ApiClientStub.Reset();
         _apiFactory.ApiClientStub.RegisterGetException("plugins", new ApiException(
-            new ProblemDetailsDto { Title = "General.Failure", Detail = "PluginNotFound" },
+            _problemDetailsDtoFixture.Create(title: "General.Failure", detail: "PluginNotFound"),
             HttpStatusCode.NotFound));
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
         HttpRequestMessage getRequest = new(HttpMethod.Get, "/en-us/admin/manage-plugins/api-get-plugins");

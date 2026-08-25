@@ -23,17 +23,17 @@ internal sealed class BookAlphaFilterSpecification : FilterSpecification<BookEnt
         .GetMethod(nameof(SqliteDbFunctionsExtensions.Glob), [typeof(DbFunctions), typeof(string), typeof(string)])!;
 
     private readonly string? _filterAlphaKey;
-    private readonly bool _ignoreThePrefixForAlphaPicker;
+    private readonly bool _shouldIgnoreThePrefixForAlphaPicker;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BookAlphaFilterSpecification"/> class.
     /// </summary>
     /// <param name="filterAlphaKey">The alpha key to filter by. A single ASCII letter, <see cref="LibraryItemAlphaKeys.NUMBER"/>, or <see cref="LibraryItemAlphaKeys.SYMBOL"/>.</param>
-    /// <param name="ignoreThePrefixForAlphaPicker">Whether the leading "The " prefix of a title should be ignored when computing the alpha key, or not.</param>
-    public BookAlphaFilterSpecification(string? filterAlphaKey, bool ignoreThePrefixForAlphaPicker)
+    /// <param name="shouldIgnoreThePrefixForAlphaPicker">Whether the leading "The " prefix of a title should be ignored when computing the alpha key, or not.</param>
+    public BookAlphaFilterSpecification(string? filterAlphaKey, bool shouldIgnoreThePrefixForAlphaPicker)
     {
         _filterAlphaKey = filterAlphaKey;
-        _ignoreThePrefixForAlphaPicker = ignoreThePrefixForAlphaPicker;
+        _shouldIgnoreThePrefixForAlphaPicker = shouldIgnoreThePrefixForAlphaPicker;
     }
 
     /// <summary>
@@ -82,7 +82,7 @@ internal sealed class BookAlphaFilterSpecification : FilterSpecification<BookEnt
 
         // when ignoring the "The " prefix, strip a leading "the " from the lowercased title
         Expression effectiveTitle = lowerTitle;
-        if (_ignoreThePrefixForAlphaPicker)
+        if (_shouldIgnoreThePrefixForAlphaPicker)
         {
             MethodCallExpression startsWithThe = Expression.Call(lowerTitle, s_startsWithMethod, Expression.Constant("the "));
             MethodCallExpression strippedTitle = Expression.Call(lowerTitle, s_substringMethod, Expression.Constant(4));

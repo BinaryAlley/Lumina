@@ -1,18 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Common;
 using Lumina.Presentation.Web.Common.Exceptions;
 using Lumina.Presentation.Web.Common.Requests.UsersManagement;
 using Lumina.Presentation.Web.Core.Endpoints.UsersManagement.Authentication.Login;
+using Lumina.Presentation.Web.Fixtures.Common.DTO.Common;
+using Lumina.Presentation.Web.Fixtures.Common.Requests.UsersManagement;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.SecurityTests.Common.Setup;
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
-using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.UsersManagement.Authentication.Login;
@@ -24,6 +22,8 @@ namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.UsersManagement.A
 public class LoginEndpointTests : IClassFixture<LuminaWebFactory>
 {
     private readonly LuminaWebFactory _apiFactory;
+    private readonly LoginRequestFixture _loginRequestFixture = new();
+    private readonly ProblemDetailsDtoFixture _problemDetailsDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LoginEndpointTests"/> class.
@@ -44,10 +44,10 @@ public class LoginEndpointTests : IClassFixture<LuminaWebFactory>
     {
         // Arrange
         _apiFactory.ApiClientStub.Reset();
-        _apiFactory.ApiClientStub.RegisterPostException("auth/login", new ApiException(new ProblemDetailsDto { Title = "General.Failure", Detail = "InvalidUsernameOrPassword" }, HttpStatusCode.Forbidden, "auth/login"));
+        _apiFactory.ApiClientStub.RegisterPostException("auth/login", new ApiException(_problemDetailsDtoFixture.Create(title: "General.Failure", detail: "InvalidUsernameOrPassword"), HttpStatusCode.Forbidden, "auth/login"));
         HttpClient client = WebTestHelpers.CreateAnonymousClient(_apiFactory);
         string antiforgeryToken = await WebTestHelpers.GetAntiforgeryTokenAsync(client);
-        HttpRequestMessage loginRequest = CreateLoginRequest(new LoginRequest(Username: maliciousUsername, Password: "Abcd123$"), antiforgeryToken);
+        HttpRequestMessage loginRequest = CreateLoginRequest(_loginRequestFixture.Create(username: maliciousUsername, password: "Abcd123$"), antiforgeryToken);
 
         // Act
         HttpResponseMessage response = await client.SendAsync(loginRequest);
@@ -71,7 +71,7 @@ public class LoginEndpointTests : IClassFixture<LuminaWebFactory>
         _apiFactory.ApiClientStub.Reset();
         HttpClient client = WebTestHelpers.CreateAnonymousClient(_apiFactory);
         string antiforgeryToken = await WebTestHelpers.GetAntiforgeryTokenAsync(client);
-        HttpRequestMessage loginRequest = CreateLoginRequest(new LoginRequest(Username: "testuser", Password: "TestPass123!"), antiforgeryToken);
+        HttpRequestMessage loginRequest = CreateLoginRequest(_loginRequestFixture.Create(username: "testuser", password: "TestPass123!"), antiforgeryToken);
 
         // Act
         HttpResponseMessage response = await client.SendAsync(loginRequest);
@@ -96,7 +96,7 @@ public class LoginEndpointTests : IClassFixture<LuminaWebFactory>
         _apiFactory.ApiClientStub.Reset();
         HttpClient client = WebTestHelpers.CreateAnonymousClient(_apiFactory);
         string antiforgeryToken = await WebTestHelpers.GetAntiforgeryTokenAsync(client);
-        HttpRequestMessage loginRequest = CreateLoginRequest(new LoginRequest(Username: "testuser", Password: "TestPass123!"), antiforgeryToken);
+        HttpRequestMessage loginRequest = CreateLoginRequest(_loginRequestFixture.Create(username: "testuser", password: "TestPass123!"), antiforgeryToken);
 
         // Act
         HttpResponseMessage response = await client.SendAsync(loginRequest);
@@ -113,6 +113,12 @@ public class LoginEndpointTests : IClassFixture<LuminaWebFactory>
         Assert.Contains("samesite=strict", tokenCookie, StringComparison.OrdinalIgnoreCase);
     }
 
+    /// <summary>
+    /// Builds the login request that sends the given <paramref name="request"/> to the login endpoint.
+    /// </summary>
+    /// <param name="request">The login request to send.</param>
+    /// <param name="antiforgeryToken">The antiforgery token to include in the request.</param>
+    /// <returns>The configured login request.</returns>
     private static HttpRequestMessage CreateLoginRequest(LoginRequest request, string antiforgeryToken)
     {
         HttpRequestMessage loginRequest = new(HttpMethod.Post, "/en-us/auth/api-login")

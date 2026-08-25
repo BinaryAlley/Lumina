@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,6 +28,7 @@ public class StubApiHttpClient : IApiHttpClient
     private readonly Dictionary<string, Func<object, object>> _postResponseFactories = [];
     private readonly Dictionary<string, Func<object, object>> _putResponseFactories = [];
     private readonly HashSet<string> _deleteSuccessEndpoints = [];
+    private BlobDataDto? _blobResponse;
 
     /// <summary>
     /// Gets the authorization response returned for the <c>auth/get-authorization</c> endpoint.
@@ -168,6 +168,15 @@ public class StubApiHttpClient : IApiHttpClient
     }
 
     /// <summary>
+    /// Registers the blob response returned when a blob endpoint is called.
+    /// </summary>
+    /// <param name="blob">The blob response to return.</param>
+    public void RegisterBlobResponse(BlobDataDto blob)
+    {
+        _blobResponse = blob;
+    }
+
+    /// <summary>
     /// Resets all registered responses and captured requests, keeping only the default responses.
     /// </summary>
     public void Reset()
@@ -176,6 +185,7 @@ public class StubApiHttpClient : IApiHttpClient
         _postResponseFactories.Clear();
         _putResponseFactories.Clear();
         _deleteSuccessEndpoints.Clear();
+        _blobResponse = null;
         GetEndpointsCalled.Clear();
         PostRequests.Clear();
         PutRequests.Clear();
@@ -222,6 +232,8 @@ public class StubApiHttpClient : IApiHttpClient
     /// <returns>A model containing the deserialized blob.</returns>
     public Task<BlobDataDto> GetBlobAsync(string endpoint, CancellationToken cancellationToken = default)
     {
+        if (_blobResponse is not null)
+            return Task.FromResult(_blobResponse);
         throw new NotSupportedException("Blob retrieval is not supported by the test stub.");
     }
 

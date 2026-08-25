@@ -11,7 +11,7 @@ namespace Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.
 /// </summary>
 public interface IPathStrategy
 {
-    public char PathSeparator { get; }
+    char PathSeparator { get; }
 
     /// <summary>
     /// Checks if <paramref name="path"/> is a valid path.
@@ -55,6 +55,12 @@ public interface IPathStrategy
     /// </summary>
     /// <returns>A collection of characters that are invalid in the context of paths</returns>
     char[] GetInvalidPathCharsForPlatform();
+
+    /// <summary>
+    /// Returns a collection of characters that are invalid for a single path segment.
+    /// </summary>
+    /// <returns>A collection of characters that are invalid in the context of a single path segment.</returns>
+    char[] GetInvalidPathSegmentCharsForPlatform();
 
     /// <summary>
     /// Returns the root portion of the given path.

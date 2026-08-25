@@ -26,6 +26,8 @@ public class RoleRepositoryTests
 {
     private readonly LuminaDbContext _mockContext;
     private readonly RoleRepository _sut;
+    private readonly RoleEntityFixture _roleEntityFixture = new();
+    private readonly RolePermissionEntityFixture _rolePermissionEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RoleRepositoryTests"/> class.
@@ -40,13 +42,7 @@ public class RoleRepositoryTests
     public async Task InsertAsync_WhenRoleDoesNotExist_ShouldAddRoleToContextAndReturnCreated()
     {
         // Arrange
-        RoleEntity role = new()
-        {
-            Id = Guid.NewGuid(),
-            RoleName = "Admin",
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = Guid.NewGuid()
-        };
+        RoleEntity role = _roleEntityFixture.Create(roleName: "Admin");
 
         // Act
         Result<Created> result = await _sut.InsertAsync(role, CancellationToken.None);
@@ -65,24 +61,12 @@ public class RoleRepositoryTests
     public async Task InsertAsync_WhenRoleWithSameIdExists_ShouldReturnError()
     {
         // Arrange
-        RoleEntity existingRole = new()
-        {
-            Id = Guid.NewGuid(),
-            RoleName = "Admin",
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = Guid.NewGuid()
-        };
+        RoleEntity existingRole = _roleEntityFixture.Create(roleName: "Admin");
 
         _mockContext.Roles.Add(existingRole);
         await _mockContext.SaveChangesAsync();
 
-        RoleEntity newRole = new()
-        {
-            Id = existingRole.Id,
-            RoleName = "SuperAdmin",
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = Guid.NewGuid()
-        };
+        RoleEntity newRole = _roleEntityFixture.Create(id: existingRole.Id, roleName: "SuperAdmin");
 
         // Act
         Result<Created> result = await _sut.InsertAsync(newRole, CancellationToken.None);
@@ -97,24 +81,12 @@ public class RoleRepositoryTests
     public async Task InsertAsync_WhenRoleWithSameNameExists_ShouldReturnError()
     {
         // Arrange
-        RoleEntity existingRole = new()
-        {
-            Id = Guid.NewGuid(),
-            RoleName = "Admin",
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = Guid.NewGuid()
-        };
+        RoleEntity existingRole = _roleEntityFixture.Create(roleName: "Admin");
 
         _mockContext.Roles.Add(existingRole);
         await _mockContext.SaveChangesAsync();
 
-        RoleEntity newRole = new()
-        {
-            Id = Guid.NewGuid(),
-            RoleName = "Admin",
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = Guid.NewGuid()
-        };
+        RoleEntity newRole = _roleEntityFixture.Create(roleName: "Admin");
 
         // Act
         Result<Created> result = await _sut.InsertAsync(newRole, CancellationToken.None);
@@ -131,20 +103,8 @@ public class RoleRepositoryTests
         // Arrange
         List<RoleEntity> roles =
         [
-            new()
-        {
-            Id = Guid.NewGuid(),
-            RoleName = "Admin",
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = Guid.NewGuid()
-        },
-        new()
-        {
-            Id = Guid.NewGuid(),
-            RoleName = "User",
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = Guid.NewGuid()
-        }
+            _roleEntityFixture.Create(roleName: "Admin"),
+            _roleEntityFixture.Create(roleName: "User")
         ];
 
         _mockContext.Roles.AddRange(roles);
@@ -176,13 +136,7 @@ public class RoleRepositoryTests
     public async Task GetByNameAsync_WhenRoleExists_ShouldReturnRoleWithPermissions()
     {
         // Arrange
-        RoleEntity role = new()
-        {
-            Id = Guid.NewGuid(),
-            RoleName = "Admin",
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = Guid.NewGuid()
-        };
+        RoleEntity role = _roleEntityFixture.Create(roleName: "Admin");
 
         _mockContext.Roles.Add(role);
         await _mockContext.SaveChangesAsync();
@@ -211,8 +165,7 @@ public class RoleRepositoryTests
     public async Task GetByIdAsync_WhenRoleExists_ShouldReturnRoleWithPermissions()
     {
         // Arrange
-        RolePermissionEntityFixture rolePermissionFixture = new();
-        RolePermissionEntity rolePermission = rolePermissionFixture.Create();
+        RolePermissionEntity rolePermission = _rolePermissionEntityFixture.Create();
         RoleEntity role = rolePermission.Role;
 
         _mockContext.Roles.Add(role);
@@ -248,26 +201,14 @@ public class RoleRepositoryTests
     public async Task UpdateAsync_WhenRoleExists_ShouldUpdateRoleAndReturnUpdated()
     {
         // Arrange
-        RoleEntity existingRole = new()
-        {
-            Id = Guid.NewGuid(),
-            RoleName = "Admin",
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = Guid.NewGuid()
-        };
+        RoleEntity existingRole = _roleEntityFixture.Create(roleName: "Admin");
 
         _mockContext.Roles.Add(existingRole);
         await _mockContext.SaveChangesAsync();
 
-        RoleEntity updatedRole = new()
-        {
-            Id = existingRole.Id,
-            RoleName = "SuperAdmin",
-            CreatedOnUtc = existingRole.CreatedOnUtc,
-            CreatedBy = existingRole.CreatedBy,
-            UpdatedOnUtc = DateTime.UtcNow,
-            UpdatedBy = Guid.NewGuid()
-        };
+        RoleEntity updatedRole = _roleEntityFixture.Create(id: existingRole.Id, roleName: "SuperAdmin", createdBy: existingRole.CreatedBy, createdOnUtc: existingRole.CreatedOnUtc);
+        updatedRole.UpdatedOnUtc = DateTime.UtcNow;
+        updatedRole.UpdatedBy = Guid.NewGuid();
 
         // Act
         Result<Updated> result = await _sut.UpdateAsync(updatedRole, CancellationToken.None);
@@ -286,13 +227,7 @@ public class RoleRepositoryTests
     public async Task UpdateAsync_WhenRoleDoesNotExist_ShouldReturnError()
     {
         // Arrange
-        RoleEntity nonExistentRole = new()
-        {
-            Id = Guid.NewGuid(),
-            RoleName = "Admin",
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = Guid.NewGuid()
-        };
+        RoleEntity nonExistentRole = _roleEntityFixture.Create(roleName: "Admin");
 
         // Act
         Result<Updated> result = await _sut.UpdateAsync(nonExistentRole, CancellationToken.None);
@@ -306,25 +241,17 @@ public class RoleRepositoryTests
     public async Task UpdateAsync_WhenRoleHasPermissions_ShouldUpdatePermissionsAndReturnUpdated()
     {
         // Arrange
-        RolePermissionEntityFixture rolePermissionFixture = new();
-        RolePermissionEntity rolePermission = rolePermissionFixture.Create();
+        RolePermissionEntity rolePermission = _rolePermissionEntityFixture.Create();
         RoleEntity existingRole = rolePermission.Role;
         existingRole.RolePermissions = [rolePermission];
 
         _mockContext.Roles.Add(existingRole);
         await _mockContext.SaveChangesAsync();
 
-        RolePermissionEntity newRolePermission = rolePermissionFixture.Create();
-        RoleEntity updatedRole = new()
-        {
-            Id = existingRole.Id,
-            RoleName = existingRole.RoleName,
-            RolePermissions = [newRolePermission],
-            CreatedOnUtc = existingRole.CreatedOnUtc,
-            CreatedBy = existingRole.CreatedBy,
-            UpdatedOnUtc = DateTime.UtcNow,
-            UpdatedBy = Guid.NewGuid()
-        };
+        RolePermissionEntity newRolePermission = _rolePermissionEntityFixture.Create();
+        RoleEntity updatedRole = _roleEntityFixture.Create(id: existingRole.Id, roleName: existingRole.RoleName, rolePermissions: [newRolePermission], includeRolePermissions: true, createdBy: existingRole.CreatedBy, createdOnUtc: existingRole.CreatedOnUtc);
+        updatedRole.UpdatedOnUtc = DateTime.UtcNow;
+        updatedRole.UpdatedBy = Guid.NewGuid();
 
         // Act
         Result<Updated> result = await _sut.UpdateAsync(updatedRole, CancellationToken.None);
@@ -344,13 +271,7 @@ public class RoleRepositoryTests
     public async Task DeleteByIdAsync_WhenRoleExists_ShouldDeleteRoleAndReturnDeleted()
     {
         // Arrange
-        RoleEntity existingRole = new()
-        {
-            Id = Guid.NewGuid(),
-            RoleName = "Admin",
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = Guid.NewGuid()
-        };
+        RoleEntity existingRole = _roleEntityFixture.Create(roleName: "Admin");
 
         _mockContext.Roles.Add(existingRole);
         await _mockContext.SaveChangesAsync();
@@ -386,8 +307,7 @@ public class RoleRepositoryTests
     public async Task DeleteByIdAsync_WhenRoleHasPermissions_ShouldDeleteRoleWithPermissions()
     {
         // Arrange
-        RolePermissionEntityFixture rolePermissionFixture = new();
-        RolePermissionEntity rolePermission = rolePermissionFixture.Create();
+        RolePermissionEntity rolePermission = _rolePermissionEntityFixture.Create();
         RoleEntity existingRole = rolePermission.Role;
         existingRole.RolePermissions = [rolePermission];
 

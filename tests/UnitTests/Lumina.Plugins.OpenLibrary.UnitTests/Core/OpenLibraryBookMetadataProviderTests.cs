@@ -7,12 +7,12 @@ using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Plugins.OpenLibrary.Common.Models.DTO.Settings;
 using Lumina.Plugins.OpenLibrary.Core;
 using Lumina.Plugins.OpenLibrary.Core.Api;
+using Lumina.Plugins.OpenLibrary.Core.Settings;
 using Lumina.Plugins.OpenLibrary.Fixtures.Common.Models.DTO.Settings;
 using Lumina.Plugins.OpenLibrary.Fixtures.Common.Setup;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,13 +30,9 @@ public class OpenLibraryBookMetadataProviderTests
     private readonly BookMetadataLookupDtoFixture _bookMetadataLookupDtoFixture = new();
 
     private const string EDITION_JSON = """{"key":"/books/OL100M","title":"Edition Title","publish_date":"2010-05-01","number_of_pages":320,"physical_format":"Hardcover","edition_name":"First Edition","series":["The Series"],"volume":"Vol. 3","publishers":["Publisher Co"],"isbn_13":["9780306406157"],"languages":[{"key":"/languages/eng"}],"works":[{"key":"/works/OL200W"}]}""";
-
     private const string WORK_JSON = """{"key":"/works/OL200W","title":"Work Title","first_publish_date":"2001-01-01","description":{"value":"A work description"},"subjects":["Science fiction"],"authors":[{"author":{"key":"/authors/OL1A"}}]}""";
-
     private const string AUTHOR_JSON = """{"key":"/authors/OL1A","name":"Test Author"}""";
-
     private const string RATINGS_JSON = """{"summary":{"average":4.2,"count":100}}""";
-
     private const string EDITIONS_JSON = """{"entries":[{"key":"/books/OL100M","title":"Edition Title","languages":[{"key":"/languages/eng"}]}]}""";
 
     [Fact]
@@ -53,16 +49,17 @@ public class OpenLibraryBookMetadataProviderTests
     }
 
     [Fact]
-    public void SupportedLibraryType_WhenCalled_ShouldReturnBook()
+    public void SupportedLibraryTypes_WhenCalled_ShouldReturnBook()
     {
         // Arrange
         OpenLibraryBookMetadataProvider sut = CreateProvider(new StubOpenLibraryHttpMessageHandler());
 
         // Act
-        LibraryType result = sut.SupportedLibraryType;
+        IReadOnlyList<LibraryType> result = sut.SupportedLibraryTypes;
 
         // Assert
-        Assert.Equal(LibraryType.Book, result);
+        Assert.Single(result);
+        Assert.Equal(LibraryType.Book, result[0]);
     }
 
     [Fact]
@@ -442,7 +439,8 @@ public class OpenLibraryBookMetadataProviderTests
     private OpenLibraryBookMetadataProvider CreateProvider(StubOpenLibraryHttpMessageHandler handler, OpenLibrarySettingsDto? settings = null)
     {
         OpenLibrarySettingsDto runtimeSettings = settings ?? _settingsFixture.Create(minimumRequestInterval: TimeSpan.Zero);
-        OpenLibraryHttpClient openLibraryHttpClient = new(new HttpClient(handler), runtimeSettings);
-        return new OpenLibraryBookMetadataProvider(openLibraryHttpClient, runtimeSettings);
+        OpenLibrarySettingsProvider settingsProvider = new(null, Guid.NewGuid(), runtimeSettings);
+        OpenLibraryHttpClient openLibraryHttpClient = new(new HttpClient(handler), settingsProvider);
+        return new OpenLibraryBookMetadataProvider(openLibraryHttpClient, settingsProvider);
     }
 }

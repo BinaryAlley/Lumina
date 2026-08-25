@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Contracts.DTO.Common;
+using Lumina.Contracts.Fixtures.Core.DTO.Common;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
 using System.Collections.Generic;
@@ -16,11 +17,13 @@ namespace Lumina.Application.UnitTests.Common.Mapping.Common.Metadata;
 [ExcludeFromCodeCoverage]
 public class TagDtoMappingTests
 {
+    private readonly TagDtoFixture _tagDtoFixture = new();
+
     [Fact]
     public void ToDomainEntity_WhenMappingValidTagDto_ShouldMapCorrectly()
     {
         // Arrange
-        TagDto tagDto = new("indie");
+        TagDto tagDto = _tagDtoFixture.Create(name: "indie");
 
         // Act
         Result<Tag> result = tagDto.ToDomainEntity();
@@ -40,7 +43,7 @@ public class TagDtoMappingTests
     public void ToDomainEntity_WhenMappingDifferentValidTagDtos_ShouldMapCorrectly(string name)
     {
         // Arrange
-        TagDto tagDto = new(name);
+        TagDto tagDto = _tagDtoFixture.Create(name: name);
 
         // Act
         Result<Tag> result = tagDto.ToDomainEntity();
@@ -58,7 +61,7 @@ public class TagDtoMappingTests
     public void ToDomainEntity_WhenMappingInvalidTagDto_ShouldReturnError(string? invalidName)
     {
         // Arrange
-        TagDto tagDto = new(invalidName);
+        TagDto tagDto = _tagDtoFixture.Create(name: invalidName, includeName: invalidName is not null);
 
         // Act
         Result<Tag> result = tagDto.ToDomainEntity();
@@ -73,10 +76,10 @@ public class TagDtoMappingTests
         // Arrange
         List<TagDto> tagDtos =
         [
-            new TagDto("indie"),
-            new TagDto("electronic"),
-            new TagDto("instrumental"),
-            new TagDto("live")
+            _tagDtoFixture.Create(name: "indie"),
+            _tagDtoFixture.Create(name: "electronic"),
+            _tagDtoFixture.Create(name: "instrumental"),
+            _tagDtoFixture.Create(name: "live")
         ];
 
         // Act
@@ -100,10 +103,10 @@ public class TagDtoMappingTests
         // Arrange
         List<TagDto> tagDtos =
         [
-            new TagDto("indie"),
-            new TagDto(""),
-            new TagDto("electronic"),
-            new TagDto(" ")
+            _tagDtoFixture.Create(name: "indie"),
+            _tagDtoFixture.Create(name: ""),
+            _tagDtoFixture.Create(name: "electronic"),
+            _tagDtoFixture.Create(name: " ")
         ];
 
         // Act

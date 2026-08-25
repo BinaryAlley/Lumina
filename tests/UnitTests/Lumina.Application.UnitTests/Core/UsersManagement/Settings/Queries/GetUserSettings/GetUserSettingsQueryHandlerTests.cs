@@ -6,6 +6,7 @@ using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Core.UsersManagement.Settings.Queries.GetUserSettings;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Application.Fixtures.Core.UsersManagement.Settings.Queries.GetUserSettings;
 using Lumina.Contracts.Responses.UsersManagement.Settings;
 using Lumina.Domain.Common.Primitives;
 using NSubstitute;
@@ -28,6 +29,7 @@ public class GetUserSettingsQueryHandlerTests
     private readonly IUserSettingsRepository _mockUserSettingsRepository;
     private readonly GetUserSettingsQueryHandler _sut;
     private readonly UserSettingsEntityFixture _userSettingsEntityFixture = new();
+    private readonly GetUserSettingsQueryFixture _getUserSettingsQueryFixture = new();
     private readonly Guid _userId = Guid.NewGuid();
 
     /// <summary>
@@ -49,7 +51,7 @@ public class GetUserSettingsQueryHandlerTests
     public async Task HandleAsync_WhenSettingsExist_ShouldReturnStoredSettings()
     {
         // Arrange
-        GetUserSettingsQuery query = new();
+        GetUserSettingsQuery query = _getUserSettingsQueryFixture.Create();
         UserSettingsEntity storedSettings = _userSettingsEntityFixture.Create(userId: _userId);
         _mockUserSettingsRepository.GetByUserIdAsync(_userId, Arg.Any<CancellationToken>())
             .Returns(Result.From<UserSettingsEntity?>(storedSettings));
@@ -62,14 +64,14 @@ public class GetUserSettingsQueryHandlerTests
         Assert.Equal(storedSettings.UserId, result.Value.UserId);
         Assert.Equal(storedSettings.IsPaginationEnabled, result.Value.IsPaginationEnabled);
         Assert.Equal(storedSettings.ItemsPerPage, result.Value.ItemsPerPage);
-        Assert.Equal(storedSettings.IgnoreThePrefixForAlphaPicker, result.Value.IgnoreThePrefixForAlphaPicker);
+        Assert.Equal(storedSettings.ShouldIgnoreThePrefixForAlphaPicker, result.Value.ShouldIgnoreThePrefixForAlphaPicker);
     }
 
     [Fact]
     public async Task HandleAsync_WhenSettingsDoNotExist_ShouldReturnDefaultSettings()
     {
         // Arrange
-        GetUserSettingsQuery query = new();
+        GetUserSettingsQuery query = _getUserSettingsQueryFixture.Create();
         _mockUserSettingsRepository.GetByUserIdAsync(_userId, Arg.Any<CancellationToken>())
             .Returns(Result.From<UserSettingsEntity?>(null));
 
@@ -81,14 +83,14 @@ public class GetUserSettingsQueryHandlerTests
         Assert.NotEqual(Guid.Empty, result.Value.UserId);
         Assert.True(result.Value.IsPaginationEnabled);
         Assert.Equal(48, result.Value.ItemsPerPage);
-        Assert.False(result.Value.IgnoreThePrefixForAlphaPicker);
+        Assert.False(result.Value.ShouldIgnoreThePrefixForAlphaPicker);
     }
 
     [Fact]
     public async Task HandleAsync_WhenCurrentUserIsNull_ShouldReturnNotAuthorized()
     {
         // Arrange
-        GetUserSettingsQuery query = new();
+        GetUserSettingsQuery query = _getUserSettingsQueryFixture.Create();
         _mockCurrentUserService.UserId.Returns((Guid?)null);
 
         // Act
@@ -104,7 +106,7 @@ public class GetUserSettingsQueryHandlerTests
     public async Task HandleAsync_WhenGetByIdReturnsError_ShouldReturnError()
     {
         // Arrange
-        GetUserSettingsQuery query = new();
+        GetUserSettingsQuery query = _getUserSettingsQueryFixture.Create();
         Error error = Error.Failure("Database.Error", "Failed to retrieve user settings");
         _mockUserSettingsRepository.GetByUserIdAsync(_userId, Arg.Any<CancellationToken>())
             .Returns(error);

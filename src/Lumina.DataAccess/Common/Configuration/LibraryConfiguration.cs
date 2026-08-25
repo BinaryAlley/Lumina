@@ -46,7 +46,7 @@ public class LibraryConfiguration : IEntityTypeConfiguration<LibraryEntity>
         builder.Property(library => library.IsLocked)
             .HasColumnOrder(5);
 
-        builder.Property(library => library.DownloadMetadataFromWeb)
+        builder.Property(library => library.CanDownloadMetadataFromWeb)
             .HasDefaultValue(true)
             .HasColumnOrder(6);
 

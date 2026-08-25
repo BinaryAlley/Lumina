@@ -1,18 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Plugins;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Plugins;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.SharedKernel.Common.Enums.Plugins;
 using Lumina.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
-using System.Net.Http;
 using System.Text.Json;
-using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Plugins.GetPluginSettings;
@@ -29,6 +24,7 @@ public class GetPluginSettingsEndpointTests : IClassFixture<LuminaApiFactory>
     {
         PropertyNameCaseInsensitive = true
     };
+    private readonly PluginEntityFixture _pluginEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetPluginSettingsEndpointTests"/> class.
@@ -71,8 +67,8 @@ public class GetPluginSettingsEndpointTests : IClassFixture<LuminaApiFactory>
         // Arrange
         // authenticate with an admin user and seed a plugin, so a valid pluginId would reach the handler
         HttpClient client = _apiFactory.CreateClient();
-        Guid userId = await _apiFactory.CreateAndAuthenticateAdminUserAsync(client);
-        await SeedPluginAsync(userId);
+        await _apiFactory.CreateAndAuthenticateAdminUserAsync(client);
+        await SeedPluginAsync();
 
         // Act
         HttpResponseMessage response = await client.GetAsync($"/api/v1/plugins/{Uri.EscapeDataString(maliciousPluginId)}/settings");
@@ -91,28 +87,14 @@ public class GetPluginSettingsEndpointTests : IClassFixture<LuminaApiFactory>
     }
 
     /// <summary>
-    /// Seeds a <see cref="PluginEntity"/> created by <paramref name="userId"/>.
+    /// Seeds a <see cref="PluginEntity"/> created by the authenticated admin user.
     /// </summary>
-    /// <param name="userId">The Id of the creator.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    private async Task SeedPluginAsync(Guid userId)
+    private async Task SeedPluginAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
-        dbContext.Plugins.Add(new PluginEntity
-        {
-            Id = Guid.NewGuid(),
-            Name = "Test Plugin",
-            Author = "Test Author",
-            Version = "1.0.0",
-            Description = "A test plugin.",
-            LoadStatus = PluginLoadStatus.Loaded,
-            LoadError = null,
-            SettingsJson = null,
-            CreatedBy = userId,
-            CreatedOnUtc = DateTime.UtcNow,
-            UpdatedBy = null
-        });
+        dbContext.Plugins.Add(_pluginEntityFixture.Create(name: "Test Plugin", loadStatus: PluginLoadStatus.Loaded, includeSettingsJson: false));
         await dbContext.SaveChangesAsync();
     }
 }

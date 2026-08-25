@@ -2,6 +2,7 @@
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.MediaLibrary.Management.Commands.ScanLibrary;
 using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.Management;
+using Lumina.Contracts.Fixtures.Core.Responses.MediaLibrary.Management;
 using Lumina.Contracts.Requests.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
 using Lumina.Domain.Common.Primitives;
@@ -26,6 +27,7 @@ public class ScanLibraryEndpointTests
     private readonly ICommandHandler<ScanLibraryCommand, Result<MediaLibraryScanResponse>> _mockHandler;
     private readonly ScanLibraryEndpoint _sut;
     private readonly ScanLibraryRequestFixture _scanLibraryRequestFixture = new();
+    private readonly MediaLibraryScanResponseFixture _mediaLibraryScanResponseFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ScanLibraryEndpointTests"/> class.
@@ -42,7 +44,7 @@ public class ScanLibraryEndpointTests
         // Arrange
         ScanLibraryRequest request = _scanLibraryRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
-        MediaLibraryScanResponse expectedResponse = new(Guid.NewGuid(), request.Id);
+        MediaLibraryScanResponse expectedResponse = _mediaLibraryScanResponseFixture.Create(libraryId: request.Id);
         _mockHandler.HandleAsync(Arg.Any<ScanLibraryCommand>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(expectedResponse));
 
@@ -87,7 +89,7 @@ public class ScanLibraryEndpointTests
         ScanLibraryRequest request = _scanLibraryRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<ScanLibraryCommand>(), Arg.Any<CancellationToken>())
-            .Returns(Result.From(new MediaLibraryScanResponse(Guid.NewGuid(), request.Id)));
+            .Returns(Result.From(_mediaLibraryScanResponseFixture.Create(libraryId: request.Id)));
 
         // Act
         await _sut.ExecuteAsync(request, cancellationToken);
@@ -113,7 +115,7 @@ public class ScanLibraryEndpointTests
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return Result.From(new MediaLibraryScanResponse(Guid.NewGuid(), request.Id));
+                return Result.From(_mediaLibraryScanResponseFixture.Create(libraryId: request.Id));
             }, callInfo.Arg<CancellationToken>()));
 
         // Act

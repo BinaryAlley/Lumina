@@ -2,6 +2,7 @@
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
@@ -19,11 +20,13 @@ namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.WrittenConten
 [ExcludeFromCodeCoverage]
 public class IsbnEntityMappingTests
 {
+    private readonly IsbnEntityFixture _isbnEntityFixture = new();
+
     [Fact]
     public void ToResponse_WhenMappingValidIsbnEntity_ShouldMapCorrectly()
     {
         // Arrange
-        IsbnEntity entity = new("0-7475-3269-9", IsbnFormat.Isbn10);
+        IsbnEntity entity = _isbnEntityFixture.Create(value: "0-7475-3269-9", format: IsbnFormat.Isbn10);
 
         // Act  
         IsbnDto result = entity.ToResponse();
@@ -40,7 +43,7 @@ public class IsbnEntityMappingTests
     public void ToResponse_WhenMappingDifferentValidIsbnEntities_ShouldMapCorrectly(string value, IsbnFormat format)
     {
         // Arrange
-        IsbnEntity entity = new(value, format);
+        IsbnEntity entity = _isbnEntityFixture.Create(value: value, format: format);
 
         // Act
         IsbnDto result = entity.ToResponse();
@@ -58,7 +61,7 @@ public class IsbnEntityMappingTests
     public void ToResponse_WhenMappingInvalidIsbnEntity_ShouldPreserveValues(string? value, IsbnFormat? format)
     {
         // Arrange
-        IsbnEntity entity = new(value, format);
+        IsbnEntity entity = _isbnEntityFixture.Create(value: value, format: format, includeValue: value is not null);
 
         // Act
         IsbnDto result = entity.ToResponse();
@@ -72,7 +75,7 @@ public class IsbnEntityMappingTests
     public void ToDomainEntity_WhenMappingValidIsbnEntity_ShouldMapCorrectly()
     {
         // Arrange
-        IsbnEntity entity = new("0-7475-3269-9", IsbnFormat.Isbn10);
+        IsbnEntity entity = _isbnEntityFixture.Create(value: "0-7475-3269-9", format: IsbnFormat.Isbn10);
 
         // Act
         Result<Isbn> result = entity.ToDomainEntity();
@@ -91,7 +94,7 @@ public class IsbnEntityMappingTests
     public void ToDomainEntity_WhenMappingInvalidIsbnEntity_ShouldReturnError(string? invalidValue)
     {
         // Arrange
-        IsbnEntity entity = new(invalidValue, null);
+        IsbnEntity entity = _isbnEntityFixture.Create(value: invalidValue, includeValue: invalidValue is not null);
 
         // Act
         Result<Isbn> result = entity.ToDomainEntity();
@@ -106,8 +109,8 @@ public class IsbnEntityMappingTests
         // Arrange
         List<IsbnEntity> entities =
         [
-            new IsbnEntity("0-7475-3269-9", IsbnFormat.Isbn10),
-            new IsbnEntity("978-0-7475-3269-9", IsbnFormat.Isbn13)
+            _isbnEntityFixture.Create(value: "0-7475-3269-9", format: IsbnFormat.Isbn10),
+            _isbnEntityFixture.Create(value: "978-0-7475-3269-9", format: IsbnFormat.Isbn13)
         ];
 
         // Act
@@ -132,8 +135,8 @@ public class IsbnEntityMappingTests
         // Arrange
         List<IsbnEntity> entities =
         [
-            new IsbnEntity("0-7475-3269-9", IsbnFormat.Isbn10),
-            new IsbnEntity("978-0-7475-3269-9", IsbnFormat.Isbn13)
+            _isbnEntityFixture.Create(value: "0-7475-3269-9", format: IsbnFormat.Isbn10),
+            _isbnEntityFixture.Create(value: "978-0-7475-3269-9", format: IsbnFormat.Isbn13)
         ];
 
         // Act

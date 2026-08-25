@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.Management;
 using Lumina.Contracts.Requests.MediaLibrary.Management;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
@@ -12,6 +13,7 @@ namespace Lumina.Contracts.UnitTests.Requests.MediaLibrary.Management;
 [ExcludeFromCodeCoverage]
 public class AddLibraryRequestTests
 {
+    private readonly AddLibraryRequestFixture _addLibraryRequestFixture = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
@@ -21,16 +23,16 @@ public class AddLibraryRequestTests
     public void RoundTrip_WhenSerializingAddLibraryRequest_ShouldPreserveValues()
     {
         // Arrange
-        AddLibraryRequest expected = new(
-            "Books",
-            "Book",
-            [@"C:\Media\Books"],
-            null,
-            true,
-            false,
-            true,
-            false,
-            true
+        AddLibraryRequest expected = _addLibraryRequestFixture.Create(
+            title: "Books",
+            libraryType: "Book",
+            contentLocations: [@"C:\Media\Books"],
+            coverImage: null,
+            isEnabled: true,
+            isLocked: false,
+            canDownloadMetadataFromWeb: true,
+            shouldSaveMetadataInMediaDirectories: false,
+            shouldSkipUnchangedDirectoriesDuringScan: true
         );
 
         // Act
@@ -45,20 +47,20 @@ public class AddLibraryRequestTests
     public void Deconstruct_WhenCalled_ShouldReturnAllProperties()
     {
         // Arrange
-        AddLibraryRequest sut = new(
-            "Books",
-            "Book",
-            [@"C:\Media\Books"],
-            null,
-            true,
-            false,
-            true,
-            false,
-            true
+        AddLibraryRequest sut = _addLibraryRequestFixture.Create(
+            title: "Books",
+            libraryType: "Book",
+            contentLocations: [@"C:\Media\Books"],
+            coverImage: null,
+            isEnabled: true,
+            isLocked: false,
+            canDownloadMetadataFromWeb: true,
+            shouldSaveMetadataInMediaDirectories: false,
+            shouldSkipUnchangedDirectoriesDuringScan: true
         );
 
         // Act
-        (string? title, string? libraryType, string[]? contentLocations, string? coverImage, bool isEnabled, bool isLocked, bool downloadMetadataFromWeb, bool shouldSaveMetadataInMediaDirectories, bool shouldSkipUnchangedDirectoriesDuringScan) = sut;
+        (string? title, string? libraryType, string[]? contentLocations, string? coverImage, bool isEnabled, bool isLocked, bool canDownloadMetadataFromWeb, bool shouldSaveMetadataInMediaDirectories, bool shouldSkipUnchangedDirectoriesDuringScan) = sut;
 
         // Assert
         Assert.Equal(sut.Title, title);
@@ -67,7 +69,7 @@ public class AddLibraryRequestTests
         Assert.Equal(sut.CoverImage, coverImage);
         Assert.Equal(sut.IsEnabled, isEnabled);
         Assert.Equal(sut.IsLocked, isLocked);
-        Assert.Equal(sut.DownloadMetadataFromWeb, downloadMetadataFromWeb);
+        Assert.Equal(sut.CanDownloadMetadataFromWeb, canDownloadMetadataFromWeb);
         Assert.Equal(sut.ShouldSaveMetadataInMediaDirectories, shouldSaveMetadataInMediaDirectories);
         Assert.Equal(sut.ShouldSkipUnchangedDirectoriesDuringScan, shouldSkipUnchangedDirectoriesDuringScan);
     }

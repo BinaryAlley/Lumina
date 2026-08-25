@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Core.MediaLibrary.Management.Commands.UpdateLibrary;
 using Lumina.Contracts.Requests.MediaLibrary.Management;
-using System;
 #endregion
 
 namespace Lumina.Application.Common.Mapping.MediaLibrary.Management;
@@ -27,7 +26,7 @@ public static class UpdateLibraryRequestMapping
             request.CoverImage,
             request.IsEnabled,
             request.IsLocked,
-            request.DownloadMetadataFromWeb,
+            request.CanDownloadMetadataFromWeb,
             request.ShouldSaveMetadataInMediaDirectories,
             request.ShouldSkipUnchangedDirectoriesDuringScan
         );

@@ -1,5 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Enums.Library;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -56,7 +55,7 @@ public class LibraryDto
     /// <summary>
     /// Gets or sets whether this media library should update the metadata of its elements from the web, or not.
     /// </summary>
-    public bool DownloadMetadataFromWeb { get; set; } = true;
+    public bool CanDownloadMetadataFromWeb { get; set; } = true;
 
     /// <summary>
     /// Gets or sets whether this media library should copy the downloaded metadata into the media library content locations, or not.

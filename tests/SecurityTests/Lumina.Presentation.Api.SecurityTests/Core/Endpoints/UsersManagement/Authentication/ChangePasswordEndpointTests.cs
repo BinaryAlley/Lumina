@@ -1,5 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.DataAccess.Core.UoW;
@@ -26,6 +28,8 @@ public class ChangePasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDis
     private readonly LuminaApiFactory _apiFactory;
     private readonly HttpClient _client;
     private readonly PasswordHashService _hashService = new();
+    private readonly UserEntityFixture _userEntityFixture = new();
+    private readonly ChangePasswordRequestFixture _changePasswordRequestFixture = new();
     private readonly string _testUsername;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -49,11 +53,11 @@ public class ChangePasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDis
     public async Task ChangePassword_WithoutAuthentication_ShouldReturnUnauthorizedResult()
     {
         // Arrange
-        ChangePasswordRequest request = new(
-            Username: _testUsername,
-            CurrentPassword: "OldPass123!",
-            NewPassword: "NewPass123!",
-            NewPasswordConfirm: "NewPass123!"
+        ChangePasswordRequest request = _changePasswordRequestFixture.Create(
+            username: _testUsername,
+            currentPassword: "OldPass123!",
+            newPassword: "NewPass123!",
+            newPasswordConfirm: "NewPass123!"
         );
 
         // Act
@@ -78,11 +82,11 @@ public class ChangePasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDis
     {
         // Arrange
         UserEntity user = await CreateAndAuthenticateUser();
-        ChangePasswordRequest request = new(
-            Username: user.Username,
-            CurrentPassword: "WrongPass123!",
-            NewPassword: "NewPass123!",
-            NewPasswordConfirm: "NewPass123!"
+        ChangePasswordRequest request = _changePasswordRequestFixture.Create(
+            username: user.Username,
+            currentPassword: "WrongPass123!",
+            newPassword: "NewPass123!",
+            newPasswordConfirm: "NewPass123!"
         );
 
         // Act
@@ -106,11 +110,11 @@ public class ChangePasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDis
         // Arrange
         UserEntity user = await CreateAndAuthenticateUser();
         string originalPasswordHash = user.Password;
-        ChangePasswordRequest request = new(
-            Username: maliciousUsername,
-            CurrentPassword: "TestPass123!",
-            NewPassword: "NewPass123!",
-            NewPasswordConfirm: "NewPass123!"
+        ChangePasswordRequest request = _changePasswordRequestFixture.Create(
+            username: maliciousUsername,
+            currentPassword: "TestPass123!",
+            newPassword: "NewPass123!",
+            newPasswordConfirm: "NewPass123!"
         );
 
         // Act
@@ -130,6 +134,12 @@ public class ChangePasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDis
         Assert.Equal(originalPasswordHash, storedUser!.Password);
     }
 
+    /// <summary>
+    /// Asserts that the given <paramref name="content"/> is a problem detail with the expected title and detail.
+    /// </summary>
+    /// <param name="content">The response content to assert.</param>
+    /// <param name="expectedTitle">The expected title of the problem detail.</param>
+    /// <param name="expectedDetail">The expected detail of the problem detail.</param>
     private void AssertProblemDetail(string content, string expectedTitle, string expectedDetail)
     {
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
@@ -138,22 +148,18 @@ public class ChangePasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDis
         Assert.Equal(expectedDetail, problemDetails["detail"].GetString());
     }
 
+    /// <summary>
+    /// Creates a test user, authenticates it on the client, and returns it.
+    /// </summary>
+    /// <returns>The created user entity.</returns>
     private async Task<UserEntity> CreateAndAuthenticateUser()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
 
         // create test user
-        UserEntity user = new()
-        {
-            Username = _testUsername,
-            Password = _hashService.HashString("TestPass123!"),
-            Libraries = [],
-            UserRole = null,
-            UserPermissions = [],
-            CreatedBy = Guid.NewGuid(),
-            CreatedOnUtc = DateTime.UtcNow
-        };
+        UserEntity user = _userEntityFixture.Create(username: _testUsername, password: _hashService.HashString("TestPass123!"));
+        user.TotpSecret = null;
 
         dbContext.Users.Add(user);
         await dbContext.SaveChangesAsync();
