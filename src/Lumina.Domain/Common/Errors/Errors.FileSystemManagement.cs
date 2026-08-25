@@ -29,5 +29,6 @@ public static partial class Errors
         public static Error FileAlreadyExists => Error.Conflict(description: nameof(FileAlreadyExists));
         public static Error DirectoryNotFound => Error.NotFound(description: nameof(DirectoryNotFound));
         public static Error DirectoryAlreadyExists => Error.Conflict(description: nameof(DirectoryAlreadyExists));
+        public static Error FileTooLarge => Error.Validation(description: nameof(FileTooLarge));
     }
 }

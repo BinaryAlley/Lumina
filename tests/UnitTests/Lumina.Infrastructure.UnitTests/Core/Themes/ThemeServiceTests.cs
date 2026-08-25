@@ -1,6 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Infrastructure.Models.DTO.Themes;
 using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Infrastructure.Common.Models.DTO.Configuration;
 using Lumina.Infrastructure.Core.Themes;
 using Lumina.Infrastructure.Fixtures.Common.Models.DTO.Configuration;
@@ -53,26 +55,6 @@ public class ThemeServiceTests : IDisposable
             maxSingleFileBytes: 6 * 1024 * 1024,
             maxEntries: 250);
         _sut = CreateSut(_options);
-    }
-
-    /// <summary>
-    /// Cleans up the temporary storage used by the tests.
-    /// </summary>
-    public void Dispose()
-    {
-        try
-        {
-            if (Directory.Exists(_testRootPath))
-                Directory.Delete(_testRootPath, recursive: true);
-        }
-        catch (IOException)
-        {
-            // best effort cleanup of the per-test temp directory
-        }
-        catch (UnauthorizedAccessException)
-        {
-            // best effort cleanup of the per-test temp directory
-        }
     }
 
     [Fact]
@@ -1152,6 +1134,26 @@ public class ThemeServiceTests : IDisposable
     }
 
     /// <summary>
+    /// Cleans up the temporary storage used by the tests.
+    /// </summary>
+    public void Dispose()
+    {
+        try
+        {
+            if (Directory.Exists(_testRootPath))
+                Directory.Delete(_testRootPath, recursive: true);
+        }
+        catch (IOException)
+        {
+            // best effort cleanup of the per-test temp directory
+        }
+        catch (UnauthorizedAccessException)
+        {
+            // best effort cleanup of the per-test temp directory
+        }
+    }
+
+    /// <summary>
     /// Creates a valid theme pack that declares the default, home and library templates and their files.
     /// </summary>
     /// <returns>The created theme pack ZIP archive.</returns>
@@ -1207,6 +1209,9 @@ public class ThemeServiceTests : IDisposable
     private static ThemeService CreateSut(ThemeEngineOptionsDto options)
     {
         ILogger<ThemeService> logger = Substitute.For<ILogger<ThemeService>>();
-        return new ThemeService(Options.Create(options), logger);
+        IPathService pathService = Substitute.For<IPathService>();
+        pathService.SanitizeSegment(Arg.Any<string>())
+            .Returns(callInfo => PathSegment.Create(callInfo.Arg<string>(), isDirectory: true, isDrive: false));
+        return new ThemeService(Options.Create(options), logger, pathService);
     }
 }
