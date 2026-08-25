@@ -124,12 +124,13 @@ public class BookArtworkServiceSecurityTests
                 .Returns(Result.From(_fileSystemPathIdFixture.Create(Path.Combine(AppContext.BaseDirectory, "media", "books", "cover.jpeg"))));
 
             // Act
+            char separator = Path.DirectorySeparatorChar;
             Result<string> result = await _sut.SaveBookArtworkAsync(
                 Guid.NewGuid(),
                 Guid.NewGuid(),
-                libraryName: "..\\..\\Library",
-                authorName: "..\\evil",
-                bookTitle: "..\\..\\cover",
+                libraryName: $"..{separator}..{separator}Library",
+                authorName: $"..{separator}evil",
+                bookTitle: $"..{separator}..{separator}cover",
                 _artworkDtoFixture.Create(localPath: sourcePath),
                 CancellationToken.None);
 
