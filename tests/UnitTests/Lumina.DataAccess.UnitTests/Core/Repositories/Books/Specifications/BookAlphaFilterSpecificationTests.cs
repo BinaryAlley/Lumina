@@ -47,9 +47,9 @@ public class BookAlphaFilterSpecificationTests : IDisposable
     {
         // Arrange
         List<BookEntity> books = await SeedBooksAsync(
-            _bookEntityFixture.Create(title: "The Fellowship of the Ring"),
-            _bookEntityFixture.Create(title: "1984"),
-            _bookEntityFixture.Create(title: "@home"));
+            _bookEntityFixture.Create(title: "The Fellowship of the Ring", includeMetadata: false),
+            _bookEntityFixture.Create(title: "1984", includeMetadata: false),
+            _bookEntityFixture.Create(title: "@home", includeMetadata: false));
         BookAlphaFilterSpecification specification = new(null, false);
 
         // Act
@@ -64,9 +64,9 @@ public class BookAlphaFilterSpecificationTests : IDisposable
     {
         // Arrange
         List<BookEntity> books = await SeedBooksAsync(
-            _bookEntityFixture.Create(title: "The Fellowship of the Ring"),
-            _bookEntityFixture.Create(title: "1984"),
-            _bookEntityFixture.Create(title: "Zoo"));
+            _bookEntityFixture.Create(title: "The Fellowship of the Ring", includeMetadata: false),
+            _bookEntityFixture.Create(title: "1984", includeMetadata: false),
+            _bookEntityFixture.Create(title: "Zoo", includeMetadata: false));
         BookAlphaFilterSpecification specification = new("T", false);
 
         // Act
@@ -82,8 +82,8 @@ public class BookAlphaFilterSpecificationTests : IDisposable
     {
         // Arrange
         await SeedBooksAsync(
-            _bookEntityFixture.Create(title: "Zoo"),
-            _bookEntityFixture.Create(title: "moby dick"));
+            _bookEntityFixture.Create(title: "Zoo", includeMetadata: false),
+            _bookEntityFixture.Create(title: "moby dick", includeMetadata: false));
         BookAlphaFilterSpecification specification = new("Z", false);
 
         // Act
@@ -99,8 +99,8 @@ public class BookAlphaFilterSpecificationTests : IDisposable
     {
         // Arrange
         List<BookEntity> books = await SeedBooksAsync(
-            _bookEntityFixture.Create(title: "1984"),
-            _bookEntityFixture.Create(title: "The Fellowship of the Ring"));
+            _bookEntityFixture.Create(title: "1984", includeMetadata: false),
+            _bookEntityFixture.Create(title: "The Fellowship of the Ring", includeMetadata: false));
         BookAlphaFilterSpecification specification = new(LibraryItemAlphaKeys.NUMBER, false);
 
         // Act
@@ -116,9 +116,9 @@ public class BookAlphaFilterSpecificationTests : IDisposable
     {
         // Arrange
         List<BookEntity> books = await SeedBooksAsync(
-            _bookEntityFixture.Create(title: "@home"),
-            _bookEntityFixture.Create(title: "1984"),
-            _bookEntityFixture.Create(title: "Zoo"));
+            _bookEntityFixture.Create(title: "@home", includeMetadata: false),
+            _bookEntityFixture.Create(title: "1984", includeMetadata: false),
+            _bookEntityFixture.Create(title: "Zoo", includeMetadata: false));
         BookAlphaFilterSpecification specification = new(LibraryItemAlphaKeys.SYMBOL, false);
 
         // Act
@@ -134,8 +134,8 @@ public class BookAlphaFilterSpecificationTests : IDisposable
     {
         // Arrange
         List<BookEntity> books = await SeedBooksAsync(
-            _bookEntityFixture.Create(title: "The Fellowship of the Ring"),
-            _bookEntityFixture.Create(title: "To Kill a Mockingbird"));
+            _bookEntityFixture.Create(title: "The Fellowship of the Ring", includeMetadata: false),
+            _bookEntityFixture.Create(title: "To Kill a Mockingbird", includeMetadata: false));
         BookAlphaFilterSpecification specification = new("T", true);
 
         // Act
@@ -151,8 +151,8 @@ public class BookAlphaFilterSpecificationTests : IDisposable
     {
         // Arrange
         await SeedBooksAsync(
-            _bookEntityFixture.Create(title: "The Fellowship of the Ring"),
-            _bookEntityFixture.Create(title: "To Kill a Mockingbird"));
+            _bookEntityFixture.Create(title: "The Fellowship of the Ring", includeMetadata: false),
+            _bookEntityFixture.Create(title: "To Kill a Mockingbird", includeMetadata: false));
         BookAlphaFilterSpecification specification = new("T", false);
 
         // Act
@@ -166,7 +166,7 @@ public class BookAlphaFilterSpecificationTests : IDisposable
     public async Task ToExpression_WhenTitleIsEmpty_ShouldFallBackToOriginalTitle()
     {
         // Arrange
-        await SeedBooksAsync(_bookEntityFixture.Create(title: string.Empty, originalTitle: "The Real Title"));
+        await SeedBooksAsync(_bookEntityFixture.Create(title: string.Empty, originalTitle: "The Real Title", includeMetadata: false));
         BookAlphaFilterSpecification specification = new("T", false);
 
         // Act
