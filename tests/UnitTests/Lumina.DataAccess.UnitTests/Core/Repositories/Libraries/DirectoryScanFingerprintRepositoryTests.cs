@@ -125,13 +125,7 @@ public class DirectoryScanFingerprintRepositoryTests : IDisposable
         await _context.SaveChangesAsync();
 
         DateTime newLastWriteTimeUtc = DateTime.UtcNow.AddDays(1);
-        DirectoryScanFingerprintEntity updatedFingerprint = new()
-        {
-            Id = Guid.NewGuid(),
-            LibraryId = libraryId,
-            Path = "/dir1",
-            LastWriteTimeUtc = newLastWriteTimeUtc
-        };
+        DirectoryScanFingerprintEntity updatedFingerprint = _directoryScanFingerprintEntityFixture.Create(libraryId: libraryId, path: "/dir1", lastWriteTimeUtc: newLastWriteTimeUtc);
 
         // Act
         Result<Updated> result = await _sut.UpsertRangeAsync([updatedFingerprint], CancellationToken.None);

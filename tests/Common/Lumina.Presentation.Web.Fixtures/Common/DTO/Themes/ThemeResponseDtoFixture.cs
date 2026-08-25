@@ -16,6 +16,8 @@ namespace Lumina.Presentation.Web.Fixtures.Common.DTO.Themes;
 [ExcludeFromCodeCoverage]
 public class ThemeResponseDtoFixture
 {
+    private readonly Faker _faker = new();
+
     /// <summary>
     /// Creates a new <see cref="ThemeResponseDto"/> instance with randomized test data.
     /// </summary>
@@ -48,19 +50,18 @@ public class ThemeResponseDtoFixture
         DateTime? installedAtUtc = null,
         bool? isDeleted = null)
     {
-        Faker faker = new();
         return new ThemeResponseDto(
             Id: id ?? Guid.NewGuid(),
-            ThemeId: themeId ?? faker.Lorem.Word(),
-            Name: name ?? faker.Commerce.ProductName(),
-            Description: description ?? faker.Lorem.Sentence(),
-            Author: author ?? faker.Name.FullName(),
-            Version: version ?? faker.System.Semver(),
-            PreviewPath: includePreviewPath ? (previewPath ?? (faker.Random.Bool() ? faker.System.FilePath() : null)) : null,
+            ThemeId: themeId ?? _faker.Lorem.Word(),
+            Name: name ?? _faker.Commerce.ProductName(),
+            Description: description ?? _faker.Lorem.Sentence(),
+            Author: author ?? _faker.Name.FullName(),
+            Version: version ?? _faker.System.Semver(),
+            PreviewPath: includePreviewPath ? (previewPath ?? (_faker.Random.Bool() ? _faker.System.FilePath() : null)) : null,
             InstallSource: installSource ?? ThemeInstallSource.Uploaded,
-            IsCurrent: includeIsCurrent ? (isCurrent ?? (faker.Random.Bool() ? true : null)) : null,
-            InstalledAtUtc: installedAtUtc ?? faker.Date.Recent(),
-            IsDeleted: isDeleted ?? faker.Random.Bool()
+            IsCurrent: includeIsCurrent ? (isCurrent ?? (_faker.Random.Bool() ? true : null)) : null,
+            InstalledAtUtc: installedAtUtc ?? _faker.Date.Recent(),
+            IsDeleted: isDeleted ?? _faker.Random.Bool()
         );
     }
 

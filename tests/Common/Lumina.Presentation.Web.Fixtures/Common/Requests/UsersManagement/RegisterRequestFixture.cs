@@ -14,6 +14,8 @@ namespace Lumina.Presentation.Web.Fixtures.Common.Requests.UsersManagement;
 [ExcludeFromCodeCoverage]
 public class RegisterRequestFixture
 {
+    private readonly Faker _faker = new();
+
     /// <summary>
     /// Creates a new <see cref="RegisterRequest"/> instance with randomized test data.
     /// </summary>
@@ -23,12 +25,16 @@ public class RegisterRequestFixture
     /// <param name="registrationType">Optional registration type, e.g. "Admin" or "User".</param>
     /// <param name="use2fa">Whether two-factor authentication is enabled for the account.</param>
     /// <returns>A configured <see cref="RegisterRequest"/> instance.</returns>
-    public RegisterRequest Create(string? username = null, string? password = null, string? passwordConfirm = null, string? registrationType = "User", bool use2fa = true)
+    public RegisterRequest Create(
+        string? username = null, 
+        string? password = null, 
+        string? passwordConfirm = null, 
+        string? registrationType = "User", 
+        bool use2fa = true)
     {
-        Faker faker = new();
-        string generatedPassword = password ?? faker.Internet.Password(12);
+        string generatedPassword = password ?? _faker.Internet.Password(12);
         return new RegisterRequest(
-            Username: username ?? faker.Internet.UserName(),
+            Username: username ?? _faker.Internet.UserName(),
             Password: generatedPassword,
             PasswordConfirm: passwordConfirm ?? generatedPassword,
             RegistrationType: registrationType,

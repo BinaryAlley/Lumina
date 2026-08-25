@@ -27,31 +27,33 @@ public class GetBooksLiteQueryFixture
     /// <param name="paginationData">Optional. The pagination data of the query.</param>
     /// <param name="searchTerm">Optional. The search term used to filter results.</param>
     /// <param name="filterAlphaKey">Optional. The alpha key used to filter the results by the first character of their title, for the alpha picker.</param>
-    /// <param name="ignoreThePrefixForAlphaPicker">Optional. Whether the leading "The " prefix of a title should be ignored when computing the alpha key, or not.</param>
+    /// <param name="shouldIgnoreThePrefixForAlphaPicker">Optional. Whether the leading "The " prefix of a title should be ignored when computing the alpha key, or not.</param>
     /// <param name="sortBy">Optional. The name of the field by which to sort the results.</param>
     /// <param name="sortOrder">Optional. The direction in which to sort the results.</param>
+    /// <param name="includePaginationData">Whether the query should include pagination data or not.</param>
     /// <returns>The created query to get the lightweight details of books.</returns>
     public GetBooksLiteQuery Create(
         Guid? libraryId = null,
         PaginationDataDto? paginationData = null,
         string? searchTerm = null,
         string? filterAlphaKey = null,
-        bool ignoreThePrefixForAlphaPicker = false,
+        bool shouldIgnoreThePrefixForAlphaPicker = false,
         string? sortBy = null,
-        SortOrder? sortOrder = null)
+        SortOrder? sortOrder = null,
+        bool includePaginationData = true)
     {
         return new GetBooksLiteQuery(
-            paginationData ?? new PaginationDataDto
+            includePaginationData ? paginationData ?? new PaginationDataDto
             {
                 CurrentPage = _faker.Random.Number(1, 100),
                 PerPage = _faker.Random.Number(1, 200)
-            },
+            } : null,
             new LibraryFilterDto
             {
                 LibraryId = libraryId ?? _faker.Random.Guid(),
                 SearchTerm = searchTerm,
                 FilterAlphaKey = filterAlphaKey,
-                IgnoreThePrefixForAlphaPicker = ignoreThePrefixForAlphaPicker
+                ShouldIgnoreThePrefixForAlphaPicker = shouldIgnoreThePrefixForAlphaPicker
             },
             sortBy,
             sortOrder ?? _faker.PickRandom<SortOrder>()

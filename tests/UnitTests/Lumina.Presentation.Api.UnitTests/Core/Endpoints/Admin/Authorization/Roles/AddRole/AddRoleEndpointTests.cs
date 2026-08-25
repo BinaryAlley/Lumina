@@ -1,7 +1,9 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.Admin.Authorization.Roles.Commands.AddRole;
-using Lumina.Contracts.DTO.Authentication;
+using Lumina.Contracts.Fixtures.Core.DTO.Authentication;
+using Lumina.Contracts.Fixtures.Core.Requests.Authorization;
+using Lumina.Contracts.Fixtures.Core.Responses.Authorization;
 using Lumina.Contracts.Requests.Authorization;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.Domain.Common.Primitives;
@@ -26,6 +28,9 @@ public class AddRoleEndpointTests
 {
     private readonly ICommandHandler<AddRoleCommand, Result<RolePermissionsResponse>> _mockHandler;
     private readonly AddRoleEndpoint _sut;
+    private readonly RolePermissionsResponseFixture _rolePermissionsResponseFixture = new();
+    private readonly RoleDtoFixture _roleDtoFixture = new();
+    private readonly AddRoleRequestFixture _addRoleRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AddRoleEndpointTests"/> class.
@@ -40,9 +45,11 @@ public class AddRoleEndpointTests
     public async Task ExecuteAsync_WhenSuccessful_ShouldReturnOkResultWithRoleResponse()
     {
         // Arrange
-        AddRoleRequest request = new("Admin", [Guid.NewGuid()]);
+        AddRoleRequest request = _addRoleRequestFixture.Create(roleName: "Admin", permissions: [Guid.NewGuid()]);
         CancellationToken cancellationToken = CancellationToken.None;
-        RolePermissionsResponse expectedResponse = new(new RoleDto(Guid.NewGuid(), "Admin"), []);
+        RolePermissionsResponse expectedResponse = _rolePermissionsResponseFixture.Create(
+            role: _roleDtoFixture.Create(roleName: "Admin"),
+            permissions: []);
         _mockHandler.HandleAsync(Arg.Any<AddRoleCommand>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(expectedResponse));
 
@@ -58,7 +65,7 @@ public class AddRoleEndpointTests
     public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
     {
         // Arrange
-        AddRoleRequest request = new("Admin", [Guid.NewGuid()]);
+        AddRoleRequest request = _addRoleRequestFixture.Create(roleName: "Admin", permissions: [Guid.NewGuid()]);
         CancellationToken cancellationToken = CancellationToken.None;
         Error expectedError = Error.Failure("Role.Creation.Failed", "Failed to create role.");
         _mockHandler.HandleAsync(Arg.Any<AddRoleCommand>(), Arg.Any<CancellationToken>())
@@ -84,10 +91,12 @@ public class AddRoleEndpointTests
     public async Task ExecuteAsync_WhenCalled_ShouldSendAddRoleCommandToSender()
     {
         // Arrange
-        AddRoleRequest request = new("Admin", [Guid.NewGuid()]);
+        AddRoleRequest request = _addRoleRequestFixture.Create(roleName: "Admin", permissions: [Guid.NewGuid()]);
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<AddRoleCommand>(), Arg.Any<CancellationToken>())
-            .Returns(Result.From(new RolePermissionsResponse(new RoleDto(Guid.NewGuid(), "Admin"), [])));
+            .Returns(Result.From(_rolePermissionsResponseFixture.Create(
+                role: _roleDtoFixture.Create(roleName: "Admin"),
+                permissions: [])));
 
         // Act
         await _sut.ExecuteAsync(request, cancellationToken);
@@ -114,11 +123,13 @@ public class AddRoleEndpointTests
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 info.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return Result.From(new RolePermissionsResponse(new RoleDto(Guid.NewGuid(), "Admin"), []));
+                return Result.From(_rolePermissionsResponseFixture.Create(
+                    role: _roleDtoFixture.Create(roleName: "Admin"),
+                    permissions: []));
             }, info.Arg<CancellationToken>()));
 
         // Act
-        Task<IResult> operationTask = _sut.ExecuteAsync(new AddRoleRequest("Admin", []), cts.Token);
+        Task<IResult> operationTask = _sut.ExecuteAsync(_addRoleRequestFixture.Create(roleName: "Admin", permissions: []), cts.Token);
         await operationStarted.Task;
         cts.Cancel();
         cancellationRequested.SetResult(true);

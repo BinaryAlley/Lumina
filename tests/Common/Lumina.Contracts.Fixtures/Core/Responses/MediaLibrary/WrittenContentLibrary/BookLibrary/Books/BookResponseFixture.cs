@@ -40,7 +40,8 @@ public class BookResponseFixture
         WrittenContentMetadataDto? metadata = null,
         BookFormat? format = null,
         MetadataStatus? metadataStatus = null,
-        DateTime? createdOnUtc = null)
+        DateTime? createdOnUtc = null,
+        string? coverPath = null)
     {
         DateTime resolvedCreatedOnUtc = createdOnUtc ?? _faker.Date.Past().ToUniversalTime();
         return new BookResponse(
@@ -70,7 +71,8 @@ public class BookResponseFixture
             _faker.Date.Recent().ToUniversalTime(),
             _faker.Company.CompanyName(),
             resolvedCreatedOnUtc,
-            _faker.Random.Bool() ? _faker.Date.Recent().ToUniversalTime() : null
+            _faker.Random.Bool() ? _faker.Date.Recent().ToUniversalTime() : null,
+            coverPath ?? (_faker.Random.Bool() ? _faker.System.FilePath() : null)
         );
     }
 

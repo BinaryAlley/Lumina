@@ -2,6 +2,7 @@
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.Infrastructure.Security;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.DataAccess.Core.UoW;
@@ -29,6 +30,7 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
 {
     private readonly PasswordHashService _hashService = new();
     private readonly UserEntityFixture _userEntityFixture = new();
+    private readonly LoginRequestFixture _loginRequestFixture = new();
     private readonly ICryptographyService _cryptographyService;
     private readonly TotpTokenGenerator _totpTokenGenerator = new();
     private readonly LuminaApiFactory _apiFactory;
@@ -62,9 +64,9 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
     {
         // Arrange
         UserEntity user = await CreateTestUser();
-        LoginRequest request = new(
-            Username: user.Username,
-            Password: "TestPass123!"
+        LoginRequest request = _loginRequestFixture.Create(
+            username: user.Username,
+            password: "TestPass123!"
         );
         DateTimeOffset beforeRequest = DateTimeOffset.UtcNow;
         _client.DefaultRequestHeaders.Clear();
@@ -116,13 +118,13 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
     {
         // Arrange
         UserEntity user = await CreateTestUser();
-        LoginRequest unknownUserRequest = new(
-            Username: "nonexistent_user",
-            Password: "TestPass123!"
+        LoginRequest unknownUserRequest = _loginRequestFixture.Create(
+            username: "nonexistent_user",
+            password: "TestPass123!"
         );
-        LoginRequest wrongPasswordRequest = new(
-            Username: user.Username,
-            Password: "WrongPass123!"
+        LoginRequest wrongPasswordRequest = _loginRequestFixture.Create(
+            username: user.Username,
+            password: "WrongPass123!"
         );
         _client.DefaultRequestHeaders.Clear();
         _client.DefaultRequestHeaders.Add("X-Forwarded-For", $"192.168.1.2");
@@ -147,9 +149,9 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
         // set a fake IP for this test instance
         _client.DefaultRequestHeaders.Clear();
         _client.DefaultRequestHeaders.Add("X-Forwarded-For", $"192.168.1.3");
-        LoginRequest request = new(
-            Username: "testuser",
-            Password: "TestPass123!"
+        LoginRequest request = _loginRequestFixture.Create(
+            username: "testuser",
+            password: "TestPass123!"
         );
 
         // Act
@@ -185,9 +187,9 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
     {
         // Arrange
         UserEntity legitimateUser = await CreateTestUser();
-        LoginRequest request = new(
-            Username: maliciousUsername,
-            Password: "Abcd123$"
+        LoginRequest request = _loginRequestFixture.Create(
+            username: maliciousUsername,
+            password: "Abcd123$"
         );
 
         // Act
@@ -212,9 +214,9 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
     {
         // Arrange
         UserEntity user = await CreateTestUser();
-        LoginRequest request = new(
-            Username: user.Username,
-            Password: "' OR '1'='1"
+        LoginRequest request = _loginRequestFixture.Create(
+            username: user.Username,
+            password: "' OR '1'='1"
         );
         _client.DefaultRequestHeaders.Clear();
         _client.DefaultRequestHeaders.Add("X-Forwarded-For", $"192.168.1.11");
@@ -234,10 +236,10 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
     {
         // Arrange
         UserEntity user = await CreateTestUserWithTotp();
-        LoginRequest request = new(
-            Username: user.Username,
-            Password: "TestPass123!",
-            TotpCode: "' OR '1'='1"
+        LoginRequest request = _loginRequestFixture.Create(
+            username: user.Username,
+            password: "TestPass123!",
+            totpCode: "' OR '1'='1"
         );
 
         // Act
@@ -250,6 +252,12 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
         Assert.DoesNotContain("Exception", content);
     }
 
+    /// <summary>
+    /// Asserts that the given <paramref name="content"/> is a problem detail with the expected title and detail.
+    /// </summary>
+    /// <param name="content">The response content to assert.</param>
+    /// <param name="expectedTitle">The expected title of the problem detail.</param>
+    /// <param name="expectedDetail">The expected detail of the problem detail.</param>
     private void AssertProblemDetail(string content, string expectedTitle, string expectedDetail)
     {
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
@@ -258,6 +266,10 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
         Assert.Equal(expectedDetail, problemDetails["detail"].GetString());
     }
 
+    /// <summary>
+    /// Creates a test user without a TOTP secret in the database and returns it.
+    /// </summary>
+    /// <returns>The created user entity.</returns>
     private async Task<UserEntity> CreateTestUser()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
@@ -271,23 +283,18 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
         return user;
     }
 
+    /// <summary>
+    /// Creates a test user with a TOTP secret in the database and returns it.
+    /// </summary>
+    /// <returns>The created user entity.</returns>
     private async Task<UserEntity> CreateTestUserWithTotp()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
 
         byte[] totpSecret = _totpTokenGenerator.GenerateSecret();
-        UserEntity user = new()
-        {
-            Username = _testUsername,
-            Password = _hashService.HashString("TestPass123!"),
-            TotpSecret = _cryptographyService.Encrypt(Convert.ToBase64String(totpSecret)),
-            Libraries = [],
-            UserPermissions = [],
-            UserRole = null,
-            CreatedBy = Guid.NewGuid(),
-            CreatedOnUtc = DateTime.UtcNow
-        };
+        UserEntity user = _userEntityFixture.Create(username: _testUsername, password: _hashService.HashString("TestPass123!"));
+        user.TotpSecret = _cryptographyService.Encrypt(Convert.ToBase64String(totpSecret));
 
         dbContext.Users.Add(user);
         await dbContext.SaveChangesAsync();

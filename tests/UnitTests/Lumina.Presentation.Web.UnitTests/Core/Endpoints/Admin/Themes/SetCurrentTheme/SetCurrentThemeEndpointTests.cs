@@ -2,16 +2,15 @@
 using FastEndpoints;
 using Lumina.Presentation.Web.Common.Api;
 using Lumina.Presentation.Web.Common.DTO.Themes;
-using Lumina.Presentation.Web.Common.Requests.Themes;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Core.Endpoints.Admin.Themes.SetCurrentTheme;
 using Lumina.Presentation.Web.Core.Themes;
 using Lumina.Presentation.Web.Fixtures.Common.DTO.Themes;
+using Lumina.Presentation.Web.Fixtures.Common.Requests.Themes;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,6 +27,7 @@ public class SetCurrentThemeEndpointTests
     private readonly IApiHttpClient _mockApiHttpClient;
     private readonly SetCurrentThemeEndpoint _sut;
     private readonly ThemeResponseDtoFixture _themeResponseDtoFixture = new();
+    private readonly SetCurrentThemeRequestFixture _setCurrentThemeRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SetCurrentThemeEndpointTests"/> class.
@@ -48,7 +48,7 @@ public class SetCurrentThemeEndpointTests
             .Returns(_themeResponseDtoFixture.Create());
 
         // Act
-        IResult result = await _sut.ExecuteAsync(new SetCurrentThemeRequest(themeId), CancellationToken.None);
+        IResult result = await _sut.ExecuteAsync(_setCurrentThemeRequestFixture.Create(themeId: themeId), CancellationToken.None);
         string body = await JsonResultTestHelper.GetResponseBodyAsync(result);
 
         // Assert
@@ -68,7 +68,7 @@ public class SetCurrentThemeEndpointTests
     public async Task ExecuteAsync_WhenThemeIdIsBlank_ShouldReturnProblemWithBadRequest(string? themeId)
     {
         // Act
-        IResult result = await _sut.ExecuteAsync(new SetCurrentThemeRequest(themeId), CancellationToken.None);
+        IResult result = await _sut.ExecuteAsync(_setCurrentThemeRequestFixture.Create(themeId: themeId), CancellationToken.None);
 
         // Assert
         ProblemHttpResult problemResult = Assert.IsType<ProblemHttpResult>(result);

@@ -6,6 +6,7 @@ using Lumina.Presentation.Web.Common.Enums.Authorization;
 using Lumina.Presentation.Web.Common.Requests.Authorization;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Core.Endpoints.Admin.Authorization.Roles.AddRole;
+using Lumina.Presentation.Web.Fixtures.Common.DTO.Authorization;
 using Lumina.Presentation.Web.Fixtures.Common.Requests.Authorization;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Http;
@@ -29,6 +30,9 @@ public class AddRoleEndpointTests
     private readonly IApiHttpClient _mockApiHttpClient;
     private readonly AddRoleEndpoint _sut;
     private readonly AddRoleRequestFixture _addRoleRequestFixture = new();
+    private readonly RoleDtoFixture _roleDtoFixture = new();
+    private readonly PermissionDtoFixture _permissionDtoFixture = new();
+    private readonly RolePermissionsDtoFixture _rolePermissionsDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AddRoleEndpointTests"/> class.
@@ -44,7 +48,7 @@ public class AddRoleEndpointTests
     {
         // Arrange
         AddRoleRequest request = _addRoleRequestFixture.Create();
-        RolePermissionsDto expectedResponse = new(new RoleDto(Guid.NewGuid(), request.RoleName!), [new PermissionDto(Guid.NewGuid(), AuthorizationPermission.CanViewUsers)]);
+        RolePermissionsDto expectedResponse = _rolePermissionsDtoFixture.Create(role: _roleDtoFixture.Create(id: Guid.NewGuid(), roleName: request.RoleName!), permissions: [_permissionDtoFixture.Create(id: Guid.NewGuid(), permission: AuthorizationPermission.CanViewUsers)]);
         _mockApiHttpClient.PostAsync<RolePermissionsDto, AddRoleRequest>(Arg.Any<string>(), Arg.Any<AddRoleRequest>(), Arg.Any<CancellationToken>())
             .Returns(expectedResponse);
 

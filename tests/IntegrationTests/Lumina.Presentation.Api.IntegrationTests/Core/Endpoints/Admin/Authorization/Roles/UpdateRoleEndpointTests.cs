@@ -1,7 +1,9 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
 using Lumina.Contracts.DTO.Authentication;
+using Lumina.Contracts.Fixtures.Core.Requests.Authorization;
 using Lumina.Contracts.Requests.Authorization;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.DataAccess.Core.UoW;
@@ -33,6 +35,8 @@ public class UpdateRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
 {
     private HttpClient _client;
     private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly RoleEntityFixture _roleEntityFixture = new();
+    private readonly UpdateRoleRequestFixture _updateRoleRequestFixture = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -64,21 +68,15 @@ public class UpdateRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
 
-        RoleEntity role = new()
-        {
-            Id = Guid.NewGuid(),
-            RoleName = "TestRole",
-            CreatedBy = Guid.NewGuid(),
-            CreatedOnUtc = DateTime.UtcNow
-        };
+        RoleEntity role = _roleEntityFixture.Create(roleName: "TestRole");
         dbContext.Roles.Add(role);
         await dbContext.SaveChangesAsync();
 
         PermissionEntity[] permissions = [.. dbContext.Permissions.Take(2)];
-        UpdateRoleRequest request = new(
-            RoleId: role.Id,
-            RoleName: "UpdatedRole",
-            Permissions: permissions.Select(p => p.Id).ToList()
+        UpdateRoleRequest request = _updateRoleRequestFixture.Create(
+            roleId: role.Id,
+            roleName: "UpdatedRole",
+            permissions: [.. permissions.Select(p => p.Id)]
         );
 
         // Act
@@ -107,10 +105,10 @@ public class UpdateRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
     {
         // Arrange
         _client = await _apiFactory.CreateAuthenticatedClientAsync();
-        UpdateRoleRequest request = new(
-            RoleId: Guid.NewGuid(),
-            RoleName: "UpdatedRole",
-            Permissions: [Guid.NewGuid()]
+        UpdateRoleRequest request = _updateRoleRequestFixture.Create(
+            roleId: Guid.NewGuid(),
+            roleName: "UpdatedRole",
+            permissions: [Guid.NewGuid()]
         );
 
         // Act
@@ -136,10 +134,10 @@ public class UpdateRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
     {
         // Arrange
         Guid nonExistentRoleId = Guid.NewGuid();
-        UpdateRoleRequest request = new(
-            RoleId: nonExistentRoleId,
-            RoleName: "UpdatedRole",
-            Permissions: [Guid.NewGuid()]
+        UpdateRoleRequest request = _updateRoleRequestFixture.Create(
+            roleId: nonExistentRoleId,
+            roleName: "UpdatedRole",
+            permissions: [Guid.NewGuid()]
         );
 
         // Act
@@ -165,10 +163,10 @@ public class UpdateRoleEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
     {
         // Arrange
         using CancellationTokenSource cts = new();
-        UpdateRoleRequest request = new(
-            RoleId: Guid.NewGuid(),
-            RoleName: "UpdatedRole",
-            Permissions: [Guid.NewGuid()]
+        UpdateRoleRequest request = _updateRoleRequestFixture.Create(
+            roleId: Guid.NewGuid(),
+            roleName: "UpdatedRole",
+            permissions: [Guid.NewGuid()]
         );
 
         // Act & Assert

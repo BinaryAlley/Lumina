@@ -15,17 +15,20 @@ namespace Lumina.Presentation.Web.Fixtures.Common.Requests.Authorization;
 [ExcludeFromCodeCoverage]
 public class AddRoleRequestFixture
 {
+    private readonly Faker _faker = new();
+
     /// <summary>
     /// Creates a new <see cref="AddRoleRequest"/> instance with randomized test data.
     /// </summary>
     /// <param name="roleName">Optional name of the role.</param>
     /// <param name="permissions">Optional collection of permission identifiers.</param>
     /// <returns>A configured <see cref="AddRoleRequest"/> instance.</returns>
-    public AddRoleRequest Create(string? roleName = null, List<Guid>? permissions = null)
+    public AddRoleRequest Create(
+        string? roleName = null, 
+        List<Guid>? permissions = null)
     {
-        Faker faker = new();
         return new AddRoleRequest(
-            RoleName: roleName ?? faker.Commerce.Department(),
+            RoleName: roleName ?? _faker.Commerce.Department(),
             Permissions: permissions ?? [Guid.NewGuid(), Guid.NewGuid()]
         );
     }

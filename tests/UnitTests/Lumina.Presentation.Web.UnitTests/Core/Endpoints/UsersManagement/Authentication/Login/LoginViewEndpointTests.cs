@@ -1,15 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
 using Lumina.Presentation.Web.Common.Http;
-using Lumina.Presentation.Web.Common.Requests.UsersManagement.Authentication;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Common.Services;
 using Lumina.Presentation.Web.Core.Endpoints.UsersManagement.Authentication.Login;
+using Lumina.Presentation.Web.Fixtures.Common.Requests.UsersManagement.Authentication;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Threading;
@@ -26,6 +25,7 @@ public class LoginViewEndpointTests
 {
     private readonly IUrlService _mockUrlService;
     private readonly LoginViewEndpoint _sut;
+    private readonly LoginViewRequestFixture _loginViewRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LoginViewEndpointTests"/> class.
@@ -45,7 +45,7 @@ public class LoginViewEndpointTests
         _mockUrlService.GetAbsoluteUrl(WebRoutes.Home.INDEX_CULTURED).Returns("http://localhost/en-us");
 
         // Act
-        IResult result = await _sut.ExecuteAsync(new LoginViewRequest(), CancellationToken.None);
+        IResult result = await _sut.ExecuteAsync(_loginViewRequestFixture.Create(), CancellationToken.None);
 
         // Assert
         RedirectHttpResult redirectResult = Assert.IsType<RedirectHttpResult>(result);
@@ -57,7 +57,7 @@ public class LoginViewEndpointTests
     public async Task ExecuteAsync_WhenSuperAdminSetupPending_ShouldRedirectToRegisterView()
     {
         // Arrange
-        Microsoft.AspNetCore.Http.ISession session = Substitute.For<Microsoft.AspNetCore.Http.ISession>();
+        ISession session = Substitute.For<ISession>();
         byte[] pendingBytes = Encoding.UTF8.GetBytes("true");
 #pragma warning disable CS8601 // possible null reference assignment in the NSubstitute out-argument stub
         session.TryGetValue(HttpContextItemKeys.PENDING_SUPER_ADMIN_SETUP, out Arg.Any<byte[]>()).Returns(callInfo =>
@@ -70,7 +70,7 @@ public class LoginViewEndpointTests
         _mockUrlService.GetAbsoluteUrl(WebRoutes.Authentication.REGISTER_VIEW).Returns("http://localhost/en-us/auth/register");
 
         // Act
-        IResult result = await _sut.ExecuteAsync(new LoginViewRequest(), CancellationToken.None);
+        IResult result = await _sut.ExecuteAsync(_loginViewRequestFixture.Create(), CancellationToken.None);
 
         // Assert
         RedirectHttpResult redirectResult = Assert.IsType<RedirectHttpResult>(result);
@@ -85,7 +85,7 @@ public class LoginViewEndpointTests
         TestHttpContextFactory.ConfigureSession(_sut.HttpContext, TestHttpContextFactory.CreateSession());
 
         // Act
-        IResult result = await _sut.ExecuteAsync(new LoginViewRequest(), CancellationToken.None);
+        IResult result = await _sut.ExecuteAsync(_loginViewRequestFixture.Create(), CancellationToken.None);
 
         // Assert
         Assert.IsType<RazorViewResult>(result);

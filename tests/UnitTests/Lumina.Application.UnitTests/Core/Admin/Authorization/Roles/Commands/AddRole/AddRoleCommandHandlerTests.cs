@@ -7,12 +7,14 @@ using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.Admin.Authorization.Roles.Commands.AddRole;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Fixtures.Core.Admin.Authorization.Roles.Commands.AddRole;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using NSubstitute;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
@@ -33,6 +35,9 @@ public class AddRoleCommandHandlerTests
     private readonly IRoleRepository _mockRoleRepository;
     private readonly AddRoleCommandHandler _sut;
     private readonly AddRoleCommandFixture _addRoleCommandFixture = new();
+    private readonly RoleEntityFixture _roleEntityFixture = new();
+    private readonly RolePermissionEntityFixture _rolePermissionEntityFixture = new();
+    private readonly PermissionEntityFixture _permissionEntityFixture = new();
     private readonly Guid _userId;
 
     /// <summary>
@@ -163,22 +168,12 @@ public class AddRoleCommandHandlerTests
         // Arrange
         AddRoleCommand command = _addRoleCommandFixture.Create();
         Guid roleId = Guid.NewGuid();
-        RoleEntity role = new()
-        {
-            Id = roleId,
-            RoleName = command.RoleName,
-            RolePermissions = [.. command.Permissions.Select(p => new RolePermissionEntity
-            {
-                RoleId = roleId,
-                PermissionId = p,
-                Role = null!,
-                Permission = new()
-                {
-                    Id = p,
-                    PermissionName = AuthorizationPermission.CanViewUsers
-                }
-            })]
-        };
+        List<RolePermissionEntity> rolePermissions = [.. command.Permissions.Select(permissionId =>
+            _rolePermissionEntityFixture.Create(
+                roleId: roleId,
+                permissionId: permissionId,
+                permission: _permissionEntityFixture.Create(id: permissionId, permissionName: AuthorizationPermission.CanViewUsers)))];
+        RoleEntity role = _roleEntityFixture.Create(id: roleId, roleName: command.RoleName, includeRolePermissions: true, rolePermissions: rolePermissions);
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(true);

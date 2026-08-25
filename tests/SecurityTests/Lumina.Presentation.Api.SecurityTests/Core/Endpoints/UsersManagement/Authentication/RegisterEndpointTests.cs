@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Infrastructure.Core.Security;
@@ -24,6 +25,7 @@ public class RegisterEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
 {
     private readonly PasswordHashService _hashService = new();
     private readonly UserEntityFixture _userEntityFixture = new();
+    private readonly RegistrationRequestFixture _registrationRequestFixture = new();
     private readonly LuminaApiFactory _apiFactory;
     private readonly HttpClient _client;
     private readonly JsonSerializerOptions _jsonOptions = new()
@@ -46,10 +48,10 @@ public class RegisterEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
     public async Task Register_WhenUsernameTaken_ShouldReturnUniformConflictResponse()
     {
         // Arrange
-        RegistrationRequest request = new(
-            Username: _testUsername,
-            Password: "TestPass123!",
-            PasswordConfirm: "TestPass123!"
+        RegistrationRequest request = _registrationRequestFixture.Create(
+            username: _testUsername,
+            password: "TestPass123!",
+            passwordConfirm: "TestPass123!"
         );
         _client.DefaultRequestHeaders.Clear();
         _client.DefaultRequestHeaders.Add("X-Forwarded-For", $"192.168.1.6");
@@ -74,10 +76,10 @@ public class RegisterEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
         // Arrange
         _client.DefaultRequestHeaders.Clear();
         _client.DefaultRequestHeaders.Add("X-Forwarded-For", $"192.168.1.7");
-        RegistrationRequest request = new(
-            Username: _testUsername,
-            Password: "TestPass123!",
-            PasswordConfirm: "TestPass123!"
+        RegistrationRequest request = _registrationRequestFixture.Create(
+            username: _testUsername,
+            password: "TestPass123!",
+            passwordConfirm: "TestPass123!"
         );
 
         // Act
@@ -114,10 +116,10 @@ public class RegisterEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
         // Arrange
         // note: the register validator rejects these usernames (invalid username format) with 422 before any DB access,
         // so the malicious username never reaches a query; the 422 assertion below is the security guarantee
-        RegistrationRequest request = new(
-            Username: maliciousUsername,
-            Password: "TestPass123!",
-            PasswordConfirm: "TestPass123!"
+        RegistrationRequest request = _registrationRequestFixture.Create(
+            username: maliciousUsername,
+            password: "TestPass123!",
+            passwordConfirm: "TestPass123!"
         );
 
         // Act
@@ -141,10 +143,10 @@ public class RegisterEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
     public async Task Register_WithWeakPassword_ShouldBeDenied(string weakPassword)
     {
         // Arrange
-        RegistrationRequest request = new(
-            Username: _testUsername,
-            Password: weakPassword,
-            PasswordConfirm: weakPassword
+        RegistrationRequest request = _registrationRequestFixture.Create(
+            username: _testUsername,
+            password: weakPassword,
+            passwordConfirm: weakPassword
         );
         _client.DefaultRequestHeaders.Clear();
         _client.DefaultRequestHeaders.Add("X-Forwarded-For", $"192.168.1.8");
@@ -164,10 +166,10 @@ public class RegisterEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
     public async Task Register_WithValidPassword_ShouldAcceptPassword(string password)
     {
         // Arrange
-        RegistrationRequest request = new(
-            Username: _testUsername,
-            Password: password,
-            PasswordConfirm: password
+        RegistrationRequest request = _registrationRequestFixture.Create(
+            username: _testUsername,
+            password: password,
+            passwordConfirm: password
         );
 
         // Act
@@ -182,10 +184,10 @@ public class RegisterEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
     {
         // Arrange
         await CreateTestUser();
-        RegistrationRequest request = new(
-            Username: _testUsername,
-            Password: "TestPass123!",
-            PasswordConfirm: "TestPass123!"
+        RegistrationRequest request = _registrationRequestFixture.Create(
+            username: _testUsername,
+            password: "TestPass123!",
+            passwordConfirm: "TestPass123!"
         );
         _client.DefaultRequestHeaders.Clear();
         _client.DefaultRequestHeaders.Add("X-Forwarded-For", $"192.168.1.9");
@@ -201,6 +203,12 @@ public class RegisterEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
         Assert.DoesNotContain("salt", content);
     }
 
+    /// <summary>
+    /// Asserts that the given <paramref name="content"/> is a problem detail with the expected title and detail.
+    /// </summary>
+    /// <param name="content">The response content to assert.</param>
+    /// <param name="expectedTitle">The expected title of the problem detail.</param>
+    /// <param name="expectedDetail">The expected detail of the problem detail.</param>
     private void AssertProblemDetail(string content, string expectedTitle, string expectedDetail)
     {
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
@@ -209,6 +217,10 @@ public class RegisterEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
         Assert.Equal(expectedDetail, problemDetails["detail"].GetString());
     }
 
+    /// <summary>
+    /// Creates a test user in the database and returns it.
+    /// </summary>
+    /// <returns>The created user entity.</returns>
     private async Task<UserEntity> CreateTestUser()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();

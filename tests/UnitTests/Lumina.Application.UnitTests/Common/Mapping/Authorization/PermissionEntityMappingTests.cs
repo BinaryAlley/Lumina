@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.Mapping.Authorization;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using System;
@@ -17,15 +18,13 @@ namespace Lumina.Application.UnitTests.Common.Mapping.Authorization;
 [ExcludeFromCodeCoverage]
 public class PermissionEntityMappingTests
 {
+    private readonly PermissionEntityFixture _permissionEntityFixture = new();
+
     [Fact]
     public void ToResponse_WhenMappingValidEntity_ShouldMapCorrectly()
     {
         // Arrange
-        PermissionEntity entity = new()
-        {
-            Id = Guid.NewGuid(),
-            PermissionName = AuthorizationPermission.CanViewUsers
-        };
+        PermissionEntity entity = _permissionEntityFixture.Create(permissionName: AuthorizationPermission.CanViewUsers);
 
         // Act
         PermissionResponse result = entity.ToResponse();
@@ -44,11 +43,7 @@ public class PermissionEntityMappingTests
     public void ToResponse_WhenMappingDifferentPermissions_ShouldMapCorrectly(AuthorizationPermission permission)
     {
         // Arrange
-        PermissionEntity entity = new()
-        {
-            Id = Guid.NewGuid(),
-            PermissionName = permission
-        };
+        PermissionEntity entity = _permissionEntityFixture.Create(permissionName: permission);
 
         // Act
         PermissionResponse result = entity.ToResponse();
@@ -65,9 +60,9 @@ public class PermissionEntityMappingTests
         // Arrange
         List<PermissionEntity> entities =
         [
-            new() { Id = Guid.NewGuid(), PermissionName = AuthorizationPermission.CanViewUsers },
-            new() { Id = Guid.NewGuid(), PermissionName = AuthorizationPermission.CanDeleteUsers },
-            new() { Id = Guid.NewGuid(), PermissionName = AuthorizationPermission.CanRegisterUsers }
+            _permissionEntityFixture.Create(permissionName: AuthorizationPermission.CanViewUsers),
+            _permissionEntityFixture.Create(permissionName: AuthorizationPermission.CanDeleteUsers),
+            _permissionEntityFixture.Create(permissionName: AuthorizationPermission.CanRegisterUsers)
         ];
 
         // Act
@@ -101,11 +96,7 @@ public class PermissionEntityMappingTests
     public void ToResponse_WhenMappingDifferentIds_ShouldMapCorrectly(string idString)
     {
         // Arrange
-        PermissionEntity entity = new()
-        {
-            Id = Guid.Parse(idString),
-            PermissionName = AuthorizationPermission.CanViewUsers
-        };
+        PermissionEntity entity = _permissionEntityFixture.Create(id: Guid.Parse(idString), permissionName: AuthorizationPermission.CanViewUsers);
 
         // Act
         PermissionResponse result = entity.ToResponse();

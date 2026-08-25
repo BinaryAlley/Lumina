@@ -7,6 +7,8 @@ using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetUserPermissions;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Fixtures.Core.UsersManagement.Authorization.Queries.GetUserPermissions;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.Domain.Common.Primitives;
@@ -34,6 +36,9 @@ public class GetUserPermissionsQueryHandlerTests
     private readonly IUserRepository _mockUserRepository;
     private readonly GetUserPermissionsQueryHandler _sut;
     private readonly GetUserPermissionsQueryFixture _getUserPermissionsQueryFixture = new();
+    private readonly UserEntityFixture _userEntityFixture = new();
+    private readonly UserPermissionEntityFixture _userPermissionEntityFixture = new();
+    private readonly PermissionEntityFixture _permissionEntityFixture = new();
     private readonly Guid _userId;
 
     /// <summary>
@@ -138,26 +143,17 @@ public class GetUserPermissionsQueryHandlerTests
     {
         // Arrange
         GetUserPermissionsQuery query = _getUserPermissionsQueryFixture.Create();
-        UserEntity user = new()
-        {
-            Id = query.UserId!.Value,
-            Username = "testUser",
-            Password = "hashedPassword",
-            Libraries = [],
-            UserPermissions =
+        UserEntity user = _userEntityFixture.Create(
+            username: "testUser",
+            password: "hashedPassword",
+            id: query.UserId!.Value,
+            userPermissions:
             [
-                new()
-                {
-                    UserId = query.UserId!.Value,
-                    PermissionId = Guid.NewGuid(),
-                    User = null!,
-                    Permission = new() { Id = Guid.NewGuid(), PermissionName = AuthorizationPermission.CanViewUsers }
-                }
+                _userPermissionEntityFixture.Create(
+                    _userEntityFixture.Create(id: query.UserId!.Value),
+                    _permissionEntityFixture.Create(permissionName: AuthorizationPermission.CanViewUsers))
             ],
-            UserRole = null,
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = query.UserId!.Value
-        };
+            includeUserPermissions: true);
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(true);

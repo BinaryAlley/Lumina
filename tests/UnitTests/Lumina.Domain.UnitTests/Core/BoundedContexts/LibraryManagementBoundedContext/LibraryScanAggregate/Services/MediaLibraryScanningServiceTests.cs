@@ -20,7 +20,6 @@ using NSubstitute;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
@@ -72,7 +71,7 @@ public class MediaLibraryScanningServiceTests
         IMediaTypeScanner scanner = CreateScanner([job]);
 
         // Act
-        Result<Success> result = await _sut.StartScanAsync(scan, LibraryType.Book, downloadMetadataFromWeb: false, CancellationToken.None);
+        Result<Success> result = await _sut.StartScanAsync(scan, LibraryType.Book, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -95,7 +94,7 @@ public class MediaLibraryScanningServiceTests
         LibraryScan scan = _libraryScanFixture.Create(status: LibraryScanJobStatus.Running);
 
         // Act
-        Result<Success> result = await _sut.StartScanAsync(scan, LibraryType.Book, downloadMetadataFromWeb: false, CancellationToken.None);
+        Result<Success> result = await _sut.StartScanAsync(scan, LibraryType.Book, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
@@ -111,11 +110,11 @@ public class MediaLibraryScanningServiceTests
         // Arrange
         LibraryScan scan = _libraryScanFixture.Create();
         IMediaTypeScanner scanner = Substitute.For<IMediaTypeScanner>();
-        scanner.CreateScanJobsForLibrary(Arg.Any<LibraryId>(), Arg.Any<bool>()).Returns(_ => throw new NotImplementedException());
+        scanner.CreateScanJobsForLibrary(Arg.Any<LibraryId>()).Returns(_ => throw new NotImplementedException());
         _mockScannerFactory.CreateLibraryScanner(LibraryType.Book).Returns(scanner);
 
         // Act
-        Result<Success> result = await _sut.StartScanAsync(scan, LibraryType.Book, downloadMetadataFromWeb: false, CancellationToken.None);
+        Result<Success> result = await _sut.StartScanAsync(scan, LibraryType.Book, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -135,7 +134,7 @@ public class MediaLibraryScanningServiceTests
         IMediaTypeScanner scanner = CreateScanner([firstRoot, secondRoot]);
 
         // Act
-        Result<Success> result = await _sut.StartScanAsync(scan, LibraryType.Book, downloadMetadataFromWeb: false, CancellationToken.None);
+        Result<Success> result = await _sut.StartScanAsync(scan, LibraryType.Book, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -180,14 +179,24 @@ public class MediaLibraryScanningServiceTests
         Assert.Equal(userId, leafJob.UserId);
     }
 
+    /// <summary>
+    /// Creates a mocked <see cref="IMediaTypeScanner"/> and registers it with the mocked scanner factory.
+    /// </summary>
+    /// <param name="jobs">The scan jobs the scanner returns when asked to create scan jobs for a library.</param>
+    /// <returns>The created mocked scanner.</returns>
     private IMediaTypeScanner CreateScanner(List<IMediaLibraryScanJob> jobs)
     {
         IMediaTypeScanner scanner = Substitute.For<IMediaTypeScanner>();
-        scanner.CreateScanJobsForLibrary(Arg.Any<LibraryId>(), Arg.Any<bool>()).Returns(jobs);
+        scanner.CreateScanJobsForLibrary(Arg.Any<LibraryId>()).Returns(jobs);
         _mockScannerFactory.CreateLibraryScanner(LibraryType.Book).Returns(scanner);
         return scanner;
     }
 
+    /// <summary>
+    /// Creates a mocked scan job with the given children.
+    /// </summary>
+    /// <param name="children">The child scan jobs of the created job.</param>
+    /// <returns>The created mocked scan job.</returns>
     private static IMediaLibraryScanJob CreateJob(List<IMediaLibraryScanJob> children)
     {
         IMediaLibraryScanJob job = Substitute.For<IMediaLibraryScanJob>();
@@ -195,6 +204,10 @@ public class MediaLibraryScanningServiceTests
         return job;
     }
 
+    /// <summary>
+    /// Counts and drains the scan jobs currently enqueued on the scan queue channel.
+    /// </summary>
+    /// <returns>The number of enqueued scan jobs.</returns>
     private int CountEnqueuedJobs()
     {
         int count = 0;

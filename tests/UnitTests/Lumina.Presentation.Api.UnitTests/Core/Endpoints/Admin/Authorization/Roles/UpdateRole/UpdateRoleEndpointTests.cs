@@ -1,7 +1,9 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.Admin.Authorization.Roles.Commands.UpdateRole;
-using Lumina.Contracts.DTO.Authentication;
+using Lumina.Contracts.Fixtures.Core.DTO.Authentication;
+using Lumina.Contracts.Fixtures.Core.Requests.Authorization;
+using Lumina.Contracts.Fixtures.Core.Responses.Authorization;
 using Lumina.Contracts.Requests.Authorization;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.Domain.Common.Primitives;
@@ -27,6 +29,10 @@ public class UpdateRoleEndpointTests
 {
     private readonly ICommandHandler<UpdateRoleCommand, Result<RolePermissionsResponse>> _mockHandler;
     private readonly UpdateRoleEndpoint _sut;
+    private readonly UpdateRoleRequestFixture _updateRoleRequestFixture = new();
+    private readonly RolePermissionsResponseFixture _rolePermissionsResponseFixture = new();
+    private readonly RoleDtoFixture _roleDtoFixture = new();
+    private readonly PermissionDtoFixture _permissionDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UpdateRoleEndpointTests"/> class.
@@ -41,11 +47,11 @@ public class UpdateRoleEndpointTests
     public async Task ExecuteAsync_WhenSuccessful_ShouldReturnOkResultWithUpdatedRole()
     {
         // Arrange
-        UpdateRoleRequest request = new(Guid.NewGuid(), "UpdatedAdmin", [Guid.NewGuid()]);
+        UpdateRoleRequest request = _updateRoleRequestFixture.Create(roleName: "UpdatedAdmin");
         CancellationToken cancellationToken = CancellationToken.None;
-        RolePermissionsResponse expectedResponse = new(
-            new RoleDto(Guid.NewGuid(), "UpdatedAdmin"),
-            [new PermissionDto(Guid.NewGuid(), AuthorizationPermission.CanViewUsers)]
+        RolePermissionsResponse expectedResponse = _rolePermissionsResponseFixture.Create(
+            role: _roleDtoFixture.Create(roleName: "UpdatedAdmin"),
+            permissions: [_permissionDtoFixture.Create(permissionName: AuthorizationPermission.CanViewUsers)]
         );
         _mockHandler.HandleAsync(Arg.Any<UpdateRoleCommand>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(expectedResponse));
@@ -62,7 +68,7 @@ public class UpdateRoleEndpointTests
     public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
     {
         // Arrange
-        UpdateRoleRequest request = new(Guid.NewGuid(), "UpdatedAdmin", [Guid.NewGuid()]);
+        UpdateRoleRequest request = _updateRoleRequestFixture.Create(roleName: "UpdatedAdmin");
         CancellationToken cancellationToken = CancellationToken.None;
         Error expectedError = Error.Failure("Role.Update.Failed", "Failed to update role.");
         _mockHandler.HandleAsync(Arg.Any<UpdateRoleCommand>(), Arg.Any<CancellationToken>())
@@ -88,12 +94,12 @@ public class UpdateRoleEndpointTests
     public async Task ExecuteAsync_WhenCalled_ShouldSendUpdateRoleCommandToSender()
     {
         // Arrange
-        UpdateRoleRequest request = new(Guid.NewGuid(), "UpdatedAdmin", [Guid.NewGuid()]);
+        UpdateRoleRequest request = _updateRoleRequestFixture.Create(roleName: "UpdatedAdmin");
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<UpdateRoleCommand>(), Arg.Any<CancellationToken>())
-            .Returns(Result.From(new RolePermissionsResponse(
-                new RoleDto(Guid.NewGuid(), "UpdatedAdmin"),
-                []
+            .Returns(Result.From(_rolePermissionsResponseFixture.Create(
+                role: _roleDtoFixture.Create(roleName: "UpdatedAdmin"),
+                permissions: []
             )));
 
         // Act
@@ -122,15 +128,15 @@ public class UpdateRoleEndpointTests
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 info.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return Result.From(new RolePermissionsResponse(
-                    new RoleDto(Guid.NewGuid(), "UpdatedAdmin"),
-                    []
+                return Result.From(_rolePermissionsResponseFixture.Create(
+                    role: _roleDtoFixture.Create(roleName: "UpdatedAdmin"),
+                    permissions: []
                 ));
             }, info.Arg<CancellationToken>()));
 
         // Act
         Task<IResult> operationTask = _sut.ExecuteAsync(
-            new UpdateRoleRequest(Guid.NewGuid(), "UpdatedAdmin", [Guid.NewGuid()]),
+            _updateRoleRequestFixture.Create(roleName: "UpdatedAdmin"),
             cts.Token);
         await operationStarted.Task;
         cts.Cancel();

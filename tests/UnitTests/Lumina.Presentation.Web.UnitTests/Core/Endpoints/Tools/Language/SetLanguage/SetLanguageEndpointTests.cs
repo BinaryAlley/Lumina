@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Requests.Tools;
 using Lumina.Presentation.Web.Core.Endpoints.Tools.Language.SetLanguage;
+using Lumina.Presentation.Web.Fixtures.Common.Requests.Tools;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -20,6 +20,7 @@ namespace Lumina.Presentation.Web.UnitTests.Core.Endpoints.Tools.Language.SetLan
 public class SetLanguageEndpointTests
 {
     private readonly SetLanguageEndpoint _sut;
+    private readonly SetLanguageRequestFixture _setLanguageRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SetLanguageEndpointTests"/> class.
@@ -36,7 +37,7 @@ public class SetLanguageEndpointTests
         TestHttpContextFactory.ConfigureCulture(_sut.HttpContext, "en-us");
 
         // Act
-        IResult result = await _sut.ExecuteAsync(new SetLanguageRequest("de-DE", null), CancellationToken.None);
+        IResult result = await _sut.ExecuteAsync(_setLanguageRequestFixture.Create(newCulture: "de-DE"), CancellationToken.None);
 
         // Assert
         RedirectHttpResult redirectResult = Assert.IsType<RedirectHttpResult>(result);
@@ -54,7 +55,7 @@ public class SetLanguageEndpointTests
         TestHttpContextFactory.ConfigureCulture(_sut.HttpContext, "en-us");
 
         // Act
-        IResult result = await _sut.ExecuteAsync(new SetLanguageRequest("de-DE", "/en-us/tools/settings"), CancellationToken.None);
+        IResult result = await _sut.ExecuteAsync(_setLanguageRequestFixture.Create(newCulture: "de-DE", returnUrl: "/en-us/tools/settings"), CancellationToken.None);
 
         // Assert
         RedirectHttpResult redirectResult = Assert.IsType<RedirectHttpResult>(result);
@@ -69,7 +70,7 @@ public class SetLanguageEndpointTests
         _sut.HttpContext.Request.PathBase = "/lumina";
 
         // Act
-        IResult result = await _sut.ExecuteAsync(new SetLanguageRequest("fr-FR", "/en-us/tools/settings"), CancellationToken.None);
+        IResult result = await _sut.ExecuteAsync(_setLanguageRequestFixture.Create(newCulture: "fr-FR", returnUrl: "/en-us/tools/settings"), CancellationToken.None);
 
         // Assert
         RedirectHttpResult redirectResult = Assert.IsType<RedirectHttpResult>(result);

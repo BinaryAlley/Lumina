@@ -1,16 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Common;
 using Lumina.Presentation.Web.Common.Exceptions;
 using Lumina.Presentation.Web.Core.Endpoints.Plugins.InstallPlugin;
+using Lumina.Presentation.Web.Fixtures.Common.DTO.Common;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.SecurityTests.Common.Setup;
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
-using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Plugins.InstallPlugin;
@@ -22,6 +19,7 @@ namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Plugins.InstallPl
 public class InstallPluginEndpointTests : IClassFixture<LuminaWebFactory>
 {
     private readonly LuminaWebFactory _apiFactory;
+    private readonly ProblemDetailsDtoFixture _problemDetailsDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="InstallPluginEndpointTests"/> class.
@@ -101,7 +99,7 @@ public class InstallPluginEndpointTests : IClassFixture<LuminaWebFactory>
         // Arrange
         _apiFactory.ApiClientStub.Reset();
         _apiFactory.ApiClientStub.RegisterPostException("plugins", new ApiException(
-            new ProblemDetailsDto { Title = "General.Failure", Detail = "PluginArchiveNotReadable" },
+            _problemDetailsDtoFixture.Create(title: "General.Failure", detail: "PluginArchiveNotReadable"),
             HttpStatusCode.Forbidden));
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
         HttpRequestMessage installRequest = new(HttpMethod.Post, "/en-us/admin/manage-plugins/api-install-plugin")

@@ -2,6 +2,8 @@
 using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetUserRole;
+using Lumina.Contracts.Fixtures.Core.Requests.Authorization;
+using Lumina.Contracts.Fixtures.Core.Responses.Authorization;
 using Lumina.Contracts.Requests.Authorization;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.Domain.Common.Primitives;
@@ -25,6 +27,8 @@ public class GetUserRoleEndpointTests
 {
     private readonly IQueryHandler<GetUserRoleQuery, Result<RoleResponse?>> _mockHandler;
     private readonly GetUserRoleEndpoint _sut;
+    private readonly RoleResponseFixture _roleResponseFixture = new();
+    private readonly GetUserRoleRequestFixture _getUserRoleRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetUserRoleEndpointTests"/> class.
@@ -39,9 +43,9 @@ public class GetUserRoleEndpointTests
     public async Task ExecuteAsync_WhenSuccessful_ShouldReturnOkResultWithRole()
     {
         // Arrange
-        GetUserRoleRequest request = new(Guid.NewGuid());
+        GetUserRoleRequest request = _getUserRoleRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
-        RoleResponse expectedResponse = new(Guid.NewGuid(), "Admin");
+        RoleResponse expectedResponse = _roleResponseFixture.Create(roleName: "Admin");
         _mockHandler.HandleAsync(Arg.Any<GetUserRoleQuery>(), Arg.Any<CancellationToken>())
             .Returns(Result.From<RoleResponse?>(expectedResponse));
 
@@ -57,7 +61,7 @@ public class GetUserRoleEndpointTests
     public async Task ExecuteAsync_WhenHandlerReturnsError_ShouldReturnProblemResult()
     {
         // Arrange
-        GetUserRoleRequest request = new(Guid.NewGuid());
+        GetUserRoleRequest request = _getUserRoleRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
         Error expectedError = Error.Failure("User.Role.NotFound", "User role not found.");
         _mockHandler.HandleAsync(Arg.Any<GetUserRoleQuery>(), Arg.Any<CancellationToken>())
@@ -84,10 +88,10 @@ public class GetUserRoleEndpointTests
     {
         // Arrange
         Guid userId = Guid.NewGuid();
-        GetUserRoleRequest request = new(userId);
+        GetUserRoleRequest request = _getUserRoleRequestFixture.Create(userId: userId);
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<GetUserRoleQuery>(), Arg.Any<CancellationToken>())
-            .Returns(Result.From<RoleResponse?>(new RoleResponse(Guid.NewGuid(), "Admin")));
+            .Returns(Result.From<RoleResponse?>(_roleResponseFixture.Create(roleName: "Admin")));
 
         // Act
         await _sut.ExecuteAsync(request, cancellationToken);
@@ -112,11 +116,11 @@ public class GetUserRoleEndpointTests
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 info.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return Result.From<RoleResponse?>(new RoleResponse(Guid.NewGuid(), "Admin"));
+                return Result.From<RoleResponse?>(_roleResponseFixture.Create(roleName: "Admin"));
             }, info.Arg<CancellationToken>()));
 
         // Act
-        Task<IResult> operationTask = _sut.ExecuteAsync(new GetUserRoleRequest(Guid.NewGuid()), cts.Token);
+        Task<IResult> operationTask = _sut.ExecuteAsync(_getUserRoleRequestFixture.Create(), cts.Token);
         await operationStarted.Task;
         cts.Cancel();
         cancellationRequested.SetResult(true);

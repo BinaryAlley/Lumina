@@ -2,6 +2,7 @@
 using Bogus;
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -20,23 +21,33 @@ public class RolePermissionEntityFixture
     /// <summary>
     /// Creates a random valid <see cref="RolePermissionEntity"/>.
     /// </summary>
+    /// <param name="id">Optional. The Id of the role permission association.</param>
+    /// <param name="roleId">Optional. The Id of the role the permission is granted to.</param>
+    /// <param name="role">Optional. The role the permission is granted to.</param>
+    /// <param name="permissionId">Optional. The Id of the permission granted to the role.</param>
+    /// <param name="permission">Optional. The permission granted to the role.</param>
     /// <returns>The created <see cref="RolePermissionEntity"/>.</returns>
-    public RolePermissionEntity Create()
+    public RolePermissionEntity Create(
+        Guid? id = null,
+        Guid? roleId = null,
+        RoleEntity? role = null,
+        Guid? permissionId = null,
+        PermissionEntity? permission = null)
     {
-        PermissionEntity permission = new()
+        RoleEntity resolvedRole = role ?? new RoleEntity
         {
-            Id = _faker.Random.Guid(),
-            PermissionName = _faker.PickRandom<AuthorizationPermission>(),
+            Id = roleId ?? _faker.Random.Guid(),
+            RoleName = _faker.Random.String2(10),
             CreatedOnUtc = _faker.Date.Past(),
             CreatedBy = _faker.Random.Guid(),
             UpdatedOnUtc = _faker.Date.Recent(),
             UpdatedBy = _faker.Random.Guid()
         };
 
-        RoleEntity role = new()
+        PermissionEntity resolvedPermission = permission ?? new PermissionEntity
         {
-            Id = _faker.Random.Guid(),
-            RoleName = _faker.Random.String2(10),
+            Id = permissionId ?? _faker.Random.Guid(),
+            PermissionName = _faker.PickRandom<AuthorizationPermission>(),
             CreatedOnUtc = _faker.Date.Past(),
             CreatedBy = _faker.Random.Guid(),
             UpdatedOnUtc = _faker.Date.Recent(),
@@ -46,11 +57,11 @@ public class RolePermissionEntityFixture
         return new Faker<RolePermissionEntity>()
             .CustomInstantiator(f => new RolePermissionEntity
             {
-                Id = f.Random.Guid(),
-                RoleId = role.Id,
-                Role = role,
-                PermissionId = permission.Id,
-                Permission = permission,
+                Id = id ?? f.Random.Guid(),
+                RoleId = resolvedRole.Id,
+                Role = role ?? resolvedRole,
+                PermissionId = resolvedPermission.Id,
+                Permission = permission ?? resolvedPermission,
                 CreatedOnUtc = f.Date.Past(),
                 CreatedBy = f.Random.Guid(),
                 UpdatedOnUtc = f.Date.Recent(),

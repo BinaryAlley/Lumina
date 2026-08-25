@@ -15,6 +15,8 @@ namespace Lumina.Contracts.Fixtures.Core.Responses.FileSystemManagement.Thumbnai
 [ExcludeFromCodeCoverage]
 public class ThumbnailResponseFixture
 {
+    private readonly Faker _faker = new();
+
     /// <summary>
     /// Creates a random valid <see cref="ThumbnailResponse"/>.
     /// </summary>
@@ -23,10 +25,9 @@ public class ThumbnailResponseFixture
     /// <returns>The created <see cref="ThumbnailResponse"/>.</returns>
     public ThumbnailResponse Create(ImageType? type = null, byte[]? bytes = null)
     {
-        Faker faker = new();
         return new ThumbnailResponse(
-            type ?? faker.PickRandom<ImageType>(),
-            bytes ?? faker.Random.Bytes(20)
+            type ?? _faker.PickRandom<ImageType>(),
+            bytes ?? _faker.Random.Bytes(20)
         );
     }
 

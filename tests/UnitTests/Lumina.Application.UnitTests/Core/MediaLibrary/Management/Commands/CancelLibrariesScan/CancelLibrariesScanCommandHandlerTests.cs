@@ -7,7 +7,7 @@ using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Core.MediaLibrary.Management.Commands.CancelLibrariesScan;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Domain.Common.Events;
+using Lumina.Application.Fixtures.Core.MediaLibrary.Management.Commands.CancelLibrariesScan;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
@@ -15,7 +15,6 @@ using NSubstitute;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
@@ -35,6 +34,7 @@ public class CancelLibrariesScanCommandHandlerTests
     private readonly ICurrentUserService _mockCurrentUserService;
     private readonly IDomainEventsQueue _mockDomainEventsQueue;
     private readonly CancelLibrariesScanCommandHandler _sut;
+    private readonly CancelLibrariesScanCommandFixture _cancelLibrariesScanCommandFixture = new();
     private readonly LibraryScanEntityFixture _libraryScanEntityFixture = new();
     private readonly Guid _userId;
 
@@ -72,7 +72,7 @@ public class CancelLibrariesScanCommandHandlerTests
         _mockLibraryScanRepository.GetRunningScansAsync(Arg.Any<CancellationToken>()).Returns(Result.From<IEnumerable<LibraryScanEntity>>(runningScans));
 
         // Act
-        Result<Success> result = await _sut.HandleAsync(new CancelLibrariesScanCommand(), CancellationToken.None);
+        Result<Success> result = await _sut.HandleAsync(_cancelLibrariesScanCommandFixture.Create(), CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -96,7 +96,7 @@ public class CancelLibrariesScanCommandHandlerTests
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>()).Returns(false);
 
         // Act
-        Result<Success> result = await _sut.HandleAsync(new CancelLibrariesScanCommand(), CancellationToken.None);
+        Result<Success> result = await _sut.HandleAsync(_cancelLibrariesScanCommandFixture.Create(), CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -111,7 +111,7 @@ public class CancelLibrariesScanCommandHandlerTests
         _mockCurrentUserService.UserId.Returns((Guid?)null);
 
         // Act
-        Result<Success> result = await _sut.HandleAsync(new CancelLibrariesScanCommand(), CancellationToken.None);
+        Result<Success> result = await _sut.HandleAsync(_cancelLibrariesScanCommandFixture.Create(), CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
@@ -128,7 +128,7 @@ public class CancelLibrariesScanCommandHandlerTests
             .Returns(Error.Failure(description: "Failed to get running scans"));
 
         // Act
-        Result<Success> result = await _sut.HandleAsync(new CancelLibrariesScanCommand(), CancellationToken.None);
+        Result<Success> result = await _sut.HandleAsync(_cancelLibrariesScanCommandFixture.Create(), CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
@@ -146,7 +146,7 @@ public class CancelLibrariesScanCommandHandlerTests
             .Returns(Error.Failure(description: "Failed to update library scan"));
 
         // Act
-        Result<Success> result = await _sut.HandleAsync(new CancelLibrariesScanCommand(), CancellationToken.None);
+        Result<Success> result = await _sut.HandleAsync(_cancelLibrariesScanCommandFixture.Create(), CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
@@ -161,7 +161,7 @@ public class CancelLibrariesScanCommandHandlerTests
         _mockLibraryScanRepository.GetRunningScansAsync(Arg.Any<CancellationToken>()).Returns(Result.From<IEnumerable<LibraryScanEntity>>(runningScans));
 
         // Act
-        Result<Success> result = await _sut.HandleAsync(new CancelLibrariesScanCommand(), CancellationToken.None);
+        Result<Success> result = await _sut.HandleAsync(_cancelLibrariesScanCommandFixture.Create(), CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);

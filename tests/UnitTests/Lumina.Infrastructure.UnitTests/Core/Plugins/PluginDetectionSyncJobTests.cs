@@ -3,11 +3,12 @@ using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Plugins;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Plugins;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.Plugins;
 using Lumina.Infrastructure.Common.Models.DTO.Plugins;
-using Lumina.Infrastructure.Fixtures.Common.Models.DTO.Plugins;
 using Lumina.Infrastructure.Core.Plugins;
+using Lumina.Infrastructure.Fixtures.Common.Models.DTO.Plugins;
 using Lumina.Plugins.Contracts.Core.Plugins;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -40,6 +41,7 @@ public class PluginDetectionSyncJobTests
     private readonly IPluginManager _mockPluginManager;
     private readonly ILogger<PluginDetectionSyncJob> _mockLogger;
     private readonly PluginLoadErrorDtoFixture _pluginLoadErrorDtoFixture;
+    private readonly PluginEntityFixture _pluginEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PluginDetectionSyncJobTests"/> class.
@@ -166,8 +168,8 @@ public class PluginDetectionSyncJobTests
         _mockPluginManager.GetPlugins().Returns([loadedPlugin]);
         _mockPluginRepository.UpsertAsync(Arg.Any<PluginEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(Result.Updated));
-        PluginEntity loadedPluginRow = CreatePluginEntity(loadedPlugin.Id, loadedPlugin.Name, PluginLoadStatus.Loaded);
-        PluginEntity stalePluginRow = CreatePluginEntity(Guid.NewGuid(), "Stale Plugin", PluginLoadStatus.Loaded);
+        PluginEntity loadedPluginRow = _pluginEntityFixture.Create(id: loadedPlugin.Id, name: loadedPlugin.Name, loadStatus: PluginLoadStatus.Loaded);
+        PluginEntity stalePluginRow = _pluginEntityFixture.Create(name: "Stale Plugin", loadStatus: PluginLoadStatus.Loaded);
         _mockPluginRepository.GetAllAsync(Arg.Any<CancellationToken>())
             .Returns(Result.From((IEnumerable<PluginEntity>)[loadedPluginRow, stalePluginRow]));
         _mockPluginRepository.DeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
@@ -194,7 +196,7 @@ public class PluginDetectionSyncJobTests
         PluginLoadErrorDto loadError = _pluginLoadErrorDtoFixture.Create(
             assemblyName: "MyPlugin",
             errorMessage: "Failed to load plugin assembly 'MyPlugin.dll': unexpected error");
-        PluginEntity staleLoadedRow = CreatePluginEntity(previouslyLoadedPlugin.Id, previouslyLoadedPlugin.Name, PluginLoadStatus.Loaded);
+        PluginEntity staleLoadedRow = _pluginEntityFixture.Create(id: previouslyLoadedPlugin.Id, name: previouslyLoadedPlugin.Name, loadStatus: PluginLoadStatus.Loaded);
         _mockPluginRepository.GetAllAsync(Arg.Any<CancellationToken>())
             .Returns(Result.From((IEnumerable<PluginEntity>)[staleLoadedRow]));
         _mockPluginRepository.DeleteByIdAsync(previouslyLoadedPlugin.Id, Arg.Any<CancellationToken>())
@@ -255,29 +257,6 @@ public class PluginDetectionSyncJobTests
     }
 
     /// <summary>
-    /// Creates a stored plugin row with the provided identity.
-    /// </summary>
-    /// <param name="id">The Id of the plugin row.</param>
-    /// <param name="name">The name of the plugin row.</param>
-    /// <param name="loadStatus">The load status of the plugin row.</param>
-    /// <returns>The created plugin entity.</returns>
-    private static PluginEntity CreatePluginEntity(Guid id, string name, PluginLoadStatus loadStatus)
-    {
-        return new PluginEntity
-        {
-            Id = id,
-            Name = name,
-            Author = "Test Author",
-            Version = "1.0.0",
-            Description = "Test plugin description",
-            LoadStatus = loadStatus,
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = Guid.NewGuid(),
-            UpdatedBy = default
-        };
-    }
-
-    /// <summary>
     /// Derives the stable plugin Id expected for a failing plugin assembly, mirroring the detection job logic.
     /// </summary>
     /// <param name="assemblyName">The file name of the plugin assembly, without its extension.</param>
@@ -285,6 +264,6 @@ public class PluginDetectionSyncJobTests
     private static Guid DeriveExpectedId(string assemblyName)
     {
         byte[] hash = SHA256.HashData(Encoding.UTF8.GetBytes(assemblyName));
-        return new Guid(hash.Take(16).ToArray());
+        return new Guid([.. hash.Take(16)]);
     }
 }

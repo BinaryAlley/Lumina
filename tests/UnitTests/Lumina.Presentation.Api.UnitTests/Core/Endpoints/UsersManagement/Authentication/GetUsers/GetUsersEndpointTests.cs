@@ -2,6 +2,7 @@
 using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.UsersManagement.Authentication.Queries.GetUsers;
+using Lumina.Contracts.Fixtures.Core.Responses.UsersManagement.Users;
 using Lumina.Contracts.Responses.UsersManagement.Users;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authentication.GetUsers;
@@ -25,6 +26,7 @@ public class GetUsersEndpointTests
 {
     private readonly IQueryHandler<GetUsersQuery, Result<IEnumerable<UserResponse>>> _mockHandler;
     private readonly GetUsersEndpoint _sut;
+    private readonly UserResponseFixture _userResponseFixture = new();
     /// <summary>
     /// Initializes a new instance of the <see cref="GetUsersEndpointTests"/> class.
     /// </summary>
@@ -41,7 +43,7 @@ public class GetUsersEndpointTests
         CancellationToken cancellationToken = CancellationToken.None;
         IEnumerable<UserResponse> expectedResponse =
         [
-        new UserResponse(Guid.NewGuid(), "testUser", DateTime.UtcNow, null)
+        _userResponseFixture.Create(username: "testUser", createdOnUtc: DateTime.UtcNow, updatedOnUtc: null)
     ];
         _mockHandler.HandleAsync(Arg.Any<GetUsersQuery>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(expectedResponse));

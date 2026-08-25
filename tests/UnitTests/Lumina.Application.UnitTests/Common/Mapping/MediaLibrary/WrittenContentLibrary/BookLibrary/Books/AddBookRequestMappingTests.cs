@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook;
-using Lumina.Contracts.DTO.MediaContributors;
-using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
+using Lumina.Contracts.Fixtures.Core.DTO.MediaContributors;
+using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary;
 using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
@@ -19,6 +19,9 @@ namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.WrittenConten
 public class AddBookRequestMappingTests
 {
     private readonly AddBookRequestFixture _requestFixture = new();
+    private readonly WrittenContentMetadataDtoFixture _writtenContentMetadataDtoFixture = new();
+    private readonly MediaContributorNameDtoFixture _mediaContributorNameDtoFixture = new();
+    private readonly MediaContributorRoleDtoFixture _mediaContributorRoleDtoFixture = new();
 
     [Fact]
     public void ToCommand_WhenMappingCompleteRequest_ShouldMapAllPropertiesCorrectly()
@@ -54,36 +57,12 @@ public class AddBookRequestMappingTests
     public void ToCommand_WhenMappingMinimalRequest_ShouldMapCorrectly()
     {
         // Arrange
-        AddBookRequest request = new(
-            LibraryId: Guid.NewGuid(),
-            Path: "/books/test.epub",
-            Metadata: new WrittenContentMetadataDto(
-                Title: "Test Book",
-                OriginalTitle: null,
-                Description: null,
-                ReleaseInfo: null,
-                Genres: null,
-                Tags: null,
-                Language: null,
-                OriginalLanguage: null,
-                Publisher: null,
-                PageCount: null),
-            Format: null,
-            Edition: null,
-            VolumeNumber: null,
-            Series: null,
-            ASIN: null,
-            GoodreadsId: null,
-            LCCN: null,
-            OCLCNumber: null,
-            OpenLibraryId: null,
-            LibraryThingId: null,
-            GoogleBooksId: null,
-            BarnesAndNobleId: null,
-            AppleBooksId: null,
-            ISBNs: null,
-            Contributors: null,
-            Ratings: null);
+        AddBookRequest request = _requestFixture.Create(
+            libraryId: Guid.NewGuid(),
+            path: "/books/test.epub",
+            metadata: _writtenContentMetadataDtoFixture.Create(title: "Test Book"),
+            includeOptionalProperties: false
+        );
 
         // Act
         AddBookCommand result = request.ToCommand();
@@ -113,42 +92,21 @@ public class AddBookRequestMappingTests
     public void ToCommand_WhenMappingRequestWithCollections_ShouldMapCollectionsCorrectly()
     {
         // Arrange
-        AddBookRequest request = new(
-            LibraryId: Guid.NewGuid(),
-            Path: "/books/test.epub",
-            Metadata: new WrittenContentMetadataDto(
-                Title: "Test Book",
-                OriginalTitle: null,
-                Description: null,
-                ReleaseInfo: null,
-                Genres: null,
-                Tags: null,
-                Language: null,
-                OriginalLanguage: null,
-                Publisher: null,
-                PageCount: null),
-            Format: null,
-            Edition: null,
-            VolumeNumber: null,
-            Series: null,
-            ASIN: null,
-            GoodreadsId: null,
-            LCCN: null,
-            OCLCNumber: null,
-            OpenLibraryId: null,
-            LibraryThingId: null,
-            GoogleBooksId: null,
-            BarnesAndNobleId: null,
-            AppleBooksId: null,
-            ISBNs: [new("978-0-123456-78-9", IsbnFormat.Isbn13)],
-            Contributors:
+        AddBookRequest request = _requestFixture.Create(
+            libraryId: Guid.NewGuid(),
+            path: "/books/test.epub",
+            metadata: _writtenContentMetadataDtoFixture.Create(title: "Test Book"),
+            isbns: [new("978-0-123456-78-9", IsbnFormat.Isbn13)],
+            contributors:
             [
                 new(
-                    new MediaContributorNameDto("John Doe", "John Smith Doe"),
-                    new MediaContributorRoleDto("Author", "Writing")
+                    _mediaContributorNameDtoFixture.Create(displayName: "John Doe", legalName: "John Smith Doe"),
+                    _mediaContributorRoleDtoFixture.Create(name: "Author", category: "Writing")
                 )
             ],
-            Ratings: [new(4.5m, 5m, BookRatingSource.Goodreads, 1000)]);
+            ratings: [new(4.5m, 5m, BookRatingSource.Goodreads, 1000)],
+            includeOptionalProperties: false
+        );
 
         // Act
         AddBookCommand result = request.ToCommand();

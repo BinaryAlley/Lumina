@@ -4,7 +4,8 @@ using Lumina.Application.Common.DTO.Pagination;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Application.Fixtures.Common.DTO.Pagination;
+using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.Responses.Common;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.Common.Primitives;
@@ -23,6 +24,9 @@ namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.WrittenConten
 public class BookEntityMappingTests
 {
     private readonly BookEntityFixture _bookEntityFixture = new();
+    private readonly IsbnDtoFixture _isbnDtoFixture = new();
+    private readonly BookRatingDtoFixture _bookRatingDtoFixture = new();
+    private readonly PaginatedResultDtoFixture<BookEntity> _paginatedResultDtoFixture = new();
 
     [Fact]
     public void ToDomainEntity_WhenMappingValidBookEntity_ShouldMapCorrectly()
@@ -297,12 +301,12 @@ public class BookEntityMappingTests
         Assert.Equal(bookEntity.GoogleBooksId, result.GoogleBooksId);
         Assert.Equal(bookEntity.BarnesAndNobleId, result.BarnesAndNobleId);
         Assert.Equal(bookEntity.AppleBooksId, result.AppleBooksId);
-        Assert.Equal(bookEntity.ISBNs.Select(i => new IsbnDto(i.Value, i.Format)), result.ISBNs);
-        Assert.Equal(bookEntity.Ratings.Select(r => new BookRatingDto(
-            r.Value,
-            r.MaxValue,
-            r.Source,
-            r.VoteCount
+        Assert.Equal(bookEntity.ISBNs.Select(i => _isbnDtoFixture.Create(value: i.Value, format: i.Format)), result.ISBNs);
+        Assert.Equal(bookEntity.Ratings.Select(r => _bookRatingDtoFixture.Create(
+            value: r.Value,
+            maxValue: r.MaxValue,
+            source: r.Source,
+            voteCount: r.VoteCount
         )), result.Ratings);
         Assert.Equal(bookEntity.CreatedOnUtc, result.CreatedOnUtc);
         Assert.Equal(bookEntity.UpdatedOnUtc, result.UpdatedOnUtc);
@@ -343,21 +347,19 @@ public class BookEntityMappingTests
     {
         // Arrange
         List<BookEntity> bookEntities = _bookEntityFixture.CreateMany(2);
-        PaginatedResultDto<BookEntity> paginatedBookEntities = new()
-        {
-            Data = bookEntities,
-            CurrentPage = 1,
-            PerPage = 10,
-            Count = 2,
-            NumberOfPages = 1
-        };
+        PaginatedResultDto<BookEntity> paginatedBookEntities = _paginatedResultDtoFixture.Create(
+            data: bookEntities,
+            currentPage: 1,
+            perPage: 10,
+            count: 2,
+            numberOfPages: 1);
 
         // Act
         PaginatedResponse<BookResponse> result = paginatedBookEntities.ToResponses();
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(paginatedBookEntities.Data.Count(), result.Data.Count());
+        Assert.Equal(paginatedBookEntities.Data.Count, result.Data.Count);
         Assert.Equal(paginatedBookEntities.CurrentPage, result.CurrentPage);
         Assert.Equal(paginatedBookEntities.PerPage, result.PerPage);
         Assert.Equal(paginatedBookEntities.Count, result.Count);
@@ -406,7 +408,7 @@ public class BookEntityMappingTests
 
         // Assert
         Assert.NotNull(results);
-        Assert.Equal(bookEntities.Count, results.Count());
+        Assert.Equal(bookEntities.Count, results.Count);
     }
 
     [Fact]
@@ -414,21 +416,19 @@ public class BookEntityMappingTests
     {
         // Arrange
         List<BookEntity> bookEntities = _bookEntityFixture.CreateMany(2);
-        PaginatedResultDto<BookEntity> paginatedBookEntities = new()
-        {
-            Data = bookEntities,
-            CurrentPage = 1,
-            PerPage = 10,
-            Count = 2,
-            NumberOfPages = 1
-        };
+        PaginatedResultDto<BookEntity> paginatedBookEntities = _paginatedResultDtoFixture.Create(
+            data: bookEntities,
+            currentPage: 1,
+            perPage: 10,
+            count: 2,
+            numberOfPages: 1);
 
         // Act
         PaginatedResponse<BookLiteResponse> result = paginatedBookEntities.ToLiteResponses();
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(paginatedBookEntities.Data.Count(), result.Data.Count());
+        Assert.Equal(paginatedBookEntities.Data.Count, result.Data.Count);
         Assert.Equal(paginatedBookEntities.CurrentPage, result.CurrentPage);
         Assert.Equal(paginatedBookEntities.PerPage, result.PerPage);
         Assert.Equal(paginatedBookEntities.Count, result.Count);

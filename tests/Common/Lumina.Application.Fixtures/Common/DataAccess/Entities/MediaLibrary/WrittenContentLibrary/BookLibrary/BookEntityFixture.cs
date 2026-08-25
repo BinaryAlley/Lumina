@@ -28,13 +28,15 @@ public class BookEntityFixture
     /// <param name="path">Optional. The file system path of the book.</param>
     /// <param name="title">Optional. The title of the book.</param>
     /// <param name="originalTitle">Optional. The original title of the book.</param>
+    /// <param name="includeMetadata">Whether the book should include its owned metadata collections (Tags, Genres, ISBNs, Ratings) or not.</param>
     /// <returns>The created <see cref="BookEntity"/>.</returns>
     public BookEntity Create(
         Guid? id = null,
         Guid? libraryId = null,
         string? path = null,
         string? title = null,
-        string? originalTitle = null)
+        string? originalTitle = null,
+        bool includeMetadata = true)
     {
         int releaseYear = _random.Next(2000, 2010);
         int reReleaseYear = _random.Next(2010, 2020);
@@ -58,8 +60,8 @@ public class BookEntityFixture
             .RuleFor(x => x.OriginalLanguageCode, f => f.Random.String2(2))
             .RuleFor(x => x.OriginalLanguageName, f => f.Random.String2(f.Random.Number(1, 50)))
             .RuleFor(x => x.OriginalLanguageNativeName, f => f.Random.String2(f.Random.Number(1, 50)))
-            .RuleFor(x => x.Tags, f => [.. CreateTags(f.Random.Number(1, 5))])
-            .RuleFor(x => x.Genres, f => [.. CreateGenres(f.Random.Number(1, 5))])
+            .RuleFor(x => x.Tags, f => includeMetadata ? [.. CreateTags(f.Random.Number(1, 5))] : [])
+            .RuleFor(x => x.Genres, f => includeMetadata ? [.. CreateGenres(f.Random.Number(1, 5))] : [])
             .RuleFor(x => x.Publisher, f => f.Random.String2(f.Random.Number(1, 100)))
             .RuleFor(x => x.PageCount, _random.Next(100, 300))
             .RuleFor(x => x.Format, f => f.PickRandom<BookFormat>())
@@ -74,8 +76,8 @@ public class BookEntityFixture
             .RuleFor(x => x.GoogleBooksId, CreateGoogleBooksId)
             .RuleFor(x => x.BarnesAndNobleId, f => f.Random.String2(10, "0123456789"))
             .RuleFor(x => x.AppleBooksId, f => $"id{f.Random.Number(1, 999999)}")
-            .RuleFor(x => x.ISBNs, f => CreateIsbns(f.Random.Number(1, 5)))
-            .RuleFor(x => x.Ratings, f => CreateBookRatings(f.Random.Number(1, 5)))
+            .RuleFor(x => x.ISBNs, f => includeMetadata ? CreateIsbns(f.Random.Number(1, 5)) : [])
+            .RuleFor(x => x.Ratings, f => includeMetadata ? CreateBookRatings(f.Random.Number(1, 5)) : [])
             .RuleFor(x => x.CreatedOnUtc, f => f.Date.Past())
             .RuleFor(x => x.UpdatedOnUtc, f => f.Date.Recent())
             .Generate();

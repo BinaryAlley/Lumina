@@ -119,7 +119,7 @@ public class UserSettingsRepositoryTests
         Assert.Equal(settings.UserId, result.Value.UserId);
         Assert.Equal(settings.IsPaginationEnabled, result.Value.IsPaginationEnabled);
         Assert.Equal(settings.ItemsPerPage, result.Value.ItemsPerPage);
-        Assert.Equal(settings.IgnoreThePrefixForAlphaPicker, result.Value.IgnoreThePrefixForAlphaPicker);
+        Assert.Equal(settings.ShouldIgnoreThePrefixForAlphaPicker, result.Value.ShouldIgnoreThePrefixForAlphaPicker);
     }
 
     [Fact]
@@ -146,7 +146,7 @@ public class UserSettingsRepositoryTests
             userId: existingSettings.UserId,
             isPaginationEnabled: false,
             itemsPerPage: 12,
-            ignoreThePrefixForAlphaPicker: true);
+            shouldIgnoreThePrefixForAlphaPicker: true);
 
         // Act
         Result<Updated> result = await _sut.UpdateAsync(updatedSettings, CancellationToken.None);
@@ -160,7 +160,7 @@ public class UserSettingsRepositoryTests
         Assert.Equal(existingSettings.UserId, modifiedSettings.UserId);
         Assert.False(modifiedSettings.IsPaginationEnabled);
         Assert.Equal(12, modifiedSettings.ItemsPerPage);
-        Assert.True(modifiedSettings.IgnoreThePrefixForAlphaPicker);
+        Assert.True(modifiedSettings.ShouldIgnoreThePrefixForAlphaPicker);
     }
 
     [Fact]

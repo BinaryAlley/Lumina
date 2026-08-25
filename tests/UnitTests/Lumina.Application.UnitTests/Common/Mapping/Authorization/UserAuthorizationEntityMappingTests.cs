@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.Mapping.Authorization;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using System;
@@ -16,16 +17,15 @@ namespace Lumina.Application.UnitTests.Common.Mapping.Authorization;
 [ExcludeFromCodeCoverage]
 public class UserAuthorizationEntityMappingTests
 {
+    private readonly UserAuthorizationEntityFixture _userAuthorizationEntityFixture = new();
+
     [Fact]
     public void ToResponse_WhenMappingValidEntity_ShouldMapCorrectly()
     {
         // Arrange
-        UserAuthorizationEntity entity = new()
-        {
-            UserId = Guid.NewGuid(),
-            Role = "Admin",
-            Permissions = new HashSet<AuthorizationPermission> { AuthorizationPermission.CanViewUsers }
-        };
+        UserAuthorizationEntity entity = _userAuthorizationEntityFixture.Create(
+            role: "Admin",
+            permissions: new HashSet<AuthorizationPermission> { AuthorizationPermission.CanViewUsers });
 
         // Act
         AuthorizationResponse result = entity.ToResponse();
@@ -41,12 +41,9 @@ public class UserAuthorizationEntityMappingTests
     public void ToResponse_WhenMappingEntityWithEmptyCollections_ShouldMapCorrectly()
     {
         // Arrange
-        UserAuthorizationEntity entity = new()
-        {
-            UserId = Guid.NewGuid(),
-            Role = string.Empty,
-            Permissions = new HashSet<AuthorizationPermission>()
-        };
+        UserAuthorizationEntity entity = _userAuthorizationEntityFixture.Create(
+            role: string.Empty,
+            permissions: new HashSet<AuthorizationPermission>());
 
         // Act
         AuthorizationResponse result = entity.ToResponse();
@@ -62,17 +59,14 @@ public class UserAuthorizationEntityMappingTests
     public void ToResponse_WhenMappingEntityWithMultipleRolesAndPermissions_ShouldMapCorrectly()
     {
         // Arrange
-        UserAuthorizationEntity entity = new()
-        {
-            UserId = Guid.NewGuid(),
-            Role = "Admin",
-            Permissions = new HashSet<AuthorizationPermission>
+        UserAuthorizationEntity entity = _userAuthorizationEntityFixture.Create(
+            role: "Admin",
+            permissions: new HashSet<AuthorizationPermission>
             {
                 AuthorizationPermission.CanViewUsers,
                 AuthorizationPermission.CanDeleteUsers,
                 AuthorizationPermission.CanRegisterUsers
-            }
-        };
+            });
 
         // Act
         AuthorizationResponse result = entity.ToResponse();
@@ -91,12 +85,10 @@ public class UserAuthorizationEntityMappingTests
     public void ToResponse_WhenMappingDifferentUserIds_ShouldMapCorrectly(string userIdString)
     {
         // Arrange
-        UserAuthorizationEntity entity = new()
-        {
-            UserId = Guid.Parse(userIdString),
-            Role = "Admin",
-            Permissions = new HashSet<AuthorizationPermission> { AuthorizationPermission.CanViewUsers }
-        };
+        UserAuthorizationEntity entity = _userAuthorizationEntityFixture.Create(
+            userId: Guid.Parse(userIdString),
+            role: "Admin",
+            permissions: new HashSet<AuthorizationPermission> { AuthorizationPermission.CanViewUsers });
 
         // Act
         AuthorizationResponse result = entity.ToResponse();

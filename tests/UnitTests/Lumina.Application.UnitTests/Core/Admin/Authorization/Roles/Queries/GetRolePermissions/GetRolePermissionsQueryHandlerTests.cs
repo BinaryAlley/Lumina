@@ -7,6 +7,7 @@ using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.Admin.Authorization.Roles.Queries.GetRolePermissions;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Fixtures.Core.Admin.Authorization.Roles.Queries.GetRolePermissions;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.Domain.Common.Primitives;
@@ -32,6 +33,9 @@ public class GetRolePermissionsQueryHandlerTests
     private readonly IRoleRepository _mockRoleRepository;
     private readonly GetRolePermissionsQueryHandler _sut;
     private readonly GetRolePermissionsQueryFixture _getRolePermissionsQueryFixture = new();
+    private readonly RoleEntityFixture _roleEntityFixture = new();
+    private readonly RolePermissionEntityFixture _rolePermissionEntityFixture = new();
+    private readonly PermissionEntityFixture _permissionEntityFixture = new();
     private readonly Guid _userId;
 
     /// <summary>
@@ -136,25 +140,16 @@ public class GetRolePermissionsQueryHandlerTests
     {
         // Arrange
         GetRolePermissionsQuery query = _getRolePermissionsQueryFixture.Create();
-        RoleEntity role = new()
-        {
-            Id = query.RoleId,
-            RoleName = "TestRole",
-            RolePermissions =
+        RoleEntity role = _roleEntityFixture.Create(
+            id: query.RoleId,
+            roleName: "TestRole",
+            rolePermissions:
             [
-                new()
-                {
-                    RoleId = query.RoleId,
-                    PermissionId = Guid.NewGuid(),
-                    Role = null!,
-                    Permission = new()
-                    {
-                        Id = Guid.NewGuid(),
-                        PermissionName = AuthorizationPermission.CanViewUsers
-                    }
-                }
-            ]
-        };
+                _rolePermissionEntityFixture.Create(
+                    roleId: query.RoleId,
+                    permission: _permissionEntityFixture.Create(permissionName: AuthorizationPermission.CanViewUsers))
+            ],
+            includeRolePermissions: true);
 
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
             .Returns(true);

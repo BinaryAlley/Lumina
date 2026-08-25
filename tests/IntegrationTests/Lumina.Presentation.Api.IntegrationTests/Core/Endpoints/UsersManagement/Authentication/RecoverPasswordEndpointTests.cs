@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.Infrastructure.Security;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.DataAccess.Core.UoW;
@@ -35,6 +36,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
     private HttpClient _client;
     private readonly AuthenticatedLuminaApiFactory _apiFactory;
     private readonly PasswordHashService _hashService = new();
+    private readonly UserEntityFixture _userEntityFixture = new();
     private readonly ICryptographyService _cryptographyService;
     private readonly TotpTokenGenerator _totpTokenGenerator = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
@@ -244,18 +246,8 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
         using (IServiceScope scope = _apiFactory.Services.CreateScope())
         {
             LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
-            UserEntity userWithoutTotp = new()
-            {
-                Id = Guid.NewGuid(),
-                Username = "userwithoutotp2",
-                Password = _hashService.HashString("OldPass123!"),
-                TotpSecret = null, // No TOTP configured
-                Libraries = [],
-                UserPermissions = [],
-                UserRole = null,
-                CreatedBy = Guid.NewGuid(),
-                CreatedOnUtc = DateTime.UtcNow
-            };
+            UserEntity userWithoutTotp = _userEntityFixture.Create(username: "userwithoutotp2", password: _hashService.HashString("OldPass123!"));
+            userWithoutTotp.TotpSecret = null; // No TOTP configured
             dbContext.Users.Add(userWithoutTotp);
             await dbContext.SaveChangesAsync();
         }
@@ -307,47 +299,35 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
         Assert.IsType<TaskCanceledException>(exception);
     }
 
+    /// <summary>
+    /// Creates a test user with a TOTP secret in the database and returns it.
+    /// </summary>
+    /// <returns>The created user entity.</returns>
     private async Task<UserEntity> CreateUserWithTotp()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
 
         byte[] totpSecret = _totpTokenGenerator.GenerateSecret();
-        UserEntity user = new()
-        {
-            Id = Guid.NewGuid(),
-            Username = _testUsername,
-            Password = _hashService.HashString("OldPass123!"),
-            TotpSecret = _cryptographyService.Encrypt(Convert.ToBase64String(totpSecret)),
-            Libraries = [],
-            UserPermissions = [],
-            UserRole = null,
-            CreatedBy = Guid.NewGuid(),
-            CreatedOnUtc = DateTime.UtcNow
-        };
+        UserEntity user = _userEntityFixture.Create(username: _testUsername, password: _hashService.HashString("OldPass123!"));
+        user.TotpSecret = _cryptographyService.Encrypt(Convert.ToBase64String(totpSecret));
 
         dbContext.Users.Add(user);
         await dbContext.SaveChangesAsync();
         return user;
     }
 
+    /// <summary>
+    /// Creates a test user without a TOTP secret in the database and returns it.
+    /// </summary>
+    /// <returns>The created user entity.</returns>
     private async Task<UserEntity> CreateUserWithoutTotp()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
 
-        UserEntity user = new()
-        {
-            Id = Guid.NewGuid(),
-            Username = _testUsername,
-            Password = _hashService.HashString("OldPass123!"),
-            TotpSecret = null,
-            Libraries = [],
-            UserPermissions = [],
-            UserRole = null,
-            CreatedBy = Guid.NewGuid(),
-            CreatedOnUtc = DateTime.UtcNow
-        };
+        UserEntity user = _userEntityFixture.Create(username: _testUsername, password: _hashService.HashString("OldPass123!"));
+        user.TotpSecret = null;
 
         dbContext.Users.Add(user);
         await dbContext.SaveChangesAsync();

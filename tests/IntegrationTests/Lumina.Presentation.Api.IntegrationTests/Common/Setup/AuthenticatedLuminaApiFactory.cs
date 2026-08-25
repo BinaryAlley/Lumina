@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Seed;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Contracts.Requests.Authentication;
 using Lumina.Contracts.Responses.Authentication;
 using Lumina.DataAccess.Core.UoW;
@@ -30,6 +31,7 @@ public class AuthenticatedLuminaApiFactory : LuminaApiFactory, IDisposable
     {
         PropertyNameCaseInsensitive = true
     };
+    private readonly UserEntityFixture _userEntityFixture = new();
 
     /// <summary>
     /// Gets the username of the currently created test user.
@@ -65,17 +67,8 @@ public class AuthenticatedLuminaApiFactory : LuminaApiFactory, IDisposable
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
 
         // create test user
-        UserEntity user = new()
-        {
-            Id = Guid.NewGuid(),
-            Username = TestUsername!,
-            Password = _hashService.HashString("TestPass123!"),
-            Libraries = [],
-            UserPermissions = [],
-            UserRole = null,
-            CreatedBy = Guid.NewGuid(),
-            CreatedOnUtc = DateTime.UtcNow
-        };
+        UserEntity user = _userEntityFixture.Create(username: TestUsername!, password: _hashService.HashString("TestPass123!"));
+        user.TotpSecret = null;
 
         dbContext.Users.Add(user);
         await dbContext.SaveChangesAsync();
@@ -127,17 +120,8 @@ public class AuthenticatedLuminaApiFactory : LuminaApiFactory, IDisposable
         IDataSeedService dataSeedService = scope.ServiceProvider.GetRequiredService<IDataSeedService>();
 
         // create test user
-        UserEntity user = new()
-        {
-            Id = Guid.NewGuid(),
-            Username = TestUsername!,
-            Password = _hashService.HashString("TestPass123!"),
-            Libraries = [],
-            UserPermissions = [],
-            UserRole = null,
-            CreatedBy = Guid.NewGuid(),
-            CreatedOnUtc = DateTime.UtcNow
-        };
+        UserEntity user = _userEntityFixture.Create(username: TestUsername!, password: _hashService.HashString("TestPass123!"));
+        user.TotpSecret = null;
 
         dbContext.Users.Add(user);
         await dbContext.SaveChangesAsync();

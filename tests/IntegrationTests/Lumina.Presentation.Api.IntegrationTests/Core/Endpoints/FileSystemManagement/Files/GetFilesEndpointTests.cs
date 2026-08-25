@@ -26,6 +26,7 @@ public class GetFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
 {
     private HttpClient _client;
     private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly FileSystemStructureFixture _fileSystemStructureFixture = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         ReferenceHandler = ReferenceHandler.Preserve,
@@ -56,8 +57,7 @@ public class GetFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     public async Task GetFiles_WhenCalledWithValidPathAndNotIncludeHiddenElements_ShouldReturnFilesWithoutHiddenElements()
     {
         // Arrange
-        FileSystemStructureFixture fileSystemFixture = new();
-        string testPath = fileSystemFixture.CreateFileSystemStructure();
+        string testPath = _fileSystemStructureFixture.CreateFileSystemStructure();
         testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath;
         bool includeHiddenElements = false;
         try
@@ -85,7 +85,7 @@ public class GetFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         }
         finally
         {
-            fileSystemFixture.CleanupFileSystemStructure();
+            _fileSystemStructureFixture.CleanupFileSystemStructure();
         }
     }
 
@@ -93,8 +93,7 @@ public class GetFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     public async Task GetFiles_WhenCalledWithValidPathAndHiddenChildrenAndNotIncludeHiddenElements_ShouldReturnNoFiles()
     {
         // Arrange
-        FileSystemStructureFixture fileSystemFixture = new();
-        string testPath = fileSystemFixture.CreateFileSystemStructure();
+        string testPath = _fileSystemStructureFixture.CreateFileSystemStructure();
         testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath;
         testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath; // two levels to get to the element that has a hidden element as child
         bool includeHiddenElements = false;
@@ -117,7 +116,7 @@ public class GetFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         }
         finally
         {
-            fileSystemFixture.CleanupFileSystemStructure();
+            _fileSystemStructureFixture.CleanupFileSystemStructure();
         }
     }
 
@@ -125,8 +124,7 @@ public class GetFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     public async Task GetFiles_WhenCalledWithValidPathAndWithIncludeHiddenElements_ShouldReturnFilesWithHiddenElements()
     {
         // Arrange
-        FileSystemStructureFixture fileSystemFixture = new();
-        string testPath = fileSystemFixture.CreateFileSystemStructure();
+        string testPath = _fileSystemStructureFixture.CreateFileSystemStructure();
         testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath;
         testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath; // two levels to get to the element that has a hidden element as child
         bool includeHiddenElements = true;
@@ -158,7 +156,7 @@ public class GetFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         }
         finally
         {
-            fileSystemFixture.CleanupFileSystemStructure();
+            _fileSystemStructureFixture.CleanupFileSystemStructure();
         }
     }
 

@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
+using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.GetBook;
 using Microsoft.AspNetCore.Http;
@@ -19,12 +20,13 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Library.WrittenConten
 public class GetBookEndpointTests
 {
     private readonly GetBookEndpoint _sut = Factory.Create<GetBookEndpoint>();
+    private readonly GetBookRequestFixture _getBookRequestFixture = new();
 
     [Fact]
     public async Task ExecuteAsync_WhenCalled_ShouldReturnOkResult()
     {
         // Arrange
-        GetBookRequest request = new(Guid.NewGuid().ToString());
+        GetBookRequest request = _getBookRequestFixture.Create(id: Guid.NewGuid().ToString());
         CancellationToken cancellationToken = CancellationToken.None;
 
         // Act

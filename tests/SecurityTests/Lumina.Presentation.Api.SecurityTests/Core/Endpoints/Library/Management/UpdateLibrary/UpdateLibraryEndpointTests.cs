@@ -1,5 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.Management;
 using Lumina.Contracts.Requests.MediaLibrary.Management;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
@@ -7,14 +9,10 @@ using Lumina.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
-using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Library.Management.UpdateLibrary;
@@ -31,6 +29,8 @@ public class UpdateLibraryEndpointTests : IClassFixture<LuminaApiFactory>
     {
         PropertyNameCaseInsensitive = true
     };
+    private readonly LibraryEntityFixture _libraryEntityFixture = new();
+    private readonly UpdateLibraryRequestFixture _updateLibraryRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UpdateLibraryEndpointTests"/> class.
@@ -47,18 +47,18 @@ public class UpdateLibraryEndpointTests : IClassFixture<LuminaApiFactory>
     {
         // Arrange
         string libraryId = Guid.NewGuid().ToString();
-        UpdateLibraryRequest request = new(
-            Id: Guid.NewGuid(),
-            UserId: Guid.NewGuid(),
-            Title: "Updated Library",
-            LibraryType: "EBook",
-            ContentLocations: ["C:/Media"],
-            CoverImage: null,
-            IsEnabled: true,
-            IsLocked: false,
-            DownloadMetadataFromWeb: true,
-            ShouldSaveMetadataInMediaDirectories: false,
-            ShouldSkipUnchangedDirectoriesDuringScan: true
+        UpdateLibraryRequest request = _updateLibraryRequestFixture.Create(
+            id: Guid.NewGuid(),
+            userId: Guid.NewGuid(),
+            title: "Updated Library",
+            libraryType: "EBook",
+            contentLocations: ["C:/Media"],
+            coverImage: null,
+            isEnabled: true,
+            isLocked: false,
+            canDownloadMetadataFromWeb: true,
+            shouldSaveMetadataInMediaDirectories: false,
+            shouldSkipUnchangedDirectoriesDuringScan: true
         );
 
         // Act
@@ -88,18 +88,18 @@ public class UpdateLibraryEndpointTests : IClassFixture<LuminaApiFactory>
         Guid userId = await _apiFactory.CreateAndAuthenticateAdminUserAsync(client);
         Guid libraryId = Guid.NewGuid();
         await SeedLibraryAsync(libraryId, userId);
-        UpdateLibraryRequest request = new(
-            Id: libraryId,
-            UserId: userId,
-            Title: maliciousTitle,
-            LibraryType: "EBook",
-            ContentLocations: ["C:/Media"],
-            CoverImage: null,
-            IsEnabled: true,
-            IsLocked: false,
-            DownloadMetadataFromWeb: true,
-            ShouldSaveMetadataInMediaDirectories: false,
-            ShouldSkipUnchangedDirectoriesDuringScan: true
+        UpdateLibraryRequest request = _updateLibraryRequestFixture.Create(
+            id: libraryId,
+            userId: userId,
+            title: maliciousTitle,
+            libraryType: "EBook",
+            contentLocations: ["C:/Media"],
+            coverImage: null,
+            isEnabled: true,
+            isLocked: false,
+            canDownloadMetadataFromWeb: true,
+            shouldSaveMetadataInMediaDirectories: false,
+            shouldSkipUnchangedDirectoriesDuringScan: true
         );
 
         // Act
@@ -132,17 +132,7 @@ public class UpdateLibraryEndpointTests : IClassFixture<LuminaApiFactory>
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
-        dbContext.Libraries.Add(new LibraryEntity
-        {
-            Id = libraryId,
-            UserId = userId,
-            Title = "Test Library",
-            LibraryType = LibraryType.EBook,
-            ContentLocations = [],
-            CreatedBy = userId,
-            CreatedOnUtc = DateTime.UtcNow,
-            UpdatedBy = null
-        });
+        dbContext.Libraries.Add(_libraryEntityFixture.Create(id: libraryId, userId: userId, title: "Test Library", libraryType: LibraryType.EBook, contentLocations: []));
         await dbContext.SaveChangesAsync();
     }
 }

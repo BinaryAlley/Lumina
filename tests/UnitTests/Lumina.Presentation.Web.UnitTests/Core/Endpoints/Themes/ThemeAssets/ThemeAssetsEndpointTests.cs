@@ -1,14 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
 using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.DTO.FileSystemManagement;
-using Lumina.Presentation.Web.Common.Requests.Themes;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Core.Endpoints.Themes.ThemeAssets;
+using Lumina.Presentation.Web.Fixtures.Common.DTO.FileSystemManagement;
+using Lumina.Presentation.Web.Fixtures.Common.Requests.Themes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,6 +23,8 @@ public class ThemeAssetsEndpointTests
 {
     private readonly IApiHttpClient _mockApiHttpClient;
     private readonly ThemeAssetsEndpoint _sut;
+    private readonly GetThemeAssetRequestFixture _getThemeAssetRequestFixture = new();
+    private readonly BlobDataDtoFixture _blobDataDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ThemeAssetsEndpointTests"/> class.
@@ -39,10 +40,10 @@ public class ThemeAssetsEndpointTests
     {
         // Arrange
         _mockApiHttpClient.GetBlobAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
-            .Returns(new BlobDataDto { Data = [1, 2, 3], ContentType = "text/css" });
+            .Returns(_blobDataDtoFixture.Create(data: [1, 2, 3], contentType: "text/css"));
 
         // Act
-        IResult result = await _sut.ExecuteAsync(new GetThemeAssetRequest(ThemeId: "editorial-paper", Path: "assets/style.css"), CancellationToken.None);
+        IResult result = await _sut.ExecuteAsync(_getThemeAssetRequestFixture.Create(themeId: "editorial-paper", path: "assets/style.css"), CancellationToken.None);
 
         // Assert
         FileContentHttpResult fileResult = Assert.IsType<FileContentHttpResult>(result);
@@ -57,7 +58,7 @@ public class ThemeAssetsEndpointTests
     public async Task ExecuteAsync_WhenAssetPathMissing_ShouldReturnProblem()
     {
         // Act
-        IResult result = await _sut.ExecuteAsync(new GetThemeAssetRequest(ThemeId: "editorial-paper", Path: null), CancellationToken.None);
+        IResult result = await _sut.ExecuteAsync(_getThemeAssetRequestFixture.Create(themeId: "editorial-paper", path: null), CancellationToken.None);
 
         // Assert
         ProblemHttpResult problemResult = Assert.IsType<ProblemHttpResult>(result);

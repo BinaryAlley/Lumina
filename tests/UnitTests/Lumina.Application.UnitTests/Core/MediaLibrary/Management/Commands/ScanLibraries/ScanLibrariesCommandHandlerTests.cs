@@ -7,8 +7,8 @@ using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Core.MediaLibrary.Management.Commands.ScanLibraries;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Lumina.Application.Fixtures.Core.MediaLibrary.Management.Commands.ScanLibraries;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
-using Lumina.Domain.Common.Events;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using NSubstitute;
@@ -37,6 +37,7 @@ public class ScanLibrariesCommandHandlerTests
     private readonly ICurrentUserService _mockCurrentUserService;
     private readonly IDomainEventsQueue _mockDomainEventsQueue;
     private readonly ScanLibrariesCommandHandler _sut;
+    private readonly ScanLibrariesCommandFixture _scanLibrariesCommandFixture = new();
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
     private readonly LibraryScanEntityFixture _libraryScanEntityFixture = new();
     private readonly Guid _userId;
@@ -79,7 +80,7 @@ public class ScanLibrariesCommandHandlerTests
         _mockLibraryRepository.GetAllEnabledAndUnlockedAsync(Arg.Any<CancellationToken>()).Returns(Result.From<IEnumerable<LibraryEntity>>(libraries));
 
         // Act
-        Result<IEnumerable<MediaLibraryScanResponse>> result = await _sut.HandleAsync(new ScanLibrariesCommand(), CancellationToken.None);
+        Result<IEnumerable<MediaLibraryScanResponse>> result = await _sut.HandleAsync(_scanLibrariesCommandFixture.Create(), CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -105,7 +106,7 @@ public class ScanLibrariesCommandHandlerTests
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>()).Returns(false);
 
         // Act
-        Result<IEnumerable<MediaLibraryScanResponse>> result = await _sut.HandleAsync(new ScanLibrariesCommand(), CancellationToken.None);
+        Result<IEnumerable<MediaLibraryScanResponse>> result = await _sut.HandleAsync(_scanLibrariesCommandFixture.Create(), CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -122,7 +123,7 @@ public class ScanLibrariesCommandHandlerTests
         _mockCurrentUserService.UserId.Returns((Guid?)null);
 
         // Act
-        Result<IEnumerable<MediaLibraryScanResponse>> result = await _sut.HandleAsync(new ScanLibrariesCommand(), CancellationToken.None);
+        Result<IEnumerable<MediaLibraryScanResponse>> result = await _sut.HandleAsync(_scanLibrariesCommandFixture.Create(), CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
@@ -139,7 +140,7 @@ public class ScanLibrariesCommandHandlerTests
             .Returns(Error.Failure(description: "Failed to get libraries"));
 
         // Act
-        Result<IEnumerable<MediaLibraryScanResponse>> result = await _sut.HandleAsync(new ScanLibrariesCommand(), CancellationToken.None);
+        Result<IEnumerable<MediaLibraryScanResponse>> result = await _sut.HandleAsync(_scanLibrariesCommandFixture.Create(), CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
@@ -161,7 +162,7 @@ public class ScanLibrariesCommandHandlerTests
             .Returns(Result.From<IEnumerable<LibraryScanEntity>>([runningScan]));
 
         // Act
-        Result<IEnumerable<MediaLibraryScanResponse>> result = await _sut.HandleAsync(new ScanLibrariesCommand(), CancellationToken.None);
+        Result<IEnumerable<MediaLibraryScanResponse>> result = await _sut.HandleAsync(_scanLibrariesCommandFixture.Create(), CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -181,7 +182,7 @@ public class ScanLibrariesCommandHandlerTests
             .Returns(Error.Failure(description: "Failed to insert library scan"));
 
         // Act
-        Result<IEnumerable<MediaLibraryScanResponse>> result = await _sut.HandleAsync(new ScanLibrariesCommand(), CancellationToken.None);
+        Result<IEnumerable<MediaLibraryScanResponse>> result = await _sut.HandleAsync(_scanLibrariesCommandFixture.Create(), CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
@@ -198,7 +199,7 @@ public class ScanLibrariesCommandHandlerTests
             .Returns(Error.Failure(description: "Failed to get past month scans"));
 
         // Act
-        Result<IEnumerable<MediaLibraryScanResponse>> result = await _sut.HandleAsync(new ScanLibrariesCommand(), CancellationToken.None);
+        Result<IEnumerable<MediaLibraryScanResponse>> result = await _sut.HandleAsync(_scanLibrariesCommandFixture.Create(), CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
@@ -214,7 +215,7 @@ public class ScanLibrariesCommandHandlerTests
         _mockLibraryRepository.GetAllEnabledAndUnlockedAsync(Arg.Any<CancellationToken>()).Returns(Result.From<IEnumerable<LibraryEntity>>(libraries));
 
         // Act
-        Result<IEnumerable<MediaLibraryScanResponse>> result = await _sut.HandleAsync(new ScanLibrariesCommand(), CancellationToken.None);
+        Result<IEnumerable<MediaLibraryScanResponse>> result = await _sut.HandleAsync(_scanLibrariesCommandFixture.Create(), CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);

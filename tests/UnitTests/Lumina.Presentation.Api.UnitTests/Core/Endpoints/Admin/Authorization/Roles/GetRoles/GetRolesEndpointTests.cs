@@ -2,6 +2,7 @@
 using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.Admin.Authorization.Roles.Queries.GetRoles;
+using Lumina.Contracts.Fixtures.Core.Responses.Authorization;
 using Lumina.Contracts.Responses.Authorization;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Core.Endpoints.Admin.Authorization.Roles.GetRoles;
@@ -25,6 +26,7 @@ public class GetRolesEndpointTests
 {
     private readonly IQueryHandler<GetRolesQuery, Result<IEnumerable<RoleResponse>>> _mockHandler;
     private readonly GetRolesEndpoint _sut;
+    private readonly RoleResponseFixture _roleResponseFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetRolesEndpointTests"/> class.
@@ -42,8 +44,8 @@ public class GetRolesEndpointTests
         CancellationToken cancellationToken = CancellationToken.None;
         IEnumerable<RoleResponse> expectedResponse =
         [
-        new RoleResponse(Guid.NewGuid(), "Admin")
-    ];
+            _roleResponseFixture.Create(roleName: "Admin")
+        ];
         _mockHandler.HandleAsync(Arg.Any<GetRolesQuery>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(expectedResponse));
 
@@ -88,7 +90,7 @@ public class GetRolesEndpointTests
         _mockHandler.HandleAsync(Arg.Any<GetRolesQuery>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(new List<RoleResponse>
                 {
-                    new(Guid.NewGuid(), "Admin")
+                    _roleResponseFixture.Create(roleName: "Admin")
                 } as IEnumerable<RoleResponse>));
 
         // Act

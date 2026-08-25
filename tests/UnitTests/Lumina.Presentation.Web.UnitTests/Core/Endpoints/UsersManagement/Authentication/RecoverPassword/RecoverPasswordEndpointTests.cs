@@ -6,6 +6,7 @@ using Lumina.Presentation.Web.Common.Responses.UsersManagement;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Core.Endpoints.UsersManagement.Authentication.RecoverPassword;
 using Lumina.Presentation.Web.Fixtures.Common.Requests.UsersManagement;
+using Lumina.Presentation.Web.Fixtures.Common.Responses.UsersManagement;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
@@ -26,6 +27,7 @@ public class RecoverPasswordEndpointTests
     private readonly IApiHttpClient _mockApiHttpClient;
     private readonly RecoverPasswordEndpoint _sut;
     private readonly RecoverPasswordRequestFixture _recoverPasswordRequestFixture = new();
+    private readonly RecoverPasswordResponseFixture _recoverPasswordResponseFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RecoverPasswordEndpointTests"/> class.
@@ -41,7 +43,7 @@ public class RecoverPasswordEndpointTests
     {
         // Arrange
         RecoverPasswordRequest request = _recoverPasswordRequestFixture.Create();
-        RecoverPasswordResponse expectedResponse = new(true);
+        RecoverPasswordResponse expectedResponse = _recoverPasswordResponseFixture.Create(isPasswordReset: true);
         _mockApiHttpClient.PostAsync<RecoverPasswordResponse, RecoverPasswordRequest>(Arg.Any<string>(), Arg.Any<RecoverPasswordRequest>(), Arg.Any<CancellationToken>())
             .Returns(expectedResponse);
 

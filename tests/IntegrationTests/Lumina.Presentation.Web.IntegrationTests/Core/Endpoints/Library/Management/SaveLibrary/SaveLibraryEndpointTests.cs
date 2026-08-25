@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Common.DTO.Libraries;
 using Lumina.Presentation.Web.Core.Endpoints.Library.Management.SaveLibrary;
+using Lumina.Presentation.Web.Fixtures.Common.DTO.Libraries;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
 using System;
@@ -22,6 +23,7 @@ namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.Manage
 public class SaveLibraryEndpointTests : IClassFixture<LuminaWebFactory>
 {
     private readonly LuminaWebFactory _apiFactory;
+    private readonly LibraryDtoFixture _libraryDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SaveLibraryEndpointTests"/> class.
@@ -37,8 +39,9 @@ public class SaveLibraryEndpointTests : IClassFixture<LuminaWebFactory>
     {
         // Arrange
         _apiFactory.ApiClientStub.Reset();
-        LibraryDto request = new() { Title = "New Books Library", LibraryType = "Book" };
-        LibraryDto expectedResponse = new() { Id = Guid.NewGuid(), Title = request.Title, LibraryType = request.LibraryType };
+        LibraryDto request = _libraryDtoFixture.Create(title: "New Books Library", libraryType: "Book");
+        request.Id = null;
+        LibraryDto expectedResponse = _libraryDtoFixture.Create(id: Guid.NewGuid(), title: request.Title, libraryType: request.LibraryType);
         _apiFactory.ApiClientStub.RegisterPostResponse("libraries", expectedResponse);
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
         HttpRequestMessage saveRequest = new(HttpMethod.Post, "/en-us/libraries/manage/api-item")
@@ -69,7 +72,7 @@ public class SaveLibraryEndpointTests : IClassFixture<LuminaWebFactory>
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
         HttpRequestMessage saveRequest = new(HttpMethod.Post, "/en-us/libraries/manage/api-item")
         {
-            Content = JsonContent.Create(new LibraryDto { Title = "New Books Library", LibraryType = "Book" })
+            Content = JsonContent.Create(_libraryDtoFixture.Create(title: "New Books Library", libraryType: "Book"))
         };
         saveRequest.Content!.Headers.ContentType = new MediaTypeHeaderValue("application/json");
         saveRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

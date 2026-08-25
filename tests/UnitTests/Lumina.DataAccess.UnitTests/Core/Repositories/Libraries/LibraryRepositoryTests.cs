@@ -163,18 +163,12 @@ public class LibraryRepositoryTests
         _mockContext.Libraries.Add(library);
         await _mockContext.SaveChangesAsync();
 
-        LibraryEntity updatedLibrary = new()
-        {
-            Id = library.Id,
-            UserId = library.UserId,
-            Title = "Updated Title",
-            LibraryType = library.LibraryType,
-            ContentLocations = [new LibraryContentLocationEntity { Path = "/new/path" }],
-            CreatedOnUtc = library.CreatedOnUtc,
-            CreatedBy = library.CreatedBy,
-            UpdatedOnUtc = DateTime.UtcNow,
-            UpdatedBy = library.UserId
-        };
+        LibraryEntity updatedLibrary = _libraryEntityFixture.Create(
+            id: library.Id,
+            userId: library.UserId,
+            title: "Updated Title",
+            libraryType: library.LibraryType,
+            contentLocations: ["/new/path"]);
 
         // Act
         Result<Updated> result = await _sut.UpdateAsync(updatedLibrary, CancellationToken.None);

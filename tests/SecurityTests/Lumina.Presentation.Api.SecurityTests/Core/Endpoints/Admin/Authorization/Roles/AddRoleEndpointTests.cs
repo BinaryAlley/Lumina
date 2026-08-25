@@ -1,19 +1,16 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using Lumina.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Admin.Authorization.Roles;
@@ -22,7 +19,7 @@ namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Admin.Authorizati
 /// Contains security tests for the <c>/auth/roles</c> route.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class AddRoleEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
+public class AddRoleEndpointTests : IClassFixture<LuminaApiFactory>, IAsyncDisposable
 {
     private readonly HttpClient _client;
     private readonly LuminaApiFactory _apiFactory;
@@ -33,6 +30,7 @@ public class AddRoleEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
     private Guid _adminUserId;
     private Guid _seededPermissionId;
     private string _createdRoleName = "";
+    private readonly PermissionEntityFixture _permissionEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AddRoleEndpointTests"/> class.
@@ -84,13 +82,7 @@ public class AddRoleEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
         using (IServiceScope seedScope = _apiFactory.Services.CreateScope())
         {
             LuminaDbContext seedDbContext = seedScope.ServiceProvider.GetRequiredService<LuminaDbContext>();
-            seedDbContext.Permissions.Add(new PermissionEntity
-            {
-                Id = _seededPermissionId,
-                PermissionName = AuthorizationPermission.CanDeleteUsers,
-                CreatedBy = Guid.NewGuid(),
-                CreatedOnUtc = DateTime.UtcNow
-            });
+            seedDbContext.Permissions.Add(_permissionEntityFixture.Create(id: _seededPermissionId, permissionName: AuthorizationPermission.CanDeleteUsers));
             await seedDbContext.SaveChangesAsync();
         }
         var requestBody = new
@@ -118,7 +110,7 @@ public class AddRoleEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
     /// <summary>
     /// Disposes API factory resources.
     /// </summary>
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
@@ -137,6 +129,6 @@ public class AddRoleEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
         }
         dbContext.SaveChanges();
         if (_adminUserId != Guid.Empty)
-            _apiFactory.RemoveAdminUserAsync(_adminUserId).GetAwaiter().GetResult();
+            await _apiFactory.RemoveAdminUserAsync(_adminUserId).ConfigureAwait(false);
     }
 }

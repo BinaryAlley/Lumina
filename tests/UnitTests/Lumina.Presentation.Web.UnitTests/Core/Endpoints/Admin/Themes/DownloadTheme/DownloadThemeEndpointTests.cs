@@ -2,16 +2,15 @@
 using FastEndpoints;
 using Lumina.Presentation.Web.Common.Api;
 using Lumina.Presentation.Web.Common.DTO.FileSystemManagement;
-using Lumina.Presentation.Web.Common.Requests.Themes;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Core.Endpoints.Admin.Themes.DownloadTheme;
 using Lumina.Presentation.Web.Core.Themes;
+using Lumina.Presentation.Web.Fixtures.Common.DTO.FileSystemManagement;
+using Lumina.Presentation.Web.Fixtures.Common.Requests.Themes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
-using System;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -26,6 +25,8 @@ public class DownloadThemeEndpointTests
 {
     private readonly IApiHttpClient _mockApiHttpClient;
     private readonly DownloadThemeEndpoint _sut;
+    private readonly GetThemeArchiveRequestFixture _getThemeArchiveRequestFixture = new();
+    private readonly BlobDataDtoFixture _blobDataDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DownloadThemeEndpointTests"/> class.
@@ -43,10 +44,10 @@ public class DownloadThemeEndpointTests
         // Arrange
         string themeId = "editorial-paper";
         _mockApiHttpClient.GetBlobAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
-            .Returns(new BlobDataDto { Data = [0x50, 0x4B, 0x03, 0x04], ContentType = "application/zip" });
+            .Returns(_blobDataDtoFixture.Create(data: [0x50, 0x4B, 0x03, 0x04], contentType: "application/zip"));
 
         // Act
-        IResult result = await _sut.ExecuteAsync(new GetThemeArchiveRequest(themeId), CancellationToken.None);
+        IResult result = await _sut.ExecuteAsync(_getThemeArchiveRequestFixture.Create(themeId: themeId), CancellationToken.None);
 
         // Assert
         FileStreamHttpResult fileResult = Assert.IsType<FileStreamHttpResult>(result);
@@ -61,10 +62,10 @@ public class DownloadThemeEndpointTests
         string themeId = "editorial-paper";
         string expectedEndpoint = ApiRoutes.Themes.GET_THEME_ARCHIVE.Replace("{themeId}", themeId);
         _mockApiHttpClient.GetBlobAsync(expectedEndpoint, Arg.Any<CancellationToken>())
-            .Returns(new BlobDataDto { Data = [1, 2, 3], ContentType = "application/zip" });
+            .Returns(_blobDataDtoFixture.Create(data: [1, 2, 3], contentType: "application/zip"));
 
         // Act
-        await _sut.ExecuteAsync(new GetThemeArchiveRequest(themeId), CancellationToken.None);
+        await _sut.ExecuteAsync(_getThemeArchiveRequestFixture.Create(themeId: themeId), CancellationToken.None);
 
         // Assert
         await _mockApiHttpClient.Received(1).GetBlobAsync(expectedEndpoint, Arg.Any<CancellationToken>());
@@ -77,7 +78,7 @@ public class DownloadThemeEndpointTests
     public async Task ExecuteAsync_WhenThemeIdIsBlank_ShouldReturnProblemWithBadRequest(string? themeId)
     {
         // Act
-        IResult result = await _sut.ExecuteAsync(new GetThemeArchiveRequest(themeId), CancellationToken.None);
+        IResult result = await _sut.ExecuteAsync(_getThemeArchiveRequestFixture.Create(themeId: themeId), CancellationToken.None);
 
         // Assert
         ProblemHttpResult problemResult = Assert.IsType<ProblemHttpResult>(result);

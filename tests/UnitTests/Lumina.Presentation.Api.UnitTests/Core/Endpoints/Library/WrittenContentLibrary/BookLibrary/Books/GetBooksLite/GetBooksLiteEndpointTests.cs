@@ -3,11 +3,13 @@ using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Queries.GetBooksLite;
 using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Lumina.Contracts.Fixtures.Core.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Lumina.Contracts.Fixtures.Responses.Common;
 using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Contracts.Responses.Common;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.Errors;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.GetBooksLite;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -30,6 +32,8 @@ public class GetBooksLiteEndpointTests
     private readonly IQueryHandler<GetBooksLiteQuery, Result<PaginatedResponse<BookLiteResponse>>> _mockHandler;
     private readonly GetBooksLiteEndpoint _sut;
     private readonly GetBooksLiteRequestFixture _getBooksLiteRequestFixture = new();
+    private readonly BookLiteResponseFixture _bookLiteResponseFixture = new();
+    private readonly PaginatedResponseFixture<BookLiteResponse> _paginatedResponseFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetBooksLiteEndpointTests"/> class.
@@ -167,24 +171,17 @@ public class GetBooksLiteEndpointTests
     /// </summary>
     /// <param name="bookCount">The number of book responses to include in the data collection.</param>
     /// <returns>A configured paginated response instance.</returns>
-    private static PaginatedResponse<BookLiteResponse> CreatePaginatedResponse(int bookCount)
+    private PaginatedResponse<BookLiteResponse> CreatePaginatedResponse(int bookCount)
     {
         List<BookLiteResponse> books = [];
         for (int index = 0; index < bookCount; index++)
-            books.Add(new BookLiteResponse(
-                Id: Guid.NewGuid(),
-                Title: "Test Book",
-                ReleaseYear: 2001,
-                CoverPath: null
+            books.Add(_bookLiteResponseFixture.Create(
+                id: Guid.NewGuid(),
+                title: "Test Book",
+                releaseYear: 2001,
+                coverPath: null
             ));
 
-        return new PaginatedResponse<BookLiteResponse>
-        {
-            Data = books,
-            CurrentPage = 1,
-            PerPage = 10,
-            Count = bookCount,
-            NumberOfPages = bookCount > 0 ? 1 : 0
-        };
+        return _paginatedResponseFixture.Create(data: books, currentPage: 1, perPage: 10, count: bookCount, numberOfPages: bookCount > 0 ? 1 : 0);
     }
 }

@@ -72,7 +72,7 @@ public class GetBooksLiteRequestTests
         GetBooksLiteRequest sut = _getBooksLiteRequestFixture.Create();
 
         // Act
-        (Guid libraryId, int? currentPage, int? perPage, string? searchTerm, string? filterAlphaKey, bool ignoreThePrefixForAlphaPicker, string? sortBy, SortOrder? sortOrder) = sut;
+        (Guid libraryId, int? currentPage, int? perPage, string? searchTerm, string? filterAlphaKey, bool shouldIgnoreThePrefixForAlphaPicker, string? sortBy, SortOrder? sortOrder) = sut;
 
         // Assert
         Assert.Equal(sut.LibraryId, libraryId);
@@ -80,7 +80,7 @@ public class GetBooksLiteRequestTests
         Assert.Equal(sut.PerPage, perPage);
         Assert.Equal(sut.SearchTerm, searchTerm);
         Assert.Equal(sut.FilterAlphaKey, filterAlphaKey);
-        Assert.Equal(sut.IgnoreThePrefixForAlphaPicker, ignoreThePrefixForAlphaPicker);
+        Assert.Equal(sut.ShouldIgnoreThePrefixForAlphaPicker, shouldIgnoreThePrefixForAlphaPicker);
         Assert.Equal(sut.SortBy, sortBy);
         Assert.Equal(sut.SortOrder, sortOrder);
     }

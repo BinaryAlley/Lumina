@@ -14,16 +14,18 @@ namespace Lumina.Presentation.Web.Fixtures.Common.Requests.UsersManagement.Authe
 [ExcludeFromCodeCoverage]
 public class LoginViewRequestFixture
 {
+    private readonly Faker _faker = new();
+
     /// <summary>
     /// Creates a new <see cref="LoginViewRequest"/> instance with randomized test data.
     /// </summary>
     /// <param name="returnUrl">Optional URL to return to, after login.</param>
     /// <returns>A configured <see cref="LoginViewRequest"/> instance.</returns>
-    public LoginViewRequest Create(string? returnUrl = null)
+    public LoginViewRequest Create(
+        string? returnUrl = null)
     {
-        Faker faker = new();
         return new LoginViewRequest(
-            ReturnUrl: returnUrl ?? $"/{faker.Random.AlphaNumeric(8)}"
+            ReturnUrl: returnUrl ?? $"/{_faker.Random.AlphaNumeric(8)}"
         );
     }
 

@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
 using Lumina.Presentation.Web.Common.DTO.Themes;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -15,6 +14,7 @@ namespace Lumina.Presentation.Web.Fixtures.Common.DTO.Themes;
 [ExcludeFromCodeCoverage]
 public class ThemeTemplateResponseDtoFixture
 {
+    private readonly Faker _faker = new();
     private readonly ThemeResponseDtoFixture _themeResponseDtoFixture = new();
 
     /// <summary>
@@ -27,10 +27,9 @@ public class ThemeTemplateResponseDtoFixture
         ThemeResponseDto? theme = null, 
         string? template = null)
     {
-        Faker faker = new();
         return new ThemeTemplateResponseDto(
             Theme: theme ?? _themeResponseDtoFixture.Create(),
-            Template: template ?? faker.Lorem.Paragraph()
+            Template: template ?? _faker.Lorem.Paragraph()
         );
     }
 

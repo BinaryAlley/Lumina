@@ -7,6 +7,7 @@ using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Core.MediaLibrary.Management.Queries.GetRunningLibraryScans;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Lumina.Application.Fixtures.Core.MediaLibrary.Management.Queries.GetRunningLibraryScans;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Progress;
@@ -37,6 +38,7 @@ public class GetRunningLibraryScansQueryHandlerTests
     private readonly ICurrentUserService _mockCurrentUserService;
     private readonly IMediaLibrariesScanProgressTracker _mockMediaLibrariesScanProgressTracker;
     private readonly GetRunningLibraryScansQueryHandler _sut;
+    private readonly GetRunningLibraryScansQueryFixture _getRunningLibraryScansQueryFixture = new();
     private readonly LibraryScanEntityFixture _libraryScanEntityFixture = new();
     private readonly MediaLibraryScanProgressFixture _mediaLibraryScanProgressFixture = new();
     private readonly UserIdFixture _userIdFixture = new();
@@ -80,7 +82,7 @@ public class GetRunningLibraryScansQueryHandlerTests
         _mockLibraryScanRepository.GetRunningScansAsync(Arg.Any<CancellationToken>()).Returns(Result.From<IEnumerable<LibraryScanEntity>>(runningScans));
 
         // Act
-        Result<IEnumerable<MediaLibraryScanProgressResponse>> result = await _sut.HandleAsync(new GetRunningLibraryScansQuery(), CancellationToken.None);
+        Result<IEnumerable<MediaLibraryScanProgressResponse>> result = await _sut.HandleAsync(_getRunningLibraryScansQueryFixture.Create(), CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -100,7 +102,7 @@ public class GetRunningLibraryScansQueryHandlerTests
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>()).Returns(false);
 
         // Act
-        Result<IEnumerable<MediaLibraryScanProgressResponse>> result = await _sut.HandleAsync(new GetRunningLibraryScansQuery(), CancellationToken.None);
+        Result<IEnumerable<MediaLibraryScanProgressResponse>> result = await _sut.HandleAsync(_getRunningLibraryScansQueryFixture.Create(), CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -114,7 +116,7 @@ public class GetRunningLibraryScansQueryHandlerTests
         _mockCurrentUserService.UserId.Returns((Guid?)null);
 
         // Act
-        Result<IEnumerable<MediaLibraryScanProgressResponse>> result = await _sut.HandleAsync(new GetRunningLibraryScansQuery(), CancellationToken.None);
+        Result<IEnumerable<MediaLibraryScanProgressResponse>> result = await _sut.HandleAsync(_getRunningLibraryScansQueryFixture.Create(), CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
@@ -130,7 +132,7 @@ public class GetRunningLibraryScansQueryHandlerTests
             .Returns(Error.Failure(description: "Failed to get running scans"));
 
         // Act
-        Result<IEnumerable<MediaLibraryScanProgressResponse>> result = await _sut.HandleAsync(new GetRunningLibraryScansQuery(), CancellationToken.None);
+        Result<IEnumerable<MediaLibraryScanProgressResponse>> result = await _sut.HandleAsync(_getRunningLibraryScansQueryFixture.Create(), CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
@@ -146,7 +148,7 @@ public class GetRunningLibraryScansQueryHandlerTests
             .Returns(Error.Failure(description: "Failed to get scan progress"));
 
         // Act
-        Result<IEnumerable<MediaLibraryScanProgressResponse>> result = await _sut.HandleAsync(new GetRunningLibraryScansQuery(), CancellationToken.None);
+        Result<IEnumerable<MediaLibraryScanProgressResponse>> result = await _sut.HandleAsync(_getRunningLibraryScansQueryFixture.Create(), CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);

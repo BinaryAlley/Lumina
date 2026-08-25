@@ -2,6 +2,7 @@
 using Lumina.Presentation.Web.Common.DTO.Configuration;
 using Lumina.Presentation.Web.Common.Primitives;
 using Lumina.Presentation.Web.Common.Validators;
+using Lumina.Presentation.Web.Fixtures.Common.DTO.Configuration;
 using Lumina.Presentation.Web.UnitTests.Common.Setup;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -15,13 +16,14 @@ namespace Lumina.Presentation.Web.UnitTests.Common.Validators;
 [ExcludeFromCodeCoverage]
 public class ServerConfigurationModelValidatorTests
 {
+    private readonly ServerConfigurationDtoFixture _serverConfigurationDtoFixture = new();
     private readonly ServerConfigurationDtoValidator _validator = new();
 
     [Fact]
     public void Validate_WhenBaseAddressIsEmpty_ShouldHaveValidationError()
     {
         // Arrange
-        ServerConfigurationDto configuration = new() { ApiVersion = '1', BaseAddress = string.Empty, Port = 5214 };
+        ServerConfigurationDto configuration = _serverConfigurationDtoFixture.Create(apiVersion: '1', baseAddress: string.Empty, port: 5214);
 
         // Act
         List<Error> result = _validator.TestValidate(configuration);
@@ -36,7 +38,7 @@ public class ServerConfigurationModelValidatorTests
     public void Validate_WhenPortIsAtBoundary_ShouldNotHaveValidationError(ushort port)
     {
         // Arrange
-        ServerConfigurationDto configuration = new() { ApiVersion = '1', BaseAddress = "http://localhost", Port = port };
+        ServerConfigurationDto configuration = _serverConfigurationDtoFixture.Create(apiVersion: '1', baseAddress: "http://localhost", port: port);
 
         // Act
         List<Error> result = _validator.TestValidate(configuration);
@@ -51,7 +53,7 @@ public class ServerConfigurationModelValidatorTests
     public void Validate_WhenApiVersionIsAtBoundary_ShouldNotHaveValidationError(char apiVersion)
     {
         // Arrange
-        ServerConfigurationDto configuration = new() { ApiVersion = apiVersion, BaseAddress = "http://localhost", Port = 5214 };
+        ServerConfigurationDto configuration = _serverConfigurationDtoFixture.Create(apiVersion: apiVersion, baseAddress: "http://localhost", port: 5214);
 
         // Act
         List<Error> result = _validator.TestValidate(configuration);
@@ -64,7 +66,7 @@ public class ServerConfigurationModelValidatorTests
     public void Validate_WhenConfigurationIsValid_ShouldNotHaveValidationError()
     {
         // Arrange
-        ServerConfigurationDto configuration = new() { ApiVersion = '1', BaseAddress = "http://localhost", Port = 5214 };
+        ServerConfigurationDto configuration = _serverConfigurationDtoFixture.Create(apiVersion: '1', baseAddress: "http://localhost", port: 5214);
 
         // Act
         List<Error> result = _validator.TestValidate(configuration);

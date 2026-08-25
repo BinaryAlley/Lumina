@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
+using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
@@ -23,13 +24,28 @@ public class UserEntityFixture
     /// <param name="libraryCount">Number of libraries to generate. Default is 0.</param>
     /// <param name="username">Optional username to pin, or <see langword="null"/> to generate a random one.</param>
     /// <param name="password">Optional password to pin, or <see langword="null"/> to generate a random one.</param>
+    /// <param name="id">Optional Id to pin, or <see langword="null"/> to generate a random one.</param>
+    /// <param name="userRole">Optional user role association to pin when including it.</param>
+    /// <param name="userPermissions">Optional user permission associations to pin when including them.</param>
+    /// <param name="includeUserRole">Whether the user should include a user role association or not.</param>
+    /// <param name="includeUserPermissions">Whether the user should include user permission associations or not.</param>
+    /// <param name="libraries">Optional collection of libraries to pin for the user, or <see langword="null"/> to generate them based on <paramref name="libraryCount"/>.</param>
     /// <returns>The created user entity.</returns>
-    public UserEntity Create(int libraryCount = 0, string? username = null, string? password = null)
+    public UserEntity Create(
+        int libraryCount = 0,
+        string? username = null,
+        string? password = null,
+        Guid? id = null,
+        UserRoleEntity? userRole = null,
+        IEnumerable<UserPermissionEntity>? userPermissions = null,
+        bool includeUserRole = false,
+        bool includeUserPermissions = false,
+        ICollection<LibraryEntity>? libraries = null)
     {
-        Guid userId = Guid.NewGuid();
-        List<LibraryEntity> libraries = libraryCount > 0
+        Guid userId = id ?? Guid.NewGuid();
+        ICollection<LibraryEntity> resolvedLibraries = libraries ?? (libraryCount > 0
             ? CreateLibraries(libraryCount, userId)
-            : [];
+            : []);
 
         return new Faker<UserEntity>()
             .CustomInstantiator(f => new UserEntity
@@ -39,9 +55,9 @@ public class UserEntityFixture
                 Password = default!,
                 CreatedOnUtc = default,
                 TotpSecret = default,
-                Libraries = libraries,
-                UserPermissions = [],
-                UserRole = null,
+                Libraries = resolvedLibraries,
+                UserPermissions = includeUserPermissions ? (userPermissions ?? []).ToList() : [],
+                UserRole = includeUserRole ? userRole : null,
                 CreatedBy = userId
             })
             .RuleFor(x => x.Username, f => username ?? f.Internet.UserName())

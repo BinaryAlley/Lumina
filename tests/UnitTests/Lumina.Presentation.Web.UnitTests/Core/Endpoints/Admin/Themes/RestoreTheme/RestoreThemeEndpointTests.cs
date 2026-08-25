@@ -2,15 +2,14 @@
 using FastEndpoints;
 using Lumina.Presentation.Web.Common.Api;
 using Lumina.Presentation.Web.Common.DTO.Themes;
-using Lumina.Presentation.Web.Common.Requests.Themes;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Core.Endpoints.Admin.Themes.RestoreTheme;
 using Lumina.Presentation.Web.Core.Themes;
+using Lumina.Presentation.Web.Fixtures.Common.Requests.Themes;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,6 +25,7 @@ public class RestoreThemeEndpointTests
 {
     private readonly IApiHttpClient _mockApiHttpClient;
     private readonly RestoreThemeEndpoint _sut;
+    private readonly RestoreThemeRequestFixture _restoreThemeRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RestoreThemeEndpointTests"/> class.
@@ -44,7 +44,7 @@ public class RestoreThemeEndpointTests
         string themeId = "editorial-paper";
 
         // Act
-        IResult result = await _sut.ExecuteAsync(new RestoreThemeRequest(themeId), CancellationToken.None);
+        IResult result = await _sut.ExecuteAsync(_restoreThemeRequestFixture.Create(themeId: themeId), CancellationToken.None);
         string body = await JsonResultTestHelper.GetResponseBodyAsync(result);
 
         // Assert
@@ -62,7 +62,7 @@ public class RestoreThemeEndpointTests
         string expectedEndpoint = ApiRoutes.Themes.RESTORE_THEME.Replace("{themeId}", themeId);
 
         // Act
-        await _sut.ExecuteAsync(new RestoreThemeRequest(themeId), CancellationToken.None);
+        await _sut.ExecuteAsync(_restoreThemeRequestFixture.Create(themeId: themeId), CancellationToken.None);
 
         // Assert
         await _mockApiHttpClient.Received(1).PostAsync<ThemeResponseDto, object>(expectedEndpoint, Arg.Any<object>(), Arg.Any<CancellationToken>());
@@ -75,7 +75,7 @@ public class RestoreThemeEndpointTests
     public async Task ExecuteAsync_WhenThemeIdIsBlank_ShouldReturnProblemWithBadRequest(string? themeId)
     {
         // Act
-        IResult result = await _sut.ExecuteAsync(new RestoreThemeRequest(themeId), CancellationToken.None);
+        IResult result = await _sut.ExecuteAsync(_restoreThemeRequestFixture.Create(themeId: themeId), CancellationToken.None);
 
         // Assert
         ProblemHttpResult problemResult = Assert.IsType<ProblemHttpResult>(result);

@@ -28,20 +28,22 @@ public class GetBooksQueryFixture
     /// <param name="searchTerm">Optional. The search term used to filter results.</param>
     /// <param name="sortBy">Optional. The name of the field by which to sort the results.</param>
     /// <param name="sortOrder">Optional. The direction in which to sort the results.</param>
+    /// <param name="includePaginationData">Whether the query should include pagination data or not.</param>
     /// <returns>The created query to get books.</returns>
     public GetBooksQuery Create(
         Guid? libraryId = null,
         PaginationDataDto? paginationData = null,
         string? searchTerm = null,
         string? sortBy = null,
-        SortOrder? sortOrder = null)
+        SortOrder? sortOrder = null,
+        bool includePaginationData = true)
     {
         return new GetBooksQuery(
-            paginationData ?? new PaginationDataDto
+            includePaginationData ? paginationData ?? new PaginationDataDto
             {
                 CurrentPage = _faker.Random.Number(1, 100),
                 PerPage = _faker.Random.Number(1, 200)
-            },
+            } : null,
             new LibraryFilterDto
             {
                 LibraryId = libraryId ?? _faker.Random.Guid(),

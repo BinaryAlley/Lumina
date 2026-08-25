@@ -14,17 +14,20 @@ namespace Lumina.Presentation.Web.Fixtures.Common.Requests.UsersManagement;
 [ExcludeFromCodeCoverage]
 public class RecoverPasswordRequestFixture
 {
+    private readonly Faker _faker = new();
+
     /// <summary>
     /// Creates a new <see cref="RecoverPasswordRequest"/> instance with randomized test data.
     /// </summary>
     /// <param name="username">Optional username.</param>
     /// <param name="totpCode">Optional TOTP code.</param>
     /// <returns>A configured <see cref="RecoverPasswordRequest"/> instance.</returns>
-    public RecoverPasswordRequest Create(string? username = null, string? totpCode = null)
+    public RecoverPasswordRequest Create(
+        string? username = null, 
+        string? totpCode = null)
     {
-        Faker faker = new();
         return new RecoverPasswordRequest(
-            Username: username ?? faker.Internet.UserName(),
+            Username: username ?? _faker.Internet.UserName(),
             TotpCode: totpCode
         );
     }

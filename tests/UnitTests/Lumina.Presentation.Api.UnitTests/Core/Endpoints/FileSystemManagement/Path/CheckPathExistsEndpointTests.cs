@@ -3,6 +3,7 @@ using FastEndpoints;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Core.FileSystemManagement.Paths.Queries.CheckPathExists;
 using Lumina.Contracts.Fixtures.Core.Requests.FileSystemManagement.Path;
+using Lumina.Contracts.Fixtures.Core.Responses.FileSystemManagement.Path;
 using Lumina.Contracts.Requests.FileSystemManagement.Path;
 using Lumina.Contracts.Responses.FileSystemManagement.Path;
 using Lumina.Domain.Common.Primitives;
@@ -27,6 +28,7 @@ public class CheckPathExistsEndpointTests
     private readonly IQueryHandler<CheckPathExistsQuery, Result<PathExistsResponse>> _mockHandler;
     private readonly CheckPathExistsEndpoint _sut;
     private readonly CheckPathExistsRequestFixture _checkPathExistsRequestFixture = new();
+    private readonly PathExistsResponseFixture _pathExistsResponseFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CheckPathExistsEndpointTests"/> class.
@@ -43,7 +45,7 @@ public class CheckPathExistsEndpointTests
         // Arrange
         CheckPathExistsRequest request = _checkPathExistsRequestFixture.Create(path: @"C:\Users\TestUser\Documents", includeHiddenElements: true);
         CancellationToken cancellationToken = CancellationToken.None;
-        PathExistsResponse expectedResponse = new(true);
+        PathExistsResponse expectedResponse = _pathExistsResponseFixture.Create(exists: true);
         _mockHandler.HandleAsync(Arg.Any<CheckPathExistsQuery>(), Arg.Any<CancellationToken>())
             .Returns(expectedResponse);
 
@@ -62,7 +64,7 @@ public class CheckPathExistsEndpointTests
         CheckPathExistsRequest request = _checkPathExistsRequestFixture.Create(path: @"C:\Users\TestUser\Documents", includeHiddenElements: true);
         CancellationToken cancellationToken = CancellationToken.None;
         _mockHandler.HandleAsync(Arg.Any<CheckPathExistsQuery>(), Arg.Any<CancellationToken>())
-            .Returns(new PathExistsResponse(true));
+            .Returns(_pathExistsResponseFixture.Create(exists: true));
 
         // Act
         await _sut.ExecuteAsync(request, cancellationToken);
@@ -88,7 +90,7 @@ public class CheckPathExistsEndpointTests
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
                 callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
-                return Result.From(new PathExistsResponse(true));
+                return Result.From(_pathExistsResponseFixture.Create(exists: true));
             }, callInfo.Arg<CancellationToken>()));
 
         // Act

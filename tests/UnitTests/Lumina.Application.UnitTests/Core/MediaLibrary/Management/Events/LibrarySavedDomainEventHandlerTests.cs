@@ -5,6 +5,7 @@ using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Models.DTO.Configuration;
 using Lumina.Application.Core.MediaLibrary.Management.Events;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Lumina.Application.Fixtures.Common.Infrastructure.Models.DTO.Configuration;
 using Lumina.Domain.Common.Exceptions;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
@@ -44,6 +45,7 @@ public class LibrarySavedDomainEventHandlerTests
     private readonly LibraryFixture _libraryFixture = new();
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
     private readonly FileSystemPathIdFixture _fileSystemPathIdFixture = new();
+    private readonly MediaSettingsDtoFixture _mediaSettingsDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LibrarySavedDomainEventHandlerTests"/> class.
@@ -62,11 +64,10 @@ public class LibrarySavedDomainEventHandlerTests
         _mockEnvironmentContext.FileTypeService.Returns(_mockFileTypeService);
         _mockPathService = Substitute.For<IPathService>();
 
-        MediaSettingsDto mediaSettings = new()
-        {
-            RootDirectory = "Media",
-            LibrariesDirectory = "Libraries"
-        };
+        MediaSettingsDto mediaSettings = _mediaSettingsDtoFixture.Create(
+            rootDirectory: "Media",
+            librariesDirectory: "Libraries",
+            booksDirectory: "Books");
         IOptions<MediaSettingsDto> mediaSettingsOptions = Substitute.For<IOptions<MediaSettingsDto>>();
         mediaSettingsOptions.Value.Returns(mediaSettings);
 

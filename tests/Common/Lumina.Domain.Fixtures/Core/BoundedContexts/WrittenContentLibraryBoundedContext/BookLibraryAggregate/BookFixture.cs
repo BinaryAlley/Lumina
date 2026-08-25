@@ -50,7 +50,7 @@ public class BookFixture
             _fixture.Create<WrittenContentMetadata>(),
             _fixture.Create<BookFormat>(),
             _fixture.Create<Optional<string>>(),
-            _fixture.Create<Optional<int>>(),
+            _fixture.Create<Optional<float>>(),
             _fixture.Create<Optional<BookSeries>>(),
             _fixture.Create<Optional<string>>(),
             _fixture.Create<Optional<string>>(),

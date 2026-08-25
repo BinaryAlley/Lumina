@@ -26,6 +26,7 @@ public class GetDirectoriesEndpointTests : IClassFixture<AuthenticatedLuminaApiF
 {
     private HttpClient _client;
     private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly FileSystemStructureFixture _fileSystemStructureFixture = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         ReferenceHandler = ReferenceHandler.Preserve,
@@ -56,8 +57,7 @@ public class GetDirectoriesEndpointTests : IClassFixture<AuthenticatedLuminaApiF
     public async Task GetDirectories_WhenCalledWithValidPathAndHiddenChildrenAndNotIncludeHiddenElements_ShouldReturnNoDirectories()
     {
         // Arrange
-        FileSystemStructureFixture fileSystemFixture = new();
-        string testPath = fileSystemFixture.CreateFileSystemStructure();
+        string testPath = _fileSystemStructureFixture.CreateFileSystemStructure();
         testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath;
         testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath; // two levels to get to the element that has a hidden element as child
         string encodedPath = Uri.EscapeDataString(testPath);
@@ -79,7 +79,7 @@ public class GetDirectoriesEndpointTests : IClassFixture<AuthenticatedLuminaApiF
         }
         finally
         {
-            fileSystemFixture.CleanupFileSystemStructure();
+            _fileSystemStructureFixture.CleanupFileSystemStructure();
         }
     }
 
@@ -87,8 +87,7 @@ public class GetDirectoriesEndpointTests : IClassFixture<AuthenticatedLuminaApiF
     public async Task GetDirectories_WhenCalledWithValidPathAndWithIncludeHiddenElements_ShouldReturnDirectoriesWithHiddenElements()
     {
         // Arrange
-        FileSystemStructureFixture fileSystemFixture = new();
-        string testPath = fileSystemFixture.CreateFileSystemStructure();
+        string testPath = _fileSystemStructureFixture.CreateFileSystemStructure();
         testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath;
         testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath; // two levels to get to the element that has a hidden element as child
         string encodedPath = Uri.EscapeDataString(testPath);
@@ -118,7 +117,7 @@ public class GetDirectoriesEndpointTests : IClassFixture<AuthenticatedLuminaApiF
         }
         finally
         {
-            fileSystemFixture.CleanupFileSystemStructure();
+            _fileSystemStructureFixture.CleanupFileSystemStructure();
         }
     }
 
