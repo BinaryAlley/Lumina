@@ -171,7 +171,14 @@ public static class PresentationApiLayerServices
 
         services.AddAuthorization();
 
-        services.AddFastEndpoints(endpointDiscoveryOptions => endpointDiscoveryOptions.Assemblies = [ typeof(Program).Assembly ]);
+        services.AddFastEndpoints(endpointDiscoveryOptions =>
+        {
+            endpointDiscoveryOptions.Assemblies = [ typeof(Program).Assembly ];
+            // only scan the application assembly, so that duplicate copies of it loaded into other assembly load
+            // contexts during the process lifetime are never scanned again; otherwise a single host can register
+            // every endpoint multiple times and fail with duplicate routes
+            endpointDiscoveryOptions.DisableAutoDiscovery = true;
+        });
 
         services.AddOpenApi();
 

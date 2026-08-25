@@ -3,7 +3,6 @@ using FastEndpoints;
 using Lumina.Presentation.Web.Common.DTO.Common;
 using Lumina.Presentation.Web.Common.DTO.Libraries;
 using Lumina.Presentation.Web.Common.Requests.Libraries;
-using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -28,7 +27,7 @@ public class GetLibraryItemsEndpointSummary : Summary<GetLibraryItemsEndpoint, G
         RequestParam(r => r.PerPage, "Optional. The maximum number of books to retrieve per page.");
         RequestParam(r => r.SearchTerm, "Optional. The search term used to filter results.");
         RequestParam(r => r.FilterAlphaKey, "Optional. The alpha key used to filter the results by the first character of their title, for the alpha picker.");
-        RequestParam(r => r.IgnoreThePrefixForAlphaPicker, "Whether the leading The prefix of a title is ignored when computing the alpha key, or not.");
+        RequestParam(r => r.ShouldIgnoreThePrefixForAlphaPicker, "Whether the leading The prefix of a title is ignored when computing the alpha key, or not.");
         RequestParam(r => r.SortBy, "Optional. The name of the field by which to sort the results.");
         RequestParam(r => r.SortOrder, "Optional. The direction in which to sort the results.");
 

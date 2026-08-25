@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Lumina.Domain.Common.Models.Core;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.MediaContributorBoundedContext.MediaContributorAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.ExternalIdentifiers.LibraryManagementBoundedContext.LibraryAggregate;
+using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -66,7 +66,7 @@ public sealed class Book : AggregateRoot<BookId>
     /// <summary>
     /// Gets the volume or book number in the series, if applicable.
     /// </summary>
-    public Optional<int> VolumeNumber { get; private set; }
+    public Optional<float> VolumeNumber { get; private set; }
 
     /// <summary>
     /// Gets the series name, if the book is part of a series.
@@ -119,6 +119,11 @@ public sealed class Book : AggregateRoot<BookId>
     public Optional<string> AppleBooksId { get; private set; }
 
     /// <summary>
+    /// Gets the file system path of the cover image of the book, if applicable.
+    /// </summary>
+    public Optional<string> CoverImagePath { get; private set; }
+
+    /// <summary>
     /// Gets the list of ISBN (International Standard Book Number) of the book.
     /// </summary>
     public IReadOnlyCollection<Isbn> ISBNs => _isbns.AsReadOnly();
@@ -165,7 +170,7 @@ public sealed class Book : AggregateRoot<BookId>
         WrittenContentMetadata metadata,
         Optional<BookFormat> format,
         Optional<string> edition,
-        Optional<int> volumeNumber,
+        Optional<float> volumeNumber,
         Optional<BookSeries> series,
         Optional<string> asin,
         Optional<string> goodreadsId,
@@ -202,6 +207,7 @@ public sealed class Book : AggregateRoot<BookId>
         GoogleBooksId = googleBooksId;
         BarnesAndNobleId = barnesAndNobleId;
         AppleBooksId = appleBooksId;
+        CoverImagePath = Optional<string>.None();
         CreatedOnUtc = createdOnUtc;
         UpdatedOnUtc = updatedOnUtc.HasValue ? updatedOnUtc.Value : null;
         _isbns = isbns;
@@ -240,7 +246,7 @@ public sealed class Book : AggregateRoot<BookId>
         WrittenContentMetadata metadata,
         Optional<BookFormat> format,
         Optional<string> edition,
-        Optional<int> volumeNumber,
+        Optional<float> volumeNumber,
         Optional<BookSeries> series,
         Optional<string> asin,
         Optional<string> goodreadsId,
@@ -317,7 +323,7 @@ public sealed class Book : AggregateRoot<BookId>
         WrittenContentMetadata metadata,
         Optional<BookFormat> format,
         Optional<string> edition,
-        Optional<int> volumeNumber,
+        Optional<float> volumeNumber,
         Optional<BookSeries> series,
         Optional<string> asin,
         Optional<string> goodreadsId,
@@ -382,6 +388,15 @@ public sealed class Book : AggregateRoot<BookId>
     }
 
     /// <summary>
+    /// Sets the file system path of the cover image of the book.
+    /// </summary>
+    /// <param name="coverImagePath">The file system path of the cover image of the book.</param>
+    public void SetBookCoverImagePath(string coverImagePath)
+    {
+        CoverImagePath = coverImagePath;
+    }
+
+    /// <summary>
     /// Applies the enriched <paramref name="metadata"/> and the related fields to the book, marking its metadata as enriched by the provided <paramref name="providerName"/>.
     /// </summary>
     /// <param name="metadata">The enriched metadata of the book.</param>
@@ -406,7 +421,7 @@ public sealed class Book : AggregateRoot<BookId>
         WrittenContentMetadata metadata,
         Optional<BookFormat> format,
         Optional<string> edition,
-        Optional<int> volumeNumber,
+        Optional<float> volumeNumber,
         Optional<BookSeries> series,
         Optional<string> asin,
         Optional<string> goodreadsId,

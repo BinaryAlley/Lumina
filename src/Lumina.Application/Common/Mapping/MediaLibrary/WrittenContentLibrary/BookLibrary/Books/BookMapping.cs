@@ -56,6 +56,7 @@ public static class BookMapping
             GoogleBooksId = domainEntity.GoogleBooksId.HasValue ? domainEntity.GoogleBooksId.Value : null,
             BarnesAndNobleId = domainEntity.BarnesAndNobleId.HasValue ? domainEntity.BarnesAndNobleId.Value : null,
             AppleBooksId = domainEntity.AppleBooksId.HasValue ? domainEntity.AppleBooksId.Value : null,
+            CoverImagePath = domainEntity.CoverImagePath.HasValue ? domainEntity.CoverImagePath.Value : null,
             ISBNs = [.. domainEntity.ISBNs.ToRepositoryEntities()],
             Ratings = [.. domainEntity.Ratings.ToRepositoryEntities()],
             MetadataStatus = domainEntity.MetadataStatus,

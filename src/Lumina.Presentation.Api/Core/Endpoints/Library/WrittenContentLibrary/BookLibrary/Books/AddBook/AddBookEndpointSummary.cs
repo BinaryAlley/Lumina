@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
+using Lumina.Contracts.DTO.Common;
+using Lumina.Contracts.DTO.MediaContributors;
+using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using System.Diagnostics.CodeAnalysis;
-using System.Collections.Generic;
-using Lumina.Contracts.DTO.Common;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
-using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Contracts.DTO.MediaContributors;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 #endregion
 
 namespace Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.AddBook;
@@ -284,7 +284,8 @@ public class AddLibraryEndpointSummary : Summary<AddBookEndpoint, AddBookRequest
                 LastMetadataUpdateUtc: default,
                 MetadataProvider: default,
                 CreatedOnUtc: DateTime.UtcNow,
-                UpdatedOnUtc: default
+                UpdatedOnUtc: default,
+                CoverPath: null
             )
         );
 

@@ -33,9 +33,8 @@ internal class BookLibraryTypeScanner : IBookLibraryTypeScanner
     /// Creates the media library scan jobs for the provided media library.
     /// </summary>
     /// <param name="libraryId">The unique identifier of the media library for which to create the media library scan jobs.</param>
-    /// <param name="downloadMetadataFromWeb">Whether the library permits downloading data from the web, or not.</param>
     /// <returns>A collection of media library scan jobs.</returns>
-    public IEnumerable<IMediaLibraryScanJob> CreateScanJobsForLibrary(LibraryId libraryId, bool downloadMetadataFromWeb)
+    public IEnumerable<IMediaLibraryScanJob> CreateScanJobsForLibrary(LibraryId libraryId)
     {
         // declare the list of jobs that this scanner requires
         IBooksFileSystemDiscoveryJob fileSystemDiscoveryJob = _mediaScanJobFactory.CreateJob<IBooksFileSystemDiscoveryJob>(libraryId);
@@ -53,14 +52,12 @@ internal class BookLibraryTypeScanner : IBookLibraryTypeScanner
         mediaLibraryScanHashJob.AddChild(mediaLibraryScanResultsSaveJob);
         mediaLibraryScanResultsSaveJob.AddParent(mediaLibraryScanHashJob);
 
-        // when the library permits downloading data from the web, the metadata enrichment job is the last job in the directed acyclic job graph,
-        // running after the scan results save job, so that the books are materialized before their metadata is enriched
-        if (downloadMetadataFromWeb)
-        {
-            IMediaLibraryScanMetadataEnrichmentJob mediaLibraryScanMetadataEnrichmentJob = _mediaScanJobFactory.CreateJob<IMediaLibraryScanMetadataEnrichmentJob>(libraryId);
-            mediaLibraryScanResultsSaveJob.AddChild(mediaLibraryScanMetadataEnrichmentJob);
-            mediaLibraryScanMetadataEnrichmentJob.AddParent(mediaLibraryScanResultsSaveJob);
-        }
+        // the metadata enrichment job is always the last job in the directed acyclic job graph, running after the scan results save job,
+        // so that the books are materialized before their metadata is enriched. The job itself is the host-side gate that skips the providers
+        // requiring access to the web when the media library does not permit downloading data from the web, so that the local providers still run offline
+        IMediaLibraryScanMetadataEnrichmentJob mediaLibraryScanMetadataEnrichmentJob = _mediaScanJobFactory.CreateJob<IMediaLibraryScanMetadataEnrichmentJob>(libraryId);
+        mediaLibraryScanResultsSaveJob.AddChild(mediaLibraryScanMetadataEnrichmentJob);
+        mediaLibraryScanMetadataEnrichmentJob.AddParent(mediaLibraryScanResultsSaveJob);
 
         // return the top level jobs that will be triggered when the scan will be started
         yield return fileSystemDiscoveryJob;

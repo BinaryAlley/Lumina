@@ -29,4 +29,9 @@ public enum BookRatingSource
     /// Ratings from Google Books, a service that searches the full text of books and magazines that Google has scanned and converted to text.
     /// </summary>
     GoogleBooks,
+
+    /// <summary>
+    /// Ratings sourced from Calibre, an ebook management application.
+    /// </summary>
+    Calibre,
 }

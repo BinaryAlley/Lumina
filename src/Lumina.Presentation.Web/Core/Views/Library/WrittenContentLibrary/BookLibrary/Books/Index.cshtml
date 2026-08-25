@@ -100,7 +100,7 @@
                 params.set('searchTerm', state.searchTerm);
             if (state.alphaKey !== null)
                 params.set('filterAlphaKey', state.alphaKey);
-            params.set('ignoreThePrefixForAlphaPicker', state.ignoreThePrefix);
+            params.set('shouldIgnoreThePrefixForAlphaPicker', state.ignoreThePrefix);
             params.set('sortOrder', state.sortOrder);
             return `${url}?${params.toString()}`;
         }
@@ -259,7 +259,7 @@
         async function loadSettingsAsync() {
             const data = await callApiGetAsync('@_urlService.GetAbsoluteUrl(WebRoutes.Settings.GET_USER_SETTINGS)');
             if (data) {
-                state.ignoreThePrefix = data.ignoreThePrefixForAlphaPicker === true;
+                state.ignoreThePrefix = data.shouldIgnoreThePrefixForAlphaPicker === true;
                 state.perPage = data.isPaginationEnabled === true ? data.itemsPerPage : null;
             }
         }
