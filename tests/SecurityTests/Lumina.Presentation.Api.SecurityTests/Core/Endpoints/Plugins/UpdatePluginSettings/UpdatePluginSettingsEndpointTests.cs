@@ -1,5 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Plugins;
+using Lumina.Contracts.Fixtures.Core.Requests.Plugins;
 using Lumina.Contracts.Requests.Plugins;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.SharedKernel.Common.Enums.Plugins;
@@ -7,14 +9,10 @@ using Lumina.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
-using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Plugins.UpdatePluginSettings;
@@ -31,6 +29,8 @@ public class UpdatePluginSettingsEndpointTests : IClassFixture<LuminaApiFactory>
     {
         PropertyNameCaseInsensitive = true
     };
+    private readonly PluginEntityFixture _pluginEntityFixture = new();
+    private readonly UpdatePluginSettingsRequestFixture _updatePluginSettingsRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UpdatePluginSettingsEndpointTests"/> class.
@@ -47,9 +47,9 @@ public class UpdatePluginSettingsEndpointTests : IClassFixture<LuminaApiFactory>
     {
         // Arrange
         string pluginId = Guid.NewGuid().ToString();
-        UpdatePluginSettingsRequest request = new(
-            PluginId: Guid.NewGuid(),
-            Settings: new Dictionary<string, string> { ["Key"] = "Value" }
+        UpdatePluginSettingsRequest request = _updatePluginSettingsRequestFixture.Create(
+            pluginId: Guid.NewGuid(),
+            settings: new Dictionary<string, string> { ["Key"] = "Value" }
         );
 
         // Act
@@ -76,11 +76,11 @@ public class UpdatePluginSettingsEndpointTests : IClassFixture<LuminaApiFactory>
     {
         // Arrange
         HttpClient client = _apiFactory.CreateClient();
-        Guid userId = await _apiFactory.CreateAndAuthenticateAdminUserAsync(client);
-        Guid pluginId = await SeedPluginAsync(userId);
-        UpdatePluginSettingsRequest request = new(
-            PluginId: pluginId,
-            Settings: new Dictionary<string, string> { ["Key"] = maliciousValue }
+        await _apiFactory.CreateAndAuthenticateAdminUserAsync(client);
+        Guid pluginId = await SeedPluginAsync();
+        UpdatePluginSettingsRequest request = _updatePluginSettingsRequestFixture.Create(
+            pluginId: pluginId,
+            settings: new Dictionary<string, string> { ["Key"] = maliciousValue }
         );
 
         // Act
@@ -107,29 +107,15 @@ public class UpdatePluginSettingsEndpointTests : IClassFixture<LuminaApiFactory>
     }
 
     /// <summary>
-    /// Seeds a <see cref="PluginEntity"/> created by <paramref name="userId"/>.
+    /// Seeds a <see cref="PluginEntity"/> created by the authenticated admin user.
     /// </summary>
-    /// <param name="userId">The Id of the creator.</param>
     /// <returns>The Id of the seeded plugin.</returns>
-    private async Task<Guid> SeedPluginAsync(Guid userId)
+    private async Task<Guid> SeedPluginAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
         Guid pluginId = Guid.NewGuid();
-        dbContext.Plugins.Add(new PluginEntity
-        {
-            Id = pluginId,
-            Name = "Test Plugin",
-            Author = "Test Author",
-            Version = "1.0.0",
-            Description = "A test plugin.",
-            LoadStatus = PluginLoadStatus.Loaded,
-            LoadError = null,
-            SettingsJson = null,
-            CreatedBy = userId,
-            CreatedOnUtc = DateTime.UtcNow,
-            UpdatedBy = null
-        });
+        dbContext.Plugins.Add(_pluginEntityFixture.Create(id: pluginId, name: "Test Plugin", loadStatus: PluginLoadStatus.Loaded, includeSettingsJson: false));
         await dbContext.SaveChangesAsync();
         return pluginId;
     }

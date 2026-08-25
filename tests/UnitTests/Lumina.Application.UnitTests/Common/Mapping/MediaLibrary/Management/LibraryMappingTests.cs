@@ -3,7 +3,6 @@ using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.Mapping.Common.Metadata;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
-using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
@@ -34,7 +33,7 @@ public class LibraryMappingTests
             coverImage: "D:/myPoster.jpg",
             isEnabled: true,
             isLocked: false,
-            downloadMetadataFromWeb: true,
+            canDownloadMetadataFromWeb: true,
             shouldSaveMetadataInMediaDirectories: false,
             shouldSkipUnchangedDirectoriesDuringScan: false,
             scanIds: [Guid.NewGuid()]);
@@ -54,7 +53,7 @@ public class LibraryMappingTests
         Assert.Equal(library.UpdatedOnUtc, result.UpdatedOnUtc);
         Assert.True(result.IsEnabled);
         Assert.False(result.IsLocked);
-        Assert.True(result.DownloadMetadataFromWeb);
+        Assert.True(result.CanDownloadMetadataFromWeb);
         Assert.False(result.ShouldSaveMetadataInMediaDirectories);
         Assert.Equal(library.ScanIds.Select(scanId => scanId.Value), result.LibraryScans.Select(libraryScan => libraryScan.Id));
     }
@@ -93,7 +92,7 @@ public class LibraryMappingTests
             coverImage: "D:/myPoster.jpg",
             isEnabled: true,
             isLocked: false,
-            downloadMetadataFromWeb: true,
+            canDownloadMetadataFromWeb: true,
             shouldSaveMetadataInMediaDirectories: false);
 
         // Act
@@ -105,7 +104,7 @@ public class LibraryMappingTests
         Assert.Equal(library.CoverImage, result.CoverImage);
         Assert.True(result.IsEnabled);
         Assert.False(result.IsLocked);
-        Assert.True(result.DownloadMetadataFromWeb);
+        Assert.True(result.CanDownloadMetadataFromWeb);
         Assert.False(result.ShouldSaveMetadataInMediaDirectories);
     }
 

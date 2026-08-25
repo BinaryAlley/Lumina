@@ -1,13 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Contracts.Responses.UsersManagement.Settings;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
@@ -27,6 +26,7 @@ public class GetUserSettingsEndpointTests : IClassFixture<AuthenticatedLuminaApi
 {
     private HttpClient _client;
     private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly UserSettingsEntityFixture _userSettingsEntityFixture = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -71,7 +71,7 @@ public class GetUserSettingsEndpointTests : IClassFixture<AuthenticatedLuminaApi
         Assert.Equal(storedSettings.UserId, result!.UserId);
         Assert.Equal(storedSettings.IsPaginationEnabled, result.IsPaginationEnabled);
         Assert.Equal(storedSettings.ItemsPerPage, result.ItemsPerPage);
-        Assert.Equal(storedSettings.IgnoreThePrefixForAlphaPicker, result.IgnoreThePrefixForAlphaPicker);
+        Assert.Equal(storedSettings.ShouldIgnoreThePrefixForAlphaPicker, result.ShouldIgnoreThePrefixForAlphaPicker);
     }
 
     [Fact]
@@ -90,7 +90,7 @@ public class GetUserSettingsEndpointTests : IClassFixture<AuthenticatedLuminaApi
         Assert.NotNull(result);
         Assert.True(result!.IsPaginationEnabled);
         Assert.Equal(48, result.ItemsPerPage);
-        Assert.False(result.IgnoreThePrefixForAlphaPicker);
+        Assert.False(result.ShouldIgnoreThePrefixForAlphaPicker);
     }
 
     [Fact]
@@ -112,14 +112,11 @@ public class GetUserSettingsEndpointTests : IClassFixture<AuthenticatedLuminaApi
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
 
         Guid userId = dbContext.Users.First(user => user.Username == _apiFactory.TestUsername).Id;
-        UserSettingsEntity settings = new()
-        {
-            Id = Guid.NewGuid(),
-            UserId = userId,
-            IsPaginationEnabled = false,
-            ItemsPerPage = 24,
-            IgnoreThePrefixForAlphaPicker = true
-        };
+        UserSettingsEntity settings = _userSettingsEntityFixture.Create(
+            userId: userId,
+            isPaginationEnabled: false,
+            itemsPerPage: 24,
+            shouldIgnoreThePrefixForAlphaPicker: true);
 
         dbContext.UserSettings.Add(settings);
         await dbContext.SaveChangesAsync();

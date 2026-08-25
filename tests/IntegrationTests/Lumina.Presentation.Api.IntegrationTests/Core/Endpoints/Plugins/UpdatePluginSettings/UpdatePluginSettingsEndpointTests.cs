@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.Plugins;
+using Lumina.Contracts.Fixtures.Core.Requests.Plugins;
 using Lumina.Contracts.Requests.Plugins;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.SharedKernel.Common.Enums.Plugins;
@@ -12,7 +13,6 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -36,6 +36,8 @@ public class UpdatePluginSettingsEndpointTests : IClassFixture<AuthenticatedLumi
         PropertyNameCaseInsensitive = true,
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
+    private readonly PluginEntityFixture _pluginEntityFixture = new();
+    private readonly UpdatePluginSettingsRequestFixture _updatePluginSettingsRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UpdatePluginSettingsEndpointTests"/> class.
@@ -61,9 +63,9 @@ public class UpdatePluginSettingsEndpointTests : IClassFixture<AuthenticatedLumi
         // Arrange
         Guid pluginId = Guid.NewGuid();
         await SeedPluginAsync(pluginId, "Test Plugin");
-        UpdatePluginSettingsRequest request = new(
-            PluginId: pluginId,
-            Settings: new Dictionary<string, string> { ["Key1"] = "Value1" }
+        UpdatePluginSettingsRequest request = _updatePluginSettingsRequestFixture.Create(
+            pluginId: pluginId,
+            settings: new Dictionary<string, string> { ["Key1"] = "Value1" }
         );
 
         // Act
@@ -85,9 +87,9 @@ public class UpdatePluginSettingsEndpointTests : IClassFixture<AuthenticatedLumi
     {
         // Arrange
         Guid pluginId = Guid.NewGuid();
-        UpdatePluginSettingsRequest request = new(
-            PluginId: pluginId,
-            Settings: new Dictionary<string, string> { ["Key1"] = "Value1" }
+        UpdatePluginSettingsRequest request = _updatePluginSettingsRequestFixture.Create(
+            pluginId: pluginId,
+            settings: new Dictionary<string, string> { ["Key1"] = "Value1" }
         );
 
         // Act
@@ -118,34 +120,8 @@ public class UpdatePluginSettingsEndpointTests : IClassFixture<AuthenticatedLumi
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
-        Guid userId = GetCurrentUserId();
-        dbContext.Plugins.Add(new PluginEntity
-        {
-            Id = pluginId,
-            Name = name,
-            Author = "Test Author",
-            Version = "1.0.0",
-            Description = "A test plugin.",
-            LoadStatus = PluginLoadStatus.Loaded,
-            LoadError = null,
-            SettingsJson = null,
-            CreatedBy = userId,
-            CreatedOnUtc = DateTime.UtcNow,
-            UpdatedBy = null
-        });
+        dbContext.Plugins.Add(_pluginEntityFixture.Create(id: pluginId, name: name, loadStatus: PluginLoadStatus.Loaded, includeSettingsJson: false));
         await dbContext.SaveChangesAsync();
-    }
-
-    /// <summary>
-    /// Gets the Id of the currently authenticated test user.
-    /// </summary>
-    /// <returns>The Id of the authenticated test user.</returns>
-    private Guid GetCurrentUserId()
-    {
-        using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
-        UserEntity user = dbContext.Users.First(user => user.Username == _apiFactory.TestUsername);
-        return user.Id;
     }
 
     /// <summary>

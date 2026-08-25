@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
+using Lumina.Contracts.Fixtures.Core.Requests.UsersManagement.Settings;
 using Lumina.Contracts.Requests.UsersManagement.Settings;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
@@ -28,6 +29,7 @@ public class UpdateUserSettingsEndpointTests : IClassFixture<AuthenticatedLumina
 {
     private HttpClient _client;
     private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly UpdateUserSettingsRequestFixture _updateUserSettingsRequestFixture = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -56,11 +58,12 @@ public class UpdateUserSettingsEndpointTests : IClassFixture<AuthenticatedLumina
     public async Task UpdateUserSettings_WhenCalledWithValidRequest_ShouldUpdateSettings()
     {
         // Arrange
-        UpdateUserSettingsRequest request = new(
-            IsPaginationEnabled: false,
-            ItemsPerPage: 24,
-            IgnoreThePrefixForAlphaPicker: true,
-            IsThemeCachingEnabled: false
+        UpdateUserSettingsRequest request = _updateUserSettingsRequestFixture.Create(
+            isPaginationEnabled: false,
+            itemsPerPage: 24,
+            shouldIgnoreThePrefixForAlphaPicker: true,
+            isThemeCachingEnabled: false,
+            shouldAggregateMetadataWhenMissing: false
         );
 
         // Act
@@ -77,7 +80,7 @@ public class UpdateUserSettingsEndpointTests : IClassFixture<AuthenticatedLumina
         Assert.NotNull(storedSettings);
         Assert.False(storedSettings.IsPaginationEnabled);
         Assert.Equal(24, storedSettings.ItemsPerPage);
-        Assert.True(storedSettings.IgnoreThePrefixForAlphaPicker);
+        Assert.True(storedSettings.ShouldIgnoreThePrefixForAlphaPicker);
         Assert.False(storedSettings.IsThemeCachingEnabled);
     }
 
@@ -85,11 +88,12 @@ public class UpdateUserSettingsEndpointTests : IClassFixture<AuthenticatedLumina
     public async Task UpdateUserSettings_WhenItemsPerPageIsNotPositive_ShouldReturnValidationError()
     {
         // Arrange
-        UpdateUserSettingsRequest request = new(
-            IsPaginationEnabled: true,
-            ItemsPerPage: 0,
-            IgnoreThePrefixForAlphaPicker: false,
-            IsThemeCachingEnabled: true
+        UpdateUserSettingsRequest request = _updateUserSettingsRequestFixture.Create(
+            isPaginationEnabled: true,
+            itemsPerPage: 0,
+            shouldIgnoreThePrefixForAlphaPicker: false,
+            isThemeCachingEnabled: true,
+            shouldAggregateMetadataWhenMissing: false
         );
 
         // Act
@@ -118,11 +122,12 @@ public class UpdateUserSettingsEndpointTests : IClassFixture<AuthenticatedLumina
     {
         // Arrange
         HttpClient unauthenticatedClient = _apiFactory.CreateClient();
-        UpdateUserSettingsRequest request = new(
-            IsPaginationEnabled: true,
-            ItemsPerPage: 48,
-            IgnoreThePrefixForAlphaPicker: false,
-            IsThemeCachingEnabled: true
+        UpdateUserSettingsRequest request = _updateUserSettingsRequestFixture.Create(
+            isPaginationEnabled: true,
+            itemsPerPage: 48,
+            shouldIgnoreThePrefixForAlphaPicker: false,
+            isThemeCachingEnabled: true,
+            shouldAggregateMetadataWhenMissing: false
         );
 
         // Act

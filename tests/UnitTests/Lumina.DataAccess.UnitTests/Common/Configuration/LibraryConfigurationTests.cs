@@ -53,7 +53,7 @@ public class LibraryConfigurationTests
         IProperty titleProperty = entityType.GetProperty(nameof(LibraryEntity.Title));
         IProperty libraryTypeProperty = entityType.GetProperty(nameof(LibraryEntity.LibraryType));
         IProperty isEnabledProperty = entityType.GetProperty(nameof(LibraryEntity.IsEnabled));
-        IProperty downloadMetadataProperty = entityType.GetProperty(nameof(LibraryEntity.DownloadMetadataFromWeb));
+        IProperty downloadMetadataProperty = entityType.GetProperty(nameof(LibraryEntity.CanDownloadMetadataFromWeb));
 
         // Assert
         Assert.False(titleProperty.IsNullable);

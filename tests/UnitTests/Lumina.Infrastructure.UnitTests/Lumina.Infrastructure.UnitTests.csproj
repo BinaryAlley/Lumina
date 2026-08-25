@@ -43,6 +43,7 @@
         <ProjectReference Include="..\..\..\src\Lumina.Infrastructure\Lumina.Infrastructure.csproj" />
         <ProjectReference Include="..\..\Common\Lumina.Domain.Fixtures\Lumina.Domain.Fixtures.csproj" />
         <ProjectReference Include="..\..\Common\Lumina.Application.Fixtures\Lumina.Application.Fixtures.csproj" />
+        <ProjectReference Include="..\..\Common\Lumina.Contracts.Fixtures\Lumina.Contracts.Fixtures.csproj" />
         <ProjectReference Include="..\..\Common\Lumina.Infrastructure.Fixtures\Lumina.Infrastructure.Fixtures.csproj" />
         <ProjectReference Include="..\..\Common\Lumina.TestPlugin\Lumina.TestPlugin.csproj" />
     </ItemGroup>

@@ -171,7 +171,7 @@
   <data name="DescriptionDirectories" xml:space="preserve">
     <value>Selectează dosarele care conțin fișierele media ale acestei biblioteci</value>
   </data>
-  <data name="DescriptionDownloadMetadataFromWeb" xml:space="preserve">
+  <data name="DescriptionCanDownloadMetadataFromWeb" xml:space="preserve">
     <value>Dacă această bibliotecă media ar trebui să obțină metadatele elementelor sale prin descărcare de pe Internet sau nu.</value>
   </data>
   <data name="DescriptionEnabled" xml:space="preserve">
@@ -198,7 +198,7 @@
   <data name="Documentary" xml:space="preserve">
     <value>Documentar</value>
   </data>
-  <data name="DownloadMetadataFromWeb" xml:space="preserve">
+  <data name="CanDownloadMetadataFromWeb" xml:space="preserve">
     <value>Descarcă Metadate De Pe Web</value>
   </data>
   <data name="EBook" xml:space="preserve">

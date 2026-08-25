@@ -1,11 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using Lumina.Application.Common.DataAccess.Repositories.Authorization;
-using Lumina.Application.Common.DataAccess.Repositories.Books;
-using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
-using Lumina.Application.Common.DataAccess.Repositories.Plugins;
-using Lumina.Application.Common.DataAccess.Repositories.Users;
+using Lumina.Application.Common.DataAccess.Entities.Authorization;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Time;
@@ -98,6 +94,26 @@ public class UnitOfWorkTests
 
         // Assert
         await dbContext.Received(1).SaveChangesAsync(cancellationToken);
+    }
+
+    [Fact]
+    public async Task ClearTrackedEntities_WhenCalled_ShouldDetachAllTrackedEntities()
+    {
+        // Arrange
+        DbContextOptions<LuminaDbContext> options = new DbContextOptionsBuilder<LuminaDbContext>()
+            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+            .Options;
+        LuminaDbContext dbContext = new(options);
+        UnitOfWork unitOfWork = new(dbContext);
+        dbContext.Roles.Add(new RoleEntity { Id = Guid.NewGuid(), RoleName = "TestRole" });
+        await dbContext.SaveChangesAsync(CancellationToken.None);
+        Assert.NotEmpty(dbContext.ChangeTracker.Entries());
+
+        // Act
+        unitOfWork.ClearTrackedEntities();
+
+        // Assert
+        Assert.Empty(dbContext.ChangeTracker.Entries());
     }
 
     [Fact]

@@ -2,7 +2,6 @@
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
 #endregion
 
 namespace Lumina.DataAccess.Common.Configuration;
@@ -43,9 +42,13 @@ public class UserSettingsConfiguration : IEntityTypeConfiguration<UserSettingsEn
             .IsRequired()
             .HasColumnOrder(3);
 
-        builder.Property(settings => settings.IgnoreThePrefixForAlphaPicker)
+        builder.Property(settings => settings.ShouldIgnoreThePrefixForAlphaPicker)
             .IsRequired()
             .HasColumnOrder(4);
+
+        builder.Property(settings => settings.ShouldAggregateMetadataWhenMissing)
+            .IsRequired()
+            .HasColumnOrder(10);
 
         builder.Property(settings => settings.IsThemeCachingEnabled)
             .IsRequired()

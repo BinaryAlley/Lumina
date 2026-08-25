@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -17,28 +17,17 @@ namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.Management;
 [ExcludeFromCodeCoverage]
 public class LibraryEntityMappingTests
 {
+    private readonly LibraryEntityFixture _libraryEntityFixture = new();
+
     [Fact]
     public void ToResponse_WhenMappingValidLibraryEntity_ShouldMapCorrectly()
     {
         // Arrange
-        LibraryEntity entity = new()
-        {
-            Id = Guid.NewGuid(),
-            UserId = Guid.NewGuid(),
-            Title = "My Library",
-            LibraryType = LibraryType.Book,
-            ContentLocations =
-            [
-                new() { Path = "C:/Books" },
-                new() { Path = "D:/Media/Books" }
-            ],
-            CoverImage = "D:/myPoster.jpg",
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = Guid.NewGuid(),
-            UpdatedOnUtc = null,
-            UpdatedBy = null,
-            LibraryScans = []
-        };
+        LibraryEntity entity = _libraryEntityFixture.Create(
+            title: "My Library",
+            libraryType: LibraryType.Book,
+            contentLocations: ["C:/Books", "D:/Media/Books"],
+            coverImage: "D:/myPoster.jpg");
 
         // Act
         LibraryResponse result = entity.ToResponse();
@@ -63,19 +52,11 @@ public class LibraryEntityMappingTests
     public void ToResponse_WhenMappingDifferentLibraryTypes_ShouldMapCorrectly(LibraryType libraryType)
     {
         // Arrange
-        LibraryEntity entity = new()
-        {
-            Id = Guid.NewGuid(),
-            UserId = Guid.NewGuid(),
-            Title = "My Library",
-            LibraryType = libraryType,
-            ContentLocations = [new() { Path = "C:/Media" }],
-            CoverImage = "D:/myPoster.jpg",
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = Guid.NewGuid(),
-            UpdatedOnUtc = null,
-            UpdatedBy = null
-        };
+        LibraryEntity entity = _libraryEntityFixture.Create(
+            title: "My Library",
+            libraryType: libraryType,
+            contentLocations: ["C:/Media"],
+            coverImage: "D:/myPoster.jpg");
 
         // Act
         LibraryResponse result = entity.ToResponse();
@@ -89,25 +70,11 @@ public class LibraryEntityMappingTests
     public void ToResponse_WhenMappingMultipleContentLocations_ShouldMapAllCorrectly()
     {
         // Arrange
-        LibraryEntity entity = new()
-        {
-            Id = Guid.NewGuid(),
-            UserId = Guid.NewGuid(),
-            Title = "My Library",
-            LibraryType = LibraryType.Book,
-            ContentLocations =
-            [
-                new() { Path = "C:/Media/Books" },
-                new() { Path = "D:/Books" },
-                new() { Path = "E:/Digital Library/Books" },
-                new() { Path = "F:/Reading Material" }
-            ],
-            CoverImage = "D:/myPoster.jpg",
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = Guid.NewGuid(),
-            UpdatedOnUtc = null,
-            UpdatedBy = null
-        };
+        LibraryEntity entity = _libraryEntityFixture.Create(
+            title: "My Library",
+            libraryType: LibraryType.Book,
+            contentLocations: ["C:/Media/Books", "D:/Books", "E:/Digital Library/Books", "F:/Reading Material"],
+            coverImage: "D:/myPoster.jpg");
 
         // Act
         LibraryResponse result = entity.ToResponse();
@@ -122,19 +89,12 @@ public class LibraryEntityMappingTests
     {
         // Arrange
         DateTime updated = DateTime.UtcNow.AddDays(-1);
-        LibraryEntity entity = new()
-        {
-            Id = Guid.NewGuid(),
-            UserId = Guid.NewGuid(),
-            Title = "My Library",
-            LibraryType = LibraryType.Book,
-            ContentLocations = [new() { Path = "C:/Books" }],
-            CoverImage = "D:/myPoster.jpg",
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = Guid.NewGuid(),
-            UpdatedOnUtc = updated,
-            UpdatedBy = Guid.NewGuid()
-        };
+        LibraryEntity entity = _libraryEntityFixture.Create(
+            title: "My Library",
+            libraryType: LibraryType.Book,
+            contentLocations: ["C:/Books"],
+            coverImage: "D:/myPoster.jpg");
+        entity.UpdatedOnUtc = updated;
 
         // Act
         LibraryResponse result = entity.ToResponse();
@@ -149,19 +109,12 @@ public class LibraryEntityMappingTests
     {
         // Arrange
         DateTime updated = DateTime.UtcNow.AddDays(-1);
-        LibraryEntity entity = new()
-        {
-            Id = Guid.NewGuid(),
-            UserId = Guid.NewGuid(),
-            Title = "My Library",
-            LibraryType = LibraryType.Book,
-            ContentLocations = [new() { Path = "C:/Books" }],
-            CoverImage = null,
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = Guid.NewGuid(),
-            UpdatedOnUtc = updated,
-            UpdatedBy = Guid.NewGuid()
-        };
+        LibraryEntity entity = _libraryEntityFixture.Create(
+            title: "My Library",
+            libraryType: LibraryType.Book,
+            contentLocations: ["C:/Books"]);
+        entity.CoverImage = null;
+        entity.UpdatedOnUtc = updated;
 
         // Act
         LibraryResponse result = entity.ToResponse();

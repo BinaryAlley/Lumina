@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Domain.Common.Events;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Cancellation;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Progress;
@@ -9,6 +8,7 @@ using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.Library
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Scanners;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -55,10 +55,9 @@ internal class MediaLibraryScanningService : IMediaLibraryScanningService
     /// </summary>
     /// <param name="scan">The media library scan to start.</param>
     /// <param name="libraryType">The type of the media library to be scanned.</param>
-    /// <param name="downloadMetadataFromWeb">Whether the library permits downloading data from the web, or not.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<Result<Success>> StartScanAsync(LibraryScan scan, LibraryType libraryType, bool downloadMetadataFromWeb, CancellationToken cancellationToken)
+    public async Task<Result<Success>> StartScanAsync(LibraryScan scan, LibraryType libraryType, CancellationToken cancellationToken)
     {
         // mark the scan itself as started
         Result<Success> startScanResult = scan.StartScan();
@@ -81,7 +80,7 @@ internal class MediaLibraryScanningService : IMediaLibraryScanningService
             IMediaTypeScanner scanner = _mediaLibraryScannerFactory.CreateLibraryScanner(libraryType);
             // get the list of scan jobs for the retrieved scanner. It is impotant to enumerate them here, because deferred execuction would destroy any graph relationships
             // and properties we might set before putting the jobs on the in-memory queue.
-            List<IMediaLibraryScanJob> jobs = [.. scanner.CreateScanJobsForLibrary(scan.LibraryId, downloadMetadataFromWeb)];
+            List<IMediaLibraryScanJob> jobs = [.. scanner.CreateScanJobsForLibrary(scan.LibraryId)];
 
             // count total jobs in the chain by traversing the job graph
             int totalJobs = CountTotalJobs(jobs);

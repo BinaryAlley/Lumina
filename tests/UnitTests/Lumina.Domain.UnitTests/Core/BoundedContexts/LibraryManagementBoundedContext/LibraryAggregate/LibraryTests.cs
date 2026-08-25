@@ -3,7 +3,6 @@ using Lumina.Domain.Common.Events;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.Events;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
@@ -14,7 +13,6 @@ using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 #endregion
 
 namespace Lumina.Domain.UnitTests.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
@@ -50,7 +48,7 @@ public class LibraryTests
             coverImageSourcePath,
             isEnabled: false,
             isLocked: true,
-            downloadMetadataFromWeb: false,
+            canDownloadMetadataFromWeb: false,
             shouldSaveMetadataInMediaDirectories: true,
             shouldSkipUnchangedDirectoriesDuringScan: true,
             scanIds);
@@ -64,7 +62,7 @@ public class LibraryTests
         Assert.Equal(coverImageSourcePath, result.Value.CoverImage);
         Assert.False(result.Value.IsEnabled);
         Assert.True(result.Value.IsLocked);
-        Assert.False(result.Value.DownloadMetadataFromWeb);
+        Assert.False(result.Value.CanDownloadMetadataFromWeb);
         Assert.True(result.Value.ShouldSaveMetadataInMediaDirectories);
         Assert.True(result.Value.ShouldSkipUnchangedDirectoriesDuringScan);
         Assert.Equal(scanIds, result.Value.ScanIds);
@@ -87,7 +85,7 @@ public class LibraryTests
             null,
             isEnabled: true,
             isLocked: false,
-            downloadMetadataFromWeb: true,
+            canDownloadMetadataFromWeb: true,
             shouldSaveMetadataInMediaDirectories: false,
             shouldSkipUnchangedDirectoriesDuringScan: false,
             scanIds);
@@ -109,7 +107,7 @@ public class LibraryTests
             null,
             isEnabled: true,
             isLocked: false,
-            downloadMetadataFromWeb: true,
+            canDownloadMetadataFromWeb: true,
             shouldSaveMetadataInMediaDirectories: false,
             shouldSkipUnchangedDirectoriesDuringScan: false,
             []);
@@ -136,7 +134,7 @@ public class LibraryTests
             null,
             isEnabled: true,
             isLocked: false,
-            downloadMetadataFromWeb: true,
+            canDownloadMetadataFromWeb: true,
             shouldSaveMetadataInMediaDirectories: false,
             shouldSkipUnchangedDirectoriesDuringScan: false,
             []);

@@ -22,16 +22,18 @@ public class UserSettingsEntityFixture
     /// <param name="userId">Optional. The Id of the user that owns these settings.</param>
     /// <param name="isPaginationEnabled">Optional. Whether pagination is enabled for the user, or not.</param>
     /// <param name="itemsPerPage">Optional. The number of library items displayed per page when pagination is enabled.</param>
-    /// <param name="ignoreThePrefixForAlphaPicker">Optional. Whether the "The" prefix is ignored by the alpha picker, or not.</param>
+    /// <param name="shouldIgnoreThePrefixForAlphaPicker">Optional. Whether the "The" prefix is ignored by the alpha picker, or not.</param>
     /// <param name="isThemeCachingEnabled">Optional. Whether the theme data served to this user is cached, or not.</param>
+    /// <param name="shouldAggregateMetadataWhenMissing">Optional. Whether the metadata of the media library items is aggregated from multiple providers, when fields are missing, or not.</param>
     /// <returns>The created user settings entity.</returns>
     public UserSettingsEntity Create(
         Guid? id = null,
         Guid? userId = null,
         bool? isPaginationEnabled = null,
         int? itemsPerPage = null,
-        bool? ignoreThePrefixForAlphaPicker = null,
-        bool? isThemeCachingEnabled = null)
+        bool? shouldIgnoreThePrefixForAlphaPicker = null,
+        bool? isThemeCachingEnabled = null,
+        bool? shouldAggregateMetadataWhenMissing = null)
     {
         return new Faker<UserSettingsEntity>()
             .CustomInstantiator(f => new UserSettingsEntity
@@ -40,8 +42,9 @@ public class UserSettingsEntityFixture
                 UserId = userId ?? Guid.NewGuid(),
                 IsPaginationEnabled = isPaginationEnabled ?? f.Random.Bool(),
                 ItemsPerPage = itemsPerPage ?? f.Random.Int(1, 100),
-                IgnoreThePrefixForAlphaPicker = ignoreThePrefixForAlphaPicker ?? f.Random.Bool(),
-                IsThemeCachingEnabled = isThemeCachingEnabled ?? f.Random.Bool()
+                ShouldIgnoreThePrefixForAlphaPicker = shouldIgnoreThePrefixForAlphaPicker ?? f.Random.Bool(),
+                IsThemeCachingEnabled = isThemeCachingEnabled ?? f.Random.Bool(),
+                ShouldAggregateMetadataWhenMissing = shouldAggregateMetadataWhenMissing ?? f.Random.Bool()
             })
             .Generate();
     }

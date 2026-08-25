@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.Management;
 using Lumina.Contracts.Requests.MediaLibrary.Management;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -13,6 +14,7 @@ namespace Lumina.Contracts.UnitTests.Requests.MediaLibrary.Management;
 [ExcludeFromCodeCoverage]
 public class UpdateLibraryRequestTests
 {
+    private readonly UpdateLibraryRequestFixture _updateLibraryRequestFixture = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
@@ -24,18 +26,18 @@ public class UpdateLibraryRequestTests
         // Arrange
         Guid id = Guid.NewGuid();
         Guid userId = Guid.NewGuid();
-        UpdateLibraryRequest expected = new(
-            id,
-            userId,
-            "Books",
-            "Book",
-            [@"C:\Media\Books"],
-            null,
-            true,
-            false,
-            true,
-            false,
-            true
+        UpdateLibraryRequest expected = _updateLibraryRequestFixture.Create(
+            id: id,
+            userId: userId,
+            title: "Books",
+            libraryType: "Book",
+            contentLocations: [@"C:\Media\Books"],
+            coverImage: null,
+            isEnabled: true,
+            isLocked: false,
+            canDownloadMetadataFromWeb: true,
+            shouldSaveMetadataInMediaDirectories: false,
+            shouldSkipUnchangedDirectoriesDuringScan: true
         );
 
         // Act
@@ -52,22 +54,22 @@ public class UpdateLibraryRequestTests
         // Arrange
         Guid id = Guid.NewGuid();
         Guid userId = Guid.NewGuid();
-        UpdateLibraryRequest sut = new(
-            id,
-            userId,
-            "Books",
-            "Book",
-            [@"C:\Media\Books"],
-            null,
-            true,
-            false,
-            true,
-            false,
-            true
+        UpdateLibraryRequest sut = _updateLibraryRequestFixture.Create(
+            id: id,
+            userId: userId,
+            title: "Books",
+            libraryType: "Book",
+            contentLocations: [@"C:\Media\Books"],
+            coverImage: null,
+            isEnabled: true,
+            isLocked: false,
+            canDownloadMetadataFromWeb: true,
+            shouldSaveMetadataInMediaDirectories: false,
+            shouldSkipUnchangedDirectoriesDuringScan: true
         );
 
         // Act
-        (Guid sutId, Guid sutUserId, string? title, string? libraryType, string[]? contentLocations, string? coverImage, bool isEnabled, bool isLocked, bool downloadMetadataFromWeb, bool shouldSaveMetadataInMediaDirectories, bool shouldSkipUnchangedDirectoriesDuringScan) = sut;
+        (Guid sutId, Guid sutUserId, string? title, string? libraryType, string[]? contentLocations, string? coverImage, bool isEnabled, bool isLocked, bool canDownloadMetadataFromWeb, bool shouldSaveMetadataInMediaDirectories, bool shouldSkipUnchangedDirectoriesDuringScan) = sut;
 
         // Assert
         Assert.Equal(sut.Id, sutId);
@@ -78,7 +80,7 @@ public class UpdateLibraryRequestTests
         Assert.Equal(sut.CoverImage, coverImage);
         Assert.Equal(sut.IsEnabled, isEnabled);
         Assert.Equal(sut.IsLocked, isLocked);
-        Assert.Equal(sut.DownloadMetadataFromWeb, downloadMetadataFromWeb);
+        Assert.Equal(sut.CanDownloadMetadataFromWeb, canDownloadMetadataFromWeb);
         Assert.Equal(sut.ShouldSaveMetadataInMediaDirectories, shouldSaveMetadataInMediaDirectories);
         Assert.Equal(sut.ShouldSkipUnchangedDirectoriesDuringScan, shouldSkipUnchangedDirectoriesDuringScan);
     }

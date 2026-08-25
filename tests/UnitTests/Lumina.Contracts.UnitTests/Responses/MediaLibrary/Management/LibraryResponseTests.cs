@@ -58,7 +58,7 @@ public class LibraryResponseTests
         LibraryResponse sut = _libraryResponseFixture.Create();
 
         // Act
-        (Guid id, Guid userId, string title, LibraryType libraryType, List<string> contentLocations, string? coverImage, bool isEnabled, bool isLocked, bool downloadMetadataFromWeb, bool shouldSaveMetadataInMediaDirectories, bool shouldSkipUnchangedDirectoriesDuringScan, DateTime createdOnUtc, DateTime? updatedOnUtc) = sut;
+        (Guid id, Guid userId, string title, LibraryType libraryType, List<string> contentLocations, string? coverImage, bool isEnabled, bool isLocked, bool canDownloadMetadataFromWeb, bool shouldSaveMetadataInMediaDirectories, bool shouldSkipUnchangedDirectoriesDuringScan, DateTime createdOnUtc, DateTime? updatedOnUtc) = sut;
 
         // Assert
         Assert.Equal(sut.Id, id);
@@ -69,7 +69,7 @@ public class LibraryResponseTests
         Assert.Equal(sut.CoverImage, coverImage);
         Assert.Equal(sut.IsEnabled, isEnabled);
         Assert.Equal(sut.IsLocked, isLocked);
-        Assert.Equal(sut.DownloadMetadataFromWeb, downloadMetadataFromWeb);
+        Assert.Equal(sut.CanDownloadMetadataFromWeb, canDownloadMetadataFromWeb);
         Assert.Equal(sut.ShouldSaveMetadataInMediaDirectories, shouldSaveMetadataInMediaDirectories);
         Assert.Equal(sut.ShouldSkipUnchangedDirectoriesDuringScan, shouldSkipUnchangedDirectoriesDuringScan);
         Assert.Equal(sut.CreatedOnUtc, createdOnUtc);

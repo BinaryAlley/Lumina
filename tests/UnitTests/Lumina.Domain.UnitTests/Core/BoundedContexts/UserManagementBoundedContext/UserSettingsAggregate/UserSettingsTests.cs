@@ -5,7 +5,6 @@ using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggreg
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserSettingsAggregate;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.UserManagementBoundedContext.UserSettingsAggregate;
-using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -34,7 +33,8 @@ public class UserSettingsTests
         Assert.Equal(userId, result.Value.UserId);
         Assert.True(result.Value.IsPaginationEnabled);
         Assert.Equal(48, result.Value.ItemsPerPage);
-        Assert.False(result.Value.IgnoreThePrefixForAlphaPicker);
+        Assert.False(result.Value.ShouldIgnoreThePrefixForAlphaPicker);
+        Assert.False(result.Value.ShouldAggregateMetadataWhenMissing);
     }
 
     [Fact]
@@ -48,7 +48,8 @@ public class UserSettingsTests
         Assert.NotNull(result.Value.UserId);
         Assert.True(result.Value.IsPaginationEnabled);
         Assert.Equal(48, result.Value.ItemsPerPage);
-        Assert.False(result.Value.IgnoreThePrefixForAlphaPicker);
+        Assert.False(result.Value.ShouldIgnoreThePrefixForAlphaPicker);
+        Assert.False(result.Value.ShouldAggregateMetadataWhenMissing);
     }
 
     [Fact]
@@ -72,15 +73,16 @@ public class UserSettingsTests
         UserId userId = _userIdFixture.Create();
 
         // Act
-        Result<UserSettings> result = UserSettings.Create(userId, isPaginationEnabled: false, itemsPerPage: 24, ignoreThePrefixForAlphaPicker: true, isThemeCachingEnabled: true);
+        Result<UserSettings> result = UserSettings.Create(userId, isPaginationEnabled: false, itemsPerPage: 24, shouldIgnoreThePrefixForAlphaPicker: true, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: true);
 
         // Assert
         Assert.False(result.IsFailure);
         Assert.Equal(userId, result.Value.UserId);
         Assert.False(result.Value.IsPaginationEnabled);
         Assert.Equal(24, result.Value.ItemsPerPage);
-        Assert.True(result.Value.IgnoreThePrefixForAlphaPicker);
+        Assert.True(result.Value.ShouldIgnoreThePrefixForAlphaPicker);
         Assert.True(result.Value.IsThemeCachingEnabled);
+        Assert.True(result.Value.ShouldAggregateMetadataWhenMissing);
     }
 
     [Fact]
@@ -106,7 +108,7 @@ public class UserSettingsTests
         UserId userId = _userIdFixture.Create();
 
         // Act
-        Result<UserSettings> result = UserSettings.Create(userId, isPaginationEnabled: true, itemsPerPage: itemsPerPage, ignoreThePrefixForAlphaPicker: false, isThemeCachingEnabled: true);
+        Result<UserSettings> result = UserSettings.Create(userId, isPaginationEnabled: true, itemsPerPage: itemsPerPage, shouldIgnoreThePrefixForAlphaPicker: false, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: false);
 
         // Assert
         Assert.True(result.IsFailure);
@@ -120,14 +122,15 @@ public class UserSettingsTests
         UserSettings userSettings = _userSettingsFixture.Create();
 
         // Act
-        Result<Updated> result = userSettings.UpdateSettings(isPaginationEnabled: false, itemsPerPage: 12, ignoreThePrefixForAlphaPicker: true, isThemeCachingEnabled: false);
+        Result<Updated> result = userSettings.UpdateSettings(isPaginationEnabled: false, itemsPerPage: 12, shouldIgnoreThePrefixForAlphaPicker: true, isThemeCachingEnabled: false, shouldAggregateMetadataWhenMissing: true);
 
         // Assert
         Assert.False(result.IsFailure);
         Assert.False(userSettings.IsPaginationEnabled);
         Assert.Equal(12, userSettings.ItemsPerPage);
-        Assert.True(userSettings.IgnoreThePrefixForAlphaPicker);
+        Assert.True(userSettings.ShouldIgnoreThePrefixForAlphaPicker);
         Assert.False(userSettings.IsThemeCachingEnabled);
+        Assert.True(userSettings.ShouldAggregateMetadataWhenMissing);
     }
 
     [Theory]
@@ -139,7 +142,7 @@ public class UserSettingsTests
         UserSettings userSettings = _userSettingsFixture.Create();
 
         // Act
-        Result<Updated> result = userSettings.UpdateSettings(isPaginationEnabled: true, itemsPerPage: itemsPerPage, ignoreThePrefixForAlphaPicker: false, isThemeCachingEnabled: true);
+        Result<Updated> result = userSettings.UpdateSettings(isPaginationEnabled: true, itemsPerPage: itemsPerPage, shouldIgnoreThePrefixForAlphaPicker: false, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: false);
 
         // Assert
         Assert.True(result.IsFailure);

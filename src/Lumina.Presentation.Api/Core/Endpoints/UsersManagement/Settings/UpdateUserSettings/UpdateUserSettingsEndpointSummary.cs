@@ -24,13 +24,14 @@ public class UpdateUserSettingsEndpointSummary : Summary<UpdateUserSettingsEndpo
         ExampleRequest = new UpdateUserSettingsRequest(
             IsPaginationEnabled: true,
             ItemsPerPage: 48,
-            IgnoreThePrefixForAlphaPicker: false,
-            IsThemeCachingEnabled: true
+            ShouldIgnoreThePrefixForAlphaPicker: false,
+            IsThemeCachingEnabled: true,
+            ShouldAggregateMetadataWhenMissing: false
         );
 
         RequestParam(r => r.IsPaginationEnabled, "Whether pagination is enabled for the user, or not. Required.");
         RequestParam(r => r.ItemsPerPage, "The number of library items displayed per page when pagination is enabled. Required.");
-        RequestParam(r => r.IgnoreThePrefixForAlphaPicker, "Whether the \"The\" prefix of library item titles is ignored by the alpha picker, or not. Required.");
+        RequestParam(r => r.ShouldIgnoreThePrefixForAlphaPicker, "Whether the \"The\" prefix of library item titles is ignored by the alpha picker, or not. Required.");
         RequestParam(r => r.IsThemeCachingEnabled, "Whether the theme data served to this user is cached, or not. Required.");
 
         Response(200, "The settings of the current user were successfully updated.");

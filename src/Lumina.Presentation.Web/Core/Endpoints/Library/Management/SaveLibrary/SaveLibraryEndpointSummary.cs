@@ -2,7 +2,6 @@
 using FastEndpoints;
 using Lumina.Presentation.Web.Common.DTO.Common;
 using Lumina.Presentation.Web.Common.DTO.Libraries;
-using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -29,7 +28,7 @@ public class SaveLibraryEndpointSummary : Summary<SaveLibraryEndpoint, LibraryDt
         RequestParam(r => r.ContentLocations, "The collection of directories that contain the media library files. Required.");
         RequestParam(r => r.IsEnabled, "Whether the media library is enabled or not. Optional.");
         RequestParam(r => r.IsLocked, "Whether the media library is locked or not. Optional.");
-        RequestParam(r => r.DownloadMetadataFromWeb, "Whether the metadata of the media library items should be downloaded from the web, or not. Optional.");
+        RequestParam(r => r.CanDownloadMetadataFromWeb, "Whether the metadata of the media library items should be downloaded from the web, or not. Optional.");
         RequestParam(r => r.ShouldSaveMetadataInMediaDirectories, "Whether the downloaded metadata should be copied into the media library content locations, or not. Optional.");
         RequestParam(r => r.ShouldSkipUnchangedDirectoriesDuringScan, "Whether the directories whose contents have not changed since the last scan should be skipped during the scan, or not. Optional.");
 

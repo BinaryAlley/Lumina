@@ -1,13 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.CQRS;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Mapping.UsersManagement.Users;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserSettingsAggregate;
 using System;
@@ -72,8 +71,9 @@ public class UpdateUserSettingsCommandHandler : ICommandHandler<UpdateUserSettin
                 UserId.Create(userId),
                 command.IsPaginationEnabled,
                 command.ItemsPerPage,
-                command.IgnoreThePrefixForAlphaPicker,
-                command.IsThemeCachingEnabled);
+                command.ShouldIgnoreThePrefixForAlphaPicker,
+                command.IsThemeCachingEnabled,
+                command.ShouldAggregateMetadataWhenMissing);
             if (createSettingsResult.IsFailure)
                 return createSettingsResult.Errors;
 
@@ -91,8 +91,9 @@ public class UpdateUserSettingsCommandHandler : ICommandHandler<UpdateUserSettin
             Result<Updated> updateSettingsResult = toDomainEntityResult.Value.UpdateSettings(
                 command.IsPaginationEnabled,
                 command.ItemsPerPage,
-                command.IgnoreThePrefixForAlphaPicker,
-                command.IsThemeCachingEnabled);
+                command.ShouldIgnoreThePrefixForAlphaPicker,
+                command.IsThemeCachingEnabled,
+                command.ShouldAggregateMetadataWhenMissing);
             if (updateSettingsResult.IsFailure)
                 return updateSettingsResult.Errors;
 

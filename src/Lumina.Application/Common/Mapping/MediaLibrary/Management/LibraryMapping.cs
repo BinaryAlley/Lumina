@@ -25,14 +25,14 @@ public static class LibraryMapping
             Title = domainEntity.Title,
             LibraryType = domainEntity.LibraryType,
             UserId = domainEntity.UserId.Value,
-            ContentLocations = domainEntity.ContentLocations.Select(path => new LibraryContentLocationEntity() { Path = path.Path }).ToList(),
+            ContentLocations = [.. domainEntity.ContentLocations.Select(path => new LibraryContentLocationEntity() { Path = path.Path })],
             CoverImage = domainEntity.CoverImage,
             IsEnabled = domainEntity.IsEnabled,
             IsLocked = domainEntity.IsLocked,
-            DownloadMetadataFromWeb = domainEntity.DownloadMetadataFromWeb,
+            CanDownloadMetadataFromWeb = domainEntity.CanDownloadMetadataFromWeb,
             ShouldSaveMetadataInMediaDirectories = domainEntity.ShouldSaveMetadataInMediaDirectories,
             ShouldSkipUnchangedDirectoriesDuringScan = domainEntity.ShouldSkipUnchangedDirectoriesDuringScan,
-            LibraryScans = domainEntity.ScanIds.Select(scanId => new LibraryScanEntity()
+            LibraryScans = [.. domainEntity.ScanIds.Select(scanId => new LibraryScanEntity()
             {
                 Id = scanId.Value,
                 LibraryId = domainEntity.Id.Value,
@@ -43,7 +43,7 @@ public static class LibraryMapping
                 CreatedBy = default,
                 CreatedOnUtc = default,
                 UpdatedBy = default,
-            }).ToList(),
+            })],
             CreatedOnUtc = domainEntity.CreatedOnUtc,
             CreatedBy = Guid.Empty,
             UpdatedOnUtc = domainEntity.UpdatedOnUtc.HasValue ? domainEntity.UpdatedOnUtc : null,

@@ -21,4 +21,9 @@ public class MediaSettingsDto
     /// Gets or sets the directory where media library files are stored.
     /// </summary>
     public required string LibrariesDirectory { get; init; }
+
+    /// <summary>
+    /// Gets or sets the directory where the media item files are stored.
+    /// </summary>
+    public required string BooksDirectory { get; init; }
 }

@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,6 +23,7 @@ public class LuminaDbContextTests : IDisposable
     private readonly string _connectionString;
     private readonly SqliteConnection _anchorConnection;
     private readonly LuminaDbContext _context;
+    private readonly BookEntityFixture _bookEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LuminaDbContextTests"/> class.
@@ -46,7 +47,7 @@ public class LuminaDbContextTests : IDisposable
 
         // Assert
         // The count assertion fails when a table is added or removed, reminding to update the assertions below.
-        Assert.Equal(24, tableNames.Length);
+        Assert.Equal(25, tableNames.Length);
         Assert.Contains("Books", tableNames);
         Assert.Contains("Users", tableNames);
         Assert.Contains("UserSettings", tableNames);
@@ -63,6 +64,7 @@ public class LuminaDbContextTests : IDisposable
         Assert.Contains("DirectoryScanFingerprints", tableNames);
         Assert.Contains("Plugins", tableNames);
         Assert.Contains("LibraryMetadataProviderConfigurations", tableNames);
+        Assert.Contains("LibraryArtworkProviderConfigurations", tableNames);
         Assert.Contains("Tags", tableNames);
         Assert.Contains("Genres", tableNames);
         Assert.Contains("LibraryContentLocations", tableNames);
@@ -78,17 +80,10 @@ public class LuminaDbContextTests : IDisposable
     {
         // Arrange
         _context.Database.EnsureCreated();
-        BookEntity book = new()
-        {
-            Id = Guid.NewGuid(),
-            LibraryId = Guid.NewGuid(),
-            Path = "/books/test.epub",
-            Title = "Test Book",
-            MetadataStatus = MetadataStatus.Pending,
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = Guid.NewGuid(),
-            UpdatedBy = null
-        };
+        BookEntity book = _bookEntityFixture.Create(path: "/books/test.epub", title: "Test Book", includeMetadata: false);
+        book.MetadataStatus = MetadataStatus.Pending;
+        book.CreatedOnUtc = DateTime.UtcNow;
+        book.CreatedBy = Guid.NewGuid();
         _context.Books.Add(book);
 
         // Act

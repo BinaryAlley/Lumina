@@ -171,7 +171,7 @@
   <data name="DescriptionDirectories" xml:space="preserve">
     <value>选择包含该图书馆媒体文件的文件夹</value>
   </data>
-  <data name="DescriptionDownloadMetadataFromWeb" xml:space="preserve">
+  <data name="DescriptionCanDownloadMetadataFromWeb" xml:space="preserve">
     <value>此媒体库是否应该从互联网下载其元素的元数据。</value>
   </data>
   <data name="DescriptionEnabled" xml:space="preserve">
@@ -198,7 +198,7 @@
   <data name="Documentary" xml:space="preserve">
     <value>纪录片</value>
   </data>
-  <data name="DownloadMetadataFromWeb" xml:space="preserve">
+  <data name="CanDownloadMetadataFromWeb" xml:space="preserve">
     <value>从网络下载元数据</value>
   </data>
   <data name="EBook" xml:space="preserve">

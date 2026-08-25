@@ -171,7 +171,7 @@
   <data name="DescriptionDirectories" xml:space="preserve">
     <value>Seleziona le cartelle che contengono i file multimediali di questa biblioteca</value>
   </data>
-  <data name="DescriptionDownloadMetadataFromWeb" xml:space="preserve">
+  <data name="DescriptionCanDownloadMetadataFromWeb" xml:space="preserve">
     <value>Se questa libreria multimediale deve ottenere i metadati dei suoi elementi scaricandoli da Internet o meno.</value>
   </data>
   <data name="DescriptionEnabled" xml:space="preserve">
@@ -198,7 +198,7 @@
   <data name="Documentary" xml:space="preserve">
     <value>Documentario</value>
   </data>
-  <data name="DownloadMetadataFromWeb" xml:space="preserve">
+  <data name="CanDownloadMetadataFromWeb" xml:space="preserve">
     <value>Scarica I Metadati Dal Web</value>
   </data>
   <data name="EBook" xml:space="preserve">
