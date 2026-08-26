@@ -168,6 +168,11 @@ public class UpdateLibraryCommandHandlerTests
     {
         // Arrange
         UpdateLibraryCommand command = _updateLibraryCommandFixture.Create();
+        command = command with { CoverImage = "C:/Users/user/cover.jpg" };
+        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: command.OwnerId);
+        existingLibrary.CoverImage = null;
+        _mockLibraryRepository.GetByIdAsync(command.Id, Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(existingLibrary));
         _mockEnvironmentContext.FileTypeService.GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(ImageType.None));
 
@@ -177,7 +182,7 @@ public class UpdateLibraryCommandHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(DomainErrors.Library.CoverFileMustBeAnImage, result.FirstError);
-        await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockLibraryRepository.Received(1).GetByIdAsync(command.Id, Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -186,6 +191,11 @@ public class UpdateLibraryCommandHandlerTests
     {
         // Arrange
         UpdateLibraryCommand command = _updateLibraryCommandFixture.Create();
+        command = command with { CoverImage = "C:/Users/user/cover.jpg" };
+        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: command.OwnerId);
+        existingLibrary.CoverImage = null;
+        _mockLibraryRepository.GetByIdAsync(command.Id, Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(existingLibrary));
         _mockEnvironmentContext.FileTypeService.GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>())
             .Returns(Error.Failure(description: "Failed to determine image type"));
 
@@ -194,7 +204,7 @@ public class UpdateLibraryCommandHandlerTests
 
         // Assert
         Assert.True(result.IsFailure);
-        await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockLibraryRepository.Received(1).GetByIdAsync(command.Id, Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -204,6 +214,10 @@ public class UpdateLibraryCommandHandlerTests
         // Arrange
         UpdateLibraryCommand command = _updateLibraryCommandFixture.Create();
         command = command with { CoverImage = " " };
+        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: command.OwnerId);
+        existingLibrary.CoverImage = null;
+        _mockLibraryRepository.GetByIdAsync(command.Id, Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(existingLibrary));
 
         // Act
         Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
@@ -211,8 +225,29 @@ public class UpdateLibraryCommandHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(DomainErrors.FileSystemManagement.InvalidPath, result.FirstError);
-        await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockLibraryRepository.Received(1).GetByIdAsync(command.Id, Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenCoverImageIsUnchanged_ShouldSkipImageTypeCheck()
+    {
+        // Arrange
+        UpdateLibraryCommand command = _updateLibraryCommandFixture.Create();
+        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: command.OwnerId);
+        existingLibrary.CoverImage = command.CoverImage;
+        _mockLibraryRepository.GetByIdAsync(command.Id, Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(existingLibrary));
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        await _mockEnvironmentContext.FileTypeService.DidNotReceive()
+            .GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>());
+        await _mockLibraryRepository.Received(2).GetByIdAsync(command.Id, Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]

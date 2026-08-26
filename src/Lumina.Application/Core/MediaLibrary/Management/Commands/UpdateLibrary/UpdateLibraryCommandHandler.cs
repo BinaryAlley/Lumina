@@ -93,8 +93,16 @@ public class UpdateLibraryCommandHandler : ICommandHandler<UpdateLibraryCommand,
             return ApplicationErrors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
-        // make sure the file is an actual supported image
-        if (command.CoverImage is not null)
+        // get a library repository and retrieve the library to update
+        Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository.GetByIdAsync(command.Id, cancellationToken).ConfigureAwait(false);
+        if (getLibraryResult.IsFailure)
+            return getLibraryResult.Errors;
+        else if (getLibraryResult.Value is null)
+            return DomainErrors.Library.LibraryNotFound;
+
+        // make sure the file is an actual supported image, but only when a new cover image was chosen; the stored cover image is
+        // relative to the application base directory and is already validated, so it must not block saving unrelated changes
+        if (command.CoverImage is not null && command.CoverImage != getLibraryResult.Value.CoverImage)
         {
             Result<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(command.CoverImage);
             if (fileSystemPathIdResult.IsFailure)
@@ -106,13 +114,6 @@ public class UpdateLibraryCommandHandler : ICommandHandler<UpdateLibraryCommand,
             if (imageCheckResult.Value == ImageType.None)
                 return DomainErrors.Library.CoverFileMustBeAnImage;
         }
-
-        // get a library repository and retrieve the library to update
-        Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository.GetByIdAsync(command.Id, cancellationToken).ConfigureAwait(false);
-        if (getLibraryResult.IsFailure)
-            return getLibraryResult.Errors;
-        else if (getLibraryResult.Value is null)
-            return DomainErrors.Library.LibraryNotFound;
 
         // admins or users with the permission to manage media libraries can update any library; other users can only update the libraries they own
         bool hasManagePermission = await _authorizationService.HasPermissionAsync(userId, AuthorizationPermission.CanCreateLibraries, cancellationToken).ConfigureAwait(false);

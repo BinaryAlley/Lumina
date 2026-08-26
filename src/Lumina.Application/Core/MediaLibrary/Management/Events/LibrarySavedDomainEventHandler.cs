@@ -108,6 +108,22 @@ public class LibrarySavedDomainEventHandler : IDomainEventHandler<LibrarySavedDo
     }
 
     /// <summary>
+    /// Resolves a media file path stored relative to the application base directory into an absolute file system path.
+    /// The stored path was created by removing the base directory from the copied file path, so it is resolved by prepending the
+    /// base directory back. The path is built directly instead of using <see cref="IPathService.CombinePath"/>, because that method
+    /// treats the combined name as a directory segment and appends a trailing separator, which would make the file path invalid.
+    /// </summary>
+    /// <param name="relativePath">The path relative to the application base directory, with a leading path separator.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing the absolute path, or an error.</returns>
+    private Result<FileSystemPathId> ResolveInternalMediaPathId(string relativePath)
+    {
+        string absolutePath = AppContext.BaseDirectory.TrimEnd(_pathService.PathSeparator)
+            + _pathService.PathSeparator
+            + relativePath.TrimStart(_pathService.PathSeparator);
+        return FileSystemPathId.Create(absolutePath);
+    }
+
+    /// <summary>
     /// Saves the cover image of a media library to the internal media directory.
     /// </summary>
     /// <param name="libraryId">The unique identifier of the library for which to save the cover image.</param>
@@ -125,8 +141,21 @@ public class LibrarySavedDomainEventHandler : IDomainEventHandler<LibrarySavedDo
         Result<bool> fileExistsResult = _environmentContext.FileProviderService.FileExists(fileSystemPathIdResult.Value);
         if (fileExistsResult.IsFailure)
             return fileExistsResult.Errors;
+
+        // when the library is saved without changing its cover, the stored cover image path is already the internal media directory
+        // path, relative to the application base directory; resolve it against the base directory and keep it when the file is found
         if (!fileExistsResult.Value)
+        {
+            Result<FileSystemPathId> internalImagePathIdResult = ResolveInternalMediaPathId(imagePath);
+            if (internalImagePathIdResult.IsFailure)
+                return internalImagePathIdResult.Errors;
+            Result<bool> internalFileExistsResult = _environmentContext.FileProviderService.FileExists(internalImagePathIdResult.Value);
+            if (internalFileExistsResult.IsFailure)
+                return internalFileExistsResult.Errors;
+            if (internalFileExistsResult.Value)
+                return imagePath;
             return Errors.FileSystemManagement.FileNotFound;
+        }
 
         // make sure the file is an actual supported image
         Result<ImageType> imageCheckResult = await _environmentContext.FileTypeService.GetImageTypeAsync(fileSystemPathIdResult.Value, cancellationToken).ConfigureAwait(false);
