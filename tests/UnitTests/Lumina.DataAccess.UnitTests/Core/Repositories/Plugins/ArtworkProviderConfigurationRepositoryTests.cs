@@ -134,4 +134,66 @@ public class ArtworkProviderConfigurationRepositoryTests
         Assert.True(retrievedConfiguration.IsEnabled);
         Assert.Equal(configuration.Id, retrievedConfiguration.Id);
     }
+
+    [Fact]
+    public async Task DeleteByLibraryIdAsync_WhenCalled_ShouldRemoveOnlyConfigurationsOfTheLibrary()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        LibraryArtworkProviderConfigurationEntity configurationOfLibrary = _configurationFixture.Create(libraryId, Guid.NewGuid(), 1);
+        LibraryArtworkProviderConfigurationEntity configurationOfAnotherLibrary = _configurationFixture.Create(Guid.NewGuid(), Guid.NewGuid(), 1);
+        _mockContext.LibraryArtworkProviderConfigurations.AddRange(configurationOfLibrary, configurationOfAnotherLibrary);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<Deleted> result = await _sut.DeleteByLibraryIdAsync(libraryId, CancellationToken.None);
+        await _mockContext.SaveChangesAsync();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        LibraryArtworkProviderConfigurationEntity remainingConfiguration = Assert.Single(_mockContext.LibraryArtworkProviderConfigurations);
+        Assert.Equal(configurationOfAnotherLibrary.Id, remainingConfiguration.Id);
+    }
+
+    [Fact]
+    public async Task DeleteByPluginIdAsync_WhenCalled_ShouldRemoveConfigurationsOfThePlugin()
+    {
+        // Arrange
+        Guid pluginId = Guid.NewGuid();
+        LibraryArtworkProviderConfigurationEntity configurationOfPlugin = _configurationFixture.Create(Guid.NewGuid(), pluginId, 1);
+        LibraryArtworkProviderConfigurationEntity configurationOfAnotherPlugin = _configurationFixture.Create(Guid.NewGuid(), Guid.NewGuid(), 1);
+        _mockContext.LibraryArtworkProviderConfigurations.AddRange(configurationOfPlugin, configurationOfAnotherPlugin);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<Deleted> result = await _sut.DeleteByPluginIdAsync(pluginId, CancellationToken.None);
+        await _mockContext.SaveChangesAsync();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        LibraryArtworkProviderConfigurationEntity remainingConfiguration = Assert.Single(_mockContext.LibraryArtworkProviderConfigurations);
+        Assert.Equal(configurationOfAnotherPlugin.Id, remainingConfiguration.Id);
+    }
+
+    [Fact]
+    public async Task DeleteByLibraryIdAndPluginIdsAsync_WhenCalled_ShouldRemoveOnlyTheConfigurationsOfTheProvidedPlugins()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        Guid removedPluginId = Guid.NewGuid();
+        Guid keptPluginId = Guid.NewGuid();
+        LibraryArtworkProviderConfigurationEntity removedConfiguration = _configurationFixture.Create(libraryId, removedPluginId, 1);
+        LibraryArtworkProviderConfigurationEntity keptConfiguration = _configurationFixture.Create(libraryId, keptPluginId, 2);
+        _mockContext.LibraryArtworkProviderConfigurations.AddRange(removedConfiguration, keptConfiguration);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<Deleted> result = await _sut.DeleteByLibraryIdAndPluginIdsAsync(libraryId, [removedPluginId], CancellationToken.None);
+        await _mockContext.SaveChangesAsync();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        LibraryArtworkProviderConfigurationEntity remainingConfiguration = Assert.Single(_mockContext.LibraryArtworkProviderConfigurations);
+        Assert.Equal(keptConfiguration.Id, remainingConfiguration.Id);
+    }
 }

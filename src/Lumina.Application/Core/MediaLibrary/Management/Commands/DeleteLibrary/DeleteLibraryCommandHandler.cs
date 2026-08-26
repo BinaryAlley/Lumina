@@ -8,6 +8,7 @@ using Lumina.Application.Common.DomainEvents;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
+using Lumina.Application.Common.Infrastructure.Plugins;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Domain.Common.Events;
@@ -31,6 +32,7 @@ public class DeleteLibraryCommandHandler : ICommandHandler<DeleteLibraryCommand,
     private readonly ICurrentUserService _currentUserService;
     private readonly IAuthorizationService _authorizationService;
     private readonly IDomainEventsQueue _domainEventsQueue;
+    private readonly IMediaLibraryProviderConfigurationStore _providerConfigurationStore;
     private readonly IValidator<DeleteLibraryCommand> _validator;
 
     /// <summary>
@@ -39,18 +41,21 @@ public class DeleteLibraryCommandHandler : ICommandHandler<DeleteLibraryCommand,
     /// <param name="authorizationService">Injected service for authorization related functionality.</param>
     /// <param name="currentUserService">Injected service to retrieve the current user information.</param>
     /// <param name="domainEventsQueue">Injected service for the queue of domain events.</param>
+    /// <param name="providerConfigurationStore">Injected store of the provider configurations of the media libraries.</param>
     /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
     /// <param name="validator">Injected validator for application validation rules.</param>
     public DeleteLibraryCommandHandler(
         IAuthorizationService authorizationService,
         ICurrentUserService currentUserService,
         IDomainEventsQueue domainEventsQueue,
+        IMediaLibraryProviderConfigurationStore providerConfigurationStore,
         IUnitOfWork unitOfWork,
         IValidator<DeleteLibraryCommand> validator)
     {
         _authorizationService = authorizationService;
         _currentUserService = currentUserService;
         _domainEventsQueue = domainEventsQueue;
+        _providerConfigurationStore = providerConfigurationStore;
         _unitOfWork = unitOfWork;
         _validator = validator;
     }
@@ -100,7 +105,10 @@ public class DeleteLibraryCommandHandler : ICommandHandler<DeleteLibraryCommand,
         foreach (IDomainEvent domainEvent in createLibraryResult.Value.GetDomainEvents())
             _domainEventsQueue.Enqueue(domainEvent);
 
-        // perform the deletion
+        // remove the provider configurations of the library, so that they are not orphaned, and delete the library
+        Result<Deleted> removeProviderConfigurationsResult = await _providerConfigurationStore.RemoveProviderConfigurationsForLibraryAsync(command.Id, cancellationToken).ConfigureAwait(false);
+        if (removeProviderConfigurationsResult.IsFailure)
+            return removeProviderConfigurationsResult.Errors;
         Result<Deleted> deletePersistenceLibraryResult = await _unitOfWork.LibraryRepository.DeleteByIdAsync(command.Id, cancellationToken).ConfigureAwait(false);
         if (deletePersistenceLibraryResult.IsFailure)
             return deletePersistenceLibraryResult.Errors;

@@ -5,6 +5,7 @@ using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
+using Lumina.Application.Common.Infrastructure.Plugins;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Mapping.Plugins;
 using Lumina.Contracts.Responses.Plugins;
@@ -27,6 +28,7 @@ public class GetLibraryMetadataProvidersQueryHandler : IQueryHandler<GetLibraryM
     private readonly IUnitOfWork _unitOfWork;
     private readonly IAuthorizationService _authorizationService;
     private readonly ICurrentUserService _currentUserService;
+    private readonly IMediaLibraryProviderConfigurationStore _providerConfigurationStore;
     private readonly IValidator<GetLibraryMetadataProvidersQuery> _validator;
 
     /// <summary>
@@ -34,12 +36,14 @@ public class GetLibraryMetadataProvidersQueryHandler : IQueryHandler<GetLibraryM
     /// </summary>
     /// <param name="authorizationService">Injected service for authorization related functionality.</param>
     /// <param name="currentUserService">Injected service to retrieve the current user information.</param>
+    /// <param name="providerConfigurationStore">Injected store of the provider configurations of the media libraries.</param>
     /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
     /// <param name="validator">Injected validator for application validation rules.</param>
-    public GetLibraryMetadataProvidersQueryHandler(IAuthorizationService authorizationService, ICurrentUserService currentUserService, IUnitOfWork unitOfWork, IValidator<GetLibraryMetadataProvidersQuery> validator)
+    public GetLibraryMetadataProvidersQueryHandler(IAuthorizationService authorizationService, ICurrentUserService currentUserService, IMediaLibraryProviderConfigurationStore providerConfigurationStore, IUnitOfWork unitOfWork, IValidator<GetLibraryMetadataProvidersQuery> validator)
     {
         _authorizationService = authorizationService;
         _currentUserService = currentUserService;
+        _providerConfigurationStore = providerConfigurationStore;
         _unitOfWork = unitOfWork;
         _validator = validator;
     }
@@ -70,7 +74,7 @@ public class GetLibraryMetadataProvidersQueryHandler : IQueryHandler<GetLibraryM
         if (!canAccessLibrary)
             return ApplicationErrors.Authorization.NotAuthorized;
 
-        Result<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>> getConfigurationsResult = await _unitOfWork.LibraryMetadataProviderConfigurationRepository.GetByLibraryIdAsync(query.LibraryId, cancellationToken).ConfigureAwait(false);
+        Result<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>> getConfigurationsResult = await _providerConfigurationStore.GetConfigurationsAsync(query.LibraryId, cancellationToken).ConfigureAwait(false);
         if (getConfigurationsResult.IsFailure)
             return getConfigurationsResult.Errors;
 

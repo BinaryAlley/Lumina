@@ -5,6 +5,7 @@ using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.DomainEvents;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
+using Lumina.Application.Common.Infrastructure.Plugins;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.MediaLibrary.Management.Commands.AddLibrary;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
@@ -14,6 +15,7 @@ using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.Events;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
 using NSubstitute;
 using System;
@@ -39,6 +41,7 @@ public class AddLibraryCommandHandlerTests
     private readonly ICurrentUserService _mockCurrentUserService;
     private readonly IDomainEventsQueue _mockDomainEventsQueue;
     private readonly IEnvironmentContext _mockEnvironmentContext;
+    private readonly IMediaLibraryProviderConfigurationStore _mockProviderConfigurationStore;
     private readonly IValidator<AddLibraryCommand> _mockValidator;
     private readonly AddLibraryCommandHandler _sut;
     private readonly AddLibraryCommandFixture _addLibraryCommandFixture = new();
@@ -57,19 +60,22 @@ public class AddLibraryCommandHandlerTests
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
         _mockDomainEventsQueue = Substitute.For<IDomainEventsQueue>();
         _mockEnvironmentContext = Substitute.For<IEnvironmentContext>();
+        _mockProviderConfigurationStore = Substitute.For<IMediaLibraryProviderConfigurationStore>();
         _mockValidator = Substitute.For<IValidator<AddLibraryCommand>>();
         _userId = Guid.NewGuid();
 
-        // default stubs: the current user is authenticated, is an admin, and the cover image is a valid image
+        // default stubs: the current user is authenticated, is an admin, the cover image is a valid image, and the provider configurations are seeded successfully
         _mockCurrentUserService.UserId.Returns(_userId);
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>()).Returns(true);
         _mockEnvironmentContext.FileTypeService.GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(ImageType.PNG));
         _mockLibraryRepository.InsertAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Created);
+        _mockProviderConfigurationStore.EnsureProviderConfigurationsAsync(Arg.Any<Guid>(), Arg.Any<LibraryType>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Success);
         _mockValidator.Validate(Arg.Any<AddLibraryCommand>()).Returns([]);
 
-        _sut = new AddLibraryCommandHandler(_mockAuthorizationService, _mockCurrentUserService, _mockDomainEventsQueue, _mockEnvironmentContext, _mockUnitOfWork, _mockValidator);
+        _sut = new AddLibraryCommandHandler(_mockAuthorizationService, _mockCurrentUserService, _mockDomainEventsQueue, _mockEnvironmentContext, _mockProviderConfigurationStore, _mockUnitOfWork, _mockValidator);
     }
 
     [Fact]
@@ -88,8 +94,26 @@ public class AddLibraryCommandHandlerTests
         Assert.False(result.IsFailure);
         Assert.Equal(persistedLibrary.Id, result.Value.Id);
         await _mockLibraryRepository.Received(1).InsertAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>());
+        await _mockProviderConfigurationStore.Received(1).EnsureProviderConfigurationsAsync(
+            Arg.Any<Guid>(), Arg.Is<LibraryType>(libraryType => libraryType == Enum.Parse<LibraryType>(command.LibraryType)), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
         _mockDomainEventsQueue.Received(1).Enqueue(Arg.Any<LibrarySavedDomainEvent>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenProviderConfigurationSeedingFails_ShouldReturnErrorWithoutSaving()
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create();
+        _mockProviderConfigurationStore.EnsureProviderConfigurationsAsync(Arg.Any<Guid>(), Arg.Any<LibraryType>(), Arg.Any<CancellationToken>())
+            .Returns(Error.Failure(description: "Failed to seed provider configurations"));
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]

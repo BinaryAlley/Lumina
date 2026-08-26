@@ -157,6 +157,30 @@ public class LibrarySavedDomainEventHandlerTests
     }
 
     [Fact]
+    public async Task HandleAsync_WhenCoverImageIsAlreadyInMediaDirectory_ShouldKeepItWithoutRecopying()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        Library library = _libraryFixture.Create(id: libraryId, coverImage: "/Media/Libraries/guid/cover.png");
+        LibrarySavedDomainEvent domainEvent = new(Guid.NewGuid(), library, DateTime.UtcNow);
+        // mirror the real CombinePath behavior, which treats the combined name as a directory segment and appends a trailing
+        // separator; the internal cover path resolution must still yield the file path without that trailing separator
+        _mockPathService.CombinePath(Arg.Any<string>(), Arg.Any<string>())
+            .Returns(callInfo => Result.From(string.Concat(callInfo.ArgAt<string>(0), callInfo.ArgAt<string>(1)) + '/'));
+        string internalImagePath = $"{AppContext.BaseDirectory.TrimEnd('/')}/Media/Libraries/guid/cover.png";
+        _mockFileProviderService.FileExists(Arg.Any<FileSystemPathId>())
+            .Returns(callInfo => Result.From(callInfo.Arg<FileSystemPathId>().Path == internalImagePath));
+
+        // Act
+        await _sut.HandleAsync(domainEvent, CancellationToken.None);
+
+        // Assert
+        Assert.Equal("/Media/Libraries/guid/cover.png", library.CoverImage);
+        _mockFileProviderService.DidNotReceive().CopyFile(Arg.Any<FileSystemPathId>(), Arg.Any<FileSystemPathId>(), Arg.Any<bool>());
+        await _mockLibraryRepository.Received(1).UpdateAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task HandleAsync_WhenCoverSourceFileDoesNotExist_ShouldThrowEventualConsistencyException()
     {
         // Arrange

@@ -5,6 +5,7 @@ using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
+using Lumina.Application.Common.Infrastructure.Plugins;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.Plugins.Queries.GetLibraryMetadataProviders;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Plugins;
@@ -30,10 +31,10 @@ namespace Lumina.Application.UnitTests.Core.Plugins.Queries.GetLibraryMetadataPr
 public class GetLibraryMetadataProvidersQueryHandlerTests
 {
     private readonly IUnitOfWork _mockUnitOfWork;
-    private readonly ILibraryMetadataProviderConfigurationRepository _mockLibraryMetadataProviderConfigurationRepository;
     private readonly IPluginRepository _mockPluginRepository;
     private readonly IAuthorizationService _mockAuthorizationService;
     private readonly ICurrentUserService _mockCurrentUserService;
+    private readonly IMediaLibraryProviderConfigurationStore _mockProviderConfigurationStore;
     private readonly IValidator<GetLibraryMetadataProvidersQuery> _mockValidator;
     private readonly GetLibraryMetadataProvidersQueryHandler _sut;
     private readonly GetLibraryMetadataProvidersQueryFixture _getLibraryMetadataProvidersQueryFixture = new();
@@ -47,12 +48,11 @@ public class GetLibraryMetadataProvidersQueryHandlerTests
     public GetLibraryMetadataProvidersQueryHandlerTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
-        _mockLibraryMetadataProviderConfigurationRepository = Substitute.For<ILibraryMetadataProviderConfigurationRepository>();
         _mockPluginRepository = Substitute.For<IPluginRepository>();
-        _mockUnitOfWork.LibraryMetadataProviderConfigurationRepository.Returns(_mockLibraryMetadataProviderConfigurationRepository);
         _mockUnitOfWork.PluginRepository.Returns(_mockPluginRepository);
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
+        _mockProviderConfigurationStore = Substitute.For<IMediaLibraryProviderConfigurationStore>();
         _mockValidator = Substitute.For<IValidator<GetLibraryMetadataProvidersQuery>>();
         _userId = Guid.NewGuid();
 
@@ -62,7 +62,7 @@ public class GetLibraryMetadataProvidersQueryHandlerTests
             .Returns(true);
         _mockValidator.Validate(Arg.Any<GetLibraryMetadataProvidersQuery>()).Returns([]);
 
-        _sut = new GetLibraryMetadataProvidersQueryHandler(_mockAuthorizationService, _mockCurrentUserService, _mockUnitOfWork, _mockValidator);
+        _sut = new GetLibraryMetadataProvidersQueryHandler(_mockAuthorizationService, _mockCurrentUserService, _mockProviderConfigurationStore, _mockUnitOfWork, _mockValidator);
     }
 
     [Fact]
@@ -78,7 +78,7 @@ public class GetLibraryMetadataProvidersQueryHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.Plugins.LibraryIdCannotBeEmpty, result.FirstError);
-        await _mockLibraryMetadataProviderConfigurationRepository.DidNotReceive().GetByLibraryIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockProviderConfigurationStore.DidNotReceive().GetConfigurationsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -93,7 +93,7 @@ public class GetLibraryMetadataProvidersQueryHandlerTests
             _configurationEntityFixture.Create(query.LibraryId, secondPluginId, 2),
             _configurationEntityFixture.Create(query.LibraryId, firstPluginId, 1)
         ];
-        _mockLibraryMetadataProviderConfigurationRepository.GetByLibraryIdAsync(query.LibraryId, Arg.Any<CancellationToken>())
+        _mockProviderConfigurationStore.GetConfigurationsAsync(query.LibraryId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>(configurations));
         List<PluginEntity> plugins =
         [
@@ -125,7 +125,7 @@ public class GetLibraryMetadataProvidersQueryHandlerTests
         [
             _configurationEntityFixture.Create(query.LibraryId, unknownPluginId, 1)
         ];
-        _mockLibraryMetadataProviderConfigurationRepository.GetByLibraryIdAsync(query.LibraryId, Arg.Any<CancellationToken>())
+        _mockProviderConfigurationStore.GetConfigurationsAsync(query.LibraryId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>(configurations));
         _mockPluginRepository.GetAllAsync(Arg.Any<CancellationToken>())
             .Returns(Result.From<IEnumerable<PluginEntity>>([_pluginEntityFixture.Create()]));
@@ -145,7 +145,7 @@ public class GetLibraryMetadataProvidersQueryHandlerTests
     {
         // Arrange
         GetLibraryMetadataProvidersQuery query = _getLibraryMetadataProvidersQueryFixture.Create();
-        _mockLibraryMetadataProviderConfigurationRepository.GetByLibraryIdAsync(query.LibraryId, Arg.Any<CancellationToken>())
+        _mockProviderConfigurationStore.GetConfigurationsAsync(query.LibraryId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>([]));
         _mockPluginRepository.GetAllAsync(Arg.Any<CancellationToken>())
             .Returns(Result.From<IEnumerable<PluginEntity>>([]));
@@ -164,7 +164,7 @@ public class GetLibraryMetadataProvidersQueryHandlerTests
         // Arrange
         GetLibraryMetadataProvidersQuery query = _getLibraryMetadataProvidersQueryFixture.Create();
         Error error = Error.Failure(description: "Failed to get configurations");
-        _mockLibraryMetadataProviderConfigurationRepository.GetByLibraryIdAsync(query.LibraryId, Arg.Any<CancellationToken>())
+        _mockProviderConfigurationStore.GetConfigurationsAsync(query.LibraryId, Arg.Any<CancellationToken>())
             .Returns(error);
 
         // Act
@@ -180,7 +180,7 @@ public class GetLibraryMetadataProvidersQueryHandlerTests
     {
         // Arrange
         GetLibraryMetadataProvidersQuery query = _getLibraryMetadataProvidersQueryFixture.Create();
-        _mockLibraryMetadataProviderConfigurationRepository.GetByLibraryIdAsync(query.LibraryId, Arg.Any<CancellationToken>())
+        _mockProviderConfigurationStore.GetConfigurationsAsync(query.LibraryId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>([]));
         _mockPluginRepository.GetAllAsync(Arg.Any<CancellationToken>())
             .Returns(Error.Failure(description: "Failed to get plugins"));
@@ -208,7 +208,7 @@ public class GetLibraryMetadataProvidersQueryHandlerTests
         Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
         await _mockAuthorizationService.Received(1).EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
             _userId, Arg.Is<LibraryOwnershipPolicyContext>(context => context.LibraryId == query.LibraryId), Arg.Any<CancellationToken>());
-        await _mockLibraryMetadataProviderConfigurationRepository.DidNotReceive().GetByLibraryIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockProviderConfigurationStore.DidNotReceive().GetConfigurationsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockPluginRepository.DidNotReceive().GetAllAsync(Arg.Any<CancellationToken>());
     }
 
@@ -226,6 +226,6 @@ public class GetLibraryMetadataProvidersQueryHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
         await _mockAuthorizationService.DidNotReceive().EvaluatePolicyAsync<ILibraryOwnershipPolicy>(Arg.Any<Guid>(), Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>());
-        await _mockLibraryMetadataProviderConfigurationRepository.DidNotReceive().GetByLibraryIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockProviderConfigurationStore.DidNotReceive().GetConfigurationsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
     }
 }

@@ -6,6 +6,7 @@ using Lumina.Application.Common.DomainEvents;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
+using Lumina.Application.Common.Infrastructure.Plugins;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.MediaLibrary.Management.Commands.DeleteLibrary;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
@@ -36,6 +37,7 @@ public class DeleteLibraryCommandHandlerTests
     private readonly IAuthorizationService _mockAuthorizationService;
     private readonly ICurrentUserService _mockCurrentUserService;
     private readonly IDomainEventsQueue _mockDomainEventsQueue;
+    private readonly IMediaLibraryProviderConfigurationStore _mockProviderConfigurationStore;
     private readonly IValidator<DeleteLibraryCommand> _mockValidator;
     private readonly DeleteLibraryCommandHandler _sut;
     private readonly DeleteLibraryCommandFixture _deleteLibraryCommandFixture = new();
@@ -53,18 +55,21 @@ public class DeleteLibraryCommandHandlerTests
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
         _mockDomainEventsQueue = Substitute.For<IDomainEventsQueue>();
+        _mockProviderConfigurationStore = Substitute.For<IMediaLibraryProviderConfigurationStore>();
         _mockValidator = Substitute.For<IValidator<DeleteLibraryCommand>>();
         _userId = Guid.NewGuid();
 
-        // default stubs: the current user is authenticated and the ownership policy allows the deletion
+        // default stubs: the current user is authenticated, the ownership policy allows the deletion, and the provider configurations are removed successfully
         _mockCurrentUserService.UserId.Returns(_userId);
         _mockAuthorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(_userId, Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>())
             .Returns(true);
+        _mockProviderConfigurationStore.RemoveProviderConfigurationsForLibraryAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Deleted);
         _mockLibraryRepository.DeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
             .Returns(Result.Deleted);
         _mockValidator.Validate(Arg.Any<DeleteLibraryCommand>()).Returns([]);
 
-        _sut = new DeleteLibraryCommandHandler(_mockAuthorizationService, _mockCurrentUserService, _mockDomainEventsQueue, _mockUnitOfWork, _mockValidator);
+        _sut = new DeleteLibraryCommandHandler(_mockAuthorizationService, _mockCurrentUserService, _mockDomainEventsQueue, _mockProviderConfigurationStore, _mockUnitOfWork, _mockValidator);
     }
 
     [Fact]
@@ -82,9 +87,30 @@ public class DeleteLibraryCommandHandlerTests
         // Assert
         Assert.False(result.IsFailure);
         Assert.Equal(Result.Deleted, result.Value);
+        await _mockProviderConfigurationStore.Received(1).RemoveProviderConfigurationsForLibraryAsync(command.Id, Arg.Any<CancellationToken>());
         await _mockLibraryRepository.Received(1).DeleteByIdAsync(command.Id, Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
         _mockDomainEventsQueue.Received(1).Enqueue(Arg.Any<LibraryDeletedDomainEvent>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenProviderConfigurationRemovalFails_ShouldReturnErrorWithoutSaving()
+    {
+        // Arrange
+        DeleteLibraryCommand command = _deleteLibraryCommandFixture.Create();
+        LibraryEntity library = _libraryEntityFixture.Create(id: command.Id, userId: _userId);
+        _mockLibraryRepository.GetByIdAsync(command.Id, Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(library));
+        _mockProviderConfigurationStore.RemoveProviderConfigurationsForLibraryAsync(command.Id, Arg.Any<CancellationToken>())
+            .Returns(Error.Failure(description: "Failed to remove provider configurations"));
+
+        // Act
+        Result<Deleted> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        await _mockLibraryRepository.DidNotReceive().DeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]

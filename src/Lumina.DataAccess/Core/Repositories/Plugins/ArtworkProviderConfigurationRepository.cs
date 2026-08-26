@@ -77,4 +77,55 @@ internal sealed class ArtworkProviderConfigurationRepository : IArtworkProviderC
         }
         return Result.Updated;
     }
+
+    /// <summary>
+    /// Deletes all the artwork provider configurations of the media library identified by <paramref name="libraryId"/>.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose artwork provider configurations are deleted.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Deleted>> DeleteByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken)
+    {
+        List<LibraryArtworkProviderConfigurationEntity> configurations = await _luminaDbContext.LibraryArtworkProviderConfigurations
+            .Where(configuration => configuration.LibraryId == libraryId)
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
+        if (configurations.Count > 0)
+            _luminaDbContext.LibraryArtworkProviderConfigurations.RemoveRange(configurations);
+        return Result.Deleted;
+    }
+
+    /// <summary>
+    /// Deletes all the artwork provider configurations referencing the plugin identified by <paramref name="pluginId"/>.
+    /// </summary>
+    /// <param name="pluginId">The Id of the plugin whose artwork provider configurations are deleted.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Deleted>> DeleteByPluginIdAsync(Guid pluginId, CancellationToken cancellationToken)
+    {
+        List<LibraryArtworkProviderConfigurationEntity> configurations = await _luminaDbContext.LibraryArtworkProviderConfigurations
+            .Where(configuration => configuration.PluginId == pluginId)
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
+        if (configurations.Count > 0)
+            _luminaDbContext.LibraryArtworkProviderConfigurations.RemoveRange(configurations);
+        return Result.Deleted;
+    }
+
+    /// <summary>
+    /// Deletes the artwork provider configurations of the media library identified by <paramref name="libraryId"/> that reference
+    /// one of the plugins identified by <paramref name="pluginIds"/>.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose artwork provider configurations are deleted.</param>
+    /// <param name="pluginIds">The Ids of the plugins whose configurations of the media library are deleted.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Deleted>> DeleteByLibraryIdAndPluginIdsAsync(Guid libraryId, IEnumerable<Guid> pluginIds, CancellationToken cancellationToken)
+    {
+        List<Guid> pluginIdList = [.. pluginIds];
+        List<LibraryArtworkProviderConfigurationEntity> configurations = await _luminaDbContext.LibraryArtworkProviderConfigurations
+            .Where(configuration => configuration.LibraryId == libraryId && pluginIdList.Contains(configuration.PluginId))
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
+        if (configurations.Count > 0)
+            _luminaDbContext.LibraryArtworkProviderConfigurations.RemoveRange(configurations);
+        return Result.Deleted;
+    }
 }
