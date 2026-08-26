@@ -115,6 +115,7 @@ public static class InfrastructureLayerServices
         services.AddSingleton<IPluginManager>(new PluginManager(pluginLoadResult.Plugins));
         services.AddScoped<IPluginSettingsStore, PluginSettingsStore>();
         services.AddScoped<IPluginInstaller, PluginInstaller>();
+        services.AddScoped<IMediaLibraryProviderConfigurationStore, MediaLibraryProviderConfigurationStore>();
         services.AddSingleton(serviceProvider => new PluginDetectionSyncJob(
             serviceProvider.GetRequiredService<IServiceScopeFactory>(),
             serviceProvider.GetRequiredService<IPluginManager>(),

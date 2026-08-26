@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Domain.Common.Primitives;
+using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -106,7 +107,9 @@ internal sealed class PluginDetectionSyncJob : BackgroundService
                 _logger.LogError("Failed to persist the detection of plugin '{PluginName}': {Error}", loadError.AssemblyName, upsertResult.FirstError.Description);
         }
 
-        // remove the rows of the plugins that are no longer detected, so that each plugin assembly has exactly one row regardless of its load status
+        // remove the rows of the plugins that are no longer detected, so that each plugin assembly has exactly one row regardless of its load status,
+        // and delete the provider configurations of the removed plugins, since their configuration only makes sense while the plugin is installed
+        IMediaLibraryProviderConfigurationStore providerConfigurationStore = asyncServiceScope.ServiceProvider.GetRequiredService<IMediaLibraryProviderConfigurationStore>();
         Result<IEnumerable<PluginEntity>> getPluginsResult = await unitOfWork.PluginRepository.GetAllAsync(stoppingToken).ConfigureAwait(false);
         if (getPluginsResult.IsFailure)
             _logger.LogError("Failed to get the detected plugins while reconciling the plugin rows.");
@@ -119,6 +122,23 @@ internal sealed class PluginDetectionSyncJob : BackgroundService
                 Result<Deleted> deleteResult = await unitOfWork.PluginRepository.DeleteByIdAsync(plugin.Id, stoppingToken).ConfigureAwait(false);
                 if (deleteResult.IsFailure)
                     _logger.LogError("Failed to remove the stale detection of plugin '{PluginName}': {Error}", plugin.Name, deleteResult.FirstError.Description);
+                Result<Deleted> removeConfigurationsResult = await providerConfigurationStore.RemoveProviderConfigurationsAsync(plugin.Id, stoppingToken).ConfigureAwait(false);
+                if (removeConfigurationsResult.IsFailure)
+                    _logger.LogError("Failed to remove the provider configurations of the removed plugin '{PluginName}': {Error}", plugin.Name, removeConfigurationsResult.FirstError.Description);
+            }
+        }
+
+        // seed the provider configurations of the media libraries, so that every library lists the plugins providing metadata or artwork for its type
+        Result<IEnumerable<LibraryEntity>> getLibrariesResult = await unitOfWork.LibraryRepository.GetAllAsync(stoppingToken).ConfigureAwait(false);
+        if (getLibrariesResult.IsFailure)
+            _logger.LogError("Failed to get the media libraries while seeding the provider configurations.");
+        else
+        {
+            foreach (LibraryEntity library in getLibrariesResult.Value)
+            {
+                Result<Success> ensureResult = await providerConfigurationStore.EnsureProviderConfigurationsAsync(library.Id, library.LibraryType, stoppingToken).ConfigureAwait(false);
+                if (ensureResult.IsFailure)
+                    _logger.LogError("Failed to seed the provider configurations of the media library '{LibraryTitle}': {Error}", library.Title, ensureResult.FirstError.Description);
             }
         }
 

@@ -6,6 +6,7 @@ using Lumina.Application.Common.DomainEvents;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
+using Lumina.Application.Common.Infrastructure.Plugins;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
@@ -41,6 +42,7 @@ public class UpdateLibraryCommandHandler : ICommandHandler<UpdateLibraryCommand,
     private readonly IAuthorizationService _authorizationService;
     private readonly IDomainEventsQueue _domainEventsQueue;
     private readonly IEnvironmentContext _environmentContext;
+    private readonly IMediaLibraryProviderConfigurationStore _providerConfigurationStore;
     private readonly IValidator<UpdateLibraryCommand> _validator;
 
     /// <summary>
@@ -50,13 +52,15 @@ public class UpdateLibraryCommandHandler : ICommandHandler<UpdateLibraryCommand,
     /// <param name="currentUserService">Injected service to retrieve the current user information.</param>
     /// <param name="domainEventsQueue">Injected service for the queue of domain events.</param>
     /// <param name="environmentContext">Injected facade service for environment contextual services.</param>
+    /// <param name="providerConfigurationStore">Injected store of the provider configurations of the media libraries.</param>
     /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
     /// <param name="validator">Injected validator for application validation rules.</param>
     public UpdateLibraryCommandHandler(
-        IAuthorizationService authorizationService, 
+        IAuthorizationService authorizationService,
         ICurrentUserService currentUserService,
         IDomainEventsQueue domainEventsQueue,
         IEnvironmentContext environmentContext,
+        IMediaLibraryProviderConfigurationStore providerConfigurationStore,
         IUnitOfWork unitOfWork,
         IValidator<UpdateLibraryCommand> validator)
     {
@@ -65,6 +69,7 @@ public class UpdateLibraryCommandHandler : ICommandHandler<UpdateLibraryCommand,
         _unitOfWork = unitOfWork;
         _domainEventsQueue = domainEventsQueue;
         _environmentContext = environmentContext;
+        _providerConfigurationStore = providerConfigurationStore;
         _validator = validator;
     }
 
@@ -117,11 +122,12 @@ public class UpdateLibraryCommandHandler : ICommandHandler<UpdateLibraryCommand,
             return ApplicationErrors.Authorization.NotAuthorized;
 
         // create a domain library object
+        LibraryType newLibraryType = Enum.Parse<LibraryType>(command.LibraryType!);
         Result<Library> createLibraryResult = Library.Create(
             LibraryId.Create(command.Id),
             UserId.Create(command.OwnerId),
             command.Title!,
-            Enum.Parse<LibraryType>(command.LibraryType!),
+            newLibraryType,
             command.ContentLocations!,
             command.CoverImage,
             command.IsEnabled,
@@ -136,10 +142,17 @@ public class UpdateLibraryCommandHandler : ICommandHandler<UpdateLibraryCommand,
         // convert the domain library entity to a repository library entity
         LibraryEntity persistenceLibrary = createLibraryResult.Value.ToRepositoryEntity();
 
-        // update the repository entity and save changes
+        // update the repository entity, and when the library type changed, reconcile the provider configurations so that
+        // they match the plugins supporting the new type, and save the changes
         Result<Updated> updateLibraryResult = await _unitOfWork.LibraryRepository.UpdateAsync(persistenceLibrary, cancellationToken).ConfigureAwait(false);
         if (updateLibraryResult.IsFailure)
             return updateLibraryResult.Errors;
+        if (getLibraryResult.Value.LibraryType != newLibraryType)
+        {
+            Result<Success> reconcileResult = await _providerConfigurationStore.ReconcileProviderConfigurationsAsync(command.Id, newLibraryType, cancellationToken).ConfigureAwait(false);
+            if (reconcileResult.IsFailure)
+                return reconcileResult.Errors;
+        }
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         // retrieve the updated media library from the persistence medium and return it

@@ -6,6 +6,7 @@ using Lumina.Application.Common.DomainEvents;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
+using Lumina.Application.Common.Infrastructure.Plugins;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.MediaLibrary.Management.Commands.UpdateLibrary;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
@@ -16,6 +17,7 @@ using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.File
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.Events;
 using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
 using NSubstitute;
 using System;
@@ -41,6 +43,7 @@ public class UpdateLibraryCommandHandlerTests
     private readonly ICurrentUserService _mockCurrentUserService;
     private readonly IDomainEventsQueue _mockDomainEventsQueue;
     private readonly IEnvironmentContext _mockEnvironmentContext;
+    private readonly IMediaLibraryProviderConfigurationStore _mockProviderConfigurationStore;
     private readonly IValidator<UpdateLibraryCommand> _mockValidator;
     private readonly UpdateLibraryCommandHandler _sut;
     private readonly UpdateLibraryCommandFixture _updateLibraryCommandFixture = new();
@@ -59,10 +62,11 @@ public class UpdateLibraryCommandHandlerTests
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
         _mockDomainEventsQueue = Substitute.For<IDomainEventsQueue>();
         _mockEnvironmentContext = Substitute.For<IEnvironmentContext>();
+        _mockProviderConfigurationStore = Substitute.For<IMediaLibraryProviderConfigurationStore>();
         _mockValidator = Substitute.For<IValidator<UpdateLibraryCommand>>();
         _userId = Guid.NewGuid();
 
-        // default stubs: the current user is authenticated, has the manage permission, and the cover image is a valid image
+        // default stubs: the current user is authenticated, has the manage permission, the cover image is a valid image, and the provider configurations are reconciled successfully
         _mockCurrentUserService.UserId.Returns(_userId);
         _mockAuthorizationService.HasPermissionAsync(_userId, Arg.Any<AuthorizationPermission>(), Arg.Any<CancellationToken>())
             .Returns(true);
@@ -70,9 +74,11 @@ public class UpdateLibraryCommandHandlerTests
             .Returns(Result.From(ImageType.PNG));
         _mockLibraryRepository.UpdateAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Updated);
+        _mockProviderConfigurationStore.ReconcileProviderConfigurationsAsync(Arg.Any<Guid>(), Arg.Any<LibraryType>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Success);
         _mockValidator.Validate(Arg.Any<UpdateLibraryCommand>()).Returns([]);
 
-        _sut = new UpdateLibraryCommandHandler(_mockAuthorizationService, _mockCurrentUserService, _mockDomainEventsQueue, _mockEnvironmentContext, _mockUnitOfWork, _mockValidator);
+        _sut = new UpdateLibraryCommandHandler(_mockAuthorizationService, _mockCurrentUserService, _mockDomainEventsQueue, _mockEnvironmentContext, _mockProviderConfigurationStore, _mockUnitOfWork, _mockValidator);
     }
 
     [Fact]
@@ -80,7 +86,9 @@ public class UpdateLibraryCommandHandlerTests
     {
         // Arrange
         UpdateLibraryCommand command = _updateLibraryCommandFixture.Create();
+        LibraryType commandLibraryType = Enum.Parse<LibraryType>(command.LibraryType);
         LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: command.OwnerId);
+        existingLibrary.LibraryType = commandLibraryType == LibraryType.Book ? LibraryType.EBook : LibraryType.Book;
         _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(existingLibrary));
 
@@ -91,8 +99,49 @@ public class UpdateLibraryCommandHandlerTests
         Assert.False(result.IsFailure);
         Assert.Equal(existingLibrary.Id, result.Value.Id);
         await _mockLibraryRepository.Received(1).UpdateAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>());
+        await _mockProviderConfigurationStore.Received(1).ReconcileProviderConfigurationsAsync(
+            command.Id, Arg.Is<LibraryType>(libraryType => libraryType == commandLibraryType), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
         _mockDomainEventsQueue.Received(1).Enqueue(Arg.Any<LibrarySavedDomainEvent>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenLibraryTypeIsUnchanged_ShouldNotReconcileProviderConfigurations()
+    {
+        // Arrange
+        UpdateLibraryCommand command = _updateLibraryCommandFixture.Create();
+        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: command.OwnerId);
+        existingLibrary.LibraryType = Enum.Parse<LibraryType>(command.LibraryType);
+        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(existingLibrary));
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        await _mockProviderConfigurationStore.DidNotReceive().ReconcileProviderConfigurationsAsync(Arg.Any<Guid>(), Arg.Any<LibraryType>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenProviderConfigurationReconciliationFails_ShouldReturnErrorWithoutSaving()
+    {
+        // Arrange
+        UpdateLibraryCommand command = _updateLibraryCommandFixture.Create();
+        LibraryType commandLibraryType = Enum.Parse<LibraryType>(command.LibraryType);
+        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: command.OwnerId);
+        existingLibrary.LibraryType = commandLibraryType == LibraryType.Book ? LibraryType.EBook : LibraryType.Book;
+        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(existingLibrary));
+        _mockProviderConfigurationStore.ReconcileProviderConfigurationsAsync(Arg.Any<Guid>(), Arg.Any<LibraryType>(), Arg.Any<CancellationToken>())
+            .Returns(Error.Failure(description: "Failed to reconcile provider configurations"));
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]

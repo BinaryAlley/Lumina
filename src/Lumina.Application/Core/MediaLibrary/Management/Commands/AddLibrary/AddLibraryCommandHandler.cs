@@ -5,6 +5,7 @@ using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.DomainEvents;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
+using Lumina.Application.Common.Infrastructure.Plugins;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Mapping.MediaLibrary.Management;
 using Lumina.Contracts.Responses.MediaLibrary.Management;
@@ -37,6 +38,7 @@ public class AddLibraryCommandHandler : ICommandHandler<AddLibraryCommand, Resul
     private readonly IDomainEventsQueue _domainEventsQueue;
     private readonly IEnvironmentContext _environmentContext;
     private readonly IAuthorizationService _authorizationService;
+    private readonly IMediaLibraryProviderConfigurationStore _providerConfigurationStore;
     private readonly IValidator<AddLibraryCommand> _validator;
 
     /// <summary>
@@ -46,13 +48,15 @@ public class AddLibraryCommandHandler : ICommandHandler<AddLibraryCommand, Resul
     /// <param name="currentUserService">Injected service to retrieve the current user information.</param>
     /// <param name="domainEventsQueue">Injected service for the queue of domain events.</param>
     /// <param name="environmentContext">Injected facade service for environment contextual services.</param>
+    /// <param name="providerConfigurationStore">Injected store of the provider configurations of the media libraries.</param>
     /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
     /// <param name="validator">Injected validator for application validation rules.</param>
     public AddLibraryCommandHandler(
         IAuthorizationService authorizationService,
-        ICurrentUserService currentUserService, 
+        ICurrentUserService currentUserService,
         IDomainEventsQueue domainEventsQueue,
         IEnvironmentContext environmentContext,
+        IMediaLibraryProviderConfigurationStore providerConfigurationStore,
         IUnitOfWork unitOfWork,
         IValidator<AddLibraryCommand> validator)
     {
@@ -61,6 +65,7 @@ public class AddLibraryCommandHandler : ICommandHandler<AddLibraryCommand, Resul
         _domainEventsQueue = domainEventsQueue;
         _environmentContext = environmentContext;
         _authorizationService = authorizationService;
+        _providerConfigurationStore = providerConfigurationStore;
         _validator = validator;
     }
 
@@ -123,10 +128,15 @@ public class AddLibraryCommandHandler : ICommandHandler<AddLibraryCommand, Resul
 
         // convert the domain library entity to a repository library entity
         LibraryEntity persistenceLibrary = createLibraryResult.Value.ToRepositoryEntity();
-        // insert the repository entity and save changes
+        // insert the repository entity, seed the provider configurations of the new library so that it lists the plugins
+        // providing metadata or artwork for its type, and save the changes
         Result<Created> insertLibraryResult = await _unitOfWork.LibraryRepository.InsertAsync(persistenceLibrary, cancellationToken).ConfigureAwait(false);
         if (insertLibraryResult.IsFailure)
             return insertLibraryResult.Errors;
+        Result<Success> ensureProviderConfigurationsResult = await _providerConfigurationStore.EnsureProviderConfigurationsAsync(
+            createLibraryResult.Value.Id.Value, Enum.Parse<LibraryType>(command.LibraryType!), cancellationToken).ConfigureAwait(false);
+        if (ensureProviderConfigurationsResult.IsFailure)
+            return ensureProviderConfigurationsResult.Errors;
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         // retrieve the newly saved media library from the persistence medium and return it

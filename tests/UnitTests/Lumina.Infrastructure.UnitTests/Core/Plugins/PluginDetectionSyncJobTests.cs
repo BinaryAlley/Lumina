@@ -1,10 +1,14 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
+using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Plugins;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Plugins;
 using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.Plugins;
 using Lumina.Infrastructure.Common.Models.DTO.Plugins;
 using Lumina.Infrastructure.Core.Plugins;
@@ -38,10 +42,13 @@ public class PluginDetectionSyncJobTests
     private readonly IServiceProvider _mockServiceProvider;
     private readonly IUnitOfWork _mockUnitOfWork;
     private readonly IPluginRepository _mockPluginRepository;
+    private readonly ILibraryRepository _mockLibraryRepository;
+    private readonly IMediaLibraryProviderConfigurationStore _mockProviderConfigurationStore;
     private readonly IPluginManager _mockPluginManager;
     private readonly ILogger<PluginDetectionSyncJob> _mockLogger;
     private readonly PluginLoadErrorDtoFixture _pluginLoadErrorDtoFixture;
     private readonly PluginEntityFixture _pluginEntityFixture = new();
+    private readonly LibraryEntityFixture _libraryEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PluginDetectionSyncJobTests"/> class.
@@ -57,7 +64,15 @@ public class PluginDetectionSyncJobTests
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
         _mockPluginRepository = Substitute.For<IPluginRepository>();
         _mockUnitOfWork.PluginRepository.Returns(_mockPluginRepository);
+        _mockLibraryRepository = Substitute.For<ILibraryRepository>();
+        _mockUnitOfWork.LibraryRepository.Returns(_mockLibraryRepository);
+        _mockProviderConfigurationStore = Substitute.For<IMediaLibraryProviderConfigurationStore>();
+        _mockProviderConfigurationStore.RemoveProviderConfigurationsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Deleted);
+        _mockProviderConfigurationStore.EnsureProviderConfigurationsAsync(Arg.Any<Guid>(), Arg.Any<LibraryType>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Success);
         _mockServiceProvider.GetService(typeof(IUnitOfWork)).Returns(_mockUnitOfWork);
+        _mockServiceProvider.GetService(typeof(IMediaLibraryProviderConfigurationStore)).Returns(_mockProviderConfigurationStore);
 
         _mockPluginManager = Substitute.For<IPluginManager>();
         _mockLogger = Substitute.For<ILogger<PluginDetectionSyncJob>>();
@@ -182,6 +197,31 @@ public class PluginDetectionSyncJobTests
         // Assert
         await _mockPluginRepository.Received(1).DeleteByIdAsync(stalePluginRow.Id, Arg.Any<CancellationToken>());
         await _mockPluginRepository.DidNotReceive().DeleteByIdAsync(loadedPluginRow.Id, Arg.Any<CancellationToken>());
+        await _mockProviderConfigurationStore.Received(1).RemoveProviderConfigurationsAsync(stalePluginRow.Id, Arg.Any<CancellationToken>());
+        await _mockProviderConfigurationStore.DidNotReceive().RemoveProviderConfigurationsAsync(loadedPluginRow.Id, Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task StartAsync_WhenMediaLibrariesExist_ShouldEnsureTheirProviderConfigurations()
+    {
+        // Arrange
+        IPlugin loadedPlugin = CreatePlugin(Guid.NewGuid(), "Loaded Plugin", new Version(1, 0, 0));
+        _mockPluginManager.GetPlugins().Returns([loadedPlugin]);
+        _mockPluginRepository.UpsertAsync(Arg.Any<PluginEntity>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From(Result.Updated));
+        LibraryEntity bookLibrary = _libraryEntityFixture.Create(libraryType: LibraryType.Book);
+        _mockLibraryRepository.GetAllAsync(Arg.Any<CancellationToken>())
+            .Returns(Result.From((IEnumerable<LibraryEntity>)[bookLibrary]));
+        _mockProviderConfigurationStore.EnsureProviderConfigurationsAsync(Arg.Any<Guid>(), Arg.Any<LibraryType>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Success);
+        PluginDetectionSyncJob sut = CreateSut();
+
+        // Act
+        await StartAndWaitForExecutionAsync(sut);
+
+        // Assert
+        await _mockProviderConfigurationStore.Received(1).EnsureProviderConfigurationsAsync(bookLibrary.Id, LibraryType.Book, Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
