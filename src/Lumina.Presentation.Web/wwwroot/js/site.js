@@ -76,11 +76,12 @@ async function callApiPostAsync(url, data, options = {}) {
             if (token)
                 headers['RequestVerificationToken'] = token;
         }
-        // make the request
+        // make the request; when no data is provided, send an empty JSON object, because FastEndpoints parses the JSON body when
+        // the content type is application/json, so an empty body would fail to deserialize
         const response = await fetch(url, {
             method: 'POST',
             headers: headers,
-            body: JSON.stringify(data)
+            body: JSON.stringify(data ?? {})
         });
         if (response.redirected) // if a redirect is requested, perform it
             window.location.href = response.url;
@@ -131,11 +132,12 @@ async function callApiPutAsync(url, data, options = {}) {
             if (token)
                 headers['RequestVerificationToken'] = token;
         }
-        // make the request
+        // make the request; when no data is provided, send an empty JSON object, because FastEndpoints parses the JSON body when
+        // the content type is application/json, so an empty body would fail to deserialize
         const response = await fetch(url, {
             method: 'PUT',
             headers: headers,
-            body: JSON.stringify(data)
+            body: JSON.stringify(data ?? {})
         });
         if (response.redirected) // if a redirect is requested, perform it
             window.location.href = response.url;
@@ -233,6 +235,10 @@ function initializeNavigation() {
 
     // handle browser back/forward
     window.addEventListener('popstate', handlePopStateAsync);
+
+    // execute the view scripts of the initially loaded page, now that the application scripts are loaded; the view scripts are
+    // stored with a non-executable type, so the browser does not run them before the application scripts are available
+    processViewScriptsAsync(document.querySelector('[data-section="scripts"]'));
 }
 
 /**
@@ -274,6 +280,72 @@ async function handlePopStateAsync(e) {
         }
         // still fetch fresh content to ensure it's up to date
         await updateContentAsync(e.state.url, false);
+    }
+}
+
+/**
+ * Executes the view scripts of a page, creating executable script elements from the scripts found in the provided source container.
+ * The view scripts are stored with a non-executable type, so that the browser does not run them before the application scripts
+ * are loaded; they are executed here, once the application scripts are available.
+ * @param {Element|null} sourceContainer - The element containing the view scripts to execute.
+ * @returns {Promise<void>} A promise that completes when the external view scripts have loaded.
+ */
+async function processViewScriptsAsync(sourceContainer) {
+    const viewScripts = Array.from(sourceContainer?.getElementsByTagName('script') ?? []);
+    if (viewScripts.length === 0)
+        return;
+
+    // get or create scripts container
+    let scriptsContainer = document.querySelector('[data-section="scripts"]');
+    if (!scriptsContainer) {
+        scriptsContainer = document.createElement('div');
+        scriptsContainer.setAttribute('data-section', 'scripts');
+        document.body.appendChild(scriptsContainer);
+    }
+    // clear existing scripts in container
+    scriptsContainer.innerHTML = '';
+
+    // process view scripts
+    for (const script of viewScripts) {
+        const scriptId = script.getAttribute('data-form');
+        // remove existing script with same Id if it exists
+        const existingScript = document.querySelector(`script[data-form="${scriptId}"]`);
+        if (existingScript)
+            existingScript.remove();
+
+        const newScript = document.createElement('script');
+        // copy script attributes, except the type, which is overridden so that the stored non-executable scripts are executed
+        Array.from(script.attributes).forEach(attr => {
+            if (attr.name !== 'type')
+                newScript.setAttribute(attr.name, attr.value);
+        });
+
+        // handle both inline and external scripts
+        if (script.src) {
+            newScript.src = script.src;
+            // wait for external script to load
+            await new Promise((resolve, reject) => {
+                newScript.onload = resolve;
+                newScript.onerror = reject;
+            });
+        } else {
+            // wrap inline scripts in a safety check
+            newScript.textContent = `
+            (async function() {
+                const safeGetElement = (id) => document.getElementById(id);
+                const safeAddEventListener = (element, e, handler) => {
+                    if (element) 
+                        element.addEventListener(e, handler);
+                };
+                ${script.textContent}
+                // call Initialize function, if defined in this script's scope
+                if (typeof InitializeAsync === 'function') 
+                    await InitializeAsync();
+            })();
+        `;
+        }
+        // add script to scripts container
+        scriptsContainer.appendChild(newScript);
     }
 }
 
@@ -340,59 +412,7 @@ async function updateContentAsync(url, addToHistory) {
                 document.body.appendChild(newScript);
             }
             // process view scripts
-            const viewScripts = doc.querySelector('[data-section="scripts"]')?.getElementsByTagName('script') || [];
-
-            // get or create scripts container
-            let scriptsContainer = document.querySelector('[data-section="scripts"]');
-            if (!scriptsContainer) {
-                scriptsContainer = document.createElement('div');
-                scriptsContainer.setAttribute('data-section', 'scripts');
-                document.body.appendChild(scriptsContainer);
-            }
-            // clear existing scripts in container
-            scriptsContainer.innerHTML = '';
-
-            // process view scripts
-            for (const script of viewScripts) {
-                const scriptId = script.getAttribute('data-form');
-                // remove existing script with same Id if it exists
-                const existingScript = document.querySelector(`script[data-form="${scriptId}"]`);
-                if (existingScript)
-                    existingScript.remove();
-
-                const newScript = document.createElement('script');
-                // copy script attributes
-                Array.from(script.attributes).forEach(attr => {
-                    newScript.setAttribute(attr.name, attr.value);
-                });
-
-                // handle both inline and external scripts
-                if (script.src) {
-                    newScript.src = script.src;
-                    // wait for external script to load
-                    await new Promise((resolve, reject) => {
-                        newScript.onload = resolve;
-                        newScript.onerror = reject;
-                    });
-                } else {
-                    // wrap inline scripts in a safety check
-                    newScript.textContent = `
-                    (async function() {
-                        const safeGetElement = (id) => document.getElementById(id);
-                        const safeAddEventListener = (element, e, handler) => {
-                            if (element) 
-                                element.addEventListener(e, handler);
-                        };
-                        ${script.textContent}
-                        // call Initialize function, if defined in this script's scope
-                        if (typeof InitializeAsync === 'function') 
-                            await InitializeAsync();
-                    })();
-                `;
-                }
-                // add script to scripts container
-                scriptsContainer.appendChild(newScript);
-            }
+            await processViewScriptsAsync(doc.querySelector('[data-section="scripts"]'));
             // bind navigation links in the new content
             bindNavigationLinks();
 
