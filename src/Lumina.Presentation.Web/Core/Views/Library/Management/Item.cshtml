@@ -222,6 +222,22 @@
                         </table>
                         <small class="form-label text-disabled form-description">@_localizer["DescriptionMetadataProviders"]</small>
                     </div>
+                    <h3 class="text-light-two">@_localizer["ArtworkProviders"]</h3>
+                    <div class="form-row">
+                        <table id="artwork-providers-table" class="w-100">
+                            <thead>
+                                <tr>
+                                    <th class="w-50">@_localizer["Name"]</th>
+                                    <th class="w-15 text-center">@_localizer["Enabled"]</th>
+                                    <th class="w-35 text-center">@_localizer["Order"]</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- artwork providers will be populated here -->
+                            </tbody>
+                        </table>
+                        <small class="form-label text-disabled form-description">@_localizer["DescriptionArtworkProviders"]</small>
+                    </div>
                 }
                 <div class="form-row">
                     <button type="submit" class="confirm-button w-100px">@_localizer["Save"]</button>
@@ -435,6 +451,77 @@
             }
         };
 
+        const artworkProvidersTable = document.getElementById('artwork-providers-table');
+        const artworkProvidersTbody = artworkProvidersTable ? artworkProvidersTable.querySelector('tbody') : null;
+
+        // loads the artwork providers configured for the library, when editing an existing library
+        async function loadArtworkProvidersAsync() {
+            if (!id || !artworkProvidersTbody) return;
+            const url = '@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.GET_ARTWORK_PROVIDERS, new { libraryId = default(Guid) })'
+                .replace('/@(default(Guid))', `/${id}`); // libraryId needs to be replaced here, because GetAbsoluteUrl is server side, libraryId is client side
+            const response = await callApiGetAsync(url);
+            if (response && response.length > 0) {
+                artworkProvidersTbody.innerHTML = response.map((provider, index) => renderArtworkProviderRow(provider, index, response.length)).join('');
+            }
+        }
+
+        // renders an artwork provider row of the library
+        function renderArtworkProviderRow(provider, index, count) {
+            return `
+                <tr data-provider-plugin-id="${provider.pluginId}">
+                    <td>${provider.name}</td>
+                    <td class="text-center">
+                        <label class="enlightenment-checkbox-label">
+                            <input type="checkbox" class="enlightenment-checkbox-hidden artwork-provider-enabled" ${provider.isEnabled ? 'checked' : ''} />
+                            <span class="enlightenment-checkbox"></span>
+                        </label>
+                    </td>
+                    <td class="text-center">
+                        <button type="button" class="artwork-provider-move-up confirm-button f-12 h-20px" ${index === 0 ? 'disabled' : ''}>@_localizer["MoveUp"]</button>
+                        <button type="button" class="artwork-provider-move-down abort-button f-12 h-20px" ${index === count - 1 ? 'disabled' : ''}>@_localizer["MoveDown"]</button>
+                    </td>
+                </tr>`;
+        }
+
+        // on artwork provider move button click, reorders the providers and persists the new order
+        async function handleArtworkProviderReorderAsync(e) {
+            const button = e.target.closest('.artwork-provider-move-up, .artwork-provider-move-down');
+            if (!button || !artworkProvidersTbody) return;
+            const row = button.closest('tr');
+            if (button.classList.contains('artwork-provider-move-up')) {
+                const previousRow = row.previousElementSibling;
+                if (previousRow) artworkProvidersTbody.insertBefore(row, previousRow);
+            } else {
+                const nextRow = row.nextElementSibling;
+                if (nextRow) artworkProvidersTbody.insertBefore(nextRow, row);
+            }
+            await saveArtworkProviderOrderAsync();
+        }
+
+        // persists the current order of the artwork providers of the library
+        async function saveArtworkProviderOrderAsync() {
+            if (!id || !artworkProvidersTbody) return;
+            const pluginIds = Array.from(artworkProvidersTbody.querySelectorAll('tr[data-provider-plugin-id]'))
+                .map(row => row.getAttribute('data-provider-plugin-id'));
+            const result = await callApiPutAsync('@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.REORDER_ARTWORK_PROVIDERS)', { libraryId: id, pluginIds: pluginIds });
+            if (result.success) {
+                notificationService.show('@_localizer["OrderSaved"]', NotificationType.SUCCESS);
+            }
+        }
+
+        // on artwork provider enabled checkbox change, persists the new state
+        async function handleArtworkProviderEnabledChangeAsync(e) {
+            if (e.target.matches('.artwork-provider-enabled')) {
+                const row = e.target.closest('tr');
+                const pluginId = row.getAttribute('data-provider-plugin-id');
+                const isEnabled = e.target.checked;
+                const result = await callApiPutAsync('@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.SET_ARTWORK_PROVIDER_ENABLED)', { libraryId: id, pluginId: pluginId, isEnabled: isEnabled });
+                if (!result.success) {
+                    e.target.checked = !isEnabled;
+                }
+            }
+        };
+
         // add listeners
         form.addEventListener('keypress', handleEnterKey);
         form.addEventListener('submit', handleSubmit);
@@ -447,6 +534,10 @@
         if (metadataProvidersTbody) {
             metadataProvidersTbody.addEventListener('click', handleMetadataProviderReorderAsync);
             metadataProvidersTbody.addEventListener('change', handleMetadataProviderEnabledChangeAsync);
+        }
+        if (artworkProvidersTbody) {
+            artworkProvidersTbody.addEventListener('click', handleArtworkProviderReorderAsync);
+            artworkProvidersTbody.addEventListener('change', handleArtworkProviderEnabledChangeAsync);
         }
 
         // register cleanup for these listeners
@@ -463,11 +554,16 @@
                 metadataProvidersTbody.removeEventListener('click', handleMetadataProviderReorderAsync);
                 metadataProvidersTbody.removeEventListener('change', handleMetadataProviderEnabledChangeAsync);
             }
+            if (artworkProvidersTbody) {
+                artworkProvidersTbody.removeEventListener('click', handleArtworkProviderReorderAsync);
+                artworkProvidersTbody.removeEventListener('change', handleArtworkProviderEnabledChangeAsync);
+            }
         });
 
-        // load the metadata providers when editing an existing library
+        // load the metadata and artwork providers when editing an existing library
         if (id) {
             loadMetadataProvidersAsync();
+            loadArtworkProvidersAsync();
         }
 
         // store all cleanups for this view on window object using the scriptId

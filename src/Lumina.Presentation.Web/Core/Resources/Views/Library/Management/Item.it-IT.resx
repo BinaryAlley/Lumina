@@ -336,4 +336,10 @@
   <data name="DescriptionMetadataProviders" xml:space="preserve">
     <value>I fornitori di metadati utilizzati per arricchire gli elementi di questa libreria, nell'ordine in cui vengono provati.</value>
   </data>
+  <data name="ArtworkProviders" xml:space="preserve">
+    <value>Artwork providers</value>
+  </data>
+  <data name="DescriptionArtworkProviders" xml:space="preserve">
+    <value>The artwork providers used to retrieve the covers of the items of this library, in the order they are tried.</value>
+  </data>
 </root>
