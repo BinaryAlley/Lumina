@@ -16,6 +16,8 @@
 @inject IViewLocalizer _localizer
 @inject IUrlService _urlService
 
+@Html.AntiForgeryToken()
+
 <form id="authorization-roles-form" method="post" class="w-100 h-100 mx-auto pl-10 pr-10 pt-10 pb-10">
     <div id="authorization-roles-container">
         <input type="hidden" name="authorization-roles-selected-id" id="authorization-roles-selected-id" value="" />
@@ -81,7 +83,8 @@
 </form>
 
 @section Scripts {
-    <script type="text/javascript" data-form="@scriptId" defer>
+    <!-- The "text/plain" type is a design choice, not a mistake: it keeps the browser from executing this view script during HTML parsing, before site.js defines the API helpers it calls (callApiGetAsync, callApiPostAsync, ...). site.js (which loads deferred) executes these scripts once it is loaded, both on the initial page load and during AJAX navigation. -->
+    <script type="text/plain" data-form="@scriptId">
         // create cleanup registry for this view
         const cleanupFunctions = [];
 
