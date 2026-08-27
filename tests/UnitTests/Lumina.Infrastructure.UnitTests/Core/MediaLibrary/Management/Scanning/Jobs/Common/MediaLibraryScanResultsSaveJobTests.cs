@@ -21,6 +21,7 @@ using NSubstitute;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -38,6 +39,7 @@ public class MediaLibraryScanResultsSaveJobTests
     private readonly IServiceProvider _mockServiceProvider;
     private readonly IUnitOfWork _mockUnitOfWork;
     private readonly ILibraryScanSnapshotRepository _mockSnapshotRepository;
+    private readonly ILibraryScanStagingResultsRepository _mockStagingResultsRepository;
     private readonly IBookRepository _mockBookRepository;
     private readonly IDomainEventPublisher _mockDomainEventPublisher;
     private readonly MediaLibraryScanResultsSaveJob _sut;
@@ -62,8 +64,10 @@ public class MediaLibraryScanResultsSaveJobTests
 
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
         _mockSnapshotRepository = Substitute.For<ILibraryScanSnapshotRepository>();
+        _mockStagingResultsRepository = Substitute.For<ILibraryScanStagingResultsRepository>();
         _mockBookRepository = Substitute.For<IBookRepository>();
         _mockUnitOfWork.LibraryScanSnapshotRepository.Returns(_mockSnapshotRepository);
+        _mockUnitOfWork.LibraryScanStagingResultsRepository.Returns(_mockStagingResultsRepository);
         _mockUnitOfWork.BookRepository.Returns(_mockBookRepository);
         _mockServiceProvider.GetService(typeof(IUnitOfWork)).Returns(_mockUnitOfWork);
 
@@ -89,6 +93,10 @@ public class MediaLibraryScanResultsSaveJobTests
         // Arrange
         _mockSnapshotRepository.GetDeletedPathsAsync(_libraryId.Value, _scanId.Value, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<string>>(["deleted.pdf"]));
+        _mockStagingResultsRepository.GetChangedPathsAsync(_scanId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<string>>(["changed.pdf"]));
+        _mockBookRepository.ResetEnrichmentStateForPathsAsync(_libraryId.Value, Arg.Any<IReadOnlyCollection<string>>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From(Result.Updated));
         _mockSnapshotRepository.ApplySnapshotSwapAsync(_libraryId.Value, _scanId.Value, _userId.Value, Arg.Any<CancellationToken>())
             .Returns(Result.From(Result.Updated));
         _mockSnapshotRepository.GetPathsAsync(_libraryId.Value, Arg.Any<CancellationToken>())
@@ -105,6 +113,7 @@ public class MediaLibraryScanResultsSaveJobTests
         // Assert
         Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
         await _mockDomainEventPublisher.Received(1).PublishAsync(Arg.Is<LibraryMediaItemDeletedDomainEvent>(domainEvent => domainEvent.Path == "deleted.pdf"), Arg.Any<CancellationToken>());
+        await _mockBookRepository.Received(1).ResetEnrichmentStateForPathsAsync(_libraryId.Value, Arg.Is<IReadOnlyCollection<string>>(paths => paths.Any(path => path == "changed.pdf")), Arg.Any<CancellationToken>());
         await _mockBookRepository.Received(1).InsertAsync(Arg.Is<BookEntity>(book => book.Path == "book1.pdf" && book.Title == "book1" && book.MetadataStatus == MetadataStatus.Pending), Arg.Any<CancellationToken>());
         await _mockBookRepository.Received(1).InsertAsync(Arg.Is<BookEntity>(book => book.Path == "book2.pdf" && book.Title == "book2" && book.MetadataStatus == MetadataStatus.Pending), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
@@ -112,10 +121,35 @@ public class MediaLibraryScanResultsSaveJobTests
     }
 
     [Fact]
+    public async Task ExecuteAsync_WhenNoContentChanged_ShouldNotResetTheEnrichmentState()
+    {
+        // Arrange
+        _mockSnapshotRepository.GetDeletedPathsAsync(_libraryId.Value, _scanId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<string>>([]));
+        _mockStagingResultsRepository.GetChangedPathsAsync(_scanId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<string>>([]));
+        _mockSnapshotRepository.ApplySnapshotSwapAsync(_libraryId.Value, _scanId.Value, _userId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From(Result.Updated));
+        _mockSnapshotRepository.GetPathsAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<string>>([]));
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        // no book content changed since the last scan, so the enrichment state of the books must not be reset
+        await _mockBookRepository.DidNotReceive().ResetEnrichmentStateForPathsAsync(Arg.Any<Guid>(), Arg.Any<IReadOnlyCollection<string>>(), Arg.Any<CancellationToken>());
+        Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
+    }
+
+    [Fact]
     public async Task ExecuteAsync_WhenBookAlreadyExists_ShouldSkipInsertingIt()
     {
         // Arrange
         _mockSnapshotRepository.GetDeletedPathsAsync(_libraryId.Value, _scanId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<string>>([]));
+        _mockStagingResultsRepository.GetChangedPathsAsync(_scanId.Value, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<string>>([]));
         _mockSnapshotRepository.ApplySnapshotSwapAsync(_libraryId.Value, _scanId.Value, _userId.Value, Arg.Any<CancellationToken>())
             .Returns(Result.From(Result.Updated));

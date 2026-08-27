@@ -56,16 +56,53 @@ public static class BookMapping
             GoogleBooksId = domainEntity.GoogleBooksId.HasValue ? domainEntity.GoogleBooksId.Value : null,
             BarnesAndNobleId = domainEntity.BarnesAndNobleId.HasValue ? domainEntity.BarnesAndNobleId.Value : null,
             AppleBooksId = domainEntity.AppleBooksId.HasValue ? domainEntity.AppleBooksId.Value : null,
-            CoverImagePath = domainEntity.CoverImagePath.HasValue ? domainEntity.CoverImagePath.Value : null,
             ISBNs = [.. domainEntity.ISBNs.ToRepositoryEntities()],
             Ratings = [.. domainEntity.Ratings.ToRepositoryEntities()],
-            MetadataStatus = domainEntity.MetadataStatus,
-            LastMetadataUpdateUtc = domainEntity.LastMetadataUpdateUtc.HasValue ? domainEntity.LastMetadataUpdateUtc.Value : null,
-            MetadataProvider = domainEntity.MetadataProvider.HasValue ? domainEntity.MetadataProvider.Value : null,
             CreatedOnUtc = domainEntity.CreatedOnUtc,
             CreatedBy = Guid.NewGuid(),
             UpdatedOnUtc = domainEntity.UpdatedOnUtc.HasValue ? domainEntity.UpdatedOnUtc : null,
             UpdatedBy = domainEntity.UpdatedOnUtc.HasValue ? Guid.NewGuid() : null,
         };
+    }
+
+    /// <summary>
+    /// Applies the metadata fields of <paramref name="domainEntity"/> onto the existing <paramref name="entity"/>,
+    /// without touching the enrichment tracking columns, which are managed directly by the enrichment jobs.
+    /// </summary>
+    /// <param name="entity">The repository entity onto which the metadata is applied.</param>
+    /// <param name="domainEntity">The domain entity whose metadata is applied.</param>
+    public static void ApplyMetadataToEntity(this BookEntity entity, Book domainEntity)
+    {
+        entity.Title = domainEntity.Metadata.Title;
+        entity.OriginalTitle = domainEntity.Metadata.OriginalTitle.HasValue ? domainEntity.Metadata.OriginalTitle.Value : null;
+        entity.Description = domainEntity.Metadata.Description.HasValue ? domainEntity.Metadata.Description.Value : null;
+        entity.OriginalReleaseDate = domainEntity.Metadata.ReleaseInfo.OriginalReleaseDate.HasValue ? domainEntity.Metadata.ReleaseInfo.OriginalReleaseDate.Value : null;
+        entity.OriginalReleaseYear = domainEntity.Metadata.ReleaseInfo.OriginalReleaseYear.HasValue ? domainEntity.Metadata.ReleaseInfo.OriginalReleaseYear.Value : null;
+        entity.ReReleaseDate = domainEntity.Metadata.ReleaseInfo.ReReleaseDate.HasValue ? domainEntity.Metadata.ReleaseInfo.ReReleaseDate.Value : null;
+        entity.ReReleaseYear = domainEntity.Metadata.ReleaseInfo.ReReleaseYear.HasValue ? domainEntity.Metadata.ReleaseInfo.ReReleaseYear.Value : null;
+        entity.ReleaseCountry = domainEntity.Metadata.ReleaseInfo.ReleaseCountry.HasValue ? domainEntity.Metadata.ReleaseInfo.ReleaseCountry.Value : null;
+        entity.ReleaseVersion = domainEntity.Metadata.ReleaseInfo.ReleaseVersion.HasValue ? domainEntity.Metadata.ReleaseInfo.ReleaseVersion.Value : null;
+        entity.LanguageCode = domainEntity.Metadata.Language.HasValue ? domainEntity.Metadata.Language.Value.LanguageCode : null;
+        entity.LanguageName = domainEntity.Metadata.Language.HasValue ? domainEntity.Metadata.Language.Value.LanguageName : null;
+        entity.LanguageNativeName = domainEntity.Metadata.Language.HasValue ? domainEntity.Metadata.Language.Value.NativeName.Value : null;
+        entity.OriginalLanguageCode = domainEntity.Metadata.OriginalLanguage.HasValue ? domainEntity.Metadata.OriginalLanguage.Value.LanguageCode : null;
+        entity.OriginalLanguageName = domainEntity.Metadata.OriginalLanguage.HasValue ? domainEntity.Metadata.OriginalLanguage.Value.LanguageName : null;
+        entity.OriginalLanguageNativeName = domainEntity.Metadata.OriginalLanguage.HasValue ? domainEntity.Metadata.OriginalLanguage.Value.NativeName.Value : null;
+        entity.Publisher = domainEntity.Metadata.Publisher.HasValue ? domainEntity.Metadata.Publisher.Value : null;
+        entity.PageCount = domainEntity.Metadata.PageCount.HasValue ? domainEntity.Metadata.PageCount.Value : null;
+        entity.Format = domainEntity.Format.HasValue ? domainEntity.Format.Value : null;
+        entity.Edition = domainEntity.Edition.HasValue ? domainEntity.Edition.Value : null;
+        entity.VolumeNumber = domainEntity.VolumeNumber.HasValue ? domainEntity.VolumeNumber.Value : null;
+        entity.ASIN = domainEntity.ASIN.HasValue ? domainEntity.ASIN.Value : null;
+        entity.GoodreadsId = domainEntity.GoodreadsId.HasValue ? domainEntity.GoodreadsId.Value : null;
+        entity.LCCN = domainEntity.LCCN.HasValue ? domainEntity.LCCN.Value : null;
+        entity.OCLCNumber = domainEntity.OCLCNumber.HasValue ? domainEntity.OCLCNumber.Value : null;
+        entity.OpenLibraryId = domainEntity.OpenLibraryId.HasValue ? domainEntity.OpenLibraryId.Value : null;
+        entity.LibraryThingId = domainEntity.LibraryThingId.HasValue ? domainEntity.LibraryThingId.Value : null;
+        entity.GoogleBooksId = domainEntity.GoogleBooksId.HasValue ? domainEntity.GoogleBooksId.Value : null;
+        entity.BarnesAndNobleId = domainEntity.BarnesAndNobleId.HasValue ? domainEntity.BarnesAndNobleId.Value : null;
+        entity.AppleBooksId = domainEntity.AppleBooksId.HasValue ? domainEntity.AppleBooksId.Value : null;
+        entity.UpdatedOnUtc = DateTime.UtcNow;
+        entity.UpdatedBy = Guid.NewGuid();
     }
 }

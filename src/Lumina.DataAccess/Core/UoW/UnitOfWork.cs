@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Repositories.Authorization;
 using Lumina.Application.Common.DataAccess.Repositories.Books;
+using Lumina.Application.Common.DataAccess.Repositories.MediaContributors;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Themes;
@@ -9,6 +10,7 @@ using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.DataAccess.Core.Repositories.Authorization;
 using Lumina.DataAccess.Core.Repositories.Books;
 using Lumina.DataAccess.Core.Repositories.Libraries;
+using Lumina.DataAccess.Core.Repositories.MediaContributors;
 using Lumina.DataAccess.Core.Repositories.Plugins;
 using Lumina.DataAccess.Core.Repositories.Themes;
 using Lumina.DataAccess.Core.Repositories.Users;
@@ -33,6 +35,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     private IRoleRepository? _roleRepository;
     private IUserRoleRepository? _userRoleRepository;
     private IBookRepository? _bookRepository;
+    private IMediaContributorRepository? _mediaContributorRepository;
     private IDirectoryScanFingerprintRepository? _directoryScanFingerprintRepository;
     private ILibraryRepository? _libraryRepository;
     private ILibraryScanRepository? _libraryScanRepository;
@@ -102,6 +105,15 @@ public class UnitOfWork : IUnitOfWork, IDisposable
         {
             _bookRepository ??= new BookRepository(_luminaDbContext);
             return _bookRepository;
+        }
+    }
+
+    public IMediaContributorRepository MediaContributorRepository
+    {
+        get
+        {
+            _mediaContributorRepository ??= new MediaContributorRepository(_luminaDbContext);
+            return _mediaContributorRepository;
         }
     }
 

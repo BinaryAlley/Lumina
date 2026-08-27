@@ -1474,24 +1474,6 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     }
 
     [Fact]
-    public async Task AddBook_WhenCalledWithInvalidLengthContributorRoleCategory_ShouldReturnUnprocessableEntity()
-    {
-        // Arrange
-        AddBookRequest bookRequest = _requestBookFixture.Create();
-        bookRequest = bookRequest with
-        {
-            Contributors = [.. bookRequest.Contributors!.Select((contributor, index) => index == 0 ? contributor with
-            { Role = contributor.Role! with { Category = new Faker().Random.String2(100) } } : contributor)]
-        };
-
-        // Act
-        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/books", bookRequest);
-
-        // Assert
-        await AssertUnprocessableEntityWithValidationErrors(response, Errors.MediaContributor.RoleCategoryMustBeMaximum50CharactersLong.Description);
-    }
-
-    [Fact]
     public async Task AddBook_WhenCalledWithNullRatings_ShouldReturnUnprocessableEntity()
     {
         // Arrange

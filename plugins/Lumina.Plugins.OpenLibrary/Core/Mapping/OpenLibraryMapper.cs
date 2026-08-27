@@ -5,6 +5,7 @@ using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
 using Lumina.Plugins.OpenLibrary.Common.Models.Contracts.Responses;
 using System;
 using System.Collections.Generic;
@@ -272,7 +273,7 @@ internal static partial class OpenLibraryMapper
         List<MediaContributorDto> result = [];
         HashSet<string> seen = new(StringComparer.OrdinalIgnoreCase);
 
-        void Add(string? displayName, string? legalName, string role, string category)
+        void Add(string? displayName, string? legalName, string role, MediaContributorRoleCategory category)
         {
             if (string.IsNullOrWhiteSpace(displayName) || !seen.Add($"{displayName}|{role}"))
                 return;
@@ -280,9 +281,9 @@ internal static partial class OpenLibraryMapper
         }
 
         foreach (OpenLibraryAuthorResponse author in authors)
-            Add(author.Name, author.PersonalName, "Author", "Writing");
+            Add(author.Name, author.PersonalName, "Author", MediaContributorRoleCategory.Author);
         foreach (string authorName in fallbackAuthors ?? [])
-            Add(authorName, null, "Author", "Writing");
+            Add(authorName, null, "Author", MediaContributorRoleCategory.Author);
 
         foreach (string contribution in contributions ?? [])
         {
@@ -490,24 +491,24 @@ internal static partial class OpenLibraryMapper
     }
 
     /// <summary>
-    /// Maps a contributor role into a contributor category.
+    /// Maps a contribution role into the canonical category of the role.
     /// </summary>
     /// <param name="role">The role to categorize.</param>
-    /// <returns>The mapped contributor category.</returns>
-    private static string ContributorCategory(string role)
+    /// <returns>The canonical category of the role.</returns>
+    private static MediaContributorRoleCategory ContributorCategory(string role)
     {
         if (role.Contains("illustr", StringComparison.OrdinalIgnoreCase) ||
             role.Contains("artist", StringComparison.OrdinalIgnoreCase))
-            return "Art";
+            return MediaContributorRoleCategory.Illustrator;
         if (role.Contains("translat", StringComparison.OrdinalIgnoreCase))
-            return "Translation";
+            return MediaContributorRoleCategory.Translator;
+        if (role.Contains("narrat", StringComparison.OrdinalIgnoreCase))
+            return MediaContributorRoleCategory.Narrator;
         if (role.Contains("edit", StringComparison.OrdinalIgnoreCase) ||
             role.Contains("author", StringComparison.OrdinalIgnoreCase) ||
             role.Contains("writer", StringComparison.OrdinalIgnoreCase))
-            return "Writing";
-        if (role.Contains("narrat", StringComparison.OrdinalIgnoreCase))
-            return "Performance";
-        return "Other";
+            return MediaContributorRoleCategory.Author;
+        return MediaContributorRoleCategory.Other;
     }
 
     /// <summary>

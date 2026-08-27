@@ -146,6 +146,30 @@ internal sealed class LibraryScanStagingResultsRepository : ILibraryScanStagingR
     }
 
     /// <summary>
+    /// Gets the paths of the media library scan staging results of the current scan that changed, meaning their content needs to be re-hashed
+    /// and the books stored at those paths need to be re-enriched, excluding the staging results that are new.
+    /// </summary>
+    /// <param name="scanId">The unique identifier of the media library scan whose staging results are retrieved.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the paths of the changed staging results, or an error.</returns>
+    public async Task<Result<IReadOnlyList<string>>> GetChangedPathsAsync(Guid scanId, CancellationToken cancellationToken)
+    {
+        await using SqliteConnection connection = await OpenConnectionAsync(cancellationToken).ConfigureAwait(false);
+        const string GET_CHANGED_PATHS_SQL = """
+            SELECT Path
+            FROM LibraryScanStagingResults
+            WHERE LibraryScanId = @scanId
+              AND NeedsRehash = 1
+              AND IsNew = 0;
+            """;
+
+        CommandDefinition command = new(GET_CHANGED_PATHS_SQL, new { scanId }, cancellationToken: cancellationToken);
+
+        IEnumerable<string> paths = await connection.QueryAsync<string>(command).ConfigureAwait(false);
+        return paths.ToList();
+    }
+
+    /// <summary>
     /// Updates the content hashes of the provided media library scan staging results.
     /// </summary>
     /// <param name="scanId">The unique identifier of the media library scan whose staging results are updated.</param>

@@ -70,6 +70,21 @@ internal class FileHashService : IFileHashService
     }
 
     /// <summary>
+    /// Computes the content hash of the file stored at <paramref name="filePath"/>, by sampling chunks from it.
+    /// </summary>
+    /// <param name="filePath">The path of the file to hash.</param>
+    /// <returns>The content hash of the file.</returns>
+    public ulong ComputeFileHash(string filePath)
+    {
+        long fileSize = new FileInfo(filePath).Length;
+        if (fileSize == 0)
+            return s_emptyFileHash; // precomputed constant: XxHash64 hash of zero-length input
+
+        ushort bufferSize = (ushort)Math.Min(DEFAULT_BUFFER_SIZE, fileSize);
+        return ComputeFileHash(filePath, fileSize, bufferSize);
+    }
+
+    /// <summary>
     /// Computes content hash using memory-mapped sampling.
     /// </summary>
     /// <param name="filePath">The path of the file to hash.</param>

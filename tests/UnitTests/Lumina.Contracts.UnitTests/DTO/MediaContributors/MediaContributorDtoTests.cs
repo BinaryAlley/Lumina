@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.DTO.MediaContributors;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 #endregion
@@ -23,7 +24,7 @@ public class MediaContributorDtoTests
         // Arrange
         MediaContributorDto expected = new(
             new MediaContributorNameDto("John Smith", "Johnathan Smith"),
-            new MediaContributorRoleDto("Author", "Writer")
+            new MediaContributorRoleDto("Author", MediaContributorRoleCategory.Author)
         );
 
         // Act

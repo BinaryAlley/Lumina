@@ -40,7 +40,7 @@ public class BookLibraryTypeScannerTests
     }
 
     [Fact]
-    public void CreateScanJobsForLibrary_WhenCalled_ShouldCreateJobChainWithMetadataEnrichment()
+    public void CreateScanJobsForLibrary_WhenCalled_ShouldCreateJobChainWithEnrichmentJobs()
     {
         // Arrange
         LibraryId libraryId = _libraryIdFixture.Create();
@@ -48,7 +48,9 @@ public class BookLibraryTypeScannerTests
         TestScanJob diffJob = CreateJob<IMediaLibraryScanDiffJob>();
         TestScanJob hashJob = CreateJob<IMediaLibraryScanHashJob>();
         TestScanJob saveJob = CreateJob<IMediaLibraryScanResultsSaveJob>();
+        TestScanJob invalidationJob = CreateJob<IMediaLibraryScanProviderConfigurationInvalidationJob>();
         TestScanJob enrichmentJob = CreateJob<IMediaLibraryScanMetadataEnrichmentJob>();
+        TestScanJob artworkEnrichmentJob = CreateJob<IMediaLibraryScanArtworkEnrichmentJob>();
         BookLibraryTypeScanner sut = new(_mockJobFactory);
 
         // Act
@@ -63,9 +65,14 @@ public class BookLibraryTypeScannerTests
         Assert.Contains(diffJob, hashJob.Parents);
         Assert.Contains(saveJob, hashJob.Children);
         Assert.Contains(hashJob, saveJob.Parents);
-        Assert.Contains(enrichmentJob, saveJob.Children);
-        Assert.Contains(saveJob, enrichmentJob.Parents);
+        Assert.Contains(invalidationJob, saveJob.Children);
+        Assert.Contains(saveJob, invalidationJob.Parents);
+        Assert.Contains(enrichmentJob, invalidationJob.Children);
+        Assert.Contains(invalidationJob, enrichmentJob.Parents);
+        Assert.Contains(artworkEnrichmentJob, enrichmentJob.Children);
+        Assert.Contains(enrichmentJob, artworkEnrichmentJob.Parents);
         _mockJobFactory.Received(1).CreateJob<IMediaLibraryScanMetadataEnrichmentJob>(libraryId);
+        _mockJobFactory.Received(1).CreateJob<IMediaLibraryScanArtworkEnrichmentJob>(libraryId);
     }
 
     [Fact]
@@ -77,7 +84,9 @@ public class BookLibraryTypeScannerTests
         CreateJob<IMediaLibraryScanDiffJob>();
         CreateJob<IMediaLibraryScanHashJob>();
         CreateJob<IMediaLibraryScanResultsSaveJob>();
+        CreateJob<IMediaLibraryScanProviderConfigurationInvalidationJob>();
         CreateJob<IMediaLibraryScanMetadataEnrichmentJob>();
+        CreateJob<IMediaLibraryScanArtworkEnrichmentJob>();
         BookLibraryTypeScanner sut = new(_mockJobFactory);
 
         // Act
@@ -88,7 +97,9 @@ public class BookLibraryTypeScannerTests
         _mockJobFactory.Received(1).CreateJob<IMediaLibraryScanDiffJob>(libraryId);
         _mockJobFactory.Received(1).CreateJob<IMediaLibraryScanHashJob>(libraryId);
         _mockJobFactory.Received(1).CreateJob<IMediaLibraryScanResultsSaveJob>(libraryId);
+        _mockJobFactory.Received(1).CreateJob<IMediaLibraryScanProviderConfigurationInvalidationJob>(libraryId);
         _mockJobFactory.Received(1).CreateJob<IMediaLibraryScanMetadataEnrichmentJob>(libraryId);
+        _mockJobFactory.Received(1).CreateJob<IMediaLibraryScanArtworkEnrichmentJob>(libraryId);
     }
 
     private TestScanJob CreateJob<TJob>() where TJob : class, IMediaLibraryScanJob
@@ -111,7 +122,9 @@ public class BookLibraryTypeScannerTests
         IMediaLibraryScanDiffJob,
         IMediaLibraryScanHashJob,
         IMediaLibraryScanResultsSaveJob,
-        IMediaLibraryScanMetadataEnrichmentJob
+        IMediaLibraryScanProviderConfigurationInvalidationJob,
+        IMediaLibraryScanMetadataEnrichmentJob,
+        IMediaLibraryScanArtworkEnrichmentJob
     {
         /// <summary>
         /// Executes the payload of the media library scan job.

@@ -71,9 +71,21 @@ public class LibraryEntity : IStorageEntity, IAuditableEntity
     public bool ShouldSaveMetadataInMediaDirectories { get; init; }
 
     /// <summary>
-    /// Gets whether this media library should skip the directories whose contents have not changed since the last scan, during the scan.
+    /// Gets or sets whether the unchanged directories are skipped during the scan of the media library.
     /// </summary>
     public bool ShouldSkipUnchangedDirectoriesDuringScan { get; init; }
+
+    /// <summary>
+    /// Gets or sets the fingerprint of the metadata provider configuration of the media library, used to detect
+    /// whether the configuration changed since the last scan, and thus whether the books need re-enrichment.
+    /// </summary>
+    public string? MetadataProvidersConfigurationFingerprint { get; set; }
+
+    /// <summary>
+    /// Gets or sets the fingerprint of the artwork provider configuration of the media library, used to detect
+    /// whether the configuration changed since the last scan, and thus whether the books need their artwork re-resolved.
+    /// </summary>
+    public string? ArtworkProvidersConfigurationFingerprint { get; set; }
 
     /// <summary>
     /// Gets the user that owns the media library.

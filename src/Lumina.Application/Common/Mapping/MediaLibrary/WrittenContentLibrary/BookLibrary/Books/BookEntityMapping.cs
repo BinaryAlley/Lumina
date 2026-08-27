@@ -10,11 +10,13 @@ using Lumina.Contracts.Responses.Common;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Common.ValueObjects.Metadata;
+using Lumina.Domain.Core.BoundedContexts.MediaContributorBoundedContext.MediaContributorAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.ExternalIdentifiers.LibraryManagementBoundedContext.LibraryAggregate;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -131,13 +133,10 @@ public static class BookEntityMapping
             repositoryEntity.CreatedOnUtc,
             Optional<DateTime>.FromNullable(repositoryEntity.UpdatedOnUtc),
             [.. isbnsResult.Select(isbn => isbn.Value)],
-            [],
+            [.. repositoryEntity.BookContributors.Select(bookContributor => MediaContributorId.Create(bookContributor.MediaContributorId))],
             [.. bookRatingsResult.Select(bookRating => bookRating.Value)]);
         if (bookResult.IsFailure)
             return bookResult.Errors;
-
-        if (repositoryEntity.CoverImagePath is not null)
-            bookResult.Value.SetBookCoverImagePath(repositoryEntity.CoverImagePath);
 
         return bookResult;
     }
@@ -225,7 +224,7 @@ public static class BookEntityMapping
             repositoryEntity.MetadataProvider,
             repositoryEntity.CreatedOnUtc,
             repositoryEntity.UpdatedOnUtc,
-            repositoryEntity.CoverImagePath
+            repositoryEntity.BookArtwork.FirstOrDefault(artwork => artwork.ArtworkType == ArtworkType.Cover)?.FileName
         );
     }
 
@@ -267,7 +266,7 @@ public static class BookEntityMapping
             repositoryEntity.Id,
             repositoryEntity.Title,
             repositoryEntity.ReReleaseYear ?? repositoryEntity.OriginalReleaseYear,
-            repositoryEntity.CoverImagePath
+            repositoryEntity.BookArtwork.FirstOrDefault(artwork => artwork.ArtworkType == ArtworkType.Cover)?.FileName
         );
     }
 

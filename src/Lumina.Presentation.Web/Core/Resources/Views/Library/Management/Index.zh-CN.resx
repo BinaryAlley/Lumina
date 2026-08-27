@@ -255,6 +255,12 @@
   <data name="SavingScanData" xml:space="preserve">
     <value>正在保存扫描数据...</value>
   </data>
+  <data name="InvalidatingStaleEnrichment" xml:space="preserve">
+    <value>正在使过期的补全失效...</value>
+  </data>
+  <data name="ResolvingArtwork" xml:space="preserve">
+    <value>正在获取封面图...</value>
+  </data>
   <data name="Scan" xml:space="preserve">
     <value>扫描</value>
   </data>

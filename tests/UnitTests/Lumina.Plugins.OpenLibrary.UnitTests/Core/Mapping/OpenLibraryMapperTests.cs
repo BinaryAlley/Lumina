@@ -6,6 +6,7 @@ using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
 using Lumina.Plugins.OpenLibrary.Common.Models.Contracts.Responses;
 using Lumina.Plugins.OpenLibrary.Core.Mapping;
 using Lumina.Plugins.OpenLibrary.Fixtures.Common.Models.Contracts.Responses;
@@ -276,7 +277,7 @@ public class OpenLibraryMapperTests
         Assert.Contains(result.ISBNs!, isbn => isbn.Value == "9780306406157" && isbn.Format == IsbnFormat.Isbn13);
         Assert.Contains(result.ISBNs!, isbn => isbn.Value == "0306406152" && isbn.Format == IsbnFormat.Isbn10);
         Assert.Contains(result.Contributors!, contributor => contributor.Name!.DisplayName == "Test Author" && contributor.Name.LegalName == "Test Personal Name" && contributor.Role!.Name == "Author");
-        Assert.Contains(result.Contributors!, contributor => contributor.Name!.DisplayName == "John Smith" && contributor.Role!.Name == "Illustrator" && contributor.Role.Category == "Art");
+        Assert.Contains(result.Contributors!, contributor => contributor.Name!.DisplayName == "John Smith" && contributor.Role!.Name == "Illustrator" && contributor.Role.Category == MediaContributorRoleCategory.Illustrator);
         BookRatingDto mappedRating = Assert.Single(result.Ratings!);
         Assert.Equal(4.2m, mappedRating.Value);
         Assert.Equal(5m, mappedRating.MaxValue);

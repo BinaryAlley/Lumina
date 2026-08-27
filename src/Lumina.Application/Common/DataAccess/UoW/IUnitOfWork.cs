@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Repositories.Authorization;
 using Lumina.Application.Common.DataAccess.Repositories.Books;
+using Lumina.Application.Common.DataAccess.Repositories.MediaContributors;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Themes;
@@ -40,6 +41,11 @@ public interface IUnitOfWork
     /// Gets the book repository.
     /// </summary>
     IBookRepository BookRepository { get; }
+
+    /// <summary>
+    /// Gets the media contributor repository.
+    /// </summary>
+    IMediaContributorRepository MediaContributorRepository { get; }
 
     /// <summary>
     /// Gets the directory scan fingerprint repository.

@@ -21,4 +21,11 @@ public interface IFileHashService
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>A collection of the hashed files, along with their hashes.</returns>
     Task<List<HashedFileSystemFileDto>> HashFilesAsync(IReadOnlyCollection<HashedFileSystemFileDto> files, Func<Task> callback, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Computes the content hash of the file stored at <paramref name="filePath"/>, by sampling chunks from it.
+    /// </summary>
+    /// <param name="filePath">The path of the file to hash.</param>
+    /// <returns>The content hash of the file.</returns>
+    ulong ComputeFileHash(string filePath);
 }

@@ -1,5 +1,8 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Models.Core;
+using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
 using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
@@ -7,42 +10,47 @@ using System.Diagnostics;
 namespace Lumina.Domain.Core.BoundedContexts.MediaContributorBoundedContext.MediaContributorAggregate.ValueObjects;
 
 /// <summary>
-/// Value Object for the role of a media contributor.
+/// Value Object for the role of a media contributor in a media item.
+/// The role carries both a free-form display name, as returned by the metadata providers, and the canonical
+/// category the display name normalizes to, so that roles describing the same kind of contribution are never
+/// treated as distinct.
 /// </summary>
 [DebuggerDisplay("{DisplayName}")]
 public sealed class MediaContributorRole : ValueObject
 {
     /// <summary>
-    /// Gets the value representing this object.
+    /// Gets the display name of the role.
     /// </summary>
-    public string Name { get; }
+    public string DisplayName { get; }
 
     /// <summary>
-    /// Gets the category of this object.
+    /// Gets the canonical category of the role.
     /// </summary>
-    public string Category { get; }
+    public MediaContributorRoleCategory Category { get; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MediaContributorRole"/> class.
     /// </summary>
-    /// <param name="name">The value representing this object.</param>
-    /// <param name="category">The category of this object.</param>
-    private MediaContributorRole(string name, string category)
+    /// <param name="displayName">The display name of the role.</param>
+    /// <param name="category">The canonical category of the role.</param>
+    private MediaContributorRole(string displayName, MediaContributorRoleCategory category)
     {
-        Name = name;
+        DisplayName = displayName;
         Category = category;
     }
 
     /// <summary>
-    /// Creates a new instance of the <see cref="MediaContributorRole"/> class, from a pre-existing <paramref name="value"/>.
+    /// Creates a new instance of the <see cref="MediaContributorRole"/> class, from a display <paramref name="displayName"/> and its canonical <paramref name="category"/>.
     /// </summary>
-    /// <param name="name">The value representing this object.</param>
-    /// <param name="category">The category of this object.</param>
+    /// <param name="displayName">The display name of the role.</param>
+    /// <param name="category">The canonical category of the role.</param>
     /// <returns>The created <see cref="MediaContributorRole"/> instance.</returns>
-    public static MediaContributorRole Create(string name, string category)
+    public static Result<MediaContributorRole> Create(string displayName, MediaContributorRoleCategory category)
     {
-        // TODO: enforce invariants
-        return new MediaContributorRole(name, category);
+        if (string.IsNullOrWhiteSpace(displayName))
+            return Errors.MediaContributors.MediaContributorRoleNameCannotBeEmpty;
+
+        return new MediaContributorRole(displayName, category);
     }
 
     /// <summary>
@@ -51,7 +59,7 @@ public sealed class MediaContributorRole : ValueObject
     /// <returns>A list of items defining the equality.</returns>
     public override IEnumerable<object> GetEqualityComponents()
     {
-        yield return Name;
+        yield return DisplayName;
         yield return Category;
     }
 }

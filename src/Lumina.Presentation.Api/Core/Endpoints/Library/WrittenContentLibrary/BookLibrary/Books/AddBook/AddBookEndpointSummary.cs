@@ -6,6 +6,7 @@ using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -99,7 +100,7 @@ public class AddLibraryEndpointSummary : Summary<AddBookEndpoint, AddBookRequest
                     ),
                     Role: new MediaContributorRoleDto(
                         Name: "author",
-                        Category: "book"
+                        Category: MediaContributorRoleCategory.Author
                     )
                 ),
                 new(
@@ -109,7 +110,7 @@ public class AddLibraryEndpointSummary : Summary<AddBookEndpoint, AddBookRequest
                     ),
                     Role: new MediaContributorRoleDto(
                         Name: "illustrator",
-                        Category: "book"
+                        Category: MediaContributorRoleCategory.Illustrator
                     )
                 )
             ],
@@ -252,7 +253,7 @@ public class AddLibraryEndpointSummary : Summary<AddBookEndpoint, AddBookRequest
                         ),
                         Role: new MediaContributorRoleDto(
                             Name: "author",
-                            Category: "book"
+                            Category: MediaContributorRoleCategory.Author
                         )
                     ),
                     new(
@@ -262,7 +263,7 @@ public class AddLibraryEndpointSummary : Summary<AddBookEndpoint, AddBookRequest
                         ),
                         Role: new MediaContributorRoleDto(
                             Name: "illustrator",
-                            Category: "book"
+                            Category: MediaContributorRoleCategory.Illustrator
                         )
                     )
                 ],
@@ -391,7 +392,6 @@ public class AddLibraryEndpointSummary : Summary<AddBookEndpoint, AddBookRequest
                             "RoleNameCannotBeEmpty",
                             "RoleNameMustBeMaximum50CharactersLong",
                             "RoleCategoryCannotBeEmpty",
-                            "RoleCategoryMustBeMaximum50CharactersLong",
                             "RatingsListCannotBeNull",
                             "RatingValueMustBePositive",
                             "RatingValueCannotBeGreaterThanMaxValue",

@@ -4,6 +4,7 @@ using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
 using Lumina.Plugins.Calibre.Common.Models.DTO.Opf;
 using System;
 using System.Collections.Generic;
@@ -123,7 +124,7 @@ internal static class CalibreMapper
         List<MediaContributorDto> result = [];
         HashSet<string> seen = new(StringComparer.OrdinalIgnoreCase);
 
-        void Add(string? displayName, string role, string category)
+        void Add(string? displayName, string role, MediaContributorRoleCategory category)
         {
             if (string.IsNullOrWhiteSpace(displayName) || !seen.Add($"{displayName}|{role}"))
                 return;
@@ -134,7 +135,7 @@ internal static class CalibreMapper
         }
 
         foreach (OpfCreatorDto creator in creators)
-            Add(creator.Name, "Author", "Writing");
+            Add(creator.Name, "Author", MediaContributorRoleCategory.Author);
         foreach (OpfContributorDto contributor in contributors)
             Add(contributor.Name, MapContributorRole(contributor.Role), MapContributorCategory(contributor.Role));
 
@@ -223,20 +224,20 @@ internal static class CalibreMapper
     }
 
     /// <summary>
-    /// Maps a creator or contributor role code into a contributor category.
+    /// Maps a creator or contributor role code into the canonical category of the role.
     /// </summary>
     /// <param name="role">The role code to map.</param>
-    /// <returns>The mapped contributor category.</returns>
-    private static string MapContributorCategory(string? role)
+    /// <returns>The canonical category of the role.</returns>
+    private static MediaContributorRoleCategory MapContributorCategory(string? role)
     {
         if (string.Equals(role, "aut", StringComparison.OrdinalIgnoreCase) || role?.Contains("author", StringComparison.OrdinalIgnoreCase) == true)
-            return "Writing";
+            return MediaContributorRoleCategory.Author;
         if (string.Equals(role, "ill", StringComparison.OrdinalIgnoreCase))
-            return "Art";
+            return MediaContributorRoleCategory.Illustrator;
         if (string.Equals(role, "trl", StringComparison.OrdinalIgnoreCase))
-            return "Translation";
+            return MediaContributorRoleCategory.Translator;
         if (string.Equals(role, "bkp", StringComparison.OrdinalIgnoreCase))
-            return "Production";
-        return "Other";
+            return MediaContributorRoleCategory.Publisher;
+        return MediaContributorRoleCategory.Other;
     }
 }

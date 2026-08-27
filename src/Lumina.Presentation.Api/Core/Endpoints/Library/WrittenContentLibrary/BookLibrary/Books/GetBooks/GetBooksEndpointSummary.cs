@@ -7,6 +7,7 @@ using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.B
 using Lumina.Contracts.Responses.Common;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
 using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using System;
 using System.Collections.Generic;
@@ -122,7 +123,7 @@ public class GetBooksEndpointSummary : Summary<GetBooksEndpoint, GetBooksRequest
                                 ),
                                 Role: new MediaContributorRoleDto(
                                     Name: "author",
-                                    Category: "book"
+                                    Category: MediaContributorRoleCategory.Author
                                 )
                             ),
                             new(
@@ -132,7 +133,7 @@ public class GetBooksEndpointSummary : Summary<GetBooksEndpoint, GetBooksRequest
                                 ),
                                 Role: new MediaContributorRoleDto(
                                     Name: "illustrator",
-                                    Category: "book"
+                                    Category: MediaContributorRoleCategory.Illustrator
                                 )
                             )
                         ],
@@ -229,7 +230,7 @@ public class GetBooksEndpointSummary : Summary<GetBooksEndpoint, GetBooksRequest
                                 ),
                                 Role: new MediaContributorRoleDto(
                                     Name: "author",
-                                    Category: "book"
+                                    Category: MediaContributorRoleCategory.Author
                                 )
                             ),
                             new(
@@ -239,7 +240,7 @@ public class GetBooksEndpointSummary : Summary<GetBooksEndpoint, GetBooksRequest
                                 ),
                                 Role: new MediaContributorRoleDto(
                                     Name: "illustrator",
-                                    Category: "book"
+                                    Category: MediaContributorRoleCategory.Illustrator
                                 )
                             )
                         ],

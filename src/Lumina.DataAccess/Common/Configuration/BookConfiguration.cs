@@ -152,27 +152,15 @@ public class BookConfiguration : IEntityTypeConfiguration<BookEntity>
         builder.Property(book => book.UpdatedOnUtc)
             .HasColumnOrder(31);
 
-        //builder.HasMany<ContributorIdModel>()
-        //.WithMany()
-        //.UsingEntity<Dictionary<string, object>>(
-        //    "BookContributors",
-        //    j => j.HasOne<ContributorIdModel>().WithMany().HasForeignKey("ContributorId"),
-        //    j => j.HasOne<BookModel>().WithMany().HasForeignKey("BookId"),
-        //    j =>
-        //    {
-        //        j.HasKey("BookId", "ContributorId");
-        //        j.ToTable("BookContributors");
-        //    });
+        builder.HasMany(book => book.BookContributors)
+            .WithOne()
+            .HasForeignKey(bookContributor => bookContributor.BookId)
+            .OnDelete(DeleteBehavior.Cascade);
 
-        //builder.OwnsMany(book => book.ContributorIds, ownedBuilder =>
-        //{
-        //    ownedBuilder.ToTable("BookContributors");
-        //    ownedBuilder.WithOwner().HasForeignKey("BookId");
-        //    ownedBuilder.Property(c => c.Id)
-        //        .HasColumnName("ContributorId")
-        //        .HasColumnType("uniqueidentifier");
-        //    ownedBuilder.HasKey("BookId", "Id"); // Use the actual property name 'Id' here
-        //});
+        builder.HasMany(book => book.BookArtwork)
+            .WithOne()
+            .HasForeignKey(bookArtwork => bookArtwork.BookId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.OwnsMany(book => book.Ratings, ratingBuilder =>
         {
@@ -241,13 +229,3 @@ public class BookConfiguration : IEntityTypeConfiguration<BookEntity>
         builder.HasIndex(book => new { book.LibraryId, book.MetadataStatus });
     }
 }
-
-//public class ContributorConfiguration : IEntityTypeConfiguration<ContributorIdModel>
-//{
-//    public void Configure(EntityTypeBuilder<ContributorIdModel> builder)
-//    {
-//        builder.ToTable("Contributors");
-//        builder.HasKey(c => c.Id);
-//        builder.Property(c => c.Id).ValueGeneratedNever();
-//    }
-//}

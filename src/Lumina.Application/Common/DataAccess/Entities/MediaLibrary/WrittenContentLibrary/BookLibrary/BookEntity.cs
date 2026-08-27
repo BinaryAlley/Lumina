@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Common;
+using Lumina.Application.Common.DataAccess.Entities.MediaContributors;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using System;
 using System.Collections.Generic;
@@ -191,19 +192,19 @@ public class BookEntity : IStorageEntity, IAuditableEntity
     public string? AppleBooksId { get; set; }
 
     /// <summary>
-    /// Gets or sets the file system path of the cover image of the book, if applicable.
-    /// </summary>
-    public string? CoverImagePath { get; set; }
-
-    /// <summary>
     /// Gets or sets the list of ISBN (International Standard Book Number) of the book.
     /// </summary>
     public List<IsbnEntity> ISBNs { get; set; } = [];
 
     /// <summary>
-    /// Gets or sets the list of media contributors (actors, directors, etc) starring in this book.
+    /// Gets or sets the participations of the media contributors in the book, each carrying the role the contributor played.
     /// </summary>
-    //public List<ContributorIdModel> ContributorIds { get; set; } = [];
+    public List<BookContributorEntity> BookContributors { get; set; } = [];
+
+    /// <summary>
+    /// Gets or sets the pieces of artwork of the book, each tracked independently with its own enrichment state.
+    /// </summary>
+    public List<BookArtworkEntity> BookArtwork { get; set; } = [];
 
     /// <summary>
     /// Gets or sets the list of ratings for this book.

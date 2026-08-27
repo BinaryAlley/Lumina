@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Models.Core;
 using Lumina.Domain.Common.Primitives;
 using System.Collections.Generic;
@@ -42,7 +43,9 @@ public sealed class MediaContributorName : ValueObject
     /// <returns>The created <see cref="MediaContributorName"/> instance.</returns>
     public static Result<MediaContributorName> Create(string displayName, Optional<string> legalName)
     {
-        // TODO: enforce invariants
+        if (string.IsNullOrWhiteSpace(displayName))
+            return Errors.MediaContributors.MediaContributorNameCannotBeEmpty;
+
         return new MediaContributorName(displayName, legalName);
     }
 

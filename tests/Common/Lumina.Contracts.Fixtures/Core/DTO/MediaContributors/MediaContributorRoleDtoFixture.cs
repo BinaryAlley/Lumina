@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
 using Lumina.Contracts.DTO.MediaContributors;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -23,12 +24,12 @@ public class MediaContributorRoleDtoFixture
     /// <param name="category">Optional. The category of the role.</param>
     /// <returns>The created <see cref="MediaContributorRoleDto"/>.</returns>
     public MediaContributorRoleDto Create(
-        string? name = null, 
-        string? category = null)
+        string? name = null,
+        MediaContributorRoleCategory? category = null)
     {
         return new MediaContributorRoleDto(
             name ?? _faker.Commerce.Department(),
-            category ?? _faker.Commerce.Department());
+            category ?? _faker.PickRandom<MediaContributorRoleCategory>());
     }
 
     /// <summary>
