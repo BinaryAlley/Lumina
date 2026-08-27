@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
+using Lumina.Application.Common.DataAccess.Entities.MediaContributors;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
@@ -35,6 +36,8 @@ public class LuminaDbContext : DbContext
     public virtual DbSet<LibraryMetadataProviderConfigurationEntity> LibraryMetadataProviderConfigurations { get; set; } = null!;
     public virtual DbSet<LibraryArtworkProviderConfigurationEntity> LibraryArtworkProviderConfigurations { get; set; } = null!;
     public virtual DbSet<ThemeEntity> Themes { get; set; } = null!;
+    public virtual DbSet<MediaContributorEntity> MediaContributors { get; set; } = null!;
+    public virtual DbSet<BookContributorEntity> BookContributors { get; set; } = null!;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LuminaDbContext"/> class.

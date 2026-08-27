@@ -39,21 +39,6 @@ public sealed class Book : AggregateRoot<BookId>
     public string Path { get; private set; }
 
     /// <summary>
-    /// Gets the status of the metadata enrichment of the book.
-    /// </summary>
-    public MetadataStatus MetadataStatus { get; private set; }
-
-    /// <summary>
-    /// Gets the date and time when the metadata of the book was last enriched, if applicable.
-    /// </summary>
-    public Optional<DateTime> LastMetadataUpdateUtc { get; private set; }
-
-    /// <summary>
-    /// Gets the name of the plugin that enriched the metadata of the book, if applicable.
-    /// </summary>
-    public Optional<string> MetadataProvider { get; private set; }
-
-    /// <summary>
     /// Gets the format of the book (e.g., Hardcover, Paperback), if applicable.
     /// </summary>
     public Optional<BookFormat> Format { get; private set; }
@@ -117,11 +102,6 @@ public sealed class Book : AggregateRoot<BookId>
     /// Gets the Apple Books ID of the book, if applicable.
     /// </summary>
     public Optional<string> AppleBooksId { get; private set; }
-
-    /// <summary>
-    /// Gets the file system path of the cover image of the book, if applicable.
-    /// </summary>
-    public Optional<string> CoverImagePath { get; private set; }
 
     /// <summary>
     /// Gets the list of ISBN (International Standard Book Number) of the book.
@@ -191,9 +171,6 @@ public sealed class Book : AggregateRoot<BookId>
         LibraryId = libraryId;
         Path = path;
         Metadata = metadata;
-        MetadataStatus = MetadataStatus.Pending;
-        LastMetadataUpdateUtc = Optional<DateTime>.None();
-        MetadataProvider = Optional<string>.None();
         Format = format;
         Edition = edition;
         VolumeNumber = volumeNumber;
@@ -207,7 +184,6 @@ public sealed class Book : AggregateRoot<BookId>
         GoogleBooksId = googleBooksId;
         BarnesAndNobleId = barnesAndNobleId;
         AppleBooksId = appleBooksId;
-        CoverImagePath = Optional<string>.None();
         CreatedOnUtc = createdOnUtc;
         UpdatedOnUtc = updatedOnUtc.HasValue ? updatedOnUtc.Value : null;
         _isbns = isbns;
@@ -368,36 +344,18 @@ public sealed class Book : AggregateRoot<BookId>
     }
 
     /// <summary>
-    /// Marks the metadata of the book as enriched by the provided <paramref name="providerName"/>.
+    /// Replaces the media contributors of the book with the provided <paramref name="contributors"/>, identified by their unique identifiers.
     /// </summary>
-    /// <param name="providerName">The name of the metadata provider that enriched the book.</param>
-    /// <param name="lastUpdateUtc">The date and time when the metadata of the book was enriched.</param>
-    public void MarkMetadataAsEnriched(string providerName, DateTime lastUpdateUtc)
+    /// <param name="contributors">The unique identifiers of the media contributors of the book.</param>
+    public void UpdateContributors(IReadOnlyCollection<MediaContributorId> contributors)
     {
-        MetadataProvider = providerName;
-        LastMetadataUpdateUtc = lastUpdateUtc;
-        MetadataStatus = MetadataStatus.Enriched;
+        // replace the contents of the collection in place, preserving the readonly reference invariants of the aggregate
+        _contributors.Clear();
+        _contributors.AddRange(contributors);
     }
 
     /// <summary>
-    /// Marks the metadata enrichment of the book as failed.
-    /// </summary>
-    public void MarkMetadataAsFailed()
-    {
-        MetadataStatus = MetadataStatus.Failed;
-    }
-
-    /// <summary>
-    /// Sets the file system path of the cover image of the book.
-    /// </summary>
-    /// <param name="coverImagePath">The file system path of the cover image of the book.</param>
-    public void SetBookCoverImagePath(string coverImagePath)
-    {
-        CoverImagePath = coverImagePath;
-    }
-
-    /// <summary>
-    /// Applies the enriched <paramref name="metadata"/> and the related fields to the book, marking its metadata as enriched by the provided <paramref name="providerName"/>.
+    /// Applies the enriched <paramref name="metadata"/> and the related fields to the book.
     /// </summary>
     /// <param name="metadata">The enriched metadata of the book.</param>
     /// <param name="format">The optional format of the book.</param>
@@ -415,8 +373,6 @@ public sealed class Book : AggregateRoot<BookId>
     /// <param name="appleBooksId">The optional Apple Books ID of the book.</param>
     /// <param name="isbns">The list of ISBNs of the book.</param>
     /// <param name="ratings">The list of ratings for the book.</param>
-    /// <param name="providerName">The name of the metadata provider that enriched the book.</param>
-    /// <param name="lastUpdateUtc">The date and time when the metadata was enriched.</param>
     public void ApplyEnrichedMetadata(
         WrittenContentMetadata metadata,
         Optional<BookFormat> format,
@@ -433,9 +389,7 @@ public sealed class Book : AggregateRoot<BookId>
         Optional<string> barnesAndNobleId,
         Optional<string> appleBooksId,
         List<Isbn> isbns,
-        List<BookRating> ratings,
-        string providerName,
-        DateTime lastUpdateUtc)
+        List<BookRating> ratings)
     {
         Metadata = metadata;
         Format = format;
@@ -456,6 +410,5 @@ public sealed class Book : AggregateRoot<BookId>
         _isbns.AddRange(isbns);
         _ratings.Clear();
         _ratings.AddRange(ratings);
-        MarkMetadataAsEnriched(providerName, lastUpdateUtc);
     }
 }

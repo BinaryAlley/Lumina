@@ -1,21 +1,25 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Application.Common.DataAccess.Entities.MediaContributors;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Books;
+using Lumina.Application.Common.DataAccess.Repositories.MediaContributors;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Artwork;
+using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaContributors;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Contracts.DTO.Common;
+using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.Fixtures.Core.DTO.Common;
+using Lumina.Contracts.Fixtures.Core.DTO.MediaContributors;
 using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.Common.Events;
 using Lumina.Domain.Common.Primitives;
@@ -27,6 +31,7 @@ using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContex
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Common;
 using Lumina.Plugins.Contracts.Core.Metadata;
@@ -55,6 +60,7 @@ public class MediaLibraryScanMetadataEnrichmentJobTests
     private readonly IUnitOfWork _mockUnitOfWork;
     private readonly ILibraryMetadataProviderConfigurationRepository _mockConfigurationRepository;
     private readonly IBookRepository _mockBookRepository;
+    private readonly IMediaContributorRepository _mockMediaContributorRepository;
     private readonly IDomainEventPublisher _mockDomainEventPublisher;
     private readonly ILogger<MediaLibraryScanMetadataEnrichmentJob> _mockLogger;
     private readonly MediaLibraryScanMetadataEnrichmentJob _sut;
@@ -62,11 +68,11 @@ public class MediaLibraryScanMetadataEnrichmentJobTests
     private readonly UserIdFixture _userIdFixture = new();
     private readonly LibraryIdFixture _libraryIdFixture = new();
     private readonly LibraryMetadataProviderConfigurationEntityFixture _configurationEntityFixture = new();
-    private readonly LibraryArtworkProviderConfigurationEntityFixture _artworkConfigurationEntityFixture = new();
     private readonly UserSettingsEntityFixture _userSettingsEntityFixture = new();
     private readonly BookMetadataDtoFixture _bookMetadataDtoFixture = new();
-    private readonly ArtworkDtoFixture _artworkDtoFixture = new();
+    private readonly MediaContributorDtoFixture _mediaContributorDtoFixture = new();
     private readonly BookEntityFixture _bookEntityFixture = new();
+    private readonly MediaContributorEntityFixture _mediaContributorEntityFixture = new();
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
     private readonly ScanId _scanId;
     private readonly UserId _userId;
@@ -86,8 +92,10 @@ public class MediaLibraryScanMetadataEnrichmentJobTests
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
         _mockConfigurationRepository = Substitute.For<ILibraryMetadataProviderConfigurationRepository>();
         _mockBookRepository = Substitute.For<IBookRepository>();
+        _mockMediaContributorRepository = Substitute.For<IMediaContributorRepository>();
         _mockUnitOfWork.LibraryMetadataProviderConfigurationRepository.Returns(_mockConfigurationRepository);
         _mockUnitOfWork.BookRepository.Returns(_mockBookRepository);
+        _mockUnitOfWork.MediaContributorRepository.Returns(_mockMediaContributorRepository);
         _mockServiceProvider.GetService(typeof(IUnitOfWork)).Returns(_mockUnitOfWork);
 
         _mockDomainEventPublisher = Substitute.For<IDomainEventPublisher>();
@@ -125,7 +133,7 @@ public class MediaLibraryScanMetadataEnrichmentJobTests
 
         // Assert
         Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
-        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
         await _mockDomainEventPublisher.Received(1).PublishAsync(Arg.Is<LibraryScanFinishedDomainEvent>(domainEvent => domainEvent.MediaLibraryScanCompositeId.ScanId == _scanId), Arg.Any<CancellationToken>());
     }
 
@@ -145,8 +153,7 @@ public class MediaLibraryScanMetadataEnrichmentJobTests
         Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
         await _mockBookRepository.DidNotReceive().GetBooksNeedingMetadataCountAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockBookRepository.DidNotReceive().GetBooksNeedingMetadataAsync(Arg.Any<Guid>(), Arg.Any<string?>(), Arg.Any<int>(), Arg.Any<CancellationToken>());
-        await _mockBookRepository.DidNotReceive().UpdateAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>());
-        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -285,116 +292,125 @@ public class MediaLibraryScanMetadataEnrichmentJobTests
 
         SetupRealServiceProviderForProviders(firstPluginId, firstProvider, shouldAggregateMetadataWhenMissing: true);
         BookEntity book = _bookEntityFixture.Create(libraryId: _libraryId.Value, path: "/books/test.epub");
+        SetupSingleBookPage(book, firstPluginId);
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        // the enrichment state is tracked directly on the entity, so the failed status is visible on the same instance
+        Assert.Equal(MetadataStatus.Failed, book.MetadataStatus);
+        Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenMetadataIsEnriched_ShouldSetTheEnrichmentTrackingColumnsOnTheEntity()
+    {
+        // Arrange
+        Guid firstPluginId = Guid.NewGuid();
+        IMetadataProvider firstProvider = Substitute.For<IMetadataProvider>();
+        firstProvider.Name.Returns("First Provider");
+        firstProvider.SupportedLibraryTypes.Returns([LibraryType.Book]);
+        firstProvider.GetMetadataAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>())
+            .Returns(_bookMetadataDtoFixture.Create(title: "First Title", publisher: "First Publisher"));
+
+        SetupRealServiceProviderForProviders(firstPluginId, firstProvider, shouldAggregateMetadataWhenMissing: false);
+        BookEntity book = _bookEntityFixture.Create(libraryId: _libraryId.Value, path: "/books/test.epub");
+        SetupSingleBookPage(book, firstPluginId);
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        // the enrichment tracking columns are managed directly on the entity by the enrichment job
+        Assert.Equal(MetadataStatus.Enriched, book.MetadataStatus);
+        Assert.Equal("First Provider", book.MetadataProvider);
+        Assert.NotNull(book.LastMetadataUpdateUtc);
+        Assert.Equal("First Title", book.Title);
+        Assert.Equal("First Publisher", book.Publisher);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenMetadataHasContributors_ShouldFindOrCreateThemAndLinkThemToTheBook()
+    {
+        // Arrange
+        Guid firstPluginId = Guid.NewGuid();
+        IMetadataProvider firstProvider = Substitute.For<IMetadataProvider>();
+        firstProvider.Name.Returns("First Provider");
+        firstProvider.SupportedLibraryTypes.Returns([LibraryType.Book]);
+        MediaContributorDto author = _mediaContributorDtoFixture.Create(displayName: "Frank Herbert", roleName: "Author", roleCategory: MediaContributorRoleCategory.Author);
+        MediaContributorDto translator = _mediaContributorDtoFixture.Create(displayName: "Jane Translator", roleName: "Translator", roleCategory: MediaContributorRoleCategory.Translator);
+        firstProvider.GetMetadataAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>())
+            .Returns(_bookMetadataDtoFixture.Create(title: "First Title", contributors: [author, translator]));
+
+        SetupRealServiceProviderForProviders(firstPluginId, firstProvider, shouldAggregateMetadataWhenMissing: false);
+        BookEntity book = _bookEntityFixture.Create(libraryId: _libraryId.Value, path: "/books/test.epub");
+        SetupSingleBookPage(book, firstPluginId);
+
+        MediaContributorEntity authorEntity = _mediaContributorEntityFixture.Create(displayName: "Frank Herbert");
+        MediaContributorEntity translatorEntity = _mediaContributorEntityFixture.Create(displayName: "Jane Translator");
+        _mockMediaContributorRepository.FindOrCreateByDisplayNameAsync("Frank Herbert", Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From(authorEntity));
+        _mockMediaContributorRepository.FindOrCreateByDisplayNameAsync("Jane Translator", Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From(translatorEntity));
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        await _mockMediaContributorRepository.Received(1).FindOrCreateByDisplayNameAsync("Frank Herbert", Arg.Any<string?>(), Arg.Any<CancellationToken>());
+        await _mockMediaContributorRepository.Received(1).FindOrCreateByDisplayNameAsync("Jane Translator", Arg.Any<string?>(), Arg.Any<CancellationToken>());
+
+        // the participation rows are replaced on the entity, carrying the role and the category of each contributor
+        Assert.Equal(2, book.BookContributors.Count);
+        BookContributorEntity linkedAuthor = Assert.Single(book.BookContributors, contributor => contributor.MediaContributorId == authorEntity.Id);
+        Assert.Equal("Author", linkedAuthor.RoleName);
+        Assert.Equal(MediaContributorRoleCategory.Author, linkedAuthor.RoleCategory);
+        Assert.Equal(book.Id, linkedAuthor.BookId);
+        BookContributorEntity linkedTranslator = Assert.Single(book.BookContributors, contributor => contributor.MediaContributorId == translatorEntity.Id);
+        Assert.Equal("Translator", linkedTranslator.RoleName);
+        Assert.Equal(MediaContributorRoleCategory.Translator, linkedTranslator.RoleCategory);
+        Assert.Equal(MetadataStatus.Enriched, book.MetadataStatus);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenTheSameContributorAppearsInMultipleBooksOfAPage_ShouldFindOrCreateItOnlyOnce()
+    {
+        // Arrange
+        Guid firstPluginId = Guid.NewGuid();
+        IMetadataProvider firstProvider = Substitute.For<IMetadataProvider>();
+        firstProvider.Name.Returns("First Provider");
+        firstProvider.SupportedLibraryTypes.Returns([LibraryType.Book]);
+        MediaContributorDto author = _mediaContributorDtoFixture.Create(displayName: "Frank Herbert", roleName: "Author", roleCategory: MediaContributorRoleCategory.Author);
+        firstProvider.GetMetadataAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>())
+            .Returns(_bookMetadataDtoFixture.Create(title: "First Title", contributors: [author]));
+
+        SetupRealServiceProviderForProviders(firstPluginId, firstProvider, shouldAggregateMetadataWhenMissing: false);
+
+        BookEntity firstBook = _bookEntityFixture.Create(libraryId: _libraryId.Value, path: "/books/a.epub");
+        BookEntity secondBook = _bookEntityFixture.Create(libraryId: _libraryId.Value, path: "/books/b.epub");
         _mockConfigurationRepository.GetByLibraryIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
-            .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>([
-                _configurationEntityFixture.Create(_libraryId.Value, firstPluginId, 1)
-            ]));
+            .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>([_configurationEntityFixture.Create(_libraryId.Value, firstPluginId, 1)]));
         _mockBookRepository.GetBooksNeedingMetadataCountAsync(_libraryId.Value, Arg.Any<CancellationToken>())
-            .Returns(Result.From(1));
+            .Returns(Result.From(2));
         _mockBookRepository.GetBooksNeedingMetadataAsync(_libraryId.Value, Arg.Any<string?>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
-            .Returns(Result.From<IReadOnlyList<BookEntity>>([book]), Result.From<IReadOnlyList<BookEntity>>([]));
-        _mockBookRepository.UpdateAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>())
-            .Returns(Result.Updated);
+            .Returns(Result.From<IReadOnlyList<BookEntity>>([firstBook, secondBook]), Result.From<IReadOnlyList<BookEntity>>([]));
         _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
 
-        // Act
-        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
-
-        // Assert
-        await _mockBookRepository.Received(1).UpdateAsync(
-            Arg.Is<BookEntity>(entity => entity.MetadataStatus == MetadataStatus.Failed),
-            Arg.Any<CancellationToken>());
-        Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
-    }
-
-    [Fact]
-    public async Task ExecuteAsync_WhenArtworkConfigurationRepositoryReturnsFailure_ShouldStillEnrichTheMetadata()
-    {
-        // Arrange
-        Guid firstPluginId = Guid.NewGuid();
-        IMetadataProvider firstProvider = Substitute.For<IMetadataProvider>();
-        firstProvider.Name.Returns("First Provider");
-        firstProvider.SupportedLibraryTypes.Returns([LibraryType.Book]);
-        firstProvider.GetMetadataAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>())
-            .Returns(_bookMetadataDtoFixture.Create(title: "First Title"));
-
-        SetupRealServiceProviderForProviders(firstPluginId, firstProvider, shouldAggregateMetadataWhenMissing: true);
-        BookEntity book = _bookEntityFixture.Create(libraryId: _libraryId.Value, path: "/books/test.epub");
-        SetupSingleBookPage(book, firstPluginId);
-
-        IArtworkProviderConfigurationRepository mockArtworkConfigurationRepository = Substitute.For<IArtworkProviderConfigurationRepository>();
-        mockArtworkConfigurationRepository.GetByLibraryIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
-            .Returns(Error.Failure(description: "Failed to get the artwork provider configurations"));
-        _mockUnitOfWork.ArtworkProviderConfigurationRepository.Returns(mockArtworkConfigurationRepository);
+        MediaContributorEntity authorEntity = _mediaContributorEntityFixture.Create(displayName: "Frank Herbert");
+        _mockMediaContributorRepository.FindOrCreateByDisplayNameAsync("Frank Herbert", Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From(authorEntity));
 
         // Act
         await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
 
         // Assert
-        Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
-        await _mockBookRepository.Received(1).UpdateAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>());
-    }
-
-    [Fact]
-    public async Task ExecuteAsync_WhenAnArtworkProviderReturnsArtwork_ShouldStoreItAndSetTheBookCoverPath()
-    {
-        // Arrange
-        Guid firstPluginId = Guid.NewGuid();
-        Guid artworkPluginId = Guid.NewGuid();
-        IMetadataProvider firstProvider = Substitute.For<IMetadataProvider>();
-        firstProvider.Name.Returns("First Provider");
-        firstProvider.SupportedLibraryTypes.Returns([LibraryType.Book]);
-        firstProvider.GetMetadataAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>())
-            .Returns(_bookMetadataDtoFixture.Create(title: "First Title"));
-
-        IArtworkProvider artworkProvider = Substitute.For<IArtworkProvider>();
-        artworkProvider.Name.Returns("Artwork Provider");
-        artworkProvider.SupportedLibraryTypes.Returns([LibraryType.Book]);
-        artworkProvider.GetArtworkAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>())
-            .Returns(_artworkDtoFixture.Create(localPath: "/some/cover.jpg"));
-
-        IBookArtworkService mockBookArtworkService = Substitute.For<IBookArtworkService>();
-        mockBookArtworkService.SaveBookArtworkAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<ArtworkDto>(), Arg.Any<CancellationToken>())
-            .Returns(Result.From("\\media\\books\\Library\\Author\\Title\\cover.jpeg"));
-
-        ServiceCollection services = new();
-        services.AddKeyedSingleton(firstPluginId, firstProvider);
-        services.AddKeyedSingleton(artworkPluginId, artworkProvider);
-        services.AddSingleton(_mockUnitOfWork);
-        services.AddSingleton(_mockDomainEventPublisher);
-        services.AddSingleton(mockBookArtworkService);
-        using ServiceProvider realServiceProvider = services.BuildServiceProvider();
-        AsyncServiceScope asyncServiceScope = realServiceProvider.CreateAsyncScope();
-        _mockServiceScopeFactory.CreateAsyncScope().Returns(asyncServiceScope);
-
-        IUserSettingsRepository mockUserSettingsRepository = Substitute.For<IUserSettingsRepository>();
-        mockUserSettingsRepository.GetByUserIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
-            .Returns(Result.From<UserSettingsEntity?>(_userSettingsEntityFixture.Create(shouldAggregateMetadataWhenMissing: false)));
-        _mockUnitOfWork.UserSettingsRepository.Returns(mockUserSettingsRepository);
-
-        IArtworkProviderConfigurationRepository mockArtworkConfigurationRepository = Substitute.For<IArtworkProviderConfigurationRepository>();
-        mockArtworkConfigurationRepository.GetByLibraryIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
-            .Returns(Result.From<IReadOnlyList<LibraryArtworkProviderConfigurationEntity>>([_artworkConfigurationEntityFixture.Create(_libraryId.Value, artworkPluginId, 1)]));
-        _mockUnitOfWork.ArtworkProviderConfigurationRepository.Returns(mockArtworkConfigurationRepository);
-
-        BookEntity book = _bookEntityFixture.Create(libraryId: _libraryId.Value, path: "/books/test.epub");
-        SetupSingleBookPage(book, firstPluginId);
-
-        // Act
-        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
-
-        // Assert
-        await mockBookArtworkService.Received(1).SaveBookArtworkAsync(
-            _libraryId.Value,
-            book.Id,
-            Arg.Any<string>(),
-            Arg.Any<string>(),
-            "First Title",
-            Arg.Any<ArtworkDto>(),
-            Arg.Any<CancellationToken>());
-        await _mockBookRepository.Received(1).UpdateAsync(
-            Arg.Is<BookEntity>(entity => entity.CoverImagePath == "\\media\\books\\Library\\Author\\Title\\cover.jpeg"),
-            Arg.Any<CancellationToken>());
+        // the contributor cache of the page guarantees a single contributor per person, so the repository is queried only once
+        await _mockMediaContributorRepository.Received(1).FindOrCreateByDisplayNameAsync("Frank Herbert", Arg.Any<string?>(), Arg.Any<CancellationToken>());
+        Assert.Single(firstBook.BookContributors);
+        Assert.Single(secondBook.BookContributors);
+        Assert.Equal(authorEntity.Id, firstBook.BookContributors[0].MediaContributorId);
+        Assert.Equal(authorEntity.Id, secondBook.BookContributors[0].MediaContributorId);
     }
 
     [Fact]
@@ -472,63 +488,6 @@ public class MediaLibraryScanMetadataEnrichmentJobTests
         Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
     }
 
-    [Fact]
-    public async Task ExecuteAsync_WhenTheLibraryForbidsWebDownloads_ShouldNotUseArtworkProvidersThatRequireWebAccess()
-    {
-        // Arrange
-        Guid localPluginId = Guid.NewGuid();
-        Guid artworkPluginId = Guid.NewGuid();
-        IMetadataProvider localProvider = Substitute.For<IMetadataProvider>();
-        localProvider.Name.Returns("Local Provider");
-        localProvider.SupportedLibraryTypes.Returns([LibraryType.Book]);
-        localProvider.RequiresWebAccess.Returns(false);
-        localProvider.GetMetadataAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>())
-            .Returns(_bookMetadataDtoFixture.Create(title: "Local Title"));
-
-        IArtworkProvider artworkProvider = Substitute.For<IArtworkProvider>();
-        artworkProvider.Name.Returns("Web Artwork Provider");
-        artworkProvider.SupportedLibraryTypes.Returns([LibraryType.Book]);
-        artworkProvider.RequiresWebAccess.Returns(true);
-        artworkProvider.GetArtworkAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>())
-            .Returns(_artworkDtoFixture.Create(localPath: "/some/cover.jpg"));
-
-        ServiceCollection services = new();
-        services.AddKeyedSingleton(localPluginId, localProvider);
-        services.AddKeyedSingleton(artworkPluginId, artworkProvider);
-        services.AddSingleton(_mockUnitOfWork);
-        services.AddSingleton(_mockDomainEventPublisher);
-        // the provider is intentionally not disposed here, so that the async service scope used by the job stays alive for the whole test
-        using ServiceProvider realServiceProvider = services.BuildServiceProvider();
-        AsyncServiceScope asyncServiceScope = realServiceProvider.CreateAsyncScope();
-        _mockServiceScopeFactory.CreateAsyncScope().Returns(asyncServiceScope);
-
-        IUserSettingsRepository mockUserSettingsRepository = Substitute.For<IUserSettingsRepository>();
-        mockUserSettingsRepository.GetByUserIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
-            .Returns(Result.From<UserSettingsEntity?>(_userSettingsEntityFixture.Create(shouldAggregateMetadataWhenMissing: false)));
-        _mockUnitOfWork.UserSettingsRepository.Returns(mockUserSettingsRepository);
-
-        ILibraryRepository mockLibraryRepository = Substitute.For<ILibraryRepository>();
-        mockLibraryRepository.GetByIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
-            .Returns(Result.From<LibraryEntity?>(_libraryEntityFixture.Create(title: "My Library", canDownloadMetadataFromWeb: false)));
-        _mockUnitOfWork.LibraryRepository.Returns(mockLibraryRepository);
-
-        IArtworkProviderConfigurationRepository mockArtworkConfigurationRepository = Substitute.For<IArtworkProviderConfigurationRepository>();
-        mockArtworkConfigurationRepository.GetByLibraryIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
-            .Returns(Result.From<IReadOnlyList<LibraryArtworkProviderConfigurationEntity>>([_artworkConfigurationEntityFixture.Create(_libraryId.Value, artworkPluginId, 1)]));
-        _mockUnitOfWork.ArtworkProviderConfigurationRepository.Returns(mockArtworkConfigurationRepository);
-
-        BookEntity book = _bookEntityFixture.Create(libraryId: _libraryId.Value, path: "/books/test.epub");
-        SetupSingleBookPage(book, localPluginId);
-
-        // Act
-        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
-
-        // Assert
-        // the artwork provider requiring access to the web is skipped when the library does not permit downloading data from the web
-        await artworkProvider.DidNotReceive().GetArtworkAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>());
-        Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
-    }
-
     /// <summary>
     /// Wires a real service provider with the given metadata providers, so that the job resolves them from the dependency injection container.
     /// </summary>
@@ -570,8 +529,6 @@ public class MediaLibraryScanMetadataEnrichmentJobTests
             .Returns(Result.From(1));
         _mockBookRepository.GetBooksNeedingMetadataAsync(_libraryId.Value, Arg.Any<string?>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<BookEntity>>([book]), Result.From<IReadOnlyList<BookEntity>>([]));
-        _mockBookRepository.UpdateAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>())
-            .Returns(Result.Updated);
         _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
     }
 }

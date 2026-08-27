@@ -326,9 +326,7 @@ public class AddBookCommandValidator : AbstractValidator<AddBookCommand>
                             .WithError(Errors.MediaContributor.RoleNameMustBeMaximum50CharactersLong);
                         role.RuleFor(r => r!.Category)
                             .NotEmpty()
-                            .WithError(Errors.MediaContributor.RoleCategoryCannotBeEmpty)
-                            .MaximumLength(50)
-                            .WithError(Errors.MediaContributor.RoleCategoryMustBeMaximum50CharactersLong);
+                            .WithError(Errors.MediaContributor.RoleCategoryCannotBeEmpty);
                     });
             });
        

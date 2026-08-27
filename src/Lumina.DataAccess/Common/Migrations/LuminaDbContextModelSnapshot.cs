@@ -239,6 +239,112 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.ToTable("Tags", (string)null);
                 });
 
+            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.MediaContributors.BookContributorEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(0);
+
+                    b.Property<Guid>("BookId")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(1);
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(6);
+
+                    b.Property<DateTime>("CreatedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(5);
+
+                    b.Property<Guid>("MediaContributorId")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(2);
+
+                    b.Property<string>("RoleCategory")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(4);
+
+                    b.Property<string>("RoleName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(3);
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(8);
+
+                    b.Property<DateTime?>("UpdatedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(7);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MediaContributorId");
+
+                    b.HasIndex("BookId", "MediaContributorId");
+
+                    b.ToTable("BookContributors", (string)null);
+                });
+
+            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.MediaContributors.MediaContributorEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(0);
+
+                    b.Property<string>("Biography")
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(3);
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(7);
+
+                    b.Property<DateTime>("CreatedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(6);
+
+                    b.Property<DateOnly?>("DateOfBirth")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(4);
+
+                    b.Property<DateOnly?>("DateOfDeath")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(5);
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(1)
+                        .UseCollation("NOCASE");
+
+                    b.Property<string>("LegalName")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(2);
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(9);
+
+                    b.Property<DateTime?>("UpdatedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(8);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DisplayName")
+                        .IsUnique();
+
+                    b.ToTable("MediaContributors", (string)null);
+                });
+
             modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management.DirectoryScanFingerprintEntity", b =>
                 {
                     b.Property<Guid>("LibraryId")
@@ -270,6 +376,11 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnOrder(0);
 
+                    b.Property<string>("ArtworkProvidersConfigurationFingerprint")
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(10);
+
                     b.Property<bool>("CanDownloadMetadataFromWeb")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER")
@@ -283,11 +394,11 @@ namespace Lumina.DataAccess.Common.Migrations
 
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(10);
+                        .HasColumnOrder(12);
 
                     b.Property<DateTime>("CreatedOnUtc")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(9);
+                        .HasColumnOrder(11);
 
                     b.Property<bool>("IsEnabled")
                         .ValueGeneratedOnAdd()
@@ -303,6 +414,11 @@ namespace Lumina.DataAccess.Common.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT")
                         .HasColumnOrder(2);
+
+                    b.Property<string>("MetadataProvidersConfigurationFingerprint")
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(9);
 
                     b.Property<bool>("ShouldSaveMetadataInMediaDirectories")
                         .HasColumnType("INTEGER")
@@ -320,11 +436,11 @@ namespace Lumina.DataAccess.Common.Migrations
 
                     b.Property<Guid?>("UpdatedBy")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(12);
+                        .HasColumnOrder(14);
 
                     b.Property<DateTime?>("UpdatedOnUtc")
                         .HasColumnType("TEXT")
-                        .HasColumnOrder(11);
+                        .HasColumnOrder(13);
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("TEXT");
@@ -515,6 +631,76 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.ToTable("LibraryScanStagingResults", (string)null);
                 });
 
+            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary.BookArtworkEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(0);
+
+                    b.Property<string>("ArtworkType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(2);
+
+                    b.Property<Guid>("BookId")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(1);
+
+                    b.Property<ulong>("ContentHash")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(5);
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(10);
+
+                    b.Property<DateTime>("CreatedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(9);
+
+                    b.Property<string>("FileName")
+                        .HasMaxLength(2048)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(4);
+
+                    b.Property<DateTime?>("LastUpdateUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(8);
+
+                    b.Property<int>("Ordinal")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(3);
+
+                    b.Property<string>("Provider")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(7);
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(6);
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(12);
+
+                    b.Property<DateTime?>("UpdatedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(11);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("BookId", "ArtworkType", "Ordinal")
+                        .IsUnique();
+
+                    b.ToTable("BookArtwork", (string)null);
+                });
+
             modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary.BookEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -534,9 +720,6 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("TEXT")
                         .HasColumnOrder(28);
-
-                    b.Property<string>("CoverImagePath")
-                        .HasColumnType("TEXT");
 
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("TEXT")
@@ -1139,6 +1322,15 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.MediaContributors.BookContributorEntity", b =>
+                {
+                    b.HasOne("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary.BookEntity", null)
+                        .WithMany("BookContributors")
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management.DirectoryScanFingerprintEntity", b =>
                 {
                     b.HasOne("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management.LibraryEntity", null)
@@ -1232,6 +1424,15 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.HasOne("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management.LibraryScanEntity", null)
                         .WithMany()
                         .HasForeignKey("LibraryScanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary.BookArtworkEntity", b =>
+                {
+                    b.HasOne("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary.BookEntity", null)
+                        .WithMany("BookArtwork")
+                        .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -1337,6 +1538,13 @@ namespace Lumina.DataAccess.Common.Migrations
             modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management.LibraryScanEntity", b =>
                 {
                     b.Navigation("LibraryScanResults");
+                });
+
+            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary.BookEntity", b =>
+                {
+                    b.Navigation("BookArtwork");
+
+                    b.Navigation("BookContributors");
                 });
 
             modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.UsersManagement.UserEntity", b =>

@@ -3,6 +3,7 @@ using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -53,7 +54,7 @@ public class BookMetadataDtoTests
             "1234567890",
             "id12345",
             [new IsbnDto("978-0-306-40615-7", IsbnFormat.Isbn13)],
-            [new MediaContributorDto(new MediaContributorNameDto("Frank Herbert", "Frank Herbert"), new MediaContributorRoleDto("Author", "Writer"))],
+            [new MediaContributorDto(new MediaContributorNameDto("Frank Herbert", "Frank Herbert"), new MediaContributorRoleDto("Author", MediaContributorRoleCategory.Author))],
             [new BookRatingDto(4.5m, 5m, BookRatingSource.Goodreads, 1000)],
             "https://example.com/dune.jpg"
         );

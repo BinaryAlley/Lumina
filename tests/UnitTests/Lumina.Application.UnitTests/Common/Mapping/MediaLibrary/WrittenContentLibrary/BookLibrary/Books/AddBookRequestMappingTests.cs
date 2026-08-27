@@ -6,6 +6,7 @@ using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary;
 using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
@@ -101,7 +102,7 @@ public class AddBookRequestMappingTests
             [
                 new(
                     _mediaContributorNameDtoFixture.Create(displayName: "John Doe", legalName: "John Smith Doe"),
-                    _mediaContributorRoleDtoFixture.Create(name: "Author", category: "Writing")
+                    _mediaContributorRoleDtoFixture.Create(name: "Author", category: MediaContributorRoleCategory.Author)
                 )
             ],
             ratings: [new(4.5m, 5m, BookRatingSource.Goodreads, 1000)],

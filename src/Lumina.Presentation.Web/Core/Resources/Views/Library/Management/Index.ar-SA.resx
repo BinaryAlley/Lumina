@@ -255,6 +255,12 @@
   <data name="SavingScanData" xml:space="preserve">
     <value>حفظ بيانات الفحص...</value>
   </data>
+  <data name="InvalidatingStaleEnrichment" xml:space="preserve">
+    <value>إبطال التخصيب القديم...</value>
+  </data>
+  <data name="ResolvingArtwork" xml:space="preserve">
+    <value>جاري حل العمل الفني...</value>
+  </data>
   <data name="Scan" xml:space="preserve">
     <value>الفحص</value>
   </data>

@@ -19,7 +19,6 @@ public static partial class Errors
         public static Error RoleNameCannotBeEmpty => Error.Validation(description: nameof(RoleNameCannotBeEmpty));
         public static Error RoleNameMustBeMaximum50CharactersLong => Error.Validation(description: nameof(RoleNameMustBeMaximum50CharactersLong));
         public static Error RoleCategoryCannotBeEmpty => Error.Validation(description: nameof(RoleCategoryCannotBeEmpty));
-        public static Error RoleCategoryMustBeMaximum50CharactersLong => Error.Validation(description: nameof(RoleCategoryMustBeMaximum50CharactersLong));
         public static Error ContributorRoleCannotBeNull => Error.Validation(description: nameof(ContributorRoleCannotBeNull));
     }
 }

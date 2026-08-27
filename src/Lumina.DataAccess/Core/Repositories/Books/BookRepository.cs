@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Common;
+using Lumina.Application.Common.DataAccess.Entities.MediaContributors;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.Books;
 using Lumina.Application.Common.DTO.Filtering;
@@ -11,6 +12,8 @@ using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.Common;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -84,6 +87,7 @@ internal sealed class BookRepository : IBookRepository
             .Include(book => book.Tags)
             .Include(book => book.Genres)
             .Include(book => book.ISBNs)
+            .Include(book => book.BookArtwork)
             .FirstOrDefaultAsync(book => book.Id == id, cancellationToken).ConfigureAwait(false);
     }
 
@@ -98,6 +102,7 @@ internal sealed class BookRepository : IBookRepository
             .Include(book => book.Tags)
             .Include(book => book.Genres)
             .Include(book => book.ISBNs)
+            .Include(book => book.BookArtwork)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
     }
 
@@ -118,6 +123,7 @@ internal sealed class BookRepository : IBookRepository
             .Include(book => book.Genres)
             .Include(book => book.ISBNs)
             .Include(book => book.Ratings)
+            .Include(book => book.BookArtwork)
             .AsNoTracking();
 
         // books should always be retrieved only per owning libraries
@@ -180,6 +186,7 @@ internal sealed class BookRepository : IBookRepository
             .Include(book => book.Tags)
             .Include(book => book.Genres)
             .Include(book => book.ISBNs)
+            .Include(book => book.BookArtwork)
             .Where(book => book.LibraryId == libraryId)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
     }
@@ -197,6 +204,7 @@ internal sealed class BookRepository : IBookRepository
             .Include(book => book.Tags)
             .Include(book => book.Genres)
             .Include(book => book.ISBNs)
+            .Include(book => book.BookArtwork)
             .FirstOrDefaultAsync(book => book.LibraryId == libraryId && book.Path == path, cancellationToken).ConfigureAwait(false);
     }
 
@@ -215,6 +223,7 @@ internal sealed class BookRepository : IBookRepository
             .Include(book => book.Tags)
             .Include(book => book.Genres)
             .Include(book => book.ISBNs)
+            .Include(book => book.BookContributors)
             .Where(book => book.LibraryId == libraryId
                         && book.MetadataStatus != MetadataStatus.Enriched
                         && (lastPath == null || book.Path.CompareTo(lastPath) > 0))
@@ -233,6 +242,148 @@ internal sealed class BookRepository : IBookRepository
     {
         return await _luminaDbContext.Books
             .CountAsync(book => book.LibraryId == libraryId && book.MetadataStatus != MetadataStatus.Enriched, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Gets a page of the books of the media library identified by <paramref name="libraryId"/> that need their artwork resolved,
+    /// meaning they lack at least one required piece of artwork with an enriched status, ordered by path, using keyset pagination.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose books are retrieved.</param>
+    /// <param name="lastPath">The path of the last retrieved book, used for keyset pagination. Pass <see langword="null"/> to get the first page.</param>
+    /// <param name="pageSize">The maximum number of books to retrieve.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either a page of books needing their artwork resolved, or an error.</returns>
+    public async Task<Result<IReadOnlyList<BookEntity>>> GetBooksNeedingArtworkAsync(Guid libraryId, string? lastPath, int pageSize, CancellationToken cancellationToken)
+    {
+        return await _luminaDbContext.Books
+            .Include(book => book.Tags)
+            .Include(book => book.Genres)
+            .Include(book => book.ISBNs)
+            .Include(book => book.BookArtwork)
+            .Where(book => book.LibraryId == libraryId
+                        && !book.BookArtwork.Any(artwork => artwork.ArtworkType == ArtworkType.Cover && artwork.Status == ArtworkStatus.Enriched)
+                        && (lastPath == null || book.Path.CompareTo(lastPath) > 0))
+            .OrderBy(book => book.Path)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Gets the number of books of the media library identified by <paramref name="libraryId"/> that need their artwork resolved.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose books are counted.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the number of books needing their artwork resolved, or an error.</returns>
+    public async Task<Result<int>> GetBooksNeedingArtworkCountAsync(Guid libraryId, CancellationToken cancellationToken)
+    {
+        return await _luminaDbContext.Books
+            .CountAsync(book => book.LibraryId == libraryId
+                             && !book.BookArtwork.Any(artwork => artwork.ArtworkType == ArtworkType.Cover && artwork.Status == ArtworkStatus.Enriched), cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Resets the enrichment state of the books stored at the provided <paramref name="paths"/> in the media library identified by
+    /// <paramref name="libraryId"/>, so that they are re-enriched, because their content changed since the last scan.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose books are reset.</param>
+    /// <param name="paths">The file system paths of the books whose enrichment state is reset.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Updated>> ResetEnrichmentStateForPathsAsync(Guid libraryId, IReadOnlyCollection<string> paths, CancellationToken cancellationToken)
+    {
+        await _luminaDbContext.Books
+            .Where(book => book.LibraryId == libraryId && paths.Contains(book.Path))
+            .ExecuteUpdateAsync(setters => setters.SetProperty(book => book.MetadataStatus, MetadataStatus.Pending), cancellationToken)
+            .ConfigureAwait(false);
+
+        await _luminaDbContext.Set<BookArtworkEntity>()
+            .Where(artwork => _luminaDbContext.Books.Any(book => book.Id == artwork.BookId && book.LibraryId == libraryId && paths.Contains(book.Path)))
+            .ExecuteUpdateAsync(setters => setters.SetProperty(artwork => artwork.Status, ArtworkStatus.Pending), cancellationToken)
+            .ConfigureAwait(false);
+
+        return Result.Updated;
+    }
+
+    /// <summary>
+    /// Resets the metadata enrichment status of all the books of the media library identified by <paramref name="libraryId"/>,
+    /// so that they are re-enriched, because the metadata provider configuration of the library changed.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose books are reset.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Updated>> ResetMetadataStatusForLibraryAsync(Guid libraryId, CancellationToken cancellationToken)
+    {
+        await _luminaDbContext.Books
+            .Where(book => book.LibraryId == libraryId)
+            .ExecuteUpdateAsync(setters => setters.SetProperty(book => book.MetadataStatus, MetadataStatus.Pending), cancellationToken)
+            .ConfigureAwait(false);
+
+        return Result.Updated;
+    }
+
+    /// <summary>
+    /// Resets the artwork status of all the artwork of the books of the media library identified by <paramref name="libraryId"/>,
+    /// so that they are re-resolved, because the artwork provider configuration of the library changed.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose artwork is reset.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Updated>> ResetArtworkStatusForLibraryAsync(Guid libraryId, CancellationToken cancellationToken)
+    {
+        await _luminaDbContext.Set<BookArtworkEntity>()
+            .Where(artwork => _luminaDbContext.Books.Any(book => book.Id == artwork.BookId && book.LibraryId == libraryId))
+            .ExecuteUpdateAsync(setters => setters.SetProperty(artwork => artwork.Status, ArtworkStatus.Pending), cancellationToken)
+            .ConfigureAwait(false);
+
+        return Result.Updated;
+    }
+
+    /// <summary>
+    /// Gets the display names of the author of the books identified by the provided <paramref name="bookIds"/>,
+    /// keyed by the Id of the book, or <see langword="null"/> when a book has no author.
+    /// </summary>
+    /// <param name="bookIds">The unique identifiers of the books whose authors are retrieved.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the display names of the authors of the books, keyed by book Id, or an error.</returns>
+    public async Task<Result<IReadOnlyDictionary<Guid, string?>>> GetAuthorsDisplayNamesByBookIdsAsync(IReadOnlyCollection<Guid> bookIds, CancellationToken cancellationToken)
+    {
+        List<AuthorRow> authorRows = await _luminaDbContext.BookContributors
+            .Where(bookContributor => bookIds.Contains(bookContributor.BookId) && bookContributor.RoleCategory == MediaContributorRoleCategory.Author)
+            .Join(_luminaDbContext.MediaContributors,
+                bookContributor => bookContributor.MediaContributorId,
+                contributor => contributor.Id,
+                (bookContributor, contributor) => new AuthorRow(bookContributor.BookId, contributor.DisplayName))
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        return authorRows
+            .GroupBy(row => row.BookId)
+            .ToDictionary(group => group.Key, group => (string?)group.Min(row => row.DisplayName));
+    }
+
+    /// <summary>
+    /// The author row of a book, joining the participation of an author contributor in a book with the display name of the contributor.
+    /// </summary>
+    /// <param name="BookId">The Id of the book.</param>
+    /// <param name="DisplayName">The display name of the author contributor.</param>
+    private sealed record AuthorRow(Guid BookId, string DisplayName);
+
+    /// <summary>
+    /// Deletes the book identified by <paramref name="bookId"/>.
+    /// </summary>
+    /// <param name="bookId">The Id of the book to delete.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Deleted>> DeleteAsync(Guid bookId, CancellationToken cancellationToken)
+    {
+        BookEntity? book = await _luminaDbContext.Books
+            .FirstOrDefaultAsync(repositoryBook => repositoryBook.Id == bookId, cancellationToken).ConfigureAwait(false);
+        if (book is null)
+            return Errors.WrittenContent.BookNotFound;
+
+        _luminaDbContext.Books.Remove(book);
+        return Result.Deleted;
     }
 
     /// <summary>

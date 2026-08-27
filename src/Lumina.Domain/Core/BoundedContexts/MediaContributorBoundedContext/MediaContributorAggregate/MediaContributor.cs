@@ -6,11 +6,13 @@ using System;
 using System.Diagnostics;
 #endregion
 
-
 namespace Lumina.Domain.Core.BoundedContexts.MediaContributorBoundedContext.MediaContributorAggregate;
 
 /// <summary>
-/// Aggregate Root for a media contributor.
+/// Aggregate root for a media contributor, the person that contributed to a media item.
+/// A media contributor is a person, unique by name, agnostic of the kind of media it contributed to, and of
+/// the roles it played in the media items. The roles a contributor plays are tracked per media item, so that a
+/// single contributor that is both an actor and a writer is never duplicated.
 /// </summary>
 [DebuggerDisplay("{Id}: {Name}")]
 public class MediaContributor : AggregateRoot<MediaContributorId>
@@ -19,11 +21,6 @@ public class MediaContributor : AggregateRoot<MediaContributorId>
     /// Gets the name of the contributor.
     /// </summary>
     public MediaContributorName Name { get; private set; }
-
-    /// <summary>
-    /// Gets the role of the contributor.
-    /// </summary>
-    public MediaContributorRole Role { get; private set; }
 
     /// <summary>
     /// Gets the biography of the contributor.
@@ -45,19 +42,19 @@ public class MediaContributor : AggregateRoot<MediaContributorId>
     /// </summary>
     /// <param name="id">The unique identifier of the contributor.</param>
     /// <param name="name">The name of the contributor.</param>
-    /// <param name="role">The role of the contributor.</param>
+    /// <param name="biography">The optional biography of the contributor.</param>
     /// <param name="dateOfBirth">The optional date of birth of the contributor.</param>
-    /// <param name="dateOfBirth">The optional date of death of the contributor.</param>
+    /// <param name="dateOfDeath">The optional date of death of the contributor.</param>
     private MediaContributor(
         MediaContributorId id,
         MediaContributorName name,
-        MediaContributorRole role,
+        Optional<string> biography,
         Optional<DateOnly> dateOfBirth,
         Optional<DateOnly> dateOfDeath) : base(id)
     {
         Id = id;
         Name = name;
-        Role = role;
+        Biography = biography;
         DateOfBirth = dateOfBirth;
         DateOfDeath = dateOfDeath;
     }
@@ -69,9 +66,12 @@ public class MediaContributor : AggregateRoot<MediaContributorId>
     /// <returns>The created <see cref="MediaContributor"/> instance.</returns>
     public static Result<MediaContributor> Create(MediaContributorName name)
     {
-        // TODO: enforce invariants
-        throw new NotImplementedException();
-        //return new MediaContributor(id, name);
+        return new MediaContributor(
+            MediaContributorId.CreateUnique(),
+            name,
+            Optional<string>.None(),
+            Optional<DateOnly>.None(),
+            Optional<DateOnly>.None());
     }
 
     /// <summary>
@@ -79,14 +79,17 @@ public class MediaContributor : AggregateRoot<MediaContributorId>
     /// </summary>
     /// <param name="id">The unique identifier of the contributor.</param>
     /// <param name="name">The name of the contributor.</param>
+    /// <param name="biography">The optional biography of the contributor.</param>
+    /// <param name="dateOfBirth">The optional date of birth of the contributor.</param>
+    /// <param name="dateOfDeath">The optional date of death of the contributor.</param>
     /// <returns>The created <see cref="MediaContributor"/> instance.</returns>
     public static Result<MediaContributor> Create(
         MediaContributorId id,
         MediaContributorName name,
-        MediaContributorRole role,
+        Optional<string> biography,
         Optional<DateOnly> dateOfBirth,
         Optional<DateOnly> dateOfDeath)
     {
-        return new MediaContributor(id, name, role, dateOfBirth, dateOfDeath);
+        return new MediaContributor(id, name, biography, dateOfBirth, dateOfDeath);
     }
 }

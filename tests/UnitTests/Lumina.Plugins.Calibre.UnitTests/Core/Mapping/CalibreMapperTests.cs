@@ -2,6 +2,7 @@
 using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
 using Lumina.Plugins.Calibre.Common.Models.DTO.Opf;
 using Lumina.Plugins.Calibre.Core.Mapping;
 using Lumina.Plugins.Calibre.Fixtures.Common.Models.DTO.Opf;
@@ -210,32 +211,32 @@ public class CalibreMapperTests
         MediaContributorDto author = result.Contributors[0];
         Assert.Equal("Test Author", author.Name!.DisplayName);
         Assert.Equal("Author", author.Role!.Name);
-        Assert.Equal("Writing", author.Role.Category);
+        Assert.Equal(MediaContributorRoleCategory.Author, author.Role.Category);
 
         MediaContributorDto coAuthor = result.Contributors[1];
         Assert.Equal("Co Author", coAuthor.Name!.DisplayName);
         Assert.Equal("Author", coAuthor.Role!.Name);
-        Assert.Equal("Writing", coAuthor.Role.Category);
+        Assert.Equal(MediaContributorRoleCategory.Author, coAuthor.Role.Category);
 
         MediaContributorDto translator = result.Contributors[2];
         Assert.Equal("Test Translator", translator.Name!.DisplayName);
         Assert.Equal("trl", translator.Role!.Name);
-        Assert.Equal("Translation", translator.Role.Category);
+        Assert.Equal(MediaContributorRoleCategory.Translator, translator.Role.Category);
 
         MediaContributorDto illustrator = result.Contributors[3];
         Assert.Equal("Test Illustrator", illustrator.Name!.DisplayName);
         Assert.Equal("ill", illustrator.Role!.Name);
-        Assert.Equal("Art", illustrator.Role.Category);
+        Assert.Equal(MediaContributorRoleCategory.Illustrator, illustrator.Role.Category);
 
         MediaContributorDto production = result.Contributors[4];
         Assert.Equal("calibre (3.48.0) [https://calibre-ebook.com]", production.Name!.DisplayName);
         Assert.Equal("bkp", production.Role!.Name);
-        Assert.Equal("Production", production.Role.Category);
+        Assert.Equal(MediaContributorRoleCategory.Publisher, production.Role.Category);
 
         MediaContributorDto misc = result.Contributors[5];
         Assert.Equal("Misc Contributor", misc.Name!.DisplayName);
         Assert.Equal("Contributor", misc.Role!.Name);
-        Assert.Equal("Other", misc.Role.Category);
+        Assert.Equal(MediaContributorRoleCategory.Other, misc.Role.Category);
     }
 
     [Fact]

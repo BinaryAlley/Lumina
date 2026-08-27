@@ -52,12 +52,23 @@ internal class BookLibraryTypeScanner : IBookLibraryTypeScanner
         mediaLibraryScanHashJob.AddChild(mediaLibraryScanResultsSaveJob);
         mediaLibraryScanResultsSaveJob.AddParent(mediaLibraryScanHashJob);
 
-        // the metadata enrichment job is always the last job in the directed acyclic job graph, running after the scan results save job,
-        // so that the books are materialized before their metadata is enriched. The job itself is the host-side gate that skips the providers
-        // requiring access to the web when the media library does not permit downloading data from the web, so that the local providers still run offline
+        // the enrichment of the media library items is split into independent, modular jobs that run sequentially: the provider configuration
+        // invalidation job invalidates the enrichment state of the items whose metadata or artwork providers changed since the last scan, the
+        // metadata enrichment job enriches the metadata and links the media contributors, and the artwork enrichment job resolves the artwork.
+        // The artwork enrichment job is always the last job in the directed acyclic job graph, running after the metadata enrichment job, so that
+        // the artwork is resolved after the metadata, and thus after the contributors that provide the author names used to build the artwork directories.
+        IMediaLibraryScanProviderConfigurationInvalidationJob mediaLibraryScanProviderConfigurationInvalidationJob = _mediaScanJobFactory.CreateJob<IMediaLibraryScanProviderConfigurationInvalidationJob>(libraryId);
         IMediaLibraryScanMetadataEnrichmentJob mediaLibraryScanMetadataEnrichmentJob = _mediaScanJobFactory.CreateJob<IMediaLibraryScanMetadataEnrichmentJob>(libraryId);
-        mediaLibraryScanResultsSaveJob.AddChild(mediaLibraryScanMetadataEnrichmentJob);
-        mediaLibraryScanMetadataEnrichmentJob.AddParent(mediaLibraryScanResultsSaveJob);
+        IMediaLibraryScanArtworkEnrichmentJob mediaLibraryScanArtworkEnrichmentJob = _mediaScanJobFactory.CreateJob<IMediaLibraryScanArtworkEnrichmentJob>(libraryId);
+
+        mediaLibraryScanResultsSaveJob.AddChild(mediaLibraryScanProviderConfigurationInvalidationJob);
+        mediaLibraryScanProviderConfigurationInvalidationJob.AddParent(mediaLibraryScanResultsSaveJob);
+
+        mediaLibraryScanProviderConfigurationInvalidationJob.AddChild(mediaLibraryScanMetadataEnrichmentJob);
+        mediaLibraryScanMetadataEnrichmentJob.AddParent(mediaLibraryScanProviderConfigurationInvalidationJob);
+
+        mediaLibraryScanMetadataEnrichmentJob.AddChild(mediaLibraryScanArtworkEnrichmentJob);
+        mediaLibraryScanArtworkEnrichmentJob.AddParent(mediaLibraryScanMetadataEnrichmentJob);
 
         // return the top level jobs that will be triggered when the scan will be started
         yield return fileSystemDiscoveryJob;

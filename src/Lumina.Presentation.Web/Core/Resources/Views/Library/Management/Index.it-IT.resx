@@ -255,6 +255,12 @@
   <data name="SavingScanData" xml:space="preserve">
     <value>Salvataggio dei dati di scansione...</value>
   </data>
+  <data name="InvalidatingStaleEnrichment" xml:space="preserve">
+    <value>Invalidazione dell'arricchimento obsoleto...</value>
+  </data>
+  <data name="ResolvingArtwork" xml:space="preserve">
+    <value>Risoluzione della copertina...</value>
+  </data>
   <data name="Scan" xml:space="preserve">
     <value>Scansiona</value>
   </data>

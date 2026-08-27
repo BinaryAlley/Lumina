@@ -1,6 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
 using Lumina.Domain.Core.BoundedContexts.MediaContributorBoundedContext.MediaContributorAggregate.ValueObjects;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -22,11 +23,11 @@ public class MediaContributorRoleFixture
     /// <param name="name">Optional. The name of the role. If not provided, a random name is generated.</param>
     /// <param name="category">Optional. The category of the role. If not provided, a random category is generated.</param>
     /// <returns>The created <see cref="MediaContributorRole"/>.</returns>
-    public MediaContributorRole Create(string? name = null, string? category = null)
+    public MediaContributorRole Create(string? name = null, MediaContributorRoleCategory? category = null)
     {
         return MediaContributorRole.Create(
             name ?? _faker.Lorem.Word(),
-            category ?? _faker.Commerce.Department());
+            category ?? _faker.PickRandom<MediaContributorRoleCategory>()).Value;
     }
 
     /// <summary>

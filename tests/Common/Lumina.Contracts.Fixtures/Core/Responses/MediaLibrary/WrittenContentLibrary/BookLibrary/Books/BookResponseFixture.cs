@@ -6,6 +6,7 @@ using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -65,7 +66,7 @@ public class BookResponseFixture
             [new IsbnDto(_faker.Random.Replace("###-#-##-#####-#"), IsbnFormat.Isbn13)],
             [new MediaContributorDto(
                 new MediaContributorNameDto(_faker.Name.FullName(), _faker.Name.FullName()),
-                new MediaContributorRoleDto(_faker.Commerce.ProductAdjective(), _faker.Commerce.Department()))],
+                new MediaContributorRoleDto(_faker.Commerce.ProductAdjective(), _faker.PickRandom<MediaContributorRoleCategory>()))],
             [new BookRatingDto(_faker.Random.Decimal(1m, 5m), 5m, BookRatingSource.Goodreads, _faker.Random.Int(1, 1000))],
             metadataStatus ?? _faker.PickRandom<MetadataStatus>(),
             _faker.Date.Recent().ToUniversalTime(),

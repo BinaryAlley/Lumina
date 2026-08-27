@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Contracts.DTO.MediaContributors;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 #endregion
@@ -21,7 +22,7 @@ public class MediaContributorRoleDtoTests
     public void RoundTrip_WhenSerializingRole_ShouldPreserveValues()
     {
         // Arrange
-        MediaContributorRoleDto expected = new("Author", "Writer");
+        MediaContributorRoleDto expected = new("Author", MediaContributorRoleCategory.Author);
 
         // Act
         string json = JsonSerializer.Serialize(expected, _jsonOptions);

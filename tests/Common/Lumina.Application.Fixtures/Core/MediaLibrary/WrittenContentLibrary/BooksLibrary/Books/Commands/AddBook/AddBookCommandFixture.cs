@@ -8,6 +8,7 @@ using Lumina.Contracts.DTO.MediaContributors;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -78,7 +79,7 @@ public class AddBookCommandFixture
                 default!
             ))
             .RuleFor(e => e.Name, f => f.Random.String2(f.Random.Number(1, 50)))
-            .RuleFor(e => e.Category, f => f.Random.String2(f.Random.Number(1, 50)));
+            .RuleFor(e => e.Category, f => f.PickRandom<MediaContributorRoleCategory>());
 
         Faker<MediaContributorNameDto> mediaContributorName = new Faker<MediaContributorNameDto>()
             .CustomInstantiator(f => new MediaContributorNameDto(

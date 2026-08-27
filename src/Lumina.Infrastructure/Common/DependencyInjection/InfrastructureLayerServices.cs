@@ -99,7 +99,9 @@ public static class InfrastructureLayerServices
         services.AddTransient<IMediaLibraryScanDiffJob, MediaLibraryScanDiffJob>();
         services.AddTransient<IMediaLibraryScanHashJob, MediaLibraryScanHashJob>();
         services.AddTransient<IMediaLibraryScanResultsSaveJob, MediaLibraryScanResultsSaveJob>();
+        services.AddTransient<IMediaLibraryScanProviderConfigurationInvalidationJob, MediaLibraryScanProviderConfigurationInvalidationJob>();
         services.AddTransient<IMediaLibraryScanMetadataEnrichmentJob, MediaLibraryScanMetadataEnrichmentJob>();
+        services.AddTransient<IMediaLibraryScanArtworkEnrichmentJob, MediaLibraryScanArtworkEnrichmentJob>();
 
 
         services.AddSingleton<IMediaLibraryScanProgressNotifier, DebouncedMediaLibraryScanProgressNotifier>();

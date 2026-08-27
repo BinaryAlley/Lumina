@@ -7,7 +7,6 @@ using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
-using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -24,7 +23,7 @@ public class BookMetadataDtoMappingTests
     private readonly GenreDtoFixture _genreDtoFixture = new();
 
     [Fact]
-    public void ApplyMetadata_WhenCalledWithValidMetadata_ShouldApplyItAndMarkTheBookAsEnriched()
+    public void ApplyMetadata_WhenCalledWithValidMetadata_ShouldApplyItToTheBook()
     {
         // Arrange
         Book book = _bookFixture.Create();
@@ -37,7 +36,7 @@ public class BookMetadataDtoMappingTests
             pageCount: 398);
 
         // Act
-        Result<Success> result = book.ApplyMetadata(metadata, "Goodreads", DateTime.UtcNow);
+        Result<Success> result = book.ApplyMetadata(metadata);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -46,9 +45,6 @@ public class BookMetadataDtoMappingTests
         Assert.Equal("The first part of J.R.R. Tolkien's epic adventure.", book.Metadata.Description.Value);
         Assert.Equal(BookFormat.Paperback, book.Format.Value);
         Assert.Equal("Houghton Mifflin", book.Metadata.Publisher.Value);
-        Assert.Equal(MetadataStatus.Enriched, book.MetadataStatus);
-        Assert.Equal("Goodreads", book.MetadataProvider.Value);
-        Assert.True(book.LastMetadataUpdateUtc.HasValue);
     }
 
     [Fact]
@@ -64,10 +60,10 @@ public class BookMetadataDtoMappingTests
         };
 
         // Act
-        Result<Success> result = book.ApplyMetadata(metadata, "Goodreads", DateTime.UtcNow);
+        Result<Success> result = book.ApplyMetadata(metadata);
 
         // Assert
         Assert.True(result.IsFailure);
-        Assert.Equal(MetadataStatus.Pending, book.MetadataStatus);
+        Assert.NotEqual("The Fellowship of the Ring", book.Metadata.Title);
     }
 }

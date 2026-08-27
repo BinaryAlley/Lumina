@@ -1766,20 +1766,6 @@ public class AddBookCommandValidatorTests
     }
 
     [Fact]
-    public void Validate_WhenCalledWithInvalidLengthContributorRoleCategory_ShouldHaveValidationError()
-    {
-        // Arrange
-        AddBookCommand bookCommand = _commandBookFixture.Create();
-        bookCommand = bookCommand with { Contributors = [.. bookCommand.Contributors!.Select((contributor, index) => index == 0 ? contributor with { Role = contributor.Role! with { Category = new Faker().Random.String2(51) } } : contributor)] };
-
-        // Act
-        List<Error> result = _validator.TestValidate(bookCommand);
-
-        // Assert
-        result.ShouldHaveValidationError(Errors.MediaContributor.RoleCategoryMustBeMaximum50CharactersLong);
-    }
-
-    [Fact]
     public void Validate_WhenCalledWithNullRatings_ShouldHaveValidationError()
     {
         // Arrange

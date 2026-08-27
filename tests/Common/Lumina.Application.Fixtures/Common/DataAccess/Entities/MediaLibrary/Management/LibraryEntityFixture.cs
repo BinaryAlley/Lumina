@@ -30,6 +30,8 @@ public class LibraryEntityFixture
     /// <param name="canDownloadMetadataFromWeb">Whether the media library should download metadata from the web or not.</param>
     /// <param name="shouldSaveMetadataInMediaDirectories">Whether the metadata should be saved in the media directories or not.</param>
     /// <param name="shouldSkipUnchangedDirectoriesDuringScan">Whether unchanged directories should be skipped during a scan or not.</param>
+    /// <param name="metadataProvidersConfigurationFingerprint">Optional. The fingerprint of the metadata provider configuration of the media library.</param>
+    /// <param name="artworkProvidersConfigurationFingerprint">Optional. The fingerprint of the artwork provider configuration of the media library.</param>
     /// <returns>The created media library entity.</returns>
     public LibraryEntity Create(
         Guid? id = null,
@@ -42,7 +44,9 @@ public class LibraryEntityFixture
         bool isLocked = false,
         bool canDownloadMetadataFromWeb = true,
         bool shouldSaveMetadataInMediaDirectories = true,
-        bool shouldSkipUnchangedDirectoriesDuringScan = false)
+        bool shouldSkipUnchangedDirectoriesDuringScan = false,
+        string? metadataProvidersConfigurationFingerprint = null,
+        string? artworkProvidersConfigurationFingerprint = null)
     {
         return new Faker<LibraryEntity>()
             .CustomInstantiator(f => new LibraryEntity
@@ -59,6 +63,8 @@ public class LibraryEntityFixture
                 CanDownloadMetadataFromWeb = canDownloadMetadataFromWeb,
                 ShouldSaveMetadataInMediaDirectories = shouldSaveMetadataInMediaDirectories,
                 ShouldSkipUnchangedDirectoriesDuringScan = shouldSkipUnchangedDirectoriesDuringScan,
+                MetadataProvidersConfigurationFingerprint = metadataProvidersConfigurationFingerprint,
+                ArtworkProvidersConfigurationFingerprint = artworkProvidersConfigurationFingerprint,
                 CreatedOnUtc = default,
                 CreatedBy = default,
                 UpdatedOnUtc = null,

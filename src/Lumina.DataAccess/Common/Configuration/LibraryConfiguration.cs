@@ -56,6 +56,16 @@ public class LibraryConfiguration : IEntityTypeConfiguration<LibraryEntity>
         builder.Property(library => library.ShouldSkipUnchangedDirectoriesDuringScan)
             .HasColumnOrder(8);
 
+        builder.Property(library => library.MetadataProvidersConfigurationFingerprint)
+            .HasMaxLength(64)
+            .HasDefaultValue(null)
+            .HasColumnOrder(9);
+
+        builder.Property(library => library.ArtworkProvidersConfigurationFingerprint)
+            .HasMaxLength(64)
+            .HasDefaultValue(null)
+            .HasColumnOrder(10);
+
         // one user with many libraries
         builder.HasOne(library => library.User)
             .WithMany(user => user.Libraries)
@@ -88,18 +98,18 @@ public class LibraryConfiguration : IEntityTypeConfiguration<LibraryEntity>
         // audit
         builder.Property(library => library.CreatedOnUtc)
             .IsRequired()
-            .HasColumnOrder(9);
+            .HasColumnOrder(11);
 
         builder.Property(library => library.CreatedBy)
             .IsRequired()
-            .HasColumnOrder(10);
+            .HasColumnOrder(12);
 
         builder.Property(library => library.UpdatedOnUtc)
             .HasDefaultValue(null)
-            .HasColumnOrder(11);
+            .HasColumnOrder(13);
 
         builder.Property(library => library.UpdatedBy)
             .HasDefaultValue(null)
-            .HasColumnOrder(12);
+            .HasColumnOrder(14);
     }
 }

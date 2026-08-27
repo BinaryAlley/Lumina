@@ -80,10 +80,23 @@ internal sealed class MediaLibraryScanResultsSaveJob : MediaLibraryScanJob, IMed
                     if (getDeletedPathsResult.IsFailure)
                         throw new InvalidOperationException(getDeletedPathsResult.FirstError.Description);
 
+                    // get the paths of the media library scan staging results that changed since the previous scan, so that the books stored at those paths are re-enriched
+                    Result<IReadOnlyList<string>> getChangedPathsResult = await unitOfWork.LibraryScanStagingResultsRepository.GetChangedPathsAsync(ScanId.Value, cancellationToken).ConfigureAwait(false);
+                    if (getChangedPathsResult.IsFailure)
+                        throw new InvalidOperationException(getChangedPathsResult.FirstError.Description);
+
                     // apply the results of the current scan to the storage medium, atomically replacing the media library scan snapshot of the previous scan
                     Result<Updated> applySnapshotSwapResult = await unitOfWork.LibraryScanSnapshotRepository.ApplySnapshotSwapAsync(LibraryId.Value, ScanId.Value, UserId.Value, cancellationToken).ConfigureAwait(false);
                     if (applySnapshotSwapResult.IsFailure)
                         throw new InvalidOperationException(applySnapshotSwapResult.FirstError.Description);
+
+                    // reset the enrichment state of the books whose content changed, so that they are re-enriched by the enrichment jobs that follow
+                    if (getChangedPathsResult.Value.Count > 0)
+                    {
+                        Result<Updated> resetEnrichmentStateResult = await unitOfWork.BookRepository.ResetEnrichmentStateForPathsAsync(LibraryId.Value, getChangedPathsResult.Value, cancellationToken).ConfigureAwait(false);
+                        if (resetEnrichmentStateResult.IsFailure)
+                            throw new InvalidOperationException(resetEnrichmentStateResult.FirstError.Description);
+                    }
 
                     // raise a deletion event for every media library scan snapshot item that is no longer present on disk
                     foreach (string deletedPath in getDeletedPathsResult.Value)

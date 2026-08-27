@@ -19,14 +19,12 @@ namespace Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.B
 public static class BookMetadataDtoMapping
 {
     /// <summary>
-    /// Applies the metadata of <paramref name="metadata"/> to <paramref name="book"/>, marking its metadata as enriched by the provided <paramref name="providerName"/>.
+    /// Applies the metadata of <paramref name="metadata"/> to <paramref name="book"/>.
     /// </summary>
     /// <param name="book">The domain book to which the metadata is applied.</param>
     /// <param name="metadata">The metadata to be applied.</param>
-    /// <param name="providerName">The name of the metadata provider that enriched the book.</param>
-    /// <param name="lastUpdateUtc">The date and time when the metadata was enriched.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
-    public static Result<Success> ApplyMetadata(this Book book, BookMetadataDto metadata, string providerName, DateTime lastUpdateUtc)
+    public static Result<Success> ApplyMetadata(this Book book, BookMetadataDto metadata)
     {
         if (string.IsNullOrWhiteSpace(metadata.Title))
             return Domain.Common.Errors.Errors.Metadata.TitleCannotBeEmpty;
@@ -126,13 +124,8 @@ public static class BookMetadataDtoMapping
             Optional<string>.FromNullable(metadata.BarnesAndNobleId),
             Optional<string>.FromNullable(metadata.AppleBooksId),
             [.. domainIsbnsResult.Select(isbnResult => isbnResult.Value)],
-            [.. domainRatingsResult.Select(ratingResult => ratingResult.Value)],
-            providerName,
-            lastUpdateUtc
+            [.. domainRatingsResult.Select(ratingResult => ratingResult.Value)]
         );
-
-        if (!string.IsNullOrWhiteSpace(metadata.CoverImagePath))
-            book.SetBookCoverImagePath(metadata.CoverImagePath);
 
         return Result.Success;
     }
