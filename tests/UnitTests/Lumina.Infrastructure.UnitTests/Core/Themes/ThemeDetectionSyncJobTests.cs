@@ -164,6 +164,30 @@ public class ThemeDetectionSyncJobTests : IDisposable
     }
 
     [Fact]
+    public async Task StartAsync_WhenInstalledBundledThemePackIsMissingAndNotDeleted_ShouldReinstallTheFilesWithoutInsertingANewRow()
+    {
+        // Arrange
+        ThemeEntity existingTheme = _themeEntityFixture.Create(themeId: "bundled-theme", isCurrent: true, includeIsCurrent: true, installSource: ThemeInstallSource.Bundled, isDeleted: false);
+        _mockThemeRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(Result.From<IEnumerable<ThemeEntity>>([existingTheme]));
+        _mockThemeService.HasThemePack("bundled-theme").Returns(false);
+        string archivePath = CreateBundledArchiveFile("bundled-theme");
+        ThemeManifestDto manifest = _themeManifestDtoFixture.Create(id: "bundled-theme");
+        _mockThemeService.GetBundledThemeArchivePaths().Returns([archivePath]);
+        _mockThemeService.ReadManifestFromArchiveAsync(archivePath, Arg.Any<CancellationToken>()).Returns(manifest);
+        _mockThemeService.InstallAsync(Arg.Any<Stream>(), Arg.Any<CancellationToken>()).Returns(manifest);
+        _mockThemeService.RestoreBundledThemeAsync("bundled-theme", Arg.Any<CancellationToken>()).Returns(Result.Success);
+
+        // Act
+        await StartAndWaitForExecutionAsync(CreateSut());
+
+        // Assert
+        await _mockThemeService.Received(1).InstallAsync(Arg.Any<Stream>(), Arg.Any<CancellationToken>());
+        await _mockThemeRepository.DidNotReceiveWithAnyArgs().InsertAsync(default!, Arg.Any<CancellationToken>());
+        await _mockThemeRepository.DidNotReceiveWithAnyArgs().UpdateAsync(default!, Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task StartAsync_WhenBundledArchiveManifestCannotBeRead_ShouldSkipTheArchive()
     {
         // Arrange
@@ -252,7 +276,7 @@ public class ThemeDetectionSyncJobTests : IDisposable
     }
 
     [Fact]
-    public async Task StartAsync_WhenMissingBundledThemePackCannotBeRestored_ShouldSoftDeleteTheTheme()
+    public async Task StartAsync_WhenLastBundledThemePackCannotBeRestored_ShouldKeepAndActivateTheTheme()
     {
         // Arrange
         ThemeEntity brokenTheme = _themeEntityFixture.Create(themeId: "bundled-theme", installSource: ThemeInstallSource.Bundled, isDeleted: false);
@@ -267,7 +291,33 @@ public class ThemeDetectionSyncJobTests : IDisposable
 
         // Assert
         await _mockThemeRepository.Received(1).UpdateAsync(
-            Arg.Is<ThemeEntity>(theme => theme.ThemeId == "bundled-theme" && theme.IsDeleted && theme.IsCurrent == null),
+            Arg.Is<ThemeEntity>(theme => theme.ThemeId == "bundled-theme" && theme.IsCurrent == true && !theme.IsDeleted),
+            Arg.Any<CancellationToken>());
+        await _mockThemeService.Received(1).RestoreBundledThemeAsync("bundled-theme", Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task StartAsync_WhenMissingBundledThemePackCannotBeRestoredAndAnotherBundledThemeRemains_ShouldSoftDeleteTheTheme()
+    {
+        // Arrange
+        ThemeEntity brokenTheme = _themeEntityFixture.Create(themeId: "broken-theme", installSource: ThemeInstallSource.Bundled, isDeleted: false);
+        ThemeEntity healthyTheme = _themeEntityFixture.Create(themeId: "healthy-theme", installSource: ThemeInstallSource.Bundled, isDeleted: false);
+        _mockThemeRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(Result.From<IEnumerable<ThemeEntity>>([brokenTheme, healthyTheme]));
+        _mockThemeService.HasThemePack("broken-theme").Returns(false);
+        _mockThemeService.GetBundledThemeArchivePaths().Returns([]);
+        _mockThemeService.RestoreBundledThemeAsync("broken-theme", Arg.Any<CancellationToken>()).Returns(Error.Failure("Theme.Files", "restore failed"));
+        _mockThemeRepository.UpdateAsync(Arg.Any<ThemeEntity>(), Arg.Any<CancellationToken>()).Returns(Result.From(Result.Updated));
+
+        // Act
+        await StartAndWaitForExecutionAsync(CreateSut());
+
+        // Assert
+        await _mockThemeRepository.Received(1).UpdateAsync(
+            Arg.Is<ThemeEntity>(theme => theme.ThemeId == "broken-theme" && theme.IsDeleted && theme.IsCurrent == null),
+            Arg.Any<CancellationToken>());
+        await _mockThemeRepository.Received(1).UpdateAsync(
+            Arg.Is<ThemeEntity>(theme => theme.ThemeId == "healthy-theme" && theme.IsCurrent == true),
             Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }

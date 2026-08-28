@@ -44,12 +44,12 @@ internal sealed class ThemeDetectionSyncJob : BackgroundService
     /// Method called when the background service starts.
     /// </summary>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
         await using AsyncServiceScope asyncServiceScope = _serviceScopeFactory.CreateAsyncScope();
         IUnitOfWork unitOfWork = asyncServiceScope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-        Result<IEnumerable<ThemeEntity>> getThemesResult = await unitOfWork.ThemeRepository.GetAllAsync(stoppingToken);
+        Result<IEnumerable<ThemeEntity>> getThemesResult = await unitOfWork.ThemeRepository.GetAllAsync(cancellationToken);
         if (getThemesResult.IsFailure)
         {
             _logger.LogWarning("Failed to read the installed themes: {Error}", getThemesResult.FirstError.Description);
@@ -58,18 +58,21 @@ internal sealed class ThemeDetectionSyncJob : BackgroundService
 
         // themes that were soft deleted by the user must not be reinstalled automatically
         List<ThemeEntity> themes = [.. getThemesResult.Value];
-        HashSet<string> knownThemeIds = [.. themes.Select(theme => theme.ThemeId)];
 
         foreach (string archivePath in _themeService.GetBundledThemeArchivePaths())
         {
-            Result<ThemeManifestDto> manifestResult = await _themeService.ReadManifestFromArchiveAsync(archivePath, stoppingToken);
+            Result<ThemeManifestDto> manifestResult = await _themeService.ReadManifestFromArchiveAsync(archivePath, cancellationToken);
             if (manifestResult.IsFailure)
             {
                 _logger.LogWarning("Skipping bundled theme archive {ArchivePath}: {Error}", archivePath, manifestResult.FirstError.Description);
                 continue;
             }
 
-            if (knownThemeIds.Contains(manifestResult.Value.Id))
+            ThemeEntity? existingTheme = themes.Where(theme => theme.ThemeId == manifestResult.Value.Id).FirstOrDefault();
+
+            // a theme that was soft deleted by the user must not be reinstalled automatically; an installed bundled theme
+            // whose files are present is already in sync, so only a bundled theme whose files went missing gets its files reinstalled
+            if (existingTheme is not null && (existingTheme.IsDeleted || existingTheme.InstallSource != ThemeInstallSource.Bundled || _themeService.HasThemePack(existingTheme.ThemeId)))
                 continue;
 
             // installing a bundled theme at startup is best effort: a file system failure here must never crash the host,
@@ -78,12 +81,16 @@ internal sealed class ThemeDetectionSyncJob : BackgroundService
             try
             {
                 await using FileStream archive = File.OpenRead(archivePath);
-                Result<ThemeManifestDto> installResult = await _themeService.InstallAsync(archive, stoppingToken);
+                Result<ThemeManifestDto> installResult = await _themeService.InstallAsync(archive, cancellationToken);
                 if (installResult.IsFailure)
                 {
                     _logger.LogWarning("Failed to install bundled theme '{ThemeId}': {Error}", manifestResult.Value.Id, installResult.FirstError.Description);
                     continue;
                 }
+
+                // a known theme only gets its missing files reinstalled, so no new row is inserted
+                if (existingTheme is not null)
+                    continue;
 
                 ThemeEntity themeEntity = new()
                 {
@@ -101,7 +108,7 @@ internal sealed class ThemeDetectionSyncJob : BackgroundService
                     UpdatedBy = default
                 };
 
-                Result<Created> insertResult = await unitOfWork.ThemeRepository.InsertAsync(themeEntity, stoppingToken);
+                Result<Created> insertResult = await unitOfWork.ThemeRepository.InsertAsync(themeEntity, cancellationToken);
                 if (insertResult.IsFailure)
                     _logger.LogWarning("Failed to persist the detection of theme '{ThemeId}': {Error}", manifestResult.Value.Id, insertResult.FirstError.Description);
                 else
@@ -117,10 +124,10 @@ internal sealed class ThemeDetectionSyncJob : BackgroundService
             }
         }
 
-        await CleanUpMissingThemePacksAsync(unitOfWork, themes, stoppingToken);
-        await EnsureCurrentThemeExistsAsync(unitOfWork, themes, stoppingToken);
+        await CleanUpMissingThemePacksAsync(unitOfWork, themes, cancellationToken);
+        await EnsureCurrentThemeExistsAsync(unitOfWork, themes, cancellationToken);
 
-        await unitOfWork.SaveChangesAsync(stoppingToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
     /// <summary>
@@ -148,6 +155,15 @@ internal sealed class ThemeDetectionSyncJob : BackgroundService
                     continue;
 
                 _logger.LogWarning("Failed to restore the files of bundled theme '{ThemeId}': {Error}", brokenTheme.ThemeId, restoreResult.FirstError.Description);
+
+                // at least one bundled theme must always remain available, so the application never ends up without any theme;
+                // the last remaining bundled theme is kept even when its files cannot be recovered
+                int availableBundledThemes = themes.Count(availableTheme => !availableTheme.IsDeleted && availableTheme.InstallSource == ThemeInstallSource.Bundled);
+                if (availableBundledThemes <= 1)
+                {
+                    _logger.LogWarning("Bundled theme '{ThemeId}' is the last remaining bundled theme and its files could not be restored, so it is kept.", brokenTheme.ThemeId);
+                    continue;
+                }
 
                 // a bundled theme whose files could not be recovered is soft deleted, so it is not shown anymore, but can be restored later
                 brokenTheme.IsDeleted = true;
@@ -181,9 +197,12 @@ internal sealed class ThemeDetectionSyncJob : BackgroundService
         if (themes.Any(theme => !theme.IsDeleted && theme.IsCurrent == true))
             return;
 
+        // a theme whose files are present is preferred, so the activated theme can render immediately; a bundled theme
+        // whose files could not be restored is kept as the fallback, so the application always has an active theme
         ThemeEntity? defaultTheme = themes
-            .Where(theme => !theme.IsDeleted && _themeService.HasThemePack(theme.ThemeId))
-            .OrderBy(theme => string.Equals(theme.ThemeId, _themeService.DefaultThemeId, StringComparison.OrdinalIgnoreCase) ? 0 : 1)
+            .Where(theme => !theme.IsDeleted)
+            .OrderBy(theme => _themeService.HasThemePack(theme.ThemeId) ? 0 : 1)
+            .ThenBy(theme => string.Equals(theme.ThemeId, _themeService.DefaultThemeId, StringComparison.OrdinalIgnoreCase) ? 0 : 1)
             .ThenBy(theme => theme.ThemeId, StringComparer.OrdinalIgnoreCase)
             .FirstOrDefault();
         if (defaultTheme is null)
