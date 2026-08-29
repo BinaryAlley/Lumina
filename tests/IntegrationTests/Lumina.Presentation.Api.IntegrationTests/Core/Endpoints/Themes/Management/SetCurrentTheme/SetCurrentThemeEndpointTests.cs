@@ -220,8 +220,8 @@ public class SetCurrentThemeEndpointTests : IClassFixture<AuthenticatedLuminaApi
             }
         }
 
-        // restore the bundled theme as the active one, so the following tests start from a clean state
-        ThemeEntity? bundledTheme = await dbContext.Themes.FirstOrDefaultAsync(t => t.ThemeId == "editorial-paper");
+        // restore the bundled default theme as the active one, so the following tests start from a clean state
+        ThemeEntity? bundledTheme = await dbContext.Themes.FirstOrDefaultAsync(t => t.ThemeId == "lumina-default");
         if (bundledTheme is not null)
             bundledTheme.IsCurrent = true;
 

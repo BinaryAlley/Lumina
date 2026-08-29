@@ -65,7 +65,7 @@ public class GetThemesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactor
         List<ThemeResponse>? themes = await response.Content.ReadFromJsonAsync<List<ThemeResponse>>(_jsonOptions);
         Assert.NotNull(themes);
 
-        ThemeResponse? bundledTheme = themes!.FirstOrDefault(theme => theme.ThemeId == "editorial-paper");
+        ThemeResponse? bundledTheme = themes!.FirstOrDefault(theme => theme.ThemeId == "lumina-default");
         Assert.NotNull(bundledTheme);
         Assert.NotEmpty(bundledTheme!.Name);
         Assert.Equal(ThemeInstallSource.Bundled, bundledTheme.InstallSource);

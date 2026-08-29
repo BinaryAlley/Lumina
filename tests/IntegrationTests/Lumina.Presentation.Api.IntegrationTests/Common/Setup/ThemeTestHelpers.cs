@@ -17,7 +17,7 @@ namespace Lumina.Presentation.Api.IntegrationTests.Common.Setup;
 public static class ThemeTestHelpers
 {
     /// <summary>
-    /// Waits until the bundled 'editorial-paper' theme has been installed and activated by the theme detection job at startup.
+    /// Waits until the bundled 'lumina-default' theme has been installed and activated by the theme detection job at startup.
     /// </summary>
     /// <param name="apiFactory">The shared API factory whose database is polled.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
@@ -31,12 +31,12 @@ public static class ThemeTestHelpers
             using IServiceScope scope = apiFactory.Services.CreateScope();
             LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
 
-            if (await dbContext.Themes.AnyAsync(theme => theme.ThemeId == "editorial-paper" && theme.IsCurrent == true))
+            if (await dbContext.Themes.AnyAsync(theme => theme.ThemeId == "lumina-default" && theme.IsCurrent == true))
                 return;
 
             await Task.Delay(DELAY_MILLISECONDS);
         }
 
-        Assert.Fail("The bundled theme 'editorial-paper' was not installed and activated within the expected time.");
+        Assert.Fail("The bundled theme 'lumina-default' was not installed and activated within the expected time.");
     }
 }
