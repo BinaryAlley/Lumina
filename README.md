@@ -87,7 +87,7 @@ To explore more about Enlightenment and their contributions to the open-source c
 
 ### Icons
 
-Most icons were taken from [Lyra Icon Theme](https://github.com/yeyushengfan258/Lyra-icon-theme/tree/master/src), a beautiful icon theme for Linux desktops.
+Most icons were taken from [Lyra Icon Theme](https://github.com/yeyushengfan258/Lyra-icon-theme/tree/master/src), a beautiful icon theme for Linux desktops. They ship as part of some of the bundled themes, in the `assets/images/icons/` directory of the theme pack.
 
 Several icons used in this project were adapted from icons sourced from [svgrepo](https://www.svgrepo.com/).
 

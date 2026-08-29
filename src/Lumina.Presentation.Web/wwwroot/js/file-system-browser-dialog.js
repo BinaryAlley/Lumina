@@ -64,71 +64,16 @@
     //|                                   Variables                                          |
     //+======================================================================================+ 
 
-    // current icon pack theme
-    const CURRENT_ICON_THEME = "Lyra";
-    // mapping of file extensions to SVG image paths
-    const FILE_ICONS = {
-        "ai": "application-postscript.svg",
-        "apk": "android-package-archive.svg",
-        "appimage": "application-vnd.appimage.svg",
-        "atom": "application-atom+xml.svg",
-        "avif": "application-image.svg",
-        "bmp": "application-image.svg",
-        "bz": "application-x-7z-ace.svg",
-        "chm": "application-vnd.ms-htmlhelp.svg",
-        "dicom": "application-dicom.svg",
-        "dll": "application-octet-stream.svg",
-        "dot": "application-msword-template.svg",
-        "doc": "application-msword-template.svg",
-        "docx": "application-msword-template.svg",
-        "eps": "application-postscript.svg",
-        "epub": "application-epub+zip.svg",
-        "exe": "application-octet-stream.svg",
-        "flac": "application-ogg.svg",
-        "gif": "application-image.svg",
-        "gz": "application-x-7z-ace.svg",
-        "ico": "application-image.svg",
-        "infopath": "application-vnd.ms-infopath.svg",
-        "jpeg": "application-image.svg",
-        "jpg": "application-image.svg",
-        "json": "application-json.svg",
-        "mdb": "application-vnd.ms-access.svg",
-        "mp3": "application-ogg.svg",
-        "ogg": "application-ogg.svg",
-        "otp": "application-vnd.oasis.opendocument.presentation-template.svg",
-        "ods": "application-vnd.oasis.opendocument.spreadsheet-template.svg",
-        "ots": "application-vnd.oasis.opendocument.spreadsheet-template.svg",
-        "ott": "application-vnd.oasis.opendocument.text-template.svg",
-        "otw": "application-vnd.oasis.opendocument.web-template.svg",
-        "p7s": "application-pgp-signature.svg",
-        "pdf": "application-pdf.svg",
-        "pict": "application-image.svg",
-        "pgp": "application-pgp.svg",
-        "png": "application-image.svg",
-        "ppt": "application-vnd.ms-powerpoint.svg",
-        "ps": "application-postscript.svg",
-        "psd": "application-photoshop.svg",
-        "pub": "application-vnd.ms-publisher.svg",
-        "rar": "application-x-7z-ace.svg",
-        "ref": "application-vnd.flatpak.ref.svg",
-        "sendfile": "application-vnd.kde.bluedevil-sendfile.svg",
-        "snap": "application-vnd.snap.svg",
-        "stream": "application-octet-stream.svg",
-        "svg": "application-image.svg",
-        "sql": "application-sql.svg",
-        "sqlite": "application-sql.svg",
-        "tar": "application-x-7z-ace.svg",
-        "tga": "application-image.svg",
-        "tiff": "application-image.svg",
-        "txt": "application-pgp-signature.svg",
-        "wav": "application-ogg.svg",
-        "webp": "application-image.svg",
-        "xdgapp": "application-vnd.xdgapp.svg",
-        "xls": "application-vnd.ms-excel.svg",
-        "xlsx": "application-vnd.ms-excel.svg",
-        "xml": "application-atom+xml.svg",
-        "zip": "application-x-7z-ace.svg"
-    };
+    // base URL of the file type icons of the active theme, empty when no theme is applied, in which case no icons are rendered
+    let iconBaseUrl = '';
+    // URL of the theme file icons mapping, mapping file extensions to icon paths, empty when no theme is applied
+    let fileIconsUrl = '';
+    // the file extension to icon path mapping of the active theme, null until the mapping is loaded
+    let fileIcons = null;
+    // the raw theme sub templates for the dynamic content, null when the theme does not provide a template and the built-in markup is used instead
+    let treeNodeTemplate = null;
+    let explorerItemTemplate = null;
+    let pathSegmentTemplate = null;
 
     let serverBasePath;
     let clientBasePath;
@@ -165,16 +110,18 @@
 
     /**
      * Initializes the values needed by the file sytem browser.
-     * @param {any} serverBasePathValue The base path of the server API.
-     * @param {any} clientBasePathValue The base path of the client app API.
-     * @param {any} initialPath The initial path of the file system browser.
-     * @param {any} viewModeValue The initial view mode of he file system browser.
-     * @param {any} iconSizeValue The initial icon size of the file system browser.
+     * @param {any} config The configuration of the file system browser, with the server and client base paths, the initial path, the initial view mode and icon size, and the optional theme asset URLs.
      */
-    async function initFileSystemBrowser(serverBasePathValue, clientBasePathValue, initialPath, viewModeValue, iconSizeValue) {
-        serverBasePath = serverBasePathValue;
-        clientBasePath = clientBasePathValue;
+    async function initFileSystemBrowser(config) {
+        serverBasePath = config.serverBasePath;
+        clientBasePath = config.clientBasePath;
+        iconBaseUrl = config.iconBaseUrl || '';
+        fileIconsUrl = config.fileIconsUrl || '';
+        readSubTemplates();
         await getFileSystemPropertiesAsync();
+        if (fileIconsUrl !== '')
+            await loadFileIconsAsync();
+        let initialPath = config.path;
         if (!initialPath.endsWith(pathSeparator))
             initialPath += pathSeparator;
 
@@ -183,8 +130,63 @@
         showFileSystemTreeView = true; // TODO: take from config
 
         addHorizontalScrolling(addressBar);
-        //switchViewMode('list', null, true);
-        switchViewMode(viewModeValue, viewModeValue === 'list' ? null : iconSizeValue, true);
+        switchViewMode(config.viewMode, config.viewMode === 'list' ? null : config.iconSize, true);
+    }
+
+    /**
+     * Reads the raw theme sub templates of the dynamic file system browser content from the template elements of the component.
+     */
+    function readSubTemplates() {
+        treeNodeTemplate = getSubTemplate('fsb-template-tree-node');
+        explorerItemTemplate = getSubTemplate('fsb-template-explorer-item');
+        pathSegmentTemplate = getSubTemplate('fsb-template-path-segment');
+    }
+
+    /**
+     * Gets the raw source of a theme sub template element, or null when the theme does not provide one.
+     * @param {string} id - The id of the template element.
+     * @returns {string|null} The raw template source, or null when the element is missing.
+     */
+    function getSubTemplate(id) {
+        const templateElement = document.getElementById(id);
+        if (!templateElement)
+            return null;
+        // the theme template engine may be absent on a partially loaded page, in which case the built-in markup is used
+        if (typeof renderThemeTemplate !== 'function')
+            return null;
+        // an empty template element means the theme does not provide the template, in which case the built-in markup is used
+        return templateElement.innerHTML || null;
+    }
+
+    /**
+     * Loads the file extension to icon path mapping of the active theme, degrading to the default icons when the mapping cannot be loaded.
+     */
+    async function loadFileIconsAsync() {
+        try {
+            const response = await fetch(fileIconsUrl);
+            if (response.ok)
+                fileIcons = await response.json();
+        } catch (error) {
+            fileIcons = null;
+        }
+    }
+
+    /**
+     * Resolves the URL of the icon of a file system entry, based on the file extension mapping of the active theme.
+     * @param {string} filename - The full name of the file including its extension.
+     * @param {string} type - The type of the entry, 'Directory' or 'File'.
+     * @returns {string} The icon URL, or an empty string when the active theme does not provide icons.
+     */
+    function resolveIconUrl(filename, type) {
+        if (iconBaseUrl === '')
+            return '';
+        if (type === 'Directory') {
+            const iconPath = fileIcons && fileIcons.directory ? fileIcons.directory : 'directory.svg';
+            return iconBaseUrl + '/' + iconPath;
+        }
+        const fileExtension = filename.split('.').pop().toLowerCase();
+        const iconPath = fileIcons && fileIcons[fileExtension] ? fileIcons[fileExtension] : (fileIcons && fileIcons.default ? fileIcons.default : 'file.svg');
+        return iconBaseUrl + '/' + iconPath;
     }
 
     /**
@@ -381,46 +383,70 @@
         pathSegmentsContainer.innerHTML = ""; // clear existing segments
         if (pathSegments !== null) {
             pathSegments.forEach((segment, index) => {
-                const li = document.createElement("li");
-                li.id = `path-segment-${index}`;
-                // create the combobox
-                const combobox = document.createElement("div");
-                combobox.className = "navigator-combobox inline-block";
-                // the shine effect 
-                const shineEffect = document.createElement("div");
-                shineEffect.className = "shine-effect";
-                shineEffect.style.top = "1px";
-                combobox.appendChild(shineEffect);
-                const toggleCheckbox = document.createElement("input");
-                toggleCheckbox.type = "checkbox";
-                toggleCheckbox.className = "navigator-toggle-checkbox";
-                toggleCheckbox.id = `segment-toggle-${index}`;
-                combobox.appendChild(toggleCheckbox);
-                const toggleLabel = document.createElement("label");
-                toggleLabel.className = "navigator-toggle";
-                toggleLabel.htmlFor = `segment-toggle-${index}`;
-                const span = document.createElement("span");
-                span.className = "navigator-selected-text";
-                span.innerText = segment.path;
-                toggleLabel.appendChild(span);
-                // add the arrow element
-                const arrowSpan = document.createElement("span");
-                arrowSpan.className = "navigator-arrow";
-                toggleLabel.appendChild(arrowSpan);
-                combobox.appendChild(toggleLabel);
-                const dropdown = document.createElement("div");
-                dropdown.className = "navigator-dropdown";
-                dropdown.id = `navigator-dropdown-${index}`;
-                dropdown.setAttribute('data-path-segment-id', `path-segment-${index}`);
-                // get the segments from start to the current one (on UNIX, start with path separator char!)
-                const concatenatedPath = (platformType === "Unix" ? '/' : '') + pathSegments.slice(0, index + 1).map(seg => seg.path).join(pathSeparator);
-                combobox.setAttribute('data-path', concatenatedPath + (!concatenatedPath.endsWith(pathSeparator) ? pathSeparator : ''));
-                combobox.appendChild(dropdown);
-                li.appendChild(combobox);
+                const li = renderPathSegment(segment, index, pathSegments);
                 pathSegmentsContainer.appendChild(li);
             });
         } else
             pathSegmentsContainer.querySelectorAll('li').forEach(li => li.remove()); // no address, clear path segments
+    }
+
+    /**
+     * Renders a single path segment of the address bar, using the theme sub template when the active theme provides one, or the built-in markup otherwise.
+     * @param {Object} segment - The path segment data.
+     * @param {number} index - The index of the segment in the address bar.
+     * @param {Array<Object>} pathSegments - All the path segments of the address bar.
+     * @returns {HTMLElement} The created list item element of the path segment.
+     */
+    function renderPathSegment(segment, index, pathSegments) {
+        const concatenatedPath = (platformType === "Unix" ? '/' : '') + pathSegments.slice(0, index + 1).map(segmentItem => segmentItem.path).join(pathSeparator);
+        const dataPath = concatenatedPath + (!concatenatedPath.endsWith(pathSeparator) ? pathSeparator : '');
+        if (pathSegmentTemplate !== null) {
+            const html = renderThemeTemplate(pathSegmentTemplate, {
+                id: `path-segment-${index}`,
+                path: segment.path,
+                dataPath: dataPath,
+                toggleId: `segment-toggle-${index}`,
+                dropdownId: `navigator-dropdown-${index}`
+            });
+            const container = document.createElement("div");
+            container.innerHTML = html;
+            return container.firstElementChild;
+        }
+        const li = document.createElement("li");
+        li.id = `path-segment-${index}`;
+        // create the combobox
+        const combobox = document.createElement("div");
+        combobox.className = "navigator-combobox inline-block";
+        // the shine effect 
+        const shineEffect = document.createElement("div");
+        shineEffect.className = "shine-effect";
+        shineEffect.style.top = "1px";
+        combobox.appendChild(shineEffect);
+        const toggleCheckbox = document.createElement("input");
+        toggleCheckbox.type = "checkbox";
+        toggleCheckbox.className = "navigator-toggle-checkbox";
+        toggleCheckbox.id = `segment-toggle-${index}`;
+        combobox.appendChild(toggleCheckbox);
+        const toggleLabel = document.createElement("label");
+        toggleLabel.className = "navigator-toggle";
+        toggleLabel.htmlFor = `segment-toggle-${index}`;
+        const span = document.createElement("span");
+        span.className = "navigator-selected-text";
+        span.innerText = segment.path;
+        toggleLabel.appendChild(span);
+        // add the arrow element
+        const arrowSpan = document.createElement("span");
+        arrowSpan.className = "navigator-arrow";
+        toggleLabel.appendChild(arrowSpan);
+        combobox.appendChild(toggleLabel);
+        const dropdown = document.createElement("div");
+        dropdown.className = "navigator-dropdown";
+        dropdown.id = `navigator-dropdown-${index}`;
+        dropdown.setAttribute('data-path-segment-id', `path-segment-${index}`);
+        combobox.setAttribute('data-path', dataPath);
+        combobox.appendChild(dropdown);
+        li.appendChild(combobox);
+        return li;
     }
 
     /**
@@ -604,6 +630,29 @@
      * @returns {HTMLElement} The created tree node element.
      */
     function createFileSystemTreeViewTreeNode(nodeData) {
+        if (treeNodeTemplate !== null) {
+            const html = renderThemeTemplate(treeNodeTemplate, {
+                path: nodeData.path,
+                name: nodeData.name,
+                itemType: nodeData.itemType,
+                isRoot: nodeData.itemType === 'Root',
+                isDirectory: nodeData.itemType !== 'File',
+                isFile: nodeData.itemType === 'File',
+                isExpanded: !!nodeData.isExpanded,
+                icon: getNodeIcon(nodeData)
+            });
+            const container = document.createElement("div");
+            container.innerHTML = html;
+            const treeNodeDiv = container.firstElementChild;
+            // the theme template must keep the DOM contract the script binds its events to
+            const nodeContent = treeNodeDiv.querySelector('.node-content');
+            if (nodeContent)
+                nodeContent.addEventListener('click', handleNodeClickAsync);
+            const expandButton = treeNodeDiv.querySelector('.expand-button');
+            if (expandButton)
+                expandButton.addEventListener('click', toggleFileSysemTreeViewNodeExpandAsync);
+            return treeNodeDiv;
+        }
         const treeNodeDiv = document.createElement("div");
         treeNodeDiv.className = "tree-node";
         treeNodeDiv.setAttribute('data-path', nodeData.path);
@@ -674,17 +723,21 @@
         // get the current expanded state of the clicked node, and toggle it
         const isExpanded = expandButton.classList.contains('expanded');
         nodeData.isExpanded = !isExpanded;
-        treeNodeIcon.textContent = getNodeIcon(nodeData);
+        if (treeNodeIcon)
+            treeNodeIcon.textContent = getNodeIcon(nodeData);
         // expand or collapse the node
         if (isExpanded) {
             expandButton.classList.remove('expanded');
-            childNodes.style.display = 'none';
+            if (childNodes)
+                childNodes.style.display = 'none';
         } else {
             expandButton.classList.add('expanded');
-            childNodes.style.display = 'block';
-            // if node is expanded and child nodes are not yet loaded, load them
-            if (childNodes.children.length === 0)
-                await loadFileSystemTreeViewChildNodesAsync(treeNode, path);
+            if (childNodes) {
+                childNodes.style.display = 'block';
+                // if node is expanded and child nodes are not yet loaded, load them
+                if (childNodes.children.length === 0)
+                    await loadFileSystemTreeViewChildNodesAsync(treeNode, path);
+            }
         }
     }
 
@@ -696,6 +749,8 @@
     async function loadFileSystemTreeViewChildNodesAsync(parentNode, path) {
         // get the div that hosts child nodes
         const childNodes = parentNode.querySelector('.child-nodes');
+        if (!childNodes)
+            return;
         // clear existing child nodes
         childNodes.innerHTML = '';
         try {
@@ -852,8 +907,26 @@
      * @returns {HTMLElement} The created DOM element for the file system item.
      */
     function createFileSystemExplorerItem(item) {
-        const itemDiv = document.createElement('div');
         const itemType = item.itemType;
+        if (explorerItemTemplate !== null) {
+            const html = renderThemeTemplate(explorerItemTemplate, {
+                path: item.path,
+                name: item.name,
+                itemType: itemType,
+                isDirectory: itemType === 'Directory',
+                isFile: itemType === 'File',
+                cssClass: viewMode,
+                iconUrl: resolveIconUrl(item.path, itemType)
+            });
+            const container = document.createElement('div');
+            container.innerHTML = html;
+            const itemDiv = container.firstElementChild;
+            // add event listeners for mouse interactions
+            itemDiv.onmouseup = handleFileSystemEntityMouseUpAsync;
+            itemDiv.onmousedown = handleFileSystemEntityMouseDown;
+            return itemDiv;
+        }
+        const itemDiv = document.createElement('div');
         // set up the main item div with appropriate classes and data attributes
         itemDiv.className = `e ${viewMode}`;
         itemDiv.setAttribute('data-path', item.path);
@@ -861,7 +934,8 @@
         // create and set up the icon div
         const iconDiv = document.createElement('div');
         iconDiv.className = 'icon';
-        iconDiv.innerHTML = `<img src='/images/icons/${CURRENT_ICON_THEME}/${getIconPathForFile(item.path, itemType)}'>`;
+        const iconUrl = resolveIconUrl(item.path, itemType);
+        iconDiv.innerHTML = iconUrl !== '' ? `<img src='${iconUrl}'>` : '';
         // create and set up the text div
         const textDiv = document.createElement('div');
         textDiv.className = 'text';
@@ -1338,11 +1412,14 @@
             // if the item is fully or partially visible in both directions, add it to our list
             if ((isFullyVisibleHorizontally || isPartiallyVisibleHorizontally) &&
                 (isFullyVisibleVertically || isPartiallyVisibleVertically)) {
+                // skip entries without an image element, which happens when the active theme does not provide icons
                 const imgElement = item.querySelector('img');
-                visibleItems.push({
-                    path: itemPath,
-                    img: imgElement
-                });
+                if (imgElement) {
+                    visibleItems.push({
+                        path: itemPath,
+                        img: imgElement
+                    });
+                }
             }
         });
         // process the list of visible items
@@ -1374,12 +1451,11 @@
             if (error.name === 'AbortError') {
                 // console.log('Fetch operation was aborted.');
             } else {
-                // on error, revert the icons to the default ones
+                // on error, revert the icons to the default ones of the active theme
                 let itemType = item.img.closest('.e').getAttribute('data-type');
-                if (itemType === 'directory')
-                    item.img.src = clientBasePath + "images/icons/" + CURRENT_ICON_THEME + "/directory.svg";
-                else if (itemType === 'file')
-                    item.img.src = clientBasePath + "images/icons/" + CURRENT_ICON_THEME + "/file.svg";
+                const iconUrl = resolveIconUrl('', itemType);
+                if (iconUrl !== '')
+                    item.img.src = iconUrl;
                 console.error('Error processing item:', error);
             }
         }
@@ -1422,18 +1498,6 @@
         }
     }
 
-
-    /**
-     * Returns the path to an SVG icon based on the file extension.
-     * @param {string} filename - The full name of the file including its extension.
-     * @returns {string} - The path to the appropriate SVG icon or a default one if not found.
-     */
-    function getIconPathForFile(filename, type) {
-        // extract file extension from filename
-        const fileExtension = filename.split('.').pop().toLowerCase();
-        // return the appropriate SVG image path or a default one if not found
-        return FILE_ICONS[fileExtension] || (type === "File" ? "file.svg" : "directory.svg");
-    }
 
     //+======================================================================================+
     //|                                  Miscellaneous                                       |
@@ -1518,35 +1582,47 @@
     //|                                Event Handlers                                        |
     //+======================================================================================+ 
 
+    /**
+     * Registers an event handler only when the element exists, so that a theme template may omit optional elements without breaking the script.
+     * @param {HTMLElement|null} element - The element to register the handler on, or null when the element is absent.
+     * @param {string} eventName - The name of the event.
+     * @param {Function} handler - The event handler.
+     * @param {object} [options] - Optional options passed to the event listener registration.
+     */
+    function addEventListenerIfPresent(element, eventName, handler, options) {
+        if (element)
+            element.addEventListener(eventName, handler, options);
+    }
+
     // event handlers for changing file system view modes
-    btnListView.addEventListener('click', () => switchViewMode('list', null, true));
-    btnDetailsView.addEventListener('click', () => switchViewMode('details', null, true));
-    btnSmallIconsView.addEventListener('click', () => switchViewMode('icons', 'small', true));
-    btnMediumIconsView.addEventListener('click', () => switchViewMode('icons', 'medium', true));
-    btnLargeIconsView.addEventListener('click', () => switchViewMode('icons', 'large', true));
-    btnExtraLargeIconsView.addEventListener('click', () => switchViewMode('icons', 'extra-large', true));
+    addEventListenerIfPresent(btnListView, 'click', () => switchViewMode('list', null, true));
+    addEventListenerIfPresent(btnDetailsView, 'click', () => switchViewMode('details', null, true));
+    addEventListenerIfPresent(btnSmallIconsView, 'click', () => switchViewMode('icons', 'small', true));
+    addEventListenerIfPresent(btnMediumIconsView, 'click', () => switchViewMode('icons', 'medium', true));
+    addEventListenerIfPresent(btnLargeIconsView, 'click', () => switchViewMode('icons', 'large', true));
+    addEventListenerIfPresent(btnExtraLargeIconsView, 'click', () => switchViewMode('icons', 'extra-large', true));
 
-    btnNavigatorToggleTreeView.addEventListener('click', async () => await toggleFileSystemTreeViewAsync(true));
-    btnNavigatorToggleThumbnails.addEventListener('click', async () => await toggleShowFileSystemElementsThumbnailsAsync(true));
-    btnNavigatorToggleSelectionMode.addEventListener('click', toggleFileSystemSelectionMode);
-    btnNavigatorHiddenElements.addEventListener('click', async () => await toggleShowFileSystemHiddenElementsAsync(true));
-    btnNavigatorNavigateUp.addEventListener('click', navigateUpAsync);
+    addEventListenerIfPresent(btnNavigatorToggleTreeView, 'click', async () => await toggleFileSystemTreeViewAsync(true));
+    addEventListenerIfPresent(btnNavigatorToggleThumbnails, 'click', async () => await toggleShowFileSystemElementsThumbnailsAsync(true));
+    addEventListenerIfPresent(btnNavigatorToggleSelectionMode, 'click', toggleFileSystemSelectionMode);
+    addEventListenerIfPresent(btnNavigatorHiddenElements, 'click', async () => await toggleShowFileSystemHiddenElementsAsync(true));
+    addEventListenerIfPresent(btnNavigatorNavigateUp, 'click', navigateUpAsync);
 
-    fileSystemExplorer.addEventListener('mouseup', handleFileSystemExplorerMouseUp);
-    fileSystemExplorer.addEventListener('scroll', handleFileSystemBrowserScrollEvent);
-    fileSystemExplorerContainer.addEventListener('scroll', handleFileSystemBrowserScrollEvent);
+    addEventListenerIfPresent(fileSystemExplorer, 'mouseup', handleFileSystemExplorerMouseUp);
+    addEventListenerIfPresent(fileSystemExplorer, 'scroll', handleFileSystemBrowserScrollEvent);
+    addEventListenerIfPresent(fileSystemExplorerContainer, 'scroll', handleFileSystemBrowserScrollEvent);
 
-    fileSystemExplorerContainer.addEventListener('mousedown', startSelection);
-    fileSystemExplorerContainer.addEventListener('mousemove', updateSelection);
-    fileSystemExplorerContainer.addEventListener('mouseup', endSelection);
-    fileSystemExplorerContainer.addEventListener('wheel', handleSelection, { passive: true });
-    fileSystemExplorerContainer.addEventListener('scroll', handleSelection);
+    addEventListenerIfPresent(fileSystemExplorerContainer, 'mousedown', startSelection);
+    addEventListenerIfPresent(fileSystemExplorerContainer, 'mousemove', updateSelection);
+    addEventListenerIfPresent(fileSystemExplorerContainer, 'mouseup', endSelection);
+    addEventListenerIfPresent(fileSystemExplorerContainer, 'wheel', handleSelection, { passive: true });
+    addEventListenerIfPresent(fileSystemExplorerContainer, 'scroll', handleSelection);
 
 
     /**
      * Event handler for the address bar input navigate button Click event.
      */
-    btnFileSystemBrowserSubmitPath.addEventListener('click', async function () {
+    addEventListenerIfPresent(btnFileSystemBrowserSubmitPath, 'click', async function () {
         await navigateToPathAsync(addressBarInput.value, false, false);
         addressBarInput.style.display = 'none';
         addressBar.style.display = 'block';
@@ -1555,7 +1631,7 @@
     /**
      * Event handler for the address bar input edit button Click event.
      */
-    btnFileSystemBrowserEditPath.addEventListener('click', function () {
+    addEventListenerIfPresent(btnFileSystemBrowserEditPath, 'click', function () {
         addressBarInput.style.display = 'block';
         addressBarInput.focus();
         addressBar.style.display = 'none';
@@ -1564,7 +1640,7 @@
     /**
      * Event handler for the navigator back button Click event.
      */
-    btnNavigatorNavigateBack.addEventListener('click', async function () {
+    addEventListenerIfPresent(btnNavigatorNavigateBack, 'click', async function () {
         if (addressBarInput.value !== null) 
             await navigateToPathAsync(addressBarInput.value, false, true);
     });
@@ -1572,7 +1648,7 @@
     /**
      * Event handler for the navigator address bar input KeyDown event.
      */
-    addressBarInput.addEventListener('keydown', async function (e) {
+    addEventListenerIfPresent(addressBarInput, 'keydown', async function (e) {
         if (e.key === 'Escape') {
             e.preventDefault();
             addressBarInput.style.display = 'none';
@@ -1584,7 +1660,7 @@
     /**
      * Event handler for the addressbar Click event.
      */
-    addressBar.addEventListener('click', function (e) {
+    addEventListenerIfPresent(addressBar, 'click', function (e) {
         // if the clicked element is the ul itself or one of its direct children (but not deeper nested children)
         if (e.target === e.currentTarget || e.target.parentElement === e.currentTarget) {
             this.style.display = 'none'; // hide #addressBar

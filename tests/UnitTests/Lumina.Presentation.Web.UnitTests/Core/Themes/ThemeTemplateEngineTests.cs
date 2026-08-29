@@ -23,6 +23,7 @@ public class ThemeTemplateEngineTests
     private readonly ThemeNavMenuDtoFixture _themeNavMenuDtoFixture = new();
     private readonly ThemeNavSectionDtoFixture _themeNavSectionDtoFixture = new();
     private readonly ThemeNavEntryDtoFixture _themeNavEntryDtoFixture = new();
+    private readonly ThemeFileSystemBrowserDtoFixture _themeFileSystemBrowserDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ThemeTemplateEngineTests"/> class.
@@ -156,6 +157,24 @@ public class ThemeTemplateEngineTests
         // Assert
         Assert.True(result.IsSuccess);
         Assert.Equal("Tools:[Language]English,Francais,Settings", result.Value.Content);
+    }
+
+    [Fact]
+    public void RenderPage_WhenFileSystemBrowserModelUsed_ShouldResolveStringsAndInlineRawSubTemplates()
+    {
+        // Arrange
+        ThemeFileSystemBrowserDto model = _themeFileSystemBrowserDtoFixture.Create(
+            assetBase: "/theme-assets/editorial/assets",
+            treeNodeTemplate: "<div class=\"tree-node\" data-path=\"{{path}}\">{{name}}</div>",
+            strings: new Dictionary<string, object?> { ["cancel"] = "Annuler" });
+        string template = "{{assetBase}}|{{strings.cancel}}|<template id=\"fsb-template-tree-node\">{{{treeNodeTemplate}}}</template>";
+
+        // Act
+        Result<ThemePageRenderResultDto> result = _sut.RenderPage(template, model);
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        Assert.Equal("/theme-assets/editorial/assets|Annuler|<template id=\"fsb-template-tree-node\"><div class=\"tree-node\" data-path=\"{{path}}\">{{name}}</div></template>", result.Value.Content);
     }
 
     [Fact]
