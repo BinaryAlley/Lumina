@@ -75,7 +75,6 @@
     let explorerItemTemplate = null;
     let pathSegmentTemplate = null;
 
-    let serverBasePath;
     let clientBasePath;
     let _path;
     let pathSeparator = '/';
@@ -113,7 +112,6 @@
      * @param {any} config The configuration of the file system browser.
      */
     async function initFileSystemBrowser(config) {
-        serverBasePath = config.serverBasePath;
         clientBasePath = config.clientBasePath;
         iconBaseUrl = config.iconBaseUrl || '';
         fileIconsUrl = config.fileIconsUrl || '';
@@ -1470,8 +1468,8 @@
      * @throws {Error} - Throws an error if the API call fails.
      */
     async function getThumbnailApiCall(path, quality) {
-        // fetch the thumbnail for the given item from the server
-        const response = await fetch(`${serverBasePath}thumbnails/get-thumbnail?path=` + encodeURIComponent(path) + '&quality=' + quality, {
+        // fetch the thumbnail for the given item from the server, through the Web application, which proxies the request with the authentication of the current user
+        const response = await fetch(`${clientBasePath}thumbnails/api-get-thumbnail?path=` + encodeURIComponent(path) + '&quality=' + quality, {
             signal: abortController.signal // use the abort signal 
         });
         if (!response.ok)
