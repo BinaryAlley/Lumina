@@ -19,21 +19,18 @@ public class ThemeFileSystemBrowserConfigurationDtoFixture
     /// <summary>
     /// Creates a new <see cref="ThemeFileSystemBrowserConfigurationDto"/> instance with randomized test data.
     /// </summary>
-    /// <param name="serverBasePath">Optional base URL of the remote API.</param>
     /// <param name="clientBasePath">Optional base URL of the Web application.</param>
     /// <param name="path">Optional initial path displayed by the file system browser.</param>
     /// <param name="viewMode">Optional initial view mode of the file system browser.</param>
     /// <param name="iconSize">Optional initial icon size of the file system browser.</param>
     /// <returns>A configured <see cref="ThemeFileSystemBrowserConfigurationDto"/> instance.</returns>
     public ThemeFileSystemBrowserConfigurationDto Create(
-        string? serverBasePath = null,
         string? clientBasePath = null,
         string? path = null,
         string? viewMode = null,
         string? iconSize = null)
     {
         return new ThemeFileSystemBrowserConfigurationDto(
-            ServerBasePath: serverBasePath ?? $"http://localhost:{_faker.Random.UShort()}/api/v1/",
             ClientBasePath: clientBasePath ?? $"http://localhost:{_faker.Random.UShort()}/",
             Path: path ?? (_faker.Random.Bool() ? "/" : "C:\\Users\\"),
             ViewMode: viewMode ?? _faker.Random.Word(),

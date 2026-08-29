@@ -119,11 +119,10 @@ public class ThemeFileSystemBrowserRenderer
     {
         string initConfigJson = JsonSerializer.Serialize(new
         {
-            configuration.ServerBasePath,
-            configuration.ClientBasePath,
-            configuration.Path,
-            configuration.ViewMode,
-            configuration.IconSize,
+            ClientBasePath = configuration.ClientBasePath,
+            Path = configuration.Path,
+            ViewMode = configuration.ViewMode,
+            IconSize = configuration.IconSize,
             IconBaseUrl = $"{assetBase}/images/icons",
             FileIconsUrl = $"{assetBase}/file-icons.json"
         }, s_camelCaseJsonOptions);

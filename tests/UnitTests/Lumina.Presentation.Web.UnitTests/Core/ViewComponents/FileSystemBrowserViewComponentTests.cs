@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.DTO.Configuration;
 using Lumina.Presentation.Web.Common.DTO.Themes;
 using Lumina.Presentation.Web.Common.Primitives;
 using Lumina.Presentation.Web.Core.Themes;
@@ -9,7 +8,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewComponents;
 using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.Options;
 using NSubstitute;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -25,7 +23,6 @@ namespace Lumina.Presentation.Web.UnitTests.Core.ViewComponents;
 [ExcludeFromCodeCoverage]
 public class FileSystemBrowserViewComponentTests
 {
-    private readonly IOptions<ServerConfigurationDto> _serverConfigurationOptions;
     private readonly ThemeFileSystemBrowserRenderer _mockRenderer;
     private readonly FileSystemBrowserViewComponent _sut;
 
@@ -34,16 +31,10 @@ public class FileSystemBrowserViewComponentTests
     /// </summary>
     public FileSystemBrowserViewComponentTests()
     {
-        _serverConfigurationOptions = Options.Create(new ServerConfigurationDto
-        {
-            ApiVersion = '1',
-            BaseAddress = "http://localhost",
-            Port = 5214
-        });
         ThemeService themeService = new(Substitute.For<IApiHttpClient>());
         ThemeFileSystemBrowserBuilder builder = new(Substitute.For<IStringLocalizerFactory>(), Substitute.For<IHttpContextAccessor>());
         _mockRenderer = Substitute.For<ThemeFileSystemBrowserRenderer>(themeService, new ThemeTemplateEngine(), builder);
-        _sut = new FileSystemBrowserViewComponent(_serverConfigurationOptions, _mockRenderer);
+        _sut = new FileSystemBrowserViewComponent(_mockRenderer);
     }
 
     [Fact]
@@ -95,7 +86,6 @@ public class FileSystemBrowserViewComponentTests
         // Assert
         await _mockRenderer.Received(1).RenderAsync(
             Arg.Is<ThemeFileSystemBrowserConfigurationDto>(configuration =>
-                configuration.ServerBasePath == "http://localhost:5214/api/v1/" &&
                 configuration.ClientBasePath == "http://localhost:5012/" &&
                 configuration.ViewMode == "list" &&
                 configuration.IconSize == "large"),

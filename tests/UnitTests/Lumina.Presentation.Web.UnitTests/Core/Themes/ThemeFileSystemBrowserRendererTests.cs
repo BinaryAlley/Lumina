@@ -68,7 +68,6 @@ public class ThemeFileSystemBrowserRendererTests
         Assert.Contains("/theme-assets/editorial/assets/images/icons", result.Value);
         Assert.Contains("data-path=\"{{path}}\"", result.Value);
         Assert.Contains("initFileSystemBrowser(", result.Value);
-        Assert.Contains("serverBasePath", result.Value);
     }
 
     [Fact]
