@@ -52,7 +52,9 @@ public class GetPathRootEndpointTests : IClassFixture<LuminaWebFactory>
         // Arrange
         _apiFactory.ApiClientStub.Reset();
         string expectedEndpoint = $"path/get-path-root?path={Uri.EscapeDataString(maliciousPath)}";
-        _apiFactory.ApiClientStub.RegisterGetResponse(expectedEndpoint, _pathSegmentDtoFixture.Create());
+        // a deterministic path keeps the content assertions independent of randomized fixture data, which could
+        // otherwise contain one of the forbidden substrings by coincidence
+        _apiFactory.ApiClientStub.RegisterGetResponse(expectedEndpoint, _pathSegmentDtoFixture.Create(path: "/documents/reports/final-report.pdf"));
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
         HttpRequestMessage getRequest = new(HttpMethod.Get, $"/path/api-get-path-root?path={Uri.EscapeDataString(maliciousPath)}");
         getRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
