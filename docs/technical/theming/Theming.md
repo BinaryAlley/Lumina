@@ -162,6 +162,10 @@ Known page keys:
 | `shared/nav-menu` | The navigation menu of the theme. |
 | `shared/not-found` | The 404 page. |
 | `library/written-content-library/book-library/books/index` | The books browsing page. |
+| `shared/file-system-browser` | The file system browser component shell. |
+| `shared/file-system-browser/tree-node` | The tree view node of the file system browser. |
+| `shared/file-system-browser/explorer-item` | The file system entry of the file system browser. |
+| `shared/file-system-browser/path-segment` | The address bar path segment of the file system browser. |
 
 ### The Layout Template (shared/layout)
 
@@ -228,6 +232,62 @@ The navigation template renders the menu of the active theme. Its model contains
 - An item has a `label`, an optional `url`, an optional `cssClass` and a list of `children`. Items with children are submenus, items without children are plain links.
 
 The navigation template is also best effort: when its template cannot be rendered, the application menu is used instead.
+
+### The File System Browser Templates (shared/file-system-browser)
+
+The file system browser is a modal component hosted by the library editing page. Like the navigation menu, it is rendered from theme templates and is best effort: when its component template cannot be loaded, the application renders its own unstyled fallback.
+
+The component is split into a shell template and three sub templates, all provided as mirrored files under `templates/shared/file-system-browser/`. Because the sub template page keys live under the shell page key, the engine would resolve a missing sub template to the shell template by walking up the path scopes; the application detects this fallback and treats it as a missing sub template, so a theme can omit any sub template and keep the built-in rendering of that part.
+
+The shell template receives a model with the following fields:
+
+| Field | Content |
+| --- | --- |
+| `appBase` | The absolute base URL of the Web application, used to reference the application scripts, for example `{{appBase}}js/file-system-browser-dialog.js`. |
+| `assetBase` | The base URL of the theme assets. |
+| `iconBaseUrl` | The base URL of the file type icons of the theme, derived from `assetBase`. |
+| `fileIconsUrl` | The URL of the file icons mapping of the theme, derived from `assetBase`. |
+| `treeNodeTemplate` | The raw source of the `shared/file-system-browser/tree-node` template, inlined by the application into a plain text script element. |
+| `explorerItemTemplate` | The raw source of the `shared/file-system-browser/explorer-item` template, inlined by the application into a plain text script element. |
+| `pathSegmentTemplate` | The raw source of the `shared/file-system-browser/path-segment` template, inlined by the application into a plain text script element. |
+| `strings` | The localized strings of the component, keyed by their resource names. |
+
+The shell template owns the whole dialog markup: the header with the view mode, navigation and address bar controls, the tree view and explorer panes and the action bar. It must keep the DOM contract the application script binds to (the element ids such as `file-system-browser-dialog`, `navigator-*`, `file-system-browser-treeview`, `file-system-browser-file-system-explorer` and the two selection rectangles), and it must include the application component scripts with their `data-component-script` attributes:
+
+```html
+<script type="text/plain" id="fsb-template-tree-node">{{{treeNodeTemplate}}}</script>
+<script type="text/plain" id="fsb-template-explorer-item">{{{explorerItemTemplate}}}</script>
+<script type="text/plain" id="fsb-template-path-segment">{{{pathSegmentTemplate}}}</script>
+<script defer src="{{appBase}}js/theme-client-template-engine.js" data-component-script="file-system-browser"></script>
+<script defer src="{{appBase}}js/file-system-browser-dialog.js" data-component-script="file-system-browser"></script>
+```
+
+The sub template sources are inlined into plain text script elements, whose content the browser never parses into elements, so the theme markup cannot be loaded or requested before the application script renders it. The application script reads the raw source from the script element text and renders it for each dynamic entry.
+
+The application appends the initialization script of the component after the rendered shell, so the theme does not author it.
+
+The sub templates are rendered client side by the application script for each dynamic entry, using the same Mustache syntax as the server side engine. They receive the following fields:
+
+| Template | Fields |
+| --- | --- |
+| `tree-node` | `path`, `name`, `itemType` (`Root`, `Directory` or `File`), `isRoot`, `isDirectory`, `isFile`, `isExpanded` and `icon`. The node must keep the `.tree-node` root with its `data-path`, the `.node-content`, `.expand-button` (or `.spacer` for files), `.node-icon` and `.node-name` elements, and the `.child-nodes` container. |
+| `explorer-item` | `path`, `name`, `itemType` (`Directory` or `File`), `isDirectory`, `isFile`, `cssClass` (the active view mode, such as `large-icons`) and `iconUrl`. The item must keep the `.e` root with its `data-path` and `data-type`, and an `<img>` element, which the script replaces with thumbnails for image files. |
+| `path-segment` | `id`, `path` (the segment name), `dataPath` (the full path up to and including the segment), `toggleId` and `dropdownId`. The segment must keep the combobox structure with its `.navigator-combobox` (`data-path`), `.navigator-toggle-checkbox`, `.navigator-selected-text`, `.navigator-arrow` and `.navigator-dropdown` elements. |
+
+#### The file icons mapping (assets/file-icons.json)
+
+The icons of the file system entries are owned by the theme. The theme ships its icon files under `assets/images/icons/`, and maps file extensions to icon paths in an optional `assets/file-icons.json`:
+
+```json
+{
+    "default": "file.svg",
+    "directory": "directory.svg",
+    "pdf": "application-pdf.svg",
+    "zip": "application-x-7z-ace.svg"
+}
+```
+
+The application fetches this mapping when the component initializes and resolves icon URLs against `iconBaseUrl`. Extensions without an entry fall back to `default`, directories use `directory`. When the theme does not ship the mapping or the icons, the component renders without icons rather than failing.
 
 ### Page Templates
 
@@ -299,7 +359,7 @@ The theme engine is configured through the `ThemeEngine` section of the API conf
 
 1. Create a directory for the theme with `theme.json`, a `templates/` directory and an `assets/` directory, following the layout of `editorial-paper`.
 2. Write the manifest following the field rules in [The Manifest (theme.json)](#the-manifest-themejson).
-3. Author the templates. Start with `templates/shared/layout.html` and `templates/shared/nav-menu.html`, then add page templates.
+3. Author the templates. Start with `templates/shared/layout.html` and `templates/shared/nav-menu.html`, then add page templates and the optional `templates/shared/file-system-browser*.html` component templates.
 4. Add the static files under `assets/`, for example a stylesheet referenced from the layout.
 5. Keep the pack within the size limits: the archive at most 8 MB, the extracted pack at most 24 MB, no single file larger than 6 MB and at most 250 entries.
 6. Compress the directory into a ZIP archive with `theme.json` at the root of the archive, not nested inside an extra folder.
