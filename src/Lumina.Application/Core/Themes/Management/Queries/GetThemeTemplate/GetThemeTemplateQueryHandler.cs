@@ -14,6 +14,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using Microsoft.Extensions.Logging;
 #endregion
 
 namespace Lumina.Application.Core.Themes.Management.Queries.GetThemeTemplate;
@@ -26,6 +27,7 @@ public class GetThemeTemplateQueryHandler : IQueryHandler<GetThemeTemplateQuery,
     private readonly IUnitOfWork _unitOfWork;
     private readonly IThemeService _themeService;
     private readonly IValidator<GetThemeTemplateQuery> _validator;
+    private readonly ILogger<GetThemeTemplateQueryHandler> _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetThemeTemplateQueryHandler"/> class.
@@ -33,11 +35,13 @@ public class GetThemeTemplateQueryHandler : IQueryHandler<GetThemeTemplateQuery,
     /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
     /// <param name="themeService">Injected service for the server-side storage and serving of theme packs.</param>
     /// <param name="validator">Injected validator for application validation rules.</param>
-    public GetThemeTemplateQueryHandler(IUnitOfWork unitOfWork, IThemeService themeService, IValidator<GetThemeTemplateQuery> validator)
+    /// <param name="logger">Injected logger for the handler.</param>
+    public GetThemeTemplateQueryHandler(IUnitOfWork unitOfWork, IThemeService themeService, IValidator<GetThemeTemplateQuery> validator, ILogger<GetThemeTemplateQueryHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _themeService = themeService;
         _validator = validator;
+        _logger = logger;
     }
 
     /// <summary>
@@ -66,8 +70,12 @@ public class GetThemeTemplateQueryHandler : IQueryHandler<GetThemeTemplateQuery,
         if (templateResult.IsFailure)
         {
             // the stored files of a bundled theme removed externally are restored, and if the broken theme was the
-            // active one, the configured default theme is activated, so clients always have a renderable theme
-            if (theme.InstallSource == ThemeInstallSource.Bundled && await TryRestoreBundledThemeAsync(theme, cancellationToken).ConfigureAwait(false))
+            // active one, the configured default theme is activated, so clients always have a renderable theme; a
+            // theme that simply does not provide a template for the page is not broken, so it is not restored and the
+            // caller falls back to the application's default unstyled Razor view instead
+            if (templateResult.FirstError != DomainErrors.Themes.ThemeTemplateNotFound
+                && theme.InstallSource == ThemeInstallSource.Bundled
+                && await TryRestoreBundledThemeAsync(theme, cancellationToken).ConfigureAwait(false))
                 templateResult = await _themeService.GetTemplateAsync(theme.ThemeId, query.PageKey!, cancellationToken).ConfigureAwait(false);
 
             if (templateResult.IsFailure)
@@ -85,29 +93,43 @@ public class GetThemeTemplateQueryHandler : IQueryHandler<GetThemeTemplateQuery,
     /// <returns><see langword="true"/> when the theme was restored; <see langword="false"/> otherwise.</returns>
     private async Task<bool> TryRestoreBundledThemeAsync(ThemeEntity theme, CancellationToken cancellationToken)
     {
-        Result<Success> restoreResult = await _themeService.RestoreBundledThemeAsync(theme.ThemeId, cancellationToken).ConfigureAwait(false);
-        if (restoreResult.IsFailure)
-            return false;
-
-        if (theme.IsCurrent == true)
+        try
         {
-            Result<ThemeEntity?> getDefaultResult = await _unitOfWork.ThemeRepository.GetByThemeIdAsync(_themeService.DefaultThemeId, cancellationToken).ConfigureAwait(false);
-            if (getDefaultResult.IsFailure)
-                return true;
+            Result<Success> restoreResult = await _themeService.RestoreBundledThemeAsync(theme.ThemeId, cancellationToken).ConfigureAwait(false);
+            if (restoreResult.IsFailure)
+                return false;
 
-            ThemeEntity? defaultTheme = getDefaultResult.Value;
-            if (defaultTheme is not null && !defaultTheme.IsDeleted && defaultTheme.Id != theme.Id)
+            if (theme.IsCurrent == true)
             {
-                theme.IsCurrent = null;
-                await _unitOfWork.ThemeRepository.UpdateAsync(theme, cancellationToken).ConfigureAwait(false);
+                Result<ThemeEntity?> getDefaultResult = await _unitOfWork.ThemeRepository.GetByThemeIdAsync(_themeService.DefaultThemeId, cancellationToken).ConfigureAwait(false);
+                if (getDefaultResult.IsFailure)
+                    return true;
 
-                defaultTheme.IsCurrent = true;
-                await _unitOfWork.ThemeRepository.UpdateAsync(defaultTheme, cancellationToken).ConfigureAwait(false);
+                ThemeEntity? defaultTheme = getDefaultResult.Value;
+                if (defaultTheme is not null && !defaultTheme.IsDeleted && defaultTheme.Id != theme.Id)
+                {
+                    theme.IsCurrent = null;
+                    await _unitOfWork.ThemeRepository.UpdateAsync(theme, cancellationToken).ConfigureAwait(false);
 
-                await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+                    defaultTheme.IsCurrent = true;
+                    await _unitOfWork.ThemeRepository.UpdateAsync(defaultTheme, cancellationToken).ConfigureAwait(false);
+
+                    await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+                }
             }
-        }
 
-        return true;
+            return true;
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception exception)
+        {
+            // the restore is best effort: an unexpected failure must not fail the request, so the caller falls back to
+            // the application view instead of returning an error to the browser
+            _logger.LogWarning(exception, "Failed to restore the files of bundled theme '{ThemeId}'.", theme.ThemeId);
+            return false;
+        }
     }
 }

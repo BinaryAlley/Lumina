@@ -276,6 +276,26 @@ public class ThemeDetectionSyncJobTests : IDisposable
     }
 
     [Fact]
+    public async Task StartAsync_WhenRestoringBundledThemeThrows_ShouldNotCrashTheJob()
+    {
+        // Arrange
+        ThemeEntity brokenTheme = _themeEntityFixture.Create(themeId: "bundled-theme", installSource: ThemeInstallSource.Bundled, isDeleted: false);
+        _mockThemeRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns(Result.From<IEnumerable<ThemeEntity>>([brokenTheme]));
+        _mockThemeService.HasThemePack("bundled-theme").Returns(false);
+        _mockThemeService.GetBundledThemeArchivePaths().Returns([]);
+        _mockThemeService.RestoreBundledThemeAsync("bundled-theme", Arg.Any<CancellationToken>())
+            .Returns(Task.FromException<Result<Success>>(new IOException("The theme storage is locked.")));
+        _mockThemeRepository.UpdateAsync(Arg.Any<ThemeEntity>(), Arg.Any<CancellationToken>()).Returns(Result.From(Result.Updated));
+
+        // Act
+        await StartAndWaitForExecutionAsync(CreateSut());
+
+        // Assert
+        await _mockThemeService.Received(1).RestoreBundledThemeAsync("bundled-theme", Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task StartAsync_WhenLastBundledThemePackCannotBeRestored_ShouldKeepAndActivateTheTheme()
     {
         // Arrange

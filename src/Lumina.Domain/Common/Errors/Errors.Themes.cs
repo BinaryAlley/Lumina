@@ -21,6 +21,7 @@ public static partial class Errors
         public static Error ThemeCannotBeRestored => Error.Forbidden(description: nameof(ThemeCannotBeRestored));
         public static Error ThemeArchiveNotReadable => Error.Failure(description: nameof(ThemeArchiveNotReadable));
         public static Error ThemeFilesUnreadable => Error.Failure(description: nameof(ThemeFilesUnreadable));
+        public static Error ThemeTemplateNotFound => Error.NotFound(description: nameof(ThemeTemplateNotFound));
         public static Error ThemeNotAvailable => Error.Failure(description: nameof(ThemeNotAvailable));
     }
 }

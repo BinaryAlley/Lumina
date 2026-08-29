@@ -158,14 +158,48 @@ public sealed class ThemeService : IThemeService
                 _logger.LogWarning(exception, "An uploaded theme archive could not be read.");
                 return Errors.Themes.ThemeArchiveNotReadable;
             }
+            catch (IOException exception)
+            {
+                // the extracted pack could not be moved into place; the install is best effort, so the caller receives an error
+                // instead of an unhandled exception that would crash the host or fail the request
+                _logger.LogWarning(exception, "The theme pack could not be installed.");
+                return Errors.Themes.ThemeFilesUnreadable;
+            }
+            catch (UnauthorizedAccessException exception)
+            {
+                _logger.LogWarning(exception, "The theme pack could not be installed.");
+                return Errors.Themes.ThemeFilesUnreadable;
+            }
             finally
             {
-                if (File.Exists(temporaryArchivePath))
-                    File.Delete(temporaryArchivePath);
+                try
+                {
+                    if (File.Exists(temporaryArchivePath))
+                        File.Delete(temporaryArchivePath);
 
-                if (Directory.Exists(extractionPath))
-                    Directory.Delete(extractionPath, recursive: true);
+                    if (Directory.Exists(extractionPath))
+                        Directory.Delete(extractionPath, recursive: true);
+                }
+                catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+                {
+                    // a locked staging file must not turn the install into an unhandled exception; the stale staging
+                    // directory is removed on the next install attempt
+                    _logger.LogTrace(exception, "Failed to clean up the theme staging directory.");
+                }
             }
+        }
+        catch (IOException exception)
+        {
+            // a file system failure before or during the install (for example a locked storage or staging directory)
+            // must not escape as an unhandled exception, which would crash the host or fail the request; the install
+            // is best effort and returns an error instead
+            _logger.LogWarning(exception, "The theme pack could not be installed.");
+            return Errors.Themes.ThemeFilesUnreadable;
+        }
+        catch (UnauthorizedAccessException exception)
+        {
+            _logger.LogWarning(exception, "The theme pack could not be installed.");
+            return Errors.Themes.ThemeFilesUnreadable;
         }
         finally
         {
@@ -242,7 +276,7 @@ public sealed class ThemeService : IThemeService
     }
 
     /// <summary>
-    /// Gets the sanitized content of the template selected by a page key, falling back to the default template when the key is missing.
+    /// Gets the sanitized content of the template selected by a page key, returning an error when the theme provides no template for the page.
     /// </summary>
     /// <param name="themeId">The manifest id of the theme.</param>
     /// <param name="pageKey">The page key that selects the template.</param>
@@ -259,7 +293,10 @@ public sealed class ThemeService : IThemeService
         string? templatePath = manifest.Templates.TryGetValue(pageKey, out string? explicitPath)
             ? explicitPath
             : ResolveMirroredTemplatePath(themePath, pageKey);
-        templatePath ??= manifest.Templates["default"]; // the manifest validation guarantees a default template
+
+        // a template is used for a page only when the theme provides one explicitly or as a mirrored file
+        if (templatePath is null)
+            return Errors.Themes.ThemeTemplateNotFound;
 
         Result<string> fullPathResult = ResolveContainedPath(themePath, templatePath);
         if (fullPathResult.IsFailure)
@@ -607,8 +644,8 @@ public sealed class ThemeService : IThemeService
         if (!s_versionPattern.IsMatch(manifest.Version))
             return PackageInvalid("Theme version must use semantic version form, for example 1.0.0.");
 
-        if (manifest.Templates is null || manifest.Templates.Count == 0 || manifest.Templates.Count > 32)
-            return PackageInvalid("A theme must declare between 1 and 32 templates.");
+        if (manifest.Templates is null || manifest.Templates.Count > 32)
+            return PackageInvalid("A theme must declare at most 32 templates.");
 
         Dictionary<string, string> normalizedTemplates = new(StringComparer.OrdinalIgnoreCase);
         foreach ((string key, string path) in manifest.Templates)
@@ -633,9 +670,6 @@ public sealed class ThemeService : IThemeService
 
             normalizedTemplates[key] = normalizedPath;
         }
-
-        if (!normalizedTemplates.ContainsKey("default"))
-            return PackageInvalid("The manifest must define a 'default' template fallback.");
 
         manifest.Templates = normalizedTemplates;
 
@@ -796,7 +830,7 @@ public sealed class ThemeService : IThemeService
                 else
                     File.Delete(path);
             }
-            catch (IOException exception)
+            catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
             {
                 _logger.LogDebug(exception, "Could not remove stale theme staging path {StagingPath}.", path);
             }
@@ -829,7 +863,7 @@ public sealed class ThemeService : IThemeService
                 Directory.Move(extractionPath, destination);
                 return;
             }
-            catch (IOException) when (attempt < MAX_ATTEMPTS)
+            catch (Exception exception) when (attempt < MAX_ATTEMPTS && exception is IOException or UnauthorizedAccessException)
             {
                 await Task.Delay(100 * attempt, cancellationToken);
             }

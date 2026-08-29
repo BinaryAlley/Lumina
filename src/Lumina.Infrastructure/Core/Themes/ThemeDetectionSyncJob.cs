@@ -147,41 +147,54 @@ internal sealed class ThemeDetectionSyncJob : BackgroundService
 
         foreach (ThemeEntity brokenTheme in brokenThemes)
         {
-            if (brokenTheme.InstallSource == ThemeInstallSource.Bundled)
+            try
             {
-                // the files of a bundled theme that was not deleted by the user are restored from its shipped archive
-                Result<Success> restoreResult = await _themeService.RestoreBundledThemeAsync(brokenTheme.ThemeId, cancellationToken);
-                if (restoreResult.IsSuccess)
-                    continue;
-
-                _logger.LogWarning("Failed to restore the files of bundled theme '{ThemeId}': {Error}", brokenTheme.ThemeId, restoreResult.FirstError.Description);
-
-                // at least one bundled theme must always remain available, so the application never ends up without any theme;
-                // the last remaining bundled theme is kept even when its files cannot be recovered
-                int availableBundledThemes = themes.Count(availableTheme => !availableTheme.IsDeleted && availableTheme.InstallSource == ThemeInstallSource.Bundled);
-                if (availableBundledThemes <= 1)
+                if (brokenTheme.InstallSource == ThemeInstallSource.Bundled)
                 {
-                    _logger.LogWarning("Bundled theme '{ThemeId}' is the last remaining bundled theme and its files could not be restored, so it is kept.", brokenTheme.ThemeId);
-                    continue;
-                }
+                    // the files of a bundled theme that was not deleted by the user are restored from its shipped archive
+                    Result<Success> restoreResult = await _themeService.RestoreBundledThemeAsync(brokenTheme.ThemeId, cancellationToken);
+                    if (restoreResult.IsSuccess)
+                        continue;
 
-                // a bundled theme whose files could not be recovered is soft deleted, so it is not shown anymore, but can be restored later
-                brokenTheme.IsDeleted = true;
-                brokenTheme.IsCurrent = null;
-                brokenTheme.UpdatedOnUtc = DateTime.UtcNow;
-                brokenTheme.UpdatedBy = default;
-                Result<Updated> updateResult = await unitOfWork.ThemeRepository.UpdateAsync(brokenTheme, cancellationToken);
-                if (updateResult.IsFailure)
-                    _logger.LogWarning("Failed to delete theme '{ThemeId}': {Error}", brokenTheme.ThemeId, updateResult.FirstError.Description);
+                    _logger.LogWarning("Failed to restore the files of bundled theme '{ThemeId}': {Error}", brokenTheme.ThemeId, restoreResult.FirstError.Description);
+
+                    // at least one bundled theme must always remain available, so the application never ends up without any theme;
+                    // the last remaining bundled theme is kept even when its files cannot be recovered
+                    int availableBundledThemes = themes.Count(availableTheme => !availableTheme.IsDeleted && availableTheme.InstallSource == ThemeInstallSource.Bundled);
+                    if (availableBundledThemes <= 1)
+                    {
+                        _logger.LogWarning("Bundled theme '{ThemeId}' is the last remaining bundled theme and its files could not be restored, so it is kept.", brokenTheme.ThemeId);
+                        continue;
+                    }
+
+                    // a bundled theme whose files could not be recovered is soft deleted, so it is not shown anymore, but can be restored later
+                    brokenTheme.IsDeleted = true;
+                    brokenTheme.IsCurrent = null;
+                    brokenTheme.UpdatedOnUtc = DateTime.UtcNow;
+                    brokenTheme.UpdatedBy = default;
+                    Result<Updated> updateResult = await unitOfWork.ThemeRepository.UpdateAsync(brokenTheme, cancellationToken);
+                    if (updateResult.IsFailure)
+                        _logger.LogWarning("Failed to delete theme '{ThemeId}': {Error}", brokenTheme.ThemeId, updateResult.FirstError.Description);
+                }
+                else
+                {
+                    // a user theme has no shipped archive to restore from, so damage is permanent and the theme is removed entirely
+                    _logger.LogWarning("The stored files of user theme '{ThemeId}' are missing, so the theme is deleted.", brokenTheme.ThemeId);
+                    brokenTheme.IsCurrent = null;
+                    Result<Deleted> deleteResult = await unitOfWork.ThemeRepository.DeleteByIdAsync(brokenTheme.Id, cancellationToken);
+                    if (deleteResult.IsFailure)
+                        _logger.LogWarning("Failed to delete theme '{ThemeId}': {Error}", brokenTheme.ThemeId, deleteResult.FirstError.Description);
+                }
             }
-            else
+            catch (OperationCanceledException)
             {
-                // a user theme has no shipped archive to restore from, so damage is permanent and the theme is removed entirely
-                _logger.LogWarning("The stored files of user theme '{ThemeId}' are missing, so the theme is deleted.", brokenTheme.ThemeId);
-                brokenTheme.IsCurrent = null;
-                Result<Deleted> deleteResult = await unitOfWork.ThemeRepository.DeleteByIdAsync(brokenTheme.Id, cancellationToken);
-                if (deleteResult.IsFailure)
-                    _logger.LogWarning("Failed to delete theme '{ThemeId}': {Error}", brokenTheme.ThemeId, deleteResult.FirstError.Description);
+                throw;
+            }
+            catch (Exception exception)
+            {
+                // repairing a broken theme is best effort: an unexpected failure on one theme must not crash the host,
+                // so it is logged and the remaining broken themes are still processed
+                _logger.LogWarning(exception, "Failed to repair the broken theme '{ThemeId}'.", brokenTheme.ThemeId);
             }
         }
     }

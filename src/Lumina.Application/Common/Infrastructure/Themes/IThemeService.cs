@@ -57,7 +57,7 @@ public interface IThemeService
     Task<Result<ThemeManifestDto>> LoadManifestAsync(string themeId, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Gets the sanitized content of the template selected by a page key, falling back to the default template when the key is missing.
+    /// Gets the sanitized content of the template selected by a page key, returning an error when the theme provides no template for the page.
     /// </summary>
     /// <param name="themeId">The manifest id of the theme.</param>
     /// <param name="pageKey">The page key that selects the template.</param>
