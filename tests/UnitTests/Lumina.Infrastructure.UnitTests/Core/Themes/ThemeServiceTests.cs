@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Infrastructure.Models.DTO.Themes;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
@@ -200,7 +201,7 @@ public class ThemeServiceTests : IDisposable
         // Act
         await InstallValidThemeAsync(firstArchive);
         await InstallValidThemeAsync(secondArchive);
-        Result<string> templateResult = await _sut.GetTemplateAsync("test-theme", "unknown-page", CancellationToken.None);
+        Result<string> templateResult = await _sut.GetTemplateAsync("test-theme", "default", CancellationToken.None);
 
         // Assert
         Assert.True(templateResult.IsSuccess);
@@ -208,6 +209,23 @@ public class ThemeServiceTests : IDisposable
         string[] themeDirectories = [.. Directory.GetDirectories(_options.StoragePath).Where(path => Path.GetFileName(path) != ".staging")];
         Assert.Single(themeDirectories);
         Assert.Equal("test-theme", Path.GetFileName(themeDirectories[0]));
+    }
+
+    [Fact]
+    public async Task InstallAsync_WhenThemeDestinationIsBlocked_ShouldReturnThemeFilesUnreadableInsteadOfThrowing()
+    {
+        // Arrange
+        byte[] archive = _themePackFixture.Create(themeId: "test-theme");
+        // the destination path is blocked by an existing file, so the extracted pack cannot be moved into place
+        Directory.CreateDirectory(_options.StoragePath);
+        File.WriteAllText(Path.Combine(_options.StoragePath, "test-theme"), "blocked");
+
+        // Act
+        Result<ThemeManifestDto> result = await _sut.InstallAsync(new MemoryStream(archive), CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal("ThemeFilesUnreadable", result.FirstError.Description);
     }
 
     [Fact]
@@ -558,7 +576,7 @@ public class ThemeServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task InstallAsync_WhenManifestDeclaresNoTemplates_ShouldReturnPackageInvalidError()
+    public async Task InstallAsync_WhenManifestDeclaresNoTemplates_ShouldInstallSuccessfully()
     {
         // Arrange
         byte[] archive = _themePackFixture.Create(templates: new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase));
@@ -567,7 +585,7 @@ public class ThemeServiceTests : IDisposable
         Result<ThemeManifestDto> result = await _sut.InstallAsync(new MemoryStream(archive), CancellationToken.None);
 
         // Assert
-        AssertPackageInvalid(result, "between 1 and 32");
+        Assert.True(result.IsSuccess);
     }
 
     [Fact]
@@ -583,7 +601,7 @@ public class ThemeServiceTests : IDisposable
         Result<ThemeManifestDto> result = await _sut.InstallAsync(new MemoryStream(archive), CancellationToken.None);
 
         // Assert
-        AssertPackageInvalid(result, "between 1 and 32");
+        AssertPackageInvalid(result, "at most 32");
     }
 
     [Fact]
@@ -641,7 +659,7 @@ public class ThemeServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task InstallAsync_WhenManifestLacksDefaultTemplate_ShouldReturnPackageInvalidError()
+    public async Task InstallAsync_WhenManifestLacksDefaultTemplate_ShouldInstallSuccessfully()
     {
         // Arrange
         Dictionary<string, string> templates = new(StringComparer.OrdinalIgnoreCase)
@@ -654,7 +672,7 @@ public class ThemeServiceTests : IDisposable
         Result<ThemeManifestDto> result = await _sut.InstallAsync(new MemoryStream(archive), CancellationToken.None);
 
         // Assert
-        AssertPackageInvalid(result, "default");
+        Assert.True(result.IsSuccess);
     }
 
     [Fact]
@@ -889,7 +907,7 @@ public class ThemeServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task GetTemplateAsync_WhenNoTemplateResolves_ShouldFallBackToDefaultTemplate()
+    public async Task GetTemplateAsync_WhenNoTemplateResolves_ShouldReturnThemeTemplateNotFound()
     {
         // Arrange
         byte[] archive = CreateThemeWithTemplates();
@@ -899,15 +917,15 @@ public class ThemeServiceTests : IDisposable
         Result<string> result = await _sut.GetTemplateAsync("test-theme", "unknown-page", CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
-        Assert.Equal(DEFAULT_TEMPLATE, result.Value);
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Themes.ThemeTemplateNotFound, result.FirstError);
     }
 
     [Theory]
     [InlineData("../secret")] // parent scope traversal attempt
     [InlineData("/etc/passwd")] // rooted path attempt
     [InlineData("templates//nested")] // empty segment attempt
-    public async Task GetTemplateAsync_WhenPageKeyAttemptsToEscapeTheThemePack_ShouldFallBackToDefaultTemplate(string pageKey)
+    public async Task GetTemplateAsync_WhenPageKeyAttemptsToEscapeTheThemePack_ShouldReturnThemeTemplateNotFound(string pageKey)
     {
         // Arrange
         byte[] archive = CreateThemeWithTemplates();
@@ -917,8 +935,57 @@ public class ThemeServiceTests : IDisposable
         Result<string> result = await _sut.GetTemplateAsync("test-theme", pageKey, CancellationToken.None);
 
         // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Themes.ThemeTemplateNotFound, result.FirstError);
+    }
+
+    [Fact]
+    public async Task GetTemplateAsync_WhenSharedLayoutTemplateIsMissing_ShouldReturnThemeTemplateNotFound()
+    {
+        // Arrange
+        byte[] archive = CreateThemeWithTemplates();
+        await InstallValidThemeAsync(archive);
+
+        // Act
+        Result<string> result = await _sut.GetTemplateAsync("test-theme", "shared/layout", CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Themes.ThemeTemplateNotFound, result.FirstError);
+    }
+
+    [Fact]
+    public async Task GetTemplateAsync_WhenSharedNavMenuTemplateIsMissing_ShouldReturnThemeTemplateNotFound()
+    {
+        // Arrange
+        byte[] archive = CreateThemeWithTemplates();
+        await InstallValidThemeAsync(archive);
+
+        // Act
+        Result<string> result = await _sut.GetTemplateAsync("test-theme", "shared/nav-menu", CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Themes.ThemeTemplateNotFound, result.FirstError);
+    }
+
+    [Fact]
+    public async Task GetTemplateAsync_WhenSharedNavMenuMirrorExists_ShouldReturnTheMirroredTemplate()
+    {
+        // Arrange
+        const string NAV_TEMPLATE = "<html><body>nav menu</body></html>";
+        byte[] archive = _themePackFixture.Create(additionalFiles: new Dictionary<string, string>
+        {
+            ["templates/shared/nav-menu.html"] = NAV_TEMPLATE
+        });
+        await InstallValidThemeAsync(archive);
+
+        // Act
+        Result<string> result = await _sut.GetTemplateAsync("test-theme", "shared/nav-menu", CancellationToken.None);
+
+        // Assert
         Assert.True(result.IsSuccess);
-        Assert.Equal(DEFAULT_TEMPLATE, result.Value);
+        Assert.Equal(NAV_TEMPLATE, result.Value);
     }
 
     [Fact]
@@ -953,7 +1020,7 @@ public class ThemeServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task GetTemplateAsync_WhenMirroredTemplateFileWasRemoved_ShouldFallBackToDefaultTemplate()
+    public async Task GetTemplateAsync_WhenMirroredTemplateFileWasRemoved_ShouldReturnThemeTemplateNotFound()
     {
         // Arrange
         byte[] archive = CreateThemeWithTemplates();
@@ -964,8 +1031,8 @@ public class ThemeServiceTests : IDisposable
         Result<string> result = await _sut.GetTemplateAsync("test-theme", "library/book", CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
-        Assert.Equal(DEFAULT_TEMPLATE, result.Value);
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Themes.ThemeTemplateNotFound, result.FirstError);
     }
 
     [Fact]

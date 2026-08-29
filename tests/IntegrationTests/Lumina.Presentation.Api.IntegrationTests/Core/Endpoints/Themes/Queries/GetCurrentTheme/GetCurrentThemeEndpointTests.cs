@@ -60,7 +60,7 @@ public class GetCurrentThemeEndpointTests : IClassFixture<AuthenticatedLuminaApi
 
         ThemeResponse? theme = await response.Content.ReadFromJsonAsync<ThemeResponse>(_jsonOptions);
         Assert.NotNull(theme);
-        Assert.Equal("editorial-paper", theme!.ThemeId);
+        Assert.Equal("lumina-default", theme!.ThemeId);
         Assert.True(theme.IsCurrent);
     }
 

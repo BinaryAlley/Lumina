@@ -20,6 +20,7 @@ using NSubstitute;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -128,6 +129,29 @@ public class ThemeLayoutRendererTests
         _mockHttpContextAccessor.HttpContext.Returns(TestHttpContextFactory.Create(user: null));
         ThemeResponseDto theme = _themeResponseDtoFixture.Create(themeId: "editorial");
         SetupRenderDocuments(theme, layoutTemplate: "{{title}}|{{{nav}}}", navTemplate: "{{#unclosed}}");
+        ThemeLayoutPageDto page = _themeLayoutPageDtoFixture.Create(title: "My Page", content: "<main>", script: string.Empty);
+
+        // Act
+        Result<string> result = await _sut.RenderAsync(page, "editorial", CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        Assert.Equal("My Page|<nav-menu-fragment>", result.Value);
+        _mockViewEngine.Received(1).FindView(Arg.Any<ActionContext>(), "_NavMenu", false);
+    }
+
+    [Fact]
+    public async Task RenderAsync_WhenNavDocumentCannotBeLoaded_ShouldFallBackToApplicationNavMenu()
+    {
+        // Arrange
+        _mockHttpContextAccessor.HttpContext.Returns(TestHttpContextFactory.Create(user: null));
+        ThemeResponseDto theme = _themeResponseDtoFixture.Create(themeId: "editorial");
+        SetupRenderDocuments(theme, layoutTemplate: "{{title}}|{{{nav}}}", navTemplate: "nav:{{siteName}}");
+        string navEndpoint = ApiRoutes.Themes.GET_THEME_TEMPLATE
+            .Replace("{themeId}", "editorial")
+            .Replace("{*pageKey}", "shared/nav-menu");
+        _mockApiHttpClient.GetAsync<ThemeTemplateResponseDto>(navEndpoint, Arg.Any<CancellationToken>())
+            .Returns(Task.FromException<ThemeTemplateResponseDto>(new HttpRequestException("The navigation template is unavailable.")));
         ThemeLayoutPageDto page = _themeLayoutPageDtoFixture.Create(title: "My Page", content: "<main>", script: string.Empty);
 
         // Act

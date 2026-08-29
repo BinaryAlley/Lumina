@@ -13,7 +13,6 @@
     const fileSystemBrowserTreeview = document.getElementById('file-system-browser-treeview');
     const pathSegmentsContainer = document.getElementById('navigator-path-segments');
     const article = document.querySelector('article');
-    const menubar = document.getElementsByClassName('menubar')[0];
 
     const fileSystemTreeViewContainer = document.getElementById('file-system-browser-file-system-treeview-container');
     const fileSystemExplorerContainer = document.getElementById('file-system-browser-file-system-explorer-container');
@@ -1076,6 +1075,14 @@
     //+======================================================================================+ 
 
     /**
+     * Gets the height of the fixed top bar of the active theme, declared by the theme script, used to translate
+     * page coordinates into the content coordinate space of the file system browser.
+     */
+    function getThemeTopOffset() {
+        return parseInt(window.getComputedStyle(document.documentElement).getPropertyValue('--theme-top-offset')) || 0;
+    }
+
+    /**
      * Handler for the file system browser dialog selection start.
      * @param {MouseEvent} e - The mousedown event object.
      */
@@ -1092,16 +1099,16 @@
         document.body.style.overflowY = 'hidden'; // needed in order to not put a vertical scrollbar on the document, while in vertical layout selection
         document.documentElement.style.overflowY = 'hidden';
         selectionStartPosition.x = e.pageX + fileSystemExplorer.scrollLeft;
-        selectionStartPosition.y = (e.pageY - parseInt(window.getComputedStyle(menubar).height)) + fileSystemExplorerContainer.scrollTop; // not a mistake - in vertical mode, this is the overflow container!
+        selectionStartPosition.y = (e.pageY - getThemeTopOffset()) + fileSystemExplorerContainer.scrollTop; // not a mistake - in vertical mode, this is the overflow container!
         // place the selection rectangle at the clicked location (relative to the whole page, and taking into account scroll offset), with 0 size
         visibleSelectionRectangle.style.left = e.pageX + 'px';
-        visibleSelectionRectangle.style.top = (e.pageY - parseInt(window.getComputedStyle(menubar).height)) + 'px';
+        visibleSelectionRectangle.style.top = (e.pageY - getThemeTopOffset()) + 'px';
         visibleSelectionRectangle.style.width = '0px';
         visibleSelectionRectangle.style.height = '0px';
         visibleSelectionRectangle.style.visibility = 'visible';
 
         selectionRectangle.style.left = e.pageX + 'px';
-        selectionRectangle.style.top = (e.pageY - parseInt(window.getComputedStyle(menubar).height)) + 'px';
+        selectionRectangle.style.top = (e.pageY - getThemeTopOffset()) + 'px';
         selectionRectangle.style.width = '0px';
         selectionRectangle.style.height = '0px';
     }
@@ -1114,7 +1121,7 @@
         if (!isSelecting)
             return;
         currentMousePosition.x = e.pageX;
-        currentMousePosition.y = e.pageY - parseInt(window.getComputedStyle(menubar).height);
+        currentMousePosition.y = e.pageY - getThemeTopOffset();
         handleSelection();
     }
 
@@ -1205,10 +1212,10 @@
         if (right > containerRect.right)
             visibleSelectionRectangle.style.width = (containerRect.right - left) + 'px';
 
-        if (top < containerRect.top - parseInt(window.getComputedStyle(menubar).height)) {
-            const difference = containerRect.top - top - parseInt(window.getComputedStyle(menubar).height);
+        if (top < containerRect.top - getThemeTopOffset()) {
+            const difference = containerRect.top - top - getThemeTopOffset();
             visibleSelectionRectangle.style.height = (parseFloat(visibleSelectionRectangle.style.height) - difference) + 'px';
-            visibleSelectionRectangle.style.top = (containerRect.top - parseInt(window.getComputedStyle(menubar).height)) + 'px';
+            visibleSelectionRectangle.style.top = (containerRect.top - getThemeTopOffset()) + 'px';
         }
         if (bottom > containerRect.bottom)
             visibleSelectionRectangle.style.height = (containerRect.bottom - top) + 'px';

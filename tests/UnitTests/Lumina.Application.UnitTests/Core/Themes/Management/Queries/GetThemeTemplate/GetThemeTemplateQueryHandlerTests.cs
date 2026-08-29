@@ -11,10 +11,12 @@ using Lumina.Contracts.Responses.Themes;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.Themes;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -31,6 +33,7 @@ public class GetThemeTemplateQueryHandlerTests
     private readonly IThemeService _mockThemeService;
     private readonly IValidator<GetThemeTemplateQuery> _mockValidator;
     private readonly IThemeRepository _mockThemeRepository;
+    private readonly ILogger<GetThemeTemplateQueryHandler> _mockLogger;
     private readonly GetThemeTemplateQueryHandler _sut;
     private readonly GetThemeTemplateQueryFixture _getThemeTemplateQueryFixture = new();
     private readonly ThemeEntityFixture _themeEntityFixture = new();
@@ -44,12 +47,13 @@ public class GetThemeTemplateQueryHandlerTests
         _mockThemeService = Substitute.For<IThemeService>();
         _mockValidator = Substitute.For<IValidator<GetThemeTemplateQuery>>();
         _mockThemeRepository = Substitute.For<IThemeRepository>();
+        _mockLogger = Substitute.For<ILogger<GetThemeTemplateQueryHandler>>();
 
         _mockValidator.Validate(Arg.Any<GetThemeTemplateQuery>())
             .Returns([]);
         _mockUnitOfWork.ThemeRepository.Returns(_mockThemeRepository);
 
-        _sut = new GetThemeTemplateQueryHandler(_mockUnitOfWork, _mockThemeService, _mockValidator);
+        _sut = new GetThemeTemplateQueryHandler(_mockUnitOfWork, _mockThemeService, _mockValidator, _mockLogger);
     }
 
     [Fact]
@@ -164,6 +168,51 @@ public class GetThemeTemplateQueryHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(error, result.FirstError);
         await _mockThemeService.DidNotReceive().RestoreBundledThemeAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenTemplateIsNotFoundForBundledTheme_ShouldNotRestoreBundledTheme()
+    {
+        // Arrange
+        GetThemeTemplateQuery query = _getThemeTemplateQueryFixture.Create();
+        ThemeEntity theme = _themeEntityFixture.Create(themeId: query.ThemeId, installSource: ThemeInstallSource.Bundled, isDeleted: false);
+        _mockThemeRepository.GetByThemeIdAsync(query.ThemeId!, Arg.Any<CancellationToken>())
+            .Returns(Result.From<ThemeEntity?>(theme));
+        _mockThemeService.GetTemplateAsync(theme.ThemeId, query.PageKey!, Arg.Any<CancellationToken>())
+            .Returns(Errors.Themes.ThemeTemplateNotFound);
+
+        // Act
+        Result<ThemeTemplateResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Themes.ThemeTemplateNotFound, result.FirstError);
+        await _mockThemeService.DidNotReceive().RestoreBundledThemeAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
+        await _mockThemeService.Received(1).GetTemplateAsync(theme.ThemeId, query.PageKey!, Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenRestoreThrowsForBundledTheme_ShouldReturnTemplateErrorInsteadOfThrowing()
+    {
+        // Arrange
+        GetThemeTemplateQuery query = _getThemeTemplateQueryFixture.Create();
+        ThemeEntity theme = _themeEntityFixture.Create(themeId: query.ThemeId, installSource: ThemeInstallSource.Bundled, isDeleted: false);
+        Error templateError = Errors.Themes.ThemeFilesUnreadable;
+        _mockThemeRepository.GetByThemeIdAsync(query.ThemeId!, Arg.Any<CancellationToken>())
+            .Returns(Result.From<ThemeEntity?>(theme));
+        _mockThemeService.GetTemplateAsync(theme.ThemeId, query.PageKey!, Arg.Any<CancellationToken>())
+            .Returns(templateError);
+        _mockThemeService.RestoreBundledThemeAsync(theme.ThemeId, Arg.Any<CancellationToken>())
+            .Returns(Task.FromException<Result<Success>>(new IOException("The theme storage is locked.")));
+
+        // Act
+        Result<ThemeTemplateResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(templateError, result.FirstError);
+        await _mockThemeService.Received(1).RestoreBundledThemeAsync(theme.ThemeId, Arg.Any<CancellationToken>());
+        await _mockThemeService.Received(1).GetTemplateAsync(theme.ThemeId, query.PageKey!, Arg.Any<CancellationToken>());
     }
 
     [Fact]

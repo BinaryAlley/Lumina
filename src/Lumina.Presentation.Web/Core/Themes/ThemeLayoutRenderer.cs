@@ -92,7 +92,7 @@ public class ThemeLayoutRenderer
     }
 
     /// <summary>
-    /// Renders the navigation menu of the active theme, falling back to the application Razor menu when the theme template cannot be rendered.
+    /// Renders the navigation menu of the active theme, falling back to the application Razor menu when the theme navigation template cannot be loaded or rendered.
     /// </summary>
     /// <param name="themeId">The manifest id of the active theme.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
@@ -100,10 +100,22 @@ public class ThemeLayoutRenderer
     private async Task<string> RenderNavAsync(string themeId, CancellationToken cancellationToken)
     {
         ThemeNavMenuDto navModel = await _navBuilder.BuildAsync(cancellationToken);
-        ThemeRenderDocumentDto navDocument = await _themeService.GetRenderDocumentAsync(NAV_PAGE_KEY, themeId, cancellationToken);
-        Result<ThemePageRenderResultDto> navRenderResult = _templateEngine.RenderPage(navDocument.Template, navModel);
-        if (navRenderResult.IsSuccess)
-            return navRenderResult.Value.Content;
+        try
+        {
+            ThemeRenderDocumentDto navDocument = await _themeService.GetRenderDocumentAsync(NAV_PAGE_KEY, themeId, cancellationToken);
+            Result<ThemePageRenderResultDto> navRenderResult = _templateEngine.RenderPage(navDocument.Template, navModel);
+            if (navRenderResult.IsSuccess)
+                return navRenderResult.Value.Content;
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception)
+        {
+            // the navigation menu is best effort: when the theme navigation template cannot be loaded or rendered,
+            // the application navigation menu is rendered instead, keeping the themed shell of the page intact
+        }
 
         return await _viewRenderer.RenderPartialAsync("_NavMenu", cancellationToken);
     }

@@ -114,8 +114,12 @@ public class DeleteThemeEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         // Arrange
         await ThemeTestHelpers.WaitForBundledThemeAsync(_apiFactory);
 
-        // Act
-        HttpResponseMessage response = await _client.DeleteAsync("/api/v1/themes/editorial-paper");
+        // deleting a bundled theme that is not the last remaining one is allowed, so only the last one is protected
+        HttpResponseMessage firstDeletionResponse = await _client.DeleteAsync("/api/v1/themes/editorial-paper");
+        Assert.Equal(HttpStatusCode.NoContent, firstDeletionResponse.StatusCode);
+
+        // Act: the last remaining bundled theme cannot be deleted
+        HttpResponseMessage response = await _client.DeleteAsync("/api/v1/themes/lumina-default");
 
         // Assert
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
@@ -127,9 +131,13 @@ public class DeleteThemeEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.4", problemDetails["type"].GetString());
         Assert.Equal("General.Forbidden", problemDetails["title"].GetString());
         Assert.Equal("LastBundledThemeCannotBeDeleted", problemDetails["detail"].GetString());
-        Assert.Equal("/api/v1/themes/editorial-paper", problemDetails["instance"].GetString());
+        Assert.Equal("/api/v1/themes/lumina-default", problemDetails["instance"].GetString());
         Assert.NotNull(problemDetails["traceId"].GetString());
         Assert.NotEmpty(problemDetails["traceId"].GetString()!);
+
+        // restore the soft-deleted bundled theme, so the following tests start from a clean state
+        HttpResponseMessage restoreResponse = await _client.PostAsJsonAsync("/api/v1/themes/editorial-paper/restore", new { });
+        Assert.Equal(HttpStatusCode.NoContent, restoreResponse.StatusCode);
     }
 
     [Fact]

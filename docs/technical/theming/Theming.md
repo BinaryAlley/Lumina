@@ -40,7 +40,7 @@ my-theme/
   theme.json
   assets/
     preview.svg
-    theme.css
+    site.css
   templates/
     index.html
     shared/
@@ -90,7 +90,7 @@ The manifest is a JSON object describing the theme. The example below is the man
 | `author` | yes | Author of the theme, up to 80 characters. |
 | `version` | yes | Semantic version form, for example `1.0.0`. Up to 40 characters. |
 | `preview` | no | Path to a preview image, relative to the pack root and under `assets/`. Shown on the administration page. |
-| `templates` | yes | A mapping from template key to a file under `templates/`, with 1 to 32 entries. Must include the `default` key. |
+| `templates` | no | An optional mapping from template key to a file under `templates/`, with up to 32 entries. Templates can also be provided as mirrored files under `templates/` without a manifest entry. |
 
 All text fields must be non-empty and must not contain control characters. Template keys follow the same lowercase kebab-case rule as the theme id and are at most 40 characters. Template paths are normalized and must point to an existing file under `templates/`.
 
@@ -149,9 +149,10 @@ Every themed page is identified by a page key that mirrors the path of the corre
 
 1. An explicit mapping in `templates` when the manifest declares the page key.
 2. A mirrored template file at `templates/{pageKey}.html`, walking up the scope of the path when the exact mirror does not exist.
-3. The `default` template from the manifest.
 
-For example, the books index page has the page key `library/written-content-library/book-library/books/index`. The engine tries, in order: the explicit `templates` entry for that key, `templates/library/written-content-library/book-library/books/index.html`, then the parent scopes such as `templates/library/written-content-library/book-library/books.html`, and finally the `default` template.
+When neither an explicit mapping nor a mirrored file exists, the theme has no template for that page, and the application renders its own fallback unstylied Razor view instead.
+
+For example, the books index page has the page key `library/written-content-library/book-library/books/index`. The engine tries, in order: the explicit `templates` entry for that key, `templates/library/written-content-library/book-library/books/index.html`, then the parent scopes such as `templates/library/written-content-library/book-library/books.html`. When none exists, the application renders the books page view itself.
 
 Known page keys:
 
@@ -188,7 +189,7 @@ The layout template of the bundled theme shows the intended shape:
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{title}} - Lumina</title>
     {{&appHead}}
-    <link rel="stylesheet" href="{{assetBase}}/theme.css">
+    <link rel="stylesheet" href="{{assetBase}}/site.css">
 </head>
 <body>
     <div id="page">
@@ -262,9 +263,23 @@ JavaScript is always allowed in themes: script elements in templates are served 
 
 ## Assets
 
-Static files under `assets/` are served to the browser. The asset base URL is available to the layout and page templates as `assetBase`, so a stylesheet is referenced as `{{assetBase}}/theme.css`. Assets are served only from within the pack, and paths that would escape the pack are rejected.
+Static files under `assets/` are served to the browser. The asset base URL is available to the layout and page templates as `assetBase`, so a stylesheet is referenced as `{{assetBase}}/site.css`. Assets are served only from within the pack, and paths that would escape the pack are rejected.
+
+A theme owns its behavior as much as its look: the theme script, for example `{{assetBase}}/theme.js`, carries the behavior of the theme chrome, such as the desktop menu bar.
+
+A theme ships the images its stylesheets use as assets too, referenced with paths relative to the stylesheet. For example a stylesheet at `assets/combobox.css` references `images/ui/metal-plate.png`, which is served from `assets/images/ui/metal-plate.png`.
 
 The `preview` field of the manifest points at an asset that is shown as the theme thumbnail on the administration page.
+
+### The top offset contract
+
+The application translates page coordinates into the content coordinate space of some widgets (for example the selection rectangle of the file system browser) by subtracting the height of the fixed top bar of the theme. A theme that renders a fixed top bar declares that height on the root element as the `--theme-top-offset` custom property, for example in its theme script:
+
+```js
+document.documentElement.style.setProperty('--theme-top-offset', window.getComputedStyle(menubar).height);
+```
+
+When the property is absent it is treated as `0`, which is correct for a theme without a fixed top bar.
 
 ## Configuration Options
 
@@ -284,7 +299,7 @@ The theme engine is configured through the `ThemeEngine` section of the API conf
 
 1. Create a directory for the theme with `theme.json`, a `templates/` directory and an `assets/` directory, following the layout of `editorial-paper`.
 2. Write the manifest following the field rules in [The Manifest (theme.json)](#the-manifest-themejson).
-3. Author the templates. Start with `templates/shared/layout.html` and `templates/shared/nav-menu.html`, then add page templates and the `default` template.
+3. Author the templates. Start with `templates/shared/layout.html` and `templates/shared/nav-menu.html`, then add page templates.
 4. Add the static files under `assets/`, for example a stylesheet referenced from the layout.
 5. Keep the pack within the size limits: the archive at most 8 MB, the extracted pack at most 24 MB, no single file larger than 6 MB and at most 250 entries.
 6. Compress the directory into a ZIP archive with `theme.json` at the root of the archive, not nested inside an extra folder.
