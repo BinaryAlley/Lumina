@@ -18,4 +18,10 @@ public sealed record ThemeNavEntryDto(
     string? Url,
     string? CssClass,
     IReadOnlyList<ThemeNavEntryDto> Children
-);
+)
+{
+    /// <summary>
+    /// Gets whether this entry is a submenu: it has child links instead of a direct URL.
+    /// </summary>
+    public bool IsSubmenu => Children.Count > 0;
+}

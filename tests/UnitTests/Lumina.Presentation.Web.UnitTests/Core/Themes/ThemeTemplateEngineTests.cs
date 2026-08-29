@@ -2,6 +2,7 @@
 using Lumina.Presentation.Web.Common.DTO.Themes;
 using Lumina.Presentation.Web.Common.Primitives;
 using Lumina.Presentation.Web.Core.Themes;
+using Lumina.Presentation.Web.Fixtures.Common.DTO.Themes;
 using Lumina.Presentation.Web.Fixtures.Common.Models;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,9 @@ public class ThemeTemplateEngineTests
 {
     private readonly ThemeTemplateEngine _sut;
     private readonly SectionModelFixture _sectionModelFixture = new();
+    private readonly ThemeNavMenuDtoFixture _themeNavMenuDtoFixture = new();
+    private readonly ThemeNavSectionDtoFixture _themeNavSectionDtoFixture = new();
+    private readonly ThemeNavEntryDtoFixture _themeNavEntryDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ThemeTemplateEngineTests"/> class.
@@ -118,6 +122,40 @@ public class ThemeTemplateEngineTests
         // Assert
         Assert.True(result.IsSuccess);
         Assert.Equal("3", result.Value.Content);
+    }
+
+    [Fact]
+    public void RenderPage_WhenMenuEntryHasChildren_ShouldRenderEntryLabelOnceWithNestedChildren()
+    {
+        // Arrange
+        ThemeNavMenuDto model = _themeNavMenuDtoFixture.Create(
+            siteName: "Lumina",
+            mobileSections: [],
+            menubarSections:
+            [
+                _themeNavSectionDtoFixture.Create(
+                    label: "Tools",
+                    items:
+                    [
+                        _themeNavEntryDtoFixture.Create(
+                            label: "Language",
+                            includeUrl: false,
+                            children:
+                            [
+                                _themeNavEntryDtoFixture.Create(label: "English", includeUrl: true, url: "/en", cssClass: "lang-set", includeCssClass: true),
+                                _themeNavEntryDtoFixture.Create(label: "Francais", includeUrl: true, url: "/fr", cssClass: "lang-set", includeCssClass: true)
+                            ]),
+                        _themeNavEntryDtoFixture.Create(label: "Settings", includeUrl: true, url: "/settings", cssClass: "nav-link", includeCssClass: true)
+                    ])
+            ]);
+        string template = "{{#menubarSections}}{{label}}:{{#items}}{{#isSubmenu}}[{{label}}]{{#children}}{{label}},{{/children}}{{/isSubmenu}}{{^isSubmenu}}{{label}}{{/isSubmenu}}{{/items}}{{/menubarSections}}";
+
+        // Act
+        Result<ThemePageRenderResultDto> result = _sut.RenderPage(template, model);
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        Assert.Equal("Tools:[Language]English,Francais,Settings", result.Value.Content);
     }
 
     [Fact]
