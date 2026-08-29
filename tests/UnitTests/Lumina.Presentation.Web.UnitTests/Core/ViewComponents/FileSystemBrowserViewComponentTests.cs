@@ -11,6 +11,7 @@ using Microsoft.Extensions.Localization;
 using NSubstitute;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -68,7 +69,8 @@ public class FileSystemBrowserViewComponentTests
         Assert.NotNull(viewResult.ViewData);
         Assert.NotNull(viewResult.ViewData!.Model);
         dynamic model = viewResult.ViewData!.Model!;
-        Assert.Equal("/", (string)model.Path);
+        string expectedPath = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? @"/" : @"C:\Users\";
+        Assert.Equal(expectedPath, (string)model.Path);
         Assert.Equal("list", (string)model.ViewMode);
         Assert.Equal("large", (string)model.IconSize);
     }
