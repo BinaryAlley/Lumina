@@ -66,7 +66,7 @@ public class EditLibraryViewEndpointTests : IClassFixture<LuminaWebFactory>
         _apiFactory.ApiClientStub.RegisterGetResponse($"libraries/{libraryId}", expectedLibrary);
         ThemeResponseDto theme = _themeResponseDtoFixture.Create(themeId: "lumina-default");
         _apiFactory.ApiClientStub.RegisterGetResponse(ApiRoutes.Themes.GET_CURRENT_THEME, theme);
-        RegisterThemeTemplate(theme, "shared/file-system-browser", "<template id=\"fsb-template-tree-node\">{{{treeNodeTemplate}}}</template><div id=\"file-system-browser-dialog\">themed</div>");
+        RegisterThemeTemplate(theme, "shared/file-system-browser", "<script type=\"text/plain\" id=\"fsb-template-tree-node\">{{{treeNodeTemplate}}}</script><div id=\"file-system-browser-dialog\">themed</div>");
         RegisterThemeTemplate(theme, "shared/file-system-browser/tree-node", "<div class=\"tree-node\">{{name}}</div>");
         RegisterThemeTemplate(theme, "shared/file-system-browser/explorer-item", "<div class=\"e\">{{name}}</div>");
         RegisterThemeTemplate(theme, "shared/file-system-browser/path-segment", "<li>{{path}}</li>");

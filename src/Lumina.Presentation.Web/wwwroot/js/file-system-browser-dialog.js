@@ -75,6 +75,7 @@
     let explorerItemTemplate = null;
     let pathSegmentTemplate = null;
 
+    let serverBasePath;
     let clientBasePath;
     let _path;
     let pathSeparator = '/';
@@ -109,9 +110,10 @@
 
     /**
      * Initializes the values needed by the file sytem browser.
-     * @param {any} config The configuration of the file system browser, with the server and client base paths, the initial path, the initial view mode and icon size, and the optional theme asset URLs.
+     * @param {any} config The configuration of the file system browser.
      */
     async function initFileSystemBrowser(config) {
+        serverBasePath = config.serverBasePath;
         clientBasePath = config.clientBasePath;
         iconBaseUrl = config.iconBaseUrl || '';
         fileIconsUrl = config.fileIconsUrl || '';
@@ -142,6 +144,8 @@
 
     /**
      * Gets the raw source of a theme sub template element, or null when the theme does not provide one.
+     * The theme inlines the sub template sources into plain text script elements, so that the browser never parses the theme markup into live elements,
+     * which could otherwise make it request their resources, and the raw source is recovered by reading the element text.
      * @param {string} id - The id of the template element.
      * @returns {string|null} The raw template source, or null when the element is missing.
      */
@@ -153,7 +157,7 @@
         if (typeof renderThemeTemplate !== 'function')
             return null;
         // an empty template element means the theme does not provide the template, in which case the built-in markup is used
-        return templateElement.innerHTML || null;
+        return templateElement.textContent || null;
     }
 
     /**
@@ -1466,8 +1470,8 @@
      * @throws {Error} - Throws an error if the API call fails.
      */
     async function getThumbnailApiCall(path, quality) {
-        // fetch the thumbnail for the given item from the server, through the Web application, which proxies the request with the authentication of the current user
-        const response = await fetch(`${clientBasePath}thumbnails/api-get-thumbnail?path=` + encodeURIComponent(path) + '&quality=' + quality, {
+        // fetch the thumbnail for the given item from the server
+        const response = await fetch(`${serverBasePath}thumbnails/get-thumbnail?path=` + encodeURIComponent(path) + '&quality=' + quality, {
             signal: abortController.signal // use the abort signal 
         });
         if (!response.ok)

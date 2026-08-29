@@ -247,20 +247,22 @@ The shell template receives a model with the following fields:
 | `assetBase` | The base URL of the theme assets. |
 | `iconBaseUrl` | The base URL of the file type icons of the theme, derived from `assetBase`. |
 | `fileIconsUrl` | The URL of the file icons mapping of the theme, derived from `assetBase`. |
-| `treeNodeTemplate` | The raw source of the `shared/file-system-browser/tree-node` template, inlined by the application into a `<template>` element. |
-| `explorerItemTemplate` | The raw source of the `shared/file-system-browser/explorer-item` template, inlined by the application into a `<template>` element. |
-| `pathSegmentTemplate` | The raw source of the `shared/file-system-browser/path-segment` template, inlined by the application into a `<template>` element. |
+| `treeNodeTemplate` | The raw source of the `shared/file-system-browser/tree-node` template, inlined by the application into a plain text script element. |
+| `explorerItemTemplate` | The raw source of the `shared/file-system-browser/explorer-item` template, inlined by the application into a plain text script element. |
+| `pathSegmentTemplate` | The raw source of the `shared/file-system-browser/path-segment` template, inlined by the application into a plain text script element. |
 | `strings` | The localized strings of the component, keyed by their resource names. |
 
 The shell template owns the whole dialog markup: the header with the view mode, navigation and address bar controls, the tree view and explorer panes and the action bar. It must keep the DOM contract the application script binds to (the element ids such as `file-system-browser-dialog`, `navigator-*`, `file-system-browser-treeview`, `file-system-browser-file-system-explorer` and the two selection rectangles), and it must include the application component scripts with their `data-component-script` attributes:
 
 ```html
-<template id="fsb-template-tree-node">{{{treeNodeTemplate}}}</template>
-<template id="fsb-template-explorer-item">{{{explorerItemTemplate}}}</template>
-<template id="fsb-template-path-segment">{{{pathSegmentTemplate}}}</template>
+<script type="text/plain" id="fsb-template-tree-node">{{{treeNodeTemplate}}}</script>
+<script type="text/plain" id="fsb-template-explorer-item">{{{explorerItemTemplate}}}</script>
+<script type="text/plain" id="fsb-template-path-segment">{{{pathSegmentTemplate}}}</script>
 <script defer src="{{appBase}}js/theme-client-template-engine.js" data-component-script="file-system-browser"></script>
 <script defer src="{{appBase}}js/file-system-browser-dialog.js" data-component-script="file-system-browser"></script>
 ```
+
+The sub template sources are inlined into plain text script elements, whose content the browser never parses into elements, so the theme markup cannot be loaded or requested before the application script renders it. The application script reads the raw source from the script element text and renders it for each dynamic entry.
 
 The application appends the initialization script of the component after the rendered shell, so the theme does not author it.
 
