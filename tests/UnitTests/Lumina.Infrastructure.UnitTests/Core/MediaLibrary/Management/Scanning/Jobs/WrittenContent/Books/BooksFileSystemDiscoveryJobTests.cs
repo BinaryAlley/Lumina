@@ -6,6 +6,7 @@ using Lumina.Domain.Common.Events;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
@@ -46,6 +47,7 @@ public class BooksFileSystemDiscoveryJobTests
     private readonly UserIdFixture _userIdFixture = new();
     private readonly LibraryIdFixture _libraryIdFixture = new();
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
+    private readonly DirectoryScanFingerprintEntityFixture _directoryScanFingerprintEntityFixture = new();
     private readonly ScanId _scanId;
     private readonly UserId _userId;
     private readonly LibraryId _libraryId;
@@ -175,6 +177,185 @@ public class BooksFileSystemDiscoveryJobTests
         // Assert
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() => operation);
         Assert.Equal(LibraryScanJobStatus.Canceled, _sut.Status);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenFastSkipIsEnabledAndDirectoryDidNotChange_ShouldSkipTheDirectoryAndUpsertOnlyChangedFingerprints()
+    {
+        // Arrange
+        using TemporaryLibraryDirectory temporaryLibraryDirectory = new();
+        string unchangedDirectoryPath = temporaryLibraryDirectory.CreateSubdirectory("unchanged");
+        File.WriteAllText(Path.Combine(unchangedDirectoryPath, "skip.pdf"), "unchanged book content");
+        string changedDirectoryPath = temporaryLibraryDirectory.CreateSubdirectory("changed");
+        File.WriteAllText(Path.Combine(changedDirectoryPath, "book.pdf"), "changed book content");
+
+        DirectoryInfo unchangedDirectory = new(unchangedDirectoryPath);
+        string unchangedDirectoryFullName = unchangedDirectory.FullName;
+        DateTime unchangedDirectoryLastWriteTimeUtc = unchangedDirectory.LastWriteTimeUtc;
+        DirectoryInfo changedDirectory = new(changedDirectoryPath);
+        string changedDirectoryFullName = changedDirectory.FullName;
+        DirectoryInfo rootDirectory = new(temporaryLibraryDirectory.Path);
+        string rootDirectoryFullName = rootDirectory.FullName;
+
+        LibraryEntity libraryEntity = _libraryEntityFixture.Create(
+            id: _libraryId.Value,
+            userId: _userId.Value,
+            title: "Test Library",
+            libraryType: LibraryType.Book,
+            contentLocations: [temporaryLibraryDirectory.Path],
+            shouldSkipUnchangedDirectoriesDuringScan: true);
+        _mockLibraryRepository.GetByIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(libraryEntity));
+        _mockDirectoryScanFingerprintRepository.GetMappedByLibraryIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From(new Dictionary<string, DirectoryScanFingerprintEntity>
+            {
+                [unchangedDirectoryFullName] = _directoryScanFingerprintEntityFixture.Create(
+                    libraryId: _libraryId.Value,
+                    path: unchangedDirectoryFullName,
+                    lastWriteTimeUtc: unchangedDirectoryLastWriteTimeUtc)
+            }));
+        _mockStagingResultsRepository.InsertRangeAsync(Arg.Any<IReadOnlyCollection<LibraryScanStagingResultsEntity>>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From(Result.Created));
+        _mockDirectoryScanFingerprintRepository.UpsertRangeAsync(Arg.Any<IReadOnlyCollection<DirectoryScanFingerprintEntity>>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From(Result.Updated));
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
+        await _mockStagingResultsRepository.Received(1).InsertRangeAsync(
+            Arg.Is<IReadOnlyCollection<LibraryScanStagingResultsEntity>>(entities =>
+                entities.Count == 1 && Path.GetFileName(entities.Single().Path) == "book.pdf"),
+            Arg.Any<CancellationToken>());
+        await _mockDirectoryScanFingerprintRepository.Received(1).UpsertRangeAsync(
+            Arg.Is<IReadOnlyCollection<DirectoryScanFingerprintEntity>>(entities =>
+                entities.Count == 2
+                && entities.Any(entity => entity.Path == rootDirectoryFullName)
+                && entities.Any(entity => entity.Path == changedDirectoryFullName)
+                && entities.All(entity => entity.Path != unchangedDirectoryFullName)
+                && entities.All(entity => entity.LibraryId == _libraryId.Value)),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenLoadingDirectoryScanFingerprintsFails_ShouldMarkJobAsFailedAndPublishFailureEvent()
+    {
+        // Arrange
+        using TemporaryLibraryDirectory temporaryLibraryDirectory = new();
+        LibraryEntity libraryEntity = _libraryEntityFixture.Create(
+            id: _libraryId.Value,
+            userId: _userId.Value,
+            title: "Test Library",
+            libraryType: LibraryType.Book,
+            contentLocations: [temporaryLibraryDirectory.Path],
+            shouldSkipUnchangedDirectoriesDuringScan: true);
+        _mockLibraryRepository.GetByIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(libraryEntity));
+        _mockDirectoryScanFingerprintRepository.GetMappedByLibraryIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+            .Returns(Error.Failure("Database.Error", "Failed to load the directory scan fingerprints"));
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(LibraryScanJobStatus.Failed, _sut.Status);
+        await _mockStagingResultsRepository.DidNotReceive().InsertRangeAsync(Arg.Any<IReadOnlyCollection<LibraryScanStagingResultsEntity>>(), Arg.Any<CancellationToken>());
+        await _mockDomainEventPublisher.Received(1).PublishAsync(Arg.Is<LibraryScanFailedDomainEvent>(domainEvent =>
+            domainEvent.LibraryId == _libraryId), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenUpsertingDirectoryScanFingerprintsFails_ShouldMarkJobAsFailedAndPublishFailureEvent()
+    {
+        // Arrange
+        using TemporaryLibraryDirectory temporaryLibraryDirectory = new();
+        temporaryLibraryDirectory.CreateSubdirectory("changed");
+        LibraryEntity libraryEntity = _libraryEntityFixture.Create(
+            id: _libraryId.Value,
+            userId: _userId.Value,
+            title: "Test Library",
+            libraryType: LibraryType.Book,
+            contentLocations: [temporaryLibraryDirectory.Path],
+            shouldSkipUnchangedDirectoriesDuringScan: true);
+        _mockLibraryRepository.GetByIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(libraryEntity));
+        _mockDirectoryScanFingerprintRepository.GetMappedByLibraryIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From(new Dictionary<string, DirectoryScanFingerprintEntity>()));
+        _mockDirectoryScanFingerprintRepository.UpsertRangeAsync(Arg.Any<IReadOnlyCollection<DirectoryScanFingerprintEntity>>(), Arg.Any<CancellationToken>())
+            .Returns(Error.Failure("Database.Error", "Failed to upsert the directory scan fingerprints"));
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(LibraryScanJobStatus.Failed, _sut.Status);
+        await _mockDomainEventPublisher.Received(1).PublishAsync(Arg.Is<LibraryScanFailedDomainEvent>(domainEvent =>
+            domainEvent.LibraryId == _libraryId), Arg.Any<CancellationToken>());
+        await _mockDomainEventPublisher.DidNotReceive().PublishAsync(Arg.Is<LibraryScanProgressChangedDomainEvent>(domainEvent =>
+            domainEvent.LibraryId == _libraryId), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenInsertingStagingResultsFails_ShouldMarkJobAsFailedAndPublishFailureEvent()
+    {
+        // Arrange
+        using TemporaryLibraryDirectory temporaryLibraryDirectory = new();
+        temporaryLibraryDirectory.CreateFile("book.pdf", "book content");
+        LibraryEntity libraryEntity = _libraryEntityFixture.Create(
+            id: _libraryId.Value,
+            userId: _userId.Value,
+            title: "Test Library",
+            libraryType: LibraryType.Book,
+            contentLocations: [temporaryLibraryDirectory.Path],
+            shouldSkipUnchangedDirectoriesDuringScan: false);
+        _mockLibraryRepository.GetByIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(libraryEntity));
+        _mockStagingResultsRepository.InsertRangeAsync(Arg.Any<IReadOnlyCollection<LibraryScanStagingResultsEntity>>(), Arg.Any<CancellationToken>())
+            .Returns(Error.Failure("Database.Error", "Failed to insert the staging results"));
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(LibraryScanJobStatus.Failed, _sut.Status);
+        await _mockDirectoryScanFingerprintRepository.DidNotReceive().UpsertRangeAsync(Arg.Any<IReadOnlyCollection<DirectoryScanFingerprintEntity>>(), Arg.Any<CancellationToken>());
+        await _mockDomainEventPublisher.Received(1).PublishAsync(Arg.Is<LibraryScanFailedDomainEvent>(domainEvent =>
+            domainEvent.LibraryId == _libraryId), Arg.Any<CancellationToken>());
+        await _mockDomainEventPublisher.DidNotReceive().PublishAsync(Arg.Is<LibraryScanProgressChangedDomainEvent>(domainEvent =>
+            domainEvent.LibraryId == _libraryId), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenJobHasLinkedChildren_ShouldExecuteEachChildAndComplete()
+    {
+        // Arrange
+        using TemporaryLibraryDirectory temporaryLibraryDirectory = new();
+        temporaryLibraryDirectory.CreateFile("book1.pdf", "book content");
+        LibraryEntity libraryEntity = _libraryEntityFixture.Create(
+            id: _libraryId.Value,
+            userId: _userId.Value,
+            title: "Test Library",
+            libraryType: LibraryType.Book,
+            contentLocations: [temporaryLibraryDirectory.Path],
+            shouldSkipUnchangedDirectoriesDuringScan: false);
+        _mockLibraryRepository.GetByIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(libraryEntity));
+        _mockStagingResultsRepository.InsertRangeAsync(Arg.Any<IReadOnlyCollection<LibraryScanStagingResultsEntity>>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From(Result.Created));
+
+        IMediaLibraryScanJob mockChild = Substitute.For<IMediaLibraryScanJob>();
+        mockChild.ExecuteAsync(Arg.Any<Guid>(), Arg.Any<object>(), Arg.Any<CancellationToken>())
+            .Returns(Task.CompletedTask);
+        _sut.AddChild(mockChild);
+        object input = new();
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), input, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
+        await mockChild.Received(1).ExecuteAsync(Arg.Any<Guid>(), Arg.Is<object>(executedInput => executedInput == input), Arg.Any<CancellationToken>());
     }
 
     /// <summary>

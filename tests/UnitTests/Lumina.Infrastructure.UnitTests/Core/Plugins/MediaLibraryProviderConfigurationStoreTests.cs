@@ -736,6 +736,279 @@ public class MediaLibraryProviderConfigurationStoreTests
         Assert.True(result.IsFailure);
     }
 
+    [Fact]
+    public async Task RemoveProviderConfigurationsForLibraryAsync_WhenDeletingBookReadersFails_ShouldReturnError()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        _mockMetadataConfigurationRepository.DeleteByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
+            .Returns(Result.Deleted);
+        _mockArtworkConfigurationRepository.DeleteByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
+            .Returns(Result.Deleted);
+        _mockBookReaderConfigurationRepository.DeleteByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
+            .Returns(Error.Failure(description: "Failed to delete the configurations"));
+        MediaLibraryProviderConfigurationStore sut = CreateSut();
+
+        // Act
+        Result<Deleted> result = await sut.RemoveProviderConfigurationsForLibraryAsync(libraryId, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        _mockEnablementCache.DidNotReceive().InvalidateLibrary(Arg.Any<Guid>());
+    }
+
+    [Fact]
+    public async Task RemoveProviderConfigurationsAsync_WhenDeletingBookReadersFails_ShouldReturnError()
+    {
+        // Arrange
+        Guid pluginId = Guid.NewGuid();
+        _mockMetadataConfigurationRepository.DeleteByPluginIdAsync(pluginId, Arg.Any<CancellationToken>())
+            .Returns(Result.Deleted);
+        _mockArtworkConfigurationRepository.DeleteByPluginIdAsync(pluginId, Arg.Any<CancellationToken>())
+            .Returns(Result.Deleted);
+        _mockBookReaderConfigurationRepository.DeleteByPluginIdAsync(pluginId, Arg.Any<CancellationToken>())
+            .Returns(Error.Failure(description: "Failed to delete the configurations"));
+        MediaLibraryProviderConfigurationStore sut = CreateSut();
+
+        // Act
+        Result<Deleted> result = await sut.RemoveProviderConfigurationsAsync(pluginId, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        _mockEnablementCache.DidNotReceive().InvalidatePlugin(Arg.Any<Guid>());
+    }
+
+    [Fact]
+    public async Task ReconcileProviderConfigurationsAsync_WhenMetadataProviderIsAlreadyConfigured_ShouldKeepItWithoutUpserting()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        Guid pluginId = Guid.NewGuid();
+        IPlugin plugin = CreatePlugin(pluginId, "Plugin");
+        _mockPluginManager.GetPlugins().Returns([plugin]);
+        MediaLibraryProviderConfigurationStore sut = CreateSut((pluginId, CreateMetadataProvider(LibraryType.EBook), null, null));
+        LibraryMetadataProviderConfigurationEntity existingConfiguration = _metadataConfigurationFixture.Create(libraryId, pluginId, 1);
+        _mockMetadataConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>([existingConfiguration]));
+        _mockArtworkConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<LibraryArtworkProviderConfigurationEntity>>([]));
+        _mockBookReaderConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<LibraryBookReaderConfigurationEntity>>([]));
+
+        // Act
+        Result<Success> result = await sut.ReconcileProviderConfigurationsAsync(libraryId, LibraryType.EBook, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        await _mockMetadataConfigurationRepository.DidNotReceive().UpsertAsync(Arg.Any<LibraryMetadataProviderConfigurationEntity>(), Arg.Any<CancellationToken>());
+        await _mockMetadataConfigurationRepository.DidNotReceive().DeleteByLibraryIdAndPluginIdsAsync(Arg.Any<Guid>(), Arg.Any<IEnumerable<Guid>>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ReconcileProviderConfigurationsAsync_WhenArtworkProviderIsAlreadyConfigured_ShouldKeepItWithoutUpserting()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        Guid pluginId = Guid.NewGuid();
+        IPlugin plugin = CreatePlugin(pluginId, "Plugin");
+        _mockPluginManager.GetPlugins().Returns([plugin]);
+        MediaLibraryProviderConfigurationStore sut = CreateSut((pluginId, null, CreateArtworkProvider(LibraryType.EBook), null));
+        LibraryArtworkProviderConfigurationEntity existingConfiguration = _artworkConfigurationFixture.Create(libraryId, pluginId, 1);
+        _mockMetadataConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>([]));
+        _mockArtworkConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<LibraryArtworkProviderConfigurationEntity>>([existingConfiguration]));
+        _mockBookReaderConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<LibraryBookReaderConfigurationEntity>>([]));
+
+        // Act
+        Result<Success> result = await sut.ReconcileProviderConfigurationsAsync(libraryId, LibraryType.EBook, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        await _mockArtworkConfigurationRepository.DidNotReceive().UpsertAsync(Arg.Any<LibraryArtworkProviderConfigurationEntity>(), Arg.Any<CancellationToken>());
+        await _mockArtworkConfigurationRepository.DidNotReceive().DeleteByLibraryIdAndPluginIdsAsync(Arg.Any<Guid>(), Arg.Any<IEnumerable<Guid>>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ReconcileProviderConfigurationsAsync_WhenReadingMetadataConfigurationsFails_ShouldReturnError()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        Guid pluginId = Guid.NewGuid();
+        IPlugin plugin = CreatePlugin(pluginId, "Plugin");
+        _mockPluginManager.GetPlugins().Returns([plugin]);
+        MediaLibraryProviderConfigurationStore sut = CreateSut((pluginId, CreateMetadataProvider(LibraryType.EBook), null, null));
+        _mockMetadataConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
+            .Returns(Error.Failure(description: "Failed to read configurations"));
+
+        // Act
+        Result<Success> result = await sut.ReconcileProviderConfigurationsAsync(libraryId, LibraryType.EBook, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        await _mockArtworkConfigurationRepository.DidNotReceive().GetByLibraryIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockBookReaderConfigurationRepository.DidNotReceive().GetByLibraryIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ReconcileProviderConfigurationsAsync_WhenDeletingStaleMetadataConfigurationsFails_ShouldReturnError()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        Guid pluginId = Guid.NewGuid();
+        IPlugin plugin = CreatePlugin(pluginId, "Plugin");
+        _mockPluginManager.GetPlugins().Returns([plugin]);
+        MediaLibraryProviderConfigurationStore sut = CreateSut((pluginId, CreateMetadataProvider(LibraryType.Book), null, null));
+        LibraryMetadataProviderConfigurationEntity staleConfiguration = _metadataConfigurationFixture.Create(libraryId, pluginId, 1);
+        _mockMetadataConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>([staleConfiguration]));
+        _mockMetadataConfigurationRepository.DeleteByLibraryIdAndPluginIdsAsync(libraryId, Arg.Any<IEnumerable<Guid>>(), Arg.Any<CancellationToken>())
+            .Returns(Error.Failure(description: "Failed to delete the configurations"));
+
+        // Act
+        Result<Success> result = await sut.ReconcileProviderConfigurationsAsync(libraryId, LibraryType.EBook, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+    }
+
+    [Fact]
+    public async Task ReconcileProviderConfigurationsAsync_WhenUpsertingMetadataConfigurationFails_ShouldReturnError()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        Guid pluginId = Guid.NewGuid();
+        IPlugin plugin = CreatePlugin(pluginId, "Plugin");
+        _mockPluginManager.GetPlugins().Returns([plugin]);
+        MediaLibraryProviderConfigurationStore sut = CreateSut((pluginId, CreateMetadataProvider(LibraryType.EBook), null, null));
+        _mockMetadataConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>([]));
+        _mockMetadataConfigurationRepository.UpsertAsync(Arg.Any<LibraryMetadataProviderConfigurationEntity>(), Arg.Any<CancellationToken>())
+            .Returns(Error.Failure(description: "Failed to persist the configuration"));
+
+        // Act
+        Result<Success> result = await sut.ReconcileProviderConfigurationsAsync(libraryId, LibraryType.EBook, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        await _mockArtworkConfigurationRepository.DidNotReceive().GetByLibraryIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ReconcileProviderConfigurationsAsync_WhenReadingArtworkConfigurationsFails_ShouldReturnError()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        Guid pluginId = Guid.NewGuid();
+        IPlugin plugin = CreatePlugin(pluginId, "Plugin");
+        _mockPluginManager.GetPlugins().Returns([plugin]);
+        MediaLibraryProviderConfigurationStore sut = CreateSut((pluginId, null, CreateArtworkProvider(LibraryType.EBook), null));
+        _mockMetadataConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>([]));
+        _mockArtworkConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
+            .Returns(Error.Failure(description: "Failed to read configurations"));
+
+        // Act
+        Result<Success> result = await sut.ReconcileProviderConfigurationsAsync(libraryId, LibraryType.EBook, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        await _mockBookReaderConfigurationRepository.DidNotReceive().GetByLibraryIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ReconcileProviderConfigurationsAsync_WhenUpsertingArtworkConfigurationFails_ShouldReturnError()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        Guid pluginId = Guid.NewGuid();
+        IPlugin plugin = CreatePlugin(pluginId, "Plugin");
+        _mockPluginManager.GetPlugins().Returns([plugin]);
+        MediaLibraryProviderConfigurationStore sut = CreateSut((pluginId, null, CreateArtworkProvider(LibraryType.EBook), null));
+        _mockMetadataConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>([]));
+        _mockArtworkConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<LibraryArtworkProviderConfigurationEntity>>([]));
+        _mockArtworkConfigurationRepository.UpsertAsync(Arg.Any<LibraryArtworkProviderConfigurationEntity>(), Arg.Any<CancellationToken>())
+            .Returns(Error.Failure(description: "Failed to persist the configuration"));
+
+        // Act
+        Result<Success> result = await sut.ReconcileProviderConfigurationsAsync(libraryId, LibraryType.EBook, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        await _mockBookReaderConfigurationRepository.DidNotReceive().GetByLibraryIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ReconcileBookReaderConfigurationsAsync_WhenConfigurationAlreadyExists_ShouldKeepItWithoutUpserting()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        Guid pluginId = Guid.NewGuid();
+        IPlugin plugin = CreatePlugin(pluginId, "Reader Plugin");
+        _mockPluginManager.GetPlugins().Returns([plugin]);
+        MediaLibraryProviderConfigurationStore sut = CreateSut((pluginId, null, null, CreateBookReader(LibraryType.EBook, ".epub")));
+        LibraryBookReaderConfigurationEntity existingConfiguration = _bookReaderConfigurationFixture.Create(libraryId: libraryId, pluginId: pluginId);
+        _mockMetadataConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>([]));
+        _mockArtworkConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<LibraryArtworkProviderConfigurationEntity>>([]));
+        _mockBookReaderConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<LibraryBookReaderConfigurationEntity>>([existingConfiguration]));
+
+        // Act
+        Result<Success> result = await sut.ReconcileProviderConfigurationsAsync(libraryId, LibraryType.EBook, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        await _mockBookReaderConfigurationRepository.DidNotReceive().UpsertAsync(Arg.Any<LibraryBookReaderConfigurationEntity>(), Arg.Any<CancellationToken>());
+        await _mockBookReaderConfigurationRepository.DidNotReceive().DeleteByLibraryIdAndPluginIdsAsync(Arg.Any<Guid>(), Arg.Any<IEnumerable<Guid>>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task EnsureProviderConfigurationsAsync_WhenUpsertingMetadataConfigurationFails_ShouldReturnError()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        Guid pluginId = Guid.NewGuid();
+        IPlugin plugin = CreatePlugin(pluginId, "Plugin");
+        _mockPluginManager.GetPlugins().Returns([plugin]);
+        MediaLibraryProviderConfigurationStore sut = CreateSut((pluginId, CreateMetadataProvider(LibraryType.Book), null, null));
+        _mockMetadataConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>([]));
+        _mockMetadataConfigurationRepository.UpsertAsync(Arg.Any<LibraryMetadataProviderConfigurationEntity>(), Arg.Any<CancellationToken>())
+            .Returns(Error.Failure(description: "Failed to persist the configuration"));
+
+        // Act
+        Result<Success> result = await sut.EnsureProviderConfigurationsAsync(libraryId, LibraryType.Book, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        await _mockArtworkConfigurationRepository.DidNotReceive().GetByLibraryIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task EnsureProviderConfigurationsAsync_WhenReadingArtworkConfigurationsFails_ShouldReturnError()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        Guid pluginId = Guid.NewGuid();
+        IPlugin plugin = CreatePlugin(pluginId, "Plugin");
+        _mockPluginManager.GetPlugins().Returns([plugin]);
+        MediaLibraryProviderConfigurationStore sut = CreateSut((pluginId, null, CreateArtworkProvider(LibraryType.Book), null));
+        _mockArtworkConfigurationRepository.GetByLibraryIdAsync(libraryId, Arg.Any<CancellationToken>())
+            .Returns(Error.Failure(description: "Failed to read configurations"));
+
+        // Act
+        Result<Success> result = await sut.EnsureProviderConfigurationsAsync(libraryId, LibraryType.Book, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        await _mockMetadataConfigurationRepository.DidNotReceive().GetByLibraryIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+    }
+
     /// <summary>
     /// Creates the store under test wired to the mocked dependencies, optionally registering the providers and book readers of the loaded plugins.
     /// </summary>

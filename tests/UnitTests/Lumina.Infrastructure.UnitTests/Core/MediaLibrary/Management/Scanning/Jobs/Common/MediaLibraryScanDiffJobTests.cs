@@ -5,6 +5,7 @@ using Lumina.Domain.Common.Events;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
@@ -121,5 +122,24 @@ public class MediaLibraryScanDiffJobTests
         // Assert
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() => operation);
         Assert.Equal(LibraryScanJobStatus.Canceled, _sut.Status);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenMarkingChangesSucceeds_ShouldExecuteTheChildJobs()
+    {
+        // Arrange
+        _mockStagingResultsRepository.MarkChangesAgainstSnapshotAsync(_scanId.Value, _libraryId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From(Result.Updated));
+        IMediaLibraryScanJob mockChild = Substitute.For<IMediaLibraryScanJob>();
+        _sut.AddChild(mockChild);
+        Guid id = Guid.NewGuid();
+        object input = new();
+
+        // Act
+        await _sut.ExecuteAsync(id, input, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
+        await mockChild.Received(1).ExecuteAsync(id, input, Arg.Any<CancellationToken>());
     }
 }

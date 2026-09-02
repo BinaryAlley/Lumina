@@ -394,6 +394,262 @@ public class BookArtworkServiceTests
     }
 
     [Fact]
+    public async Task SaveBookArtworkAsync_WhenFileExistenceCheckFails_ShouldReturnTheError()
+    {
+        // Arrange
+        string sourcePath = Path.Combine(Path.GetTempPath(), $"missing-artwork-{Guid.NewGuid():N}.jpg");
+        _mockFileProviderService.FileExists(Arg.Any<FileSystemPathId>())
+            .Returns(Error.Failure("FileSystem.Error", "Failed to check the artwork file"));
+
+        // Act
+        Result<string> result = await _sut.SaveBookArtworkAsync(Guid.NewGuid(), Guid.NewGuid(), "Library", "Author", "Title", _artworkDtoFixture.Create(localPath: sourcePath), CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal("FileSystem.Error", result.FirstError.Code);
+    }
+
+    [Fact]
+    public async Task SaveBookArtworkAsync_WhenImageTypeDetectionFails_ShouldReturnTheError()
+    {
+        // Arrange
+        string sourcePath = CreateTempImageFile(smallImageBytes: 1024);
+        try
+        {
+            _mockFileProviderService.FileExists(Arg.Any<FileSystemPathId>()).Returns(Result.From(true));
+            _mockFileTypeService.GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>())
+                .Returns(Error.Failure("FileSystem.Error", "Failed to detect the image type"));
+
+            // Act
+            Result<string> result = await _sut.SaveBookArtworkAsync(Guid.NewGuid(), Guid.NewGuid(), "Library", "Author", "Title", _artworkDtoFixture.Create(localPath: sourcePath), CancellationToken.None);
+
+            // Assert
+            Assert.True(result.IsFailure);
+            Assert.Equal("FileSystem.Error", result.FirstError.Code);
+            _mockFileProviderService.DidNotReceive().CopyFile(Arg.Any<FileSystemPathId>(), Arg.Any<FileSystemPathId>(), true);
+        }
+        finally
+        {
+            File.Delete(sourcePath);
+        }
+    }
+
+    [Fact]
+    public async Task SaveBookArtworkAsync_WhenCreatingTheArtworkDirectoryFails_ShouldReturnTheError()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        Guid bookId = Guid.NewGuid();
+        string libraryName = "Test Library";
+        string authorName = "Test Author";
+        string bookTitle = "Test Book";
+
+        string sourcePath = CreateTempImageFile(smallImageBytes: 1024);
+        try
+        {
+            _mockFileProviderService.FileExists(Arg.Any<FileSystemPathId>()).Returns(Result.From(true));
+            _mockFileTypeService.GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>())
+                .Returns(Result.From(ImageType.JPEG));
+
+            string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, bookId, libraryName, authorName, bookTitle);
+            MockArtworkDirectoryStubs(artworkDirectoryPath);
+            _mockDirectoryProviderService.CreateDirectory(Arg.Any<FileSystemPathId>(), Arg.Any<string>())
+                .Returns(Error.Failure("Directory.Error", "Failed to create the artwork directory"));
+
+            // Act
+            Result<string> result = await _sut.SaveBookArtworkAsync(libraryId, bookId, libraryName, authorName, bookTitle, _artworkDtoFixture.Create(localPath: sourcePath), CancellationToken.None);
+
+            // Assert
+            Assert.True(result.IsFailure);
+            Assert.Equal("Directory.Error", result.FirstError.Code);
+            _mockFileProviderService.DidNotReceive().CopyFile(Arg.Any<FileSystemPathId>(), Arg.Any<FileSystemPathId>(), true);
+        }
+        finally
+        {
+            File.Delete(sourcePath);
+        }
+    }
+
+    [Fact]
+    public async Task SaveBookArtworkAsync_WhenDirectoryExistenceCheckFails_ShouldReturnTheError()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        Guid bookId = Guid.NewGuid();
+        string libraryName = "Test Library";
+        string authorName = "Test Author";
+        string bookTitle = "Test Book";
+
+        string sourcePath = CreateTempImageFile(smallImageBytes: 1024);
+        try
+        {
+            _mockFileProviderService.FileExists(Arg.Any<FileSystemPathId>()).Returns(Result.From(true));
+            _mockFileTypeService.GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>())
+                .Returns(Result.From(ImageType.JPEG));
+
+            string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, bookId, libraryName, authorName, bookTitle);
+            MockArtworkDirectoryStubs(artworkDirectoryPath);
+            _mockDirectoryProviderService.DirectoryExists(Arg.Any<FileSystemPathId>())
+                .Returns(Error.Failure("Directory.Error", "Failed to check the artwork directory"));
+
+            // Act
+            Result<string> result = await _sut.SaveBookArtworkAsync(libraryId, bookId, libraryName, authorName, bookTitle, _artworkDtoFixture.Create(localPath: sourcePath), CancellationToken.None);
+
+            // Assert
+            Assert.True(result.IsFailure);
+            Assert.Equal("Directory.Error", result.FirstError.Code);
+            _mockFileProviderService.DidNotReceive().CopyFile(Arg.Any<FileSystemPathId>(), Arg.Any<FileSystemPathId>(), true);
+        }
+        finally
+        {
+            File.Delete(sourcePath);
+        }
+    }
+
+    [Fact]
+    public async Task SaveBookArtworkAsync_WhenCopyingTheArtworkFails_ShouldReturnTheError()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        Guid bookId = Guid.NewGuid();
+        string libraryName = "Test Library";
+        string authorName = "Test Author";
+        string bookTitle = "Test Book";
+
+        string sourcePath = CreateTempImageFile(smallImageBytes: 1024);
+        try
+        {
+            _mockFileProviderService.FileExists(Arg.Any<FileSystemPathId>()).Returns(Result.From(true));
+            _mockFileTypeService.GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>())
+                .Returns(Result.From(ImageType.JPEG));
+
+            string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, bookId, libraryName, authorName, bookTitle);
+            MockArtworkDirectoryStubs(artworkDirectoryPath);
+            _mockFileProviderService.CopyFile(Arg.Any<FileSystemPathId>(), Arg.Any<FileSystemPathId>(), true)
+                .Returns(Error.Failure("FileSystem.Error", "Failed to copy the artwork"));
+
+            // Act
+            Result<string> result = await _sut.SaveBookArtworkAsync(libraryId, bookId, libraryName, authorName, bookTitle, _artworkDtoFixture.Create(localPath: sourcePath), CancellationToken.None);
+
+            // Assert
+            Assert.True(result.IsFailure);
+            Assert.Equal("FileSystem.Error", result.FirstError.Code);
+            _mockFileProviderService.DidNotReceive().RenameFile(Arg.Any<FileSystemPathId>(), Arg.Any<string>());
+        }
+        finally
+        {
+            File.Delete(sourcePath);
+        }
+    }
+
+    [Fact]
+    public async Task SaveBookArtworkAsync_WhenRenamingTheCopiedArtworkFails_ShouldReturnTheError()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        Guid bookId = Guid.NewGuid();
+        string libraryName = "Test Library";
+        string authorName = "Test Author";
+        string bookTitle = "Test Book";
+
+        string sourcePath = CreateTempImageFile(smallImageBytes: 1024);
+        try
+        {
+            _mockFileProviderService.FileExists(Arg.Any<FileSystemPathId>()).Returns(Result.From(true));
+            _mockFileTypeService.GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>())
+                .Returns(Result.From(ImageType.JPEG));
+
+            string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, bookId, libraryName, authorName, bookTitle);
+            MockArtworkDirectoryStubs(artworkDirectoryPath);
+            _mockFileProviderService.CopyFile(Arg.Any<FileSystemPathId>(), Arg.Any<FileSystemPathId>(), true)
+                .Returns(Result.From(_fileSystemPathIdFixture.Create(Path.Combine(artworkDirectoryPath, "cover.jpg"))));
+            _mockFileProviderService.RenameFile(Arg.Any<FileSystemPathId>(), "cover.jpeg")
+                .Returns(Error.Failure("FileSystem.Error", "Failed to rename the artwork"));
+
+            // Act
+            Result<string> result = await _sut.SaveBookArtworkAsync(libraryId, bookId, libraryName, authorName, bookTitle, _artworkDtoFixture.Create(localPath: sourcePath), CancellationToken.None);
+
+            // Assert
+            Assert.True(result.IsFailure);
+            Assert.Equal("FileSystem.Error", result.FirstError.Code);
+            _mockFileProviderService.DidNotReceive().DeleteFile(Arg.Any<FileSystemPathId>());
+        }
+        finally
+        {
+            File.Delete(sourcePath);
+        }
+    }
+
+    [Fact]
+    public async Task SaveBookArtworkAsync_WhenAuthorNameCannotBeSanitized_ShouldReturnInvalidPath()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        Guid bookId = Guid.NewGuid();
+        string libraryName = "Test Library";
+        string authorName = "Test Author";
+        string bookTitle = "Test Book";
+
+        string sourcePath = CreateTempImageFile(smallImageBytes: 1024);
+        try
+        {
+            _mockFileProviderService.FileExists(Arg.Any<FileSystemPathId>()).Returns(Result.From(true));
+            _mockFileTypeService.GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>())
+                .Returns(Result.From(ImageType.JPEG));
+
+            string mediaRoot = Path.Combine(AppContext.BaseDirectory, "media");
+            string booksPath = Path.Combine(mediaRoot, "books");
+            _mockPathService.CombinePath(AppContext.BaseDirectory, "media").Returns(Result.From(mediaRoot));
+            _mockPathService.CombinePath(mediaRoot, "books").Returns(Result.From(booksPath));
+            _mockPathService.CombinePath(Arg.Any<string>(), Arg.Any<string>())
+                .Returns(callInfo => Result.From(Path.Combine(callInfo.ArgAt<string>(0), callInfo.ArgAt<string>(1))));
+            _mockPathService.SanitizeSegment(Arg.Any<string>())
+                .Returns(callInfo =>
+                {
+                    string name = callInfo.Arg<string>();
+                    return name == $"{libraryName}-{libraryId}"
+                        ? Result.From(_pathSegmentFixture.Create(name: name, isDirectory: true, isDrive: false))
+                        : Errors.FileSystemManagement.InvalidPath;
+                });
+
+            // Act
+            Result<string> result = await _sut.SaveBookArtworkAsync(libraryId, bookId, libraryName, authorName, bookTitle, _artworkDtoFixture.Create(localPath: sourcePath), CancellationToken.None);
+
+            // Assert
+            Assert.True(result.IsFailure);
+            Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
+            _mockFileProviderService.DidNotReceive().CopyFile(Arg.Any<FileSystemPathId>(), Arg.Any<FileSystemPathId>(), true);
+        }
+        finally
+        {
+            File.Delete(sourcePath);
+        }
+    }
+
+    [Fact]
+    public void DeleteBookArtwork_WhenListingTheCoverFilesFails_ShouldReturnSuccessAndDeleteNothing()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        Guid bookId = Guid.NewGuid();
+        string libraryName = "Test Library";
+        string authorName = "Test Author";
+        string bookTitle = "Test Book";
+
+        string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, bookId, libraryName, authorName, bookTitle);
+        MockArtworkDirectoryStubs(artworkDirectoryPath);
+        _mockFileProviderService.GetFilePaths(Arg.Any<FileSystemPathId>(), true)
+            .Returns(Error.Failure("FileSystem.Error", "Failed to list the artwork files"));
+
+        // Act
+        Result<Deleted> result = _sut.DeleteBookArtwork(libraryId, bookId, libraryName, authorName, bookTitle);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        _mockFileProviderService.DidNotReceive().DeleteFile(Arg.Any<FileSystemPathId>());
+    }
+
+    [Fact]
     public void DeleteBookArtwork_WhenCalled_ShouldDeleteTheCoverFilesInTheBookDirectory()
     {
         // Arrange

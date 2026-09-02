@@ -14,6 +14,7 @@ using Lumina.Domain.Common.Events;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
@@ -247,6 +248,161 @@ public class MediaLibraryScanProviderConfigurationInvalidationJobTests
         // Assert
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() => operation);
         Assert.Equal(LibraryScanJobStatus.Canceled, _sut.Status);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenLibraryDoesNotExist_ShouldMarkJobAsFailedAndPublishFailureEvent()
+    {
+        // Arrange
+        _mockLibraryRepository.GetByIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(null));
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(LibraryScanJobStatus.Failed, _sut.Status);
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockDomainEventPublisher.Received(1).PublishAsync(Arg.Is<LibraryScanFailedDomainEvent>(domainEvent =>
+            domainEvent.LibraryId == _libraryId), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenGettingMetadataConfigurationsFails_ShouldMarkJobAsFailedAndPublishFailureEvent()
+    {
+        // Arrange
+        LibraryEntity library = _libraryEntityFixture.Create(id: _libraryId.Value, title: "My Library");
+        SetupLibraryAndConfigurations(library);
+        _mockMetadataConfigurationRepository.GetByLibraryIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+            .Returns(Error.Failure("Database.Error", "Failed to get the metadata provider configurations"));
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(LibraryScanJobStatus.Failed, _sut.Status);
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockDomainEventPublisher.Received(1).PublishAsync(Arg.Is<LibraryScanFailedDomainEvent>(domainEvent =>
+            domainEvent.LibraryId == _libraryId), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenGettingArtworkConfigurationsFails_ShouldMarkJobAsFailedAndPublishFailureEvent()
+    {
+        // Arrange
+        LibraryEntity library = _libraryEntityFixture.Create(id: _libraryId.Value, title: "My Library");
+        SetupLibraryAndConfigurations(library);
+        _mockArtworkConfigurationRepository.GetByLibraryIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+            .Returns(Error.Failure("Database.Error", "Failed to get the artwork provider configurations"));
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(LibraryScanJobStatus.Failed, _sut.Status);
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockDomainEventPublisher.Received(1).PublishAsync(Arg.Is<LibraryScanFailedDomainEvent>(domainEvent =>
+            domainEvent.LibraryId == _libraryId), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenResettingMetadataStatusFails_ShouldMarkJobAsFailedAndPublishFailureEvent()
+    {
+        // Arrange
+        LibraryEntity library = _libraryEntityFixture.Create(id: _libraryId.Value, title: "My Library", metadataProvidersConfigurationFingerprint: "STALE_METADATA", artworkProvidersConfigurationFingerprint: null);
+        SetupLibraryAndConfigurations(library);
+        _mockBookRepository.ResetMetadataStatusForLibraryAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+            .Returns(Error.Failure("Database.Error", "Failed to reset the metadata status"));
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(LibraryScanJobStatus.Failed, _sut.Status);
+        await _mockBookRepository.DidNotReceive().ResetArtworkStatusForLibraryAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockDomainEventPublisher.Received(1).PublishAsync(Arg.Is<LibraryScanFailedDomainEvent>(domainEvent =>
+            domainEvent.LibraryId == _libraryId), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenResettingArtworkStatusFails_ShouldMarkJobAsFailedAndPublishFailureEvent()
+    {
+        // Arrange
+        LibraryEntity library = _libraryEntityFixture.Create(id: _libraryId.Value, title: "My Library", metadataProvidersConfigurationFingerprint: null, artworkProvidersConfigurationFingerprint: "STALE_ARTWORK");
+        SetupLibraryAndConfigurations(library);
+        _mockBookRepository.ResetArtworkStatusForLibraryAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+            .Returns(Error.Failure("Database.Error", "Failed to reset the artwork status"));
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(LibraryScanJobStatus.Failed, _sut.Status);
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockDomainEventPublisher.Received(1).PublishAsync(Arg.Is<LibraryScanFailedDomainEvent>(domainEvent =>
+            domainEvent.LibraryId == _libraryId), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenReadingUserSettingsFails_ShouldStillSeedTheFingerprintsAndComplete()
+    {
+        // Arrange
+        LibraryEntity library = _libraryEntityFixture.Create(id: _libraryId.Value, title: "My Library");
+        SetupLibraryAndConfigurations(library);
+        IUserSettingsRepository mockUserSettingsRepository = Substitute.For<IUserSettingsRepository>();
+        mockUserSettingsRepository.GetByUserIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Error.Failure("Database.Error", "Failed to read the user settings"));
+        _mockUnitOfWork.UserSettingsRepository.Returns(mockUserSettingsRepository);
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        // reading the user settings is best effort, a failure must not prevent the fingerprints from being persisted
+        Assert.NotNull(library.MetadataProvidersConfigurationFingerprint);
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+        Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenUserSettingsRepositoryIsNotRegistered_ShouldSeedTheFingerprintsAndComplete()
+    {
+        // Arrange
+        LibraryEntity library = _libraryEntityFixture.Create(id: _libraryId.Value, title: "My Library");
+        SetupLibraryAndConfigurations(library);
+        _mockUnitOfWork.UserSettingsRepository.Returns((IUserSettingsRepository)null!);
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        // the user settings repository is optional, its absence must not prevent the fingerprints from being persisted
+        Assert.NotNull(library.MetadataProvidersConfigurationFingerprint);
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+        Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenJobHasLinkedChildren_ShouldExecuteEachChildAndComplete()
+    {
+        // Arrange
+        LibraryEntity library = _libraryEntityFixture.Create(id: _libraryId.Value, title: "My Library");
+        SetupLibraryAndConfigurations(library);
+
+        IMediaLibraryScanJob mockChild = Substitute.For<IMediaLibraryScanJob>();
+        mockChild.ExecuteAsync(Arg.Any<Guid>(), Arg.Any<object>(), Arg.Any<CancellationToken>())
+            .Returns(Task.CompletedTask);
+        _sut.AddChild(mockChild);
+        object input = new();
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), input, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
+        await mockChild.Received(1).ExecuteAsync(Arg.Any<Guid>(), Arg.Is<object>(executedInput => executedInput == input), Arg.Any<CancellationToken>());
+        await _mockDomainEventPublisher.DidNotReceive().PublishAsync(Arg.Any<LibraryScanFinishedDomainEvent>(), Arg.Any<CancellationToken>());
     }
 
     /// <summary>

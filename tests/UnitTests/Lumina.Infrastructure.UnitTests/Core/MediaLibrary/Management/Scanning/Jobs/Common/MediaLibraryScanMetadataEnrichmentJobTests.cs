@@ -25,6 +25,7 @@ using Lumina.Domain.Common.Events;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
@@ -485,6 +486,223 @@ public class MediaLibraryScanMetadataEnrichmentJobTests
         // Assert
         // the provider requiring access to the web is used when the library permits downloading data from the web
         await webProvider.Received(1).GetMetadataAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>());
+        Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenCountingTheBooksNeedingMetadataFails_ShouldMarkJobAsFailed()
+    {
+        // Arrange
+        Guid firstPluginId = Guid.NewGuid();
+        IMetadataProvider firstProvider = Substitute.For<IMetadataProvider>();
+        firstProvider.Name.Returns("First Provider");
+        firstProvider.SupportedLibraryTypes.Returns([LibraryType.Book]);
+
+        SetupRealServiceProviderForProviders(firstPluginId, firstProvider, shouldAggregateMetadataWhenMissing: false);
+        _mockConfigurationRepository.GetByLibraryIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>([_configurationEntityFixture.Create(_libraryId.Value, firstPluginId, 1)]));
+        _mockBookRepository.GetBooksNeedingMetadataCountAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+            .Returns(Error.Failure("Database.Error", "Failed to count the books to enrich"));
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(LibraryScanJobStatus.Failed, _sut.Status);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenGettingTheBooksPageNeedingMetadataFails_ShouldMarkJobAsFailed()
+    {
+        // Arrange
+        Guid firstPluginId = Guid.NewGuid();
+        IMetadataProvider firstProvider = Substitute.For<IMetadataProvider>();
+        firstProvider.Name.Returns("First Provider");
+        firstProvider.SupportedLibraryTypes.Returns([LibraryType.Book]);
+
+        SetupRealServiceProviderForProviders(firstPluginId, firstProvider, shouldAggregateMetadataWhenMissing: false);
+        _mockConfigurationRepository.GetByLibraryIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>([_configurationEntityFixture.Create(_libraryId.Value, firstPluginId, 1)]));
+        _mockBookRepository.GetBooksNeedingMetadataCountAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From(1));
+        _mockBookRepository.GetBooksNeedingMetadataAsync(_libraryId.Value, Arg.Any<string?>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(Error.Failure("Database.Error", "Failed to get the books to enrich"));
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(LibraryScanJobStatus.Failed, _sut.Status);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenAMetadataProviderThrowsWhileTryingTheProvidersInOrder_ShouldTryTheNextProvider()
+    {
+        // Arrange
+        Guid firstPluginId = Guid.NewGuid();
+        Guid secondPluginId = Guid.NewGuid();
+        IMetadataProvider firstProvider = Substitute.For<IMetadataProvider>();
+        firstProvider.Name.Returns("First Provider");
+        firstProvider.SupportedLibraryTypes.Returns([LibraryType.Book]);
+        firstProvider.GetMetadataAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromException<MetadataDto?>(new InvalidOperationException("The metadata provider failed")));
+        IMetadataProvider secondProvider = Substitute.For<IMetadataProvider>();
+        secondProvider.Name.Returns("Second Provider");
+        secondProvider.SupportedLibraryTypes.Returns([LibraryType.Book]);
+        secondProvider.GetMetadataAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>())
+            .Returns(_bookMetadataDtoFixture.Create(title: "Second Title", publisher: "Second Publisher"));
+
+        SetupRealServiceProviderForProviders(firstPluginId, firstProvider, secondPluginId, secondProvider, shouldAggregateMetadataWhenMissing: false);
+        BookEntity book = _bookEntityFixture.Create(libraryId: _libraryId.Value, path: "/books/test.epub");
+        SetupSingleBookPage(book, firstPluginId, secondPluginId);
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        // a failing metadata provider must not prevent the metadata of the next provider from being used
+        Assert.Equal(MetadataStatus.Enriched, book.MetadataStatus);
+        Assert.Equal("Second Provider", book.MetadataProvider);
+        Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenAMetadataProviderThrowsWhileAggregatingMetadata_ShouldUseTheFindingsOfTheOtherProviders()
+    {
+        // Arrange
+        Guid firstPluginId = Guid.NewGuid();
+        Guid secondPluginId = Guid.NewGuid();
+        IMetadataProvider firstProvider = Substitute.For<IMetadataProvider>();
+        firstProvider.Name.Returns("First Provider");
+        firstProvider.SupportedLibraryTypes.Returns([LibraryType.Book]);
+        firstProvider.GetMetadataAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromException<MetadataDto?>(new InvalidOperationException("The metadata provider failed")));
+        IMetadataProvider secondProvider = Substitute.For<IMetadataProvider>();
+        secondProvider.Name.Returns("Second Provider");
+        secondProvider.SupportedLibraryTypes.Returns([LibraryType.Book]);
+        secondProvider.GetMetadataAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>())
+            .Returns(_bookMetadataDtoFixture.Create(title: "Second Title", publisher: "Second Publisher"));
+
+        SetupRealServiceProviderForProviders(firstPluginId, firstProvider, secondPluginId, secondProvider, shouldAggregateMetadataWhenMissing: true);
+        BookEntity book = _bookEntityFixture.Create(libraryId: _libraryId.Value, path: "/books/test.epub");
+        SetupSingleBookPage(book, firstPluginId, secondPluginId);
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(MetadataStatus.Enriched, book.MetadataStatus);
+        Assert.Equal("Second Provider", book.MetadataProvider);
+        Assert.Equal("Second Title", book.Title);
+        Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenAContributorHasNoDisplayName_ShouldSkipLinkingIt()
+    {
+        // Arrange
+        Guid firstPluginId = Guid.NewGuid();
+        IMetadataProvider firstProvider = Substitute.For<IMetadataProvider>();
+        firstProvider.Name.Returns("First Provider");
+        firstProvider.SupportedLibraryTypes.Returns([LibraryType.Book]);
+        MediaContributorDto namelessContributor = _mediaContributorDtoFixture.Create(roleName: "Author", roleCategory: MediaContributorRoleCategory.Author) with { Name = null };
+        firstProvider.GetMetadataAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>())
+            .Returns(_bookMetadataDtoFixture.Create(title: "First Title", contributors: [namelessContributor]));
+
+        SetupRealServiceProviderForProviders(firstPluginId, firstProvider, shouldAggregateMetadataWhenMissing: false);
+        BookEntity book = _bookEntityFixture.Create(libraryId: _libraryId.Value, path: "/books/test.epub");
+        SetupSingleBookPage(book, firstPluginId);
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        // a contributor without a display name cannot be linked to the book, so no contributor is queried or created
+        await _mockMediaContributorRepository.DidNotReceive().FindOrCreateByDisplayNameAsync(Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
+        Assert.Empty(book.BookContributors);
+        Assert.Equal(MetadataStatus.Enriched, book.MetadataStatus);
+        Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenAContributorHasNoRole_ShouldLinkItWithTheDefaultRole()
+    {
+        // Arrange
+        Guid firstPluginId = Guid.NewGuid();
+        IMetadataProvider firstProvider = Substitute.For<IMetadataProvider>();
+        firstProvider.Name.Returns("First Provider");
+        firstProvider.SupportedLibraryTypes.Returns([LibraryType.Book]);
+        MediaContributorDto contributorWithoutRole = _mediaContributorDtoFixture.Create(displayName: "Frank Herbert") with { Role = null };
+        firstProvider.GetMetadataAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>())
+            .Returns(_bookMetadataDtoFixture.Create(title: "First Title", contributors: [contributorWithoutRole]));
+
+        SetupRealServiceProviderForProviders(firstPluginId, firstProvider, shouldAggregateMetadataWhenMissing: false);
+        BookEntity book = _bookEntityFixture.Create(libraryId: _libraryId.Value, path: "/books/test.epub", includeMetadata: false);
+        SetupSingleBookPage(book, firstPluginId);
+
+        MediaContributorEntity authorEntity = _mediaContributorEntityFixture.Create(displayName: "Frank Herbert");
+        _mockMediaContributorRepository.FindOrCreateByDisplayNameAsync("Frank Herbert", Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From(authorEntity));
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        BookContributorEntity linkedContributor = Assert.Single(book.BookContributors);
+        Assert.Equal("Contributor", linkedContributor.RoleName);
+        Assert.Equal(MediaContributorRoleCategory.Other, linkedContributor.RoleCategory);
+        Assert.Equal(MetadataStatus.Enriched, book.MetadataStatus);
+        Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenFindingOrCreatingAContributorFails_ShouldMarkJobAsFailed()
+    {
+        // Arrange
+        Guid firstPluginId = Guid.NewGuid();
+        IMetadataProvider firstProvider = Substitute.For<IMetadataProvider>();
+        firstProvider.Name.Returns("First Provider");
+        firstProvider.SupportedLibraryTypes.Returns([LibraryType.Book]);
+        MediaContributorDto author = _mediaContributorDtoFixture.Create(displayName: "Frank Herbert", roleName: "Author", roleCategory: MediaContributorRoleCategory.Author);
+        firstProvider.GetMetadataAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>())
+            .Returns(_bookMetadataDtoFixture.Create(title: "First Title", contributors: [author]));
+
+        SetupRealServiceProviderForProviders(firstPluginId, firstProvider, shouldAggregateMetadataWhenMissing: false);
+        BookEntity book = _bookEntityFixture.Create(libraryId: _libraryId.Value, path: "/books/test.epub");
+        SetupSingleBookPage(book, firstPluginId);
+
+        _mockMediaContributorRepository.FindOrCreateByDisplayNameAsync("Frank Herbert", Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(Error.Failure("Database.Error", "Failed to find or create the contributor"));
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(LibraryScanJobStatus.Failed, _sut.Status);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenTheJobHasChildJobs_ShouldExecuteThemAfterCompletingItsPayload()
+    {
+        // Arrange
+        _mockConfigurationRepository.GetByLibraryIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>([]));
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+
+        IMediaLibraryScanJob mockChildJob = Substitute.For<IMediaLibraryScanJob>();
+        mockChildJob.ExecuteAsync(Arg.Any<Guid>(), Arg.Any<object>(), Arg.Any<CancellationToken>())
+            .Returns(Task.CompletedTask);
+        _sut.AddChild(mockChildJob);
+        Guid id = Guid.NewGuid();
+        object input = new();
+
+        // Act
+        await _sut.ExecuteAsync(id, input, CancellationToken.None);
+
+        // Assert
+        await mockChildJob.Received(1).ExecuteAsync(id, input, Arg.Any<CancellationToken>());
         Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
     }
 

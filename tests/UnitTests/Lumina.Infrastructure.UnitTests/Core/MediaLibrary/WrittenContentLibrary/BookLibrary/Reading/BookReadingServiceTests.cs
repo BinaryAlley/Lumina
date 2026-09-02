@@ -708,6 +708,81 @@ public class BookReadingServiceTests : IDisposable
         }
     }
 
+    [Fact]
+    public async Task GetSectionAsync_WhenNoReaderSupportsTheFormat_ShouldReturnNoReaderAvailableError()
+    {
+        // Arrange
+        _mockPluginManager.GetPlugins().Returns([]);
+
+        // Act
+        Result<ReadingSectionDto> result = await _sut.GetSectionAsync(_bookId, _libraryId, _bookPath, LibraryType.EBook, "section-1", shouldRenderPdfAsImages: false, shouldPreserveStyles: false, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Reading.NoReaderAvailable, result.FirstError);
+        await _mockReader.DidNotReceive().OpenAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task GetManifestAsync_WhenAReaderDeclaresABlankExtension_ShouldSkipItAndStillResolveTheFormat()
+    {
+        // Arrange
+        ReadingDocumentDto document = CreateExtractableDocument();
+        StubOpenAsyncToExtract(document);
+        IBookReader blankExtensionReader = Substitute.For<IBookReader>();
+        blankExtensionReader.SupportedExtensions.Returns(["   "]);
+        blankExtensionReader.SupportedLibraryTypes.Returns([LibraryType.EBook]);
+        ServiceCollection services = new();
+        services.AddKeyedSingleton(_pluginId, blankExtensionReader);
+        services.AddKeyedSingleton(_pluginId, _mockReader);
+        services.AddSingleton(_mockUnitOfWork);
+        using (ServiceProvider serviceProvider = services.BuildServiceProvider())
+        {
+            IServiceScopeFactory serviceScopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
+            BookReadingService sut = new(serviceProvider, _mockPluginManager, _enablementCache, serviceScopeFactory, Substitute.For<ILogger<BookReadingService>>());
+
+            // Act
+            Result<ReadingManifestResponse> result = await sut.GetManifestAsync(_bookId, _libraryId, _bookPath, LibraryType.EBook, shouldRenderPdfAsImages: false, CancellationToken.None);
+
+            // Assert
+            Assert.False(result.IsFailure);
+            Assert.Equal(document.Title, result.Value.Title);
+        }
+    }
+
+    [Fact]
+    public async Task GetResourceAsync_WhenTwoRequestsMissTheSameResourceConcurrently_ShouldProduceItOnceAndBothServeIt()
+    {
+        // Arrange
+        ReadingDocumentDto document = CreateExtractableDocument();
+        StubOpenAsyncToExtract(document);
+        byte[] producedResource = [7, 8, 9];
+        TaskCompletionSource<bool> productionStarted = new();
+        TaskCompletionSource<bool> allowProductionToFinish = new();
+        _mockReader.GetResourceAsync(Arg.Any<string>(), Arg.Any<string>(), "cover", Arg.Any<CancellationToken>())
+            .Returns(async callInfo =>
+            {
+                productionStarted.SetResult(true);
+                await allowProductionToFinish.Task;
+                return producedResource;
+            });
+
+        // Act
+        Task<Result<ReadingResourceDataDto>> firstTask = _sut.GetResourceAsync(_bookId, _libraryId, _bookPath, LibraryType.EBook, "cover", shouldRenderPdfAsImages: false, CancellationToken.None);
+        await productionStarted.Task;
+        Task<Result<ReadingResourceDataDto>> secondTask = _sut.GetResourceAsync(_bookId, _libraryId, _bookPath, LibraryType.EBook, "cover", shouldRenderPdfAsImages: false, CancellationToken.None);
+        allowProductionToFinish.SetResult(true);
+        Result<ReadingResourceDataDto> firstResult = await firstTask;
+        Result<ReadingResourceDataDto> secondResult = await secondTask;
+
+        // Assert
+        Assert.False(firstResult.IsFailure);
+        Assert.False(secondResult.IsFailure);
+        Assert.Equal(new byte[] { 7, 8, 9 }, firstResult.Value.Data);
+        Assert.Equal(new byte[] { 7, 8, 9 }, secondResult.Value.Data);
+        await _mockReader.Received(1).GetResourceAsync(_bookPath, Arg.Any<string>(), "cover", Arg.Any<CancellationToken>());
+    }
+
     /// <summary>
     /// Creates a reading document whose spine and resources are extractable into the working directory.
     /// </summary>

@@ -168,4 +168,65 @@ public class DebouncedMediaLibraryScanProgressNotifierTests
                 && ((MediaLibraryScanProgressResponse)args[0]!).Status == LibraryScanJobStatus.Failed.ToString()),
             Arg.Any<CancellationToken>());
     }
+
+    [Fact]
+    public async Task SendLibraryScanFinishedEventAsync_WhenTokenIsCancelled_ShouldNotRemoveProgressOrSendEvent()
+    {
+        // Arrange
+        MediaLibraryScanCompositeId compositeId = _mediaLibraryScanCompositeIdFixture.Create();
+        using CancellationTokenSource cancellationTokenSource = new();
+        cancellationTokenSource.Cancel();
+
+        // Act
+        await _sut.SendLibraryScanFinishedEventAsync(compositeId, cancellationTokenSource.Token);
+
+        // Assert
+        _mockProgressTracker.DidNotReceive().RemoveScanProgress(Arg.Any<MediaLibraryScanCompositeId>());
+        _mockHubClients.DidNotReceive().Group(Arg.Any<string>());
+    }
+
+    [Fact]
+    public async Task SendLibraryScanFailedEventAsync_WhenTokenIsCancelled_ShouldNotRemoveProgressOrSendEvent()
+    {
+        // Arrange
+        MediaLibraryScanCompositeId compositeId = _mediaLibraryScanCompositeIdFixture.Create();
+        using CancellationTokenSource cancellationTokenSource = new();
+        cancellationTokenSource.Cancel();
+
+        // Act
+        await _sut.SendLibraryScanFailedEventAsync(compositeId, cancellationTokenSource.Token);
+
+        // Assert
+        _mockProgressTracker.DidNotReceive().RemoveScanProgress(Arg.Any<MediaLibraryScanCompositeId>());
+        _mockHubClients.DidNotReceive().Group(Arg.Any<string>());
+    }
+
+    [Fact]
+    public async Task SendLibraryScanFinishedEventAsync_WhenADebouncedUpdateWasScheduledForTheScan_ShouldRemoveTheDebouncer()
+    {
+        // Arrange
+        MediaLibraryScanCompositeId compositeId = _mediaLibraryScanCompositeIdFixture.Create();
+        // The scheduled update is registered by the progress update even when the progress is missing, which also avoids sending an update event.
+        _mockProgressTracker.GetScanProgress(compositeId)
+            .Returns(Error.Failure("Tracking.Error", "The scan progress is missing"));
+        MediaLibraryScanProgress progress = _mediaLibraryScanProgressFixture.Create(
+            scanId: compositeId.ScanId,
+            userId: compositeId.UserId,
+            completedJobs: 1,
+            totalJobs: 2,
+            status: LibraryScanJobStatus.Running);
+        _mockProgressTracker.RemoveScanProgress(compositeId).Returns(Result.From(progress));
+
+        // Act
+        await _sut.SendLibraryProgressUpdateEventAsync(compositeId, CancellationToken.None);
+        await _sut.SendLibraryScanFinishedEventAsync(compositeId, CancellationToken.None);
+
+        // Assert
+        await _mockClientProxy.Received(1).SendCoreAsync(
+            "libraryScanFinishedEvent",
+            Arg.Is<object?[]>(args => args.Length == 1
+                && args[0] != null
+                && ((MediaLibraryScanProgressResponse)args[0]!).Status == LibraryScanJobStatus.Completed.ToString()),
+            Arg.Any<CancellationToken>());
+    }
 }

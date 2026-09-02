@@ -144,6 +144,52 @@ public class FileHashServiceTests
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() => operation);
     }
 
+    [Fact]
+    public void ComputeFileHash_WhenFileIsEmpty_ShouldReturnEmptyFileHash()
+    {
+        // Arrange
+        using TemporaryTestDirectory temporaryTestDirectory = new();
+        string filePath = temporaryTestDirectory.CreateFile("empty.pdf", string.Empty);
+
+        // Act
+        ulong hash = _sut.ComputeFileHash(filePath);
+
+        // Assert
+        Assert.Equal(BitConverter.ToUInt64(new XxHash64().GetCurrentHash()), hash);
+    }
+
+    [Fact]
+    public void ComputeFileHash_WhenFileHasContent_ShouldReturnNonZeroHash()
+    {
+        // Arrange
+        using TemporaryTestDirectory temporaryTestDirectory = new();
+        string filePath = temporaryTestDirectory.CreateFile("book.pdf", "content of the book");
+
+        // Act
+        ulong hash = _sut.ComputeFileHash(filePath);
+
+        // Assert
+        Assert.NotEqual(0UL, hash);
+    }
+
+    [Fact]
+    public async Task HashFilesAsync_WhenFileIsLargerThanTheSamplingThreshold_ShouldSampleTheWholeFile()
+    {
+        // Arrange
+        using TemporaryTestDirectory temporaryTestDirectory = new();
+        string filePath = Path.Combine(temporaryTestDirectory.Path, "large.pdf");
+        File.WriteAllBytes(filePath, new byte[500_000]);
+        List<HashedFileSystemFileDto> inputFiles = [_hashedFileSystemFileDtoFixture.Create(path: filePath, size: new FileInfo(filePath).Length, currentHash: 0, oldHash: 0, ticks: 0)];
+
+        // Act
+        List<HashedFileSystemFileDto> result = await _sut.HashFilesAsync(inputFiles, () => Task.CompletedTask, CancellationToken.None);
+
+        // Assert
+        HashedFileSystemFileDto hashedFile = Assert.Single(result);
+        Assert.Equal(filePath, hashedFile.Path);
+        Assert.NotEqual(0UL, hashedFile.CurrentHash);
+    }
+
     /// <summary>
     /// Test helper managing a temporary directory, deleted when the test finishes.
     /// </summary>

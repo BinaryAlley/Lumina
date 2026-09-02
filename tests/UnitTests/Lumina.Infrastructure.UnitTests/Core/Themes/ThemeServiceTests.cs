@@ -1200,6 +1200,243 @@ public class ThemeServiceTests : IDisposable
         Assert.False(_sut.HasThemePack("bundled-theme"));
     }
 
+    [Fact]
+    public async Task InstallAsync_WhenArchiveContainsAllowedDirectoryEntries_ShouldInstallSuccessfully()
+    {
+        // Arrange
+        string manifestJson = _themePackFixture.CreateManifestJson();
+        byte[] archive = _themePackFixture.CreateArchive(
+            new("templates/", string.Empty),
+            new("theme.json", manifestJson),
+            new("templates/default.html", DEFAULT_TEMPLATE),
+            new("assets/preview.png", "preview-image-bytes"));
+
+        // Act
+        Result<ThemeManifestDto> result = await _sut.InstallAsync(new MemoryStream(archive), CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        Assert.True(_sut.HasThemePack("test-theme"));
+    }
+
+    [Fact]
+    public async Task InstallAsync_WhenArchiveContainsDisallowedDirectoryEntry_ShouldReturnPackageInvalidError()
+    {
+        // Arrange
+        byte[] archive = _themePackFixture.CreateArchive(new ThemeArchiveEntry("notes/", string.Empty));
+
+        // Act
+        Result<ThemeManifestDto> result = await _sut.InstallAsync(new MemoryStream(archive), CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal("Theme.Package.Invalid", result.FirstError.Code);
+        Assert.Contains("not allowed", result.FirstError.Description);
+    }
+
+    [Fact]
+    public async Task InstallAsync_WhenArchiveDoesNotContainThemeJson_ShouldReturnPackageInvalidError()
+    {
+        // Arrange
+        byte[] archive = _themePackFixture.CreateArchive(new ThemeArchiveEntry("templates/default.html", DEFAULT_TEMPLATE));
+
+        // Act
+        Result<ThemeManifestDto> result = await _sut.InstallAsync(new MemoryStream(archive), CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal("Theme.Package.Invalid", result.FirstError.Code);
+        Assert.Contains("theme.json", result.FirstError.Description);
+    }
+
+    [Fact]
+    public async Task InstallAsync_WhenTemplatePathFailsNormalization_ShouldReturnPackageInvalidError()
+    {
+        // Arrange
+        string manifestJson = _themePackFixture.CreateManifestJson(templates: new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["default"] = "templates/../../escape.html"
+        });
+        byte[] archive = _themePackFixture.CreateArchive(new ThemeArchiveEntry("theme.json", manifestJson));
+
+        // Act
+        Result<ThemeManifestDto> result = await _sut.InstallAsync(new MemoryStream(archive), CancellationToken.None);
+
+        // Assert
+        AssertPackageInvalid(result, "Theme path segment");
+    }
+
+    [Fact]
+    public async Task InstallAsync_WhenPreviewPathFailsNormalization_ShouldReturnPackageInvalidError()
+    {
+        // Arrange
+        string manifestJson = _themePackFixture.CreateManifestJson(preview: "../../outside.png");
+        byte[] archive = _themePackFixture.CreateArchive(
+            new("theme.json", manifestJson),
+            new("templates/default.html", DEFAULT_TEMPLATE));
+
+        // Act
+        Result<ThemeManifestDto> result = await _sut.InstallAsync(new MemoryStream(archive), CancellationToken.None);
+
+        // Assert
+        AssertPackageInvalid(result, "Theme path segment");
+    }
+
+    [Fact]
+    public async Task InstallAsync_WhenManifestContainsNullLiteral_ShouldReturnInvalidJsonError()
+    {
+        // Arrange
+        byte[] archive = _themePackFixture.CreateArchive(new ThemeArchiveEntry("theme.json", "null"));
+
+        // Act
+        Result<ThemeManifestDto> result = await _sut.InstallAsync(new MemoryStream(archive), CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal("Theme.Manifest.InvalidJson", result.FirstError.Code);
+        Assert.Contains("no manifest object", result.FirstError.Description);
+    }
+
+    [Fact]
+    public async Task InstallAsync_WhenStorageRootCannotBeCreated_ShouldReturnThemeFilesUnreadable()
+    {
+        // Arrange
+        string blockedRootPath = Path.Combine(_testRootPath, "blocked-storage");
+        File.WriteAllText(blockedRootPath, "a file occupies the storage root path");
+        ThemeEngineOptionsDto options = _themeEngineOptionsDtoFixture.Create(
+            storagePath: blockedRootPath,
+            bundledThemesPath: Path.Combine(_testRootPath, "bundled"),
+            defaultThemeId: "lumina-default",
+            maxArchiveBytes: 8 * 1024 * 1024,
+            maxExpandedBytes: 24 * 1024 * 1024,
+            maxSingleFileBytes: 6 * 1024 * 1024,
+            maxEntries: 250);
+        ThemeService sut = CreateSut(options);
+        byte[] archive = _themePackFixture.Create();
+
+        // Act
+        Result<ThemeManifestDto> result = await sut.InstallAsync(new MemoryStream(archive), CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal("ThemeFilesUnreadable", result.FirstError.Description);
+    }
+
+    [Fact]
+    public async Task InstallAsync_WhenStagingDirectoryContainsStaleEntries_ShouldRemoveThemBeforeInstalling()
+    {
+        // Arrange
+        Directory.CreateDirectory(_options.StoragePath);
+        Directory.CreateDirectory(Path.Combine(_options.StoragePath, ".staging"));
+        File.WriteAllText(Path.Combine(_options.StoragePath, ".staging", "stale.txt"), "stale");
+        Directory.CreateDirectory(Path.Combine(_options.StoragePath, ".staging", "old"));
+        File.WriteAllText(Path.Combine(_options.StoragePath, ".staging", "old", "inner.txt"), "stale");
+        byte[] archive = _themePackFixture.Create();
+
+        // Act
+        await InstallValidThemeAsync(archive);
+
+        // Assert
+        Assert.True(_sut.HasThemePack("test-theme"));
+        Assert.False(File.Exists(Path.Combine(_options.StoragePath, ".staging", "stale.txt")));
+        Assert.False(Directory.Exists(Path.Combine(_options.StoragePath, ".staging", "old")));
+    }
+
+    [Fact]
+    public async Task LoadManifestAsync_WhenThemeDirectoryExistsButManifestWasRemoved_ShouldReturnMissingManifestError()
+    {
+        // Arrange
+        await InstallValidThemeAsync(_themePackFixture.Create(themeId: "removed-manifest-theme"));
+        File.Delete(Path.Combine(_options.StoragePath, "removed-manifest-theme", "theme.json"));
+
+        // Act
+        Result<ThemeManifestDto> result = await _sut.LoadManifestAsync("removed-manifest-theme", CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal("Theme.Package.Invalid", result.FirstError.Code);
+        Assert.Contains("missing theme.json", result.FirstError.Description);
+    }
+
+    [Fact]
+    public async Task ReadManifestFromArchiveAsync_WhenManifestContainsNullLiteral_ShouldReturnInvalidJsonError()
+    {
+        // Arrange
+        string archivePath = Path.Combine(_testRootPath, "null-manifest.zip");
+        File.WriteAllBytes(archivePath, _themePackFixture.CreateArchive(new ThemeArchiveEntry("theme.json", "null")));
+
+        // Act
+        Result<ThemeManifestDto> result = await _sut.ReadManifestFromArchiveAsync(archivePath, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal("Theme.Manifest.InvalidJson", result.FirstError.Code);
+        Assert.Contains("no manifest object", result.FirstError.Description);
+    }
+
+    [Fact]
+    public async Task GetAssetAsync_WhenPathSegmentIsRenamedByPathService_ShouldReturnPackageInvalidError()
+    {
+        // Arrange
+        IPathService pathService = Substitute.For<IPathService>();
+        pathService.SanitizeSegment(Arg.Any<string>())
+            .Returns(callInfo =>
+            {
+                string segment = callInfo.Arg<string>();
+                string sanitized = segment == "assets" ? "renamed-assets" : segment;
+                return PathSegment.Create(sanitized, isDirectory: true, isDrive: false);
+            });
+        ThemeService sut = new(Options.Create(_options), Substitute.For<ILogger<ThemeService>>(), pathService);
+
+        // Act
+        Result<ThemeAssetDto> result = await sut.GetAssetAsync("test-theme", "assets/logo.png", CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal("Theme.Package.Invalid", result.FirstError.Code);
+    }
+
+    [Fact]
+    public async Task RestoreBundledThemeAsync_WhenThemeDestinationIsBlocked_ShouldReturnThemeFilesUnreadable()
+    {
+        // Arrange
+        string bundledPath = Path.Combine(_testRootPath, "bundled");
+        Directory.CreateDirectory(bundledPath);
+        File.WriteAllBytes(Path.Combine(bundledPath, "restore-blocked.zip"), _themePackFixture.Create(themeId: "restore-blocked"));
+        Directory.CreateDirectory(_options.StoragePath);
+        File.WriteAllText(Path.Combine(_options.StoragePath, "restore-blocked"), "blocked");
+
+        // Act
+        Result<Success> result = await _sut.RestoreBundledThemeAsync("restore-blocked", CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal("ThemeFilesUnreadable", result.FirstError.Description);
+        Assert.False(_sut.HasThemePack("restore-blocked"));
+    }
+
+    [Fact]
+    public void Constructor_WhenConfiguredPathsAreRelative_ShouldResolveThemAgainstTheBaseDirectory()
+    {
+        // Arrange
+        ThemeEngineOptionsDto options = _themeEngineOptionsDtoFixture.Create(
+            storagePath: Path.Combine(_testRootPath, "themes"),
+            bundledThemesPath: Path.Combine(_testRootPath, "bundled"),
+            defaultThemeId: "lumina-default",
+            maxArchiveBytes: 8 * 1024 * 1024,
+            maxExpandedBytes: 24 * 1024 * 1024,
+            maxSingleFileBytes: 6 * 1024 * 1024,
+            maxEntries: 250);
+        options.StoragePath = $"relative-themes-{Guid.NewGuid():N}";
+        options.BundledThemesPath = $"relative-bundled-{Guid.NewGuid():N}";
+
+        // Act
+        ThemeService sut = CreateSut(options);
+
+        // Assert
+        Assert.False(sut.HasThemePack("not-installed"));
+    }
+
     /// <summary>
     /// Cleans up the temporary storage used by the tests.
     /// </summary>
