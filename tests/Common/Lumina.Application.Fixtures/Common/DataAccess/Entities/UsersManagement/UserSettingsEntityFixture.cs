@@ -25,6 +25,8 @@ public class UserSettingsEntityFixture
     /// <param name="shouldIgnoreThePrefixForAlphaPicker">Optional. Whether the "The" prefix is ignored by the alpha picker, or not.</param>
     /// <param name="isThemeCachingEnabled">Optional. Whether the theme data served to this user is cached, or not.</param>
     /// <param name="shouldAggregateMetadataWhenMissing">Optional. Whether the metadata of the media library items is aggregated from multiple providers, when fields are missing, or not.</param>
+    /// <param name="shouldRenderPdfAsImages">Optional. Whether PDF books are rendered as page images for the user, or not.</param>
+    /// <param name="shouldPreserveBookStyles">Optional. Whether the styles of the book content are preserved when it is rendered for the user, or not.</param>
     /// <returns>The created user settings entity.</returns>
     public UserSettingsEntity Create(
         Guid? id = null,
@@ -33,7 +35,9 @@ public class UserSettingsEntityFixture
         int? itemsPerPage = null,
         bool? shouldIgnoreThePrefixForAlphaPicker = null,
         bool? isThemeCachingEnabled = null,
-        bool? shouldAggregateMetadataWhenMissing = null)
+        bool? shouldAggregateMetadataWhenMissing = null,
+        bool? shouldRenderPdfAsImages = null,
+        bool? shouldPreserveBookStyles = null)
     {
         return new Faker<UserSettingsEntity>()
             .CustomInstantiator(f => new UserSettingsEntity
@@ -44,7 +48,9 @@ public class UserSettingsEntityFixture
                 ItemsPerPage = itemsPerPage ?? f.Random.Int(1, 100),
                 ShouldIgnoreThePrefixForAlphaPicker = shouldIgnoreThePrefixForAlphaPicker ?? f.Random.Bool(),
                 IsThemeCachingEnabled = isThemeCachingEnabled ?? f.Random.Bool(),
-                ShouldAggregateMetadataWhenMissing = shouldAggregateMetadataWhenMissing ?? f.Random.Bool()
+                ShouldAggregateMetadataWhenMissing = shouldAggregateMetadataWhenMissing ?? f.Random.Bool(),
+                ShouldRenderPdfAsImages = shouldRenderPdfAsImages ?? f.Random.Bool(),
+                ShouldPreserveBookStyles = shouldPreserveBookStyles ?? f.Random.Bool()
             })
             .Generate();
     }

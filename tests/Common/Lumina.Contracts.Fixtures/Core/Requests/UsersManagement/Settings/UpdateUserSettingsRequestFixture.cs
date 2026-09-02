@@ -24,20 +24,26 @@ public class UpdateUserSettingsRequestFixture
     /// <param name="shouldIgnoreThePrefixForAlphaPicker">Whether the "The" prefix is ignored by the alpha picker.</param>
     /// <param name="isThemeCachingEnabled">Whether the theme data served to this user is cached.</param>
     /// <param name="shouldAggregateMetadataWhenMissing">Whether the metadata of the media library items is aggregated from multiple providers, when fields are missing.</param>
+    /// <param name="shouldRenderPdfAsImages">Whether PDF books are rendered as page images for the user.</param>
+    /// <param name="shouldPreserveBookStyles">Whether the styles of the book content are preserved when it is rendered for the user.</param>
     /// <returns>The created <see cref="UpdateUserSettingsRequest"/>.</returns>
     public UpdateUserSettingsRequest Create(
         bool? isPaginationEnabled = null,
         int? itemsPerPage = null,
         bool? shouldIgnoreThePrefixForAlphaPicker = null,
         bool? isThemeCachingEnabled = null,
-        bool? shouldAggregateMetadataWhenMissing = null)
+        bool? shouldAggregateMetadataWhenMissing = null,
+        bool? shouldRenderPdfAsImages = null,
+        bool? shouldPreserveBookStyles = null)
     {
         return new UpdateUserSettingsRequest(
             isPaginationEnabled ?? _faker.Random.Bool(),
             itemsPerPage ?? _faker.Random.Int(1, 100),
             shouldIgnoreThePrefixForAlphaPicker ?? _faker.Random.Bool(),
             isThemeCachingEnabled ?? _faker.Random.Bool(),
-            shouldAggregateMetadataWhenMissing ?? _faker.Random.Bool());
+            shouldAggregateMetadataWhenMissing ?? _faker.Random.Bool(),
+            shouldRenderPdfAsImages ?? _faker.Random.Bool(),
+            shouldPreserveBookStyles ?? _faker.Random.Bool());
     }
 
     /// <summary>

@@ -1,10 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
-using Lumina.Application.Common.DataAccess.Repositories.Plugins;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Plugins;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.Plugins;
 using Lumina.Infrastructure.Common.Models.DTO.Plugins;
 using Lumina.Plugins.Contracts.Core.Plugins;
@@ -60,7 +59,7 @@ internal sealed class PluginDetectionSyncJob : BackgroundService
         await using AsyncServiceScope asyncServiceScope = _serviceScopeFactory.CreateAsyncScope();
         IUnitOfWork unitOfWork = asyncServiceScope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-        // the Ids of the plugin rows that are currently detected, either loaded successfully or failed to load
+        // The Ids of the plugin rows that are currently detected, either loaded successfully or failed to load.
         HashSet<Guid> detectedPluginIds = [];
 
         foreach (IPlugin plugin in _pluginManager.GetPlugins())
@@ -85,8 +84,8 @@ internal sealed class PluginDetectionSyncJob : BackgroundService
 
         foreach (PluginLoadErrorDto loadError in _loadErrors)
         {
-            // a failing plugin cannot report its own Id, so it is identified by a stable Id derived from its assembly file name,
-            // which keeps the same row across restarts and avoids creating a new row every time the application starts
+            // A failing plugin cannot report its own Id, so it is identified by a stable Id derived from its assembly file name,
+            // which keeps the same row across restarts and avoids creating a new row every time the application starts.
             Guid failedPluginId = DerivePluginId(loadError.AssemblyName);
             detectedPluginIds.Add(failedPluginId);
             PluginEntity pluginEntity = new()
@@ -107,8 +106,8 @@ internal sealed class PluginDetectionSyncJob : BackgroundService
                 _logger.LogError("Failed to persist the detection of plugin '{PluginName}': {Error}", loadError.AssemblyName, upsertResult.FirstError.Description);
         }
 
-        // remove the rows of the plugins that are no longer detected, so that each plugin assembly has exactly one row regardless of its load status,
-        // and delete the provider configurations of the removed plugins, since their configuration only makes sense while the plugin is installed
+        // Remove the rows of the plugins that are no longer detected, so that each plugin assembly has exactly one row regardless of its load status,
+        // and delete the provider configurations of the removed plugins, since their configuration only makes sense while the plugin is installed.
         IMediaLibraryProviderConfigurationStore providerConfigurationStore = asyncServiceScope.ServiceProvider.GetRequiredService<IMediaLibraryProviderConfigurationStore>();
         Result<IEnumerable<PluginEntity>> getPluginsResult = await unitOfWork.PluginRepository.GetAllAsync(stoppingToken).ConfigureAwait(false);
         if (getPluginsResult.IsFailure)
@@ -128,7 +127,7 @@ internal sealed class PluginDetectionSyncJob : BackgroundService
             }
         }
 
-        // seed the provider configurations of the media libraries, so that every library lists the plugins providing metadata or artwork for its type
+        // Seed the provider configurations of the media libraries, so that every library lists the plugins providing metadata or artwork for its type.
         Result<IEnumerable<LibraryEntity>> getLibrariesResult = await unitOfWork.LibraryRepository.GetAllAsync(stoppingToken).ConfigureAwait(false);
         if (getLibrariesResult.IsFailure)
             _logger.LogError("Failed to get the media libraries while seeding the provider configurations.");
@@ -139,6 +138,9 @@ internal sealed class PluginDetectionSyncJob : BackgroundService
                 Result<Success> ensureResult = await providerConfigurationStore.EnsureProviderConfigurationsAsync(library.Id, library.LibraryType, stoppingToken).ConfigureAwait(false);
                 if (ensureResult.IsFailure)
                     _logger.LogError("Failed to seed the provider configurations of the media library '{LibraryTitle}': {Error}", library.Title, ensureResult.FirstError.Description);
+                Result<Success> ensureBookReadersResult = await providerConfigurationStore.EnsureBookReaderConfigurationsAsync(library.Id, library.LibraryType, stoppingToken).ConfigureAwait(false);
+                if (ensureBookReadersResult.IsFailure)
+                    _logger.LogError("Failed to seed the book reader configurations of the media library '{LibraryTitle}': {Error}", library.Title, ensureBookReadersResult.FirstError.Description);
             }
         }
 
@@ -146,8 +148,7 @@ internal sealed class PluginDetectionSyncJob : BackgroundService
     }
 
     /// <summary>
-    /// Derives a stable unique identifier for a plugin from the file name of its assembly, so that a plugin that fails to load
-    /// is always identified by the same row across application restarts.
+    /// Derives a stable unique identifier for a plugin from the file name of its assembly, so that a plugin that fails to load is always identified by the same row across application restarts.
     /// </summary>
     /// <param name="assemblyName">The file name of the plugin assembly, without its extension.</param>
     /// <returns>The derived plugin identifier.</returns>

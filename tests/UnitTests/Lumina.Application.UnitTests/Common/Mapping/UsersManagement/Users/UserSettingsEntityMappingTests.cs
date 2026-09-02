@@ -35,6 +35,8 @@ public class UserSettingsEntityMappingTests
         Assert.Equal(entity.ItemsPerPage, result.Value.ItemsPerPage);
         Assert.Equal(entity.ShouldIgnoreThePrefixForAlphaPicker, result.Value.ShouldIgnoreThePrefixForAlphaPicker);
         Assert.Equal(entity.IsThemeCachingEnabled, result.Value.IsThemeCachingEnabled);
+        Assert.Equal(entity.ShouldRenderPdfAsImages, result.Value.ShouldRenderPdfAsImages);
+        Assert.Equal(entity.ShouldPreserveBookStyles, result.Value.ShouldPreserveBookStyles);
     }
 
     [Fact]
@@ -53,5 +55,7 @@ public class UserSettingsEntityMappingTests
         Assert.Equal(entity.ItemsPerPage, result.ItemsPerPage);
         Assert.Equal(entity.ShouldIgnoreThePrefixForAlphaPicker, result.ShouldIgnoreThePrefixForAlphaPicker);
         Assert.Equal(entity.IsThemeCachingEnabled, result.IsThemeCachingEnabled);
+        Assert.Equal(entity.ShouldRenderPdfAsImages, result.ShouldRenderPdfAsImages);
+        Assert.Equal(entity.ShouldPreserveBookStyles, result.ShouldPreserveBookStyles);
     }
 }

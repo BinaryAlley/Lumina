@@ -14,14 +14,19 @@ namespace Lumina.Infrastructure.Core.Plugins;
 internal sealed class PluginManager : IPluginManager
 {
     private readonly IReadOnlyDictionary<Guid, IPlugin> _pluginsById;
+    // The load contexts of the loaded plugins are held for the lifetime of the host, because a collectible load context is only kept alive by a direct reference to the
+    // context object itself, and the garbage collector would otherwise unload the plugin assemblies mid-request, when a lazily resolved dependency is first used.
+    private readonly IReadOnlyList<PluginLoadContext> _loadContexts;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PluginManager"/> class.
     /// </summary>
     /// <param name="plugins">The plugins that were loaded successfully.</param>
-    public PluginManager(IEnumerable<IPlugin> plugins)
+    /// <param name="loadContexts">The load contexts of the loaded plugins, kept referenced for the lifetime of the host.</param>
+    public PluginManager(IEnumerable<IPlugin> plugins, IReadOnlyList<PluginLoadContext> loadContexts)
     {
         _pluginsById = plugins.ToDictionary(plugin => plugin.Id);
+        _loadContexts = loadContexts;
     }
 
     /// <summary>

@@ -20,6 +20,8 @@ public class UserSettings : AggregateRoot<UserSettingsId>
     private const bool DEFAULT_IGNORE_THE_PREFIX_FOR_ALPHA_PICKER = false;
     private const bool DEFAULT_IS_THEME_CACHING_ENABLED = true;
     private const bool DEFAULT_AGGREGATE_METADATA_WHEN_MISSING = false;
+    private const bool DEFAULT_SHOULD_RENDER_PDF_AS_IMAGES = false;
+    private const bool DEFAULT_SHOULD_PRESERVE_BOOK_STYLES = true;
 
     /// <summary>
     /// Gets the object representing the unique identifier of the user that owns these settings.
@@ -52,6 +54,19 @@ public class UserSettings : AggregateRoot<UserSettingsId>
     public bool ShouldAggregateMetadataWhenMissing { get; private set; }
 
     /// <summary>
+    /// Gets whether PDF books are rendered as page images for the user, or not. Rendering PDFs as images preserves the original
+    /// layout, but the pages are not selectable or searchable, unlike their text layer.
+    /// </summary>
+    public bool ShouldRenderPdfAsImages { get; private set; }
+
+    /// <summary>
+    /// Gets whether the styles of the book content are preserved when it is rendered for the user, or not. Preserving them keeps the
+    /// original look of a book (its fonts, colors, and alignment), but the styles of a book can load resources from external servers,
+    /// which those servers could observe; stripping them removes that possibility, at the cost of the look of the book.
+    /// </summary>
+    public bool ShouldPreserveBookStyles { get; private set; }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="UserSettings"/> class.
     /// </summary>
     /// <param name="id">The object representing the unique identifier of these settings.</param>
@@ -61,6 +76,8 @@ public class UserSettings : AggregateRoot<UserSettingsId>
     /// <param name="shouldIgnoreThePrefixForAlphaPicker">Whether the "The" prefix of library item titles is ignored by the alpha picker, or not.</param>
     /// <param name="isThemeCachingEnabled">Whether the theme data served to this user is cached, or not.</param>
     /// <param name="shouldAggregateMetadataWhenMissing">Whether the metadata of the media library items is aggregated from multiple providers, when fields are missing, or not.</param>
+    /// <param name="shouldRenderPdfAsImages">Whether PDF books are rendered as page images for the user, or not.</param>
+    /// <param name="shouldPreserveBookStyles">Whether the styles of the book content are preserved when it is rendered for the user, or not.</param>
     private UserSettings(
         UserSettingsId id,
         UserId userId,
@@ -68,7 +85,9 @@ public class UserSettings : AggregateRoot<UserSettingsId>
         int itemsPerPage,
         bool shouldIgnoreThePrefixForAlphaPicker,
         bool isThemeCachingEnabled,
-        bool shouldAggregateMetadataWhenMissing) : base(id)
+        bool shouldAggregateMetadataWhenMissing,
+        bool shouldRenderPdfAsImages,
+        bool shouldPreserveBookStyles) : base(id)
     {
         UserId = userId;
         IsPaginationEnabled = isPaginationEnabled;
@@ -76,6 +95,8 @@ public class UserSettings : AggregateRoot<UserSettingsId>
         ShouldIgnoreThePrefixForAlphaPicker = shouldIgnoreThePrefixForAlphaPicker;
         IsThemeCachingEnabled = isThemeCachingEnabled;
         ShouldAggregateMetadataWhenMissing = shouldAggregateMetadataWhenMissing;
+        ShouldRenderPdfAsImages = shouldRenderPdfAsImages;
+        ShouldPreserveBookStyles = shouldPreserveBookStyles;
     }
 
     /// <summary>
@@ -86,7 +107,16 @@ public class UserSettings : AggregateRoot<UserSettingsId>
     /// </returns>
     public static Result<UserSettings> Create()
     {
-        return Create(UserId.CreateUnique(), DEFAULT_IS_PAGINATION_ENABLED, DEFAULT_ITEMS_PER_PAGE, DEFAULT_IGNORE_THE_PREFIX_FOR_ALPHA_PICKER, DEFAULT_IS_THEME_CACHING_ENABLED, DEFAULT_AGGREGATE_METADATA_WHEN_MISSING);
+        return Create(
+            UserId.CreateUnique(), 
+            DEFAULT_IS_PAGINATION_ENABLED, 
+            DEFAULT_ITEMS_PER_PAGE, 
+            DEFAULT_IGNORE_THE_PREFIX_FOR_ALPHA_PICKER, 
+            DEFAULT_IS_THEME_CACHING_ENABLED, 
+            DEFAULT_AGGREGATE_METADATA_WHEN_MISSING, 
+            DEFAULT_SHOULD_RENDER_PDF_AS_IMAGES,
+            DEFAULT_SHOULD_PRESERVE_BOOK_STYLES
+        );
     }
 
     /// <summary>
@@ -98,7 +128,16 @@ public class UserSettings : AggregateRoot<UserSettingsId>
     /// </returns>
     public static Result<UserSettings> Create(UserId userId)
     {
-        return Create(userId, DEFAULT_IS_PAGINATION_ENABLED, DEFAULT_ITEMS_PER_PAGE, DEFAULT_IGNORE_THE_PREFIX_FOR_ALPHA_PICKER, DEFAULT_IS_THEME_CACHING_ENABLED, DEFAULT_AGGREGATE_METADATA_WHEN_MISSING);
+        return Create(
+            userId, 
+            DEFAULT_IS_PAGINATION_ENABLED, 
+            DEFAULT_ITEMS_PER_PAGE, 
+            DEFAULT_IGNORE_THE_PREFIX_FOR_ALPHA_PICKER, 
+            DEFAULT_IS_THEME_CACHING_ENABLED, 
+            DEFAULT_AGGREGATE_METADATA_WHEN_MISSING, 
+            DEFAULT_SHOULD_RENDER_PDF_AS_IMAGES,
+            DEFAULT_SHOULD_PRESERVE_BOOK_STYLES
+        );
     }
 
     /// <summary>
@@ -110,6 +149,8 @@ public class UserSettings : AggregateRoot<UserSettingsId>
     /// <param name="shouldIgnoreThePrefixForAlphaPicker">Whether the "The" prefix of library item titles is ignored by the alpha picker, or not.</param>
     /// <param name="isThemeCachingEnabled">Whether the theme data served to this user is cached, or not.</param>
     /// <param name="shouldAggregateMetadataWhenMissing">Whether the metadata of the media library items is aggregated from multiple providers, when fields are missing, or not.</param>
+    /// <param name="shouldRenderPdfAsImages">Whether PDF books are rendered as page images for the user, or not.</param>
+    /// <param name="shouldPreserveBookStyles">Whether the styles of the book content are preserved when it is rendered for the user, or not.</param>
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="UserSettings"/>, or an error message.
     /// </returns>
@@ -119,7 +160,9 @@ public class UserSettings : AggregateRoot<UserSettingsId>
         int itemsPerPage,
         bool shouldIgnoreThePrefixForAlphaPicker,
         bool isThemeCachingEnabled,
-        bool shouldAggregateMetadataWhenMissing)
+        bool shouldAggregateMetadataWhenMissing,
+        bool shouldRenderPdfAsImages,
+        bool shouldPreserveBookStyles)
     {
         if (itemsPerPage <= 0)
             return Errors.UserSettings.ItemsPerPageMustBeGreaterThanZero;
@@ -131,7 +174,9 @@ public class UserSettings : AggregateRoot<UserSettingsId>
             itemsPerPage,
             shouldIgnoreThePrefixForAlphaPicker,
             isThemeCachingEnabled,
-            shouldAggregateMetadataWhenMissing);
+            shouldAggregateMetadataWhenMissing,
+            shouldRenderPdfAsImages,
+            shouldPreserveBookStyles);
     }
 
     /// <summary>
@@ -144,6 +189,8 @@ public class UserSettings : AggregateRoot<UserSettingsId>
     /// <param name="shouldIgnoreThePrefixForAlphaPicker">Whether the "The" prefix of library item titles is ignored by the alpha picker, or not.</param>
     /// <param name="isThemeCachingEnabled">Whether the theme data served to this user is cached, or not.</param>
     /// <param name="shouldAggregateMetadataWhenMissing">Whether the metadata of the media library items is aggregated from multiple providers, when fields are missing, or not.</param>
+    /// <param name="shouldRenderPdfAsImages">Whether PDF books are rendered as page images for the user, or not.</param>
+    /// <param name="shouldPreserveBookStyles">Whether the styles of the book content are preserved when it is rendered for the user, or not.</param>
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="UserSettings"/>, or an error message.
     /// </returns>
@@ -154,12 +201,14 @@ public class UserSettings : AggregateRoot<UserSettingsId>
         int itemsPerPage,
         bool shouldIgnoreThePrefixForAlphaPicker,
         bool isThemeCachingEnabled,
-        bool shouldAggregateMetadataWhenMissing)
+        bool shouldAggregateMetadataWhenMissing,
+        bool shouldRenderPdfAsImages,
+        bool shouldPreserveBookStyles)
     {
         if (itemsPerPage <= 0)
             return Errors.UserSettings.ItemsPerPageMustBeGreaterThanZero;
 
-        return new UserSettings(id, userId, isPaginationEnabled, itemsPerPage, shouldIgnoreThePrefixForAlphaPicker, isThemeCachingEnabled, shouldAggregateMetadataWhenMissing);
+        return new UserSettings(id, userId, isPaginationEnabled, itemsPerPage, shouldIgnoreThePrefixForAlphaPicker, isThemeCachingEnabled, shouldAggregateMetadataWhenMissing, shouldRenderPdfAsImages, shouldPreserveBookStyles);
     }
 
     /// <summary>
@@ -170,13 +219,17 @@ public class UserSettings : AggregateRoot<UserSettingsId>
     /// <param name="shouldIgnoreThePrefixForAlphaPicker">Whether the "The" prefix of library item titles is ignored by the alpha picker, or not.</param>
     /// <param name="isThemeCachingEnabled">Whether the theme data served to this user is cached, or not.</param>
     /// <param name="shouldAggregateMetadataWhenMissing">Whether the metadata of the media library items is aggregated from multiple providers, when fields are missing, or not.</param>
+    /// <param name="shouldRenderPdfAsImages">Whether PDF books are rendered as page images for the user, or not.</param>
+    /// <param name="shouldPreserveBookStyles">Whether the styles of the book content are preserved when it is rendered for the user, or not.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful update, or an error.</returns>
     public Result<Updated> UpdateSettings(
         bool isPaginationEnabled,
         int itemsPerPage,
         bool shouldIgnoreThePrefixForAlphaPicker,
         bool isThemeCachingEnabled,
-        bool shouldAggregateMetadataWhenMissing)
+        bool shouldAggregateMetadataWhenMissing,
+        bool shouldRenderPdfAsImages,
+        bool shouldPreserveBookStyles)
     {
         if (itemsPerPage <= 0)
             return Errors.UserSettings.ItemsPerPageMustBeGreaterThanZero;
@@ -186,6 +239,8 @@ public class UserSettings : AggregateRoot<UserSettingsId>
         ShouldIgnoreThePrefixForAlphaPicker = shouldIgnoreThePrefixForAlphaPicker;
         IsThemeCachingEnabled = isThemeCachingEnabled;
         ShouldAggregateMetadataWhenMissing = shouldAggregateMetadataWhenMissing;
+        ShouldRenderPdfAsImages = shouldRenderPdfAsImages;
+        ShouldPreserveBookStyles = shouldPreserveBookStyles;
         return Result.Updated;
     }
 }

@@ -23,7 +23,11 @@ public class GetMetadataProvidersEndpointSummary : Summary<GetMetadataProvidersE
         Summary = "Retrieves the metadata providers of a media library.";
         Description = "Retrieves the metadata providers of the media library identified by the request.";
 
-        RequestParam(r => r.LibraryId, "The unique identifier of the media library whose metadata providers are retrieved.");
+        RequestParam(r => r.LibraryId, "The unique identifier of the media library whose metadata providers are retrieved. Required.");
+
+        ExampleRequest = new GetMetadataProvidersRequest(
+            LibraryId: Guid.NewGuid()
+        );
 
         Response(200, "The metadata providers of the media library are returned.", example: new SuccessResponse<LibraryMetadataProviderDto[]>(true, default));
     }

@@ -35,6 +35,8 @@ public class UserSettingsMappingTests
         Assert.Equal(domainEntity.IsPaginationEnabled, result.IsPaginationEnabled);
         Assert.Equal(domainEntity.ItemsPerPage, result.ItemsPerPage);
         Assert.Equal(domainEntity.ShouldIgnoreThePrefixForAlphaPicker, result.ShouldIgnoreThePrefixForAlphaPicker);
+        Assert.Equal(domainEntity.ShouldRenderPdfAsImages, result.ShouldRenderPdfAsImages);
+        Assert.Equal(domainEntity.ShouldPreserveBookStyles, result.ShouldPreserveBookStyles);
     }
 
     [Fact]
@@ -53,5 +55,7 @@ public class UserSettingsMappingTests
         Assert.Equal(domainEntity.IsPaginationEnabled, result.IsPaginationEnabled);
         Assert.Equal(domainEntity.ItemsPerPage, result.ItemsPerPage);
         Assert.Equal(domainEntity.ShouldIgnoreThePrefixForAlphaPicker, result.ShouldIgnoreThePrefixForAlphaPicker);
+        Assert.Equal(domainEntity.ShouldRenderPdfAsImages, result.ShouldRenderPdfAsImages);
+        Assert.Equal(domainEntity.ShouldPreserveBookStyles, result.ShouldPreserveBookStyles);
     }
 }

@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Books.Commands.AddBook;
+using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Commands.AddBook;
 using Lumina.Contracts.Fixtures.Core.DTO.MediaContributors;
 using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary;
 using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;

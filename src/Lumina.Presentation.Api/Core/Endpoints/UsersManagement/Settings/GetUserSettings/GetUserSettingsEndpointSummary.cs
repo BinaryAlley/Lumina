@@ -28,7 +28,9 @@ public class GetUserSettingsEndpointSummary : Summary<GetUserSettingsEndpoint, E
                 ItemsPerPage: 48,
                 ShouldIgnoreThePrefixForAlphaPicker: false,
                 IsThemeCachingEnabled: true,
-                ShouldAggregateMetadataWhenMissing: false
+                ShouldAggregateMetadataWhenMissing: false,
+                ShouldRenderPdfAsImages: false,
+                ShouldPreserveBookStyles: true
             ));
 
         Response(401, "Authentication required.", "application/problem+json",

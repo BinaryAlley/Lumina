@@ -22,7 +22,11 @@ public class SetCurrentThemeEndpointSummary : Summary<SetCurrentThemeEndpoint, S
         Summary = "Sets the currently active theme.";
         Description = "Sets the theme identified by the request as the currently active theme.";
 
-        RequestParam(r => r.ThemeId, "The manifest id of the theme to activate.");
+        RequestParam(r => r.ThemeId, "The manifest id of the theme to activate. Required.");
+
+        ExampleRequest = new SetCurrentThemeRequest(
+            ThemeId: "lumina-default"
+        );
 
         Response(200, "The theme was successfully activated.", example: new SuccessResponse(true));
     }

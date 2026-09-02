@@ -22,7 +22,11 @@ public class DeleteLibraryEndpointSummary : Summary<DeleteLibraryEndpoint, Delet
         Summary = "Deletes a media library.";
         Description = "Deletes the media library identified by the request.";
 
-        RequestParam(r => r.Id, "The unique identifier of the media library to delete.");
+        RequestParam(r => r.Id, "The unique identifier of the media library to delete. Required.");
+
+        ExampleRequest = new DeleteLibraryRequest(
+            Id: Guid.NewGuid()
+        );
 
         Response(200, "The media library is deleted.", example: new SuccessResponse(true));
     }

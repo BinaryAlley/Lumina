@@ -83,6 +83,11 @@ public interface IUnitOfWork
     IArtworkProviderConfigurationRepository ArtworkProviderConfigurationRepository { get; }
 
     /// <summary>
+    /// Gets the library book reader configuration repository.
+    /// </summary>
+    ILibraryBookReaderConfigurationRepository LibraryBookReaderConfigurationRepository { get; }
+
+    /// <summary>
     /// Gets the plugin repository.
     /// </summary>
     IPluginRepository PluginRepository { get; }

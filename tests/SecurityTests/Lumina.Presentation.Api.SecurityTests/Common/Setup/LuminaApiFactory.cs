@@ -72,36 +72,37 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
     {
         builder.ConfigureAppConfiguration((context, config) =>
         {
-            // clear all existing configuration sources
+            // Clear all existing configuration sources.
             config.Sources.Clear();
 
             config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
             config.AddJsonFile($"appsettings.test.json", optional: true, reloadOnChange: true);
             config.AddJsonFile("appsettings.shared.json", optional: true, reloadOnChange: true);
             config.AddJsonFile($"appsettings.shared.test.json", optional: true, reloadOnChange: true);
-            // First add the test values directly
+            // First add the test values directly.
             config.AddInMemoryCollection(initialData: new Dictionary<string, string?>
             {
                 ["JwtSettings:SecretKey"] = "test-key-thats-at-least-32-chars-long-for-jwt",
-                ["JwtSettings:ExpiryMinutes"] = "15", // control the expiry time during tests
+                ["JwtSettings:ExpiryMinutes"] = "15", // Control the expiry time during tests.
                 ["JwtSettings:Issuer"] = "Lumina",
                 ["JwtSettings:Audience"] = "Lumina",
-                ["EncryptionSettings:SecretKey"] = TEST_ENCRYPTION_KEY // base64 encoded test key
+                ["CorsSettings:AllowedOrigins:0"] = "http://localhost:5012",
+                ["EncryptionSettings:SecretKey"] = TEST_ENCRYPTION_KEY // Base64 encoded test key.
             });
         });
         builder.ConfigureServices(services =>
         {
-            // remove existing DbContext configuration
+            // Remove existing DbContext configuration.
             ServiceDescriptor? descriptor = services.SingleOrDefault(serviceDescriptor => serviceDescriptor.ServiceType == typeof(DbContextOptions<LuminaDbContext>));
             if (descriptor is not null)
                 services.Remove(descriptor);
-            // add SQLite DbContext configuration
+            // Add SQLite DbContext configuration.
             services.AddDbContext<LuminaDbContext>((serviceProvider, options) =>
             {
                 options.UseSqlite(_sharedInMemoryConnectionString);
                 options.AddInterceptors(serviceProvider.GetRequiredService<UpdateAuditableEntitiesInterceptor>());
             });
-            // configure JWT authentication for testing
+            // Configure JWT authentication for testing.
             services.PostConfigure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters
@@ -115,7 +116,7 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("test-key-thats-at-least-32-chars-long-for-jwt"))
                 };
             });
-            // build service provider and ensure database is created
+            // Build service provider and ensure database is created.
             ServiceProvider servicePreovider = services.BuildServiceProvider();
             using (IServiceScope scope = servicePreovider.CreateScope())
             {
@@ -143,7 +144,7 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
     /// <returns>The Id of the created admin test user.</returns>
     public async Task<Guid> CreateAndAuthenticateAdminUserAsync(HttpClient client)
     {
-        // a unique X-Forwarded-For isolates rate limiting state per test
+        // A unique X-Forwarded-For isolates rate limiting state per test.
         client.DefaultRequestHeaders.Clear();
         client.DefaultRequestHeaders.Add("X-Forwarded-For", GetUniqueTestIp());
 
@@ -157,7 +158,7 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
         dbContext.Users.Add(user);
         await dbContext.SaveChangesAsync();
 
-        // seed a dedicated Admin role for this test user, keeping each test isolated in the shared in-memory database
+        // Seed a dedicated Admin role for this test user, keeping each test isolated in the shared in-memory database.
         Guid roleId = Guid.NewGuid();
         RoleEntity role = _roleEntityFixture.Create(id: roleId, roleName: "Admin", createdBy: userId, createdOnUtc: DateTime.UtcNow);
         dbContext.Roles.Add(role);
@@ -179,7 +180,7 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
     /// <returns>The Id and username of the created test user.</returns>
     public async Task<(Guid UserId, string Username)> CreateAndAuthenticateUserAsync(HttpClient client)
     {
-        // a unique X-Forwarded-For isolates rate limiting state per test
+        // A unique X-Forwarded-For isolates rate limiting state per test.
         client.DefaultRequestHeaders.Clear();
         client.DefaultRequestHeaders.Add("X-Forwarded-For", GetUniqueTestIp());
 

@@ -1,0 +1,243 @@
+@startuml Book Reading and Book Reader Plugins Code
+!include <C4/C4_Component>
+
+LAYOUT_WITH_LEGEND()
+title Code diagram for Book Reading 3.2.2 and Book Reader Plugins
+
+skinparam class {
+    BackgroundColor White
+    BorderColor Black
+}
+
+' ============================== READING HOST - APPLICATION CONTRACTS ==============================
+
+interface IBookReadingService {
+    + GetManifestAsync(bookId: Guid, libraryId: Guid, path: string, libraryType: LibraryType, shouldRenderPdfAsImages: bool, token: CancellationToken): Task<Result<ReadingManifestResponse>>
+    + GetSectionAsync(bookId: Guid, libraryId: Guid, path: string, libraryType: LibraryType, locationRef: string, shouldRenderPdfAsImages: bool, shouldPreserveStyles: bool, token: CancellationToken): Task<Result<ReadingSectionDto>>
+    + GetResourceAsync(bookId: Guid, libraryId: Guid, path: string, libraryType: LibraryType, resourceKey: string, shouldRenderPdfAsImages: bool, token: CancellationToken): Task<Result<ReadingResourceDataDto>>
+    + GetAvailabilityAsync(bookId: Guid, libraryId: Guid, path: string, libraryType: LibraryType, token: CancellationToken): Task<Result<ReadingAvailabilityResponse>>
+}
+
+interface IBookReaderRegistry {
+    + GetSupportedExtensionsByPluginId(): IReadOnlyDictionary<Guid, IReadOnlyList<string>>
+}
+
+interface IBookReaderEnablementCache {
+    + Get(libraryId: Guid, pluginId: Guid): bool?
+    + Set(libraryId: Guid, pluginId: Guid, isEnabled: bool)
+    + Invalidate(libraryId: Guid, pluginId: Guid)
+    + InvalidateLibrary(libraryId: Guid)
+    + InvalidatePlugin(pluginId: Guid)
+}
+
+' ============================== READING HOST - INFRASTRUCTURE ==============================
+
+class BookReadingService {
+    - _extractions: ConcurrentDictionary<ReadingCacheKey, BookExtractionEntry>
+    - _bookExtractionLocks: ConcurrentDictionary<ReadingCacheKey, SemaphoreSlim>
+    - _pluginIdsByReaderKey: IReadOnlyDictionary<ReaderKey, Guid>
+    - _enablementCache: IBookReaderEnablementCache
+    + GetManifestAsync(...): Task<Result<ReadingManifestResponse>>
+    + GetSectionAsync(...): Task<Result<ReadingSectionDto>>
+    + GetResourceAsync(...): Task<Result<ReadingResourceDataDto>>
+    + GetAvailabilityAsync(...): Task<Result<ReadingAvailabilityResponse>>
+}
+
+note right of BookReadingService
+  Serves the manifest, sections and resources of a book:
+  resolves the reader of the book format, checks the
+  per-library enablement through the cache, reuses the already
+  extracted document while the fingerprint of the book file is
+  unchanged, extracts each rendering preference (text or page
+  images) into its own directory under the reading cache, and
+  produces on-demand resources (for example a PDF page render)
+  once per resource file.
+end note
+
+class BookReaderRegistry {
+    - _pluginManager: IPluginManager
+    - _serviceProvider: IServiceProvider
+    + GetSupportedExtensionsByPluginId(): IReadOnlyDictionary<Guid, IReadOnlyList<string>>
+}
+
+note right of BookReaderRegistry
+  Reads the supported extensions live from the book readers
+  registered by the loaded plugins, so that a plugin update
+  that changes its formats never leaves stale configurations.
+end note
+
+class BookReaderEnablementCache {
+    - _enablements: ConcurrentDictionary<(Guid LibraryId, Guid PluginId), bool>
+    + Get(libraryId: Guid, pluginId: Guid): bool?
+    + Set(libraryId: Guid, pluginId: Guid, isEnabled: bool)
+    + Invalidate(libraryId: Guid, pluginId: Guid)
+    + InvalidateLibrary(libraryId: Guid)
+    + InvalidatePlugin(pluginId: Guid)
+}
+
+class ReadingCachePaths {
+    + DIRECTORY_NAME: string = reading-cache
+    + {static} GetRootDirectory(): string
+}
+
+note bottom of ReadingCachePaths
+  The reading cache is a temporary directory in the API output,
+  wiped at startup, under which every book keeps one directory
+  per rendering preference (text and images).
+end note
+
+class ReadingContentSanitizer {
+    + RESOURCE_ATTRIBUTE: string = data-lumina-resource
+    + {static} Sanitize(html: string, shouldPreserveStyles: bool): string
+}
+
+note right of ReadingContentSanitizer
+  Sanitizes every reading section with an explicit allowlist of
+  inert markup, regardless of what the reader plugin produced;
+  whether the style attribute survives is the per-user choice.
+end note
+
+' ============================== ENABLEMENT PERSISTENCE ==============================
+
+class LibraryBookReaderConfigurationEntity {
+    + Id: Guid
+    + LibraryId: Guid
+    + PluginId: Guid
+    + IsEnabled: bool
+}
+
+interface ILibraryBookReaderConfigurationRepository {
+    + GetByLibraryIdAsync(libraryId: Guid, token: CancellationToken): Task<Result<IReadOnlyList<LibraryBookReaderConfigurationEntity>>>
+    + GetByLibraryAndPluginIdAsync(libraryId: Guid, pluginId: Guid, token: CancellationToken): Task<Result<LibraryBookReaderConfigurationEntity?>>
+    + UpsertAsync(configuration: LibraryBookReaderConfigurationEntity, token: CancellationToken): Task<Result<Updated>>
+    + DeleteByLibraryIdAsync(libraryId: Guid, token: CancellationToken): Task<Result<Deleted>>
+    + DeleteByPluginIdAsync(pluginId: Guid, token: CancellationToken): Task<Result<Deleted>>
+    + DeleteByLibraryIdAndPluginIdsAsync(libraryId: Guid, pluginIds: IEnumerable<Guid>, token: CancellationToken): Task<Result<Deleted>>
+}
+
+class LibraryBookReaderConfigurationRepository
+
+class GetLibraryBookReadersQueryHandler {
+    - _unitOfWork: IUnitOfWork
+    - _bookReaderRegistry: IBookReaderRegistry
+    + HandleAsync(query: GetLibraryBookReadersQuery, token: CancellationToken): Task<Result<IReadOnlyList<LibraryBookReaderResponse>>>
+}
+
+class SetLibraryBookReaderEnabledCommandHandler {
+    - _unitOfWork: IUnitOfWork
+    - _enablementCache: IBookReaderEnablementCache
+    + HandleAsync(command: SetLibraryBookReaderEnabledCommand, token: CancellationToken): Task<Result<Success>>
+}
+
+note right of SetLibraryBookReaderEnabledCommandHandler
+  Enables or disables the book reader of a plugin for a media
+  library by upserting its configuration row, then invalidates
+  the enablement cache so that a disabled reader stops being
+  served immediately.
+end note
+
+' ============================== BOOK READER PLUGINS ==============================
+
+interface IBookReader {
+    + SupportedExtensions: IReadOnlyList<string>
+    + SupportedLibraryTypes: IReadOnlyList<LibraryType>
+    + OpenAsync(path: string, workingDirectory: string, shouldRenderPdfAsImages: bool, token: CancellationToken): Task<ReadingDocumentDto>
+    + GetResourceAsync(path: string, workingDirectory: string, resourceKey: string, token: CancellationToken): Task<byte[]>
+}
+
+note top of IBookReader
+  Contract of a reader plugin, implemented in Lumina.Plugins.Contracts.
+  The plugins are host-trusted: they receive the absolute path of the
+  book and a working directory to extract into, while the host
+  sanitizes and contained-checks everything they produce before
+  serving it to the client.
+end note
+
+class EpubReader {
+}
+
+note right of EpubReader
+  Reads .epub books of the EBook and Book library types.
+  EPUB is a ZIP archive, decoded entry by entry with bounded
+  sizes and archive-contained paths.
+end note
+
+class EpubDocumentParser {
+    + {static} Parse(epubPath: string, workingDirectory: string, token: CancellationToken): ReadingDocumentDto
+}
+
+class PdfReader {
+}
+
+note right of PdfReader
+  Reads .pdf books of the EBook and Book library types.
+  Each page is a reading section; the table of contents comes
+  from the PDF bookmarks.
+end note
+
+class PdfDocumentParser {
+    + {static} Parse(pdfPath: string, workingDirectory: string, shouldRenderPdfAsImages: bool, token: CancellationToken): ReadingDocumentDto
+    + {static} RenderResource(pdfPath: string, resourceKey: string, token: CancellationToken): byte[]
+}
+
+note right of PdfDocumentParser
+  Extracts the text layer of the pages with PdfPig, and renders
+  the pages as images with PDFtoImage on demand when the
+  render-as-images user setting is enabled; file size, page count
+  and rendered page area are bounded.
+end note
+
+class EpubPlugin {
+    + Id: Guid
+    + Name: string = EPUB Reader
+    + RegisterServices(services: IServiceCollection)
+}
+
+class PdfPlugin {
+    + Id: Guid
+    + Name: string = PDF Reader
+    + RegisterServices(services: IServiceCollection)
+}
+
+' ============================== HOST IMPLEMENTATION RELATIONSHIPS ==============================
+
+IBookReadingService <|.. BookReadingService : implements
+IBookReaderRegistry <|.. BookReaderRegistry : implements
+IBookReaderEnablementCache <|.. BookReaderEnablementCache : implements
+ILibraryBookReaderConfigurationRepository <|.. LibraryBookReaderConfigurationRepository : implements
+
+' ============================== READING HOST RELATIONSHIPS ==============================
+
+BookReadingService --> IBookReaderRegistry : finds the plugin of the book format
+BookReadingService --> IBookReaderEnablementCache : checks the per-library enablement
+BookReadingService --> ILibraryBookReaderConfigurationRepository : fills the cache on a miss
+BookReadingService ..> IBookReader : opens and produces resources
+BookReadingService ..> ReadingContentSanitizer : sanitizes section content
+BookReadingService ..> ReadingCachePaths : extracts into and serves from
+
+BookReaderRegistry ..> IBookReader : reads the supported extensions of loaded plugins
+
+' ============================== ENABLEMENT MANAGEMENT RELATIONSHIPS ==============================
+
+GetLibraryBookReadersQueryHandler --> ILibraryBookReaderConfigurationRepository : reads configurations
+GetLibraryBookReadersQueryHandler --> IBookReaderRegistry : reads supported extensions
+SetLibraryBookReaderEnabledCommandHandler --> ILibraryBookReaderConfigurationRepository : upserts the configuration
+SetLibraryBookReaderEnabledCommandHandler --> IBookReaderEnablementCache : invalidates the entry
+
+ILibraryBookReaderConfigurationRepository --> LibraryBookReaderConfigurationEntity : persists
+
+' ============================== BOOK READER PLUGIN RELATIONSHIPS ==============================
+
+EpubReader <|.. IBookReader : implements
+PdfReader <|.. IBookReader : implements
+
+EpubReader ..> EpubDocumentParser : parses
+PdfReader ..> PdfDocumentParser : parses and renders pages
+
+EpubPlugin ..> EpubReader : registers as a keyed IBookReader
+PdfPlugin ..> PdfReader : registers as a keyed IBookReader
+
+caption [Code] Lumina - Book Reading 3.2.2 and Book Reader Plugins
+
+footer The code diagram for the Book Reading 3.2.2 and the Book Reader Plugins - created with PlantUML
+@enduml

@@ -7,7 +7,7 @@ namespace Lumina.Presentation.Web.Common.Requests.UsersManagement.Authentication
 /// <summary>
 /// Represents the request for displaying the account login view.
 /// </summary>
-/// <param name="ReturnUrl">The URL to return to, after login.</param>
+/// <param name="ReturnUrl">The URL to return to, after login. Optional.</param>
 [DebuggerDisplay("ReturnUrl: {ReturnUrl}")]
 public record LoginViewRequest(
     string? ReturnUrl = null

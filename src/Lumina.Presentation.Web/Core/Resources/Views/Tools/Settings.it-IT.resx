@@ -45,4 +45,16 @@
   <data name="DescriptionEnableThemeCaching" xml:space="preserve">
     <value>Controlla se i file dei temi serviti dall'applicazione vengono memorizzati nella cache. Disattivalo mentre modifichi i file dei temi affinché le modifiche appaiano immediatamente.</value>
   </data>
+  <data name="ShouldRenderPdfAsImages" xml:space="preserve">
+    <value>Visualizza i PDF come immagini</value>
+  </data>
+  <data name="DescriptionShouldRenderPdfAsImages" xml:space="preserve">
+    <value>Se i libri PDF vengono visualizzati come immagini delle pagine, preservando il layout originale, ma rendendo il testo delle pagine non selezionabile o ricercabile. Utile per PDF scansionati senza testo estraibile.</value>
+  </data>
+  <data name="ShouldPreserveBookStyles" xml:space="preserve">
+    <value>Conserva gli stili dei libri</value>
+  </data>
+  <data name="DescriptionShouldPreserveBookStyles" xml:space="preserve">
+    <value>Indica se lo stile originale del contenuto dei libri viene conservato quando leggi un libro. Attivarlo mantiene l'aspetto del libro (font, colori, allineamento), ma gli stili dei libri possono caricare risorse da server esterni, che tali server potrebbero osservare. Disattivalo per rimuovere gli stili.</value>
+  </data>
 </root>

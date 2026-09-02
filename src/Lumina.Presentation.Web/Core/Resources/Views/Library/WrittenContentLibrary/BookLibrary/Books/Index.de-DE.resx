@@ -45,4 +45,10 @@
   <data name="NoItemsMatchFilters" xml:space="preserve">
     <value>Keine Einträge entsprechen den aktuellen Filtern</value>
   </data>
+  <data name="ReaderUnavailable" xml:space="preserve">
+    <value>Es ist kein Buchleser verfügbar, der dieses Buchformat öffnen kann.</value>
+  </data>
+  <data name="ReaderDisabled" xml:space="preserve">
+    <value>Der Buchleser, der dieses Buch öffnet, ist für diese Mediathek deaktiviert. Aktivieren Sie ihn in den Mediathek-Einstellungen, um das Buch zu lesen.</value>
+  </data>
 </root>

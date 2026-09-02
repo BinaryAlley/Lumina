@@ -58,4 +58,38 @@ public interface IMediaLibraryProviderConfigurationStore
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     Task<Result<Deleted>> RemoveProviderConfigurationsAsync(Guid pluginId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Adds a disabled book reader configuration for every loaded plugin that supports the provided library type and has no configuration yet, for the media library identified by <paramref name="libraryId"/>.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose book reader configurations are ensured.</param>
+    /// <param name="libraryType">The type of the media library, used to determine the plugins whose book readers apply.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Success>> EnsureBookReaderConfigurationsAsync(Guid libraryId, LibraryType libraryType, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Replaces the book reader configurations of the media library identified by <paramref name="libraryId"/> so that they match the plugins supporting the provided library type.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose book reader configurations are reconciled.</param>
+    /// <param name="libraryType">The type of the media library, used to determine the plugins whose book readers apply.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Success>> ReconcileBookReaderConfigurationsAsync(Guid libraryId, LibraryType libraryType, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Deletes all the book reader configurations of the media library identified by <paramref name="libraryId"/>.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose book reader configurations are deleted.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Deleted>> RemoveBookReaderConfigurationsForLibraryAsync(Guid libraryId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Deletes all the book reader configurations referencing the plugin identified by <paramref name="pluginId"/>.
+    /// </summary>
+    /// <param name="pluginId">The Id of the plugin whose book reader configurations are deleted.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Deleted>> RemoveBookReaderConfigurationsAsync(Guid pluginId, CancellationToken cancellationToken);
 }

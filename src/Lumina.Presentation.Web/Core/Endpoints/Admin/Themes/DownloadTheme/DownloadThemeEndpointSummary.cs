@@ -21,7 +21,11 @@ public class DownloadThemeEndpointSummary : Summary<DownloadThemeEndpoint, GetTh
         Summary = "Downloads the archive of a theme.";
         Description = "Downloads the ZIP archive of the installed theme identified by the request.";
 
-        RequestParam(r => r.ThemeId, "The manifest id of the theme to download.");
+        RequestParam(r => r.ThemeId, "The manifest id of the theme to download. Required.");
+
+        ExampleRequest = new GetThemeArchiveRequest(
+            ThemeId: "lumina-default"
+        );
 
         Response(200, "The ZIP archive of the theme is returned.", "application/zip");
     }

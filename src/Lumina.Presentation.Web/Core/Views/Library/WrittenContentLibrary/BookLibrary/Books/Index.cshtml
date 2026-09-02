@@ -7,7 +7,7 @@
 @using Microsoft.AspNetCore.Mvc.Localization
 
 @{
-    // generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler
+    // Generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler.
     var scriptId = ScriptIdentifierHelper.GenerateScriptId();
 }
 
@@ -18,8 +18,8 @@
 
 <div class="cotton-candy">
     <div style="display: grid; grid-template-rows: auto 1fr;">
-        <!--container with two rows, one fixed, one filling remaining space-->
-        <div style="min-height: 1rem;"></div><!--the first row is a dummy row for "margin", because setting a margin on the next row would offset the parent's position-->
+        <!--Container with two rows, one fixed, one filling remaining space.-->
+        <div style="min-height: 1rem;"></div><!--The first row is a dummy row for "margin", because setting a margin on the next row would offset the parent's position.-->
         <div class="pl-10 pr-10 pb-10">
             <div class="text-center">
                 <h1 class="text-light-two engraved-title">@(Model.Title ?? string.Empty)</h1>
@@ -48,12 +48,14 @@
 @section Scripts {
     <!-- The "text/plain" type is a design choice, not a mistake: it keeps the browser from executing this view script during HTML parsing, before site.js defines the API helpers it calls (callApiGetAsync, callApiPostAsync, ...). site.js (which loads deferred) executes these scripts once it is loaded, both on the initial page load and during AJAX navigation. -->
     <script type="text/plain" data-form="@scriptId">
-        // create cleanup registry for this view
+        // Create cleanup registry for this view.
         const cleanupFunctions = [];
         let isInitialized = false;
         let requestSequence = 0;
 
         const libraryId = '@(Model.Id ?? Guid.Empty)';
+        const readUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.READ, new { bookId = default(Guid) })';
+        const availabilityUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.GET_READING_AVAILABILITY, new { bookId = default(Guid) })';
         const booksContainer = document.getElementById('books-container');
         const noItemsMessage = document.getElementById('no-items');
         const noItemsMatchingMessage = document.getElementById('no-items-matching');
@@ -67,7 +69,7 @@
         const nextPageButton = document.getElementById('next-page');
         const pageIndicator = document.getElementById('page-indicator');
 
-        // the special alpha keys for numbers and symbols, followed by the letters
+        // The special alpha keys for numbers and symbols, followed by the letters.
         const alphaKeys = ['#', '*', ...Array.from({ length: 26 }, (_, index) => String.fromCharCode(65 + index))];
 
         const state = {
@@ -85,10 +87,12 @@
             of: '@_localizer["Of"]',
             page: '@_localizer["Page"]',
             sortAscending: '@_localizer["SortAscending"]',
-            sortDescending: '@_localizer["SortDescending"]'
+            sortDescending: '@_localizer["SortDescending"]',
+            readerUnavailable: '@_localizer["ReaderUnavailable"]',
+            readerDisabled: '@_localizer["ReaderDisabled"]'
         };
 
-        // builds the URL of the retrieval endpoint, from the current state
+        // Builds the URL of the retrieval endpoint, from the current state.
         function buildItemsUrl() {
             const url = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.GET_LIBRARY_ITEMS)';
             const params = new URLSearchParams();
@@ -106,7 +110,7 @@
             return `${url}?${params.toString()}`;
         }
 
-        // retrieves the books and renders them, ignoring stale responses of earlier requests
+        // Retrieves the books and renders them, ignoring stale responses of earlier requests.
         async function loadItemsAsync() {
             const requestId = ++requestSequence;
             const response = await callApiGetAsync(buildItemsUrl());
@@ -116,7 +120,7 @@
                 renderItems(response);
         }
 
-        // renders the retrieved books, the count label and the pagination controls
+        // Renders the retrieved books, the count label and the pagination controls.
         function renderItems(response) {
             booksContainer.querySelectorAll('.media-panel').forEach(card => card.remove());
 
@@ -132,16 +136,29 @@
                 response.data.forEach(book => booksContainer.appendChild(createBookCard(book)));
             }
 
+            // Bind the AJAX navigation behavior to the book cards, which were created after the initial navigation binding, so that
+            // navigating to the reader does not reload the page (and, for example, does not interrupt the audio player).
+            bindNavigationLinks();
             updateCountLabel(response);
             updatePagination(response);
         }
 
-        // creates a portrait card for a book, with its cover image (or a placeholder) and its title
+        // Creates a portrait card for a book, with its cover image (or a placeholder) and its title, that opens the reader when clicked.
         function createBookCard(book) {
-            const card = document.createElement('div');
-            card.className = 'media-panel';
+            const card = document.createElement('a');
+            card.className = 'media-panel nav-link no-underline';
             card.style.width = '160px';
             card.style.height = '240px';
+            card.href = readUrlTemplate.replace('/@(default(Guid))', `/${book.id}`);
+            card.dataset.bookId = book.id;
+            // Opening the reader is conditional on the reader being available and enabled for the library, so the generic nav-link
+            // navigation is intercepted and replaced by one that first checks the reading availability, warning instead of navigating
+            // when the book cannot be read.
+            card.addEventListener('click', async event => {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                await handleBookCardClickAsync(card);
+            });
 
             const image = document.createElement('img');
             image.src = book.coverPath
@@ -160,7 +177,26 @@
             return card;
         }
 
-        // updates the count label: total items when pagination is off, displayed range out of total when it is on
+        // Opens the reader of the book when it can be read, and warns the user otherwise; the navigation is done through the same
+        // AJAX navigation used by the nav-links, so that the page is not reloaded (and the audio player is not interrupted).
+        async function handleBookCardClickAsync(card) {
+            const availabilityUrl = availabilityUrlTemplate.replace('/@(default(Guid))', `/${card.dataset.bookId}`);
+            const response = await fetch(availabilityUrl, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            const jsonResponse = await response.json();
+            if (jsonResponse.success) {
+                await updateContentAsync(card.href, true);
+            } else {
+                const message = jsonResponse.errorCode === 'ReaderDisabled' ? jsLocalizedStrings.readerDisabled : jsLocalizedStrings.readerUnavailable;
+                notificationService.show(message, NotificationType.WARNING);
+            }
+        }
+
+        // Updates the count label: total items when pagination is off, displayed range out of total when it is on.
         function updateCountLabel(response) {
             if (state.perPage === null)
                 countLabel.textContent = `${response.count} ${jsLocalizedStrings.items}`;
@@ -173,7 +209,7 @@
             }
         }
 
-        // updates the pagination controls, which are only visible when pagination is enabled
+        // Updates the pagination controls, which are only visible when pagination is enabled.
         function updatePagination(response) {
             if (state.perPage === null) {
                 pagination.classList.add('hidden');
@@ -186,7 +222,7 @@
             nextPageButton.disabled = response.currentPage >= totalPages;
         }
 
-        // builds the alpha picker column, with the "All" key followed by the numbers, symbols and letters keys
+        // Builds the alpha picker column, with the "All" key followed by the numbers, symbols and letters keys.
         function buildAlphaPicker() {
             const allKey = document.createElement('span');
             allKey.className = 'alpha-key';
@@ -207,7 +243,7 @@
             updateAlphaPickerActiveState();
         }
 
-        // highlights the currently active key of the alpha picker
+        // Highlights the currently active key of the alpha picker.
         function updateAlphaPickerActiveState() {
             alphaPicker.querySelectorAll('.alpha-key').forEach(key => {
                 const keyValue = key.dataset.alphaKey === '' ? null : key.dataset.alphaKey;
@@ -215,7 +251,7 @@
             });
         }
 
-        // applies the given alpha key (null clears the alpha filter) and reloads the books
+        // Applies the given alpha key (null clears the alpha filter) and reloads the books.
         function handleAlphaKeyClick(key) {
             state.alphaKey = key;
             state.currentPage = 1;
@@ -223,14 +259,14 @@
             loadItemsAsync();
         }
 
-        // applies the search term and reloads the books
+        // Applies the search term and reloads the books.
         function handleSearch() {
             state.searchTerm = searchInput.value.trim();
             state.currentPage = 1;
             loadItemsAsync();
         }
 
-        // triggers the search when the Enter key is pressed in the search input
+        // Triggers the search when the Enter key is pressed in the search input.
         function handleSearchKeydown(event) {
             if (event.key === 'Enter') {
                 event.preventDefault();
@@ -238,7 +274,7 @@
             }
         }
 
-        // toggles the sort direction and reloads the books
+        // Toggles the sort direction and reloads the books.
         function handleSortToggle() {
             state.sortOrder = state.sortOrder === 'Ascending' ? 'Descending' : 'Ascending';
             sortToggle.textContent = state.sortOrder === 'Ascending' ? jsLocalizedStrings.sortAscending : jsLocalizedStrings.sortDescending;
@@ -246,7 +282,7 @@
             loadItemsAsync();
         }
 
-        // applies an alpha filter when a letter is pressed while the search input does not have focus; Escape clears the alpha filter
+        // Applies an alpha filter when a letter is pressed while the search input does not have focus; Escape clears the alpha filter.
         function handleAlphaKeydown(event) {
             if (document.activeElement === searchInput)
                 return;
@@ -256,7 +292,7 @@
                 handleAlphaKeyClick(null);
         }
 
-        // loads the settings of the current user, which drive pagination and the alpha picker prefix handling
+        // Loads the settings of the current user, which drive pagination and the alpha picker prefix handling.
         async function loadSettingsAsync() {
             const data = await callApiGetAsync('@_urlService.GetAbsoluteUrl(WebRoutes.Settings.GET_USER_SETTINGS)');
             if (data) {
@@ -265,19 +301,19 @@
             }
         }
 
-        // navigates to the previous page
+        // Navigates to the previous page.
         function handlePrevPageClick() {
             state.currentPage = Math.max(1, state.currentPage - 1);
             loadItemsAsync();
         }
 
-        // navigates to the next page
+        // Navigates to the next page.
         function handleNextPageClick() {
             state.currentPage = state.currentPage + 1;
             loadItemsAsync();
         }
 
-        // add listeners
+        // Add listeners.
         searchButton.addEventListener('click', handleSearch);
         searchInput.addEventListener('keydown', handleSearchKeydown);
         sortToggle.addEventListener('click', handleSortToggle);
@@ -286,7 +322,7 @@
         document.addEventListener('keydown', handleAlphaKeydown);
         document.addEventListener('DOMContentLoaded', InitializeAsync);
 
-        // register cleanup for these listeners
+        // Register cleanup for these listeners.
         cleanupFunctions.push(() => {
             searchButton.removeEventListener('click', handleSearch);
             searchInput.removeEventListener('keydown', handleSearchKeydown);
@@ -307,7 +343,7 @@
             await loadItemsAsync();
         }
 
-        // store all cleanups for this view on window object using the scriptId
+        // Store all cleanups for this view on window object using the scriptId.
         window.viewCleanups = window.viewCleanups || {};
         window.viewCleanups['@scriptId'] = () => {
             cleanupFunctions.forEach(cleanup => cleanup());

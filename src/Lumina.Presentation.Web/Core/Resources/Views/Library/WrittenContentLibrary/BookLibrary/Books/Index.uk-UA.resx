@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -44,5 +44,11 @@
   </data>
   <data name="NoItemsMatchFilters" xml:space="preserve">
     <value>Жоден елемент не відповідає поточним фільтрам</value>
+  </data>
+  <data name="ReaderUnavailable" xml:space="preserve">
+    <value>Немає доступного читача книг, який міг би відкрити цей формат книги.</value>
+  </data>
+  <data name="ReaderDisabled" xml:space="preserve">
+    <value>Читач книг, який відкриває цю книгу, вимкнено для цієї бібліотеки. Увімкніть його в налаштуваннях бібліотеки, щоб читати книгу.</value>
   </data>
 </root>

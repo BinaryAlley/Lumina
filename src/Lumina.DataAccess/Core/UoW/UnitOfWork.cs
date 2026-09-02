@@ -43,6 +43,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     private ILibraryScanStagingResultsRepository? _libraryScanStagingResultsRepository;
     private ILibraryMetadataProviderConfigurationRepository? _libraryMetadataProviderConfigurationRepository;
     private IArtworkProviderConfigurationRepository? _artworkProviderConfigurationRepository;
+    private ILibraryBookReaderConfigurationRepository? _libraryBookReaderConfigurationRepository;
     private IPluginRepository? _pluginRepository;
     private IThemeRepository? _themeRepository;
     private IUserRepository? _userRepository;
@@ -198,6 +199,18 @@ public class UnitOfWork : IUnitOfWork, IDisposable
         {
             _artworkProviderConfigurationRepository ??= new ArtworkProviderConfigurationRepository(_luminaDbContext);
             return _artworkProviderConfigurationRepository;
+        }
+    }
+
+    /// <summary>
+    /// Gets the library book reader configuration repository.
+    /// </summary>
+    public ILibraryBookReaderConfigurationRepository LibraryBookReaderConfigurationRepository
+    {
+        get
+        {
+            _libraryBookReaderConfigurationRepository ??= new LibraryBookReaderConfigurationRepository(_luminaDbContext);
+            return _libraryBookReaderConfigurationRepository;
         }
     }
 

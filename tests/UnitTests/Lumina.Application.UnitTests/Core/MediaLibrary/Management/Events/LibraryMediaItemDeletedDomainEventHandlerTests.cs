@@ -5,7 +5,7 @@ using Lumina.Application.Common.DataAccess.Repositories.Books;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Core.MediaLibrary.Management.Events;
-using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Artwork;
+using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Artwork;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.Common.Exceptions;

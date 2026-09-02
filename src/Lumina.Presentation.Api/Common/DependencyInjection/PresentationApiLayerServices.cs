@@ -25,23 +25,23 @@ using System.Threading.RateLimiting;
 namespace Lumina.Presentation.Api.Common.DependencyInjection;
 
 /// <summary>
-/// Contains all services of the Presentation API layer.
+/// Utility class for registering the services of the Presentation Api layer into the Dependency Injection container.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public static class PresentationApiLayerServices
 {
     /// <summary>
-    /// Registers the services of the Presentation API layer into the dependency injection container.
+    /// Registers the services of the Presentation Api layer into the Dependency Injection container.
     /// </summary>
     /// <param name="services">The service collection to add the services to.</param>
-    /// <param name="configuration">Application configuration properties.</param>
+    /// <param name="configuration">The configuration used to read the application configuration.</param>
     /// <returns>The updated <see cref="IServiceCollection"/>.</returns>
     public static IServiceCollection AddPresentationApiLayerServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddMemoryCache(); // used for the tracking involved in authentication rate limiting
+        services.AddMemoryCache(); // Used for the tracking involved in authentication rate limiting.
         services.AddProblemDetails();
 
-        // the readiness health check verifies that the database can be reached, and is probed by container orchestrators and load balancers
+        // The readiness health check verifies that the database can be reached, and is probed by container orchestrators and load balancers.
         services.AddHealthChecks()
             .AddCheck<DatabaseHealthCheck>("database", HealthStatus.Unhealthy, ["ready"]);
 
@@ -49,10 +49,10 @@ public static class PresentationApiLayerServices
         {
             jsonOptions.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
             jsonOptions.SerializerOptions.MaxDepth = 256;
-            jsonOptions.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; // needed because file system API responses can have very nested structures
+            jsonOptions.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; // Needed because file system API responses can have very nested structures.
         });
 
-        // TODO: also implement account locking after a number of failed login attempts
+        // TODO: also implement account locking after a number of failed login attempts.
         services.AddRateLimiter(rateLimiterOptions =>
         {
             rateLimiterOptions.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
@@ -68,16 +68,16 @@ public static class PresentationApiLayerServices
                     "Rate limit exceeded. IP: {IpAddress}, Route: {Route}, Lease Acquired: {IsAcquired}",
                     clientIp,
                     onRejectedContext.HttpContext.Request.Path,
-                    onRejectedContext.Lease.IsAcquired); // when False, the request was rejected because it exceeded rate limits
+                    onRejectedContext.Lease.IsAcquired); // When False, the request was rejected because it exceeded rate limits.
 
                 onRejectedContext.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
                 onRejectedContext.HttpContext.Response.ContentType = "application/problem+json";
 
-                // set standard rate limit headers
+                // Set standard rate limit headers.
                 if (onRejectedContext.Lease.TryGetMetadata(MetadataName.RetryAfter, out TimeSpan retryAfter))
                     onRejectedContext.HttpContext.Response.Headers.RetryAfter = ((int)retryAfter.TotalSeconds).ToString();
 
-                // set custom rate limit headers
+                // Set custom rate limit headers.
                 onRejectedContext.HttpContext.Response.Headers["X-RateLimit-Limit"] = "10";
                 onRejectedContext.HttpContext.Response.Headers["X-RateLimit-Remaining"] = "0";
                 onRejectedContext.HttpContext.Response.Headers["X-RateLimit-Reset"] = DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeSeconds().ToString();
@@ -95,23 +95,23 @@ public static class PresentationApiLayerServices
             };
             rateLimiterOptions.AddPolicy("authenticationPolicy", httpContext =>
             {
-                string clientIp = httpContext.Request.Headers["X-Forwarded-For"] // first check forwarded headers, in case this is behind a reverse proxy 
-                    .FirstOrDefault()?.Split(',')[0].Trim() // take first IP, if multiple available, to avoid IP spoofing attempts
-                    ?? httpContext.Connection.RemoteIpAddress?.ToString() // then try RemoteIpAddress
-                    ?? "unknown"; // fallback if both are null
+                string clientIp = httpContext.Request.Headers["X-Forwarded-For"] // First check forwarded headers, in case this is behind a reverse proxy.
+                    .FirstOrDefault()?.Split(',')[0].Trim() // Take first IP, if multiple available, to avoid IP spoofing attempts,
+                    ?? httpContext.Connection.RemoteIpAddress?.ToString() // then try RemoteIpAddress.
+                    ?? "unknown"; // Fallback if both are null.
                 return RateLimitPartition.GetFixedWindowLimiter(
                     partitionKey: $"auth_{clientIp}",
                     factory: _ => new FixedWindowRateLimiterOptions
                     {
-                        PermitLimit = 10, // allow 10 attempts
-                        Window = TimeSpan.FromMinutes(15), // within 15 minute window
-                        QueueLimit = 0,  // don't queue requests
-                        AutoReplenishment = true  // automatically reset rate limiter tokens
+                        PermitLimit = 10, // Allow 10 attempts
+                        Window = TimeSpan.FromMinutes(15), // within 15 minute window.
+                        QueueLimit = 0,  // Don't queue requests.
+                        AutoReplenishment = true  // Automatically reset rate limiter tokens.
                     });
             });
         });
 
-        // add authentication and specify the JWT scheme to check tokens against
+        // Add authentication and specify the JWT scheme to check tokens against.
         services.AddAuthentication(defaultScheme: JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(jwtBearerOptions =>
             {
@@ -128,10 +128,10 @@ public static class PresentationApiLayerServices
 
                 jwtBearerOptions.Events = new JwtBearerEvents
                 {
-                    OnChallenge = jwtBearerChallengeContext => // event triggered when authentication is not successful for whatever reason
+                    OnChallenge = jwtBearerChallengeContext => // Event triggered when authentication is not successful for whatever reason.
                     {
-                        jwtBearerChallengeContext.HandleResponse(); // prevent the default 401 response
-                        // set the response status code to 401 Unauthorized
+                        jwtBearerChallengeContext.HandleResponse(); // Prevent the default 401 response.
+                        // Set the response status code to 401 Unauthorized.
                         jwtBearerChallengeContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
                         jwtBearerChallengeContext.Response.ContentType = "application/problem+json";
 
@@ -139,7 +139,7 @@ public static class PresentationApiLayerServices
                         if (!string.IsNullOrEmpty(jwtBearerChallengeContext.Error))
                         {
                             errorDetails = jwtBearerChallengeContext.Error switch
-                            { // TODO: implement translation
+                            { // TODO: implement translation.
                                 "invalid_token" => !string.IsNullOrEmpty(jwtBearerChallengeContext.ErrorDescription)
                                     ? $"Invalid token: {jwtBearerChallengeContext.ErrorDescription}"
                                     : "The token is invalid",
@@ -174,9 +174,8 @@ public static class PresentationApiLayerServices
         services.AddFastEndpoints(endpointDiscoveryOptions =>
         {
             endpointDiscoveryOptions.Assemblies = [ typeof(Program).Assembly ];
-            // only scan the application assembly, so that duplicate copies of it loaded into other assembly load
-            // contexts during the process lifetime are never scanned again; otherwise a single host can register
-            // every endpoint multiple times and fail with duplicate routes
+            // Only scan the application assembly, so that duplicate copies of it loaded into other assembly load contexts during the process lifetime are never scanned again;
+            // otherwise a single host can register every endpoint multiple times and fail with duplicate routes.
             endpointDiscoveryOptions.DisableAutoDiscovery = true;
         });
 
@@ -200,7 +199,7 @@ public static class PresentationApiLayerServices
             };
             documentOptions.RemoveEmptyRequestSchema = true;
             documentOptions.ShortSchemaNames = true;
-        }); // for an eventual next version:
+        }); // For an eventual next version:
         //.SwaggerDocument(documentOptions => 
         //{
         //    documentOptions.MaxEndpointVersion = 2;

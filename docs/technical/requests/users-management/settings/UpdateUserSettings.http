@@ -6,5 +6,8 @@ Content-Type: application/json
   "isPaginationEnabled": true,
   "itemsPerPage": 50,
   "ignoreThePrefixForAlphaPicker": true,
-  "isThemeCachingEnabled": true
+  "isThemeCachingEnabled": true,
+  "shouldAggregateMetadataWhenMissing": true,
+  "shouldRenderPdfAsImages": false,
+  "shouldPreserveBookStyles": true
 }

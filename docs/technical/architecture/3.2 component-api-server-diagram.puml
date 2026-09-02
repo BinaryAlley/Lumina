@@ -17,10 +17,16 @@ Container_Boundary(api, "API Server 2.2") {
     
     Component(backgroundServices, "Background Services 3.2.1", ".NET Worker Services", "Handles media scanning, metadata synchronization and other maintenance tasks [detailed in '4.1 code-media-library-scanning-diagram.puml']")
     
+    Component(bookReading, "Book Reading 3.2.2", "Application + Infrastructure services", "Resolves the reader plugin of a book, checks its per-library enablement, extracts the book into the reading cache on first access, sanitizes every section, and serves the reading manifest, sections and resources [detailed in '4.2 code-book-reading-diagram.puml']")
+    
+    Component(readerPlugins, "Book Reader Plugins", "Lumina.Plugins.Epub, Lumina.Plugins.Pdf", "Decode a book format into a normalized reading document (spine, table of contents, sections, resources), loaded into the host by the plugin loader [detailed in '4.2 code-book-reading-diagram.puml']")
+    
     Component(repositories, "Repositories", "EF Core", "Provides data access abstraction for domain entities")
 }
 
 ContainerDb(db, "Database", "SQLite", "Stores user data, media metadata, and system configuration")
+
+Container(readCache, "Reading Cache", "File System", "Temporary directory in the API output, wiped at startup, where the reader plugins extract the contents of the books")
 
 System_Ext(metadataServices, "External Metadata Services", "Provides media information (TMDB, TVDB, GoodReads, MusicBrainz, etc)")
 
@@ -28,12 +34,17 @@ Rel(webapp, endpoints, "Makes API calls to", "JSON/HTTPS")
 Rel(endpoints, mediaManagement, "Uses")
 Rel(endpoints, userManagement, "Uses")
 Rel(endpoints, fileSystem, "Uses")
+Rel(endpoints, bookReading, "Uses")
 Rel(mediaManagement, repositories, "Uses")
 Rel(userManagement, repositories, "Uses")
 Rel(fileSystem, repositories, "Uses")
 Rel(backgroundServices, mediaManagement, "Uses")
 Rel(repositories, db, "Reads from and writes to", "SQL")
 Rel(mediaManagement, metadataServices, "Retrieves metadata from", "HTTPS")
+Rel(bookReading, readerPlugins, "Resolves and invokes")
+Rel(bookReading, repositories, "Reads the per-library reader enablement")
+Rel(bookReading, readCache, "Extracts into and serves from", "File system")
+Rel(readerPlugins, readCache, "Extracts into", "File system")
 
 caption [Component] Lumina - API Server 2.2 (Lumina.Presentation.Api)
 

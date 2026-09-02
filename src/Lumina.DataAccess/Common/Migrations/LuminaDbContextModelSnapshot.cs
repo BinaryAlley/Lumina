@@ -929,6 +929,48 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.ToTable("LibraryArtworkProviderConfigurations", (string)null);
                 });
 
+            modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.Plugins.LibraryBookReaderConfigurationEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(0);
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(5);
+
+                    b.Property<DateTime>("CreatedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(4);
+
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(3);
+
+                    b.Property<Guid>("LibraryId")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(1);
+
+                    b.Property<Guid>("PluginId")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(2);
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(7);
+
+                    b.Property<DateTime?>("UpdatedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(6);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LibraryId", "PluginId")
+                        .IsUnique();
+
+                    b.ToTable("LibraryBookReaderConfigurations", (string)null);
+                });
+
             modelBuilder.Entity("Lumina.Application.Common.DataAccess.Entities.Plugins.LibraryMetadataProviderConfigurationEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1214,6 +1256,14 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.Property<bool>("ShouldIgnoreThePrefixForAlphaPicker")
                         .HasColumnType("INTEGER")
                         .HasColumnOrder(4);
+
+                    b.Property<bool>("ShouldRenderPdfAsImages")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(11);
+
+                    b.Property<bool>("ShouldPreserveBookStyles")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(12);
 
                     b.Property<Guid?>("UpdatedBy")
                         .HasColumnType("TEXT")

@@ -238,6 +238,22 @@
                         </table>
                         <small class="form-label text-disabled form-description">@_localizer["DescriptionArtworkProviders"]</small>
                     </div>
+                    <h3 class="text-light-two">@_localizer["BookReaders"]</h3>
+                    <div class="form-row">
+                        <table id="book-readers-table" class="w-100">
+                            <thead>
+                                <tr>
+                                    <th class="w-35">@_localizer["Name"]</th>
+                                    <th class="w-40">@_localizer["SupportedExtensions"]</th>
+                                    <th class="w-25 text-center">@_localizer["Enabled"]</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- book readers will be populated here -->
+                            </tbody>
+                        </table>
+                        <small class="form-label text-disabled form-description">@_localizer["DescriptionBookReaders"]</small>
+                    </div>
                 }
                 <div class="form-row">
                     <button type="submit" class="confirm-button w-100px">@_localizer["Save"]</button>
@@ -522,6 +538,49 @@
             }
         };
 
+        const bookReadersTable = document.getElementById('book-readers-table');
+        const bookReadersTbody = bookReadersTable ? bookReadersTable.querySelector('tbody') : null;
+
+        // loads the book readers configured for the library, when editing an existing library
+        async function loadBookReadersAsync() {
+            if (!id || !bookReadersTbody) return;
+            const url = '@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.GET_BOOK_READERS, new { libraryId = default(Guid) })'
+                .replace('/@(default(Guid))', `/${id}`); // libraryId needs to be replaced here, because GetAbsoluteUrl is server side, libraryId is client side
+            const response = await callApiGetAsync(url);
+            if (response && response.length > 0) {
+                bookReadersTbody.innerHTML = response.map(reader => renderBookReaderRow(reader)).join('');
+            }
+        }
+
+        // renders a book reader row of the library
+        function renderBookReaderRow(reader) {
+            const extensions = (reader.supportedExtensions || []).join(', ');
+            return `
+                <tr data-reader-plugin-id="${reader.pluginId}">
+                    <td>${reader.name}</td>
+                    <td>${extensions}</td>
+                    <td class="text-center">
+                        <label class="enlightenment-checkbox-label">
+                            <input type="checkbox" class="enlightenment-checkbox-hidden book-reader-enabled" ${reader.isEnabled ? 'checked' : ''} />
+                            <span class="enlightenment-checkbox"></span>
+                        </label>
+                    </td>
+                </tr>`;
+        }
+
+        // on book reader enabled checkbox change, persists the new state
+        async function handleBookReaderEnabledChangeAsync(e) {
+            if (e.target.matches('.book-reader-enabled')) {
+                const row = e.target.closest('tr');
+                const pluginId = row.getAttribute('data-reader-plugin-id');
+                const isEnabled = e.target.checked;
+                const result = await callApiPutAsync('@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.SET_BOOK_READER_ENABLED)', { libraryId: id, pluginId: pluginId, isEnabled: isEnabled });
+                if (!result.success) {
+                    e.target.checked = !isEnabled;
+                }
+            }
+        };
+
         // add listeners
         form.addEventListener('keypress', handleEnterKey);
         form.addEventListener('submit', handleSubmit);
@@ -538,6 +597,9 @@
         if (artworkProvidersTbody) {
             artworkProvidersTbody.addEventListener('click', handleArtworkProviderReorderAsync);
             artworkProvidersTbody.addEventListener('change', handleArtworkProviderEnabledChangeAsync);
+        }
+        if (bookReadersTbody) {
+            bookReadersTbody.addEventListener('change', handleBookReaderEnabledChangeAsync);
         }
 
         // register cleanup for these listeners
@@ -558,12 +620,16 @@
                 artworkProvidersTbody.removeEventListener('click', handleArtworkProviderReorderAsync);
                 artworkProvidersTbody.removeEventListener('change', handleArtworkProviderEnabledChangeAsync);
             }
+            if (bookReadersTbody) {
+                bookReadersTbody.removeEventListener('change', handleBookReaderEnabledChangeAsync);
+            }
         });
 
-        // load the metadata and artwork providers when editing an existing library
+        // load the metadata and artwork providers and book readers when editing an existing library
         if (id) {
             loadMetadataProvidersAsync();
             loadArtworkProvidersAsync();
+            loadBookReadersAsync();
         }
 
         // store all cleanups for this view on window object using the scriptId

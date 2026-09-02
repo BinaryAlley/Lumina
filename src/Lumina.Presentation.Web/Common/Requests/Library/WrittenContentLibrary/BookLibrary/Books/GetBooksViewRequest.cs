@@ -8,7 +8,7 @@ namespace Lumina.Presentation.Web.Common.Requests.Library.WrittenContentLibrary.
 /// <summary>
 /// Represents the request for displaying the books browsing view.
 /// </summary>
-/// <param name="LibraryId">The unique identifier of the media library whose books are browsed.</param>
+/// <param name="LibraryId">The unique identifier of the media library whose books are browsed. Optional.</param>
 [DebuggerDisplay("LibraryId: {LibraryId}")]
 public record GetBooksViewRequest(
     Guid? LibraryId

@@ -1,0 +1,2 @@
+GET {{host}}/api/v1/books/{{$guid}}/reading/resources/0f4d6e2b1c9a4f3e8d7c6b5a4f3e2d1c
+Authorization: Bearer {{ACCESS_TOKEN}}

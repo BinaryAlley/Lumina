@@ -21,8 +21,13 @@ public class CheckPathExistsEndpointSummary : Summary<CheckPathExistsEndpoint, C
         Summary = "Checks the existence of a file system path.";
         Description = "Checks whether the file system path identified by the request exists.";
 
-        RequestParam(r => r.Path, "The file system path to check the existence of.");
-        RequestParam(r => r.IncludeHiddenElements, "Whether to include hidden elements in the search results, or not.");
+        RequestParam(r => r.Path, "The file system path to check the existence of. Required.");
+        RequestParam(r => r.IncludeHiddenElements, "Whether to include hidden elements in the search results, or not. Optional.");
+
+        ExampleRequest = new CheckPathExistsRequest(
+            Path: "/media/movies/",
+            IncludeHiddenElements: true
+        );
 
         Response(200, "Whether the file system path exists is returned.", example: new { success = true, data = new { exists = true } });
     }

@@ -23,7 +23,11 @@ public class GetUserRoleEndpointSummary : Summary<GetUserRoleEndpoint, GetUserRo
         Summary = "Gets the role of a user.";
         Description = "Retrieves the authorization role of a user identified by its unique identifier.";
 
-        RequestParam(r => r.UserId, "The unique identifier of the user for whom to get the authorization role.");
+        RequestParam(r => r.UserId, "The unique identifier of the user for whom to get the authorization role. Required.");
+
+        ExampleRequest = new GetUserRoleRequest(
+            UserId: Guid.NewGuid()
+        );
 
         Response(200, "The role of the user is returned.", example: new SuccessResponse<RoleDto?>(true, default));
     }

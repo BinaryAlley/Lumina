@@ -12,13 +12,13 @@ using System.Reflection;
 namespace Lumina.Application.Common.DependencyInjection;
 
 /// <summary>
-/// Contains all services of the Application layer.
+/// Utility class for registering the services of the Application layer into the Dependency Injection container.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public static class ApplicationLayerServices
 {
     /// <summary>
-    /// Registers the services of the Application layer into the dependency injection container.
+    /// Registers the services of the Application layer into the Dependency Injection container.
     /// </summary>
     /// <param name="services">The service collection to add the services to.</param>
     /// <returns>The updated <see cref="IServiceCollection"/>.</returns>
@@ -52,7 +52,7 @@ public static class ApplicationLayerServices
                 continue;
             }
 
-            // wrap query, command, and domain event handlers in their telemetry decorator, so that every invocation emits traces, metrics, and structured logs
+            // Wrap query, command, and domain event handlers in their telemetry decorator, so that every invocation emits traces, metrics, and structured logs.
             services.AddScoped(registration.Contract, serviceProvider =>
             {
                 object handler = ActivatorUtilities.GetServiceOrCreateInstance(serviceProvider, registration.Implementation);

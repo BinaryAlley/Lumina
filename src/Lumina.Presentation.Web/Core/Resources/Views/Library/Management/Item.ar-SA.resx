@@ -337,9 +337,18 @@
     <value>مزوّدو البيانات الوصفية المستخدمون لإثراء عناصر هذه المكتبة، بالترتيب الذي يتم تجريبهم به.</value>
   </data>
   <data name="ArtworkProviders" xml:space="preserve">
-    <value>Artwork providers</value>
+    <value>مزوّدو الأغلفة</value>
   </data>
   <data name="DescriptionArtworkProviders" xml:space="preserve">
-    <value>The artwork providers used to retrieve the covers of the items of this library, in the order they are tried.</value>
+    <value>مزوّدو الأغلفة المستخدمون لاسترداد أغلفة عناصر هذه المكتبة، بالترتيب الذي يتم تجريبهم به.</value>
+  </data>
+  <data name="BookReaders" xml:space="preserve">
+    <value>قارئات الكتب</value>
+  </data>
+  <data name="SupportedExtensions" xml:space="preserve">
+    <value>الامتدادات المدعومة</value>
+  </data>
+  <data name="DescriptionBookReaders" xml:space="preserve">
+    <value>قارئات الكتب المستخدمة لقراءة كتب هذه المكتبة. القارئة المعطّلة تتيح للمستخدم معرفة أن هناك إضافة قارئ لهذا التنسيق، لكنها معطّلة.</value>
   </data>
 </root>

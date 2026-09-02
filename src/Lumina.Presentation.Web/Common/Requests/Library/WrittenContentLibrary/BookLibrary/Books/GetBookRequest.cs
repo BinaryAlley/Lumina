@@ -8,7 +8,7 @@ namespace Lumina.Presentation.Web.Common.Requests.Library.WrittenContentLibrary.
 /// <summary>
 /// Represents a request to get a book by the specified Id.
 /// </summary>
-/// <param name="Id">The unique identifier of the book to retrieve.</param>
+/// <param name="Id">The unique identifier of the book to retrieve. Required.</param>
 [DebuggerDisplay("Id: {Id}")]
 public record GetBookRequest(
     Guid Id

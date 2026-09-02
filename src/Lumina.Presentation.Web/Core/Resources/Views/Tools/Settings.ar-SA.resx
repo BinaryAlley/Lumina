@@ -45,4 +45,16 @@
   <data name="DescriptionEnableThemeCaching" xml:space="preserve">
     <value>ما إذا كانت ملفات السمات التي يقدمها التطبيق مخزنة في الذاكرة المؤقتة أم لا. أوقف هذا الخيار أثناء تعديل ملفات السمات حتى تظهر التغييرات فورًا.</value>
   </data>
+  <data name="ShouldRenderPdfAsImages" xml:space="preserve">
+    <value>عرض ملفات PDF كصور</value>
+  </data>
+  <data name="DescriptionShouldRenderPdfAsImages" xml:space="preserve">
+    <value>ما إذا كانت كتب PDF تُعرض كصور للصفحات، مع الحفاظ على التخطيط الأصلي، ولكن مع جعل نص الصفحات غير قابل للتحديد أو البحث. هذا مفيد لملفات PDF الممسوحة ضوئياً التي لا تحتوي على نص قابل للاستخراج.</value>
+  </data>
+  <data name="ShouldPreserveBookStyles" xml:space="preserve">
+    <value>الحفاظ على أنماط الكتب</value>
+  </data>
+  <data name="DescriptionShouldPreserveBookStyles" xml:space="preserve">
+    <value>ما إذا كان يتم الحفاظ على التنسيق الأصلي لمحتوى الكتاب عند قراءته. يؤدي تفعيله إلى الاحتفاظ بمظهر الكتاب (الخطوط والألوان والمحاذاة)، لكن أنماط الكتب يمكنها تحميل موارد من خوادم خارجية، وقد تتمكن تلك الخوادم من مراقبة ذلك. عطّله لإزالة الأنماط.</value>
+  </data>
 </root>

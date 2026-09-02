@@ -1,0 +1,320 @@
+@*
+/library/written-content-library/books-library/books/{bookId}/read
+*@
+
+@using Lumina.Presentation.Web.Common.Requests.Library.WrittenContentLibrary.BookLibrary.Books.Reading
+@using Lumina.Presentation.Web.Common.Services
+@using Microsoft.AspNetCore.Mvc.Localization
+
+@{
+    // Generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler.
+    var scriptId = ScriptIdentifierHelper.GenerateScriptId();
+}
+
+@inject IViewLocalizer _localizer
+@inject IUrlService _urlService
+
+@model ReadBookViewRequest
+
+<div class="cotton-candy reader-root">
+    <div class="reader-toolbar form-row">
+        <button id="btn-back" type="button" class="abort-button">@_localizer["Back"]</button>
+        <button id="btn-toc-toggle" type="button" class="confirm-button">@_localizer["TableOfContents"]</button>
+        <button id="btn-prev" type="button" class="abort-button">@_localizer["Previous"]</button>
+        <button id="btn-next" type="button" class="confirm-button">@_localizer["Next"]</button>
+        <span id="reader-position" class="text-light-two"></span>
+        <span class="text-light-two">@_localizer["FontSize"]</span>
+        <button id="btn-font-decrease" type="button" class="abort-button">A-</button>
+        <button id="btn-font-increase" type="button" class="confirm-button">A+</button>
+        <h2 id="reader-title" class="text-light-two engraved-title"></h2>
+    </div>
+    <div id="toc-panel" class="reader-toc hidden">
+        <ul id="toc-list"></ul>
+    </div>
+    <p id="reader-status" class="text-light-two">@_localizer["Loading"]</p>
+    <div id="reader-content" class="reader-content"></div>
+</div>
+@section Scripts {
+    <!-- The "text/plain" type is a design choice, not a mistake: it keeps the browser from executing this view script during HTML parsing, before site.js defines the API helpers it calls (callApiGetAsync, callApiPutAsync, ...). site.js (which loads deferred) executes these scripts once it is loaded, both on the initial page load and during AJAX navigation. -->
+    <script type="text/plain" data-form="@scriptId">
+        // Create cleanup registry for this view.
+        const cleanupFunctions = [];
+        let isInitialized = false;
+
+        const bookId = '@Model.BookId';
+        const manifestUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.GET_READING_MANIFEST, new { bookId = default(Guid) })'.replace('/@(default(Guid))', `/${bookId}`);
+        const availabilityUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.GET_READING_AVAILABILITY, new { bookId = default(Guid) })'.replace('/@(default(Guid))', `/${bookId}`);
+        const libraryIndexUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.INDEX)';
+        const sectionUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.GET_READING_SECTION, new { bookId = default(Guid) })'.replace('/@(default(Guid))', `/${bookId}`) + '?locationRef=';
+        const resourceUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.GET_READING_RESOURCE, new { bookId = default(Guid) })'.replace('/@(default(Guid))', `/${bookId}`) + '?resourceKey=';
+
+        // Escapes a string for safe interpolation into HTML markup; the table of contents labels and location references come from
+        // the book file itself, so they are escaped before they are placed into innerHTML, keeping a malicious book from injecting markup.
+        function escapeHtml(value) {
+            return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        const readerTitle = document.getElementById('reader-title');
+        const readerContent = document.getElementById('reader-content');
+        const readerStatus = document.getElementById('reader-status');
+        const readerPosition = document.getElementById('reader-position');
+        const tocPanel = document.getElementById('toc-panel');
+        const tocList = document.getElementById('toc-list');
+        const btnBack = document.getElementById('btn-back');
+        const btnTocToggle = document.getElementById('btn-toc-toggle');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+        const btnFontDecrease = document.getElementById('btn-font-decrease');
+        const btnFontIncrease = document.getElementById('btn-font-increase');
+
+        // The strings are serialized as JSON, so that single quotes and other characters are escaped into valid JavaScript string literals.
+        const jsLocalizedStrings = {
+            loading: @Json.Serialize(_localizer["Loading"].Value),
+            readFailed: @Json.Serialize(_localizer["ReadFailed"].Value),
+            readerUnavailable: @Json.Serialize(_localizer["ReaderUnavailable"].Value),
+            readerDisabled: @Json.Serialize(_localizer["ReaderDisabled"].Value),
+            imageOnlyPdf: @Json.Serialize(_localizer["ImageOnlyPdf"].Value)
+        };
+
+        let manifest = null;
+        let currentIndex = -1;
+        let fontSize = 18;
+
+        // Loads the reading manifest of the book, and opens the first reading section.
+        async function loadManifestAsync() {
+            readerStatus.textContent = jsLocalizedStrings.loading;
+            const response = await fetch(manifestUrl, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            if (response.redirected) {
+                window.location.href = response.url;
+                return;
+            }
+            if (!response.ok) {
+                readerStatus.textContent = jsLocalizedStrings.readFailed;
+                return;
+            }
+            const jsonResponse = await response.json();
+            if (!jsonResponse.success) {
+                // The manifest endpoint reports the absence of a book reader, or its disabled state, with distinct error codes, so
+                // that the user is told what must be fixed to read the book instead of being shown a generic failure. The reading page
+                // cannot display anything for such a book, so the user is also sent back to the library page of the book, using the same
+                // AJAX navigation as the nav-links, so that the page is not reloaded (and the audio player is not interrupted).
+                if (jsonResponse.errorCode === 'NoReaderAvailable') {
+                    readerStatus.textContent = jsLocalizedStrings.readerUnavailable;
+                    notificationService.show(jsLocalizedStrings.readerUnavailable, NotificationType.WARNING);
+                    await redirectToLibraryPageAsync();
+                } else if (jsonResponse.errorCode === 'ReaderDisabled') {
+                    readerStatus.textContent = jsLocalizedStrings.readerDisabled;
+                    notificationService.show(jsLocalizedStrings.readerDisabled, NotificationType.WARNING);
+                    await redirectToLibraryPageAsync();
+                } else 
+                    readerStatus.textContent = jsLocalizedStrings.readFailed;
+                return;
+            }
+            const manifestResponse = jsonResponse.data;
+            if (!manifestResponse) {
+                readerStatus.textContent = jsLocalizedStrings.readFailed;
+                return;
+            }
+            manifest = manifestResponse;
+            readerTitle.textContent = manifest.title || '';
+            renderTableOfContents(manifest.tableOfContents || []);
+            if (manifest.spine && manifest.spine.length > 0)
+                await goToIndexAsync(0);
+            else
+                readerStatus.textContent = jsLocalizedStrings.readFailed;
+
+            // A scanned PDF has no text layer, so its pages are empty unless they are rendered as images; when the user has not
+            // enabled the render-as-images setting, the book cannot be displayed, so the user is told that the setting exists and
+            // is sent back to the library page, exactly like a book whose reader is not available or not enabled.
+            if (manifest.hasTextContent === false)
+                await notifyIfPdfImageOnlyAsync();
+        }
+
+        // Warns the user when the book is a PDF whose pages could not be displayed because they have no extractable text and the
+        // render-as-images setting is off, since enabling that setting is the way to make such a book readable, and navigates back
+        // to the library page, because the reading page cannot display anything for such a book.
+        async function notifyIfPdfImageOnlyAsync() {
+            const settings = await callApiGetAsync('@_urlService.GetAbsoluteUrl(WebRoutes.Settings.GET_USER_SETTINGS)');
+            if (settings && settings.shouldRenderPdfAsImages !== true) {
+                notificationService.show(jsLocalizedStrings.imageOnlyPdf, NotificationType.WARNING);
+                await redirectToLibraryPageAsync();
+            }
+        }
+
+        // Navigates back to the library page of the book, using the same AJAX navigation as the nav-links, so that the page is not
+        // reloaded (and, for example, the audio player is not interrupted); the library page is the one the book was opened from,
+        // and it is the only page that makes sense for a book whose reader is not available or not enabled.
+        async function redirectToLibraryPageAsync() {
+            const response = await fetch(availabilityUrl, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            if (!response.ok)
+                return;
+            const jsonResponse = await response.json();
+            if (jsonResponse.libraryId) {
+                const libraryUrl = `${libraryIndexUrl}?libraryId=${encodeURIComponent(jsonResponse.libraryId)}`;
+                await updateContentAsync(libraryUrl, true);
+            }
+        }
+
+        // Opens the reading section at the given spine index.
+        async function goToIndexAsync(index) {
+            if (!manifest || index < 0 || index >= manifest.spine.length)
+                return;
+            currentIndex = index;
+            // The status line lives outside the content container, so that replacing the section content cannot destroy it; it is
+            // shown while a section loads and hidden once the section is rendered, and a failing section load leaves it visible with
+            // the failure message.
+            readerStatus.classList.remove('hidden');
+            readerStatus.textContent = jsLocalizedStrings.loading;
+            const response = await callApiGetAsync(sectionUrlTemplate + encodeURIComponent(manifest.spine[index].locationRef));
+            if (!response) {
+                readerStatus.textContent = jsLocalizedStrings.readFailed;
+                return;
+            }
+            readerContent.innerHTML = response.contentHtml || '';
+            resolveResources();
+            updatePosition();
+            readerStatus.classList.add('hidden');
+        }
+
+        // Resolves the resource marker attributes of the rendered content, pointing them at the reading resource endpoint.
+        function resolveResources() {
+            readerContent.querySelectorAll('[data-lumina-resource]').forEach(element => {
+                const key = element.getAttribute('data-lumina-resource');
+                if (!key)
+                    return;
+                if (element.tagName === 'IMG' || element.tagName === 'SOURCE' || element.tagName === 'VIDEO' || element.tagName === 'AUDIO')
+                    element.setAttribute('src', resourceUrlTemplate + encodeURIComponent(key));
+                else if (element.tagName === 'A')
+                    element.addEventListener('click', event => {
+                        event.preventDefault();
+                        navigateToLocation(key);
+                    });
+            });
+        }
+
+        // Navigates to the reading section identified by the location reference, when it is part of the spine.
+        function navigateToLocation(locationRef) {
+            const index = manifest.spine.findIndex(item => item.locationRef === locationRef);
+            if (index >= 0)
+                goToIndexAsync(index);
+        }
+
+        // Updates the position label with the current reading section index.
+        function updatePosition() {
+            if (!manifest || manifest.spine.length === 0)
+                readerPosition.textContent = '';
+            else
+                readerPosition.textContent = `${currentIndex + 1} / ${manifest.spine.length}`;
+        }
+
+        // Renders the table of contents of the book into the table of contents panel.
+        function renderTableOfContents(entries) {
+            tocList.innerHTML = entries.map(entry => renderTableOfContentsEntry(entry)).join('');
+        }
+
+        // Renders a table of contents entry, recursively rendering its children; the label and the location reference are escaped so
+        // that a book cannot inject markup or break out of the data-location-ref attribute.
+        function renderTableOfContentsEntry(entry) {
+            const children = entry.children && entry.children.length > 0
+                ? '<ul>' + entry.children.map(child => renderTableOfContentsEntry(child)).join('') + '</ul>'
+                : '';
+            return `<li><a href="#" data-location-ref="${escapeHtml(entry.locationRef || '')}">${escapeHtml(entry.label || '')}</a>${children}</li>`;
+        }
+
+        // Toggles the visibility of the table of contents panel.
+        function handleTocToggleClick() {
+            tocPanel.classList.toggle('hidden');
+        }
+
+        // On table of contents entry click, navigates to the reading section.
+        function handleTocClick(event) {
+            const anchor = event.target.closest('a[data-location-ref]');
+            if (!anchor)
+                return;
+            event.preventDefault();
+            navigateToLocation(anchor.getAttribute('data-location-ref'));
+        }
+
+        // On back button click, returns to the previous page.
+        function handleBackClick() {
+            window.history.back();
+        }
+
+        // On previous button click, opens the previous reading section.
+        function handlePrevClick() {
+            goToIndexAsync(currentIndex - 1);
+        }
+
+        // On next button click, opens the next reading section.
+        function handleNextClick() {
+            goToIndexAsync(currentIndex + 1);
+        }
+
+        // Applies the current font size to the reading content.
+        function applyFontSize() {
+            readerContent.style.fontSize = `${fontSize}px`;
+        }
+
+        // On font size decrease button click, decreases the font size of the reading content.
+        function handleFontDecreaseClick() {
+            fontSize = Math.max(12, fontSize - 2);
+            applyFontSize();
+        }
+
+        // On font size increase button click, increases the font size of the reading content.
+        function handleFontIncreaseClick() {
+            fontSize = Math.min(32, fontSize + 2);
+            applyFontSize();
+        }
+
+        // Add listeners.
+        btnBack.addEventListener('click', handleBackClick);
+        btnTocToggle.addEventListener('click', handleTocToggleClick);
+        tocList.addEventListener('click', handleTocClick);
+        btnPrev.addEventListener('click', handlePrevClick);
+        btnNext.addEventListener('click', handleNextClick);
+        btnFontDecrease.addEventListener('click', handleFontDecreaseClick);
+        btnFontIncrease.addEventListener('click', handleFontIncreaseClick);
+        document.addEventListener('DOMContentLoaded', InitializeAsync);
+
+        // Register cleanup for these listeners.
+        cleanupFunctions.push(() => {
+            btnBack.removeEventListener('click', handleBackClick);
+            btnTocToggle.removeEventListener('click', handleTocToggleClick);
+            tocList.removeEventListener('click', handleTocClick);
+            btnPrev.removeEventListener('click', handlePrevClick);
+            btnNext.removeEventListener('click', handleNextClick);
+            btnFontDecrease.removeEventListener('click', handleFontDecreaseClick);
+            btnFontIncrease.removeEventListener('click', handleFontIncreaseClick);
+            document.removeEventListener('DOMContentLoaded', InitializeAsync);
+        });
+
+        // Initializes the reader, loading the reading manifest of the book; the DOMContentLoaded listener covers the initial
+        // full page load, while the site.js script processor invokes InitializeAsync directly after an AJAX navigation, when
+        // the DOMContentLoaded event has already fired.
+        async function InitializeAsync() {
+            if (isInitialized)
+                return;
+            isInitialized = true;
+            await loadManifestAsync();
+        }
+
+        // Store all cleanups for this view on window object using the scriptId.
+        window.viewCleanups = window.viewCleanups || {};
+        window.viewCleanups['@scriptId'] = () => {
+            cleanupFunctions.forEach(cleanup => cleanup());
+            console.log(`Unloaded @scriptId`);
+        };
+        console.log(`Loaded @scriptId`);
+    </script>
+}

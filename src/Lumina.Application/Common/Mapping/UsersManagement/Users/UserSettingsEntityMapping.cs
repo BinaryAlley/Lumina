@@ -30,7 +30,9 @@ public static class UserSettingsEntityMapping
             repositoryEntity.ItemsPerPage,
             repositoryEntity.ShouldIgnoreThePrefixForAlphaPicker,
             repositoryEntity.IsThemeCachingEnabled,
-            repositoryEntity.ShouldAggregateMetadataWhenMissing
+            repositoryEntity.ShouldAggregateMetadataWhenMissing,
+            repositoryEntity.ShouldRenderPdfAsImages,
+            repositoryEntity.ShouldPreserveBookStyles
         );
     }
 
@@ -47,7 +49,9 @@ public static class UserSettingsEntityMapping
             repositoryEntity.ItemsPerPage,
             repositoryEntity.ShouldIgnoreThePrefixForAlphaPicker,
             repositoryEntity.IsThemeCachingEnabled,
-            repositoryEntity.ShouldAggregateMetadataWhenMissing
+            repositoryEntity.ShouldAggregateMetadataWhenMissing,
+            repositoryEntity.ShouldRenderPdfAsImages,
+            repositoryEntity.ShouldPreserveBookStyles
         );
     }
 }

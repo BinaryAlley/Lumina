@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Contracts.Fixtures.Core.Requests.Plugins;
 using Lumina.Contracts.Requests.Plugins;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -13,17 +14,43 @@ namespace Lumina.Contracts.UnitTests.Requests.Plugins;
 [ExcludeFromCodeCoverage]
 public class GetLibraryMetadataProvidersRequestTests
 {
+    private readonly GetLibraryMetadataProvidersRequestFixture _getLibraryMetadataProvidersRequestFixture = new();
+
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
     };
 
     [Fact]
+    public void Create_WhenCalled_ShouldReturnValidGetLibraryMetadataProvidersRequest()
+    {
+        // Act
+        GetLibraryMetadataProvidersRequest sut = _getLibraryMetadataProvidersRequestFixture.Create();
+
+        // Assert
+        Assert.NotNull(sut);
+        Assert.NotEqual(Guid.Empty, sut.LibraryId);
+    }
+
+    [Fact]
+    public void Equality_WhenTwoInstancesHaveSameValues_ShouldBeEqual()
+    {
+        // Arrange
+        GetLibraryMetadataProvidersRequest first = _getLibraryMetadataProvidersRequestFixture.Create();
+        GetLibraryMetadataProvidersRequest second = first with { };
+
+        // Act
+        bool areEqual = first == second;
+
+        // Assert
+        Assert.True(areEqual);
+    }
+
+    [Fact]
     public void RoundTrip_WhenSerializingGetLibraryMetadataProvidersRequest_ShouldPreserveValues()
     {
         // Arrange
-        Guid libraryId = Guid.NewGuid();
-        GetLibraryMetadataProvidersRequest expected = new(libraryId);
+        GetLibraryMetadataProvidersRequest expected = _getLibraryMetadataProvidersRequestFixture.Create();
 
         // Act
         string json = JsonSerializer.Serialize(expected, _jsonOptions);
@@ -32,20 +59,5 @@ public class GetLibraryMetadataProvidersRequestTests
         // Assert
         Assert.NotNull(actual);
         Assert.Equal(expected, actual);
-    }
-
-    [Fact]
-    public void Equality_WhenTwoInstancesHaveSameValues_ShouldBeEqual()
-    {
-        // Arrange
-        Guid libraryId = Guid.NewGuid();
-        GetLibraryMetadataProvidersRequest first = new(libraryId);
-        GetLibraryMetadataProvidersRequest second = new(libraryId);
-
-        // Act
-        bool areEqual = first == second;
-
-        // Assert
-        Assert.True(areEqual);
     }
 }

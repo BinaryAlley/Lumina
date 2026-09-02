@@ -45,4 +45,16 @@
   <data name="DescriptionEnableThemeCaching" xml:space="preserve">
     <value>控制应用程序提供的主题文件是否缓存。编辑主题文件时请关闭此选项，以便更改立即生效。</value>
   </data>
+  <data name="ShouldRenderPdfAsImages" xml:space="preserve">
+    <value>将 PDF 显示为图像</value>
+  </data>
+  <data name="DescriptionShouldRenderPdfAsImages" xml:space="preserve">
+    <value>是否将 PDF 书籍渲染为页面图像，保留原始版式，但页面文本不可选择或搜索。适用于没有可提取文本的扫描 PDF。</value>
+  </data>
+  <data name="ShouldPreserveBookStyles" xml:space="preserve">
+    <value>保留书籍样式</value>
+  </data>
+  <data name="DescriptionShouldPreserveBookStyles" xml:space="preserve">
+    <value>阅读书籍时是否保留书籍内容的原始样式。启用后保留书籍的外观（字体、颜色、对齐方式），但书籍样式可以从外部服务器加载资源，这些服务器可能观察到该行为。禁用可去除样式。</value>
+  </data>
 </root>

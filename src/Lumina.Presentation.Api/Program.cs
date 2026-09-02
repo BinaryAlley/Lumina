@@ -8,6 +8,7 @@ using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using Lumina.Infrastructure.Common.DependencyInjection;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Progress;
+using Lumina.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
 using Lumina.Presentation.Api.Common.DependencyInjection;
 using Lumina.Presentation.Api.Common.Middlewares;
 using Lumina.Presentation.Api.Common.Utilities;
@@ -57,22 +58,22 @@ public class Program
         builder.Services.AddDataAccessLayerServices();
         builder.Services.AddDomainLayerServices();
 
-        // determine log path based on environment
+        // Determine log path based on environment.
         string logPath;
         if (Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true")
         {
-            logPath = Environment.GetEnvironmentVariable("LOG_PATH") ?? "/logs"; // use docker volume path
+            logPath = Environment.GetEnvironmentVariable("LOG_PATH") ?? "/logs"; // Use docker volume path.
             builder.WebHost.ConfigureKestrel(options =>
             {
-                options.ListenAnyIP(5214); // HTTP only; also, the port is also the same port exposed in the Dockerfile
+                options.ListenAnyIP(5214); // HTTP only; also, the port is also the same port exposed in the Dockerfile.
             });
         }
         else
-            logPath = Path.Combine(AppContext.BaseDirectory, "logs"); // use local binary path
+            logPath = Path.Combine(AppContext.BaseDirectory, "logs"); // Use local binary path.
         Directory.CreateDirectory(logPath);
         if (!logPath.EndsWith(Path.DirectorySeparatorChar.ToString()))
             logPath = logPath += Path.DirectorySeparatorChar;
-        // set environment variable for Serilog configuration
+        // Set environment variable for Serilog configuration.
         Environment.SetEnvironmentVariable("LOG_PATH", logPath);
 
         builder.Host.UseSerilog((context, services, configuration) =>
@@ -85,7 +86,7 @@ public class Program
 
         app.UseSerilogRequestLogging();
 
-        // apply any pending migrations
+        // Apply any pending migrations.
         using (IServiceScope scope = app.Services.CreateScope())
         {
             IServiceProvider services = scope.ServiceProvider;
@@ -94,8 +95,8 @@ public class Program
                 LuminaDbContext context = services.GetRequiredService<LuminaDbContext>();
                 await context.Database.MigrateAsync();
 
-                // enable the Write-Ahead Logging journal mode and a busy timeout, so that the Entity Framework connection and the dedicated connections
-                // used by the bulk data access operations of Dapper can access the database concurrently, without database locking errors
+                // Enable the Write-Ahead Logging journal mode and a busy timeout, so that the Entity Framework connection and the dedicated connections
+                // used by the bulk data access operations of Dapper can access the database concurrently, without database locking errors.
                 SqliteConnection sqliteConnection = new(context.Database.GetDbConnection().ConnectionString);
                 sqliteConnection.Open();
                 using SqliteCommand sqliteCommand = sqliteConnection.CreateCommand();
@@ -113,7 +114,7 @@ public class Program
         app.UseRouting();
         app.UseCors("SecurePolicy");
 
-        app.UseApiExceptionHandling(); // catches any unhandled exception and returns a ProblemDetails response
+        app.UseApiExceptionHandling(); // Catches any unhandled exception and returns a ProblemDetails response.
 
         //app.UseHttpsRedirection();
 
@@ -130,7 +131,7 @@ public class Program
             config.Endpoints.ShortNames = true;
         });
 
-        // add API documentation (OpenApi/Scalar)
+        // Add API documentation (OpenApi/Scalar).
         app.MapOpenApi();
         app.UseOpenApi(openApiDocumentMiddlewareSettings => openApiDocumentMiddlewareSettings.Path = "/openapi/{documentName}.json"); // this is needed for API versioning to work correctly with Scalar
         app.MapScalarApiReference(scalarOptions =>
@@ -138,22 +139,28 @@ public class Program
             scalarOptions.WithTitle("Lumina API")
                 .WithTheme(ScalarTheme.BluePlanet)
                 .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient)
-                //.WithFavicon() // TODO: enable when favicon is added
+                //.WithFavicon() // TODO: enable when favicon is added.
                 .WithDotNetFlag(true);
         });
 
-        // add the middleware that fires domain events and ensures eventual transactional consistency, but NOT for long-polling/WebSockets stuff like SignalR, which would keep the db locked,
-        // and NOT for the health probes, which would otherwise begin a database transaction on every probe
+        // Add the middleware that fires domain events and ensures eventual transactional consistency, but NOT for long-polling/WebSockets stuff like SignalR, which would keep the db locked,
+        // and NOT for the health probes, which would otherwise begin a database transaction on every probe.
         app.UseWhen(ctx => !ctx.Request.Path.StartsWithSegments("/scanProgressHub") && !ctx.Request.Path.StartsWithSegments("/health"), app => app.UseMiddleware<EventualConsistencyMiddleware>());
 
-        // create a directory relative to the application's startup directory, and use it to store static files that are served at the /media route on the API
+        // Create a directory relative to the application's startup directory, and use it to store static files that are served at the /media route on the API.
         string mediaRootDirectoryPathSetting = app.Configuration.GetValue<string>("MediaSettings:RootDirectory") ?? string.Empty;
         string mediaRootPath = Path.Combine(AppContext.BaseDirectory, mediaRootDirectoryPathSetting);
 
         if (!Directory.Exists(mediaRootPath))
             Directory.CreateDirectory(mediaRootPath);
 
-        // ensure the default file system structure is present
+        // Wipe the temporary directory, so that it cannot grow across restarts.
+        string readingCachePath = ReadingCachePaths.GetRootDirectory();
+        if (Directory.Exists(readingCachePath))
+            Directory.Delete(readingCachePath, recursive: true);
+        Directory.CreateDirectory(readingCachePath);
+
+        // Ensure the default file system structure is present.
         using (IServiceScope scope = app.Services.CreateScope())
         {
             IServiceProvider services = scope.ServiceProvider;            
@@ -177,7 +184,7 @@ public class Program
 
         app.MapHub<MediaLibraryScanProgressHub>("/scanProgressHub");
 
-        // the liveness probe reports whether the process is running, while the readiness probe also verifies that the database is reachable
+        // The liveness probe reports whether the process is running, while the readiness probe also verifies that the database is reachable.
         app.MapHealthChecks("/health/live", new HealthCheckOptions
         {
             Predicate = _ => false,

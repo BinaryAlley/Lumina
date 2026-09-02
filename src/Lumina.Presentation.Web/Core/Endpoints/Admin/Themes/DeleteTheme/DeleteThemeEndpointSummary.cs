@@ -22,7 +22,11 @@ public class DeleteThemeEndpointSummary : Summary<DeleteThemeEndpoint, DeleteThe
         Summary = "Deletes a theme.";
         Description = "Deletes the theme identified by the request, switching to another available theme when the deleted theme was the active one.";
 
-        RequestParam(r => r.ThemeId, "The manifest id of the theme to delete.");
+        RequestParam(r => r.ThemeId, "The manifest id of the theme to delete. Required.");
+
+        ExampleRequest = new DeleteThemeRequest(
+            ThemeId: "neon-grid"
+        );
 
         Response(200, "The theme was successfully deleted.", example: new SuccessResponse(true));
     }

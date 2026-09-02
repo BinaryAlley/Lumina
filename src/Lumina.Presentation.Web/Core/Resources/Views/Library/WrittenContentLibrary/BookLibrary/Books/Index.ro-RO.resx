@@ -45,4 +45,10 @@
   <data name="NoItemsMatchFilters" xml:space="preserve">
     <value>Niciun element nu corespunde filtrelor curente</value>
   </data>
+  <data name="ReaderUnavailable" xml:space="preserve">
+    <value>Nu există niciun cititor de cărți disponibil care să poată deschide acest format de carte.</value>
+  </data>
+  <data name="ReaderDisabled" xml:space="preserve">
+    <value>Cititorul de cărți care deschide această carte este dezactivat pentru această bibliotecă. Activați-l în setările bibliotecii pentru a citi cartea.</value>
+  </data>
 </root>

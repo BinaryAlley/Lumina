@@ -21,7 +21,11 @@ public class LoginViewEndpointSummary : Summary<LoginViewEndpoint, LoginViewRequ
         Summary = "Renders the account login view.";
         Description = "Renders the account login view, using the specified URL to return to after login.";
 
-        RequestParam(r => r.ReturnUrl, "The URL to return to, after login.");
+        RequestParam(r => r.ReturnUrl, "The URL to return to, after login. Optional.");
+
+        ExampleRequest = new LoginViewRequest(
+            ReturnUrl: "/"
+        );
 
         Response(200, "The account login view is rendered.");
     }

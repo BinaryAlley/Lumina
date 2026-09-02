@@ -53,27 +53,29 @@ public class UpdateUserSettingsCommandHandler : ICommandHandler<UpdateUserSettin
         if (validationResult.Count > 0)
             return validationResult;
 
-        // an authenticated request must always carry a user identity
+        // An authenticated request must always carry a user identity.
         Guid? currentUserId = _currentUserService.UserId;
         if (currentUserId is null)
             return Errors.Authorization.NotAuthorized;
         Guid userId = currentUserId.Value;
 
-        // get the existing settings of the current user, if any
+        // Get the existing settings of the current user, if any.
         Result<UserSettingsEntity?> getSettingsResult = await _unitOfWork.UserSettingsRepository.GetByUserIdAsync(userId, cancellationToken).ConfigureAwait(false);
         if (getSettingsResult.IsFailure)
             return getSettingsResult.Errors;
 
         if (getSettingsResult.Value is null)
         {
-            // create the settings of the current user, since they are not stored yet
+            // Create the settings of the current user, since they are not stored yet.
             Result<UserSettings> createSettingsResult = UserSettings.Create(
                 UserId.Create(userId),
                 command.IsPaginationEnabled,
                 command.ItemsPerPage,
                 command.ShouldIgnoreThePrefixForAlphaPicker,
                 command.IsThemeCachingEnabled,
-                command.ShouldAggregateMetadataWhenMissing);
+                command.ShouldAggregateMetadataWhenMissing,
+                command.ShouldRenderPdfAsImages,
+                command.ShouldPreserveBookStyles);
             if (createSettingsResult.IsFailure)
                 return createSettingsResult.Errors;
 
@@ -83,7 +85,7 @@ public class UpdateUserSettingsCommandHandler : ICommandHandler<UpdateUserSettin
         }
         else
         {
-            // update the stored settings of the current user
+            // Update the stored settings of the current user.
             Result<UserSettings> toDomainEntityResult = getSettingsResult.Value.ToDomainEntity();
             if (toDomainEntityResult.IsFailure)
                 return toDomainEntityResult.Errors;
@@ -93,7 +95,9 @@ public class UpdateUserSettingsCommandHandler : ICommandHandler<UpdateUserSettin
                 command.ItemsPerPage,
                 command.ShouldIgnoreThePrefixForAlphaPicker,
                 command.IsThemeCachingEnabled,
-                command.ShouldAggregateMetadataWhenMissing);
+                command.ShouldAggregateMetadataWhenMissing,
+                command.ShouldRenderPdfAsImages,
+                command.ShouldPreserveBookStyles);
             if (updateSettingsResult.IsFailure)
                 return updateSettingsResult.Errors;
 

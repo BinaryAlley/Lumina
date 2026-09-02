@@ -25,7 +25,9 @@ public class UpdateUserSettingsRequestMappingTests
             itemsPerPage: 48,
             shouldIgnoreThePrefixForAlphaPicker: false,
             isThemeCachingEnabled: true,
-            shouldAggregateMetadataWhenMissing: false
+            shouldAggregateMetadataWhenMissing: false,
+            shouldRenderPdfAsImages: true,
+            shouldPreserveBookStyles: true
         );
 
         // Act
@@ -37,5 +39,7 @@ public class UpdateUserSettingsRequestMappingTests
         Assert.Equal(request.ItemsPerPage, result.ItemsPerPage);
         Assert.Equal(request.ShouldIgnoreThePrefixForAlphaPicker, result.ShouldIgnoreThePrefixForAlphaPicker);
         Assert.Equal(request.IsThemeCachingEnabled, result.IsThemeCachingEnabled);
+        Assert.Equal(request.ShouldRenderPdfAsImages, result.ShouldRenderPdfAsImages);
+        Assert.Equal(request.ShouldPreserveBookStyles, result.ShouldPreserveBookStyles);
     }
 }

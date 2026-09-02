@@ -337,9 +337,18 @@
     <value>用于丰富此库项目内容的元数据提供程序，按其尝试顺序排列。</value>
   </data>
   <data name="ArtworkProviders" xml:space="preserve">
-    <value>Artwork providers</value>
+    <value>封面提供程序</value>
   </data>
   <data name="DescriptionArtworkProviders" xml:space="preserve">
-    <value>The artwork providers used to retrieve the covers of the items of this library, in the order they are tried.</value>
+    <value>用于获取此库项目封面的封面提供程序，按其尝试顺序排列。</value>
+  </data>
+  <data name="BookReaders" xml:space="preserve">
+    <value>书籍阅读器</value>
+  </data>
+  <data name="SupportedExtensions" xml:space="preserve">
+    <value>支持的扩展名</value>
+  </data>
+  <data name="DescriptionBookReaders" xml:space="preserve">
+    <value>用于阅读此库书籍的阅读器。禁用的阅读器会让用户知道该格式存在阅读器插件，但该插件已被禁用。</value>
   </data>
 </root>

@@ -45,4 +45,16 @@
   <data name="DescriptionEnableThemeCaching" xml:space="preserve">
     <value>Визначає, чи кешуються файли тем, що надаються застосунком. Вимкніть цю опцію під час редагування файлів тем, щоб зміни відображалися одразу.</value>
   </data>
+  <data name="ShouldRenderPdfAsImages" xml:space="preserve">
+    <value>Відображати PDF як зображення</value>
+  </data>
+  <data name="DescriptionShouldRenderPdfAsImages" xml:space="preserve">
+    <value>Чи відображаються книги PDF як зображення сторінок, зберігаючи оригінальний макет, але роблячи текст сторінок невибірним і недоступним для пошуку. Корисно для сканованих PDF без витягуваного тексту.</value>
+  </data>
+  <data name="ShouldPreserveBookStyles" xml:space="preserve">
+    <value>Зберігати стилі книг</value>
+  </data>
+  <data name="DescriptionShouldPreserveBookStyles" xml:space="preserve">
+    <value>Визначає, чи зберігається оригінальне оформлення вмісту книги під час її читання. Увімкнення зберігає вигляд книги (шрифти, кольори, вирівнювання), але стилі книг можуть завантажувати ресурси із зовнішніх серверів, і ті сервери можуть це спостерігати. Вимкніть, щоб прибрати стилі.</value>
+  </data>
 </root>

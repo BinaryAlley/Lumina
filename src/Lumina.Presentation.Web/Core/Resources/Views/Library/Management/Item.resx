@@ -342,4 +342,13 @@
   <data name="DescriptionArtworkProviders" xml:space="preserve">
     <value>The artwork providers used to retrieve the covers of the items of this library, in the order they are tried.</value>
   </data>
+  <data name="BookReaders" xml:space="preserve">
+    <value>Book readers</value>
+  </data>
+  <data name="SupportedExtensions" xml:space="preserve">
+    <value>Supported extensions</value>
+  </data>
+  <data name="DescriptionBookReaders" xml:space="preserve">
+    <value>The book readers used to read the books of this library. A disabled book reader lets the user know that a reader plugin exists for the format, but it is disabled.</value>
+  </data>
 </root>

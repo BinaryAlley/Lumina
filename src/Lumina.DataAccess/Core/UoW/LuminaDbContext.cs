@@ -35,6 +35,7 @@ public class LuminaDbContext : DbContext
     public virtual DbSet<PluginEntity> Plugins { get; set; } = null!;
     public virtual DbSet<LibraryMetadataProviderConfigurationEntity> LibraryMetadataProviderConfigurations { get; set; } = null!;
     public virtual DbSet<LibraryArtworkProviderConfigurationEntity> LibraryArtworkProviderConfigurations { get; set; } = null!;
+    public virtual DbSet<LibraryBookReaderConfigurationEntity> LibraryBookReaderConfigurations { get; set; } = null!;
     public virtual DbSet<ThemeEntity> Themes { get; set; } = null!;
     public virtual DbSet<MediaContributorEntity> MediaContributors { get; set; } = null!;
     public virtual DbSet<BookContributorEntity> BookContributors { get; set; } = null!;
