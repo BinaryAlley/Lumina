@@ -1,14 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using EntityFrameworkCore.Testing.NSubstitute;
 using Lumina.Application.Common.DataAccess.Entities.MediaContributors;
-using Lumina.Application.Common.DataAccess.Repositories.MediaContributors;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaContributors;
 using Lumina.DataAccess.Core.Repositories.MediaContributors;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -50,7 +48,7 @@ public class MediaContributorRepositoryTests
 
         // Assert
         Assert.False(result.IsFailure);
-        // the comparison is case-insensitive, so the existing contributor is returned and no new one is created
+        // The comparison is case-insensitive, so the existing contributor is returned and no new one is created.
         Assert.Equal(existingContributor.Id, result.Value.Id);
         Assert.Equal("Stephen King", result.Value.DisplayName);
         Assert.Single(_mockContext.ChangeTracker.Entries<MediaContributorEntity>());
@@ -111,5 +109,23 @@ public class MediaContributorRepositoryTests
         Assert.Equal(2, result.Value.Count);
         Assert.Contains(result.Value, contributor => contributor.Id == firstContributor.Id);
         Assert.Contains(result.Value, contributor => contributor.Id == thirdContributor.Id);
+    }
+
+    [Fact]
+    public async Task InsertAsync_WhenCalled_ShouldAddContributorToContextAndReturnCreated()
+    {
+        // Arrange
+        MediaContributorEntity contributor = _mediaContributorEntityFixture.Create();
+
+        // Act
+        Result<Created> result = await _sut.InsertAsync(contributor, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(Result.Created, result.Value);
+
+        EntityEntry<MediaContributorEntity>? addedContributor = _mockContext.ChangeTracker.Entries<MediaContributorEntity>()
+            .FirstOrDefault(entityEntry => entityEntry.State == EntityState.Added && entityEntry.Entity.Id == contributor.Id);
+        Assert.NotNull(addedContributor);
     }
 }

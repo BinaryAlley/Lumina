@@ -12,10 +12,10 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Core.Security;
+namespace Lumina.Infrastructure.IntegrationTests.Core.Security;
 
 /// <summary>
-/// Contains unit tests for the <see cref="FileHashService"/> class.
+/// Contains integration tests for the <see cref="FileHashService"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class FileHashServiceTests
@@ -51,7 +51,7 @@ public class FileHashServiceTests
         Assert.Equal(2, result.Count);
         Assert.Equal(2, callbackInvocationCount);
         Assert.All(result, file => Assert.NotEqual(0UL, file.CurrentHash));
-        // the hashing is parallelized, so the results are not guaranteed to be in the input order
+        // The hashing is parallelized, so the results are not guaranteed to be in the input order.
         Assert.Equal(
             inputFiles.Select(file => file.Path).OrderBy(path => path, StringComparer.Ordinal),
             result.Select(file => file.Path).OrderBy(path => path, StringComparer.Ordinal));
@@ -222,7 +222,7 @@ public class FileHashServiceTests
                 }
                 catch (IOException)
                 {
-                    // best effort cleanup of the temporary test directory
+                    // Best effort cleanup of the temporary test directory.
                 }
                 _disposed = true;
             }

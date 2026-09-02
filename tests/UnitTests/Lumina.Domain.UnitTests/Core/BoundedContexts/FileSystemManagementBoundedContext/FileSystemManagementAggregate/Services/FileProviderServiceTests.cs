@@ -255,30 +255,17 @@ public class FileProviderServiceTests
     public void GetFileAsync_WhenUserHasAccess_ShouldReturnFileContents()
     {
         // Arrange
-        string tempFilePath = Path.GetTempFileName();
-        try
-        {
-            byte[] expectedContents = [1, 2, 3, 4, 5];
-            File.WriteAllBytes(tempFilePath, expectedContents);
+        FileSystemPathId path = _fileSystemPathIdFixture.Create();
+        byte[] expectedContents = [1, 2, 3, 4, 5];
+        _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadContents).Returns(true);
+        _mockFileSystem.File.ReadAllBytes(path.Path).Returns(expectedContents);
 
-            FileSystemPathId path = _fileSystemPathIdFixture.Create(tempFilePath);
-            _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadContents).Returns(true);
+        // Act
+        Result<byte[]> result = _sut.GetFileAsync(path);
 
-            // We need to update the _fileSystem mock to use the real file system for this method
-            _mockFileSystem.File.ReadAllBytes(tempFilePath).Returns(x => File.ReadAllBytes(x.Arg<string>()));
-
-            // Act
-            Result<byte[]> result = _sut.GetFileAsync(path);
-
-            // Assert
-            Assert.False(result.IsFailure);
-            Assert.Equal(expectedContents, result.Value);
-        }
-        finally
-        {
-            // clean up
-            File.Delete(tempFilePath);
-        }
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(expectedContents, result.Value);
     }
 
     [Fact]
@@ -300,52 +287,34 @@ public class FileProviderServiceTests
     public void GetFileAsync_WhenFileIsEmpty_ShouldReturnEmptyByteArray()
     {
         // Arrange
-        string tempFilePath = Path.GetTempFileName();
-        try
-        {
-            FileSystemPathId path = _fileSystemPathIdFixture.Create(tempFilePath);
-            _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadContents).Returns(true);
+        FileSystemPathId path = _fileSystemPathIdFixture.Create();
+        _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadContents).Returns(true);
+        _mockFileSystem.File.ReadAllBytes(path.Path).Returns([]);
 
-            // Act
-            Result<byte[]> result = _sut.GetFileAsync(path);
+        // Act
+        Result<byte[]> result = _sut.GetFileAsync(path);
 
-            // Assert
-            Assert.False(result.IsFailure);
-            Assert.Empty(result.Value);
-        }
-        finally
-        {
-            // clean up
-            File.Delete(tempFilePath);
-        }
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Empty(result.Value);
     }
 
     [Fact]
     public void GetLastWriteTime_WhenUserHasAccess_ShouldReturnLastWriteTime()
     {
         // Arrange
-        string tempFilePath = Path.GetTempFileName();
-        try
-        {
-            File.WriteAllText(tempFilePath, "Test content");
-            FileSystemPathId path = _fileSystemPathIdFixture.Create(tempFilePath);
-            DateTime expectedDateTime = File.GetLastWriteTime(tempFilePath);
+        FileSystemPathId path = _fileSystemPathIdFixture.Create();
+        DateTime expectedDateTime = new(2024, 1, 2, 3, 4, 5);
+        _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties).Returns(true);
+        _mockFileSystem.File.GetLastWriteTime(path.Path).Returns(expectedDateTime);
 
-            _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties).Returns(true);
-            _mockFileSystem.File.GetLastWriteTime(path.Path).Returns(expectedDateTime);
+        // Act
+        Result<Optional<DateTime>> result = _sut.GetLastWriteTime(path);
 
-            // Act
-            Result<Optional<DateTime>> result = _sut.GetLastWriteTime(path);
-
-            // Assert
-            Assert.False(result.IsFailure);
-            Assert.True(result.Value.HasValue);
-            Assert.Equal(expectedDateTime, result.Value.Value, TimeSpan.FromSeconds(1));
-        }
-        finally
-        {
-            File.Delete(tempFilePath);
-        }
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.True(result.Value.HasValue);
+        Assert.Equal(expectedDateTime, result.Value.Value, TimeSpan.FromSeconds(1));
     }
 
     [Fact]
@@ -367,28 +336,18 @@ public class FileProviderServiceTests
     public void GetCreationTime_WhenUserHasAccess_ShouldReturnCreationTime()
     {
         // Arrange
-        string tempFilePath = Path.GetTempFileName();
-        try
-        {
-            File.WriteAllText(tempFilePath, "Test content");
-            FileSystemPathId path = _fileSystemPathIdFixture.Create(tempFilePath);
-            DateTime expectedDateTime = File.GetCreationTime(tempFilePath);
+        FileSystemPathId path = _fileSystemPathIdFixture.Create();
+        DateTime expectedDateTime = new(2024, 1, 2, 3, 4, 5);
+        _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties).Returns(true);
+        _mockFileSystem.File.GetCreationTime(path.Path).Returns(expectedDateTime);
 
-            _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties).Returns(true);
-            _mockFileSystem.File.GetCreationTime(path.Path).Returns(expectedDateTime);
+        // Act
+        Result<Optional<DateTime>> result = _sut.GetCreationTime(path);
 
-            // Act
-            Result<Optional<DateTime>> result = _sut.GetCreationTime(path);
-
-            // Assert
-            Assert.False(result.IsFailure);
-            Assert.True(result.Value.HasValue);
-            Assert.Equal(expectedDateTime, result.Value.Value, TimeSpan.FromSeconds(1));
-        }
-        finally
-        {
-            File.Delete(tempFilePath);
-        }
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.True(result.Value.HasValue);
+        Assert.Equal(expectedDateTime, result.Value.Value, TimeSpan.FromSeconds(1));
     }
 
     [Fact]
@@ -410,29 +369,20 @@ public class FileProviderServiceTests
     public void GetSize_WhenUserHasAccess_ShouldReturnFileSize()
     {
         // Arrange
-        string tempFilePath = Path.GetTempFileName();
-        try
-        {
-            string content = "Test content";
-            File.WriteAllText(tempFilePath, content);
-            FileSystemPathId path = _fileSystemPathIdFixture.Create(tempFilePath);
-            long expectedSize = new FileInfo(tempFilePath).Length;
+        FileSystemPathId path = _fileSystemPathIdFixture.Create();
+        long expectedSize = 42;
+        IFileInfo mockFileInfo = Substitute.For<IFileInfo>();
+        mockFileInfo.Length.Returns(expectedSize);
+        _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties).Returns(true);
+        _mockFileSystem.FileInfo.New(path.Path).Returns(mockFileInfo);
 
-            _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties).Returns(true);
-            _mockFileSystem.FileInfo.New(path.Path).Returns(new FileInfoWrapper(_mockFileSystem, new FileInfo(tempFilePath)));
+        // Act
+        Result<long?> result = _sut.GetSize(path);
 
-            // Act
-            Result<long?> result = _sut.GetSize(path);
-
-            // Assert
-            Assert.False(result.IsFailure);
-            Assert.NotNull(result.Value);
-            Assert.Equal(expectedSize, result.Value);
-        }
-        finally
-        {
-            File.Delete(tempFilePath);
-        }
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.NotNull(result.Value);
+        Assert.Equal(expectedSize, result.Value);
     }
 
     [Fact]
@@ -601,7 +551,7 @@ public class FileProviderServiceTests
         _mockFileSystem.Path.Combine(Arg.Any<string>(), Arg.Any<string>())
             .Returns(callInfo => Path.Combine(callInfo.ArgAt<string>(0), callInfo.ArgAt<string>(1)));
 
-        // Simulate the behavior of CreateUniqueFilePath
+        // Simulate the behavior of CreateUniqueFilePath.
         int copyNumber = 1;
         _mockFileSystem.File.Exists(Arg.Any<string>())
             .Returns(x =>
@@ -920,11 +870,11 @@ public class FileProviderServiceTests
         _mockFileSystem.FileInfo.New(path.Path).Returns(fileInfo);
         _mockFileSystem.Path.Combine(parentPath, newName).Returns(newPath);
 
-        // Mock successful creation of parent directory FileSystemPathId
+        // Mock successful creation of parent directory FileSystemPathId.
         FileSystemPathId parentDirectoryPathId = _fileSystemPathIdFixture.Create(parentPath);
         _mockFileSystem.Path.GetDirectoryName(path.Path).Returns(parentPath);
 
-        // Mock permissions: executable for the file, but not writable for the parent directory
+        // Mock permissions: executable for the file, but not writable for the parent directory.
         _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.Execute).Returns(true);
         _mockFileSystemPermissionsService.CanAccessPath(Arg.Is<FileSystemPathId>(x => x.Path == parentPath), FileAccessMode.Write).Returns(false);
 

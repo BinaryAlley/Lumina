@@ -19,10 +19,10 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.UnitTests.Core.Repositories.Libraries;
+namespace Lumina.DataAccess.IntegrationTests.Core.Repositories.Libraries;
 
 /// <summary>
-/// Contains unit tests for the <see cref="LibraryScanStagingResultsRepository"/> class.
+/// Contains integration tests for the <see cref="LibraryScanStagingResultsRepository"/> class.
 /// </summary>
 /// <remarks>
 /// The repository executes parameterized raw SQL on a dedicated database connection, so the tests exercise it against a real SQLite database
@@ -143,7 +143,7 @@ public class LibraryScanStagingResultsRepositoryTests : IDisposable
     {
         // Arrange
         (_, LibraryEntity library, Guid scanId) = await SeedScanGraphAsync();
-        // the file system discovery job seeds new items with no hash and marks them as new, needing a rehash
+        // The file system discovery job seeds new items with no hash and marks them as new, needing a rehash.
         LibraryScanStagingResultsEntity staging = _libraryScanStagingResultsEntityFixture.Create(libraryScanId: scanId, path: "/books/a.epub", contentHash: 0, previousContentHash: 0, needsRehash: true, isNew: true);
         _context.LibraryScanStagingResults.Add(staging);
         await _context.SaveChangesAsync();
@@ -223,6 +223,43 @@ public class LibraryScanStagingResultsRepositoryTests : IDisposable
         Assert.False(result.IsFailure);
         HashedFileSystemFileDto retrievedFile = Assert.Single(result.Value);
         Assert.Equal("/books/b.epub", retrievedFile.Path);
+    }
+
+    [Fact]
+    public async Task GetChangedPathsAsync_WhenStagingResultsChanged_ShouldReturnOnlyTheChangedPathsExcludingNewItems()
+    {
+        // Arrange
+        (_, _, Guid scanId) = await SeedScanGraphAsync();
+        LibraryScanStagingResultsEntity changedStaging = _libraryScanStagingResultsEntityFixture.Create(libraryScanId: scanId, path: "/books/a.epub", needsRehash: true, isNew: false);
+        LibraryScanStagingResultsEntity newStaging = _libraryScanStagingResultsEntityFixture.Create(libraryScanId: scanId, path: "/books/b.epub", needsRehash: true, isNew: true);
+        LibraryScanStagingResultsEntity unchangedStaging = _libraryScanStagingResultsEntityFixture.Create(libraryScanId: scanId, path: "/books/c.epub", needsRehash: false, isNew: false);
+        _context.LibraryScanStagingResults.AddRange(changedStaging, newStaging, unchangedStaging);
+        await _context.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyList<string>> result = await _sut.GetChangedPathsAsync(scanId, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        string changedPath = Assert.Single(result.Value);
+        Assert.Equal("/books/a.epub", changedPath);
+    }
+
+    [Fact]
+    public async Task GetChangedPathsAsync_WhenNoStagingResultsAreChanged_ShouldReturnEmptyList()
+    {
+        // Arrange
+        (_, _, Guid scanId) = await SeedScanGraphAsync();
+        LibraryScanStagingResultsEntity newStaging = _libraryScanStagingResultsEntityFixture.Create(libraryScanId: scanId, path: "/books/b.epub", needsRehash: true, isNew: true);
+        _context.LibraryScanStagingResults.Add(newStaging);
+        await _context.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyList<string>> result = await _sut.GetChangedPathsAsync(scanId, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Empty(result.Value);
     }
 
     [Fact]

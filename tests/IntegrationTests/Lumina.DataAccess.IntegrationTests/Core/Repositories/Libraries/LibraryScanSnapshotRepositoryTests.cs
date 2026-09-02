@@ -17,10 +17,10 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.UnitTests.Core.Repositories.Libraries;
+namespace Lumina.DataAccess.IntegrationTests.Core.Repositories.Libraries;
 
 /// <summary>
-/// Contains unit tests for the <see cref="LibraryScanSnapshotRepository"/> class.
+/// Contains integration tests for the <see cref="LibraryScanSnapshotRepository"/> class.
 /// </summary>
 /// <remarks>
 /// The repository executes parameterized raw SQL on a dedicated database connection, so the tests exercise it against a real SQLite database
@@ -174,7 +174,7 @@ public class LibraryScanSnapshotRepositoryTests : IDisposable
         Assert.False(result.IsFailure);
         Assert.Equal(Result.Updated, result.Value);
 
-        // audit entries: deleted, new and modified items
+        // Audit entries: deleted, new and modified items.
         List<LibraryScanResultEntity> scanResults = await _context.LibraryScanResults.AsNoTracking()
             .Where(scanResult => scanResult.LibraryScanId == scanId)
             .ToListAsync();
@@ -184,7 +184,7 @@ public class LibraryScanSnapshotRepositoryTests : IDisposable
         Assert.Contains(scanResults, scanResult => scanResult.Path == "/books/modified.epub" && scanResult.Status == LibraryScanFileStatus.Modified);
         Assert.DoesNotContain(scanResults, scanResult => scanResult.Path == "/books/keep.epub");
 
-        // the snapshot now contains the kept, new and modified items and no longer contains the deleted one
+        // The snapshot now contains the kept, new and modified items and no longer contains the deleted one.
         List<LibraryScanSnapshotEntity> snapshots = await _context.LibraryScanSnapshots.AsNoTracking()
             .Where(snapshot => snapshot.LibraryId == library.Id)
             .ToListAsync();
@@ -194,7 +194,7 @@ public class LibraryScanSnapshotRepositoryTests : IDisposable
         Assert.Contains(snapshots, snapshot => snapshot.Path == "/books/modified.epub" && snapshot.ContentHash == 400);
         Assert.DoesNotContain(snapshots, snapshot => snapshot.Path == "/books/delete.epub");
 
-        // the staging results of the scan have been cleared
+        // The staging results of the scan have been cleared.
         Assert.False(await _context.LibraryScanStagingResults.AsNoTracking().AnyAsync(staging => staging.LibraryScanId == scanId));
     }
 

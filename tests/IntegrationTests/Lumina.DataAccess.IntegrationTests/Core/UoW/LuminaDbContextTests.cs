@@ -12,10 +12,10 @@ using System.Linq;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.UnitTests.Core.UoW;
+namespace Lumina.DataAccess.IntegrationTests.Core.UoW;
 
 /// <summary>
-/// Contains unit tests for the <see cref="LuminaDbContext"/> class.
+/// Contains integration tests for the <see cref="LuminaDbContext"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class LuminaDbContextTests : IDisposable

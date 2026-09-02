@@ -9,10 +9,10 @@ using System.IO;
 using System.Linq;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Core.Plugins;
+namespace Lumina.Infrastructure.IntegrationTests.Core.Plugins;
 
 /// <summary>
-/// Contains unit tests for the <see cref="PluginLoader"/> class.
+/// Contains integration tests for the <see cref="PluginLoader"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class PluginLoaderTests
@@ -266,11 +266,11 @@ public class PluginLoaderTests
                 }
                 catch (IOException)
                 {
-                    // best effort cleanup of the temporary plugins directory
+                    // Best effort cleanup of the temporary plugins directory.
                 }
                 catch (UnauthorizedAccessException)
                 {
-                    // the plugin assemblies are still locked by their load contexts, best effort cleanup only
+                    // The plugin assemblies are still locked by their load contexts, best effort cleanup only.
                 }
                 _disposed = true;
             }

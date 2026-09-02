@@ -6,10 +6,10 @@ using System.IO;
 using System.Reflection;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Core.Plugins;
+namespace Lumina.Infrastructure.IntegrationTests.Core.Plugins;
 
 /// <summary>
-/// Contains unit tests for the <see cref="PluginLoadContext"/> class.
+/// Contains integration tests for the <see cref="PluginLoadContext"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class PluginLoadContextTests
@@ -93,11 +93,11 @@ public class PluginLoadContextTests
                 }
                 catch (IOException)
                 {
-                    // best effort cleanup of the temporary plugins directory
+                    // Best effort cleanup of the temporary plugins directory.
                 }
                 catch (UnauthorizedAccessException)
                 {
-                    // the plugin assemblies are still locked by their load contexts, best effort cleanup only
+                    // The plugin assemblies are still locked by their load contexts, best effort cleanup only.
                 }
                 _disposed = true;
             }

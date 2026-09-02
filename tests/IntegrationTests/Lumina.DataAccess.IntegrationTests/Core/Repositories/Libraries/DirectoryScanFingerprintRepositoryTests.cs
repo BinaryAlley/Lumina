@@ -17,10 +17,10 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.UnitTests.Core.Repositories.Libraries;
+namespace Lumina.DataAccess.IntegrationTests.Core.Repositories.Libraries;
 
 /// <summary>
-/// Contains unit tests for the <see cref="DirectoryScanFingerprintRepository"/> class.
+/// Contains integration tests for the <see cref="DirectoryScanFingerprintRepository"/> class.
 /// </summary>
 /// <remarks>
 /// The repository executes parameterized raw SQL on a dedicated database connection, so the tests exercise it against a real SQLite database

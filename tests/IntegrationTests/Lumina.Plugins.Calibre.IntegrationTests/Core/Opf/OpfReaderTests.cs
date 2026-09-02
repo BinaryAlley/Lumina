@@ -6,10 +6,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 #endregion
 
-namespace Lumina.Plugins.Calibre.UnitTests.Core.Opf;
+namespace Lumina.Plugins.Calibre.IntegrationTests.Core.Opf;
 
 /// <summary>
-/// Contains unit tests for the <see cref="OpfReader"/> class.
+/// Contains integration tests for the <see cref="OpfReader"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class OpfReaderTests
@@ -117,7 +117,7 @@ public class OpfReaderTests
     public void Read_WhenOpfFileDeclaresADoctypeWithEntities_ShouldNotExpandThem()
     {
         // Arrange
-        // the DTD is prohibited, so the document must not be parsed and the entity must not be expanded into the title
+        // The DTD is prohibited, so the document must not be parsed and the entity must not be expanded into the title.
         string opfFilePath = CreateOpfFile("""<?xml version="1.0" encoding="utf-8"?><!DOCTYPE package [<!ENTITY xxe SYSTEM "file:///etc/passwd">]><package xmlns="http://www.idpf.org/2007/opf"><metadata xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:title>&xxe;</dc:title></metadata></package>""");
 
         try

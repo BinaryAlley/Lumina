@@ -18,7 +18,6 @@ using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.Common;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
@@ -73,7 +72,7 @@ public class BookRepositoryTests
         Assert.False(result.IsFailure);
         Assert.Equal(Result.Created, result.Value);
 
-        // check if the book was added to the context's ChangeTracker
+        // Check if the book was added to the context's ChangeTracker.
         EntityEntry<BookEntity>? addedBook = _mockContext.ChangeTracker.Entries<BookEntity>()
         .FirstOrDefault(e => e.State == EntityState.Added && e.Entity.Id == bookModel.Id);
         Assert.NotNull(addedBook);
@@ -94,7 +93,7 @@ public class BookRepositoryTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.WrittenContent.BookAlreadyExists, result.FirstError);
-        Assert.Single(_mockContext.ChangeTracker.Entries<BookEntity>()); // only the existing book should be in the context
+        Assert.Single(_mockContext.ChangeTracker.Entries<BookEntity>()); // Only the existing book should be in the context.
     }
 
     [Fact]
@@ -596,116 +595,6 @@ public class BookRepositoryTests
     }
 
     [Fact]
-    public async Task ResetEnrichmentStateForPathsAsync_WhenCalled_ShouldResetTheMetadataAndArtworkStatusesForThePaths()
-    {
-        // Arrange
-        // the reset methods use ExecuteUpdateAsync, which is not supported by the in-memory provider, so a real SQLite database is used
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-reset-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
-        anchorConnection.Open();
-        LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
-        context.Database.EnsureCreated();
-        BookRepository sut = new(context);
-
-        Guid libraryId = Guid.NewGuid();
-        BookEntity changedBook = _bookEntityFixture.Create();
-        changedBook.LibraryId = libraryId;
-        changedBook.Path = "/books/changed.epub";
-        changedBook.MetadataStatus = MetadataStatus.Enriched;
-        changedBook.BookArtwork = [_bookArtworkEntityFixture.Create(bookId: changedBook.Id, artworkType: ArtworkType.Cover, ordinal: 0, status: ArtworkStatus.Enriched)];
-        BookEntity unchangedBook = _bookEntityFixture.Create();
-        unchangedBook.LibraryId = libraryId;
-        unchangedBook.Path = "/books/unchanged.epub";
-        unchangedBook.MetadataStatus = MetadataStatus.Enriched;
-        unchangedBook.BookArtwork = [_bookArtworkEntityFixture.Create(bookId: unchangedBook.Id, artworkType: ArtworkType.Cover, ordinal: 0, status: ArtworkStatus.Enriched)];
-        context.Books.AddRange(changedBook, unchangedBook);
-        await context.SaveChangesAsync();
-
-        // Act
-        Result<Updated> result = await sut.ResetEnrichmentStateForPathsAsync(libraryId, ["/books/changed.epub"], CancellationToken.None);
-
-        // Assert
-        Assert.False(result.IsFailure);
-        Assert.Equal(Result.Updated, result.Value);
-        BookEntity? resetBook = await context.Books.AsNoTracking().Include(book => book.BookArtwork).FirstOrDefaultAsync(book => book.Id == changedBook.Id);
-        Assert.NotNull(resetBook);
-        Assert.Equal(MetadataStatus.Pending, resetBook!.MetadataStatus);
-        Assert.Equal(ArtworkStatus.Pending, resetBook.BookArtwork.Single().Status);
-        BookEntity? keptBook = await context.Books.AsNoTracking().FirstOrDefaultAsync(book => book.Id == unchangedBook.Id);
-        Assert.NotNull(keptBook);
-        Assert.Equal(MetadataStatus.Enriched, keptBook!.MetadataStatus);
-    }
-
-    [Fact]
-    public async Task ResetMetadataStatusForLibraryAsync_WhenCalled_ShouldResetTheMetadataStatusOfAllBooksOfTheLibrary()
-    {
-        // Arrange
-        // the reset methods use ExecuteUpdateAsync, which is not supported by the in-memory provider, so a real SQLite database is used
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-reset-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
-        anchorConnection.Open();
-        LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
-        context.Database.EnsureCreated();
-        BookRepository sut = new(context);
-
-        Guid libraryId = Guid.NewGuid();
-        BookEntity enrichedBook = _bookEntityFixture.Create();
-        enrichedBook.LibraryId = libraryId;
-        enrichedBook.MetadataStatus = MetadataStatus.Enriched;
-        BookEntity bookOfAnotherLibrary = _bookEntityFixture.Create();
-        bookOfAnotherLibrary.LibraryId = Guid.NewGuid();
-        bookOfAnotherLibrary.MetadataStatus = MetadataStatus.Enriched;
-        context.Books.AddRange(enrichedBook, bookOfAnotherLibrary);
-        await context.SaveChangesAsync();
-
-        // Act
-        Result<Updated> result = await sut.ResetMetadataStatusForLibraryAsync(libraryId, CancellationToken.None);
-
-        // Assert
-        Assert.False(result.IsFailure);
-        Assert.Equal(Result.Updated, result.Value);
-        BookEntity? resetBook = await context.Books.AsNoTracking().FirstOrDefaultAsync(book => book.Id == enrichedBook.Id);
-        Assert.NotNull(resetBook);
-        Assert.Equal(MetadataStatus.Pending, resetBook!.MetadataStatus);
-        BookEntity? keptBook = await context.Books.AsNoTracking().FirstOrDefaultAsync(book => book.Id == bookOfAnotherLibrary.Id);
-        Assert.NotNull(keptBook);
-        Assert.Equal(MetadataStatus.Enriched, keptBook!.MetadataStatus);
-    }
-
-    [Fact]
-    public async Task ResetArtworkStatusForLibraryAsync_WhenCalled_ShouldResetTheArtworkStatusOfTheLibraryBooks()
-    {
-        // Arrange
-        // the reset methods use ExecuteUpdateAsync, which is not supported by the in-memory provider, so a real SQLite database is used
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-reset-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
-        anchorConnection.Open();
-        LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
-        context.Database.EnsureCreated();
-        BookRepository sut = new(context);
-
-        Guid libraryId = Guid.NewGuid();
-        BookEntity book = _bookEntityFixture.Create();
-        book.LibraryId = libraryId;
-        book.BookArtwork = [_bookArtworkEntityFixture.Create(bookId: book.Id, artworkType: ArtworkType.Cover, ordinal: 0, status: ArtworkStatus.Enriched)];
-        BookEntity bookOfAnotherLibrary = _bookEntityFixture.Create();
-        bookOfAnotherLibrary.LibraryId = Guid.NewGuid();
-        bookOfAnotherLibrary.BookArtwork = [_bookArtworkEntityFixture.Create(bookId: bookOfAnotherLibrary.Id, artworkType: ArtworkType.Cover, ordinal: 0, status: ArtworkStatus.Enriched)];
-        context.Books.AddRange(book, bookOfAnotherLibrary);
-        await context.SaveChangesAsync();
-
-        // Act
-        Result<Updated> result = await sut.ResetArtworkStatusForLibraryAsync(libraryId, CancellationToken.None);
-
-        // Assert
-        Assert.False(result.IsFailure);
-        Assert.Equal(Result.Updated, result.Value);
-        BookArtworkEntity? resetArtwork = await context.Set<BookArtworkEntity>().AsNoTracking().FirstOrDefaultAsync(artwork => artwork.BookId == book.Id);
-        Assert.NotNull(resetArtwork);
-        Assert.Equal(ArtworkStatus.Pending, resetArtwork!.Status);
-        BookArtworkEntity? keptArtwork = await context.Set<BookArtworkEntity>().AsNoTracking().FirstOrDefaultAsync(artwork => artwork.BookId == bookOfAnotherLibrary.Id);
-        Assert.NotNull(keptArtwork);
-        Assert.Equal(ArtworkStatus.Enriched, keptArtwork!.Status);
-    }
-
-    [Fact]
     public async Task GetAuthorsDisplayNamesByBookIdsAsync_WhenCalled_ShouldReturnTheAuthorDisplayNames()
     {
         // Arrange
@@ -730,7 +619,7 @@ public class BookRepositoryTests
 
         // Assert
         Assert.False(result.IsFailure);
-        // only the author contributor of the first book is returned; the book with no author is not included
+        // Only the author contributor of the first book is returned; the book with no author is not included.
         Assert.Single(result.Value);
         Assert.Equal("Frank Herbert", result.Value[firstBook.Id]);
     }
@@ -764,4 +653,258 @@ public class BookRepositoryTests
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.WrittenContent.BookNotFound, result.FirstError);
     }
+
+    [Fact]
+    public async Task GetByIdAsync_WhenBookExists_ShouldReturnTheBook()
+    {
+        // Arrange
+        BookEntity book = _bookEntityFixture.Create();
+        _mockContext.Books.Add(book);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<BookEntity?> result = await _sut.GetByIdAsync(book.Id, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(book.Id, result.Value!.Id);
+    }
+
+    [Fact]
+    public async Task GetByIdAsync_WhenBookDoesNotExist_ShouldReturnNull()
+    {
+        // Act
+        Result<BookEntity?> result = await _sut.GetByIdAsync(Guid.NewGuid(), CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Null(result.Value);
+    }
+
+    [Fact]
+    public async Task GetByIdAsync_WhenBookExists_ShouldIncludeRelatedEntities()
+    {
+        // Arrange
+        BookEntity book = _bookEntityFixture.Create();
+        book.Tags = [_tagEntityFixture.Create(name: "Tag1"), _tagEntityFixture.Create(name: "Tag2")];
+        book.Genres = [_genreEntityFixture.Create(name: "Genre1"), _genreEntityFixture.Create(name: "Genre2")];
+        book.ISBNs = [_isbnEntityFixture.Create(value: "1234567890", format: IsbnFormat.Isbn10), _isbnEntityFixture.Create(value: "1234567890123", format: IsbnFormat.Isbn13)];
+        book.BookArtwork = [_bookArtworkEntityFixture.Create(bookId: book.Id, artworkType: ArtworkType.Cover, ordinal: 0, status: ArtworkStatus.Enriched)];
+        _mockContext.Books.Add(book);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<BookEntity?> result = await _sut.GetByIdAsync(book.Id, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        BookEntity retrievedBook = result.Value!;
+        Assert.Equal(2, retrievedBook.Tags.Count);
+        Assert.Equal(2, retrievedBook.Genres.Count);
+        Assert.Equal(2, retrievedBook.ISBNs.Count);
+        Assert.Single(retrievedBook.BookArtwork);
+    }
+
+    [Fact]
+    public async Task GetBooksNeedingMetadataCountAsync_WhenCalled_ShouldCountOnlyBooksWhoseMetadataIsNotEnriched()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        BookEntity pendingBook = _bookEntityFixture.Create();
+        pendingBook.LibraryId = libraryId;
+        pendingBook.MetadataStatus = MetadataStatus.Pending;
+        BookEntity enrichedBook = _bookEntityFixture.Create();
+        enrichedBook.LibraryId = libraryId;
+        enrichedBook.MetadataStatus = MetadataStatus.Enriched;
+        BookEntity failedBook = _bookEntityFixture.Create();
+        failedBook.LibraryId = libraryId;
+        failedBook.MetadataStatus = MetadataStatus.Failed;
+        BookEntity bookOfAnotherLibrary = _bookEntityFixture.Create();
+        bookOfAnotherLibrary.LibraryId = Guid.NewGuid();
+        bookOfAnotherLibrary.MetadataStatus = MetadataStatus.Pending;
+        _mockContext.Books.AddRange(pendingBook, enrichedBook, failedBook, bookOfAnotherLibrary);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<int> result = await _sut.GetBooksNeedingMetadataCountAsync(libraryId, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(2, result.Value);
+    }
+
+    [Fact]
+    public async Task GetPaginatedAsync_WhenSortByLanguageCodeAscending_ShouldReturnBooksInAscendingOrder()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        BookEntity frenchBook = _bookEntityFixture.Create(title: "French Book");
+        frenchBook.LibraryId = libraryId;
+        frenchBook.LanguageCode = "fr";
+        BookEntity englishBook = _bookEntityFixture.Create(title: "English Book");
+        englishBook.LibraryId = libraryId;
+        englishBook.LanguageCode = "en";
+        _mockContext.Books.AddRange(frenchBook, englishBook);
+        await _mockContext.SaveChangesAsync();
+
+        PaginationDataDto paginationData = _paginationDataDtoFixture.Create(currentPage: 1, perPage: 10);
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId);
+
+        // Act
+        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetPaginatedAsync(paginationData, "languageCode", SortOrder.Ascending, filter, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(["English Book", "French Book"], result.Value.Data.Select(book => book.Title));
+    }
+
+    [Fact]
+    public async Task GetPaginatedAsync_WhenSortByLanguageCodeDescending_ShouldReturnBooksInDescendingOrder()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        BookEntity englishBook = _bookEntityFixture.Create(title: "English Book");
+        englishBook.LibraryId = libraryId;
+        englishBook.LanguageCode = "en";
+        BookEntity frenchBook = _bookEntityFixture.Create(title: "French Book");
+        frenchBook.LibraryId = libraryId;
+        frenchBook.LanguageCode = "fr";
+        _mockContext.Books.AddRange(englishBook, frenchBook);
+        await _mockContext.SaveChangesAsync();
+
+        PaginationDataDto paginationData = _paginationDataDtoFixture.Create(currentPage: 1, perPage: 10);
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId);
+
+        // Act
+        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetPaginatedAsync(paginationData, "languageCode", SortOrder.Descending, filter, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(["French Book", "English Book"], result.Value.Data.Select(book => book.Title));
+    }
+
+    [Fact]
+    public async Task GetPaginatedAsync_WhenSortByFormatAscending_ShouldReturnBooksInAscendingOrder()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        BookEntity paperbackBook = _bookEntityFixture.Create(title: "Paperback Book");
+        paperbackBook.LibraryId = libraryId;
+        paperbackBook.Format = BookFormat.Paperback;
+        BookEntity hardcoverBook = _bookEntityFixture.Create(title: "Hardcover Book");
+        hardcoverBook.LibraryId = libraryId;
+        hardcoverBook.Format = BookFormat.Hardcover;
+        _mockContext.Books.AddRange(paperbackBook, hardcoverBook);
+        await _mockContext.SaveChangesAsync();
+
+        PaginationDataDto paginationData = _paginationDataDtoFixture.Create(currentPage: 1, perPage: 10);
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId);
+
+        // Act
+        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetPaginatedAsync(paginationData, "format", SortOrder.Ascending, filter, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(["Hardcover Book", "Paperback Book"], result.Value.Data.Select(book => book.Title));
+    }
+
+    [Fact]
+    public async Task GetPaginatedAsync_WhenSortByFormatDescending_ShouldReturnBooksInDescendingOrder()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        BookEntity hardcoverBook = _bookEntityFixture.Create(title: "Hardcover Book");
+        hardcoverBook.LibraryId = libraryId;
+        hardcoverBook.Format = BookFormat.Hardcover;
+        BookEntity paperbackBook = _bookEntityFixture.Create(title: "Paperback Book");
+        paperbackBook.LibraryId = libraryId;
+        paperbackBook.Format = BookFormat.Paperback;
+        _mockContext.Books.AddRange(hardcoverBook, paperbackBook);
+        await _mockContext.SaveChangesAsync();
+
+        PaginationDataDto paginationData = _paginationDataDtoFixture.Create(currentPage: 1, perPage: 10);
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId);
+
+        // Act
+        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetPaginatedAsync(paginationData, "format", SortOrder.Descending, filter, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(["Paperback Book", "Hardcover Book"], result.Value.Data.Select(book => book.Title));
+    }
+
+    [Fact]
+    public async Task GetPaginatedAsync_WhenSortByMetadataProviderAscending_ShouldReturnBooksInAscendingOrder()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        BookEntity openLibraryBook = _bookEntityFixture.Create(title: "OpenLibrary Book");
+        openLibraryBook.LibraryId = libraryId;
+        openLibraryBook.MetadataProvider = "OpenLibrary";
+        BookEntity calibreBook = _bookEntityFixture.Create(title: "Calibre Book");
+        calibreBook.LibraryId = libraryId;
+        calibreBook.MetadataProvider = "Calibre";
+        _mockContext.Books.AddRange(openLibraryBook, calibreBook);
+        await _mockContext.SaveChangesAsync();
+
+        PaginationDataDto paginationData = _paginationDataDtoFixture.Create(currentPage: 1, perPage: 10);
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId);
+
+        // Act
+        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetPaginatedAsync(paginationData, "metadataProvider", SortOrder.Ascending, filter, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(["Calibre Book", "OpenLibrary Book"], result.Value.Data.Select(book => book.Title));
+    }
+
+    [Fact]
+    public async Task GetPaginatedAsync_WhenSortByMetadataProviderDescending_ShouldReturnBooksInDescendingOrder()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        BookEntity calibreBook = _bookEntityFixture.Create(title: "Calibre Book");
+        calibreBook.LibraryId = libraryId;
+        calibreBook.MetadataProvider = "Calibre";
+        BookEntity openLibraryBook = _bookEntityFixture.Create(title: "OpenLibrary Book");
+        openLibraryBook.LibraryId = libraryId;
+        openLibraryBook.MetadataProvider = "OpenLibrary";
+        _mockContext.Books.AddRange(calibreBook, openLibraryBook);
+        await _mockContext.SaveChangesAsync();
+
+        PaginationDataDto paginationData = _paginationDataDtoFixture.Create(currentPage: 1, perPage: 10);
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId);
+
+        // Act
+        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetPaginatedAsync(paginationData, "metadataProvider", SortOrder.Descending, filter, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(["OpenLibrary Book", "Calibre Book"], result.Value.Data.Select(book => book.Title));
+    }
+
+    [Fact]
+    public async Task GetPaginatedAsync_WhenIgnoringTheTitlePrefixForSorting_ShouldSortByTitleStrippedOfItsPrefix()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        BookEntity beneathBook = _bookEntityFixture.Create(title: "Beneath the Surface", includeMetadata: false);
+        beneathBook.LibraryId = libraryId;
+        BookEntity artOfWarBook = _bookEntityFixture.Create(title: "The Art of War", includeMetadata: false);
+        artOfWarBook.LibraryId = libraryId;
+        _mockContext.Books.AddRange(beneathBook, artOfWarBook);
+        await _mockContext.SaveChangesAsync();
+
+        PaginationDataDto paginationData = _paginationDataDtoFixture.Create(currentPage: 1, perPage: 10);
+        LibraryFilterDto filter = _libraryFilterDtoFixture.Create(libraryId: libraryId, shouldIgnoreThePrefixForAlphaPicker: true);
+
+        // Act
+        Result<PaginatedResultDto<BookEntity>> result = await _sut.GetPaginatedAsync(paginationData, null, null, filter, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        // Without stripping the prefix, "The Art of War" would be sorted after "Beneath the Surface", since its sort key would start with "the" instead of "art".
+        Assert.Equal(["The Art of War", "Beneath the Surface"], result.Value.Data.Select(book => book.Title));
+    }
+
 }

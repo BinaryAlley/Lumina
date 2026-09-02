@@ -13,10 +13,10 @@ using System.Text;
 using System.Threading;
 #endregion
 
-namespace Lumina.Plugins.Epub.UnitTests.Core.Epub;
+namespace Lumina.Plugins.Epub.IntegrationTests.Core.Epub;
 
 /// <summary>
-/// Contains unit tests for the <see cref="EpubDocumentParser"/> class.
+/// Contains integration tests for the <see cref="EpubDocumentParser"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class EpubDocumentParserTests : IDisposable

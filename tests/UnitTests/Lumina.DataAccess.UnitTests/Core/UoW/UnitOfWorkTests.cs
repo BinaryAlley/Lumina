@@ -14,6 +14,7 @@ using NSubstitute;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -54,14 +55,19 @@ public class UnitOfWorkTests
         yield return new object[] { nameof(IUnitOfWork.RoleRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.RoleRepository) };
         yield return new object[] { nameof(IUnitOfWork.UserRoleRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.UserRoleRepository) };
         yield return new object[] { nameof(IUnitOfWork.BookRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.BookRepository) };
+        yield return new object[] { nameof(IUnitOfWork.MediaContributorRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.MediaContributorRepository) };
         yield return new object[] { nameof(IUnitOfWork.DirectoryScanFingerprintRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.DirectoryScanFingerprintRepository) };
         yield return new object[] { nameof(IUnitOfWork.LibraryRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.LibraryRepository) };
         yield return new object[] { nameof(IUnitOfWork.LibraryScanRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.LibraryScanRepository) };
         yield return new object[] { nameof(IUnitOfWork.LibraryScanSnapshotRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.LibraryScanSnapshotRepository) };
         yield return new object[] { nameof(IUnitOfWork.LibraryScanStagingResultsRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.LibraryScanStagingResultsRepository) };
         yield return new object[] { nameof(IUnitOfWork.LibraryMetadataProviderConfigurationRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.LibraryMetadataProviderConfigurationRepository) };
+        yield return new object[] { nameof(IUnitOfWork.ArtworkProviderConfigurationRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.ArtworkProviderConfigurationRepository) };
+        yield return new object[] { nameof(IUnitOfWork.LibraryBookReaderConfigurationRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.LibraryBookReaderConfigurationRepository) };
         yield return new object[] { nameof(IUnitOfWork.PluginRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.PluginRepository) };
+        yield return new object[] { nameof(IUnitOfWork.ThemeRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.ThemeRepository) };
         yield return new object[] { nameof(IUnitOfWork.UserRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.UserRepository) };
+        yield return new object[] { nameof(IUnitOfWork.UserSettingsRepository), (Func<UnitOfWork, object>)(unitOfWork => unitOfWork.UserSettingsRepository) };
     }
 
     [Theory]
