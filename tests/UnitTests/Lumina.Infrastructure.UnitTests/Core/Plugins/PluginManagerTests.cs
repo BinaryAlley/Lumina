@@ -5,7 +5,6 @@ using NSubstitute;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 #endregion
 
 namespace Lumina.Infrastructure.UnitTests.Core.Plugins;
@@ -22,7 +21,7 @@ public class PluginManagerTests
         // Arrange
         IPlugin firstPlugin = CreatePlugin(Guid.NewGuid(), "First Plugin");
         IPlugin secondPlugin = CreatePlugin(Guid.NewGuid(), "Second Plugin");
-        PluginManager sut = new([firstPlugin, secondPlugin]);
+        PluginManager sut = new([firstPlugin, secondPlugin], []);
 
         // Act
         IReadOnlyList<IPlugin> result = sut.GetPlugins();
@@ -37,7 +36,7 @@ public class PluginManagerTests
     public void GetPlugins_WhenNoPluginsWereLoaded_ShouldReturnEmptyList()
     {
         // Arrange
-        PluginManager sut = new([]);
+        PluginManager sut = new([], []);
 
         // Act
         IReadOnlyList<IPlugin> result = sut.GetPlugins();
@@ -52,7 +51,7 @@ public class PluginManagerTests
         // Arrange
         Guid pluginId = Guid.NewGuid();
         IPlugin expectedPlugin = CreatePlugin(pluginId, "Expected Plugin");
-        PluginManager sut = new([expectedPlugin, CreatePlugin(Guid.NewGuid(), "Other Plugin")]);
+        PluginManager sut = new([expectedPlugin, CreatePlugin(Guid.NewGuid(), "Other Plugin")], []);
 
         // Act
         IPlugin? result = sut.GetPlugin(pluginId);
@@ -65,7 +64,7 @@ public class PluginManagerTests
     public void GetPlugin_WhenPluginWithIdWasNotLoaded_ShouldReturnNull()
     {
         // Arrange
-        PluginManager sut = new([CreatePlugin(Guid.NewGuid(), "Loaded Plugin")]);
+        PluginManager sut = new([CreatePlugin(Guid.NewGuid(), "Loaded Plugin")], []);
 
         // Act
         IPlugin? result = sut.GetPlugin(Guid.NewGuid());

@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.Management;
 using Lumina.Contracts.Requests.MediaLibrary.Management;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -13,17 +14,43 @@ namespace Lumina.Contracts.UnitTests.Requests.MediaLibrary.Management;
 [ExcludeFromCodeCoverage]
 public class GetLibraryRequestTests
 {
+    private readonly GetLibraryRequestFixture _getLibraryRequestFixture = new();
+
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
     };
 
     [Fact]
+    public void Create_WhenCalled_ShouldReturnValidGetLibraryRequest()
+    {
+        // Act
+        GetLibraryRequest sut = _getLibraryRequestFixture.Create();
+
+        // Assert
+        Assert.NotNull(sut);
+        Assert.NotEqual(Guid.Empty, sut.Id);
+    }
+
+    [Fact]
+    public void Equality_WhenTwoInstancesHaveSameValues_ShouldBeEqual()
+    {
+        // Arrange
+        GetLibraryRequest first = _getLibraryRequestFixture.Create();
+        GetLibraryRequest second = first with { };
+
+        // Act
+        bool areEqual = first == second;
+
+        // Assert
+        Assert.True(areEqual);
+    }
+
+    [Fact]
     public void RoundTrip_WhenSerializingGetLibraryRequest_ShouldPreserveValues()
     {
         // Arrange
-        Guid id = Guid.NewGuid();
-        GetLibraryRequest expected = new(id);
+        GetLibraryRequest expected = _getLibraryRequestFixture.Create();
 
         // Act
         string json = JsonSerializer.Serialize(expected, _jsonOptions);
@@ -32,20 +59,5 @@ public class GetLibraryRequestTests
         // Assert
         Assert.NotNull(actual);
         Assert.Equal(expected, actual);
-    }
-
-    [Fact]
-    public void Equality_WhenTwoInstancesHaveSameValues_ShouldBeEqual()
-    {
-        // Arrange
-        Guid id = Guid.NewGuid();
-        GetLibraryRequest first = new(id);
-        GetLibraryRequest second = new(id);
-
-        // Act
-        bool areEqual = first == second;
-
-        // Assert
-        Assert.True(areEqual);
     }
 }

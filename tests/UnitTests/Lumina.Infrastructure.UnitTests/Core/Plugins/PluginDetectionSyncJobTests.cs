@@ -71,6 +71,8 @@ public class PluginDetectionSyncJobTests
             .Returns(Result.Deleted);
         _mockProviderConfigurationStore.EnsureProviderConfigurationsAsync(Arg.Any<Guid>(), Arg.Any<LibraryType>(), Arg.Any<CancellationToken>())
             .Returns(Result.Success);
+        _mockProviderConfigurationStore.EnsureBookReaderConfigurationsAsync(Arg.Any<Guid>(), Arg.Any<LibraryType>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Success);
         _mockServiceProvider.GetService(typeof(IUnitOfWork)).Returns(_mockUnitOfWork);
         _mockServiceProvider.GetService(typeof(IMediaLibraryProviderConfigurationStore)).Returns(_mockProviderConfigurationStore);
 
@@ -222,6 +224,7 @@ public class PluginDetectionSyncJobTests
 
         // Assert
         await _mockProviderConfigurationStore.Received(1).EnsureProviderConfigurationsAsync(bookLibrary.Id, LibraryType.Book, Arg.Any<CancellationToken>());
+        await _mockProviderConfigurationStore.Received(1).EnsureBookReaderConfigurationsAsync(bookLibrary.Id, LibraryType.Book, Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 

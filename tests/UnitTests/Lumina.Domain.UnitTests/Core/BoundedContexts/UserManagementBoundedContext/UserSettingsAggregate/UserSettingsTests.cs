@@ -35,6 +35,8 @@ public class UserSettingsTests
         Assert.Equal(48, result.Value.ItemsPerPage);
         Assert.False(result.Value.ShouldIgnoreThePrefixForAlphaPicker);
         Assert.False(result.Value.ShouldAggregateMetadataWhenMissing);
+        Assert.False(result.Value.ShouldRenderPdfAsImages);
+        Assert.True(result.Value.ShouldPreserveBookStyles);
     }
 
     [Fact]
@@ -50,6 +52,8 @@ public class UserSettingsTests
         Assert.Equal(48, result.Value.ItemsPerPage);
         Assert.False(result.Value.ShouldIgnoreThePrefixForAlphaPicker);
         Assert.False(result.Value.ShouldAggregateMetadataWhenMissing);
+        Assert.False(result.Value.ShouldRenderPdfAsImages);
+        Assert.True(result.Value.ShouldPreserveBookStyles);
     }
 
     [Fact]
@@ -73,7 +77,7 @@ public class UserSettingsTests
         UserId userId = _userIdFixture.Create();
 
         // Act
-        Result<UserSettings> result = UserSettings.Create(userId, isPaginationEnabled: false, itemsPerPage: 24, shouldIgnoreThePrefixForAlphaPicker: true, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: true);
+        Result<UserSettings> result = UserSettings.Create(userId, isPaginationEnabled: false, itemsPerPage: 24, shouldIgnoreThePrefixForAlphaPicker: true, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: true, shouldRenderPdfAsImages: true, shouldPreserveBookStyles: true);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -83,6 +87,8 @@ public class UserSettingsTests
         Assert.True(result.Value.ShouldIgnoreThePrefixForAlphaPicker);
         Assert.True(result.Value.IsThemeCachingEnabled);
         Assert.True(result.Value.ShouldAggregateMetadataWhenMissing);
+        Assert.True(result.Value.ShouldRenderPdfAsImages);
+        Assert.True(result.Value.ShouldPreserveBookStyles);
     }
 
     [Fact]
@@ -108,7 +114,7 @@ public class UserSettingsTests
         UserId userId = _userIdFixture.Create();
 
         // Act
-        Result<UserSettings> result = UserSettings.Create(userId, isPaginationEnabled: true, itemsPerPage: itemsPerPage, shouldIgnoreThePrefixForAlphaPicker: false, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: false);
+        Result<UserSettings> result = UserSettings.Create(userId, isPaginationEnabled: true, itemsPerPage: itemsPerPage, shouldIgnoreThePrefixForAlphaPicker: false, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: false, shouldRenderPdfAsImages: false, shouldPreserveBookStyles: false);
 
         // Assert
         Assert.True(result.IsFailure);
@@ -122,7 +128,7 @@ public class UserSettingsTests
         UserSettings userSettings = _userSettingsFixture.Create();
 
         // Act
-        Result<Updated> result = userSettings.UpdateSettings(isPaginationEnabled: false, itemsPerPage: 12, shouldIgnoreThePrefixForAlphaPicker: true, isThemeCachingEnabled: false, shouldAggregateMetadataWhenMissing: true);
+        Result<Updated> result = userSettings.UpdateSettings(isPaginationEnabled: false, itemsPerPage: 12, shouldIgnoreThePrefixForAlphaPicker: true, isThemeCachingEnabled: false, shouldAggregateMetadataWhenMissing: true, shouldRenderPdfAsImages: true, shouldPreserveBookStyles: true);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -131,6 +137,8 @@ public class UserSettingsTests
         Assert.True(userSettings.ShouldIgnoreThePrefixForAlphaPicker);
         Assert.False(userSettings.IsThemeCachingEnabled);
         Assert.True(userSettings.ShouldAggregateMetadataWhenMissing);
+        Assert.True(userSettings.ShouldRenderPdfAsImages);
+        Assert.True(userSettings.ShouldPreserveBookStyles);
     }
 
     [Theory]
@@ -142,7 +150,7 @@ public class UserSettingsTests
         UserSettings userSettings = _userSettingsFixture.Create();
 
         // Act
-        Result<Updated> result = userSettings.UpdateSettings(isPaginationEnabled: true, itemsPerPage: itemsPerPage, shouldIgnoreThePrefixForAlphaPicker: false, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: false);
+        Result<Updated> result = userSettings.UpdateSettings(isPaginationEnabled: true, itemsPerPage: itemsPerPage, shouldIgnoreThePrefixForAlphaPicker: false, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: false, shouldRenderPdfAsImages: false, shouldPreserveBookStyles: false);
 
         // Assert
         Assert.True(result.IsFailure);

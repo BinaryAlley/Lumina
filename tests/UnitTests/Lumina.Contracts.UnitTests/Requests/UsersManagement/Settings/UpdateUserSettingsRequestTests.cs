@@ -49,11 +49,13 @@ public class UpdateUserSettingsRequestTests
             itemsPerPage: 25,
             shouldIgnoreThePrefixForAlphaPicker: false,
             isThemeCachingEnabled: false,
-            shouldAggregateMetadataWhenMissing: false
+            shouldAggregateMetadataWhenMissing: false,
+            shouldRenderPdfAsImages: true,
+            shouldPreserveBookStyles: true
         );
 
         // Act
-        (bool isPaginationEnabled, int itemsPerPage, bool shouldIgnoreThePrefixForAlphaPicker, bool isThemeCachingEnabled, bool shouldAggregateMetadataWhenMissing) = sut;
+        (bool isPaginationEnabled, int itemsPerPage, bool shouldIgnoreThePrefixForAlphaPicker, bool isThemeCachingEnabled, bool shouldAggregateMetadataWhenMissing, bool shouldRenderPdfAsImages, bool shouldPreserveBookStyles) = sut;
 
         // Assert
         Assert.Equal(sut.IsPaginationEnabled, isPaginationEnabled);
@@ -61,5 +63,7 @@ public class UpdateUserSettingsRequestTests
         Assert.Equal(sut.ShouldIgnoreThePrefixForAlphaPicker, shouldIgnoreThePrefixForAlphaPicker);
         Assert.Equal(sut.IsThemeCachingEnabled, isThemeCachingEnabled);
         Assert.Equal(sut.ShouldAggregateMetadataWhenMissing, shouldAggregateMetadataWhenMissing);
+        Assert.Equal(sut.ShouldRenderPdfAsImages, shouldRenderPdfAsImages);
+        Assert.Equal(sut.ShouldPreserveBookStyles, shouldPreserveBookStyles);
     }
 }

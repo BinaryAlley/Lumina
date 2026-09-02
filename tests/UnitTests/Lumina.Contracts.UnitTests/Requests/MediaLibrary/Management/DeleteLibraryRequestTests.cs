@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.Management;
 using Lumina.Contracts.Requests.MediaLibrary.Management;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -13,17 +14,43 @@ namespace Lumina.Contracts.UnitTests.Requests.MediaLibrary.Management;
 [ExcludeFromCodeCoverage]
 public class DeleteLibraryRequestTests
 {
+    private readonly DeleteLibraryRequestFixture _deleteLibraryRequestFixture = new();
+
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
     };
 
     [Fact]
+    public void Create_WhenCalled_ShouldReturnValidDeleteLibraryRequest()
+    {
+        // Act
+        DeleteLibraryRequest sut = _deleteLibraryRequestFixture.Create();
+
+        // Assert
+        Assert.NotNull(sut);
+        Assert.NotEqual(Guid.Empty, sut.Id);
+    }
+
+    [Fact]
+    public void Equality_WhenTwoInstancesHaveSameValues_ShouldBeEqual()
+    {
+        // Arrange
+        DeleteLibraryRequest first = _deleteLibraryRequestFixture.Create();
+        DeleteLibraryRequest second = first with { };
+
+        // Act
+        bool areEqual = first == second;
+
+        // Assert
+        Assert.True(areEqual);
+    }
+
+    [Fact]
     public void RoundTrip_WhenSerializingDeleteLibraryRequest_ShouldPreserveValues()
     {
         // Arrange
-        Guid id = Guid.NewGuid();
-        DeleteLibraryRequest expected = new(id);
+        DeleteLibraryRequest expected = _deleteLibraryRequestFixture.Create();
 
         // Act
         string json = JsonSerializer.Serialize(expected, _jsonOptions);
@@ -32,20 +59,5 @@ public class DeleteLibraryRequestTests
         // Assert
         Assert.NotNull(actual);
         Assert.Equal(expected, actual);
-    }
-
-    [Fact]
-    public void Equality_WhenTwoInstancesHaveSameValues_ShouldBeEqual()
-    {
-        // Arrange
-        Guid id = Guid.NewGuid();
-        DeleteLibraryRequest first = new(id);
-        DeleteLibraryRequest second = new(id);
-
-        // Act
-        bool areEqual = first == second;
-
-        // Assert
-        Assert.True(areEqual);
     }
 }

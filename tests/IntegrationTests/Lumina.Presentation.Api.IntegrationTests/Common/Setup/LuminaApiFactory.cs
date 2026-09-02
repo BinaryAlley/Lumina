@@ -66,8 +66,10 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
             config.AddInMemoryCollection(initialData: new Dictionary<string, string?>
             {
                 ["JwtSettings:SecretKey"] = "test-key-thats-at-least-32-chars-long-for-jwt",
+                ["JwtSettings:ExpiryMinutes"] = "60",
                 ["JwtSettings:Issuer"] = "test-issuer",
                 ["JwtSettings:Audience"] = "test-audience",
+                ["CorsSettings:AllowedOrigins:0"] = "http://localhost:5012",
                 ["EncryptionSettings:SecretKey"] = TEST_ENCRYPTION_KEY // base64 encoded test key
             });
         });

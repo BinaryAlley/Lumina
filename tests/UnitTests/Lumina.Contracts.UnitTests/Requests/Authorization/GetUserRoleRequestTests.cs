@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Contracts.Fixtures.Core.Requests.Authorization;
 using Lumina.Contracts.Requests.Authorization;
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 #endregion
@@ -13,17 +13,39 @@ namespace Lumina.Contracts.UnitTests.Requests.Authorization;
 [ExcludeFromCodeCoverage]
 public class GetUserRoleRequestTests
 {
+    private readonly GetUserRoleRequestFixture _getUserRoleRequestFixture = new();
+
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
     };
 
     [Fact]
+    public void Create_WhenCalled_ShouldReturnValidGetUserRoleRequest()
+    {
+        // Act
+        GetUserRoleRequest sut = _getUserRoleRequestFixture.Create();
+
+        // Assert
+        Assert.NotNull(sut);
+        Assert.True(sut.UserId.HasValue);
+    }
+
+    [Fact]
+    public void Constructor_WhenPassingNullUserId_ShouldReturnNullUserId()
+    {
+        // Act
+        GetUserRoleRequest sut = new(UserId: null);
+
+        // Assert
+        Assert.Null(sut.UserId);
+    }
+
+    [Fact]
     public void RoundTrip_WhenSerializingGetUserRoleRequest_ShouldPreserveValues()
     {
         // Arrange
-        Guid userId = Guid.NewGuid();
-        GetUserRoleRequest expected = new(userId);
+        GetUserRoleRequest expected = _getUserRoleRequestFixture.Create();
 
         // Act
         string json = JsonSerializer.Serialize(expected, _jsonOptions);
@@ -32,20 +54,5 @@ public class GetUserRoleRequestTests
         // Assert
         Assert.NotNull(actual);
         Assert.Equal(expected, actual);
-    }
-
-    [Fact]
-    public void RoundTrip_WhenSerializingGetUserRoleRequestWithNullUserId_ShouldPreserveNull()
-    {
-        // Arrange
-        GetUserRoleRequest expected = new(null);
-
-        // Act
-        string json = JsonSerializer.Serialize(expected, _jsonOptions);
-        GetUserRoleRequest? actual = JsonSerializer.Deserialize<GetUserRoleRequest>(json, _jsonOptions);
-
-        // Assert
-        Assert.NotNull(actual);
-        Assert.Null(actual.UserId);
     }
 }

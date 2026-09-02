@@ -83,6 +83,7 @@ public class BooksIndexViewEndpointTests
             .Returns(expectedLibrary);
         _mockUrlService.GetAbsoluteUrl(WebRoutes.Books.GET_LIBRARY_ITEMS).Returns("http://localhost/en-us/library/written-content-library/books-library/books/api-get-library-items");
         _mockUrlService.GetAbsoluteUrl(WebRoutes.Settings.GET_USER_SETTINGS).Returns("http://localhost/en-us/tools/settings/api-get-user-settings");
+        _mockUrlService.GetAbsoluteUrl(WebRoutes.Books.READ, Arg.Any<object>()).Returns("http://localhost/en-us/library/written-content-library/books-library/books/00000000-0000-0000-0000-000000000000/read");
         _mockThemePageRenderer.RenderAsync(Arg.Any<ThemePageDto>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(_themePageRenderResultDtoFixture.Create(content: "<section>content</section>", script: "<script>script</script>")));
 
@@ -101,6 +102,10 @@ public class BooksIndexViewEndpointTests
                 string.Equals(
                     page.PageData["itemsUrl"] as string,
                     "http://localhost/en-us/library/written-content-library/books-library/books/api-get-library-items",
+                    StringComparison.Ordinal) &&
+                string.Equals(
+                    page.PageData["readUrl"] as string,
+                    "http://localhost/en-us/library/written-content-library/books-library/books/00000000-0000-0000-0000-000000000000/read",
                     StringComparison.Ordinal)),
             Arg.Is<string?>(requestedThemeId => requestedThemeId == null),
             Arg.Any<CancellationToken>());

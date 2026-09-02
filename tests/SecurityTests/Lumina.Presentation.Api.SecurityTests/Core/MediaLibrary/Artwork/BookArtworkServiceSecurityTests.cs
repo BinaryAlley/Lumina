@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Infrastructure.Models.DTO.Configuration;
-using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Artwork;
+using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Artwork;
 using Lumina.Application.Fixtures.Common.Infrastructure.Models.DTO.Configuration;
 using Lumina.Contracts.Fixtures.Core.DTO.Common;
 using Lumina.Domain.Common.Errors;

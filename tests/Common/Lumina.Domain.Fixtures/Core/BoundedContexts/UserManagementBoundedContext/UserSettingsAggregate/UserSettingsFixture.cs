@@ -25,6 +25,8 @@ public class UserSettingsFixture
     /// <param name="shouldIgnoreThePrefixForAlphaPicker">Whether the "The" prefix of library item titles is ignored by the alpha picker.</param>
     /// <param name="isThemeCachingEnabled">Whether the theme data served to this user is cached.</param>
     /// <param name="shouldAggregateMetadataWhenMissing">Whether the metadata of the media library items is aggregated from multiple providers, when fields are missing.</param>
+    /// <param name="shouldRenderPdfAsImages">Whether PDF books are rendered as page images for the user.</param>
+    /// <param name="shouldPreserveBookStyles">Whether the styles of the book content are preserved when it is rendered for the user.</param>
     /// <returns>The created <see cref="UserSettings"/>.</returns>
     public UserSettings Create(
         Guid? userId = null,
@@ -32,7 +34,9 @@ public class UserSettingsFixture
         int itemsPerPage = 48,
         bool shouldIgnoreThePrefixForAlphaPicker = false,
         bool isThemeCachingEnabled = true,
-        bool shouldAggregateMetadataWhenMissing = false)
+        bool shouldAggregateMetadataWhenMissing = false,
+        bool shouldRenderPdfAsImages = false,
+        bool shouldPreserveBookStyles = true)
     {
         Result<UserSettings> settings = UserSettings.Create(
             userId is null ? UserId.CreateUnique() : UserId.Create(userId.Value),
@@ -40,7 +44,9 @@ public class UserSettingsFixture
             itemsPerPage,
             shouldIgnoreThePrefixForAlphaPicker,
             isThemeCachingEnabled,
-            shouldAggregateMetadataWhenMissing);
+            shouldAggregateMetadataWhenMissing,
+            shouldRenderPdfAsImages,
+            shouldPreserveBookStyles);
         return settings.Value;
     }
 
