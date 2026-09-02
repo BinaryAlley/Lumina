@@ -4,7 +4,7 @@ using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentL
 using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Infrastructure.Security;
-using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Artwork;
+using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Artwork;
 using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Domain.Common.Events;

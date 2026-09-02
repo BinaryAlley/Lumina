@@ -22,8 +22,13 @@ public class CancelLibraryScanEndpointSummary : Summary<CancelLibraryScanEndpoin
         Summary = "Cancels the scan of a media library.";
         Description = "Cancels a running scan of the media library identified by the request.";
 
-        RequestParam(r => r.LibraryId, "The unique identifier of the media library whose scan is cancelled.");
-        RequestParam(r => r.ScanId, "The Id of the scan to cancel.");
+        RequestParam(r => r.LibraryId, "The unique identifier of the media library whose scan is cancelled. Required.");
+        RequestParam(r => r.ScanId, "The Id of the scan to cancel. Required.");
+
+        ExampleRequest = new CancelLibraryScanRequest(
+            LibraryId: Guid.NewGuid(),
+            ScanId: Guid.NewGuid()
+        );
 
         Response(200, "The scan of the media library is cancelled.", example: new SuccessResponse(true));
     }

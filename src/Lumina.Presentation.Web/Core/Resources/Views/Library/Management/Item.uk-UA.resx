@@ -337,9 +337,18 @@
     <value>Постачальники метаданих, які використовуються для збагачення елементів цієї бібліотеки, у порядку, в якому вони випробовуються.</value>
   </data>
   <data name="ArtworkProviders" xml:space="preserve">
-    <value>Artwork providers</value>
+    <value>Постачальники обкладинок</value>
   </data>
   <data name="DescriptionArtworkProviders" xml:space="preserve">
-    <value>The artwork providers used to retrieve the covers of the items of this library, in the order they are tried.</value>
+    <value>Постачальники обкладинок, які використовуються для отримання обкладинок елементів цієї бібліотеки, у порядку, в якому вони випробовуються.</value>
+  </data>
+  <data name="BookReaders" xml:space="preserve">
+    <value>Читачі книг</value>
+  </data>
+  <data name="SupportedExtensions" xml:space="preserve">
+    <value>Підтримувані розширення</value>
+  </data>
+  <data name="DescriptionBookReaders" xml:space="preserve">
+    <value>Читачі книг, які використовуються для читання книг цієї бібліотеки. Вимкнений читач повідомляє користувача про те, що для цього формату існує плагін для читання, але він вимкнений.</value>
   </data>
 </root>

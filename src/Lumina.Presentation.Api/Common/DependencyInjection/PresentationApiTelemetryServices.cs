@@ -16,7 +16,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Lumina.Presentation.Api.Common.DependencyInjection;
 
 /// <summary>
-/// Contains the OpenTelemetry services of the Presentation API layer.
+/// Utility class for registering the OpenTelemetry services of the Presentation Api layer into the Dependency Injection container.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public static class PresentationApiTelemetryServices
@@ -25,10 +25,10 @@ public static class PresentationApiTelemetryServices
     private const string ENTITY_FRAMEWORK_CORE_METER_NAME = "Microsoft.EntityFrameworkCore";
 
     /// <summary>
-    /// Registers the OpenTelemetry tracing and metrics pipelines into the dependency injection container.
+    /// Registers the OpenTelemetry services of the Presentation Api layer into the Dependency Injection container.
     /// </summary>
     /// <param name="services">The service collection to add the services to.</param>
-    /// <param name="configuration">Application configuration properties.</param>
+    /// <param name="configuration">The configuration used to read the application configuration.</param>
     /// <param name="environment">The hosting environment of the application.</param>
     /// <returns>The updated <see cref="IServiceCollection"/>.</returns>
     public static IServiceCollection AddPresentationApiTelemetryServices(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment environment)

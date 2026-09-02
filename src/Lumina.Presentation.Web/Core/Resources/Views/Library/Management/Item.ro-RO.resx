@@ -337,9 +337,18 @@
     <value>Furnizorii de metadate folosiți pentru a îmbogăți elementele acestei biblioteci, în ordinea în care sunt încercați.</value>
   </data>
   <data name="ArtworkProviders" xml:space="preserve">
-    <value>Artwork providers</value>
+    <value>Furnizori de coperți</value>
   </data>
   <data name="DescriptionArtworkProviders" xml:space="preserve">
-    <value>The artwork providers used to retrieve the covers of the items of this library, in the order they are tried.</value>
+    <value>Furnizorii de coperți folosiți pentru a recupera coperțile elementelor acestei biblioteci, în ordinea în care sunt încercați.</value>
+  </data>
+  <data name="BookReaders" xml:space="preserve">
+    <value>Cititori de cărți</value>
+  </data>
+  <data name="SupportedExtensions" xml:space="preserve">
+    <value>Extensii acceptate</value>
+  </data>
+  <data name="DescriptionBookReaders" xml:space="preserve">
+    <value>Cititorii de cărți folosiți pentru a citi cărțile acestei biblioteci. Un cititor dezactivat îi permite utilizatorului să știe că există un plugin de citire pentru format, dar este dezactivat.</value>
   </data>
 </root>

@@ -23,7 +23,11 @@ public class GetArtworkProvidersEndpointSummary : Summary<GetArtworkProvidersEnd
         Summary = "Retrieves the artwork providers of a media library.";
         Description = "Retrieves the artwork providers of the media library identified by the request.";
 
-        RequestParam(r => r.LibraryId, "The unique identifier of the media library whose artwork providers are retrieved.");
+        RequestParam(r => r.LibraryId, "The unique identifier of the media library whose artwork providers are retrieved. Required.");
+
+        ExampleRequest = new GetArtworkProvidersRequest(
+            LibraryId: Guid.NewGuid()
+        );
 
         Response(200, "The artwork providers of the media library are returned.", example: new SuccessResponse<LibraryArtworkProviderDto[]>(true, default));
     }

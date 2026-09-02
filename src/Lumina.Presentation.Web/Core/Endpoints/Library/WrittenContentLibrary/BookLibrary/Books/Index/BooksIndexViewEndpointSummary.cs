@@ -21,7 +21,11 @@ public class BooksIndexViewEndpointSummary : Summary<BooksIndexViewEndpoint, Get
         Summary = "Renders the books browsing view.";
         Description = "Renders the view for browsing the books of the media library identified by the request.";
 
-        RequestParam(r => r.LibraryId, "Optional. The unique identifier of the media library whose books are browsed.");
+        RequestParam(r => r.LibraryId, "The unique identifier of the media library whose books are browsed. Optional.");
+
+        ExampleRequest = new GetBooksViewRequest(
+            LibraryId: Guid.NewGuid()
+        );
 
         Response(200, "The view for browsing the books of the media library is rendered.");
     }

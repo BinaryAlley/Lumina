@@ -22,8 +22,12 @@ public class SplitPathEndpointSummary : Summary<SplitPathEndpoint, SplitPathRequ
         Summary = "Splits a file system path into its segments.";
         Description = "Splits the file system path identified by the request into its path segments.";
 
-        RequestParam(r => r.Path, "The file system path for which to get the path segments.");
+        RequestParam(r => r.Path, "The file system path for which to get the path segments. Required.");
 
-        Response(200, "The path segments of the file system path are returned.", example: new { success = true, data = new { pathSegments = new PathSegmentDto[] { } } });
+        ExampleRequest = new SplitPathRequest(
+            Path: "/media/movies/"
+        );
+
+        Response(200, "The path segments of the file system path are returned.", example: new { success = true, data = new { pathSegments = Array.Empty<PathSegmentDto>() } });
     }
 }

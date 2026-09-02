@@ -45,4 +45,16 @@
   <data name="DescriptionEnableThemeCaching" xml:space="preserve">
     <value>Controlează dacă fișierele temelor servite de aplicație sunt puse în cache. Dezactivați această opțiune în timp ce editați fișierele temelor, pentru ca modificările să apară imediat.</value>
   </data>
+  <data name="ShouldRenderPdfAsImages" xml:space="preserve">
+    <value>Afișează PDF-urile ca imagini</value>
+  </data>
+  <data name="DescriptionShouldRenderPdfAsImages" xml:space="preserve">
+    <value>Dacă cărțile PDF sunt afișate ca imagini ale paginilor, păstrând aspectul original, dar făcând textul paginilor neselectabil și necăutabil. Util pentru PDF-urile scanate fără text extractibil.</value>
+  </data>
+  <data name="ShouldPreserveBookStyles" xml:space="preserve">
+    <value>Păstrează stilurile cărților</value>
+  </data>
+  <data name="DescriptionShouldPreserveBookStyles" xml:space="preserve">
+    <value>Dacă stilul original al conținutului cărții este păstrat atunci când citiți o carte. Activarea păstrează aspectul cărții (fonturi, culori, aliniere), dar stilurile cărților pot încărca resurse de pe servere externe, pe care acele servere le-ar putea observa. Dezactivați-l pentru a elimina stilurile.</value>
+  </data>
 </root>

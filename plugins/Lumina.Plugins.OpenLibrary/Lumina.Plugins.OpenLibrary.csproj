@@ -21,7 +21,7 @@
     
     <ItemGroup>
         <ProjectReference Include="..\..\src\Lumina.Plugins.Contracts\Lumina.Plugins.Contracts.csproj">
-            <Private>false</Private><!--Do not copy this assembly in the output directory, it loaded from somewhere else-->
+            <Private>false</Private><!--Do not copy this assembly in the output directory, it's loaded from somewhere else-->
             <ExcludeAssets>runtime</ExcludeAssets>
         </ProjectReference>
     </ItemGroup>

@@ -12,10 +12,14 @@ namespace Lumina.Application.Core.UsersManagement.Settings.Commands.UpdateUserSe
 /// <param name="ShouldIgnoreThePrefixForAlphaPicker">Whether the "The" prefix of library item titles is ignored by the alpha picker, or not.</param>
 /// <param name="IsThemeCachingEnabled">Whether the theme data served to this user is cached, or not.</param>
 /// <param name="ShouldAggregateMetadataWhenMissing">Whether the metadata of the media library items is aggregated from multiple providers, when fields are missing, or not.</param>
+/// <param name="ShouldRenderPdfAsImages">Whether PDF books are rendered as page images for the user, or not.</param>
+/// <param name="ShouldPreserveBookStyles">Whether the styles of the book content are preserved when it is rendered for the user, or not.</param>
 public record UpdateUserSettingsCommand(
     bool IsPaginationEnabled,
     int ItemsPerPage,
     bool ShouldIgnoreThePrefixForAlphaPicker,
     bool IsThemeCachingEnabled,
-    bool ShouldAggregateMetadataWhenMissing
+    bool ShouldAggregateMetadataWhenMissing,
+    bool ShouldRenderPdfAsImages,
+    bool ShouldPreserveBookStyles
 ) : ICommand;

@@ -45,4 +45,10 @@
   <data name="NoItemsMatchFilters" xml:space="preserve">
     <value>Aucun élément ne correspond aux filtres actuels</value>
   </data>
+  <data name="ReaderUnavailable" xml:space="preserve">
+    <value>Aucun lecteur de livres n&apos;est disponible pour ouvrir ce format de livre.</value>
+  </data>
+  <data name="ReaderDisabled" xml:space="preserve">
+    <value>Le lecteur de livres qui ouvre ce livre est désactivé pour cette bibliothèque. Activez-le dans les paramètres de la bibliothèque pour lire le livre.</value>
+  </data>
 </root>

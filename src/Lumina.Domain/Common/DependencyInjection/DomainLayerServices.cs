@@ -16,13 +16,13 @@ using System.IO.Abstractions;
 namespace Lumina.Domain.Common.DependencyInjection;
 
 /// <summary>
-/// Contains all services of the Domain layer.
+/// Utility class for registering the services of the Domain layer into the Dependency Injection container.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public static class DomainLayerServices
 {
     /// <summary>
-    /// Registers the services of the Domain layer into the dependency injection container.
+    /// Registers the services of the Domain layer into the Dependency Injection container.
     /// </summary>
     /// <param name="services">The service collection to add the services to.</param>
     /// <returns>The updated <see cref="IServiceCollection"/>.</returns>

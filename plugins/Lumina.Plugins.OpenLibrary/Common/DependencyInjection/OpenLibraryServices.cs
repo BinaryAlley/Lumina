@@ -13,17 +13,17 @@ using System;
 namespace Lumina.Plugins.OpenLibrary.Common.DependencyInjection;
 
 /// <summary>
-/// Provides extension methods for registering the Open Library metadata provider services.
+/// Utility class for registering the services of the Open Library metadata provider into the Dependency Injection container.
 /// </summary>
 internal static class OpenLibraryServices
 {
     /// <summary>
-    /// Registers the Open Library book metadata provider and its dependencies, associated with the plugin that provides it.
+    /// Registers the services of the Open Library metadata provider into the Dependency Injection container.
     /// </summary>
-    /// <param name="services">The service collection to register the services into.</param>
+    /// <param name="services">The service collection to add the services to.</param>
     /// <param name="pluginId">The unique identifier of the plugin that provides the metadata.</param>
     /// <param name="settingsCallback">Action used to configure the <see cref="OpenLibrarySettingsDto"/>.</param>
-    /// <returns>The service collection, for chaining.</returns>
+    /// <returns>The updated <see cref="IServiceCollection"/>.</returns>
     internal static IServiceCollection AddOpenLibraryBookMetadataProvider(this IServiceCollection services, Guid pluginId, Action<OpenLibrarySettingsDto>? settingsCallback = null)
     {
         ArgumentNullException.ThrowIfNull(services);

@@ -28,5 +28,7 @@ public static partial class WebRoutes
         public const string GET_ARTWORK_PROVIDERS = "{culture}/libraries/manage/api-get-artwork-providers/{libraryId}";
         public const string SET_ARTWORK_PROVIDER_ENABLED = "{culture}/libraries/manage/api-set-artwork-provider-enabled";
         public const string REORDER_ARTWORK_PROVIDERS = "{culture}/libraries/manage/api-reorder-artwork-providers";
+        public const string GET_BOOK_READERS = "{culture}/libraries/manage/api-get-book-readers/{libraryId}";
+        public const string SET_BOOK_READER_ENABLED = "{culture}/libraries/manage/api-set-book-reader-enabled";
     }
 }

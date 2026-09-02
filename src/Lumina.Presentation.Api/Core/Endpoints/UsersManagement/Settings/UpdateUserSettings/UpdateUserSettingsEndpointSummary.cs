@@ -26,13 +26,17 @@ public class UpdateUserSettingsEndpointSummary : Summary<UpdateUserSettingsEndpo
             ItemsPerPage: 48,
             ShouldIgnoreThePrefixForAlphaPicker: false,
             IsThemeCachingEnabled: true,
-            ShouldAggregateMetadataWhenMissing: false
+            ShouldAggregateMetadataWhenMissing: false,
+            ShouldRenderPdfAsImages: false,
+            ShouldPreserveBookStyles: true
         );
 
         RequestParam(r => r.IsPaginationEnabled, "Whether pagination is enabled for the user, or not. Required.");
         RequestParam(r => r.ItemsPerPage, "The number of library items displayed per page when pagination is enabled. Required.");
         RequestParam(r => r.ShouldIgnoreThePrefixForAlphaPicker, "Whether the \"The\" prefix of library item titles is ignored by the alpha picker, or not. Required.");
         RequestParam(r => r.IsThemeCachingEnabled, "Whether the theme data served to this user is cached, or not. Required.");
+        RequestParam(r => r.ShouldRenderPdfAsImages, "Whether PDF books are rendered as page images for the user, or not. Required.");
+        RequestParam(r => r.ShouldPreserveBookStyles, "Whether the styles of the book content are preserved when it is rendered for the user, or not. Required.");
 
         Response(200, "The settings of the current user were successfully updated.");
 

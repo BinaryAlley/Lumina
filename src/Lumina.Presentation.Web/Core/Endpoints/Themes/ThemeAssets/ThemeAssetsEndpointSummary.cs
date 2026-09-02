@@ -21,8 +21,13 @@ public class ThemeAssetsEndpointSummary : Summary<ThemeAssetsEndpoint, GetThemeA
         Summary = "Retrieves an asset file of a theme.";
         Description = "Serves the binary content of an asset file of a theme, fetched from the remote API.";
 
-        RequestParam(r => r.ThemeId, "The manifest id of the theme.");
-        RequestParam(r => r.Path, "The asset path relative to the theme pack root.");
+        RequestParam(r => r.ThemeId, "The manifest id of the theme. Required.");
+        RequestParam(r => r.Path, "The asset path relative to the theme pack root. Required.");
+
+        ExampleRequest = new GetThemeAssetRequest(
+            ThemeId: "lumina-default",
+            Path: "assets/style.css"
+        );
 
         Response(200, "The asset file of the theme is returned.", "application/octet-stream");
     }

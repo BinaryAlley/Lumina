@@ -10,7 +10,7 @@ namespace Lumina.Presentation.Web.Common.Requests.UsersManagement;
 /// <param name="Username">The username of the account to authenticate. Required.</param>
 /// <param name="Password">The password of the account to authenticate. Required.</param>
 /// <param name="TotpCode">The TOTP (Time-Based One-Time Password) of the account to authenticate. Optional.</param>
-/// <param name="ReturnUrl">The URL to return to, after login.</param>
+/// <param name="ReturnUrl">The URL to return to, after login. Optional.</param>
 [DebuggerDisplay("Username: {Username}")]
 public record LoginRequest(
     string? Username = null,

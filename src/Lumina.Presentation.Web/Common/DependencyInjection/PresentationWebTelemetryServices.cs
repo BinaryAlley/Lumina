@@ -16,7 +16,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Lumina.Presentation.Web.Common.DependencyInjection;
 
 /// <summary>
-/// Contains the OpenTelemetry services of the Presentation Web layer.
+/// Utility class for registering the OpenTelemetry services of the Presentation Web layer into the Dependency Injection container.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public static class PresentationWebTelemetryServices
@@ -24,10 +24,10 @@ public static class PresentationWebTelemetryServices
     private const string SERVICE_NAME = "Lumina.Web";
 
     /// <summary>
-    /// Registers the OpenTelemetry tracing and metrics pipelines into the dependency injection container.
+    /// Registers the OpenTelemetry services of the Presentation Web layer into the Dependency Injection container.
     /// </summary>
     /// <param name="services">The service collection to add the services to.</param>
-    /// <param name="configuration">Application configuration properties.</param>
+    /// <param name="configuration">The configuration used to read the application configuration.</param>
     /// <param name="environment">The hosting environment of the application.</param>
     /// <returns>The updated <see cref="IServiceCollection"/>.</returns>
     public static IServiceCollection AddPresentationWebTelemetryServices(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment environment)
@@ -54,8 +54,8 @@ public static class PresentationWebTelemetryServices
                 tracingBuilder.SetSampler(CreateSampler(traceSampleRatio));
                 tracingBuilder.AddSource(WebTelemetry.SOURCE_NAME);
                 tracingBuilder.AddAspNetCoreInstrumentation();
-                // the HTTP client instrumentation emits spans and metrics for the calls to the API, and injects the W3C trace context
-                // into their headers, so that the API continues the same trace across the two separately deployed applications
+                // The HTTP client instrumentation emits spans and metrics for the calls to the API, and injects the W3C trace context
+                // into their headers, so that the API continues the same trace across the two separately deployed applications.
                 tracingBuilder.AddHttpClientInstrumentation();
                 if (isConsoleExporterEnabled)
                     tracingBuilder.AddConsoleExporter();

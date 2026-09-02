@@ -23,7 +23,11 @@ public class GetRolePermissionsEndpointSummary : Summary<GetRolePermissionsEndpo
         Summary = "Gets the permissions of a role.";
         Description = "Retrieves the permissions of an existing authorization role identified by its unique identifier.";
 
-        RequestParam(r => r.RoleId, "The unique identifier of the role whose permissions are retrieved.");
+        RequestParam(r => r.RoleId, "The unique identifier of the role whose permissions are retrieved. Required.");
+
+        ExampleRequest = new GetRolePermissionsRequest(
+            RoleId: Guid.NewGuid()
+        );
 
         Response(200, "The permissions of the role are returned.", example: new SuccessResponse<RolePermissionsDto>(true, default));
     }

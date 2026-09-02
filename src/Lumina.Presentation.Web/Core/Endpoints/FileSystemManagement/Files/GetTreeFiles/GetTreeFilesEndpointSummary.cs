@@ -23,8 +23,13 @@ public class GetTreeFilesEndpointSummary : Summary<GetTreeFilesEndpoint, GetTree
         Summary = "Retrieves the file system tree of a file system path.";
         Description = "Retrieves the file system tree of the file system path identified by the request.";
 
-        RequestParam(r => r.Path, "The file system path for which to get the tree files.");
-        RequestParam(r => r.IncludeHiddenElements, "Whether to include hidden file system elements or not.");
+        RequestParam(r => r.Path, "The file system path for which to get the tree files. Required.");
+        RequestParam(r => r.IncludeHiddenElements, "Whether to include hidden file system elements or not. Optional.");
+
+        ExampleRequest = new GetTreeFilesRequest(
+            Path: "/media/movies/",
+            IncludeHiddenElements: true
+        );
 
         Response(200, "The file system tree of the file system path is returned.", example: new SuccessResponse<FileSystemTreeNodeDto[]>(true, default));
     }

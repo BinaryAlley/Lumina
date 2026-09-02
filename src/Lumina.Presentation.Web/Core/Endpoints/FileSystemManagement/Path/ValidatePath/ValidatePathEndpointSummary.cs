@@ -21,7 +21,11 @@ public class ValidatePathEndpointSummary : Summary<ValidatePathEndpoint, Validat
         Summary = "Validates a file system path.";
         Description = "Validates the file system path identified by the request.";
 
-        RequestParam(r => r.Path, "The file system path to validate.");
+        RequestParam(r => r.Path, "The file system path to validate. Required.");
+
+        ExampleRequest = new ValidatePathRequest(
+            Path: "/media/movies/"
+        );
 
         Response(200, "Whether the file system path is valid is returned.", example: new { success = true, data = new { isValid = true } });
     }

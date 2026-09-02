@@ -23,7 +23,11 @@ public class GetPluginSettingsEndpointSummary : Summary<GetPluginSettingsEndpoin
         Summary = "Retrieves the settings of a plugin and their schema.";
         Description = "Retrieves the settings and their schema of the plugin identified by the request.";
 
-        RequestParam(r => r.PluginId, "The unique identifier of the plugin whose settings are retrieved.");
+        RequestParam(r => r.PluginId, "The unique identifier of the plugin whose settings are retrieved. Required.");
+
+        ExampleRequest = new GetPluginSettingsRequest(
+            PluginId: Guid.NewGuid()
+        );
 
         Response(200, "The settings and their schema of the plugin are returned.", example: new SuccessResponse<PluginSettingsDto>(true, default));
     }

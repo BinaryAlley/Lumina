@@ -9,7 +9,6 @@ using Lumina.Presentation.Web.Common.Http;
 using Lumina.Presentation.Web.Common.Localization;
 using Lumina.Presentation.Web.Common.Security;
 using Lumina.Presentation.Web.Common.Services;
-using Lumina.Presentation.Web.Common.Validation;
 using Lumina.Presentation.Web.Core.Themes;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -19,7 +18,6 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Localization.Routing;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,13 +38,13 @@ using System.Threading.Tasks;
 namespace Lumina.Presentation.Web.Common.DependencyInjection;
 
 /// <summary>
-/// Contains all services of the Presentation Web layer.
+/// Utility class for registering the services of the Presentation Web layer into the Dependency Injection container.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public static class PresentationWebLayerServices
 {
     /// <summary>
-    /// Registers the services of the Presentation Web layer into the dependency injection container.
+    /// Registers the services of the Presentation Web layer into the Dependency Injection container.
     /// </summary>
     /// <param name="services">The service collection to add the services to.</param>
     /// <returns>The updated <see cref="IServiceCollection"/>.</returns>
@@ -58,11 +56,11 @@ public static class PresentationWebLayerServices
             .AddJsonOptions(jsonOptions =>
             {
                 jsonOptions.JsonSerializerOptions.MaxDepth = 256;
-                jsonOptions.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; // needed because file system API responses can have very nested structures
+                jsonOptions.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; // Needed because file system API responses can have very nested structures.
                 jsonOptions.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
 
-        // configure the locations where the Razor view engine looks for views and layouts, since the views live under the Core directory
+        // Configure the locations where the Razor view engine looks for views and layouts, since the views live under the Core directory.
         services.Configure<RazorViewEngineOptions>(razorViewEngineOptions =>
         {
             razorViewEngineOptions.ViewLocationFormats.Clear();
@@ -70,17 +68,17 @@ public static class PresentationWebLayerServices
             razorViewEngineOptions.ViewLocationFormats.Add("/Core/Views/Shared/{0}.cshtml");
         });
 
-        // configure the JSON serialization settings used by Results.Json, so that the JSON responses of the endpoints match the MVC responses they replace
+        // Configure the JSON serialization settings used by Results.Json, so that the JSON responses of the endpoints match the MVC responses they replace.
         services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(jsonOptions =>
         {
             jsonOptions.SerializerOptions.MaxDepth = 256;
-            jsonOptions.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; // needed because file system API responses can have very nested structures
+            jsonOptions.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; // Needed because file system API responses can have very nested structures.
             jsonOptions.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
 
-        // register the FastEndpoints library, which replaces the MVC controllers for handling the application routes
+        // Register the FastEndpoints library, which replaces the MVC controllers for handling the application routes.
         services.AddFastEndpoints();
-        // add OpenAPI document generation, so that the endpoints exposed by the web application are discoverable and their contracts are visible
+        // Add OpenAPI document generation, so that the endpoints exposed by the web application are discoverable and their contracts are visible.
         services.AddOpenApi();
         services.SwaggerDocument(documentOptions =>
         {
@@ -98,9 +96,9 @@ public static class PresentationWebLayerServices
             documentOptions.RemoveEmptyRequestSchema = true;
             documentOptions.ShortSchemaNames = true;
         });
-        // configure URL-based localization 
+        // Configure URL-based localization.
         services.AddLocalization(localizationOptions => localizationOptions.ResourcesPath = "Core/Resources");
-        // resolve the resources of the views that live under the Core/Views directory
+        // Resolve the resources of the views that live under the Core/Views directory.
         services.AddSingleton<IHtmlLocalizerFactory, CoreHtmlLocalizerFactory>();
 
         services.Configure<RequestLocalizationOptions>(requestLocalizationOptions =>
@@ -122,57 +120,57 @@ public static class PresentationWebLayerServices
             requestLocalizationOptions.SupportedCultures = supportedCultures;
             requestLocalizationOptions.SupportedUICultures = supportedCultures;
 
-            // configure route-based culture provider
+            // Configure route-based culture provider.
             RouteDataRequestCultureProvider routeDataRequestCultureProvider = new()
             {
                 RouteDataStringKey = "culture",
                 UIRouteDataStringKey = "culture",
                 Options = requestLocalizationOptions
             };
-            // make the route culture provider the first one to be evaluated
+            // Make the route culture provider the first one to be evaluated.
             requestLocalizationOptions.RequestCultureProviders = 
             [
-                routeDataRequestCultureProvider, // keep route-based culture handling
-                new CookieRequestCultureProvider(), // but also add cookie option, so the application "remembers" the last used language the next time it's opened
+                routeDataRequestCultureProvider, // Keep route-based culture handling,
+                new CookieRequestCultureProvider(), // but also add cookie option, so the application "remembers" the last used language the next time it's opened.
                 new AcceptLanguageHeaderRequestCultureProvider()
             ];
         });
 
-        // configure cookie-based authentication
+        // Configure cookie-based authentication.
         services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
             .AddCookie(cookieAuthenticationOptions =>
             {
-                // basic path configuration
+                // Basic path configuration.
                 cookieAuthenticationOptions.LoginPath = "/auth/login";
                 cookieAuthenticationOptions.LogoutPath = "/auth/logout";
                 cookieAuthenticationOptions.AccessDeniedPath = "/auth/access-denied";
 
-                // cookie configuration
+                // Cookie configuration.
                 cookieAuthenticationOptions.Cookie = new CookieBuilder
                 {
-                    Name = ".Lumina.Auth", // unique name to avoid conflicts
-                    HttpOnly = true,       // prevent JavaScript access
+                    Name = ".Lumina.Auth", // Unique name to avoid conflicts.
+                    HttpOnly = true,       // Prevent JavaScript access.
                     SameSite = SameSiteMode.Strict,
-                    SecurePolicy = CookieSecurePolicy.Always, // require HTTPS
-                    Path = "/",            // make cookie available for all paths
-                    IsEssential = true     // mark as essential for GDPR
+                    SecurePolicy = CookieSecurePolicy.Always, // Require HTTPS.
+                    Path = "/",            // Make cookie available for all paths.
+                    IsEssential = true     // Mark as essential for GDPR.
                 };
 
-                // security settings
+                // Security settings.
                 cookieAuthenticationOptions.ExpireTimeSpan = TimeSpan.FromHours(24); // TODO: perhaps make it configurable by user?
                 cookieAuthenticationOptions.SlidingExpiration = true;
 
-                // handle validation to support various deployment scenarios
+                // Handle validation to support various deployment scenarios.
                 cookieAuthenticationOptions.Events = new CookieAuthenticationEvents
                 {
-                    // handle redirects to work with different base paths
+                    // Handle redirects to work with different base paths.
                     OnRedirectToLogin = redirectContext =>
                     {
                         HttpContext httpContext = redirectContext.HttpContext;
                         string culture = httpContext.Request.RouteValues["culture"]?.ToString()?.ToLower() ?? "en-us";
                         string? lastDisplayedView = httpContext.Session.GetString(HttpContextItemKeys.LAST_DISPLAYED_VIEW);
 
-                        // build the login path considering reverse proxy and subfolder scenarios
+                        // Build the login path considering reverse proxy and subfolder scenarios.
                         string? originalHost = httpContext.Request.Headers["X-Forwarded-Host"].FirstOrDefault() ?? httpContext.Request.Host.Value;
                         string? originalScheme = httpContext.Request.Headers["X-Forwarded-Proto"].FirstOrDefault() ?? httpContext.Request.Scheme;
                         string? originalPathBase = httpContext.Request.Headers["X-Forwarded-Prefix"].FirstOrDefault() ?? httpContext.Request.PathBase.Value;
@@ -226,8 +224,8 @@ public static class PresentationWebLayerServices
                 };
             });
 
-        // add authorization policies that ensure the application is initialized with the super admin account before allowing access,
-        // and that restrict access based on the roles and permissions retrieved from the remote API
+        // Add authorization policies that ensure the application is initialized with the super admin account before allowing access,
+        // and that restrict access based on the roles and permissions retrieved from the remote API.
         services.AddAuthorizationBuilder()
             .AddPolicy(AuthorizationPolicies.REQUIRE_INITIALIZATION, authorizationPolicyBuilder => authorizationPolicyBuilder.Requirements.Add(new InitializationRequirement()))
             .AddPolicy(AuthorizationPolicies.REQUIRE_ADMIN_ROLE, authorizationPolicyBuilder =>
@@ -241,7 +239,7 @@ public static class PresentationWebLayerServices
                 authorizationPolicyBuilder.RequireAuthenticatedUser();
             });
 
-        // add forwarded headers middleware to handle reverse proxy scenarios
+        // Add forwarded headers middleware to handle reverse proxy scenarios.
         services.Configure<ForwardedHeadersOptions>(forwardedHeadersOptions =>
         {
             forwardedHeadersOptions.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost;
@@ -249,15 +247,15 @@ public static class PresentationWebLayerServices
             forwardedHeadersOptions.KnownProxies.Clear();
         });
 
-        // configure session management to maintain user-specific data across requests
+        // Configure session management to maintain user-specific data across requests.
         services.AddSession(sessionOptions =>
         {
-            sessionOptions.IdleTimeout = TimeSpan.FromMinutes(30); // session expires after 30 minutes of inactivity
-            sessionOptions.Cookie.HttpOnly = true; // prevent JavaScript access to session cookie, for security
-            sessionOptions.Cookie.IsEssential = true; // mark session cookie as essential, for GDPR compliance
+            sessionOptions.IdleTimeout = TimeSpan.FromMinutes(30); // Session expires after 30 minutes of inactivity.
+            sessionOptions.Cookie.HttpOnly = true; // Prevent JavaScript access to session cookie, for security.
+            sessionOptions.Cookie.IsEssential = true; // Mark session cookie as essential, for GDPR compliance.
         });
 
-        // scan the current assembly for validators and register them as singletons in the DI container
+        // Scan the current assembly for validators and register them as singletons in the DI container.
         foreach (Type validatorType in typeof(Program).Assembly.GetTypes())
         {
             if (validatorType.IsInterface || validatorType.IsAbstract || validatorType.IsGenericTypeDefinition)
@@ -273,16 +271,16 @@ public static class PresentationWebLayerServices
             }
         }
 
-        // handle transient errors like network timeouts or intermittent failures
+        // Handle transient errors like network timeouts or intermittent failures.
         AsyncRetryPolicy<HttpResponseMessage> retryPolicy = Policy<HttpResponseMessage>
             .Handle<HttpRequestException>()
             .OrInner<ApiException>(apiException =>
-                apiException.HttpStatusCode != HttpStatusCode.BadRequest && // do not retry Bad Request and Forbidden responses, it's pointless
+                apiException.HttpStatusCode != HttpStatusCode.BadRequest && // Do not retry Bad Request and Forbidden responses, it's pointless.
                 apiException.HttpStatusCode != HttpStatusCode.Forbidden)
             .WaitAndRetryAsync(3, retryAttempt =>
                 TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
 
-        // use a circuit breaker to prevent repeatedly calling a failing service
+        // Use a circuit breaker to prevent repeatedly calling a failing service.
         AsyncCircuitBreakerPolicy<HttpResponseMessage> circuitBreakerPolicy = Policy<HttpResponseMessage>
             .Handle<HttpRequestException>()
             .OrInner<ApiException>(apiException => apiException.HttpStatusCode == HttpStatusCode.InternalServerError)
@@ -290,7 +288,7 @@ public static class PresentationWebLayerServices
 
         AsyncPolicyWrap<HttpResponseMessage> policy = Policy.WrapAsync(retryPolicy, circuitBreakerPolicy);
 
-        // register the HTTP typed client used for the API interaction
+        // Register the HTTP typed client used for the API interaction.
         services.AddHttpClient<IApiHttpClient, ApiHttpClient>()
             .AddHttpMessageHandler<CachedAuthorizationHandler>()
             .AddHttpMessageHandler<CachedThemeHandler>()
@@ -301,7 +299,7 @@ public static class PresentationWebLayerServices
         services.AddScoped<CachedThemeHandler>();
         services.AddScoped<ThemeCachePreferenceService>();
 
-        // enable access to the current HTTP context in non-controller classes
+        // Enable access to the current HTTP context in non-controller classes.
         services.AddHttpContextAccessor();
         services.Configure<FormOptions>(options => options.MultipartBodyLengthLimit = 10 * 1024 * 1024);
 
@@ -320,7 +318,7 @@ public static class PresentationWebLayerServices
         services.AddScoped<Authorization.IAuthorizationService, AuthorizationService>();
         services.AddSingleton<ICryptographyService, CryptographyService>();
         services.AddSingleton<IUrlService, UrlService>();
-        services.AddHybridCache(); // used for caching authorization roles, permissions, policies and theme data
+        services.AddHybridCache(); // Used for caching authorization roles, permissions, policies and theme data.
 
         return services;
     }

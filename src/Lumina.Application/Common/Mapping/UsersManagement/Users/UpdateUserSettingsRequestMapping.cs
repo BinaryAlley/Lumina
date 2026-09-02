@@ -22,7 +22,9 @@ public static class UpdateUserSettingsRequestMapping
             request.ItemsPerPage,
             request.ShouldIgnoreThePrefixForAlphaPicker,
             request.IsThemeCachingEnabled,
-            request.ShouldAggregateMetadataWhenMissing
+            request.ShouldAggregateMetadataWhenMissing,
+            request.ShouldRenderPdfAsImages,
+            request.ShouldPreserveBookStyles
         );
     }
 }

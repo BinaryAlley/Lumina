@@ -2,7 +2,7 @@
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BooksLibrary.Artwork;
+using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Artwork;
 using Lumina.Domain.Common.Events;
 using Lumina.Domain.Common.Exceptions;
 using Lumina.Domain.Common.Primitives;

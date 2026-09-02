@@ -45,4 +45,16 @@
   <data name="DescriptionEnableThemeCaching" xml:space="preserve">
     <value>Gibt an, ob die von der Anwendung bereitgestellten Themendateien zwischengespeichert werden. Deaktivieren Sie diese Option beim Bearbeiten von Themendateien, damit die Änderungen sofort erscheinen.</value>
   </data>
+  <data name="ShouldRenderPdfAsImages" xml:space="preserve">
+    <value>PDFs als Bilder rendern</value>
+  </data>
+  <data name="DescriptionShouldRenderPdfAsImages" xml:space="preserve">
+    <value>Ob PDF-Bücher als Seitenbilder gerendert werden, wodurch das ursprüngliche Layout erhalten bleibt, der Text der Seiten aber nicht auswählbar oder durchsuchbar ist. Dies ist nützlich für gescannte PDFs ohne extrahierbaren Text.</value>
+  </data>
+  <data name="ShouldPreserveBookStyles" xml:space="preserve">
+    <value>Buchstile beibehalten</value>
+  </data>
+  <data name="DescriptionShouldPreserveBookStyles" xml:space="preserve">
+    <value>Legt fest, ob die ursprüngliche Formatierung des Buchinhalts beibehalten wird, wenn Sie ein Buch lesen. Wenn die Option aktiviert ist, bleibt das Aussehen des Buches erhalten (Schriftarten, Farben, Ausrichtung). Buchstile können jedoch Ressourcen von externen Servern laden, die diese Server beobachten könnten. Deaktivieren Sie die Option, um die Stile zu entfernen.</value>
+  </data>
 </root>

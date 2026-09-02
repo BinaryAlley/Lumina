@@ -26,7 +26,9 @@ public static class UserSettingsMapping
             ItemsPerPage = domainEntity.ItemsPerPage,
             ShouldIgnoreThePrefixForAlphaPicker = domainEntity.ShouldIgnoreThePrefixForAlphaPicker,
             IsThemeCachingEnabled = domainEntity.IsThemeCachingEnabled,
-            ShouldAggregateMetadataWhenMissing = domainEntity.ShouldAggregateMetadataWhenMissing
+            ShouldAggregateMetadataWhenMissing = domainEntity.ShouldAggregateMetadataWhenMissing,
+            ShouldRenderPdfAsImages = domainEntity.ShouldRenderPdfAsImages,
+            ShouldPreserveBookStyles = domainEntity.ShouldPreserveBookStyles
         };
     }
 
@@ -43,7 +45,9 @@ public static class UserSettingsMapping
             domainEntity.ItemsPerPage,
             domainEntity.ShouldIgnoreThePrefixForAlphaPicker,
             domainEntity.IsThemeCachingEnabled,
-            domainEntity.ShouldAggregateMetadataWhenMissing
+            domainEntity.ShouldAggregateMetadataWhenMissing,
+            domainEntity.ShouldRenderPdfAsImages,
+            domainEntity.ShouldPreserveBookStyles
         );
     }
 }

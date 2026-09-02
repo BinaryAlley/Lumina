@@ -23,8 +23,13 @@ public class GetFilesEndpointSummary : Summary<GetFilesEndpoint, GetFilesRequest
         Summary = "Retrieves the files of a file system path.";
         Description = "Retrieves the files of the file system path identified by the request.";
 
-        RequestParam(r => r.Path, "The file system path for which to get the files.");
-        RequestParam(r => r.IncludeHiddenElements, "Whether to include hidden file system elements or not.");
+        RequestParam(r => r.Path, "The file system path for which to get the files. Required.");
+        RequestParam(r => r.IncludeHiddenElements, "Whether to include hidden file system elements or not. Optional.");
+
+        ExampleRequest = new GetFilesRequest(
+            Path: "/media/movies/",
+            IncludeHiddenElements: true
+        );
 
         Response(200, "The files of the file system path are returned.", example: new SuccessResponse<FileDto[]>(true, default));
     }

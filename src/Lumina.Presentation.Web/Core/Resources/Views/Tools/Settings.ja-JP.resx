@@ -45,4 +45,16 @@
   <data name="DescriptionEnableThemeCaching" xml:space="preserve">
     <value>アプリケーションが提供するテーマファイルをキャッシュするかどうかを制御します。テーマファイルを編集している間はオフにして、変更がすぐに反映されるようにします。</value>
   </data>
+  <data name="ShouldRenderPdfAsImages" xml:space="preserve">
+    <value>PDFを画像として表示</value>
+  </data>
+  <data name="DescriptionShouldRenderPdfAsImages" xml:space="preserve">
+    <value>PDFの書籍をページ画像として表示するかどうか。元のレイアウトは保たれますが、ページのテキストは選択や検索ができなくなります。抽出可能なテキストのないスキャンされたPDFに役立ちます。</value>
+  </data>
+  <data name="ShouldPreserveBookStyles" xml:space="preserve">
+    <value>本のスタイルを保持</value>
+  </data>
+  <data name="DescriptionShouldPreserveBookStyles" xml:space="preserve">
+    <value>本を読むときに、本のコンテンツの元のスタイルを保持するかどうか。有効にすると本の見た目（フォント、色、配置）が維持されますが、本のスタイルは外部サーバーからリソースを読み込むことができ、そのサーバーがアクセスを監視できる可能性があります。無効にするとスタイルが削除されます。</value>
+  </data>
 </root>

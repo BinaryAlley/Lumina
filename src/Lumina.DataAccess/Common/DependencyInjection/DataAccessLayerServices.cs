@@ -7,7 +7,6 @@ using Lumina.DataAccess.Core.Seed;
 using Lumina.DataAccess.Core.UoW;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
@@ -16,13 +15,13 @@ using System.Reflection;
 namespace Lumina.DataAccess.Common.DependencyInjection;
 
 /// <summary>
-/// Contains all services of the DataAccess layer.
+/// Utility class for registering the services of the Data Access layer into the Dependency Injection container..
 /// </summary>
 [ExcludeFromCodeCoverage]
 public static class DataAccessLayerServices
 {
     /// <summary>
-    /// Extension method for adding the DataAccess layer services to the DI container.
+    /// Registers the services of the Data Access layer into the Dependency Injection container.
     /// </summary>
     /// <param name="services">The service collection to add the services to.</param>
     /// <returns>The updated <see cref="IServiceCollection"/>.</returns>

@@ -45,4 +45,10 @@
   <data name="NoItemsMatchFilters" xml:space="preserve">
     <value>現在のフィルターに一致する項目はありません</value>
   </data>
+  <data name="ReaderUnavailable" xml:space="preserve">
+    <value>この本の形式を開けるブックリーダーがありません。</value>
+  </data>
+  <data name="ReaderDisabled" xml:space="preserve">
+    <value>この本を開くブックリーダーは、このライブラリで無効になっています。ライブラリ設定で有効にすると本を読めます。</value>
+  </data>
 </root>

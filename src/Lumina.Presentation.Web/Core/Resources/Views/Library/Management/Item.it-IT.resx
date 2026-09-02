@@ -337,9 +337,18 @@
     <value>I fornitori di metadati utilizzati per arricchire gli elementi di questa libreria, nell'ordine in cui vengono provati.</value>
   </data>
   <data name="ArtworkProviders" xml:space="preserve">
-    <value>Artwork providers</value>
+    <value>Fornitori di copertine</value>
   </data>
   <data name="DescriptionArtworkProviders" xml:space="preserve">
-    <value>The artwork providers used to retrieve the covers of the items of this library, in the order they are tried.</value>
+    <value>I fornitori di copertine utilizzati per recuperare le copertine degli elementi di questa libreria, nell'ordine in cui vengono provati.</value>
+  </data>
+  <data name="BookReaders" xml:space="preserve">
+    <value>Lettori di libri</value>
+  </data>
+  <data name="SupportedExtensions" xml:space="preserve">
+    <value>Estensioni supportate</value>
+  </data>
+  <data name="DescriptionBookReaders" xml:space="preserve">
+    <value>I lettori di libri utilizzati per leggere i libri di questa libreria. Un lettore disabilitato informa l'utente che esiste un plugin di lettura per il formato, ma che è disabilitato.</value>
   </data>
 </root>

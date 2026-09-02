@@ -8,16 +8,16 @@ using System;
 namespace Lumina.Plugins.Calibre.Common.DependencyInjection;
 
 /// <summary>
-/// Provides extension methods for registering the Calibre metadata and artwork providers.
+/// Utility class for registering the services of the Calibre metadata and artwork providers into the Dependency Injection container.
 /// </summary>
 internal static class CalibreServices
 {
     /// <summary>
-    /// Registers the Calibre book metadata provider, associated with the plugin that provides it.
+    /// Registers the services of the Calibre metadata provider into the Dependency Injection container.
     /// </summary>
-    /// <param name="services">The service collection to register the services into.</param>
+    /// <param name="services">The service collection to add the services to.</param>
     /// <param name="pluginId">The unique identifier of the plugin that provides the metadata.</param>
-    /// <returns>The service collection, for chaining.</returns>
+    /// <returns>The updated <see cref="IServiceCollection"/>.</returns>
     internal static IServiceCollection AddCalibreBookMetadataProvider(this IServiceCollection services, Guid pluginId)
     {
         ArgumentNullException.ThrowIfNull(services);
@@ -29,7 +29,7 @@ internal static class CalibreServices
     }
 
     /// <summary>
-    /// Registers the Calibre artwork provider, associated with the plugin that provides it.
+    /// Registers the services of the Calibre artwork provider into the Dependency Injection container.
     /// </summary>
     /// <param name="services">The service collection to register the services into.</param>
     /// <param name="pluginId">The unique identifier of the plugin that provides the artwork.</param>

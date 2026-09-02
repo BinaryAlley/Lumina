@@ -48,6 +48,19 @@ public class UserSettingsEntity : IStorageEntity, IAuditableEntity
     public bool ShouldAggregateMetadataWhenMissing { get; set; }
 
     /// <summary>
+    /// Gets or sets whether PDF books are rendered as page images for the user, or not. Rendering PDFs as images preserves the
+    /// original layout, but the pages are not selectable or searchable, unlike their text layer.
+    /// </summary>
+    public bool ShouldRenderPdfAsImages { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the styles of the book content are preserved when it is rendered for the user, or not. Preserving them
+    /// keeps the original look of a book (its fonts, colors, and alignment), but the styles of a book can load resources from
+    /// external servers, which those servers could observe; stripping them removes that possibility, at the cost of the look of the book.
+    /// </summary>
+    public bool ShouldPreserveBookStyles { get; set; }
+
+    /// <summary>
     /// Gets or sets the time and date when the entity was added.
     /// </summary>
     public DateTime CreatedOnUtc { get; set; }

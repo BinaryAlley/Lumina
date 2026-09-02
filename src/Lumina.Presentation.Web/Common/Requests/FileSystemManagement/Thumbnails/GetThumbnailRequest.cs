@@ -7,8 +7,8 @@ namespace Lumina.Presentation.Web.Common.Requests.FileSystemManagement.Thumbnail
 /// <summary>
 /// Represents a request for retrieving the thumbnail of a file system file.
 /// </summary>
-/// <param name="Path">The path of the file for which the thumbnail is retrieved.</param>
-/// <param name="Quality">The quality to use for the thumbnail.</param>
+/// <param name="Path">The path of the file for which the thumbnail is retrieved. Required.</param>
+/// <param name="Quality">The quality to use for the thumbnail. Required.</param>
 [DebuggerDisplay("Path: {Path}")]
 public record GetThumbnailRequest(
     string? Path,

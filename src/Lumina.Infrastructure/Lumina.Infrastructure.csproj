@@ -16,6 +16,7 @@
 
     <ItemGroup>
         <PackageReference Include="DebounceThrottle" />
+        <PackageReference Include="HtmlSanitizer" />
         <PackageReference Include="Konscious.Security.Cryptography.Argon2" />
         <PackageReference Include="Microsoft.AspNetCore.SignalR.Core" />
         <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" />

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -44,5 +44,11 @@
   </data>
   <data name="NoItemsMatchFilters" xml:space="preserve">
     <value>لا توجد عناصر تطابق الفلاتر الحالية</value>
+  </data>
+  <data name="ReaderUnavailable" xml:space="preserve">
+    <value>لا يوجد قارئ كتب متاح يمكنه فتح هذا التنسيق من الكتب.</value>
+  </data>
+  <data name="ReaderDisabled" xml:space="preserve">
+    <value>قارئ الكتب الذي يفتح هذا الكتاب معطل لهذه المكتبة. قم بتمكينه في إعدادات المكتبة لقراءة الكتاب.</value>
   </data>
 </root>

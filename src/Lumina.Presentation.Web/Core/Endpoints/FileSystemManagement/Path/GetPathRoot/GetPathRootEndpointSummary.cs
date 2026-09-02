@@ -22,7 +22,11 @@ public class GetPathRootEndpointSummary : Summary<GetPathRootEndpoint, GetPathRo
         Summary = "Retrieves the root of a file system path.";
         Description = "Retrieves the root of the file system path identified by the request.";
 
-        RequestParam(r => r.Path, "The file system path for which to get the root.");
+        RequestParam(r => r.Path, "The file system path for which to get the root. Required.");
+
+        ExampleRequest = new GetPathRootRequest(
+            Path: "/media/movies/"
+        );
 
         Response(200, "The root of the file system path is returned.", example: new { success = true, data = new { root = new PathSegmentDto() } });
     }

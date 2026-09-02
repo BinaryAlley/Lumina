@@ -22,8 +22,12 @@ public class GetPathParentEndpointSummary : Summary<GetPathParentEndpoint, GetPa
         Summary = "Retrieves the parent path of a file system path.";
         Description = "Retrieves the path segments of the parent path of the file system path identified by the request.";
 
-        RequestParam(r => r.Path, "The path for which the parent path is retrieved.");
+        RequestParam(r => r.Path, "The path for which the parent path is retrieved. Required.");
 
-        Response(200, "The path segments of the parent path are returned.", example: new { success = true, data = new { pathSegments = new PathSegmentDto[] { } } });
+        ExampleRequest = new GetPathParentRequest(
+            Path: "/media/movies/"
+        );
+
+        Response(200, "The path segments of the parent path are returned.", example: new { success = true, data = new { pathSegments = Array.Empty<PathSegmentDto>() } });
     }
 }

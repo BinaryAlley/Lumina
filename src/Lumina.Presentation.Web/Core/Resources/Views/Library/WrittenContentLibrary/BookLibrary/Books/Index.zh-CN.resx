@@ -45,4 +45,10 @@
   <data name="NoItemsMatchFilters" xml:space="preserve">
     <value>没有项目符合当前筛选条件</value>
   </data>
+  <data name="ReaderUnavailable" xml:space="preserve">
+    <value>没有可用的图书阅读器能够打开此图书格式。</value>
+  </data>
+  <data name="ReaderDisabled" xml:space="preserve">
+    <value>打开此图书的图书阅读器已在此媒体库中禁用。在媒体库设置中启用它即可阅读该图书。</value>
+  </data>
 </root>

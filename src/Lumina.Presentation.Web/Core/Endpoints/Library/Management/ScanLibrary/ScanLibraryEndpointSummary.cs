@@ -23,7 +23,11 @@ public class ScanLibraryEndpointSummary : Summary<ScanLibraryEndpoint, ScanLibra
         Summary = "Starts the scan of a media library.";
         Description = "Initiates the scan of the media library identified by the request.";
 
-        RequestParam(r => r.Id, "The unique identifier of the media library to scan.");
+        RequestParam(r => r.Id, "The unique identifier of the media library to scan. Required.");
+
+        ExampleRequest = new ScanLibraryRequest(
+            Id: Guid.NewGuid()
+        );
 
         Response(200, "The scan of the media library is started.", example: new SuccessResponse<ScanLibraryDto>(true, default));
     }

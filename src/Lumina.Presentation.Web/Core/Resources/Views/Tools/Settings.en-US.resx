@@ -45,4 +45,16 @@
   <data name="DescriptionEnableThemeCaching" xml:space="preserve">
     <value>Whether the theme files served by the application are cached. Turn this off while editing theme files so the changes appear immediately.</value>
   </data>
+  <data name="ShouldRenderPdfAsImages" xml:space="preserve">
+    <value>Render PDFs as images</value>
+  </data>
+  <data name="DescriptionShouldRenderPdfAsImages" xml:space="preserve">
+    <value>Whether PDF books are rendered as page images, preserving the original layout, but making the text of the pages not selectable or searchable. This is useful for scanned PDFs that have no extractable text.</value>
+  </data>
+  <data name="ShouldPreserveBookStyles" xml:space="preserve">
+    <value>Preserve book styles</value>
+  </data>
+  <data name="DescriptionShouldPreserveBookStyles" xml:space="preserve">
+    <value>Whether the original styling of book content is preserved when you read a book. Enabling it keeps the look of the book (fonts, colors, alignment), but book styles can load resources from external servers, which those servers could observe; disable it to strip the styles.</value>
+  </data>
 </root>
