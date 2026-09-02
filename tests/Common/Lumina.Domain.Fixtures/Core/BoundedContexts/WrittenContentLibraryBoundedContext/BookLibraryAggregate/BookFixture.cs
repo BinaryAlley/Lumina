@@ -84,8 +84,8 @@ public class BookFixture
 
         _fixture.Register(() =>
         {
-            int originalYear = _fixture.Create<Generator<int>>().First(year => year >= 1900 && year <= 2025);
-            int reReleaseYear = _fixture.Create<Generator<int>>().First(year => year >= originalYear && year <= 2025);
+            int originalYear = Random.Shared.Next(1900, 2026);
+            int reReleaseYear = Random.Shared.Next(originalYear, 2026);
 
             return ReleaseInfo.Create(
                 Optional<DateOnly>.Some(DateOnly.FromDateTime(new DateTime(originalYear, 1, 1))),
