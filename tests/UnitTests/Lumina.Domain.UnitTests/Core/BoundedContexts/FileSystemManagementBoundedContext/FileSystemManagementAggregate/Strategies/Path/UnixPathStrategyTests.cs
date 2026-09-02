@@ -377,6 +377,20 @@ public class UnixPathStrategyTests
     }
 
     [Fact]
+    public void ParsePath_WhenPathContainsWhitespaceSegment_ShouldReturnError()
+    {
+        // Arrange
+        FileSystemPathId path = _fileSystemPathIdFixture.Create("/home/ /user");
+
+        // Act
+        Result<IEnumerable<PathSegment>> result = _sut.ParsePath(path);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.NameCannotBeEmpty, result.FirstError);
+    }
+
+    [Fact]
     public void ParsePath_WithPathContainingDots_ShouldParseCorrectly()
     {
         // Arrange

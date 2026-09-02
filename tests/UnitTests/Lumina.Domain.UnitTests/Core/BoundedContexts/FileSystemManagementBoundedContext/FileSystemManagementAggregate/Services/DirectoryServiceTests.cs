@@ -36,6 +36,7 @@ public class DirectoryServiceTests
     private readonly string _pathDirTest = s_isUnix ? "/TestDir" : @"C:\TestDir";
     private readonly string _pathDirTestSubDir1 = s_isUnix ? "/TestDir/Sub1" : @"C:\TestDir\Sub1";
     private readonly string _pathDirTestSubDir2 = s_isUnix ? "/TestDir/Sub2" : @"C:\TestDir\Sub2";
+    private readonly char _dirSeparator = s_isUnix ? '/' : '\\';
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DirectoryServiceTests"/> class.
@@ -495,6 +496,150 @@ public class DirectoryServiceTests
         // Verify that DirectoryExists was not called
         _mockEnvironmentContext.DirectoryProviderService.DidNotReceive().DirectoryExists(Arg.Any<FileSystemPathId>());
         _mockEnvironmentContext.DirectoryProviderService.DidNotReceive().CreateDirectory(Arg.Any<FileSystemPathId>(), Arg.Any<string>());
+    }
+
+    [Fact]
+    public void CopyDirectory_WhenSourceAndDestinationDoNotEndWithSeparator_ShouldAppendSeparatorAndReturnDirectoryNotFoundError()
+    {
+        // Arrange
+        string sourcePath = s_isUnix ? "/TestDir/Source" : @"C:\TestDir\Source";
+        string destinationPath = s_isUnix ? "/TestDir/Destination" : @"C:\TestDir\Destination";
+        bool overrideExisting = true;
+        _mockPlatformContext.PathStrategy.PathSeparator.Returns(_dirSeparator);
+        _mockEnvironmentContext.DirectoryProviderService.DirectoryExists(Arg.Any<FileSystemPathId>())
+            .Returns(Result.From(false));
+
+        // Act
+        Result<Directory> result = _sut.CopyDirectory(sourcePath, destinationPath, overrideExisting);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.DirectoryNotFound, result.FirstError);
+    }
+
+    [Fact]
+    public void CopyDirectory_WhenSourceAndDestinationEndWithSeparator_ShouldReturnDirectoryNotFoundError()
+    {
+        // Arrange
+        string sourcePath = s_isUnix ? "/TestDir/Source/" : @"C:\TestDir\Source\";
+        string destinationPath = s_isUnix ? "/TestDir/Destination/" : @"C:\TestDir\Destination\";
+        bool overrideExisting = true;
+        _mockPlatformContext.PathStrategy.PathSeparator.Returns(_dirSeparator);
+        _mockEnvironmentContext.DirectoryProviderService.DirectoryExists(Arg.Any<FileSystemPathId>())
+            .Returns(Result.From(false));
+
+        // Act
+        Result<Directory> result = _sut.CopyDirectory(sourcePath, destinationPath, overrideExisting);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.DirectoryNotFound, result.FirstError);
+    }
+
+    [Fact]
+    public void CopyDirectory_WhenDirectoryExistsReturnsError_ShouldPropagateError()
+    {
+        // Arrange
+        string sourcePath = s_isUnix ? "/TestDir/Source" : @"C:\TestDir\Source";
+        string destinationPath = s_isUnix ? "/TestDir/Destination" : @"C:\TestDir\Destination";
+        bool overrideExisting = true;
+        _mockPlatformContext.PathStrategy.PathSeparator.Returns(_dirSeparator);
+        _mockEnvironmentContext.DirectoryProviderService.DirectoryExists(Arg.Any<FileSystemPathId>())
+            .Returns(Errors.Permission.UnauthorizedAccess);
+
+        // Act
+        Result<Directory> result = _sut.CopyDirectory(sourcePath, destinationPath, overrideExisting);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
+    }
+
+    [Fact]
+    public void CopyDirectory_WhenSourceDirectoryExists_ShouldThrowNotImplementedException()
+    {
+        // Arrange
+        string sourcePath = s_isUnix ? "/TestDir/Source" : @"C:\TestDir\Source";
+        string destinationPath = s_isUnix ? "/TestDir/Destination" : @"C:\TestDir\Destination";
+        bool overrideExisting = true;
+        _mockPlatformContext.PathStrategy.PathSeparator.Returns(_dirSeparator);
+        _mockEnvironmentContext.DirectoryProviderService.DirectoryExists(Arg.Any<FileSystemPathId>())
+            .Returns(Result.From(true));
+
+        // Act & Assert
+        Assert.Throws<NotImplementedException>(() => _sut.CopyDirectory(sourcePath, destinationPath, overrideExisting));
+    }
+
+    [Fact]
+    public void MoveDirectory_WhenSourceAndDestinationDoNotEndWithSeparator_ShouldAppendSeparatorAndReturnDirectoryNotFoundError()
+    {
+        // Arrange
+        string sourcePath = s_isUnix ? "/TestDir/Source" : @"C:\TestDir\Source";
+        string destinationPath = s_isUnix ? "/TestDir/Destination" : @"C:\TestDir\Destination";
+        bool overrideExisting = true;
+        _mockPlatformContext.PathStrategy.PathSeparator.Returns(_dirSeparator);
+        _mockEnvironmentContext.DirectoryProviderService.DirectoryExists(Arg.Any<FileSystemPathId>())
+            .Returns(Result.From(false));
+
+        // Act
+        Result<Directory> result = _sut.MoveDirectory(sourcePath, destinationPath, overrideExisting);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.DirectoryNotFound, result.FirstError);
+    }
+
+    [Fact]
+    public void MoveDirectory_WhenSourceAndDestinationEndWithSeparator_ShouldReturnDirectoryNotFoundError()
+    {
+        // Arrange
+        string sourcePath = s_isUnix ? "/TestDir/Source/" : @"C:\TestDir\Source\";
+        string destinationPath = s_isUnix ? "/TestDir/Destination/" : @"C:\TestDir\Destination\";
+        bool overrideExisting = true;
+        _mockPlatformContext.PathStrategy.PathSeparator.Returns(_dirSeparator);
+        _mockEnvironmentContext.DirectoryProviderService.DirectoryExists(Arg.Any<FileSystemPathId>())
+            .Returns(Result.From(false));
+
+        // Act
+        Result<Directory> result = _sut.MoveDirectory(sourcePath, destinationPath, overrideExisting);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.DirectoryNotFound, result.FirstError);
+    }
+
+    [Fact]
+    public void MoveDirectory_WhenDirectoryExistsReturnsError_ShouldPropagateError()
+    {
+        // Arrange
+        string sourcePath = s_isUnix ? "/TestDir/Source" : @"C:\TestDir\Source";
+        string destinationPath = s_isUnix ? "/TestDir/Destination" : @"C:\TestDir\Destination";
+        bool overrideExisting = true;
+        _mockPlatformContext.PathStrategy.PathSeparator.Returns(_dirSeparator);
+        _mockEnvironmentContext.DirectoryProviderService.DirectoryExists(Arg.Any<FileSystemPathId>())
+            .Returns(Errors.Permission.UnauthorizedAccess);
+
+        // Act
+        Result<Directory> result = _sut.MoveDirectory(sourcePath, destinationPath, overrideExisting);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
+    }
+
+    [Fact]
+    public void MoveDirectory_WhenSourceDirectoryExists_ShouldThrowNotImplementedException()
+    {
+        // Arrange
+        string sourcePath = s_isUnix ? "/TestDir/Source" : @"C:\TestDir\Source";
+        string destinationPath = s_isUnix ? "/TestDir/Destination" : @"C:\TestDir\Destination";
+        bool overrideExisting = true;
+        _mockPlatformContext.PathStrategy.PathSeparator.Returns(_dirSeparator);
+        _mockEnvironmentContext.DirectoryProviderService.DirectoryExists(Arg.Any<FileSystemPathId>())
+            .Returns(Result.From(true));
+
+        // Act & Assert
+        Assert.Throws<NotImplementedException>(() => _sut.MoveDirectory(sourcePath, destinationPath, overrideExisting));
     }
 
     [Fact]

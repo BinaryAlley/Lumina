@@ -96,6 +96,45 @@ public class LibraryTests
     }
 
     [Fact]
+    public void Create_WhenGivenPreExistingIdAndInvalidContentLocation_ShouldReturnError()
+    {
+        // Arrange
+        Guid id = Guid.NewGuid();
+
+        // Act
+        Result<Library> result = Library.Create(
+            _libraryIdFixture.Create(id),
+            _userIdFixture.Create(),
+            "My Library",
+            LibraryType.Book,
+            [""],
+            null,
+            isEnabled: true,
+            isLocked: false,
+            canDownloadMetadataFromWeb: true,
+            shouldSaveMetadataInMediaDirectories: false,
+            shouldSkipUnchangedDirectoriesDuringScan: false,
+            []);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Lumina.Domain.Common.Errors.Errors.FileSystemManagement.InvalidPath, result.FirstError);
+    }
+
+    [Fact]
+    public void Create_WhenCalledWithValidData_ShouldLeaveCoverImageSourcePathUnset()
+    {
+        // Arrange
+        Library library = _libraryFixture.Create();
+
+        // Act
+        string? coverImageSourcePath = library.CoverImageSourcePath;
+
+        // Assert
+        Assert.Null(coverImageSourcePath);
+    }
+
+    [Fact]
     public void Create_WhenCalledWithContentLocations_ShouldCreateFileSystemPathIdForEachLocation()
     {
         // Act

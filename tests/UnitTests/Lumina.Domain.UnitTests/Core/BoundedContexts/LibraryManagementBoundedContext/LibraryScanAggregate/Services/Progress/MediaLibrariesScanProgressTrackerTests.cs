@@ -101,6 +101,23 @@ public class MediaLibrariesScanProgressTrackerTests
     }
 
     [Fact]
+    public void UpdateScanProgress_WhenScanIsAlreadyCompleted_ShouldReturnError()
+    {
+        // Arrange
+        LibraryId libraryId = _libraryIdFixture.Create();
+        MediaLibraryScanCompositeId compositeId = _mediaLibraryScanCompositeIdFixture.Create();
+        _sut.InitializeScanProgress(libraryId, compositeId, totalJobs: 1);
+        _sut.UpdateScanProgress(libraryId, compositeId);
+
+        // Act
+        Result<Updated> result = _sut.UpdateScanProgress(libraryId, compositeId);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.LibraryScanning.CompletedScanJobsCountCantExceedTotalScanJobsCount, result.FirstError);
+    }
+
+    [Fact]
     public void UpdateScanJobProgress_WhenScanExists_ShouldUpdateCurrentJobProgress()
     {
         // Arrange

@@ -598,6 +598,90 @@ public class DirectoryProviderServiceTests
     }
 
     [Fact]
+    public void CopyDirectory_WhenNestedSubdirectoryPathIsInvalid_ShouldReturnError()
+    {
+        // Arrange
+        FileSystemPathId sourcePath = _fileSystemPathIdFixture.Create(_pathSource);
+        FileSystemPathId destinationPath = _fileSystemPathIdFixture.Create(_pathDestination);
+        bool overrideExisting = false;
+
+        _mockFileSystem.Directory.Exists(_pathSource).Returns(true);
+        _mockFileSystem.Directory.Exists(_pathSourceSubDir).Returns(true);
+        _mockFileSystem.Directory.Exists(_pathDestination).Returns(false);
+
+        _mockFileSystem.Directory.CreateDirectory(Arg.Any<string>()).Returns(callInfo =>
+        {
+            IDirectoryInfo mockDirInfo = Substitute.For<IDirectoryInfo>();
+            mockDirInfo.FullName.Returns(callInfo.Arg<string>());
+            return mockDirInfo;
+        });
+
+        IDirectoryInfo invalidNestedDir = Substitute.For<IDirectoryInfo>();
+        invalidNestedDir.FullName.Returns("   ");
+
+        IDirectoryInfo nestedDirInfo = Substitute.For<IDirectoryInfo>();
+        nestedDirInfo.GetFiles().Returns([]);
+        nestedDirInfo.GetDirectories().Returns([invalidNestedDir]);
+        _mockFileSystem.DirectoryInfo.New(_pathSourceSubDir).Returns(nestedDirInfo);
+
+        IDirectoryInfo subDirInfo = Substitute.For<IDirectoryInfo>();
+        subDirInfo.Name.Returns("SubDir");
+        subDirInfo.FullName.Returns(_pathSourceSubDir);
+
+        IDirectoryInfo sourceDirectoryInfo = Substitute.For<IDirectoryInfo>();
+        sourceDirectoryInfo.GetFiles().Returns([]);
+        sourceDirectoryInfo.GetDirectories().Returns([subDirInfo]);
+        _mockFileSystem.DirectoryInfo.New(_pathSource).Returns(sourceDirectoryInfo);
+
+        _mockFileSystem.Path.Combine(Arg.Any<string>(), Arg.Any<string>())
+            .Returns(callInfo => Path.Combine(callInfo.ArgAt<string>(0), callInfo.ArgAt<string>(1)));
+
+        // Act
+        Result<FileSystemPathId> result = _sut.CopyDirectory(sourcePath, destinationPath, overrideExisting);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
+    }
+
+    [Fact]
+    public void CopyDirectory_WhenDestinationSubdirectoryPathIsInvalid_ShouldReturnError()
+    {
+        // Arrange
+        FileSystemPathId sourcePath = _fileSystemPathIdFixture.Create(_pathSource);
+        FileSystemPathId destinationPath = _fileSystemPathIdFixture.Create(_pathDestination);
+        bool overrideExisting = false;
+
+        _mockFileSystem.Directory.Exists(_pathSource).Returns(true);
+        _mockFileSystem.Directory.Exists(_pathDestination).Returns(false);
+
+        _mockFileSystem.Directory.CreateDirectory(Arg.Any<string>()).Returns(callInfo =>
+        {
+            IDirectoryInfo mockDirInfo = Substitute.For<IDirectoryInfo>();
+            mockDirInfo.FullName.Returns(callInfo.Arg<string>());
+            return mockDirInfo;
+        });
+
+        IDirectoryInfo subDirInfo = Substitute.For<IDirectoryInfo>();
+        subDirInfo.Name.Returns("SubDir");
+        subDirInfo.FullName.Returns(_pathSourceSubDir);
+
+        IDirectoryInfo sourceDirectoryInfo = Substitute.For<IDirectoryInfo>();
+        sourceDirectoryInfo.GetFiles().Returns([]);
+        sourceDirectoryInfo.GetDirectories().Returns([subDirInfo]);
+        _mockFileSystem.DirectoryInfo.New(_pathSource).Returns(sourceDirectoryInfo);
+
+        _mockFileSystem.Path.Combine(Arg.Any<string>(), Arg.Any<string>()).Returns("   ");
+
+        // Act
+        Result<FileSystemPathId> result = _sut.CopyDirectory(sourcePath, destinationPath, overrideExisting);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
+    }
+
+    [Fact]
     public void MoveDirectory_WhenSourceDirectoryDoesNotExist_ShouldReturnDirectoryNotFoundError()
     {
         // Arrange
@@ -959,6 +1043,52 @@ public class DirectoryProviderServiceTests
         parentDirectoryInfo.FullName.Returns(parentPath);
         _mockFileSystem.Directory.GetParent(path.Path).Returns(parentDirectoryInfo);
         _mockFileSystem.Path.Combine(parentPath, newName).Returns((string)null!);
+
+        // Act
+        Result<FileSystemPathId> result = _sut.RenameDirectory(path, newName);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
+        _mockFileSystem.Directory.DidNotReceive().Move(Arg.Any<string>(), Arg.Any<string>());
+    }
+
+    [Fact]
+    public void RenameDirectory_WhenParentDirectoryPathIsWhitespace_ShouldReturnInvalidPathError()
+    {
+        // Arrange
+        FileSystemPathId path = _fileSystemPathIdFixture.Create(
+            s_isUnix ? "/OldName" : @"C:\OldName"
+        );
+        string newName = "NewName";
+
+        IDirectoryInfo parentDirectoryInfo = Substitute.For<IDirectoryInfo>();
+        parentDirectoryInfo.FullName.Returns("   ");
+        _mockFileSystem.Directory.GetParent(path.Path).Returns(parentDirectoryInfo);
+
+        // Act
+        Result<FileSystemPathId> result = _sut.RenameDirectory(path, newName);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
+        _mockFileSystem.Directory.DidNotReceive().Move(Arg.Any<string>(), Arg.Any<string>());
+    }
+
+    [Fact]
+    public void RenameDirectory_WhenNewPathIsWhitespace_ShouldReturnInvalidPathError()
+    {
+        // Arrange
+        FileSystemPathId path = _fileSystemPathIdFixture.Create(
+            s_isUnix ? "/OldName" : @"C:\OldName"
+        );
+        string newName = "NewName";
+        string parentPath = s_isUnix ? "/" : @"C:\";
+
+        IDirectoryInfo parentDirectoryInfo = Substitute.For<IDirectoryInfo>();
+        parentDirectoryInfo.FullName.Returns(parentPath);
+        _mockFileSystem.Directory.GetParent(path.Path).Returns(parentDirectoryInfo);
+        _mockFileSystem.Path.Combine(parentPath, newName).Returns("   ");
 
         // Act
         Result<FileSystemPathId> result = _sut.RenameDirectory(path, newName);

@@ -76,6 +76,27 @@ public class DriveServiceTests
         Assert.Equal(["C:\\", "D:\\"], result.Value.Select(d => d.Name));
     }
 
+    [Fact]
+    public void GetDrives_OnWindowsPlatformWithDriveWithInvalidName_ShouldExcludeThatDrive()
+    {
+        // Arrange
+        _mockPlatformContext.Platform.Returns(PlatformType.Windows);
+        IDriveInfo[] mockDrives =
+        [
+            CreateMockDriveInfo("C:\\", true),
+            CreateMockDriveInfo("", true) // drive whose name cannot be turned into a valid path
+        ];
+        _mockFileSystem.DriveInfo.GetDrives().Returns(mockDrives);
+
+        // Act
+        Result<IEnumerable<FileSystemItem>> result = _sut.GetDrives();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Single(result.Value);
+        Assert.Equal("C:\\", result.Value.First().Name);
+    }
+
     private static IDriveInfo CreateMockDriveInfo(string name, bool isReady)
     {
         IDriveInfo mockDriveInfo = Substitute.For<IDriveInfo>();

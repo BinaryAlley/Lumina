@@ -85,6 +85,31 @@ public class EntityIdTests
         Assert.Equal(firstHashCode, secondHashCode);
     }
 
+    [Fact]
+    public void GetEqualityComponents_WhenNotOverridden_ShouldYieldOnlyTheValue()
+    {
+        // Arrange
+        Guid value = Guid.NewGuid();
+        DefaultEntityId entityId = new(value);
+
+        // Act
+        IEnumerable<object?> components = entityId.GetEqualityComponents();
+
+        // Assert
+        object? component = Assert.Single(components);
+        Assert.Equal(value, component);
+    }
+
+    [Fact]
+    public void Constructor_WhenCalledWithoutArguments_ShouldLeaveValueAsDefault()
+    {
+        // Act
+        DefaultEntityId entityId = new();
+
+        // Assert
+        Assert.Equal(default, entityId.Value);
+    }
+
     /// <summary>
     /// Concrete test implementation of the abstract <see cref="EntityId{TId}"/> class.
     /// </summary>
@@ -105,6 +130,27 @@ public class EntityIdTests
         public override IEnumerable<object> GetEqualityComponents()
         {
             yield return Value;
+        }
+    }
+
+    /// <summary>
+    /// Concrete test implementation of the abstract <see cref="EntityId{TId}"/> class that relies on the base equality components.
+    /// </summary>
+    private sealed class DefaultEntityId : EntityId<Guid>
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DefaultEntityId"/> class.
+        /// </summary>
+        /// <param name="value">The value representing this object.</param>
+        public DefaultEntityId(Guid value) : base(value)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DefaultEntityId"/> class.
+        /// </summary>
+        public DefaultEntityId() : base()
+        {
         }
     }
 }

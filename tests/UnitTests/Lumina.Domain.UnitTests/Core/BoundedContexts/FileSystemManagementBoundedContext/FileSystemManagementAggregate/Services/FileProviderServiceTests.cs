@@ -859,6 +859,52 @@ public class FileProviderServiceTests
     }
 
     [Fact]
+    public void RenameFile_WhenParentDirectoryPathIsWhitespace_ShouldReturnInvalidPathError()
+    {
+        // Arrange
+        FileSystemPathId path = _fileSystemPathIdFixture.Create(
+            s_isUnix ? "/OldName.txt" : @"C:\OldName.txt"
+        );
+        string newName = "NewName.txt";
+
+        IFileInfo fileInfo = Substitute.For<IFileInfo>();
+        fileInfo.DirectoryName.Returns("   ");
+        _mockFileSystem.FileInfo.New(path.Path).Returns(fileInfo);
+
+        // Act
+        Result<FileSystemPathId> result = _sut.RenameFile(path, newName);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
+        _mockFileSystem.File.DidNotReceive().Move(Arg.Any<string>(), Arg.Any<string>());
+    }
+
+    [Fact]
+    public void RenameFile_WhenNewPathIsWhitespace_ShouldReturnInvalidPathError()
+    {
+        // Arrange
+        FileSystemPathId path = _fileSystemPathIdFixture.Create(
+            s_isUnix ? "/OldName.txt" : @"C:\OldName.txt"
+        );
+        string newName = "NewName.txt";
+        string parentPath = s_isUnix ? "/" : @"C:\";
+
+        IFileInfo fileInfo = Substitute.For<IFileInfo>();
+        fileInfo.DirectoryName.Returns(parentPath);
+        _mockFileSystem.FileInfo.New(path.Path).Returns(fileInfo);
+        _mockFileSystem.Path.Combine(parentPath, newName).Returns("   ");
+
+        // Act
+        Result<FileSystemPathId> result = _sut.RenameFile(path, newName);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
+        _mockFileSystem.File.DidNotReceive().Move(Arg.Any<string>(), Arg.Any<string>());
+    }
+
+    [Fact]
     public void RenameFile_WhenParentDirectoryExistsButNotWritable_ShouldReturnUnauthorizedAccessError()
     {
         // Arrange

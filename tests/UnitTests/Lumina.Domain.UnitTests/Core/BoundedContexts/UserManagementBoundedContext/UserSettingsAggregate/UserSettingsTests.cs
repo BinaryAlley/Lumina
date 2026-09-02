@@ -3,8 +3,10 @@ using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserSettingsAggregate;
+using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserSettingsAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.UserManagementBoundedContext.UserSettingsAggregate;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.UserManagementBoundedContext.UserSettingsAggregate.ValueObjects;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -18,6 +20,7 @@ public class UserSettingsTests
 {
     private readonly UserIdFixture _userIdFixture = new();
     private readonly UserSettingsFixture _userSettingsFixture = new();
+    private readonly UserSettingsIdFixture _userSettingsIdFixture = new();
 
     [Fact]
     public void Create_WhenCalledWithoutValues_ShouldCreateSettingsWithDefaultValues()
@@ -115,6 +118,38 @@ public class UserSettingsTests
 
         // Act
         Result<UserSettings> result = UserSettings.Create(userId, isPaginationEnabled: true, itemsPerPage: itemsPerPage, shouldIgnoreThePrefixForAlphaPicker: false, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: false, shouldRenderPdfAsImages: false, shouldPreserveBookStyles: false);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.UserSettings.ItemsPerPageMustBeGreaterThanZero, result.FirstError);
+    }
+
+    [Fact]
+    public void Create_WhenCalledWithPreExistingIdAndValidValues_ShouldCreateSettingsWithThatId()
+    {
+        // Arrange
+        UserId userId = _userIdFixture.Create();
+        UserSettingsId id = _userSettingsIdFixture.Create();
+
+        // Act
+        Result<UserSettings> result = UserSettings.Create(id, userId, isPaginationEnabled: true, itemsPerPage: 24, shouldIgnoreThePrefixForAlphaPicker: false, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: false, shouldRenderPdfAsImages: false, shouldPreserveBookStyles: true);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(id, result.Value.Id);
+        Assert.Equal(userId, result.Value.UserId);
+        Assert.Equal(24, result.Value.ItemsPerPage);
+    }
+
+    [Fact]
+    public void Create_WhenCalledWithPreExistingIdAndNonPositiveItemsPerPage_ShouldReturnError()
+    {
+        // Arrange
+        UserId userId = _userIdFixture.Create();
+        UserSettingsId id = _userSettingsIdFixture.Create();
+
+        // Act
+        Result<UserSettings> result = UserSettings.Create(id, userId, isPaginationEnabled: true, itemsPerPage: 0, shouldIgnoreThePrefixForAlphaPicker: false, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: false, shouldRenderPdfAsImages: false, shouldPreserveBookStyles: false);
 
         // Assert
         Assert.True(result.IsFailure);

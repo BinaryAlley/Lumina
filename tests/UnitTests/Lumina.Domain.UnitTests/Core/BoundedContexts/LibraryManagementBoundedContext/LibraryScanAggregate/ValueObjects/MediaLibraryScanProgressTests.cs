@@ -197,4 +197,22 @@ public class MediaLibraryScanProgressTests
         // Assert
         Assert.NotEqual(firstResult, secondResult);
     }
+
+    [Fact]
+    public void ToString_WhenCalled_ShouldReturnFormattedProgressString()
+    {
+        // Arrange
+        MediaLibraryScanJobProgress currentJobProgress = _mediaLibraryScanJobProgressFixture.Create(completedItems: 3, totalItems: 10, currentOperation: "Hashing files");
+        MediaLibraryScanProgress scanProgress = _mediaLibraryScanProgressFixture.Create(
+            completedJobs: 2,
+            totalJobs: 5,
+            status: LibraryScanJobStatus.Running,
+            currentJobProgress: Optional<MediaLibraryScanJobProgress>.Some(currentJobProgress));
+
+        // Act
+        string result = scanProgress.ToString();
+
+        // Assert
+        Assert.Equal("CompletedJobs: 2; TotalJobs: 5; CurrentJobProgress: CompletedItems: 3; TotalItems: 10; CurrentOperation: Hashing files", result);
+    }
 }

@@ -296,6 +296,39 @@ public class ResultTests
     }
 
     [Fact]
+    public void Equals_WhenOneResultIsSuccessfulAndTheOtherIsFailed_ShouldReturnFalse()
+    {
+        // Act
+        Result<string> successResult = Result<string>.Success("test");
+        Result<string> failureResult = Result<string>.Failure(Error.Validation("Code", "Description"));
+
+        // Assert
+        Assert.False(successResult.Equals(failureResult));
+    }
+
+    [Fact]
+    public void Equals_WhenCalledWithBoxedResult_ShouldReturnTrue()
+    {
+        // Act
+        Result<string> firstResult = Result<string>.Success("test");
+        object boxedResult = Result<string>.Success("test");
+
+        // Assert
+        Assert.True(firstResult.Equals(boxedResult));
+    }
+
+    [Fact]
+    public void Equals_WhenCalledWithNonResultObject_ShouldReturnFalse()
+    {
+        // Act
+        Result<string> result = Result<string>.Success("test");
+        object nonResultObject = new();
+
+        // Assert
+        Assert.False(result.Equals(nonResultObject));
+    }
+
+    [Fact]
     public void EqualityOperator_WhenResultsAreEqual_ShouldReturnTrue()
     {
         // Act
