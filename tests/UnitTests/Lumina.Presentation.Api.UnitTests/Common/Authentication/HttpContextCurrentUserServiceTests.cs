@@ -44,7 +44,10 @@ public class HttpContextCurrentUserServiceTests
     public void UserId_WhenUserIsNull_ShouldReturnNull()
     {
         // Arrange
-        HttpContext mockHttpContext = new DefaultHttpContext();
+        HttpContext mockHttpContext = new DefaultHttpContext
+        {
+            User = null
+        };
         _mockHttpContextAccessor.HttpContext.Returns(mockHttpContext);
 
         // Act

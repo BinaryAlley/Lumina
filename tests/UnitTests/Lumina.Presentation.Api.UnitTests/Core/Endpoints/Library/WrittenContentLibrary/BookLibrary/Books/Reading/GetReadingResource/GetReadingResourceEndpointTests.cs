@@ -79,6 +79,38 @@ public class GetReadingResourceEndpointTests
         Assert.Equal("ResourceNotFound", problemResult.ProblemDetails.Detail);
     }
 
+    [Theory]
+    [InlineData("image/png", "image/png")] // a non-svg image is inert content
+    [InlineData("image/svg+xml", "application/octet-stream")] // an svg can be executed, so it is served as an opaque download
+    [InlineData("audio/mpeg", "audio/mpeg")] // audio is inert content
+    [InlineData("video/mp4", "video/mp4")] // video is inert content
+    [InlineData("font/woff2", "font/woff2")] // fonts are inert content
+    [InlineData("application/font-woff", "application/font-woff")] // legacy woff font media type
+    [InlineData("application/font-woff2", "application/font-woff2")] // legacy woff2 font media type
+    [InlineData("application/vnd.ms-opentype", "application/vnd.ms-opentype")] // opentype font media type
+    [InlineData("application/x-font-ttf", "application/x-font-ttf")] // ttf font media type
+    [InlineData("application/x-font-opentype", "application/x-font-opentype")] // otf font media type
+    [InlineData("text/css", "text/css")] // stylesheets are inert content
+    [InlineData("text/html", "application/octet-stream")] // an html document can be executed, so it is served as an opaque download
+    public async Task ExecuteAsync_WhenServingAResource_ShouldUseTheSafeContentType(string mimeType, string expectedContentType)
+    {
+        // Arrange
+        GetReadingResourceRequest request = _getReadingResourceRequestFixture.Create();
+        CancellationToken cancellationToken = CancellationToken.None;
+        ReadingResourceDataDto response = new(Guid.NewGuid().ToByteArray(), mimeType);
+        _mockHandler.HandleAsync(Arg.Any<GetReadingResourceQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From(response));
+
+        // Act
+        IResult result = await _sut.ExecuteAsync(request, cancellationToken);
+
+        // Assert
+        FileContentHttpResult bytesResult = Assert.IsType<FileContentHttpResult>(result);
+        Assert.Equal(response.Data, bytesResult.FileContents);
+        Assert.Equal(expectedContentType, bytesResult.ContentType);
+        Assert.Equal("nosniff", _sut.HttpContext.Response.Headers["X-Content-Type-Options"]);
+    }
+
     [Fact]
     public async Task ExecuteAsync_WhenCalled_ShouldSendGetReadingResourceQueryToSender()
     {
