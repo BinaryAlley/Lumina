@@ -196,7 +196,7 @@ public class GetBooksLiteEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         PaginatedResponse<BookLiteResponse>? paginatedBooks = await response.Content.ReadFromJsonAsync<PaginatedResponse<BookLiteResponse>>(_jsonOptions);
         Assert.NotNull(paginatedBooks);
         Assert.Equal(2, paginatedBooks!.Count);
-        Assert.Contains(paginatedBooks.Data, book => book.Title == ""); // the empty title book matches the filter through its original title
+        Assert.Contains(paginatedBooks.Data, book => book.Title == ""); // The empty title book matches the filter through its original title.
         Assert.Contains(paginatedBooks.Data, book => book.Title == "Racing");
     }
 
@@ -220,6 +220,28 @@ public class GetBooksLiteEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         BookLiteResponse book = Assert.Single(paginatedBooks!.Data);
         Assert.Equal("The Fellowship of the Ring", book.Title);
         Assert.Equal(1, paginatedBooks.Count);
+    }
+
+    [Fact]
+    public async Task GetBooksLite_WhenCalledWithSearchTermAndFilterAlphaKey_ShouldReturnOnlyBooksSatisfyingBothFilters()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        Guid libraryId = Guid.NewGuid();
+        await SeedLibraryAsync(libraryId, userId);
+        // The search term matches only one book, while the alpha key matches only the other, so no book satisfies both filters at once.
+        await SeedBookAsync(libraryId, "The Fellowship of the Ring");
+        await SeedBookAsync(libraryId, "Zoo");
+
+        // Act
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/books/lite?libraryId={libraryId}&searchTerm={Uri.EscapeDataString("Fellowship")}&filterAlphaKey=z");
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        PaginatedResponse<BookLiteResponse>? paginatedBooks = await response.Content.ReadFromJsonAsync<PaginatedResponse<BookLiteResponse>>(_jsonOptions);
+        Assert.NotNull(paginatedBooks);
+        Assert.Empty(paginatedBooks!.Data);
+        Assert.Equal(0, paginatedBooks.Count);
     }
 
     [Fact]

@@ -87,4 +87,65 @@ public class LanguageInfoTests
         // Assert
         Assert.Equal("en - English", result);
     }
+
+    [Fact]
+    public void Equals_WithSameValues_ShouldReturnTrue()
+    {
+        // Arrange
+        LanguageInfo firstLanguageInfo = _languageInfoFixture.Create(
+            languageCode: "en",
+            languageName: "English",
+            nativeName: Optional<string>.Some("English"));
+        LanguageInfo secondLanguageInfo = _languageInfoFixture.Create(
+            languageCode: "en",
+            languageName: "English",
+            nativeName: Optional<string>.Some("English"));
+
+        // Act
+        bool result = firstLanguageInfo.Equals(secondLanguageInfo);
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void GetHashCode_WithSameValues_ShouldReturnSameHashCode()
+    {
+        // Arrange
+        LanguageInfo firstLanguageInfo = _languageInfoFixture.Create(
+            languageCode: "en",
+            languageName: "English",
+            nativeName: Optional<string>.Some("English"));
+        LanguageInfo secondLanguageInfo = _languageInfoFixture.Create(
+            languageCode: "en",
+            languageName: "English",
+            nativeName: Optional<string>.Some("English"));
+
+        // Act
+        int firstHashCode = firstLanguageInfo.GetHashCode();
+        int secondHashCode = secondLanguageInfo.GetHashCode();
+
+        // Assert
+        Assert.Equal(firstHashCode, secondHashCode);
+    }
+
+    [Fact]
+    public void Equals_WithDifferentLanguageName_ShouldReturnFalse()
+    {
+        // Arrange
+        LanguageInfo firstLanguageInfo = _languageInfoFixture.Create(
+            languageCode: "en",
+            languageName: "English",
+            nativeName: Optional<string>.None());
+        LanguageInfo secondLanguageInfo = _languageInfoFixture.Create(
+            languageCode: "en",
+            languageName: "French",
+            nativeName: Optional<string>.None());
+
+        // Act
+        bool result = firstLanguageInfo.Equals(secondLanguageInfo);
+
+        // Assert
+        Assert.False(result);
+    }
 }

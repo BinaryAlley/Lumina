@@ -156,6 +156,29 @@ public class InstallThemeEndpointTests
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() => operationTask);
     }
 
+    [Fact]
+    public async Task ExecuteAsync_WhenTheFormIsMalformed_ShouldTreatTheUploadAsMissingAndSendNullArchive()
+    {
+        // Arrange
+        CancellationToken cancellationToken = CancellationToken.None;
+        ThemeResponse expectedResponse = _themeResponseFixture.Create();
+        _mockHandler.HandleAsync(Arg.Any<InstallThemeCommand>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From(expectedResponse));
+        ConfigureMalformedForm();
+
+        // Act
+        IResult result = await _sut.ExecuteAsync(EmptyRequest.Instance, cancellationToken);
+
+        // Assert
+        Ok<ThemeResponse> okResult = Assert.IsType<Ok<ThemeResponse>>(result);
+        Assert.Equal(expectedResponse, okResult.Value);
+        await _mockHandler.Received(1).HandleAsync(
+            Arg.Is<InstallThemeCommand>(command =>
+                command.Archive == null &&
+                command.FileName == null),
+            Arg.Is(cancellationToken));
+    }
+
     private void ConfigureFormWithArchive(byte[] content, string fileName)
     {
         // the stream stays open for the duration of the test, since the endpoint reads it through the form file during execution
@@ -164,8 +187,8 @@ public class InstallThemeEndpointTests
         FormFileCollection files = [formFile];
         IFormCollection form = new FormCollection([], files);
         _sut.HttpContext.Request.ContentType = "multipart/form-data; boundary=----test";
-        // a real FormFeature is used instead of a substitute, because the endpoint execution reads the form through the
-        // request machinery, which would bypass a mocked feature and parse the (empty) request body
+        // A real FormFeature is used instead of a substitute, because the endpoint execution reads the form through the
+        // request machinery, which would bypass a mocked feature and parse the (empty) request body.
         _sut.HttpContext.Features.Set<IFormFeature>(new FormFeature(form));
     }
 
@@ -174,5 +197,13 @@ public class InstallThemeEndpointTests
         IFormCollection form = new FormCollection([]);
         _sut.HttpContext.Request.ContentType = "multipart/form-data; boundary=----test";
         _sut.HttpContext.Features.Set<IFormFeature>(new FormFeature(form));
+    }
+
+    private void ConfigureMalformedForm()
+    {
+        _sut.HttpContext.Request.ContentType = "multipart/form-data; boundary=----test";
+        IFormCollection malformedForm = Substitute.For<IFormCollection>();
+        malformedForm.Files.Returns(_ => throw new InvalidDataException("Malformed multipart body."));
+        _sut.HttpContext.Features.Set<IFormFeature>(new FormFeature(malformedForm));
     }
 }

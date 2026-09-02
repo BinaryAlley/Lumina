@@ -7,6 +7,7 @@ using Lumina.Domain.Common.Events;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
+using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
@@ -199,5 +200,203 @@ public class MediaLibraryScanResultsSaveJobTests
         // Assert
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() => operation);
         Assert.Equal(LibraryScanJobStatus.Canceled, _sut.Status);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenGettingChangedPathsFails_ShouldMarkJobAsFailedAndPublishFailureEvent()
+    {
+        // Arrange
+        _mockSnapshotRepository.GetDeletedPathsAsync(_libraryId.Value, _scanId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<string>>([]));
+        _mockStagingResultsRepository.GetChangedPathsAsync(_scanId.Value, Arg.Any<CancellationToken>())
+            .Returns(Error.Failure("Database.Error", "Failed to get the changed paths"));
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(LibraryScanJobStatus.Failed, _sut.Status);
+        await _mockSnapshotRepository.DidNotReceive().ApplySnapshotSwapAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockDomainEventPublisher.Received(1).PublishAsync(Arg.Is<LibraryScanFailedDomainEvent>(domainEvent =>
+            domainEvent.LibraryId == _libraryId), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenApplyingSnapshotSwapFails_ShouldMarkJobAsFailedAndPublishFailureEvent()
+    {
+        // Arrange
+        _mockSnapshotRepository.GetDeletedPathsAsync(_libraryId.Value, _scanId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<string>>([]));
+        _mockStagingResultsRepository.GetChangedPathsAsync(_scanId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<string>>([]));
+        _mockSnapshotRepository.ApplySnapshotSwapAsync(_libraryId.Value, _scanId.Value, _userId.Value, Arg.Any<CancellationToken>())
+            .Returns(Error.Failure("Database.Error", "Failed to apply the snapshot swap"));
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(LibraryScanJobStatus.Failed, _sut.Status);
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockDomainEventPublisher.Received(1).PublishAsync(Arg.Is<LibraryScanFailedDomainEvent>(domainEvent =>
+            domainEvent.LibraryId == _libraryId), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenResettingEnrichmentStateFails_ShouldMarkJobAsFailedAndPublishFailureEvent()
+    {
+        // Arrange
+        _mockSnapshotRepository.GetDeletedPathsAsync(_libraryId.Value, _scanId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<string>>([]));
+        _mockStagingResultsRepository.GetChangedPathsAsync(_scanId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<string>>(["changed.pdf"]));
+        _mockSnapshotRepository.ApplySnapshotSwapAsync(_libraryId.Value, _scanId.Value, _userId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From(Result.Updated));
+        _mockBookRepository.ResetEnrichmentStateForPathsAsync(_libraryId.Value, Arg.Any<IReadOnlyCollection<string>>(), Arg.Any<CancellationToken>())
+            .Returns(Error.Failure("Database.Error", "Failed to reset the enrichment state"));
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(LibraryScanJobStatus.Failed, _sut.Status);
+        await _mockBookRepository.DidNotReceive().InsertAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockDomainEventPublisher.Received(1).PublishAsync(Arg.Is<LibraryScanFailedDomainEvent>(domainEvent =>
+            domainEvent.LibraryId == _libraryId), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenGettingPathsFails_ShouldMarkJobAsFailedAndPublishFailureEvent()
+    {
+        // Arrange
+        _mockSnapshotRepository.GetDeletedPathsAsync(_libraryId.Value, _scanId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<string>>([]));
+        _mockStagingResultsRepository.GetChangedPathsAsync(_scanId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<string>>([]));
+        _mockSnapshotRepository.ApplySnapshotSwapAsync(_libraryId.Value, _scanId.Value, _userId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From(Result.Updated));
+        _mockSnapshotRepository.GetPathsAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+            .Returns(Error.Failure("Database.Error", "Failed to get the paths"));
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(LibraryScanJobStatus.Failed, _sut.Status);
+        await _mockBookRepository.DidNotReceive().InsertAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockDomainEventPublisher.Received(1).PublishAsync(Arg.Is<LibraryScanFailedDomainEvent>(domainEvent =>
+            domainEvent.LibraryId == _libraryId), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenGettingExistingBookFails_ShouldMarkJobAsFailedAndPublishFailureEvent()
+    {
+        // Arrange
+        _mockSnapshotRepository.GetDeletedPathsAsync(_libraryId.Value, _scanId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<string>>([]));
+        _mockStagingResultsRepository.GetChangedPathsAsync(_scanId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<string>>([]));
+        _mockSnapshotRepository.ApplySnapshotSwapAsync(_libraryId.Value, _scanId.Value, _userId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From(Result.Updated));
+        _mockSnapshotRepository.GetPathsAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<string>>(["book1.pdf"]));
+        _mockBookRepository.GetByPathAsync(_libraryId.Value, Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(Error.Failure("Database.Error", "Failed to get the existing book"));
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(LibraryScanJobStatus.Failed, _sut.Status);
+        await _mockBookRepository.DidNotReceive().InsertAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockDomainEventPublisher.Received(1).PublishAsync(Arg.Is<LibraryScanFailedDomainEvent>(domainEvent =>
+            domainEvent.LibraryId == _libraryId), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenInsertingShellBookFails_ShouldMarkJobAsFailedAndPublishFailureEvent()
+    {
+        // Arrange
+        _mockSnapshotRepository.GetDeletedPathsAsync(_libraryId.Value, _scanId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<string>>([]));
+        _mockStagingResultsRepository.GetChangedPathsAsync(_scanId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<string>>([]));
+        _mockSnapshotRepository.ApplySnapshotSwapAsync(_libraryId.Value, _scanId.Value, _userId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From(Result.Updated));
+        _mockSnapshotRepository.GetPathsAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<string>>(["book1.pdf"]));
+        _mockBookRepository.GetByPathAsync(_libraryId.Value, Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From<BookEntity?>(null));
+        _mockBookRepository.InsertAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>())
+            .Returns(Error.Failure("Database.Error", "Failed to insert the shell book"));
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(LibraryScanJobStatus.Failed, _sut.Status);
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockDomainEventPublisher.Received(1).PublishAsync(Arg.Is<LibraryScanFailedDomainEvent>(domainEvent =>
+            domainEvent.LibraryId == _libraryId), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenJobHasLinkedChildren_ShouldExecuteEachChildWithoutPublishingFinishedEvent()
+    {
+        // Arrange
+        _mockSnapshotRepository.GetDeletedPathsAsync(_libraryId.Value, _scanId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<string>>([]));
+        _mockStagingResultsRepository.GetChangedPathsAsync(_scanId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<string>>([]));
+        _mockSnapshotRepository.ApplySnapshotSwapAsync(_libraryId.Value, _scanId.Value, _userId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From(Result.Updated));
+        _mockSnapshotRepository.GetPathsAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<string>>([]));
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+
+        IMediaLibraryScanJob mockChild = Substitute.For<IMediaLibraryScanJob>();
+        mockChild.ExecuteAsync(Arg.Any<Guid>(), Arg.Any<object>(), Arg.Any<CancellationToken>())
+            .Returns(Task.CompletedTask);
+        _sut.AddChild(mockChild);
+        object input = new();
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), input, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
+        await mockChild.Received(1).ExecuteAsync(Arg.Any<Guid>(), Arg.Is<object>(executedInput => executedInput == input), Arg.Any<CancellationToken>());
+        await _mockDomainEventPublisher.DidNotReceive().PublishAsync(Arg.Any<LibraryScanFinishedDomainEvent>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenBookPathYieldsEmptyDerivedTitle_ShouldFallBackToTheFileNameAsTitle()
+    {
+        // Arrange
+        _mockSnapshotRepository.GetDeletedPathsAsync(_libraryId.Value, _scanId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<string>>([]));
+        _mockStagingResultsRepository.GetChangedPathsAsync(_scanId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<string>>([]));
+        _mockSnapshotRepository.ApplySnapshotSwapAsync(_libraryId.Value, _scanId.Value, _userId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From(Result.Updated));
+        _mockSnapshotRepository.GetPathsAsync(_libraryId.Value, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<string>>(["_.pdf"]));
+        _mockBookRepository.GetByPathAsync(_libraryId.Value, "_.pdf", Arg.Any<CancellationToken>())
+            .Returns(Result.From<BookEntity?>(null));
+        _mockBookRepository.InsertAsync(Arg.Any<BookEntity>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From(Result.Created));
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        // the file name is made only of separators, so the derived title is empty and the raw file name is used as a fallback
+        await _mockBookRepository.Received(1).InsertAsync(Arg.Is<BookEntity>(book => book.Path == "_.pdf" && book.Title == "_"), Arg.Any<CancellationToken>());
+        Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
     }
 }

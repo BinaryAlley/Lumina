@@ -17,4 +17,5 @@ using System.Runtime.InteropServices;
 [assembly: Guid("B6F9E5D2-3C4D-5E6F-9A7B-8C9D0E1F2A31")]
 
 [assembly: InternalsVisibleTo("Lumina.Plugins.Calibre.UnitTests")]
+[assembly: InternalsVisibleTo("Lumina.Plugins.Calibre.IntegrationTests")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

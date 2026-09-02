@@ -68,6 +68,148 @@ public class BookTests
     }
 
     [Fact]
+    public void Create_WhenCalledWithPreExistingIdAndTimestamps_ShouldPreserveIdentityAndTimestamps()
+    {
+        // Arrange
+        Book sourceBook = _bookFixture.Create();
+        DateTime createdOnUtc = DateTime.UtcNow.AddDays(-1);
+        DateTime updatedOnUtc = DateTime.UtcNow;
+
+        // Act
+        Result<Book> result = Book.Create(
+            sourceBook.Id,
+            sourceBook.LibraryId,
+            sourceBook.Path,
+            sourceBook.Metadata,
+            sourceBook.Format,
+            sourceBook.Edition,
+            sourceBook.VolumeNumber,
+            sourceBook.Series,
+            sourceBook.ASIN,
+            sourceBook.GoodreadsId,
+            sourceBook.LCCN,
+            sourceBook.OCLCNumber,
+            sourceBook.OpenLibraryId,
+            sourceBook.LibraryThingId,
+            sourceBook.GoogleBooksId,
+            sourceBook.BarnesAndNobleId,
+            sourceBook.AppleBooksId,
+            createdOnUtc,
+            Optional<DateTime>.Some(updatedOnUtc),
+            [.. sourceBook.ISBNs],
+            [.. sourceBook.Contributors],
+            [.. sourceBook.Ratings]);
+
+        // Assert
+        Book book = result.Value;
+        Assert.Equal(sourceBook.Id, book.Id);
+        Assert.Equal(sourceBook.LibraryId, book.LibraryId);
+        Assert.Equal(sourceBook.Path, book.Path);
+        Assert.Equal(sourceBook.Metadata, book.Metadata);
+        Assert.Equal(createdOnUtc, book.CreatedOnUtc);
+        Assert.Equal(updatedOnUtc, book.UpdatedOnUtc);
+        Assert.Equal(sourceBook.ISBNs, book.ISBNs);
+        Assert.Equal(sourceBook.Ratings, book.Ratings);
+    }
+
+    [Fact]
+    public void ApplyEnrichedMetadata_WhenCalled_ShouldReplaceMetadataAndRelatedFields()
+    {
+        // Arrange
+        Book book = _bookFixture.Create();
+        Book enrichedSource = _bookFixture.Create();
+
+        // Act
+        book.ApplyEnrichedMetadata(
+            enrichedSource.Metadata,
+            enrichedSource.Format,
+            enrichedSource.Edition,
+            enrichedSource.VolumeNumber,
+            enrichedSource.Series,
+            enrichedSource.ASIN,
+            enrichedSource.GoodreadsId,
+            enrichedSource.LCCN,
+            enrichedSource.OCLCNumber,
+            enrichedSource.OpenLibraryId,
+            enrichedSource.LibraryThingId,
+            enrichedSource.GoogleBooksId,
+            enrichedSource.BarnesAndNobleId,
+            enrichedSource.AppleBooksId,
+            [.. enrichedSource.ISBNs],
+            [.. enrichedSource.Ratings]);
+
+        // Assert
+        // the metadata and related fields are replaced with the enriched values
+        Assert.Equal(enrichedSource.Metadata, book.Metadata);
+        Assert.Equal(enrichedSource.Format, book.Format);
+        Assert.Equal(enrichedSource.Edition, book.Edition);
+        Assert.Equal(enrichedSource.VolumeNumber, book.VolumeNumber);
+        Assert.Equal(enrichedSource.Series, book.Series);
+        Assert.Equal(enrichedSource.ASIN, book.ASIN);
+        Assert.Equal(enrichedSource.GoodreadsId, book.GoodreadsId);
+        Assert.Equal(enrichedSource.LCCN, book.LCCN);
+        Assert.Equal(enrichedSource.OCLCNumber, book.OCLCNumber);
+        Assert.Equal(enrichedSource.OpenLibraryId, book.OpenLibraryId);
+        Assert.Equal(enrichedSource.LibraryThingId, book.LibraryThingId);
+        Assert.Equal(enrichedSource.GoogleBooksId, book.GoogleBooksId);
+        Assert.Equal(enrichedSource.BarnesAndNobleId, book.BarnesAndNobleId);
+        Assert.Equal(enrichedSource.AppleBooksId, book.AppleBooksId);
+        Assert.Equal(enrichedSource.ISBNs, book.ISBNs);
+        Assert.Equal(enrichedSource.Ratings, book.Ratings);
+    }
+
+    [Fact]
+    public void ApplyEnrichedMetadata_WhenCalledAgain_ShouldReplaceCollectionsWithoutAppending()
+    {
+        // Arrange
+        Book book = _bookFixture.Create();
+        Book firstEnrichmentSource = _bookFixture.Create();
+        Book secondEnrichmentSource = _bookFixture.Create();
+        book.ApplyEnrichedMetadata(
+            firstEnrichmentSource.Metadata,
+            firstEnrichmentSource.Format,
+            firstEnrichmentSource.Edition,
+            firstEnrichmentSource.VolumeNumber,
+            firstEnrichmentSource.Series,
+            firstEnrichmentSource.ASIN,
+            firstEnrichmentSource.GoodreadsId,
+            firstEnrichmentSource.LCCN,
+            firstEnrichmentSource.OCLCNumber,
+            firstEnrichmentSource.OpenLibraryId,
+            firstEnrichmentSource.LibraryThingId,
+            firstEnrichmentSource.GoogleBooksId,
+            firstEnrichmentSource.BarnesAndNobleId,
+            firstEnrichmentSource.AppleBooksId,
+            [.. firstEnrichmentSource.ISBNs],
+            [.. firstEnrichmentSource.Ratings]);
+
+        // Act
+        book.ApplyEnrichedMetadata(
+            secondEnrichmentSource.Metadata,
+            secondEnrichmentSource.Format,
+            secondEnrichmentSource.Edition,
+            secondEnrichmentSource.VolumeNumber,
+            secondEnrichmentSource.Series,
+            secondEnrichmentSource.ASIN,
+            secondEnrichmentSource.GoodreadsId,
+            secondEnrichmentSource.LCCN,
+            secondEnrichmentSource.OCLCNumber,
+            secondEnrichmentSource.OpenLibraryId,
+            secondEnrichmentSource.LibraryThingId,
+            secondEnrichmentSource.GoogleBooksId,
+            secondEnrichmentSource.BarnesAndNobleId,
+            secondEnrichmentSource.AppleBooksId,
+            [.. secondEnrichmentSource.ISBNs],
+            [.. secondEnrichmentSource.Ratings]);
+
+        // Assert
+        // the second enrichment replaces the first, it is not appended to it
+        Assert.Equal(secondEnrichmentSource.ISBNs.Count, book.ISBNs.Count);
+        Assert.Equal(secondEnrichmentSource.ISBNs, book.ISBNs);
+        Assert.Equal(secondEnrichmentSource.Ratings, book.Ratings);
+    }
+
+    [Fact]
     public void Create_WhenCalled_ShouldNotExposeEnrichmentTracking()
     {
         // Arrange

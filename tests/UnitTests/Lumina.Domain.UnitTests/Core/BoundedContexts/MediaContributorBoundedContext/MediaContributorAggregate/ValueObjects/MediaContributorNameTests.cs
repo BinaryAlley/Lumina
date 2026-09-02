@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.MediaContributorBoundedContext.MediaContributorAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.MediaContributorBoundedContext.MediaContributorAggregate.ValueObjects;
@@ -38,6 +39,20 @@ public class MediaContributorNameTests
         Assert.False(result.IsFailure);
         Assert.Equal("Jane Doe", result.Value.DisplayName);
         Assert.False(result.Value.LegalName.HasValue);
+    }
+
+    [Theory]
+    [InlineData(null)] // null display name
+    [InlineData("")] // empty display name
+    [InlineData("   ")] // whitespace display name
+    public void Create_WhenDisplayNameIsNullOrWhitespace_ShouldReturnError(string? displayName)
+    {
+        // Act
+        Result<MediaContributorName> result = MediaContributorName.Create(displayName!, Optional<string>.None());
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.MediaContributors.MediaContributorNameCannotBeEmpty, result.FirstError);
     }
 
     [Fact]

@@ -6,6 +6,7 @@ using Lumina.Presentation.Api.Fixtures.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -181,5 +182,82 @@ public class BaseEndpointTests
         Assert.Contains("Code2", validationProblemDetails.Errors.Keys);
         Assert.Equal(new[] { "Description1", "Description2" }, validationProblemDetails.Errors["Code1"]);
         Assert.Equal(new[] { "Description3" }, validationProblemDetails.Errors["Code2"]);
+    }
+
+    [Fact]
+    public void Problem_WhenCalledWithSingleUnauthorizedError_ShouldReturnForbiddenStatusCode()
+    {
+        // Act
+        IResult result = _sut.TestProblem([Error.Unauthorized("ErrorCode", "ErrorDescription")]);
+
+        // Assert
+        ProblemHttpResult problemResult = Assert.IsType<ProblemHttpResult>(result);
+        Assert.Equal(StatusCodes.Status403Forbidden, problemResult.StatusCode);
+    }
+
+    [Fact]
+    public void Problem_WhenCalledWithSingleForbiddenError_ShouldReturnForbiddenStatusCode()
+    {
+        // Act
+        IResult result = _sut.TestProblem([Error.Forbidden("ErrorCode", "ErrorDescription")]);
+
+        // Assert
+        ProblemHttpResult problemResult = Assert.IsType<ProblemHttpResult>(result);
+        Assert.Equal(StatusCodes.Status403Forbidden, problemResult.StatusCode);
+    }
+
+    [Fact]
+    public void Problem_WhenCalledWithMixedErrorsStartingWithValidation_ShouldReturnTheValidationStatusCode()
+    {
+        // Arrange
+        List<Error> errors = [
+            Error.Validation("Code1", "Description1"),
+            Error.Conflict("Code2", "Description2")
+        ];
+
+        // Act
+        IResult result = _sut.TestProblem(errors);
+
+        // Assert
+        ProblemHttpResult problemResult = Assert.IsType<ProblemHttpResult>(result);
+        Assert.Equal(StatusCodes.Status400BadRequest, problemResult.StatusCode);
+        Assert.Equal("Code1", problemResult.ProblemDetails.Title);
+    }
+
+    [Fact]
+    public void Problem_WhenActivityIsCurrent_ShouldUseTheActivityIdAsTraceId()
+    {
+        // Arrange
+        using (Activity activity = new Activity("TestActivity"))
+        {
+            activity.Start();
+            List<Error> errors = [Error.NotFound("ErrorCode", "ErrorDescription")];
+
+            // Act
+            IResult result = _sut.TestProblem(errors);
+
+            // Assert
+            ProblemHttpResult problemResult = Assert.IsType<ProblemHttpResult>(result);
+            Assert.Equal(activity.Id, problemResult.ProblemDetails.Extensions["traceId"]);
+        }
+    }
+
+    [Fact]
+    public void ValidationProblem_WhenActivityIsCurrent_ShouldUseTheActivityIdAsTraceId()
+    {
+        // Arrange
+        using (Activity activity = new Activity("TestActivity"))
+        {
+            activity.Start();
+            List<Error> errors = [Error.Validation("Code1", "Description1")];
+
+            // Act
+            IResult result = _sut.TestValidationProblem(errors);
+
+            // Assert
+            ProblemHttpResult problemResult = Assert.IsType<ProblemHttpResult>(result);
+            HttpValidationProblemDetails validationProblemDetails = Assert.IsType<HttpValidationProblemDetails>(problemResult.ProblemDetails);
+            Assert.Equal(activity.Id, validationProblemDetails.Extensions["traceId"]);
+        }
     }
 }

@@ -2,6 +2,7 @@
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Events;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
@@ -11,7 +12,6 @@ using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggreg
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.WrittenContent.Books;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,8 +19,6 @@ using NSubstitute;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -39,13 +37,11 @@ public class BooksFileSystemDiscoveryJobTests
     private readonly IUnitOfWork _mockUnitOfWork;
     private readonly ILibraryRepository _mockLibraryRepository;
     private readonly ILibraryScanStagingResultsRepository _mockStagingResultsRepository;
-    private readonly IDirectoryScanFingerprintRepository _mockDirectoryScanFingerprintRepository;
     private readonly IDomainEventPublisher _mockDomainEventPublisher;
     private readonly BooksFileSystemDiscoveryJob _sut;
     private readonly ScanIdFixture _scanIdFixture = new();
     private readonly UserIdFixture _userIdFixture = new();
     private readonly LibraryIdFixture _libraryIdFixture = new();
-    private readonly LibraryEntityFixture _libraryEntityFixture = new();
     private readonly ScanId _scanId;
     private readonly UserId _userId;
     private readonly LibraryId _libraryId;
@@ -64,10 +60,8 @@ public class BooksFileSystemDiscoveryJobTests
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
         _mockLibraryRepository = Substitute.For<ILibraryRepository>();
         _mockStagingResultsRepository = Substitute.For<ILibraryScanStagingResultsRepository>();
-        _mockDirectoryScanFingerprintRepository = Substitute.For<IDirectoryScanFingerprintRepository>();
         _mockUnitOfWork.LibraryRepository.Returns(_mockLibraryRepository);
         _mockUnitOfWork.LibraryScanStagingResultsRepository.Returns(_mockStagingResultsRepository);
-        _mockUnitOfWork.DirectoryScanFingerprintRepository.Returns(_mockDirectoryScanFingerprintRepository);
         _mockServiceProvider.GetService(typeof(IUnitOfWork)).Returns(_mockUnitOfWork);
 
         _mockDomainEventPublisher = Substitute.For<IDomainEventPublisher>();
@@ -84,47 +78,6 @@ public class BooksFileSystemDiscoveryJobTests
             UserId = _userId,
             LibraryId = _libraryId
         };
-    }
-
-    [Fact]
-    public async Task ExecuteAsync_WhenContentLocationContainsBookFiles_ShouldDiscoverAndStageThemAndComplete()
-    {
-        // Arrange
-        using TemporaryLibraryDirectory temporaryLibraryDirectory = new();
-        temporaryLibraryDirectory.CreateFile("book1.pdf", "book content");
-        temporaryLibraryDirectory.CreateFile("notes.log", "not a book");
-        string subdirectoryPath = temporaryLibraryDirectory.CreateSubdirectory("sub");
-        File.WriteAllText(Path.Combine(subdirectoryPath, "book2.epub"), "another book content");
-
-        LibraryEntity libraryEntity = _libraryEntityFixture.Create(
-            id: _libraryId.Value,
-            userId: _userId.Value,
-            title: "Test Library",
-            libraryType: LibraryType.Book,
-            contentLocations: [temporaryLibraryDirectory.Path],
-            shouldSkipUnchangedDirectoriesDuringScan: false);
-        _mockLibraryRepository.GetByIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
-            .Returns(Result.From<LibraryEntity?>(libraryEntity));
-        _mockStagingResultsRepository.InsertRangeAsync(Arg.Any<IReadOnlyCollection<LibraryScanStagingResultsEntity>>(), Arg.Any<CancellationToken>())
-            .Returns(Result.From(Result.Created));
-        _mockDirectoryScanFingerprintRepository.UpsertRangeAsync(Arg.Any<IReadOnlyCollection<DirectoryScanFingerprintEntity>>(), Arg.Any<CancellationToken>())
-            .Returns(Result.From(Result.Updated));
-
-        // Act
-        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
-
-        // Assert
-        Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
-        IReadOnlyList<LibraryScanStagingResultsEntity>? actualEntities = _mockStagingResultsRepository.ReceivedCalls()
-            .Where(call => call.GetMethodInfo().Name == nameof(ILibraryScanStagingResultsRepository.InsertRangeAsync))
-            .Select(call => call.GetArguments().FirstOrDefault() as IReadOnlyList<LibraryScanStagingResultsEntity>)
-            .FirstOrDefault();
-        Assert.True(actualEntities is not null, $"InsertRangeAsync was not called. Received: {string.Join(", ", _mockStagingResultsRepository.ReceivedCalls().Select(call => call.GetMethodInfo().Name))}");
-        Assert.Equal(
-            ["book1.pdf", "book2.epub"],
-            actualEntities!.Select(entity => Path.GetFileName(entity.Path)).OrderBy(name => name, StringComparer.Ordinal));
-        await _mockDirectoryScanFingerprintRepository.DidNotReceive().UpsertRangeAsync(Arg.Any<IReadOnlyCollection<DirectoryScanFingerprintEntity>>(), Arg.Any<CancellationToken>());
-        await _mockDomainEventPublisher.Received(1).PublishAsync(Arg.Is<LibraryScanProgressChangedDomainEvent>(domainEvent => domainEvent.LibraryId == _libraryId), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -175,49 +128,5 @@ public class BooksFileSystemDiscoveryJobTests
         // Assert
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() => operation);
         Assert.Equal(LibraryScanJobStatus.Canceled, _sut.Status);
-    }
-
-    /// <summary>
-    /// Test helper managing a temporary library directory, deleted when the test finishes.
-    /// </summary>
-    private sealed class TemporaryLibraryDirectory : IDisposable
-    {
-        private bool _disposed;
-
-        public TemporaryLibraryDirectory()
-        {
-            Path = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"lumina-books-discovery-{Guid.NewGuid()}");
-            Directory.CreateDirectory(Path);
-        }
-
-        public string Path { get; }
-
-        public void CreateFile(string fileName, string content)
-        {
-            File.WriteAllText(System.IO.Path.Combine(Path, fileName), content);
-        }
-
-        public string CreateSubdirectory(string name)
-        {
-            string subdirectoryPath = System.IO.Path.Combine(Path, name);
-            Directory.CreateDirectory(subdirectoryPath);
-            return subdirectoryPath;
-        }
-
-        public void Dispose()
-        {
-            if (!_disposed)
-            {
-                try
-                {
-                    Directory.Delete(Path, recursive: true);
-                }
-                catch (IOException)
-                {
-                    // best effort cleanup of the temporary library directory
-                }
-                _disposed = true;
-            }
-        }
     }
 }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
@@ -83,6 +84,31 @@ public class ExceptionHandlingMiddlewareTests
             Arg.Any<object>(),
             Arg.Is<Exception>(exception => exception is InvalidOperationException && exception.Message == "sensitive internal details"),
             Arg.Any<Func<object, Exception?, string>>());
+    }
+
+    [Fact]
+    public async Task InvokeAsync_WhenNextThrowsExceptionAndActivityIsCurrent_ShouldUseTheActivityIdAsTraceId()
+    {
+        // Arrange
+        using (Activity activity = new Activity("TestActivity"))
+        {
+            activity.Start();
+            DefaultHttpContext context = new()
+            {
+                Response = { Body = new MemoryStream() }
+            };
+            _nextDelegate = _ => throw new InvalidOperationException("sensitive internal details");
+
+            // Act
+            await _sut.InvokeAsync(context);
+
+            // Assert
+            context.Response.Body.Seek(0, SeekOrigin.Begin);
+            using StreamReader reader = new(context.Response.Body, Encoding.UTF8);
+            string responseBody = await reader.ReadToEndAsync();
+            ProblemDetails problemDetails = JsonSerializer.Deserialize<ProblemDetails>(responseBody, _jsonOptions)!;
+            Assert.Equal(activity.Id, problemDetails.Extensions["traceId"]?.ToString());
+        }
     }
 
     [Fact]

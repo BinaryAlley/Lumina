@@ -18,4 +18,5 @@ using System.Runtime.InteropServices;
 
 [assembly: InternalsVisibleTo("Lumina.Infrastructure.UnitTests")]
 [assembly: InternalsVisibleTo("Lumina.Infrastructure.Fixtures")]
+[assembly: InternalsVisibleTo("Lumina.Infrastructure.IntegrationTests")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

@@ -17,4 +17,5 @@ using System.Runtime.InteropServices;
 [assembly: Guid("A3C1E9B4-5D7F-4E2A-9B6C-8D1F0E3A2B41")]
 
 [assembly: InternalsVisibleTo("Lumina.Plugins.Epub.UnitTests")]
+[assembly: InternalsVisibleTo("Lumina.Plugins.Epub.IntegrationTests")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

@@ -9,6 +9,7 @@ using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedCon
 using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
 using NSubstitute;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.PixelFormats;
 using System.Diagnostics.CodeAnalysis;
@@ -168,6 +169,67 @@ public class ThumbnailServiceTests
         }
     }
 
+    [Theory]
+    [InlineData(ImageType.JPEG2000)] // resolution adjustment switch branch for JPEG2000
+    [InlineData(ImageType.JPEG_CANON)] // resolution adjustment switch branch for Canon JPEG
+    [InlineData(ImageType.JPEG_UNKNOWN)] // resolution adjustment switch branch for unknown JPEG
+    [InlineData(ImageType.TIFF)] // resolution adjustment switch branch for TIFF
+    [InlineData(ImageType.WEBP)] // resolution adjustment switch branch for WEBP
+    [InlineData(ImageType.TGA)] // resolution adjustment switch branch for TGA
+    public async Task GetThumbnailAsync_WithAdditionalSupportedImageTypes_ShouldReturnAdjustedThumbnail(ImageType imageType)
+    {
+        // Arrange
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(@"C:\TestImage");
+        int quality = 80;
+        byte[] imageBytes = CreateImageBytes(new JpegEncoder());
+
+        _mockEnvironmentContext.FileTypeService.GetImageTypeAsync(pathId, Arg.Any<CancellationToken>())
+            .Returns(Result.From(imageType));
+        _mockEnvironmentContext.FileProviderService.GetFileAsync(pathId)
+            .Returns(Result.From(imageBytes));
+
+        // Act
+        Result<Thumbnail> result = await _sut.GetThumbnailAsync(pathId, quality, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(imageType, result.Value.Type);
+        Assert.NotEmpty(result.Value.Bytes);
+
+        using (MemoryStream ms = new(result.Value.Bytes))
+        {
+            Image loadedImage = Image.Load(ms);
+            Assert.NotNull(loadedImage);
+        }
+    }
+
+    [Theory]
+    [InlineData(ImageType.SVG)] // SVG is not resized, original bytes are returned
+    [InlineData(ImageType.PICT)] // PICT is not resized, original bytes are returned
+    [InlineData(ImageType.ICO)] // ICO is not resized, original bytes are returned
+    [InlineData(ImageType.PSD)] // PSD is not resized, original bytes are returned
+    [InlineData(ImageType.AVIF)] // AVIF is not resized, original bytes are returned
+    public async Task GetThumbnailAsync_WithUnsupportedNonNoneImageType_ShouldReturnOriginalBytes(ImageType imageType)
+    {
+        // Arrange
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(@"C:\TestImage");
+        int quality = 80;
+        byte[] imageBytes = CreateImageBytes(new JpegEncoder());
+
+        _mockEnvironmentContext.FileTypeService.GetImageTypeAsync(pathId, Arg.Any<CancellationToken>())
+            .Returns(Result.From(imageType));
+        _mockEnvironmentContext.FileProviderService.GetFileAsync(pathId)
+            .Returns(Result.From(imageBytes));
+
+        // Act
+        Result<Thumbnail> result = await _sut.GetThumbnailAsync(pathId, quality, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(imageType, result.Value.Type);
+        Assert.Equal(imageBytes, result.Value.Bytes);
+    }
+
     [Fact]
     public async Task GetThumbnailAsync_WithCancellation_ShouldThrowTaskCanceledException()
     {
@@ -183,5 +245,18 @@ public class ThumbnailServiceTests
         // Act & Assert
         await Assert.ThrowsAsync<TaskCanceledException>(() =>
             _sut.GetThumbnailAsync(pathId, quality, cts.Token));
+    }
+
+    /// <summary>
+    /// Creates the bytes of a small image encoded with the specified encoder.
+    /// </summary>
+    /// <param name="encoder">The encoder used to encode the image.</param>
+    /// <returns>The bytes of the created image.</returns>
+    private static byte[] CreateImageBytes(IImageEncoder encoder)
+    {
+        using Image<Rgba32> image = new(10, 10);
+        using MemoryStream memoryStream = new();
+        image.Save(memoryStream, encoder);
+        return memoryStream.ToArray();
     }
 }

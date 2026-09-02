@@ -1,12 +1,15 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Lumina.Contracts.DTO.Common;
 using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Contracts.Fixtures.Core.DTO.Common;
 using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
@@ -65,5 +68,172 @@ public class BookMetadataDtoMappingTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.NotEqual("The Fellowship of the Ring", book.Metadata.Title);
+    }
+
+    [Theory]
+    [InlineData(null)] // missing title
+    [InlineData("")] // empty title
+    [InlineData("   ")] // whitespace title
+    public void ApplyMetadata_WhenTitleIsNullOrWhitespace_ShouldReturnTitleCannotBeEmptyError(string? title)
+    {
+        // Arrange
+        Book book = _bookFixture.Create();
+        BookMetadataDto metadata = _bookMetadataDtoFixture.Create(title: title, includeOptionalProperties: false);
+
+        // Act
+        Result<Success> result = book.ApplyMetadata(metadata);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Metadata.TitleCannotBeEmpty, result.FirstError);
+    }
+
+    [Fact]
+    public void ApplyMetadata_WhenReleaseInfoIsNull_ShouldReturnReleaseInfoCannotBeNullError()
+    {
+        // Arrange
+        Book book = _bookFixture.Create();
+        BookMetadataDto metadata = _bookMetadataDtoFixture.Create(title: "A valid title", includeOptionalProperties: false);
+
+        // Act
+        Result<Success> result = book.ApplyMetadata(metadata);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Metadata.ReleaseInfoCannotBeNull, result.FirstError);
+    }
+
+    [Fact]
+    public void ApplyMetadata_WhenReleaseInfoIsInvalid_ShouldReturnError()
+    {
+        // Arrange
+        Book book = _bookFixture.Create();
+        BookMetadataDto metadata = _bookMetadataDtoFixture.Create(
+            title: "A valid title",
+            releaseInfo: new ReleaseInfoDto(new DateOnly(2000, 1, 1), 1999, null, null, null, null));
+
+        // Act
+        Result<Success> result = book.ApplyMetadata(metadata);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Metadata.OriginalReleaseDateAndYearMustMatch, result.FirstError);
+    }
+
+    [Fact]
+    public void ApplyMetadata_WhenTagsAreInvalid_ShouldReturnError()
+    {
+        // Arrange
+        Book book = _bookFixture.Create();
+        BookMetadataDto metadata = _bookMetadataDtoFixture.Create(
+            title: "A valid title",
+            tags: [new TagDto("   ")]);
+
+        // Act
+        Result<Success> result = book.ApplyMetadata(metadata);
+
+        // Assert
+        Assert.True(result.IsFailure);
+    }
+
+    [Fact]
+    public void ApplyMetadata_WhenLanguageIsInvalid_ShouldReturnError()
+    {
+        // Arrange
+        Book book = _bookFixture.Create();
+        BookMetadataDto metadata = _bookMetadataDtoFixture.Create(
+            title: "A valid title",
+            language: new LanguageInfoDto("", "English", "English"));
+
+        // Act
+        Result<Success> result = book.ApplyMetadata(metadata);
+
+        // Assert
+        Assert.True(result.IsFailure);
+    }
+
+    [Fact]
+    public void ApplyMetadata_WhenOriginalLanguageIsInvalid_ShouldReturnError()
+    {
+        // Arrange
+        Book book = _bookFixture.Create();
+        BookMetadataDto metadata = _bookMetadataDtoFixture.Create(
+            title: "A valid title",
+            originalLanguage: new LanguageInfoDto("", "English", "English"));
+
+        // Act
+        Result<Success> result = book.ApplyMetadata(metadata);
+
+        // Assert
+        Assert.True(result.IsFailure);
+    }
+
+    [Fact]
+    public void ApplyMetadata_WhenIsbnIsInvalid_ShouldReturnError()
+    {
+        // Arrange
+        Book book = _bookFixture.Create();
+        BookMetadataDto metadata = _bookMetadataDtoFixture.Create(
+            title: "A valid title",
+            isbns: [new IsbnDto("not-an-isbn", IsbnFormat.Isbn13)]);
+
+        // Act
+        Result<Success> result = book.ApplyMetadata(metadata);
+
+        // Assert
+        Assert.True(result.IsFailure);
+    }
+
+    [Fact]
+    public void ApplyMetadata_WhenRatingIsInvalid_ShouldReturnError()
+    {
+        // Arrange
+        Book book = _bookFixture.Create();
+        BookMetadataDto metadata = _bookMetadataDtoFixture.Create(
+            title: "A valid title",
+            ratings: [new BookRatingDto(-1m, 5m, null, null)]);
+
+        // Act
+        Result<Success> result = book.ApplyMetadata(metadata);
+
+        // Assert
+        Assert.True(result.IsFailure);
+    }
+
+    [Fact]
+    public void ApplyMetadata_WhenOptionalCollectionsAreNull_ShouldApplyMetadataWithoutCollections()
+    {
+        // Arrange
+        Book book = _bookFixture.Create();
+        BookMetadataDto metadata = _bookMetadataDtoFixture.Create(
+            title: "A valid title",
+            releaseInfo: new ReleaseInfoDto(new DateOnly(2000, 1, 1), 2000, null, null, null, null),
+            includeOptionalProperties: false);
+
+        // Act
+        Result<Success> result = book.ApplyMetadata(metadata);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal("A valid title", book.Metadata.Title);
+    }
+
+    [Fact]
+    public void ApplyMetadata_WhenIsbnsAndRatingsAreValid_ShouldApplyMetadataWithTheCollections()
+    {
+        // Arrange
+        Book book = _bookFixture.Create();
+        BookMetadataDto metadata = _bookMetadataDtoFixture.Create(
+            title: "A valid title",
+            isbns: [new IsbnDto("9780306406157", IsbnFormat.Isbn13)],
+            ratings: [new BookRatingDto(4m, 5m, null, 10)]);
+
+        // Act
+        Result<Success> result = book.ApplyMetadata(metadata);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Single(book.ISBNs);
+        Assert.Single(book.Ratings);
     }
 }

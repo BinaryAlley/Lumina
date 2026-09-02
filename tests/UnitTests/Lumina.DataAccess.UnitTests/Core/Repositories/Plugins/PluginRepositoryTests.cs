@@ -6,7 +6,10 @@ using Lumina.DataAccess.Core.Repositories.Plugins;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
@@ -76,7 +79,7 @@ public class PluginRepositoryTests
 
         PluginEntity updatedPlugin = _pluginFixture.Create(plugin.Id);
         updatedPlugin.Name = "Updated Name";
-        updatedPlugin.SettingsJson = null; // the stored settings must be preserved
+        updatedPlugin.SettingsJson = null; // The stored settings must be preserved.
 
         // Act
         Result<Updated> result = await _sut.UpsertAsync(updatedPlugin, CancellationToken.None);
@@ -111,6 +114,73 @@ public class PluginRepositoryTests
     {
         // Act
         Result<Updated> result = await _sut.UpdateSettingsAsync(Guid.NewGuid(), null, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Plugins.PluginNotFound, result.FirstError);
+    }
+
+    [Fact]
+    public async Task GetAllAsync_WhenPluginsExist_ShouldReturnAllPlugins()
+    {
+        // Arrange
+        List<PluginEntity> plugins = _pluginFixture.CreateMany(2);
+
+        _mockContext.Plugins.AddRange(plugins);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<IEnumerable<PluginEntity>> result = await _sut.GetAllAsync(CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.NotNull(result.Value);
+        Assert.Equal(2, result.Value.Count());
+        Assert.Contains(result.Value, plugin => plugin.Id == plugins[0].Id);
+        Assert.Contains(result.Value, plugin => plugin.Id == plugins[1].Id);
+    }
+
+    [Fact]
+    public async Task GetAllAsync_WhenNoPluginsExist_ShouldReturnEmptyList()
+    {
+        // Act
+        Result<IEnumerable<PluginEntity>> result = await _sut.GetAllAsync(CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.NotNull(result.Value);
+        Assert.Empty(result.Value);
+    }
+
+    [Fact]
+    public async Task DeleteByIdAsync_WhenPluginExists_ShouldRemovePluginAndReturnDeleted()
+    {
+        // Arrange
+        PluginEntity existingPlugin = _pluginFixture.Create();
+        _mockContext.Plugins.Add(existingPlugin);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<Deleted> result = await _sut.DeleteByIdAsync(existingPlugin.Id, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(Result.Deleted, result.Value);
+
+        EntityEntry<PluginEntity>? deletedEntry = _mockContext.ChangeTracker.Entries<PluginEntity>()
+            .FirstOrDefault(entityEntry => entityEntry.Entity.Id == existingPlugin.Id);
+        Assert.NotNull(deletedEntry);
+        Assert.Equal(EntityState.Deleted, deletedEntry!.State);
+    }
+
+    [Fact]
+    public async Task DeleteByIdAsync_WhenPluginDoesNotExist_ShouldReturnError()
+    {
+        // Arrange
+        Guid nonExistentId = Guid.NewGuid();
+
+        // Act
+        Result<Deleted> result = await _sut.DeleteByIdAsync(nonExistentId, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);

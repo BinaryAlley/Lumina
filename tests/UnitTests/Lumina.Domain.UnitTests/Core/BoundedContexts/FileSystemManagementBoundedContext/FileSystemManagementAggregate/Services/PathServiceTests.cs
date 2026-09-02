@@ -41,6 +41,20 @@ public class PathServiceTests
     }
 
     [Fact]
+    public void PathSeparator_WhenAccessed_ShouldReturnPathStrategySeparator()
+    {
+        // Arrange
+        char expectedSeparator = '\\';
+        _mockPathStrategy.PathSeparator.Returns(expectedSeparator);
+
+        // Act
+        char result = _sut.PathSeparator;
+
+        // Assert
+        Assert.Equal(expectedSeparator, result);
+    }
+
+    [Fact]
     public void IsValidPath_WithValidPath_ShouldReturnTrue()
     {
         // Arrange
