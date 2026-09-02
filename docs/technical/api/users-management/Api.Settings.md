@@ -33,7 +33,10 @@ Returns the settings of the currently authenticated user.
   "isPaginationEnabled": true,
   "itemsPerPage": 50,
   "ignoreThePrefixForAlphaPicker": true,
-  "isThemeCachingEnabled": true
+  "isThemeCachingEnabled": true,
+  "shouldAggregateMetadataWhenMissing": true,
+  "shouldRenderPdfAsImages": false,
+  "shouldPreserveBookStyles": true
 }
 ```
 
@@ -52,7 +55,10 @@ Updates the settings of the currently authenticated user.
   "isPaginationEnabled": true,
   "itemsPerPage": 50,
   "ignoreThePrefixForAlphaPicker": true,
-  "isThemeCachingEnabled": true
+  "isThemeCachingEnabled": true,
+  "shouldAggregateMetadataWhenMissing": true,
+  "shouldRenderPdfAsImages": false,
+  "shouldPreserveBookStyles": true
 }
 ```
 

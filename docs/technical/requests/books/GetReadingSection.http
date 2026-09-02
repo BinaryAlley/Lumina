@@ -1,0 +1,2 @@
+GET {{host}}/api/v1/books/{{$guid}}/reading/sections/chapter1
+Authorization: Bearer {{ACCESS_TOKEN}}

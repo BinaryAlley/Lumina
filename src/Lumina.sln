@@ -182,6 +182,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "architecture", "architectur
 		..\docs\technical\architecture\3.2 component-api-server-diagram.svg = ..\docs\technical\architecture\3.2 component-api-server-diagram.svg
 		..\docs\technical\architecture\4.1 code-media-library-scanning-diagram.puml = ..\docs\technical\architecture\4.1 code-media-library-scanning-diagram.puml
 		..\docs\technical\architecture\4.1 code-media-library-scanning-diagram.svg = ..\docs\technical\architecture\4.1 code-media-library-scanning-diagram.svg
+		..\docs\technical\architecture\4.2 code-book-reading-diagram.puml = ..\docs\technical\architecture\4.2 code-book-reading-diagram.puml
+		..\docs\technical\architecture\4.2 code-book-reading-diagram.svg = ..\docs\technical\architecture\4.2 code-book-reading-diagram.svg
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "architecture-knowledge-management", "architecture-knowledge-management", "{70B56088-6D3A-481E-9459-79AC6B16FEC1}"

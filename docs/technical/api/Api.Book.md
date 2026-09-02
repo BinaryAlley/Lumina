@@ -14,6 +14,18 @@
     - [Get Books Lite](#get-books-lite)
       - [Get Books Lite Request](#get-books-lite-request)
       - [Get Books Lite Response](#get-books-lite-response)
+    - [Get Reading Availability](#get-reading-availability)
+      - [Get Reading Availability Request](#get-reading-availability-request)
+      - [Get Reading Availability Response](#get-reading-availability-response)
+    - [Get Reading Manifest](#get-reading-manifest)
+      - [Get Reading Manifest Request](#get-reading-manifest-request)
+      - [Get Reading Manifest Response](#get-reading-manifest-response)
+    - [Get Reading Resource](#get-reading-resource)
+      - [Get Reading Resource Request](#get-reading-resource-request)
+      - [Get Reading Resource Response](#get-reading-resource-response)
+    - [Get Reading Section](#get-reading-section)
+      - [Get Reading Section Request](#get-reading-section-request)
+      - [Get Reading Section Response](#get-reading-section-response)
 
 ## Book
 
@@ -393,3 +405,121 @@ GET api/v1/books/lite?libraryId=3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a&currentPage
   "numberOfPages": 1
 }
 ```
+
+### Get Reading Availability
+
+#### Get Reading Availability Request
+
+```js
+GET api/v1/books/{bookId}/reading/availability
+```
+
+Reports whether the book identified by `bookId` can be opened for reading: the book reader that supports the format of the book is resolved and its enablement for the media library of the book is checked, without extracting the book. When the book cannot be read, the response carries the code of the error preventing it, so the client can tell a missing book reader apart from a disabled one.
+
+#### Get Reading Availability Response
+
+```js
+200 Ok
+```
+
+```json
+{
+  "bookId": "32b336e8-dafc-4a08-9dec-9454e66dd55d",
+  "libraryId": "3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a",
+  "isAvailable": true,
+  "errorCode": null
+}
+```
+
+### Get Reading Manifest
+
+#### Get Reading Manifest Request
+
+```js
+GET api/v1/books/{bookId}/reading/manifest
+```
+
+Opens the book identified by `bookId` for reading by extracting its contents through the book reader that is enabled for its media library, and returns the reading manifest: the title and author of the book, its hierarchical table of contents, its ordered spine of reading sections, the keys of its resources, and whether it has extractable text content. A scanned book, whose pages are only images, has no text content and is displayed as page images.
+
+#### Get Reading Manifest Response
+
+```js
+200 Ok
+```
+
+```json
+{
+  "title": "The Fellowship of the Ring",
+  "author": "J.R.R. Tolkien",
+  "coverResourceKey": "0f4d6e2b1c9a4f3e8d7c6b5a4f3e2d1c",
+  "tableOfContents": [
+    {
+      "label": "Chapter One",
+      "locationRef": "chapter1",
+      "children": [
+        {
+          "label": "Part One",
+          "locationRef": "chapter1",
+          "children": []
+        }
+      ]
+    }
+  ],
+  "spine": [
+    {
+      "locationRef": "chapter1",
+      "title": "Chapter One"
+    },
+    {
+      "locationRef": "chapter2",
+      "title": "Chapter Two"
+    }
+  ],
+  "resourceKeys": [
+    "0f4d6e2b1c9a4f3e8d7c6b5a4f3e2d1c"
+  ],
+  "hasTextContent": true
+}
+```
+
+### Get Reading Section
+
+#### Get Reading Section Request
+
+```js
+GET api/v1/books/{bookId}/reading/sections/{locationRef}
+```
+
+Returns the reading section identified by `locationRef` of the book identified by `bookId`. The section content is sanitized by the host before it is served, and its references to the resources of the book are resolved by the client through the resource endpoint. The `locationRef` of a section is taken from the spine of the reading manifest of the book.
+
+#### Get Reading Section Response
+
+```js
+200 Ok
+```
+
+```json
+{
+  "locationRef": "chapter1",
+  "title": "Chapter One",
+  "contentHtml": "<section><h1>Chapter One</h1><p>First paragraph.</p></section>"
+}
+```
+
+### Get Reading Resource
+
+#### Get Reading Resource Request
+
+```js
+GET api/v1/books/{bookId}/reading/resources/{resourceKey}
+```
+
+Returns the binary resource identified by `resourceKey` of the book identified by `bookId` (for example an image, a font, or a stylesheet of the book, or a page image of a scanned PDF that is rendered on demand). The `resourceKey` of a resource is taken from the reading manifest of the book.
+
+#### Get Reading Resource Response
+
+```js
+200 Ok
+```
+
+The response is the raw bytes of the resource, served with the `Content-Type` of the resource and with `X-Content-Type-Options: nosniff`. A resource whose declared media type could be rendered as an active document (for example an SVG) is served as an opaque binary download instead.

@@ -23,6 +23,12 @@
     - [Reorder Library Metadata Providers](#reorder-library-metadata-providers)
       - [Reorder Library Metadata Providers Request](#reorder-library-metadata-providers-request)
       - [Reorder Library Metadata Providers Response](#reorder-library-metadata-providers-response)
+    - [Get Library Book Readers](#get-library-book-readers)
+      - [Get Library Book Readers Request](#get-library-book-readers-request)
+      - [Get Library Book Readers Response](#get-library-book-readers-response)
+    - [Set Library Book Reader Enabled](#set-library-book-reader-enabled)
+      - [Set Library Book Reader Enabled Request](#set-library-book-reader-enabled-request)
+      - [Set Library Book Reader Enabled Response](#set-library-book-reader-enabled-response)
 
 ## Plugins
 
@@ -203,6 +209,65 @@ PUT api/v1/libraries/{libraryId}/metadata-providers/reorder
 ```
 
 #### Reorder Library Metadata Providers Response
+
+```js
+200 Ok
+```
+
+### Get Library Book Readers
+
+#### Get Library Book Readers Request
+
+```js
+GET api/v1/libraries/{libraryId}/book-readers
+```
+
+Returns the book readers available for the media library, one entry per plugin that provides a book reader, along with whether the reader is enabled for the media library. A book can be opened for reading only through a book reader that is enabled for its media library.
+
+#### Get Library Book Readers Response
+
+```js
+200 Ok
+```
+
+```json
+[
+  {
+    "pluginId": "f0d1a2b3-4c5d-4e6f-8a7b-9c0d1e2f3a4b",
+    "name": "EPUB Reader",
+    "supportedExtensions": [
+      ".epub"
+    ],
+    "isEnabled": true
+  },
+  {
+    "pluginId": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+    "name": "PDF Reader",
+    "supportedExtensions": [
+      ".pdf"
+    ],
+    "isEnabled": false
+  }
+]
+```
+
+### Set Library Book Reader Enabled
+
+#### Set Library Book Reader Enabled Request
+
+```js
+PUT api/v1/libraries/{libraryId}/book-readers/{pluginId}/enabled
+```
+
+```json
+{
+  "libraryId": "3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a",
+  "pluginId": "f0d1a2b3-4c5d-4e6f-8a7b-9c0d1e2f3a4b",
+  "isEnabled": true
+}
+```
+
+#### Set Library Book Reader Enabled Response
 
 ```js
 200 Ok
