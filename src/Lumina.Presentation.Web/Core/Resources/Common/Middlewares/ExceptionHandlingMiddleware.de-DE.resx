@@ -738,4 +738,43 @@
   <data name="PluginArchiveNotReadable" xml:space="preserve">
     <value>Das hochgeladene Plugin-Archiv konnte nicht gelesen werden!</value>
   </data>
+  <data name="ScheduledJobNotFound" xml:space="preserve">
+    <value>Der geplante Auftrag wurde nicht gefunden!</value>
+  </data>
+  <data name="ScheduledJobNameCannotBeEmpty" xml:space="preserve">
+    <value>Der Name des geplanten Auftrags darf nicht leer sein!</value>
+  </data>
+  <data name="IntervalMinutesMustBePositive" xml:space="preserve">
+    <value>Die Intervallminuten müssen eine positive Zahl sein!</value>
+  </data>
+  <data name="HourMustBeBetweenZeroAndTwentyThree" xml:space="preserve">
+    <value>Die Stunde muss zwischen 0 und 23 liegen!</value>
+  </data>
+  <data name="MinuteMustBeBetweenZeroAndFiftyNine" xml:space="preserve">
+    <value>Die Minute muss zwischen 0 und 59 liegen!</value>
+  </data>
+  <data name="ScheduledJobAlreadyExists" xml:space="preserve">
+    <value>Ein geplanter Auftrag mit diesem Namen ist bereits vorhanden!</value>
+  </data>
+  <data name="ScheduledJobExecutionAlreadyExists" xml:space="preserve">
+    <value>The execution of the scheduled job already exists!</value>
+  </data>
+  <data name="ScheduledJobExecutionNotFound" xml:space="preserve">
+    <value>Die Ausführung des geplanten Auftrags wurde nicht gefunden!</value>
+  </data>
+  <data name="ScheduledJobCycleAlreadyStarted" xml:space="preserve">
+    <value>Der Ausführungszyklus des geplanten Auftrags wurde bereits gestartet!</value>
+  </data>
+  <data name="ScheduledJobNotStarted" xml:space="preserve">
+    <value>Der Ausführungszyklus des geplanten Auftrags wurde nicht gestartet!</value>
+  </data>
+  <data name="ScheduledJobAlreadyRunning" xml:space="preserve">
+    <value>Der geplante Auftrag wird bereits ausgeführt!</value>
+  </data>
+  <data name="CanOnlyCompleteRunningScheduledJob" xml:space="preserve">
+    <value>Nur ein laufender geplanter Auftrag kann abgeschlossen werden!</value>
+  </data>
+  <data name="InvalidScheduleType" xml:space="preserve">
+    <value>Der Zeitplantyp ist ungültig!</value>
+  </data>
 </root>

@@ -738,4 +738,43 @@
   <data name="PluginArchiveNotReadable" xml:space="preserve">
     <value>The plugin archive could not be read!</value>
   </data>
+  <data name="ScheduledJobNotFound" xml:space="preserve">
+    <value>The scheduled job was not found!</value>
+  </data>
+  <data name="ScheduledJobNameCannotBeEmpty" xml:space="preserve">
+    <value>The name of the scheduled job cannot be empty!</value>
+  </data>
+  <data name="IntervalMinutesMustBePositive" xml:space="preserve">
+    <value>The interval minutes must be a positive number!</value>
+  </data>
+  <data name="HourMustBeBetweenZeroAndTwentyThree" xml:space="preserve">
+    <value>The hour must be between 0 and 23!</value>
+  </data>
+  <data name="MinuteMustBeBetweenZeroAndFiftyNine" xml:space="preserve">
+    <value>The minute must be between 0 and 59!</value>
+  </data>
+  <data name="ScheduledJobAlreadyExists" xml:space="preserve">
+    <value>A scheduled job with this name already exists!</value>
+  </data>
+  <data name="ScheduledJobExecutionAlreadyExists" xml:space="preserve">
+    <value>The execution of the scheduled job already exists!</value>
+  </data>
+  <data name="ScheduledJobExecutionNotFound" xml:space="preserve">
+    <value>The execution of the scheduled job was not found!</value>
+  </data>
+  <data name="ScheduledJobCycleAlreadyStarted" xml:space="preserve">
+    <value>The execution cycle of the scheduled job has already been started!</value>
+  </data>
+  <data name="ScheduledJobNotStarted" xml:space="preserve">
+    <value>The execution cycle of the scheduled job has not been started!</value>
+  </data>
+  <data name="ScheduledJobAlreadyRunning" xml:space="preserve">
+    <value>The scheduled job is already running!</value>
+  </data>
+  <data name="CanOnlyCompleteRunningScheduledJob" xml:space="preserve">
+    <value>Only a running scheduled job can be completed!</value>
+  </data>
+  <data name="InvalidScheduleType" xml:space="preserve">
+    <value>The schedule type is invalid!</value>
+  </data>
 </root>

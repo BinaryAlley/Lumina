@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ScheduledJobs" xml:space="preserve">
+    <value>Заплановані завдання</value>
+  </data>
+  <data name="FilterByJobType" xml:space="preserve">
+    <value>Фільтрувати за типом завдання</value>
+  </data>
+  <data name="All" xml:space="preserve">
+    <value>Усі</value>
+  </data>
+  <data name="TaskType.ScanMediaLibraries" xml:space="preserve">
+    <value>Сканувати медіатеки</value>
+  </data>
+  <data name="TaskType.CleanTemporaryFiles" xml:space="preserve">
+    <value>Очистити тимчасові файли</value>
+  </data>
+  <data name="DisplayLast" xml:space="preserve">
+    <value>Показати останні</value>
+  </data>
+  <data name="TimeUnit" xml:space="preserve">
+    <value>Одиниця часу</value>
+  </data>
+  <data name="Minutes" xml:space="preserve">
+    <value>Хвилини</value>
+  </data>
+  <data name="MinutesShort" xml:space="preserve">
+    <value>хв</value>
+  </data>
+  <data name="Hours" xml:space="preserve">
+    <value>Години</value>
+  </data>
+  <data name="Days" xml:space="preserve">
+    <value>Дні</value>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>Оновити</value>
+  </data>
+  <data name="CurrentJobs" xml:space="preserve">
+    <value>Поточні завдання</value>
+  </data>
+  <data name="AddNewJob" xml:space="preserve">
+    <value>Додати завдання</value>
+  </data>
+  <data name="Id" xml:space="preserve">
+    <value>Id</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Назва</value>
+  </data>
+  <data name="JobType" xml:space="preserve">
+    <value>Тип завдання</value>
+  </data>
+  <data name="ScheduleType" xml:space="preserve">
+    <value>Тип розкладу</value>
+  </data>
+  <data name="Interval" xml:space="preserve">
+    <value>Інтервал</value>
+  </data>
+  <data name="Time" xml:space="preserve">
+    <value>Час</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Статус</value>
+  </data>
+  <data name="Started" xml:space="preserve">
+    <value>Запущено</value>
+  </data>
+  <data name="Completed" xml:space="preserve">
+    <value>Завершено</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>Дії</value>
+  </data>
+  <data name="JobName" xml:space="preserve">
+    <value>Назва завдання</value>
+  </data>
+  <data name="IntervalSchedule" xml:space="preserve">
+    <value>Інтервал</value>
+  </data>
+  <data name="DailySchedule" xml:space="preserve">
+    <value>Щоденно</value>
+  </data>
+  <data name="IntervalMinutes" xml:space="preserve">
+    <value>Інтервал (хвилини)</value>
+  </data>
+  <data name="Hour" xml:space="preserve">
+    <value>Година</value>
+  </data>
+  <data name="Minute" xml:space="preserve">
+    <value>Хвилина</value>
+  </data>
+  <data name="AddJob" xml:space="preserve">
+    <value>Додати завдання</value>
+  </data>
+  <data name="Start" xml:space="preserve">
+    <value>Запустити</value>
+  </data>
+  <data name="Stop" xml:space="preserve">
+    <value>Зупинити</value>
+  </data>
+  <data name="Fire" xml:space="preserve">
+    <value>Виконати</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>Видалити</value>
+  </data>
+  <data name="NoJobs" xml:space="preserve">
+    <value>Завдань не додано</value>
+  </data>
+  <data name="JobStarted" xml:space="preserve">
+    <value>Завдання успішно запущено.</value>
+  </data>
+  <data name="JobStopped" xml:space="preserve">
+    <value>Завдання успішно зупинено.</value>
+  </data>
+  <data name="JobFired" xml:space="preserve">
+    <value>Завдання успішно виконано.</value>
+  </data>
+  <data name="JobAdded" xml:space="preserve">
+    <value>Завдання успішно додано.</value>
+  </data>
+  <data name="JobRemoved" xml:space="preserve">
+    <value>Завдання успішно видалено.</value>
+  </data>
+  <data name="JobNotFound" xml:space="preserve">
+    <value>Завдання не знайдено.</value>
+  </data>
+  <data name="JobAlreadyRunning" xml:space="preserve">
+    <value>Завдання вже виконується.</value>
+  </data>
+  <data name="Status.Added" xml:space="preserve">
+    <value>Додано</value>
+  </data>
+  <data name="Status.Active" xml:space="preserve">
+    <value>Активне</value>
+  </data>
+  <data name="Status.Running" xml:space="preserve">
+    <value>Виконується</value>
+  </data>
+  <data name="Status.Completed" xml:space="preserve">
+    <value>Завершено</value>
+  </data>
+  <data name="RemoveJobConfirm" xml:space="preserve">
+    <value>Видалити це заплановане завдання?</value>
+  </data>
+  <data name="JobNameRequired" xml:space="preserve">
+    <value>Назва завдання обов'язкова.</value>
+  </data>
+</root>

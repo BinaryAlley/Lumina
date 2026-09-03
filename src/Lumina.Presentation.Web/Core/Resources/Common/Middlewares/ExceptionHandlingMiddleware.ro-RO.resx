@@ -738,4 +738,43 @@
   <data name="PluginArchiveNotReadable" xml:space="preserve">
     <value>Arhiva pluginului încărcat nu a putut fi citită!</value>
   </data>
+  <data name="ScheduledJobNotFound" xml:space="preserve">
+    <value>Jobul programat nu a fost găsit!</value>
+  </data>
+  <data name="ScheduledJobNameCannotBeEmpty" xml:space="preserve">
+    <value>Numele jobului programat nu poate fi gol!</value>
+  </data>
+  <data name="IntervalMinutesMustBePositive" xml:space="preserve">
+    <value>Minutele intervalului trebuie să fie un număr pozitiv!</value>
+  </data>
+  <data name="HourMustBeBetweenZeroAndTwentyThree" xml:space="preserve">
+    <value>Ora trebuie să fie între 0 și 23!</value>
+  </data>
+  <data name="MinuteMustBeBetweenZeroAndFiftyNine" xml:space="preserve">
+    <value>Minutul trebuie să fie între 0 și 59!</value>
+  </data>
+  <data name="ScheduledJobAlreadyExists" xml:space="preserve">
+    <value>Există deja un job programat cu acest nume!</value>
+  </data>
+  <data name="ScheduledJobExecutionAlreadyExists" xml:space="preserve">
+    <value>The execution of the scheduled job already exists!</value>
+  </data>
+  <data name="ScheduledJobExecutionNotFound" xml:space="preserve">
+    <value>Execuția jobului programat nu a fost găsită!</value>
+  </data>
+  <data name="ScheduledJobCycleAlreadyStarted" xml:space="preserve">
+    <value>Ciclul de execuție al jobului programat a fost deja pornit!</value>
+  </data>
+  <data name="ScheduledJobNotStarted" xml:space="preserve">
+    <value>Ciclul de execuție al jobului programat nu a fost pornit!</value>
+  </data>
+  <data name="ScheduledJobAlreadyRunning" xml:space="preserve">
+    <value>Jobul programat rulează deja!</value>
+  </data>
+  <data name="CanOnlyCompleteRunningScheduledJob" xml:space="preserve">
+    <value>Doar un job programat în execuție poate fi finalizat!</value>
+  </data>
+  <data name="InvalidScheduleType" xml:space="preserve">
+    <value>Tipul de programare este invalid!</value>
+  </data>
 </root>

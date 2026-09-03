@@ -738,4 +738,43 @@
   <data name="PluginArchiveNotReadable" xml:space="preserve">
     <value>Не вдалося прочитати архів завантаженого плагіна!</value>
   </data>
+  <data name="ScheduledJobNotFound" xml:space="preserve">
+    <value>Плановане завдання не знайдено!</value>
+  </data>
+  <data name="ScheduledJobNameCannotBeEmpty" xml:space="preserve">
+    <value>Назва планованого завдання не може бути порожньою!</value>
+  </data>
+  <data name="IntervalMinutesMustBePositive" xml:space="preserve">
+    <value>Хвилини інтервалу повинні бути додатним числом!</value>
+  </data>
+  <data name="HourMustBeBetweenZeroAndTwentyThree" xml:space="preserve">
+    <value>Година повинна бути між 0 та 23!</value>
+  </data>
+  <data name="MinuteMustBeBetweenZeroAndFiftyNine" xml:space="preserve">
+    <value>Хвилина повинна бути між 0 та 59!</value>
+  </data>
+  <data name="ScheduledJobAlreadyExists" xml:space="preserve">
+    <value>Плановане завдання з таким ім'ям вже існує!</value>
+  </data>
+  <data name="ScheduledJobExecutionAlreadyExists" xml:space="preserve">
+    <value>The execution of the scheduled job already exists!</value>
+  </data>
+  <data name="ScheduledJobExecutionNotFound" xml:space="preserve">
+    <value>Виконання планованого завдання не знайдено!</value>
+  </data>
+  <data name="ScheduledJobCycleAlreadyStarted" xml:space="preserve">
+    <value>Цикл виконання планованого завдання вже запущено!</value>
+  </data>
+  <data name="ScheduledJobNotStarted" xml:space="preserve">
+    <value>Цикл виконання планованого завдання не запущено!</value>
+  </data>
+  <data name="ScheduledJobAlreadyRunning" xml:space="preserve">
+    <value>Плановане завдання вже виконується!</value>
+  </data>
+  <data name="CanOnlyCompleteRunningScheduledJob" xml:space="preserve">
+    <value>Завершити можна лише плановане завдання, що виконується!</value>
+  </data>
+  <data name="InvalidScheduleType" xml:space="preserve">
+    <value>Тип розкладу недійсний!</value>
+  </data>
 </root>

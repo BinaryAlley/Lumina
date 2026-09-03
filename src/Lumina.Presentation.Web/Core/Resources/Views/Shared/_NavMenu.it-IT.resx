@@ -216,4 +216,7 @@
   <data name="Plugins" xml:space="preserve">
     <value>Plugin</value>
   </data>
+  <data name="ScheduledJobs" xml:space="preserve">
+    <value>Attività pianificate</value>
+  </data>
 </root>

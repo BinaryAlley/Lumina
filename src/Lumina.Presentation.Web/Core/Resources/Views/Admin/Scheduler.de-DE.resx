@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ScheduledJobs" xml:space="preserve">
+    <value>Geplante Aufgaben</value>
+  </data>
+  <data name="FilterByJobType" xml:space="preserve">
+    <value>Nach Aufgabentyp filtern</value>
+  </data>
+  <data name="All" xml:space="preserve">
+    <value>Alle</value>
+  </data>
+  <data name="TaskType.ScanMediaLibraries" xml:space="preserve">
+    <value>Medienbibliotheken scannen</value>
+  </data>
+  <data name="TaskType.CleanTemporaryFiles" xml:space="preserve">
+    <value>Temporäre Dateien bereinigen</value>
+  </data>
+  <data name="DisplayLast" xml:space="preserve">
+    <value>Zuletzt anzeigen</value>
+  </data>
+  <data name="TimeUnit" xml:space="preserve">
+    <value>Zeiteinheit</value>
+  </data>
+  <data name="Minutes" xml:space="preserve">
+    <value>Minuten</value>
+  </data>
+  <data name="MinutesShort" xml:space="preserve">
+    <value>Min.</value>
+  </data>
+  <data name="Hours" xml:space="preserve">
+    <value>Stunden</value>
+  </data>
+  <data name="Days" xml:space="preserve">
+    <value>Tage</value>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>Aktualisieren</value>
+  </data>
+  <data name="CurrentJobs" xml:space="preserve">
+    <value>Aktuelle Aufgaben</value>
+  </data>
+  <data name="AddNewJob" xml:space="preserve">
+    <value>Neue Aufgabe hinzufügen</value>
+  </data>
+  <data name="Id" xml:space="preserve">
+    <value>ID</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="JobType" xml:space="preserve">
+    <value>Aufgabentyp</value>
+  </data>
+  <data name="ScheduleType" xml:space="preserve">
+    <value>Zeitplantyp</value>
+  </data>
+  <data name="Interval" xml:space="preserve">
+    <value>Intervall</value>
+  </data>
+  <data name="Time" xml:space="preserve">
+    <value>Uhrzeit</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="Started" xml:space="preserve">
+    <value>Gestartet</value>
+  </data>
+  <data name="Completed" xml:space="preserve">
+    <value>Abgeschlossen</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>Aktionen</value>
+  </data>
+  <data name="JobName" xml:space="preserve">
+    <value>Aufgabenname</value>
+  </data>
+  <data name="IntervalSchedule" xml:space="preserve">
+    <value>Intervall</value>
+  </data>
+  <data name="DailySchedule" xml:space="preserve">
+    <value>Täglich</value>
+  </data>
+  <data name="IntervalMinutes" xml:space="preserve">
+    <value>Intervall (Minuten)</value>
+  </data>
+  <data name="Hour" xml:space="preserve">
+    <value>Stunde</value>
+  </data>
+  <data name="Minute" xml:space="preserve">
+    <value>Minute</value>
+  </data>
+  <data name="AddJob" xml:space="preserve">
+    <value>Aufgabe hinzufügen</value>
+  </data>
+  <data name="Start" xml:space="preserve">
+    <value>Starten</value>
+  </data>
+  <data name="Stop" xml:space="preserve">
+    <value>Stoppen</value>
+  </data>
+  <data name="Fire" xml:space="preserve">
+    <value>Ausführen</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>Entfernen</value>
+  </data>
+  <data name="NoJobs" xml:space="preserve">
+    <value>Keine Aufgaben hinzugefügt</value>
+  </data>
+  <data name="JobStarted" xml:space="preserve">
+    <value>Aufgabe erfolgreich gestartet.</value>
+  </data>
+  <data name="JobStopped" xml:space="preserve">
+    <value>Aufgabe erfolgreich gestoppt.</value>
+  </data>
+  <data name="JobFired" xml:space="preserve">
+    <value>Aufgabe erfolgreich ausgeführt.</value>
+  </data>
+  <data name="JobAdded" xml:space="preserve">
+    <value>Aufgabe erfolgreich hinzugefügt.</value>
+  </data>
+  <data name="JobRemoved" xml:space="preserve">
+    <value>Aufgabe erfolgreich entfernt.</value>
+  </data>
+  <data name="JobNotFound" xml:space="preserve">
+    <value>Aufgabe nicht gefunden.</value>
+  </data>
+  <data name="JobAlreadyRunning" xml:space="preserve">
+    <value>Die Aufgabe läuft bereits.</value>
+  </data>
+  <data name="Status.Added" xml:space="preserve">
+    <value>Hinzugefügt</value>
+  </data>
+  <data name="Status.Active" xml:space="preserve">
+    <value>Aktiv</value>
+  </data>
+  <data name="Status.Running" xml:space="preserve">
+    <value>Läuft</value>
+  </data>
+  <data name="Status.Completed" xml:space="preserve">
+    <value>Abgeschlossen</value>
+  </data>
+  <data name="RemoveJobConfirm" xml:space="preserve">
+    <value>Diese geplante Aufgabe entfernen?</value>
+  </data>
+  <data name="JobNameRequired" xml:space="preserve">
+    <value>Der Aufgabenname ist erforderlich.</value>
+  </data>
+</root>

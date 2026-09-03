@@ -17,6 +17,7 @@ public static partial class WebRoutes
         public const string PROFILE_VIEW = "{culture}/auth/profile";
         public const string ACCESS_DENIED_VIEW = "{culture}/auth/access-denied";
         public const string LOGOUT = "{culture}/auth/logout";
+        public const string GET_API_ACCESS_TOKEN = "{culture}/auth/api-access-token";
         public const string REGISTER = "{culture}/auth/api-register";
         public const string LOGIN = "{culture}/auth/api-login";
         public const string RECOVER_PASSWORD = "{culture}/auth/api-recover-password";

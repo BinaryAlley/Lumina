@@ -738,4 +738,43 @@
   <data name="PluginArchiveNotReadable" xml:space="preserve">
     <value>No se pudo leer el archivo del plugin subido!</value>
   </data>
+  <data name="ScheduledJobNotFound" xml:space="preserve">
+    <value>La tarea programada no fue encontrada!</value>
+  </data>
+  <data name="ScheduledJobNameCannotBeEmpty" xml:space="preserve">
+    <value>El nombre de la tarea programada no puede estar vacío!</value>
+  </data>
+  <data name="IntervalMinutesMustBePositive" xml:space="preserve">
+    <value>Los minutos del intervalo deben ser un número positivo!</value>
+  </data>
+  <data name="HourMustBeBetweenZeroAndTwentyThree" xml:space="preserve">
+    <value>La hora debe estar entre 0 y 23!</value>
+  </data>
+  <data name="MinuteMustBeBetweenZeroAndFiftyNine" xml:space="preserve">
+    <value>El minuto debe estar entre 0 y 59!</value>
+  </data>
+  <data name="ScheduledJobAlreadyExists" xml:space="preserve">
+    <value>Ya existe una tarea programada con este nombre!</value>
+  </data>
+  <data name="ScheduledJobExecutionAlreadyExists" xml:space="preserve">
+    <value>The execution of the scheduled job already exists!</value>
+  </data>
+  <data name="ScheduledJobExecutionNotFound" xml:space="preserve">
+    <value>No se encontró la ejecución de la tarea programada!</value>
+  </data>
+  <data name="ScheduledJobCycleAlreadyStarted" xml:space="preserve">
+    <value>El ciclo de ejecución de la tarea programada ya se ha iniciado!</value>
+  </data>
+  <data name="ScheduledJobNotStarted" xml:space="preserve">
+    <value>El ciclo de ejecución de la tarea programada no se ha iniciado!</value>
+  </data>
+  <data name="ScheduledJobAlreadyRunning" xml:space="preserve">
+    <value>La tarea programada ya se está ejecutando!</value>
+  </data>
+  <data name="CanOnlyCompleteRunningScheduledJob" xml:space="preserve">
+    <value>Solo se puede completar una tarea programada en ejecución!</value>
+  </data>
+  <data name="InvalidScheduleType" xml:space="preserve">
+    <value>El tipo de programación no es válido!</value>
+  </data>
 </root>
