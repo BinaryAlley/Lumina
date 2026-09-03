@@ -4,6 +4,7 @@ using Lumina.Application.Common.DataAccess.Repositories.Books;
 using Lumina.Application.Common.DataAccess.Repositories.MediaContributors;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
+using Lumina.Application.Common.DataAccess.Repositories.Scheduling;
 using Lumina.Application.Common.DataAccess.Repositories.Themes;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using System.Threading;
@@ -86,6 +87,16 @@ public interface IUnitOfWork
     /// Gets the library book reader configuration repository.
     /// </summary>
     ILibraryBookReaderConfigurationRepository LibraryBookReaderConfigurationRepository { get; }
+
+    /// <summary>
+    /// Gets the scheduled job repository.
+    /// </summary>
+    IScheduledJobRepository ScheduledJobRepository { get; }
+
+    /// <summary>
+    /// Gets the scheduled job execution repository.
+    /// </summary>
+    IScheduledJobExecutionRepository ScheduledJobExecutionRepository { get; }
 
     /// <summary>
     /// Gets the plugin repository.
