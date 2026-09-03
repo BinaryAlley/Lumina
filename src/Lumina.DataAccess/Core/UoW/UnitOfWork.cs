@@ -4,6 +4,7 @@ using Lumina.Application.Common.DataAccess.Repositories.Books;
 using Lumina.Application.Common.DataAccess.Repositories.MediaContributors;
 using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.Plugins;
+using Lumina.Application.Common.DataAccess.Repositories.Scheduling;
 using Lumina.Application.Common.DataAccess.Repositories.Themes;
 using Lumina.Application.Common.DataAccess.Repositories.Users;
 using Lumina.Application.Common.DataAccess.UoW;
@@ -12,6 +13,7 @@ using Lumina.DataAccess.Core.Repositories.Books;
 using Lumina.DataAccess.Core.Repositories.Libraries;
 using Lumina.DataAccess.Core.Repositories.MediaContributors;
 using Lumina.DataAccess.Core.Repositories.Plugins;
+using Lumina.DataAccess.Core.Repositories.Scheduling;
 using Lumina.DataAccess.Core.Repositories.Themes;
 using Lumina.DataAccess.Core.Repositories.Users;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -44,6 +46,8 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     private ILibraryMetadataProviderConfigurationRepository? _libraryMetadataProviderConfigurationRepository;
     private IArtworkProviderConfigurationRepository? _artworkProviderConfigurationRepository;
     private ILibraryBookReaderConfigurationRepository? _libraryBookReaderConfigurationRepository;
+    private IScheduledJobRepository? _scheduledJobRepository;
+    private IScheduledJobExecutionRepository? _scheduledJobExecutionRepository;
     private IPluginRepository? _pluginRepository;
     private IThemeRepository? _themeRepository;
     private IUserRepository? _userRepository;
@@ -211,6 +215,30 @@ public class UnitOfWork : IUnitOfWork, IDisposable
         {
             _libraryBookReaderConfigurationRepository ??= new LibraryBookReaderConfigurationRepository(_luminaDbContext);
             return _libraryBookReaderConfigurationRepository;
+        }
+    }
+
+    /// <summary>
+    /// Gets the scheduled job repository.
+    /// </summary>
+    public IScheduledJobRepository ScheduledJobRepository
+    {
+        get
+        {
+            _scheduledJobRepository ??= new ScheduledJobRepository(_luminaDbContext);
+            return _scheduledJobRepository;
+        }
+    }
+
+    /// <summary>
+    /// Gets the scheduled job execution repository.
+    /// </summary>
+    public IScheduledJobExecutionRepository ScheduledJobExecutionRepository
+    {
+        get
+        {
+            _scheduledJobExecutionRepository ??= new ScheduledJobExecutionRepository(_luminaDbContext);
+            return _scheduledJobExecutionRepository;
         }
     }
 
