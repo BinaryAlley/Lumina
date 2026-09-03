@@ -21,6 +21,8 @@ Container_Boundary(api, "API Server 2.2") {
     
     Component(readerPlugins, "Book Reader Plugins", "Lumina.Plugins.Epub, Lumina.Plugins.Pdf", "Decode a book format into a normalized reading document (spine, table of contents, sections, resources), loaded into the host by the plugin loader [detailed in '4.2 code-book-reading-diagram.puml']")
     
+    Component(scheduledJobs, "Scheduled Jobs 3.2.3", "Application + Infrastructure services", "Lets administrators schedule the one off or recurring execution of maintenance tasks (media library scans, temporary files cleanup); a background scheduler runs the tasks on their schedules and the scheduled jobs hub broadcasts the jobs and their executions [detailed in '4.3 code-scheduler-diagram.puml']")
+    
     Component(repositories, "Repositories", "EF Core", "Provides data access abstraction for domain entities")
 }
 
@@ -35,16 +37,20 @@ Rel(endpoints, mediaManagement, "Uses")
 Rel(endpoints, userManagement, "Uses")
 Rel(endpoints, fileSystem, "Uses")
 Rel(endpoints, bookReading, "Uses")
+Rel(endpoints, scheduledJobs, "Uses")
 Rel(mediaManagement, repositories, "Uses")
 Rel(userManagement, repositories, "Uses")
 Rel(fileSystem, repositories, "Uses")
 Rel(backgroundServices, mediaManagement, "Uses")
+Rel(scheduledJobs, repositories, "Uses")
 Rel(repositories, db, "Reads from and writes to", "SQL")
 Rel(mediaManagement, metadataServices, "Retrieves metadata from", "HTTPS")
 Rel(bookReading, readerPlugins, "Resolves and invokes")
 Rel(bookReading, repositories, "Reads the per-library reader enablement")
 Rel(bookReading, readCache, "Extracts into and serves from", "File system")
 Rel(readerPlugins, readCache, "Extracts into", "File system")
+Rel(scheduledJobs, backgroundServices, "Queues the media library scans of its ScanMediaLibraries task")
+Rel(scheduledJobs, readCache, "Empties with its CleanTemporaryFiles task", "File system")
 
 caption [Component] Lumina - API Server 2.2 (Lumina.Presentation.Api)
 

@@ -13,11 +13,13 @@ Container_Boundary(wb, "Web Application 2.1") {
     
     Component(bookReader, "Book Reading", "FastEndpoints + JavaScript", "Serves the book reader view and proxies the reading manifest, section and resource endpoints to the API")
     
+    Component(scheduler, "Scheduler", "FastEndpoints + JavaScript", "Serves the scheduled jobs dashboard, proxies the scheduled job endpoints to the API, and plots the executions of the scheduled job tasks over time")
+    
     Component(admin, "Administration", "ASP.NET MVC Controllers", "Handles system administration and configuration")
     
     Component(users, "User Management", "ASP.NET MVC Controllers", "Handles authentication and user management")
     
-    Component(clientJs, "Client-Side Logic", "JavaScript", "Handles dynamic page updates, persistent media playback, and the book reader (table of contents, page navigation, font size)")
+    Component(clientJs, "Client-Side Logic", "JavaScript", "Handles dynamic page updates, persistent media playback, the book reader (table of contents, page navigation, font size), and the scheduled jobs dashboard (job type filters, execution graph, live hub updates)")
     
     Component(httpClient, "API HTTP Client", "C# TypedHttpClient", "Handles communication with the API server")
 }
@@ -25,14 +27,17 @@ Container_Boundary(wb, "Web Application 2.1") {
 Rel(fileSystem, httpClient, "Uses")
 Rel(library, httpClient, "Uses")
 Rel(bookReader, httpClient, "Uses")
+Rel(scheduler, httpClient, "Uses")
 Rel(admin, httpClient, "Uses")
 Rel(users, httpClient, "Uses")
 Rel(httpClient, api, "Makes API calls to", "JSON/HTTPS")
 Rel(clientJs, fileSystem, "Makes AJAX calls to")
 Rel(clientJs, library, "Makes AJAX calls to")
 Rel(clientJs, bookReader, "Makes AJAX calls to")
+Rel(clientJs, scheduler, "Makes AJAX calls to")
 Rel(clientJs, admin, "Makes AJAX calls to")
 Rel(clientJs, users, "Makes AJAX calls to")
+Rel(clientJs, api, "Receives scheduled jobs and execution updates from the scheduled jobs hub", "SignalR")
 
 caption [Component] Lumina - Web Application Client 2.1 (Lumina.Presentation.Web)
 

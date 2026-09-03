@@ -1,0 +1,2 @@
+PUT {{host}}/api/v1/scheduled-jobs/{{$guid}}/fire
+Authorization: Bearer {{ACCESS_TOKEN}}
