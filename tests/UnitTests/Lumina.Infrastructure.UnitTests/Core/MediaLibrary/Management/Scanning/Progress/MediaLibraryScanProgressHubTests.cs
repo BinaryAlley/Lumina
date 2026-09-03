@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.SignalR;
 using NSubstitute;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
@@ -17,9 +18,9 @@ namespace Lumina.Infrastructure.UnitTests.Core.MediaLibrary.Management.Scanning.
 public class MediaLibraryScanProgressHubTests
 {
     [Fact]
-    public async Task SubscribeToScan_WhenCalled_ShouldAddTheConnectionToTheScanGroup()
+    public async Task SubscribeToScan_WhenCalled_ShouldAddTheConnectionToTheGroupOfTheAuthenticatedUser()
     {
-        // Arrange
+        // Arrange.
         MediaLibraryScanProgressHub sut = new();
         HubCallerContext context = Substitute.For<HubCallerContext>();
         context.ConnectionId.Returns("connection-1");
@@ -28,11 +29,14 @@ public class MediaLibraryScanProgressHubTests
         sut.Groups = groupManager;
         Guid scanId = Guid.NewGuid();
         Guid userId = Guid.NewGuid();
+        // The user is always taken from the authenticated connection, never from the client.
+        ClaimsPrincipal user = new(new ClaimsIdentity([new Claim(ClaimTypes.NameIdentifier, userId.ToString())]));
+        context.User.Returns(user);
 
-        // Act
-        await sut.SubscribeToScan(scanId, userId);
+        // Act.
+        await sut.SubscribeToScan(scanId);
 
-        // Assert
+        // Assert.
         await groupManager.Received(1).AddToGroupAsync("connection-1", $"{scanId}-{userId}", CancellationToken.None);
     }
 }
