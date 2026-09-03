@@ -99,6 +99,11 @@ public interface IUnitOfWork
     IScheduledJobExecutionRepository ScheduledJobExecutionRepository { get; }
 
     /// <summary>
+    /// Gets the scheduler display preferences repository.
+    /// </summary>
+    ISchedulerDisplayPreferencesRepository SchedulerDisplayPreferencesRepository { get; }
+
+    /// <summary>
     /// Gets the plugin repository.
     /// </summary>
     IPluginRepository PluginRepository { get; }

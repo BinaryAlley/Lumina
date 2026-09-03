@@ -757,7 +757,7 @@
     <value>已存在同名计划任务！</value>
   </data>
   <data name="ScheduledJobExecutionAlreadyExists" xml:space="preserve">
-    <value>The execution of the scheduled job already exists!</value>
+    <value>计划任务的执行记录已存在！</value>
   </data>
   <data name="ScheduledJobExecutionNotFound" xml:space="preserve">
     <value>未找到计划任务的执行记录！</value>
@@ -773,6 +773,9 @@
   </data>
   <data name="CanOnlyCompleteRunningScheduledJob" xml:space="preserve">
     <value>只有运行中的计划任务才能完成！</value>
+  </data>
+  <data name="SchedulerDisplayTimeSpanMustBePositive" xml:space="preserve">
+    <value>计划任务页面的显示时长必须是正数！</value>
   </data>
   <data name="InvalidScheduleType" xml:space="preserve">
     <value>调度类型无效！</value>

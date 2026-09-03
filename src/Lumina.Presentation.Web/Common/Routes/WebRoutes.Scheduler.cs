@@ -18,5 +18,7 @@ public static partial class WebRoutes
         public const string START_SCHEDULED_JOB = "{culture}/admin/api-scheduled-jobs/{scheduledJobId}/start";
         public const string STOP_SCHEDULED_JOB = "{culture}/admin/api-scheduled-jobs/{scheduledJobId}/stop";
         public const string FIRE_SCHEDULED_JOB = "{culture}/admin/api-scheduled-jobs/{scheduledJobId}/fire";
+        public const string GET_DISPLAY_PREFERENCES = "{culture}/admin/api-scheduled-jobs/display-preferences";
+        public const string UPDATE_DISPLAY_PREFERENCES = "{culture}/admin/api-scheduled-jobs/display-preferences";
     }
 }

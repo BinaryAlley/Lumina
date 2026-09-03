@@ -757,7 +757,7 @@
     <value>المهمة المجدولة بهذا الاسم موجودة بالفعل!</value>
   </data>
   <data name="ScheduledJobExecutionAlreadyExists" xml:space="preserve">
-    <value>The execution of the scheduled job already exists!</value>
+    <value>تنفيذ المهمة المجدولة موجود بالفعل!</value>
   </data>
   <data name="ScheduledJobExecutionNotFound" xml:space="preserve">
     <value>لم يتم العثور على تنفيذ المهمة المجدولة!</value>
@@ -773,6 +773,9 @@
   </data>
   <data name="CanOnlyCompleteRunningScheduledJob" xml:space="preserve">
     <value>يمكن إكمال المهمة المجدولة قيد التشغيل فقط!</value>
+  </data>
+  <data name="SchedulerDisplayTimeSpanMustBePositive" xml:space="preserve">
+    <value>يجب أن تكون الفترة الزمنية للعرض في صفحة الجدولة رقمًا موجبًا!</value>
   </data>
   <data name="InvalidScheduleType" xml:space="preserve">
     <value>نوع الجدول غير صالح!</value>

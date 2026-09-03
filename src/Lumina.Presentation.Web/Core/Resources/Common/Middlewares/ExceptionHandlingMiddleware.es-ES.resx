@@ -757,7 +757,7 @@
     <value>Ya existe una tarea programada con este nombre!</value>
   </data>
   <data name="ScheduledJobExecutionAlreadyExists" xml:space="preserve">
-    <value>The execution of the scheduled job already exists!</value>
+    <value>La ejecución de la tarea programada ya existe!</value>
   </data>
   <data name="ScheduledJobExecutionNotFound" xml:space="preserve">
     <value>No se encontró la ejecución de la tarea programada!</value>
@@ -773,6 +773,9 @@
   </data>
   <data name="CanOnlyCompleteRunningScheduledJob" xml:space="preserve">
     <value>Solo se puede completar una tarea programada en ejecución!</value>
+  </data>
+  <data name="SchedulerDisplayTimeSpanMustBePositive" xml:space="preserve">
+    <value>El intervalo de visualización de la página de tareas programadas debe ser un número positivo!</value>
   </data>
   <data name="InvalidScheduleType" xml:space="preserve">
     <value>El tipo de programación no es válido!</value>

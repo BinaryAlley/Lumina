@@ -214,6 +214,8 @@
         const removeJobUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Scheduler.REMOVE_SCHEDULED_JOB, new { scheduledJobId = default(Guid) })';
         const accessTokenUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Authentication.GET_API_ACCESS_TOKEN)';
         const schedulerHubUrl = '@scheduledJobsHubUrl';
+        const getDisplayPreferencesUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Scheduler.GET_DISPLAY_PREFERENCES)';
+        const updateDisplayPreferencesUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Scheduler.UPDATE_DISPLAY_PREFERENCES)';
 
         function getComboboxValue(combobox) {
             const selected = combobox.querySelector('.enlightenment-selected-text');
@@ -238,26 +240,33 @@
             return () => combobox.removeEventListener('click', handler);
         }
 
-        // Persists the display preferences of the scheduler page (the job type filter, the time span and its unit) in the
-        // browser, so that they are restored when the page is reloaded, and the graph and the jobs list respect them.
-        const schedulerSettingsKey = 'luminaSchedulerSettings';
-
-        function readSchedulerSettings() {
-            try {
-                const storedSettings = localStorage.getItem(schedulerSettingsKey);
-                return storedSettings ? JSON.parse(storedSettings) : {};
-            } catch (error) {
-                console.error('Failed to read the scheduler settings:', error);
-                return {};
-            }
+        // Reads the display preferences of the scheduler page from its controls, as the payload sent to the update endpoint.
+        function getDisplayPreferencesPayload() {
+            const selectedJobType = getComboboxValue(jobTypeFilter) || 'All';
+            return {
+                jobTypeFilter: selectedJobType === 'All' ? null : selectedJobType,
+                displayTimeSpan: Number(timespanInput.value),
+                displayTimeUnit: getComboboxValue(timeunitSelect)
+            };
         }
 
-        function writeSchedulerSettings(settings) {
-            try {
-                localStorage.setItem(schedulerSettingsKey, JSON.stringify(settings));
-            } catch (error) {
-                console.error('Failed to store the scheduler settings:', error);
-            }
+        // Persists the display preferences of the scheduler page (the job type filter, the time span and its unit) on the
+        // server, so that they are shared by every client the current user signs in from, not only by the browser that changed them.
+        async function persistDisplayPreferences() {
+            await callApiPutAsync(updateDisplayPreferencesUrl, getDisplayPreferencesPayload());
+        }
+
+        // Loads the display preferences of the current user from the server, and applies them to the controls, before the graph and
+        // the jobs list are loaded; the server returns the default display preferences when none are stored for the user yet.
+        async function applyDisplayPreferences() {
+            const displayPreferences = await callApiGetAsync(getDisplayPreferencesUrl);
+            if (!displayPreferences)
+                return;
+            setComboboxValue(jobTypeFilter, displayPreferences.jobTypeFilter || 'All');
+            setComboboxValue(timeunitSelect, displayPreferences.displayTimeUnit || 'Minutes');
+            const storedTimeSpan = Number(displayPreferences.displayTimeSpan);
+            if (Number.isFinite(storedTimeSpan) && storedTimeSpan >= 1)
+                timespanInput.value = storedTimeSpan;
         }
 
         function setComboboxValue(combobox, value) {
@@ -269,27 +278,6 @@
                 selected.textContent = option.textContent;
                 selected.setAttribute('data-value', option.getAttribute('data-value'));
             }
-        }
-
-        function persistDisplayPreferences() {
-            const settings = {
-                jobType: getComboboxValue(jobTypeFilter) || 'All',
-                timespan: timespanInput.value,
-                timeUnit: getComboboxValue(timeunitSelect)
-            };
-            writeSchedulerSettings(settings);
-        }
-
-        // Restores the stored display preferences on the controls, before the graph and the jobs list are loaded.
-        function applyDisplayPreferences() {
-            const settings = readSchedulerSettings();
-            if (settings.jobType)
-                setComboboxValue(jobTypeFilter, settings.jobType);
-            if (settings.timeUnit)
-                setComboboxValue(timeunitSelect, settings.timeUnit);
-            const storedTimespan = Number(settings.timespan);
-            if (Number.isFinite(storedTimespan) && storedTimespan >= 1)
-                timespanInput.value = storedTimespan;
         }
 
         // Graph state.
@@ -640,7 +628,7 @@
         async function updateTimeSpanAsync() {
             adjustTimeScale();
             graphState.dataPoints = [];
-            persistDisplayPreferences();
+            await persistDisplayPreferences();
             await loadHistoryAsync();
         }
 
@@ -744,7 +732,7 @@
         //+----------------------------------------------------------------------------------------+
 
         async function initialize() {
-            applyDisplayPreferences();
+            await applyDisplayPreferences();
             renderLegend();
             graphState.startTime = new Date();
             graphState.startTime.setMinutes(0, 0, 0);
@@ -767,16 +755,19 @@
             toggleScheduleFields();
 
             // Persist the display preferences when they change, and reload the history when the job type filter changes,
-            // so that the graph and the jobs list always respect the selected filter.
-            const handleJobTypeFilterChange = () => {
-                persistDisplayPreferences();
+            // so that the graph and the jobs list always respect the selected filter, on every client of the current user.
+            const handleJobTypeFilterChange = async () => {
                 renderJobsTable();
-                updateTimeSpanAsync();
+                await updateTimeSpanAsync();
             };
             const unbindJobTypeFilterChange = bindComboboxChange(jobTypeFilter, handleJobTypeFilterChange);
-            const unbindTimeUnitChange = bindComboboxChange(timeunitSelect, persistDisplayPreferences);
-            const handleTimespanChange = () => persistDisplayPreferences();
-            timespanInput.addEventListener('input', handleTimespanChange);
+            const handleTimeUnitChange = async () => {
+                await persistDisplayPreferences();
+            };
+            const unbindTimeUnitChange = bindComboboxChange(timeunitSelect, handleTimeUnitChange);
+            const handleTimespanChange = async () => {
+                await persistDisplayPreferences();
+            };
             timespanInput.addEventListener('change', handleTimespanChange);
             updateTimespanButton.addEventListener('click', updateTimeSpanAsync);
             addJobButton.addEventListener('click', addJobAsync);
@@ -790,7 +781,6 @@
                 unbindScheduleTypeChange();
                 unbindJobTypeFilterChange();
                 unbindTimeUnitChange();
-                timespanInput.removeEventListener('input', handleTimespanChange);
                 timespanInput.removeEventListener('change', handleTimespanChange);
                 updateTimespanButton.removeEventListener('click', updateTimeSpanAsync);
                 addJobButton.removeEventListener('click', addJobAsync);

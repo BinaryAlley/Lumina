@@ -24,5 +24,6 @@ public static partial class Errors
         public static Error ScheduledJobAlreadyRunning => Error.Forbidden(description: nameof(ScheduledJobAlreadyRunning));
         public static Error CanOnlyCompleteRunningScheduledJob => Error.Forbidden(description: nameof(CanOnlyCompleteRunningScheduledJob));
         public static Error InvalidScheduleType => Error.Validation(description: nameof(InvalidScheduleType));
+        public static Error SchedulerDisplayTimeSpanMustBePositive => Error.Validation(description: nameof(SchedulerDisplayTimeSpanMustBePositive));
     }
 }

@@ -1,0 +1,9 @@
+PUT {{host}}/api/v1/scheduled-jobs/display-preferences
+Authorization: Bearer {{ACCESS_TOKEN}}
+Content-Type: application/json
+
+{
+  "jobTypeFilter": "ScanMediaLibraries",
+  "displayTimeSpan": 10,
+  "displayTimeUnit": "Minutes"
+}

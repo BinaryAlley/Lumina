@@ -42,6 +42,7 @@ public class LuminaDbContext : DbContext
     public virtual DbSet<BookContributorEntity> BookContributors { get; set; } = null!;
     public virtual DbSet<ScheduledJobEntity> ScheduledJobs { get; set; } = null!;
     public virtual DbSet<ScheduledJobExecutionEntity> ScheduledJobExecutions { get; set; } = null!;
+    public virtual DbSet<SchedulerDisplayPreferencesEntity> SchedulerDisplayPreferences { get; set; } = null!;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LuminaDbContext"/> class.

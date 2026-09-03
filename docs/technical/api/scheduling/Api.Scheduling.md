@@ -23,6 +23,12 @@
     - [Fire Scheduled Job](#fire-scheduled-job)
       - [Fire Scheduled Job Request](#fire-scheduled-job-request)
       - [Fire Scheduled Job Response](#fire-scheduled-job-response)
+    - [Get Scheduler Display Preferences](#get-scheduler-display-preferences)
+      - [Get Scheduler Display Preferences Request](#get-scheduler-display-preferences-request)
+      - [Get Scheduler Display Preferences Response](#get-scheduler-display-preferences-response)
+    - [Update Scheduler Display Preferences](#update-scheduler-display-preferences)
+      - [Update Scheduler Display Preferences Request](#update-scheduler-display-preferences-request)
+      - [Update Scheduler Display Preferences Response](#update-scheduler-display-preferences-response)
 
 ## Scheduled Jobs
 
@@ -60,10 +66,55 @@ POST api/v1/scheduled-jobs
   "intervalMinutes": null,
   "hour": 3,
   "minute": 0,
-  "status": "Added",
+  "status": "Active",
   "lastStartedOnUtc": null,
   "lastCompletedOnUtc": null
 }
+```
+
+### Get Scheduler Display Preferences
+
+#### Get Scheduler Display Preferences Request
+
+```js
+GET api/v1/scheduled-jobs/display-preferences
+```
+
+#### Get Scheduler Display Preferences Response
+
+```js
+200 Ok
+```
+
+```json
+{
+  "userId": "2cff0c0f-3a67-4e30-b94f-f4e948a3b64f",
+  "jobTypeFilter": "ScanMediaLibraries",
+  "displayTimeSpan": 10,
+  "displayTimeUnit": "Minutes"
+}
+```
+
+### Update Scheduler Display Preferences
+
+#### Update Scheduler Display Preferences Request
+
+```js
+PUT api/v1/scheduled-jobs/display-preferences
+```
+
+```json
+{
+  "jobTypeFilter": "ScanMediaLibraries",
+  "displayTimeSpan": 10,
+  "displayTimeUnit": "Minutes"
+}
+```
+
+#### Update Scheduler Display Preferences Response
+
+```js
+200 Ok
 ```
 
 ### Get Scheduled Jobs

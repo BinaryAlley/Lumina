@@ -757,7 +757,7 @@
     <value>Ein geplanter Auftrag mit diesem Namen ist bereits vorhanden!</value>
   </data>
   <data name="ScheduledJobExecutionAlreadyExists" xml:space="preserve">
-    <value>The execution of the scheduled job already exists!</value>
+    <value>Die Ausführung des geplanten Auftrags existiert bereits!</value>
   </data>
   <data name="ScheduledJobExecutionNotFound" xml:space="preserve">
     <value>Die Ausführung des geplanten Auftrags wurde nicht gefunden!</value>
@@ -773,6 +773,9 @@
   </data>
   <data name="CanOnlyCompleteRunningScheduledJob" xml:space="preserve">
     <value>Nur ein laufender geplanter Auftrag kann abgeschlossen werden!</value>
+  </data>
+  <data name="SchedulerDisplayTimeSpanMustBePositive" xml:space="preserve">
+    <value>Der Anzeigezeitraum der Scheduler-Seite muss eine positive Zahl sein!</value>
   </data>
   <data name="InvalidScheduleType" xml:space="preserve">
     <value>Der Zeitplantyp ist ungültig!</value>

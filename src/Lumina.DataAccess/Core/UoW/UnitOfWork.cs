@@ -48,6 +48,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     private ILibraryBookReaderConfigurationRepository? _libraryBookReaderConfigurationRepository;
     private IScheduledJobRepository? _scheduledJobRepository;
     private IScheduledJobExecutionRepository? _scheduledJobExecutionRepository;
+    private ISchedulerDisplayPreferencesRepository? _schedulerDisplayPreferencesRepository;
     private IPluginRepository? _pluginRepository;
     private IThemeRepository? _themeRepository;
     private IUserRepository? _userRepository;
@@ -239,6 +240,18 @@ public class UnitOfWork : IUnitOfWork, IDisposable
         {
             _scheduledJobExecutionRepository ??= new ScheduledJobExecutionRepository(_luminaDbContext);
             return _scheduledJobExecutionRepository;
+        }
+    }
+
+    /// <summary>
+    /// Gets the scheduler display preferences repository.
+    /// </summary>
+    public ISchedulerDisplayPreferencesRepository SchedulerDisplayPreferencesRepository
+    {
+        get
+        {
+            _schedulerDisplayPreferencesRepository ??= new SchedulerDisplayPreferencesRepository(_luminaDbContext);
+            return _schedulerDisplayPreferencesRepository;
         }
     }
 

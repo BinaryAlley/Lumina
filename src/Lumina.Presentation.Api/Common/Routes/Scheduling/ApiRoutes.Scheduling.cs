@@ -14,5 +14,7 @@ public static partial class ApiRoutes
         public const string START_SCHEDULED_JOB = "/scheduled-jobs/{scheduledJobId}/start";
         public const string STOP_SCHEDULED_JOB = "/scheduled-jobs/{scheduledJobId}/stop";
         public const string FIRE_SCHEDULED_JOB = "/scheduled-jobs/{scheduledJobId}/fire";
+        public const string GET_DISPLAY_PREFERENCES = "/scheduled-jobs/display-preferences";
+        public const string UPDATE_DISPLAY_PREFERENCES = "/scheduled-jobs/display-preferences";
     }
 }

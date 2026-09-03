@@ -774,6 +774,9 @@
   <data name="CanOnlyCompleteRunningScheduledJob" xml:space="preserve">
     <value>Only a running scheduled job can be completed!</value>
   </data>
+  <data name="SchedulerDisplayTimeSpanMustBePositive" xml:space="preserve">
+    <value>The display time span of the scheduler page must be a positive number!</value>
+  </data>
   <data name="InvalidScheduleType" xml:space="preserve">
     <value>The schedule type is invalid!</value>
   </data>

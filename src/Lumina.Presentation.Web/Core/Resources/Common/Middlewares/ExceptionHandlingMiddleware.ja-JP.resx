@@ -757,7 +757,7 @@
     <value>この名前のスケジュールされたジョブは既に存在します！</value>
   </data>
   <data name="ScheduledJobExecutionAlreadyExists" xml:space="preserve">
-    <value>The execution of the scheduled job already exists!</value>
+    <value>スケジュールされたジョブの実行は既に存在します！</value>
   </data>
   <data name="ScheduledJobExecutionNotFound" xml:space="preserve">
     <value>スケジュールされたジョブの実行が見つかりません！</value>
@@ -773,6 +773,9 @@
   </data>
   <data name="CanOnlyCompleteRunningScheduledJob" xml:space="preserve">
     <value>実行中のスケジュールされたジョブのみ完了できます！</value>
+  </data>
+  <data name="SchedulerDisplayTimeSpanMustBePositive" xml:space="preserve">
+    <value>スケジューラーページの表示期間は正の数である必要があります！</value>
   </data>
   <data name="InvalidScheduleType" xml:space="preserve">
     <value>スケジュールタイプが無効です！</value>

@@ -757,7 +757,7 @@
     <value>Există deja un job programat cu acest nume!</value>
   </data>
   <data name="ScheduledJobExecutionAlreadyExists" xml:space="preserve">
-    <value>The execution of the scheduled job already exists!</value>
+    <value>Execuția jobului programat există deja!</value>
   </data>
   <data name="ScheduledJobExecutionNotFound" xml:space="preserve">
     <value>Execuția jobului programat nu a fost găsită!</value>
@@ -773,6 +773,9 @@
   </data>
   <data name="CanOnlyCompleteRunningScheduledJob" xml:space="preserve">
     <value>Doar un job programat în execuție poate fi finalizat!</value>
+  </data>
+  <data name="SchedulerDisplayTimeSpanMustBePositive" xml:space="preserve">
+    <value>Durata de afișare a paginii joburilor programate trebuie să fie un număr pozitiv!</value>
   </data>
   <data name="InvalidScheduleType" xml:space="preserve">
     <value>Tipul de programare este invalid!</value>

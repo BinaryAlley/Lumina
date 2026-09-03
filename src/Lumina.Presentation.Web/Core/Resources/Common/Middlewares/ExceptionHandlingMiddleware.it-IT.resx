@@ -757,7 +757,7 @@
     <value>Esiste già un processo pianificato con questo nome!</value>
   </data>
   <data name="ScheduledJobExecutionAlreadyExists" xml:space="preserve">
-    <value>The execution of the scheduled job already exists!</value>
+    <value>L'esecuzione del processo pianificato esiste già!</value>
   </data>
   <data name="ScheduledJobExecutionNotFound" xml:space="preserve">
     <value>L'esecuzione del processo pianificato non è stata trovata!</value>
@@ -773,6 +773,9 @@
   </data>
   <data name="CanOnlyCompleteRunningScheduledJob" xml:space="preserve">
     <value>Solo un processo pianificato in esecuzione può essere completato!</value>
+  </data>
+  <data name="SchedulerDisplayTimeSpanMustBePositive" xml:space="preserve">
+    <value>L'intervallo di visualizzazione della pagina dei processi pianificati deve essere un numero positivo!</value>
   </data>
   <data name="InvalidScheduleType" xml:space="preserve">
     <value>Il tipo di pianificazione non è valido!</value>

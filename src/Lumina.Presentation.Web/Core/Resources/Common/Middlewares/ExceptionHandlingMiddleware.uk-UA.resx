@@ -757,7 +757,7 @@
     <value>Плановане завдання з таким ім'ям вже існує!</value>
   </data>
   <data name="ScheduledJobExecutionAlreadyExists" xml:space="preserve">
-    <value>The execution of the scheduled job already exists!</value>
+    <value>Виконання планованого завдання вже існує!</value>
   </data>
   <data name="ScheduledJobExecutionNotFound" xml:space="preserve">
     <value>Виконання планованого завдання не знайдено!</value>
@@ -773,6 +773,9 @@
   </data>
   <data name="CanOnlyCompleteRunningScheduledJob" xml:space="preserve">
     <value>Завершити можна лише плановане завдання, що виконується!</value>
+  </data>
+  <data name="SchedulerDisplayTimeSpanMustBePositive" xml:space="preserve">
+    <value>Період відображення сторінки планувальника має бути додатним числом!</value>
   </data>
   <data name="InvalidScheduleType" xml:space="preserve">
     <value>Тип розкладу недійсний!</value>
