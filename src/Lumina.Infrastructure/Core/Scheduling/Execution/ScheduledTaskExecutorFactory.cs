@@ -34,6 +34,8 @@ public class ScheduledTaskExecutorFactory : IScheduledTaskExecutorFactory
         {
             ScheduledTaskType.ScanMediaLibraries => _serviceProvider.GetRequiredService<MediaLibraryScanTaskExecutor>(),
             ScheduledTaskType.CleanTemporaryFiles => _serviceProvider.GetRequiredService<TemporaryFilesCleanupTaskExecutor>(),
+            ScheduledTaskType.RepairThemes => _serviceProvider.GetRequiredService<RepairThemesTaskExecutor>(),
+            ScheduledTaskType.CleanScheduledJobExecutionHistory => _serviceProvider.GetRequiredService<CleanScheduledJobExecutionHistoryTaskExecutor>(),
             _ => throw new ArgumentException($"Unsupported task type: {taskType}", nameof(taskType))
         };
     }

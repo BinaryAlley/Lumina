@@ -159,4 +159,13 @@
   <data name="JobNameRequired" xml:space="preserve">
     <value>Il nome dell'attività è obbligatorio.</value>
   </data>
+  <data name="TaskType.RepairThemes" xml:space="preserve">
+    <value>Ripara i temi</value>
+  </data>
+  <data name="TaskType.CleanScheduledJobExecutionHistory" xml:space="preserve">
+    <value>Pulisci la cronologia dei processi</value>
+  </data>
+  <data name="StartupSchedule" xml:space="preserve">
+    <value>All'avvio</value>
+  </data>
 </root>

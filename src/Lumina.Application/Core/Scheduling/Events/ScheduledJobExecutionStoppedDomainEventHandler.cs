@@ -56,6 +56,7 @@ public class ScheduledJobExecutionStoppedDomainEventHandler : IDomainEventHandle
                 ScheduledJobId = execution.ScheduledJobId,
                 TaskType = execution.TaskType,
                 IsCycleRun = execution.IsCycleRun,
+                WasCycleActive = execution.WasCycleActive,
                 StartedOnUtc = execution.StartedOnUtc,
                 CompletedOnUtc = domainEvent.OccurredOnUtc,
                 CreatedOnUtc = execution.CreatedOnUtc,

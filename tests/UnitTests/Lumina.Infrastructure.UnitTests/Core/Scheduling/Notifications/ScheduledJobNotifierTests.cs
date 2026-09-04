@@ -32,14 +32,14 @@ public class ScheduledJobNotifierTests
     {
         _mockClient = Substitute.For<IScheduledJobsClient>();
         _mockHubClients = Substitute.For<IHubClients<IScheduledJobsClient>>();
-        _mockHubClients.All.Returns(_mockClient);
+        _mockHubClients.Group(ScheduledJobsHub.ADMINISTRATORS_GROUP).Returns(_mockClient);
         _mockHubContext = Substitute.For<IHubContext<ScheduledJobsHub, IScheduledJobsClient>>();
         _mockHubContext.Clients.Returns(_mockHubClients);
         _sut = new ScheduledJobNotifier(_mockHubContext);
     }
 
     [Fact]
-    public async Task SendScheduledJobsAsync_WhenCalled_ShouldSendTheScheduledJobsToAllClients()
+    public async Task SendScheduledJobsAsync_WhenCalled_ShouldSendTheScheduledJobsToTheAdministratorGroup()
     {
         // Arrange
         IReadOnlyList<ScheduledJobResponse> scheduledJobs = _scheduledJobResponseFixture.CreateMany(2);
@@ -49,10 +49,11 @@ public class ScheduledJobNotifierTests
 
         // Assert
         await _mockClient.Received(1).ReceiveScheduledJobsAsync(scheduledJobs);
+        _mockHubClients.Received(1).Group(ScheduledJobsHub.ADMINISTRATORS_GROUP);
     }
 
     [Fact]
-    public async Task SendScheduledJobExecutionStartedAsync_WhenCalled_ShouldSendTheExecutionToAllClients()
+    public async Task SendScheduledJobExecutionStartedAsync_WhenCalled_ShouldSendTheExecutionToTheAdministratorGroup()
     {
         // Arrange
         ScheduledJobExecutionResponse execution = _scheduledJobExecutionResponseFixture.Create();
@@ -62,10 +63,11 @@ public class ScheduledJobNotifierTests
 
         // Assert
         await _mockClient.Received(1).ScheduledJobExecutionStartedAsync(execution);
+        _mockHubClients.Received(1).Group(ScheduledJobsHub.ADMINISTRATORS_GROUP);
     }
 
     [Fact]
-    public async Task SendScheduledJobExecutionCompletedAsync_WhenCalled_ShouldSendTheExecutionToAllClients()
+    public async Task SendScheduledJobExecutionCompletedAsync_WhenCalled_ShouldSendTheExecutionToTheAdministratorGroup()
     {
         // Arrange
         ScheduledJobExecutionResponse execution = _scheduledJobExecutionResponseFixture.Create();
@@ -75,5 +77,6 @@ public class ScheduledJobNotifierTests
 
         // Assert
         await _mockClient.Received(1).ScheduledJobExecutionCompletedAsync(execution);
+        _mockHubClients.Received(1).Group(ScheduledJobsHub.ADMINISTRATORS_GROUP);
     }
 }

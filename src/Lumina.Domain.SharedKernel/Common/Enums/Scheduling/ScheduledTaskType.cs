@@ -13,5 +13,15 @@ public enum ScheduledTaskType
     /// <summary>
     /// The scheduled job cleans the temporary directory of the application.
     /// </summary>
-    CleanTemporaryFiles
+    CleanTemporaryFiles,
+
+    /// <summary>
+    /// The scheduled job repairs the installed themes whose files are missing.
+    /// </summary>
+    RepairThemes,
+
+    /// <summary>
+    /// The scheduled job cleans the execution history of the scheduled jobs, keeping only the recent executions.
+    /// </summary>
+    CleanScheduledJobExecutionHistory
 }

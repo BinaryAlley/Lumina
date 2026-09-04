@@ -159,4 +159,13 @@
   <data name="JobNameRequired" xml:space="preserve">
     <value>El nombre de la tarea es obligatorio.</value>
   </data>
+  <data name="TaskType.RepairThemes" xml:space="preserve">
+    <value>Reparar temas</value>
+  </data>
+  <data name="TaskType.CleanScheduledJobExecutionHistory" xml:space="preserve">
+    <value>Limpiar historial de trabajos</value>
+  </data>
+  <data name="StartupSchedule" xml:space="preserve">
+    <value>Al inicio</value>
+  </data>
 </root>

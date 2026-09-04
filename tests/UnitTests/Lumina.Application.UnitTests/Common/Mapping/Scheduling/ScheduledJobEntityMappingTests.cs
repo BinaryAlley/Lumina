@@ -146,24 +146,39 @@ public class ScheduledJobEntityMappingTests
     }
 
     [Fact]
-    public void ToResponse_WhenRepositoryEntityHasDailySchedule_ShouldMapToResponse()
+    public void ToDomainEntity_WhenRepositoryEntityHasOnceAtStartupSchedule_ShouldMapToOnceAtStartupScheduledJob()
+    {
+        // Arrange
+        ScheduledJobEntity repositoryEntity = _scheduledJobEntityFixture.Create(
+            scheduleType: ScheduleType.OnceAtStartup,
+            status: ScheduledJobStatus.Active);
+
+        // Act
+        Result<ScheduledJob> result = repositoryEntity.ToDomainEntity();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        OnceAtStartupSchedule onceAtStartupSchedule = Assert.IsType<OnceAtStartupSchedule>(result.Value.Schedule);
+        Assert.Equal(ScheduleType.OnceAtStartup, onceAtStartupSchedule.ScheduleType);
+    }
+
+    [Fact]
+    public void ToResponse_WhenRepositoryEntityHasOnceAtStartupSchedule_ShouldMapToResponse()
     {
         // Arrange
         ScheduledJobEntity repositoryEntity = _scheduledJobEntityFixture.Create(
             id: Guid.NewGuid(),
-            scheduleType: ScheduleType.DailyAtHourAndMinute,
-            hour: 6,
-            minute: 30,
-            status: ScheduledJobStatus.Added);
+            scheduleType: ScheduleType.OnceAtStartup,
+            status: ScheduledJobStatus.Active);
 
         // Act
         ScheduledJobResponse result = repositoryEntity.ToResponse();
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(ScheduleType.DailyAtHourAndMinute, result.ScheduleType);
+        Assert.Equal(ScheduleType.OnceAtStartup, result.ScheduleType);
         Assert.Null(result.IntervalMinutes);
-        Assert.Equal(6, result.Hour);
-        Assert.Equal(30, result.Minute);
+        Assert.Null(result.Hour);
+        Assert.Null(result.Minute);
     }
 }

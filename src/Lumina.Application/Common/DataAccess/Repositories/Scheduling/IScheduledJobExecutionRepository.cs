@@ -43,4 +43,12 @@ public interface IScheduledJobExecutionRepository : IRepository<ScheduledJobExec
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     Task<Result<Success>> DeleteByScheduledJobIdAsync(Guid scheduledJobId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Removes all the executions of the tasks of scheduled jobs that started before <paramref name="cutoffUtc"/>, from the storage medium.
+    /// </summary>
+    /// <param name="cutoffUtc">The exclusive lower bound of the retained interval, in UTC; executions that started before it are removed.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Success>> DeleteOlderThanAsync(DateTime cutoffUtc, CancellationToken cancellationToken);
 }

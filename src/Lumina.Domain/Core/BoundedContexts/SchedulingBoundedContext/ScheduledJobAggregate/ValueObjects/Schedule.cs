@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Domain.Common.Models.Core;
-using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.Scheduling;
 using System;
 #endregion
@@ -8,7 +7,7 @@ using System;
 namespace Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects;
 
 /// <summary>
-/// Represents an abstract schedule for a scheduled job.
+/// Value Object for the abstract schedule for a scheduled job.
 /// </summary>
 public abstract class Schedule : ValueObject
 {

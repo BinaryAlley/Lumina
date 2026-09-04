@@ -44,22 +44,26 @@ public class ScheduledJobExecutionConfiguration : IEntityTypeConfiguration<Sched
         builder.Property(execution => execution.CompletedOnUtc)
             .HasColumnOrder(5);
 
-        // Audit.
-        builder.Property(execution => execution.CreatedOnUtc)
+        builder.Property(execution => execution.WasCycleActive)
             .IsRequired()
             .HasColumnOrder(6);
 
-        builder.Property(execution => execution.CreatedBy)
+        // Audit.
+        builder.Property(execution => execution.CreatedOnUtc)
             .IsRequired()
             .HasColumnOrder(7);
 
+        builder.Property(execution => execution.CreatedBy)
+            .IsRequired()
+            .HasColumnOrder(8);
+
         builder.Property(execution => execution.UpdatedOnUtc)
             .HasDefaultValue(null)
-            .HasColumnOrder(8);
+            .HasColumnOrder(9);
 
         builder.Property(execution => execution.UpdatedBy)
             .HasDefaultValue(null)
-            .HasColumnOrder(9);
+            .HasColumnOrder(10);
 
         // Enables fast queries of the execution history of scheduled jobs by their time range, and the cleanup of the executions of a removed scheduled job.
         builder.HasIndex(execution => new { execution.StartedOnUtc, execution.ScheduledJobId });

@@ -8,7 +8,7 @@ using System.Diagnostics;
 namespace Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects;
 
 /// <summary>
-/// Value object for the Id of a scheduled job.
+/// Value Object for the Id of a scheduled job.
 /// </summary>
 [DebuggerDisplay("{Value}")]
 public sealed class ScheduledJobId : EntityId<Guid>

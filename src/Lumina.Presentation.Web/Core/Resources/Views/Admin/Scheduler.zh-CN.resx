@@ -159,4 +159,13 @@
   <data name="JobNameRequired" xml:space="preserve">
     <value>需要提供任务名称。</value>
   </data>
+  <data name="TaskType.RepairThemes" xml:space="preserve">
+    <value>修复主题</value>
+  </data>
+  <data name="TaskType.CleanScheduledJobExecutionHistory" xml:space="preserve">
+    <value>清理作业历史</value>
+  </data>
+  <data name="StartupSchedule" xml:space="preserve">
+    <value>启动时</value>
+  </data>
 </root>

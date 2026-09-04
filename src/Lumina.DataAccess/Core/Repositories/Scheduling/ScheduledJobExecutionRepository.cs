@@ -38,8 +38,9 @@ internal sealed class ScheduledJobExecutionRepository : IScheduledJobExecutionRe
     /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="ScheduledJobExecutionEntity"/> identified by <paramref name="id"/>, or an error.</returns>
     public async Task<Result<ScheduledJobExecutionEntity?>> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.ScheduledJobExecutions
-            .FirstOrDefaultAsync(execution => execution.Id == id, cancellationToken).ConfigureAwait(false);
+        // FindAsync returns an entity that was already loaded in the current unit of work from the change tracker, and only
+        // reads it from the storage medium when it is not tracked, so an entity loaded earlier is not read again.
+        return await _luminaDbContext.ScheduledJobExecutions.FindAsync([id], cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -67,8 +68,8 @@ internal sealed class ScheduledJobExecutionRepository : IScheduledJobExecutionRe
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Updated>> UpdateAsync(ScheduledJobExecutionEntity data, CancellationToken cancellationToken)
     {
-        ScheduledJobExecutionEntity? foundExecution = await _luminaDbContext.ScheduledJobExecutions
-            .FirstOrDefaultAsync(execution => execution.Id == data.Id, cancellationToken).ConfigureAwait(false);
+        ScheduledJobExecutionEntity? foundExecution = _luminaDbContext.ScheduledJobExecutions.Local.FirstOrDefault(execution => execution.Id == data.Id)
+            ?? await _luminaDbContext.ScheduledJobExecutions.FirstOrDefaultAsync(execution => execution.Id == data.Id, cancellationToken).ConfigureAwait(false);
         if (foundExecution is null)
             return Errors.Scheduling.ScheduledJobExecutionNotFound;
         // Update scalar properties.
@@ -117,6 +118,22 @@ internal sealed class ScheduledJobExecutionRepository : IScheduledJobExecutionRe
             .Where(execution => execution.ScheduledJobId == scheduledJobId)
             .ToArrayAsync(cancellationToken).ConfigureAwait(false);
         _luminaDbContext.ScheduledJobExecutions.RemoveRange(executions);
+        return Result.Success;
+    }
+
+    /// <summary>
+    /// Removes all the executions of the tasks of scheduled jobs that started before <paramref name="cutoffUtc"/>, from the storage medium.
+    /// </summary>
+    /// <param name="cutoffUtc">The exclusive lower bound of the retained interval, in UTC; executions that started before it are removed.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Success>> DeleteOlderThanAsync(DateTime cutoffUtc, CancellationToken cancellationToken)
+    {
+        // The executions are deleted with a single query, without loading them into memory first, because the retention cleanup
+        // routinely removes a large number of executions at once.
+        await _luminaDbContext.ScheduledJobExecutions
+            .Where(execution => execution.StartedOnUtc < cutoffUtc)
+            .ExecuteDeleteAsync(cancellationToken).ConfigureAwait(false);
         return Result.Success;
     }
 }

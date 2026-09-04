@@ -17,6 +17,11 @@ namespace Lumina.Infrastructure.Core.Scheduling.Notifications;
 [Authorize]
 public class ScheduledJobsHub : Hub<IScheduledJobsClient>
 {
+    /// <summary>
+    /// Name of the group that holds the connections of the verified administrator clients.
+    /// </summary>
+    public const string ADMINISTRATORS_GROUP = "Administrators";
+
     private readonly IServiceScopeFactory _serviceScopeFactory;
 
     /// <summary>
@@ -40,6 +45,9 @@ public class ScheduledJobsHub : Hub<IScheduledJobsClient>
             Context.Abort();
             return;
         }
+        // The connection is added to the administrator group only after the role check succeeded, so the notifications, which are
+        // broadcast to that group, can never reach a client whose connection was not verified to belong to an administrator.
+        await Groups.AddToGroupAsync(Context.ConnectionId, ADMINISTRATORS_GROUP).ConfigureAwait(false);
         await base.OnConnectedAsync().ConfigureAwait(false);
     }
 

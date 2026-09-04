@@ -10,7 +10,7 @@ using System.Collections.Generic;
 namespace Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects;
 
 /// <summary>
-/// Represents a daily schedule for a scheduled job.
+/// Value Object for the daily schedule for a scheduled job.
 /// </summary>
 public class DailySchedule : Schedule
 {

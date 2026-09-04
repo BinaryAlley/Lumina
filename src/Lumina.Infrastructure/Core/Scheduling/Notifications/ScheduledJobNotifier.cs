@@ -32,7 +32,7 @@ public sealed class ScheduledJobNotifier : IScheduledJobNotifier
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public async Task SendScheduledJobsAsync(IReadOnlyList<ScheduledJobResponse> scheduledJobs, CancellationToken cancellationToken)
     {
-        await _hubContext.Clients.All.ReceiveScheduledJobsAsync(scheduledJobs).ConfigureAwait(false);
+        await _hubContext.Clients.Group(ScheduledJobsHub.ADMINISTRATORS_GROUP).ReceiveScheduledJobsAsync(scheduledJobs).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -42,7 +42,7 @@ public sealed class ScheduledJobNotifier : IScheduledJobNotifier
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public async Task SendScheduledJobExecutionStartedAsync(ScheduledJobExecutionResponse execution, CancellationToken cancellationToken)
     {
-        await _hubContext.Clients.All.ScheduledJobExecutionStartedAsync(execution).ConfigureAwait(false);
+        await _hubContext.Clients.Group(ScheduledJobsHub.ADMINISTRATORS_GROUP).ScheduledJobExecutionStartedAsync(execution).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -52,6 +52,6 @@ public sealed class ScheduledJobNotifier : IScheduledJobNotifier
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public async Task SendScheduledJobExecutionCompletedAsync(ScheduledJobExecutionResponse execution, CancellationToken cancellationToken)
     {
-        await _hubContext.Clients.All.ScheduledJobExecutionCompletedAsync(execution).ConfigureAwait(false);
+        await _hubContext.Clients.Group(ScheduledJobsHub.ADMINISTRATORS_GROUP).ScheduledJobExecutionCompletedAsync(execution).ConfigureAwait(false);
     }
 }

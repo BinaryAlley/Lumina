@@ -159,4 +159,13 @@
   <data name="JobNameRequired" xml:space="preserve">
     <value>The job name is required.</value>
   </data>
+  <data name="TaskType.RepairThemes" xml:space="preserve">
+    <value>Repair themes</value>
+  </data>
+  <data name="TaskType.CleanScheduledJobExecutionHistory" xml:space="preserve">
+    <value>Clean job history</value>
+  </data>
+  <data name="StartupSchedule" xml:space="preserve">
+    <value>At startup</value>
+  </data>
 </root>

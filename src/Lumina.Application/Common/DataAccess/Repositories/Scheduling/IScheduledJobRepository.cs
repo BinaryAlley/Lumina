@@ -23,6 +23,14 @@ public interface IScheduledJobRepository : IRepository<ScheduledJobEntity>,
                                            IDeleteByIdRepositoryAction<Guid>
 {
     /// <summary>
+    /// Gets a scheduled job identified by <paramref name="id"/> from the storage medium, without tracking it.
+    /// </summary>
+    /// <param name="id">The id of the scheduled job to get.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="ScheduledJobEntity"/> identified by <paramref name="id"/>, or an error.</returns>
+    Task<Result<ScheduledJobEntity?>> GetByIdWithoutTrackingAsync(Guid id, CancellationToken cancellationToken);
+
+    /// <summary>
     /// Gets the scheduled jobs that have an active or running execution cycle, from the storage medium.
     /// </summary>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>

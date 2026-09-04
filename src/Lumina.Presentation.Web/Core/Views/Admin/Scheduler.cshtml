@@ -1,5 +1,9 @@
 @*
 /admin/scheduled-jobs
+
+This view is the application fallback of the scheduler page, rendered only when the theme page of the scheduler cannot be loaded.
+It is intentionally plain and unstyled: on a healthy site the page comes from the theme's scheduler template, styled by the theme.
+It keeps the DOM contract the client script binds to, without any images or colors, so that the active theme cannot leak into the fallback.
 *@
 
 @using Lumina.Presentation.Web.Common.DTO.Configuration
@@ -40,7 +44,9 @@
                         <div class="shine-effect" style="top: -4px;"></div>
                         <div class="enlightenment-option first-option" data-value="All">@_localizer["All"]</div>
                         <div class="enlightenment-option" data-value="ScanMediaLibraries">@_localizer["TaskType.ScanMediaLibraries"]</div>
-                        <div class="enlightenment-option last-option" data-value="CleanTemporaryFiles">@_localizer["TaskType.CleanTemporaryFiles"]</div>
+                        <div class="enlightenment-option" data-value="CleanTemporaryFiles">@_localizer["TaskType.CleanTemporaryFiles"]</div>
+                        <div class="enlightenment-option" data-value="RepairThemes">@_localizer["TaskType.RepairThemes"]</div>
+                        <div class="enlightenment-option last-option" data-value="CleanScheduledJobExecutionHistory">@_localizer["TaskType.CleanScheduledJobExecutionHistory"]</div>
                     </div>
                 </div>
             </div>
@@ -109,7 +115,9 @@
                     <div class="enlightenment-dropdown">
                         <div class="shine-effect" style="top: -4px;"></div>
                         <div class="enlightenment-option first-option" data-value="ScanMediaLibraries">@_localizer["TaskType.ScanMediaLibraries"]</div>
-                        <div class="enlightenment-option last-option" data-value="CleanTemporaryFiles">@_localizer["TaskType.CleanTemporaryFiles"]</div>
+                        <div class="enlightenment-option" data-value="CleanTemporaryFiles">@_localizer["TaskType.CleanTemporaryFiles"]</div>
+                        <div class="enlightenment-option" data-value="RepairThemes">@_localizer["TaskType.RepairThemes"]</div>
+                        <div class="enlightenment-option last-option" data-value="CleanScheduledJobExecutionHistory">@_localizer["TaskType.CleanScheduledJobExecutionHistory"]</div>
                     </div>
                 </div>
             </div>
@@ -124,7 +132,8 @@
                     <div class="enlightenment-dropdown">
                         <div class="shine-effect" style="top: -4px;"></div>
                         <div class="enlightenment-option first-option" data-value="WithIntervalInMinutes">@_localizer["IntervalSchedule"]</div>
-                        <div class="enlightenment-option last-option" data-value="DailyAtHourAndMinute">@_localizer["DailySchedule"]</div>
+                        <div class="enlightenment-option" data-value="DailyAtHourAndMinute">@_localizer["DailySchedule"]</div>
+                        <div class="enlightenment-option last-option" data-value="OnceAtStartup">@_localizer["StartupSchedule"]</div>
                     </div>
                 </div>
             </div>
@@ -159,6 +168,7 @@
             noJobs: '@_localizer["NoJobs"]',
             daily: '@_localizer["DailySchedule"]',
             interval: '@_localizer["IntervalSchedule"]',
+            startup: '@_localizer["StartupSchedule"]',
             jobStarted: '@_localizer["JobStarted"]',
             jobRemoved: '@_localizer["JobRemoved"]',
             jobStopped: '@_localizer["JobStopped"]',
@@ -168,7 +178,9 @@
             jobAlreadyRunning: '@_localizer["JobAlreadyRunning"]',
             taskTypeNames: {
                 ScanMediaLibraries: '@_localizer["TaskType.ScanMediaLibraries"]',
-                CleanTemporaryFiles: '@_localizer["TaskType.CleanTemporaryFiles"]'
+                CleanTemporaryFiles: '@_localizer["TaskType.CleanTemporaryFiles"]',
+                RepairThemes: '@_localizer["TaskType.RepairThemes"]',
+                CleanScheduledJobExecutionHistory: '@_localizer["TaskType.CleanScheduledJobExecutionHistory"]'
             },
             statusNames: {
                 Added: '@_localizer["Status.Added"]',
@@ -181,7 +193,9 @@
         // Colors of the job types.
         const jobTypeColors = {
             ScanMediaLibraries: '#5aa7c7',
-            CleanTemporaryFiles: '#c7a15a'
+            CleanTemporaryFiles: '#c7a15a',
+            RepairThemes: '#8bc34a',
+            CleanScheduledJobExecutionHistory: '#ba68c8'
         };
 
         const jobsTable = document.getElementById('scheduler-jobs-table');
@@ -281,7 +295,7 @@
         }
 
         // Graph state.
-        const taskTypeOrder = ['ScanMediaLibraries', 'CleanTemporaryFiles'];
+        const taskTypeOrder = ['ScanMediaLibraries', 'CleanTemporaryFiles', 'RepairThemes', 'CleanScheduledJobExecutionHistory'];
         const graphState = {
             dataPoints: [],
             pixelsPerSecond: 0,
@@ -341,13 +355,15 @@
                 row.dataset.scheduledJobId = job.id;
 
                 const isInterval = job.scheduleType === 'WithIntervalInMinutes';
+                const isDaily = job.scheduleType === 'DailyAtHourAndMinute';
+                const scheduleLabel = isInterval ? schedulerStrings.interval : isDaily ? schedulerStrings.daily : schedulerStrings.startup;
                 row.innerHTML = `
                     <td data-label="${escapeHtml(columnLabels[0])}">${job.id}</td>
                     <td data-label="${escapeHtml(columnLabels[1])}">${escapeHtml(job.name)}</td>
                     <td data-label="${escapeHtml(columnLabels[2])}">${schedulerStrings.taskTypeNames[job.taskType] ?? job.taskType}</td>
-                    <td data-label="${escapeHtml(columnLabels[3])}">${isInterval ? schedulerStrings.interval : schedulerStrings.daily}</td>
+                    <td data-label="${escapeHtml(columnLabels[3])}">${scheduleLabel}</td>
                     <td data-label="${escapeHtml(columnLabels[4])}">${isInterval ? job.intervalMinutes + ' ' + '@_localizer["MinutesShort"]' : '-'}</td>
-                    <td data-label="${escapeHtml(columnLabels[5])}">${isInterval ? '-' : String(job.hour).padStart(2, '0') + ':' + String(job.minute).padStart(2, '0')}</td>
+                    <td data-label="${escapeHtml(columnLabels[5])}">${isDaily ? String(job.hour).padStart(2, '0') + ':' + String(job.minute).padStart(2, '0') : '-'}</td>
                     <td data-label="${escapeHtml(columnLabels[6])}">${schedulerStrings.statusNames[job.status] ?? job.status}</td>
                     <td data-label="${escapeHtml(columnLabels[7])}">${formatDateTime(job.lastStartedOnUtc)}</td>
                     <td data-label="${escapeHtml(columnLabels[8])}">${formatDateTime(job.lastCompletedOnUtc)}</td>
@@ -746,8 +762,10 @@
 
             // Toggle the schedule fields based on the selected schedule type.
             const toggleScheduleFields = () => {
-                const isDaily = getComboboxValue(jobScheduleTypeSelect) === 'DailyAtHourAndMinute';
-                intervalGroup.classList.toggle('hidden', isDaily);
+                const scheduleType = getComboboxValue(jobScheduleTypeSelect);
+                const isInterval = scheduleType === 'WithIntervalInMinutes';
+                const isDaily = scheduleType === 'DailyAtHourAndMinute';
+                intervalGroup.classList.toggle('hidden', !isInterval);
                 dailyGroup.classList.toggle('hidden', !isDaily);
                 dailyMinuteGroup.classList.toggle('hidden', !isDaily);
             };

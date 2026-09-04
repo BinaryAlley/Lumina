@@ -159,4 +159,13 @@
   <data name="JobNameRequired" xml:space="preserve">
     <value>Numele sarcinii este obligatoriu.</value>
   </data>
+  <data name="TaskType.RepairThemes" xml:space="preserve">
+    <value>Repară temele</value>
+  </data>
+  <data name="TaskType.CleanScheduledJobExecutionHistory" xml:space="preserve">
+    <value>Curăță istoricul proceselor</value>
+  </data>
+  <data name="StartupSchedule" xml:space="preserve">
+    <value>La pornire</value>
+  </data>
 </root>

@@ -97,6 +97,13 @@ public class AddScheduledJobCommandHandler : ICommandHandler<AddScheduledJobComm
                 return dailyScheduleResult.Errors;
             scheduleResult = Result.From<Schedule>(dailyScheduleResult.Value);
         }
+        else if (command.ScheduleType == ScheduleType.OnceAtStartup)
+        {
+            Result<OnceAtStartupSchedule> onceAtStartupScheduleResult = OnceAtStartupSchedule.Create();
+            if (onceAtStartupScheduleResult.IsFailure)
+                return onceAtStartupScheduleResult.Errors;
+            scheduleResult = Result.From<Schedule>(onceAtStartupScheduleResult.Value);
+        }
         else
             return DomainErrors.Scheduling.InvalidScheduleType;
 

@@ -84,13 +84,16 @@ public class ScheduledJobsHubTests
     }
 
     [Fact]
-    public async Task OnConnectedAsync_WhenUserIsAdministrator_ShouldNotAbortTheConnection()
+    public async Task OnConnectedAsync_WhenUserIsAdministrator_ShouldAddTheConnectionToTheAdministratorGroup()
     {
         // Arrange
         Guid userId = Guid.NewGuid();
         ClaimsPrincipal user = new(new ClaimsIdentity([new Claim(ClaimTypes.NameIdentifier, userId.ToString())]));
         HubCallerContext context = CreateHubCallerContext(user);
+        context.ConnectionId.Returns("connection-1");
         _sut.Context = context;
+        IGroupManager mockGroupManager = Substitute.For<IGroupManager>();
+        _sut.Groups = mockGroupManager;
         _mockAuthorizationService.IsInRoleAsync(userId, "Admin", System.Threading.CancellationToken.None).Returns(true);
 
         // Act
@@ -98,6 +101,7 @@ public class ScheduledJobsHubTests
 
         // Assert
         context.DidNotReceive().Abort();
+        await mockGroupManager.Received(1).AddToGroupAsync("connection-1", ScheduledJobsHub.ADMINISTRATORS_GROUP, System.Threading.CancellationToken.None);
     }
 
     /// <summary>

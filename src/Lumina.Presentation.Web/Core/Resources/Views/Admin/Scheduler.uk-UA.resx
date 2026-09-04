@@ -159,4 +159,13 @@
   <data name="JobNameRequired" xml:space="preserve">
     <value>Назва завдання обов'язкова.</value>
   </data>
+  <data name="TaskType.RepairThemes" xml:space="preserve">
+    <value>Відновлення тем</value>
+  </data>
+  <data name="TaskType.CleanScheduledJobExecutionHistory" xml:space="preserve">
+    <value>Очистити історію завдань</value>
+  </data>
+  <data name="StartupSchedule" xml:space="preserve">
+    <value>Під час запуску</value>
+  </data>
 </root>

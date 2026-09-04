@@ -6,7 +6,6 @@ using Lumina.Presentation.Web.Common.DTO.Scheduling;
 using Lumina.Presentation.Web.Common.Requests.Scheduling;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Core.Endpoints.Common;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -41,6 +40,7 @@ public class AddScheduledJobEndpoint : BaseEndpoint<AddScheduledJobRequest, IRes
         DontAutoTag();
         Options(options => options.WithTags("Admin"));
         Policies(AuthorizationPolicies.REQUIRE_ADMIN_ROLE);
+        EnableAntiforgery();
     }
 
     /// <summary>

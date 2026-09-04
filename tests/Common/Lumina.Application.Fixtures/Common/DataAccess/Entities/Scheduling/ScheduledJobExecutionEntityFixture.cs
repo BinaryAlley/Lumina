@@ -23,6 +23,7 @@ public class ScheduledJobExecutionEntityFixture
     /// <param name="scheduledJobId">Optional. The Id of the scheduled job whose task was executed.</param>
     /// <param name="taskType">Optional. The type of the task that was executed.</param>
     /// <param name="isCycleRun">Optional. Whether the execution was a cycle run.</param>
+    /// <param name="wasCycleActive">Optional. Whether the execution cycle of the scheduled job was active when the execution started.</param>
     /// <param name="startedOnUtc">Optional. The start time of the execution.</param>
     /// <param name="completedOnUtc">Optional. The completion time of the execution.</param>
     /// <returns>The created <see cref="ScheduledJobExecutionEntity"/>.</returns>
@@ -31,6 +32,7 @@ public class ScheduledJobExecutionEntityFixture
         Guid? scheduledJobId = null,
         ScheduledTaskType? taskType = null,
         bool? isCycleRun = null,
+        bool? wasCycleActive = null,
         DateTime? startedOnUtc = null,
         DateTime? completedOnUtc = null)
     {
@@ -41,6 +43,7 @@ public class ScheduledJobExecutionEntityFixture
                 ScheduledJobId = scheduledJobId ?? Guid.NewGuid(),
                 TaskType = taskType ?? f.PickRandom<ScheduledTaskType>(),
                 IsCycleRun = isCycleRun ?? f.Random.Bool(),
+                WasCycleActive = wasCycleActive ?? f.Random.Bool(),
                 StartedOnUtc = startedOnUtc ?? DateTime.UtcNow,
                 CompletedOnUtc = completedOnUtc,
                 CreatedOnUtc = DateTime.UtcNow,

@@ -139,9 +139,9 @@ public static class InfrastructureLayerServices
             serviceProvider.GetRequiredService<ILogger<PluginDetectionSyncJob>>()));
         services.AddHostedService(serviceProvider => serviceProvider.GetRequiredService<PluginDetectionSyncJob>());
 
-        // Themes: the theme service stores and serves theme packs, and the detection job seeds the bundled themes at startup.
+        // Themes: the theme service stores and serves theme packs; the bundled themes are installed and repaired by the
+        // default "Repair themes at startup" scheduled job that is seeded when the application is set up.
         services.AddSingleton<IThemeService, ThemeService>();
-        services.AddHostedService<ThemeDetectionSyncJob>();
 
         // Scheduled jobs: the scheduler executes the tasks of the scheduled jobs on their schedules, and the notifier broadcasts their state to the SignalR clients.
         services.AddSingleton<IScheduledJobScheduler, ScheduledJobSchedulerJob>();
@@ -151,6 +151,8 @@ public static class InfrastructureLayerServices
         services.AddScoped<IScheduledTaskExecutorFactory, ScheduledTaskExecutorFactory>();
         services.AddScoped<MediaLibraryScanTaskExecutor>();
         services.AddScoped<TemporaryFilesCleanupTaskExecutor>();
+        services.AddScoped<RepairThemesTaskExecutor>();
+        services.AddScoped<CleanScheduledJobExecutionHistoryTaskExecutor>();
 
         return services;
     }

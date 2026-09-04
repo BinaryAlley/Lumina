@@ -19,10 +19,24 @@ public interface IScheduledJobRuntimeRegistry
     bool TryStartCycle(ScheduledJobId scheduledJobId, CancellationTokenSource cycleCancellationTokenSource);
 
     /// <summary>
+    /// Gets a value indicating whether the execution cycle of the scheduled job identified by <paramref name="scheduledJobId"/> is currently running.
+    /// </summary>
+    /// <param name="scheduledJobId">The object representing the unique identifier of the scheduled job whose cycle is checked.</param>
+    /// <returns><see langword="true"/> when a cycle is currently running, <see langword="false"/> otherwise.</returns>
+    bool HasActiveCycle(ScheduledJobId scheduledJobId);
+
+    /// <summary>
     /// Stops the execution cycle of the scheduled job identified by <paramref name="scheduledJobId"/>.
     /// </summary>
     /// <param name="scheduledJobId">The object representing the unique identifier of the scheduled job whose cycle is stopped.</param>
     void StopCycle(ScheduledJobId scheduledJobId);
+
+    /// <summary>
+    /// Ends the execution cycle of the scheduled job identified by <paramref name="scheduledJobId"/>, when it was started with <paramref name="cycleCancellationTokenSource"/>.
+    /// </summary>
+    /// <param name="scheduledJobId">The object representing the unique identifier of the scheduled job whose cycle is ended.</param>
+    /// <param name="cycleCancellationTokenSource">The cancellation token source of the cycle that is ending.</param>
+    void EndCycle(ScheduledJobId scheduledJobId, CancellationTokenSource cycleCancellationTokenSource);
 
     /// <summary>
     /// Attempts to reserve the execution slot of the scheduled job identified by <paramref name="scheduledJobId"/>.

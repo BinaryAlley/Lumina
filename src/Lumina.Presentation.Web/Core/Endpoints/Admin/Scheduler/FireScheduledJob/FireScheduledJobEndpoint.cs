@@ -40,6 +40,7 @@ public class FireScheduledJobEndpoint : BaseEndpoint<FireScheduledJobRequest, IR
         DontAutoTag();
         Options(options => options.WithTags("Admin"));
         Policies(AuthorizationPolicies.REQUIRE_ADMIN_ROLE);
+        EnableAntiforgery();
     }
 
     /// <summary>

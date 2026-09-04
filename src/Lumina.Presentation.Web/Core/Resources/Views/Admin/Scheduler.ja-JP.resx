@@ -159,4 +159,13 @@
   <data name="JobNameRequired" xml:space="preserve">
     <value>ジョブ名が必要です。</value>
   </data>
+  <data name="TaskType.RepairThemes" xml:space="preserve">
+    <value>テーマを修復</value>
+  </data>
+  <data name="TaskType.CleanScheduledJobExecutionHistory" xml:space="preserve">
+    <value>ジョブ履歴を削除</value>
+  </data>
+  <data name="StartupSchedule" xml:space="preserve">
+    <value>起動時</value>
+  </data>
 </root>

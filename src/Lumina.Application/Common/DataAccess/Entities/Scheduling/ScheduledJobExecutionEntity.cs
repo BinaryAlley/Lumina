@@ -44,6 +44,16 @@ public class ScheduledJobExecutionEntity : IStorageEntity, IAuditableEntity
     public DateTime? CompletedOnUtc { get; init; }
 
     /// <summary>
+    /// Gets a value indicating whether the execution cycle of the scheduled job was active when the execution started.
+    /// </summary>
+    /// <remarks>
+    /// A job whose execution cycle is active stays in its active state while a manually fired one time execution runs, so an
+    /// interrupted execution of such a job must return it to its active state at the next startup; the flag keeps that fact
+    /// separate from <see cref="IsCycleRun"/>, which records how the execution was triggered for the audit trail.
+    /// </remarks>
+    public required bool WasCycleActive { get; init; }
+
+    /// <summary>
     /// Gets or sets the time and date when the entity was added.
     /// </summary>
     public required DateTime CreatedOnUtc { get; set; }

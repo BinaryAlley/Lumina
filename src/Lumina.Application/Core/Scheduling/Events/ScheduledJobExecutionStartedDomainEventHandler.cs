@@ -52,6 +52,9 @@ public class ScheduledJobExecutionStartedDomainEventHandler : IDomainEventHandle
         if (getScheduledJobResult.Value is null)
             throw new EventualConsistencyException(Errors.Scheduling.ScheduledJobNotFound);
         ScheduledJobEntity scheduledJob = getScheduledJobResult.Value;
+        // The execution cycle is active when the scheduled job was in its active state before this execution started; the
+        // status is read before the scheduled job is updated to its running state below.
+        bool wasCycleActive = scheduledJob.Status == ScheduledJobStatus.Active;
 
         // Update the scheduled job with its running status and the start time of the execution.
         ScheduledJobEntity updatedScheduledJob = CreateUpdatedScheduledJob(scheduledJob, ScheduledJobStatus.Running, domainEvent.StartedOnUtc, scheduledJob.LastCompletedOnUtc);
@@ -66,6 +69,7 @@ public class ScheduledJobExecutionStartedDomainEventHandler : IDomainEventHandle
             ScheduledJobId = scheduledJob.Id,
             TaskType = scheduledJob.TaskType,
             IsCycleRun = domainEvent.IsCycleRun,
+            WasCycleActive = wasCycleActive,
             StartedOnUtc = domainEvent.StartedOnUtc,
             CompletedOnUtc = null,
             CreatedOnUtc = scheduledJob.CreatedOnUtc,

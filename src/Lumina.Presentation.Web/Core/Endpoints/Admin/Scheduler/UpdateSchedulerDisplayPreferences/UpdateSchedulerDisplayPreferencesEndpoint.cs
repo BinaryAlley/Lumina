@@ -40,6 +40,7 @@ public class UpdateSchedulerDisplayPreferencesEndpoint : BaseEndpoint<UpdateSche
         DontAutoTag();
         Options(options => options.WithTags("Admin"));
         Policies(AuthorizationPolicies.REQUIRE_ADMIN_ROLE);
+        EnableAntiforgery();
     }
 
     /// <summary>

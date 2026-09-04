@@ -69,6 +69,27 @@ public class ScheduledJobEntityFixture
                         UpdatedBy = null
                     };
                 }
+                if (resolvedScheduleType == ScheduleType.OnceAtStartup)
+                {
+                    return new ScheduledJobEntity
+                    {
+                        Id = id ?? Guid.NewGuid(),
+                        Name = name ?? f.Commerce.ProductName(),
+                        TaskType = taskType ?? f.PickRandom<ScheduledTaskType>(),
+                        ScheduleType = resolvedScheduleType,
+                        IntervalMinutes = null,
+                        Hour = null,
+                        Minute = null,
+                        Status = status ?? f.PickRandom<ScheduledJobStatus>(),
+                        OwnerUserId = ownerUserId ?? Guid.NewGuid(),
+                        LastStartedOnUtc = lastStartedOnUtc,
+                        LastCompletedOnUtc = lastCompletedOnUtc,
+                        CreatedOnUtc = DateTime.UtcNow,
+                        CreatedBy = Guid.NewGuid(),
+                        UpdatedOnUtc = null,
+                        UpdatedBy = null
+                    };
+                }
                 return new ScheduledJobEntity
                 {
                     Id = id ?? Guid.NewGuid(),

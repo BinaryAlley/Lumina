@@ -123,6 +123,7 @@ public class ScheduledJobExecutionCompletedDomainEventHandler : IDomainEventHand
             ScheduledJobId = execution.ScheduledJobId,
             TaskType = execution.TaskType,
             IsCycleRun = execution.IsCycleRun,
+            WasCycleActive = execution.WasCycleActive,
             StartedOnUtc = execution.StartedOnUtc,
             CompletedOnUtc = completedOnUtc,
             CreatedOnUtc = execution.CreatedOnUtc,

@@ -94,6 +94,14 @@ public static class ScheduledJobEntityMapping
             return Result.From<Schedule>(intervalScheduleResult.Value);
         }
 
+        if (repositoryEntity.ScheduleType == ScheduleType.OnceAtStartup)
+        {
+            Result<OnceAtStartupSchedule> onceAtStartupScheduleResult = OnceAtStartupSchedule.Create();
+            if (onceAtStartupScheduleResult.IsFailure)
+                return onceAtStartupScheduleResult.Errors;
+            return Result.From<Schedule>(onceAtStartupScheduleResult.Value);
+        }
+
         Result<DailySchedule> dailyScheduleResult = DailySchedule.Create(repositoryEntity.Hour ?? 0, repositoryEntity.Minute ?? 0);
         if (dailyScheduleResult.IsFailure)
             return dailyScheduleResult.Errors;

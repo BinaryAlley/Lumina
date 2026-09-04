@@ -13,5 +13,10 @@ public enum ScheduleType
     /// <summary>
     /// The scheduled job repeats daily at a fixed hour and minute.
     /// </summary>
-    DailyAtHourAndMinute
+    DailyAtHourAndMinute,
+
+    /// <summary>
+    /// The scheduled job fires its task once, every time the application starts.
+    /// </summary>
+    OnceAtStartup
 }
