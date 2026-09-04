@@ -4,6 +4,7 @@ using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.Library
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -19,6 +20,7 @@ public class LibraryMediaItemDeletedDomainEventTests
 {
     private readonly LibraryIdFixture _libraryIdFixture = new();
     private readonly MediaLibraryScanCompositeIdFixture _mediaLibraryScanCompositeIdFixture = new();
+    private readonly LibraryMediaItemDeletedDomainEventFixture _libraryMediaItemDeletedDomainEventFixture = new();
 
     [Fact]
     public void Constructor_WhenCalled_ShouldSetAllProperties()
@@ -31,7 +33,7 @@ public class LibraryMediaItemDeletedDomainEventTests
         DateTime occurredOnUtc = DateTime.UtcNow;
 
         // Act
-        LibraryMediaItemDeletedDomainEvent domainEvent = new(id, libraryId, compositeId, path, occurredOnUtc);
+        LibraryMediaItemDeletedDomainEvent domainEvent = _libraryMediaItemDeletedDomainEventFixture.Create(id, libraryId, compositeId, path, occurredOnUtc);
 
         // Assert
         Assert.Equal(id, domainEvent.Id);

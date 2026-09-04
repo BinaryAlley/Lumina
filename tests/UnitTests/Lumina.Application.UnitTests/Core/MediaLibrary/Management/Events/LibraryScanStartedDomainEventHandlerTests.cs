@@ -5,9 +5,8 @@ using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Core.MediaLibrary.Management.Events;
 using Lumina.Domain.Common.Exceptions;
 using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -27,7 +26,7 @@ public class LibraryScanStartedDomainEventHandlerTests
     private readonly IUnitOfWork _mockUnitOfWork;
     private readonly ILibraryScanRepository _mockLibraryScanRepository;
     private readonly LibraryScanStartedDomainEventHandler _sut;
-    private readonly LibraryScanFixture _libraryScanFixture = new();
+    private readonly LibraryScanStartedDomainEventFixture _libraryScanStartedDomainEventFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LibraryScanStartedDomainEventHandlerTests"/> class.
@@ -47,15 +46,14 @@ public class LibraryScanStartedDomainEventHandlerTests
     public async Task HandleAsync_WhenScanStarts_ShouldUpdateScanStatusAndSaveChanges()
     {
         // Arrange
-        LibraryScan libraryScan = _libraryScanFixture.Create();
-        LibraryScanStartedDomainEvent domainEvent = new(Guid.NewGuid(), libraryScan, DateTime.UtcNow);
+        LibraryScanStartedDomainEvent domainEvent = _libraryScanStartedDomainEventFixture.Create();
 
         // Act
         await _sut.HandleAsync(domainEvent, CancellationToken.None);
 
         // Assert
         await _mockLibraryScanRepository.Received(1).UpdateAsync(
-            Arg.Is<LibraryScanEntity>(scan => scan.Id == libraryScan.Id.Value),
+            Arg.Is<LibraryScanEntity>(scan => scan.Id == domainEvent.LibraryScan.Id.Value),
             Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
@@ -64,8 +62,7 @@ public class LibraryScanStartedDomainEventHandlerTests
     public async Task HandleAsync_WhenUpdateFails_ShouldThrowEventualConsistencyException()
     {
         // Arrange
-        LibraryScan libraryScan = _libraryScanFixture.Create();
-        LibraryScanStartedDomainEvent domainEvent = new(Guid.NewGuid(), libraryScan, DateTime.UtcNow);
+        LibraryScanStartedDomainEvent domainEvent = _libraryScanStartedDomainEventFixture.Create();
         Error error = Error.Failure(description: "Failed to update library scan");
         _mockLibraryScanRepository.UpdateAsync(Arg.Any<LibraryScanEntity>(), Arg.Any<CancellationToken>())
             .Returns(error);

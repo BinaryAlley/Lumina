@@ -4,6 +4,7 @@ using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.Library
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -19,6 +20,7 @@ public class LibraryScanProgressChangedDomainEventTests
 {
     private readonly LibraryIdFixture _libraryIdFixture = new();
     private readonly MediaLibraryScanCompositeIdFixture _mediaLibraryScanCompositeIdFixture = new();
+    private readonly LibraryScanProgressChangedDomainEventFixture _libraryScanProgressChangedDomainEventFixture = new();
 
     [Fact]
     public void Constructor_WhenCalled_ShouldSetAllProperties()
@@ -30,7 +32,7 @@ public class LibraryScanProgressChangedDomainEventTests
         DateTime occurredOnUtc = DateTime.UtcNow;
 
         // Act
-        LibraryScanProgressChangedDomainEvent domainEvent = new(id, libraryId, compositeId, occurredOnUtc);
+        LibraryScanProgressChangedDomainEvent domainEvent = _libraryScanProgressChangedDomainEventFixture.Create(id, libraryId, compositeId, occurredOnUtc);
 
         // Assert
         Assert.Equal(id, domainEvent.Id);

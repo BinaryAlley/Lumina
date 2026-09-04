@@ -6,8 +6,7 @@ using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.Library
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Progress;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using NSubstitute;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -26,8 +25,7 @@ public class LibraryScanProgressChangedDomainEventHandlerTests
     private readonly IMediaLibrariesScanProgressTracker _mockMediaLibrariesScanProgressTracker;
     private readonly IMediaLibraryScanProgressNotifier _mockDebouncedLibraryScanProgressNotifier;
     private readonly LibraryScanProgressChangedDomainEventHandler _sut;
-    private readonly LibraryIdFixture _libraryIdFixture = new();
-    private readonly MediaLibraryScanCompositeIdFixture _mediaLibraryScanCompositeIdFixture = new();
+    private readonly LibraryScanProgressChangedDomainEventFixture _libraryScanProgressChangedDomainEventFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LibraryScanProgressChangedDomainEventHandlerTests"/> class.
@@ -44,9 +42,9 @@ public class LibraryScanProgressChangedDomainEventHandlerTests
     public async Task HandleAsync_WhenScanProgressChanges_ShouldUpdateTrackerAndNotifySignalRClients()
     {
         // Arrange
-        LibraryId libraryId = _libraryIdFixture.Create();
-        MediaLibraryScanCompositeId compositeId = _mediaLibraryScanCompositeIdFixture.Create();
-        LibraryScanProgressChangedDomainEvent domainEvent = new(Guid.NewGuid(), libraryId, compositeId, DateTime.UtcNow);
+        LibraryScanProgressChangedDomainEvent domainEvent = _libraryScanProgressChangedDomainEventFixture.Create();
+        LibraryId libraryId = domainEvent.LibraryId;
+        MediaLibraryScanCompositeId compositeId = domainEvent.MediaLibraryScanCompositeId;
         _mockMediaLibrariesScanProgressTracker.UpdateScanProgress(libraryId, compositeId).Returns(Result.Updated);
 
         // Act

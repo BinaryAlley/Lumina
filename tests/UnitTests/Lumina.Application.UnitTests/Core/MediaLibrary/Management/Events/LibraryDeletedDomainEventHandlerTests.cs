@@ -10,6 +10,7 @@ using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.File
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.Events;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.Events;
 using Microsoft.Extensions.Options;
 using NSubstitute;
 using System;
@@ -31,6 +32,7 @@ public class LibraryDeletedDomainEventHandlerTests
     private readonly IPathService _mockPathService;
     private readonly LibraryDeletedDomainEventHandler _sut;
     private readonly LibraryFixture _libraryFixture = new();
+    private readonly LibraryDeletedDomainEventFixture _libraryDeletedDomainEventFixture = new();
     private readonly MediaSettingsDtoFixture _mediaSettingsDtoFixture = new();
 
     /// <summary>
@@ -64,7 +66,7 @@ public class LibraryDeletedDomainEventHandlerTests
         // Arrange
         Guid libraryId = Guid.NewGuid();
         Library library = _libraryFixture.Create(id: libraryId);
-        LibraryDeletedDomainEvent domainEvent = new(Guid.NewGuid(), library, DateTime.UtcNow);
+        LibraryDeletedDomainEvent domainEvent = _libraryDeletedDomainEventFixture.Create(library: library);
 
         // Act
         await _sut.HandleAsync(domainEvent, CancellationToken.None);
@@ -80,7 +82,7 @@ public class LibraryDeletedDomainEventHandlerTests
         // Arrange
         Guid libraryId = Guid.NewGuid();
         Library library = _libraryFixture.Create(id: libraryId);
-        LibraryDeletedDomainEvent domainEvent = new(Guid.NewGuid(), library, DateTime.UtcNow);
+        LibraryDeletedDomainEvent domainEvent = _libraryDeletedDomainEventFixture.Create(library: library);
         Error error = Error.Failure(description: "Failed to delete library directory");
         _mockDirectoryProviderService.DeleteDirectory(Arg.Any<FileSystemPathId>()).Returns(error);
 
@@ -98,7 +100,7 @@ public class LibraryDeletedDomainEventHandlerTests
         // Arrange
         Guid libraryId = Guid.NewGuid();
         Library library = _libraryFixture.Create(id: libraryId);
-        LibraryDeletedDomainEvent domainEvent = new(Guid.NewGuid(), library, DateTime.UtcNow);
+        LibraryDeletedDomainEvent domainEvent = _libraryDeletedDomainEventFixture.Create(library: library);
         Error error = Error.Failure(description: "Failed to combine path");
         _mockPathService.CombinePath(Arg.Any<string>(), Arg.Any<string>()).Returns(error);
 

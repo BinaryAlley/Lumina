@@ -12,8 +12,7 @@ using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.Library
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Cancellation;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Progress;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using DomainErrors = Lumina.Domain.Common.Errors.Errors;
 using NSubstitute;
 using System;
@@ -39,8 +38,7 @@ public class LibraryScanCancelledDomainEventHandlerTests
     private readonly IMediaLibrariesScanCancellationTracker _mockMediaLibrariesScanCancellationTracker;
     private readonly LibraryScanCancelledDomainEventHandler _sut;
     private readonly LibraryScanEntityFixture _libraryScanEntityFixture = new();
-    private readonly ScanIdFixture _scanIdFixture = new();
-    private readonly LibraryIdFixture _libraryIdFixture = new();
+    private readonly LibraryScanCancelledDomainEventFixture _libraryScanCancelledDomainEventFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LibraryScanCancelledDomainEventHandlerTests"/> class.
@@ -68,8 +66,10 @@ public class LibraryScanCancelledDomainEventHandlerTests
     public async Task HandleAsync_WhenScanExists_ShouldCancelScanAndCleanupResources()
     {
         // Arrange
-        LibraryScanEntity scan = _libraryScanEntityFixture.Create();
-        LibraryScanCancelledDomainEvent domainEvent = new(Guid.NewGuid(), _scanIdFixture.Create(value: scan.Id), _libraryIdFixture.Create(value: scan.LibraryId), DateTime.UtcNow);
+        LibraryScanCancelledDomainEvent domainEvent = _libraryScanCancelledDomainEventFixture.Create();
+        LibraryScanEntity scan = _libraryScanEntityFixture.Create(
+            id: domainEvent.ScanId.Value,
+            libraryId: domainEvent.LibraryId.Value);
         _mockLibraryScanRepository.GetByIdAsync(scan.Id, Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryScanEntity?>(scan));
 
@@ -87,7 +87,7 @@ public class LibraryScanCancelledDomainEventHandlerTests
     public async Task HandleAsync_WhenGetByIdFails_ShouldThrowEventualConsistencyException()
     {
         // Arrange
-        LibraryScanCancelledDomainEvent domainEvent = new(Guid.NewGuid(), _scanIdFixture.Create(), _libraryIdFixture.Create(), DateTime.UtcNow);
+        LibraryScanCancelledDomainEvent domainEvent = _libraryScanCancelledDomainEventFixture.Create();
         Error error = Error.Failure(description: "Failed to get library scan");
         _mockLibraryScanRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
             .Returns(error);
@@ -105,7 +105,7 @@ public class LibraryScanCancelledDomainEventHandlerTests
     public async Task HandleAsync_WhenScanDoesNotExist_ShouldThrowEventualConsistencyExceptionWithNotFoundError()
     {
         // Arrange
-        LibraryScanCancelledDomainEvent domainEvent = new(Guid.NewGuid(), _scanIdFixture.Create(), _libraryIdFixture.Create(), DateTime.UtcNow);
+        LibraryScanCancelledDomainEvent domainEvent = _libraryScanCancelledDomainEventFixture.Create();
         _mockLibraryScanRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
             .Returns(Result<LibraryScanEntity?>.Success(null));
 
@@ -122,8 +122,10 @@ public class LibraryScanCancelledDomainEventHandlerTests
     public async Task HandleAsync_WhenCancelScanFails_ShouldThrowEventualConsistencyException()
     {
         // Arrange
-        LibraryScanEntity scan = _libraryScanEntityFixture.Create();
-        LibraryScanCancelledDomainEvent domainEvent = new(Guid.NewGuid(), _scanIdFixture.Create(value: scan.Id), _libraryIdFixture.Create(value: scan.LibraryId), DateTime.UtcNow);
+        LibraryScanCancelledDomainEvent domainEvent = _libraryScanCancelledDomainEventFixture.Create();
+        LibraryScanEntity scan = _libraryScanEntityFixture.Create(
+            id: domainEvent.ScanId.Value,
+            libraryId: domainEvent.LibraryId.Value);
         _mockLibraryScanRepository.GetByIdAsync(scan.Id, Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryScanEntity?>(scan));
         Error error = Error.Failure(description: "Failed to cancel scan");
@@ -143,8 +145,10 @@ public class LibraryScanCancelledDomainEventHandlerTests
     public async Task HandleAsync_WhenClearForScanFails_ShouldThrowEventualConsistencyException()
     {
         // Arrange
-        LibraryScanEntity scan = _libraryScanEntityFixture.Create();
-        LibraryScanCancelledDomainEvent domainEvent = new(Guid.NewGuid(), _scanIdFixture.Create(value: scan.Id), _libraryIdFixture.Create(value: scan.LibraryId), DateTime.UtcNow);
+        LibraryScanCancelledDomainEvent domainEvent = _libraryScanCancelledDomainEventFixture.Create();
+        LibraryScanEntity scan = _libraryScanEntityFixture.Create(
+            id: domainEvent.ScanId.Value,
+            libraryId: domainEvent.LibraryId.Value);
         _mockLibraryScanRepository.GetByIdAsync(scan.Id, Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryScanEntity?>(scan));
         Error error = Error.Failure(description: "Failed to clear staging results");

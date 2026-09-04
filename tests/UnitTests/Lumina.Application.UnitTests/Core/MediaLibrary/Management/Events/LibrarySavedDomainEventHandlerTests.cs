@@ -15,6 +15,7 @@ using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.Library
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.Events;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
+using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.Events;
 using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -43,6 +44,7 @@ public class LibrarySavedDomainEventHandlerTests
     private readonly IPathService _mockPathService;
     private readonly LibrarySavedDomainEventHandler _sut;
     private readonly LibraryFixture _libraryFixture = new();
+    private readonly LibrarySavedDomainEventFixture _librarySavedDomainEventFixture = new();
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
     private readonly FileSystemPathIdFixture _fileSystemPathIdFixture = new();
     private readonly MediaSettingsDtoFixture _mediaSettingsDtoFixture = new();
@@ -97,14 +99,14 @@ public class LibrarySavedDomainEventHandlerTests
         // Arrange
         Guid libraryId = Guid.NewGuid();
         Library library = _libraryFixture.Create(id: libraryId, coverImage: "C:/Users/user/cover.jpg");
-        LibrarySavedDomainEvent domainEvent = new(Guid.NewGuid(), library, DateTime.UtcNow);
+        LibrarySavedDomainEvent domainEvent = _librarySavedDomainEventFixture.Create(library: library);
         LibraryEntity updatedLibrary = _libraryEntityFixture.Create(id: libraryId);
 
         // Act
         await _sut.HandleAsync(domainEvent, CancellationToken.None);
 
         // Assert
-        Assert.NotNull(library.CoverImage);
+        Assert.NotNull(domainEvent.Library.CoverImage);
         await _mockLibraryRepository.Received(1).UpdateAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
@@ -115,7 +117,7 @@ public class LibrarySavedDomainEventHandlerTests
         // Arrange
         Guid libraryId = Guid.NewGuid();
         Library library = _libraryFixture.Create(id: libraryId, coverImage: "C:/Users/user/cover.jpg");
-        LibrarySavedDomainEvent domainEvent = new(Guid.NewGuid(), library, DateTime.UtcNow);
+        LibrarySavedDomainEvent domainEvent = _librarySavedDomainEventFixture.Create(library: library);
         _mockDirectoryProviderService.DirectoryExists(Arg.Any<FileSystemPathId>()).Returns(Result.From(true));
         _mockFileProviderService.GetFilePaths(Arg.Any<FileSystemPathId>(), true)
             .Returns(Result.From<IEnumerable<FileSystemPathId>>(
@@ -140,7 +142,7 @@ public class LibrarySavedDomainEventHandlerTests
         // Arrange
         Guid libraryId = Guid.NewGuid();
         Library library = _libraryFixture.Create(id: libraryId, includeCoverImage: false);
-        LibrarySavedDomainEvent domainEvent = new(Guid.NewGuid(), library, DateTime.UtcNow);
+        LibrarySavedDomainEvent domainEvent = _librarySavedDomainEventFixture.Create(library: library);
         _mockFileProviderService.GetFilePaths(Arg.Any<FileSystemPathId>(), true)
             .Returns(Result.From<IEnumerable<FileSystemPathId>>(
             [
@@ -162,7 +164,7 @@ public class LibrarySavedDomainEventHandlerTests
         // Arrange
         Guid libraryId = Guid.NewGuid();
         Library library = _libraryFixture.Create(id: libraryId, coverImage: "/Media/Libraries/guid/cover.png");
-        LibrarySavedDomainEvent domainEvent = new(Guid.NewGuid(), library, DateTime.UtcNow);
+        LibrarySavedDomainEvent domainEvent = _librarySavedDomainEventFixture.Create(library: library);
         // mirror the real CombinePath behavior, which treats the combined name as a directory segment and appends a trailing
         // separator; the internal cover path resolution must still yield the file path without that trailing separator
         _mockPathService.CombinePath(Arg.Any<string>(), Arg.Any<string>())
@@ -175,7 +177,7 @@ public class LibrarySavedDomainEventHandlerTests
         await _sut.HandleAsync(domainEvent, CancellationToken.None);
 
         // Assert
-        Assert.Equal("/Media/Libraries/guid/cover.png", library.CoverImage);
+        Assert.Equal("/Media/Libraries/guid/cover.png", domainEvent.Library.CoverImage);
         _mockFileProviderService.DidNotReceive().CopyFile(Arg.Any<FileSystemPathId>(), Arg.Any<FileSystemPathId>(), Arg.Any<bool>());
         await _mockLibraryRepository.Received(1).UpdateAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>());
     }
@@ -186,7 +188,7 @@ public class LibrarySavedDomainEventHandlerTests
         // Arrange
         Guid libraryId = Guid.NewGuid();
         Library library = _libraryFixture.Create(id: libraryId, coverImage: "C:/Users/user/cover.jpg");
-        LibrarySavedDomainEvent domainEvent = new(Guid.NewGuid(), library, DateTime.UtcNow);
+        LibrarySavedDomainEvent domainEvent = _librarySavedDomainEventFixture.Create(library: library);
         _mockFileProviderService.FileExists(Arg.Any<FileSystemPathId>()).Returns(Result.From(false));
 
         // Act
@@ -204,7 +206,7 @@ public class LibrarySavedDomainEventHandlerTests
         // Arrange
         Guid libraryId = Guid.NewGuid();
         Library library = _libraryFixture.Create(id: libraryId, coverImage: "C:/Users/user/cover.jpg");
-        LibrarySavedDomainEvent domainEvent = new(Guid.NewGuid(), library, DateTime.UtcNow);
+        LibrarySavedDomainEvent domainEvent = _librarySavedDomainEventFixture.Create(library: library);
         _mockFileTypeService.GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(ImageType.None));
 
@@ -223,7 +225,7 @@ public class LibrarySavedDomainEventHandlerTests
         // Arrange
         Guid libraryId = Guid.NewGuid();
         Library library = _libraryFixture.Create(id: libraryId, coverImage: "C:/Users/user/cover.jpg");
-        LibrarySavedDomainEvent domainEvent = new(Guid.NewGuid(), library, DateTime.UtcNow);
+        LibrarySavedDomainEvent domainEvent = _librarySavedDomainEventFixture.Create(library: library);
         Error error = Error.Failure(description: "Failed to copy cover file");
         _mockFileProviderService.CopyFile(Arg.Any<FileSystemPathId>(), Arg.Any<FileSystemPathId>(), true)
             .Returns(error);
@@ -243,7 +245,7 @@ public class LibrarySavedDomainEventHandlerTests
         // Arrange
         Guid libraryId = Guid.NewGuid();
         Library library = _libraryFixture.Create(id: libraryId, includeCoverImage: false);
-        LibrarySavedDomainEvent domainEvent = new(Guid.NewGuid(), library, DateTime.UtcNow);
+        LibrarySavedDomainEvent domainEvent = _librarySavedDomainEventFixture.Create(library: library);
         Error error = Error.Failure(description: "Failed to combine path");
         _mockPathService.CombinePath(Arg.Any<string>(), Arg.Any<string>()).Returns(error);
 
@@ -262,7 +264,7 @@ public class LibrarySavedDomainEventHandlerTests
         // Arrange
         Guid libraryId = Guid.NewGuid();
         Library library = _libraryFixture.Create(id: libraryId, coverImage: "C:/Users/user/cover.jpg");
-        LibrarySavedDomainEvent domainEvent = new(Guid.NewGuid(), library, DateTime.UtcNow);
+        LibrarySavedDomainEvent domainEvent = _librarySavedDomainEventFixture.Create(library: library);
         Error error = Error.Failure(description: "Failed to update library");
         _mockLibraryRepository.UpdateAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>())
             .Returns(error);

@@ -39,4 +39,46 @@ public class MediaLibraryScanProgressHubTests
         // Assert.
         await groupManager.Received(1).AddToGroupAsync("connection-1", $"{scanId}-{userId}", CancellationToken.None);
     }
+
+    [Fact]
+    public async Task SubscribeToScan_WhenUserClaimIsMissing_ShouldNotAddTheConnectionToAnyGroup()
+    {
+        // Arrange.
+        MediaLibraryScanProgressHub sut = new();
+        HubCallerContext context = Substitute.For<HubCallerContext>();
+        context.ConnectionId.Returns("connection-1");
+        IGroupManager groupManager = Substitute.For<IGroupManager>();
+        sut.Context = context;
+        sut.Groups = groupManager;
+        Guid scanId = Guid.NewGuid();
+        ClaimsPrincipal user = new(new ClaimsIdentity());
+        context.User.Returns(user);
+
+        // Act.
+        await sut.SubscribeToScan(scanId);
+
+        // Assert.
+        await groupManager.DidNotReceive().AddToGroupAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task SubscribeToScan_WhenUserIdClaimIsNotAGuid_ShouldNotAddTheConnectionToAnyGroup()
+    {
+        // Arrange.
+        MediaLibraryScanProgressHub sut = new();
+        HubCallerContext context = Substitute.For<HubCallerContext>();
+        context.ConnectionId.Returns("connection-1");
+        IGroupManager groupManager = Substitute.For<IGroupManager>();
+        sut.Context = context;
+        sut.Groups = groupManager;
+        Guid scanId = Guid.NewGuid();
+        ClaimsPrincipal user = new(new ClaimsIdentity([new Claim(ClaimTypes.NameIdentifier, "not-a-guid")]));
+        context.User.Returns(user);
+
+        // Act.
+        await sut.SubscribeToScan(scanId);
+
+        // Assert.
+        await groupManager.DidNotReceive().AddToGroupAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+    }
 }
